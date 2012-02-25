@@ -156,7 +156,9 @@ namespace sdf
     /// \brief Get the parameter value as a string
     public: virtual std::string GetAsString() const
     {
-       return boost::lexical_cast<std::string>(this->value);
+      std::ostringstream stream;
+      stream << std::fixed << this->value;
+      return stream.str(); 
     }
 
     /// \brief Set the parameter value from a string

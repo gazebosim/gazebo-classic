@@ -154,7 +154,9 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 /////////////////////////////////////////////////
 void MainWindow::New()
 {
-  gzdbg << "MainWindow::New world\n";
+  msgs::ServerControl msg;
+  msg.set_new_world(true);
+  this->serverControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

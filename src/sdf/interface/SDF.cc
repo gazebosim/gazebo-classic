@@ -399,8 +399,6 @@ ParamPtr Element::GetAttribute(const std::string &_key)
     if ((*iter)->GetKey() == _key)
       return (*iter);
   }
-  gzerr << "Element[" << this->GetName() << "] does not have attribute ["
-        << _key << "]\n";
   return ParamPtr();
 }
 
@@ -669,8 +667,6 @@ std::string Element::GetValueString(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
   }
   return result;
 }

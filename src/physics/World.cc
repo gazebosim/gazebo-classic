@@ -110,7 +110,7 @@ World::~World()
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf->Copy(_sdf);
+  this->sdf = _sdf;
 
   if (this->sdf->GetValueString("name").empty())
     gzwarn << "create_world(world_name =["

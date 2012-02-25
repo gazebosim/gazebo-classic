@@ -53,8 +53,9 @@ namespace gazebo
 
     public: bool GetInitialized() const;
 
-    private: void OnControl(
-                 ConstServerControlPtr &_msg);
+    private: void OnControl(ConstServerControlPtr &_msg);
+
+    private: bool OpenWorld(const std::string &_filename);
 
     private: void ProcessControlMsgs();
 
