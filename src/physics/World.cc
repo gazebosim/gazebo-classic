@@ -187,8 +187,11 @@ void World::Load(sdf::ElementPtr _sdf)
 
     while (childElem)
     {
-
+      WorldState state;
+      state.Load(childElem);
       childElem = childElem->GetNextElement();
+
+      this->SetState(state);
     }
   }
 }

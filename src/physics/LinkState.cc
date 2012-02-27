@@ -47,6 +47,19 @@ LinkState::~LinkState()
 }
 
 /////////////////////////////////////////////////
+void LinkState::Load(sdf::ElementPtr _elem)
+{
+  std::cout << "LinkState::Load\n";
+
+  this->name = _elem->GetValueString("name");
+  std::cout << "  Name[" << this->name << "]\n";
+
+  if (_elem->HasElement("pose"))
+    this->pose = _elem->GetElement("pose")->GetValuePose("");
+  std::cout << "  Pose[" << this->pose << "]\n";
+}
+
+/////////////////////////////////////////////////
 math::Pose LinkState::GetPose() const
 {
   return this->pose;

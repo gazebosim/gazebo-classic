@@ -44,6 +44,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~LinkState();
 
+      /// \brief Load state from SDF element
+      public: virtual void Load(sdf::ElementPtr _elem);
+
       /// \brief Get the link pose
       public: math::Pose GetPose() const;
 

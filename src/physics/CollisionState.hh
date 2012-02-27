@@ -39,6 +39,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CollisionState();
 
+      /// \brief Load state from SDF element
+      public: virtual void Load(sdf::ElementPtr _elem);
+
       /// \brief Get the collision pose
       public: math::Pose GetPose() const;
 

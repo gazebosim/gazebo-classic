@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "sdf/sdf.h"
 #include "physics/PhysicsTypes.hh"
 #include "common/Time.hh"
 
@@ -43,6 +44,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~State();
 
+      /// \brief Load state from SDF element
+      public: virtual void Load(sdf::ElementPtr _elem) = 0;
+
       /// \brief Get the name of the state
       public: std::string GetName() const;
 
@@ -55,8 +59,8 @@ namespace gazebo
       /// \brief Get the sim time when this state was generated
       public: common::Time GetSimTime() const;
 
-      private: std::string name;
-      private: common::Time wallTime, realTime, simTime;
+      protected: std::string name;
+      protected: common::Time wallTime, realTime, simTime;
     };
   }
 }
