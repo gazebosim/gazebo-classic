@@ -183,6 +183,9 @@ namespace gazebo
                   const std::map<std::string, common::NumericAnimationPtr> anim,
                   boost::function<void()> _onComplete);
 
+      /// \brief Stop the current animations
+      public: virtual void StopAnimation();
+
       /// \brief Attach a static model to this model
       public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
 
