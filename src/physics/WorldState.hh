@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "sdf/sdf.h"
 #include "physics/State.hh"
 #include "physics/ModelState.hh"
 
@@ -42,13 +43,18 @@ namespace gazebo
       /// \brief Get the number of model states
       public: unsigned int GetModelStateCount() const;
 
+      /// \brief Get the state in SDF format
+      public: const sdf::ElementPtr &GetSDF() const;
+
       /// \brief Get a model state
       public: ModelState GetModelState(unsigned int _index) const;
 
       /// \brief Get a model state by model name
       public: ModelState GetModelState(const std::string &_modelName) const;
 
+      private: common::Time time;
       private: std::vector<ModelState> modelStates;
+      private: sdf::ElementPtr sdf;
     };
   }
 }

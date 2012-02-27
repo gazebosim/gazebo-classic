@@ -83,3 +83,17 @@ CollisionState LinkState::GetCollisionState(
 
   return CollisionState();
 }
+
+/////////////////////////////////////////////////
+void LinkState::FillSDF(sdf::ElementPtr _elem)
+{
+  _elem->GetAttribute("name")->Set(this->GetName());
+  _elem->GetOrCreateElement("pose")->GetValue()->Set(this->pose);
+  _elem->GetOrCreateElement("velocity")->GetValue()->Set(this->velocity);
+
+  /*for (std::vector<math::Pose>::iterator iter = this->forces.begin();
+       iter != this->forces.end(); ++iter)
+  {
+    sdf::ElementPtr forceElem = _elem->AddElement("force");
+  }*/
+}

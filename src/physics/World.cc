@@ -180,6 +180,17 @@ void World::Load(sdf::ElementPtr _sdf)
 
     event::Events::worldCreated(this->GetName());
   }
+
+  if (_sdf->HasElement("state"))
+  {
+    sdf::ElementPtr childElem = _sdf->GetElement("state");
+
+    while (childElem)
+    {
+
+      childElem = childElem->GetNextElement();
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -190,6 +201,7 @@ void World::Save(const std::string &_filename)
   data = "<?xml version ='1.0'?>\n";
   data += "<gazebo version ='1.0'>\n";
   data += this->sdf->ToString("");
+  data += this->GetState().GetSDF()->ToString("");
   data += "</gazebo>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);

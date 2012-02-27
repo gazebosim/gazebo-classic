@@ -3,5 +3,6 @@
 
   <include filename="world.sdf" required="*"/>
   <include filename="model.sdf" required="*"/>
+  <include filename="state.sdf" required="*"/>
 
 </element> <!-- End Gazebo -->

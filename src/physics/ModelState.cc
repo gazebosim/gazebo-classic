@@ -53,6 +53,20 @@ ModelState::~ModelState()
 }
 
 /////////////////////////////////////////////////
+void ModelState::FillSDF(sdf::ElementPtr _elem)
+{
+  _elem->GetAttribute("name")->Set(this->GetName());
+  _elem->GetOrCreateElement("pose")->GetValue()->Set(this->pose);
+
+  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
+  {
+    sdf::ElementPtr linkElem = _elem->AddElement("link");
+    (*iter).FillSDF(linkElem);
+  }
+}
+
+/////////////////////////////////////////////////
 math::Pose ModelState::GetPose() const
 {
   return this->pose;

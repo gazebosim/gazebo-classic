@@ -33,7 +33,9 @@
 
 #include "common/Console.hh"
 #include "common/Color.hh"
+#include "common/Time.hh"
 #include "math/Vector3.hh"
+#include "math/Vector2i.hh"
 #include "math/Pose.hh"
 #include "math/Quaternion.hh"
 
@@ -83,9 +85,11 @@ namespace sdf
     public: bool IsChar() const;
     public: bool IsStr() const;
     public: bool IsVector3() const;
+    public: bool IsVector2i() const;
     public: bool IsQuaternion() const;
     public: bool IsPose() const;
     public: bool IsColor() const;
+    public: bool IsTime() const;
 
     public: bool Set(const bool &_value);
     public: bool Set(const int &_value);
@@ -96,9 +100,11 @@ namespace sdf
     public: bool Set(const std::string &_value);
     public: bool Set(const char *_value);
     public: bool Set(const gazebo::math::Vector3 &_value);
+    public: bool Set(const gazebo::math::Vector2i &_value);
     public: bool Set(const gazebo::math::Quaternion &_value);
     public: bool Set(const gazebo::math::Pose &_value);
     public: bool Set(const gazebo::common::Color &_value);
+    public: bool Set(const gazebo::common::Time &_value);
 
     public: bool Get(bool &_value);
     public: bool Get(int &_value);
@@ -108,9 +114,11 @@ namespace sdf
     public: bool Get(char &_value);
     public: bool Get(std::string &_value);
     public: bool Get(gazebo::math::Vector3 &_value);
+    public: bool Get(gazebo::math::Vector2i &_value);
     public: bool Get(gazebo::math::Quaternion &_value);
     public: bool Get(gazebo::math::Pose &_value);
     public: bool Get(gazebo::common::Color &_value);
+    public: bool Get(gazebo::common::Time &_value);
 
     /// List of created parameters
     private: static std::vector<Param*> *params;

@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 
+#include "sdf/sdf.h"
 #include "physics/State.hh"
 #include "physics/CollisionState.hh"
 #include "math/Pose.hh"
@@ -56,6 +57,9 @@ namespace gazebo
       public: CollisionState GetCollisionState(
                   const std::string &_collisionName) const;
 
+      /// \brief Fill an SDF element with state info
+      public: void FillSDF(sdf::ElementPtr _elem);
+
       /// 3D pose of the link relative to the model
       private: math::Pose pose;
 
@@ -66,7 +70,7 @@ namespace gazebo
       private: math::Pose acceleration;
 
       // Forces on the link(linear and angular)
-      private: math::Pose force;
+      private: std::vector<math::Pose> forces;
 
       private: std::vector<CollisionState> collisionStates;
     };

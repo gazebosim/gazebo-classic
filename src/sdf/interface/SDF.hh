@@ -105,6 +105,7 @@ namespace sdf
                 const std::string &_key = "");
     public: gazebo::math::Pose GetValuePose(const std::string &_key = "");
     public: gazebo::common::Color GetValueColor(const std::string &_key = "");
+    public: gazebo::common::Time GetValueTime(const std::string &_key = "");
 
     public: bool HasElement(const std::string &_name) const;
 

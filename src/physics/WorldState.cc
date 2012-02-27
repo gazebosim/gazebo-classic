@@ -29,15 +29,23 @@ using namespace physics;
 WorldState::WorldState(WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/state.sdf", this->sdf);
+
+  this->sdf->GetAttribute("time")->Set(_world->GetSimTime());
+
   for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
   {
+    sdf::ElementPtr modelElem = this->sdf->AddElement("model");
     this->modelStates.push_back(_world->GetModel(i)->GetState());
+    this->modelStates.back().FillSDF(modelElem);
   }
 }
 
 /////////////////////////////////////////////////
 WorldState::~WorldState()
 {
+  this->sdf.reset();
   this->modelStates.clear();
 }
 
@@ -45,6 +53,12 @@ WorldState::~WorldState()
 unsigned int WorldState::GetModelStateCount() const
 {
   return this->modelStates.size();
+}
+
+/////////////////////////////////////////////////
+const sdf::ElementPtr &WorldState::GetSDF() const
+{
+  return this->sdf;
 }
 
 /////////////////////////////////////////////////

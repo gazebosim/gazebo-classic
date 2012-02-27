@@ -20,6 +20,7 @@ set (sdfs gazebo.sdf
           ray.sdf
           contact.sdf
           gui.sdf
+          state.sdf
 )
 
 INSTALL_INCLUDES("sdf" ${headers})

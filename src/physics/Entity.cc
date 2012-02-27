@@ -108,9 +108,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
       this->worldPose = originElem->GetValuePose("pose");
 
     this->initialRelativePose = originElem->GetValuePose("pose");
-
-    originElem->GetAttribute("pose")->SetUpdateFunc(
-        boost::bind(&Entity::GetRelativePose, this));
   }
 
   if (this->parent)

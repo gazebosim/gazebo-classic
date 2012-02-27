@@ -73,8 +73,6 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("origin"))
   {
     center = this->sdf->GetElement("origin")->GetValuePose("pose").pos;
-    this->sdf->GetElement("origin")->GetAttribute("pose")->SetUpdateFunc(
-        boost::bind(&Inertial::GetPose, this));
   }
   this->SetCoG(center.x, center.y, center.z);
 

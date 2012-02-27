@@ -166,10 +166,22 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
         new ParamT<gazebo::math::Vector3>(_key, _defaultValue, _required));
     return param;
   }
+  else if (_type == "vector2i")
+  {
+    boost::shared_ptr<ParamT<gazebo::math::Vector2i> > param(
+        new ParamT<gazebo::math::Vector2i>(_key, _defaultValue, _required));
+    return param;
+  }
   else if (_type == "pose")
   {
     boost::shared_ptr<ParamT<gazebo::math::Pose> > param(
         new ParamT<gazebo::math::Pose>(_key, _defaultValue, _required));
+    return param;
+  }
+  else if (_type == "time")
+  {
+    boost::shared_ptr<ParamT<gazebo::common::Time> > param(
+        new ParamT<gazebo::common::Time>(_key, _defaultValue, _required));
     return param;
   }
   else

@@ -65,6 +65,9 @@ namespace gazebo
       /// \brief Get a model state by model name
       public: JointState GetJointState(const std::string &_jointName) const;
 
+      /// \brief Fill an SDF element with state info
+      public: void FillSDF(sdf::ElementPtr _elem);
+
       private: math::Pose pose;
       private: std::vector<LinkState> linkStates;
       private: std::vector<JointState> jointStates;
