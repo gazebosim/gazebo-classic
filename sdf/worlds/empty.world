@@ -43,4 +43,5 @@
       <attenuation range="20" constant="0.8" linear="0.01" quadratic="0.0"/>
       <direction xyz="1.0 1.0 -1.0"/>
     </light>
+  </world>
 </gazebo>
