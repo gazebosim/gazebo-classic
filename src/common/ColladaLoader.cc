@@ -636,7 +636,9 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   std::vector<std::string>::iterator strs_iter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
-    if (l > 0) strs_iter += inputs.size()*vcounts[l-1]; // puts us at the beginning of the polygon list
+    // put us at the beginning of the polygon list
+    if (l > 0) strs_iter += inputs.size()*vcounts[l-1];
+
     for (unsigned int k = 2; k < (unsigned int)vcounts[l]; ++k)
     {
       // if vcounts[l] = 5, then read 0,1,2, then 0,2,3, 0,3,4,...
