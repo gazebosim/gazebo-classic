@@ -3,6 +3,7 @@ set (files empty.world
            pr2.world
            shapes.world
            willowgarage.world
+           test_ambient.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)
