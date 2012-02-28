@@ -596,7 +596,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  this->userCamera->SetWorldPosition(math::Vector3(-5, 0, 5));
+  this->userCamera->SetWorldPosition(math::Vector3(-5, 0, 1));
   this->userCamera->SetWorldRotation(
       math::Quaternion::EulerToQuaternion(0, 0, 0));
 

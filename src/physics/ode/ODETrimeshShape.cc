@@ -101,11 +101,15 @@ void ODETrimeshShape::Init()
 
   unsigned int i = 0;
 
-  const common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
-  if (subMesh->GetVertexCount() < 3)
+  const common::SubMesh *subMesh = NULL;
+  if (this->mesh->GetSubMeshCount() > 0)
   {
-    gzerr << "ODETrimesh invalid mesh\n";
-    return;
+    subMesh = this->mesh->GetSubMesh(i);
+    if (subMesh->GetVertexCount() < 3)
+    {
+      gzerr << "ODETrimesh invalid mesh\n";
+      return;
+    }
   }
 
   /// This will hold the vertex data of the triangle mesh
@@ -119,10 +123,17 @@ void ODETrimeshShape::Init()
   this->vertices = NULL;
   this->indices = NULL;
 
-  subMesh->FillArrays(&this->vertices, &this->indices);
-
-  numIndices = subMesh->GetIndexCount();
-  numVertices = subMesh->GetVertexCount();
+  if (subMesh)
+  {
+    subMesh->FillArrays(&this->vertices, &this->indices);
+    numIndices = subMesh->GetIndexCount();
+    numVertices = subMesh->GetVertexCount();
+  }
+  else
+  {
+    numIndices = 0;
+    numVertices = 0;
+  }
 
   for (unsigned int j = 0;  j < numVertices; j++)
   {

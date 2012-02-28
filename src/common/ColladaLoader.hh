@@ -84,6 +84,10 @@ namespace gazebo
                                    const math::Matrix4 &_transform,
                                    Mesh *_mesh);
 
+      private: void LoadPolylist(TiXmlElement *_polylistXml,
+                                   const math::Matrix4 &_transform,
+                                   Mesh *_mesh);
+
       private: void LoadLines(TiXmlElement *_xml,
                                const math::Matrix4 &_transform,
                                Mesh *_mesh);
