@@ -48,6 +48,9 @@ if (USE_FULL_RPATH)
 endif()
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
+set (build_errors "" CACHE INTERNAL "build errors" FORCE)
+set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
+
 
 set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
 set (LIB_INSTALL_DIR "lib")
@@ -133,9 +136,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
-set (build_errors "" CACHE INTERNAL "build errors" FORCE)
-set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
-
 #####################################
 # Set all the global build flags
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
@@ -166,20 +166,21 @@ message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
 add_subdirectory(deps)
 message (STATUS "----------------------------------------\n")
 
+#################################################
+# Print warnings and errors
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")
   foreach (msg ${build_warnings})
     message(STATUS ${msg})
-  endforeach (msg ${build_warnings})
+  endforeach ()
   message(STATUS "END BUILD WARNINGS\n")
 endif (build_warnings)
 
-
-if ( build_errors )
+if (build_errors)
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
-  endforeach (msg ${build_errors})
+  endforeach ()
   message(STATUS "END BUILD ERRORS\n")
   message (FATAL_ERROR "Errors encountered in build.")
 else (build_errors)

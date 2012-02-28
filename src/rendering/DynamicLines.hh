@@ -19,8 +19,8 @@
  * Date: 28 June 2007
  */
 
-#ifndef OGREDYNAMICLINES_HH
-#define OGREDYNAMICLINES_HH
+#ifndef DYNAMICLINES_HH
+#define DYNAMICLINES_HH
 
 #include <vector>
 #include <string>

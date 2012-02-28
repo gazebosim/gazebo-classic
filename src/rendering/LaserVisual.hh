@@ -40,8 +40,7 @@ namespace gazebo
 
       public: virtual ~LaserVisual();
 
-      private: void OnScan(
-                   ConstLaserScanPtr &_msg);
+      private: void OnScan(ConstLaserScanPtr &_msg);
 
       private: transport::NodePtr node;
       private: transport::SubscriberPtr laserScanSub;

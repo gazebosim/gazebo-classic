@@ -29,8 +29,7 @@ using namespace gazebo;
 boost::thread *g_runThread = NULL;
 bool g_stopped = true;
 
-/// Get the hostname and port of the master from the GAZEBO_MASTER_URI
-/// environment variable
+/////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &master_host,
                                unsigned int &master_port)
 {
@@ -55,7 +54,7 @@ bool transport::get_master_uri(std::string &master_host,
   return true;
 }
 
-
+/////////////////////////////////////////////////
 bool transport::init(const std::string &master_host, unsigned int master_port)
 {
   std::string host = master_host;
@@ -71,6 +70,7 @@ bool transport::init(const std::string &master_host, unsigned int master_port)
   return true;
 }
 
+/////////////////////////////////////////////////
 void transport::run()
 {
   g_stopped = false;
@@ -96,18 +96,20 @@ void transport::run()
     gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
 }
 
+/////////////////////////////////////////////////
 bool transport::is_stopped()
 {
   return g_stopped;
 }
 
-
+/////////////////////////////////////////////////
 void transport::stop()
 {
   g_stopped = true;
   transport::ConnectionManager::Instance()->Stop();
 }
 
+/////////////////////////////////////////////////
 void transport::fini()
 {
   g_stopped = true;
@@ -123,14 +125,14 @@ void transport::fini()
   transport::ConnectionManager::Instance()->Fini();
 }
 
+/////////////////////////////////////////////////
 void transport::clear_buffers()
 {
   transport::TopicManager::Instance()->ClearBuffers();
 }
 
+/////////////////////////////////////////////////
 void transport::pause_incoming(bool _pause)
 {
   transport::TopicManager::Instance()->PauseIncoming(_pause);
 }
-
-

@@ -1662,7 +1662,7 @@ void ModelListWidget::ProcessPoseMsgs()
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnPose(ConstPosePtr &_msg)
+void ModelListWidget::OnPose(ConstPosePtr &/*_msg*/)
 {
   /*this->receiveMutex->lock();
   if (!this->selectedModelName.empty() && 

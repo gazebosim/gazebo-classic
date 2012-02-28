@@ -77,8 +77,7 @@ namespace gazebo
       public: VisualPtr Clone(const std::string &_name, VisualPtr _newParent);
 
       /// \brief Load from a message
-      public: void LoadFromMsg(
-                  const boost::shared_ptr< msgs::Visual const> &msg);
+      public: void LoadFromMsg(ConstVisualPtr &_msg);
 
       /// \brief Load the visual with a set of parameters
       public: void Load(sdf::ElementPtr sdf);

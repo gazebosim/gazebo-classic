@@ -68,6 +68,7 @@ void TopicManager::Fini()
   this->nodes.clear();
 }
 
+//////////////////////////////////////////////////
 void TopicManager::AddNode(NodePtr _node)
 {
   this->nodeMutex->lock();
@@ -75,6 +76,7 @@ void TopicManager::AddNode(NodePtr _node)
   this->nodeMutex->unlock();
 }
 
+//////////////////////////////////////////////////
 void TopicManager::RemoveNode(unsigned int _id)
 {
   std::vector<NodePtr>::iterator iter;

@@ -64,7 +64,7 @@ MACRO (APPEND_TO_CONTROLLER_SOURCES)
 ENDMACRO (APPEND_TO_CONTROLLER_SOURCES)
 
 
-###############################################################################
+#################################################
 # Macro to turn a list into a string (why doesn't CMake have this built-in?)
 MACRO (LIST_TO_STRING _string _list)
     SET (${_string})
@@ -74,14 +74,18 @@ MACRO (LIST_TO_STRING _string _list)
     #STRING(STRIP ${${_string}} ${_string})
 ENDMACRO (LIST_TO_STRING)
 
+#################################################
+# BUILD ERROR macro
 macro (BUILD_ERROR)
   foreach (str ${ARGN})
-    SET (msg "\t${str}" )
-    MESSAGE (STATUS ${msg} )
+    SET (msg "\t${str}")
+    MESSAGE (STATUS ${msg})
     APPEND_TO_CACHED_LIST(build_errors "build errors" ${msg})
-  endforeach (str ${ARGN})
+  endforeach ()
 endmacro (BUILD_ERROR)
 
+#################################################
+# BUILD WARNING macro
 macro (BUILD_WARNING)
   foreach (str ${ARGN})
     SET (msg "\t${str}" )
