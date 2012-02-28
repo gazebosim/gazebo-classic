@@ -2,7 +2,7 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.1 0.1 0.1 1"/>
+      <ambient rgba="1.0 1.0 1.0 1.0"/>
       <background rgba="0 0 0 1"/>
       <shadows enabled="true"/>
     </scene>
@@ -43,5 +43,25 @@
       <attenuation range="20" constant="0.8" linear="0.01" quadratic="0.0"/>
       <direction xyz="1.0 1.0 -1.0"/>
     </light>
+
+    <model name="collada_mesh_model" static="true">
+      <origin pose="0 0 1 0 0 0"/>
+      <link name="collada_mesh_link">
+        <inertial mass='1.0'>
+          <origin pose='0 0 0 0 0 0'/>
+          <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
+        </inertial>
+        <collision name="col">
+          <geometry>
+            <mesh filename="collada_quad_test/cube_blender_2-61_default_export.dae"/>
+          </geometry>
+        </collision>
+        <visual name="vis">
+          <geometry>
+            <mesh filename="collada_quad_test/cube_blender_2-61_default_export.dae"/>
+          </geometry>
+        </visual>
+      </link>
+    </model>
   </world>
 </gazebo>

@@ -243,6 +243,13 @@ void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
     childXml = childXml->NextSiblingElement("triangles");
   }
 
+  childXml = meshXml->FirstChildElement("polylist");
+  while (childXml)
+  {
+    this->LoadPolylist(childXml, _transform, _mesh);
+    childXml = childXml->NextSiblingElement("polylist");
+  }
+
   childXml = meshXml->FirstChildElement("lines");
   while (childXml)
   {
@@ -540,6 +547,154 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   }
 }
 
+void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
+    const math::Matrix4 &_transform,
+    Mesh *_mesh)
+{
+  // This function parses polylist types in collada into
+  // a set of triangle meshes.  The assumption is that
+  // each polylist polygon is convex, and we do decomposiont
+  // by anchoring each triangle about vertex 0 or each polygon
+  SubMesh *subMesh = new SubMesh;
+  bool combinedVertNorms = false;
+
+  subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
+
+  if (_polylistXml->Attribute("material"))
+  {
+    std::map<std::string, std::string>::iterator iter;
+    std::string matStr = _polylistXml->Attribute("material");
+
+    iter = this->materialMap.find(matStr);
+    if (iter != this->materialMap.end())
+      matStr = iter->second;
+
+    unsigned int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
+    subMesh->SetMaterialIndex(matIndex);
+  }
+
+  TiXmlElement *polylistInputXml = _polylistXml->FirstChildElement("input");
+
+  std::vector<math::Vector3> verts;
+  std::vector<math::Vector3> norms;
+  std::vector<math::Vector2d> texcoords;
+
+  // read input elements
+  std::map<std::string, int> inputs;
+  while (polylistInputXml)
+  {
+    std::string semantic = polylistInputXml->Attribute("semantic");
+    std::string source = polylistInputXml->Attribute("source");
+    std::string offset = polylistInputXml->Attribute("offset");
+    if (semantic == "VERTEX")
+    {
+      unsigned int count = norms.size();
+      this->LoadVertices(source, _transform, verts, norms);
+      if (norms.size() > count)
+        combinedVertNorms = true;
+    }
+    else if (semantic == "NORMAL")
+    {
+      this->LoadNormals(source, _transform, norms);
+      combinedVertNorms = false;
+    }
+    else if (semantic == "TEXCOORD")
+      this->LoadTexCoords(source, texcoords);
+
+    inputs[semantic] = math::parseInt(offset);
+
+    polylistInputXml = polylistInputXml->NextSiblingElement("input");
+  }
+
+  // read vcount
+  // break poly into triangles
+  // if vcount >= 4, anchor around 0 (note this is bad for concave elements)
+  //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
+  std::vector<std::string> vcount_strs;
+  TiXmlElement *vcountXml = _polylistXml->FirstChildElement("vcount");
+  std::string vcountStr = vcountXml->GetText();
+  boost::split(vcount_strs, vcountStr, boost::is_any_of("   "));
+  std::vector<int> vcounts;
+  for (unsigned int j = 0; j < vcount_strs.size(); ++j)
+    vcounts.push_back(math::parseInt(vcount_strs[j]));
+
+  // read p
+  TiXmlElement *pXml = _polylistXml->FirstChildElement("p");
+  std::string pStr = pXml->GetText();
+
+  std::vector<math::Vector3> vertNorms(verts.size());
+  std::vector<int> vertNormsCounts(verts.size());
+  std::fill(vertNormsCounts.begin(), vertNormsCounts.end(), 0);
+
+  int *values = new int[inputs.size()];
+  std::map<std::string, int>::iterator end = inputs.end();
+  std::map<std::string, int>::iterator iter;
+  math::Vector2d vec;
+
+  std::vector<std::string> strs;
+  boost::split(strs, pStr, boost::is_any_of("   "));
+  std::vector<std::string>::iterator strs_iter = strs.begin();
+  for (unsigned int l = 0; l < vcounts.size(); ++l)
+  {
+    // put us at the beginning of the polygon list
+    if (l > 0) strs_iter += inputs.size()*vcounts[l-1];
+
+    for (unsigned int k = 2; k < (unsigned int)vcounts[l]; ++k)
+    {
+      // if vcounts[l] = 5, then read 0,1,2, then 0,2,3, 0,3,4,...
+      // here k = the last number in the series
+      // j is the triangle loop
+      for (unsigned int j=0; j < 3; ++j)
+      {
+        // break polygon into triangles
+        unsigned int triangle_index;
+        if (j==0) triangle_index = 0;
+        if (j==1) triangle_index = (k-1)*inputs.size();
+        if (j==2) triangle_index = (k)*inputs.size();
+        for (unsigned int i = 0; i < inputs.size(); i++)
+        {
+          values[i] = math::parseInt(strs_iter[triangle_index+i]);
+          /*gzerr << "debug parsing "
+                << " poly-i[" << l
+                << "] tri-end-index[" << k
+                << "] tri-vertex-i[" << j
+                << "] triangle[" << triangle_index
+                << "] input[" << i
+                << "] value[" << values[i]
+                << "]\n"; */
+        }
+
+
+        for (iter = inputs.begin(); iter != end; ++iter)
+        {
+          if (iter->first == "VERTEX")
+          {
+            subMesh->AddVertex(verts[values[iter->second]]);
+            subMesh->AddIndex(subMesh->GetVertexCount()-1);
+            if (combinedVertNorms)
+              subMesh->AddNormal(norms[values[iter->second]]);
+          }
+          else if (iter->first == "NORMAL")
+          {
+            subMesh->AddNormal(norms[values[iter->second]]);
+          }
+          else if (iter->first == "TEXCOORD")
+          {
+            subMesh->AddTexCoord(texcoords[values[iter->second]].x,
+                texcoords[values[iter->second]].y);
+          }
+          // else
+          // gzerr << "Unhandled semantic[" << iter->first << "]\n";
+        }
+      }
+    }
+  }
+  delete [] values;
+
+  _mesh->AddSubMesh(subMesh);
+}
+
+
 void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     const math::Matrix4 &_transform,
     Mesh *_mesh)
@@ -698,6 +853,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
   {
     int a, b;
     iss >> a >> b;
+    gzerr << "debug " << iss.str() << "\n";
 
     if (!iss)
       break;

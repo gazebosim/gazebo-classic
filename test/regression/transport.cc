@@ -145,7 +145,7 @@ TEST_F(TransportTest, Errors)
   int i = 0;
   while (!g_worldStatsMsg && !g_sceneMsg && !g_worldStatsDebugMsg && i < 20)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(100);
     ++i;
   }
   EXPECT_LT(i, 20);

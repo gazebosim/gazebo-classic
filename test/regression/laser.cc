@@ -83,7 +83,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 
     ScanCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
     EXPECT_LT(diffMax, 1e-6);
-    EXPECT_LT(diffSum, 1e-6);
+    EXPECT_LT(diffSum, 1e-5);
     EXPECT_LT(diffAvg, 1e-6);
 
     // This line will print the current scan. Use this to generate
