@@ -26,6 +26,14 @@ using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
+WorldState::WorldState()
+  : State()
+{
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/state.sdf", this->sdf);
+}
+
+/////////////////////////////////////////////////
 WorldState::WorldState(WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
@@ -47,6 +55,28 @@ WorldState::~WorldState()
 {
   this->sdf.reset();
   this->modelStates.clear();
+}
+
+/////////////////////////////////////////////////
+void WorldState::Load(sdf::ElementPtr _elem)
+{
+  std::cout << "WorldState::Load\n";
+
+  this->name = _elem->GetValueString("world_name");
+  std::cout << "  Name[" << this->name << "]\n";
+
+  if (_elem->HasElement("model"))
+  {
+    sdf::ElementPtr childElem = _elem->GetElement("model");
+
+    while (childElem)
+    {
+      ModelState state;
+      state.Load(childElem);
+      this->modelStates.push_back(state);
+      childElem = childElem->GetNextElement();
+    }
+  }
 }
 
 /////////////////////////////////////////////////

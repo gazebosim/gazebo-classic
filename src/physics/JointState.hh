@@ -42,6 +42,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~JointState();
 
+      /// \brief Load state from SDF element
+      public: virtual void Load(sdf::ElementPtr _elem);
+
       /// \brief Get the number of angles
       public: unsigned int GetAngleCount() const;
 

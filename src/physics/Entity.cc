@@ -540,6 +540,7 @@ void Entity::UpdateAnimation()
       this->onAnimationComplete();
     }
   }
+
 }
 
 

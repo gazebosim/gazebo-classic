@@ -51,6 +51,6 @@
     -->
 
 
-    <include filename="wg.model"/>
+    <include filename="willowgarage.model"/>
   </world>
 </gazebo>

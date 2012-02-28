@@ -34,11 +34,17 @@ namespace gazebo
   {
     class WorldState : public State
     {
+      /// \brief Default constructor
+      public: WorldState();
+
       /// \brief Constructor
       public: WorldState(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~WorldState();
+
+      /// \brief Load state from SDF element
+      public: virtual void Load(sdf::ElementPtr _elem);
 
       /// \brief Get the number of model states
       public: unsigned int GetModelStateCount() const;
@@ -52,7 +58,6 @@ namespace gazebo
       /// \brief Get a model state by model name
       public: ModelState GetModelState(const std::string &_modelName) const;
 
-      private: common::Time time;
       private: std::vector<ModelState> modelStates;
       private: sdf::ElementPtr sdf;
     };

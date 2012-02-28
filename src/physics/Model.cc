@@ -960,6 +960,16 @@ void Model::SetJointAnimation(
 }
 
 //////////////////////////////////////////////////
+void Model::StopAnimation()
+{
+  this->updateMutex->lock();
+  Entity::StopAnimation();
+  this->onJointAnimationComplete.clear();
+  this->jointAnimations.clear();
+  this->updateMutex->unlock();
+}
+
+//////////////////////////////////////////////////
 void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
 {
   if (!_model->IsStatic())

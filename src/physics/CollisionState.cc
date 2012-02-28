@@ -42,6 +42,11 @@ CollisionState::~CollisionState()
 }
 
 /////////////////////////////////////////////////
+void CollisionState::Load(sdf::ElementPtr /*_elem*/)
+{
+}
+
+/////////////////////////////////////////////////
 math::Pose CollisionState::GetPose() const
 {
   return this->pose;

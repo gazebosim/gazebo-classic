@@ -43,6 +43,11 @@ JointState::~JointState()
 }
 
 /////////////////////////////////////////////////
+void JointState::Load(sdf::ElementPtr /*_elem*/)
+{
+}
+
+/////////////////////////////////////////////////
 unsigned int JointState::GetAngleCount() const
 {
   return this->angles.size();
