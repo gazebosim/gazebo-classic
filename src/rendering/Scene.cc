@@ -211,7 +211,7 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Init()
 {
-  this->worldVisual.reset(new Visual("__world_node__", this));
+  this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
   RTShaderSystem::Instance()->AddScene(this);
 

@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "sdf/sdf.h"
@@ -63,7 +64,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
     /// \brief Representation of an entire scene graph
-    class Scene
+    class Scene : public boost::enable_shared_from_this<Scene>
     {
       public: enum SceneType {BSP, GENERIC};
       private: Scene() {}

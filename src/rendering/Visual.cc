@@ -77,7 +77,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 }
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, Scene *_scene)
+Visual::Visual(const std::string &_name, ScenePtr _scene)
 {
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
@@ -1243,38 +1243,38 @@ void Visual::SetShaderType(const std::string &_type)
 
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool value)
+void Visual::SetRibbonTrail(bool _value)
 {
   if (this->ribbonTrail == NULL)
   {
-    this->ribbonTrail =
-      (Ogre::RibbonTrail*)this->sceneNode->getCreator()->createMovableObject(
-          "RibbonTrail");
+    this->ribbonTrail = this->scene->GetManager()->createRibbonTrail("RibbonTrail");
     this->ribbonTrail->setMaterialName("Gazebo/Red");
     this->ribbonTrail->setTrailLength(200);
     this->ribbonTrail->setMaxChainElements(1000);
-    this->ribbonTrail->setNumberOfChains(1);
-    this->ribbonTrail->setVisible(false);
+    //this->ribbonTrail->setNumberOfChains(1);
+    this->ribbonTrail->setVisible(true);
     this->ribbonTrail->setInitialWidth(0, 0.05);
-    this->sceneNode->attachObject(this->ribbonTrail);
+    this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
   }
 
 
-  if (value)
+  if (_value)
   {
     try
     {
       this->ribbonTrail->addNode(this->sceneNode);
     }
     catch(...)
-    { }
+    { 
+      gzerr << "Unable to create ribbon trail\n";
+    }
   }
   else
   {
     this->ribbonTrail->removeNode(this->sceneNode);
     this->ribbonTrail->clearChain(0);
   }
-  this->ribbonTrail->setVisible(value);
+  this->ribbonTrail->setVisible(_value);
 }
 
 //////////////////////////////////////////////////
@@ -1677,6 +1677,48 @@ std::string Visual::GetMeshName() const
 }
 
 //////////////////////////////////////////////////
+void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
+                             double _time)
+{
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  std::string animName = this->GetName() + "_animation";
+
+  Ogre::Animation *anim =
+    this->sceneNode->getCreator()->createAnimation(animName, _time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  double dt = _time / (_pts.size()-1);
+  double tt = 0;
+  for (unsigned int i = 0; i < _pts.size(); i++)
+  {
+    key = strack->createNodeKeyFrame(tt);
+    key->setTranslate(Ogre::Vector3(_pts[i].x, _pts[i].y, _pts[i].z));
+    key->setRotation(this->sceneNode->getOrientation());
+
+    tt += dt;
+  }
+ 
+  this->animState =
+    this->sceneNode->getCreator()->createAnimationState(animName);
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+
+  this->preRenderConnection =
+    event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+
+}
+
+//////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Vector3 &_end,
                              double _pitch, double _yaw, double _time)
 {
@@ -1719,13 +1761,13 @@ void Visual::ShowBoundingBox()
 }
 
 //////////////////////////////////////////////////
-void Visual::SetScene(Scene *_scene)
+void Visual::SetScene(ScenePtr _scene)
 {
   this->scene = _scene;
 }
 
 //////////////////////////////////////////////////
-Scene *Visual::GetScene() const
+ScenePtr Visual::GetScene() const
 {
   return this->scene;
 }

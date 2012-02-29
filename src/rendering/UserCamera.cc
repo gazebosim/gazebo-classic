@@ -466,6 +466,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   this->animState->setLoop(false);
 }
 
+/////////////////////////////////////////////////
 bool UserCamera::MoveToPosition(const math::Vector3 &_end,
                                  double _pitch, double _yaw, double _time)
 {

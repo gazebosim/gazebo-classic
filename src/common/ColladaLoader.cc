@@ -830,6 +830,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   _mesh->AddSubMesh(subMesh);
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadLines(TiXmlElement *_xml,
     const math::Matrix4 &_transform,
     Mesh *_mesh)
@@ -853,7 +854,6 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
   {
     int a, b;
     iss >> a >> b;
-    gzerr << "debug " << iss.str() << "\n";
 
     if (!iss)
       break;
@@ -865,10 +865,6 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
 
   _mesh->AddSubMesh(subMesh);
 }
-
-
-
-
 
 float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 {
@@ -882,6 +878,7 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
   return value;
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material * /*_mat*/)
 {
   // const char *opaque = _elem->Attribute("opaque");
