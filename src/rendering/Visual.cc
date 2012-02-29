@@ -1254,7 +1254,8 @@ void Visual::SetRibbonTrail(bool _value)
     //this->ribbonTrail->setNumberOfChains(1);
     this->ribbonTrail->setVisible(true);
     this->ribbonTrail->setInitialWidth(0, 0.05);
-    this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
+    this->scene->GetManager()->getRootSceneNode()->attachObject(
+        this->ribbonTrail);
   }
 
 
@@ -1715,7 +1716,6 @@ void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
 
   this->preRenderConnection =
     event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
-
 }
 
 //////////////////////////////////////////////////
