@@ -17,7 +17,6 @@
 #include <string.h>
 
 #include "math/Helpers.hh"
-#include "common/Exception.hh"
 #include "math/Matrix4.hh"
 
 using namespace gazebo;
@@ -271,7 +270,7 @@ Vector3 Matrix4::TransformAffine(const Vector3 &_v) const
 {
   if (!this->IsAffine())
   {
-    gzthrow("Not and affine matrix");
+    throw("Not and affine matrix");
   }
 
   return Vector3(this->m[0][0]*_v.x + this->m[0][1]*_v.y +

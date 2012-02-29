@@ -17,7 +17,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/Exception.hh"
 #include "math/Helpers.hh"
 #include "math/Matrix3.hh"
 
@@ -91,7 +90,7 @@ void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
 void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
 {
   if (_i >= 3)
-    gzthrow("Invalid column number");
+    throw("Invalid column number");
 
   m[0][_i] = _v.x;
   m[1][_i] = _v.y;

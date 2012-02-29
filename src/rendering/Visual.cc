@@ -439,7 +439,9 @@ void Visual::Update()
           this->GetName() + "_animation");
       this->sceneNode->getCreator()->destroyAnimationState(
           this->GetName() + "_animation");
-      event::Events::DisconnectPreRender(this->preRenderConnection);
+      if (this->onAnimationComplete)
+        this->onAnimationComplete();
+      //event::Events::DisconnectPreRender(this->preRenderConnection);
     }
   }
 }
@@ -1252,7 +1254,8 @@ void Visual::SetRibbonTrail(bool _value)
     this->ribbonTrail->setTrailLength(200);
     this->ribbonTrail->setMaxChainElements(1000);
     //this->ribbonTrail->setNumberOfChains(1);
-    this->ribbonTrail->setVisible(true);
+    this->ribbonTrail->setVisible(false);
+    this->ribbonTrail->setCastShadows(false);
     this->ribbonTrail->setInitialWidth(0, 0.05);
     this->scene->GetManager()->getRootSceneNode()->attachObject(
         this->ribbonTrail);
@@ -1679,10 +1682,13 @@ std::string Visual::GetMeshName() const
 
 //////////////////////////////////////////////////
 void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
-                             double _time)
+                             double _time,
+                             boost::function<void()> _onComplete)
 {
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;
+
+  this->onAnimationComplete = _onComplete;
 
   std::string animName = this->GetName() + "_animation";
 
@@ -1714,8 +1720,9 @@ void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
 
-  this->preRenderConnection =
-    event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+  if (!this->preRenderConnection)
+    this->preRenderConnection =
+      event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
 }
 
 //////////////////////////////////////////////////

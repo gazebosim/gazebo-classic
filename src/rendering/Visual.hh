@@ -253,7 +253,8 @@ namespace gazebo
                                    double _pitch, double _yaw, double _time);
 
       public: void MoveToPositions(const std::vector<math::Vector3> &_pts,
-                             double _time);
+                                   double _time,
+                                   boost::function<void()> _onComplete);
 
       public: void ShowBoundingBox();
       public: void ShowCollision(bool _show);
@@ -302,6 +303,7 @@ namespace gazebo
       public: std::vector<VisualPtr> children;
 
       private: Ogre::AnimationState *animState;
+      private: boost::function<void()> onAnimationComplete;
       protected: ScenePtr scene;
     };
     /// \}
