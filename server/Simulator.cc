@@ -715,8 +715,10 @@ void Simulator::PhysicsLoop()
   world->GetPhysicsEngine()->InitForThread();
 
   bool userStepped;
-  Time diffTime;
-  Time currTime;
+  Time sleepRequestTime;
+  Time actualSleepTime;
+  Time sleepAdjustTime(0);
+  Time elapsedTime;
   Time lastTime = this->GetRealTime();
   struct timespec req, rem;
 
@@ -726,7 +728,6 @@ void Simulator::PhysicsLoop()
   while (!this->userQuit || !this->renderQuit)
   {
     //DIAGNOSTICTIMER(timer("PHYSICS LOOP ",6));
-
     {
       //DIAGNOSTICTIMER(timer1("PHYSICS MR MD Mutex and world->Update() ",6));
 
@@ -734,8 +735,6 @@ void Simulator::PhysicsLoop()
       // unless an alternative dead-lock prevention strategy has been implemented
       boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
       boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
-
-      currTime = this->GetRealTime();
 
       // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
       Time step = world->GetPhysicsEngine()->GetStepTime();
@@ -748,47 +747,9 @@ void Simulator::PhysicsLoop()
       if (this->GetStepInc())
         userStepped = true;
 
-      lastTime = this->GetRealTime();
-
       world->Update();
     }
   
-    currTime = this->GetRealTime();
-
-    // Set a default sleep time
-    req.tv_sec  = 0;
-    req.tv_nsec = 0;
-
-    // compute update rate and update period within the update loop 
-    // is less efficient, but allows changing update rate dynamically
-    double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
-    Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
-    //printf("debug: %f %f\n", 1.0 / physicsUpdateRate, physicsUpdateRate);
-    // If the physicsUpdateRate < 0, then we should try to match the
-    // update rate to real time
-    if ( physicsUpdateRate < 0 && (this->GetSimTime() + this->GetPauseTime()) > this->GetRealTime()) 
-    {
-      diffTime = (this->GetSimTime() + this->GetPauseTime()) - this->GetRealTime();
-      req.tv_sec  = diffTime.sec;
-      req.tv_nsec = diffTime.nsec;
-    }
-    // Otherwise try to match the update rate to the one specified in
-    // the xml file
-    else if (physicsUpdateRate > 0 && currTime - lastTime < physicsUpdatePeriod)
-    {
-      diffTime = physicsUpdatePeriod - (currTime - lastTime);
-      req.tv_sec  = diffTime.sec;
-      req.tv_nsec = diffTime.nsec;
-    }
-
-    //printf("phys: %f, %f, %f\n",this->min_nanosleep_time.Double(),physicsUpdatePeriod.Double(),diffTime.Double());
-    // nanosleep on some kernels are taking up about 10ms per call
-    // as a hackish fix for the large kernel time resolution (10ms) problem,
-    //   throttle according to physics time step size, 
-    //   this way, at least we are not infringing upon trying to run physics near real-time
-    if (this->min_nanosleep_time.Double() < 0.5*world->GetPhysicsEngine()->GetStepTime().Double())
-      nanosleep(&req, &rem);
-    
     /*{
       DIAGNOSTICTIMER(timer1("PHYSICS UpdateSimIfaces ",6));
       // Process all incoming messages from simiface
@@ -806,6 +767,48 @@ void Simulator::PhysicsLoop()
       this->SetStepInc(false);
       this->SetPaused(true);
     }
+
+
+    // compute update rate and update period within the update loop 
+    // is less efficient, but allows changing update rate dynamically
+    // If the physicsUpdateRate < 0, then we should try to match the update rate to real time
+    double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
+    Time physicsUpdatePeriod(0.0);
+    if (physicsUpdateRate > 0) physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+    else if (physicsUpdateRate < 0) physicsUpdatePeriod = world->GetPhysicsEngine()->GetStepTime().Double();
+
+    //printf("debug: %f %f before[%f]", physicsUpdateRate, physicsUpdatePeriod.Double(), this->GetRealTime().Double());
+
+    Time preSleepTime = this->GetRealTime();
+    if (physicsUpdatePeriod.Double() > 0)
+    {
+      elapsedTime = this->GetRealTime() - lastTime;
+      // Set a default sleep time
+      sleepRequestTime = physicsUpdatePeriod - elapsedTime - sleepAdjustTime;
+      if (sleepRequestTime > this->min_nanosleep_time) // as best as we can given machine min sleep time
+      {
+        req.tv_sec  = sleepRequestTime.sec;
+        req.tv_nsec = sleepRequestTime.nsec;
+      }
+      else
+      {
+        req.tv_sec  = 0;
+        req.tv_nsec = 0;
+      }
+      nanosleep(&req, &rem);
+    }
+
+    Time tmp = lastTime;
+    lastTime = this->GetRealTime();
+    actualSleepTime = lastTime - preSleepTime;
+    sleepAdjustTime = actualSleepTime - sleepRequestTime;
+
+    // printf(" slept[%f] total diff[%f] | sleep req[%f] actual[%f]\n"
+    //        ,lastTime.Double()
+    //        ,(lastTime-tmp).Double()
+    //        ,sleepRequestTime.Double()
+    //        ,actualSleepTime.Double()
+    //        );
   }
 }
 

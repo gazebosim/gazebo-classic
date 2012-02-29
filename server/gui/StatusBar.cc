@@ -133,7 +133,6 @@ void StatusBar::Update()
     Time simTime = Simulator::Instance()->GetSimTime();
     Time realTime = Simulator::Instance()->GetRealTime();
     
-    //if (realTime < this->statusUpdatePeriod )
     if (!this->percents_full)
     {
       this->percentLastRealTime =0;
@@ -149,13 +148,15 @@ void StatusBar::Update()
     }
     else
     {
+      // update last element
+      this->percent_sum -= *this->percents_iter;
       *this->percents_iter = ((simTime - this->percentLastSimTime) / 
                              (realTime - this->percentLastRealTime)).Double();
       this->percent_sum += *this->percents_iter;
+      // advance 1
       this->percents_iter++;
       if (this->percents_iter == this->percents.end())
         this->percents_iter = this->percents.begin();
-      this->percent_sum -= *this->percents_iter;
 
       this->percentLastRealTime = realTime;
       this->percentLastSimTime = simTime;
