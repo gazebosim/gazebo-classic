@@ -20,6 +20,8 @@ set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRI
 
 SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
 
+SET (general_libraries "" CACHE STRING "general libraries")
+
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
@@ -313,8 +315,7 @@ ENDIF (HAVE_FFMPEG)
 find_library(PROFILER profiler)
 if (PROFILER)
   message (STATUS "Looking for libprofiler - found")
-  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
-       CACHE INTERNAL "Link flags for profile" FORCE)
+  APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
 else ()
   message (STATUS "Looking for libprofiler - not found")
 endif ()
@@ -323,8 +324,7 @@ endif ()
 # Find tcmalloc library, optional
 find_library(TCMALLOC tcmalloc)
 if (TCMALLOC)
-  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
-       CACHE INTERNAL "Link flags for profile" FORCE)
+  APPEND_TO_CACHED_LIST(general_libraries "general libraries" tcmalloc)
   message (STATUS "Looking for libtcmalloc - found")
 else ()
   message (STATUS "Looking for libtcmalloc - not found")

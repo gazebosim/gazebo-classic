@@ -65,6 +65,7 @@ target_link_libraries( gazebo_gui gazebo_common
                                   ${QT_LIBRARIES} 
                                   ${ogre_libraries} 
                                   ${boost_libraries} 
+                                  ${general_libraries}
                                   pthread)
 
 target_link_libraries( gzclient  gazebo_common
@@ -77,7 +78,9 @@ target_link_libraries( gzclient  gazebo_common
                                  ${QT_LIBRARIES} 
                                  ${ogre_libraries} 
                                  ${boost_libraries} 
+                                 ${general_libraries}
                                  pthread)
+
  
 
 add_definitions(${QT_DEFINITIONS})

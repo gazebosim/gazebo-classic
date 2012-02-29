@@ -53,12 +53,13 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/common.h.in ${CMAKE_CURRENT_BINARY_
 
 add_library(gazebo_common SHARED ${sources})
 
-target_link_libraries( gazebo_common gazebo_math
-                                     ${libdl_library}
-                                     ${tinyxml_libraries}
-                                     ${boost_libraries}
-                                     ${freeimage_library}
-                                     ${tinyxml_libraries}
+target_link_libraries(gazebo_common gazebo_math
+                                    ${libdl_library}
+                                    ${tinyxml_libraries}
+                                    ${boost_libraries}
+                                    ${freeimage_library}
+                                    ${tinyxml_libraries}
+                                    ${general_libraries}
                      )
 
 INSTALL_LIBRARY(gazebo_common)

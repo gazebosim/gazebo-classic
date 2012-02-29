@@ -86,6 +86,7 @@ target_link_libraries(gazebo_physics gazebo_common
                                      ${libtool_library} 
                                      ${boost_libraries}
                                      ${tinyxml_libraries}
+                                     ${general_libraries}
                                      )
 
 add_executable(gzphysics server.cc)
@@ -95,7 +96,9 @@ target_link_libraries(gzphysics gazebo_common
                                 gazebo_sensors
                                 gazebo_sdf_interface
                                 gazebo_msgs
-                                pthread)
+                                pthread
+                                ${general_libraries}
+                                )
 INSTALL_EXECUTABLE( gzphysics )
 INSTALL_LIBRARY(gazebo_physics)
 INSTALL_INCLUDES("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)

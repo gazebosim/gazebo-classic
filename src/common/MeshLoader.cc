@@ -28,5 +28,3 @@ MeshLoader::MeshLoader()
 MeshLoader::~MeshLoader()
 {
 }
-
-

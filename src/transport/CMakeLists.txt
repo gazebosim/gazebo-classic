@@ -40,7 +40,8 @@ add_library(gazebo_transport SHARED ${sources})
 
 target_link_libraries(gazebo_transport gazebo_common 
                                        gazebo_msgs 
-                                       ${boost_libraries})
+                                       ${boost_libraries}
+                                       ${general_libraries})
 
 INSTALL_LIBRARY(gazebo_transport)
 INSTALL_INCLUDES("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.h)

@@ -85,6 +85,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   return mesh;
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadScene(Mesh *_mesh)
 {
   TiXmlElement *sceneXml = this->colladaXml->FirstChildElement("scene");
@@ -107,6 +108,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
   }
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     const math::Matrix4 &_transform)
 {
@@ -170,6 +172,7 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
   }
 }
 
+/////////////////////////////////////////////////
 math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 {
   math::Matrix4 transform(math::Matrix4::IDENTITY);
@@ -230,8 +233,9 @@ math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
   return transform;
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
-    const math::Matrix4 &_transform, Mesh *_mesh)
+                                 const math::Matrix4 &_transform, Mesh *_mesh)
 {
   TiXmlElement *meshXml = _xml->FirstChildElement("mesh");
   TiXmlElement *childXml;
@@ -258,12 +262,14 @@ void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
   }
 }
 
+/////////////////////////////////////////////////
 TiXmlElement *ColladaLoader::GetElementId(const std::string &_name,
                                           const std::string &_id)
 {
   return this->GetElementId(this->colladaXml, _name, _id);
 }
 
+/////////////////////////////////////////////////
 TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
     const std::string &_name,
     const std::string &_id)
@@ -292,6 +298,7 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
   return NULL;
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadVertices(const std::string &_id,
     const math::Matrix4 &_transform,
     std::vector<math::Vector3> &_verts,
@@ -323,6 +330,7 @@ void ColladaLoader::LoadVertices(const std::string &_id,
   }
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadPositions(const std::string &_id,
     const math::Matrix4 &_transform,
     std::vector<math::Vector3> &_values)
@@ -350,6 +358,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   }
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadNormals(const std::string &_id,
     const math::Matrix4 &_transform,
     std::vector<math::Vector3> &_values)
@@ -383,6 +392,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
   } while (iss);
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadTexCoords(const std::string &_id,
                                   std::vector<math::Vector2d> &_values)
 {
@@ -414,6 +424,7 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   } while (iss);
 }
 
+/////////////////////////////////////////////////
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
 {
   Material *mat = new Material();
@@ -499,6 +510,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
   return mat;
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
     const std::string &_type, Material *_mat)
 {
@@ -547,6 +559,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   }
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     const math::Matrix4 &_transform,
     Mesh *_mesh)
@@ -694,10 +707,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   _mesh->AddSubMesh(subMesh);
 }
 
-
+/////////////////////////////////////////////////
 void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
-    const math::Matrix4 &_transform,
-    Mesh *_mesh)
+                                  const math::Matrix4 &_transform,
+                                  Mesh *_mesh)
 {
   SubMesh *subMesh = new SubMesh;
   bool combinedVertNorms = false;
@@ -791,42 +804,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
   delete [] values;
 
-  /*do
-    {
-    for (unsigned int i = 0; i < inputs.size(); i++)
-    iss >> values[i];
-
-    if (!iss)
-    {
-    delete [] values;
-    break;
-    }
-
-    for (iter = inputs.begin(); iter != end; iter++)
-    {
-    if (iter->first == "VERTEX")
-    {
-    subMesh->AddVertex(verts[values[iter->second]]);
-    subMesh->AddIndex(subMesh->GetVertexCount()-1);
-    if (combinedVertNorms)
-    subMesh->AddNormal(norms[values[iter->second]]);
-    }
-    else if (iter->first == "NORMAL")
-    {
-    subMesh->AddNormal(norms[values[iter->second]]);
-    }
-    else if (iter->first == "TEXCOORD")
-    {
-    subMesh->AddTexCoord(texcoords[values[iter->second]].x,
-    texcoords[values[iter->second]].y);
-    }
-  // else
-  // gzerr << "Unhandled semantic[" << iter->first << "]\n";
-
-  }
-  } while (iss);
-  */
-
   _mesh->AddSubMesh(subMesh);
 }
 
@@ -866,6 +843,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
   _mesh->AddSubMesh(subMesh);
 }
 
+/////////////////////////////////////////////////
 float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 {
   float value = 0;
@@ -913,4 +891,3 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material * /*_mat*/)
   // _mat->SetBlendFactors(ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
   // _mat->SetBlendFactors(srcFactor, dstFactor);
 }
-
