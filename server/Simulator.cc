@@ -750,11 +750,11 @@ void Simulator::PhysicsLoop()
       world->Update();
     }
   
-    /*{
+    {
       DIAGNOSTICTIMER(timer1("PHYSICS UpdateSimIfaces ",6));
       // Process all incoming messages from simiface
       world->UpdateSimulationIface();
-    }*/
+    }
 
     if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
