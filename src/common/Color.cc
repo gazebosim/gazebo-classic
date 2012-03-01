@@ -36,21 +36,21 @@ const Color Color::Green = Color(0, 1, 0, 1);
 const Color Color::Blue = Color(0, 0, 1, 1);
 
 //////////////////////////////////////////////////
-  Color::Color()
+Color::Color()
 : r(0), g(0), b(0), a(0)
 {
   this->Clamp();
 }
 
 //////////////////////////////////////////////////
-  Color::Color(float _r, float _g, float _b, const float _a)
+Color::Color(float _r, float _g, float _b, const float _a)
 : r(_r), g(_g), b(_b), a(_a)
 {
   this->Clamp();
 }
 
 //////////////////////////////////////////////////
-  Color::Color(const Color &_pt)
+Color::Color(const Color &_pt)
 : r(_pt.r), g(_pt.g), b(_pt.b), a(_pt.a)
 {
   this->Clamp();

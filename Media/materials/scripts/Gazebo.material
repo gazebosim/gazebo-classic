@@ -48,6 +48,20 @@ material Gazebo/Grey
   }
 }
 
+material Gazebo/RibbonTrail
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      scene_blend add
+      depth_write off
+      diffuse vertexcolour
+    }
+  }
+}
+
 material Gazebo/White : perpixel_template
 {
 	technique

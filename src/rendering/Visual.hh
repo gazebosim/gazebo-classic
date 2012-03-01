@@ -210,7 +210,9 @@ namespace gazebo
       public: void SetNormalMap(const std::string &nmap);
 
       /// \brief True on or off a ribbon trail
-      public: void SetRibbonTrail(bool value);
+      public: void SetRibbonTrail(bool value,
+                  const common::Color &_initialColor,
+                  const common::Color &_changeColor);
 
       /// \brief Get the bounding box for the visual
       public: math::Box GetBoundingBox() const;

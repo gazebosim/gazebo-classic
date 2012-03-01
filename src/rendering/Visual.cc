@@ -1245,20 +1245,26 @@ void Visual::SetShaderType(const std::string &_type)
 
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value)
+void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
+                            const common::Color &_changeColor)
 {
   if (this->ribbonTrail == NULL)
   {
-    this->ribbonTrail = this->scene->GetManager()->createRibbonTrail("RibbonTrail");
-    this->ribbonTrail->setMaterialName("Gazebo/Red");
-    this->ribbonTrail->setTrailLength(200);
-    this->ribbonTrail->setMaxChainElements(1000);
+    this->ribbonTrail = 
+      this->scene->GetManager()->createRibbonTrail(this->GetName() +
+                                                   "_RibbonTrail");
+    this->ribbonTrail->setMaterialName("Gazebo/RibbonTrail");
+    //this->ribbonTrail->setTrailLength(100);
+    this->ribbonTrail->setMaxChainElements(10000);
     //this->ribbonTrail->setNumberOfChains(1);
     this->ribbonTrail->setVisible(false);
     this->ribbonTrail->setCastShadows(false);
     this->ribbonTrail->setInitialWidth(0, 0.05);
     this->scene->GetManager()->getRootSceneNode()->attachObject(
         this->ribbonTrail);
+
+    this->ribbonTrail->setInitialColour(0, Conversions::Convert(_initialColor));
+    this->ribbonTrail->setColourChange(0, Conversions::Convert(_changeColor));
   }
 
 
