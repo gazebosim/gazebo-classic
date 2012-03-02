@@ -63,6 +63,40 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
+  pkg_check_modules(PROFILER libprofiler)
+  if (PROFILER_FOUND)
+    APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
+    set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler"
+      CACHE INTERNAL "Link flags for profile" FORCE)
+  else ()
+    find_library(PROFILER profiler)
+    if (PROFILER)
+      message (STATUS "Looking for libprofiler - found")
+      APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
+      set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler"
+        CACHE INTERNAL "Link flags for profile" FORCE)
+    else()
+      message (STATUS "Looking for libprofiler - not found")
+    endif()
+  endif()
+
+  pkg_check_modules(TCMALLOC libtcmalloc)
+  if (TCMALLOC_FOUND)
+    APPEND_TO_CACHED_LIST(general_libraries "general libraries" tcmalloc)
+    set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc"
+      CACHE INTERNAL "Link flags for profile" FORCE)
+  else ()
+    find_library(TCMALLOC tcmalloc)
+    if (TCMALLOC)
+      message (STATUS "Looking for libtcmalloc - found")
+      APPEND_TO_CACHED_LIST(general_libraries "general libraries" tcmalloc)
+      set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc"
+        CACHE INTERNAL "Link flags for profile" FORCE)
+    else ()
+      message (STATUS "Looking for libtcmalloc - not found")
+    endif()
+  endif ()
+
   pkg_check_modules(CEGUI CEGUI)
   pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
   if (NOT CEGUI_FOUND)
@@ -309,26 +343,6 @@ ELSE (HAVE_FFMPEG)
   SET (LIBAVFORMAT_PATH /usr/include)
   SET (LIBAVCODEC_PATH /usr/include)
 ENDIF (HAVE_FFMPEG)
-
-########################################
-# Find profiler library, optional
-find_library(PROFILER profiler)
-if (PROFILER)
-  message (STATUS "Looking for libprofiler - found")
-  APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
-else ()
-  message (STATUS "Looking for libprofiler - not found")
-endif ()
-
-########################################
-# Find tcmalloc library, optional
-find_library(TCMALLOC tcmalloc)
-if (TCMALLOC)
-  APPEND_TO_CACHED_LIST(general_libraries "general libraries" tcmalloc)
-  message (STATUS "Looking for libtcmalloc - found")
-else ()
-  message (STATUS "Looking for libtcmalloc - not found")
-endif ()
 
 ########################################
 # Find libtool

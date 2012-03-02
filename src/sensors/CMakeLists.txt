@@ -28,7 +28,7 @@ endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/sensors.h.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.h )
 
 
-add_library(gazebo_sensors SHARED ${sources})
+gz_add_library(gazebo_sensors ${sources})
 
 target_link_libraries(gazebo_sensors gazebo_common 
                                      gazebo_rendering
@@ -36,10 +36,9 @@ target_link_libraries(gazebo_sensors gazebo_common
                                      ${libtool_library} 
                                      ${boost_libraries}
                                      ${ogre_ldflags}
-                                     ${general_libraries}
                                      )
 
-add_executable(gzsensor server.cc)
+gz_add_executable(gzsensor server.cc)
 target_link_libraries( gzsensor gazebo_common
                                 gazebo_transport
                                 gazebo_sensors

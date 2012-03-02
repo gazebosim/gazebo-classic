@@ -17,12 +17,11 @@ set (GAZEBO_PATCH_VERSION 0)
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION}-RC3)
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
-
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set (CMAKE_INSTALL_PREFIX "/usr/" CACHE PATH "Gazebo install prefix" FORCE)
-endif()
-
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
+
+#if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#  set (CMAKE_INSTALL_PREFIX "/usr/" CACHE PATH "Gazebo install prefix" FORCE)
+#endif()
 
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
 
@@ -51,11 +50,9 @@ set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
-
 set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
 set (LIB_INSTALL_DIR "lib")
 set (BIN_INSTALL_DIR "bin")
-
 
 # with -fPIC
 if(UNIX AND NOT WIN32)
@@ -85,13 +82,21 @@ set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH
 
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
+#####################################
+# Build type cflags
+set (CMAKE_C_FLAGS_ALL " -Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic" CACHE INTERNAL "General C Flags")
+
+
+#####################################
+# Build type link flags
+set (CMAKE_LINK_FLAGS_RELEASE " " CACHE INTERNAL "Link flags fro release" FORCE)
+set (CMAKE_LINK_FLAGS_DEBUG " " CACHE INTERNAL "Link flags for debug" FORCE)
+set (CMAKE_LINK_FLAGS_PROFILE " " CACHE INTERNAL "Link flags for profile" FORCE)
+set (CMAKE_LINK_FLAGS_CHECK " --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
+
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
-
-#####################################
-# Build type cflags
-set (CMAKE_C_FLAGS_ALL " -Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow -Winit-self -Wswitch-default -Wmissing-include-dirs -fPIC -pedantic" CACHE INTERNAL "General C Flags")
 
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
@@ -115,18 +120,11 @@ set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 set (CMAKE_C_FLAGS_DEBUG " -ggdb3 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
 set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 
-set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_PROFILE " -ggdb3" CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
 set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
 set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates")
-
-#####################################
-# Build type link flags
-set (CMAKE_LINK_FLAGS_RELEASE " -fPIC" CACHE INTERNAL "Link flags fro release" FORCE)
-set (CMAKE_LINK_FLAGS_DEBUG " -fPIC" CACHE INTERNAL "Link flags for debug" FORCE)
-set (CMAKE_LINK_FLAGS_PROFILE " -fPIC" CACHE INTERNAL "Link flags for profile" FORCE)
-set (CMAKE_LINK_FLAGS_CHECK " -fPIC --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
 
 #####################################
 # Set the default build type
@@ -241,4 +239,3 @@ else (build_errors)
 
   message(STATUS "Configuration successful. Type make to compile gazebo")
 endif(build_errors)
-

@@ -77,7 +77,7 @@ foreach (hdr ${headers})
 endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/physics.h.in ${CMAKE_CURRENT_BINARY_DIR}/physics.h )
 
-add_library(gazebo_physics SHARED ${sources} ${sources})
+gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics gazebo_common 
                                      gazebo_sdf_interface
@@ -86,10 +86,9 @@ target_link_libraries(gazebo_physics gazebo_common
                                      ${libtool_library} 
                                      ${boost_libraries}
                                      ${tinyxml_libraries}
-                                     ${general_libraries}
                                      )
 
-add_executable(gzphysics server.cc)
+gz_add_executable(gzphysics server.cc)
 target_link_libraries(gzphysics gazebo_common
                                 gazebo_transport
                                 gazebo_physics
@@ -97,8 +96,8 @@ target_link_libraries(gzphysics gazebo_common
                                 gazebo_sdf_interface
                                 gazebo_msgs
                                 pthread
-                                ${general_libraries}
                                 )
+
 INSTALL_EXECUTABLE( gzphysics )
 INSTALL_LIBRARY(gazebo_physics)
 INSTALL_INCLUDES("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)

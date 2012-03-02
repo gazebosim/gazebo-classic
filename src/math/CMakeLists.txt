@@ -42,9 +42,8 @@ endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/gzmath.h.in ${CMAKE_CURRENT_BINARY_DIR}/gzmath.h )
 
 
-add_library(gazebo_math SHARED ${sources})
-
-target_link_libraries(gazebo_math ${boost_libraries} ${general_libraries})
+gz_add_library(gazebo_math ${sources})
+target_link_libraries(gazebo_math ${boost_libraries})
 
 INSTALL_LIBRARY(gazebo_math)
 INSTALL_INCLUDES("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.h)

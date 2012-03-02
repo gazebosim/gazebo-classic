@@ -34,6 +34,6 @@ include_directories(SYSTEM
   ${CMAKE_SOURCE_DIR}/deps/libccd/include 
   )
 
-add_library(gazebo_fcl SHARED ${sources})
-target_link_libraries( gazebo_fcl gazebo_ccd gazebo_ann)
+gz_add_library(gazebo_fcl ${sources})
+target_link_libraries(gazebo_fcl gazebo_ccd gazebo_ann)
 INSTALL_LIBRARY(gazebo_fcl)

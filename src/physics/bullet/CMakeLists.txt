@@ -63,6 +63,6 @@ set (sources ${sources} BulletScrewJoint.cc)
 
 add_definitions(${bullet_cflags})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
-add_library(gazebo_physics_bullet SHARED ${sources})
-target_link_libraries( gazebo_physics_bullet ${bullet_lflags} )
+gz_add_library(gazebo_physics_bullet ${sources})
+target_link_libraries( gazebo_physics_bullet ${bullet_lflags})
 install( TARGETS gazebo_physics_bullet DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

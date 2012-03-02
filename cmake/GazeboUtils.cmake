@@ -94,17 +94,32 @@ macro (BUILD_WARNING)
   endforeach (str ${ARGN})
 endmacro (BUILD_WARNING)
 
+#################################################
+macro (gz_add_library _name)
+  add_library(${_name} SHARED ${ARGN})
+  target_link_libraries (${_name} ${general_libraries})
+endmacro ()
+
+#################################################
+macro (gz_add_executable _name)
+  add_executable(${_name} ${ARGN})
+  target_link_libraries (${_name} ${general_libraries})
+endmacro ()
+
+
+#################################################
 macro (INSTALL_INCLUDES _subdir)
   install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
-endmacro(INSTALL_INCLUDES)
+endmacro()
 
+#################################################
 macro (INSTALL_LIBRARY _name)
   set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION})
   install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
-endmacro (INSTALL_LIBRARY _name)
+endmacro ()
 
+#################################################
 macro (INSTALL_EXECUTABLE _name)
   set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
-endmacro (INSTALL_EXECUTABLE _name)
-
+endmacro ()

@@ -236,11 +236,11 @@ endif()
 
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
-add_library(gazebo_ode SHARED ${sources})
-target_link_libraries( gazebo_ode gazebo_opcode gazebo_ccd gazebo_opende_ou)
+gz_add_library(gazebo_ode ${sources})
+target_link_libraries(gazebo_ode gazebo_opcode gazebo_ccd gazebo_opende_ou)
 
-add_dependencies( gazebo_ode gazebo_opcode)
-add_dependencies( gazebo_ode gazebo_opende_ou)
+add_dependencies(gazebo_ode gazebo_opcode)
+add_dependencies(gazebo_ode gazebo_opende_ou)
 
 INSTALL_LIBRARY(gazebo_ode)
 INSTALL_INCLUDES("ode" ${headers})

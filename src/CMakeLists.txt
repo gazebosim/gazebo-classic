@@ -29,16 +29,16 @@ add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
 
-add_dependencies( gazebo_physics gazebo_msgs )
-add_dependencies( gazebo_physics_ode gazebo_msgs )
-add_dependencies( gazebo_gui gazebo_msgs )
-add_dependencies( gazebo_rendering gazebo_msgs )
-add_dependencies( gazebo_sensors gazebo_rendering )
+add_dependencies(gazebo_physics gazebo_msgs)
+add_dependencies(gazebo_physics_ode gazebo_msgs)
+add_dependencies(gazebo_gui gazebo_msgs)
+add_dependencies(gazebo_rendering gazebo_msgs)
+add_dependencies(gazebo_sensors gazebo_rendering)
 
-add_executable(gzmaster master_main.cc Master.cc)
-add_executable(gzserver server_main.cc Server.cc Master.cc)
+gz_add_executable(gzmaster master_main.cc Master.cc)
+gz_add_executable(gzserver server_main.cc Server.cc Master.cc)
 
-target_link_libraries( gzmaster gazebo_common
+target_link_libraries(gzmaster gazebo_common
                                 gazebo_transport
                                 gazebo_sdf_interface
                                 gazebo_msgs
@@ -46,7 +46,7 @@ target_link_libraries( gzmaster gazebo_common
                                 ${freeimage_library}
                                 ${PROTOBUF_LIBRARY})
 
-target_link_libraries( gzserver gazebo_common
+target_link_libraries(gzserver gazebo_common
                                 gazebo_sdf_interface
                                 gazebo_transport
                                 gazebo_physics
@@ -57,17 +57,16 @@ target_link_libraries( gzserver gazebo_common
                                 ${tinyxml_libraries}
                                 )
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)
 endif()
 
 
+INSTALL_EXECUTABLE(gzmaster)
+INSTALL_EXECUTABLE(gzserver)
 
-INSTALL_EXECUTABLE( gzmaster )
-INSTALL_EXECUTABLE( gzserver )
-
-add_library(gazebo_server SHARED Server.cc Master.cc ${sources})
-target_link_libraries( gazebo_server gazebo_common
+gz_add_library(gazebo_server Server.cc Master.cc ${sources})
+target_link_libraries(gazebo_server gazebo_common
                                      gazebo_transport
                                      gazebo_physics
                                      gazebo_sensors
@@ -82,4 +81,3 @@ INSTALL_LIBRARY(gazebo_server)
 
 set( headers Server.hh gazebo.h)
 INSTALL_INCLUDES("" ${headers})
-
