@@ -97,13 +97,13 @@ endmacro (BUILD_WARNING)
 #################################################
 macro (gz_add_library _name)
   add_library(${_name} SHARED ${ARGN})
-  #target_link_libraries (${_name} ${general_libraries})
+  target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
 #################################################
 macro (gz_add_executable _name)
   add_executable(${_name} ${ARGN})
-  target_link_libraries (${_name} profiler)
+  target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
 

@@ -50,7 +50,9 @@ void TrimeshShape::Init()
   common::MeshManager *meshManager = common::MeshManager::Instance();
   this->mesh = meshManager->Load(this->sdf->GetValueString("filename"));
 
-  if (this->mesh->GetSubMeshCount() > 1)
+  // Commented out this because it seems uncesseary, and creates duplicate
+  // mesh objects
+  /*if (this->mesh->GetSubMeshCount() > 1)
   {
     // Create a mesh for each of the submeshes.
     for (unsigned int i = 1; i < this->mesh->GetSubMeshCount(); i++)
@@ -93,7 +95,7 @@ void TrimeshShape::Init()
       newCollision->SetSaveable(false);
       // newCollision->Load(config->GetRootNode()->GetChild());
     }
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
