@@ -189,9 +189,14 @@ void World::Load(sdf::ElementPtr _sdf)
     {
       WorldState state;
       state.Load(childElem);
+      this->sdf->InsertElement(childElem);
+      this->SetState(state);
+
       childElem = childElem->GetNextElement();
 
-      this->SetState(state);
+      // TODO: We currently load just the first state data. Need to
+      // implement a better mechanism for handling multiple states
+      break;
     }
   }
 }
@@ -200,11 +205,12 @@ void World::Load(sdf::ElementPtr _sdf)
 void World::Save(const std::string &_filename)
 {
   this->sdf->Update();
+  this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
   data += "<gazebo version ='1.0'>\n";
   data += this->sdf->ToString("");
-  data += this->GetState().GetSDF()->ToString("");
+  //data += this->GetState().GetSDF()->ToString("");
   data += "</gazebo>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);
@@ -1061,13 +1067,35 @@ WorldState World::GetState()
 }
 
 //////////////////////////////////////////////////
+void World::UpdateStateSDF()
+{
+  sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
+  stateElem->ClearElements();
+
+  stateElem->GetAttribute("world_name")->Set(this->GetName());
+  stateElem->GetAttribute("time")->Set(this->GetSimTime());
+
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+  {
+    sdf::ElementPtr elem = stateElem->AddElement("model");
+    this->GetModel(i)->GetState().FillSDF(elem);
+  }
+}
+
+//////////////////////////////////////////////////
 void World::SetState(const WorldState &_state)
 {
+  sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
+
+  stateElem->GetAttribute("world_name")->Set(_state.GetName());
+  stateElem->GetAttribute("time")->Set(_state.GetSimTime());
+
   this->SetSimTime(_state.GetSimTime());
   for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
   {
     ModelState modelState = _state.GetModelState(i);
     ModelPtr model = this->GetModel(modelState.GetName());
+    modelState.FillSDF(stateElem->AddElement("model"));
     if (model)
       model->SetState(modelState);
     else

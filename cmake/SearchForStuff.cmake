@@ -66,14 +66,14 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(PROFILER libprofiler)
   if (PROFILER_FOUND)
     APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
-    set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler"
+    set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -Wl,--no-as-needed -lprofiler -Wl,--as-needed"
       CACHE INTERNAL "Link flags for profile" FORCE)
   else ()
     find_library(PROFILER profiler)
     if (PROFILER)
       message (STATUS "Looking for libprofiler - found")
       APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
-      set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler"
+      set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -Wl,--no-as-needed -lprofiler -Wl,--as-needed"
         CACHE INTERNAL "Link flags for profile" FORCE)
     else()
       message (STATUS "Looking for libprofiler - not found")
@@ -83,7 +83,7 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(TCMALLOC libtcmalloc)
   if (TCMALLOC_FOUND)
     APPEND_TO_CACHED_LIST(general_libraries "general libraries" tcmalloc)
-    set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc"
+    set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -Wl,--no-as-needed -ltcmalloc -Wl,--no-as-needed"
       CACHE INTERNAL "Link flags for profile" FORCE)
   else ()
     find_library(TCMALLOC tcmalloc)

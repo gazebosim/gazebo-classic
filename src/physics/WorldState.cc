@@ -60,10 +60,7 @@ WorldState::~WorldState()
 /////////////////////////////////////////////////
 void WorldState::Load(sdf::ElementPtr _elem)
 {
-  std::cout << "WorldState::Load\n";
-
   this->name = _elem->GetValueString("world_name");
-  std::cout << "  Name[" << this->name << "]\n";
 
   if (_elem->HasElement("model"))
   {

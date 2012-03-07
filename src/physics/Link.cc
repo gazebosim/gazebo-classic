@@ -751,7 +751,7 @@ LinkState Link::GetState()
 //////////////////////////////////////////////////
 void Link::SetState(const LinkState &_state)
 {
-  this->SetWorldPose(_state.GetPose());
+  this->SetRelativePose(_state.GetPose());
 
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
   {

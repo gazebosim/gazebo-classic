@@ -178,7 +178,7 @@ void MainWindow::Open()
 void MainWindow::Save()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
-      tr("Save World"), "/home/nkoenig",
+      tr("Save World"), QString(),
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
   msgs::ServerControl msg;
@@ -656,13 +656,14 @@ bool MainWindow::HasEntityName(const std::string &_name)
   return result;
 }
 
-void MainWindow::OnWorldModify(
-    ConstWorldModifyPtr &_msg)
+void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_create() && _msg->create())
+  {
     this->renderWidget->CreateScene(_msg->world_name());
+    this->requestMsg = msgs::CreateRequest("entity_list");
+    this->requestPub->Publish(*this->requestMsg);
+  }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
-  else if (_msg->has_create() && _msg->create())
-    this->renderWidget->CreateScene(_msg->world_name());
 }

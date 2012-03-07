@@ -55,13 +55,9 @@ ModelState::~ModelState()
 /////////////////////////////////////////////////
 void ModelState::Load(sdf::ElementPtr _elem)
 {
-  std::cout << "ModelState::Load\n";
-
   this->name = _elem->GetValueString("name");
-  std::cout << "  Name[" << this->name << "]\n";
   if (_elem->HasElement("pose"))
     this->pose = _elem->GetElement("pose")->GetValuePose("");
-  std::cout << "  Pose[" << this->pose << "]\n";
 
   if (_elem->HasElement("link"))
   {

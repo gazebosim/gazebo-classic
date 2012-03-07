@@ -238,6 +238,8 @@ namespace gazebo
       private: void ProcessFactoryMsgs();
       private: void ProcessModelMsgs();
 
+      private: void UpdateStateSDF();
+
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
 

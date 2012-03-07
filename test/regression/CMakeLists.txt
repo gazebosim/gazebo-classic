@@ -19,9 +19,9 @@ if (INCLUDE_PLAYER)
 endif()
 
 find_package(GTest REQUIRED)
-include_directories( ${GTEST_INCLUDE_DIRS} )
+include_directories(${GTEST_INCLUDE_DIRS})
 
-set (gtest_sources transport.cc speed.cc factory.cc physics.cc msgs.cc math.cc pr2.cc common.cc laser.cc)
+set (gtest_sources transport.cc speed.cc factory.cc physics.cc msgs.cc math.cc pr2.cc common.cc laser.cc file_handling.cc)
 
 foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})

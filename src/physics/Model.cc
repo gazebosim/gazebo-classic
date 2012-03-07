@@ -143,15 +143,10 @@ void Model::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::Init()
 {
-  math::Pose pose;
-
-  // Get the position and orientation of the model (relative to parent)
-  pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
-
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(pose);
+  this->SetInitialRelativePose(this->GetWorldPose());
 
-  this->SetRelativePose(pose);
+  this->SetRelativePose(this->GetWorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -689,15 +684,16 @@ void Model::FillModelMsg(msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (_msg.has_id() && _msg.id() != this->GetId())
+  if (!(_msg.has_id() && _msg.id() == this->GetId()))
   {
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
   }
-  else if (_msg.name() != this->GetScopedName())
+  else if ((_msg.has_id() && _msg.id() != this->GetId()) &&
+      _msg.name() != this->GetScopedName())
   {
     gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
-          << "]\n";
+      << "]\n";
     return;
   }
 
@@ -1017,7 +1013,7 @@ ModelState Model::GetState()
 //////////////////////////////////////////////////
 void Model::SetState(const ModelState &_state)
 {
-  this->SetWorldPose(_state.GetPose());
+  this->SetWorldPose(_state.GetPose(), true);
 
   for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
