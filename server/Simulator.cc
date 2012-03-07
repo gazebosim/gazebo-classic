@@ -780,25 +780,22 @@ void Simulator::PhysicsLoop()
     //printf("debug: %f %f before[%f]", physicsUpdateRate, physicsUpdatePeriod.Double(), this->GetRealTime().Double());
 
     Time preSleepTime = this->GetRealTime();
-    if (physicsUpdatePeriod.Double() > 0)
+    elapsedTime = this->GetRealTime() - lastTime;
+    // Set a default sleep time
+    sleepRequestTime = physicsUpdatePeriod - elapsedTime - sleepAdjustTime;
+    if (sleepRequestTime > this->min_nanosleep_time) // as best as we can given machine min sleep time
     {
-      elapsedTime = this->GetRealTime() - lastTime;
-      // Set a default sleep time
-      sleepRequestTime = physicsUpdatePeriod - elapsedTime - sleepAdjustTime;
-      if (sleepRequestTime > this->min_nanosleep_time) // as best as we can given machine min sleep time
-      {
-        req.tv_sec  = sleepRequestTime.sec;
-        req.tv_nsec = sleepRequestTime.nsec;
-      }
-      else
-      {
-        req.tv_sec  = 0;
-        req.tv_nsec = 0;
-      }
+      req.tv_sec  = sleepRequestTime.sec;
+      req.tv_nsec = sleepRequestTime.nsec;
       nanosleep(&req, &rem);
     }
+    else
+    {
+      req.tv_sec  = 0;
+      req.tv_nsec = 0;
+    }
 
-    Time tmp = lastTime;
+    //Time tmp = lastTime;
     lastTime = this->GetRealTime();
     actualSleepTime = lastTime - preSleepTime;
     sleepAdjustTime = actualSleepTime - sleepRequestTime;
