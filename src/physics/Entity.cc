@@ -540,9 +540,7 @@ void Entity::UpdateAnimation()
       this->onAnimationComplete();
     }
   }
-
 }
-
 
 //////////////////////////////////////////////////
 const math::Pose &Entity::GetDirtyPose() const

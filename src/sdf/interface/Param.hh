@@ -166,7 +166,7 @@ namespace sdf
     {
       std::ostringstream stream;
       stream << std::fixed << this->value;
-      return stream.str(); 
+      return stream.str();
     }
 
     /// \brief Set the parameter value from a string

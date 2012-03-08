@@ -206,7 +206,6 @@ void World::Save(const std::string &_filename)
   data = "<?xml version ='1.0'?>\n";
   data += "<gazebo version ='1.0'>\n";
   data += this->sdf->ToString("");
-  //data += this->GetState().GetSDF()->ToString("");
   data += "</gazebo>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);

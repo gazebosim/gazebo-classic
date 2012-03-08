@@ -794,7 +794,7 @@ TEST_F(MathTest, Matrix3)
   matrix.SetCol(0, math::Vector3(3, 4, 5));
   EXPECT_TRUE(matrix == math::Matrix3(3, 2, 2, 4, 1, 2, 5, 2, 1));
 
-  EXPECT_THROW(matrix.SetCol(3, math::Vector3(1, 1, 1)), common::Exception);
+  EXPECT_THROW(matrix.SetCol(3, math::Vector3(1, 1, 1)), std::string);
 }
 
 TEST_F(MathTest, Angle)

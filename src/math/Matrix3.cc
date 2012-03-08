@@ -90,7 +90,7 @@ void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
 void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
 {
   if (_i >= 3)
-    throw("Invalid column number");
+    throw(std::string("Invalid column number"));
 
   m[0][_i] = _v.x;
   m[1][_i] = _v.y;

@@ -38,7 +38,7 @@ LinkState::LinkState(const LinkPtr _link)
   {
     this->collisionStates.push_back(_link->GetCollision(i)->GetState());
   }
-  this->pose = _link->GetWorldPose();
+  this->pose = _link->GetRelativePose();
 }
 
 /////////////////////////////////////////////////

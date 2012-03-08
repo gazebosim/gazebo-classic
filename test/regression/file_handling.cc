@@ -59,8 +59,6 @@ TEST_F(FileHandling, Save)
   }
 
   EXPECT_LT(i, 10);
-
-
 }
 
 int main(int argc, char **argv)

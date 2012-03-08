@@ -270,7 +270,7 @@ Vector3 Matrix4::TransformAffine(const Vector3 &_v) const
 {
   if (!this->IsAffine())
   {
-    throw("Not and affine matrix");
+    throw(std::string("Not and affine matrix"));
   }
 
   return Vector3(this->m[0][0]*_v.x + this->m[0][1]*_v.y +

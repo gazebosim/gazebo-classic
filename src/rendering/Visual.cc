@@ -441,7 +441,7 @@ void Visual::Update()
           this->GetName() + "_animation");
       if (this->onAnimationComplete)
         this->onAnimationComplete();
-      //event::Events::DisconnectPreRender(this->preRenderConnection);
+      // event::Events::DisconnectPreRender(this->preRenderConnection);
     }
   }
 }
@@ -1250,13 +1250,13 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 {
   if (this->ribbonTrail == NULL)
   {
-    this->ribbonTrail = 
+    this->ribbonTrail =
       this->scene->GetManager()->createRibbonTrail(this->GetName() +
                                                    "_RibbonTrail");
     this->ribbonTrail->setMaterialName("Gazebo/RibbonTrail");
-    //this->ribbonTrail->setTrailLength(100);
+    // this->ribbonTrail->setTrailLength(100);
     this->ribbonTrail->setMaxChainElements(10000);
-    //this->ribbonTrail->setNumberOfChains(1);
+    // this->ribbonTrail->setNumberOfChains(1);
     this->ribbonTrail->setVisible(false);
     this->ribbonTrail->setCastShadows(false);
     this->ribbonTrail->setInitialWidth(0, 0.05);
@@ -1275,7 +1275,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
       this->ribbonTrail->addNode(this->sceneNode);
     }
     catch(...)
-    { 
+    {
       gzerr << "Unable to create ribbon trail\n";
     }
   }
@@ -1718,7 +1718,7 @@ void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
 
     tt += dt;
   }
- 
+
   this->animState =
     this->sceneNode->getCreator()->createAnimationState(animName);
 

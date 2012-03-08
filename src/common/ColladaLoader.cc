@@ -657,13 +657,18 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
       // if vcounts[l] = 5, then read 0,1,2, then 0,2,3, 0,3,4,...
       // here k = the last number in the series
       // j is the triangle loop
-      for (unsigned int j=0; j < 3; ++j)
+      for (unsigned int j = 0; j < 3; ++j)
       {
         // break polygon into triangles
         unsigned int triangle_index;
-        if (j==0) triangle_index = 0;
-        if (j==1) triangle_index = (k-1)*inputs.size();
-        if (j==2) triangle_index = (k)*inputs.size();
+
+        if (j == 0)
+          triangle_index = 0;
+        if (j == 1)
+          triangle_index = (k-1)*inputs.size();
+        if (j == 2)
+          triangle_index = (k)*inputs.size();
+
         for (unsigned int i = 0; i < inputs.size(); i++)
         {
           values[i] = math::parseInt(strs_iter[triangle_index+i]);

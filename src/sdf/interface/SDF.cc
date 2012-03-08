@@ -364,7 +364,8 @@ void Element::ToString(const std::string &_prefix,
     for (aiter = this->attributes.begin();
         aiter != this->attributes.end(); ++aiter)
     {
-      _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
+      _out << " " << (*aiter)->GetKey() << "='"
+           << (*aiter)->GetAsString() << "'";
     }
 
     if (this->elements.size() > 0)
@@ -382,7 +383,8 @@ void Element::ToString(const std::string &_prefix,
     {
       if (this->value)
       {
-        _out << ">" << this->value->GetAsString() << "</" << this->name << ">\n";
+        _out << ">" << this->value->GetAsString()
+             << "</" << this->name << ">\n";
       }
       else
       {

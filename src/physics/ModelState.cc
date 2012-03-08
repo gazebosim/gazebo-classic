@@ -82,17 +82,7 @@ void ModelState::FillStateSDF(sdf::ElementPtr _elem)
   for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)
   {
-    sdf::ElementPtr elem;
-    for (elem = _elem->GetElement("link");
-         elem != NULL; elem = elem->GetNextElement("link"))
-    {
-      if (elem->GetValueString("name") == (*iter).GetName())
-        break;
-    }
-
-    if (!elem)
-      elem = _elem->AddElement("link");
-
+    sdf::ElementPtr elem = _elem->AddElement("link");
     (*iter).FillStateSDF(elem);
   }
 }
