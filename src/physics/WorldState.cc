@@ -46,7 +46,7 @@ WorldState::WorldState(WorldPtr _world)
   {
     sdf::ElementPtr modelElem = this->sdf->AddElement("model");
     this->modelStates.push_back(_world->GetModel(i)->GetState());
-    this->modelStates.back().FillSDF(modelElem);
+    this->modelStates.back().FillStateSDF(modelElem);
   }
 }
 

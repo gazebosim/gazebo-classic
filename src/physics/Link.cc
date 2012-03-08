@@ -586,6 +586,7 @@ void Link::FillLinkMsg(msgs::Link &_msg)
   _msg.set_kinematic(this->GetKinematic());
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
 
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());

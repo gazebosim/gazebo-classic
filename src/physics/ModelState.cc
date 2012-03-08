@@ -39,10 +39,10 @@ ModelState::ModelState(ModelPtr _model)
     this->linkStates.push_back(_model->GetLink(i)->GetState());
   }
 
-  for (unsigned int i = 0; i < _model->GetJointCount(); ++i)
+  /*for (unsigned int i = 0; i < _model->GetJointCount(); ++i)
   {
     this->jointStates.push_back(_model->GetJoint(i)->GetState());
-  }
+  }*/
 
   this->pose = _model->GetWorldPose();
 }
@@ -74,7 +74,7 @@ void ModelState::Load(sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-void ModelState::FillSDF(sdf::ElementPtr _elem)
+void ModelState::FillStateSDF(sdf::ElementPtr _elem)
 {
   _elem->GetAttribute("name")->Set(this->GetName());
   _elem->GetOrCreateElement("pose")->GetValue()->Set(this->pose);
@@ -82,8 +82,45 @@ void ModelState::FillSDF(sdf::ElementPtr _elem)
   for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)
   {
-    sdf::ElementPtr linkElem = _elem->AddElement("link");
-    (*iter).FillSDF(linkElem);
+    sdf::ElementPtr elem;
+    for (elem = _elem->GetElement("link");
+         elem != NULL; elem = elem->GetNextElement("link"))
+    {
+      if (elem->GetValueString("name") == (*iter).GetName())
+        break;
+    }
+
+    if (!elem)
+      elem = _elem->AddElement("link");
+
+    (*iter).FillStateSDF(elem);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelState::UpdateModelSDF(sdf::ElementPtr _elem)
+{
+  _elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->pose);
+
+  if (_elem->HasElement("link"))
+  {
+    sdf::ElementPtr childElem = _elem->GetElement("link");
+
+    // Update all links
+    while (childElem)
+    {
+      // Find matching link state
+      for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+          iter != this->linkStates.end(); ++iter)
+      {
+        if ((*iter).GetName() == childElem->GetValueString("name"))
+        {
+          (*iter).UpdateLinkSDF(childElem);
+        }
+      }
+
+      childElem = childElem->GetNextElement();
+    }
   }
 }
 

@@ -364,10 +364,12 @@ void Collision::FillCollisionMsg(msgs::Collision &_msg)
   this->shape->FillShapeMsg(*_msg.mutable_geometry());
   this->surface->FillSurfaceMsg(*_msg.mutable_surface());
 
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
   _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
 }
 
+//////////////////////////////////////////////////
 void Collision::ProcessMsg(const msgs::Collision &_msg)
 {
   if (_msg.id() != this->GetId())

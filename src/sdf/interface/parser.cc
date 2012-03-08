@@ -481,6 +481,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 
         includeSDF->root->GetFirstElement()->SetParent(_sdf);
         _sdf->InsertElement(includeSDF->root->GetFirstElement());
+        includeSDF->root->GetFirstElement()->SetInclude(elemXml->Attribute("filename"));
 
         if (elemXml->Attribute("model_name"))
           includeSDF->root->GetElement("model")->GetAttribute(

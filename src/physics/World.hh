@@ -239,6 +239,7 @@ namespace gazebo
       private: void ProcessModelMsgs();
 
       private: void UpdateStateSDF();
+      private: void UpdateSDFFromState(const WorldState &_state);
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;

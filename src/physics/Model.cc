@@ -660,10 +660,10 @@ void Model::FillModelMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
-  _msg.mutable_pose()->CopyFrom(
-      msgs::Convert(this->GetWorldPose()));
+  _msg.mutable_pose()->CopyFrom( msgs::Convert(this->GetWorldPose()));
   _msg.set_id(this->GetId());
 
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (unsigned int j = 0; j < this->GetChildCount(); j++)

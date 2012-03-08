@@ -118,7 +118,7 @@ void World::Load(sdf::ElementPtr _sdf)
   else
     this->name = this->sdf->GetValueString("name");
 
-  this->sceneMsg.CopyFrom(msgs::SceneFromSDF(_sdf->GetElement("scene")));
+  this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
 
   // The period at which statistics about the world are published
@@ -149,48 +149,31 @@ void World::Load(sdf::ElementPtr _sdf)
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
 
+  std::string type = this->sdf->GetElement("physics")->GetValueString("type");
+  this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
+      shared_from_this());
+
+  if (this->physicsEngine == NULL)
+    gzthrow("Unable to create physics engine\n");
+
+  // This should come before loading of entities
+  this->physicsEngine->Load(this->sdf->GetElement("physics"));
+
+  this->rootElement.reset(new Base(BasePtr()));
+  this->rootElement->SetName(this->GetName());
+  this->rootElement->SetWorld(shared_from_this());
+
+  if (this->sdf->HasElement("state"))
   {
-    // Make all incoming messages wait until the world is done loading.
-    // boost::mutex::scoped_lock lock(*this->receiveMutex);
-
-    std::string type = _sdf->GetElement("physics")->GetValueString("type");
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
-        shared_from_this());
-
-    if (this->physicsEngine == NULL)
-      gzthrow("Unable to create physics engine\n");
-
-    // This should come before loading of entities
-    this->physicsEngine->Load(_sdf->GetElement("physics"));
-
-    this->rootElement.reset(new Base(BasePtr()));
-    this->rootElement->SetName(this->GetName());
-    this->rootElement->SetWorld(shared_from_this());
-
-    // Create all the entities
-    this->LoadEntities(_sdf, this->rootElement);
-
-    // TODO: Performance test to see if TBB model updating is necessary
-    // Choose threaded or unthreaded model updating depending on the number of
-    // models in the scene
-    // if (this->GetModelCount() < 20)
-    this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
-    // else
-    // this->modelUpdateFunc = &World::ModelUpdateTBB;
-
-    event::Events::worldCreated(this->GetName());
-  }
-
-  if (_sdf->HasElement("state"))
-  {
-    sdf::ElementPtr childElem = _sdf->GetElement("state");
+    sdf::ElementPtr childElem = this->sdf->GetElement("state");
 
     while (childElem)
     {
       WorldState state;
       state.Load(childElem);
       this->sdf->InsertElement(childElem);
-      this->SetState(state);
+      this->UpdateSDFFromState(state);
+      // this->SetState(state);
 
       childElem = childElem->GetNextElement();
 
@@ -199,6 +182,19 @@ void World::Load(sdf::ElementPtr _sdf)
       break;
     }
   }
+
+  // Create all the entities
+  this->LoadEntities(this->sdf, this->rootElement);
+
+  // TODO: Performance test to see if TBB model updating is necessary
+  // Choose threaded or unthreaded model updating depending on the number of
+  // models in the scene
+  // if (this->GetModelCount() < 20)
+  this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
+  // else
+  // this->modelUpdateFunc = &World::ModelUpdateTBB;
+
+  event::Events::worldCreated(this->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -1078,7 +1074,7 @@ void World::UpdateStateSDF()
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
   {
     sdf::ElementPtr elem = stateElem->AddElement("model");
-    this->GetModel(i)->GetState().FillSDF(elem);
+    this->GetModel(i)->GetState().FillStateSDF(elem);
   }
 }
 
@@ -1095,7 +1091,7 @@ void World::SetState(const WorldState &_state)
   {
     ModelState modelState = _state.GetModelState(i);
     ModelPtr model = this->GetModel(modelState.GetName());
-    modelState.FillSDF(stateElem->AddElement("model"));
+    modelState.FillStateSDF(stateElem->AddElement("model"));
     if (model)
       model->SetState(modelState);
     else
@@ -1128,4 +1124,27 @@ std::string World::StripWorldName(const std::string &_name) const
     return _name.substr(this->GetName().size() + 2);
   else
     return _name;
+}
+
+//////////////////////////////////////////////////
+void World::UpdateSDFFromState(const WorldState &_state)
+{
+  if (this->sdf->HasElement("model"))
+  {
+    sdf::ElementPtr childElem = this->sdf->GetElement("model");
+
+    while (childElem)
+    {
+      for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
+      {
+        ModelState modelState = _state.GetModelState(i);
+        if (modelState.GetName() == childElem->GetValueString("name"))
+        {
+          modelState.UpdateModelSDF(childElem);
+        }
+      }
+
+      childElem = childElem->GetNextElement();
+    }
+  }
 }

@@ -264,4 +264,3 @@ void Joint::SetState(const JointState &_state)
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
     this->SetAngle(i, _state.GetAngle(i));
 }
-

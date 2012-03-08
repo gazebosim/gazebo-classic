@@ -124,6 +124,9 @@ namespace sdf
     public: void Update();
     public: void Reset();
 
+    public: void SetInclude(const std::string &_filename);
+    public: std::string GetInclude() const;
+
     /// \brief Add a new element description
     public: void AddElementDescription(ElementPtr _elem);
 
@@ -148,6 +151,9 @@ namespace sdf
 
     // The possible child elements
     private: ElementPtr_V elementDescriptions;
+
+    /// name of the include file that was used to create this element
+    private: std::string includeFilename;
   };
 
 

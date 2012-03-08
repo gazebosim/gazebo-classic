@@ -49,14 +49,10 @@ LinkState::~LinkState()
 /////////////////////////////////////////////////
 void LinkState::Load(sdf::ElementPtr _elem)
 {
-  std::cout << "LinkState::Load\n";
-
   this->name = _elem->GetValueString("name");
-  std::cout << "  Name[" << this->name << "]\n";
 
   if (_elem->HasElement("pose"))
     this->pose = _elem->GetElement("pose")->GetValuePose("");
-  std::cout << "  Pose[" << this->pose << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -98,7 +94,7 @@ CollisionState LinkState::GetCollisionState(
 }
 
 /////////////////////////////////////////////////
-void LinkState::FillSDF(sdf::ElementPtr _elem)
+void LinkState::FillStateSDF(sdf::ElementPtr _elem)
 {
   _elem->GetAttribute("name")->Set(this->GetName());
   _elem->GetOrCreateElement("pose")->GetValue()->Set(this->pose);
@@ -109,4 +105,10 @@ void LinkState::FillSDF(sdf::ElementPtr _elem)
   {
     sdf::ElementPtr forceElem = _elem->AddElement("force");
   }*/
+}
+
+/////////////////////////////////////////////////
+void LinkState::UpdateLinkSDF(sdf::ElementPtr _elem)
+{
+  _elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->pose);
 }

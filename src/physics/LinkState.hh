@@ -60,8 +60,11 @@ namespace gazebo
       public: CollisionState GetCollisionState(
                   const std::string &_collisionName) const;
 
-      /// \brief Fill an SDF element with state info
-      public: void FillSDF(sdf::ElementPtr _elem);
+      /// \brief Fill a State SDF element with state info
+      public: void FillStateSDF(sdf::ElementPtr _elem);
+
+      /// \brief Update a Link SDF element with this state info
+      public: void UpdateLinkSDF(sdf::ElementPtr _elem);
 
       /// 3D pose of the link relative to the model
       private: math::Pose pose;

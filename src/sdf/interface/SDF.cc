@@ -207,6 +207,7 @@ ElementPtr Element::Clone() const
   clone->required = this->required;
   clone->parent = this->parent;
   clone->copyChildren = this->copyChildren;
+  clone->includeFilename = this->includeFilename;
 
   Param_V::const_iterator aiter;
   for (aiter = this->attributes.begin();
@@ -239,6 +240,7 @@ void Element::Copy(const ElementPtr _elem)
   this->name = _elem->GetName();
   this->required = _elem->GetRequired();
   this->copyChildren = _elem->GetCopyChildren();
+  this->includeFilename = _elem->includeFilename;
 
   for (Param_V::iterator iter = _elem->attributes.begin();
        iter != _elem->attributes.end(); ++iter)
@@ -354,36 +356,44 @@ std::string Element::ToString(const std::string &_prefix) const
 void Element::ToString(const std::string &_prefix,
                        std::ostringstream &_out) const
 {
-  _out << _prefix << "<" << this->name;
-
-  Param_V::const_iterator aiter;
-  for (aiter = this->attributes.begin();
-      aiter != this->attributes.end(); ++aiter)
+  if (this->includeFilename.empty())
   {
-    _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
-  }
+    _out << _prefix << "<" << this->name;
 
-  if (this->elements.size() > 0)
-  {
-    _out << ">\n";
-    ElementPtr_V::const_iterator eiter;
-    for (eiter = this->elements.begin();
-        eiter != this->elements.end(); ++eiter)
+    Param_V::const_iterator aiter;
+    for (aiter = this->attributes.begin();
+        aiter != this->attributes.end(); ++aiter)
     {
-      (*eiter)->ToString(_prefix + "  ", _out);
+      _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
     }
-    _out << _prefix << "</" << this->name << ">\n";
-  }
-  else
-  {
-    if (this->value)
+
+    if (this->elements.size() > 0)
     {
-      _out << ">" << this->value->GetAsString() << "</" << this->name << ">\n";
+      _out << ">\n";
+      ElementPtr_V::const_iterator eiter;
+      for (eiter = this->elements.begin();
+          eiter != this->elements.end(); ++eiter)
+      {
+        (*eiter)->ToString(_prefix + "  ", _out);
+      }
+      _out << _prefix << "</" << this->name << ">\n";
     }
     else
     {
-      _out << "/>\n";
+      if (this->value)
+      {
+        _out << ">" << this->value->GetAsString() << "</" << this->name << ">\n";
+      }
+      else
+      {
+        _out << "/>\n";
+      }
     }
+  }
+  else
+  {
+    _out << _prefix << "<include filename='"
+         << this->includeFilename << "'/>\n";
   }
 }
 
@@ -802,6 +812,19 @@ void Element::AddElementDescription(ElementPtr _elem)
 {
   this->elementDescriptions.push_back(_elem);
 }
+
+/////////////////////////////////////////////////
+void Element::SetInclude(const std::string &_filename)
+{
+  this->includeFilename = _filename;
+}
+
+/////////////////////////////////////////////////
+std::string Element::GetInclude() const
+{
+  return this->includeFilename;
+}
+
 
 
 
