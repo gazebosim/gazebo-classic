@@ -238,6 +238,14 @@ void InsertModelWidget::OnMouseRelease(const common::MouseEvent &_event)
     sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
     std::string modelName = modelElem->GetValueString("name");
 
+    // Automatically create a new name if the model exists
+    int i = 0;
+    while (has_entity_name(modelName))
+    {
+      modelName = modelElem->GetValueString("name") + "_" +
+                  boost::lexical_cast<std::string>(i++);
+    }
+
     // Remove the topic namespace from the model name. This will get re-inserted
     // by the World automatically
     modelName.erase(0, this->node->GetTopicNamespace().size()+2);

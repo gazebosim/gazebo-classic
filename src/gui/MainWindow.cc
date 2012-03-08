@@ -626,6 +626,7 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name)
   this->selectionPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 unsigned int MainWindow::GetEntityId(const std::string &_name)
 {
   unsigned int result = 0;
@@ -638,17 +639,21 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
   if (iter != this->entities.end())
     result = iter->second;
   else
-    gzerr << "Unable to find model[" << name << "]\n";
+    gzerr << "Unable to find model[" << _name << "]\n";
 
   return result;
 }
 
+/////////////////////////////////////////////////
 bool MainWindow::HasEntityName(const std::string &_name)
 {
   bool result = false;
 
+  std::string name = _name;
+  boost::replace_first(name, gui::get_world()+"::", "");
+
   std::map<std::string, unsigned int>::iterator iter;
-  iter = this->entities.find(_name);
+  iter = this->entities.find(name);
 
   if (iter != this->entities.end())
     result = true;
@@ -656,6 +661,7 @@ bool MainWindow::HasEntityName(const std::string &_name)
   return result;
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_create() && _msg->create())

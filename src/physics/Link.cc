@@ -580,7 +580,7 @@ void Link::AddChildJoint(JointPtr _joint)
 void Link::FillLinkMsg(msgs::Link &_msg)
 {
   _msg.set_id(this->GetId());
-  _msg.set_name(this->GetName());
+  _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());

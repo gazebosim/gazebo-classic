@@ -190,7 +190,6 @@ void ModelListWidget::Update()
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 {
-  std::cout << "OnModel Update[" << _msg.name() << "]\n";
   std::string name = _msg.name();
 
   QTreeWidgetItem *listItem = this->GetModelListItem(_msg.id());
@@ -199,7 +198,6 @@ void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
   {
     if (!_msg.has_deleted() || !_msg.deleted())
     {
-      std::cout << "   New\n";
       // Create a top-level tree item for the path
       QTreeWidgetItem *topItem = new QTreeWidgetItem(
           static_cast<QTreeWidgetItem*>(0),
@@ -230,18 +228,15 @@ void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
   {
     if (_msg.has_deleted() && _msg.deleted())
     {
-      std::cout << "   DELETED\n";
       int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
       this->modelTreeWidget->takeTopLevelItem(i);
     }
     else
     {
-      std::cout << "   Set Text\n";
       listItem->setText(0, _msg.name().c_str());
       listItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
     }
   }
-  
 }
 
 /////////////////////////////////////////////////
@@ -1695,7 +1690,6 @@ void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    std::cout << "Delete Entity[" << _msg->data() << "]\n";
     this->RemoveEntity(_msg->data());
   }
 }
@@ -1703,7 +1697,6 @@ void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
-  std::cout << "Remove Scene\n";
   this->poseMsgs.clear();
   this->modelTreeWidget->clear();
   this->propTreeBrowser->clear();
@@ -1720,8 +1713,6 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 /////////////////////////////////////////////////
 void ModelListWidget::OnCreateScene(const std::string &_name)
 {
-  std::cout << "Create Scene\n";
-
   this->poseMsgs.clear();
   this->modelTreeWidget->clear();
   this->propTreeBrowser->clear();
