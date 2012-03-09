@@ -70,6 +70,7 @@ namespace gazebo
 
     private: boost::mutex *receiveMutex;
     private: std::list<msgs::ServerControl> controlMsgs;
+    private: std::map<std::string, std::string> worldFilenames;
   };
 }
 

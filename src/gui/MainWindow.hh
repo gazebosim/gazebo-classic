@@ -56,6 +56,7 @@ namespace gazebo
       private slots: void New();
       private slots: void Open();
       private slots: void Save();
+      private slots: void SaveAs();
       private slots: void About();
       private slots: void Play();
       private slots: void Pause();
@@ -101,6 +102,7 @@ namespace gazebo
       private: QAction *newAct;
       private: QAction *openAct;
       private: QAction *saveAct;
+      private: QAction *saveAsAct;
       private: QAction *aboutAct;
       private: QAction *quitAct;
 

@@ -112,7 +112,7 @@ bool Server::Load(const std::string &_filename)
   physics::load();
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-  while (worldElem)
+  if (worldElem)
   {
     physics::WorldPtr world = physics::create_world();
 
@@ -126,7 +126,7 @@ bool Server::Load(const std::string &_filename)
       gzthrow("Failed to load the World\n"  << e);
     }
 
-    worldElem = worldElem->GetNextElement();
+    this->worldFilenames[world->GetName()] = _filename;
   }
 
   this->node = transport::NodePtr(new transport::Node());
@@ -251,10 +251,13 @@ void Server::ProcessControlMsgs()
   for (iter = this->controlMsgs.begin();
        iter != this->controlMsgs.end(); ++iter)
   {
-    if ((*iter).has_save_world_name() && (*iter).has_save_filename())
+    if ((*iter).has_save_world_name())
     {
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
-      world->Save((*iter).save_filename());
+      if ((*iter).has_save_filename())
+        world->Save((*iter).save_filename());
+      else
+        world->Save(this->worldFilenames[world->GetName()]);
     }
     else if ((*iter).has_new_world() && (*iter).new_world())
     {

@@ -177,14 +177,25 @@ void MainWindow::Open()
 /////////////////////////////////////////////////
 void MainWindow::Save()
 {
+  msgs::ServerControl msg;
+  msg.set_save_world_name(get_world());
+  this->serverControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::SaveAs()
+{
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save World"), QString(),
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  msgs::ServerControl msg;
-  msg.set_save_world_name("default");
-  msg.set_save_filename(filename);
-  this->serverControlPub->Publish(msg);
+  if (!filename.empty())
+  {
+    msgs::ServerControl msg;
+    msg.set_save_world_name(get_world());
+    msg.set_save_filename(filename);
+    this->serverControlPub->Publish(msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -345,8 +356,14 @@ void MainWindow::CreateActions()
 
   this->saveAct = new QAction(tr("&Save"), this);
   this->saveAct->setShortcut(tr("Ctrl+S"));
-  this->saveAct->setStatusTip(tr("Save to a world file"));
+  this->saveAct->setStatusTip(tr("Save world"));
   connect(this->saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+
+  this->saveAsAct = new QAction(tr("Save &As"), this);
+  this->saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
+  this->saveAsAct->setStatusTip(tr("Save world to new file"));
+  connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
+
 
   this->aboutAct = new QAction(tr("&About"), this);
   this->aboutAct->setStatusTip(tr("Show the about info"));
@@ -456,6 +473,7 @@ void MainWindow::CreateMenus()
   this->fileMenu->addAction(this->openAct);
   this->fileMenu->addAction(this->newAct);
   this->fileMenu->addAction(this->saveAct);
+  this->fileMenu->addAction(this->saveAsAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(this->quitAct);
 
