@@ -319,7 +319,7 @@ void Scene::InitShadows()
   // the shadow maps
   // add the overlay elements to show the shadow maps:
   // init overlay elements
-  Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
+  /*Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
   Ogre::Overlay* overlay = mgr.create("DebugOverlay");
   for (size_t i = 0; i < 3; ++i)
   {
@@ -343,7 +343,7 @@ void Scene::InitShadows()
     debugPanel->setMaterialName(debugMat->getName());
     overlay->add2D(debugPanel);
     overlay->show();
-  }
+  }*/
 }
 
 
