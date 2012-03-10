@@ -64,6 +64,7 @@ namespace gazebo
 
       private slots: void NewModel();
       private slots: void EditWorldProperties();
+      private slots: void RingPose();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -113,6 +114,8 @@ namespace gazebo
       private: QAction *playAct;
       private: QAction *pauseAct;
       private: QAction *stepAct;
+
+      private: QAction *ringPoseAct;
 
       private: QAction *boxCreateAct;
       private: QAction *sphereCreateAct;

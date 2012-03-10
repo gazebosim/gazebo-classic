@@ -74,9 +74,10 @@ namespace gazebo
       /// \brief Connect a boost::slot the the manip mode signal
       public: template<typename T>
               static event::ConnectionPtr ConnectManipMode(T _subscriber)
-              { return manipMode.Connect(_subscriber); }
+              {return manipMode.Connect(_subscriber);}
       public: static void DisconnectManipMode(event::ConnectionPtr _subscriber)
-              { manipMode.Disconnect(_subscriber); }
+              {manipMode.Disconnect(_subscriber);}
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the fullscreen signal
       public: template<typename T>
@@ -120,7 +121,7 @@ namespace gazebo
       public: static event::EventT<void (bool)>  moveMode;
 
       ///  that indicates the user is manipulating an object
-      public: static event::EventT<void (bool)>  manipMode;
+      public: static event::EventT<void (std::string)>  manipMode;
 
       public: static event::EventT<void (std::string)> createEntity;
       public: static event::EventT<void (std::string)> mouseMoveVisual;

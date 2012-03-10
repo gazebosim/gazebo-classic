@@ -74,12 +74,27 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      private: void OnMouseMoveRing();
+      private: void OnMouseMoveNormal();
+      private: void OnMouseMoveMakeEntity();
+
+      private: void OnMouseReleaseRing();
+      private: void OnMouseReleaseNormal();
+      private: void OnMouseReleaseMakeEntity();
+
+      private: void OnMousePressRing();
+      private: void OnMousePressNormal();
+      private: void OnMousePressMakeEntity();
+
+      private: void SmartMoveVisual(rendering::VisualPtr _vis);
+
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
       private: void OnCreateEntity(const std::string &_type);
       private: void OnFPS();
       private: void OnOrbit();
+      private: void OnManipMode(const std::string &_mode);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
       private: void TranslateEntity(rendering::VisualPtr &_vis);
@@ -88,6 +103,7 @@ namespace gazebo
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
+      private: void PublishVisualPose(rendering::VisualPtr _vis);
 
       /// \brief Copy an object by name
       private: void Paste(const std::string &_object);
@@ -110,6 +126,7 @@ namespace gazebo
       private: DirectionalLightMaker directionalLightMaker;
 
       private: rendering::VisualPtr hoverVis, mouseMoveVis;
+      private: rendering::SelectionObj *selectionObj;
       private: unsigned int selectionId;
       private: std::string selectionMod;
       private: math::Pose selectionPoseOrig;
@@ -125,6 +142,8 @@ namespace gazebo
 
       private: std::string copiedObject;
       private: bool copy;
+
+      private: std::string state;
     };
   }
 }

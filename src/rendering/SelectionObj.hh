@@ -64,6 +64,7 @@ namespace gazebo
       private: std::string visualName;
 
       private: bool active;
+      private: double boxSize;
     };
     /// \brief
   }

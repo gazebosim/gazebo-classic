@@ -47,28 +47,14 @@ void SelectionObj::Init()
   this->node.reset(new Visual("selection_obj_visual",
                               this->scene->GetWorldVisual()));
 
-  Visual::InsertMesh(
-      common::MeshManager::Instance()->GetMesh("selection_tube"));
   Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("unit_box"));
-
-
-  Ogre::SceneNode *rotNode =
-    this->node->GetSceneNode()->createChildSceneNode("rot_node");
 
   Ogre::SceneNode *transNode =
     this->node->GetSceneNode()->createChildSceneNode("trans_node");
 
   transNode->setInheritOrientation(false);
 
-  Ogre::SceneNode *xTube, *yTube, *zTube, *xBox[2], *yBox[2], *zBox[2];
-
-  xTube = rotNode->createChildSceneNode("selection_nodeX");
-  xTube->yaw(Ogre::Radian(M_PI/2.0));
-
-  yTube = rotNode->createChildSceneNode("selection_nodeY");
-  yTube->pitch(Ogre::Radian(M_PI/2.0));
-
-  zTube = rotNode->createChildSceneNode("selection_nodeZ");
+  Ogre::SceneNode *xBox[2], *yBox[2], *zBox[2];
 
   for (int i = 0; i < 2; i++)
   {
@@ -84,34 +70,6 @@ void SelectionObj::Init()
         "selection_transZ" + boost::lexical_cast<std::string>(i));
     zBox[i]->setInheritScale(true);
   }
-
-
-  Ogre::MovableObject *tubeObj1 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJ1__", "selection_tube"));
-  tubeObj1->setCastShadows(false);
-  tubeObj1->setUserAny(Ogre::Any(std::string("rotx")));
-  ((Ogre::Entity*)tubeObj1)->setMaterialName(
-    "__GAZEBO_ROTX_SELECTION_MATERIAL__");
-  tubeObj1->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  Ogre::MovableObject *tubeObj2 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJ2__", "selection_tube"));
-  tubeObj2->setCastShadows(false);
-  tubeObj2->setUserAny(Ogre::Any(std::string("roty")));
-  ((Ogre::Entity*)tubeObj2)->setMaterialName(
-    "__GAZEBO_ROTY_SELECTION_MATERIAL__");
-  tubeObj2->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  Ogre::MovableObject *tubeObj3 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJ3__", "selection_tube"));
-  tubeObj3->setCastShadows(false);
-  tubeObj3->setUserAny(Ogre::Any(std::string("rotz")));
-  ((Ogre::Entity*)tubeObj3)->setMaterialName(
-    "__GAZEBO_ROTZ_SELECTION_MATERIAL__");
-  tubeObj3->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::MovableObject *boxObjX1 =
     (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
@@ -169,39 +127,37 @@ void SelectionObj::Init()
     "__GAZEBO_TRANSZ_SELECTION_MATERIAL__");
   boxObjZ2->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  xTube->attachObject(tubeObj1);
-  yTube->attachObject(tubeObj2);
-  zTube->attachObject(tubeObj3);
+  this->boxSize = 0.2;
 
   xBox[0]->attachObject(boxObjX1);
   xBox[0]->setInheritOrientation(false);
-  xBox[0]->setScale(0.2, 0.2, 0.2);
+  xBox[0]->setScale(this->boxSize, this->boxSize, this->boxSize);
   xBox[0]->setPosition(1.5, 0, 0);
 
   xBox[1]->attachObject(boxObjX2);
   xBox[1]->setInheritOrientation(false);
-  xBox[1]->setScale(0.2, 0.2, 0.2);
+  xBox[1]->setScale(this->boxSize, this->boxSize, this->boxSize);
   xBox[1]->setPosition(-1.5, 0, 0);
 
   yBox[0]->attachObject(boxObjY1);
   yBox[0]->setInheritOrientation(false);
-  yBox[0]->setScale(0.2, 0.2, 0.2);
+  yBox[0]->setScale(this->boxSize, this->boxSize, this->boxSize);
   yBox[0]->setPosition(0, 1.5, 0);
 
   yBox[1]->attachObject(boxObjY2);
   yBox[1]->setInheritOrientation(false);
-  yBox[1]->setScale(0.2, 0.2, 0.2);
+  yBox[1]->setScale(this->boxSize, this->boxSize, this->boxSize);
   yBox[1]->setPosition(0, -1.5, 0);
 
 
   zBox[0]->attachObject(boxObjZ1);
   zBox[0]->setInheritOrientation(false);
-  zBox[0]->setScale(0.2, 0.2, 0.2);
+  zBox[0]->setScale(this->boxSize, this->boxSize, this->boxSize);
   zBox[0]->setPosition(0, 0, 1.5);
 
   zBox[1]->attachObject(boxObjZ2);
   zBox[1]->setInheritOrientation(false);
-  zBox[1]->setScale(0.2, 0.2, 0.2);
+  zBox[1]->setScale(this->boxSize, this->boxSize, this->boxSize);
   zBox[1]->setPosition(0, 0, -1.5);
 
   this->node->SetVisible(false);
@@ -213,18 +169,33 @@ void SelectionObj::Attach(VisualPtr _visual)
   this->Clear();
   if (_visual)
   {
-    math::Box box = _visual->GetBoundingBox();
-    math::Vector3 scale = box.max - box.min;
+    Ogre::Node *transNode;
 
-    double max = std::max(scale.x, scale.y);
-    max = std::max(max, scale.z);
+    math::Box box = _visual->GetBoundingBox();
     _visual->AttachVisual(this->node);
-    this->node->SetScale(math::Vector3(max, max, max));
+
+    transNode = this->node->GetSceneNode()->getChild("trans_node");
+    transNode->getChild("selection_transX0")->setPosition(
+        -box.GetXLength()*0.5 - this->boxSize, 0, 0);
+    transNode->getChild("selection_transX1")->setPosition(
+        box.GetXLength()*0.5 + this->boxSize, 0, 0);
+
+    transNode->getChild("selection_transY0")->setPosition(0,
+        -box.GetYLength()*0.5 - this->boxSize, 0);
+    transNode->getChild("selection_transY1")->setPosition(0,
+        box.GetYLength()*0.5 + this->boxSize, 0);
+
+    transNode->getChild("selection_transZ0")->setPosition(0, 0,
+        -box.GetYLength()*0.5 - this->boxSize);
+    transNode->getChild("selection_transZ1")->setPosition(0, 0,
+        box.GetYLength()*0.5 + this->boxSize);
+
     this->node->SetVisible(true);
     this->visualName = _visual->GetName();
   }
 }
 
+//////////////////////////////////////////////////
 void SelectionObj::Clear()
 {
   if (this->node->GetSceneNode()->getParentSceneNode())
@@ -256,9 +227,6 @@ void SelectionObj::SetHighlight(const std::string &_mod)
   Ogre::ColourValue color;
 
   std::map<std::string, std::string> matNames;
-  matNames["rotx"] = "__GAZEBO_ROTX_SELECTION_MATERIAL__";
-  matNames["roty"] = "__GAZEBO_ROTY_SELECTION_MATERIAL__";
-  matNames["rotz"] = "__GAZEBO_ROTZ_SELECTION_MATERIAL__";
   matNames["transx"] = "__GAZEBO_TRANSX_SELECTION_MATERIAL__";
   matNames["transy"] = "__GAZEBO_TRANSY_SELECTION_MATERIAL__";
   matNames["transz"] = "__GAZEBO_TRANSZ_SELECTION_MATERIAL__";
@@ -293,61 +261,6 @@ void SelectionObj::CreateMaterials()
   Ogre::Technique *tech;
   Ogre::Pass *pass;
   Ogre::TextureUnitState *texState;
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_ROTX_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  pass->setAmbient(1.0, 0.0, 0.0);
-  pass->setDiffuse(1.0, 0.0, 0.0, 0.5);
-  texState = pass->createTextureUnitState();
-  texState->setTextureName("redSelect.png");
-  texState->setTextureScale(0.04, 1.0);
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState = pass->createTextureUnitState();
-  texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
-
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_ROTY_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  pass->setAmbient(0.0, 1.0, 0.0);
-  pass->setDiffuse(0.0, 1.0, 0.0, 0.5);
-  texState = pass->createTextureUnitState();
-  texState->setTextureName("greenSelect.png");
-  texState->setTextureScale(0.04, 1.0);
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState = pass->createTextureUnitState();
-  texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
-
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_ROTZ_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  pass->setAmbient(0.0, 0.0, 1.0);
-  pass->setDiffuse(0.0, 0.0, 1.0, 0.5);
-  texState = pass->createTextureUnitState();
-  texState->setTextureName("blueSelect.png");
-  texState->setTextureScale(0.04, 1.0);
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState = pass->createTextureUnitState();
-  texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
-
-
 
   mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_TRANSX_SELECTION_MATERIAL__", "General");
@@ -401,4 +314,3 @@ void SelectionObj::CreateMaterials()
   texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
 }
-

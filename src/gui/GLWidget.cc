@@ -44,6 +44,8 @@ extern bool g_fullscreen;
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->state = "normal";
+
   this->copy = false;
 
   // This mouse offset is a hack. The glwindow window is not properly sized
@@ -94,6 +96,10 @@ GLWidget::GLWidget(QWidget *_parent)
       gui::Events::ConnectInsertModel(
         boost::bind(&GLWidget::OnMouseMoveVisual, this, _1)));
 
+  this->connections.push_back(
+      gui::Events::ConnectManipMode(
+        boost::bind(&GLWidget::OnManipMode, this, _1)));
+
 
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -109,6 +115,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->installEventFilter(this);
   this->keyModifiers = 0;
+
+  this->selectionObj = NULL;
+  this->mouseMoveVis.reset();
 }
 
 /////////////////////////////////////////////////
@@ -211,6 +220,27 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     gui::Events::fullScreen(g_fullscreen);
   }
 
+  // Return the mouse interaction state to normal
+  if (_event->key() == Qt::Key_Escape)
+  {
+    if (this->hoverVis)
+    {
+      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+      this->hoverVis.reset();
+    }
+
+    if (this->mouseMoveVis)
+    {
+      this->PublishVisualPose(this->mouseMoveVis);
+      this->mouseMoveVis->SetEmissive(common::Color(0, 0, 0));
+      this->mouseMoveVis.reset();
+    }
+
+    this->scene->SelectVisual("");
+    this->selectionObj = NULL;
+    this->state = "normal";
+  }
+
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
   this->mouseEvent.shift =
@@ -285,21 +315,48 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
   this->mouseEvent.dragging = false;
   gui::Events::mousePress(this->mouseEvent);
 
-  if (this->entityMaker)
-    this->entityMaker->OnMousePush(this->mouseEvent);
-  /*else if (this->selectionVis)
-  {
-    this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos,
-                             this->selectionMod);
-  }*/
-  else if (this->mouseMoveVis && _event->button() == Qt::MidButton)
-  {
-    this->onShiftMousePos = QCursor::pos();
-    this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
-    QCursor::setPos(this->onShiftMousePos.x() + 50, this->onShiftMousePos.y());
-  }
+  if (this->state == "ring")
+    this->OnMousePressRing();
+  else if (this->state == "make_entity")
+    this->OnMousePressMakeEntity();
+  else
+    this->OnMousePressNormal();
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMousePressNormal()
+{
+  this->setCursor(Qt::ArrowCursor);
+}
+
+
+/////////////////////////////////////////////////
+void GLWidget::OnMousePressMakeEntity()
+{
+  this->setCursor(Qt::ArrowCursor);
+  if (this->entityMaker)
+    this->entityMaker->OnMousePush(this->mouseEvent);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMousePressRing()
+{
+  if (this->selectionObj)
+  {
+    this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos,
+        this->selectionMod);
+    if (!this->selectionMod.empty())
+        this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+  }
+
+  if (this->mouseMoveVis)
+  {
+    this->setCursor(Qt::PointingHandCursor);
+    this->onShiftMousePos = QCursor::pos();
+    this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -338,163 +395,193 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
     common::MouseEvent::MIDDLE : 0x0;
 
-  // Handle moving a visual around with the mouse
-  if (this->mouseMoveVis)
+  if (_event->buttons())
+    this->mouseEvent.dragging = true;
+  else
+    this->mouseEvent.dragging = false;
+
+  // Update the view depending on the current GUI state
+  if (this->state == "ring")
+    this->OnMouseMoveRing();
+  else if (this->state == "make_entity")
+    this->OnMouseMoveMakeEntity();
+  else
+    this->OnMouseMoveNormal();
+
+  this->mouseEvent.prevPos = this->mouseEvent.pos;
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMouseMoveMakeEntity()
+{
+  if (this->entityMaker)
   {
-    // Get the point on the plane which correspoinds to the mouse
-    math::Vector3 pp;
+    if (this->mouseEvent.dragging)
+      this->entityMaker->OnMouseDrag(this->mouseEvent);
+    else
+      this->entityMaker->OnMouseMove(this->mouseEvent);
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::SmartMoveVisual(rendering::VisualPtr _vis)
+{
+  if (!this->mouseEvent.dragging)
+    return;
+
+  // Get the point on the plane which correspoinds to the mouse
+  math::Vector3 pp;
+
+  // Rotate the visual using the middle mouse button
+  if (this->mouseEvent.buttons == common::MouseEvent::MIDDLE)
+  {
     if (!this->userCamera->GetWorldPointOnPlane(
-          this->mouseEvent.pos.x, this->mouseEvent.pos.y,
+          this->mouseEvent.pos.x+50, this->mouseEvent.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pp))
     {
       gzerr << "Unable to get Point on plane....\n";
     }
 
-    // Rotate the visual using the middle mouse button
-    if (this->mouseEvent.buttons & common::MouseEvent::MIDDLE)
+    math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
+    math::Vector3 mp = this->mouseMoveVisStartPose.pos;
+
+    math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
+    double yaw = delta.x * 0.01;
+    if (!this->mouseEvent.shift)
     {
-      math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
-      math::Vector3 mp = this->mouseMoveVisStartPose.pos;
-      double yaw = atan2((pp.y - mp.y) , (pp.x - mp.x)) + M_PI * 0.5;
-      if (!this->mouseEvent.shift)
-      {
-        yaw = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
-      }
-      this->mouseMoveVis->SetWorldRotation(
-          math::Quaternion(rpy.x, rpy.y, rpy.z + yaw));
+      yaw = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
     }
-    else
-    {
-      // Translate the visual by just moving the mouse around
-      if (!this->mouseEvent.shift)
-      {
-        pp.x = rint(pp.x);
-        pp.y = rint(pp.y);
-      }
 
-      math::Vector3 pt(pp.x, pp.y, 100.0);
+    /*double yaw = atan2((pp.y - mp.y) , (pp.x - mp.x)) + M_PI * 0.5;
+    if (!this->mouseEvent.shift)
+      yaw = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
+      */
 
-      std::vector<rendering::VisualPtr> below;
-      this->scene->GetVisualsBelowPoint(pt, below);
-      double maxZ = 0;
-
-      for (unsigned int i = 0; i < below.size(); ++i)
-      {
-        if (below[i]->GetName().find(this->mouseMoveVis->GetName()) != 0
-            && below[i]->GetBoundingBox().max.z > maxZ)
-          maxZ = below[i]->GetBoundingBox().max.z;
-      }
-      pp.z = maxZ;
-
-      this->mouseMoveVis->SetWorldPosition(pp);
-    }
+    _vis->SetWorldRotation(math::Quaternion(rpy.x, rpy.y, rpy.z + yaw));
   }
-
-  if (_event->buttons())
+  else if (this->mouseEvent.buttons == common::MouseEvent::RIGHT)
   {
-    this->mouseEvent.dragging = true;
+    math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
+    math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
+    double pitch  = delta.y * 0.01;
+    double roll = delta.x * 0.01;
+    if (!this->mouseEvent.shift)
+    {
+      pitch = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
+      roll = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
+    }
+
+    _vis->SetWorldRotation(math::Quaternion(rpy.x,// - roll,
+                                            rpy.y - pitch,
+                                            rpy.z));
+  }
+  else if (this->mouseEvent.buttons & common::MouseEvent::LEFT &&
+           this->mouseEvent.buttons & common::MouseEvent::RIGHT)
+  {
+    math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
+    math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
+    double roll = delta.x * 0.01;
+    if (!this->mouseEvent.shift)
+      roll = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
+
+    _vis->SetWorldRotation(math::Quaternion(rpy.x - roll,
+                                            rpy.y,
+                                            rpy.z));
   }
   else
   {
-    std::string mod;
-    this->mouseEvent.dragging = false;
+    this->TranslateEntity(_vis);
 
-    rendering::VisualPtr newHoverVis;
+    /* TODO: move this code to "snap to object" in a right menu button menu
+    math::Vector3 pt(pp.x, pp.y, 100.0);
 
-    if (this->keyModifiers & Qt::ControlModifier && !this->entityMaker)
+    std::vector<rendering::VisualPtr> below;
+    this->scene->GetVisualsBelowPoint(pt, below);
+    double maxZ = 0;
+
+    for (unsigned int i = 0; i < below.size(); ++i)
     {
-      if (this->mouseMoveVis)
-      {
-        newHoverVis = this->scene->GetVisualAt(this->userCamera,
-                                               this->mouseEvent.pos, mod);
-      }
-      else
-      {
-        newHoverVis = this->scene->GetVisualAt(this->userCamera,
-                                               this->mouseEvent.pos);
-      }
+      if (below[i]->GetName().find(_vis->GetName()) != 0
+          && below[i]->GetBoundingBox().max.z > maxZ)
+        maxZ = below[i]->GetBoundingBox().max.z;
+    }
+    pp.z = maxZ;
+    */
+  }
+}
 
-      if (!mod.empty())
-      {
-        this->setCursor(Qt::SizeAllCursor);
-        this->scene->GetSelectionObj()->SetHighlight(mod);
-      }
-      else if (newHoverVis && !this->mouseMoveVis)
-      {
-        this->scene->GetSelectionObj()->SetHighlight("");
-
-        if (!newHoverVis->IsPlane())
-        {
-          if (this->hoverVis && this->hoverVis->GetName() !=
-              newHoverVis->GetName())
-          {
-            this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-          }
-          newHoverVis->SetEmissive(common::Color(.5, .5, .5));
-          this->setCursor(Qt::PointingHandCursor);
-        }
-        else
-        {
-          if (this->hoverVis)
-          {
-            this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-          }
-
-          this->setCursor(Qt::ArrowCursor);
-          newHoverVis.reset();
-        }
-      }
-      else
-      {
-        this->scene->GetSelectionObj()->SetHighlight("");
-        if (this->hoverVis)
-        {
-          this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-        }
-
-        this->setCursor(Qt::ArrowCursor);
-      }
+/////////////////////////////////////////////////
+void GLWidget::OnMouseMoveRing()
+{
+  // Handle moving a visual around using the selection object
+  if (this->selectionObj && !this->selectionMod.empty())
+  {
+    this->scene->GetSelectionObj()->SetActive(true);
+    if (this->selectionMod.substr(0, 3) == "rot")
+    {
+      this->RotateEntity(this->mouseMoveVis);
+      return;
     }
     else
     {
-      if (this->hoverVis)
-      {
-        this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-      }
-      this->setCursor(Qt::ArrowCursor);
+      this->TranslateEntity(this->mouseMoveVis);
+      return;
     }
-
-    this->hoverVis = newHoverVis;
   }
 
+  // Higlight other objects when mouse passes over them
+  if (this->selectionMod.empty() && !this->mouseEvent.dragging)
+  {
+    rendering::VisualPtr newHoverVis;
+    std::string mod;
+    newHoverVis = this->scene->GetVisualAt(this->userCamera,
+                                           this->mouseEvent.pos, mod);
+    if (!mod.empty())
+      this->setCursor(Qt::PointingHandCursor);
+    else
+      this->setCursor(Qt::ArrowCursor);
+
+    if (newHoverVis && !newHoverVis->IsPlane())
+    {
+      if (this->hoverVis)
+        this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+      this->hoverVis = newHoverVis;
+
+      this->setCursor(Qt::PointingHandCursor);
+      this->hoverVis->SetEmissive(common::Color(0.8, 0.8, 0.8));
+    }
+    else if (this->hoverVis)
+    {
+      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+      this->hoverVis.reset();
+    }
+  }
+  // Use the smart move feature when dragging the selected object
+  else if (this->mouseEvent.dragging && this->hoverVis && this->mouseMoveVis &&
+    this->hoverVis->GetParent()->GetParent() == this->mouseMoveVis)
+  {
+    this->SmartMoveVisual(this->mouseMoveVis);
+  }
+  // Move the camera when not moving the object
+  else if (this->selectionMod.empty() && this->mouseEvent.dragging)
+  {
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
+  }
+  else
+  {
+    if (this->hoverVis)
+      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+    this->hoverVis.reset();
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnMouseMoveNormal()
+{
   if (this->mouseEvent.dragging)
   {
     this->scene->GetSelectionObj()->SetActive(false);
-
-    if (this->entityMaker)
-      this->entityMaker->OnMouseDrag(this->mouseEvent);
-    /*else if (this->selectionVis && !this->selectionMod.empty())
-    {
-      this->scene->GetSelectionObj()->SetActive(true);
-      if (this->selectionMod.substr(0, 3) == "rot")
-        this->RotateEntity(this->selectionVis);
-      else
-        this->TranslateEntity(this->selectionVis);
-    }*/
-    else if (!(this->mouseMoveVis &&
-               this->mouseEvent.buttons & common::MouseEvent::MIDDLE))
-    {
-      this->userCamera->HandleMouseEvent(this->mouseEvent);
-    }
-
-    this->mouseEvent.prevPos = this->mouseEvent.pos;
-  }
-  else
-  {
-    if (this->entityMaker)
-      this->entityMaker->OnMouseMove(this->mouseEvent);
-    else
-      this->userCamera->HandleMouseEvent(this->mouseEvent);
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
   }
 }
 
@@ -532,23 +619,60 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
 
   this->scene->GetSelectionObj()->SetActive(false);
 
+  if (this->state == "ring")
+    this->OnMouseReleaseRing();
+  else if (this->state == "make_entity")
+    this->OnMouseReleaseMakeEntity();
+  else
+    this->OnMouseReleaseNormal();
+}
+
+//////////////////////////////////////////////////
+void GLWidget::OnMouseReleaseMakeEntity()
+{
   if (this->entityMaker)
     this->entityMaker->OnMouseRelease(this->mouseEvent);
-  else if (this->mouseEvent.dragging == false)
+}
+
+//////////////////////////////////////////////////
+void GLWidget::OnMouseReleaseRing()
+{
+  if (!this->mouseEvent.dragging)
   {
-    if (_event->button() & Qt::LeftButton)
+    if (this->mouseEvent.button == common::MouseEvent::LEFT)
     {
+      // Select the current hovervis for positioning
       if (this->hoverVis)
       {
-        this->mouseMoveVis = this->hoverVis;
-        if (this->mouseMoveVis)
+        if (this->mouseMoveVis &&
+            this->hoverVis->GetParent()->GetParent() != this->mouseMoveVis)
         {
-          // Get the model associated with the visual
-          this->mouseMoveVis = this->mouseMoveVis->GetParent()->GetParent();
-          this->scene->SelectVisual(this->mouseMoveVis->GetName());
+          this->PublishVisualPose(this->mouseMoveVis);
         }
+
+        this->mouseMoveVis = this->hoverVis;
+
+        // Get the model associated with the visual
+        this->mouseMoveVis = this->mouseMoveVis->GetParent()->GetParent();
+        this->selectionObj = this->scene->GetSelectionObj();
+        this->scene->SelectVisual(this->mouseMoveVis->GetName());
+
+        this->hoverVis.reset();
       }
-      else if (this->mouseMoveVis)
+    }
+  }
+
+  this->selectionMod.clear();
+}
+
+//////////////////////////////////////////////////
+void GLWidget::OnMouseReleaseNormal()
+{
+  if (!this->mouseEvent.dragging)
+  {
+    /*if (this->mouseEvent.button == common::MouseEvent::LEFT)
+    {
+      if (this->mouseMoveVis)
       {
         this->scene->SelectVisual("");
         if (this->copy)
@@ -561,7 +685,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
           this->scene->RemoveVisual(this->mouseMoveVis);
           this->mouseMoveVis.reset();
         }
-        else
+        else (this->mouseMoveVis)
         {
           msgs::Model msg;
           msg.set_id(gui::get_entity_id(this->mouseMoveVis->GetName()));
@@ -569,6 +693,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
 
           msgs::Set(msg.mutable_pose(), this->mouseMoveVis->GetWorldPose());
           this->modelPub->Publish(msg);
+
+          this->mouseMoveVis.reset();
         }
 
         this->mouseMoveVis.reset();
@@ -576,8 +702,10 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
     }
     else
       this->scene->SelectVisual("");
+      */
   }
-  else if (this->mouseMoveVis && _event->button() == Qt::MidButton)
+  else if (this->mouseMoveVis &&
+           this->mouseEvent.button == common::MouseEvent::MIDDLE)
   {
     QCursor::setPos(this->onShiftMousePos);
   }
@@ -678,11 +806,13 @@ void GLWidget::CreateEntity(const std::string &_name)
 
   if (this->entityMaker)
   {
+    this->state = "make_entity";
     // TODO: change the cursor to a cross
     this->entityMaker->Start(this->userCamera);
   }
   else
   {
+    this->state = "normal";
     // TODO: make sure cursor state stays at the default
   }
 }
@@ -708,6 +838,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnMoveMode(bool _mode)
 {
+  this->state = _mode;
   if (_mode)
   {
     // TODO: set cursor to default state
@@ -824,20 +955,25 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   // Cast two rays from the camera into the world
   this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
       this->mouseEvent.pos.y, origin1, dir1);
-  this->userCamera->GetCameraToViewportRay(this->mouseEvent.prevPos.x,
-      this->mouseEvent.prevPos.y, origin2, dir2);
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pressPos.x,
+      this->mouseEvent.pressPos.y, origin2, dir2);
 
   math::Vector3 moveVector(0, 0, 0);
   math::Vector3 planeNorm(0, 0, 1);
-  if (this->selectionMod == "transx")
-    moveVector.x = 1;
-  else if (this->selectionMod == "transy")
-    moveVector.y = 1;
-  else if (this->selectionMod == "transz")
+  if (!this->selectionMod.empty())
   {
-    moveVector.z = 1;
-    planeNorm.Set(1, 0, 0);
+    if (this->selectionMod == "transx")
+      moveVector.x = 1;
+    else if (this->selectionMod == "transy")
+      moveVector.y = 1;
+    else if (this->selectionMod == "transz")
+    {
+      moveVector.z = 1;
+      planeNorm.Set(1, 0, 0);
+    }
   }
+  else
+    moveVector.Set(1, 1, 0);
 
   // Compute the distance from the camera to plane of translation
   double d = -pose.pos.GetDotProd(planeNorm);
@@ -851,22 +987,27 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   p2 = origin2 + dir2 * dist2;
 
   moveVector *= p1 - p2;
-  pose.pos += moveVector;
+  pose.pos = this->mouseMoveVisStartPose.pos + moveVector;
+
+  if (!this->mouseEvent.shift)
+  {
+    if (ceil(pose.pos.x) - pose.pos.x <= .4)
+        pose.pos.x = ceil(pose.pos.x);
+    else if (pose.pos.x - floor(pose.pos.x) <= .4)
+      pose.pos.x = floor(pose.pos.x);
+
+    if (ceil(pose.pos.y) - pose.pos.y <= .4)
+        pose.pos.y = ceil(pose.pos.y);
+    else if (pose.pos.y - floor(pose.pos.y) <= .4)
+      pose.pos.y = floor(pose.pos.y);
+
+    if (ceil(pose.pos.z) - pose.pos.z <= .4)
+        pose.pos.z = ceil(pose.pos.z);
+    else if (pose.pos.z - floor(pose.pos.z) <= .4)
+      pose.pos.z = floor(pose.pos.z);
+  }
 
   _vis->SetPose(pose);
-
-  /*if (entity->GetType() == Entity::MODEL)
-  {
-    pose.pos += moveVector;
-    entity->SetRelativePose(pose);
-  }
-  else if (entity->GetType() == Entity::LINK)
-  {
-    Body *body = (Body*)(entity);
-    moveVector *= Gui::forceMultiplier;
-    body->SetForce(moveVector);
-  }
-*/
 }
 
 /////////////////////////////////////////////////
@@ -891,10 +1032,27 @@ void GLWidget::OnMouseMoveVisual(const std::string &_visualName)
 }
 
 /////////////////////////////////////////////////
+void GLWidget::OnManipMode(const std::string &_mode)
+{
+  this->state = _mode;
+}
+
+/////////////////////////////////////////////////
 void GLWidget::Paste(const std::string &_object)
 {
   rendering::VisualPtr newVis =
     this->scene->CloneVisual(_object, _object + "_clone_tmp");
   this->mouseMoveVis = newVis;
   this->copy = true;
+}
+
+/////////////////////////////////////////////////
+void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
+{
+  msgs::Model msg;
+  msg.set_id(gui::get_entity_id(_vis->GetName()));
+  msg.set_name(_vis->GetName());
+
+  msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+  this->modelPub->Publish(msg);
 }

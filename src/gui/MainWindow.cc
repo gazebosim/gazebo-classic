@@ -218,6 +218,7 @@ void MainWindow::Play()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Pause()
 {
   msgs::WorldControl msg;
@@ -227,6 +228,7 @@ void MainWindow::Pause()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
@@ -235,6 +237,7 @@ void MainWindow::Step()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::NewModel()
 {
   /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
@@ -244,6 +247,7 @@ void MainWindow::NewModel()
   */
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
@@ -251,6 +255,7 @@ void MainWindow::OnResetWorld()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::EditWorldProperties()
 {
   if (!this->worldPropertiesWidget)
@@ -259,45 +264,60 @@ void MainWindow::EditWorldProperties()
   this->worldPropertiesWidget->show();
 }
 
+/////////////////////////////////////////////////
+void MainWindow::RingPose()
+{
+  gui::Events::manipMode("ring");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   gui::Events::createEntity("box");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateSphere()
 {
   gui::Events::createEntity("sphere");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateCylinder()
 {
   gui::Events::createEntity("cylinder");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateMesh()
 {
   gui::Events::createEntity("mesh");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreatePointLight()
 {
   gui::Events::createEntity("pointlight");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateSpotLight()
 {
   gui::Events::createEntity("spotlight");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateDirectionalLight()
 {
   gui::Events::createEntity("directionallight");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnFullScreen(bool _value)
 {
   if (_value)
@@ -326,22 +346,26 @@ void MainWindow::OnFullScreen(bool _value)
   }
 }
 
+/////////////////////////////////////////////////
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
   gui::Events::fullScreen(g_fullscreen);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::ViewFPS()
 {
   gui::Events::fps();
 }
 
+/////////////////////////////////////////////////
 void MainWindow::ViewOrbit()
 {
   gui::Events::orbit();
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
   this->newAct = new QAction(tr("&New"), this);
@@ -405,6 +429,12 @@ void MainWindow::CreateActions()
   this->stepAct->setStatusTip(tr("Step the world"));
   connect(this->stepAct, SIGNAL(triggered()), this, SLOT(Step()));
 
+  this->ringPoseAct = new QAction(QIcon(":/images/end.png"),
+      tr("Position object"), this);
+  this->ringPoseAct->setStatusTip(tr("Position object"));
+  connect(this->ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
+
+
   this->boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   this->boxCreateAct->setStatusTip(tr("Create a box"));
   this->boxCreateAct->setCheckable(true);
@@ -467,6 +497,7 @@ void MainWindow::CreateActions()
   connect(this->viewOrbitAct, SIGNAL(triggered()), this, SLOT(ViewOrbit()));
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
   this->fileMenu = this->menuBar()->addMenu(tr("&File"));
@@ -492,6 +523,7 @@ void MainWindow::CreateMenus()
   this->helpMenu->addAction(this->aboutAct);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateToolbars()
 {
   this->playToolbar = this->addToolBar(tr("Play"));
@@ -500,6 +532,7 @@ void MainWindow::CreateToolbars()
   this->playToolbar->addAction(this->stepAct);
 
   this->editToolbar = this->addToolBar(tr("Edit"));
+  this->editToolbar->addAction(this->ringPoseAct);
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);
@@ -510,6 +543,7 @@ void MainWindow::CreateToolbars()
   this->editToolbar->addAction(this->dirLghtCreateAct);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnMoveMode(bool _mode)
 {
   if (_mode)
@@ -524,6 +558,7 @@ void MainWindow::OnMoveMode(bool _mode)
   }
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnGUI(ConstGUIPtr &_msg)
 {
   if (_msg->has_fullscreen() && _msg->fullscreen())
