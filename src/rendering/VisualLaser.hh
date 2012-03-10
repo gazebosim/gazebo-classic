@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef RENDERING_DEPTHCAMERA_HH
-#define RENDERING_DEPTHCAMERA_HH
+#ifndef RENDERING_VISUALLASER_HH
+#define RENDERING_VISUALLASER_HH
 #include <string>
 
 #include "rendering/Camera.hh"
@@ -41,10 +41,17 @@ namespace Ogre
   class Renderable;
   class Pass;
   class AutoParamDataSource;
+  class Matrix4;
 }
 
 namespace gazebo
 {
+
+  namespace common
+  {
+    class Mesh;
+  }
+
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -59,14 +66,14 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class DepthCamera : public Camera
+    class VisualLaser : public Camera
     {
       /// \brief Constructor
-      public: DepthCamera(const std::string &_namePrefix,
+      public: VisualLaser(const std::string &_namePrefix,
                           Scene *_scene, bool _autoRender = true);
 
       /// \brief Destructor
-      public: virtual ~DepthCamera();
+      public: virtual ~VisualLaser();
 
       /// \brief Load the camera with a set of parmeters
       /// \param _sdf The SDF camera info
@@ -81,56 +88,54 @@ namespace gazebo
       /// Finalize the camera
       public: void Fini();
 
-      public: void CreateDepthTexture(const std::string &_textureName);
+      public: void CreateLaserTexture(const std::string &_textureName);
 
       /// \brief Render the camera
       public: virtual void PostRender();
 
-      // All things needed to get back z buffer for depth data
-      public: virtual const float* GetDepthData();
+      // All things needed to get back z buffer for laser data
+      public: virtual const unsigned char* GetLaserData();
 
       /// \brief Connect a to the add entity signal
       public: template<typename T>
-              event::ConnectionPtr ConnectNewDepthFrame(T subscriber)
-              { return newDepthFrame.Connect(subscriber); }
-      public: void DisconnectNewDepthFrame(event::ConnectionPtr &c)
-              { newDepthFrame.Disconnect(c); }
+              event::ConnectionPtr ConnectNewLaserFrame(T subscriber)
+              { return newLaserFrame.Connect(subscriber); }
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &c)
+              { newLaserFrame.Disconnect(c); }
+
+      public: void SetRangeCount(unsigned int _w, unsigned int _h = 1);
+
       private: virtual void RenderImpl();
 
       private: void UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material *material, 
               std::string matName);
 
-      private: float *depthBuffer;
+      private: void CreateOrthoCam();
 
-      private: Ogre::Material *depthMaterial;
+      private: void CreateMesh();
+
+      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float left, float right, float bottom, float top, float near, float far);
+
+      private: unsigned char *laserBuffer;
+
+      private: Ogre::Material *laserMaterial;
 
       private: event::EventT<void(const float *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newDepthFrame;
+                   unsigned int, const std::string &)> newLaserFrame;
 
-      protected: Ogre::Texture *depthTexture;
-      protected: Ogre::RenderTarget *depthTarget;
-      public: virtual void SetDepthTarget(Ogre::RenderTarget *target);
-      protected: Ogre::Viewport *depthViewport;
+      protected: Ogre::Texture *laserTexture;
+      protected: Ogre::RenderTarget *laserTarget;
+      public: virtual void SetLaserTarget(Ogre::RenderTarget *target);
+      protected: Ogre::Viewport *laserViewport;
+      protected: Ogre::Camera *orthoCam;
       
-      private: bool output_points;
-      
-      /// \brief Connect a to the add entity signal
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewRGBPointCloud(T subscriber)
-              { return newRGBPointCloud.Connect(subscriber); }
-      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &c)
-              { newRGBPointCloud.Disconnect(c); }
+      protected: Ogre::SceneNode *origParentNode_ortho;
+      protected: Ogre::SceneNode *pitchNode_ortho;
 
-      private: float *pcdBuffer;
-      protected: Ogre::Viewport *pcdViewport;
-      
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newRGBPointCloud;
+      protected: common::Mesh *undist_mesh;
 
-      private: Ogre::Material *pcdMaterial;
-
-      protected: Ogre::Texture *pcdTexture;
-      protected: Ogre::RenderTarget *pcdTarget;
+      protected: unsigned int w2nd;
+      protected: unsigned int h2nd;
     };
 
     /// \}

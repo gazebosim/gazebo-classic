@@ -7,6 +7,7 @@ set (sources Sensors.cc
              CameraSensor.cc
              DepthCameraSensor.cc
              RaySensor.cc
+             VisualLaserSensor.cc
              ContactSensor.cc
 ) 
 
@@ -18,6 +19,7 @@ set (headers Sensors.hh
              CameraSensor.hh
              DepthCameraSensor.hh
              RaySensor.hh
+             VisualLaserSensor.hh
              ContactSensor.hh
 )
 
@@ -28,7 +30,7 @@ endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/sensors.h.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.h )
 
 
-gz_add_library(gazebo_sensors ${sources})
+add_library(gazebo_sensors SHARED ${sources})
 
 target_link_libraries(gazebo_sensors gazebo_common 
                                      gazebo_rendering
@@ -38,7 +40,7 @@ target_link_libraries(gazebo_sensors gazebo_common
                                      ${ogre_ldflags}
                                      )
 
-gz_add_executable(gzsensor server.cc)
+add_executable(gzsensor server.cc)
 target_link_libraries( gzsensor gazebo_common
                                 gazebo_transport
                                 gazebo_sensors

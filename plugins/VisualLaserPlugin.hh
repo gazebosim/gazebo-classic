@@ -15,31 +15,26 @@
  *
 */
 
-#ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
-#define __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
+#ifndef __GAZEBO_VISUAL_LASER_PLUGIN_HH__
+#define __GAZEBO_VISUAL_LASER_PLUGIN_HH__
 
 #include <string>
 
 #include "common/Plugin.hh"
-#include "sensors/DepthCameraSensor.hh"
+#include "sensors/VisualLaserSensor.hh"
 #include "sensors/CameraSensor.hh"
-#include "rendering/DepthCamera.hh"
+#include "rendering/VisualLaser.hh"
 #include "gazebo.h"
 
 namespace gazebo
 {
-  class DepthCameraPlugin : public SensorPlugin
+  class VisualLaserPlugin : public SensorPlugin
   {
-    public: DepthCameraPlugin();
+    public: VisualLaserPlugin();
 
     public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
-    public: virtual void OnNewDepthFrame(const float *_image,
-                unsigned int _width, unsigned int _height,
-                unsigned int _depth, const std::string &_format);
-
-    /// \brief Update the controller
-    public: virtual void OnNewRGBPointCloud(const float *_pcd,
+    public: virtual void OnNewLaserFrame(const float *_image,
                 unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
@@ -50,11 +45,10 @@ namespace gazebo
     protected: unsigned int width, height, depth;
     protected: std::string format;
 
-    protected: sensors::DepthCameraSensorPtr parentSensor;
-    protected: rendering::DepthCameraPtr depthCamera;
+    protected: sensors::VisualLaserSensorPtr parentSensor;
+    protected: rendering::VisualLaserPtr laserCam;
 
-    private: event::ConnectionPtr newDepthFrameConnection;
-    private: event::ConnectionPtr newRGBPointCloudConnection;
+    private: event::ConnectionPtr newLaserFrameConnection;
     private: event::ConnectionPtr newImageFrameConnection;
   };
 }

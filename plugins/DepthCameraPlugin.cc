@@ -47,6 +47,10 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
       boost::bind(&DepthCameraPlugin::OnNewDepthFrame,
         this, _1, _2, _3, _4, _5));
 
+  this->newRGBPointCloudConnection = this->depthCamera->ConnectNewRGBPointCloud(
+      boost::bind(&DepthCameraPlugin::OnNewRGBPointCloud,
+        this, _1, _2, _3, _4, _5));
+
   this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame(
       boost::bind(&DepthCameraPlugin::OnNewImageFrame,
         this, _1, _2, _3, _4, _5));
@@ -78,6 +82,14 @@ void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
     this->height, this->depth, this->format,
     "/tmp/depthCamera/me.jpg");
     */
+}
+    
+/////////////////////////////////////////////////
+void DepthCameraPlugin::OnNewRGBPointCloud(const float *_pcd,
+                unsigned int _width, unsigned int _height,
+                unsigned int _depth, const std::string &_format)
+{
+
 }
 
 /////////////////////////////////////////////////

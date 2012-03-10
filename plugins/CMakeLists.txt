@@ -6,6 +6,7 @@ include_directories(
 
 set (plugins CameraPlugin
              DepthCameraPlugin
+             VisualLaserPlugin
              ContactPlugin
              RayPlugin
              Pioneer2dxPlugin)

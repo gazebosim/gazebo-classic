@@ -17,6 +17,7 @@ set (sources MovableText.cc
              Visual.cc
              Camera.cc
              DepthCamera.cc
+             VisualLaser.cc
              UserCamera.cc
              Heightmap.cc
              Light.cc
@@ -43,6 +44,7 @@ set (headers MovableText.hh
              Visual.hh
              Camera.hh
              DepthCamera.hh
+             VisualLaser.hh
              UserCamera.hh
              Light.hh
              SelectionObj.hh
@@ -68,7 +70,8 @@ foreach (hdr ${headers})
 endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/rendering.h.in ${CMAKE_CURRENT_BINARY_DIR}/rendering.h )
 
-gz_add_library(gazebo_rendering ${sources})
+add_library(gazebo_rendering SHARED ${sources})
+
 target_link_libraries( gazebo_rendering gazebo_common 
                                         gazebo_sdf_interface
                                         ${ogre_libraries} 
