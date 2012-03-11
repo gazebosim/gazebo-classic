@@ -267,48 +267,58 @@ void MainWindow::EditWorldProperties()
 /////////////////////////////////////////////////
 void MainWindow::RingPose()
 {
-  gui::Events::manipMode("ring");
+  if (this->ringPoseAct->isChecked())
+    gui::Events::manipMode("ring");
+  else
+    gui::Events::manipMode("normal");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
+  this->ringPoseAct->setChecked(false);
   gui::Events::createEntity("box");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSphere()
 {
+  this->ringPoseAct->setChecked(false);
   gui::Events::createEntity("sphere");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateCylinder()
 {
+  this->ringPoseAct->setChecked(false);
   gui::Events::createEntity("cylinder");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMesh()
 {
+  this->ringPoseAct->setChecked(false);
   gui::Events::createEntity("mesh");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreatePointLight()
 {
+  this->ringPoseAct->setChecked(false);
   gui::Events::createEntity("pointlight");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSpotLight()
 {
+  this->ringPoseAct->setChecked(false);
   gui::Events::createEntity("spotlight");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateDirectionalLight()
 {
+  this->ringPoseAct->setChecked(false);
   gui::Events::createEntity("directionallight");
 }
 
@@ -429,9 +439,10 @@ void MainWindow::CreateActions()
   this->stepAct->setStatusTip(tr("Step the world"));
   connect(this->stepAct, SIGNAL(triggered()), this, SLOT(Step()));
 
-  this->ringPoseAct = new QAction(QIcon(":/images/end.png"),
+  this->ringPoseAct = new QAction(QIcon(":/images/translate.png"),
       tr("Position object"), this);
   this->ringPoseAct->setStatusTip(tr("Position object"));
+  this->ringPoseAct->setCheckable(true);
   connect(this->ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
 
 

@@ -174,21 +174,29 @@ void SelectionObj::Attach(VisualPtr _visual)
     math::Box box = _visual->GetBoundingBox();
     _visual->AttachVisual(this->node);
 
+    std::cout << _visual->GetPose() << "\n";
+    box = box - _visual->GetPose().pos;
+    std::cout << "Box[" << box << "]\n";
+
     transNode = this->node->GetSceneNode()->getChild("trans_node");
     transNode->getChild("selection_transX0")->setPosition(
-        -box.GetXLength()*0.5 - this->boxSize, 0, 0);
+        -box.GetXLength()*0.5 - this->boxSize, 0, 
+        box.GetZLength()*0.5 + box.min.z);
     transNode->getChild("selection_transX1")->setPosition(
-        box.GetXLength()*0.5 + this->boxSize, 0, 0);
+        box.GetXLength()*0.5 + this->boxSize, 0, 
+        box.GetZLength()*0.5 + box.min.z);
 
     transNode->getChild("selection_transY0")->setPosition(0,
-        -box.GetYLength()*0.5 - this->boxSize, 0);
+        -box.GetYLength()*0.5 - this->boxSize, 
+        box.GetZLength()*0.5 + box.min.z);
     transNode->getChild("selection_transY1")->setPosition(0,
-        box.GetYLength()*0.5 + this->boxSize, 0);
+        box.GetYLength()*0.5 + this->boxSize, 
+        box.GetZLength()*0.5 + box.min.z);
 
     transNode->getChild("selection_transZ0")->setPosition(0, 0,
-        -box.GetYLength()*0.5 - this->boxSize);
+        box.min.z - this->boxSize);
     transNode->getChild("selection_transZ1")->setPosition(0, 0,
-        box.GetYLength()*0.5 + this->boxSize);
+        box.max.z + this->boxSize);
 
     this->node->SetVisible(true);
     this->visualName = _visual->GetName();

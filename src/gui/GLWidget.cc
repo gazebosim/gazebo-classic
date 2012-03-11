@@ -223,21 +223,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   // Return the mouse interaction state to normal
   if (_event->key() == Qt::Key_Escape)
   {
-    if (this->hoverVis)
-    {
-      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-      this->hoverVis.reset();
-    }
-
-    if (this->mouseMoveVis)
-    {
-      this->PublishVisualPose(this->mouseMoveVis);
-      this->mouseMoveVis->SetEmissive(common::Color(0, 0, 0));
-      this->mouseMoveVis.reset();
-    }
-
-    this->scene->SelectVisual("");
-    this->selectionObj = NULL;
+    this->ClearSelection();
     this->state = "normal";
   }
 
@@ -435,58 +421,49 @@ void GLWidget::SmartMoveVisual(rendering::VisualPtr _vis)
   // Rotate the visual using the middle mouse button
   if (this->mouseEvent.buttons == common::MouseEvent::MIDDLE)
   {
-    if (!this->userCamera->GetWorldPointOnPlane(
-          this->mouseEvent.pos.x+50, this->mouseEvent.pos.y,
-          math::Plane(math::Vector3(0, 0, 1)), pp))
-    {
-      gzerr << "Unable to get Point on plane....\n";
-    }
-
     math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
-    math::Vector3 mp = this->mouseMoveVisStartPose.pos;
-
     math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
-    double yaw = delta.x * 0.01;
+    double yaw = (delta.x * 0.01) + rpy.z;
     if (!this->mouseEvent.shift)
     {
-      yaw = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
+      double snap = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
+
+      if (fabs(yaw - snap) < GZ_DTOR(10))
+        yaw = snap;
     }
 
-    /*double yaw = atan2((pp.y - mp.y) , (pp.x - mp.x)) + M_PI * 0.5;
-    if (!this->mouseEvent.shift)
-      yaw = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
-      */
-
-    _vis->SetWorldRotation(math::Quaternion(rpy.x, rpy.y, rpy.z + yaw));
+    _vis->SetWorldRotation(math::Quaternion(rpy.x, rpy.y, yaw));
   }
   else if (this->mouseEvent.buttons == common::MouseEvent::RIGHT)
   {
     math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
     math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
-    double pitch  = delta.y * 0.01;
-    double roll = delta.x * 0.01;
+    double pitch = (delta.y * 0.01) + rpy.y;
     if (!this->mouseEvent.shift)
     {
-      pitch = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
-      roll = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
+      double snap = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
+
+      if (fabs(pitch - snap) < GZ_DTOR(10))
+        pitch = snap;
     }
 
-    _vis->SetWorldRotation(math::Quaternion(rpy.x,// - roll,
-                                            rpy.y - pitch,
-                                            rpy.z));
+    _vis->SetWorldRotation(math::Quaternion(rpy.x, pitch, rpy.z));
   }
   else if (this->mouseEvent.buttons & common::MouseEvent::LEFT &&
            this->mouseEvent.buttons & common::MouseEvent::RIGHT)
   {
     math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
     math::Vector2i delta = this->mouseEvent.pos - this->mouseEvent.pressPos;
-    double roll = delta.x * 0.01;
+    double roll = (delta.x * 0.01) + rpy.x;
     if (!this->mouseEvent.shift)
-      roll = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
+    {
+      double snap = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
 
-    _vis->SetWorldRotation(math::Quaternion(rpy.x - roll,
-                                            rpy.y,
-                                            rpy.z));
+      if (fabs(roll - snap) < GZ_DTOR(10))
+        roll = snap;
+    }
+
+    _vis->SetWorldRotation(math::Quaternion(roll, rpy.y, rpy.z));
   }
   else
   {
@@ -786,6 +763,8 @@ std::string GLWidget::GetOgreHandle() const
 /////////////////////////////////////////////////
 void GLWidget::CreateEntity(const std::string &_name)
 {
+  this->ClearSelection();
+
   if (this->entityMaker)
     this->entityMaker->Stop();
 
@@ -1001,10 +980,13 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
     else if (pose.pos.y - floor(pose.pos.y) <= .4)
       pose.pos.y = floor(pose.pos.y);
 
-    if (ceil(pose.pos.z) - pose.pos.z <= .4)
+    if (moveVector.z > 0.0)
+    {
+      if (ceil(pose.pos.z) - pose.pos.z <= .4)
         pose.pos.z = ceil(pose.pos.z);
-    else if (pose.pos.z - floor(pose.pos.z) <= .4)
-      pose.pos.z = floor(pose.pos.z);
+      else if (pose.pos.z - floor(pose.pos.z) <= .4)
+        pose.pos.z = floor(pose.pos.z);
+    }
   }
 
   _vis->SetPose(pose);
@@ -1034,6 +1016,11 @@ void GLWidget::OnMouseMoveVisual(const std::string &_visualName)
 /////////////////////////////////////////////////
 void GLWidget::OnManipMode(const std::string &_mode)
 {
+  if (this->state == "ring" && _mode != "ring")
+  {
+    this->ClearSelection();
+  }
+
   this->state = _mode;
 }
 
@@ -1055,4 +1042,24 @@ void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
 
   msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
   this->modelPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::ClearSelection()
+{
+  if (this->hoverVis)
+  {
+    this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+    this->hoverVis.reset();
+  }
+
+  if (this->mouseMoveVis)
+  {
+    this->PublishVisualPose(this->mouseMoveVis);
+    this->mouseMoveVis->SetEmissive(common::Color(0, 0, 0));
+    this->mouseMoveVis.reset();
+  }
+
+  this->scene->SelectVisual("");
+  this->selectionObj = NULL;
 }

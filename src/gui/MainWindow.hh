@@ -157,5 +157,3 @@ namespace gazebo
 }
 
 #endif
-
-

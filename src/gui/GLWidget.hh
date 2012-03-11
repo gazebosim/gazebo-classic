@@ -104,6 +104,7 @@ namespace gazebo
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
       private: void PublishVisualPose(rendering::VisualPtr _vis);
+      private: void ClearSelection();
 
       /// \brief Copy an object by name
       private: void Paste(const std::string &_object);
