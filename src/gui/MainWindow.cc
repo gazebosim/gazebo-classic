@@ -265,60 +265,63 @@ void MainWindow::EditWorldProperties()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Arrow()
+{
+  gui::Events::manipMode("normal");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::RingPose()
 {
-  if (this->ringPoseAct->isChecked())
-    gui::Events::manipMode("ring");
-  else
-    gui::Events::manipMode("normal");
+  gui::Events::manipMode("ring");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
-  this->ringPoseAct->setChecked(false);
+  this->arrowAct->setChecked(true);
   gui::Events::createEntity("box");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSphere()
 {
-  this->ringPoseAct->setChecked(false);
+  this->arrowAct->setChecked(true);
   gui::Events::createEntity("sphere");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateCylinder()
 {
-  this->ringPoseAct->setChecked(false);
+  this->arrowAct->setChecked(true);
   gui::Events::createEntity("cylinder");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMesh()
 {
-  this->ringPoseAct->setChecked(false);
+  this->arrowAct->setChecked(true);
   gui::Events::createEntity("mesh");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreatePointLight()
 {
-  this->ringPoseAct->setChecked(false);
+  this->arrowAct->setChecked(true);
   gui::Events::createEntity("pointlight");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSpotLight()
 {
-  this->ringPoseAct->setChecked(false);
+  this->arrowAct->setChecked(true);
   gui::Events::createEntity("spotlight");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateDirectionalLight()
 {
-  this->ringPoseAct->setChecked(false);
+  this->arrowAct->setChecked(true);
   gui::Events::createEntity("directionallight");
 }
 
@@ -338,6 +341,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->removeDockWidget(this->insertModelsDock);
     this->playToolbar->hide();
     this->editToolbar->hide();
+    this->mouseToolbar->hide();
     this->menuBar()->hide();
   }
   else
@@ -350,6 +354,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->insertModelsDock->show();
     this->playToolbar->show();
     this->editToolbar->show();
+    this->mouseToolbar->show();
     this->menuBar()->show();
 
     this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
@@ -428,21 +433,32 @@ void MainWindow::CreateActions()
   this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   this->playAct->setStatusTip(tr("Run the world"));
   this->playAct->setCheckable(true);
+  this->playAct->setChecked(true);
   connect(this->playAct, SIGNAL(triggered()), this, SLOT(Play()));
 
   this->pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   this->pauseAct->setStatusTip(tr("Pause the world"));
   this->pauseAct->setCheckable(true);
+  this->pauseAct->setChecked(false);
   connect(this->pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
   this->stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   this->stepAct->setStatusTip(tr("Step the world"));
   connect(this->stepAct, SIGNAL(triggered()), this, SLOT(Step()));
 
+
+  this->arrowAct = new QAction(QIcon(":/images/arrow.png"),
+      tr("Position object"), this);
+  this->arrowAct->setStatusTip(tr("Move camera"));
+  this->arrowAct->setCheckable(true);
+  this->arrowAct->setChecked(true);
+  connect(this->arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
+
   this->ringPoseAct = new QAction(QIcon(":/images/translate.png"),
       tr("Position object"), this);
   this->ringPoseAct->setStatusTip(tr("Position object"));
   this->ringPoseAct->setCheckable(true);
+  this->ringPoseAct->setChecked(false);
   connect(this->ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
 
 
@@ -542,8 +558,14 @@ void MainWindow::CreateToolbars()
   this->playToolbar->addAction(this->pauseAct);
   this->playToolbar->addAction(this->stepAct);
 
+  QActionGroup *actionGroup = new QActionGroup(this);
+  this->mouseToolbar = this->addToolBar(tr("Mouse"));
+  actionGroup->addAction(this->arrowAct);
+  actionGroup->addAction(this->ringPoseAct);
+  this->mouseToolbar->addAction(this->arrowAct);
+  this->mouseToolbar->addAction(this->ringPoseAct);
+
   this->editToolbar = this->addToolBar(tr("Edit"));
-  this->editToolbar->addAction(this->ringPoseAct);
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);

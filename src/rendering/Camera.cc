@@ -656,8 +656,10 @@ unsigned int Camera::GetViewportWidth() const
 {
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualWidth();
-  else
+  else if (this->camera && this->camera->getViewport())
     return this->camera->getViewport()->getActualWidth();
+  else
+    return 0;
 }
 
 //////////////////////////////////////////////////
@@ -665,8 +667,10 @@ unsigned int Camera::GetViewportHeight() const
 {
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualHeight();
-  else
+  else if (this->camera && this->camera->getViewport())
     return this->camera->getViewport()->getActualHeight();
+  else
+    return 0;
 }
 
 //////////////////////////////////////////////////

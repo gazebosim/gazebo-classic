@@ -70,6 +70,8 @@ namespace gazebo
       /// \brief Finialize
       public: void Fini();
 
+      public: virtual void SetWorldPose(const math::Pose &_pose);
+
       /// \brief Hande a mouse event
       public: void HandleMouseEvent(const common::MouseEvent &_evt);
       public: void HandleKeyPressEvent(const std::string &_key);

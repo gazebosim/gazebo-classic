@@ -64,7 +64,7 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
 
   this->orbitViewController = new OrbitViewController(this);
   this->fpsViewController = new FPSViewController(this);
-  this->viewController = this->fpsViewController;
+  this->viewController = this->orbitViewController;
 }
 
 //////////////////////////////////////////////////
@@ -156,10 +156,15 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::SetWorldPose(const math::Pose &_pose)
+{
+  Camera::SetWorldPose(_pose);
+  this->viewController->Init();
+}
+
+//////////////////////////////////////////////////
 void UserCamera::Update()
 {
-  this->viewController->Update();
-
   Camera::Update();
 
   if (this->animState)

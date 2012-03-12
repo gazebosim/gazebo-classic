@@ -89,6 +89,3 @@ std::string FPSViewController::GetTypeString()
 {
   return TYPE_STRING;
 }
-
-
-

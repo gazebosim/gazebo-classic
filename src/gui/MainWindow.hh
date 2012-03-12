@@ -64,6 +64,7 @@ namespace gazebo
 
       private slots: void NewModel();
       private slots: void EditWorldProperties();
+      private slots: void Arrow();
       private slots: void RingPose();
 
       private slots: void CreateBox();
@@ -88,16 +89,15 @@ namespace gazebo
 
       private: void OnModel(ConstModelPtr &_msg);
       private: void OnSetSelectedEntity(const std::string &_name);
-      private: void OnResponse(
-                   ConstResponsePtr &_msg);
-      private: void OnWorldModify(
-                   ConstWorldModifyPtr &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
+      private: void OnWorldModify(ConstWorldModifyPtr &_msg);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;
       private: QMenu *viewMenu;
       private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
+      private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
       private: QAction *newAct;
@@ -115,6 +115,7 @@ namespace gazebo
       private: QAction *pauseAct;
       private: QAction *stepAct;
 
+      private: QAction *arrowAct;
       private: QAction *ringPoseAct;
 
       private: QAction *boxCreateAct;

@@ -66,6 +66,8 @@ namespace gazebo
       /// \brief Normalize pitch value
       private: void NormalizePitch(float &v);
 
+      private: void UpdatePose();
+
       private: float yaw, pitch;
       private: float distance;
       private: float minDist, maxDist;

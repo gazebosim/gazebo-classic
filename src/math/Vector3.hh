@@ -50,6 +50,9 @@ namespace gazebo
       /// \brief Calc distance to the given point
       public: double Distance(const Vector3 &_pt) const;
 
+      /// \brief Calc distance to the given point
+      public: double Distance(double _x, double _y, double _z) const;
+
       /// \brief Returns the length (magnitude) of the vector
       public: double GetLength() const;
 
