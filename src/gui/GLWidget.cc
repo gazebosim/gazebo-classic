@@ -17,6 +17,7 @@
 #include <math.h>
 
 #include "common/Exception.hh"
+#include "common/MeshManager.hh"
 #include "math/gzmath.h"
 
 #include "transport/transport.h"
@@ -82,7 +83,7 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->connections.push_back(
       gui::Events::ConnectCreateEntity(
-        boost::bind(&GLWidget::OnCreateEntity, this, _1)));
+        boost::bind(&GLWidget::OnCreateEntity, this, _1, _2)));
 
   this->connections.push_back(
       gui::Events::ConnectFPS(
@@ -761,24 +762,24 @@ std::string GLWidget::GetOgreHandle() const
 }
 
 /////////////////////////////////////////////////
-void GLWidget::CreateEntity(const std::string &_name)
+void GLWidget::CreateEntity(const std::string &_type)
 {
   this->ClearSelection();
 
   if (this->entityMaker)
     this->entityMaker->Stop();
 
-  if (_name == "box")
+  if (_type == "box")
     this->entityMaker = &this->boxMaker;
-  else if (_name == "sphere")
+  else if (_type == "sphere")
     this->entityMaker = &this->sphereMaker;
-  else if (_name == "cylinder")
+  else if (_type == "cylinder")
     this->entityMaker = &this->cylinderMaker;
-  else if (_name == "pointlight")
+  else if (_type == "pointlight")
     this->entityMaker =  &this->pointLightMaker;
-  else if (_name == "spotlight")
+  else if (_type == "spotlight")
     this->entityMaker =  &this->spotLightMaker;
-  else if (_name == "directionallight")
+  else if (_type == "directionallight")
     this->entityMaker =  &this->directionalLightMaker;
   else
     this->entityMaker = NULL;
@@ -826,9 +827,21 @@ void GLWidget::OnMoveMode(bool _mode)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnCreateEntity(const std::string &_type)
+void GLWidget::OnCreateEntity(const std::string &_type,
+                              const std::string &_data)
 {
-  this->CreateEntity(_type);
+  // Load the trimesh data
+  if (_type == "mesh" && !_data.empty())
+  {
+    common::MeshManager::Instance()->Load(_data);
+
+    rendering::VisualPtr vis(new rendering::Visual(_data, this->scene));
+    vis->Load();
+    vis->AttachMesh(_data);
+    vis->Init();
+  }
+  else
+    this->CreateEntity(_type);
 }
 
 /////////////////////////////////////////////////

@@ -572,23 +572,23 @@ void Visual::MakeStatic()
 }
 
 //////////////////////////////////////////////////
-void Visual::AttachMesh(const std::string &meshName)
+void Visual::AttachMesh(const std::string &_meshName)
 {
   std::ostringstream stream;
   Ogre::MovableObject *obj;
-  stream << this->sceneNode->getName() << "_ENTITY_" << meshName;
+  stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
 
   // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(meshName) &&
-      common::MeshManager::Instance()->HasMesh(meshName))
+  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+      common::MeshManager::Instance()->HasMesh(_meshName))
   {
     const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(meshName);
+      common::MeshManager::Instance()->GetMesh(_meshName);
     this->InsertMesh(mesh);
   }
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
+    (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
 
   this->AttachObject(obj);
 }

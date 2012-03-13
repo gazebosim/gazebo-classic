@@ -175,6 +175,24 @@ void MainWindow::Open()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Import()
+{
+  std::string filename = QFileDialog::getOpenFileName(this,
+      tr("Import Collada Mesh"), "",
+      tr("SDF Files (*.dae *.zip)")).toStdString();
+
+  if (!filename.empty())
+  {
+    if (filename.find(".dae") != std::string::npos)
+    {
+      gui::Events::createEntity("mesh", filename);
+    }
+    else
+      gzerr << "Unable to import mesh[" << filename << "]\n";
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Save()
 {
   msgs::ServerControl msg;
@@ -280,49 +298,49 @@ void MainWindow::RingPose()
 void MainWindow::CreateBox()
 {
   this->arrowAct->setChecked(true);
-  gui::Events::createEntity("box");
+  gui::Events::createEntity("box", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSphere()
 {
   this->arrowAct->setChecked(true);
-  gui::Events::createEntity("sphere");
+  gui::Events::createEntity("sphere", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateCylinder()
 {
   this->arrowAct->setChecked(true);
-  gui::Events::createEntity("cylinder");
+  gui::Events::createEntity("cylinder", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMesh()
 {
   this->arrowAct->setChecked(true);
-  gui::Events::createEntity("mesh");
+  gui::Events::createEntity("mesh", "mesh");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreatePointLight()
 {
   this->arrowAct->setChecked(true);
-  gui::Events::createEntity("pointlight");
+  gui::Events::createEntity("pointlight", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSpotLight()
 {
   this->arrowAct->setChecked(true);
-  gui::Events::createEntity("spotlight");
+  gui::Events::createEntity("spotlight", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateDirectionalLight()
 {
   this->arrowAct->setChecked(true);
-  gui::Events::createEntity("directionallight");
+  gui::Events::createEntity("directionallight", "");
 }
 
 /////////////////////////////////////////////////
@@ -392,6 +410,12 @@ void MainWindow::CreateActions()
   this->openAct->setShortcut(tr("Ctrl+O"));
   this->openAct->setStatusTip(tr("Open an world file"));
   connect(this->openAct, SIGNAL(triggered()), this, SLOT(Open()));
+
+  this->importAct = new QAction(tr("&Import Mesh"), this);
+  this->importAct->setShortcut(tr("Ctrl+I"));
+  this->importAct->setStatusTip(tr("Import a Collada mesh"));
+  connect(this->importAct, SIGNAL(triggered()), this, SLOT(Import()));
+
 
   this->saveAct = new QAction(tr("&Save"), this);
   this->saveAct->setShortcut(tr("Ctrl+S"));
@@ -529,6 +553,7 @@ void MainWindow::CreateMenus()
 {
   this->fileMenu = this->menuBar()->addMenu(tr("&File"));
   this->fileMenu->addAction(this->openAct);
+  this->fileMenu->addAction(this->importAct);
   this->fileMenu->addAction(this->newAct);
   this->fileMenu->addAction(this->saveAct);
   this->fileMenu->addAction(this->saveAsAct);

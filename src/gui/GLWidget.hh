@@ -91,7 +91,8 @@ namespace gazebo
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
-      private: void OnCreateEntity(const std::string &_type);
+      private: void OnCreateEntity(const std::string &_type,
+                                   const std::string &_data);
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);

@@ -123,7 +123,9 @@ namespace gazebo
       ///  that indicates the user is manipulating an object
       public: static event::EventT<void (std::string)>  manipMode;
 
-      public: static event::EventT<void (std::string)> createEntity;
+      public: static event::EventT<void (std::string,
+                                         std::string)> createEntity;
+
       public: static event::EventT<void (std::string)> mouseMoveVisual;
       public: static event::EventT<void (const msgs::Model &)> modelUpdate;
       public: static event::EventT<void (bool)> fullScreen;

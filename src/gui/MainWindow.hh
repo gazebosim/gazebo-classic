@@ -55,6 +55,7 @@ namespace gazebo
 
       private slots: void New();
       private slots: void Open();
+      private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
       private slots: void About();
@@ -102,6 +103,7 @@ namespace gazebo
 
       private: QAction *newAct;
       private: QAction *openAct;
+      private: QAction *importAct;
       private: QAction *saveAct;
       private: QAction *saveAsAct;
       private: QAction *aboutAct;
