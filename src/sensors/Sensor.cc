@@ -124,20 +124,6 @@ void Sensor::Update(bool _force)
       this->UpdateImpl(_force);
     }
   }
-
-  // DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
-
-  // Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();
-
-  // if (((this->GetWorld()->GetSimTime() -
-  //      this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
-  {
-    // this->lastUpdate = this->GetWorld()->GetSimTime();
-  }
-
-  // update any controllers that are children of sensors, e.g. ros_bumper
-  // if (this->controller)
-    // this->controller->Update();
 }
 
 //////////////////////////////////////////////////

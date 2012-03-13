@@ -55,8 +55,9 @@ TEST_F(FileHandling, Save)
   while ((file = fopen(filename.str().c_str(), "r")) == NULL && i < 10)
   {
     i++;
-    usleep(10000);
+    common::Time::MSleep(100);
   }
+  fclose(file);
 
   EXPECT_LT(i, 10);
 }

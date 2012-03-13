@@ -17,33 +17,8 @@
 
     <plugin name="world_edit" filename="libworld_edit.so"/>
 
-    <!-- Ground Plane -->
-    <model name="plane1_model" static="true">
-      <link name="body">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
+    <include filename="ground_plane.model"/>
 
-        <collision name="geom">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-          <surface>
-            <friction>
-              <ode mu="0" mu2="0"/>
-            </friction>
-          </surface>
-        </collision>
-
-        <visual name="visual" cast_shadows="false">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-          <material script="Gazebo/Gold"/>
-        </visual>
-      </link>
-    </model>
-    
     <model name="box_model">
       <origin pose="0 0 0.5 0 0 0"/>
       <link name="body">

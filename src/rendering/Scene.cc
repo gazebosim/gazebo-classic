@@ -1276,7 +1276,8 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     this->visuals[cameraVis->GetName()] = cameraVis;
   }
-  if (_msg->type() == "contact" && _msg->visualize() && !_msg->topic().empty())
+  else if (_msg->type() == "contact" && _msg->visualize() &&
+           !_msg->topic().empty())
   {
     ContactVisualPtr contactVis(new ContactVisual(
           _msg->name()+"_contact_vis", this->worldVisual, _msg->topic()));
@@ -1285,6 +1286,7 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
 {
   // TODO: Fix this

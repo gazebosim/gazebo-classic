@@ -90,7 +90,7 @@ namespace gazebo
 
       /// \brief Subtract a vector from the min and max values
       /// \param _v The vector to use during subtraction
-      /// \return The new box 
+      /// \return The new box
       public: Box operator-(const Vector3 &_v);
 
       /// \brief Output operator

@@ -167,9 +167,11 @@ class ServerFixture : public testing::Test
                {
                  if (i % 10 == 0)
                    printf("\n");
-                 printf("%d, ", (*_image)[i]);
+                 else
+                   printf(" ");
+                 printf("%d,", (*_image)[i]);
                }
-               printf("%d};\n", (*_image)[i]);
+               printf(" %d};\n", (*_image)[i]);
                printf("static unsigned char *%s = __%s;\n", _name.c_str(),
                    _name.c_str());
              }

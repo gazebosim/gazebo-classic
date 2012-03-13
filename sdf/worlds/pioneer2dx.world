@@ -15,23 +15,7 @@
       </ode>
     </physics>
 
-    <!-- Ground Plane -->
-    <model name="plane1_model" static="true">
-      <link name="body">
-        <collision name="geom_1">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual_1" cast_shadows="false">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-          <material script="Gazebo/Grey"/>
-        </visual>
-      </link>
-    </model>
+    <include filename="ground_plane.model"/>
 
     <include filename="pioneer2dx.model"/>
     <!--

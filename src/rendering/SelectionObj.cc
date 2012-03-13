@@ -180,17 +180,17 @@ void SelectionObj::Attach(VisualPtr _visual)
 
     transNode = this->node->GetSceneNode()->getChild("trans_node");
     transNode->getChild("selection_transX0")->setPosition(
-        -box.GetXLength()*0.5 - this->boxSize, 0, 
+        -box.GetXLength()*0.5 - this->boxSize, 0,
         box.GetZLength()*0.5 + box.min.z);
     transNode->getChild("selection_transX1")->setPosition(
-        box.GetXLength()*0.5 + this->boxSize, 0, 
+        box.GetXLength()*0.5 + this->boxSize, 0,
         box.GetZLength()*0.5 + box.min.z);
 
     transNode->getChild("selection_transY0")->setPosition(0,
-        -box.GetYLength()*0.5 - this->boxSize, 
+        -box.GetYLength()*0.5 - this->boxSize,
         box.GetZLength()*0.5 + box.min.z);
     transNode->getChild("selection_transY1")->setPosition(0,
-        box.GetYLength()*0.5 + this->boxSize, 
+        box.GetYLength()*0.5 + this->boxSize,
         box.GetZLength()*0.5 + box.min.z);
 
     transNode->getChild("selection_transZ0")->setPosition(0, 0,
