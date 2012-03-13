@@ -54,6 +54,18 @@ namespace gazebo
       /// \brief Get the type name of this view controller
       public: static std::string GetTypeString();
 
+      /// \brief Set the distance to the focal point
+      public: void SetDistance(float _d);
+
+      /// \brief Set the focal point
+      public: void SetFocalPoint(const math::Vector3 &_fp);
+
+      /// \brief Get the focal point
+      public: math::Vector3 GetFocalPoint() const;
+
+      public: void SetYaw(double _yaw);
+      public: void SetPitch(double _pitch);
+
       /// \brief Translate the focal point
       private: void Translate(math::Vector3 vec);
 

@@ -144,6 +144,7 @@ void ODELink::MoveCallback(dBodyID _id)
 
   self->dirtyPose.pos -= cog_vec;
 
+  // TODO: this is an ugly line of code. It's like this for speed.
   self->world->dirtyPoses.push_back(self);
 
   // self->poseMutex->unlock();
@@ -467,8 +468,3 @@ bool ODELink::GetKinematic() const
 
   return result;
 }
-
-
-
-
-

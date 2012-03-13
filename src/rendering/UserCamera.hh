@@ -131,6 +131,8 @@ namespace gazebo
       /// \brief Set whether to show the visual
       private: void ShowVisual(bool _s);
 
+      private: void OnMoveToVisualComplete();
+
       private: std::string name;
       private: static int count;
 

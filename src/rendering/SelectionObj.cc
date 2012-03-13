@@ -174,9 +174,7 @@ void SelectionObj::Attach(VisualPtr _visual)
     math::Box box = _visual->GetBoundingBox();
     _visual->AttachVisual(this->node);
 
-    std::cout << _visual->GetPose() << "\n";
     box = box - _visual->GetPose().pos;
-    std::cout << "Box[" << box << "]\n";
 
     transNode = this->node->GetSceneNode()->getChild("trans_node");
     transNode->getChild("selection_transX0")->setPosition(

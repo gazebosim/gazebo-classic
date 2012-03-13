@@ -51,7 +51,6 @@ LaserVisual::~LaserVisual()
   this->rayFan = NULL;
 }
 
-
 /////////////////////////////////////////////////
 void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
 {

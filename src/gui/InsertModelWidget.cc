@@ -217,7 +217,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     }
 
     if (visuals.size() > 0)
-    gui::Events::mouseMoveVisual(modelName);
+      gui::Events::mouseMoveVisual(modelName);
 
     QApplication::setOverrideCursor(Qt::ArrowCursor);
   }

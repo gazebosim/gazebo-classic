@@ -138,11 +138,15 @@ namespace gazebo
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(uint32_t index) const;
 
+      /// \brief Create a visual
+      public: VisualPtr CreateVisual(const std::string &_name);
+
       /// \brief Get a visual by name
       public: VisualPtr GetVisual(const std::string &_name) const;
 
       public: VisualPtr SelectVisualAt(CameraPtr camera,
                                        math::Vector2i mousePos);
+
       /// \brief Select a visual by name
       public: void SelectVisual(const std::string &_name) const;
 

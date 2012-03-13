@@ -138,6 +138,10 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
       rendering::Events::ConnectRemoveScene(
         boost::bind(&ModelListWidget::OnRemoveScene, this, _1)));
 
+  this->connections.push_back(
+      event::Events::ConnectSetSelectedEntity(
+        boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1)));
+
   QTimer::singleShot(500, this, SLOT(Update()));
 }
 
@@ -153,20 +157,25 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
   if (_item)
   {
-    msgs::Selection msg;
+    std::string name = _item->data(1, Qt::UserRole).toString().toStdString();
+    event::Events::setSelectedEntity(name);
+  }
+  else
+    this->selectedModelName.clear();
+}
 
-    this->propTreeBrowser->clear();
-    this->selectedModelName =
-      _item->data(1, Qt::UserRole).toString().toStdString();
+/////////////////////////////////////////////////
+void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
+{
+  this->selectedModelName = _name;
 
-    event::Events::setSelectedEntity(this->selectedModelName);
-
+  this->propTreeBrowser->clear();
+  if (!this->selectedModelName.empty())
+  {
     this->requestMsg = msgs::CreateRequest("entity_info",
         this->selectedModelName);
     this->requestPub->Publish(*this->requestMsg);
   }
-  else
-    this->selectedModelName.clear();
 }
 
 /////////////////////////////////////////////////

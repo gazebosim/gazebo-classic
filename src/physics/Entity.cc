@@ -112,6 +112,7 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   if (this->parent)
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
   this->visPub->Publish(*this->visualMsg);
 

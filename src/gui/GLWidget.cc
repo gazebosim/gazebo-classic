@@ -17,7 +17,6 @@
 #include <math.h>
 
 #include "common/Exception.hh"
-#include "common/MeshManager.hh"
 #include "math/gzmath.h"
 
 #include "transport/transport.h"
@@ -101,6 +100,9 @@ GLWidget::GLWidget(QWidget *_parent)
       gui::Events::ConnectManipMode(
         boost::bind(&GLWidget::OnManipMode, this, _1)));
 
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&GLWidget::OnSetSelectedEntity, this, _1)));
 
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -224,8 +226,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   // Return the mouse interaction state to normal
   if (_event->key() == Qt::Key_Escape)
   {
-    this->ClearSelection();
-    this->state = "normal";
+    event::Events::setSelectedEntity("");
   }
 
   this->mouseEvent.control =
@@ -309,15 +310,14 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
   else
     this->OnMousePressNormal();
 
-  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressNormal()
 {
   this->setCursor(Qt::ArrowCursor);
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
-
 
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressMakeEntity()
@@ -335,7 +335,9 @@ void GLWidget::OnMousePressRing()
     this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos,
         this->selectionMod);
     if (!this->selectionMod.empty())
-        this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+      this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+    else
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
   }
 
   if (this->mouseMoveVis)
@@ -631,8 +633,18 @@ void GLWidget::OnMouseReleaseRing()
         this->mouseMoveVis = this->hoverVis;
 
         // Get the model associated with the visual
-        this->mouseMoveVis = this->mouseMoveVis->GetParent()->GetParent();
+        if (this->mouseMoveVis->GetParent() &&
+            this->mouseMoveVis->GetParent()->GetName() != "__world_node__")
+        {
+          this->mouseMoveVis = this->mouseMoveVis->GetParent();
+          if (this->mouseMoveVis->GetParent() &&
+              this->mouseMoveVis->GetParent()->GetName() != "__world_node__")
+            this->mouseMoveVis = this->mouseMoveVis->GetParent();
+        }
+
         this->selectionObj = this->scene->GetSelectionObj();
+        event::Events::setSelectedEntity(this->mouseMoveVis->GetName());
+
         this->scene->SelectVisual(this->mouseMoveVis->GetName());
 
         this->hoverVis.reset();
@@ -641,53 +653,12 @@ void GLWidget::OnMouseReleaseRing()
   }
 
   this->selectionMod.clear();
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 //////////////////////////////////////////////////
 void GLWidget::OnMouseReleaseNormal()
 {
-  if (!this->mouseEvent.dragging)
-  {
-    /*if (this->mouseEvent.button == common::MouseEvent::LEFT)
-    {
-      if (this->mouseMoveVis)
-      {
-        this->scene->SelectVisual("");
-        if (this->copy)
-        {
-          msgs::Factory msg;
-          msg.set_clone_model_name(this->copiedObject);
-          msgs::Set(msg.mutable_pose(), this->mouseMoveVis->GetWorldPose());
-          this->factoryPub->Publish(msg);
-          this->copy = false;
-          this->scene->RemoveVisual(this->mouseMoveVis);
-          this->mouseMoveVis.reset();
-        }
-        else (this->mouseMoveVis)
-        {
-          msgs::Model msg;
-          msg.set_id(gui::get_entity_id(this->mouseMoveVis->GetName()));
-          msg.set_name(this->mouseMoveVis->GetName());
-
-          msgs::Set(msg.mutable_pose(), this->mouseMoveVis->GetWorldPose());
-          this->modelPub->Publish(msg);
-
-          this->mouseMoveVis.reset();
-        }
-
-        this->mouseMoveVis.reset();
-      }
-    }
-    else
-      this->scene->SelectVisual("");
-      */
-  }
-  else if (this->mouseMoveVis &&
-           this->mouseEvent.button == common::MouseEvent::MIDDLE)
-  {
-    QCursor::setPos(this->onShiftMousePos);
-  }
-
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
@@ -775,6 +746,8 @@ void GLWidget::CreateEntity(const std::string &_type)
     this->entityMaker = &this->sphereMaker;
   else if (_type == "cylinder")
     this->entityMaker = &this->cylinderMaker;
+  else if (_type == "mesh")
+    this->entityMaker = &this->meshMaker;
   else if (_type == "pointlight")
     this->entityMaker =  &this->pointLightMaker;
   else if (_type == "spotlight")
@@ -818,11 +791,10 @@ void GLWidget::OnCreateScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnMoveMode(bool _mode)
 {
-  this->state = _mode;
   if (_mode)
   {
-    // TODO: set cursor to default state
     this->entityMaker = NULL;
+    this->state = "normal";
   }
 }
 
@@ -833,12 +805,16 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   // Load the trimesh data
   if (_type == "mesh" && !_data.empty())
   {
-    common::MeshManager::Instance()->Load(_data);
+    this->meshMaker.Init(_data);
+    this->entityMaker = &this->meshMaker;
+    this->state = "make_entity";
+    this->entityMaker->Start(this->userCamera);
 
-    rendering::VisualPtr vis(new rendering::Visual(_data, this->scene));
-    vis->Load();
+    /* rendering::VisualPtr vis = this->scene->CreateVisual(_data);
     vis->AttachMesh(_data);
-    vis->Init();
+    vis->SetMaterial("Gazebo/Red");
+    vis->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));
+    */
   }
   else
     this->CreateEntity(_type);
@@ -1075,4 +1051,28 @@ void GLWidget::ClearSelection()
 
   this->scene->SelectVisual("");
   this->selectionObj = NULL;
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnSetSelectedEntity(const std::string &_name)
+{
+  std::map<std::string, unsigned int>::iterator iter;
+  if (!_name.empty())
+  {
+    std::string name = _name;
+    boost::replace_first(name, gui::get_world()+"::", "");
+
+    this->mouseMoveVis = this->scene->GetVisual(name);
+    this->selectionObj = this->scene->GetSelectionObj();
+    this->scene->SelectVisual(name);
+
+    gui::Events::manipMode("ring");
+  }
+  else
+  {
+    this->scene->SelectVisual("");
+    gui::Events::manipMode("normal");
+  }
+
+  this->hoverVis.reset();
 }

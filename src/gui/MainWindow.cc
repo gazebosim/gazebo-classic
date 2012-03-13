@@ -121,8 +121,8 @@ MainWindow::MainWindow()
         boost::bind(&MainWindow::OnMoveMode, this, _1)));
 
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
+      gui::Events::ConnectManipMode(
+        boost::bind(&MainWindow::OnManipMode, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -717,27 +717,6 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnSetSelectedEntity(const std::string &_name)
-{
-  std::map<std::string, unsigned int>::iterator iter;
-  std::string name = _name;
-  boost::replace_first(name, gui::get_world()+"::", "");
-
-  msgs::Selection msg;
-  msg.set_name(name);
-
-  iter = this->entities.find(name);
-  if (iter != this->entities.end())
-    msg.set_id(iter->second);
-  else
-  {
-    gzerr << "Unable to find model[" << _name << "]\n";
-  }
-
-  this->selectionPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
 unsigned int MainWindow::GetEntityId(const std::string &_name)
 {
   unsigned int result = 0;
@@ -783,4 +762,13 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnManipMode(const std::string &_mode)
+{
+  if (_mode == "normal")
+    this->arrowAct->setChecked(true);
+  else if (_mode == "ring")
+    this->ringPoseAct->setChecked(true);
 }

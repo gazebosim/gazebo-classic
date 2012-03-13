@@ -89,9 +89,9 @@ namespace gazebo
       private: void CreateToolbars();
 
       private: void OnModel(ConstModelPtr &_msg);
-      private: void OnSetSelectedEntity(const std::string &_name);
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
+      private: void OnManipMode(const std::string &_mode);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;

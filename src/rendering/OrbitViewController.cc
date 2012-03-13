@@ -220,6 +220,38 @@ void OrbitViewController::Translate(math::Vector3 vec)
 }
 
 //////////////////////////////////////////////////
+void OrbitViewController::SetDistance(float _d)
+{
+  this->distance = _d;
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
+{
+  this->focalPoint = _fp;
+  this->refVisual->SetWorldPosition(this->focalPoint);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 OrbitViewController::GetFocalPoint() const
+{
+  return this->focalPoint;
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::SetYaw(double _yaw)
+{
+  this->yaw = _yaw;
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::SetPitch(double _pitch)
+{
+  this->pitch = _pitch;
+}
+
+
+//////////////////////////////////////////////////
 void OrbitViewController::NormalizeYaw(float &v)
 {
   v = fmod(v, M_PI*2);

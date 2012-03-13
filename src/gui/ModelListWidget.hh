@@ -67,6 +67,7 @@ namespace gazebo
       private slots: void OnShowCollision();
       private slots: void OnTransparent();
 
+      private: void OnSetSelectedEntity(const std::string &_name);
       private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);

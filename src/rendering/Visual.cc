@@ -891,7 +891,7 @@ void Visual::SetSpecular(const common::Color &_color)
   }
 }
 
-
+/////////////////////////////////////////////////
 void Visual::AttachAxes()
 {
   std::ostringstream nodeName;
@@ -1603,7 +1603,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
-    math::Vector3 scale;
+    math::Vector3 scale(1, 1, 1);
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
@@ -1632,7 +1632,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
       scale = msgs::Convert(_msg->geometry().heightmap().size());
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
-      scale = msgs::Convert(_msg->geometry().mesh().scale());
+    {
+      if (_msg->geometry().mesh().has_scale())
+        scale = msgs::Convert(_msg->geometry().mesh().scale());
+      else
+        scale.x = scale.y = scale.z = 1.0;
+    }
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 

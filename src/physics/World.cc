@@ -780,6 +780,19 @@ void World::ProcessEntityMsgs()
   for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); ++iter)
   {
+    // Remove all the dirty poses from the delete entity.
+    for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
+         iter2 != this->dirtyPoses.end();)
+    {
+      if ((*iter2)->GetName() == *iter ||
+          (*iter2)->GetParent()->GetName() == *iter)
+      {
+        this->dirtyPoses.erase(iter2++);
+      }
+      else
+        ++iter2;
+    }
+
     this->rootElement->RemoveChild((*iter));
   }
 

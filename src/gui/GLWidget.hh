@@ -35,6 +35,7 @@
 #include "gui/BoxMaker.hh"
 #include "gui/SphereMaker.hh"
 #include "gui/CylinderMaker.hh"
+#include "gui/MeshMaker.hh"
 #include "gui/LightMaker.hh"
 
 namespace gazebo
@@ -96,6 +97,7 @@ namespace gazebo
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
+      private: void OnSetSelectedEntity(const std::string &_name);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
       private: void TranslateEntity(rendering::VisualPtr &_vis);
@@ -123,6 +125,7 @@ namespace gazebo
       private: BoxMaker boxMaker;
       private: SphereMaker sphereMaker;
       private: CylinderMaker cylinderMaker;
+      private: MeshMaker meshMaker;
       private: PointLightMaker pointLightMaker;
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;

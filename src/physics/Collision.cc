@@ -90,12 +90,17 @@ void Collision::Fini()
   this->connections.clear();
 }
 
-
-
 //////////////////////////////////////////////////
 void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
+
+  if (this->sdf->HasElement("origin"))
+      this->SetRelativePose(
+        this->sdf->GetElement("origin")->GetValuePose("pose"));
+  else
+    this->SetRelativePose(
+        math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
 
   if (this->sdf->HasElement("surface"))
     this->surface->Load(this->sdf->GetElement("surface"));
@@ -121,6 +126,7 @@ void Collision::Init()
   else
     this->SetRelativePose(
         math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
+    
   this->shape->Init();
 }
 

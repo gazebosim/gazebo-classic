@@ -512,6 +512,21 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
   return cam;
 }
 
+//////////////////////////////////////////////////
+VisualPtr Scene::CreateVisual(const std::string &_name)
+{
+  if (this->GetVisual(_name) != NULL)
+  {
+    gzerr << "Visual with name[" << _name << "] already exists\n";
+    return VisualPtr();
+  }
+
+  VisualPtr result(new Visual(_name, this->worldVisual));
+  result->Load();
+  this->visuals[_name] = result;
+
+  return result;
+}
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(const std::string &_name) const
@@ -1456,6 +1471,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   this->selectionMsg = _msg;
