@@ -1035,12 +1035,13 @@ static void dQueryCCTLPotentialCollisionTriangles(OBBCollider &Collider,
 
 // capsule - trimesh by CroTeam
 // Ported by Nguyem Binh
-int dCollideCCTL(dxGeom *o1, dxGeom *o2, int flags, dContactGeom *contact, int skip)
+int dCollideCCTL(dxGeom *o1, dxGeom *o2, int _flags,
+                 dContactGeom *contact, int skip)
 {
 	dIASSERT (skip >= (int)sizeof(dContactGeom));
 	dIASSERT (o1->type == dTriMeshClass);
 	dIASSERT (o2->type == dCapsuleClass);
-	dIASSERT ((flags & NUMC_MASK) >= 1);
+	dIASSERT ((_flags & NUMC_MASK) >= 1);
 	
 	int nContactCount = 0;
 
@@ -1048,7 +1049,7 @@ int dCollideCCTL(dxGeom *o1, dxGeom *o2, int flags, dContactGeom *contact, int s
 	dxGeom *Capsule = o2;
 
 	sTrimeshCapsuleColliderData cData;
-	cData.SetupInitialContext(TriMesh, Capsule, flags, skip);
+	cData.SetupInitialContext(TriMesh, Capsule, _flags, skip);
 
 	const unsigned uiTLSKind = TriMesh->getParentSpaceTLSKind();
 	dIASSERT(uiTLSKind == Capsule->getParentSpaceTLSKind()); // The colliding spaces must use matching cleanup method
@@ -1092,7 +1093,9 @@ int dCollideCCTL(dxGeom *o1, dxGeom *o2, int flags, dContactGeom *contact, int s
 				uint8 flags = UseFlags ? (uint8) UseFlags[Triint] : (uint8) dxTriMeshData::kUseAll;
 
 				bool bFinishSearching;
-				ctContacts0 = cData.TestCollisionForSingleTriangle(ctContacts0, Triint, dv, flags, bFinishSearching);
+				ctContacts0 =
+          cData.TestCollisionForSingleTriangle(ctContacts0, Triint, dv,
+              flags, bFinishSearching);
 
 				if (bFinishSearching) 
 				{

@@ -18,17 +18,16 @@
 
 namespace gazebo
 {
-  class PluginTemplate : public Plugin
+  class WorldPluginTutorial : public WorldPlugin
   {
-    public: PluginTemplate() : Plugin()
+    public: WorldPluginTutorial() : WorldPlugin()
             {
+              printf("Hello World!\n");
             }
 
-    public: void Load(sdf::ElementPtr &_sdf)
+    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
             {
             };
-
-    GZ_REGISTER_PLUGIN("PluginTemplate", PluginTemplate)
   };
+  GZ_REGISTER_WORLD_PLUGIN(WorldPluginTutorial)
 }
-

@@ -48,7 +48,7 @@ namespace gazebo
     /// \brief A class that encapsulates a connection
     class Connection
     {
-      public: Connection() :event(NULL), id(-1), uniqueId(-1) {}
+      public: Connection() :event(NULL), id(-1) {}
       public: Connection(Event *_e, int _i);
       public: ~Connection();
       public: int GetId() const;
@@ -57,7 +57,6 @@ namespace gazebo
       private: int id;
 
       private: static int counter;
-      private: int uniqueId;
 
       private: common::Time creationTime;
       public: template<typename T> friend class EventT;

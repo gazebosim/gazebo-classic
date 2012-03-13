@@ -721,6 +721,8 @@ void dJointSetPUParam( dJointID j, int parameter, dReal value )
     case dParamGroup3:
         joint->limotP.set( parameter & 0xff, value );
         break;
+    default:
+        break;
     }
 }
 
@@ -802,6 +804,8 @@ dReal dJointGetPUParam( dJointID j, int parameter )
         break;
     case dParamGroup3:
         return joint->limotP.get( parameter & 0xff );
+        break;
+    default:
         break;
     }
 

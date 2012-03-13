@@ -37,6 +37,7 @@
  **
  ****************************************************************************/
 
+#pragma GCC system_header
 
 #ifndef QTPROPERTYBROWSER_H
 #define QTPROPERTYBROWSER_H

@@ -47,7 +47,6 @@ namespace gazebo
     msgs::Request *CreateRequest(const std::string &_request,
                                  const std::string &_data = "");
 
-
     /// \brief Initialize a message
     /// \param _message Message to initialize
     /// \param _id Optional string id
@@ -165,6 +164,7 @@ namespace gazebo
     /// \param _sdf The sdf element
     /// \return The new msgs::TrackVisual object
     msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf);
+
 
     /// \brief Create a msgs::GUI from a GUI SDF element
     /// \param _sdf The sdf element

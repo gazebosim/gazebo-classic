@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 
 #include <boost/thread.hpp>
 
@@ -53,8 +54,9 @@ namespace gazebo
 
     public: bool GetInitialized() const;
 
-    private: void OnControl(
-                 ConstServerControlPtr &_msg);
+    private: void OnControl(ConstServerControlPtr &_msg);
+
+    private: bool OpenWorld(const std::string &_filename);
 
     private: void ProcessControlMsgs();
 
@@ -69,6 +71,7 @@ namespace gazebo
 
     private: boost::mutex *receiveMutex;
     private: std::list<msgs::ServerControl> controlMsgs;
+    private: std::map<std::string, std::string> worldFilenames;
   };
 }
 

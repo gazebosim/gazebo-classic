@@ -134,7 +134,7 @@ void echo_cb(ConstStringPtr &_data)
 msgs::TopicInfo get_topic_info(const std::string &_topic)
 {
   msgs::TopicInfo topic_info;
-  std::string data, type;
+  std::string data;
   msgs::Request request;
   msgs::Packet packet;
 
@@ -193,7 +193,7 @@ void echo()
   transport::run();
 
   while (true)
-    usleep(10000);
+    common::Time::MSleep(10);
 
   transport::fini();
 }

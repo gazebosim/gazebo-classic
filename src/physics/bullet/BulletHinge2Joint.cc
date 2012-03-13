@@ -17,7 +17,6 @@
 /* Desc: A hinge joint with 2 degrees of freedom
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: BulletHinge2Joint.cc 7129 2008-11-12 19:38:15Z natepak $
  */
 
 #include "common/Exception.hh"

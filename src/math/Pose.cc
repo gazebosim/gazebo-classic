@@ -17,7 +17,6 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
 
 #include "math/Pose.hh"
@@ -35,6 +34,13 @@ Pose::Pose()
 //////////////////////////////////////////////////
 Pose::Pose(const Vector3 &_pos, const Quaternion &_rot)
   : pos(_pos), rot(_rot)
+{
+}
+
+//////////////////////////////////////////////////
+Pose::Pose(double _x, double _y, double _z,
+           double _roll, double _pitch, double _yaw)
+: pos(_x, _y, _z), rot(_roll, _pitch, _yaw)
 {
 }
 

@@ -17,7 +17,6 @@
 /* Desc: Trimesh collisionetry
  * Author: Nate Keonig
  * Date: 21 May 2009
- * SVN: $Id:$
  */
 
 #ifndef BULLETTRIMESHSHAPE_HH

@@ -17,7 +17,6 @@
 /* Desc: Sonar Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * SVN: $Id$
  */
 
 #ifndef SONARINTERFACE_HH

@@ -17,7 +17,6 @@
 /* Desc: Trimesh geometry
  * Author: Nate Koenig
  * Date: 16 Oct 2009
- * SVN: $Id$
  */
 
 #ifndef ODETRIMESHSHAPE_HH
@@ -46,7 +45,7 @@ namespace gazebo
       public: void Update();
 
       /// \brief Load the trimesh
-      protected: virtual void Load(sdf::ElementPtr &_sdf);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       protected: virtual void Init();
 

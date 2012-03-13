@@ -19,7 +19,7 @@
  * Date: 25 May 2007
  */
 
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 #include "transport/transport.h"
 
 #include "physics/Physics.hh"
@@ -42,7 +42,7 @@ using namespace sensors;
 Sensor::Sensor()
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/sensor.sdf", this->sdf);
+  sdf::initFile("sdf/sensor.sdf", this->sdf);
 
   this->active = false;
 
@@ -61,14 +61,14 @@ Sensor::~Sensor()
 }
 
 //////////////////////////////////////////////////
-void Sensor::Load(sdf::ElementPtr &_sdf)
+void Sensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
-  this->Load();
+  this->sdf->Copy(_sdf);
+  this->Load(_worldName);
 }
 
 //////////////////////////////////////////////////
-void Sensor::Load()
+void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("origin"))
   {
@@ -78,12 +78,10 @@ void Sensor::Load()
   if (this->sdf->GetValueBool("always_on"))
     this->SetActive(true);
 
-  this->node->Init(this->sdf->GetWorldName());
-
-  // get world
-  std::string worldName = this->sdf->GetWorldName();
-  this->world = physics::get_world(worldName);
+  this->world = physics::get_world(_worldName);
   this->lastUpdateTime = this->world->GetSimTime();
+
+  this->node->Init(this->world->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -126,20 +124,6 @@ void Sensor::Update(bool _force)
       this->UpdateImpl(_force);
     }
   }
-
-  // DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
-
-  // Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();
-
-  // if (((this->GetWorld()->GetSimTime() -
-  //      this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
-  {
-    // this->lastUpdate = this->GetWorld()->GetSimTime();
-  }
-
-  // update any controllers that are children of sensors, e.g. ros_bumper
-  // if (this->controller)
-    // this->controller->Update();
 }
 
 //////////////////////////////////////////////////
@@ -155,7 +139,7 @@ std::string Sensor::GetName() const
 }
 
 //////////////////////////////////////////////////
-void Sensor::LoadPlugin(sdf::ElementPtr &_sdf)
+void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
@@ -170,9 +154,9 @@ void Sensor::LoadPlugin(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetActive(bool value)
+void Sensor::SetActive(bool _value)
 {
-  this->active = value;
+  this->active = _value;
 }
 
 //////////////////////////////////////////////////
@@ -243,3 +227,8 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   }
 }
 
+//////////////////////////////////////////////////
+std::string Sensor::GetWorldName() const
+{
+  return this->world->GetName();
+}

@@ -71,28 +71,28 @@ namespace gazebo
                 ENTITY          = 0x00000001,
                 MODEL           = 0x00000002,
                 LINK            = 0x00000004,
-                COLLISION       = 0x00000010,
-                LIGHT           = 0x00000020,
-                VISUAL          = 0x00000040,
+                COLLISION       = 0x00000008,
+                LIGHT           = 0x00000010,
+                VISUAL          = 0x00000020,
 
-                JOINT           = 0x10000000,
-                BALL_JOINT      = 0x10000001,
-                HINGE2_JOINT    = 0x10000002,
-                HINGE_JOINT     = 0x10000004,
-                SLIDER_JOINT    = 0x10000010,
-                SCREW_JOINT     = 0x10000020,
-                UNIVERSAL_JOINT = 0x10000040,
+                JOINT           = 0x00000040,
+                BALL_JOINT      = 0x00000080,
+                HINGE2_JOINT    = 0x00000100,
+                HINGE_JOINT     = 0x00000200,
+                SLIDER_JOINT    = 0x00000400,
+                SCREW_JOINT     = 0x00000800,
+                UNIVERSAL_JOINT = 0x00001000,
 
-                SHAPE           = 0x20000000,
-                BOX_SHAPE       = 0x20000001,
-                CYLINDER_SHAPE  = 0x20000002,
-                HEIGHTMAP_SHAPE = 0x20000004,
-                MAP_SHAPE       = 0x20000010,
-                MULTIRAY_SHAPE  = 0x20000020,
-                RAY_SHAPE       = 0x20000040,
-                PLANE_SHAPE     = 0x20000100,
-                SPHERE_SHAPE    = 0x20000200,
-                TRIMESH_SHAPE   = 0x20000400
+                SHAPE           = 0x00002000,
+                BOX_SHAPE       = 0x00004000,
+                CYLINDER_SHAPE  = 0x00008000,
+                HEIGHTMAP_SHAPE = 0x00010000,
+                MAP_SHAPE       = 0x00020000,
+                MULTIRAY_SHAPE  = 0x00040000,
+                RAY_SHAPE       = 0x00080000,
+                PLANE_SHAPE     = 0x00100000,
+                SPHERE_SHAPE    = 0x00200000,
+                TRIMESH_SHAPE   = 0x00400000
               };
 
       /// \brief Constructor
@@ -104,7 +104,7 @@ namespace gazebo
 
       /// \brief Load
       /// \param node Pointer to an SDF parameters
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Finialize the object
       public: virtual void Fini();
@@ -112,8 +112,9 @@ namespace gazebo
       public: virtual void Init() {}
       public: virtual void Reset();
       public: virtual void Update() {}
+
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the name of the entity
       /// \param name Link name
@@ -191,13 +192,13 @@ namespace gazebo
       public: unsigned int GetType() const;
 
       /// \brief Return the name of this entity with the model scope
-      ///        model1::...::modelN::entityName
+      ///        world::model1::...::modelN::entityName
       public: std::string GetScopedName() const;
 
       /// \brief Return the name of this entity with the
       ///        model+body+collision scope
       ///        model1::...::modelN::bodyN::entityName
-      public: std::string GetCompleteScopedName() const;
+      public: std::string GetCompleteScopedName() const GAZEBO_DEPRECATED;
 
       public: void Print(std::string prefix);
 
@@ -225,7 +226,7 @@ namespace gazebo
       public: const WorldPtr &GetWorld() const;
 
       /// \brief Get the SDF values for the model
-      public: virtual const sdf::ElementPtr &GetSDF();
+      public: virtual const sdf::ElementPtr GetSDF();
 
       protected: sdf::ElementPtr sdf;
 

@@ -61,7 +61,7 @@ void MapShape::Update()
 //////////////////////////////////////////////////
 void MapShape::Load(sdf::ElementPtr _sdf)
 {
-  Shape::Load(_sdf);
+  Base::Load(_sdf);
 
   std::string imageFilename = _sdf->GetValueString("filename");
 

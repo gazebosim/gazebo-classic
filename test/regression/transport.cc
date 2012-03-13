@@ -39,6 +39,10 @@ bool g_sceneMsg = false;
 bool g_worldStatsMsg = false;
 bool g_worldStatsDebugMsg = false;
 
+void ReceiveStringMsg(ConstStringPtr &/*_msg*/)
+{
+}
+
 void ReceiveSceneMsg(ConstScenePtr &/*_msg*/)
 {
   g_sceneMsg = true;
@@ -51,7 +55,6 @@ void ReceiveWorldStatsMsg(ConstWorldStatisticsPtr &/*_msg*/)
 
 void ReceiveWorldStatsMsg2(ConstWorldStatisticsPtr &/*_msg*/)
 {
-  printf("Receive world stats msgs 2\n");
   g_worldStatsMsg2 = true;
 }
 
@@ -90,80 +93,42 @@ TEST_F(TransportTest, PubSub)
   subs.clear();
 }
 
-TEST_F(TransportTest, Processes)
-{
-  pid_t pid = fork();
-  if (pid == 0)
-  {
-    usleep(1000000);
-    printf("HERE\n");
-    transport::init();
-    transport::run();
-
-    transport::NodePtr node(new transport::Node());
-    node->Init();
-
-    transport::SubscriberPtr sub =
-      node->Subscribe("~/world_stats", &ReceiveWorldStatsMsg2);
-
-    std::cout << "SubTopic[" << sub->GetTopic() << "]\n";
-
-    int i = 0;
-    while (!g_worldStatsMsg2 && i < 20)
-    {
-      std::cout << "Waiting for message\n";
-      usleep(1000000);
-      ++i;
-    }
-    EXPECT_LT(i, 20);
-
-    transport::fini();
-  }
-  else if (pid < 0)
-    printf("Fork failed\n");
-  else
-  {
-    Load("worlds/empty.world");
-    for (unsigned int i = 0; i < 20; ++i)
-    {
-      usleep(1000000);
-    }
-    printf("Now complete\n");
-  }
-}
 
 TEST_F(TransportTest, Errors)
 {
   Load("worlds/empty.world");
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init("default");
+  transport::NodePtr testNode = transport::NodePtr(new transport::Node());
+  testNode->Init("default");
   transport::PublisherPtr scenePub;
 
   transport::SubscriberPtr statsSub =
-    node->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
+    testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
 
   transport::SubscriberPtr statsSubDebug =
-    node->Subscribe("~/world_stats/__dbg", &ReceiveWorldStatsDebugMsg);
+    testNode->Subscribe("~/world_stats/__dbg", &ReceiveWorldStatsDebugMsg);
 
-  EXPECT_THROW(node->Advertise<math::Vector3>("~/scene"), common::Exception);
+  // This generates a warning message
+  // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
+  //             common::Exception);
 
-  scenePub = node->Advertise<msgs::Scene>("~/scene");
-  EXPECT_THROW(node->Advertise<msgs::Factory>("~/scene"), common::Exception);
+  scenePub = testNode->Advertise<msgs::Scene>("~/scene");
+  EXPECT_THROW(testNode->Advertise<msgs::Factory>("~/scene"),
+               common::Exception);
   EXPECT_TRUE(scenePub->GetPrevMsg().empty());
 
   transport::PublisherPtr factoryPub =
-    node->Advertise<msgs::Factory>("~/factory");
+    testNode->Advertise<msgs::Factory>("~/factory");
   factoryPub->WaitForConnection();
   EXPECT_EQ(0, factoryPub->GetOutgoingCount());
   EXPECT_STREQ("/gazebo/default/factory", factoryPub->GetTopic().c_str());
   EXPECT_STREQ("gazebo.msgs.Factory", factoryPub->GetMsgType().c_str());
 
-  EXPECT_STREQ("default", node->GetTopicNamespace().c_str());
+  EXPECT_STREQ("default", testNode->GetTopicNamespace().c_str());
   EXPECT_STREQ("/gazebo/default/factory",
-               node->DecodeTopicName("~/factory").c_str());
+               testNode->DecodeTopicName("~/factory").c_str());
   EXPECT_STREQ("~/factory",
-               node->EncodeTopicName("/gazebo/default/factory").c_str());
+               testNode->EncodeTopicName("/gazebo/default/factory").c_str());
 
   msgs::Scene sceneMsg;
   EXPECT_THROW(scenePub->Publish(sceneMsg), common::Exception);
@@ -180,7 +145,7 @@ TEST_F(TransportTest, Errors)
   int i = 0;
   while (!g_worldStatsMsg && !g_sceneMsg && !g_worldStatsDebugMsg && i < 20)
   {
-    usleep(10000);
+    common::Time::MSleep(100);
     ++i;
   }
   EXPECT_LT(i, 20);
@@ -207,7 +172,85 @@ TEST_F(TransportTest, Errors)
 
   scenePub.reset();
   statsSub.reset();
-  node.reset();
+  testNode.reset();
+}
+
+// This test creates a child process to test interprocess communication
+TEST_F(TransportTest, Processes)
+{
+  pid_t pid = fork();
+  if (pid == 0)
+  {
+    common::Time::MSleep(1);
+    transport::init();
+    transport::run();
+
+    transport::NodePtr node(new transport::Node());
+    node->Init();
+
+    transport::PublisherPtr pub = node->Advertise<msgs::String>("~/test");
+
+    transport::SubscriberPtr sub =
+      node->Subscribe("~/world_stats", &ReceiveWorldStatsMsg2);
+    transport::SubscriberPtr sub2 =
+      node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+    transport::PublisherPtr pub2 = node->Advertise<msgs::String>("~/test");
+
+    EXPECT_STREQ("gazebo.msgs.WorldStatistics",
+                 node->GetMsgType("/gazebo/default/world_stats").c_str());
+
+    msgs::String msg;
+    msg.set_data("Waiting for message");
+    pub->Publish(msg);
+    pub2->Publish(msg);
+
+    int i = 0;
+    while (!g_worldStatsMsg2 && i < 20)
+    {
+      common::Time::MSleep(100);
+      ++i;
+    }
+    EXPECT_LT(i, 20);
+
+    pub.reset();
+    sub.reset();
+    node.reset();
+    transport::fini();
+    common::Time::MSleep(5);
+  }
+  else if (pid < 0)
+    printf("Fork failed\n");
+  else
+  {
+    Load("worlds/empty.world");
+
+    transport::NodePtr node(new transport::Node());
+    node->Init();
+
+    transport::PublisherPtr pub = node->Advertise<msgs::String>("~/test");
+    transport::SubscriberPtr sub =
+      node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+    transport::PublisherPtr pub2 = node->Advertise<msgs::String>("~/test");
+    transport::SubscriberPtr sub2 =
+      node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+    EXPECT_STREQ("gazebo.msgs.String",
+                 node->GetMsgType("/gazebo/default/test").c_str());
+
+    msgs::String msg;
+    msg.set_data("Waiting for message");
+    pub->Publish(msg);
+    pub2->Publish(msg);
+
+    for (int i = 0; i < 5; ++i)
+      common::Time::MSleep(100);
+
+    sub.reset();
+    sub2.reset();
+    kill(pid, SIGKILL);
+  }
 }
 
 int main(int argc, char **argv)

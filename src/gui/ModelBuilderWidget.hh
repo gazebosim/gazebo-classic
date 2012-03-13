@@ -17,8 +17,7 @@
 #ifndef MODEL_BUILDER_WIDGET_HH
 #define MODEL_BUILDER_WIDGET_HH
 
-#include <QWidget>
-
+#include "gui/qt.h"
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "math/Vector3.hh"

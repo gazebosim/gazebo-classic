@@ -16,7 +16,7 @@
 */
 #include <string.h>
 
-#include "common/Exception.hh"
+#include "math/Helpers.hh"
 #include "math/Matrix4.hh"
 
 using namespace gazebo;
@@ -261,8 +261,8 @@ Vector3 Matrix4::operator*(const Vector3 &_vec) const
 //////////////////////////////////////////////////
 bool Matrix4::IsAffine() const
 {
-  return this->m[3][0] == 0 && this->m[3][1] == 0 &&
-         this->m[3][2] == 0 && this->m[3][3] == 1;
+  return equal(this->m[3][0], 0) && equal(this->m[3][1], 0) &&
+         equal(this->m[3][2], 0) && equal(this->m[3][3], 1);
 }
 
 //////////////////////////////////////////////////
@@ -270,7 +270,7 @@ Vector3 Matrix4::TransformAffine(const Vector3 &_v) const
 {
   if (!this->IsAffine())
   {
-    gzthrow("Not and affine matrix");
+    throw(std::string("Not and affine matrix"));
   }
 
   return Vector3(this->m[0][0]*_v.x + this->m[0][1]*_v.y +
@@ -281,4 +281,26 @@ Vector3 Matrix4::TransformAffine(const Vector3 &_v) const
                  this->m[2][2]*_v.z + this->m[2][3]);
 }
 
+//////////////////////////////////////////////////
+bool Matrix4::operator==(const Matrix4 &_m) const
+{
+  return math::equal(this->m[0][0], _m[0][0]) &&
+         math::equal(this->m[0][1], _m[0][1]) &&
+         math::equal(this->m[0][2], _m[0][2]) &&
+         math::equal(this->m[0][3], _m[0][3]) &&
 
+         math::equal(this->m[1][0], _m[1][0]) &&
+         math::equal(this->m[1][1], _m[1][1]) &&
+         math::equal(this->m[1][2], _m[1][2]) &&
+         math::equal(this->m[1][3], _m[1][3]) &&
+
+         math::equal(this->m[2][0], _m[2][0]) &&
+         math::equal(this->m[2][1], _m[2][1]) &&
+         math::equal(this->m[2][2], _m[2][2]) &&
+         math::equal(this->m[2][3], _m[2][3]) &&
+
+         math::equal(this->m[3][0], _m[3][0]) &&
+         math::equal(this->m[3][1], _m[3][1]) &&
+         math::equal(this->m[3][2], _m[3][2]) &&
+         math::equal(this->m[3][3], _m[3][3]);
+}

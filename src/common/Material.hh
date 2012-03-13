@@ -83,19 +83,19 @@ namespace gazebo
       public: Color GetEmissive() const;
 
       /// \brief Set the transparency percentage (0..1)
-      public: void SetTransparency(float _t);
+      public: void SetTransparency(double _t);
 
       /// \brief Get the transparency percentage (0..1)
-      public: float SetTransparency() const;
+      public: double SetTransparency() const;
 
       /// \brief Set the shininess
-      public: void SetShininess(float _t);
+      public: void SetShininess(double _t);
 
       /// \brief Get the shininess
-      public: float GetShininess() const;
+      public: double GetShininess() const;
 
       /// \brief Get the shininess
-      public: float GetTransparency() const;
+      public: double GetTransparency() const;
 
       /// \brief Set the blende factors. Will be interpreted as:
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
@@ -159,8 +159,8 @@ namespace gazebo
       protected: Color diffuse;
       protected: Color specular;
       protected: Color emissive;
-      protected: float transparency;
-      protected: float shininess;
+      protected: double transparency;
+      protected: double shininess;
       protected: double pointSize;
 
       protected: BlendMode blendMode;
@@ -177,5 +177,3 @@ namespace gazebo
   }
 }
 #endif
-
-

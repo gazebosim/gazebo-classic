@@ -17,7 +17,6 @@
 /* Desc: Specification of a contact
  * Author: Nate Koenig
  * Date: 10 Nov 2009
- * SVN: $Id$
  */
 
 #include "Contact.hh"

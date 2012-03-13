@@ -14,13 +14,11 @@
  * limitations under the License.
  *
  */
-#include <QtGui>
 #define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "sdf/sdf.h"
-#include "sdf/sdf_parser.h"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
 
@@ -39,7 +37,8 @@
 using namespace gazebo;
 using namespace gui;
 
-  InsertModelWidget::InsertModelWidget(QWidget *_parent)
+/////////////////////////////////////////////////
+InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -50,18 +49,7 @@ using namespace gui;
   connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
 
-  QHBoxLayout *buttonLayout = new QHBoxLayout;
-  this->addButton = new QPushButton(tr("Apply"));
-  connect(this->addButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-
-  this->cancelButton = new QPushButton(tr("Cancel"));
-  connect(this->cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-
-  buttonLayout->addWidget(this->addButton);
-  buttonLayout->addWidget(this->cancelButton);
-
   mainLayout->addWidget(this->fileTreeWidget);
-  mainLayout->addLayout(buttonLayout);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
@@ -110,20 +98,27 @@ using namespace gui;
         }
       }
     }
+
+    // Make all top-level items expanded. Trying to reduce mouse clicks.
+    this->fileTreeWidget->expandItem(topItem);
   }
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
-  this->visualPub = this->node->Advertise<msgs::Visual>("~/visual");
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
+
+  this->connections.push_back(
+      gui::Events::ConnectMouseRelease(
+        boost::bind(&InsertModelWidget::OnMouseRelease, this, _1)));
 }
 
+/////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
 }
 
+/////////////////////////////////////////////////
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     int /*_column*/)
 {
@@ -148,7 +143,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       return;
 
     this->modelSDF.reset(new sdf::SDF);
-    sdf::initFile("/sdf/gazebo.sdf", this->modelSDF);
+    sdf::initFile("sdf/gazebo.sdf", this->modelSDF);
     sdf::readFile(path+filename, this->modelSDF);
 
     // Load the world file
@@ -173,108 +168,109 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     scene->AddVisual(this->modelVisual);
 
     sdf::ElementPtr linkElem = modelElem->GetElement("link");
-    while (linkElem)
+
+    try
     {
-      std::string linkName = linkElem->GetValueString("name");
-      if (linkElem->HasElement("origin"))
-        linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
-
-
-      rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
-            linkName, this->modelVisual));
-      linkVisual->Load();
-      linkVisual->SetPose(linkPose);
-      this->visuals.push_back(linkVisual);
-
-      int visualIndex = 0;
-      sdf::ElementPtr visualElem;
-
-      if (linkElem->HasElement("visual"))
-        visualElem = linkElem->GetElement("visual");
-
-      while (visualElem)
+      while (linkElem)
       {
-        if (visualElem->HasElement("origin"))
-          visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
-
-        std::ostringstream visualName;
-        visualName << modelName << "::" << linkName << "::Visual_"
-          << visualIndex++;
-        rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-              linkVisual));
-        visVisual->Load(visualElem);
-        this->visuals.push_back(visVisual);
+        std::string linkName = linkElem->GetValueString("name");
+        if (linkElem->HasElement("origin"))
+          linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
 
 
-        visualElem = visualElem->GetNextElement();
+        rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
+              linkName, this->modelVisual));
+        linkVisual->Load();
+        linkVisual->SetPose(linkPose);
+        this->visuals.push_back(linkVisual);
+
+        int visualIndex = 0;
+        sdf::ElementPtr visualElem;
+
+        if (linkElem->HasElement("visual"))
+          visualElem = linkElem->GetElement("visual");
+
+        while (visualElem)
+        {
+          if (visualElem->HasElement("origin"))
+            visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
+
+          std::ostringstream visualName;
+          visualName << modelName << "::" << linkName << "::Visual_"
+            << visualIndex++;
+          rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+                linkVisual));
+
+          visVisual->Load(visualElem);
+          this->visuals.push_back(visVisual);
+
+          visualElem = visualElem->GetNextElement();
+        }
+
+        linkElem = linkElem->GetNextElement();
       }
-
-      linkElem = linkElem->GetNextElement();
+    }
+    catch(common::Exception &_e)
+    {
+      printf("Error\n");
+      this->visuals.clear();
     }
 
-    msgs::Selection selectMsg;
-    selectMsg.set_name(modelName);
-    selectMsg.set_selected(true);
-    selectMsg.set_id(gui::get_entity_id(modelName));
-    this->selectionPub->Publish(selectMsg);
+    if (visuals.size() > 0)
+      gui::Events::mouseMoveVisual(modelName);
 
     QApplication::setOverrideCursor(Qt::ArrowCursor);
   }
 }
 
-void InsertModelWidget::OnApply()
+/////////////////////////////////////////////////
+void InsertModelWidget::OnMouseRelease(const common::MouseEvent &_event)
 {
-  msgs::Factory msg;
-  msg.set_sdf(this->modelSDF->ToString());
+  if (!this->modelSDF || _event.dragging ||
+      (_event.button != common::MouseEvent::LEFT &&
+       _event.button != common::MouseEvent::RIGHT))
+  {
+    return;
+  }
 
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
-  rendering::Scene *scene = gui::get_active_camera()->GetScene();
-  std::string modelName = modelElem->GetValueString("name");
+  if (_event.button == common::MouseEvent::LEFT)
+  {
+    sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+    std::string modelName = modelElem->GetValueString("name");
 
-  // Remove the selection
-  msgs::Selection selectMsg;
-  selectMsg.set_name(modelName);
-  selectMsg.set_selected(false);
-  selectMsg.set_id(gui::get_entity_id(modelName));
-  this->selectionPub->Publish(selectMsg);
+    // Automatically create a new name if the model exists
+    int i = 0;
+    while (has_entity_name(modelName))
+    {
+      modelName = modelElem->GetValueString("name") + "_" +
+                  boost::lexical_cast<std::string>(i++);
+    }
 
-  // Remove the topic namespace from the model name. This will get re-inserted
-  // by the World automatically
-  modelName.erase(0, this->node->GetTopicNamespace().size()+2);
+    // Remove the topic namespace from the model name. This will get re-inserted
+    // by the World automatically
+    modelName.erase(0, this->node->GetTopicNamespace().size()+2);
 
-  // The the SDF model's name
-  modelElem->GetAttribute("name")->Set(modelName);
-  modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
-      this->modelVisual->GetWorldPose());
+    // The the SDF model's name
+    modelElem->GetAttribute("name")->Set(modelName);
+    modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
+        this->modelVisual->GetWorldPose());
+
+    // Spawn the model in the physics server
+    msgs::Factory msg;
+    msg.set_sdf(this->modelSDF->ToString());
+    this->factoryPub->Publish(msg);
+  }
+
+  // This disables the visual attached to the mouse in GLWidget
+  gui::Events::mouseMoveVisual(std::string());
 
   // Remove the temporary visual from the scene
-  scene->RemoveVisual(this->modelVisual);
-  this->modelVisual.reset();
-  this->visuals.clear();
-
-  this->factoryPub->Publish(msg);
-  this->fileTreeWidget->clearSelection();
-}
-
-void InsertModelWidget::OnCancel()
-{
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
-
   scene->RemoveVisual(this->modelVisual);
   this->modelVisual.reset();
   this->visuals.clear();
 
-  // Get the name of the model
-  std::string modelName =
-    this->modelSDF->root->GetElement("model")->GetValueString("name");
-
-  // Remove the selection
-  msgs::Selection selectMsg;
-  selectMsg.set_name(modelName);
-  selectMsg.set_selected(false);
-  selectMsg.set_id(gui::get_entity_id(modelName));
-  this->selectionPub->Publish(selectMsg);
   this->fileTreeWidget->clearSelection();
+
+  this->modelSDF.reset();
 }
-
-

@@ -100,7 +100,7 @@ void Heightmap::Load(std::string imageFilename,
   int ni = static_cast<int>(log(terrainVertSize-1)/log(2));
 
   // Make sure the heightmap image size is (2^n)+1 in size
-  if (nf - ni != 0)
+  if (!math::equal(nf - ni, 0))
   {
     gzthrow("Heightmap image size must be (2^n)+1\n");
   }

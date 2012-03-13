@@ -36,8 +36,7 @@ SET (headers ODEPhysics.hh
              ODEScrewJoint.hh
 )
 
-add_library(gazebo_physics_ode SHARED ${sources})
-
-set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC")
+gz_add_library(gazebo_physics_ode ${sources})
 target_link_libraries( gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
+
 INSTALL_LIBRARY(gazebo_physics_ode)

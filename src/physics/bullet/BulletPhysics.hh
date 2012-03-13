@@ -17,18 +17,18 @@
 /* Desc: The Bullet physics engine wrapper
  * Author: Nate Koenig
  * Date: 11 June 2009
- * SVN: $Id: BulletPhysics.hh 7706 2009-05-21 16:46:22Z natepak $
  */
 
 #ifndef BULLETPHYSICS_HH
 #define BULLETPHYSICS_HH
+#include <string>
+
 /*
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <string>
 
 #include "PhysicsEngine.hh"
 #include "physics/Collision.hh"

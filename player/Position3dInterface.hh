@@ -17,7 +17,6 @@
 /* Desc: Position 3d Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 #ifndef POSITION3DINTERFACE_HH

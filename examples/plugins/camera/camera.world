@@ -1,0 +1,113 @@
+<?xml version="1.0"?> 
+<gazebo version="1.0">
+  <world name="default">
+    <scene>
+      <ambient rgba="0.1 0.1 0.1 1"/>
+      <background rgba="0 0 0 1"/>
+      <shadows enabled="false"/>
+    </scene>
+
+    <physics type="ode">
+      <gravity xyz="0 0 -9.8"/>
+      <ode>
+        <solver type="quick" dt="0.01" iters="100" sor="1.3"/>
+      </ode>
+    </physics>
+
+    <!-- Ground Plane -->
+    <model name="plane1_model" static="true">
+      <link name="body">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+        <collision name="geom">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <surface>
+            <friction>
+              <ode mu="0" mu2="0"/>
+            </friction>
+          </surface>
+        </collision>
+       <visual name="visual" cast_shadows="false">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <material script="Gazebo/Gold"/>
+        </visual>
+      </link>
+    </model>
+    
+    <model name="box">
+      <link name="link">
+        <origin pose="0 0 0.5 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+         <surface>
+            <friction>
+              <ode mu="0" mu2="0"/>
+            </friction>
+          </surface>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+
+        <sensor name='cam_sensor1' type='camera' always_on='1' update_rate='10'>
+          <origin pose='0 0 0 0 0 1.57'/>
+          <camera>
+            <horizontal_fov angle='1.57'/>
+            <image width='640' height='480' format='R8G8B8'/>
+            <clip near='0.5' far='5'/>
+          </camera>
+          <plugin name='camera_dump' filename='libcamera_dump.so'/>
+        </sensor>
+      </link>
+
+      <plugin name="camera_move" filename="libcamera_move.so"/>
+    </model>
+
+    <model name="box2">
+      <origin pose="0 1.5 0 0 0 0"/>
+      <link name="body">
+        <origin pose="0 0 0.5 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+
+    <light type="directional" name="sun" cast_shadows="true">
+      <origin pose="0 0 10 0 0 0"/>
+      <diffuse rgba=".8 .8 .8 1"/>
+      <specular rgba=".1 .1 .1 1"/>
+      <attenuation range="10" constant="0.8" linear="0.01" quadratic="0.0"/>
+      <direction xyz="0 .5 -.5"/>
+    </light>
+
+  </world>
+</gazebo>

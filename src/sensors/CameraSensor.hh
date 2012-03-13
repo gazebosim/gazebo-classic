@@ -52,10 +52,11 @@ namespace gazebo
 
       /// \brief Load the camera using parameter from an SDF element
       /// \param _sdf The SDF parameters
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(const std::string &_worldName,
+                                sdf::ElementPtr _sdf);
 
       /// \brief Load the camera using default parameters
-      public: virtual void Load();
+      public: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the camera
       public: virtual void Init();
@@ -76,6 +77,8 @@ namespace gazebo
       public: unsigned int GetImageHeight() const;
       public: const unsigned char *GetImageData();
 
+      public: bool SaveFrame(const std::string &_filename);
+
       private: void OnPose(ConstPosePtr &_msg);
 
       private: rendering::CameraPtr camera;
@@ -86,5 +89,3 @@ namespace gazebo
   }
 }
 #endif
-
-

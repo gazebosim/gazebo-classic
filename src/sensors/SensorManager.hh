@@ -26,6 +26,7 @@
 #include <boost/thread.hpp>
 #include <list>
 #include <string>
+#include <vector>
 
 #include "common/SingletonT.hh"
 #include "sensors/SensorTypes.hh"
@@ -61,9 +62,19 @@ namespace gazebo
       /// \brief Finalize all the sensors
       public: void Fini();
 
-      /// \brief Add a sensor
-      public: std::string LoadSensor(sdf::ElementPtr _elem,
-                                     const std::string &_parentName);
+      /// \brief Get all the sensor types
+      public: void GetSensorTypes(std::vector<std::string> &_types) const;
+
+      /// \brief Add a sensor from an SDF element. This function will also Load
+      /// and Init the sensor.
+      /// \param _elem The SDF element that describes the sensor
+      /// \param _worldName Name of the world in which to create the sensor
+      /// \param _parentName The name of the parent link which the sensor is
+      /// attached to.
+      /// \return The name of the sensor
+      public: std::string CreateSensor(sdf::ElementPtr _elem,
+                                       const std::string &_worldName,
+                                       const std::string &_parentName);
 
       /// \brief Get a sensor
       public: SensorPtr GetSensor(const std::string &_name);
@@ -82,11 +93,11 @@ namespace gazebo
       private: boost::thread *runThread;
       private: boost::recursive_mutex *mutex;
 
-      private: std::list<SensorPtr > sensors;
+      private: std::list<SensorPtr> sensors;
 
       private: friend class SingletonT<SensorManager>;
 
-      private: std::list<SensorPtr > initSensors;
+      private: std::list<SensorPtr> initSensors;
     };
     /// \}
   }

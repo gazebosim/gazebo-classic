@@ -15,11 +15,6 @@
  *
 */
 
-#include "gazebo_config.h"
-#ifdef HAVE_CEGUI
-#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
-#endif
-
 #include "rendering/GUIOverlay.hh"
 #include "common/Console.hh"
 

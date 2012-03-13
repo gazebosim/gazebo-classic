@@ -190,12 +190,12 @@ void Image::GetData(unsigned char **_data, unsigned int &_count)
 #endif
 
     int i = 0;
-    for (unsigned int y = 0; y < this->GetHeight(); y++)
+    for (unsigned int y = 0; y < this->GetHeight(); ++y)
     {
-      for (unsigned int x = 0; x < this->GetWidth(); x++)
+      for (unsigned int x = 0; x < this->GetWidth(); ++x)
       {
         std::swap((*_data)[i], (*_data)[i+2]);
-        i += 4;
+        i += 3;
       }
     }
   }
@@ -282,17 +282,26 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y)
 Color Image::GetAvgColor()
 {
   unsigned int x, y;
-  Color clrSum;
+  double rsum, gsum, bsum;
+  common::Color pixel;
 
-  for (y = 0; y < this->GetHeight(); y++)
+  rsum = gsum = bsum = 0.0;
+  for (y = 0; y < this->GetHeight(); ++y)
   {
-    for (x = 0; x < this->GetWidth(); x++)
+    for (x = 0; x < this->GetWidth(); ++x)
     {
-      clrSum += this->GetPixel(x, y);
+      pixel = this->GetPixel(x, y);
+      rsum += pixel.R();
+      gsum += pixel.G();
+      bsum += pixel.B();
     }
   }
 
-  return clrSum / (this->GetWidth() * this->GetHeight());
+  rsum /= (this->GetWidth() * this->GetHeight());
+  gsum /= (this->GetWidth() * this->GetHeight());
+  bsum /= (this->GetWidth() * this->GetHeight());
+
+  return Color(rsum, gsum, bsum);
 }
 
 //////////////////////////////////////////////////
@@ -387,7 +396,3 @@ std::string Image::GetFilename() const
 {
   return this->fullName;
 }
-
-
-
-

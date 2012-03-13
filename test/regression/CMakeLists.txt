@@ -5,6 +5,7 @@ include_directories (
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIR}
 )
 
 link_directories(  
@@ -18,9 +19,9 @@ if (INCLUDE_PLAYER)
 endif()
 
 find_package(GTest REQUIRED)
-include_directories( ${GTEST_INCLUDE_DIRS} )
+include_directories(${GTEST_INCLUDE_DIRS})
 
-set (gtest_sources transport.cc speed.cc factory.cc)
+set (gtest_sources transport.cc speed.cc factory.cc physics.cc msgs.cc math.cc pr2.cc common.cc laser.cc file_handling.cc)
 
 foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
@@ -29,7 +30,6 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
   target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
     gazebo_common
     gazebo_sdf_interface
-    gazebo_sdf_parser
     gazebo_transport
     gazebo_physics
     gazebo_sensors

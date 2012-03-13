@@ -15,6 +15,10 @@
  *
 */
 
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wshadow"
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 
@@ -54,14 +58,17 @@ class ServerFixture : public testing::Test
   protected: virtual void Unload()
              {
                this->serverRunning = false;
-               this->node->Fini();
+               if (this->node)
+                 this->node->Fini();
 
                if (this->server)
                {
                  this->server->Stop();
 
                  if (this->serverThread)
+                 {
                    this->serverThread->join();
+                 }
                }
 
                delete this->serverThread;
@@ -79,7 +86,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the server to come up
                while (!this->server || !this->server->GetInitialized())
-                 usleep(10000);
+                 common::Time::MSleep(10);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
@@ -118,7 +125,7 @@ class ServerFixture : public testing::Test
   protected: double GetPercentRealTime() const
              {
                while (!this->serverRunning)
-                 usleep(100000);
+                 common::Time::MSleep(100);
 
                return this->percentRealTime;
              }
@@ -160,20 +167,60 @@ class ServerFixture : public testing::Test
                {
                  if (i % 10 == 0)
                    printf("\n");
-                 printf("%d, ", (*_image)[i]);
+                 else
+                   printf(" ");
+                 printf("%d,", (*_image)[i]);
                }
-               printf("%d};\n", (*_image)[i]);
+               printf(" %d};\n", (*_image)[i]);
                printf("static unsigned char *%s = __%s;\n", _name.c_str(),
                    _name.c_str());
+             }
+
+  protected: void PrintScan(const std::string &_name, double *_scan,
+                            unsigned int _sampleCount)
+             {
+               printf("static double __%s[] = {\n", _name.c_str());
+               for (unsigned int i = 0; i < _sampleCount-1; ++i)
+               {
+                 if ((i+1) % 5 == 0)
+                   printf("%13.10f,\n", math::precision(_scan[i], 10));
+                 else
+                   printf("%13.10f, ", math::precision(_scan[i], 10));
+               }
+               printf("%13.10f};\n",
+                   math::precision(_scan[_sampleCount-1], 10));
+               printf("static double *%s = __%s;\n", _name.c_str(),
+                   _name.c_str());
+             }
+
+  protected: void ScanCompare(double *_scanA, double *_scanB,
+                 unsigned int _sampleCount, double &_diffMax,
+                 double &_diffSum, double &_diffAvg)
+             {
+               double diff;
+               _diffMax = 0;
+               _diffSum = 0;
+               _diffAvg = 0;
+               for (unsigned int i = 0; i < _sampleCount; ++i)
+               {
+                 diff = fabs(math::precision(_scanA[i], 10) -
+                             math::precision(_scanB[i], 10));
+                 _diffSum += diff;
+                 if (diff > _diffMax)
+                 {
+                   _diffMax = diff;
+                 }
+               }
+               _diffAvg = _diffSum / _sampleCount;
              }
 
   protected: void ImageCompare(unsigned char **_imageA,
                  unsigned char *_imageB[],
                  unsigned int _width, unsigned int _height, unsigned int _depth,
-                 unsigned int &_maxDiff, unsigned int &_diffSum,
+                 unsigned int &_diffMax, unsigned int &_diffSum,
                  double &_diffAvg)
              {
-               _maxDiff = 0;
+               _diffMax = 0;
                _diffSum = 0;
                _diffAvg = 0;
 
@@ -186,8 +233,8 @@ class ServerFixture : public testing::Test
 
                    unsigned int diff = (unsigned int)(fabs(a - b));
 
-                   if (diff > _maxDiff)
-                     _maxDiff = diff;
+                   if (diff > _diffMax)
+                     _diffMax = diff;
 
                    _diffSum += diff;
                  }
@@ -231,7 +278,7 @@ class ServerFixture : public testing::Test
                                  this, _1, _2, _3, _4, _5));
 
                while (this->gotImage < 20)
-                 usleep(1000);
+                 common::Time::MSleep(10);
 
                camSensor->GetCamera()->DisconnectNewImageFrame(c);
              }
@@ -271,7 +318,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_modelName))
-                 usleep(10000);
+                 common::Time::MSleep(10);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -312,7 +359,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 usleep(10000);
+                 common::Time::MSleep(10);
              }
 
   protected: void SpawnSphere(const std::string &_name,
@@ -353,11 +400,12 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 usleep(10000);
+                 common::Time::MSleep(10);
              }
 
   protected: void SpawnBox(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_size, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -377,12 +425,12 @@ class ServerFixture : public testing::Test
                  << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <box size ='1 1 1'/>"
+                 << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
                  << "  </collision>"
                  << "  <visual name ='visual' cast_shadows ='true'>"
                  << "    <geometry>"
-                 << "      <box size ='1 1 1'/>"
+                 << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -394,7 +442,21 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 usleep(10000);
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnModel(const std::string &_filename)
+             {
+               msgs::Factory msg;
+               msg.set_sdf_filename(_filename);
+               this->factoryPub->Publish(msg);
+             }
+
+  protected: void SpawnSDF(const std::string &_sdf)
+             {
+               msgs::Factory msg;
+               msg.set_sdf(_sdf);
+               this->factoryPub->Publish(msg);
              }
 
   protected: Server *server;

@@ -58,15 +58,16 @@ void DepthCameraSensor::SetParent(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::Load(sdf::ElementPtr &_sdf)
+void DepthCameraSensor::Load(const std::string &_worldName,
+                             sdf::ElementPtr _sdf)
 {
-  Sensor::Load(_sdf);
+  Sensor::Load(_worldName, _sdf);
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::Load()
+void DepthCameraSensor::Load(const std::string &_worldName)
 {
-  Sensor::Load();
+  Sensor::Load(_worldName);
   this->poseSub = this->node->Subscribe("~/pose",
                                         &DepthCameraSensor::OnPose, this);
 }
@@ -74,7 +75,7 @@ void DepthCameraSensor::Load()
 //////////////////////////////////////////////////
 void DepthCameraSensor::Init()
 {
-  std::string worldName = this->sdf->GetWorldName();
+  std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
   {

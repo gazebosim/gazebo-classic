@@ -29,6 +29,7 @@
 #include "common/CommonTypes.hh"
 
 #include "physics/PhysicsTypes.hh"
+#include "physics/CollisionState.hh"
 #include "physics/Entity.hh"
 
 namespace gazebo
@@ -50,12 +51,12 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Load the collision
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       public: virtual void Init();
 
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Save the collision
       public: void Save(std::string &prefix, std::ostream &stream);
@@ -134,6 +135,12 @@ namespace gazebo
       /// \brief Get the angular acceleration of the collision in the
       ///        world frame
       public: virtual math::Vector3 GetWorldAngularAccel() const;
+
+      /// \brief Get the collision state
+      public: CollisionState GetState();
+
+      /// \brief Set the current collision state
+      public: void SetState(const CollisionState &_state);
 
       public: template< typename T>
               event::ConnectionPtr ConnectContact(T subscriber)

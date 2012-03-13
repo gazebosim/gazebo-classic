@@ -25,6 +25,12 @@ Plane::Plane()
   this->d = 0.0;
 }
 
+Plane::Plane(const Vector3 &_normal, double _offset)
+{
+  this->normal = _normal;
+  this->d = _offset;
+}
+
 Plane::Plane(const Vector3 &_normal, const Vector2d &_size, double _offset)
 {
   this->Set(_normal, _size, _offset);
@@ -51,4 +57,20 @@ Plane &Plane::operator =(const Plane & _p)
   return *this;
 }
 
+//////////////////////////////////////////////////
+double Plane::Distance(const Vector3 &_origin, const Vector3 &_dir) const
+{
+  double denom = this->normal.GetDotProd(_dir);
 
+  if (fabs(denom) < 1e-3)
+  {
+    // parallel
+    return 0;
+  }
+  else
+  {
+    double nom = _origin.GetDotProd(this->normal) - this->d;
+    double t = -(nom/denom);
+    return t;
+  }
+}

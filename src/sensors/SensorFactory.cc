@@ -32,8 +32,9 @@ void RegisterContactSensor();
 using namespace gazebo;
 using namespace sensors;
 
-std::map<std::string, SensorFactoryFn> SensorFactory::sensor_map;
+std::map<std::string, SensorFactoryFn> SensorFactory::sensorMap;
 
+/////////////////////////////////////////////////
 void SensorFactory::RegisterAll()
 {
   RegisterCameraSensor();
@@ -42,26 +43,34 @@ void SensorFactory::RegisterAll()
   RegisterContactSensor();
 }
 
-// Register a model class.  Use by dynamically loaded modules
+/////////////////////////////////////////////////
 void SensorFactory::RegisterSensor(const std::string &classname,
                                    SensorFactoryFn factoryfn)
 {
-  sensor_map[classname] = factoryfn;
+  sensorMap[classname] = factoryfn;
 }
 
-
-// Create a new instance of a model.  Used by the world when reading
-// the world file.
+/////////////////////////////////////////////////
 SensorPtr SensorFactory::NewSensor(const std::string &classname)
 {
   SensorPtr sensor;
 
-  if (sensor_map[classname])
+  if (sensorMap[classname])
   {
-    sensor.reset((sensor_map[classname]) ());
+    sensor.reset((sensorMap[classname]) ());
   }
 
   return sensor;
 }
 
+/////////////////////////////////////////////////
+void SensorFactory::GetSensorTypes(std::vector<std::string> &_types)
+{
+  _types.clear();
 
+  std::map<std::string, SensorFactoryFn>::const_iterator iter;
+  for (iter = sensorMap.begin(); iter != sensorMap.end(); ++iter)
+  {
+    _types.push_back(iter->first);
+  }
+}

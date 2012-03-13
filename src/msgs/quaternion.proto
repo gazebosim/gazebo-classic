@@ -5,11 +5,8 @@ package gazebo.msgs;
 /// \brief A message for a quaternion
 /// \verbatim
 
-import "header.proto";
-
 message Quaternion
 {
-  optional Header header = 1;
   required double x = 2;
   required double y = 3;
   required double z = 4;

@@ -24,7 +24,7 @@
 
 #include "rendering/ogre.h"
 
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 #include "msgs/msgs.h"
 
 #include "common/Events.hh"
@@ -57,7 +57,7 @@ Light::Light(Scene *scene_)
         boost::bind(&Light::ToggleShowVisual, this));
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/light.sdf", this->sdf);
+  sdf::initFile("sdf/light.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -72,9 +72,9 @@ Light::~Light()
 }
 
 //////////////////////////////////////////////////
-void Light::Load(sdf::ElementPtr &_sdf)
+void Light::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 

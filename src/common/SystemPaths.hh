@@ -67,7 +67,7 @@ namespace gazebo
       /// \brief Get the world path extension
       public: std::string GetWorldPathExtension();
 
-      public: std::string FindFileWithGazeboPaths(std::string _filename);
+      public: std::string FindFileWithGazeboPaths(const std::string &_filename);
 
       /// \brief Add colon delimited paths to Gazebo install
       public: void AddGazeboPaths(std::string _path);

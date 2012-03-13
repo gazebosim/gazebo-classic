@@ -14,6 +14,7 @@ SET (files shadow_caster_fp.glsl
            pssm.hlsl
            depth_map.frag
            depth_map.vert
+           depthshadowobject.cg
 ) 
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/programs/)

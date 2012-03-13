@@ -25,7 +25,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "sdf/parser/parser.hh"
+#include "sdf/sdf.h"
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
 #include "transport/Publisher.hh"
@@ -43,10 +43,6 @@
 #include "physics/PhysicsFactory.hh"
 #include "physics/Model.hh"
 #include "physics/World.hh"
-
-#include "sensors/Sensor.hh"
-#include "sensors/SensorManager.hh"
-#include "sensors/CameraSensor.hh"
 
 #include "physics/Collision.hh"
 
@@ -71,6 +67,9 @@ class ModelUpdate_TBB
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/world.sdf", this->sdf);
+
   this->receiveMutex = new boost::mutex();
 
   this->needsReset = false;
@@ -119,8 +118,8 @@ void World::Load(sdf::ElementPtr _sdf)
   else
     this->name = this->sdf->GetValueString("name");
 
-  this->sceneMsg.CopyFrom(
-        msgs::SceneFromSDF(_sdf->GetElement("scene")));
+  this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
+  this->sceneMsg.set_name(this->GetName());
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0, 200000000);
@@ -150,44 +149,59 @@ void World::Load(sdf::ElementPtr _sdf)
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
 
+  std::string type = this->sdf->GetElement("physics")->GetValueString("type");
+  this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
+      shared_from_this());
+
+  if (this->physicsEngine == NULL)
+    gzthrow("Unable to create physics engine\n");
+
+  // This should come before loading of entities
+  this->physicsEngine->Load(this->sdf->GetElement("physics"));
+
+  this->rootElement.reset(new Base(BasePtr()));
+  this->rootElement->SetName(this->GetName());
+  this->rootElement->SetWorld(shared_from_this());
+
+  if (this->sdf->HasElement("state"))
   {
-    // Make all incoming messages wait until the world is done loading.
-    // boost::mutex::scoped_lock lock(*this->receiveMutex);
+    sdf::ElementPtr childElem = this->sdf->GetElement("state");
 
-    std::string type = _sdf->GetElement("physics")->GetValueString("type");
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
-        shared_from_this());
+    while (childElem)
+    {
+      WorldState state;
+      state.Load(childElem);
+      this->sdf->InsertElement(childElem);
+      this->UpdateSDFFromState(state);
+      // this->SetState(state);
 
-    if (this->physicsEngine == NULL)
-      gzthrow("Unable to create physics engine\n");
+      childElem = childElem->GetNextElement();
 
-    // This should come before loading of entities
-    this->physicsEngine->Load(_sdf->GetElement("physics"));
-
-    this->rootElement.reset(new Base(BasePtr()));
-    this->rootElement->SetName(this->GetName());
-    WorldPtr me = shared_from_this();
-    this->rootElement->SetWorld(me);
-
-    // Create all the entities
-    this->LoadEntities(_sdf, this->rootElement);
-
-    // TODO: Performance test to see if TBB model updating is necessary
-    // Choose threaded or unthreaded model updating depending on the number of
-    // models in the scene
-    // if (this->GetModelCount() < 20)
-    this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
-    // else
-    // this->modelUpdateFunc = &World::ModelUpdateTBB;
-
-    event::Events::worldCreated(this->GetName());
+      // TODO: We currently load just the first state data. Need to
+      // implement a better mechanism for handling multiple states
+      break;
+    }
   }
+
+  // Create all the entities
+  this->LoadEntities(this->sdf, this->rootElement);
+
+  // TODO: Performance test to see if TBB model updating is necessary
+  // Choose threaded or unthreaded model updating depending on the number of
+  // models in the scene
+  // if (this->GetModelCount() < 20)
+  this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
+  // else
+  // this->modelUpdateFunc = &World::ModelUpdateTBB;
+
+  event::Events::worldCreated(this->GetName());
 }
 
 //////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
 {
   this->sdf->Update();
+  this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
   data += "<gazebo version ='1.0'>\n";
@@ -394,7 +408,7 @@ void World::DeleteEntityCB(const std::string &/*_name*/)
   // TODO: Implement this function
 }
 
-// Get an element by name
+//////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
   return this->rootElement->GetByName(_name);
@@ -405,7 +419,14 @@ ModelPtr World::GetModelById(unsigned int _id)
   return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
 }
 
+//////////////////////////////////////////////////
 ModelPtr World::GetModelByName(const std::string &_name)
+{
+  return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
+}
+
+//////////////////////////////////////////////////
+ModelPtr World::GetModel(const std::string &_name)
 {
   return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
 }
@@ -416,15 +437,20 @@ EntityPtr World::GetEntityByName(const std::string &_name)
   return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
 }
 
+//////////////////////////////////////////////////
+EntityPtr World::GetEntity(const std::string &_name)
+{
+  return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
+}
 
 //////////////////////////////////////////////////
-ModelPtr World::LoadModel(sdf::ElementPtr &_sdf , BasePtr _parent)
+ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   ModelPtr model(new Model(_parent));
   model->SetWorld(shared_from_this());
   model->Load(_sdf);
 
-  event::Events::addEntity(model->GetCompleteScopedName());
+  event::Events::addEntity(model->GetScopedName());
 
   msgs::Model msg;
   model->FillModelMsg(msg);
@@ -434,7 +460,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr &_sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
-void World::LoadEntities(sdf::ElementPtr &_sdf, BasePtr _parent)
+void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   if (_sdf->HasElement("light"))
   {
@@ -537,7 +563,7 @@ void World::SetSelectedEntityCB(const std::string &_name)
   if (this->selectedEntity)
   {
     msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetCompleteScopedName());
+    msg.set_name(this->selectedEntity->GetScopedName());
     msg.set_selected(false);
     this->selectionPub->Publish(msg);
 
@@ -552,7 +578,7 @@ void World::SetSelectedEntityCB(const std::string &_name)
     this->selectedEntity->SetSelected(true);
 
     msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetCompleteScopedName());
+    msg.set_name(this->selectedEntity->GetScopedName());
     msg.set_selected(true);
 
     this->selectionPub->Publish(msg);
@@ -706,7 +732,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
       boost::shared_static_cast<Model>(_entity)->FillModelMsg(*modelMsg);
     }
 
-    for (unsigned int i = 0; i < _entity->GetChildCount(); i++)
+    for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
     {
       this->BuildSceneMsg(_scene, _entity->GetChild(i));
     }
@@ -732,15 +758,15 @@ void World::ModelUpdateSingleLoop()
 
 
 //////////////////////////////////////////////////
-void World::LoadPlugin(sdf::ElementPtr &_sdf)
+void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->GetValueString("name");
+  std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename, name);
+  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename,
+                                                              pluginName);
   if (plugin)
   {
-    WorldPtr myself = shared_from_this();
-    plugin->Load(myself, _sdf);
+    plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back(plugin);
   }
 }
@@ -754,6 +780,19 @@ void World::ProcessEntityMsgs()
   for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); ++iter)
   {
+    // Remove all the dirty poses from the delete entity.
+    for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
+         iter2 != this->dirtyPoses.end();)
+    {
+      if ((*iter2)->GetName() == *iter ||
+          (*iter2)->GetParent()->GetName() == *iter)
+      {
+        this->dirtyPoses.erase(iter2++);
+      }
+      else
+        ++iter2;
+    }
+
     this->rootElement->RemoveChild((*iter));
   }
 
@@ -779,7 +818,7 @@ void World::ProcessRequestMsgs()
     {
       msgs::Model_V modelVMsg;
 
-      for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+      for (unsigned int i = 0; i < this->rootElement->GetChildCount(); ++i)
       {
         BasePtr entity = this->rootElement->GetChild(i);
         msgs::Model *modelMsg = modelVMsg.add_models();
@@ -882,7 +921,7 @@ void World::ProcessModelMsgs()
     if ((*iter).has_id())
       model = this->GetModelById((*iter).id());
     else
-      model = this->GetModelByName((*iter).name());
+      model = this->GetModel((*iter).name());
 
     if (!model)
       gzerr << "Unable to find model["
@@ -905,11 +944,12 @@ void World::ProcessFactoryMsgs()
 {
   std::list<msgs::Factory>::iterator iter;
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+
   for (iter = this->factoryMsgs.begin();
        iter != this->factoryMsgs.end(); ++iter)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("/sdf/gazebo.sdf", factorySDF);
+    sdf::initFile("sdf/gazebo.sdf", factorySDF);
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
@@ -928,16 +968,38 @@ void World::ProcessFactoryMsgs()
         continue;
       }
     }
+    else if ((*iter).has_clone_model_name())
+    {
+      ModelPtr model = this->GetModel((*iter).clone_model_name());
+      if (!model)
+      {
+        gzerr << "Unable to clone model[" << (*iter).clone_model_name()
+              << "]. Model not found.\n";
+        continue;
+      }
+
+      factorySDF->root->InsertElement(model->GetSDF()->Clone());
+
+      std::string newName = model->GetName() + "_clone";
+      int i = 0;
+      while (this->GetModel(newName))
+      {
+        newName = model->GetName() + "_clone_" +
+                  boost::lexical_cast<std::string>(i);
+        i++;
+      }
+
+      factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
+    }
     else
     {
       gzerr << "Unable to load sdf from factory message."
-        << "No SDF or SDF filename specified.\n";
+            << "No SDF or SDF filename specified.\n";
+      continue;
     }
 
     if ((*iter).has_edit_name())
     {
-      factorySDF->PrintValues();
-
       BasePtr base = this->rootElement->GetByName((*iter).edit_name());
       if (base)
       {
@@ -953,19 +1015,24 @@ void World::ProcessFactoryMsgs()
     else
     {
       sdf::ElementPtr elem = factorySDF->root->GetElement("model");
-      if (!elem)
+      if (!elem && factorySDF->root->GetElement("world"))
         elem = factorySDF->root->GetElement("world")->GetElement("model");
+
+      if (!elem)
+      {
+        gzerr << "Invalid SDF\n";
+        continue;
+      }
 
       elem->SetParent(this->sdf);
       elem->GetParent()->InsertElement(elem);
-      ModelPtr model = this->LoadModel(elem, this->rootElement);
       if ((*iter).has_pose())
-        model->SetWorldPose(msgs::Convert((*iter).pose()));
+        elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
+            msgs::Convert((*iter).pose()));
 
+      ModelPtr model = this->LoadModel(elem, this->rootElement);
       model->Init();
     }
-
-    factorySDF->root.reset();
   }
 
   this->factoryMsgs.clear();
@@ -987,7 +1054,8 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 
 //////////////////////////////////////////////////
 EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
-{ std::string entityName;
+{
+  std::string entityName;
   double dist;
   math::Vector3 end;
 
@@ -997,6 +1065,98 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   this->physicsEngine->InitForThread();
   this->testRay->SetPoints(_pt, end);
   this->testRay->GetIntersection(dist, entityName);
-  return this->GetEntityByName(entityName);
+  return this->GetEntity(entityName);
 }
 
+//////////////////////////////////////////////////
+WorldState World::GetState()
+{
+  return WorldState(shared_from_this());
+}
+
+//////////////////////////////////////////////////
+void World::UpdateStateSDF()
+{
+  sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
+  stateElem->ClearElements();
+
+  stateElem->GetAttribute("world_name")->Set(this->GetName());
+  stateElem->GetAttribute("time")->Set(this->GetSimTime());
+
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+  {
+    sdf::ElementPtr elem = stateElem->AddElement("model");
+    this->GetModel(i)->GetState().FillStateSDF(elem);
+  }
+}
+
+//////////////////////////////////////////////////
+void World::SetState(const WorldState &_state)
+{
+  sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
+
+  stateElem->GetAttribute("world_name")->Set(_state.GetName());
+  stateElem->GetAttribute("time")->Set(_state.GetSimTime());
+
+  this->SetSimTime(_state.GetSimTime());
+  for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
+  {
+    ModelState modelState = _state.GetModelState(i);
+    ModelPtr model = this->GetModel(modelState.GetName());
+    modelState.FillStateSDF(stateElem->AddElement("model"));
+    if (model)
+      model->SetState(modelState);
+    else
+      gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
+void World::InsertModel(const std::string &_sdfFilename)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Factory msg;
+  msg.set_sdf_filename(_sdfFilename);
+  this->factoryMsgs.push_back(msg);
+}
+
+//////////////////////////////////////////////////
+void World::InsertModel(const sdf::SDF &_sdf)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Factory msg;
+  msg.set_sdf(_sdf.ToString());
+  this->factoryMsgs.push_back(msg);
+}
+
+//////////////////////////////////////////////////
+std::string World::StripWorldName(const std::string &_name) const
+{
+  if (_name.find(this->GetName() + "::") == 0)
+    return _name.substr(this->GetName().size() + 2);
+  else
+    return _name;
+}
+
+//////////////////////////////////////////////////
+void World::UpdateSDFFromState(const WorldState &_state)
+{
+  if (this->sdf->HasElement("model"))
+  {
+    sdf::ElementPtr childElem = this->sdf->GetElement("model");
+
+    while (childElem)
+    {
+      for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
+      {
+        ModelState modelState = _state.GetModelState(i);
+        if (modelState.GetName() == childElem->GetValueString("name"))
+        {
+          modelState.UpdateModelSDF(childElem);
+        }
+      }
+
+      childElem = childElem->GetNextElement();
+    }
+  }
+}

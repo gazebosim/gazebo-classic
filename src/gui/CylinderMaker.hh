@@ -42,11 +42,12 @@ namespace gazebo
       public: virtual void OnMousePush(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos;
+      private: math::Vector2i mousePushPos, mouseReleasePos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

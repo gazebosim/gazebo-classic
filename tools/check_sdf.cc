@@ -15,7 +15,7 @@
  *
 */
 
-#include "sdf/parser/parser.hh"
+#include "sdf/interface/parser.hh"
 
 std::vector<std::string> params;
 
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  if (params.size() == 0 || params[0] == "help" || params[0] == "h")
+  if (params.empty() || params[0] == "help" || params[0] == "h")
   {
     help();
   }

@@ -21,7 +21,6 @@
 /* Desc: A screw or primastic/rotational joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id$
  */
 
 #ifndef SCREWJOINT_HH
@@ -47,7 +46,7 @@ namespace gazebo
       public: virtual ~ScrewJoint()
               { }
       /// \brief Load the joint
-      protected: virtual void Load(sdf::ElementPtr &_sdf)
+      protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
 

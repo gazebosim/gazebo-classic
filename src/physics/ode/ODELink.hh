@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \brief Load the link based on SDF parameters
       /// \param _sdf the sdf parameters
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the link
       public: virtual void Init();

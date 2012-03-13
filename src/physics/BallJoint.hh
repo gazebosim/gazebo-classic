@@ -49,7 +49,7 @@ namespace gazebo
               }
 
       /// \brief Load the joint
-      protected: void Load(sdf::ElementPtr &_sdf)
+      protected: void Load(sdf::ElementPtr _sdf)
                  { T::Load(_sdf); }
       /// \brief Set the axis of rotation
       public: virtual void SetAxis(int /*_index*/,

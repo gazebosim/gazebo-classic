@@ -269,7 +269,7 @@
 		inline_	Point&			Normalize()
 								{
 									float M = x*x + y*y + z*z;
-									if(M)
+									if(!_equal(M, 0.0))
 									{
 										M = 1.0f / sqrtf(M);
 										x *= M;

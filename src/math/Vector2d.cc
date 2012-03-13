@@ -20,6 +20,7 @@
  */
 
 #include <math.h>
+#include "math/Helpers.hh"
 #include "math/Vector2d.hh"
 
 using namespace gazebo;
@@ -181,7 +182,7 @@ const Vector2d &Vector2d::operator*=(double v)
 //////////////////////////////////////////////////
 bool Vector2d::operator ==(const Vector2d &pt) const
 {
-  return this->x == pt.x && this->y == pt.y;
+  return equal(this->x, pt.x) && equal(this->y, pt.y);
 }
 
 //////////////////////////////////////////////////

@@ -17,7 +17,6 @@
 /* Desc: A body that has a box shape
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: BulletHingeJoint.hh 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #ifndef BULLETHINGEJOINT_HH

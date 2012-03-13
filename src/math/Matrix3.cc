@@ -17,7 +17,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/Exception.hh"
+#include "math/Helpers.hh"
 #include "math/Matrix3.hh"
 
 using namespace gazebo;
@@ -90,11 +90,25 @@ void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
 void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
 {
   if (_i >= 3)
-    gzthrow("Invalid column number");
+    throw(std::string("Invalid column number"));
 
   m[0][_i] = _v.x;
   m[1][_i] = _v.y;
   m[2][_i] = _v.z;
 }
 
+//////////////////////////////////////////////////
+bool Matrix3::operator==(const Matrix3 &_m) const
+{
+  return math::equal(this->m[0][0], _m[0][0]) &&
+         math::equal(this->m[0][1], _m[0][1]) &&
+         math::equal(this->m[0][2], _m[0][2]) &&
 
+         math::equal(this->m[1][0], _m[1][0]) &&
+         math::equal(this->m[1][1], _m[1][1]) &&
+         math::equal(this->m[1][2], _m[1][2]) &&
+
+         math::equal(this->m[2][0], _m[2][0]) &&
+         math::equal(this->m[2][1], _m[2][1]) &&
+         math::equal(this->m[2][2], _m[2][2]);
+}

@@ -66,7 +66,7 @@ namespace gazebo
 
       /// \brief Load the camera with a set of parmeters
       /// \param _sdf The SDF camera info
-      public: void Load(sdf::ElementPtr &_sdf);
+      public: void Load(sdf::ElementPtr _sdf);
 
        /// \brief Load the camera with default parmeters
       public: void Load();

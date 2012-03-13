@@ -16,6 +16,7 @@
 */
 
 #include "msgs/msgs.h"
+#include "common/Events.hh"
 #include "transport/TopicManager.hh"
 #include "transport/ConnectionManager.hh"
 
@@ -36,11 +37,16 @@ ConnectionManager::ConnectionManager()
   this->listMutex = new boost::recursive_mutex();
   this->masterMessagesMutex = new boost::recursive_mutex();
   this->connectionMutex = new boost::recursive_mutex();
+
+  this->eventConnections.push_back(
+      event::Events::ConnectStop(boost::bind(&ConnectionManager::Stop, this)));
 }
 
 //////////////////////////////////////////////////
 ConnectionManager::~ConnectionManager()
 {
+  this->eventConnections.clear();
+
   delete this->listMutex;
   this->listMutex = NULL;
 
@@ -74,7 +80,7 @@ bool ConnectionManager::Init(const std::string &master_host,
   {
     printf(".");
     fflush(stdout);
-    usleep(1000000);
+    common::Time::MSleep(1000);
   }
   printf("\n");
 
@@ -177,10 +183,12 @@ void ConnectionManager::Fini()
 void ConnectionManager::Stop()
 {
   this->stop = true;
-  while (this->stopped == false)
-    common::Time::MSleep(100);
+  if (this->initialized)
+    while (this->stopped == false)
+      common::Time::MSleep(100);
 }
 
+//////////////////////////////////////////////////
 void ConnectionManager::RunUpdate()
 {
   std::list<ConnectionPtr>::iterator iter;
@@ -233,11 +241,11 @@ void ConnectionManager::Run()
   this->masterConn->Shutdown();
 }
 
+//////////////////////////////////////////////////
 bool ConnectionManager::IsRunning() const
 {
   return !this->stop;
 }
-
 
 //////////////////////////////////////////////////
 void ConnectionManager::OnMasterRead(const std::string &_data)

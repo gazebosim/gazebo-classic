@@ -17,15 +17,7 @@
 #ifndef EDIT_MODEL_WIDGET_HH
 #define EDIT_MODEL_WIDGET_HH
 
-#include <QWidget>
-#include <QPushButton>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-
+#include "gui/qt.h"
 #include "transport/TransportTypes.hh"
 #include "msgs/msgs.h"
 

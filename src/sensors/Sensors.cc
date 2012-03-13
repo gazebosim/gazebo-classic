@@ -28,6 +28,7 @@
 
 using namespace gazebo;
 
+/////////////////////////////////////////////////
 bool sensors::load()
 {
   // Register all the sensor types
@@ -40,6 +41,7 @@ bool sensors::load()
   return true;
 }
 
+/////////////////////////////////////////////////
 bool sensors::init()
 {
   // The rendering engine will run headless
@@ -54,7 +56,7 @@ bool sensors::init()
   return true;
 }
 
-
+/////////////////////////////////////////////////
 bool sensors::fini()
 {
   sensors::SensorManager::Instance()->Fini();
@@ -62,34 +64,41 @@ bool sensors::fini()
   return true;
 }
 
+/////////////////////////////////////////////////
 std::string sensors::create_sensor(sdf::ElementPtr _elem,
-                          const std::string &_parentName)
+                                   const std::string &_worldName,
+                                   const std::string &_parentName)
 {
-  return sensors::SensorManager::Instance()->LoadSensor(_elem, _parentName);
+  return sensors::SensorManager::Instance()->CreateSensor(_elem, _worldName,
+                                                          _parentName);
 }
 
-
+/////////////////////////////////////////////////
 void sensors::run()
 {
   sensors::SensorManager::Instance()->Run();
 }
 
+/////////////////////////////////////////////////
 void sensors::run_once(bool _force)
 {
   sensors::SensorManager::Instance()->Update(_force);
 }
 
+/////////////////////////////////////////////////
 void sensors::stop()
 {
   sensors::SensorManager::Instance()->Stop();
 }
 
+/////////////////////////////////////////////////
 bool sensors::remove_sensors()
 {
   sensors::SensorManager::Instance()->RemoveSensors();
   return true;
 }
 
+/////////////////////////////////////////////////
 sensors::SensorPtr sensors::get_sensor(const std::string &_name)
 {
   return sensors::SensorManager::Instance()->GetSensor(_name);

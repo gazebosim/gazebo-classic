@@ -123,7 +123,8 @@ static bool GetContactData(const dVector3& Center, dReal Radius, const dVector3 
 		}
 		else{  // region 0
 			// minimum at interior point
-			if (Det == REAL(0.0)){
+			if (_dequal(Det, REAL(0.0)))
+      {
 				u = REAL(0.0);
 				v = REAL(0.0);
 				DistSq = FLT_MAX;

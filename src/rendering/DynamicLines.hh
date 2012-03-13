@@ -17,11 +17,10 @@
 /* Desc: Dynamic line generator
  * Author: Nate Koenig
  * Date: 28 June 2007
- * CVS: $Id$
  */
 
-#ifndef OGREDYNAMICLINES_HH
-#define OGREDYNAMICLINES_HH
+#ifndef DYNAMICLINES_HH
+#define DYNAMICLINES_HH
 
 #include <vector>
 #include <string>

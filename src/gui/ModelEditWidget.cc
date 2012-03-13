@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include <QtGui>
 
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
@@ -110,8 +109,8 @@ ModelPropertyWidget::ModelPropertyWidget(QWidget * /*_parent*/)
   rpyLayout->addWidget(this->pitchEdit);
   rpyLayout->addWidget(this->yawEdit);
 
-  QGroupBox *originBox = new QGroupBox(tr("Origin"));
-  originBox->setStyleSheet(
+  QGroupBox *oBox = new QGroupBox(tr("Origin"));
+  oBox->setStyleSheet(
       tr("QGroupBox{border: 1px solid black; padding-top: 2ex;}"));
   QVBoxLayout *originBoxLayout = new QVBoxLayout;
   originBox->setLayout(originBoxLayout);
@@ -121,7 +120,7 @@ ModelPropertyWidget::ModelPropertyWidget(QWidget * /*_parent*/)
 
   mainLayout->addLayout(nameLayout);
   mainLayout->addLayout(staticLayout);
-  mainLayout->addWidget(originBox);
+  mainLayout->addWidget(oBox);
 
   this->setLayout(mainLayout);
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -130,5 +129,3 @@ ModelPropertyWidget::ModelPropertyWidget(QWidget * /*_parent*/)
 ModelPropertyWidget::~ModelPropertyWidget()
 {
 }
-
-

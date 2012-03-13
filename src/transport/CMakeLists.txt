@@ -1,3 +1,5 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
 set (sources TopicManager.cc
              Subscriber.cc
              Publisher.cc
@@ -34,8 +36,7 @@ endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/transport.h.in ${CMAKE_CURRENT_BINARY_DIR}/transport.h )
 
 
-add_library(gazebo_transport SHARED ${sources})
-
+gz_add_library(gazebo_transport ${sources})
 target_link_libraries(gazebo_transport gazebo_common 
                                        gazebo_msgs 
                                        ${boost_libraries})

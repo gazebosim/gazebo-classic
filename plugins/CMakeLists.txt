@@ -1,6 +1,7 @@
 include_directories( 
   ${PROJECT_BINARY_DIR}/src 
   ${PROJECT_SOURCE_DIR}/src 
+  ${PROTOBUF_INCLUDE_DIR}
 )
 
 set (plugins CameraPlugin

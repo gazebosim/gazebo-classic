@@ -54,8 +54,10 @@ namespace gazebo
 
       /// Load the contact sensor using parameter from an XMLConfig node
       /// \param node The XMLConfig node
-      public: virtual void Load(sdf::ElementPtr &_sdf);
-      public: virtual void Load();
+      public: virtual void Load(const std::string &_worldName,
+                                sdf::ElementPtr _sdf);
+
+      public: virtual void Load(const std::string &_worldName);
 
       /// Initialize the sensor
       public: virtual void Init();
@@ -80,9 +82,6 @@ namespace gazebo
       public: physics::Contact GetCollisionContact(
                   const std::string &_collisionName, unsigned int _index) const;
 
-      public: gazebo::physics::ModelPtr GetParentModel()
-              {return this->model;}
-
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
@@ -91,7 +90,6 @@ namespace gazebo
 
       private: std::vector<physics::CollisionPtr> collisions;
 
-      private: gazebo::physics::ModelPtr model;
       private: typedef std::map<std::string,
                std::map<std::string, physics::Contact> > Contact_M;
 

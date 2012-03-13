@@ -68,6 +68,7 @@ void TopicManager::Fini()
   this->nodes.clear();
 }
 
+//////////////////////////////////////////////////
 void TopicManager::AddNode(NodePtr _node)
 {
   this->nodeMutex->lock();
@@ -75,6 +76,7 @@ void TopicManager::AddNode(NodePtr _node)
   this->nodeMutex->unlock();
 }
 
+//////////////////////////////////////////////////
 void TopicManager::RemoveNode(unsigned int _id)
 {
   std::vector<NodePtr>::iterator iter;
@@ -174,17 +176,17 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 
 //////////////////////////////////////////////////
 void TopicManager::Unsubscribe(const std::string &_topic,
-                               const NodePtr &_sub)
+                               const NodePtr &_node)
 {
   PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
   {
-    publication->RemoveSubscription(_sub);
+    publication->RemoveSubscription(_node);
     ConnectionManager::Instance()->Unsubscribe(_topic,
-        _sub->GetMsgType(_topic));
+        _node->GetMsgType(_topic));
   }
 
-  this->subscribedNodes[_topic].remove(_sub);
+  this->subscribedNodes[_topic].remove(_node);
 }
 
 //////////////////////////////////////////////////

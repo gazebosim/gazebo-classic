@@ -57,7 +57,7 @@ namespace gazebo
       public: virtual ~Light();
 
       /// \brief Load the light using a set of SDF parameters
-      public: void Load(sdf::ElementPtr &_sdf);
+      public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Load the light using default parameters
       public: void Load();

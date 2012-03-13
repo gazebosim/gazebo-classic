@@ -17,10 +17,10 @@
 #ifndef GL_WIDGET_HH
 #define GL_WIDGET_HH
 
-#include <QtGui>
 #include <string>
 #include <vector>
 
+#include "gui/qt.h"
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
@@ -35,6 +35,7 @@
 #include "gui/BoxMaker.hh"
 #include "gui/SphereMaker.hh"
 #include "gui/CylinderMaker.hh"
+#include "gui/MeshMaker.hh"
 #include "gui/LightMaker.hh"
 
 namespace gazebo
@@ -56,13 +57,13 @@ namespace gazebo
 
       public: void Clear();
 
-      signals:
-        void clicked();
+      signals: void clicked();
 
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
       protected: virtual void showEvent(QShowEvent *_e);
+      protected: virtual void enterEvent(QEvent * event);
 
 
       protected: void keyPressEvent(QKeyEvent *_event);
@@ -74,19 +75,43 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      private: void OnMouseMoveRing();
+      private: void OnMouseMoveNormal();
+      private: void OnMouseMoveMakeEntity();
+
+      private: void OnMouseReleaseRing();
+      private: void OnMouseReleaseNormal();
+      private: void OnMouseReleaseMakeEntity();
+
+      private: void OnMousePressRing();
+      private: void OnMousePressNormal();
+      private: void OnMousePressMakeEntity();
+
+      private: void SmartMoveVisual(rendering::VisualPtr _vis);
+
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
-      private: void OnCreateEntity(const std::string &_type);
+      private: void OnCreateEntity(const std::string &_type,
+                                   const std::string &_data);
       private: void OnFPS();
       private: void OnOrbit();
+      private: void OnManipMode(const std::string &_mode);
+      private: void OnSetSelectedEntity(const std::string &_name);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
       private: void TranslateEntity(rendering::VisualPtr &_vis);
 
+      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
+      private: void PublishVisualPose(rendering::VisualPtr _vis);
+      private: void ClearSelection();
+
+      /// \brief Copy an object by name
+      private: void Paste(const std::string &_object);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
@@ -100,25 +125,32 @@ namespace gazebo
       private: BoxMaker boxMaker;
       private: SphereMaker sphereMaker;
       private: CylinderMaker cylinderMaker;
+      private: MeshMaker meshMaker;
       private: PointLightMaker pointLightMaker;
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr selectionVis, hoverVis;
+      private: rendering::VisualPtr hoverVis, mouseMoveVis;
+      private: rendering::SelectionObj *selectionObj;
       private: unsigned int selectionId;
       private: std::string selectionMod;
       private: math::Pose selectionPoseOrig;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr modelPub;
+      private: transport::PublisherPtr modelPub, factoryPub;
       private: transport::SubscriberPtr selectionSub;
 
       private: Qt::KeyboardModifiers keyModifiers;
+      private: QPoint onShiftMousePos;
       private: int mouseOffset;
+      private: math::Pose mouseMoveVisStartPose;
+
+      private: std::string copiedObject;
+      private: bool copy;
+
+      private: std::string state;
     };
   }
 }
 
 #endif
-
-

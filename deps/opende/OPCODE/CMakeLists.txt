@@ -3,7 +3,6 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(SYSTEM
   ${CMAKE_CURRENT_BINARY_DIR} 
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE/Ice
-  ${CMAKE_SOURCE_DIR}/deps/OPCODE/Ice
 )
 
 
@@ -84,9 +83,6 @@ OPC_VolumeCollider.h
 Stdafx.h
 )
 
-add_library(gazebo_opcode SHARED ${sources})
-
+gz_add_library(gazebo_opcode ${sources})
 INSTALL_LIBRARY(gazebo_opcode)
 INSTALL_INCLUDES("opcode" ${headers})
-
-

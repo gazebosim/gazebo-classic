@@ -155,7 +155,7 @@ ODEPhysics::~ODEPhysics()
 //////////////////////////////////////////////////
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   sdf::ElementPtr odeElem = _sdf->GetElement("ode");
 
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
@@ -239,9 +239,8 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
+    this->responsePub->Publish(response);
   }
-
-  this->responsePub->Publish(response);
 }
 
 void ODEPhysics::OnPhysicsMsg(
@@ -459,6 +458,7 @@ CollisionPtr ODEPhysics::CreateCollision(const std::string &_type,
   return collision;
 }
 
+//////////////////////////////////////////////////
 ShapePtr ODEPhysics::CreateShape(const std::string &_type,
                                  CollisionPtr _collision)
 {

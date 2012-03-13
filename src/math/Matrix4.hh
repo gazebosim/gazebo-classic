@@ -143,6 +143,11 @@ namespace gazebo
                 return this->m[_row];
               }
 
+      /// \brief Equality test operatoer
+      /// \param _m Matrix3 to test
+      /// \return True if equal
+      public: bool operator==(const Matrix4 &_m) const;
+
       /// \brief Output operator
       /// \param _out Output stream
       /// \param _m Matrix to output

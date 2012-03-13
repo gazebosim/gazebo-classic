@@ -24,12 +24,12 @@ using namespace transport;
 
 int PublicationTransport::counter = 0;
 
-PublicationTransport::PublicationTransport(const std::string &topic,
-                                           const std::string &msgType)
-: topic(topic), msgType(msgType)
+PublicationTransport::PublicationTransport(const std::string &_topic,
+                                           const std::string &_msgType)
+: topic(_topic), msgType(_msgType)
 {
   this->id = counter++;
-  TopicManager::Instance()->UpdatePublications(topic, msgType);
+  TopicManager::Instance()->UpdatePublications(this->topic, this->msgType);
 }
 
 PublicationTransport::~PublicationTransport()
@@ -115,10 +115,9 @@ std::string PublicationTransport::GetMsgType() const
 void PublicationTransport::Fini()
 {
   /// Cancel all async operatiopns.
-  this->connection->Cancel();
-  this->connection.reset();
+  if (this->connection)
+  {
+    this->connection->Cancel();
+    // this->connection.reset();
+  }
 }
-
-
-
-

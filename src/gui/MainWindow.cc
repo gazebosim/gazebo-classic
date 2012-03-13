@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#include <QtGui>
-
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Events.hh"
@@ -40,7 +38,7 @@ using namespace gui;
 
 extern bool g_fullscreen;
 
-
+/////////////////////////////////////////////////
 MainWindow::MainWindow()
   : renderWidget(0)
 {
@@ -76,9 +74,9 @@ MainWindow::MainWindow()
   this->setCentralWidget(mainWidget);
 
   this->setDockOptions(QMainWindow::ForceTabbedDocks |
-//                       QMainWindow::AllowTabbedDocks |
-//                       QMainWindow::AnimatedDocks |
-                       QMainWindow::VerticalTabs);
+                       QMainWindow::AllowTabbedDocks |
+                       QMainWindow::AnimatedDocks);
+                       // QMainWindow::VerticalTabs);
 
   this->modelsDock = new QDockWidget(tr("Models"), this);
   this->modelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
@@ -103,6 +101,7 @@ MainWindow::MainWindow()
 
   this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
   this->modelsDock->raise();
+  this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
@@ -122,38 +121,45 @@ MainWindow::MainWindow()
         boost::bind(&MainWindow::OnMoveMode, this, _1)));
 
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
-
-  this->requestMsg = msgs::CreateRequest("entity_list");
-  this->requestPub->Publish(*this->requestMsg);
+      gui::Events::ConnectManipMode(
+        boost::bind(&MainWindow::OnManipMode, this, _1)));
 }
 
+/////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Init()
 {
   this->renderWidget->show();
+  this->requestMsg = msgs::CreateRequest("entity_list");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
   delete this->renderWidget;
   delete this->timePanel;
 }
 
+/////////////////////////////////////////////////
 void MainWindow::New()
 {
-  gzdbg << "MainWindow::New world\n";
+  msgs::ServerControl msg;
+  msg.set_new_world(true);
+  this->serverControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Open()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
@@ -168,24 +174,59 @@ void MainWindow::Open()
   }
 }
 
+/////////////////////////////////////////////////
+void MainWindow::Import()
+{
+  std::string filename = QFileDialog::getOpenFileName(this,
+      tr("Import Collada Mesh"), "",
+      tr("SDF Files (*.dae *.zip)")).toStdString();
+
+  if (!filename.empty())
+  {
+    if (filename.find(".dae") != std::string::npos)
+    {
+      gui::Events::createEntity("mesh", filename);
+    }
+    else
+      gzerr << "Unable to import mesh[" << filename << "]\n";
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Save()
 {
-  std::string filename = QFileDialog::getSaveFileName(this,
-      tr("Save World"), "/home/nkoenig",
-      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
-
   msgs::ServerControl msg;
-  msg.set_save_world_name("default");
-  msg.set_save_filename(filename);
+  msg.set_save_world_name(get_world());
   this->serverControlPub->Publish(msg);
 }
 
-void MainWindow::About()
+/////////////////////////////////////////////////
+void MainWindow::SaveAs()
 {
-  QMessageBox::about(this, tr("About Gazebo"),
-      tr("The <b>Gazebo</b> is awesome."));
+  std::string filename = QFileDialog::getSaveFileName(this,
+      tr("Save World"), QString(),
+      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
+
+  if (!filename.empty())
+  {
+    msgs::ServerControl msg;
+    msg.set_save_world_name(get_world());
+    msg.set_save_filename(filename);
+    this->serverControlPub->Publish(msg);
+  }
 }
 
+/////////////////////////////////////////////////
+void MainWindow::About()
+{
+  std::string helpTxt = "Gazebo is a 3D multi-robot simulator with dynamics. ";
+  helpTxt += "It is capable of simulating articulated robot in complex and ";
+  helpTxt += "realistic environments.\n Visit http://www.gazebosim.org for ";
+  helpTxt += "more information.";
+  QMessageBox::about(this, tr("About Gazebo"), tr(helpTxt.c_str()));
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Play()
 {
   msgs::WorldControl msg;
@@ -195,6 +236,7 @@ void MainWindow::Play()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Pause()
 {
   msgs::WorldControl msg;
@@ -204,6 +246,7 @@ void MainWindow::Pause()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
@@ -212,6 +255,7 @@ void MainWindow::Step()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::NewModel()
 {
   /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
@@ -221,6 +265,7 @@ void MainWindow::NewModel()
   */
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
@@ -228,6 +273,7 @@ void MainWindow::OnResetWorld()
   this->worldControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::EditWorldProperties()
 {
   if (!this->worldPropertiesWidget)
@@ -236,40 +282,73 @@ void MainWindow::EditWorldProperties()
   this->worldPropertiesWidget->show();
 }
 
+/////////////////////////////////////////////////
+void MainWindow::Arrow()
+{
+  gui::Events::manipMode("normal");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::RingPose()
+{
+  gui::Events::manipMode("ring");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
-  gui::Events::createEntity("box");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("box", "");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateSphere()
 {
-  gui::Events::createEntity("sphere");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("sphere", "");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateCylinder()
 {
-  gui::Events::createEntity("cylinder");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("cylinder", "");
 }
 
+/////////////////////////////////////////////////
+void MainWindow::CreateMesh()
+{
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("mesh", "mesh");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreatePointLight()
 {
-  gui::Events::createEntity("pointlight");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("pointlight", "");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateSpotLight()
 {
-  gui::Events::createEntity("spotlight");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("spotlight", "");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateDirectionalLight()
 {
-  gui::Events::createEntity("directionallight");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("directionallight", "");
 }
 
+/////////////////////////////////////////////////
 void MainWindow::InsertModel()
 {
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnFullScreen(bool _value)
 {
   if (_value)
@@ -280,6 +359,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->removeDockWidget(this->insertModelsDock);
     this->playToolbar->hide();
     this->editToolbar->hide();
+    this->mouseToolbar->hide();
     this->menuBar()->hide();
   }
   else
@@ -292,28 +372,33 @@ void MainWindow::OnFullScreen(bool _value)
     this->insertModelsDock->show();
     this->playToolbar->show();
     this->editToolbar->show();
+    this->mouseToolbar->show();
     this->menuBar()->show();
 
     this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
   }
 }
 
+/////////////////////////////////////////////////
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
   gui::Events::fullScreen(g_fullscreen);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::ViewFPS()
 {
   gui::Events::fps();
 }
 
+/////////////////////////////////////////////////
 void MainWindow::ViewOrbit()
 {
   gui::Events::orbit();
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
   this->newAct = new QAction(tr("&New"), this);
@@ -326,10 +411,22 @@ void MainWindow::CreateActions()
   this->openAct->setStatusTip(tr("Open an world file"));
   connect(this->openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
+  this->importAct = new QAction(tr("&Import Mesh"), this);
+  this->importAct->setShortcut(tr("Ctrl+I"));
+  this->importAct->setStatusTip(tr("Import a Collada mesh"));
+  connect(this->importAct, SIGNAL(triggered()), this, SLOT(Import()));
+
+
   this->saveAct = new QAction(tr("&Save"), this);
   this->saveAct->setShortcut(tr("Ctrl+S"));
-  this->saveAct->setStatusTip(tr("Save to a world file"));
+  this->saveAct->setStatusTip(tr("Save world"));
   connect(this->saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+
+  this->saveAsAct = new QAction(tr("Save &As"), this);
+  this->saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
+  this->saveAsAct->setStatusTip(tr("Save world to new file"));
+  connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
+
 
   this->aboutAct = new QAction(tr("&About"), this);
   this->aboutAct->setStatusTip(tr("Show the about info"));
@@ -360,16 +457,34 @@ void MainWindow::CreateActions()
   this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   this->playAct->setStatusTip(tr("Run the world"));
   this->playAct->setCheckable(true);
+  this->playAct->setChecked(true);
   connect(this->playAct, SIGNAL(triggered()), this, SLOT(Play()));
 
   this->pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   this->pauseAct->setStatusTip(tr("Pause the world"));
   this->pauseAct->setCheckable(true);
+  this->pauseAct->setChecked(false);
   connect(this->pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
   this->stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   this->stepAct->setStatusTip(tr("Step the world"));
   connect(this->stepAct, SIGNAL(triggered()), this, SLOT(Step()));
+
+
+  this->arrowAct = new QAction(QIcon(":/images/arrow.png"),
+      tr("Position object"), this);
+  this->arrowAct->setStatusTip(tr("Move camera"));
+  this->arrowAct->setCheckable(true);
+  this->arrowAct->setChecked(true);
+  connect(this->arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
+
+  this->ringPoseAct = new QAction(QIcon(":/images/translate.png"),
+      tr("Position object"), this);
+  this->ringPoseAct->setStatusTip(tr("Position object"));
+  this->ringPoseAct->setCheckable(true);
+  this->ringPoseAct->setChecked(false);
+  connect(this->ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
+
 
   this->boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   this->boxCreateAct->setStatusTip(tr("Create a box"));
@@ -389,6 +504,14 @@ void MainWindow::CreateActions()
   this->cylinderCreateAct->setCheckable(true);
   connect(this->cylinderCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateCylinder()));
+
+  this->meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
+      tr("Mesh"), this);
+  this->meshCreateAct->setStatusTip(tr("Create a mesh"));
+  this->meshCreateAct->setCheckable(true);
+  connect(this->meshCreateAct, SIGNAL(triggered()), this,
+      SLOT(CreateMesh()));
+
 
   this->pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
@@ -425,12 +548,15 @@ void MainWindow::CreateActions()
   connect(this->viewOrbitAct, SIGNAL(triggered()), this, SLOT(ViewOrbit()));
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateMenus()
 {
   this->fileMenu = this->menuBar()->addMenu(tr("&File"));
   this->fileMenu->addAction(this->openAct);
+  this->fileMenu->addAction(this->importAct);
   this->fileMenu->addAction(this->newAct);
   this->fileMenu->addAction(this->saveAct);
+  this->fileMenu->addAction(this->saveAsAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(this->quitAct);
 
@@ -449,6 +575,7 @@ void MainWindow::CreateMenus()
   this->helpMenu->addAction(this->aboutAct);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::CreateToolbars()
 {
   this->playToolbar = this->addToolBar(tr("Play"));
@@ -456,16 +583,25 @@ void MainWindow::CreateToolbars()
   this->playToolbar->addAction(this->pauseAct);
   this->playToolbar->addAction(this->stepAct);
 
+  QActionGroup *actionGroup = new QActionGroup(this);
+  this->mouseToolbar = this->addToolBar(tr("Mouse"));
+  actionGroup->addAction(this->arrowAct);
+  actionGroup->addAction(this->ringPoseAct);
+  this->mouseToolbar->addAction(this->arrowAct);
+  this->mouseToolbar->addAction(this->ringPoseAct);
+
   this->editToolbar = this->addToolBar(tr("Edit"));
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);
+  // this->editToolbar->addAction(this->meshCreateAct);
   this->editToolbar->addSeparator();
   this->editToolbar->addAction(this->pointLghtCreateAct);
   this->editToolbar->addAction(this->spotLghtCreateAct);
   this->editToolbar->addAction(this->dirLghtCreateAct);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnMoveMode(bool _mode)
 {
   if (_mode)
@@ -473,12 +609,14 @@ void MainWindow::OnMoveMode(bool _mode)
     this->boxCreateAct->setChecked(false);
     this->sphereCreateAct->setChecked(false);
     this->cylinderCreateAct->setChecked(false);
+    this->meshCreateAct->setChecked(false);
     this->pointLghtCreateAct->setChecked(false);
     this->spotLghtCreateAct->setChecked(false);
     this->dirLghtCreateAct->setChecked(false);
   }
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnGUI(ConstGUIPtr &_msg)
 {
   if (_msg->has_fullscreen() && _msg->fullscreen())
@@ -512,19 +650,20 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     {
       std::string name = _msg->camera().track().name();
 
-      double minDist, maxDist;
-      minDist = maxDist = 0;
+      double minDist = 0.0;
+      double maxDist = 0.0;
 
       if (_msg->camera().track().has_min_dist())
         minDist = _msg->camera().track().min_dist();
       if (_msg->camera().track().has_max_dist())
         maxDist = _msg->camera().track().max_dist();
 
-      cam->AttachToVisual(name, minDist, maxDist);
+      cam->AttachToVisual(name, false, minDist, maxDist);
     }
   }
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnModel(ConstModelPtr &_msg)
 {
   this->entities[_msg->name()] = _msg->id();
@@ -542,8 +681,8 @@ void MainWindow::OnModel(ConstModelPtr &_msg)
   gui::Events::modelUpdate(*_msg);
 }
 
-void MainWindow::OnResponse(
-    ConstResponsePtr &_msg)
+/////////////////////////////////////////////////
+void MainWindow::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -577,26 +716,7 @@ void MainWindow::OnResponse(
   this->requestMsg = NULL;
 }
 
-void MainWindow::OnSetSelectedEntity(const std::string &_name)
-{
-  std::map<std::string, unsigned int>::iterator iter;
-  std::string name = _name;
-  boost::replace_first(name, gui::get_world()+"::", "");
-
-  msgs::Selection msg;
-  msg.set_name(name);
-
-  iter = this->entities.find(name);
-  if (iter != this->entities.end())
-    msg.set_id(iter->second);
-  else
-  {
-    gzerr << "Unable to find model[" << _name << "]\n";
-  }
-
-  this->selectionPub->Publish(msg);
-}
-
+/////////////////////////////////////////////////
 unsigned int MainWindow::GetEntityId(const std::string &_name)
 {
   unsigned int result = 0;
@@ -609,17 +729,21 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
   if (iter != this->entities.end())
     result = iter->second;
   else
-    gzerr << "Unable to find model[" << name << "]\n";
+    gzerr << "Unable to find model[" << _name << "]\n";
 
   return result;
 }
 
+/////////////////////////////////////////////////
 bool MainWindow::HasEntityName(const std::string &_name)
 {
   bool result = false;
 
+  std::string name = _name;
+  boost::replace_first(name, gui::get_world()+"::", "");
+
   std::map<std::string, unsigned int>::iterator iter;
-  iter = this->entities.find(_name);
+  iter = this->entities.find(name);
 
   if (iter != this->entities.end())
     result = true;
@@ -627,15 +751,24 @@ bool MainWindow::HasEntityName(const std::string &_name)
   return result;
 }
 
-void MainWindow::OnWorldModify(
-    ConstWorldModifyPtr &_msg)
+/////////////////////////////////////////////////
+void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_create() && _msg->create())
+  {
     this->renderWidget->CreateScene(_msg->world_name());
+    this->requestMsg = msgs::CreateRequest("entity_list");
+    this->requestPub->Publish(*this->requestMsg);
+  }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
-  else if (_msg->has_create() && _msg->create())
-    this->renderWidget->CreateScene(_msg->world_name());
 }
 
-
+/////////////////////////////////////////////////
+void MainWindow::OnManipMode(const std::string &_mode)
+{
+  if (_mode == "normal")
+    this->arrowAct->setChecked(true);
+  else if (_mode == "ring")
+    this->ringPoseAct->setChecked(true);
+}

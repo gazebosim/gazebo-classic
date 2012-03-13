@@ -17,7 +17,6 @@
 /* Desc: An ODE ball joint
  * Author: Nate Keonig
  * Date: 13 Oct 2009
- * SVN: $Id: BallJoint.hh 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #ifndef ODEBALLJOINT_HH

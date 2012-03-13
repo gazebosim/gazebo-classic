@@ -51,7 +51,7 @@ ODELink::~ODELink()
 }
 
 //////////////////////////////////////////////////
-void ODELink::Load(sdf::ElementPtr &_sdf)
+void ODELink::Load(sdf::ElementPtr _sdf)
 {
   this->odePhysics = boost::shared_dynamic_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
@@ -144,6 +144,7 @@ void ODELink::MoveCallback(dBodyID _id)
 
   self->dirtyPose.pos -= cog_vec;
 
+  // TODO: this is an ugly line of code. It's like this for speed.
   self->world->dirtyPoses.push_back(self);
 
   // self->poseMutex->unlock();
@@ -206,21 +207,21 @@ void ODELink::OnPoseChange()
 
   this->SetEnabled(true);
 
-  const math::Pose pose = this->GetWorldPose();
+  const math::Pose myPose = this->GetWorldPose();
 
-  math::Vector3 cog_vec = pose.rot.RotateVector(this->inertial->GetCoG());
+  math::Vector3 cog_vec = myPose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
   dBodySetPosition(this->linkId,
-      pose.pos.x + cog_vec.x,
-      pose.pos.y + cog_vec.y,
-      pose.pos.z + cog_vec.z);
+      myPose.pos.x + cog_vec.x,
+      myPose.pos.y + cog_vec.y,
+      myPose.pos.z + cog_vec.z);
 
   dQuaternion q;
-  q[0] = pose.rot.w;
-  q[1] = pose.rot.x;
-  q[2] = pose.rot.y;
-  q[3] = pose.rot.z;
+  q[0] = myPose.rot.w;
+  q[1] = myPose.rot.x;
+  q[2] = myPose.rot.y;
+  q[3] = myPose.rot.z;
 
   // Set the rotation of the ODE link
   dBodySetQuaternion(this->linkId, q);
@@ -467,8 +468,3 @@ bool ODELink::GetKinematic() const
 
   return result;
 }
-
-
-
-
-

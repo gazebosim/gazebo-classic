@@ -15,56 +15,38 @@
       </ode>
     </physics>
 
+    <include filename="ground_plane.model"/>
 
-    <!-- Ground Plane -->
-    <model name="plane1_model" static="true">
-      <link name="body">
-        <collision name="plane_geom">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual" cast_shadows="false">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-          <material script="Gazebo/Gold"/>
-        </visual>
-      </link>
-    </model>
-
-    <model name="box_model1" static="false">
-      <origin pose="0 0 .25 0 0 0"/>
-      <link name="box_body">
+    <model name="box" static="true">
+      <origin pose="0 0 .5 0 0 0"/>
+      <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
 
-        <collision name="geom1">
+        <collision name="collision">
           <geometry>
-            <box size="1 1 .5"/>
+            <box size="1 1 1"/>
           </geometry>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <box size="1 1 .5"/>
+            <box size="1 1 1"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
     </model>
 
-    <!--
-    <model name="sphere_model">
-      <origin pose="0 1.5 1.0 0 0 0"/>
-      <link name="body">
+    <model name="sphere">
+      <origin pose="0 1.5 0.5 0 0 0"/>
+      <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
 
-        <collision name="geom">
+        <collision name="collision">
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
@@ -79,14 +61,14 @@
       </link>
     </model>
 
-    <model name="cylinder_model">
-      <origin pose="0 -1.5 1.0 0 0 0"/>
-      <link name="body">
+    <model name="cylinder">
+      <origin pose="0 -1.5 0.5 0 0 0"/>
+      <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
 
-        <collision name="geom">
+        <collision name="collision">
           <geometry>
             <cylinder radius="0.5" length="1.0"/>
           </geometry>
@@ -100,30 +82,6 @@
         </visual>
       </link>
     </model>
-
-    <model name="mesh_model">
-      <origin pose="0 2.5 1.0 0 0 0"/>
-      <link name="body">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="geom">
-          <geometry>
-            <mesh filename="bowl.dae" scale="1 1 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <mesh filename="bowl.dae" scale="1 1 1"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-
--->
 
     <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>

@@ -258,13 +258,13 @@ struct FeasibilityData
   void (*grad)(dReal*, int, int, dReal*, void*);
   bool (*hess)(dReal*, int, int, dReal*, void*);
 
-  FeasibilityData(int m, int n)
+  FeasibilityData(int _m, int _n)
   {
-    this->m = m;
-    this->n = n;
-    workn = new dReal[n];
-    workm = new dReal[m+1];
-    worknxn = new dReal[n*n];
+    this->m = _m;
+    this->n = _n;
+    workn = new dReal[_n];
+    workm = new dReal[_m+1];
+    worknxn = new dReal[_n*_n];
   }
 
   ~FeasibilityData() { delete [] workm; delete [] workn; delete [] worknxn; }
@@ -456,14 +456,14 @@ static void lcp_ip_fx(dReal* x, int n, dReal* f, int /*m*/, void* data)
   // evaluate the x >= 0 constraint functions
   int fidx = 1;
   for (int i=0; i< n; i++)
-    if (x[i] != (dReal) 0.0)
+    if (!_dequal(x[i], (dReal) 0.0))
       f[fidx++] = -x[i];
     else
       f[fidx++] = -S_BUFFER;
 
   // evaluate the w >= 0 constraint functions
   for (int i=0; i< n; i++)
-    if (work[i] != (dReal) 0.0)
+    if (!_dequal(work[i], (dReal) 0.0))
       f[fidx++] = -work[i];
     else
       f[fidx++] = -S_BUFFER;

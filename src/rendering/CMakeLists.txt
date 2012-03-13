@@ -58,6 +58,8 @@ set (headers MovableText.hh
              LaserVisual.hh
              CameraVisual.hh
              ContactVisual.hh
+             ogre.h
+             cegui.h
 )
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
@@ -66,11 +68,9 @@ foreach (hdr ${headers})
 endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/rendering.h.in ${CMAKE_CURRENT_BINARY_DIR}/rendering.h )
 
-add_library(gazebo_rendering SHARED ${sources})
-
+gz_add_library(gazebo_rendering ${sources})
 target_link_libraries( gazebo_rendering gazebo_common 
                                         gazebo_sdf_interface
-                                        gazebo_sdf_parser
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 
                                         ${CEGUI_LIBRARIES}

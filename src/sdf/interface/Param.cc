@@ -19,11 +19,7 @@
  * Date: 14 Aug 2008
  */
 
-#include "common/Console.hh"
 #include "common/Exception.hh"
-#include "math/Vector3.hh"
-#include "math/Pose.hh"
-
 #include "sdf/interface/Param.hh"
 
 using namespace sdf;
@@ -44,35 +40,6 @@ Param::Param(Param *_newParam)
 //////////////////////////////////////////////////
 Param::~Param()
 {
-}
-
-//////////////////////////////////////////////////
-void Param::Begin(std::vector<Param*> *_params)
-{
-  if (params != NULL)
-    gzthrow("Calling Begin before an End\n");
-  params = _params;
-}
-
-//////////////////////////////////////////////////
-void Param::End()
-{
-  /*if (params == NULL)
-    gzthrow("Calling End before a Begin\n");
-
-    */
-  params = NULL;
-}
-
-//////////////////////////////////////////////////
-ParamPtr Param::Find(Param_V &_params, const std::string &key)
-{
-  for (Param_V::iterator iter = _params.begin(); iter != _params.end(); ++iter)
-  {
-    if ((*iter)->GetKey() == key)
-      return (*iter);
-  }
-  return ParamPtr();
 }
 
 //////////////////////////////////////////////////
@@ -130,6 +97,12 @@ bool Param::IsVector3() const
 }
 
 //////////////////////////////////////////////////
+bool Param::IsVector2i() const
+{
+  return this->GetTypeName() == typeid(gazebo::math::Vector2i).name();
+}
+
+//////////////////////////////////////////////////
 bool Param::IsQuaternion() const
 {
   return this->GetTypeName() == typeid(gazebo::math::Quaternion).name();
@@ -145,6 +118,12 @@ bool Param::IsPose() const
 bool Param::IsColor() const
 {
   return this->GetTypeName() == typeid(gazebo::common::Color).name();
+}
+
+//////////////////////////////////////////////////
+bool Param::IsTime() const
+{
+  return this->GetTypeName() == typeid(gazebo::common::Time).name();
 }
 
 //////////////////////////////////////////////////
@@ -189,6 +168,7 @@ bool Param::Set(const std::string &_value)
   return this->SetFromString(_value);
 }
 
+/////////////////////////////////////////////////
 bool Param::Set(const char *_value)
 {
   return this->SetFromString(std::string(_value));
@@ -196,6 +176,12 @@ bool Param::Set(const char *_value)
 
 //////////////////////////////////////////////////
 bool Param::Set(const gazebo::math::Vector3 &_value)
+{
+  return this->SetFromString(boost::lexical_cast<std::string>(_value));
+}
+
+//////////////////////////////////////////////////
+bool Param::Set(const gazebo::math::Vector2i &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
@@ -214,6 +200,12 @@ bool Param::Set(const gazebo::math::Pose &_value)
 
 //////////////////////////////////////////////////
 bool Param::Set(const gazebo::common::Color &_value)
+{
+  return this->SetFromString(boost::lexical_cast<std::string>(_value));
+}
+
+//////////////////////////////////////////////////
+bool Param::Set(const gazebo::common::Time &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
@@ -249,6 +241,7 @@ bool Param::Get(double &_value)
   }
 }
 
+/////////////////////////////////////////////////
 bool Param::Get(float &_value)
 {
   if (this->IsFloat())
@@ -263,6 +256,7 @@ bool Param::Get(float &_value)
   }
 }
 
+/////////////////////////////////////////////////
 bool Param::Get(gazebo::common::Color &_value)
 {
   if (this->IsColor())
@@ -276,6 +270,23 @@ bool Param::Get(gazebo::common::Color &_value)
     return false;
   }
 }
+
+/////////////////////////////////////////////////
+bool Param::Get(gazebo::common::Time &_value)
+{
+  if (this->IsTime())
+  {
+    _value = ((ParamT<gazebo::common::Time>*)this)->GetValue();
+    return true;
+  }
+  else
+  {
+    gzerr << "Parameter [" << this->key << "] is not a time\n";
+    return false;
+  }
+}
+
+/////////////////////////////////////////////////
 bool Param::Get(gazebo::math::Pose &_value)
 {
   if (this->IsPose())
@@ -289,6 +300,8 @@ bool Param::Get(gazebo::math::Pose &_value)
     return false;
   }
 }
+
+/////////////////////////////////////////////////
 bool Param::Get(gazebo::math::Vector3 &_value)
 {
   if (this->IsVector3())
@@ -335,6 +348,55 @@ bool Param::Get(gazebo::math::Vector3 &_value)
     }
   }
 }
+
+/////////////////////////////////////////////////
+bool Param::Get(gazebo::math::Vector2i &_value)
+{
+  if (this->IsVector2i())
+  {
+    _value = ((ParamT<gazebo::math::Vector2i>*)this)->GetValue();
+    return true;
+  }
+  else
+  {
+    gzwarn << "Parameter [" << this->key << "] is not a vector2i,try parsing\n";
+    std::string val_str = this->GetAsString();
+    std::vector<int> elements;
+    std::vector<std::string> pieces;
+    boost::split(pieces, val_str, boost::is_any_of(" "));
+    if (pieces.size() != 2)
+    {
+      gzerr <<
+        "string does not have 2 parts to parse into Vector2i, using 0s\n";
+      return false;
+    }
+    else
+    {
+      for (unsigned int i = 0; i < pieces.size(); ++i)
+      {
+        if (pieces[i] != "")
+        {
+          try
+          {
+            elements.push_back(boost::lexical_cast<int>(pieces[i].c_str()));
+          }
+          catch(boost::bad_lexical_cast &e)
+          {
+            gzerr << "value ["
+                  << pieces[i]
+                  << "] is not a valid double for Vector2i[" << i << "]\n";
+            return false;
+          }
+        }
+      }
+      _value.x = elements[0];
+      _value.y = elements[1];
+      return true;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 bool Param::Get(int &_value)
 {
   if (this->IsInt())
@@ -348,6 +410,8 @@ bool Param::Get(int &_value)
     return false;
   }
 }
+
+/////////////////////////////////////////////////
 bool Param::Get(unsigned int &_value)
 {
   if (this->IsUInt())
@@ -361,6 +425,8 @@ bool Param::Get(unsigned int &_value)
     return false;
   }
 }
+
+/////////////////////////////////////////////////
 bool Param::Get(char &_value)
 {
   if (this->IsChar())
@@ -374,6 +440,8 @@ bool Param::Get(char &_value)
     return false;
   }
 }
+
+/////////////////////////////////////////////////
 bool Param::Get(std::string &_value)
 {
   if (this->IsStr())
@@ -387,6 +455,8 @@ bool Param::Get(std::string &_value)
     return false;
   }
 }
+
+/////////////////////////////////////////////////
 bool Param::Get(gazebo::math::Quaternion &_value)
 {
   if (this->IsQuaternion())
@@ -400,5 +470,3 @@ bool Param::Get(gazebo::math::Quaternion &_value)
     return false;
   }
 }
-
-

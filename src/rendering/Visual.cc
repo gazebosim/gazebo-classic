@@ -20,7 +20,7 @@
  */
 
 #include "rendering/ogre.h"
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 
 #include "msgs/msgs.h"
 #include "common/Events.hh"
@@ -48,6 +48,9 @@ unsigned int Visual::visualCounter = 0;
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/visual.sdf", this->sdf);
+
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -74,8 +77,11 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 }
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, Scene *_scene)
+Visual::Visual(const std::string &_name, ScenePtr _scene)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/visual.sdf", this->sdf);
+
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -126,6 +132,7 @@ Visual::~Visual()
   this->children.clear();
 }
 
+/////////////////////////////////////////////////
 void Visual::Fini()
 {
   // Detach from the parent
@@ -154,14 +161,29 @@ void Visual::Fini()
   RTShaderSystem::Instance()->DetachEntity(this);
 }
 
-void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
+/////////////////////////////////////////////////
+VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
-  if (!i_pSceneNode)
+  VisualPtr result(new Visual(_name, _newParent));
+  result->Load(this->sdf);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    result->children.push_back((*iter)->Clone((*iter)->GetName(), result));
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* _sceneNode)
+{
+  if (!_sceneNode)
     return;
 
   // Destroy all the attached objects
   Ogre::SceneNode::ObjectIterator itObject =
-    i_pSceneNode->getAttachedObjectIterator();
+    _sceneNode->getAttachedObjectIterator();
 
   while (itObject.hasMoreElements())
   {
@@ -173,7 +195,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
   }
 
   // Recurse to child SceneNodes
-  Ogre::SceneNode::ChildNodeIterator itChild = i_pSceneNode->getChildIterator();
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
 
   while (itChild.hasMoreElements())
   {
@@ -186,10 +208,6 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
 //////////////////////////////////////////////////
 void Visual::Init()
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/visual.sdf", this->sdf);
-
-
   this->transparency = 0.0;
   this->isStatic = false;
   this->visible = true;
@@ -286,17 +304,14 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_cast_shadows())
     this->sdf->GetAttribute("cast_shadows")->Set(_msg->cast_shadows());
 
-  // if (msg->has_scale())
-  // this->SetScale(msgs::Convert(msg->scale()));
-
   this->Load();
   this->UpdateFromMsg(_msg);
 }
 
 //////////////////////////////////////////////////
-void Visual::Load(sdf::ElementPtr &_sdf)
+void Visual::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 
@@ -327,7 +342,10 @@ void Visual::Load()
       if (!common::MeshManager::Instance()->HasMesh(meshName))
       {
         mesh = common::MeshManager::Instance()->Load(meshName);
-        RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+        if (mesh)
+          RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+        else
+          gzthrow("Unable to create a mesh from " + meshName);
       }
       else
       {
@@ -421,15 +439,18 @@ void Visual::Update()
           this->GetName() + "_animation");
       this->sceneNode->getCreator()->destroyAnimationState(
           this->GetName() + "_animation");
-      event::Events::DisconnectPreRender(this->preRenderConnection);
+      if (this->onAnimationComplete)
+        this->onAnimationComplete();
+      // event::Events::DisconnectPreRender(this->preRenderConnection);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void Visual::SetName(const std::string &name_)
+void Visual::SetName(const std::string &_name)
 {
-  this->name = name_;
+  this->name = _name;
+  this->sdf->GetAttribute("name")->Set(_name);
 }
 
 //////////////////////////////////////////////////
@@ -487,10 +508,27 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     if (this->sdf->GetElement("geometry")->HasElement("plane"))
       _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 2);
 
-  this->sceneNode->attachObject(_obj);
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (!this->HasAttachedObject(_obj->getName()))
+  {
+    this->sceneNode->attachObject(_obj);
+    RTShaderSystem::Instance()->UpdateShaders();
+    _obj->setUserAny(Ogre::Any(this->GetName()));
+  }
+  else
+    gzerr << "Visual[" << this->GetName() << "] already has object["
+          << _obj->getName() << "] attached.";
+}
 
-  _obj->setUserAny(Ogre::Any(this->GetName()));
+//////////////////////////////////////////////////
+bool Visual::HasAttachedObject(const std::string &_name)
+{
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
+  {
+    if (this->sceneNode->getAttachedObject(i)->getName() == _name)
+      return true;
+  }
+
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -534,23 +572,23 @@ void Visual::MakeStatic()
 }
 
 //////////////////////////////////////////////////
-void Visual::AttachMesh(const std::string &meshName)
+void Visual::AttachMesh(const std::string &_meshName)
 {
   std::ostringstream stream;
   Ogre::MovableObject *obj;
-  stream << this->sceneNode->getName() << "_ENTITY_" << meshName;
+  stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
 
   // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(meshName) &&
-      common::MeshManager::Instance()->HasMesh(meshName))
+  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+      common::MeshManager::Instance()->HasMesh(_meshName))
   {
     const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(meshName);
+      common::MeshManager::Instance()->GetMesh(_meshName);
     this->InsertMesh(mesh);
   }
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
+    (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
 
   this->AttachObject(obj);
 }
@@ -563,11 +601,11 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (geomElem->HasElement("box"))
     geomElem->GetElement("box")->GetAttribute("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
-    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(_scale.x);
+    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(_scale.x/2.0);
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(_scale.x);
-    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(_scale.y);
+    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(_scale.z);
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetAttribute("scale")->Set(_scale);
@@ -700,7 +738,12 @@ void Visual::SetAmbient(const common::Color &_color)
     this->SetMaterial(matName);
   }
 
-  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetAmbient(_color);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
@@ -735,6 +778,11 @@ void Visual::SetAmbient(const common::Color &_color)
       }
     }
   }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetSpecular(_color);
+  }
 }
 
 /// Set the diffuse color of the visual
@@ -755,7 +803,9 @@ void Visual::SetDiffuse(const common::Color &_color)
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
     if (!entity)
+    {
       continue;
+    }
 
     // For each ogre::entity
     for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
@@ -781,6 +831,11 @@ void Visual::SetDiffuse(const common::Color &_color)
         }
       }
     }
+  }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetDiffuse(_color);
   }
 }
 
@@ -829,9 +884,14 @@ void Visual::SetSpecular(const common::Color &_color)
       }
     }
   }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetSpecular(_color);
+  }
 }
 
-
+/////////////////////////////////////////////////
 void Visual::AttachAxes()
 {
   std::ostringstream nodeName;
@@ -884,7 +944,7 @@ void Visual::AttachAxes()
 //////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
-  if (_trans == this->transparency)
+  if (math::equal(_trans, this->transparency))
     return;
 
   this->transparency = std::min(
@@ -990,6 +1050,11 @@ void Visual::SetEmissive(const common::Color &_color)
       }
     }
   }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetSpecular(_color);
+  }
 }
 
 
@@ -1013,10 +1078,10 @@ void Visual::SetCastShadows(const bool &shadows)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetVisible(bool visible_, bool cascade_)
+void Visual::SetVisible(bool _visible, bool _cascade)
 {
-  this->sceneNode->setVisible(visible_, cascade_);
-  this->visible = visible_;
+  this->sceneNode->setVisible(_visible, _cascade);
+  this->visible = _visible;
 }
 
 //////////////////////////////////////////////////
@@ -1079,17 +1144,20 @@ math::Pose Visual::GetPose() const
   return pos;
 }
 
+//////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose _pose)
 {
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
 }
 
+//////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
   this->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
+//////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
   Ogre::Quaternion vquatern(_q.w, _q.x, _q.y, _q.z);
@@ -1177,38 +1245,46 @@ void Visual::SetShaderType(const std::string &_type)
 
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool value)
+void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
+                            const common::Color &_changeColor)
 {
   if (this->ribbonTrail == NULL)
   {
     this->ribbonTrail =
-      (Ogre::RibbonTrail*)this->sceneNode->getCreator()->createMovableObject(
-          "RibbonTrail");
-    this->ribbonTrail->setMaterialName("Gazebo/Red");
-    this->ribbonTrail->setTrailLength(200);
-    this->ribbonTrail->setMaxChainElements(1000);
-    this->ribbonTrail->setNumberOfChains(1);
+      this->scene->GetManager()->createRibbonTrail(this->GetName() +
+                                                   "_RibbonTrail");
+    this->ribbonTrail->setMaterialName("Gazebo/RibbonTrail");
+    // this->ribbonTrail->setTrailLength(100);
+    this->ribbonTrail->setMaxChainElements(10000);
+    // this->ribbonTrail->setNumberOfChains(1);
     this->ribbonTrail->setVisible(false);
+    this->ribbonTrail->setCastShadows(false);
     this->ribbonTrail->setInitialWidth(0, 0.05);
-    this->sceneNode->attachObject(this->ribbonTrail);
+    this->scene->GetManager()->getRootSceneNode()->attachObject(
+        this->ribbonTrail);
+
+    this->ribbonTrail->setInitialColour(0, Conversions::Convert(_initialColor));
+    this->ribbonTrail->setColourChange(0, Conversions::Convert(_changeColor));
   }
 
 
-  if (value)
+  if (_value)
   {
     try
     {
       this->ribbonTrail->addNode(this->sceneNode);
     }
     catch(...)
-    { }
+    {
+      gzerr << "Unable to create ribbon trail\n";
+    }
   }
   else
   {
     this->ribbonTrail->removeNode(this->sceneNode);
     this->ribbonTrail->clearChain(0);
   }
-  this->ribbonTrail->setVisible(value);
+  this->ribbonTrail->setVisible(_value);
 }
 
 //////////////////////////////////////////////////
@@ -1473,7 +1549,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     */
 
   if (_msg->has_pose())
-    this->SetWorldPose(msgs::Convert(_msg->pose()));
+    this->SetPose(msgs::Convert(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());
@@ -1524,9 +1600,10 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
   }
 
+  // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
-    math::Vector3 scale;
+    math::Vector3 scale(1, 1, 1);
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
@@ -1555,7 +1632,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
       scale = msgs::Convert(_msg->geometry().heightmap().size());
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
-      scale = msgs::Convert(_msg->geometry().mesh().scale());
+    {
+      if (_msg->geometry().mesh().has_scale())
+        scale = msgs::Convert(_msg->geometry().mesh().scale());
+      else
+        scale.x = scale.y = scale.z = 1.0;
+    }
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -1577,6 +1659,7 @@ VisualPtr Visual::GetParent() const
   return this->parent;
 }
 
+//////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
   if (this->sdf->HasElement("geometry"))
@@ -1587,6 +1670,7 @@ bool Visual::IsPlane() const
   return false;
 }
 
+//////////////////////////////////////////////////
 std::string Visual::GetMeshName() const
 {
   if (this->sdf->HasElement("geometry"))
@@ -1607,6 +1691,52 @@ std::string Visual::GetMeshName() const
   return std::string();
 }
 
+//////////////////////////////////////////////////
+void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
+                             double _time,
+                             boost::function<void()> _onComplete)
+{
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  this->onAnimationComplete = _onComplete;
+
+  std::string animName = this->GetName() + "_animation";
+
+  Ogre::Animation *anim =
+    this->sceneNode->getCreator()->createAnimation(animName, _time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  double dt = _time / (_pts.size()-1);
+  double tt = 0;
+  for (unsigned int i = 0; i < _pts.size(); i++)
+  {
+    key = strack->createNodeKeyFrame(tt);
+    key->setTranslate(Ogre::Vector3(_pts[i].x, _pts[i].y, _pts[i].z));
+    key->setRotation(this->sceneNode->getOrientation());
+
+    tt += dt;
+  }
+
+  this->animState =
+    this->sceneNode->getCreator()->createAnimationState(animName);
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+
+  if (!this->preRenderConnection)
+    this->preRenderConnection =
+      event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+}
+
+//////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Vector3 &_end,
                              double _pitch, double _yaw, double _time)
 {
@@ -1642,21 +1772,25 @@ void Visual::MoveToPosition(const math::Vector3 &_end,
     event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
 }
 
+//////////////////////////////////////////////////
 void Visual::ShowBoundingBox()
 {
   this->sceneNode->showBoundingBox(true);
 }
 
-void Visual::SetScene(Scene *_scene)
+//////////////////////////////////////////////////
+void Visual::SetScene(ScenePtr _scene)
 {
   this->scene = _scene;
 }
 
-Scene *Visual::GetScene() const
+//////////////////////////////////////////////////
+ScenePtr Visual::GetScene() const
 {
   return this->scene;
 }
 
+//////////////////////////////////////////////////
 void Visual::ShowCollision(bool _show)
 {
   if (this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
@@ -1668,6 +1802,3 @@ void Visual::ShowCollision(bool _show)
     (*iter)->ShowCollision(_show);
   }
 }
-
-
-

@@ -31,7 +31,7 @@ set (NDEBUG bool true)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
 
-if (SSE2_FOUND OR SSE3_FOUND OR SSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
+if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
 endif()
 
@@ -142,7 +142,7 @@ if(DEFINED USE_CUDA)
 
   cuda_compile(CUDA_GEN_FILES ${CUDA_SOURCE_FILES} SHARED -fPic)
 
-  add_library(parallel_quickstep SHARED
+  gz_add_library(parallel_quickstep 
     ${CUDA_GEN_FILES}
     ${CUDA_SOURCE_FILES}
     ${CUDA_SOLVER_SOURCE_FILES}
@@ -170,7 +170,7 @@ elseif( DEFINED USE_OPENMP )
     src/openmp_solver.cpp
     src/openmp_kernels.cpp )
 
-  add_library( parallel_quickstep SHARED
+  gz_add_library(parallel_quickstep
     ${OPENMP_SOLVER_SOURCE_FILES}
     )
   target_link_libraries(parallel_quickstep gazebo_ode)
@@ -195,7 +195,7 @@ elseif( DEFINED USE_OPENCL )
     src/parallel_reduce.cpp
     src/parallel_quickstep.cpp)
 
-  add_library( parallel_quickstep SHARED
+  gz_add_library(parallel_quickstep
     ${OPENCL_SOLVER_SOURCE_FILES}
     )
 
@@ -213,7 +213,7 @@ elseif( DEFINED USE_CPU )
     src/parallel_stepper.cpp
     src/parallel_quickstep.cpp)
 
-  add_library( parallel_quickstep SHARED
+  gz_add_library(parallel_quickstep
     ${CPU_SOLVER_SOURCE_FILES}
     )
 

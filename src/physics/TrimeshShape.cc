@@ -45,61 +45,10 @@ TrimeshShape::~TrimeshShape()
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::Load(sdf::ElementPtr &_sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void TrimeshShape::Init()
 {
   common::MeshManager *meshManager = common::MeshManager::Instance();
   this->mesh = meshManager->Load(this->sdf->GetValueString("filename"));
-
-  if (this->mesh->GetSubMeshCount() > 1)
-  {
-    // Create a mesh for each of the submeshes.
-    for (unsigned int i = 1; i < this->mesh->GetSubMeshCount(); i++)
-    {
-      common::SubMesh *subMesh =
-        const_cast<common::SubMesh*>(mesh->GetSubMesh(i));
-
-      if (subMesh->GetVertexCount() < 3)
-        continue;
-
-      std::ostringstream newName;
-      newName << this->mesh->GetName() << "_" << i;
-
-      common::Mesh *newMesh = new common::Mesh();
-      newMesh->SetName(newName.str());
-      newMesh->AddSubMesh(subMesh);
-
-      meshManager->AddMesh(newMesh);
-
-      std::ostringstream stream;
-
-      stream << "<collision name ='" << newName.str() << "_collision'>";
-      stream << "  <geometry>";
-      stream << "    <mesh filename ='" << newName.str() << "' scale ='"
-             << this->sdf->GetValueVector3("scale") << "'/>";
-      stream << "  </geometry>";
-      stream << "</collision>";
-      stream << "<visual name ='" << newName.str() << "_visual'>";
-      stream << "  <geometry>";
-      stream << "    <mesh filename ='" << newName.str() << "' scale ='"
-             << this->sdf->GetValueVector3("scale") << "'/>";
-      stream << "  </geometry>";
-      stream << "</visual>";
-
-      CollisionPtr newCollision =
-        this->GetWorld()->GetPhysicsEngine()->CreateCollision(
-          "trimesh", this->collisionParent->GetLink());
-
-      // TODO: need to implement this function properly.
-      newCollision->SetSaveable(false);
-      // newCollision->Load(config->GetRootNode()->GetChild());
-    }
-  }
 }
 
 //////////////////////////////////////////////////

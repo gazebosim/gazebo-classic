@@ -29,8 +29,7 @@ using namespace gazebo;
 boost::thread *g_runThread = NULL;
 bool g_stopped = true;
 
-/// Get the hostname and port of the master from the GAZEBO_MASTER_URI
-/// environment variable
+/////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &master_host,
                                unsigned int &master_port)
 {
@@ -55,7 +54,7 @@ bool transport::get_master_uri(std::string &master_host,
   return true;
 }
 
-
+/////////////////////////////////////////////////
 bool transport::init(const std::string &master_host, unsigned int master_port)
 {
   std::string host = master_host;
@@ -71,6 +70,7 @@ bool transport::init(const std::string &master_host, unsigned int master_port)
   return true;
 }
 
+/////////////////////////////////////////////////
 void transport::run()
 {
   g_stopped = false;
@@ -78,32 +78,38 @@ void transport::run()
                                 transport::ConnectionManager::Instance());
 
   std::list<std::string> namespaces;
+
   // This chunk of code just waits until we get a list of topic namespaces.
   unsigned int trys = 0;
   unsigned int limit = 50;
   while (namespaces.empty() && trys < limit)
   {
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
-    common::Time::MSleep(50);
+
+    // 25 seconds max wait time
+    common::Time::MSleep(500);
+
     trys++;
   }
 
   if (trys >= limit)
-    gzerr << "Unable to get topic namespaces\n";
+    gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
 }
 
+/////////////////////////////////////////////////
 bool transport::is_stopped()
 {
   return g_stopped;
 }
 
-
+/////////////////////////////////////////////////
 void transport::stop()
 {
   g_stopped = true;
   transport::ConnectionManager::Instance()->Stop();
 }
 
+/////////////////////////////////////////////////
 void transport::fini()
 {
   g_stopped = true;
@@ -119,14 +125,14 @@ void transport::fini()
   transport::ConnectionManager::Instance()->Fini();
 }
 
+/////////////////////////////////////////////////
 void transport::clear_buffers()
 {
   transport::TopicManager::Instance()->ClearBuffers();
 }
 
+/////////////////////////////////////////////////
 void transport::pause_incoming(bool _pause)
 {
   transport::TopicManager::Instance()->PauseIncoming(_pause);
 }
-
-

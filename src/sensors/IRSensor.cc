@@ -24,11 +24,11 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-//#include "RayShape.hh"
-//#include "MultiRayShape.hh"
+// #include "RayShape.hh"
+// #include "MultiRayShape.hh"
 #include "RaySensor.hh"
-//#include "World.hh"
-//#include "PhysicsEngine.hh"
+// #include "World.hh"
+// #include "PhysicsEngine.hh"
 #include "common/Exception.hh"
 
 #include "IRSensor.hh"
@@ -53,7 +53,7 @@ IRSensor::~IRSensor()
 }
 
 //////////////////////////////////////////////////
-void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
+void IRSensor::LoadChild(sdf::ElementPtr _sdf)
 {
   if (this->body == NULL)
   {

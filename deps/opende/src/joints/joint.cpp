@@ -505,6 +505,8 @@ void dxJointLimitMotor::set( int num, dReal value )
     case dParamStopCFM:
         stop_cfm = value;
         break;
+    default:
+        break;
     }
 }
 
@@ -563,179 +565,179 @@ int dxJointLimitMotor::addLimot( dxJoint *joint,
                                  dxJoint::Info2 *info, int row,
                                  const dVector3 ax1, int rotational )
 {
-    int srow = row * info->rowskip;
+  int srow = row * info->rowskip;
 
-    // if the joint is powered, or has joint limits, add in the extra row
-    int powered = fmax > 0;
-    if ( powered || limit )
+  // if the joint is powered, or has joint limits, add in the extra row
+  int powered = fmax > 0;
+  if ( powered || limit )
+  {
+    dReal *J1 = rotational ? info->J1a : info->J1l;
+    dReal *J2 = rotational ? info->J2a : info->J2l;
+
+    J1[srow+0] = ax1[0];
+    J1[srow+1] = ax1[1];
+    J1[srow+2] = ax1[2];
+    if ( joint->node[1].body )
     {
-        dReal *J1 = rotational ? info->J1a : info->J1l;
-        dReal *J2 = rotational ? info->J2a : info->J2l;
-
-        J1[srow+0] = ax1[0];
-        J1[srow+1] = ax1[1];
-        J1[srow+2] = ax1[2];
-        if ( joint->node[1].body )
-        {
-            J2[srow+0] = -ax1[0];
-            J2[srow+1] = -ax1[1];
-            J2[srow+2] = -ax1[2];
-        }
-
-        // linear limot torque decoupling step:
-        //
-        // if this is a linear limot (e.g. from a slider), we have to be careful
-        // that the linear constraint forces (+/- ax1) applied to the two bodies
-        // do not create a torque couple. in other words, the points that the
-        // constraint force is applied at must lie along the same ax1 axis.
-        // a torque couple will result in powered or limited slider-jointed free
-        // bodies from gaining angular momentum.
-        // the solution used here is to apply the constraint forces at the point
-        // halfway between the body centers. there is no penalty (other than an
-        // extra tiny bit of computation) in doing this adjustment. note that we
-        // only need to do this if the constraint connects two bodies.
-
-        dVector3 ltd = {0,0,0}; // Linear Torque Decoupling vector (a torque)
-        if ( !rotational && joint->node[1].body )
-        {
-            dVector3 c;
-            c[0] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[0] - joint->node[0].body->posr.pos[0] );
-            c[1] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[1] - joint->node[0].body->posr.pos[1] );
-            c[2] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[2] - joint->node[0].body->posr.pos[2] );
-            dCalcVectorCross3( ltd, c, ax1 );
-            info->J1a[srow+0] = ltd[0];
-            info->J1a[srow+1] = ltd[1];
-            info->J1a[srow+2] = ltd[2];
-            info->J2a[srow+0] = ltd[0];
-            info->J2a[srow+1] = ltd[1];
-            info->J2a[srow+2] = ltd[2];
-        }
-
-        // if we're limited low and high simultaneously, the joint motor is
-        // ineffective
-        if ( limit && ( lostop == histop ) ) powered = 0;
-
-        if ( powered )
-        {
-            info->cfm[row] = normal_cfm;
-            if ( ! limit )
-            {
-                info->c[row] = vel;
-                info->lo[row] = -fmax;
-                info->hi[row] = fmax;
-            }
-            else
-            {
-                // the joint is at a limit, AND is being powered. if the joint is
-                // being powered into the limit then we apply the maximum motor force
-                // in that direction, because the motor is working against the
-                // immovable limit. if the joint is being powered away from the limit
-                // then we have problems because actually we need *two* lcp
-                // constraints to handle this case. so we fake it and apply some
-                // fraction of the maximum force. the fraction to use can be set as
-                // a fudge factor.
-
-                dReal fm = fmax;
-                if (( vel > 0 ) || ( vel == 0 && limit == 2 ) ) fm = -fm;
-
-                // if we're powering away from the limit, apply the fudge factor
-                if (( limit == 1 && vel > 0 ) || ( limit == 2 && vel < 0 ) ) fm *= fudge_factor;
-
-                if ( rotational )
-                {
-                    dBodyAddTorque( joint->node[0].body, -fm*ax1[0], -fm*ax1[1],
-                                    -fm*ax1[2] );
-                    if ( joint->node[1].body )
-                        dBodyAddTorque( joint->node[1].body, fm*ax1[0], fm*ax1[1], fm*ax1[2] );
-                }
-                else
-                {
-                    dBodyAddForce( joint->node[0].body, -fm*ax1[0], -fm*ax1[1], -fm*ax1[2] );
-                    if ( joint->node[1].body )
-                    {
-                        dBodyAddForce( joint->node[1].body, fm*ax1[0], fm*ax1[1], fm*ax1[2] );
-
-                        // linear limot torque decoupling step: refer to above discussion
-                        dBodyAddTorque( joint->node[0].body, -fm*ltd[0], -fm*ltd[1],
-                                        -fm*ltd[2] );
-                        dBodyAddTorque( joint->node[1].body, -fm*ltd[0], -fm*ltd[1],
-                                        -fm*ltd[2] );
-                    }
-                }
-            }
-        }
-
-        if ( limit )
-        {
-            dReal k = info->fps * stop_erp;
-            info->c[row] = -k * limit_err;
-            info->cfm[row] = stop_cfm;
-
-            if ( lostop == histop )
-            {
-                // limited low and high simultaneously
-                info->lo[row] = -dInfinity;
-                info->hi[row] = dInfinity;
-            }
-            else
-            {
-                if ( limit == 1 )
-                {
-                    // low limit
-                    info->lo[row] = 0;
-                    info->hi[row] = dInfinity;
-                }
-                else
-                {
-                    // high limit
-                    info->lo[row] = -dInfinity;
-                    info->hi[row] = 0;
-                }
-
-                // deal with bounce
-                if ( bounce > 0 )
-                {
-                    // calculate joint velocity
-                    dReal vel;
-                    if ( rotational )
-                    {
-                        vel = dCalcVectorDot3( joint->node[0].body->avel, ax1 );
-                        if ( joint->node[1].body )
-                            vel -= dCalcVectorDot3( joint->node[1].body->avel, ax1 );
-                    }
-                    else
-                    {
-                        vel = dCalcVectorDot3( joint->node[0].body->lvel, ax1 );
-                        if ( joint->node[1].body )
-                            vel -= dCalcVectorDot3( joint->node[1].body->lvel, ax1 );
-                    }
-
-                    // only apply bounce if the velocity is incoming, and if the
-                    // resulting c[] exceeds what we already have.
-                    if ( limit == 1 )
-                    {
-                        // low limit
-                        if ( vel < 0 )
-                        {
-                            dReal newc = -bounce * vel;
-                            if ( newc > info->c[row] ) info->c[row] = newc;
-                        }
-                    }
-                    else
-                    {
-                        // high limit - all those computations are reversed
-                        if ( vel > 0 )
-                        {
-                            dReal newc = -bounce * vel;
-                            if ( newc < info->c[row] ) info->c[row] = newc;
-                        }
-                    }
-                }
-            }
-        }
-        return 1;
+      J2[srow+0] = -ax1[0];
+      J2[srow+1] = -ax1[1];
+      J2[srow+2] = -ax1[2];
     }
-    else return 0;
+
+    // linear limot torque decoupling step:
+    //
+    // if this is a linear limot (e.g. from a slider), we have to be careful
+    // that the linear constraint forces (+/- ax1) applied to the two bodies
+    // do not create a torque couple. in other words, the points that the
+    // constraint force is applied at must lie along the same ax1 axis.
+    // a torque couple will result in powered or limited slider-jointed free
+    // bodies from gaining angular momentum.
+    // the solution used here is to apply the constraint forces at the point
+    // halfway between the body centers. there is no penalty (other than an
+    // extra tiny bit of computation) in doing this adjustment. note that we
+    // only need to do this if the constraint connects two bodies.
+
+    dVector3 ltd = {0,0,0}; // Linear Torque Decoupling vector (a torque)
+    if ( !rotational && joint->node[1].body )
+    {
+      dVector3 c;
+      c[0] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[0] - joint->node[0].body->posr.pos[0] );
+      c[1] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[1] - joint->node[0].body->posr.pos[1] );
+      c[2] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[2] - joint->node[0].body->posr.pos[2] );
+      dCalcVectorCross3( ltd, c, ax1 );
+      info->J1a[srow+0] = ltd[0];
+      info->J1a[srow+1] = ltd[1];
+      info->J1a[srow+2] = ltd[2];
+      info->J2a[srow+0] = ltd[0];
+      info->J2a[srow+1] = ltd[1];
+      info->J2a[srow+2] = ltd[2];
+    }
+
+    // if we're limited low and high simultaneously, the joint motor is
+    // ineffective
+    if ( limit && (_dequal(lostop, histop) ) ) powered = 0;
+
+    if ( powered )
+    {
+      info->cfm[row] = normal_cfm;
+      if ( ! limit )
+      {
+        info->c[row] = vel;
+        info->lo[row] = -fmax;
+        info->hi[row] = fmax;
+      }
+      else
+      {
+        // the joint is at a limit, AND is being powered. if the joint is
+        // being powered into the limit then we apply the maximum motor force
+        // in that direction, because the motor is working against the
+        // immovable limit. if the joint is being powered away from the limit
+        // then we have problems because actually we need *two* lcp
+        // constraints to handle this case. so we fake it and apply some
+        // fraction of the maximum force. the fraction to use can be set as
+        // a fudge factor.
+
+        dReal fm = fmax;
+        if (( vel > 0 ) || (_dequal(vel, 0.0) && limit == 2 ) ) fm = -fm;
+
+        // if we're powering away from the limit, apply the fudge factor
+        if (( limit == 1 && vel > 0 ) || ( limit == 2 && vel < 0 ) ) fm *= fudge_factor;
+
+        if ( rotational )
+        {
+          dBodyAddTorque( joint->node[0].body, -fm*ax1[0], -fm*ax1[1],
+              -fm*ax1[2] );
+          if ( joint->node[1].body )
+            dBodyAddTorque( joint->node[1].body, fm*ax1[0], fm*ax1[1], fm*ax1[2] );
+        }
+        else
+        {
+          dBodyAddForce( joint->node[0].body, -fm*ax1[0], -fm*ax1[1], -fm*ax1[2] );
+          if ( joint->node[1].body )
+          {
+            dBodyAddForce( joint->node[1].body, fm*ax1[0], fm*ax1[1], fm*ax1[2] );
+
+            // linear limot torque decoupling step: refer to above discussion
+            dBodyAddTorque( joint->node[0].body, -fm*ltd[0], -fm*ltd[1],
+                -fm*ltd[2] );
+            dBodyAddTorque( joint->node[1].body, -fm*ltd[0], -fm*ltd[1],
+                -fm*ltd[2] );
+          }
+        }
+      }
+    }
+
+    if ( limit )
+    {
+      dReal k = info->fps * stop_erp;
+      info->c[row] = -k * limit_err;
+      info->cfm[row] = stop_cfm;
+
+      if (_dequal(lostop, histop))
+      {
+        // limited low and high simultaneously
+        info->lo[row] = -dInfinity;
+        info->hi[row] = dInfinity;
+      }
+      else
+      {
+        if ( limit == 1 )
+        {
+          // low limit
+          info->lo[row] = 0;
+          info->hi[row] = dInfinity;
+        }
+        else
+        {
+          // high limit
+          info->lo[row] = -dInfinity;
+          info->hi[row] = 0;
+        }
+
+        // deal with bounce
+        if ( bounce > 0 )
+        {
+          // calculate joint velocity
+          dReal vvel;
+          if (rotational)
+          {
+            vvel = dCalcVectorDot3( joint->node[0].body->avel, ax1 );
+            if ( joint->node[1].body )
+              vvel -= dCalcVectorDot3( joint->node[1].body->avel, ax1 );
+          }
+          else
+          {
+            vvel = dCalcVectorDot3( joint->node[0].body->lvel, ax1 );
+            if ( joint->node[1].body )
+              vvel -= dCalcVectorDot3( joint->node[1].body->lvel, ax1 );
+          }
+
+          // only apply bounce if the velocity is incoming, and if the
+          // resulting c[] exceeds what we already have.
+          if (limit == 1)
+          {
+            // low limit
+            if (vel < 0)
+            {
+              dReal newc = -bounce * vvel;
+              if ( newc > info->c[row] ) info->c[row] = newc;
+            }
+          }
+          else
+          {
+            // high limit - all those computations are reversed
+            if (vvel > 0)
+            {
+              dReal newc = -bounce * vvel;
+              if ( newc < info->c[row] ) info->c[row] = newc;
+            }
+          }
+        }
+      }
+    }
+    return 1;
+  }
+  else return 0;
 }
 
 

@@ -32,6 +32,7 @@ using namespace gui;
 
 unsigned int SphereMaker::counter = 0;
 
+/////////////////////////////////////////////////
 SphereMaker::SphereMaker()
   : EntityMaker()
 {
@@ -44,12 +45,14 @@ SphereMaker::SphereMaker()
       math::Quaternion());
 }
 
+/////////////////////////////////////////////////
 SphereMaker::~SphereMaker()
 {
   this->camera.reset();
   delete this->visualMsg;
 }
 
+/////////////////////////////////////////////////
 void SphereMaker::Start(const rendering::UserCameraPtr _camera)
 {
   this->camera = _camera;
@@ -60,6 +63,7 @@ void SphereMaker::Start(const rendering::UserCameraPtr _camera)
   this->state = 1;
 }
 
+/////////////////////////////////////////////////
 void SphereMaker::Stop()
 {
   msgs::Request *msg = msgs::CreateRequest("entity_delete",
@@ -72,11 +76,13 @@ void SphereMaker::Stop()
   gui::Events::moveMode(true);
 }
 
+/////////////////////////////////////////////////
 bool SphereMaker::IsActive() const
 {
   return this->state > 0;
 }
 
+/////////////////////////////////////////////////
 void SphereMaker::OnMousePush(const common::MouseEvent &_event)
 {
   if (this->state == 0)
@@ -85,6 +91,7 @@ void SphereMaker::OnMousePush(const common::MouseEvent &_event)
   this->mousePushPos = _event.pressPos;
 }
 
+/////////////////////////////////////////////////
 void SphereMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
 {
   if (this->state == 0)
@@ -99,6 +106,7 @@ void SphereMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
   }
 }
 
+/////////////////////////////////////////////////
 void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 {
   if (this->state == 0)
@@ -110,7 +118,8 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   norm.Set(0, 0, 1);
 
   if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
-                                          this->mousePushPos.y, norm, 0, p1))
+                                          this->mousePushPos.y,
+                                          math::Plane(norm), p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -119,7 +128,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, norm, 0, p2))
+        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -141,6 +150,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   this->visPub->Publish(*this->visualMsg);
 }
 
+/////////////////////////////////////////////////
 void SphereMaker::CreateTheEntity()
 {
   msgs::Factory msg;
@@ -149,10 +159,11 @@ void SphereMaker::CreateTheEntity()
   newModelStr << "<gazebo version ='1.0'>\
     <model name ='custom_user_sphere" << counter << "_model'>\
     <origin pose ='" << this->visualMsg->pose().position().x() << " "
-                    << this->visualMsg->pose().position().y() << " "
-                    << this->visualMsg->geometry().sphere().radius()
-                    << " 0 0 0'/>\
+                     << this->visualMsg->pose().position().y() << " "
+                     << " 0 0 0 0'/>\
     <link name ='body'>\
+      <origin pose='0 0 " << this->visualMsg->geometry().sphere().radius()
+                          << " 0 0 0'/>\
       <inertial mass ='1.0'>\
           <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
       </inertial>\
@@ -183,5 +194,3 @@ void SphereMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
-
-

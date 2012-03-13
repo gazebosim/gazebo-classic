@@ -27,7 +27,7 @@ namespace gazebo
   {
     class Events
     {
-      //////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the add entity signal
       public: template<typename T>
               static event::ConnectionPtr ConnectCreateEntity(T _subscriber)
@@ -35,6 +35,33 @@ namespace gazebo
       public: static void DisconnectCreateEntity(
                   event::ConnectionPtr _subscriber)
               { createEntity.Disconnect(_subscriber); }
+
+      /////////////////////////////////////////////////
+      public: template<typename T>
+              static event::ConnectionPtr ConnectInsertModel(T _subscriber)
+              { return mouseMoveVisual.Connect(_subscriber); }
+      public: static void DisconnectInsertModel(
+                  event::ConnectionPtr _subscriber)
+              { mouseMoveVisual.Disconnect(_subscriber); }
+
+      /////////////////////////////////////////////////
+      public: template<typename T>
+              static event::ConnectionPtr ConnectMousePress(T _subscriber)
+              { return mousePress.Connect(_subscriber); }
+      public: static void DisconnectMousePress(
+                  event::ConnectionPtr _subscriber)
+              { mousePress.Disconnect(_subscriber); }
+
+      /////////////////////////////////////////////////
+      public: template<typename T>
+              static event::ConnectionPtr ConnectMouseRelease(T _subscriber)
+              { return mouseRelease.Connect(_subscriber); }
+      public: static void DisconnectMouseRelease(
+                  event::ConnectionPtr _subscriber)
+              { mouseRelease.Disconnect(_subscriber); }
+
+
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the move mode signal
       public: template<typename T>
@@ -47,9 +74,10 @@ namespace gazebo
       /// \brief Connect a boost::slot the the manip mode signal
       public: template<typename T>
               static event::ConnectionPtr ConnectManipMode(T _subscriber)
-              { return manipMode.Connect(_subscriber); }
+              {return manipMode.Connect(_subscriber);}
       public: static void DisconnectManipMode(event::ConnectionPtr _subscriber)
-              { manipMode.Disconnect(_subscriber); }
+              {manipMode.Disconnect(_subscriber);}
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the fullscreen signal
       public: template<typename T>
@@ -78,6 +106,7 @@ namespace gazebo
               { return keyPress.Connect(_subscriber); }
       public: static void DisconnectKeyPress(event::ConnectionPtr _subscriber)
               { keyPress.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       public: template<typename T>
               static event::ConnectionPtr ConnectModelUpdate(T _subscriber)
@@ -92,15 +121,22 @@ namespace gazebo
       public: static event::EventT<void (bool)>  moveMode;
 
       ///  that indicates the user is manipulating an object
-      public: static event::EventT<void (bool)>  manipMode;
+      public: static event::EventT<void (std::string)>  manipMode;
 
-      public: static event::EventT<void (std::string)> createEntity;
+      public: static event::EventT<void (std::string,
+                                         std::string)> createEntity;
+
+      public: static event::EventT<void (std::string)> mouseMoveVisual;
       public: static event::EventT<void (const msgs::Model &)> modelUpdate;
       public: static event::EventT<void (bool)> fullScreen;
       public: static event::EventT<void ()> fps;
       public: static event::EventT<void ()> orbit;
 
       public: static event::EventT<void (std::string)> keyPress;
+      public: static event::EventT<void (const common::MouseEvent &)>
+              mousePress;
+      public: static event::EventT<void (const common::MouseEvent &)>
+              mouseRelease;
     };
   }
 }

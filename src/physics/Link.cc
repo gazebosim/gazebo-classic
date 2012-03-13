@@ -87,7 +87,7 @@ Link::~Link()
 }
 
 //////////////////////////////////////////////////
-void Link::Load(sdf::ElementPtr &_sdf)
+void Link::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
@@ -149,7 +149,8 @@ void Link::Load(sdf::ElementPtr &_sdf)
     while (sensorElem)
     {
       std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetScopedName());
+        sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+                               this->GetScopedName());
       this->sensors.push_back(sensorName);
       sensorElem = sensorElem->GetNextElement();
     }
@@ -163,10 +164,7 @@ void Link::Init()
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-    {
-      CollisionPtr g = boost::shared_static_cast<Collision>(*iter);
-      g->Init();
-    }
+      boost::shared_static_cast<Collision>(*iter)->Init();
   }
 
   this->SetKinematic(this->sdf->GetValueBool("kinematic"));
@@ -285,7 +283,7 @@ void Link::Reset()
 }
 
 //////////////////////////////////////////////////
-void Link::UpdateParameters(sdf::ElementPtr &_sdf)
+void Link::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
 
@@ -299,7 +297,6 @@ void Link::UpdateParameters(sdf::ElementPtr &_sdf)
       boost::bind(&Link::GetGravityMode, this));
   this->sdf->GetAttribute("kinematic")->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
-
 
   if (this->sdf->GetValueBool("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->GetValueBool("gravity"));
@@ -408,20 +405,21 @@ void Link::Update()
 }
 
 //////////////////////////////////////////////////
-void Link::LoadCollision(sdf::ElementPtr &_sdf)
+void Link::LoadCollision(sdf::ElementPtr _sdf)
 {
   CollisionPtr collision;
-  std::string type = _sdf->GetElement("geometry")->GetFirstElement()->GetName();
+  std::string geomType =
+    _sdf->GetElement("geometry")->GetFirstElement()->GetName();
 
   /*if (type == "heightmap" || type == "map")
     this->SetStatic(true);
     */
 
-  collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(type,
+  collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
       boost::shared_static_cast<Link>(shared_from_this()));
 
   if (!collision)
-    gzthrow("Unknown Collisionetry Type["+type +"]");
+    gzthrow("Unknown Collisionetry Type[" + geomType + "]");
 
   collision->Load(_sdf);
 }
@@ -447,6 +445,18 @@ CollisionPtr Link::GetCollision(const std::string &_name)
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+CollisionPtr Link::GetCollision(unsigned int _index) const
+{
+  CollisionPtr collision;
+  if (_index <= this->GetChildCount())
+    collision = boost::shared_static_cast<Collision>(this->GetChild(_index));
+  else
+    gzerr << "Index is out of range\n";
+
+  return collision;
 }
 
 //////////////////////////////////////////////////
@@ -570,12 +580,13 @@ void Link::AddChildJoint(JointPtr _joint)
 void Link::FillLinkMsg(msgs::Link &_msg)
 {
   _msg.set_id(this->GetId());
-  _msg.set_name(this->GetName());
+  _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
 
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
@@ -712,6 +723,13 @@ void Link::DetachStaticModel(const std::string &_modelName)
 }
 
 //////////////////////////////////////////////////
+void Link::DetachAllStaticModels()
+{
+  this->attachedModels.clear();
+  this->attachedModelsOffset.clear();
+}
+
+//////////////////////////////////////////////////
 void Link::OnPoseChange()
 {
   math::Pose p;
@@ -725,3 +743,24 @@ void Link::OnPoseChange()
   }
 }
 
+//////////////////////////////////////////////////
+LinkState Link::GetState()
+{
+  return LinkState(boost::shared_static_cast<Link>(shared_from_this()));
+}
+
+//////////////////////////////////////////////////
+void Link::SetState(const LinkState &_state)
+{
+  this->SetRelativePose(_state.GetPose());
+
+  for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
+  {
+    CollisionState collisionState = _state.GetCollisionState(i);
+    CollisionPtr collision = this->GetCollision(collisionState.GetName());
+    if (collision)
+      collision->SetState(collisionState);
+    else
+      gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
+  }
+}

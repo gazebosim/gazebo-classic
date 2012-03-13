@@ -43,22 +43,10 @@ namespace sdf
     public: boost::shared_ptr<Element> Clone() const;
 
     /// \brief Copy values from an Element
-    public: void Copy(const ElementPtr &_elem);
+    public: void Copy(const ElementPtr _elem);
 
     public: ElementPtr GetParent() const;
-    public: void SetParent(const ElementPtr &_parent);
-
-    /// \brief Get the name of the parent link.
-    /// \return Name of parent link, or empty string if no parent link exists.
-    public: std::string GetLinkName() const;
-
-    /// \brief Get the name of the parent model.
-    /// \return Name of parent model, or empty string if no parent model exists.
-    public: std::string GetModelName() const;
-
-    /// \brief Get the name of the parent world.
-    /// \return Name of parent world, or empty string if no parent world exists.
-    public: std::string GetWorldName() const;
+    public: void SetParent(const ElementPtr _parent);
 
     public: void SetName(const std::string &_name);
     public: const std::string &GetName() const;
@@ -88,6 +76,18 @@ namespace sdf
     /// \param _key the name of the attribute
     public: ParamPtr GetAttribute(const std::string &_key);
 
+    /// \brief Get the number of attributes
+    public: unsigned int GetAttributeCount() const;
+
+    /// \brief Get an attribute using an index
+    public: ParamPtr GetAttribute(unsigned int _index) const;
+
+    /// \brief Get the number of element descriptions
+    public: unsigned int GetElementDescriptionCount() const;
+
+    /// \brief Get an attribute using an index
+    public: ElementPtr GetElementDescription(unsigned int _index) const;
+
     public: bool HasAttribute(const std::string &_key);
 
     /// \brief Get the param of the elements value
@@ -105,6 +105,7 @@ namespace sdf
                 const std::string &_key = "");
     public: gazebo::math::Pose GetValuePose(const std::string &_key = "");
     public: gazebo::common::Color GetValueColor(const std::string &_key = "");
+    public: gazebo::common::Time GetValueTime(const std::string &_key = "");
 
     public: bool HasElement(const std::string &_name) const;
 
@@ -123,6 +124,12 @@ namespace sdf
     public: void Update();
     public: void Reset();
 
+    public: void SetInclude(const std::string &_filename);
+    public: std::string GetInclude() const;
+
+    /// \brief Add a new element description
+    public: void AddElementDescription(ElementPtr _elem);
+
     private: boost::shared_ptr<Param> CreateParam(const std::string &_key,
                  const std::string &_type, const std::string &_defaultValue,
                  bool _required);
@@ -134,16 +141,19 @@ namespace sdf
     private: ElementPtr parent;
 
     // Attributes of this element
-    public: Param_V attributes;
+    private: Param_V attributes;
 
     // Value of this element
-    public: ParamPtr value;
+    private: ParamPtr value;
 
     // The existing child elements
-    public: ElementPtr_V elements;
+    private: ElementPtr_V elements;
 
     // The possible child elements
-    public: ElementPtr_V elementDescriptions;
+    private: ElementPtr_V elementDescriptions;
+
+    /// name of the include file that was used to create this element
+    private: std::string includeFilename;
   };
 
 
@@ -156,9 +166,10 @@ namespace sdf
     public: void Write(const std::string &_filename);
     public: std::string ToString() const;
 
+    /// \brief Set SDF values from a string
+    public: void SetFromString(const std::string &_sdfData);
+
     public: ElementPtr root;
   };
 }
 #endif
-
-

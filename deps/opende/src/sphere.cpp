@@ -52,7 +52,7 @@ dxSphere::dxSphere (dSpaceID space, dReal _radius) : dxGeom (space,1)
   dAASSERT (_radius >= 0);
   type = dSphereClass;
   radius = _radius;
-  updateZeroSizedFlag(!_radius);
+  updateZeroSizedFlag(_dequal(_radius, 0.0));
 }
 
 
@@ -79,7 +79,7 @@ void dGeomSphereSetRadius (dGeomID g, dReal radius)
   dAASSERT (radius >= 0);
   dxSphere *s = (dxSphere*) g;
   s->radius = radius;
-  s->updateZeroSizedFlag(!radius);
+  s->updateZeroSizedFlag(_dequal(radius,0.0));
   dGeomMoved (g);
 }
 

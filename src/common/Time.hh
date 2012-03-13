@@ -173,18 +173,18 @@ namespace gazebo
 
       /// Stream operators
       public: friend std::ostream &operator<<(std::ostream &_out,
-                  const gazebo::common::Time &_time)
+                                              const gazebo::common::Time &_time)
               {
-                _out << _time.Double();
+                _out << _time.sec << " " << _time.nsec;
                 return _out;
               }
 
       public: friend std::istream &operator>>(std::istream &_in,
-                  gazebo::common::Time &_time)
+                                              gazebo::common::Time &_time)
               {
-                double t;
-                _in >> t;
-                _time.Set(t);
+                // Skip white spaces
+                _in.setf(std::ios_base::skipws);
+                _in >> _time.sec >> _time.nsec;
                 return _in;
               }
 
@@ -200,7 +200,7 @@ namespace gazebo
       private: inline void Correct()
                {
                  // Make any corrections
-                 if (this->nsec > 1e9)
+                 if (this->nsec >= 1e9)
                  {
                    this->sec++;
                    this->nsec = (int32_t)(this->nsec - 1e9);

@@ -17,7 +17,6 @@
 /* Desc: A hinge joint with 2 degrees of freedom
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: Hinge2Joint.hh 7129 2008-11-12 19:38:15Z natepak $
  */
 
 #ifndef ODEHINGE2JOINT_HH
@@ -47,7 +46,7 @@ namespace gazebo
     public: virtual ~ODEHinge2Joint();
 
     /// \brief Load the joint
-    protected: virtual void Load(sdf::ElementPtr &_sdf);
+    protected: virtual void Load(sdf::ElementPtr _sdf);
 
     /// \brief Set the anchor point
     public: virtual void SetAnchor(int index, const math::Vector3 &anchor);

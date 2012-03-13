@@ -52,7 +52,7 @@ namespace gazebo
 
       /// Load the ray using parameter from an SDF
       /// \param _sdf The SDF parameter
-      protected: virtual void LoadChild(sdf::ElementPtr &_sdf);
+      protected: virtual void LoadChild(sdf::ElementPtr _sdf);
 
       /// Initialize the ray
       protected: virtual void InitChild();

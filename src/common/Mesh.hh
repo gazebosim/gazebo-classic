@@ -98,14 +98,11 @@ namespace gazebo
 
       /// \brief Get AABB coordinate
       public: void GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
-                           math::Vector3 &_max_xyz);
-
-      /// \brief Reset mesh center to geometric center
-      public: void SetMeshCenter(math::Vector3 _center);
+                           math::Vector3 &_max_xyz) const;
 
       /// \brief Generate texture coordinates using spherical projection
       ///        from center
-      public: void GenSphericalTexCoord(math::Vector3 _center);
+      public: void GenSphericalTexCoord(const math::Vector3 &_center);
 
       private: std::string name;
       private: std::string path;
@@ -233,7 +230,7 @@ namespace gazebo
 
       /// \brief Generate texture coordinates using spherical projection
       ///        from center
-      public: void GenSphericalTexCoord(math::Vector3 _center);
+      public: void GenSphericalTexCoord(const math::Vector3 &_center);
 
       private: std::vector< math::Vector3 > vertices;
       private: std::vector< math::Vector3 > normals;

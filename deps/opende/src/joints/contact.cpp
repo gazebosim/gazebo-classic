@@ -55,13 +55,13 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
         if ( contact.surface.mu > 0 ) m++;
         if ( contact.surface.mu2 < 0 ) contact.surface.mu2 = 0;
         if ( contact.surface.mu2 > 0 ) m++;
-        if ( contact.surface.mu  == dInfinity ) nub ++;
-        if ( contact.surface.mu2 == dInfinity ) nub ++;
+        if (_dequal(contact.surface.mu, dInfinity)) nub ++;
+        if (_dequal(contact.surface.mu2, dInfinity)) nub ++;
     }
     else
     {
         if ( contact.surface.mu > 0 ) m += 2;
-        if ( contact.surface.mu == dInfinity ) nub += 2;
+        if (_dequal(contact.surface.mu, dInfinity)) nub += 2;
     }
 
     the_m = m;

@@ -54,7 +54,7 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(sdf::ElementPtr &_sdf)
+void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
@@ -178,7 +178,7 @@ void Joint::Update()
 }
 
 //////////////////////////////////////////////////
-void Joint::UpdateParameters(sdf::ElementPtr &_sdf)
+void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
 }
@@ -199,6 +199,8 @@ void Joint::Reset()
 {
   this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
+  this->Init();
+  this->staticAngle.SetFromRadian(0);
 }
 
 //////////////////////////////////////////////////
@@ -248,3 +250,17 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
   this->staticAngle = _angle;
 }
 
+//////////////////////////////////////////////////
+JointState Joint::GetState()
+{
+  return JointState(boost::shared_static_cast<Joint>(shared_from_this()));
+}
+
+//////////////////////////////////////////////////
+void Joint::SetState(const JointState &_state)
+{
+  this->SetMaxForce(0, 0);
+  this->SetVelocity(0, 0);
+  for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
+    this->SetAngle(i, _state.GetAngle(i));
+}

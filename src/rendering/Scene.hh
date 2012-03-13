@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "sdf/sdf.h"
@@ -63,7 +64,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
     /// \brief Representation of an entire scene graph
-    class Scene
+    class Scene : public boost::enable_shared_from_this<Scene>
     {
       public: enum SceneType {BSP, GENERIC};
       private: Scene() {}
@@ -75,7 +76,7 @@ namespace gazebo
       public: virtual ~Scene();
 
       /// \brief Load the scene from a set of parameters
-      public: void Load(sdf::ElementPtr &_scene);
+      public: void Load(sdf::ElementPtr _scene);
 
       /// \brief Load the scene with default parameters
       public: void Load();
@@ -137,11 +138,15 @@ namespace gazebo
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(uint32_t index) const;
 
+      /// \brief Create a visual
+      public: VisualPtr CreateVisual(const std::string &_name);
+
       /// \brief Get a visual by name
       public: VisualPtr GetVisual(const std::string &_name) const;
 
       public: VisualPtr SelectVisualAt(CameraPtr camera,
                                        math::Vector2i mousePos);
+
       /// \brief Select a visual by name
       public: void SelectVisual(const std::string &_name) const;
 
@@ -159,16 +164,13 @@ namespace gazebo
       public: VisualPtr GetVisualAt(CameraPtr camera, math::Vector2i mousePos);
 
       /// \brief Get a visual directly below a point
-      public: VisualPtr GetVisualBelowPoint(const math::Vector3 &_pt);
+      public: void GetVisualsBelowPoint(const math::Vector3 &_pt,
+                                       std::vector<VisualPtr> &_visuals);
 
       /// \brief Helper function for GetVisualAt functions
       private: Ogre::Entity *GetOgreEntityAt(CameraPtr _camera,
                                              math::Vector2i _mousePos,
                                              bool _ignorSelectionObj);
-
-      /// \brief Helper function for GetVisualAt functions
-      private: Ogre::Entity *GetOgreEntityBelowPoint(
-                   const math::Vector3 &_mousePos, bool _ignorSelectionObj);
 
       /// \brief Get the world pos of a the first contact at a pixel location
       public: math::Vector3 GetFirstContact(CameraPtr camera,
@@ -228,6 +230,12 @@ namespace gazebo
 
       public: VisualPtr GetWorldVisual() const;
 
+      /// \brief Clone a visual
+      public: VisualPtr CloneVisual(const std::string &_visualName,
+                                    const std::string &_newName);
+
+
+      public: std::string StripSceneName(const std::string &_name) const;
 
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
@@ -240,35 +248,26 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
 
-      private: void OnRequest(
-                   ConstRequestPtr &_msg);
-      private: void OnResponse(
-                   ConstResponsePtr &_msg);
+      private: void OnRequest(ConstRequestPtr &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnJointMsg(ConstJointPtr &_msg);
 
-      private: void ProcessSensorMsg(
-                   ConstSensorPtr &_msg);
-      private: void ProcessJointMsg(
-                   ConstJointPtr &_msg);
+      private: void ProcessSensorMsg(ConstSensorPtr &_msg);
+      private: void ProcessJointMsg(ConstJointPtr &_msg);
 
-      private: void ProcessSceneMsg(
-                   ConstScenePtr &_msg);
+      private: void ProcessSceneMsg(ConstScenePtr &_msg);
 
-      private: void OnSceneMsg(
-                   ConstScenePtr &_msg);
-      private: void OnVisualMsg(
-                   ConstVisualPtr &msg);
-      private: void ProcessVisualMsg(
-                   ConstVisualPtr &msg);
+      private: void OnSceneMsg(ConstScenePtr &_msg);
+      private: void OnVisualMsg(ConstVisualPtr &_msg);
+      private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
 
-      private: void OnLightMsg(ConstLightPtr &msg);
-      private: void ProcessLightMsg(
-                   ConstLightPtr &msg);
+      private: void OnLightMsg(ConstLightPtr &_msg);
+      private: void ProcessLightMsg(ConstLightPtr &_msg);
+      private: void ProcessRequestMsg(ConstRequestPtr &_msg);
 
-      private: void OnSelectionMsg(
-                   ConstSelectionPtr &msg);
+      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
-      private: void OnPoseMsg(ConstPosePtr &msg);
+      private: void OnPoseMsg(ConstPosePtr &_msg);
 
       public: void Clear();
 
@@ -307,6 +306,8 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
       private: SensorMsgs_L sensorMsgs;
 
+      typedef std::list<boost::shared_ptr<msgs::Request const> > RequestMsgs_L;
+      private: RequestMsgs_L requestMsgs;
 
       typedef std::map<std::string, VisualPtr> Visual_M;
       private: Visual_M visuals;

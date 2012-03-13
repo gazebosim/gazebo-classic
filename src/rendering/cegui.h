@@ -14,9 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef SDF_PARSER_H_
-#define SDF_PARSER_H_
+#ifndef GAZEBO_CEGUI_H_
+#define GAZEBO_CEGUI_H_
 
-#include "sdf/parser/parser.hh"
+// This disables warning messages for OGRE
+#pragma GCC system_header
+
+#include "gazebo_config.h"
+
+#ifdef HAVE_CEGUI
+#include "CEGUI/CEGUI.h"
+#include "CEGUI/CEGUIEventArgs.h"
+#include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
+#endif
 
 #endif

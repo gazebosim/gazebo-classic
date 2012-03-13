@@ -53,9 +53,6 @@ namespace gazebo
       /// \brief Return true if the file extension is loadable
       public: bool IsValidFilename(const std::string &_filename);
 
-      /// \bridf set mesh center to be aabb center
-      public: void SetMeshCenter(const Mesh *_mesh, math::Vector3 _center);
-
       /// \bridf get mesh aabb and center
       public: void GetMeshAABB(const Mesh *mesh, math::Vector3 &center,
                                math::Vector3 &min_xyz, math::Vector3 &max_xyz);

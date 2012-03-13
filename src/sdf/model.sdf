@@ -12,5 +12,3 @@
   <include filename="plugin.sdf" required="*"/>
 
 </element> <!-- End Model -->
- 
-

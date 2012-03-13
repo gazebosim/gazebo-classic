@@ -28,6 +28,7 @@
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
+#include "physics/LinkState.hh"
 #include "physics/Entity.hh"
 #include "physics/Inertial.hh"
 #include "physics/Joint.hh"
@@ -52,7 +53,7 @@ namespace gazebo
 
       /// \brief Load the body based on an SDF element
       /// \param _sdf SDF parameters
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the body
       public: virtual void Init();
@@ -63,7 +64,7 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Update the body
       public: virtual void Update();
@@ -177,7 +178,7 @@ namespace gazebo
       public: virtual void UpdateMass() {}
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision
-      private: void LoadCollision(sdf::ElementPtr &_sdf);
+      private: void LoadCollision(sdf::ElementPtr _sdf);
 
       /// \brief Get a collision by id
       /// \return Pointer to the collision
@@ -185,6 +186,9 @@ namespace gazebo
 
       /// \brief accessor for collisions
       public: CollisionPtr GetCollision(const std::string &name);
+
+      /// \brief accessor for collisions
+      public: CollisionPtr GetCollision(unsigned int _index) const;
 
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
@@ -232,7 +236,16 @@ namespace gazebo
       /// \brief Detach a static model from this link
       public: void DetachStaticModel(const std::string &_modelName);
 
+      /// \brief Detach all static models from this link
+      public: void DetachAllStaticModels();
+
       public: virtual void OnPoseChange();
+
+      /// \brief Get the link state
+      public: LinkState GetState();
+
+      /// \brief Set the current link state
+      public: void SetState(const LinkState &_state);
 
       protected: bool isStatic;
 

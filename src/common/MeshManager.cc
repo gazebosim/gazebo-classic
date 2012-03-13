@@ -59,11 +59,8 @@ MeshManager::MeshManager()
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
 
-  this->fileExtensions.push_back("mesh");
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
-  this->fileExtensions.push_back("3ds");
-  this->fileExtensions.push_back("xml");
 }
 
 //////////////////////////////////////////////////
@@ -78,11 +75,11 @@ MeshManager::~MeshManager()
 }
 
 //////////////////////////////////////////////////
-const Mesh *MeshManager::Load(const std::string &filename)
+const Mesh *MeshManager::Load(const std::string &_filename)
 {
-  if (!this->IsValidFilename(filename))
+  if (!this->IsValidFilename(_filename))
   {
-    gzerr << "Invalid mesh filename extension[" << filename << "]\n";
+    gzerr << "Invalid mesh filename extension[" << _filename << "]\n";
     return NULL;
   }
 
@@ -90,16 +87,16 @@ const Mesh *MeshManager::Load(const std::string &filename)
 
   std::string extension;
 
-  if (this->HasMesh(filename))
+  if (this->HasMesh(_filename))
   {
-    return this->meshes[filename];
+    return this->meshes[_filename];
 
     // This breaks trimesh geom. Each new trimesh should have a unique name.
     /*
     // erase mesh from this->meshes. This allows a mesh to be modified and
     // inserted into gazebo again without closing gazebo.
     std::map<std::string, Mesh*>::iterator iter;
-    iter = this->meshes.find(filename);
+    iter = this->meshes.find(_filename);
     delete iter->second;
     iter->second = NULL;
     this->meshes.erase(iter);
@@ -107,7 +104,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
   }
 
   std::string fullname =
-    SystemPaths::Instance()->FindFileWithGazeboPaths(filename);
+    SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
 
   if (!fullname.empty())
   {
@@ -121,19 +118,23 @@ const Mesh *MeshManager::Load(const std::string &filename)
     else if (extension == "dae")
       loader = this->colladaLoader;
     else
-      gzerr << "Unsupported mesh format for file[" << filename << "]\n";
+      gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
 
     try
     {
-      if (!this->HasMesh(filename))
+      if (!this->HasMesh(_filename))
       {
-        mesh = loader->Load(fullname);
-        mesh->SetName(filename);
-        this->meshes.insert(std::make_pair(filename, mesh));
+        if ((mesh = loader->Load(fullname)) != NULL)
+        {
+          mesh->SetName(_filename);
+          this->meshes.insert(std::make_pair(_filename, mesh));
+        }
+        else
+          gzerr << "Unable to load mesh[" << fullname << "]\n";
       }
       else
       {
-        mesh = this->meshes[filename];
+        mesh = this->meshes[_filename];
       }
     }
     catch(gazebo::common::Exception &e)
@@ -144,7 +145,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
     }
   }
   else
-    gzerr << "Unable to find file[" << filename << "]\n";
+    gzerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
 }
@@ -164,13 +165,6 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
       extension) != this->fileExtensions.end();
 }
 
-
-//////////////////////////////////////////////////
-void MeshManager::SetMeshCenter(const Mesh *_mesh, math::Vector3 _center)
-{
-  if (this->HasMesh(_mesh->GetName()))
-    this->meshes[_mesh->GetName()]->SetMeshCenter(_center);
-}
 
 //////////////////////////////////////////////////
 void MeshManager::GetMeshAABB(const Mesh *_mesh, math::Vector3 &_center,
@@ -195,16 +189,16 @@ void MeshManager::AddMesh(Mesh *_mesh)
 }
 
 //////////////////////////////////////////////////
-const Mesh *MeshManager::GetMesh(const std::string &name) const
+const Mesh *MeshManager::GetMesh(const std::string &_name) const
 {
   std::map<std::string, Mesh*>::const_iterator iter;
 
-  iter = this->meshes.find(name);
+  iter = this->meshes.find(_name);
 
   if (iter != this->meshes.end())
     return iter->second;
 
-  gzerr << "Unable to find mesh with name[" << name << "]\n";
+  gzerr << "Unable to find mesh with name[" << _name << "]\n";
   return NULL;
 }
 

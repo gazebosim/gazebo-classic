@@ -37,6 +37,7 @@
  **
  ****************************************************************************/
 
+#pragma GCC system_header
 
 #ifndef QTVARIANTPROPERTY_H
 #define QTVARIANTPROPERTY_H

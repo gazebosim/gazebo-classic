@@ -60,7 +60,7 @@ namespace gazebo
 
       /// \brief Load
       /// \param node Pointer to an configuration node
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Finalize the entity
       public: virtual void Fini();
@@ -68,7 +68,7 @@ namespace gazebo
       public: virtual void Reset();
 
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the name of the entity
       /// \param name The new name
@@ -150,6 +150,9 @@ namespace gazebo
                                 boost::function<void()> _onComplete);
       public: void SetAnimation(const common::PoseAnimationPtr &_anim);
 
+      /// \brief Stop the current animation, if any
+      public: virtual void StopAnimation();
+
       private: void PublishPose();
 
       /// \brief Get the parent model, if one exists
@@ -171,6 +174,8 @@ namespace gazebo
 
       /// \brief Move this entity to be ontop of the nearest entity below
       public: void PlaceOnNearestEntityBelow();
+
+      public: void PlaceOnEntity(const std::string &_entityName);
 
       public: math::Box GetCollisionBoundingBox() const;
 

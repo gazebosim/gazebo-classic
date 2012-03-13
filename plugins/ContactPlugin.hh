@@ -44,7 +44,7 @@ namespace gazebo
 
     /// \brief Load the plugin
     /// \param take in SDF root element
-    public: void Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf);
+    public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Pointer to parent
     protected: physics::WorldPtr world;

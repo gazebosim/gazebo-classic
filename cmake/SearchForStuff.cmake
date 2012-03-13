@@ -20,6 +20,8 @@ set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRI
 
 SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
 
+SET (general_libraries "" CACHE STRING "general libraries")
+
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
@@ -35,7 +37,7 @@ endif()
 # The Google Protobuf library for message generation + serialization
 find_package(Protobuf REQUIRED)
 if (NOT PROTOBUF_FOUND)
-  BUILD_ERROR ("Missing: Google Protobuf (libprotobuf-dev")
+  BUILD_ERROR ("Missing: Google Protobuf (libprotobuf-dev)")
 endif()
 if (NOT PROTOBUF_PROTOC_EXECUTABLE)
   BUILD_ERROR ("Missing: Google Protobuf Compiler (protobuf-compiler)")
@@ -60,6 +62,38 @@ endif ()
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
+
+  pkg_check_modules(PROFILER libprofiler)
+  if (PROFILER_FOUND)
+    # APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
+    set (CMAKE_LINK_FLAGS_PROFILE "-Wl,--no-as-needed -lprofiler -Wl,--as-needed ${CMAKE_LINK_FLAGS_PROFILE}" CACHE INTERNAL "Link flags for profile")
+  else ()
+    find_library(PROFILER profiler)
+    if (PROFILER)
+      message (STATUS "Looking for libprofiler - found")
+      # APPEND_TO_CACHED_LIST(general_libraries "general libraries" profiler)
+      set (CMAKE_LINK_FLAGS_PROFILE "-Wl,--no-as-needed -lprofiler -Wl,--as-needed ${CMAKE_LINK_FLAGS_PROFILE}" CACHE INTERNAL "Link flags for profile")
+    else()
+      message (STATUS "Looking for libprofiler - not found")
+    endif()
+  endif()
+
+  pkg_check_modules(TCMALLOC libtcmalloc)
+  if (TCMALLOC_FOUND)
+    # APPEND_TO_CACHED_LIST(general_libraries "general libraries" tcmalloc)
+    set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -Wl,--no-as-needed -ltcmalloc -Wl,--no-as-needed"
+      CACHE INTERNAL "Link flags for profile" FORCE)
+  else ()
+    find_library(TCMALLOC tcmalloc)
+    if (TCMALLOC)
+      message (STATUS "Looking for libtcmalloc - found")
+      # APPEND_TO_CACHED_LIST(general_libraries "general libraries" tcmalloc)
+      set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc"
+        CACHE INTERNAL "Link flags for profile" FORCE)
+    else ()
+      message (STATUS "Looking for libtcmalloc - not found")
+    endif()
+  endif ()
 
   pkg_check_modules(CEGUI CEGUI)
   pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
@@ -309,28 +343,6 @@ ELSE (HAVE_FFMPEG)
 ENDIF (HAVE_FFMPEG)
 
 ########################################
-# Find profiler library, optional
-find_library(PROFILER profiler)
-if (PROFILER)
-  message (STATUS "Looking for libprofiler - found")
-  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
-       CACHE INTERNAL "Link flags for profile" FORCE)
-else ()
-  message (STATUS "Looking for libprofiler - not found")
-endif ()
-
-########################################
-# Find tcmalloc library, optional
-find_library(TCMALLOC tcmalloc)
-if (TCMALLOC)
-  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
-       CACHE INTERNAL "Link flags for profile" FORCE)
-  message (STATUS "Looking for libtcmalloc - found")
-else ()
-  message (STATUS "Looking for libtcmalloc - not found")
-endif ()
-
-########################################
 # Find libtool
 find_path(libtool_include_dir ltdl.h /usr/include /usr/local/include)
 if (NOT libtool_include_dir)
@@ -355,27 +367,6 @@ else ()
   set (libtool_library "" CACHE STRING "" FORCE)
 endif ()
 
-
-########################################
-# Find libyaml
-#
-#find_path(yaml_include yaml.h ${yaml_include} ENV CPATH)
-#if (yaml_include)
-#  message (STATUS "Looking for yaml.h - found")
-#else ()
-#  message (STATUS "Looking for yaml.h - not found")
-#endif ()
-#
-#find_library(libyaml yaml ENV LD_LIBRARY_PATH)
-#if (libyaml)
-#  message (STATUS "Looking for libyaml - found")
-#else ()
-#  message (STATUS "Looking for libyaml - not found")
-#endif ()
-#
-#if (NOT libyaml OR NOT yaml_include)
-#  BUILD_ERROR("Missing: yaml(http://www.yaml.org)")
-#endif (NOT libyaml OR NOT yaml_include)
 
 ########################################
 # Find libdl

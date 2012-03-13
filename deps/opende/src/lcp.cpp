@@ -112,6 +112,7 @@ rows/columns and manipulate C.
 #include <ode/matrix.h>
 #include <ode/misc.h>
 #include <ode/timer.h>		// for testing
+#include <ode/odemath.h>
 #include "config.h"
 #include "lcp.h"
 #include "mat.h"		// for testing
@@ -465,7 +466,8 @@ dLCP::dLCP (int _n, int _nskip, int _nub, dReal *_Adata, dReal *_x, dReal *_b, d
     const int n = m_n;
     for (int k = m_nub; k<n; ++k) {
       if (findex && findex[k] >= 0) continue;
-      if (lo[k]==-dInfinity && hi[k]==dInfinity) {
+      if (_dequal(lo[k], -dInfinity) && _dequal(hi[k], dInfinity))
+      {
         swapProblem (m_A,m_x,m_b,m_w,lo,hi,m_p,m_state,findex,n,m_nub,k,m_nskip,0);
         m_nub++;
       }
@@ -742,14 +744,14 @@ void dLCP::solve1 (dReal *a, int i, int dir, int only_transfer)
       dSolveL1T (m_L,tmp,m_nC,m_nskip);
       if (dir > 0) {
         int *C = m_C;
-        dReal *tmp = m_tmp;
+        dReal *tmp2 = m_tmp;
         const int nC = m_nC;
-        for (int j=0; j<nC; ++j) a[C[j]] = -tmp[j];
+        for (int j=0; j<nC; ++j) a[C[j]] = -tmp2[j];
       } else {
         int *C = m_C;
-        dReal *tmp = m_tmp;
+        dReal *tmp2 = m_tmp;
         const int nC = m_nC;
-        for (int j=0; j<nC; ++j) a[C[j]] = tmp[j];
+        for (int j=0; j<nC; ++j) a[C[j]] = tmp2[j];
       }
     }
   }
@@ -856,18 +858,22 @@ void dSolveLCP (dxWorldProcessContext *context, int n, dReal *A, dReal *x, dReal
     // contact constraint's normal force is 0, there should be no tangential
     // force applied.
 
-    if (!hit_first_friction_index && findex && findex[i] >= 0) {
+    if (!hit_first_friction_index && findex && findex[i] >= 0)
+    {
       // un-permute x into delta_w, which is not being used at the moment
       for (int j=0; j<n; ++j) delta_w[p[j]] = x[j];
 
       // set lo and hi values
-      for (int k=i; k<n; ++k) {
+      for (int k=i; k<n; ++k)
+      {
         dReal wfk = delta_w[findex[k]];
-        if (wfk == 0) {
+        if (_dequal(wfk, 0.0))
+        {
           hi[k] = 0;
           lo[k] = 0;
         }
-        else {
+        else
+        {
           hi[k] = dFabs (hi[k] * wfk);
           lo[k] = -hi[k];
         }
@@ -890,15 +896,18 @@ void dSolveLCP (dxWorldProcessContext *context, int n, dReal *A, dReal *x, dReal
     // these indexes may be incorrect, but that doesn't matter.
 
     // see if x(i),w(i) is in a valid region
-    if (lo[i]==0 && w[i] >= 0) {
+    if (_dequal(lo[i], 0.0) && w[i] >= 0)
+    {
       lcp.transfer_i_to_N (i);
       state[i] = false;
     }
-    else if (hi[i]==0 && w[i] <= 0) {
+    else if (_dequal(hi[i], 0.0) && w[i] <= 0)
+    {
       lcp.transfer_i_to_N (i);
       state[i] = true;
     }
-    else if (w[i]==0) {
+    else if (_dequal(w[i], 0.0))
+    {
       // this is a degenerate case. by the time we get to this test we know
       // that lo != 0, which means that lo < 0 as lo is not allowed to be +ve,
       // and similarly that hi > 0. this means that the line segment
@@ -966,7 +975,8 @@ void dSolveLCP (dxWorldProcessContext *context, int n, dReal *A, dReal *x, dReal
             const int indexN_k = lcp.indexN(k);
             if (!state[indexN_k] ? delta_w[indexN_k] < 0 : delta_w[indexN_k] > 0) {
                 // don't bother checking if lo=hi=0
-                if (lo[indexN_k] == 0 && hi[indexN_k] == 0) continue;
+                if (_dequal(lo[indexN_k], 0.0) && _dequal(hi[indexN_k], 0.0))
+                  continue;
                 dReal s2 = -w[indexN_k] / delta_w[indexN_k];
                 if (s2 < s) {
                   s = s2;
@@ -1027,37 +1037,40 @@ void dSolveLCP (dxWorldProcessContext *context, int n, dReal *A, dReal *x, dReal
 
         void *tmpbuf;
         // switch indexes between sets if necessary
-        switch (cmd) {
-        case 1:		// done
-          w[i] = 0;
-          lcp.transfer_i_to_C (i);
-          break;
-        case 2:		// done
-          x[i] = lo[i];
-          state[i] = false;
-          lcp.transfer_i_to_N (i);
-          break;
-        case 3:		// done
-          x[i] = hi[i];
-          state[i] = true;
-          lcp.transfer_i_to_N (i);
-          break;
-        case 4:		// keep going
-          w[si] = 0;
-          lcp.transfer_i_from_N_to_C (si);
-          break;
-        case 5:		// keep going
-          x[si] = lo[si];
-          state[si] = false;
-          tmpbuf = context->PeekBufferRemainder();
-          lcp.transfer_i_from_C_to_N (si, tmpbuf);
-          break;
-        case 6:		// keep going
-          x[si] = hi[si];
-          state[si] = true;
-          tmpbuf = context->PeekBufferRemainder();
-          lcp.transfer_i_from_C_to_N (si, tmpbuf);
-          break;
+        switch (cmd)
+        {
+          case 1:		// done
+            w[i] = 0;
+            lcp.transfer_i_to_C (i);
+            break;
+          case 2:		// done
+            x[i] = lo[i];
+            state[i] = false;
+            lcp.transfer_i_to_N (i);
+            break;
+          case 3:		// done
+            x[i] = hi[i];
+            state[i] = true;
+            lcp.transfer_i_to_N (i);
+            break;
+          case 4:		// keep going
+            w[si] = 0;
+            lcp.transfer_i_from_N_to_C (si);
+            break;
+          case 5:		// keep going
+            x[si] = lo[si];
+            state[si] = false;
+            tmpbuf = context->PeekBufferRemainder();
+            lcp.transfer_i_from_C_to_N (si, tmpbuf);
+            break;
+          case 6:		// keep going
+            x[si] = hi[si];
+            state[si] = true;
+            tmpbuf = context->PeekBufferRemainder();
+            lcp.transfer_i_from_C_to_N (si, tmpbuf);
+            break;
+          default:
+            break;
         }
 
         if (cmd <= 3) break;
@@ -1208,20 +1221,27 @@ extern "C" ODE_API int dTestSolveLCP()
       // check the solution
 
       dMultiply0 (tmp1,A,x,n,n,1);
-      for (i=0; i<n; i++) tmp2[i] = b[i] + w[i];
+      for (i = 0; i < n; ++i)
+        tmp2[i] = b[i] + w[i];
+
       dReal diff = dMaxDifference (tmp1,tmp2,n,1);
+
       // printf ("\tA*x = b+w, maximum difference = %.6e - %s (1)\n",diff,
       //	    diff > tol ? "FAILED" : "passed");
-      if (diff > tol) dDebug (0,"A*x = b+w, maximum difference = %.6e",diff);
+      if (diff > tol)
+        dDebug (0, "A*x = b+w, maximum difference = %.6e", diff);
+
       int n1=0,n2=0,n3=0;
-      for (i=0; i<n; i++) {
-        if (x[i]==lo[i] && w[i] >= 0) {
+      for (i = 0; i < n; ++i)
+      {
+        if (_dequal(x[i], lo[i]) && w[i] >= 0) {
           n1++;	// ok
         }
-        else if (x[i]==hi[i] && w[i] <= 0) {
+        else if (_dequal(x[i], hi[i]) && w[i] <= 0) {
           n2++;	// ok
         }
-        else if (x[i] >= lo[i] && x[i] <= hi[i] && w[i] == 0) {
+        else if (x[i] >= lo[i] && x[i] <= hi[i] && _dequal(w[i], 0.0))
+        {
           n3++;	// ok
         }
         else {

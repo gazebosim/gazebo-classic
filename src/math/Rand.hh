@@ -17,7 +17,6 @@
 /* Desc: Random number generator
  * Author: Nate Koenig
  * Date: 27 May 2009
- * SVN: $Id:$
  */
 
 #ifndef RAND_HH
@@ -43,12 +42,6 @@ namespace gazebo
     /// \brief Random number generator class
     class Rand
     {
-      /// \brief Constructor
-      private: Rand();
-
-      /// \brief Destructor
-      private: virtual ~Rand();
-
       /// \brief Get a double from a uniform distribution
       /// \param min Minimum bound for the random number
       /// \param max Maximum bound for the random number

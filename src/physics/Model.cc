@@ -76,7 +76,7 @@ Model::~Model()
 }
 
 //////////////////////////////////////////////////
-void Model::Load(sdf::ElementPtr &_sdf)
+void Model::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
@@ -143,15 +143,10 @@ void Model::Load(sdf::ElementPtr &_sdf)
 //////////////////////////////////////////////////
 void Model::Init()
 {
-  math::Pose pose;
-
-  // Get the position and orientation of the model (relative to parent)
-  pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
-
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(pose);
+  this->SetInitialRelativePose(this->GetWorldPose());
 
-  this->SetRelativePose(pose);
+  this->SetRelativePose(this->GetWorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -160,9 +155,7 @@ void Model::Init()
     if ((*iter)->HasType(Base::LINK))
       boost::shared_static_cast<Link>(*iter)->Init();
     else if ((*iter)->HasType(Base::MODEL))
-    {
       boost::shared_static_cast<Model>(*iter)->Init();
-    }
   }
 
   // Initialize the joints last.
@@ -202,12 +195,12 @@ void Model::Update()
       {
         iter->second->GetInterpolatedKeyFrame(kf);
         jointPositions[iter->first] = kf.GetValue();
+        ++iter;
       }
       else
       {
-        this->jointAnimations.erase(iter);
+        this->jointAnimations.erase(iter++);
       }
-      ++iter;
     }
     if (!jointPositions.empty())
     {
@@ -277,7 +270,7 @@ void Model::Fini()
 }
 
 //////////////////////////////////////////////////
-void Model::UpdateParameters(sdf::ElementPtr &_sdf)
+void Model::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
 
@@ -308,10 +301,9 @@ void Model::UpdateParameters(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-const sdf::ElementPtr &Model::GetSDF()
+const sdf::ElementPtr Model::GetSDF()
 {
-  Entity::GetSDF();
-  return this->sdf;
+  return Entity::GetSDF();
 }
 
 //////////////////////////////////////////////////
@@ -319,16 +311,16 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  for (Joint_V::iterator jiter = this->joints.begin();
-       jiter!= this->joints.end(); ++jiter)
-  {
-    (*jiter)->Reset();
-  }
-
   for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
   {
     (*iter)->Reset();
+  }
+
+  for (Joint_V::iterator jiter = this->joints.begin();
+       jiter!= this->joints.end(); ++jiter)
+  {
+    (*jiter)->Reset();
   }
 }
 
@@ -556,7 +548,19 @@ LinkPtr Model::GetLink(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Model::LoadJoint(sdf::ElementPtr &_sdf)
+LinkPtr Model::GetLink(unsigned int _index) const
+{
+  LinkPtr link;
+  if (_index <= this->GetChildCount())
+    link = boost::shared_static_cast<Link>(this->GetChild(_index));
+  else
+    gzerr << "Index is out of range\n";
+
+  return link;
+}
+
+//////////////////////////////////////////////////
+void Model::LoadJoint(sdf::ElementPtr _sdf)
 {
   JointPtr joint;
 
@@ -594,7 +598,7 @@ void Model::LoadJoint(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-void Model::LoadPlugin(sdf::ElementPtr &_sdf)
+void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
@@ -654,12 +658,12 @@ void Model::SetLaserRetro(const float &_retro)
 //////////////////////////////////////////////////
 void Model::FillModelMsg(msgs::Model &_msg)
 {
-  _msg.set_name(this->GetName());
+  _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
-  _msg.mutable_pose()->CopyFrom(
-      msgs::Convert(this->GetWorldPose()));
+  _msg.mutable_pose()->CopyFrom(msgs::Convert(this->GetWorldPose()));
   _msg.set_id(this->GetId());
 
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (unsigned int j = 0; j < this->GetChildCount(); j++)
@@ -680,19 +684,20 @@ void Model::FillModelMsg(msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (_msg.has_id() && _msg.id() != this->GetId())
+  if (!(_msg.has_id() && _msg.id() == this->GetId()))
   {
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
   }
-  else if (_msg.name() != this->GetName())
+  else if ((_msg.has_id() && _msg.id() != this->GetId()) &&
+      _msg.name() != this->GetScopedName())
   {
     gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
-          << "]\n";
+      << "]\n";
     return;
   }
 
-  this->SetName(_msg.name());
+  this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
     this->SetWorldPose(msgs::Convert(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
@@ -765,7 +770,6 @@ void Model::SetJointPositions(
             {
               double dposition = jiter->second -
                                 joint->GetAngle(0).GetAsRadian();
-
 
               math::Vector3 anchor;
               math::Vector3 axis;
@@ -952,6 +956,16 @@ void Model::SetJointAnimation(
 }
 
 //////////////////////////////////////////////////
+void Model::StopAnimation()
+{
+  this->updateMutex->lock();
+  Entity::StopAnimation();
+  this->onJointAnimationComplete.clear();
+  this->jointAnimations.clear();
+  this->updateMutex->unlock();
+}
+
+//////////////////////////////////////////////////
 void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
 {
   if (!_model->IsStatic())
@@ -990,4 +1004,34 @@ void Model::OnPoseChange()
   }
 }
 
+//////////////////////////////////////////////////
+ModelState Model::GetState()
+{
+  return ModelState(boost::shared_static_cast<Model>(shared_from_this()));
+}
 
+//////////////////////////////////////////////////
+void Model::SetState(const ModelState &_state)
+{
+  this->SetWorldPose(_state.GetPose(), true);
+
+  for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  {
+    LinkState linkState = _state.GetLinkState(i);
+    LinkPtr link = this->GetLink(linkState.GetName());
+    if (link)
+      link->SetState(linkState);
+    else
+      gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
+  }
+
+  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  {
+    JointState jointState = _state.GetJointState(i);
+    JointPtr joint = this->GetJoint(jointState.GetName());
+    if (joint)
+      joint->SetState(jointState);
+    else
+      gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
+  }
+}

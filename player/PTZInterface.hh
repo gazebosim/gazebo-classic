@@ -17,7 +17,6 @@
 /* Desc: PTZ Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 #ifndef PTZINTERFACE_HH

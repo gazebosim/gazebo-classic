@@ -37,6 +37,9 @@
  **
  ****************************************************************************/
 
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wshadow"
 
 #include <QtCore/QSet>
 #include <QtCore/QTimer>

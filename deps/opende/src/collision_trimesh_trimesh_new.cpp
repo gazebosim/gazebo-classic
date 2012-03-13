@@ -152,41 +152,41 @@ SwapNormals(dVector3 *&pen_v, dVector3 *&col_v, dVector3* v1, dVector3* v2,
 
 void UpdateContactKey(CONTACT_KEY & key, dContactGeom * contact)
 {
-	key.m_contact = contact;
+  key.m_contact = contact;
 
-	unsigned int hash=0;
+  unsigned int hash=0;
 
-	int i = 0;
+  int i = 0;
 
-	while (true)
-	{
-		dReal coord = contact->pos[i];
-		coord = dFloor(coord * CONTACT_POS_HASH_QUOTIENT);
+  while (true)
+  {
+    dReal coord = contact->pos[i];
+    coord = dFloor(coord * CONTACT_POS_HASH_QUOTIENT);
 
-        const int sz = sizeof(coord) / sizeof(unsigned);
-		dIASSERT(sizeof(coord) % sizeof(unsigned) == 0);
+    const int sz = sizeof(coord) / sizeof(unsigned);
+    dIASSERT(sizeof(coord) % sizeof(unsigned) == 0);
 
-        unsigned hash_v[ sz ];
-		memcpy(hash_v, &coord, sizeof(coord));
+    unsigned hash_v[ sz ];
+    memcpy(hash_v, &coord, sizeof(coord));
 
-		unsigned int hash_input = hash_v[0];
-        for (int i=1; i<sz; ++i)
-            hash_input ^= hash_v[i];
+    unsigned int hash_input = hash_v[0];
+    for (int j=1; j<sz; ++j)
+      hash_input ^= hash_v[j];
 
-		hash = (( hash << 4 ) + (hash_input >> 24)) ^ ( hash >> 28 );
-		hash = (( hash << 4 ) + ((hash_input >> 16) & 0xFF)) ^ ( hash >> 28 );
-		hash = (( hash << 4 ) + ((hash_input >> 8) & 0xFF)) ^ ( hash >> 28 );
-		hash = (( hash << 4 ) + (hash_input & 0xFF)) ^ ( hash >> 28 );
+    hash = (( hash << 4 ) + (hash_input >> 24)) ^ ( hash >> 28 );
+    hash = (( hash << 4 ) + ((hash_input >> 16) & 0xFF)) ^ ( hash >> 28 );
+    hash = (( hash << 4 ) + ((hash_input >> 8) & 0xFF)) ^ ( hash >> 28 );
+    hash = (( hash << 4 ) + (hash_input & 0xFF)) ^ ( hash >> 28 );
 
-		if (++i == 3)
-		{
-			break;
-		}
+    if (++i == 3)
+    {
+      break;
+    }
 
-		hash = (hash << 11) | (hash >> 21);
-	}
+    hash = (hash << 11) | (hash >> 21);
+  }
 
-	key.m_key = hash;
+  key.m_key = hash;
 }
 
 

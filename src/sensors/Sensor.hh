@@ -53,10 +53,11 @@ namespace gazebo
 
       /// \brief Load the sensor with SDF parameters
       /// \param _sdf SDF Sensor parameteres
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(const std::string &_worldName,
+                                sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters
-      public: virtual void Load();
+      public: virtual void Load(const std::string &_worldName);
 
       /// \brief  Initialize the sensor
       public: virtual void Init();
@@ -98,9 +99,11 @@ namespace gazebo
 
       public: void FillMsg(msgs::Sensor &_msg);
 
+      public: std::string GetWorldName() const;
+
       /// \brief Load a plugin for this sensor
       /// \param _sdf SDF parameters
-      private: void LoadPlugin(sdf::ElementPtr &_sdf);
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       /// \brief True if active
       protected: bool active;
@@ -121,4 +124,3 @@ namespace gazebo
   }
 }
 #endif
-

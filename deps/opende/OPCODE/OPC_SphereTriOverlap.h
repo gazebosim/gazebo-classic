@@ -78,7 +78,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
 		else  // region 0
 		{
 			// minimum at interior point
-			if(fDet==0.0f)
+			if(_opc_equal(fDet, 0.0f))
 			{
 //				u = 0.0f;
 //				v = 0.0f;

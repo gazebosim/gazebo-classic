@@ -364,8 +364,9 @@ void Connection::Close()
     }
     catch(boost::system::system_error &e)
     {
-      gzwarn << "Error closing socket[" << this->id << "] ["
-             << e.what() << "]\n";
+      // This warning message is unnecessary...
+      // gzwarn << "Error closing socket[" << this->id << "] ["
+             // << e.what() << "]\n";
     }
   }
 
@@ -404,7 +405,16 @@ void Connection::Cancel()
   }
 
   if (this->socket && this->socket->is_open())
-    this->socket->cancel();
+  {
+    try
+    {
+      this->socket->cancel();
+    }
+    catch(...)
+    {
+      this->socket->close();
+    }
+  }
 }
 
 //////////////////////////////////////////////////

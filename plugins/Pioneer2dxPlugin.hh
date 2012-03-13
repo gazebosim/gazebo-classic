@@ -26,7 +26,7 @@ namespace gazebo
   class Pioneer2dxPlugin : public ModelPlugin
   {
     public: Pioneer2dxPlugin();
-    public: void Load(physics::ModelPtr &_model, sdf::ElementPtr &_sdf);
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     private: void OnUpdate();
 
     private: physics::ModelPtr model;

@@ -17,10 +17,12 @@
 #ifndef INSERT_MODEL_WIDGET_HH
 #define INSERT_MODEL_WIDGET_HH
 
-#include <QWidget>
 #include <list>
+#include <vector>
 
+#include "gui/qt.h"
 #include "sdf/sdf.h"
+#include "common/MouseEvent.hh"
 #include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
@@ -35,25 +37,31 @@ namespace gazebo
     class InsertModelWidget : public QWidget
     {
       Q_OBJECT
+
+      /// \brief Constructor
       public: InsertModelWidget(QWidget *_parent = 0);
+
+      /// \brief Destructor
       public: virtual ~InsertModelWidget();
 
+      /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
-      private slots: void OnApply();
-      private slots: void OnCancel();
+
+      /// \brief Used to spawn the selected model when the left mouse
+      /// button is released.
+      private: void OnMouseRelease(const common::MouseEvent &_event);
 
       private: QTreeWidget *fileTreeWidget;
-      private: QPushButton *addButton;
-      private: QPushButton *cancelButton;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr factoryPub, visualPub, selectionPub;
+      private: transport::PublisherPtr factoryPub;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
       private: sdf::SDFPtr modelSDF;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }
 #endif
-

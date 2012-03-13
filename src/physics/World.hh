@@ -38,6 +38,7 @@
 #include "common/Event.hh"
 
 #include "physics/PhysicsTypes.hh"
+#include "physics/WorldState.hh"
 #include "sdf/sdf.h"
 
 namespace boost
@@ -147,11 +148,18 @@ namespace gazebo
       /// \brief Get a model by id
       public: ModelPtr GetModelById(unsigned int _id);
 
+      /// \brief Get a model by name DEPRECATED
+      public: ModelPtr GetModelByName(const std::string &name)GAZEBO_DEPRECATED;
+
       /// \brief Get a model by name
-      public: ModelPtr GetModelByName(const std::string &name);
+      public: ModelPtr GetModel(const std::string &_name);
 
       /// \brief Get a pointer to a entity based on a name
-      public: EntityPtr GetEntityByName(const std::string &_name);
+      public: EntityPtr GetEntityByName(
+                  const std::string &_name) GAZEBO_DEPRECATED;
+
+      /// \brief Get a pointer to a entity based on a name
+      public: EntityPtr GetEntity(const std::string &_name);
 
       /// \brief Get the nearest model below a point
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
@@ -159,13 +167,28 @@ namespace gazebo
       /// \brief Get the nearest entity below a point
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
+      /// \brief Get the current world state
+      public: WorldState GetState();
+
+      /// \brief Set the current world state
+      public: void SetState(const WorldState &_state);
+
+      /// \brief Insert a model from an SDF file
+      public: void InsertModel(const std::string &_sdfFilename);
+
+      /// \brief Insert a model using SDF
+      public: void InsertModel(const sdf::SDF &_sdf);
+
+      /// \brief Return a version of the name with "<world_name>::" removed
+      public: std::string StripWorldName(const std::string &_name) const;
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load
-      private: void LoadEntities(sdf::ElementPtr &_sdf , BasePtr parent);
+      private: void LoadEntities(sdf::ElementPtr _sdf , BasePtr parent);
 
       /// \brief Load a model
-      private: ModelPtr LoadModel(sdf::ElementPtr &_sdf, BasePtr parent);
+      private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr parent);
 
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
@@ -197,10 +220,8 @@ namespace gazebo
 
       private: void JointLog(ConstJointPtr &msg);
 
-      private: void OnFactoryMsg(
-                   ConstFactoryPtr &data);
-      private: void OnModelMsg(
-                   ConstModelPtr &_msg);
+      private: void OnFactoryMsg(ConstFactoryPtr &_data);
+      private: void OnModelMsg(ConstModelPtr &_msg);
 
       /// \brief TBB version of model updating
       private: void ModelUpdateTBB();
@@ -208,7 +229,7 @@ namespace gazebo
       /// \brief Single loop verison of model updating
       private: void ModelUpdateSingleLoop();
 
-      private: void LoadPlugin(sdf::ElementPtr &_sdf);
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr &_model);
 
@@ -216,6 +237,9 @@ namespace gazebo
       private: void ProcessRequestMsgs();
       private: void ProcessFactoryMsgs();
       private: void ProcessModelMsgs();
+
+      private: void UpdateStateSDF();
+      private: void UpdateSDFFromState(const WorldState &_state);
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;

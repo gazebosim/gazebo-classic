@@ -47,7 +47,7 @@ ODECollision::~ODECollision()
   this->collisionId = NULL;
 }
 
-void ODECollision::Load(sdf::ElementPtr &_sdf)
+void ODECollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
 

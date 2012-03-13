@@ -528,7 +528,7 @@ void dGeomTriMeshDataSetBuffer(dTriMeshDataID g, unsigned char* buf)
 }
 
 
-dxTriMesh::dxTriMesh(dSpaceID Space, dTriMeshDataID Data) : dxGeom(Space, 1)
+dxTriMesh::dxTriMesh(dSpaceID _Space, dTriMeshDataID _Data) : dxGeom(_Space, 1)
 {
     type = dTriMeshClass;
 
@@ -537,7 +537,7 @@ dxTriMesh::dxTriMesh(dSpaceID Space, dTriMeshDataID Data) : dxGeom(Space, 1)
     RayCallback = NULL;
     TriMergeCallback = NULL; // Not initialized in dCreateTriMesh
 
-    this->Data = Data;
+    this->Data = _Data;
 
 	/* TC has speed/space 'issues' that don't make it a clear
 	   win by default on spheres/boxes. */
@@ -793,6 +793,8 @@ void dGeomTriMeshEnableTC(dGeomID g, int geomClass, int enable)
 		case dCapsuleClass:
 			((dxTriMesh*)g)->doCapsuleTC = (1 == enable);
 			break;
+    default:
+      break;
 	}
 }
 
@@ -814,6 +816,8 @@ int dGeomTriMeshIsTCEnabled(dGeomID g, int geomClass)
 			if (((dxTriMesh*)g)->doCapsuleTC)
 				return 1;
 			break;
+    default:
+      break;
 	}
 	return 0;
 }

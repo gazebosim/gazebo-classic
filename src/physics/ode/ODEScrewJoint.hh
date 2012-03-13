@@ -21,7 +21,6 @@
 /* Desc: A screw or primastic joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: ScrewJoint.hh 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #ifndef ODESCREWJOINT_HH
@@ -46,7 +45,7 @@ namespace gazebo
       public: virtual ~ODEScrewJoint();
 
       /// \brief Load the joint
-      protected: virtual void Load(sdf::ElementPtr &_sdf);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetGlobalAxis(int index) const;

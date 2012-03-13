@@ -406,7 +406,8 @@ bool sTrimeshBoxColliderData::_cldTestSeparatingAxes(const dVector3 &v0, const d
   // Even though all triangles might be initially valid, 
   // a triangle may degenerate into a segment after applying 
   // space transformation.
-  if (!fNLen) {
+  if (_dequal(fNLen, 0.0))
+  {
 	  return false;
   }
 

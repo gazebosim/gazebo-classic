@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 #include "Inertial.hh"
 
 using namespace gazebo;
@@ -28,14 +28,14 @@ Inertial::Inertial()
   this->products.Set(0, 0, 0);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/inertial.sdf", this->sdf);
+  sdf::initFile("sdf/inertial.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
 Inertial::Inertial(double _m)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/inertial.sdf", this->sdf);
+  sdf::initFile("sdf/inertial.sdf", this->sdf);
 
   this->mass = _m;
   this->cog.Set(0, 0, 0);
@@ -47,7 +47,7 @@ Inertial::Inertial(double _m)
 Inertial::Inertial(const Inertial &_inertial)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/inertial.sdf", this->sdf);
+  sdf::initFile("sdf/inertial.sdf", this->sdf);
 
   (*this) = _inertial;
 }
@@ -65,7 +65,7 @@ void Inertial::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Inertial::UpdateParameters(sdf::ElementPtr &_sdf)
+void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
 
@@ -73,8 +73,6 @@ void Inertial::UpdateParameters(sdf::ElementPtr &_sdf)
   if (this->sdf->HasElement("origin"))
   {
     center = this->sdf->GetElement("origin")->GetValuePose("pose").pos;
-    this->sdf->GetElement("origin")->GetAttribute("pose")->SetUpdateFunc(
-        boost::bind(&Inertial::GetPose, this));
   }
   this->SetCoG(center.x, center.y, center.z);
 

@@ -403,7 +403,7 @@ void FromQuatL2(const Quat &q, float l2);
 		//! Operator for Matrix3x3 Div = Matrix3x3 / float;
 		inline_	Matrix3x3		operator/(float s)				const
 								{
-									if (s)	s = 1.0f / s;
+									if (!_equal(s, 0.0))	s = 1.0f / s;
 									return Matrix3x3(
 									m[0][0]*s,	m[0][1]*s,	m[0][2]*s,
 									m[1][0]*s,	m[1][1]*s,	m[1][2]*s,
@@ -471,7 +471,7 @@ void FromQuatL2(const Quat &q, float l2);
 		//! Operator for Matrix3x3 /= float
 		inline_	Matrix3x3&		operator/=(float s)
 								{
-									if (s)	s = 1.0f / s;
+									if (!_equal(s, 0.0))	s = 1.0f / s;
 									m[0][0] *= s;	m[0][1] *= s;	m[0][2] *= s;
 									m[1][0] *= s;	m[1][1] *= s;	m[1][2] *= s;
 									m[2][0] *= s;	m[2][1] *= s;	m[2][2] *= s;

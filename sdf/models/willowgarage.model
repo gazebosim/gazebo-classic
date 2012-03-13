@@ -1,5 +1,5 @@
 <gazebo version='1.0'>
-  <model name='wg' static='1'>
+  <model name='willowgarage' static='true'>
     <origin pose='-20 -20 0 0 0 0'/>
     <link name='walls' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0 0 0 0 -0 0'/>
@@ -10,13 +10,13 @@
                  izz='0'/>
       </inertial>
 
-      <collision name='geom'>
+      <collision name='collision'>
         <geometry>
-          <box size='0.1 0.1 0.1'/>
+          <mesh filename='willowgarage.dae' scale='0.0254 0.0254 0.0254'/>
         </geometry>
       </collision>
 
-      <visual name='visual' cast_shadows='0'>
+      <visual name='visual' cast_shadows='false'>
         <geometry>
           <mesh filename='willowgarage.dae' scale='0.0254 0.0254 0.0254'/>
         </geometry>

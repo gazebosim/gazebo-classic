@@ -15,25 +15,11 @@
       </ode>
     </physics>
 
-    <!-- Ground Plane -->
-    <model name="plane1_model" static="true">
-      <link name="body">
-        <collision name="geom">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-        </collision>
+    <include filename="ground_plane.model"/>
 
-        <visual name="visual" cast_shadows="false">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-          <material script="Gazebo/Grey"/>
-        </visual>
-      </link>
-    </model>
+    <include filename="willowgarage.model"/>
 
-    <light type="directional" name="my_light" cast_shadows="false">
+    <light type="directional" name="sun" cast_shadows="false">
       <origin pose="0 0 100 0 0 0"/>
       <diffuse rgba="1.0 1.0 1.0 1"/>
       <specular rgba="0 0 0 1"/>
@@ -41,16 +27,5 @@
       <direction xyz="0 0.2 -0.8"/>
     </light>
 
-    <!--<light type="directional" name="my_light" cast_shadows="true">
-      <origin pose="0 0 100 0 0 0"/>
-      <diffuse rgba="0.1 0.1 0.1 1"/>
-      <specular rgba="0.1 0.1 0.1 1"/>
-      <attenuation range="20"/>
-      <direction xyz="0 0.4 -0.6"/>
-    </light>
-    -->
-
-
-    <include filename="wg.model"/>
   </world>
 </gazebo>

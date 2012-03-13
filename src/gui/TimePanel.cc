@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include <QtGui>
 #include <sstream>
 
 #include "transport/Node.hh"
@@ -24,6 +23,7 @@
 using namespace gazebo;
 using namespace gui;
 
+/////////////////////////////////////////////////
 TimePanel::TimePanel(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -90,6 +90,7 @@ TimePanel::TimePanel(QWidget *_parent)
   this->simTime.Set(0);
 }
 
+/////////////////////////////////////////////////
 void TimePanel::OnFullScreen(bool &_value)
 {
   if (_value)
@@ -98,12 +99,13 @@ void TimePanel::OnFullScreen(bool &_value)
     this->show();
 }
 
+/////////////////////////////////////////////////
 TimePanel::~TimePanel()
 {
 }
 
-void TimePanel::OnStats(
-    ConstWorldStatisticsPtr &_msg)
+/////////////////////////////////////////////////
+void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   this->simTime  = msgs::Convert(_msg->sim_time());
   this->realTime = msgs::Convert(_msg->real_time());
@@ -115,6 +117,7 @@ void TimePanel::OnStats(
         "<font style ='color:green;font-weight:bold;'>      </font>");
 }
 
+/////////////////////////////////////////////////
 void TimePanel::Update()
 {
   std::ostringstream percent;
@@ -158,11 +161,10 @@ void TimePanel::Update()
   this->realTimeEdit->setText(tr(real.str().c_str()));
 }
 
+/////////////////////////////////////////////////
 void TimePanel::OnTimeReset()
 {
   msgs::WorldControl msg;
   msg.set_reset_time(true);
   this->worldControlPub->Publish(msg);
 }
-
-

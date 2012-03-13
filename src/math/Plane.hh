@@ -34,6 +34,11 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param _normal The plane normal
+      /// \param _offset Offset along the normal
+      public: Plane(const Vector3 &_normal, double _offset = 0.0);
+
+      /// \brief Constructor
+      /// \param _normal The plane normal
       /// \param _size Size of the plane
       /// \param _offset Offset along the normal
       public: Plane(const Vector3 &_normal, const Vector2d &_size,
@@ -48,6 +53,10 @@ namespace gazebo
       /// \param _offset Offset along the normal
       public: void Set(const Vector3 &_normal, const Vector2d &_size,
                        double offset);
+
+      /// \brief Get distance to the plane give an origin and direction
+      public: double Distance(const Vector3 &_origin,
+                              const Vector3 &_dir) const;
 
       /// \brief Equal operator
       /// \param _p Plane values

@@ -17,7 +17,6 @@
 /* Desc: A hinge joint with 2 degrees of freedom
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: ODEHinge2Joint.cc 7129 2008-11-12 19:38:15Z natepak $
  */
 
 #include "gazebo_config.h"
@@ -43,7 +42,7 @@ ODEHinge2Joint::~ODEHinge2Joint()
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::Load(sdf::ElementPtr &_sdf)
+void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
   Hinge2Joint<ODEJoint>::Load(_sdf);
 }

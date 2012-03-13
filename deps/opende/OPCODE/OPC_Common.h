@@ -19,6 +19,32 @@
 // Include Guard
 #ifndef __OPC_COMMON_H__
 #define __OPC_COMMON_H__
+#include <cmath>
+
+inline bool _opc_equal(const double &_a, const double &_b,
+    const double &_epsilon = 1e-6)
+{
+  return ::std::fabs(_a - _b) <= _epsilon;
+}
+
+inline bool _opc_equal(const float &_a, const float &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(_a - _b) <= _epsilon;
+}
+
+inline bool _opc_equal(const double &_a, const float &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(static_cast<float>(_a) - _b) <= _epsilon;
+}
+
+inline bool _opc_equal(const float &_a, const double &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(_a - static_cast<float>(_b)) <= _epsilon;
+}
+
 
 // [GOTTFRIED]: Just a small change for readability.
 #ifdef OPC_CPU_COMPARE

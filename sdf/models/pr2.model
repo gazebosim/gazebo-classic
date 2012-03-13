@@ -605,9 +605,11 @@
           <horizontal_fov angle='0.78539816339744828'/>
           <image width='320' height='240' format='L8'/>
           <clip near='0.10000000000000001' far='100'/>
+          <!--<save enabled='true' path='/tmp/gazebo'/>-->
         </camera>
       </sensor>
     </link>
+
     <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='-0.05 0.188 0.790675 0 -0 0'/>
       <inertial mass='25.799299999999999'>
@@ -1590,6 +1592,7 @@
         <inertia ixx='7.7384099999999997e-05' ixy='-2.0930900000000001e-06' ixz='-8.3622799999999998e-06' iyy='0.000198474' iyz='2.4611e-06' izz='0.00018107'/>
       </inertial>
     </link>
+
     <joint name='bl_caster_rotation_joint' type='revolute'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='base_footprint'/>
@@ -1725,6 +1728,7 @@
         <limit lower='-0.47123715270921696' upper='1.3962599109369596' effort='0' velocity='0'/>
       </axis>
     </joint>
+
     <joint name='l_shoulder_pan_joint' type='revolute'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='torso_lift_link'/>

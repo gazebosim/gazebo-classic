@@ -29,6 +29,7 @@
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 
+#include "physics/ModelState.hh"
 #include "physics/Entity.hh"
 
 namespace boost
@@ -54,7 +55,7 @@ namespace gazebo
 
       /// \brief Load the model
       /// \param _sdf SDF parameters
-      public: void Load(sdf::ElementPtr &_sdf);
+      public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the model
       public: virtual void Init();
@@ -66,10 +67,10 @@ namespace gazebo
       public: virtual void Fini();
 
       /// \brief update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Get the SDF values for the model
-      public: virtual const sdf::ElementPtr &GetSDF();
+      public: virtual const sdf::ElementPtr GetSDF();
 
       /// \brief Remove a child
       /// \param child Remove a child entity
@@ -152,6 +153,10 @@ namespace gazebo
       /// \return Pointer to the link
       public: LinkPtr GetLink(const std::string &name ="canonical") const;
 
+      /// \brief Get a child link by index
+      /// \return Point to the link
+      public: LinkPtr GetLink(unsigned int _index) const;
+
       /// \brief Set the gravity mode of the model
       public: void SetGravityMode(const bool &v);
 
@@ -178,10 +183,19 @@ namespace gazebo
                   const std::map<std::string, common::NumericAnimationPtr> anim,
                   boost::function<void()> _onComplete);
 
+      /// \brief Stop the current animations
+      public: virtual void StopAnimation();
+
       /// \brief Attach a static model to this model
       public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
 
       public: void DetachStaticModel(const std::string &_model);
+
+      /// \brief Get the current model state
+      public: ModelState GetState();
+
+      /// \brief Set the current model state
+      public: void SetState(const ModelState &_state);
 
       protected: virtual void OnPoseChange();
 
@@ -204,11 +218,11 @@ namespace gazebo
 
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
-      private: void LoadJoint(sdf::ElementPtr &_sdf);
+      private: void LoadJoint(sdf::ElementPtr _sdf);
 
       /// \brief Load a plugin helper function
       /// \param _sdf SDF parameter
-      private: void LoadPlugin(sdf::ElementPtr &_sdf);
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       private: LinkPtr canonicalLink;
 

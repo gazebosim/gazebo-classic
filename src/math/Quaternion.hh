@@ -264,7 +264,7 @@ namespace gazebo
     /// \brief Spherical quadratic interpolation
     public: static Quaternion Squad(double _fT, const Quaternion &_rkP,
                 const Quaternion &_rkA, const Quaternion &_rkB,
-                Quaternion &_rkQ, bool _shortestPath = false);
+                const Quaternion &_rkQ, bool _shortestPath = false);
 
     /// \brief Spherical linear interpolation
     public: static Quaternion Slerp(double _fT, const Quaternion &_rkP,

@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
@@ -14,15 +14,14 @@ set (GAZEBO_MAJOR_VERSION 1)
 set (GAZEBO_MINOR_VERSION 0)
 set (GAZEBO_PATCH_VERSION 0)
 
-set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION}-RC2)
+set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION}-RC3)
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
-
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set (CMAKE_INSTALL_PREFIX "/usr/" CACHE PATH "Gazebo install prefix" FORCE)
-endif()
-
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
+
+#if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#  set (CMAKE_INSTALL_PREFIX "/usr/" CACHE PATH "Gazebo install prefix" FORCE)
+#endif()
 
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
 
@@ -48,11 +47,12 @@ if (USE_FULL_RPATH)
 endif()
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
+set (build_errors "" CACHE INTERNAL "build errors" FORCE)
+set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
 set (LIB_INSTALL_DIR "lib")
 set (BIN_INSTALL_DIR "bin")
-
 
 # with -fPIC
 if(UNIX AND NOT WIN32)
@@ -69,22 +69,31 @@ endif(UNIX AND NOT WIN32)
 
 
 set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
-set (MIN_ODE_VERSION 0.11.1 CACHE INTERNAL "ODE version requirement" FORCE)
 set (MIN_BOOST_VERSION 1.40.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
 set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
 set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
 set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 
-
-set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
-     "Location of CMake scripts")
+set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
 # Build type cflags
-set (CMAKE_C_FLAGS_ALL " -Wall -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -fPIC -pedantic" CACHE INTERNAL "General C Flags")
+set (CMAKE_C_FLAGS_ALL " -Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic" CACHE INTERNAL "General C Flags")
+
+
+#####################################
+# Build type link flags
+set (CMAKE_LINK_FLAGS_RELEASE " " CACHE INTERNAL "Link flags fro release" FORCE)
+set (CMAKE_LINK_FLAGS_DEBUG " " CACHE INTERNAL "Link flags for debug" FORCE)
+set (CMAKE_LINK_FLAGS_PROFILE " -pg" CACHE INTERNAL "Link flags for profile" FORCE)
+set (CMAKE_LINK_FLAGS_CHECK " --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
+
+message (STATUS "\n\n====== Finding 3rd Party Packages ======")
+include (${gazebo_cmake_dir}/SearchForStuff.cmake)
+message (STATUS "----------------------------------------\n")
 
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
@@ -105,21 +114,14 @@ endif()
 set (CMAKE_C_FLAGS_RELEASE " -s -O2 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 
-set (CMAKE_C_FLAGS_DEBUG " -ggdb3 -Wextra ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
+set (CMAKE_C_FLAGS_DEBUG " -ggdb3 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
 set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 
-set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wextra -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_PROFILE " -fno-omit-frame-pointer -g -pg ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
-set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow --coverage -fno-elide-constructors ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
-set (CMAKE_CXX_FLAGS_CHECK ${CMAKE_C_FLAGS_CHECK})
-
-#####################################
-# Build type link flags
-set (CMAKE_LINK_FLAGS_RELEASE " -fPIC" CACHE INTERNAL "Link flags fro release" FORCE)
-set (CMAKE_LINK_FLAGS_DEBUG " -fPIC" CACHE INTERNAL "Link flags for debug" FORCE)
-set (CMAKE_LINK_FLAGS_PROFILE " -fPIC" CACHE INTERNAL "Link flags for profile" FORCE)
-set (CMAKE_LINK_FLAGS_CHECK " -fPIC --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
+set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
+set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates")
 
 #####################################
 # Set the default build type
@@ -128,9 +130,6 @@ if (NOT CMAKE_BUILD_TYPE)
     "Choose the type of build, options are: debug release profile check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
-
-set (build_errors "" CACHE INTERNAL "build errors" FORCE)
-set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 #####################################
 # Set all the global build flags
@@ -158,26 +157,27 @@ else()
   set (BUILD_TYPE_DEBUG FALSE)
 endif()
 
-message (STATUS "\n\n====== Finding 3rd Party Packages ======")
-include (${gazebo_cmake_dir}/SearchForStuff.cmake)
+message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
 add_subdirectory(deps)
 message (STATUS "----------------------------------------\n")
 
-
+#################################################
+# Print warnings and errors
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")
   foreach (msg ${build_warnings})
     message(STATUS ${msg})
-  endforeach (msg ${build_warnings})
+  endforeach ()
   message(STATUS "END BUILD WARNINGS\n")
 endif (build_warnings)
 
-if ( build_errors )
+if (build_errors)
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
-  endforeach (msg ${build_errors})
+  endforeach ()
   message(STATUS "END BUILD ERRORS\n")
+  message (FATAL_ERROR "Errors encountered in build.")
 else (build_errors)
 
   ########################################
@@ -236,4 +236,3 @@ else (build_errors)
 
   message(STATUS "Configuration successful. Type make to compile gazebo")
 endif(build_errors)
-

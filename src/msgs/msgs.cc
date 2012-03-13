@@ -72,7 +72,8 @@ void Init(google::protobuf::Message &_message, const std::string &_id)
 
   if (header)
   {
-    header->set_str_id(_id);
+    if (!_id.empty())
+      header->set_str_id(_id);
     Stamp(header->mutable_stamp());
   }
 }
@@ -100,8 +101,12 @@ std::string Package(const std::string &type,
   pkg.set_type(type);
 
   std::string *serialized_data = pkg.mutable_serialized_data();
+  if (!message.IsInitialized())
+    gzthrow("Can't serialize message of type[" + message.GetTypeName() +
+            "] because it is missing required fields");
+
   if (!message.SerializeToString(serialized_data))
-    gzthrow("Failed to serialized message");
+      gzthrow("Failed to serialized message");
 
   if (!pkg.SerializeToString(&data))
     gzthrow("Failed to serialized message");
@@ -374,6 +379,9 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = _sdf->GetElement("geometry")->GetFirstElement();
+    if (!geomElem)
+      gzthrow("Invalid geometry element");
+
     math::Vector3 scale(1, 1, 1);
     msgs::Geometry *geomMsg = result.mutable_geometry();
 
@@ -430,7 +438,7 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
           geomElem->GetValueString("filename"));
     }
     else
-      gzerr << "Unknown geometry type\n";
+      gzthrow("Unknown geometry type\n");
   }
 
   /// Load the material
@@ -453,8 +461,8 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
       else if (shaderElem->GetValueString("type") == "normal_map_tangent_space")
         matMsg->set_shader_type(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
       else
-        gzerr << "Unknown shader type["
-              << shaderElem->GetValueString("type") << "]\n";
+        gzthrow(std::string("Unknown shader type[") +
+                shaderElem->GetValueString("type") + "]");
 
      if (shaderElem->HasElement("normal_map"))
           matMsg->set_normal_map(
@@ -499,7 +507,7 @@ msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
   else if (type == "exp2")
     result.set_type(msgs::Fog::EXPONENTIAL2);
   else
-    gzerr << "Unknown fog type[" << type << "]\n";
+    gzthrow(std::string("Unknown fog type[") + type + "]");
 
   result.mutable_color()->CopyFrom(Convert(_sdf->GetValueColor("rgba")));
   result.set_density(_sdf->GetValueDouble("density"));
@@ -513,7 +521,6 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
   msgs::Scene result;
 
   Init(result, "scene");
-  result.set_name(_sdf->GetWorldName());
 
   if (_sdf->HasElement("grid"))
     result.set_grid(_sdf->GetElement("grid")->GetValueBool("enabled"));

@@ -255,12 +255,12 @@ void Block::AddObject(dGeomID Object){
 	Object->tome = (dxGeom**)this;
 
 	// Now traverse upwards to tell that we have a geom
-	Block* Block = this;
+	Block* Block2 = this;
 	do{
-		Block->mGeomCount++;
-		Block = Block->mParent;
+		Block2->mGeomCount++;
+		Block2 = Block2->mParent;
 	}
-	while (Block);
+	while (Block2);
 }
 
 void Block::DelObject(dGeomID Object){
@@ -283,12 +283,12 @@ void Block::DelObject(dGeomID Object){
 	Object->tome = 0;
 
 	// Now traverse upwards to tell that we have lost a geom
-	Block* Block = this;
+	Block* Block2 = this;
 	do{
-		Block->mGeomCount--;
-		Block = Block->mParent;
+		Block2->mGeomCount--;
+		Block2 = Block2->mParent;
 	}
-	while (Block);
+	while (Block2);
 }
 
 void Block::Traverse(dGeomID Object){
@@ -369,13 +369,13 @@ dxQuadTreeSpace::dxQuadTreeSpace(dSpaceID _space, const dVector3 Center, const d
 	}
 
 	Blocks = (Block*)dAlloc(BlockCount * sizeof(Block));
-	Block* Blocks = this->Blocks + 1;	// This pointer gets modified!
+	Block* Blocks2 = this->Blocks + 1;	// This pointer gets modified!
 
 	dReal MinX = Center[AXIS0] - Extents[AXIS0];
 	dReal MaxX = dNextAfter((Center[AXIS0] + Extents[AXIS0]), (dReal)dInfinity);
 	dReal MinZ = Center[AXIS1] - Extents[AXIS1];
 	dReal MaxZ = dNextAfter((Center[AXIS1] + Extents[AXIS1]), (dReal)dInfinity);
-	this->Blocks[0].Create(MinX, MaxX, MinZ, MaxZ, 0, Depth, Blocks);
+	this->Blocks[0].Create(MinX, MaxX, MinZ, MaxZ, 0, Depth, Blocks2);
 
 	CurrentBlock = 0;
 	CurrentChild = (int*)dAlloc((Depth + 1) * sizeof(int));
@@ -591,15 +591,15 @@ void dxQuadTreeSpace::collide2(void* UserData, dxGeom* g2, dNearCallback* Callba
 
   if (g2->parent_space == this){
 	  // The block the geom is in
-	  Block* CurrentBlock = (Block*)g2->tome;
+	  Block* CurrentBlock2 = (Block*)g2->tome;
 	  
 	  // Collide against block and its children
 	  DataCallback dc = {UserData, Callback};
-	  CurrentBlock->Collide(g2, CurrentBlock->mFirst, &dc, swap_callback);
+	  CurrentBlock2->Collide(g2, CurrentBlock2->mFirst, &dc, swap_callback);
 	  
 	  // Collide against parents
-	  while ((CurrentBlock = CurrentBlock->mParent))
-		  CurrentBlock->CollideLocal(g2, UserData, Callback);
+	  while ((CurrentBlock2 = CurrentBlock2->mParent))
+		  CurrentBlock2->CollideLocal(g2, UserData, Callback);
 
   }
   else {

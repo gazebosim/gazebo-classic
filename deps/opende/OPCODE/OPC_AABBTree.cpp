@@ -463,7 +463,7 @@ udword AABBTree::ComputeDepth() const
  *	Walks the tree, calling the user back for each node.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-udword AABBTree::Walk(WalkingCallback callback, void* user_data) const
+udword AABBTree::Walk(WalkingCallback _callback, void* _user_data) const
 {
 	// Call it without callback to compute max depth
 	udword MaxDepth = 0;
@@ -488,7 +488,7 @@ udword AABBTree::Walk(WalkingCallback callback, void* user_data) const
 			if(current_node->GetNeg())	{ _Walk(current_node->GetNeg(), max_depth, current_depth, callback, user_data);	current_depth--;	}
 		}
 	};
-	Local::_Walk(this, MaxDepth, CurrentDepth, callback, user_data);
+	Local::_Walk(this, MaxDepth, CurrentDepth, _callback, _user_data);
 	return MaxDepth;
 }
 

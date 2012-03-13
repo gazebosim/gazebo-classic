@@ -60,24 +60,27 @@ namespace gazebo
     class Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
-      public: Visual(const std::string &name, VisualPtr _parent);
+      public: Visual(const std::string &_name, VisualPtr _parent);
 
       /// \brief Constructor
-      public: Visual(const std::string &name, Scene *scene);
+      public: Visual(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Visual();
 
       /// \brief Helper for the contructor
       public: void Init();
+
       public: void Fini();
 
+      /// \brief Clone the visual with a new name
+      public: VisualPtr Clone(const std::string &_name, VisualPtr _newParent);
+
       /// \brief Load from a message
-      public: void LoadFromMsg(
-                  const boost::shared_ptr< msgs::Visual const> &msg);
+      public: void LoadFromMsg(ConstVisualPtr &_msg);
 
       /// \brief Load the visual with a set of parameters
-      public: void Load(sdf::ElementPtr &sdf);
+      public: void Load(sdf::ElementPtr sdf);
 
       /// \brief Load the visual with default parameters
       public: void Load();
@@ -100,6 +103,9 @@ namespace gazebo
 
       /// \brief Attach a renerable object to the visual
       public: void AttachObject(Ogre::MovableObject *obj);
+
+      /// \brief Returns true if an object with _name is attached
+      public: bool HasAttachedObject(const std::string &_name);
 
       /// \brief Detach all objects
       public: void DetachObjects();
@@ -204,7 +210,9 @@ namespace gazebo
       public: void SetNormalMap(const std::string &nmap);
 
       /// \brief True on or off a ribbon trail
-      public: void SetRibbonTrail(bool value);
+      public: void SetRibbonTrail(bool value,
+                  const common::Color &_initialColor,
+                  const common::Color &_changeColor);
 
       /// \brief Get the bounding box for the visual
       public: math::Box GetBoundingBox() const;
@@ -246,11 +254,15 @@ namespace gazebo
       public: void MoveToPosition(const math::Vector3 &_end,
                                    double _pitch, double _yaw, double _time);
 
+      public: void MoveToPositions(const std::vector<math::Vector3> &_pts,
+                                   double _time,
+                                   boost::function<void()> _onComplete);
+
       public: void ShowBoundingBox();
       public: void ShowCollision(bool _show);
 
-      public: void SetScene(Scene *_scene);
-      public: Scene *GetScene() const;
+      public: void SetScene(ScenePtr _scene);
+      public: ScenePtr GetScene() const;
 
       private: void GetBoundsHelper(Ogre::SceneNode *node,
                                     math::Box &box) const;
@@ -289,15 +301,12 @@ namespace gazebo
       private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
 
       private: std::string name;
-      private: std::string physicsEntityName;
       public: VisualPtr parent;
       public: std::vector<VisualPtr> children;
 
-      /// List of all the parameters
-      protected: std::vector<common::Param*> parameters;
-
       private: Ogre::AnimationState *animState;
-      protected: Scene *scene;
+      private: boost::function<void()> onAnimationComplete;
+      protected: ScenePtr scene;
     };
     /// \}
   }

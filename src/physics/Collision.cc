@@ -90,12 +90,17 @@ void Collision::Fini()
   this->connections.clear();
 }
 
-
-
 //////////////////////////////////////////////////
-void Collision::Load(sdf::ElementPtr &_sdf)
+void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
+
+  if (this->sdf->HasElement("origin"))
+      this->SetRelativePose(
+        this->sdf->GetElement("origin")->GetValuePose("pose"));
+  else
+    this->SetRelativePose(
+        math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
 
   if (this->sdf->HasElement("surface"))
     this->surface->Load(this->sdf->GetElement("surface"));
@@ -112,6 +117,7 @@ void Collision::Load(sdf::ElementPtr &_sdf)
   }
 }
 
+//////////////////////////////////////////////////
 void Collision::Init()
 {
   if (this->sdf->HasElement("origin"))
@@ -120,6 +126,7 @@ void Collision::Init()
   else
     this->SetRelativePose(
         math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
+    
   this->shape->Init();
 }
 
@@ -348,7 +355,7 @@ math::Vector3 Collision::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-void Collision::UpdateParameters(sdf::ElementPtr &_sdf)
+void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
 }
@@ -358,15 +365,17 @@ void Collision::FillCollisionMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
   _msg.set_id(this->GetId());
-  _msg.set_name(this->GetName());
+  _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
   this->shape->FillShapeMsg(*_msg.mutable_geometry());
   this->surface->FillSurfaceMsg(*_msg.mutable_surface());
 
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
   _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
 }
 
+//////////////////////////////////////////////////
 void Collision::ProcessMsg(const msgs::Collision &_msg)
 {
   if (_msg.id() != this->GetId())
@@ -398,6 +407,7 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
@@ -460,4 +470,15 @@ msgs::Visual Collision::CreateCollisionVisual()
   return msg;
 }
 
+/////////////////////////////////////////////////
+CollisionState Collision::GetState()
+{
+  return CollisionState(
+      boost::shared_static_cast<Collision>(shared_from_this()));
+}
 
+/////////////////////////////////////////////////
+void Collision::SetState(const CollisionState &_state)
+{
+  this->SetWorldPose(_state.GetPose());
+}

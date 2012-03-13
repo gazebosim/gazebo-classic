@@ -23,7 +23,7 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 #include "rendering/ogre.h"
 #include "rendering/RTShaderSystem.hh"
 
@@ -48,7 +48,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 {
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/camera.sdf", this->sdf);
+  sdf::initFile("sdf/camera.sdf", this->sdf);
 
   this->windowId = 0;
   this->scene = scene_;
@@ -125,22 +125,22 @@ Camera::~Camera()
 }
 
 //////////////////////////////////////////////////
-void Camera::Load(sdf::ElementPtr &_sdf)
+void Camera::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 
 //////////////////////////////////////////////////
 void Camera::Load()
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  if (imageElem)
+  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  if (imgElem)
   {
-    this->imageWidth = imageElem->GetValueInt("width");
-    this->imageHeight = imageElem->GetValueInt("height");
+    this->imageWidth = imgElem->GetValueInt("width");
+    this->imageHeight = imgElem->GetValueInt("height");
     this->imageFormat = this->GetOgrePixelFormat(
-        imageElem->GetValueString("format"));
+        imgElem->GetValueString("format"));
   }
   else
     gzthrow("Camera has no <image> tag.");
@@ -314,11 +314,10 @@ void Camera::PostRender()
 
     // record render time stamp
 
-
     if (this->sdf->HasElement("save") &&
         this->sdf->GetElement("save")->GetValueBool("enabled"))
     {
-      this->SaveFrame();
+      this->SaveFrame(this->GetFrameFilename());
     }
 
     const unsigned char *buffer = this->saveFrameBuffer;
@@ -506,8 +505,8 @@ unsigned int Camera::GetImageHeight() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageDepth() const
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  std::string imgFmt = imageElem->GetValueString("format");
+  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  std::string imgFmt = imgElem->GetValueString("format");
 
   if (imgFmt == "L8")
     return 1;
@@ -529,8 +528,8 @@ unsigned int Camera::GetImageDepth() const
 //////////////////////////////////////////////////
 std::string Camera::GetImageFormat() const
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  return imageElem->GetValueString("format");
+  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  return imgElem->GetValueString("format");
 }
 
 //////////////////////////////////////////////////
@@ -603,6 +602,7 @@ void Camera::EnableSaveFrame(bool enable)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
   elem->GetAttribute("enabled")->Set(enable);
+  this->captureData = true;
 }
 
 //////////////////////////////////////////////////
@@ -656,8 +656,10 @@ unsigned int Camera::GetViewportWidth() const
 {
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualWidth();
-  else
+  else if (this->camera && this->camera->getViewport())
     return this->camera->getViewport()->getActualWidth();
+  else
+    return 0;
 }
 
 //////////////////////////////////////////////////
@@ -665,8 +667,10 @@ unsigned int Camera::GetViewportHeight() const
 {
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualHeight();
-  else
+  else if (this->camera && this->camera->getViewport())
     return this->camera->getViewport()->getActualHeight();
+  else
+    return 0;
 }
 
 //////////////////////////////////////////////////
@@ -732,10 +736,17 @@ std::string Camera::GetName() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SaveFrame()
+bool Camera::SaveFrame(const std::string &_filename)
+{
+  return Camera::SaveFrame(this->saveFrameBuffer, this->GetImageWidth(),
+                          this->GetImageHeight(), this->GetImageDepth(),
+                          this->GetImageFormat(), _filename);
+}
+
+//////////////////////////////////////////////////
+std::string Camera::GetFrameFilename()
 {
   sdf::ElementPtr saveElem = this->sdf->GetOrCreateElement("save");
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
 
   std::string path = saveElem->GetValueString("path");
 
@@ -767,21 +778,24 @@ void Camera::SaveFrame()
         "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
   }
 
-  this->SaveFrame(this->saveFrameBuffer,
-                  this->GetImageWidth(),
-                  this->GetImageHeight(),
-                  this->GetImageDepth(),
-                  this->GetImageFormat(), tmp);
-
   this->saveCount++;
   closedir(dir);
+  return tmp;
 }
 
-void Camera::SaveFrame(const unsigned char *_image,
+
+/////////////////////////////////////////////////
+bool Camera::SaveFrame(const unsigned char *_image,
                        unsigned int _width, unsigned int _height, int _depth,
                        const std::string &_format,
                        const std::string &_filename)
 {
+  if (!_image)
+  {
+    gzerr << "Can't save an empty image\n";
+    return false;
+  }
+
   Ogre::ImageCodec::ImageData *imgData;
   Ogre::Codec * pCodec;
   size_t size, pos;
@@ -813,6 +827,8 @@ void Camera::SaveFrame(const unsigned char *_image,
   // Write out
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
   pCodec->codeToFile(stream, filename, codecDataPtr);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -964,9 +980,9 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetCaptureData(bool value)
+void Camera::SetCaptureData(bool _value)
 {
-  this->captureData = value;
+  this->captureData = _value;
 }
 
 //////////////////////////////////////////////////
@@ -1010,8 +1026,8 @@ void Camera::CreateCamera()
 
 //////////////////////////////////////////////////
 bool Camera::GetWorldPointOnPlane(int _x, int _y,
-                                  const math::Vector3 &_planeNorm,
-                                  double _d, math::Vector3 &_result)
+                                  const math::Plane &_plane,
+                                  math::Vector3 &_result)
 {
   math::Vector3 origin, dir;
   double dist;
@@ -1019,11 +1035,11 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
   // Cast two rays from the camera into the world
   this->GetCameraToViewportRay(_x, _y, origin, dir);
 
-  dist = origin.GetDistToPlane(dir, _planeNorm, _d);
+  dist = _plane.Distance(origin, dir);
 
   _result = origin + dir * dist;
 
-  if (dist != -1)
+  if (!math::equal(dist, -1))
     return true;
   else
     return false;
@@ -1053,10 +1069,10 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
   }
 }
 
-/// \brief Attach the camera to a scene node
+//////////////////////////////////////////////////
 void Camera::AttachToVisual(const std::string &_visualName,
-                             bool _inheritOrientation,
-                             double _minDist, double _maxDist)
+                            bool _inheritOrientation,
+                            double _minDist, double _maxDist)
 {
   msgs::Request request;
   msgs::TrackVisual track;

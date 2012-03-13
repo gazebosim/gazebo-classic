@@ -181,8 +181,11 @@ std::string SystemPaths::GetWorldPathExtension()
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFileWithGazeboPaths(std::string _filename)
+std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
 {
+  if (_filename[0] == '/')
+    return _filename;
+
   struct stat st;
   std::string fullname = std::string("./")+_filename;
   bool found = false;
@@ -295,6 +298,3 @@ void SystemPaths::AddPluginPaths(std::string _gazebo_plugin_path)
           _gazebo_plugin_path.size()-pos1));
   }
 }
-
-
-

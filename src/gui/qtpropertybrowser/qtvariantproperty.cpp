@@ -36,7 +36,11 @@
  ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  **
  ****************************************************************************/
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wshadow"
 
+#include <stdio.h>
 
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
@@ -1765,18 +1769,21 @@ void QtVariantPropertyManager::setValue(QtProperty *property,
 {
   int propType = val.userType();
   if (!propType)
+  {
     return;
+  }
 
   int valType = valueType(property);
 
   if (propType !=
       valType && !val.canConvert(static_cast<QVariant::Type>(valType)))
+  {
     return;
+  }
 
   QtProperty *internProp = propertyToWrappedProperty()->value(property, 0);
   if (internProp == 0)
     return;
-
 
   QtAbstractPropertyManager *manager = internProp->propertyManager();
   if (QtIntPropertyManager *intManager =

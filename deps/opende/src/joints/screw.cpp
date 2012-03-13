@@ -206,8 +206,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
             //printf("debug offset q[%f %f %f] p0[%f %f %f] p1[%f %f %f] \t",q[0],q[1],q[2],
             //    node[0].body->posr.pos[0], node[0].body->posr.pos[1], node[0].body->posr.pos[2],
             //    node[1].body->posr.pos[0], node[1].body->posr.pos[1], node[1].body->posr.pos[2]);
-            for ( int i = 0; i < 3; i++ )
-                q[i] = node[0].body->posr.pos[i] - q[i] - node[1].body->posr.pos[i];
+            for ( int ii = 0; ii < 3; ++ii )
+              q[ii] = node[0].body->posr.pos[ii] - q[ii] - node[1].body->posr.pos[ii];
         }
         else
         {

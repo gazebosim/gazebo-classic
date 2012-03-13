@@ -22,13 +22,7 @@
 #include <map>
 #include <vector>
 
-#include "gazebo_config.h"
-
-#ifdef HAVE_CEGUI
-#include <CEGUI/CEGUI.h>
-#include <CEGUI/CEGUIEventArgs.h>
-#endif
-
+#include "rendering/cegui.h"
 #include "common/MouseEvent.hh"
 #include "common/Events.hh"
 

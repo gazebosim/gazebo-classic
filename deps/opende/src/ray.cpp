@@ -302,7 +302,8 @@ int dCollideRayBox (dxGeom *o1, dxGeom *o2, int /*flags*/,
   if ((s[0] < -h[0] && v[0] <= 0) || s[0] >  h[0] ||
       (s[1] < -h[1] && v[1] <= 0) || s[1] >  h[1] ||
       (s[2] < -h[2] && v[2] <= 0) || s[2] >  h[2] ||
-      (v[0] == 0 && v[1] == 0 && v[2] == 0)) {
+      (_dequal(v[0], 0.0) && _dequal(v[1], 0.0) && _dequal(v[2], 0.0)))
+  {
     return 0;
   }
 
@@ -311,7 +312,7 @@ int dCollideRayBox (dxGeom *o1, dxGeom *o2, int /*flags*/,
   dReal hi = dInfinity;
   int nlo = 0, nhi = 0;
   for (i=0; i<3; i++) {
-    if (v[i] != 0) {
+    if (!_dequal(v[i], 0.0)) {
       dReal k = (-h[i] - s[i])/v[i];
       if (k > lo) {
 	lo = k;
@@ -479,7 +480,8 @@ int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int /*flags*/,
   // note: if alpha > 0 the starting point is below the plane
   dReal nsign = (alpha > 0) ? REAL(-1.0) : REAL(1.0);
   dReal k = dCalcVectorDot3_14(plane->p,ray->final_posr->R+2);
-  if (k==0) return 0;		// ray parallel to plane
+  if (_dequal(k, 0.0))
+    return 0;		// ray parallel to plane
   alpha /= k;
   if (alpha < 0 || alpha > ray->length) return 0;
   contact->pos[0] = ray->final_posr->pos[0] + alpha*ray->final_posr->R[0*4+2];

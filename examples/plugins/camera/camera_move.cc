@@ -15,50 +15,45 @@
  *
 */
 #include <boost/bind.hpp>
-#include "physics/physics.h"
 #include "gazebo.h"
+#include "physics/physics.h"
 
 namespace gazebo
-{
-  class BoxPush : public ModelPlugin
+{   
+  class CameraMove : public ModelPlugin
   {
-    public: void Load(physics::ModelPtr &_parent, sdf::ElementPtr & /*_sdf*/)
+    public: CameraMove() : ModelPlugin() {}
+                                    
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
-      // Get then name of the parent model
-      // std::string modelName = _sdf->GetParent()->GetValueString("name");
-      this->model = _parent;
-
-      // Get the default world.
-      // physics::WorldPtr world = physics::get_world("default");
-
       // Get a pointer to the model
-      // this->model = world->GetModelByName(modelName);
-
-      // Error message if the model couldn't be found
-      if (!this->model)
-        gzerr << "Unable to get parent model\n";
+      this->model = _model;
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateStart(
-          boost::bind(&BoxPush::OnUpdate, this));
-    }
+          boost::bind(&CameraMove::OnUpdate, this));
+    } 
 
     // Called by the world update start event
     public: void OnUpdate()
     {
-      // Apply a small linear velocity to the model.
-      this->model->SetLinearVel(math::Vector3(.03, 0, 0));
-    }
+      math::Vector3 v(0.03, 0, 0);
+      math::Pose pose = this->model->GetWorldPose();
+      v = pose.rot * v;
 
+      // Apply a small linear velocity to the model. 
+      this->model->SetLinearVel(v);
+      this->model->SetAngularVel(math::Vector3(0, 0, 0.01));
+    } 
+      
     // Pointer to the model
     private: physics::ModelPtr model;
-
+    
     // Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
   };
-
+    
   // Register this plugin with the simulator
-  GZ_REGISTER_MODEL_PLUGIN(BoxPush)
+  GZ_REGISTER_MODEL_PLUGIN(CameraMove)
 }
-

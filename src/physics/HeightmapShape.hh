@@ -48,7 +48,7 @@ namespace gazebo
       public: void Update();
 
       /// \brief Load the heightmap
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the heightmap
       public: virtual void Init();

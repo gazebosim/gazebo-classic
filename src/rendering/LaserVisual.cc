@@ -27,6 +27,7 @@
 using namespace gazebo;
 using namespace rendering;
 
+/////////////////////////////////////////////////
 LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
 : Visual(_name, _vis)
@@ -43,13 +44,14 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
 }
 
+/////////////////////////////////////////////////
 LaserVisual::~LaserVisual()
 {
   delete this->rayFan;
   this->rayFan = NULL;
 }
 
-
+/////////////////////////////////////////////////
 void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
 {
   double angle = _msg->angle_min();
@@ -74,6 +76,3 @@ void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
     angle += _msg->angle_step();
   }
 }
-
-
-

@@ -18,7 +18,7 @@
 
 #include "rendering/ogre.h"
 #include "msgs/msgs.h"
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -89,11 +89,12 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/scene.sdf", this->sdf);
+  sdf::initFile("sdf/scene.sdf", this->sdf);
 
   this->clearAll = false;
 }
 
+//////////////////////////////////////////////////
 void Scene::Clear()
 {
   this->node->Fini();
@@ -185,9 +186,9 @@ Scene::~Scene()
 }
 
 //////////////////////////////////////////////////
-void Scene::Load(sdf::ElementPtr &_sdf)
+void Scene::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 
@@ -210,7 +211,7 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Init()
 {
-  this->worldVisual.reset(new Visual("__world_node__", this));
+  this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
   RTShaderSystem::Instance()->AddScene(this);
 
@@ -318,7 +319,7 @@ void Scene::InitShadows()
   // the shadow maps
   // add the overlay elements to show the shadow maps:
   // init overlay elements
-  Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
+  /*Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
   Ogre::Overlay* overlay = mgr.create("DebugOverlay");
   for (size_t i = 0; i < 3; ++i)
   {
@@ -342,7 +343,7 @@ void Scene::InitShadows()
     debugPanel->setMaterialName(debugMat->getName());
     overlay->add2D(debugPanel);
     overlay->show();
-  }
+  }*/
 }
 
 
@@ -511,6 +512,21 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
   return cam;
 }
 
+//////////////////////////////////////////////////
+VisualPtr Scene::CreateVisual(const std::string &_name)
+{
+  if (this->GetVisual(_name) != NULL)
+  {
+    gzerr << "Visual with name[" << _name << "] already exists\n";
+    return VisualPtr();
+  }
+
+  VisualPtr result(new Visual(_name, this->worldVisual));
+  result->Load();
+  this->visuals[_name] = result;
+
+  return result;
+}
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(const std::string &_name) const
@@ -575,14 +591,43 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
   return visual;
 }
 
-VisualPtr Scene::GetVisualBelowPoint(const math::Vector3 &_pt)
+//////////////////////////////////////////////////
+void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
+                                 std::vector<VisualPtr> &_visuals)
 {
-  VisualPtr visual;
+  Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
 
-  Ogre::Entity *entity = this->GetOgreEntityBelowPoint(_pt, true);
-  visual = this->GetVisual(Ogre::any_cast<std::string>(entity->getUserAny()));
+  this->raySceneQuery->setRay(ray);
+  this->raySceneQuery->setSortByDistance(true, 0);
 
-  return visual;
+  // Perform the scene query
+  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+  _visuals.clear();
+
+  for (iter = result.begin(); iter != result.end(); ++iter)
+  {
+    // is the result a MovableObject
+    if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
+    {
+      if (!iter->movable->isVisible() ||
+          iter->movable->getName().find("__COLLISION_VISUAL__") !=
+          std::string::npos)
+        continue;
+      if (iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
+        continue;
+
+      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+      if (pentity)
+      {
+        VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
+                                      pentity->getUserAny()));
+        if (v)
+          _visuals.push_back(v);
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -600,88 +645,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
   return visual;
 }
 
-Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
-                                             bool _ignoreSelectionObj)
-{
-  Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
-
-  this->raySceneQuery->setRay(ray);
-  this->raySceneQuery->setSortByDistance(true, 0);
-
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
-  Ogre::Entity *closestEntity = NULL;
-
-  for (iter = result.begin(); iter != result.end(); ++iter)
-  {
-    // is the result a MovableObject
-    if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
-    {
-      if (!iter->movable->isVisible() ||
-          iter->movable->getName().find("__COLLISION_VISUAL__") !=
-          std::string::npos)
-        continue;
-      if (_ignoreSelectionObj &&
-          iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
-        continue;
-
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
-
-      // mesh data to retrieve
-      size_t vertex_count;
-      size_t index_count;
-      Ogre::Vector3 *vertices;
-      uint64_t *indices;
-
-      // Get the mesh information
-      this->GetMeshInformation(pentity->getMesh().get(), vertex_count,
-          vertices, index_count, indices,
-          pentity->getParentNode()->_getDerivedPosition(),
-          pentity->getParentNode()->_getDerivedOrientation(),
-          pentity->getParentNode()->_getDerivedScale());
-
-      bool new_closest_found = false;
-      for (int i = 0; i < static_cast<int>(index_count); i += 3)
-      {
-        // when indices size is not divisible by 3
-        if (i+2 >= static_cast<int>(index_count))
-          break;
-
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(ray,
-            vertices[indices[i]],
-            vertices[indices[i+1]],
-            vertices[indices[i+2]],
-            true, false);
-
-        // if it was a hit check if its the closest
-        if (hit.first)
-        {
-          if ((closest_distance < 0.0f) || (hit.second < closest_distance))
-          {
-            // this is the closest so far, save it off
-            closest_distance = hit.second;
-            new_closest_found = true;
-          }
-        }
-      }
-
-      delete [] vertices;
-      delete [] indices;
-
-      if (new_closest_found)
-      {
-        closestEntity = pentity;
-        // break;
-      }
-    }
-  }
-
-  return closestEntity;
-}
-
+/////////////////////////////////////////////////
 Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
                                      math::Vector2i _mousePos,
                                      bool _ignoreSelectionObj)
@@ -811,6 +775,12 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
     numAttachedObjs = snode->numAttachedObjects();
     isInSceneGraph = snode->isInSceneGraph();
   }
+  else
+  {
+    gzerr << "Invalid SceneNode\n";
+    return;
+  }
+
   int numChildren = node_->numChildren();
   Ogre::Vector3 pos = node_->getPosition();
   Ogre::Vector3 scale = node_->getScale();
@@ -1051,6 +1021,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   std::string modelName, linkName;
@@ -1188,6 +1159,7 @@ void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
+  RequestMsgs_L::iterator rIter;
   SceneMsgs_L::iterator sIter;
   VisualMsgs_L::iterator vIter;
   LightMsgs_L::iterator lIter;
@@ -1212,12 +1184,14 @@ void Scene::PreRender()
 
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
-  for (vIter = this->visualMsgs.begin();
-       vIter != this->visualMsgs.end(); ++vIter)
+  vIter = this->visualMsgs.begin();
+  while (vIter != this->visualMsgs.end())
   {
-    this->ProcessVisualMsg(*vIter);
+    if (this->ProcessVisualMsg(*vIter))
+      this->visualMsgs.erase(vIter++);
+    else
+      ++vIter;
   }
-  this->visualMsgs.clear();
 
   // Process the light messages
   for (lIter =  this->lightMsgs.begin();
@@ -1261,6 +1235,15 @@ void Scene::PreRender()
       ++pIter;
   }
 
+  // Process the request messages
+  for (rIter =  this->requestMsgs.begin();
+       rIter != this->requestMsgs.end(); ++rIter)
+  {
+    this->ProcessRequestMsg(*rIter);
+  }
+  this->requestMsgs.clear();
+
+
   if (this->selectionMsg)
   {
     this->SelectVisual(this->selectionMsg->name());
@@ -1268,12 +1251,14 @@ void Scene::PreRender()
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnJointMsg(ConstJointPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->jointMsgs.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
   if (!this->enableVisualizations)
@@ -1284,6 +1269,9 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!this->visuals[_msg->name()+"_laser_vis"])
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
+      if (!parentVis)
+        gzerr << "Unable to find parent visual[" << _msg->parent() << "]\n";
+
       LaserVisualPtr laserVis(new LaserVisual(
             _msg->name()+"_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
@@ -1303,7 +1291,8 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     this->visuals[cameraVis->GetName()] = cameraVis;
   }
-  if (_msg->type() == "contact" && _msg->visualize() && !_msg->topic().empty())
+  else if (_msg->type() == "contact" && _msg->visualize() &&
+           !_msg->topic().empty())
   {
     ContactVisualPtr contactVis(new ContactVisual(
           _msg->name()+"_contact_vis", this->worldVisual, _msg->topic()));
@@ -1312,6 +1301,7 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
 {
   // TODO: Fix this
@@ -1342,9 +1332,16 @@ void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
   */
 }
 
+/////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->requestMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
+{
   if (_msg->request() == "entity_delete")
   {
     Visual_M::iterator iter;
@@ -1376,8 +1373,10 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
-void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
+/////////////////////////////////////////////////
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 {
+  bool result = false;
   Visual_M::iterator iter;
   iter = this->visuals.find(_msg->name());
 
@@ -1386,39 +1385,53 @@ void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     if (iter != this->visuals.end())
     {
       this->visuals.erase(iter);
+      result = true;
     }
   }
   else if (iter != this->visuals.end())
   {
     iter->second->UpdateFromMsg(_msg);
+    result = true;
   }
   else
   {
     VisualPtr visual;
 
-    if (_msg->has_parent_name())
-      iter = this->visuals.find(_msg->parent_name());
-    else
-      iter = this->visuals.end();
-
-    if (iter != this->visuals.end())
+    // If the visual has a parent which is not the name of the scene...
+    if (_msg->has_parent_name() && _msg->parent_name() != this->GetName())
     {
-      visual.reset(new Visual(_msg->name(), iter->second));
+      iter = this->visuals.find(_msg->name());
+      if (iter != this->visuals.end())
+        gzerr << "Visual already exists. This shouldn't happen.\n";
+
+      // Make sure the parent visual exists before trying to add a child
+      // visual
+      iter = this->visuals.find(_msg->parent_name());
+      if (iter != this->visuals.end())
+        visual.reset(new Visual(_msg->name(), iter->second));
     }
     else
     {
+      // Add a visual that is attached to the scene root
       visual.reset(new Visual(_msg->name(), this->worldVisual));
     }
 
-    visual->LoadFromMsg(_msg);
-    this->visuals[_msg->name()] = visual;
-    if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+    if (visual)
     {
-      visual->SetVisible(false);
+      result = true;
+      visual->LoadFromMsg(_msg);
+      this->visuals[_msg->name()] = visual;
+      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+      {
+        visual->SetVisible(false);
+      }
     }
   }
+
+  return result;
 }
 
+/////////////////////////////////////////////////
 void Scene::OnPoseMsg(ConstPosePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -1437,12 +1450,14 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
   this->poseMsgs.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void Scene::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->lightMsgs.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
@@ -1456,6 +1471,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   this->selectionMsg = _msg;
@@ -1558,3 +1574,25 @@ void Scene::SetGrid(bool _enabled)
   }
 }
 
+/////////////////////////////////////////////////
+VisualPtr Scene::CloneVisual(const std::string &_visualName,
+                             const std::string &_newName)
+{
+  VisualPtr result;
+  VisualPtr vis = this->GetVisual(_visualName);
+  if (vis)
+  {
+    result = vis->Clone(_newName, this->worldVisual);
+    this->visuals[_newName] = result;
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string Scene::StripSceneName(const std::string &_name) const
+{
+  if (_name.find(this->GetName() + "::") == 0)
+    return _name.substr(this->GetName().size() + 2);
+  else
+    return _name;
+}

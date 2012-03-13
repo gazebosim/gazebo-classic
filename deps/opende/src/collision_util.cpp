@@ -356,10 +356,12 @@ void dClosestLineBoxPoints (const dVector3 p1, const dVector3 p2,
     }
 
     // advance to the next anchor point / region
-    for (i=0; i<3; i++) {
-      if (tanchor[i] == next_t) {
-	tanchor[i] = (h[i]-s[i])/v[i];
-	region[i]++;
+    for (i=0; i<3; i++)
+    {
+      if (_dequal(tanchor[i], next_t))
+      {
+        tanchor[i] = (h[i]-s[i])/v[i];
+        region[i]++;
       }
     }
     t = next_t;

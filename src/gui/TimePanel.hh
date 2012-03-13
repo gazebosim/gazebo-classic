@@ -17,9 +17,9 @@
 #ifndef TIME_PANEL_HH
 #define TIME_PANEL_HH
 
-#include <QWidget>
 #include <vector>
 
+#include "gui/qt.h"
 #include "transport/TransportTypes.hh"
 #include "msgs/MessageTypes.hh"
 #include "common/Event.hh"

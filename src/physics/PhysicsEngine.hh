@@ -42,7 +42,7 @@ namespace gazebo
     {
       /// \brief Default constructor
       /// \param world Pointer to the world
-      public: PhysicsEngine(WorldPtr world);
+      public: PhysicsEngine(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~PhysicsEngine();
@@ -84,7 +84,11 @@ namespace gazebo
 
       /// \brief Create a collision
       public: virtual CollisionPtr CreateCollision(
-                  const std::string &_shapeType, LinkPtr _body) = 0;
+                  const std::string &_shapeType, LinkPtr _link) = 0;
+
+      /// \brief Create a collision
+      public: CollisionPtr CreateCollision(const std::string &_shapeType,
+                                           const std::string &_linkName);
 
       public: virtual ShapePtr CreateShape(
                   const std::string &_shapeType,

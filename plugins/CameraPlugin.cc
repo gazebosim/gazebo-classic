@@ -20,11 +20,13 @@
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(CameraPlugin)
 
+/////////////////////////////////////////////////
 CameraPlugin::CameraPlugin() : SensorPlugin()
 {
 }
 
-void CameraPlugin::Load(sensors::SensorPtr &_sensor, sdf::ElementPtr &/*_sdf*/)
+/////////////////////////////////////////////////
+void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   if (!_sensor)
     gzerr << "Invalid sensor pointer.\n";
@@ -58,6 +60,7 @@ void CameraPlugin::Load(sensors::SensorPtr &_sensor, sdf::ElementPtr &/*_sdf*/)
   this->parentSensor->SetActive(true);
 }
 
+/////////////////////////////////////////////////
 void CameraPlugin::OnNewFrame(const unsigned char * /*_image*/,
                               unsigned int /*_width*/,
                               unsigned int /*_height*/,

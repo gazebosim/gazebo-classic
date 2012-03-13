@@ -34,6 +34,7 @@
  */
 
 #include <ode/common.h>
+#include <ode/odemath.h>
 #include <ode/matrix.h>
 #include <ode/collision_space.h>
 #include <ode/collision.h>
@@ -422,7 +423,7 @@ void dxSAPSpace::cleanGeoms()
 	lock_count--;
 }
 
-void dxSAPSpace::collide( void *data, dNearCallback *callback )
+void dxSAPSpace::collide( void *_data, dNearCallback *callback )
 {
 	dAASSERT (callback);
 
@@ -443,7 +444,7 @@ void dxSAPSpace::collide( void *data, dNearCallback *callback )
 		if( !GEOM_ENABLED(g) ) // skip disabled ones
 			continue;
 		const dReal& amax = g->aabb[axis0max];
-		if( amax == dInfinity ) // HACK? probably not...
+		if(_dequal(amax, dInfinity)) // HACK? probably not...
 			TmpInfGeomList.push( g );
 		else
 			TmpGeomList.push( g );
@@ -468,7 +469,7 @@ void dxSAPSpace::collide( void *data, dNearCallback *callback )
 		const Pair& pair = overlapBoxes[ j ];
 		dxGeom* g1 = TmpGeomList[ pair.id0 ];
 		dxGeom* g2 = TmpGeomList[ pair.id1 ];
-		collideGeomsNoAABBs( g1, g2, data, callback );
+		collideGeomsNoAABBs( g1, g2, _data, callback );
 	}
 
 	int infSize = TmpInfGeomList.size();
@@ -482,20 +483,20 @@ void dxSAPSpace::collide( void *data, dNearCallback *callback )
 		// collide infinite ones
 		for( n = m+1; n < infSize; ++n ) {
 			dxGeom* g2 = TmpInfGeomList[n];
-			collideGeomsNoAABBs( g1, g2, data, callback );
+			collideGeomsNoAABBs( g1, g2, _data, callback );
 		}
 
 		// collide infinite ones with normal ones
 		for( n = 0; n < normSize; ++n ) {
 			dxGeom* g2 = TmpGeomList[n];
-			collideGeomsNoAABBs( g1, g2, data, callback );
+			collideGeomsNoAABBs( g1, g2, _data, callback );
 		}
 	}
 
 	lock_count--;
 }
 
-void dxSAPSpace::collide2( void *data, dxGeom *geom, dNearCallback *callback )
+void dxSAPSpace::collide2( void *_data, dxGeom *geom, dNearCallback *callback )
 {
 	dAASSERT (geom && callback);
 
@@ -511,26 +512,26 @@ void dxSAPSpace::collide2( void *data, dxGeom *geom, dNearCallback *callback )
 	for ( int i = 0; i < geom_count; ++i ) {
 		dxGeom* g = GeomList[i];
 		if ( GEOM_ENABLED(g) )
-			collideAABBs (g,geom,data,callback);
+			collideAABBs (g,geom,_data,callback);
 	}
 
 	lock_count--;
 }
 
 
-void dxSAPSpace::BoxPruning( int count, const dxGeom** geoms, dArray< Pair >& pairs )
+void dxSAPSpace::BoxPruning( int _count, const dxGeom** geoms, dArray< Pair >& pairs )
 {
 	// 1) Build main list using the primary axis
 	//  NOTE: uses floats instead of dReals because that's what radix sort wants
-	for( int i = 0; i < count; ++i )
+	for( int i = 0; i < _count; ++i )
 		poslist[ i ] = (float)TmpGeomList[i]->aabb[ ax0idx ];
-	poslist[ count++ ] = FLT_MAX;
+	poslist[ _count++ ] = FLT_MAX;
 
 	// 2) Sort the list
-	const uint32* Sorted = sortContext.RadixSort( poslist.data(), count );
+	const uint32* Sorted = sortContext.RadixSort( poslist.data(), _count );
 
 	// 3) Prune the list
-	const uint32* const LastSorted = Sorted + count;
+	const uint32* const LastSorted = Sorted + _count;
 	const uint32* RunningAddress = Sorted;
 
 	Pair IndexPair;

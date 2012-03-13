@@ -46,10 +46,10 @@ namespace gazebo
       public: virtual Mesh *Load(const std::string &filename);
 
       /// Reads an ASCII STL (stereolithography) file.
-      private: void ReadAscii(FILE *_filein, Mesh *_mesh);
+      private: bool ReadAscii(FILE *_filein, Mesh *_mesh);
 
       /// Reads a binary STL (stereolithography) file.
-      private: void ReadBinary(FILE *_filein, Mesh *_mesh);
+      private: bool ReadBinary(FILE *_filein, Mesh *_mesh);
 
       /// Compares two strings for equality, disregarding case.
       private: bool Leqi(char* _string1, char* _string2);
@@ -61,10 +61,10 @@ namespace gazebo
       private: uint32_t LongIntRead(FILE *_filein);
 
       /// Reads a short int from a binary file.
-      private: uint16_t ShortIntRead(FILE *_filein);
+      private: bool ShortIntRead(FILE *_filein, uint16_t &_value);
 
       /// Read 1 float from a binary file.
-      private: float FloatRead(FILE *_filein);
+      private: bool FloatRead(FILE *_filein, double &_value);
     };
     /// \}
   }

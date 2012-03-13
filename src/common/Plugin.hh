@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef PLUGIN_HH
-#define PLUGIN_HH
+ */
+#ifndef GZ_PLUGIN_HH
+#define GZ_PLUGIN_HH
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -40,8 +40,6 @@
 #include "sensors/SensorTypes.hh"
 #include "sdf/sdf.h"
 
-
-
 namespace gazebo
 {
   class Event;
@@ -54,129 +52,134 @@ namespace gazebo
   {
     public: typedef boost::shared_ptr<T> TPtr;
 
-    /// \brief Get the name of the handler
+            /// \brief Get the name of the handler
     public: std::string GetFilename() const
-    {
-      return this->filename;
-    }
+            {
+              return this->filename;
+            }
 
-    /// \brief Get the short name of the handler
+            /// \brief Get the short name of the handler
     public: std::string GetHandle() const
-    {
-      return this->handle;
-    }
+            {
+              return this->handle;
+            }
 
     public: static TPtr Create(const std::string &_filename,
-                                    const std::string &_handle)
-    {
-      TPtr result;
-      // PluginPtr result;
-      struct stat st;
-      bool found = false;
-      std::string fullname;
-      std::list<std::string>::iterator iter;
-      std::list<std::string> pluginPaths =
-        common::SystemPaths::Instance()->GetPluginPaths();
+                const std::string &_handle)
+            {
+              TPtr result;
+              // PluginPtr result;
+              struct stat st;
+              bool found = false;
+              std::string fullname;
+              std::list<std::string>::iterator iter;
+              std::list<std::string> pluginPaths =
+                common::SystemPaths::Instance()->GetPluginPaths();
 
-      for (iter = pluginPaths.begin(); iter!= pluginPaths.end(); ++iter)
-      {
-        fullname = (*iter)+std::string("/")+_filename;
-        if (stat(fullname.c_str(), &st) == 0)
-        {
-          found = true;
-          break;
-        }
-      }
+              for (iter = pluginPaths.begin();
+                   iter!= pluginPaths.end(); ++iter)
+              {
+                fullname = (*iter)+std::string("/")+_filename;
+                if (stat(fullname.c_str(), &st) == 0)
+                {
+                  found = true;
+                  break;
+                }
+              }
 
-      if (!found)
-        fullname = _filename;
-      std::string registerName = "RegisterPlugin";
+              if (!found)
+                fullname = _filename;
+              std::string registerName = "RegisterPlugin";
 
-    typedef T *(*fptr)();
-    typedef union
-    {
-      fptr func;
-      void *ptr;
-    } fptr_union;
-    fptr_union registerFunc;
+              fptr_union_t registerFunc;
 
-    #ifdef HAVE_DL
-      void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-      if (!handle)
-      {
-        gzerr << "Failed to load plugin " << fullname << ": "
-              << dlerror() << "\n";
-        return result;
-      }
+#ifdef HAVE_DL
+              void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+              if (!handle)
+              {
+                gzerr << "Failed to load plugin " << fullname << ": "
+                  << dlerror() << "\n";
+                return result;
+              }
 
-      registerFunc.ptr = dlsym(handle, registerName.c_str());
+              registerFunc.ptr = dlsym(handle, registerName.c_str());
 
-      if (!registerFunc.ptr)
-      {
-        gzerr << "Failed to resolve " << registerName << ": " << dlerror();
-        return result;
-      }
+              if (!registerFunc.ptr)
+              {
+                gzerr << "Failed to resolve " << registerName
+                      << ": " << dlerror();
+                return result;
+              }
 
-      // Register the new controller.
-      result.reset(registerFunc.func());
+              // Register the new controller.
+              result.reset(registerFunc.func());
 
-    #elif HAVE_LTDL
+#elif HAVE_LTDL
 
-      static bool init_done = false;
+              static bool init_done = false;
 
-      if (!init_done)
-      {
-        int errors = lt_dlinit();
-        if (errors)
-        {
-          gzerr << "Error(s) initializing dynamic loader ("
-            << errors << ", " << lt_dlerror() << ")";
-          return NULL;
-        }
-        else
-          init_done = true;
-      }
+              if (!init_done)
+              {
+                int errors = lt_dlinit();
+                if (errors)
+                {
+                  gzerr << "Error(s) initializing dynamic loader ("
+                    << errors << ", " << lt_dlerror() << ")";
+                  return NULL;
+                }
+                else
+                  init_done = true;
+              }
 
-      lt_dlhandle handle = lt_dlopenext(fullname.c_str());
+              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
 
-      if (!handle)
-      {
-        gzerr << "Failed to load " << fullname << ": " << lt_dlerror();
-        return NULL;
-      }
+              if (!handle)
+              {
+                gzerr << "Failed to load " << fullname
+                      << ": " << lt_dlerror();
+                return NULL;
+              }
 
-      T *(*registerFunc)() = (T *(*)())lt_dlsym(handle, registerName.c_str());
-      resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-      if (!registerFunc.ptr)
-      {
-        gzerr << "Failed to resolve " << registerName << ": " << lt_dlerror();
-        return NULL;
-      }
+              T *(*registerFunc)() =
+                (T *(*)())lt_dlsym(handle, registerName.c_str());
+              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
+              if (!registerFunc.ptr)
+              {
+                gzerr << "Failed to resolve " << registerName << ": "
+                      << lt_dlerror();
+                return NULL;
+              }
 
-      // Register the new controller.
-      result.result(registerFunc.func());
+              // Register the new controller.
+              result.result(registerFunc.func());
 
-    #else  // HAVE_LTDL
+#else  // HAVE_LTDL
 
-      gzthrow("Cannot load plugins as libtool is not installed.");
+              gzthrow("Cannot load plugins as libtool is not installed.");
 
-    #endif  // HAVE_LTDL
+#endif  // HAVE_LTDL
 
-      result->handle = _handle;
-      result->filename = _filename;
+              result->handle = _handle;
+              result->filename = _filename;
 
-      return result;
-    }
+              return result;
+            }
 
     protected: std::string filename;
     protected: std::string handle;
+
+    private: typedef union
+             {
+               T *(*func)();
+               void *ptr;
+             } fptr_union_t;
   };
 
   class WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Load function
-    public: virtual void Load(physics::WorldPtr &_world,
-                              sdf::ElementPtr &_sdf) = 0;
+    public: virtual void Load(physics::WorldPtr _world,
+                sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -184,8 +187,8 @@ namespace gazebo
   class ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Load function
-    public: virtual void Load(physics::ModelPtr &_model,
-                              sdf::ElementPtr &_sdf) = 0;
+    public: virtual void Load(physics::ModelPtr _model,
+                sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -193,8 +196,8 @@ namespace gazebo
   class SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Load function
-    public: virtual void Load(
-                sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf) = 0;
+    public: virtual void Load(sensors::SensorPtr _sensor,
+                sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -210,33 +213,31 @@ namespace gazebo
   /// \}
 
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
-extern "C" gazebo::ModelPlugin *RegisterPlugin(); \
-gazebo::ModelPlugin *RegisterPlugin() \
-{\
-  return new classname();\
-}
+  extern "C" gazebo::ModelPlugin *RegisterPlugin(); \
+  gazebo::ModelPlugin *RegisterPlugin() \
+  {\
+    return new classname();\
+  }
 
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
-extern "C" gazebo::WorldPlugin *RegisterPlugin(); \
-gazebo::WorldPlugin *RegisterPlugin() \
-{\
-  return new classname();\
-}
+  extern "C" gazebo::WorldPlugin *RegisterPlugin(); \
+  gazebo::WorldPlugin *RegisterPlugin() \
+  {\
+    return new classname();\
+  }
 
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
-extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
-gazebo::SensorPlugin *RegisterPlugin() \
-{\
-  return new classname();\
-}
+  extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
+  gazebo::SensorPlugin *RegisterPlugin() \
+  {\
+    return new classname();\
+  }
 
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
-extern "C" gazebo::SystemPlugin *RegisterPlugin(); \
-gazebo::SystemPlugin *RegisterPlugin() \
-{\
-  return new classname();\
-}
+  extern "C" gazebo::SystemPlugin *RegisterPlugin(); \
+  gazebo::SystemPlugin *RegisterPlugin() \
+  {\
+    return new classname();\
+  }
 }
 #endif
-
-

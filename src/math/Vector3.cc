@@ -17,7 +17,6 @@
 /* Desc: Vector 3
  * Author: Andrew Howard and Nate Koenig
  * Date: 4 Apr 2007
- * SVN: $Id$
  */
 
 #include "math/Helpers.hh"
@@ -56,6 +55,12 @@ double Vector3::Distance(const Vector3 &_pt) const
   return sqrt((this->x-_pt.x)*(this->x-_pt.x) +
               (this->y-_pt.y)*(this->y-_pt.y) +
               (this->z-_pt.z)*(this->z-_pt.z));
+}
+
+//////////////////////////////////////////////////
+double Vector3::Distance(double _x, double _y, double _z) const
+{
+  return this->Distance(Vector3(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
@@ -151,25 +156,6 @@ Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
 }
 
 //////////////////////////////////////////////////
-double Vector3::GetDistToPlane(const Vector3 &_dir,
-                               const Vector3 &_planeNormal, double _d) const
-{
-  double denom = _planeNormal.GetDotProd(_dir);
-
-  if (fabs(denom) < 1e-3)
-  {
-    // parallel
-    return -1;
-  }
-  else
-  {
-    double nom = this->GetDotProd(_planeNormal) + _d;
-    double t = -(nom/denom);
-    return t;
-  }
-}
-
-//////////////////////////////////////////////////
 double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
 {
   double d = ((*this) - _pt1).GetCrossProd((*this) - _pt2).GetLength();
@@ -178,7 +164,6 @@ double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
 }
 
 //////////////////////////////////////////////////
-/// vector
 void Vector3::SetToMax(const Vector3 & _v)
 {
   if (_v.x > this->x) this->x = _v.x;
@@ -187,7 +172,6 @@ void Vector3::SetToMax(const Vector3 & _v)
 }
 
 //////////////////////////////////////////////////
-/// vector
 void Vector3::SetToMin(const Vector3 & _v)
 {
   if (_v.x < this->x) this->x = _v.x;
@@ -216,14 +200,13 @@ const Vector3 &Vector3::operator =(double value)
   return *this;
 }
 
-
-
 //////////////////////////////////////////////////
 Vector3 Vector3::operator+(const Vector3 &pt) const
 {
   return Vector3(this->x + pt.x, this->y + pt.y, this->z + pt.z);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator+=(const Vector3 &pt)
 {
   this->x += pt.x;
@@ -233,6 +216,7 @@ const Vector3 &Vector3::operator+=(const Vector3 &pt)
   return *this;
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator-=(const Vector3 &pt)
 {
   this->x -= pt.x;
@@ -242,14 +226,13 @@ const Vector3 &Vector3::operator-=(const Vector3 &pt)
   return *this;
 }
 
-
 //////////////////////////////////////////////////
-
 const Vector3 Vector3::operator/(const Vector3 &pt) const
 {
   return Vector3(this->x / pt.x, this->y / pt.y, this->z / pt.z);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator/=(const Vector3 &pt)
 {
   this->x /= pt.x;
@@ -259,11 +242,13 @@ const Vector3 &Vector3::operator/=(const Vector3 &pt)
   return *this;
 }
 
+//////////////////////////////////////////////////
 const Vector3 Vector3::operator/(double v) const
 {
   return Vector3(this->x / v, this->y / v, this->z / v);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator/=(double v)
 {
   this->x /= v;
@@ -273,14 +258,13 @@ const Vector3 &Vector3::operator/=(double v)
   return *this;
 }
 
-
-
 //////////////////////////////////////////////////
 const Vector3 Vector3::operator*(const Vector3 &pt) const
 {
   return Vector3(this->x * pt.x, this->y * pt.y, this->z * pt.z);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator*=(const Vector3 &pt)
 {
   this->x *= pt.x;
@@ -290,11 +274,13 @@ const Vector3 &Vector3::operator*=(const Vector3 &pt)
   return *this;
 }
 
+//////////////////////////////////////////////////
 const Vector3 Vector3::operator*(double v) const
 {
   return Vector3(this->x * v, this->y * v, this->z * v);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator*=(double v)
 {
   this->x *= v;

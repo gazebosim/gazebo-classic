@@ -25,6 +25,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include "sensors/SensorTypes.hh"
 
@@ -50,8 +51,11 @@ namespace gazebo
     /// reading the world file.
     public: static SensorPtr NewSensor(const std::string &classname);
 
+    /// \brief Get all the sensor types
+    public: static void GetSensorTypes(std::vector<std::string> &_types);
+
     /// \brief A list of registered sensor classes
-    private: static std::map<std::string, SensorFactoryFn> sensor_map;
+    private: static std::map<std::string, SensorFactoryFn> sensorMap;
   };
 
 

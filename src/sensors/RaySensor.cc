@@ -46,6 +46,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 RaySensor::RaySensor()
     : Sensor()
 {
+  this->mutex = new boost::mutex();
   this->active = false;
   this->node = transport::NodePtr(new transport::Node());
 }
@@ -53,41 +54,32 @@ RaySensor::RaySensor()
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
+  delete this->mutex;
   this->laserCollision.reset();
-  this->link.reset();
   this->laserShape.reset();
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load(sdf::ElementPtr &_sdf)
+void RaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  Sensor::Load(_sdf);
+  Sensor::Load(_worldName, _sdf);
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load()
+void RaySensor::Load(const std::string &_worldName)
 {
-  Sensor::Load();
-
-  std::string linkName = this->sdf->GetLinkName();
-  std::string modelName = this->sdf->GetModelName();
-  std::string worldName = this->sdf->GetWorldName();
+  Sensor::Load(_worldName);
 
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(worldName);
+    this->node->Init(this->world->GetName());
     this->scanPub = this->node->Advertise<msgs::LaserScan>(
         this->sdf->GetElement("topic")->GetValueString());
   }
 
-  physics::WorldPtr world = physics::get_world(worldName);
-  this->link = world->GetModelByName(modelName)->GetChildLink(linkName);
-
-  if (this->link == NULL)
-    gzthrow("Null link in the ray sensor");
-
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  this->laserCollision = physicsEngine->CreateCollision("multiray", this->link);
+  physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
+  this->laserCollision = physicsEngine->CreateCollision("multiray",
+      this->parentName);
   this->laserCollision->SetName("ray_sensor_collision");
   this->laserCollision->SetRelativePose(this->pose);
 
@@ -103,6 +95,7 @@ void RaySensor::Load()
 void RaySensor::Init()
 {
   Sensor::Init();
+  this->laserMsg.set_frame(this->parentName);
 }
 
 //////////////////////////////////////////////////
@@ -187,50 +180,66 @@ math::Angle RaySensor::GetVerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRange(int index)
+void RaySensor::GetRanges(std::vector<double> &_ranges)
 {
-  return this->laserShape->GetRange(index);
+  boost::mutex::scoped_lock(*this->mutex);
+  _ranges.resize(this->laserMsg.ranges_size());
+  memcpy(&_ranges[0], this->laserMsg.ranges().data(),
+         sizeof(_ranges[0]) * this->laserMsg.ranges_size());
+}
+
+//////////////////////////////////////////////////
+double RaySensor::GetRange(int _index)
+{
+  if (_index < 0 || _index > this->laserMsg.ranges_size())
+  {
+    gzerr << "Invalid range index[" << _index << "]\n";
+    return 0.0;
+  }
+
+  boost::mutex::scoped_lock(*this->mutex);
+  return this->laserMsg.ranges(_index);
 }
 
 //////////////////////////////////////////////////
 double RaySensor::GetRetro(int index)
 {
+  boost::mutex::scoped_lock(*this->mutex);
   return this->laserShape->GetRetro(index);
 }
 
 //////////////////////////////////////////////////
 int RaySensor::GetFiducial(int index)
 {
+  boost::mutex::scoped_lock(*this->mutex);
   return this->laserShape->GetFiducial(index);
 }
 
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
+  this->mutex->lock();
   this->laserShape->Update();
-  this->lastUpdateTime = this->link->GetWorld()->GetSimTime();
+  this->lastUpdateTime = this->world->GetSimTime();
+
+  // Store the latest laser scan.
+  msgs::Set(this->laserMsg.mutable_offset(), this->GetPose());
+  this->laserMsg.set_angle_min(this->GetAngleMin().GetAsRadian());
+  this->laserMsg.set_angle_max(this->GetAngleMax().GetAsRadian());
+  this->laserMsg.set_angle_step(this->GetAngleResolution());
+
+  this->laserMsg.set_range_min(this->GetRangeMin());
+  this->laserMsg.set_range_max(this->GetRangeMax());
+  this->laserMsg.clear_ranges();
+  this->laserMsg.clear_intensities();
+
+  for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
+  {
+    this->laserMsg.add_ranges(this->laserShape->GetRange(i));
+    this->laserMsg.add_intensities(0);
+  }
+  this->mutex->unlock();
 
   if (this->scanPub)
-  {
-    msgs::LaserScan msg;
-
-    msg.set_frame(this->link->GetScopedName());
-    msgs::Set(msg.mutable_offset(), this->GetPose());
-    msg.set_angle_min(this->GetAngleMin().GetAsRadian());
-    msg.set_angle_max(this->GetAngleMax().GetAsRadian());
-    msg.set_angle_step(this->GetAngleResolution());
-
-    msg.set_range_min(this->GetRangeMin());
-    msg.set_range_max(this->GetRangeMax());
-
-    for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
-    {
-      msg.add_ranges(this->laserShape->GetRange(i));
-      msg.add_intensities(0);
-    }
-
-    this->scanPub->Publish(msg);
-  }
+    this->scanPub->Publish(this->laserMsg);
 }
-
-

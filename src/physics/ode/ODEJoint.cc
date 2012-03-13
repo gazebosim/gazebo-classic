@@ -17,7 +17,6 @@
 /* Desc: The ODE base joint class
  * Author: Nate Keonig, Andrew Howard
  * Date: 12 Oct 2009
- * SVN: $Id$
  */
 
 #include "common/Exception.hh"
@@ -47,7 +46,7 @@ ODEJoint::~ODEJoint()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::Load(sdf::ElementPtr &_sdf)
+void ODEJoint::Load(sdf::ElementPtr _sdf)
 {
   Joint::Load(_sdf);
 
@@ -221,10 +220,16 @@ void ODEJoint::SetHighStop(int _index, math::Angle _angle)
   {
     case 0:
       this->SetParam(dParamHiStop, _angle.GetAsRadian());
+      break;
     case 1:
       this->SetParam(dParamHiStop2, _angle.GetAsRadian());
+      break;
     case 2:
       this->SetParam(dParamHiStop3, _angle.GetAsRadian());
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      break;
   };
 }
 
@@ -235,10 +240,15 @@ void ODEJoint::SetLowStop(int _index, math::Angle _angle)
   {
     case 0:
       this->SetParam(dParamLoStop, _angle.GetAsRadian());
+      break;
     case 1:
       this->SetParam(dParamLoStop2, _angle.GetAsRadian());
+      break;
     case 2:
       this->SetParam(dParamLoStop3, _angle.GetAsRadian());
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
   };
 }
 
@@ -253,6 +263,8 @@ math::Angle ODEJoint::GetHighStop(int _index)
       return this->GetParam(dParamHiStop2);
     case 2:
       return this->GetParam(dParamHiStop3);
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
   };
 
   return 0;
@@ -269,6 +281,8 @@ math::Angle ODEJoint::GetLowStop(int _index)
       return this->GetParam(dParamLoStop2);
     case 2:
       return this->GetParam(dParamLoStop3);
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
   };
 
   return 0;
@@ -278,12 +292,14 @@ math::Angle ODEJoint::GetLowStop(int _index)
 math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 {
   math::Vector3 result;
-  dJointFeedback *feedback = dJointGetFeedback(this->jointId);
+  dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
 
   if (_index == 0)
-    result.Set(feedback->f1[0], feedback->f1[1], feedback->f1[2]);
+    result.Set(jointFeedback->f1[0], jointFeedback->f1[1],
+               jointFeedback->f1[2]);
   else
-    result.Set(feedback->f2[0], feedback->f2[1], feedback->f2[2]);
+    result.Set(jointFeedback->f2[0], jointFeedback->f2[1],
+               jointFeedback->f2[2]);
 
   return result;
 }
@@ -292,12 +308,14 @@ math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 {
   math::Vector3 result;
-  dJointFeedback *feedback = dJointGetFeedback(this->jointId);
+  dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
 
   if (_index == 0)
-    result.Set(feedback->t1[0], feedback->t1[1], feedback->t1[2]);
+    result.Set(jointFeedback->t1[0], jointFeedback->t1[1],
+               jointFeedback->t1[2]);
   else
-    result.Set(feedback->t2[0], feedback->t2[1], feedback->t2[2]);
+    result.Set(jointFeedback->t2[0], jointFeedback->t2[1],
+               jointFeedback->t2[2]);
 
   return result;
 }
@@ -351,8 +369,3 @@ void ODEJoint::Reset()
   dJointReset(this->jointId);
   Joint::Reset();
 }
-
-
-
-
-

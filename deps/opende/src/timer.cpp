@@ -391,9 +391,9 @@ void dTimerReport (FILE *fout, int average)
   // compute time difference for all slots except the last one. update totals
   double *times = (double*) ALLOCA (num * sizeof(double));
   for (i=0; i < (num-1); i++) {
-    double t1 = loadClockCount (event[i].cc);
-    double t2 = loadClockCount (event[i+1].cc);
-    times[i] = t2 - t1;
+    double t11 = loadClockCount (event[i].cc);
+    double t22 = loadClockCount (event[i+1].cc);
+    times[i] = t22 - t11;
     event[i].count++;
     event[i].total_t += times[i];
     event[i].total_p += times[i]/total * 100.0;

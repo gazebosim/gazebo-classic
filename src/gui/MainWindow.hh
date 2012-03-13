@@ -17,11 +17,11 @@
 #ifndef MAINWINDOW_HH
 #define MAINWINDOW_HH
 
-#include <qmainwindow.h>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "gui/qt.h"
 #include "common/Event.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
@@ -55,7 +55,9 @@ namespace gazebo
 
       private slots: void New();
       private slots: void Open();
+      private slots: void Import();
       private slots: void Save();
+      private slots: void SaveAs();
       private slots: void About();
       private slots: void Play();
       private slots: void Pause();
@@ -63,10 +65,13 @@ namespace gazebo
 
       private slots: void NewModel();
       private slots: void EditWorldProperties();
+      private slots: void Arrow();
+      private slots: void RingPose();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
       private slots: void CreateCylinder();
+      private slots: void CreateMesh();
       private slots: void CreatePointLight();
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
@@ -84,22 +89,23 @@ namespace gazebo
       private: void CreateToolbars();
 
       private: void OnModel(ConstModelPtr &_msg);
-      private: void OnSetSelectedEntity(const std::string &_name);
-      private: void OnResponse(
-                   ConstResponsePtr &_msg);
-      private: void OnWorldModify(
-                   ConstWorldModifyPtr &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
+      private: void OnWorldModify(ConstWorldModifyPtr &_msg);
+      private: void OnManipMode(const std::string &_mode);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;
       private: QMenu *viewMenu;
       private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
+      private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
       private: QAction *newAct;
       private: QAction *openAct;
+      private: QAction *importAct;
       private: QAction *saveAct;
+      private: QAction *saveAsAct;
       private: QAction *aboutAct;
       private: QAction *quitAct;
 
@@ -111,9 +117,13 @@ namespace gazebo
       private: QAction *pauseAct;
       private: QAction *stepAct;
 
+      private: QAction *arrowAct;
+      private: QAction *ringPoseAct;
+
       private: QAction *boxCreateAct;
       private: QAction *sphereCreateAct;
       private: QAction *cylinderCreateAct;
+      private: QAction *meshCreateAct;
       private: QAction *pointLghtCreateAct;
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;
@@ -150,5 +160,3 @@ namespace gazebo
 }
 
 #endif
-
-

@@ -189,19 +189,19 @@ void dPlaneSpace (const dVector3 n, dVector3 p, dVector3 q)
 void dOrthogonalizeR(dMatrix3 m)
 {
 	dReal n0 = dCalcVectorLengthSquare3(m);
-	if (n0 != 1)
+	if (!_dequal(n0, 1.0))
 		dSafeNormalize3(m);
 
 	// project row[0] on row[1], should be zero
 	dReal proj = dCalcVectorDot3(m, m+4);
-	if (proj != 0) {
+	if (!_dequal(proj, 0.0)) {
 		// Gram-Schmidt step on row[1]
 		m[4] -= proj * m[0];
 		m[5] -= proj * m[1];
 		m[6] -= proj * m[2];
 	}
 	dReal n1 = dCalcVectorLengthSquare3(m+4);
-	if (n1 != 1)
+	if (!_dequal(n1, 1.0))
 		dSafeNormalize3(m+4);
 
 	/* just overwrite row[2], this makes sure the matrix is not

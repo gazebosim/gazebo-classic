@@ -31,8 +31,9 @@
 using namespace gazebo;
 using namespace rendering;
 
+enum {POSITION_BINDING, TEXCOORD_BINDING};
 
-enum { POSITION_BINDING, TEXCOORD_BINDING };
+/////////////////////////////////////////////////
 DynamicLines::DynamicLines(RenderOpType opType)
 {
   this->Init(opType, false);
@@ -40,28 +41,32 @@ DynamicLines::DynamicLines(RenderOpType opType)
   this->dirty = true;
 }
 
+/////////////////////////////////////////////////
 DynamicLines::~DynamicLines()
 {
 }
 
+/////////////////////////////////////////////////
 std::string DynamicLines::GetMovableType()
 {
-  return "gazebo::ogredynamiclines";
+  return "gazebo::dynamiclines";
 }
 
-/// Returns "gazebo::ogredynamicslines"
+/////////////////////////////////////////////////
 const Ogre::String &DynamicLines::getMovableType() const
 {
   static Ogre::String moveType = DynamicLines::GetMovableType();
   return moveType;
 }
 
+/////////////////////////////////////////////////
 void DynamicLines::AddPoint(const math::Vector3 &pt)
 {
   this->points.push_back(pt);
   this->dirty = true;
 }
 
+/////////////////////////////////////////////////
 void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
 {
   if (index >= this->points.size())
@@ -77,6 +82,7 @@ void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
   this->dirty = true;
 }
 
+/////////////////////////////////////////////////
 const math::Vector3& DynamicLines::GetPoint(unsigned int index) const
 {
   if (index >= this->points.size())
@@ -87,24 +93,27 @@ const math::Vector3& DynamicLines::GetPoint(unsigned int index) const
   return this->points[index];
 }
 
+/////////////////////////////////////////////////
 unsigned int DynamicLines::GetPointCount() const
 {
   return this->points.size();
 }
 
+/////////////////////////////////////////////////
 void DynamicLines::Clear()
 {
   this->points.clear();
   this->dirty = true;
 }
 
+/////////////////////////////////////////////////
 void DynamicLines::Update()
 {
   if (this->dirty && this->points.size() > 1)
     this->FillHardwareBuffers();
 }
 
-
+/////////////////////////////////////////////////
 void DynamicLines::CreateVertexDeclaration()
 {
   Ogre::VertexDeclaration *decl =
@@ -113,6 +122,7 @@ void DynamicLines::CreateVertexDeclaration()
   decl->addElement(POSITION_BINDING, 0, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
 }
 
+/////////////////////////////////////////////////
 void DynamicLines::FillHardwareBuffers()
 {
   int size = this->points.size();
@@ -148,4 +158,3 @@ void DynamicLines::FillHardwareBuffers()
 
   this->dirty = false;
 }
-

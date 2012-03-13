@@ -18,7 +18,6 @@
  * Desc: Factory for creating physics engine
  * Author: Nate Koenig
  * Date: 21 May 2009
- * SVN info:$
  */
 
 #ifndef PHYSICSFACTORY_HH

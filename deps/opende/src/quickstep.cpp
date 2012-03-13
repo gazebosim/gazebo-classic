@@ -1293,7 +1293,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
     // to run three loops for each individual component
     dxBody *const *const bodyend = body + nb;
     dReal gravity_x = world->gravity[0];
-    if (gravity_x) {
+    if (!_dequal(gravity_x, 0.0)) {
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         if ((b_ptr->flags & dxBodyNoGravity)==0) {
@@ -1302,7 +1302,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
     dReal gravity_y = world->gravity[1];
-    if (gravity_y) {
+    if (!_dequal(gravity_y, 0.0)) {
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         if ((b_ptr->flags & dxBodyNoGravity)==0) {
@@ -1311,7 +1311,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
     dReal gravity_z = world->gravity[2];
-    if (gravity_z) {
+    if (!_dequal(gravity_z, 0.0)) {
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         if ((b_ptr->flags & dxBodyNoGravity)==0) {
@@ -1564,11 +1564,28 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
               // check element-wise ratio for JiMratio
               JiMratio_ptr[0] = 1.0;
-              for (int j=0;j<3;j++) {
-                if  (JiM_ptr[  j] != 0) JiMratio_ptr[0] = std::max(JiMratio_ptr[0],JiM_ptr[6+j]/JiM_ptr[  j]);
-                if  (JiM_ptr[3+j] != 0) JiMratio_ptr[0] = std::max(JiMratio_ptr[0],JiM_ptr[9+j]/JiM_ptr[3+j]);
-                if  (JiM_ptr[6+j] != 0) JiMratio_ptr[0] = std::max(JiMratio_ptr[0],JiM_ptr[  j]/JiM_ptr[6+j]);
-                if  (JiM_ptr[9+j] != 0) JiMratio_ptr[0] = std::max(JiMratio_ptr[0],JiM_ptr[3+j]/JiM_ptr[9+j]);
+              for (int j=0;j<3;j++)
+              {
+                if (!_dequal(JiM_ptr[j], 0.0))
+                {
+                  JiMratio_ptr[0] =
+                    std::max(JiMratio_ptr[0],JiM_ptr[6+j]/JiM_ptr[  j]);
+                }
+                if (!_dequal(JiM_ptr[3+j], 0.0))
+                {
+                  JiMratio_ptr[0] =
+                    std::max(JiMratio_ptr[0],JiM_ptr[9+j]/JiM_ptr[3+j]);
+                }
+                if (!_dequal(JiM_ptr[6+j], 0.0))
+                {
+                  JiMratio_ptr[0] =
+                    std::max(JiMratio_ptr[0],JiM_ptr[  j]/JiM_ptr[6+j]);
+                }
+                if (!_dequal(JiM_ptr[9+j], 0.0))
+                {
+                  JiMratio_ptr[0] =
+                    std::max(JiMratio_ptr[0],JiM_ptr[3+j]/JiM_ptr[9+j]);
+                }
               }
             }
           }

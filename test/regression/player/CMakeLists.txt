@@ -6,6 +6,7 @@ include_directories (
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
   ${PLAYER_INCLUDE_DIRS} 
+  ${PROTOBUF_INCLUDE_DIR}
 )
 
 link_directories(  
@@ -27,7 +28,6 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
   target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
     gazebo_common
     gazebo_sdf_interface
-    gazebo_sdf_parser
     gazebo_transport
     gazebo_physics
     gazebo_sensors

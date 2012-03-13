@@ -17,7 +17,6 @@
 /* Desc: A bullet slider or primastic joint
  * Author: Nate Keonig
  * Date: 13 Oct 2009
- * SVN: $Id:$
  */
 
 

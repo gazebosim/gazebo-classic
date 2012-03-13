@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~HingeJoint()
               { }
       /// \brief Load joint
-      protected: virtual void Load(sdf::ElementPtr &_sdf)
+      protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
 

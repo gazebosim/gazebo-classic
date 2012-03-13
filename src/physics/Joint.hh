@@ -30,6 +30,7 @@
 #include "transport/TransportTypes.hh"
 #include "msgs/MessageTypes.hh"
 
+#include "physics/JointState.hh"
 #include "physics/Base.hh"
 
 namespace gazebo
@@ -61,7 +62,7 @@ namespace gazebo
       public: virtual ~Joint();
 
       /// \brief Load a joint
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize a joint
       public: virtual void Init();
@@ -70,13 +71,19 @@ namespace gazebo
       public: void Update();
 
       /// \brief update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the joint to show visuals
       public: void ShowJoints(const bool &s);
 
       /// \brief Reset the joint
       public: virtual void Reset();
+
+      /// \brief Get the joint state
+      public: JointState GetState();
+
+      /// \brief Set the joint state
+      public: void SetState(const JointState &_state);
 
       /// \brief Set the model this joint belongs too
       public: void SetModel(ModelPtr model);

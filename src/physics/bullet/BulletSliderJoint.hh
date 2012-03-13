@@ -17,7 +17,6 @@
 /* Desc: A slider or primastic joint
  * Author: Nate Keonig
  * Date: 24 May 2009
- * SVN: $Id:$
  */
 
 #ifndef BULLETSLIDERJOINT_HH

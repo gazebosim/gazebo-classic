@@ -32,6 +32,7 @@
 
 #include "math/Angle.hh"
 #include "math/Pose.hh"
+#include "math/Plane.hh"
 #include "math/Vector2i.hh"
 
 #include "msgs/MessageTypes.hh"
@@ -75,7 +76,7 @@ namespace gazebo
 
       /// \brief Load the camera with a set of parmeters
       /// \param _sdf The SDF camera info
-      public: void Load(sdf::ElementPtr &_sdf);
+      public: void Load(sdf::ElementPtr _sdf);
 
        /// \brief Load the camera with default parmeters
       public: void Load();
@@ -118,7 +119,7 @@ namespace gazebo
       public: math::Quaternion GetWorldRotation() const;
 
       /// \brief Set the global pose of the camera
-      public: void SetWorldPose(const math::Pose &_pose);
+      public: virtual void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the world position
       public: void SetWorldPosition(const math::Vector3 &_pos);
@@ -203,6 +204,9 @@ namespace gazebo
       /// \brief Set the save frame pathname
       public: void SetSaveFramePathname(const std::string &pathname);
 
+      /// \brief Save the last frame to disk
+      public: bool SaveFrame(const std::string &_filename);
+
       /// \brief Get a pointer to the ogre camera
       public: Ogre::Camera *GetOgreCamera() const;
 
@@ -258,7 +262,7 @@ namespace gazebo
                                           math::Vector3 &dir);
 
       /// \brief Set whether to capture data
-      public: void SetCaptureData(bool value);
+      public: void SetCaptureData(bool _value);
 
       /// \brief Set the render target
       public: void CreateRenderTexture(const std::string &textureName);
@@ -269,15 +273,14 @@ namespace gazebo
       /// \brief Get point on a plane
       /// \return True if a valid point was found
       public: bool GetWorldPointOnPlane(int _x, int _y,
-                  const math::Vector3 &_planeNorm, double _d,
-                  math::Vector3 &_result);
+                  const math::Plane &_plane, math::Vector3 &_result);
 
       public: virtual void SetRenderTarget(Ogre::RenderTarget *target);
 
       /// \brief Attach the camera to a scene node
       public: void AttachToVisual(const std::string &_visualName,
                   bool _inheritOrientation,
-                  double _minDist = 0, double _maxDist = 0);
+                  double _minDist = 0.0, double _maxDist = 0.0);
 
       /// \brief Set the camera to track a scene node
       public: void TrackVisual(const std::string &_visualName);
@@ -294,7 +297,8 @@ namespace gazebo
               { return newImageFrame.Connect(subscriber); }
       public: void DisconnectNewImageFrame(event::ConnectionPtr &c)
               { newImageFrame.Disconnect(c); }
-      public: static void SaveFrame(const unsigned char *_image,
+
+      public: static bool SaveFrame(const unsigned char *_image,
                   unsigned int _width, unsigned int _height, int _depth,
                   const std::string &_format,
                   const std::string &_filename);
@@ -336,8 +340,8 @@ namespace gazebo
 
       private: static int GetOgrePixelFormat(const std::string &_format);
 
-      // Save the camera frame
-      protected: virtual void SaveFrame();
+      /// Get the next frame filename based on SDF parameters
+      protected: std::string GetFrameFilename();
 
       // Create the ogre camera
       private: void CreateCamera();

@@ -17,7 +17,6 @@
 #include <stdlib.h>
 
 #include "sdf/sdf.h"
-#include "sdf/sdf_parser.h"
 
 #include "parser_deprecated.hh"
 
@@ -36,7 +35,7 @@ bool init(SDFPtr _sdf)
   bool result = false;
   std::string filename =
     gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(
-        "/sdf/gazebo.sdf");
+        "sdf/gazebo.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -66,7 +65,7 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-bool initFile(const std::string &_filename, ElementPtr &_sdf)
+bool initFile(const std::string &_filename, ElementPtr _sdf)
 {
   std::string filename =
     gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
@@ -81,7 +80,7 @@ bool initFile(const std::string &_filename, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initString(const std::string &_xmlString, SDFPtr &_sdf)
+bool initString(const std::string &_xmlString, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -90,7 +89,7 @@ bool initString(const std::string &_xmlString, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
+bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -109,7 +108,7 @@ bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
+bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -128,7 +127,7 @@ bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
+bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
 {
   const char *nameString = _xml->Attribute("name");
   if (!nameString)
@@ -161,7 +160,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     const char *name = child->Attribute("name");
     const char *type = child->Attribute("type");
     const char *defaultValue = child->Attribute("default");
-    const char *requiredString = child->Attribute("required");
+    requiredString = child->Attribute("required");
 
     if (!name)
     {
@@ -205,7 +204,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     {
       ElementPtr element(new Element);
       initXml(child, element);
-      _sdf->elementDescriptions.push_back(element);
+      _sdf->AddElementDescription(element);
     }
   }
 
@@ -215,12 +214,12 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
   {
     std::string filename =
       gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(
-          std::string("/sdf/") + child->Attribute("filename"));
+          std::string("sdf/") + child->Attribute("filename"));
 
     ElementPtr element(new Element);
 
     initFile(filename, element);
-    _sdf->elementDescriptions.push_back(element);
+    _sdf->AddElementDescription(element);
   }
 
   return true;
@@ -228,7 +227,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
 
 
 //////////////////////////////////////////////////
-bool readFile(const std::string &_filename, SDFPtr &_sdf)
+bool readFile(const std::string &_filename, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   std::string filename =
@@ -259,7 +258,7 @@ bool readFile(const std::string &_filename, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readString(const std::string &_xmlString, SDFPtr &_sdf)
+bool readString(const std::string &_xmlString, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -287,7 +286,7 @@ bool readString(const std::string &_xmlString, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readString(const std::string &_xmlString, ElementPtr &_sdf)
+bool readString(const std::string &_xmlString, ElementPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -302,7 +301,7 @@ bool readString(const std::string &_xmlString, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
+bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -342,7 +341,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
+bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -356,8 +355,14 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
       gazeboNode->Attribute("version") &&
       (strcmp(gazeboNode->Attribute("version") , "1.0") == 0))
   {
+    TiXmlElement* elemXml = gazeboNode;
+    if (gazeboNode->Value() != _sdf->GetName() &&
+        gazeboNode->FirstChildElement(_sdf->GetName()))
+    {
+      elemXml = gazeboNode->FirstChildElement(_sdf->GetName());
+    }
+
     /* parse new sdf xml */
-    TiXmlElement* elemXml = gazeboNode->FirstChildElement(_sdf->GetName());
     if (!readXml(elemXml, _sdf))
     {
       gzwarn << "Unable to parse sdf element["
@@ -383,7 +388,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
+bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 {
   if (_sdf->GetRequired() == "-1")
   {
@@ -402,50 +407,51 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
       return true;
   }
 
-  if (_xml->GetText() != NULL && _sdf->value)
+  if (_xml->GetText() != NULL && _sdf->GetValue())
   {
-    _sdf->value->SetFromString(_xml->GetText());
+    _sdf->GetValue()->SetFromString(_xml->GetText());
   }
 
-  Param_V::iterator iter;
   TiXmlAttribute *attribute = _xml->FirstAttribute();
+
+  unsigned int i = 0;
 
   // Iterate over all the attributes defined in the give XML element
   while (attribute)
   {
     // Find the matching attribute in SDF
-    for (iter = _sdf->attributes.begin();
-         iter != _sdf->attributes.end(); ++iter)
+    for (i = 0; i < _sdf->GetAttributeCount(); ++i)
     {
-      if ((*iter)->GetKey() == attribute->Name())
+      ParamPtr p = _sdf->GetAttribute(i);
+      if (p->GetKey() == attribute->Name())
       {
         // Set the value of the SDF attribute
-        if (!(*iter)->SetFromString(attribute->ValueStr()))
+        if (!p->SetFromString(attribute->ValueStr()))
         {
-          gzerr << "Unable to read attribute[" << (*iter)->GetKey() << "]\n";
+          gzerr << "Unable to read attribute[" << p->GetKey() << "]\n";
           return false;
         }
         break;
       }
     }
 
-    if (iter == _sdf->attributes.end())
+    if (i == _sdf->GetAttributeCount())
     {
       gzwarn << "XML Attribute[" << attribute->Name()
-        << "] in element[" << _xml->Value()
-        << "] not defined in SDF, ignoring.\n";
+             << "] in element[" << _xml->Value()
+             << "] not defined in SDF, ignoring.\n";
     }
 
     attribute = attribute->Next();
   }
 
   // Check that all required attributes have been set
-  for (iter = _sdf->attributes.begin();
-       iter != _sdf->attributes.end(); ++iter)
+  for (i = 0; i < _sdf->GetAttributeCount(); ++i)
   {
-    if ((*iter)->GetRequired() && !(*iter)->GetSet())
+    ParamPtr p = _sdf->GetAttribute(i);
+    if (p->GetRequired() && !p->GetSet())
     {
-      gzerr << "Required attribute[" << (*iter)->GetKey()
+      gzerr << "Required attribute[" << p->GetKey()
         << "] in element[" << _xml->Value() << "] is not specified in SDF.\n";
       return false;
     }
@@ -474,7 +480,9 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
         readFile(filename, includeSDF);
 
         includeSDF->root->GetFirstElement()->SetParent(_sdf);
-        _sdf->elements.push_back(includeSDF->root->GetFirstElement());
+        _sdf->InsertElement(includeSDF->root->GetFirstElement());
+        includeSDF->root->GetFirstElement()->SetInclude(elemXml->Attribute(
+              "filename"));
 
         if (elemXml->Attribute("model_name"))
           includeSDF->root->GetElement("model")->GetAttribute(
@@ -503,16 +511,17 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
       }
 
       // Find the matching element in SDF
-      ElementPtr_V::iterator eiter;
-      for (eiter = _sdf->elementDescriptions.begin();
-          eiter != _sdf->elementDescriptions.end(); ++eiter)
+      unsigned int descCounter = 0;
+      for (descCounter = 0;
+           descCounter != _sdf->GetElementDescriptionCount(); ++descCounter)
       {
-        if ((*eiter)->GetName() == elemXml->Value())
+        ElementPtr elemDesc = _sdf->GetElementDescription(descCounter);
+        if (elemDesc->GetName() == elemXml->Value())
         {
-          ElementPtr element = (*eiter)->Clone();
+          ElementPtr element = elemDesc->Clone();
           element->SetParent(_sdf);
           if (readXml(elemXml, element))
-            _sdf->elements.push_back(element);
+            _sdf->InsertElement(element);
           else
           {
             gzerr << "Error reading element\n";
@@ -522,7 +531,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
         }
       }
 
-      if (eiter == _sdf->elementDescriptions.end())
+      if (descCounter == _sdf->GetElementDescriptionCount())
       {
         gzerr << "XML Element[" << elemXml->Value()
           << "], child of element[" << _xml->Value()
@@ -532,18 +541,20 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     }
 
     // Chek that all required elements have been set
-    ElementPtr_V::iterator eiter;
-    for (eiter = _sdf->elementDescriptions.begin();
-        eiter != _sdf->elementDescriptions.end(); ++eiter)
+    unsigned int descCounter = 0;
+    for (descCounter = 0;
+         descCounter != _sdf->GetElementDescriptionCount(); ++descCounter)
     {
-      if ((*eiter)->GetRequired() == "1" || (*eiter)->GetRequired() == "+")
+      ElementPtr elemDesc = _sdf->GetElementDescription(descCounter);
+
+      if (elemDesc->GetRequired() == "1" || elemDesc->GetRequired() == "+")
       {
-        if (!_sdf->HasElement((*eiter)->GetName()))
+        if (!_sdf->HasElement(elemDesc->GetName()))
         {
           if (_sdf->GetName() == "joint" &&
               _sdf->GetValueString("type") != "ball")
           {
-            gzerr << "XML Missing required element[" << (*eiter)->GetName()
+            gzerr << "XML Missing required element[" << elemDesc->GetName()
               << "], child of element[" << _sdf->GetName() << "]\n";
             return false;
           }
@@ -555,7 +566,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
   return true;
 }
 
-void copyChildren(ElementPtr &_sdf, TiXmlElement *_xml)
+/////////////////////////////////////////////////
+void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
 {
   // Iterate over all the child elements
   TiXmlElement* elemXml = NULL;
@@ -571,7 +583,7 @@ void copyChildren(ElementPtr &_sdf, TiXmlElement *_xml)
       gzerr << "trying to copy stuff inside <plugin> block, "
             << "but they have NULL contents\n";
 
-    _sdf->elements.push_back(element);
+    _sdf->InsertElement(element);
   }
 }
 }

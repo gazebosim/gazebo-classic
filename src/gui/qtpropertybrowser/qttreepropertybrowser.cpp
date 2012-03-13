@@ -36,6 +36,10 @@
  ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  **
  ****************************************************************************/
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wshadow"
+
 
 
 #include <QtCore/QSet>
@@ -525,7 +529,7 @@ void QtTreePropertyBrowserPrivate::propertyInserted(QtBrowserItem *index,
   m_indexToItem[index] = newItem;
 
   newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
-  m_treeWidget->setItemExpanded(newItem, true);
+  m_treeWidget->setItemExpanded(newItem, false);
 
   updateItem(newItem);
 }
@@ -571,12 +575,16 @@ void QtTreePropertyBrowserPrivate::updateItem(QTreeWidgetItem *item)
   {
     expandIcon = m_expandIcon;
   }
+  else
+    item->setText(1, property->toolTip());
   item->setIcon(0, expandIcon);
-  item->setFirstColumnSpanned(!property->hasValue());
+  // item->setFirstColumnSpanned(!property->hasValue());
   item->setToolTip(0, property->propertyName());
   item->setStatusTip(0, property->statusTip());
   item->setWhatsThis(0, property->whatsThis());
   item->setText(0, property->propertyName());
+  item->setFont(0, QFont("arial", 10, QFont::Bold));
+  item->setFont(1, QFont("arial", 10, QFont::Normal));
   bool wasEnabled = item->flags() & Qt::ItemIsEnabled;
   bool isEnabled = wasEnabled;
   if (property->isEnabled())

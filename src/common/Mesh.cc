@@ -18,6 +18,7 @@
 #include <string.h>
 #include <algorithm>
 
+#include "math/Helpers.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
@@ -42,11 +43,13 @@ Mesh::~Mesh()
   this->submeshes.clear();
 }
 
+//////////////////////////////////////////////////
 void Mesh::SetPath(const std::string &_path)
 {
   this->path = _path;
 }
 
+//////////////////////////////////////////////////
 std::string Mesh::GetPath() const
 {
   return this->path;
@@ -242,8 +245,8 @@ void Mesh::FillArrays(float **_vertArr, int **_indArr) const
   if (*_indArr)
     delete [] *_indArr;
 
-  *_vertArr = new float[ vertCount * 3 ];
-  *_indArr = new int[ indCount ];
+  *_vertArr = new float[vertCount * 3];
+  *_indArr = new int[indCount];
 
   float *vPtr = *_vertArr;
   unsigned int index = 0;
@@ -330,9 +333,8 @@ void SubMesh::CopyNormals(const std::vector<math::Vector3> &_norms)
   {
     this->normals[i] = _norms[i];
     this->normals[i].Normalize();
-    if (this->normals[i].GetLength() == 0.0)
+    if (math::equal(this->normals[i].GetLength(), 0.0))
     {
-      std::cout << "Bad Normals[" << this->normals[i] << "]\n";
       this->normals[i].Set(0, 0, 1);
     }
   }
@@ -589,8 +591,8 @@ void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
   if (*_indArr)
     delete [] *_indArr;
 
-  *_vertArr = new float[ this->vertices.size() * 3 ];
-  *_indArr = new int[ this->indices.size() ];
+  *_vertArr = new float[this->vertices.size() * 3];
+  *_indArr = new int[this->indices.size()];
 
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
       ++viter)
@@ -642,7 +644,7 @@ void SubMesh::RecalculateNormals()
 
 //////////////////////////////////////////////////
 void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
-                   math::Vector3 &_max_xyz)
+                   math::Vector3 &_max_xyz) const
 {
   // find aabb center
   _min_xyz.x = 1e15;
@@ -655,7 +657,7 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
   _center.y = 0;
   _center.z = 0;
 
-  std::vector<SubMesh*>::iterator siter;
+  std::vector<SubMesh*>::const_iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
   {
     math::Vector3 max = (*siter)->GetMax();
@@ -673,15 +675,7 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
 }
 
 //////////////////////////////////////////////////
-void Mesh::SetMeshCenter(math::Vector3 _center)
-{
-  std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
-    (*siter)->SetSubMeshCenter(_center);
-}
-
-//////////////////////////////////////////////////
-void Mesh::GenSphericalTexCoord(math::Vector3 _center)
+void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
 {
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
@@ -689,21 +683,7 @@ void Mesh::GenSphericalTexCoord(math::Vector3 _center)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::SetSubMeshCenter(math::Vector3 _center)
-{
-  std::vector<math::Vector3>::iterator viter;
-  for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
-  {
-    // generate projected texture coordinates, projected from _center of aabb
-    // get x, y, z for computing texture coordinate projections
-    (*viter).x = (*viter).x-_center.x;
-    (*viter).y = (*viter).y-_center.y;
-    (*viter).z = (*viter).z-_center.z;
-  }
-}
-
-//////////////////////////////////////////////////
-void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
+void SubMesh::GenSphericalTexCoord(const math::Vector3 &_center)
 {
   std::vector<math::Vector3>::const_iterator viter;
   for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
@@ -722,6 +702,3 @@ void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
     this->AddTexCoord(u, v);
   }
 }
-
-
-

@@ -15,7 +15,7 @@
  *
 */
 
-#include <QApplication>
+#include "gui/qt.h"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"

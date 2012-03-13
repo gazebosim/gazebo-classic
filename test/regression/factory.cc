@@ -40,7 +40,8 @@ TEST_F(FactoryTest, Box)
     std::ostringstream name;
     name << "test_box_" << i;
     setPose.Set(math::Vector3(0, 0, i+0.5), math::Quaternion(0, 0, 0));
-    SpawnBox(name.str(), setPose.pos, setPose.rot.GetAsEuler());
+    SpawnBox(name.str(), math::Vector3(1, 1, 1), setPose.pos,
+        setPose.rot.GetAsEuler());
     testPose = GetEntityPose(name.str());
     EXPECT_TRUE(math::equal(testPose.pos.x, setPose.pos.x, 0.1));
     EXPECT_TRUE(math::equal(testPose.pos.y, setPose.pos.y, 0.1));

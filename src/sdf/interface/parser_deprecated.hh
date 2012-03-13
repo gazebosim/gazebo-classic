@@ -48,18 +48,18 @@
 
 namespace deprecated_sdf
 {
-  bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initContact(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf);
-  bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initLight(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initSensor(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initCamera(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initContact(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   /// \brief Load Model given a filename
   bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf);
@@ -88,13 +88,13 @@ namespace deprecated_sdf
   bool initWorld(xmlNodePtr _xml, sdf::SDFPtr &_sdf);
 
   /// scene
-  bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   /// physics
-  bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   /// copying <controller:...> to <plugins>
-  void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  void copyChildren(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool getPlugins(xmlNodePtr pluginXml, std::map<std::string,
       sdf::ElementPtr > &_sdf);
 

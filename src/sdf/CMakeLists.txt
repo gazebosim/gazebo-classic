@@ -1,7 +1,6 @@
 add_subdirectory(interface)
-add_subdirectory(parser)
 
-set (headers sdf.h sdf_parser.h)
+set (headers sdf.h)
 set (sdfs gazebo.sdf 
           collision.sdf 
           geometry.sdf 
@@ -21,6 +20,7 @@ set (sdfs gazebo.sdf
           ray.sdf
           contact.sdf
           gui.sdf
+          state.sdf
 )
 
 INSTALL_INCLUDES("sdf" ${headers})

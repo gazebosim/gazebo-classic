@@ -88,12 +88,14 @@ void BoxMaker::OnMousePush(const common::MouseEvent &_event)
   this->mousePushPos = _event.pressPos;
 }
 
-void BoxMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
+void BoxMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
   this->state++;
+
+  this->mouseReleasePos = _event.pos;
 
   if (this->state == 3)
   {
@@ -102,6 +104,32 @@ void BoxMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
   }
 }
 
+/////////////////////////////////////////////////
+void BoxMaker::OnMouseMove(const common::MouseEvent &_event)
+{
+  if (this->state < 2)
+    return;
+
+  math::Vector3 p(this->visualMsg->pose().position().x(),
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z());
+
+  math::Vector3 scale(this->visualMsg->geometry().box().size().x(),
+                      this->visualMsg->geometry().box().size().y(),
+                      this->visualMsg->geometry().box().size().z());
+  scale.z = (this->mouseReleasePos.y - _event.pos.y)*0.01;
+  if (!_event.shift)
+    scale.z = rint(scale.z);
+  p.z = scale.z/2.0;
+
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(),
+      scale);
+
+  this->visPub->Publish(*this->visualMsg);
+}
+
+/////////////////////////////////////////////////
 void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 {
   if (this->state == 0)
@@ -111,7 +139,8 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   math::Vector3 p1, p2;
 
   if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
-                                          this->mousePushPos.y, norm, 0, p1))
+                                          this->mousePushPos.y,
+                                          math::Plane(norm), p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -120,7 +149,7 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y , norm, 0, p2))
+        _event.pos.x, _event.pos.y , math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -133,8 +162,8 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 
   math::Vector3 scale = p1-p2;
   math::Vector3 p(this->visualMsg->pose().position().x(),
-                     this->visualMsg->pose().position().y(),
-                     this->visualMsg->pose().position().z());
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z());
 
 
   if (this->state == 1)
@@ -143,14 +172,14 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
     p.x = p1.x - scale.x/2.0;
     p.y = p1.y - scale.y/2.0;
   }
-  else
+  /*else
   {
     scale.Set(this->visualMsg->geometry().box().size().x(),
                this->visualMsg->geometry().box().size().y(),
                this->visualMsg->geometry().box().size().z());
     scale.z = (this->mousePushPos.y - _event.pos.y)*0.01;
     p.z = scale.z/2.0;
-  }
+  }*/
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(),
@@ -166,11 +195,13 @@ void BoxMaker::CreateTheEntity()
   std::ostringstream newModelStr;
 
   newModelStr << "<gazebo version ='1.0'>\
-    <model name ='custom_user_box" << counter << "_model'>\
-    <origin pose ='" << this->visualMsg->pose().position().x() << " "
+    <model name='custom_user_box" << counter << "_model'>\
+    <origin pose='" << this->visualMsg->pose().position().x() << " "
                     << this->visualMsg->pose().position().y() << " "
-                    << this->visualMsg->pose().position().z() << " 0 0 0'/>\
+                    << " 0 0 0 0'/>\
     <link name ='body'>\
+      <origin pose='0 0 " << this->visualMsg->geometry().box().size().z()/2.0
+                          << " 0 0 0'/>\
       <inertial mass ='1.0'>\
           <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
       </inertial>\
@@ -203,5 +234,3 @@ void BoxMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
-
-

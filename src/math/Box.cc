@@ -15,7 +15,6 @@
  *
 */
 #include <math.h>
-#include <float.h>
 #include "math/Box.hh"
 
 using namespace gazebo;
@@ -24,20 +23,21 @@ using namespace math;
 //////////////////////////////////////////////////
 Box::Box()
 {
-  this->min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  this->max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+  this->min.Set(0, 0, 0);
+  this->max.Set(0, 0, 0);
+  this->extent = EXTENT_NULL;
 }
 
 
 //////////////////////////////////////////////////
 Box::Box(const Vector3 &_min, const Vector3 &_max)
-  : min(_min), max(_max)
+  : min(_min), max(_max), extent(EXTENT_FINITE)
 {
 }
 
 //////////////////////////////////////////////////
 Box::Box(const Box &_b)
-  : min(_b.min), max(_b.max)
+  : min(_b.min), max(_b.max), extent(_b.extent)
 {
 }
 
@@ -84,37 +84,76 @@ math::Vector3 Box::GetCenter() const
 //////////////////////////////////////////////////
 void Box::Merge(const Box &_box)
 {
-  this->min.SetToMin(_box.min);
-  this->max.SetToMax(_box.max);
+  if (this->extent == EXTENT_NULL)
+  {
+    this->min = _box.min;
+    this->max = _box.max;
+    this->extent = _box.extent;
+  }
+  else
+  {
+    this->min.SetToMin(_box.min);
+    this->max.SetToMax(_box.max);
+  }
 }
 
 //////////////////////////////////////////////////
-Box &Box::operator =(const Box &b)
+Box &Box::operator =(const Box &_b)
 {
-  this->max = b.max;
-  this->min = b.min;
+  this->max = _b.max;
+  this->min = _b.min;
+  this->extent = _b.extent;
 
   return *this;
 }
 
 //////////////////////////////////////////////////
-Box Box::operator+(const Box &b) const
+Box Box::operator+(const Box &_b) const
 {
-  Vector3 mn = this->min;
-  Vector3 mx = this->max;
+  Vector3 mn, mx;
 
-  mn.SetToMin(b.min);
-  mx.SetToMax(b.max);
+  if (this->extent != EXTENT_NULL)
+  {
+    mn = this->min;
+    mx = this->max;
+
+    mn.SetToMin(_b.min);
+    mx.SetToMax(_b.max);
+  }
+  else
+  {
+    mn = _b.min;
+    mx = _b.max;
+  }
 
   return Box(mn, mx);
 }
 
 //////////////////////////////////////////////////
-const Box &Box::operator+=(const Box &b)
+const Box &Box::operator+=(const Box &_b)
 {
-  this->min.SetToMin(b.min);
-  this->max.SetToMax(b.max);
+  if (this->extent != EXTENT_NULL)
+  {
+    this->min.SetToMin(_b.min);
+    this->max.SetToMax(_b.max);
+  }
+  else
+  {
+    this->min = _b.min;
+    this->max = _b.max;
+    this->extent = _b.extent;
+  }
   return *this;
 }
 
+//////////////////////////////////////////////////
+bool Box::operator==(const Box &_b)
+{
+  return this->min == _b.min && this->max == _b.max;
+}
 
+//////////////////////////////////////////////////
+Box Box::operator-(const Vector3 &_v)
+{
+  return Box(this->min - _v, this->max - _v);
+}

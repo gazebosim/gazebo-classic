@@ -243,7 +243,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     // to run three loops for each individual component
     dxBody *const *const bodyend = body + nb;
     dReal gravity_x = world->gravity[0];
-    if (gravity_x) {
+    if (!_dequal(gravity_x, 0.0)) {
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
         dxBody *b = *bodycurr;
         if ((b->flags & dxBodyNoGravity)==0) {
@@ -252,7 +252,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       }
     }
     dReal gravity_y = world->gravity[1];
-    if (gravity_y) {
+    if (!_dequal(gravity_y, 0.0)) {
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
         dxBody *b = *bodycurr;
         if ((b->flags & dxBodyNoGravity)==0) {
@@ -261,7 +261,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       }
     }
     dReal gravity_z = world->gravity[2];
-    if (gravity_z) {
+    if (!_dequal(gravity_z, 0.0)) {
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
         dxBody *b = *bodycurr;
         if ((b->flags & dxBodyNoGravity)==0) {

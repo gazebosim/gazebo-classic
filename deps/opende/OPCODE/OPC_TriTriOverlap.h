@@ -6,9 +6,9 @@
 #define SORT(a,b)			\
 	if(a>b)					\
 	{						\
-		const float c=a;	\
+		const float __c=a;	\
 		a=b;				\
-		b=c;				\
+		b=__c;				\
 	}
 
 //! Edge to edge test based on Franlin Antonio's gem: "Faster Line Segment Intersection", in Graphics Gems III, pp. 199-202
@@ -134,16 +134,16 @@ BOOL CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Poin
 		/* here we know that d0d1<=0.0 */												\
 		A=VV1; B=(VV0 - VV1)*D1; C=(VV2 - VV1)*D1; X0=D1 - D0; X1=D1 - D2;				\
 	}																					\
-	else if(D1*D2>0.0f || D0!=0.0f)														\
+	else if(D1*D2>0.0f || !_opc_equal(D0, 0.0f))														\
 	{																					\
 		/* here we know that d0d1<=0.0 or that D0!=0.0 */								\
 		A=VV0; B=(VV1 - VV0)*D0; C=(VV2 - VV0)*D0; X0=D0 - D1; X1=D0 - D2;				\
 	}																					\
-	else if(D1!=0.0f)																	\
+	else if(!_opc_equal(D1, 0.0f))																	\
 	{																					\
 		A=VV1; B=(VV0 - VV1)*D1; C=(VV2 - VV1)*D1; X0=D1 - D0; X1=D1 - D2;				\
 	}																					\
-	else if(D2!=0.0f)																	\
+	else if(!_opc_equal(D2, 0.0f))																	\
 	{																					\
 		A=VV2; B=(VV0 - VV2)*D2; C=(VV1 - VV2)*D2; X0=D2 - D0; X1=D2 - D1;				\
 	}																					\

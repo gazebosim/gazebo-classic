@@ -41,7 +41,7 @@ namespace gazebo
       public: virtual ~UniversalJoint()
               { }
       /// \brief Load the joint
-      protected: virtual void Load(sdf::ElementPtr &_sdf)
+      protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
 

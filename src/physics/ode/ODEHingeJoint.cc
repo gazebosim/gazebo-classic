@@ -43,7 +43,7 @@ ODEHingeJoint::~ODEHingeJoint()
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::Load(sdf::ElementPtr &_sdf)
+void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<ODEJoint>::Load(_sdf);
 
@@ -165,8 +165,3 @@ void ODEHingeJoint::SetParam(int _parameter, double _value)
 
   dJointSetHingeParam(this->jointId, _parameter, _value);
 }
-
-
-
-
-

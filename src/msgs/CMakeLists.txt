@@ -58,15 +58,16 @@ set (msgs axis.proto
           gui_camera.proto
           gui.proto
           track_visual.proto
+          test.proto
 )
 
-add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+gz_add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
 
 set (sources msgs.cc)
 set (headers msgs.h)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(PROTO_SRCS)
 set(PROTO_HDRS)
@@ -87,7 +88,7 @@ endforeach()
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 
-add_library(gazebo_msgs SHARED ${PROTO_SRCS} ${sources})
+gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
 target_link_libraries( gazebo_msgs ${PROTOBUF_LIBRARY} gazebo_sdf_interface)
 add_dependencies(gazebo_msgs gazebomsgs_out)
 

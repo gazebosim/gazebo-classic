@@ -85,7 +85,7 @@ Entity::~Entity()
 }
 
 //////////////////////////////////////////////////
-void Entity::Load(sdf::ElementPtr &_sdf)
+void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
@@ -108,13 +108,11 @@ void Entity::Load(sdf::ElementPtr &_sdf)
       this->worldPose = originElem->GetValuePose("pose");
 
     this->initialRelativePose = originElem->GetValuePose("pose");
-
-    originElem->GetAttribute("pose")->SetUpdateFunc(
-        boost::bind(&Entity::GetRelativePose, this));
   }
 
   if (this->parent)
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
   this->visPub->Publish(*this->visualMsg);
 
@@ -199,6 +197,18 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
   this->onAnimationComplete = _onComplete;
   this->animationConnection = event::Events::ConnectWorldUpdateStart(
       boost::bind(&Entity::UpdateAnimation, this));
+}
+
+//////////////////////////////////////////////////
+void Entity::StopAnimation()
+{
+  this->animation.reset();
+  this->onAnimationComplete.clear();
+  if (this->animationConnection)
+  {
+    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    this->animationConnection.reset();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -294,7 +304,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
   {
     if ((*iter)->HasType(ENTITY))
     {
-      Entity *entity = reinterpret_cast<Entity*>((*iter).get());
+      EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
       {
@@ -394,20 +404,26 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 {
   this->OnPoseChange();
 
-  if (_updateChildren || this->IsStatic())
+  if (!this->HasType(COLLISION) && (_updateChildren || this->IsStatic()))
   {
-    for  (Base_V::iterator iter = this->children.begin();
-          iter != this->childrenEnd; ++iter)
+    for (Base_V::iterator iter = this->children.begin();
+         iter != this->childrenEnd; ++iter)
     {
       if ((*iter)->HasType(LINK))
-        reinterpret_cast<Link*>((*iter).get())->OnPoseChange();
-      else
+        boost::shared_static_cast<Link>(*iter)->OnPoseChange();
+      else if ((*iter)->HasType(COLLISION))
       {
-        Collision *coll = reinterpret_cast<Collision*>((*iter).get());
+        CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
 
         if (this->IsStatic())
           coll->worldPose = this->worldPose + coll->initialRelativePose;
         coll->OnPoseChange();
+      }
+      else
+      {
+        // Should never get here.
+        gzthrow(std::string("Invalid type[") +
+                boost::lexical_cast<std::string>((*iter)->GetType()) + "]");
       }
     }
   }
@@ -485,7 +501,7 @@ void Entity::Reset()
 }
 
 //////////////////////////////////////////////////
-void Entity::UpdateParameters(sdf::ElementPtr &_sdf)
+void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
 
@@ -510,7 +526,7 @@ void Entity::UpdateAnimation()
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
-  offset.pos = kf.GetTranslate();
+  offset.pos = kf.GetTranslation();
   offset.rot = kf.GetRotation();
 
   this->SetWorldPose(offset);
@@ -526,7 +542,6 @@ void Entity::UpdateAnimation()
     }
   }
 }
-
 
 //////////////////////////////////////////////////
 const math::Pose &Entity::GetDirtyPose() const
@@ -561,6 +576,18 @@ math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
   }
 
   return box;
+}
+
+//////////////////////////////////////////////////
+void Entity::PlaceOnEntity(const std::string &_entityName)
+{
+  EntityPtr onEntity = this->GetWorld()->GetEntity(_entityName);
+  math::Box box = this->GetCollisionBoundingBox();
+  math::Box onBox = onEntity->GetCollisionBoundingBox();
+
+  math::Pose p = onEntity->GetWorldPose();
+  p.pos.z = onBox.max.z + box.GetZLength()*0.5;
+  this->SetWorldPose(p);
 }
 
 //////////////////////////////////////////////////

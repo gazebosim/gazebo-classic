@@ -18,15 +18,18 @@
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 
+#include "sdf/interface/parser.hh"
 #include "sdf/interface/SDF.hh"
 
 using namespace sdf;
 
+/////////////////////////////////////////////////
 Element::Element()
 {
   this->copyChildren = false;
 }
 
+/////////////////////////////////////////////////
 Element::~Element()
 {
   this->parent.reset();
@@ -56,101 +59,62 @@ Element::~Element()
   // this->Reset();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetParent() const
 {
   return this->parent;
 }
 
-void Element::SetParent(const ElementPtr &_parent)
+/////////////////////////////////////////////////
+void Element::SetParent(const ElementPtr _parent)
 {
   this->parent = _parent;
 }
 
-/// Get the name of the parent link.
-std::string Element::GetLinkName() const
-{
-  std::string result;
-
-  // get parent body name by looking through sdf
-  sdf::ElementPtr sdfParent = this->GetParent();
-  while (sdfParent && sdfParent->GetName() != "link")
-    sdfParent = sdfParent->GetParent();
-
-  if (sdfParent)
-    result = sdfParent->GetValueString("name");
-
-  return result;
-}
-
-/// Get the name of the parent model.
-std::string Element::GetModelName() const
-{
-  std::string result;
-
-  // get parent body name by looking through sdf
-  sdf::ElementPtr sdfParent = this->GetParent();
-  while (sdfParent && sdfParent->GetName() != "model")
-    sdfParent = sdfParent->GetParent();
-
-  if (sdfParent)
-    result = sdfParent->GetValueString("name");
-
-  return result;
-}
-
-/// Get the name of the parent world.
-std::string Element::GetWorldName() const
-{
-  std::string result;
-
-  // get parent body name by looking through sdf
-  sdf::ElementPtr sdfParent = this->GetParent();
-  while (sdfParent && sdfParent->GetName() != "world")
-    sdfParent = sdfParent->GetParent();
-
-  if (sdfParent)
-    result = sdfParent->GetValueString("name");
-
-  return result;
-}
-
-
+/////////////////////////////////////////////////
 void Element::SetName(const std::string &_name)
 {
   this->name = _name;
 }
 
+/////////////////////////////////////////////////
 const std::string &Element::GetName() const
 {
   return this->name;
 }
 
+/////////////////////////////////////////////////
 void Element::SetRequired(const std::string &_req)
 {
   this->required = _req;
 }
 
+/////////////////////////////////////////////////
 const std::string &Element::GetRequired() const
 {
   return this->required;
 }
 
+/////////////////////////////////////////////////
 void Element::SetCopyChildren(bool _value)
 {
   this->copyChildren = _value;
 }
 
+/////////////////////////////////////////////////
 bool Element::GetCopyChildren() const
 {
   return this->copyChildren;
 }
 
+/////////////////////////////////////////////////
 void Element::AddValue(const std::string &_type,
     const std::string &_defaultValue, bool _required)
 {
   this->value = this->CreateParam(this->name, _type, _defaultValue, _required);
 }
 
+/////////////////////////////////////////////////
 boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
     const std::string &_type, const std::string &_defaultValue, bool _required)
 {
@@ -202,10 +166,22 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
         new ParamT<gazebo::math::Vector3>(_key, _defaultValue, _required));
     return param;
   }
+  else if (_type == "vector2i")
+  {
+    boost::shared_ptr<ParamT<gazebo::math::Vector2i> > param(
+        new ParamT<gazebo::math::Vector2i>(_key, _defaultValue, _required));
+    return param;
+  }
   else if (_type == "pose")
   {
     boost::shared_ptr<ParamT<gazebo::math::Pose> > param(
         new ParamT<gazebo::math::Pose>(_key, _defaultValue, _required));
+    return param;
+  }
+  else if (_type == "time")
+  {
+    boost::shared_ptr<ParamT<gazebo::common::Time> > param(
+        new ParamT<gazebo::common::Time>(_key, _defaultValue, _required));
     return param;
   }
   else
@@ -215,6 +191,7 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   }
 }
 
+/////////////////////////////////////////////////
 void Element::AddAttribute(const std::string &_key, const std::string &_type,
     const std::string &_defaultValue, bool _required)
 {
@@ -222,6 +199,7 @@ void Element::AddAttribute(const std::string &_key, const std::string &_type,
       this->CreateParam(_key, _type, _defaultValue, _required));
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::Clone() const
 {
   ElementPtr clone(new Element);
@@ -229,6 +207,7 @@ ElementPtr Element::Clone() const
   clone->required = this->required;
   clone->parent = this->parent;
   clone->copyChildren = this->copyChildren;
+  clone->includeFilename = this->includeFilename;
 
   Param_V::const_iterator aiter;
   for (aiter = this->attributes.begin();
@@ -244,36 +223,61 @@ ElementPtr Element::Clone() const
     clone->elementDescriptions.push_back((*eiter)->Clone());
   }
 
+  for (eiter = this->elements.begin(); eiter != this->elements.end(); ++eiter)
+  {
+    clone->elements.push_back((*eiter)->Clone());
+  }
+
   if (this->value)
     clone->value = this->value->Clone();
+
   return clone;
 }
 
-/// \brief Copy values from an Element
-void Element::Copy(const ElementPtr &_elem)
+/////////////////////////////////////////////////
+void Element::Copy(const ElementPtr _elem)
 {
-  for (Param_V::iterator iter = this->attributes.begin();
-      iter != this->attributes.end(); ++iter)
+  this->name = _elem->GetName();
+  this->required = _elem->GetRequired();
+  this->copyChildren = _elem->GetCopyChildren();
+  this->includeFilename = _elem->includeFilename;
+
+  for (Param_V::iterator iter = _elem->attributes.begin();
+       iter != _elem->attributes.end(); ++iter)
   {
-    ParamPtr param = _elem->GetAttribute((*iter)->GetKey());
-    if (param)
-    {
-      (*iter)->SetFromString(param->GetAsString());
-    }
+    if (!this->HasAttribute((*iter)->GetKey()))
+      this->attributes.push_back((*iter)->Clone());
+    ParamPtr param = this->GetAttribute((*iter)->GetKey());
+    param->SetFromString((*iter)->GetAsString());
   }
 
-  if (this->value && _elem->GetValue())
-    this->value->SetFromString(_elem->GetValue()->GetAsString());
-
-  for (ElementPtr_V::iterator iter = this->elements.begin();
-      iter != this->elements.end(); ++iter)
+  if (_elem->GetValue())
   {
-    ElementPtr elem = _elem->GetElement((*iter)->GetName());
-    if (elem)
-      (*iter)->Copy(elem);
+    if (!this->value)
+      this->value = _elem->GetValue()->Clone();
+    else
+      this->value->SetFromString(_elem->GetValue()->GetAsString());
+  }
+
+  this->elementDescriptions.clear();
+  for (ElementPtr_V::const_iterator iter = _elem->elementDescriptions.begin();
+       iter != _elem->elementDescriptions.end(); ++iter)
+  {
+    this->elementDescriptions.push_back((*iter)->Clone());
+  }
+
+  this->elements.clear();
+  for (ElementPtr_V::iterator iter = _elem->elements.begin();
+       iter != _elem->elements.end(); ++iter)
+  {
+    ElementPtr elem = (*iter)->Clone();
+    elem->Copy(*iter);
+    elem->parent = shared_from_this();
+    this->elements.push_back(elem);
   }
 }
 
+/////////////////////////////////////////////////
 void Element::PrintDescription(std::string _prefix)
 {
   std::cout << _prefix << "<element name ='" << this->name
@@ -302,6 +306,7 @@ void Element::PrintDescription(std::string _prefix)
   std::cout << _prefix << "</element>\n";
 }
 
+/////////////////////////////////////////////////
 void Element::PrintValues(std::string _prefix)
 {
   std::cout << _prefix << "<" << this->name;
@@ -339,6 +344,7 @@ void Element::PrintValues(std::string _prefix)
   }
 }
 
+/////////////////////////////////////////////////
 std::string Element::ToString(const std::string &_prefix) const
 {
   std::ostringstream out;
@@ -346,42 +352,54 @@ std::string Element::ToString(const std::string &_prefix) const
   return out.str();
 }
 
+/////////////////////////////////////////////////
 void Element::ToString(const std::string &_prefix,
                        std::ostringstream &_out) const
 {
-  _out << _prefix << "<" << this->name;
-
-  Param_V::const_iterator aiter;
-  for (aiter = this->attributes.begin();
-      aiter != this->attributes.end(); ++aiter)
+  if (this->includeFilename.empty())
   {
-    _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
-  }
+    _out << _prefix << "<" << this->name;
 
-  if (this->elements.size() > 0)
-  {
-    _out << ">\n";
-    ElementPtr_V::const_iterator eiter;
-    for (eiter = this->elements.begin();
-        eiter != this->elements.end(); ++eiter)
+    Param_V::const_iterator aiter;
+    for (aiter = this->attributes.begin();
+        aiter != this->attributes.end(); ++aiter)
     {
-      (*eiter)->ToString(_prefix + "  ", _out);
+      _out << " " << (*aiter)->GetKey() << "='"
+           << (*aiter)->GetAsString() << "'";
     }
-    _out << _prefix << "</" << this->name << ">\n";
-  }
-  else
-  {
-    if (this->value)
+
+    if (this->elements.size() > 0)
     {
-      _out << ">" << this->value->GetAsString() << "</" << this->name << ">\n";
+      _out << ">\n";
+      ElementPtr_V::const_iterator eiter;
+      for (eiter = this->elements.begin();
+          eiter != this->elements.end(); ++eiter)
+      {
+        (*eiter)->ToString(_prefix + "  ", _out);
+      }
+      _out << _prefix << "</" << this->name << ">\n";
     }
     else
     {
-      _out << "/>\n";
+      if (this->value)
+      {
+        _out << ">" << this->value->GetAsString()
+             << "</" << this->name << ">\n";
+      }
+      else
+      {
+        _out << "/>\n";
+      }
     }
+  }
+  else
+  {
+    _out << _prefix << "<include filename='"
+         << this->includeFilename << "'/>\n";
   }
 }
 
+/////////////////////////////////////////////////
 bool Element::HasAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
@@ -395,6 +413,7 @@ bool Element::HasAttribute(const std::string &_key)
   return false;
 }
 
+/////////////////////////////////////////////////
 ParamPtr Element::GetAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
@@ -404,17 +423,47 @@ ParamPtr Element::GetAttribute(const std::string &_key)
     if ((*iter)->GetKey() == _key)
       return (*iter);
   }
-  gzerr << "Element[" << this->GetName() << "] does not have attribute ["
-        << _key << "]\n";
   return ParamPtr();
 }
 
-/// Get the param of the elements value
+/////////////////////////////////////////////////
+unsigned int Element::GetAttributeCount() const
+{
+  return this->attributes.size();
+}
+
+/////////////////////////////////////////////////
+ParamPtr Element::GetAttribute(unsigned int _index) const
+{
+  ParamPtr result;
+  if (_index < this->attributes.size())
+    result = this->attributes[_index];
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+unsigned int Element::GetElementDescriptionCount() const
+{
+  return this->elementDescriptions.size();
+}
+
+/////////////////////////////////////////////////
+ElementPtr Element::GetElementDescription(unsigned int _index) const
+{
+  ElementPtr result;
+  if (_index < this->elementDescriptions.size())
+    result = this->elementDescriptions[_index];
+  return result;
+}
+
+/////////////////////////////////////////////////
 ParamPtr Element::GetValue()
 {
   return this->value;
 }
 
+/////////////////////////////////////////////////
 bool Element::HasElement(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
@@ -427,6 +476,7 @@ bool Element::HasElement(const std::string &_name) const
   return false;
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetElement(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
@@ -440,11 +490,16 @@ ElementPtr Element::GetElement(const std::string &_name) const
   return ElementPtr();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetFirstElement() const
 {
-  return this->elements.front();
+  if (this->elements.empty())
+    return ElementPtr();
+  else
+    return this->elements.front();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetNextElement(const std::string &_name) const
 {
   if (this->parent)
@@ -466,12 +521,14 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
   return ElementPtr();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetNextElement() const
 {
   return this->GetNextElement(this->name);
 }
 
 
+/////////////////////////////////////////////////
 boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
 {
   if (this->HasElement(_name))
@@ -480,11 +537,13 @@ boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
     return this->AddElement(_name);
 }
 
+/////////////////////////////////////////////////
 void Element::InsertElement(ElementPtr _elem)
 {
   this->elements.push_back(_elem);
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::AddElement(const std::string &_name)
 {
   ElementPtr_V::const_iterator iter;
@@ -503,6 +562,7 @@ ElementPtr Element::AddElement(const std::string &_name)
   return ElementPtr();
 }
 
+/////////////////////////////////////////////////
 bool Element::GetValueBool(const std::string &_key)
 {
   bool result = false;
@@ -520,6 +580,7 @@ bool Element::GetValueBool(const std::string &_key)
   return result;
 }
 
+/////////////////////////////////////////////////
 int Element::GetValueInt(const std::string &_key)
 {
   int result = 0;
@@ -535,6 +596,8 @@ int Element::GetValueInt(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 float Element::GetValueFloat(const std::string &_key)
 {
   float result = 0.0;
@@ -550,6 +613,8 @@ float Element::GetValueFloat(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 double Element::GetValueDouble(const std::string &_key)
 {
   double result = 0.0;
@@ -570,6 +635,8 @@ double Element::GetValueDouble(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 unsigned int Element::GetValueUInt(const std::string &_key)
 {
   unsigned int result = 0;
@@ -590,6 +657,8 @@ unsigned int Element::GetValueUInt(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 char Element::GetValueChar(const std::string &_key)
 {
   char result = '\0';
@@ -610,6 +679,8 @@ char Element::GetValueChar(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 std::string Element::GetValueString(const std::string &_key)
 {
   std::string result = "";
@@ -620,11 +691,11 @@ std::string Element::GetValueString(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 {
   gazebo::math::Vector3 result;
@@ -640,6 +711,8 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
 {
   gazebo::math::Quaternion result;
@@ -656,6 +729,7 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
   return result;
 }
 
+/////////////////////////////////////////////////
 gazebo::math::Pose Element::GetValuePose(const std::string &_key)
 {
   gazebo::math::Pose result;
@@ -672,6 +746,7 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
   return result;
 }
 
+/////////////////////////////////////////////////
 gazebo::common::Color Element::GetValueColor(const std::string &_key)
 {
   gazebo::common::Color result;
@@ -687,55 +762,14 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 void Element::ClearElements()
 {
   this->elements.clear();
 }
 
-  SDF::SDF()
-: root(new Element)
-{
-}
-
-void SDF::PrintDescription()
-{
-  this->root->PrintDescription("");
-}
-
-void SDF::PrintValues()
-{
-  this->root->PrintValues("");
-}
-void SDF::Write(const std::string &_filename)
-{
-  std::string string = this->root->ToString("");
-
-  std::ofstream out(_filename.c_str(), std::ios::out);
-
-  if (!out)
-  {
-    gzerr << "Unable to open file[" << _filename << "] for writing\n";
-    return;
-  }
-  out << string;
-  out.close();
-}
-
-std::string SDF::ToString() const
-{
-  std::string result;
-
-  if (this->root->GetName() != "gazebo")
-    result = std::string("<gazebo version ='") + SDF_VERSION + "'>";
-
-  result += this->root->ToString("");
-
-  if (this->root->GetName() != "gazebo")
-    result += "</gazebo>";
-
-  return result;
-}
-
+/////////////////////////////////////////////////
 void Element::Update()
 {
   for (sdf::Param_V::iterator iter = this->attributes.begin();
@@ -751,6 +785,7 @@ void Element::Update()
   }
 }
 
+/////////////////////////////////////////////////
 void Element::Reset()
 {
   this->parent.reset();
@@ -772,4 +807,85 @@ void Element::Reset()
   this->elementDescriptions.clear();
 
   this->value.reset();
+}
+
+/////////////////////////////////////////////////
+void Element::AddElementDescription(ElementPtr _elem)
+{
+  this->elementDescriptions.push_back(_elem);
+}
+
+/////////////////////////////////////////////////
+void Element::SetInclude(const std::string &_filename)
+{
+  this->includeFilename = _filename;
+}
+
+/////////////////////////////////////////////////
+std::string Element::GetInclude() const
+{
+  return this->includeFilename;
+}
+
+
+
+
+/////////////////////////////////////////////////
+SDF::SDF()
+: root(new Element)
+{
+}
+
+/////////////////////////////////////////////////
+void SDF::PrintDescription()
+{
+  this->root->PrintDescription("");
+}
+
+/////////////////////////////////////////////////
+void SDF::PrintValues()
+{
+  this->root->PrintValues("");
+}
+
+/////////////////////////////////////////////////
+void SDF::Write(const std::string &_filename)
+{
+  std::string string = this->root->ToString("");
+
+  std::ofstream out(_filename.c_str(), std::ios::out);
+
+  if (!out)
+  {
+    gzerr << "Unable to open file[" << _filename << "] for writing\n";
+    return;
+  }
+  out << string;
+  out.close();
+}
+
+/////////////////////////////////////////////////
+std::string SDF::ToString() const
+{
+  std::string result;
+
+  if (this->root->GetName() != "gazebo")
+    result = std::string("<gazebo version ='") + SDF_VERSION + "'>";
+
+  result += this->root->ToString("");
+
+  if (this->root->GetName() != "gazebo")
+    result += "</gazebo>";
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+void SDF::SetFromString(const std::string &_sdfData)
+{
+  sdf::initFile("sdf/gazebo.sdf", this->root);
+  if (!sdf::readString(_sdfData, this->root))
+  {
+    gzerr << "Unable to parse sdf string[" << _sdfData << "]\n";
+  }
 }
