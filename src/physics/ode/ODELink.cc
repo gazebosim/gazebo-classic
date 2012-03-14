@@ -84,7 +84,7 @@ void ODELink::Init()
 
   if (this->linkId)
   {
-    math::Vector3 cog_vec = this->inertial->GetCoG();
+    math::Vector3 cogVec = this->inertial->GetCoG();
     Base_V::iterator iter;
     for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     {
@@ -97,7 +97,7 @@ void ODELink::Init()
 
           // update pose immediately
           math::Pose localPose = g->GetRelativePose();
-          localPose.pos -= cog_vec;
+          localPose.pos -= cogVec;
 
           dQuaternion q;
           q[0] = localPose.rot.w;
@@ -139,10 +139,10 @@ void ODELink::MoveCallback(dBodyID _id)
   self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
-  math::Vector3 cog_vec = self->dirtyPose.rot.RotateVector(
+  math::Vector3 cog = self->dirtyPose.rot.RotateVector(
       self->inertial->GetCoG());
 
-  self->dirtyPose.pos -= cog_vec;
+  self->dirtyPose.pos -= cog;
 
   // TODO: this is an ugly line of code. It's like this for speed.
   self->world->dirtyPoses.push_back(self);
@@ -209,13 +209,13 @@ void ODELink::OnPoseChange()
 
   const math::Pose myPose = this->GetWorldPose();
 
-  math::Vector3 cog_vec = myPose.rot.RotateVector(this->inertial->GetCoG());
+  math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
   dBodySetPosition(this->linkId,
-      myPose.pos.x + cog_vec.x,
-      myPose.pos.y + cog_vec.y,
-      myPose.pos.z + cog_vec.z);
+      myPose.pos.x + cog.x,
+      myPose.pos.y + cog.y,
+      myPose.pos.z + cog.z);
 
   dQuaternion q;
   q[0] = myPose.rot.w;

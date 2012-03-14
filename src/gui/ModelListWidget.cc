@@ -99,30 +99,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   this->InitTransport();
 
-  this->followAction = new QAction(tr("Follow"), this);
-  this->followAction->setStatusTip(tr("Follow the selection"));
-  connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
-
-  this->moveToAction = new QAction(tr("Move To"), this);
-  this->moveToAction->setStatusTip(tr("Move camera to the selection"));
-  connect(this->moveToAction, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
-
-  this->deleteAction = new QAction(tr("Delete"), this);
-  this->deleteAction->setStatusTip(tr("Delete the selection"));
-  connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
-
-  this->showCollisionAction = new QAction(tr("Show Collision"), this);
-  this->showCollisionAction->setStatusTip(tr("Show Collision Entity"));
-  this->showCollisionAction->setCheckable(true);
-  connect(this->showCollisionAction, SIGNAL(triggered()), this,
-          SLOT(OnShowCollision()));
-
-  this->transparentAction = new QAction(tr("Transparent"), this);
-  this->transparentAction->setStatusTip(tr("Make model transparent"));
-  this->transparentAction->setCheckable(true);
-  connect(this->transparentAction, SIGNAL(triggered()), this,
-          SLOT(OnTransparent()));
-
   this->fillingPropertyTree = false;
   this->selectedProperty = NULL;
 
@@ -325,76 +301,10 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
   return listItem;
 }
 
-/////////////////////////////////////////////////
-void ModelListWidget::OnShowCollision()
-{
-  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
-  std::string modelName = item->text(0).toStdString();
-
-  this->showCollisionsActionState[modelName] =
-    this->showCollisionAction->isChecked();
 
 
-  if (this->showCollisionAction->isChecked())
-    this->requestMsg = msgs::CreateRequest("show_collision", modelName);
-  else
-    this->requestMsg = msgs::CreateRequest("hide_collision", modelName);
 
-  this->requestPub->Publish(*this->requestMsg);
-}
 
-/////////////////////////////////////////////////
-void ModelListWidget::OnTransparent()
-{
-  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
-  std::string modelName = item->text(0).toStdString();
-
-  this->transparentActionState[modelName] =
-    this->transparentAction->isChecked();
-
-  if (this->transparentAction->isChecked())
-  {
-    this->requestMsg = msgs::CreateRequest("set_transparency", modelName);
-    this->requestMsg->set_dbl_data(0.5);
-  }
-  else
-  {
-    this->requestMsg = msgs::CreateRequest("set_transparency", modelName);
-    this->requestMsg->set_dbl_data(0.0);
-  }
-
-  this->requestPub->Publish(*this->requestMsg);
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnDelete()
-{
-  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
-  std::string modelName = item->text(0).toStdString();
-
-  this->requestMsg = msgs::CreateRequest("entity_delete", modelName);
-  this->requestPub->Publish(*this->requestMsg);
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnFollow()
-{
-  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
-  std::string modelName = item->text(0).toStdString();
-
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->TrackVisual(modelName);
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnMoveTo()
-{
-  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
-  std::string modelName = item->text(0).toStdString();
-
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->MoveToVisual(modelName);
-}
 
 /////////////////////////////////////////////////
 void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
@@ -403,26 +313,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 
   if (item)
   {
-    std::string modelName = item->text(0).toStdString();
-
-    QMenu menu(this->modelTreeWidget);
-    menu.addAction(this->moveToAction);
-    menu.addAction(this->followAction);
-    menu.addAction(this->deleteAction);
-    menu.addAction(this->showCollisionAction);
-    menu.addAction(this->transparentAction);
-
-    if (this->transparentActionState[modelName])
-      this->transparentAction->setChecked(true);
-    else
-      this->transparentAction->setChecked(false);
-
-    if (this->showCollisionsActionState[modelName])
-      this->showCollisionAction->setChecked(true);
-    else
-      this->showCollisionAction->setChecked(false);
-
-    menu.exec(this->modelTreeWidget->mapToGlobal(_pt));
+    //modelRightMenu->Run(item->text(0).toStdString(),
+                        //this->modelTreeWidget->mapToGlobal(_pt));
   }
 }
 

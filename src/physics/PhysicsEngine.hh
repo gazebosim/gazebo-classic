@@ -139,15 +139,13 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer() {return 0;}
       /// \brief access functions to set ODE parameters
       public: virtual int GetMaxContacts() {return 0;}
+
       public: boost::recursive_mutex* GetRayMutex() const
               { return this->rayMutex; }
-      protected: virtual void OnRequest(
-                 ConstRequestPtr &/*_msg*/)
-                 {}
-      protected: virtual void OnPhysicsMsg(
-                 ConstPhysicsPtr &/*_msg*/)
-                 {}
 
+      protected: virtual void OnRequest(ConstRequestPtr &/*_msg*/) {}
+
+      protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/) {}
 
       protected: WorldPtr world;
       protected: sdf::ElementPtr sdf;

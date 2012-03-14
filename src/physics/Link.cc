@@ -243,6 +243,8 @@ void Link::Init()
   sdf::ElementPtr originElem = this->sdf->GetOrCreateElement("origin");
   this->SetRelativePose(originElem->GetValuePose("pose"));
   this->SetInitialRelativePose(originElem->GetValuePose("pose"));
+
+  std::cout << "WorldPose[" << this->GetScopedName() << "] P[" << this->GetWorldPose().pos << "]\n";
 }
 
 //////////////////////////////////////////////////

@@ -660,6 +660,18 @@ void GLWidget::OnMouseReleaseRing()
 void GLWidget::OnMouseReleaseNormal()
 {
   this->userCamera->HandleMouseEvent(this->mouseEvent);
+  if (!this->mouseEvent.dragging)
+  {
+    if (this->mouseEvent.button == common::MouseEvent::RIGHT)
+    {
+      this->hoverVis = this->scene->GetVisualAt(this->userCamera,
+                                                this->mouseEvent.pos);
+      if (this->hoverVis)
+      {
+        this->modelRightMenu.Run(this->hoverVis->GetName(), QCursor::pos());
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////

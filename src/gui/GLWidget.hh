@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "gui/qt.h"
+#include "gui/ModelRightMenu.hh"
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
@@ -58,6 +59,7 @@ namespace gazebo
       public: void Clear();
 
       signals: void clicked();
+
 
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
@@ -149,6 +151,7 @@ namespace gazebo
       private: bool copy;
 
       private: std::string state;
+      private: ModelRightMenu modelRightMenu;
     };
   }
 }

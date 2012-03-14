@@ -1,0 +1,141 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#include "transport/transport.h"
+#include "rendering/UserCamera.hh"
+#include "gui/Gui.hh"
+#include "gui/ModelRightMenu.hh"
+
+using namespace gazebo;
+using namespace gui;
+
+ModelRightMenu::ModelRightMenu()
+{
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
+
+  this->followAction = new QAction(tr("Follow"), this);
+  this->followAction->setStatusTip(tr("Follow the selection"));
+  connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
+
+  this->moveToAction = new QAction(tr("Move To"), this);
+  this->moveToAction->setStatusTip(tr("Move camera to the selection"));
+  connect(this->moveToAction, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
+
+  this->deleteAction = new QAction(tr("Delete"), this);
+  this->deleteAction->setStatusTip(tr("Delete the selection"));
+  connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
+
+  this->showCollisionAction = new QAction(tr("Show Collision"), this);
+  this->showCollisionAction->setStatusTip(tr("Show Collision Entity"));
+  this->showCollisionAction->setCheckable(true);
+  connect(this->showCollisionAction, SIGNAL(triggered()), this,
+          SLOT(OnShowCollision()));
+
+  this->transparentAction = new QAction(tr("Transparent"), this);
+  this->transparentAction->setStatusTip(tr("Make model transparent"));
+  this->transparentAction->setCheckable(true);
+  connect(this->transparentAction, SIGNAL(triggered()), this,
+          SLOT(OnTransparent()));
+}
+
+/////////////////////////////////////////////////
+ModelRightMenu::~ModelRightMenu()
+{
+  this->node->Fini();
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
+{
+  this->modelName = _modelName;
+
+  QMenu menu;
+  menu.addAction(this->moveToAction);
+  menu.addAction(this->followAction);
+  menu.addAction(this->showCollisionAction);
+  menu.addAction(this->transparentAction);
+  menu.addAction(this->deleteAction);
+
+  if (this->transparentActionState[modelName])
+    this->transparentAction->setChecked(true);
+  else
+    this->transparentAction->setChecked(false);
+
+  if (this->showCollisionsActionState[modelName])
+    this->showCollisionAction->setChecked(true);
+  else
+    this->showCollisionAction->setChecked(false);
+
+  menu.exec(_pt);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnMoveTo()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->MoveToVisual(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnShowCollision()
+{
+  this->showCollisionsActionState[this->modelName] =
+    this->showCollisionAction->isChecked();
+
+  if (this->showCollisionAction->isChecked())
+    this->requestMsg = msgs::CreateRequest("show_collision", this->modelName);
+  else
+    this->requestMsg = msgs::CreateRequest("hide_collision", this->modelName);
+
+  this->requestPub->Publish(*this->requestMsg);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnTransparent()
+{
+  this->transparentActionState[this->modelName] =
+    this->transparentAction->isChecked();
+
+  if (this->transparentAction->isChecked())
+  {
+    this->requestMsg = msgs::CreateRequest("set_transparency", this->modelName);
+    this->requestMsg->set_dbl_data(0.5);
+  }
+  else
+  {
+    this->requestMsg = msgs::CreateRequest("set_transparency", this->modelName);
+    this->requestMsg->set_dbl_data(0.0);
+  }
+
+  this->requestPub->Publish(*this->requestMsg);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnFollow()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->TrackVisual(this->modelName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnDelete()
+{
+  this->requestMsg = msgs::CreateRequest("entity_delete", this->modelName);
+  this->requestPub->Publish(*this->requestMsg);
+}
