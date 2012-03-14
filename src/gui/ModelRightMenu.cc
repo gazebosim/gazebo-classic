@@ -63,7 +63,7 @@ ModelRightMenu::~ModelRightMenu()
 /////////////////////////////////////////////////
 void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
 {
-  this->modelName = _modelName;
+  this->modelName = _modelName.substr(0, _modelName.find("::"));
 
   QMenu menu;
   menu.addAction(this->moveToAction);
@@ -72,12 +72,12 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(this->transparentAction);
   menu.addAction(this->deleteAction);
 
-  if (this->transparentActionState[modelName])
+  if (this->transparentActionState[this->modelName])
     this->transparentAction->setChecked(true);
   else
     this->transparentAction->setChecked(false);
 
-  if (this->showCollisionsActionState[modelName])
+  if (this->showCollisionsActionState[this->modelName])
     this->showCollisionAction->setChecked(true);
   else
     this->showCollisionAction->setChecked(false);

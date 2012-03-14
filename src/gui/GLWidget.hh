@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "gui/qt.h"
-#include "gui/ModelRightMenu.hh"
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
@@ -151,7 +150,6 @@ namespace gazebo
       private: bool copy;
 
       private: std::string state;
-      private: ModelRightMenu modelRightMenu;
     };
   }
 }

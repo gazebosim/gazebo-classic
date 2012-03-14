@@ -32,6 +32,7 @@
 #include "rendering/FPSViewController.hh"
 
 #include "gui/Gui.hh"
+#include "gui/ModelRightMenu.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/GLWidget.hh"
 
@@ -39,6 +40,7 @@ using namespace gazebo;
 using namespace gui;
 
 extern bool g_fullscreen;
+extern ModelRightMenu *g_modelRightMenu;
 
 /////////////////////////////////////////////////
 GLWidget::GLWidget(QWidget *_parent)
@@ -668,7 +670,7 @@ void GLWidget::OnMouseReleaseNormal()
                                                 this->mouseEvent.pos);
       if (this->hoverVis)
       {
-        this->modelRightMenu.Run(this->hoverVis->GetName(), QCursor::pos());
+        g_modelRightMenu->Run(this->hoverVis->GetName(), QCursor::pos());
       }
     }
   }

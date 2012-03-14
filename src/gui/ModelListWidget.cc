@@ -40,6 +40,7 @@
 #include "math/Helpers.hh"
 
 #include "gui/GuiEvents.hh"
+#include "gui/ModelRightMenu.hh"
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gui/ModelListWidget.hh"
@@ -57,6 +58,7 @@ const std::string xLbl = std::string("X");
 const std::string yLbl = std::string("Y");
 const std::string zLbl = std::string("Z");
 
+extern ModelRightMenu *g_modelRightMenu;
 
 /////////////////////////////////////////////////
 ModelListWidget::ModelListWidget(QWidget *_parent)
@@ -301,11 +303,6 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
   return listItem;
 }
 
-
-
-
-
-
 /////////////////////////////////////////////////
 void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
@@ -313,8 +310,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 
   if (item)
   {
-    //modelRightMenu->Run(item->text(0).toStdString(),
-                        //this->modelTreeWidget->mapToGlobal(_pt));
+    g_modelRightMenu->Run(item->text(0).toStdString(),
+                          this->modelTreeWidget->mapToGlobal(_pt));
   }
 }
 
