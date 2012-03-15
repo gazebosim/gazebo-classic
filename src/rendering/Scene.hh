@@ -160,8 +160,13 @@ namespace gazebo
                                     math::Vector2i mousePos,
                                     std::string &mod);
 
+      public: void SnapVisualToNearestBelow(const std::string &_visualName);
+
       /// \brief Get a visual at a mouse position
       public: VisualPtr GetVisualAt(CameraPtr camera, math::Vector2i mousePos);
+
+      /// \brief Get the closest visual below a given visual
+      public: VisualPtr GetVisualBelow(const std::string &_visualName);
 
       /// \brief Get a visual directly below a point
       public: void GetVisualsBelowPoint(const math::Vector3 &_pt,

@@ -26,6 +26,7 @@ set (sources main.cc
              GuiEvents.cc
              ModelEditWidget.cc
              MeshMaker.cc
+             ModelMaker.cc
              ModelRightMenu.cc
 )
 
@@ -46,6 +47,7 @@ set (headers Gui.hh
              SphereMaker.hh
              CylinderMaker.hh
              MeshMaker.hh
+             ModelMaker.hh
              GuiEvents.hh
              LightMaker.hh
              qt.h

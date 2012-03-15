@@ -767,7 +767,7 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnManipMode(const std::string &_mode)
 {
-  if (_mode == "normal")
+  if (_mode != "ring")
     this->arrowAct->setChecked(true);
   else if (_mode == "ring")
     this->ringPoseAct->setChecked(true);

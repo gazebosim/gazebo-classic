@@ -95,10 +95,6 @@ GLWidget::GLWidget(QWidget *_parent)
         boost::bind(&GLWidget::OnOrbit, this)));
 
   this->connections.push_back(
-      gui::Events::ConnectInsertModel(
-        boost::bind(&GLWidget::OnMouseMoveVisual, this, _1)));
-
-  this->connections.push_back(
       gui::Events::ConnectManipMode(
         boost::bind(&GLWidget::OnManipMode, this, _1)));
 
@@ -473,22 +469,6 @@ void GLWidget::SmartMoveVisual(rendering::VisualPtr _vis)
   else
   {
     this->TranslateEntity(_vis);
-
-    /* TODO: move this code to "snap to object" in a right menu button menu
-    math::Vector3 pt(pp.x, pp.y, 100.0);
-
-    std::vector<rendering::VisualPtr> below;
-    this->scene->GetVisualsBelowPoint(pt, below);
-    double maxZ = 0;
-
-    for (unsigned int i = 0; i < below.size(); ++i)
-    {
-      if (below[i]->GetName().find(_vis->GetName()) != 0
-          && below[i]->GetBoundingBox().max.z > maxZ)
-        maxZ = below[i]->GetBoundingBox().max.z;
-    }
-    pp.z = maxZ;
-    */
   }
 }
 
@@ -519,15 +499,23 @@ void GLWidget::OnMouseMoveRing()
     newHoverVis = this->scene->GetVisualAt(this->userCamera,
                                            this->mouseEvent.pos, mod);
     if (!mod.empty())
+    {
       this->setCursor(Qt::PointingHandCursor);
+      this->selectionObj->SetHighlight(mod);
+    }
     else
+    {
       this->setCursor(Qt::ArrowCursor);
+      this->selectionObj->SetHighlight("");
+    }
 
     if (newHoverVis && !newHoverVis->IsPlane())
     {
       if (this->hoverVis)
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-      this->hoverVis = newHoverVis;
+
+      this->hoverVis = this->scene->GetVisual(newHoverVis->GetName().substr(0, 
+            newHoverVis->GetName().find("::")));
 
       this->setCursor(Qt::PointingHandCursor);
       this->hoverVis->SetEmissive(common::Color(0.8, 0.8, 0.8));
@@ -652,6 +640,14 @@ void GLWidget::OnMouseReleaseRing()
         this->hoverVis.reset();
       }
     }
+    else if (this->mouseEvent.button == common::MouseEvent::RIGHT)
+    {
+      if (!this->mouseEvent.dragging)
+        if (this->hoverVis)
+        {
+          g_modelRightMenu->Run(this->hoverVis->GetName(), QCursor::pos());
+        }
+    }
   }
 
   this->selectionMod.clear();
@@ -747,44 +743,6 @@ std::string GLWidget::GetOgreHandle() const
 }
 
 /////////////////////////////////////////////////
-void GLWidget::CreateEntity(const std::string &_type)
-{
-  this->ClearSelection();
-
-  if (this->entityMaker)
-    this->entityMaker->Stop();
-
-  if (_type == "box")
-    this->entityMaker = &this->boxMaker;
-  else if (_type == "sphere")
-    this->entityMaker = &this->sphereMaker;
-  else if (_type == "cylinder")
-    this->entityMaker = &this->cylinderMaker;
-  else if (_type == "mesh")
-    this->entityMaker = &this->meshMaker;
-  else if (_type == "pointlight")
-    this->entityMaker =  &this->pointLightMaker;
-  else if (_type == "spotlight")
-    this->entityMaker =  &this->spotLightMaker;
-  else if (_type == "directionallight")
-    this->entityMaker =  &this->directionalLightMaker;
-  else
-    this->entityMaker = NULL;
-
-  if (this->entityMaker)
-  {
-    this->state = "make_entity";
-    // TODO: change the cursor to a cross
-    this->entityMaker->Start(this->userCamera);
-  }
-  else
-  {
-    this->state = "normal";
-    // TODO: make sure cursor state stays at the default
-  }
-}
-
-/////////////////////////////////////////////////
 void GLWidget::OnRemoveScene(const std::string &_name)
 {
   if (this->scene && this->scene->GetName() == _name)
@@ -816,22 +774,48 @@ void GLWidget::OnMoveMode(bool _mode)
 void GLWidget::OnCreateEntity(const std::string &_type,
                               const std::string &_data)
 {
-  // Load the trimesh data
-  if (_type == "mesh" && !_data.empty())
+  this->ClearSelection();
+
+  if (this->entityMaker)
+    this->entityMaker->Stop();
+
+  if (_type == "box")
+    this->entityMaker = &this->boxMaker;
+  else if (_type == "sphere")
+    this->entityMaker = &this->sphereMaker;
+  else if (_type == "cylinder")
+    this->entityMaker = &this->cylinderMaker;
+  else if (_type == "mesh" && !_data.empty())
   {
     this->meshMaker.Init(_data);
     this->entityMaker = &this->meshMaker;
-    this->state = "make_entity";
-    this->entityMaker->Start(this->userCamera);
+  }
+  else if (_type == "model" && !_data.empty())
+  {
+    this->modelMaker.Init(_data);
+    this->entityMaker = &this->modelMaker;
+  }
+  else if (_type == "pointlight")
+    this->entityMaker =  &this->pointLightMaker;
+  else if (_type == "spotlight")
+    this->entityMaker =  &this->spotLightMaker;
+  else if (_type == "directionallight")
+    this->entityMaker =  &this->directionalLightMaker;
+  else
+    this->entityMaker = NULL;
 
-    /* rendering::VisualPtr vis = this->scene->CreateVisual(_data);
-    vis->AttachMesh(_data);
-    vis->SetMaterial("Gazebo/Red");
-    vis->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));
-    */
+  if (this->entityMaker)
+  {
+    gui::Events::manipMode("make_entity");
+    // TODO: change the cursor to a cross
+    this->entityMaker->Start(this->userCamera);
   }
   else
-    this->CreateEntity(_type);
+  {
+    this->state = "normal";
+    // TODO: make sure cursor state stays at the default
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -1005,15 +989,6 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
     else
       this->mouseMoveVis.reset();
   }
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnMouseMoveVisual(const std::string &_visualName)
-{
-  if (_visualName.empty())
-    this->mouseMoveVis.reset();
-  else
-    this->mouseMoveVis = this->scene->GetVisual(_visualName);
 }
 
 /////////////////////////////////////////////////

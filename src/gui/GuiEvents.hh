@@ -38,14 +38,6 @@ namespace gazebo
 
       /////////////////////////////////////////////////
       public: template<typename T>
-              static event::ConnectionPtr ConnectInsertModel(T _subscriber)
-              { return mouseMoveVisual.Connect(_subscriber); }
-      public: static void DisconnectInsertModel(
-                  event::ConnectionPtr _subscriber)
-              { mouseMoveVisual.Disconnect(_subscriber); }
-
-      /////////////////////////////////////////////////
-      public: template<typename T>
               static event::ConnectionPtr ConnectMousePress(T _subscriber)
               { return mousePress.Connect(_subscriber); }
       public: static void DisconnectMousePress(
@@ -126,7 +118,6 @@ namespace gazebo
       public: static event::EventT<void (std::string,
                                          std::string)> createEntity;
 
-      public: static event::EventT<void (std::string)> mouseMoveVisual;
       public: static event::EventT<void (const msgs::Model &)> modelUpdate;
       public: static event::EventT<void (bool)> fullScreen;
       public: static event::EventT<void ()> fps;

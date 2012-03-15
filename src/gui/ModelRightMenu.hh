@@ -35,6 +35,7 @@ namespace gazebo
 
       public: void Run(const std::string &_modelName, const QPoint &_pt);
 
+      private slots: void OnSnapBelow();
       private slots: void OnMoveTo();
       private slots: void OnDelete();
       private slots: void OnFollow();
@@ -43,6 +44,7 @@ namespace gazebo
 
       private: std::string modelName;
 
+      private: QAction *snapBelowAction;
       private: QAction *moveToAction;
       private: QAction *deleteAction;
       private: QAction *followAction;

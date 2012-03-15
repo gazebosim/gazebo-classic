@@ -1802,3 +1802,19 @@ void Visual::ShowCollision(bool _show)
     (*iter)->ShowCollision(_show);
   }
 }
+
+//////////////////////////////////////////////////
+void Visual::SetVisibilityFlags(uint32_t _flags)
+{
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetVisibilityFlags(_flags);
+  }
+
+  for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
+  {
+    this->sceneNode->getAttachedObject(i)->setVisibilityFlags(_flags);
+  }
+
+}

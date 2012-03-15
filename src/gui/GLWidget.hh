@@ -36,6 +36,7 @@
 #include "gui/SphereMaker.hh"
 #include "gui/CylinderMaker.hh"
 #include "gui/MeshMaker.hh"
+#include "gui/ModelMaker.hh"
 #include "gui/LightMaker.hh"
 
 namespace gazebo
@@ -52,8 +53,6 @@ namespace gazebo
       public: void ViewScene(rendering::ScenePtr _scene);
       public: rendering::UserCameraPtr GetCamera() const;
       public: rendering::ScenePtr GetScene() const;
-
-      public: void CreateEntity(const std::string &_name);
 
       public: void Clear();
 
@@ -127,6 +126,7 @@ namespace gazebo
       private: SphereMaker sphereMaker;
       private: CylinderMaker cylinderMaker;
       private: MeshMaker meshMaker;
+      private: ModelMaker modelMaker;
       private: PointLightMaker pointLightMaker;
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;

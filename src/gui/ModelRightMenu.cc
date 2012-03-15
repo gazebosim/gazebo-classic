@@ -17,6 +17,8 @@
 
 #include "transport/transport.h"
 #include "rendering/UserCamera.hh"
+#include "rendering/Scene.hh"
+#include "rendering/Visual.hh"
 #include "gui/Gui.hh"
 #include "gui/ModelRightMenu.hh"
 
@@ -28,6 +30,11 @@ ModelRightMenu::ModelRightMenu()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
+
+  this->snapBelowAction = new QAction(tr("Snap"), this);
+  this->snapBelowAction->setStatusTip(tr("Snap to object below"));
+  connect(this->snapBelowAction, SIGNAL(triggered()), this,
+          SLOT(OnSnapBelow()));
 
   this->followAction = new QAction(tr("Follow"), this);
   this->followAction->setStatusTip(tr("Follow the selection"));
@@ -66,6 +73,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   this->modelName = _modelName.substr(0, _modelName.find("::"));
 
   QMenu menu;
+  menu.addAction(this->snapBelowAction);
   menu.addAction(this->moveToAction);
   menu.addAction(this->followAction);
   menu.addAction(this->showCollisionAction);
@@ -83,6 +91,13 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
     this->showCollisionAction->setChecked(false);
 
   menu.exec(_pt);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnSnapBelow()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
 }
 
 /////////////////////////////////////////////////

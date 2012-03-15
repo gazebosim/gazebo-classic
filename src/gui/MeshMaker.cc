@@ -19,8 +19,6 @@
 #include "msgs/msgs.h"
 
 #include "rendering/UserCamera.hh"
-// #include "common/MeshManager.hh"
-// #include "common/Mesh.hh"
 #include "common/Console.hh"
 
 #include "gui/GuiEvents.hh"

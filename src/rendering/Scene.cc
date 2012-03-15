@@ -592,6 +592,48 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
 }
 
 //////////////////////////////////////////////////
+void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
+{
+  VisualPtr visBelow = this->GetVisualBelow(_visualName);
+  VisualPtr vis = this->GetVisual(_visualName);
+
+  if (vis && visBelow)
+  {
+    math::Vector3 pos = vis->GetWorldPose().pos;
+    double dz = vis->GetBoundingBox().min.z - visBelow->GetBoundingBox().max.z;
+    pos.z -= dz;
+    vis->SetWorldPosition(pos);
+  }
+}
+
+//////////////////////////////////////////////////
+VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
+{
+  VisualPtr result;
+  VisualPtr vis = this->GetVisual(_visualName);
+
+  if (vis)
+  {
+    std::vector<VisualPtr> below;
+    this->GetVisualsBelowPoint(vis->GetWorldPose().pos, below);
+
+    double maxZ = -10000;
+
+    for (unsigned int i = 0; i < below.size(); ++i)
+    {
+      if (below[i]->GetName().find(vis->GetName()) != 0
+          && below[i]->GetBoundingBox().max.z > maxZ)
+      {
+        maxZ = below[i]->GetBoundingBox().max.z;
+        result = below[i];
+      }
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
                                  std::vector<VisualPtr> &_visuals)
 {
