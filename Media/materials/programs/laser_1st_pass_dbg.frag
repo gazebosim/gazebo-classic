@@ -10,5 +10,7 @@ void main()
   if (l>far)
     l = far;
   
-  gl_FragColor = vec4(l, l, l, 1.0);
+  float nl = l / far;
+ 
+  gl_FragColor = vec4(nl, nl, nl, 1.0);
 }

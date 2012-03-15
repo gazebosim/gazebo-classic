@@ -149,6 +149,14 @@ namespace gazebo
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
       public: int GetFiducial(int index);
+
+      public: double Get1stRatio();
+
+      public: double Get2ndRatio();
+      
+      public: double GetHFOV();
+
+      public: double GetVFOV();
       
       private: void OnPose(ConstPosePtr &_msg);
 
@@ -164,6 +172,7 @@ namespace gazebo
       protected: double near, far;
       protected: unsigned int width_1st, height_1st;
       protected: unsigned int width_2nd, height_2nd;
+      protected: double ratio_1st, ratio_2nd;
       
       private: rendering::VisualLaserPtr laserCam;
       private: rendering::ScenePtr scene;

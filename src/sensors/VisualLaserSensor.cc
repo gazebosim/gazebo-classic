@@ -57,6 +57,14 @@ VisualLaserSensor::~VisualLaserSensor()
 void VisualLaserSensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_worldName, _sdf);
+}
+
+//////////////////////////////////////////////////
+void VisualLaserSensor::Load(const std::string &_worldName)
+{
+  Sensor::Load(_worldName);
+  this->poseSub = this->node->Subscribe("~/pose",
+                                        &VisualLaserSensor::OnPose, this);
   
   this->rayElem = this->sdf->GetElement("ray");
   this->scanElem = this->rayElem->GetElement("scan");
@@ -77,12 +85,21 @@ void VisualLaserSensor::Load(const std::string &_worldName, sdf::ElementPtr &_sd
   width_2nd = this->GetRangeCount();
   height_2nd = this->GetVerticalRangeCount();
 
+  ratio_2nd = width_2nd / height_2nd;
+
 
   near = this->GetRangeMin();
   far = this->GetRangeMax();
 
-  hfov = fabs(this->GetAngleMin().GetAsRadian()) + fabs(this->GetAngleMax().GetAsRadian());
-  vfov = hfov * height_1st / width_1st;
+  hfov = this->GetAngleMax().GetAsRadian() - this->GetAngleMin().GetAsRadian();
+  vfov = this->GetVerticalAngleMax().GetAsRadian() - this->GetVerticalAngleMin().GetAsRadian();
+
+  ratio_1st = tan(hfov/2.0) / tan(vfov/2.0);
+
+  if (height_1st < width_1st) 
+    height_1st = width_1st / ratio_1st;
+  else
+    width_1st = height_1st * ratio_1st;
 
   this->cameraElem.reset(new sdf::Element);
   sdf::initFile("sdf/camera.sdf", this->cameraElem);
@@ -98,14 +115,6 @@ void VisualLaserSensor::Load(const std::string &_worldName, sdf::ElementPtr &_sd
   ptr = this->cameraElem->GetOrCreateElement("clip");
   ptr->GetAttribute("near")->Set(near);
   ptr->GetAttribute("far")->Set(far);
-}
-
-//////////////////////////////////////////////////
-void VisualLaserSensor::Load(const std::string &_worldName)
-{
-  Sensor::Load(_worldName);
-  this->poseSub = this->node->Subscribe("~/pose",
-                                        &VisualLaserSensor::OnPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -134,6 +143,7 @@ void VisualLaserSensor::Init()
 
     this->laserCam->Init();
     this->laserCam->SetRangeCount(width_2nd, height_2nd);
+    this->laserCam->SetParentSensor(this);
     this->laserCam->CreateLaserTexture(this->GetName() + "_RttTex_Laser");
     this->laserCam->CreateRenderTexture(this->GetName() + "_RttTex_Image");
     this->laserCam->SetWorldPose(this->pose);
@@ -152,6 +162,30 @@ void VisualLaserSensor::Fini()
   this->laserCam->Fini();
   this->laserCam.reset();
   this->scene.reset();
+}
+
+//////////////////////////////////////////////////
+double VisualLaserSensor::GetHFOV()
+{
+  return this->hfov;
+}
+
+//////////////////////////////////////////////////
+double VisualLaserSensor::GetVFOV()
+{
+  return this->vfov;
+}
+
+//////////////////////////////////////////////////
+double VisualLaserSensor::Get1stRatio()
+{
+  return this->ratio_1st;
+}
+
+//////////////////////////////////////////////////
+double VisualLaserSensor::Get2ndRatio()
+{
+  return this->ratio_2nd;
 }
 
 //////////////////////////////////////////////////

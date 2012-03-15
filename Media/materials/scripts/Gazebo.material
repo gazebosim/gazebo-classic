@@ -64,12 +64,12 @@ material Gazebo/XYZRGBPoints
   }
 }
 
-vertex_program Gazebo/LaserScanVS glsl
+vertex_program Gazebo/LaserScan1stVS glsl
 {
   source laser_1st_pass.vert
 }
 
-fragment_program Gazebo/LaserScanFS glsl
+fragment_program Gazebo/LaserScan1stFS glsl
 {
   source laser_1st_pass.frag
   
@@ -80,7 +80,18 @@ fragment_program Gazebo/LaserScanFS glsl
   }
 }
 
-material Gazebo/LaserScan
+fragment_program Gazebo/LaserScan1stDBGFS glsl
+{
+  source laser_1st_pass_dbg.frag
+  
+  default_params
+  {
+    param_named_auto near near_clip_distance
+    param_named_auto far far_clip_distance
+  }
+}
+
+material Gazebo/LaserScan1st
 {
   technique
   {
@@ -88,8 +99,65 @@ material Gazebo/LaserScan
     {
       separate_scene_blend one zero one zero
 
-      vertex_program_ref Gazebo/LaserScanVS { }
-      fragment_program_ref Gazebo/LaserScanFS { }
+      vertex_program_ref Gazebo/LaserScan1stVS { }
+      fragment_program_ref Gazebo/LaserScan1stFS { }
+    }
+  }
+}
+
+material Gazebo/LaserScan1stDBG
+{
+  technique
+  {
+    pass laser_tex
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/LaserScan1stVS { }
+      fragment_program_ref Gazebo/LaserScan1stDBGFS { }
+    }
+  }
+}
+
+vertex_program Gazebo/LaserScan2ndVS glsl
+{
+  source laser_2nd_pass.vert
+}
+
+fragment_program Gazebo/LaserScan2ndFS glsl
+{
+  source laser_2nd_pass.frag
+  
+  default_params
+  {
+    param_named_auto texSize texture_size 0
+  }
+}
+
+material Gazebo/LaserScan2nd
+{
+  technique
+  {
+    pass laser_tex_2nd
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/LaserScan2ndVS { }
+      fragment_program_ref Gazebo/LaserScan2ndFS { }
+    }
+  }
+}
+
+material Gazebo/LaserScan2ndDBG
+{
+  technique
+  {
+    pass laser_tex_2nd
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/LaserScan2ndVS { }
+      fragment_program_ref Gazebo/LaserScan2ndFS { }
     }
   }
 }

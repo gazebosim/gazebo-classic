@@ -42,14 +42,19 @@ namespace gazebo
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
-    protected: unsigned int width, height, depth;
-    protected: std::string format;
+    public: virtual void OnNewImage2Frame(const unsigned char *_image,
+                              unsigned int _width, unsigned int _height,
+                              unsigned int _depth, const std::string &_format);
+
+    protected: unsigned int width, height/*, depth*/;
+//    protected: std::string format;
 
     protected: sensors::VisualLaserSensorPtr parentSensor;
     protected: rendering::VisualLaserPtr laserCam;
 
     private: event::ConnectionPtr newLaserFrameConnection;
     private: event::ConnectionPtr newImageFrameConnection;
+    private: event::ConnectionPtr newImage2FrameConnection;
   };
 }
 #endif
