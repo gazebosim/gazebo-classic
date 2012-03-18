@@ -76,6 +76,7 @@ namespace gazebo
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
+      private slots: void ViewReset();
       private slots: void ViewFullScreen();
       private slots: void ViewFPS();
       private slots: void ViewOrbit();
@@ -128,6 +129,7 @@ namespace gazebo
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;
 
+      private: QAction *viewResetAct;
       private: QAction *viewFullScreenAct;
       private: QAction *viewFPSAct;
       private: QAction *viewOrbitAct;

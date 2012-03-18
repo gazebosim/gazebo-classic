@@ -39,6 +39,7 @@ material PSSM/shadow_caster
 		// all this will do is write depth and depth² to red and green
 		pass
 		{
+      depth_bias 2
 			vertex_program_ref PSSM/shadow_caster_vs
 			{
 			}

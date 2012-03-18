@@ -172,6 +172,10 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   {
     result->children.push_back((*iter)->Clone((*iter)->GetName(), result));
   }
+
+  result->SetWorldPose(this->GetWorldPose());
+  result->ShowCollision(false);
+
   return result;
 }
 
@@ -1053,7 +1057,7 @@ void Visual::SetEmissive(const common::Color &_color)
 
   for (unsigned int i = 0; i < this->children.size(); ++i)
   {
-    this->children[i]->SetSpecular(_color);
+    this->children[i]->SetEmissive(_color);
   }
 }
 

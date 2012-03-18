@@ -42,6 +42,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
 /////////////////////////////////////////////////

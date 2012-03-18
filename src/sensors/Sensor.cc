@@ -82,6 +82,7 @@ void Sensor::Load(const std::string &_worldName)
   this->lastUpdateTime = this->world->GetSimTime();
 
   this->node->Init(this->world->GetName());
+  this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
 }
 
 //////////////////////////////////////////////////
@@ -99,7 +100,12 @@ void Sensor::Init()
       pluginElem = pluginElem->GetNextElement();
     }
   }
-  // SensorManager::Instance()->AddSensor(shared_from_this());
+
+  msgs::Sensor msg;
+  this->FillMsg(msg);
+  std::cout << msg.DebugString();
+
+  this->sensorPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////

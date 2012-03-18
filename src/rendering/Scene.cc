@@ -78,6 +78,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
+  this->sensorSub = this->node->Subscribe("~/sensor",
+                                          &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
@@ -203,6 +205,7 @@ void Scene::Load()
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
 }
 
+//////////////////////////////////////////////////
 VisualPtr Scene::GetWorldVisual() const
 {
   return this->worldVisual;
@@ -589,6 +592,16 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
   }
 
   return visual;
+}
+
+//////////////////////////////////////////////////
+VisualPtr Scene::GetModelVisualAt(CameraPtr _camera, math::Vector2i _mousePos)
+{
+  VisualPtr vis = this->GetVisualAt(_camera, _mousePos);
+  if (vis)
+    vis = this->GetVisual(vis->GetName().substr(0, vis->GetName().find("::")));
+
+  return vis;
 }
 
 //////////////////////////////////////////////////
@@ -1049,6 +1062,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
@@ -1183,6 +1197,14 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 }
 
 //////////////////////////////////////////////////
+void Scene::OnSensorMsg(ConstSensorPtr &_msg)
+{
+  std::cout << "OnSensorMsg[" << _msg->DebugString() << "]\n";
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sensorMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
 void Scene::OnSceneMsg(ConstScenePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -1209,13 +1231,6 @@ void Scene::PreRender()
   JointMsgs_L::iterator jIter;
   SensorMsgs_L::iterator sensorIter;
 
-  for (sensorIter = this->sensorMsgs.begin();
-       sensorIter != this->sensorMsgs.end(); ++sensorIter)
-  {
-    this->ProcessSensorMsg(*sensorIter);
-  }
-  this->sensorMsgs.clear();
-
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
        sIter != this->sceneMsgs.end(); ++sIter)
@@ -1223,6 +1238,15 @@ void Scene::PreRender()
     this->ProcessSceneMsg(*sIter);
   }
   this->sceneMsgs.clear();
+
+  sensorIter = this->sensorMsgs.begin();
+  while (sensorIter != this->sensorMsgs.end())
+  {
+    if (this->ProcessSensorMsg(*sensorIter))
+      this->sensorMsgs.erase(sensorIter++);
+    else
+      ++sensorIter;
+  }
 
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
@@ -1301,10 +1325,10 @@ void Scene::OnJointMsg(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
+bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
   if (!this->enableVisualizations)
-    return;
+    return true;
 
   if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
@@ -1312,7 +1336,7 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
-        gzerr << "Unable to find parent visual[" << _msg->parent() << "]\n";
+        return false;
 
       LaserVisualPtr laserVis(new LaserVisual(
             _msg->name()+"_laser_vis", parentVis, _msg->topic()));
@@ -1323,6 +1347,9 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   else if (_msg->type() == "camera" && _msg->visualize())
   {
     VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
     CameraVisualPtr cameraVis(new CameraVisual(
           _msg->name()+"_camera_vis", parentVis));
 
@@ -1341,6 +1368,8 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     this->visuals[contactVis->GetName()] = contactVis;
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////

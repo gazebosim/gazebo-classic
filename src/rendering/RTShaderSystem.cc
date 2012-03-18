@@ -393,6 +393,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   return true;
 }
 
+/////////////////////////////////////////////////
 void RTShaderSystem::RemoveShadows(Scene *_scene)
 {
   if (!this->initialized)

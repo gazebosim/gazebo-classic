@@ -147,6 +147,7 @@ namespace gazebo
       public: VisualPtr SelectVisualAt(CameraPtr camera,
                                        math::Vector2i mousePos);
 
+
       /// \brief Select a visual by name
       public: void SelectVisual(const std::string &_name) const;
 
@@ -163,7 +164,13 @@ namespace gazebo
       public: void SnapVisualToNearestBelow(const std::string &_visualName);
 
       /// \brief Get a visual at a mouse position
-      public: VisualPtr GetVisualAt(CameraPtr camera, math::Vector2i mousePos);
+      public: VisualPtr GetVisualAt(CameraPtr _camera,
+                                    math::Vector2i _mousePos);
+
+      /// \brief Get a model's visual at a mouse position
+      public: VisualPtr GetModelVisualAt(CameraPtr _camera,
+                                         math::Vector2i _mousePos);
+
 
       /// \brief Get the closest visual below a given visual
       public: VisualPtr GetVisualBelow(const std::string &_visualName);
@@ -257,12 +264,13 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnJointMsg(ConstJointPtr &_msg);
 
-      private: void ProcessSensorMsg(ConstSensorPtr &_msg);
+      private: bool ProcessSensorMsg(ConstSensorPtr &_msg);
       private: void ProcessJointMsg(ConstJointPtr &_msg);
 
       private: void ProcessSceneMsg(ConstScenePtr &_msg);
 
       private: void OnSceneMsg(ConstScenePtr &_msg);
+      private: void OnSensorMsg(ConstSensorPtr &_msg);
       private: void OnVisualMsg(ConstVisualPtr &_msg);
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
 
@@ -326,6 +334,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::SubscriberPtr sceneSub;
+      private: transport::SubscriberPtr sensorSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;

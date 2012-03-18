@@ -380,6 +380,13 @@ void MainWindow::OnFullScreen(bool _value)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewReset()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0));
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
@@ -534,6 +541,11 @@ void MainWindow::CreateActions()
   connect(this->dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
 
+  this->viewResetAct = new QAction(tr("Reset View"), this);
+  this->viewResetAct->setStatusTip(tr("Move camera to origin"));
+  connect(this->viewResetAct, SIGNAL(triggered()), this,
+      SLOT(ViewReset()));
+
   this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
   this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
   connect(this->viewFullScreenAct, SIGNAL(triggered()), this,
@@ -565,6 +577,7 @@ void MainWindow::CreateMenus()
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
+  this->viewMenu->addAction(this->viewResetAct);
   this->viewMenu->addAction(this->viewFullScreenAct);
   this->viewMenu->addAction(this->viewFPSAct);
   this->viewMenu->addAction(this->viewOrbitAct);
