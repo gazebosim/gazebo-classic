@@ -36,7 +36,8 @@ namespace gazebo
       public: ModelMaker();
       public: virtual ~ModelMaker();
 
-      public: void Init(const std::string &_filename);
+      public: void InitFromModel(const std::string &_modelName);
+      public: void InitFromFile(const std::string &_filename);
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       public: virtual void Stop();
@@ -55,6 +56,8 @@ namespace gazebo
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
       private: sdf::SDFPtr modelSDF;
+
+      private: bool clone;
     };
   }
 }

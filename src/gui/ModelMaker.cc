@@ -43,6 +43,7 @@ ModelMaker::ModelMaker()
 : EntityMaker()
 {
   this->state = 0;
+  this->clone = false;
 }
 
 /////////////////////////////////////////////////
@@ -52,8 +53,30 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::Init(const std::string &_filename)
+void ModelMaker::InitFromModel(const std::string &_modelName)
 {
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  if (this->modelVisual)
+  {
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+    this->visuals.clear();
+  }
+
+  // this->modelSDF.reset(new sdf::SDF);
+  // sdf::initFile("sdf/gazebo.sdf", this->modelSDF);
+  this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
+
+  if (!this->modelVisual)
+    std::cout << "Unable to clone\n";
+
+  this->clone = true;
+}
+
+/////////////////////////////////////////////////
+void ModelMaker::InitFromFile(const std::string &_filename)
+{
+  this->clone = false;
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
   if (this->modelVisual)
@@ -66,7 +89,6 @@ void ModelMaker::Init(const std::string &_filename)
   this->modelSDF.reset(new sdf::SDF);
   sdf::initFile("sdf/gazebo.sdf", this->modelSDF);
   sdf::readFile(_filename, this->modelSDF);
-
 
   // Load the world file
   std::string modelName;
@@ -172,14 +194,7 @@ void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (!this->modelSDF || _event.dragging ||
-      (_event.button != common::MouseEvent::LEFT &&
-       _event.button != common::MouseEvent::RIGHT))
-  {
-    return;
-  }
-
-  if (_event.button == common::MouseEvent::LEFT)
+  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
   {
     this->CreateTheEntity();
     this->Stop();
@@ -220,11 +235,13 @@ void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
     else if (pose.pos.y - floor(pose.pos.y) <= .4)
       pose.pos.y = floor(pose.pos.y);
 
-    if (ceil(pose.pos.z) - pose.pos.z <= .4)
+  /*  if (ceil(pose.pos.z) - pose.pos.z <= .4)
       pose.pos.z = ceil(pose.pos.z);
     else if (pose.pos.z - floor(pose.pos.z) <= .4)
       pose.pos.z = floor(pose.pos.z);
+      */
   }
+  pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
 
   this->modelVisual->SetWorldPose(pose);
 }
@@ -237,29 +254,39 @@ void ModelMaker::OnMouseDrag(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::CreateTheEntity()
 {
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
-  std::string modelName = modelElem->GetValueString("name");
-
-  // Automatically create a new name if the model exists
-  int i = 0;
-  while (has_entity_name(modelName))
-  {
-    modelName = modelElem->GetValueString("name") + "_" +
-      boost::lexical_cast<std::string>(i++);
-  }
-
-  // Remove the topic namespace from the model name. This will get re-inserted
-  // by the World automatically
-  modelName.erase(0, this->node->GetTopicNamespace().size()+2);
-
-  // The the SDF model's name
-  modelElem->GetAttribute("name")->Set(modelName);
-  modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
-      this->modelVisual->GetWorldPose());
-
-  // Spawn the model in the physics server
+  std::cout << "Create the entity\n";
   msgs::Factory msg;
-  msg.set_sdf(this->modelSDF->ToString());
+  if (!this->clone)
+  {
+    sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+    std::string modelName = modelElem->GetValueString("name");
+
+    // Automatically create a new name if the model exists
+    int i = 0;
+    while (has_entity_name(modelName))
+    {
+      modelName = modelElem->GetValueString("name") + "_" +
+        boost::lexical_cast<std::string>(i++);
+    }
+
+    // Remove the topic namespace from the model name. This will get re-inserted
+    // by the World automatically
+    modelName.erase(0, this->node->GetTopicNamespace().size()+2);
+
+    // The the SDF model's name
+    modelElem->GetAttribute("name")->Set(modelName);
+    modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
+        this->modelVisual->GetWorldPose());
+
+    // Spawn the model in the physics server
+    msg.set_sdf(this->modelSDF->ToString());
+  }
+  else
+  {
+    msgs::Set(msg.mutable_pose(), this->modelVisual->GetWorldPose());
+    msg.set_clone_model_name(this->modelVisual->GetName().substr(0, 
+                             this->modelVisual->GetName().find("_clone_tmp")));
+  }
 
   this->makerPub->Publish(msg);
 }
