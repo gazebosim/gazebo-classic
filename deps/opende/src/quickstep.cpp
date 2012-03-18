@@ -110,7 +110,6 @@ struct dxSORLCPParameters {
     dRealPtr Ad_precon;
     dRealPtr Adcfm_precon;
     dRealPtr JiMratio;
-    dRealMutablePtr vnew;
     dRealMutablePtr b;
     dRealMutablePtr J;
     dRealMutablePtr caccel;
@@ -403,76 +402,13 @@ static int compare_index_error (const void *a, const void *b)
 
 #endif
 
-void updateVnew(const int nb, dRealPtr invI, dRealPtr caccel, dxBody * const * body, dReal stepsize, dRealMutablePtr vnew)
-{
-  /****************************************************************/
-  /* compute vnew per caccel update                               */
-  /*   based on all external forces fe, caccel                    */
-  /*   vnew should have started out same as v(n)                  */
-  /*   vnew should end up being v(n+1)                            */
-  /*                                                              */
-  /*  vnew = v_current + stepsize * invM * f_all                  */
-  /*                                                              */
-  /****************************************************************/
-  {
-    const dReal *invIrow = invI;
-    dRealMutablePtr vnew_ptr = vnew;
-    dxBody *const *const bodyend = body + nb;
-    const dReal *caccel_ptr = caccel;
-
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccel_ptr+=6, invIrow += 12, vnew_ptr+=6, bodycurr++) {
-      // compute the velocity update:
-      // add stepsize * invM * f_all to the body velocity
-      dxBody *b = *bodycurr;
-      dReal body_invMass_mul_stepsize = stepsize * b->invMass;
-      dReal tmp3[3];
-      for (int j=0; j<3; j++) {
-        // note that (caccel) is an acceleration, hence there is
-        // add stepsize * caccel to the body velocity
-        vnew_ptr[j]   = b->lvel[j] + stepsize * caccel_ptr[j]   + body_invMass_mul_stepsize * b->facc[j];
-        vnew_ptr[j+3] = b->avel[j] + stepsize * caccel_ptr[j+3];
-
-        // accumulate step*torques
-        tmp3[j] = stepsize*b->tacc[j];
-      }
-      // vnew = invI * f_all
-      dMultiplyAdd0_331 (vnew_ptr+3, invIrow, tmp3);
-
-    }
-  }
-}
-
-// vnew = J * M * vnew / stepsize
-inline static void multiply_JM (const int nb, const int m, dRealPtr J, dRealPtr I, dxBody * const *body, int *jb, dReal stepsize, dRealMutablePtr vnew)
-{
-  const dReal stepsize1 = dRecip(stepsize);
-  dReal *tmp1 = new dReal[nb*6];
-  dReal *tmp1curr = tmp1;
-  dRealPtr vnewcurr = vnew;
-  const dReal *Irow = I;
-  dxBody *const *const bodyend = body + nb;
-  for (dxBody *const *bodycurr = body; bodycurr != bodyend; vnewcurr+=6, tmp1curr+=6, Irow+=12, bodycurr++) {
-    dxBody *b_ptr = *bodycurr;
-    dReal body_mass = b_ptr->mass.mass;
-    for (int j=0; j<3; j++) tmp1curr[j] = body_mass * vnewcurr[j] * stepsize1;
-    dReal tmpa[3];
-    for (int j=0; j<3; j++) tmpa[j] = vnewcurr[j+3] * stepsize1;
-    dMultiply0_331 (tmp1curr + 3,Irow,tmpa);
-  }
-  multiply_J (m,J,jb,tmp1,vnew);
-  delete tmp1;
-  tmp1 = 0;
-}
-
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb, dRealPtr /*invI*/, dRealPtr I, dxBody * const *body, const dReal stepsize1, dRealMutablePtr c, dRealMutablePtr J, int *jb, dRealMutablePtr rhs_precon)
 {
     /************************************************************************************/
     /*                                                                                  */
     /*               compute preconditioned rhs                                         */
     /*                                                                                  */
-    /*  J J' lambda = J * ( M * (vnew - v) / h + fe )                                   */
-    /*                                                                                  */
-    /*  initiallly vnew is zero                                                         */
+    /*  J J' lambda = J * ( M * dv / dt + fe )                                          */
     /*                                                                                  */
     /************************************************************************************/
     // mimic computation of rhs, but do it with J*M*inv(J) prefixed for preconditioned case.
@@ -599,7 +535,6 @@ static void ComputeRows(
   //dRealPtr        Ad_precon    = params.Ad_precon;
   dRealPtr        Adcfm_precon = params.Adcfm_precon;
   //dRealPtr        JiMratio     = params.JiMratio;
-  //dRealMutablePtr vnew         = params.vnew;
   dRealMutablePtr b            = params.b;
   dRealMutablePtr J            = params.J;
   dRealMutablePtr caccel       = params.caccel;
@@ -784,9 +719,8 @@ static void ComputeRows(
       dReal old_lambda = lambda[index];
 
       if (preconditioning) {
-        // modify rhs_precon by adding J * M * vnew / stepsize
         // update delta
-        delta = b_precon[index] /* + vnew[index] */ - old_lambda*Adcfm_precon[index];
+        delta = b_precon[index] - old_lambda*Adcfm_precon[index];
 
         // caccel is constraint acceleration in the non-precon case,
         //  and cforce is the actual constraint force in the precon case
@@ -802,10 +736,6 @@ static void ComputeRows(
           delta -= dot6(cforce_ptr2, J_ptr + 6);
       } else {
         delta = b[index] - old_lambda*Adcfm[index];
-        // update vnew,
-        //updateVnew(nb, invI, caccel, body, stepsize, vnew);
-        // compute J * M * vnew / stepsize and store in vnew
-        //multiply_JM (nb, m, J, I, body, jb, stepsize, vnew);
 
         dRealPtr J_ptr = J + index*12;
         delta -= dot6(caccel_ptr1, J_ptr);
@@ -1034,8 +964,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
     }
   }
 
-  dReal *vnew = context->AllocateArray<dReal> (nb*6);
-
   /********************************/
   /* allocate for Adcfm           */
   /* which is a mX1 column vector */
@@ -1170,7 +1098,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].I= I;
     params[thread_id].Ad_precon = Ad_precon;
     params[thread_id].Adcfm_precon = Adcfm_precon;
-    params[thread_id].vnew = vnew;
     params[thread_id].JiMratio = JiMratio;
     params[thread_id].b = b;
     params[thread_id].J = J;
@@ -1814,7 +1741,6 @@ static size_t EstimateSOR_LCPMemoryRequirements(int m,int nb)
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Ad_precon
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm_precon
-  res += dEFFICIENT_SIZE(sizeof(dReal) * nb*6); // for vnew
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for delta_error
   res += dEFFICIENT_SIZE(sizeof(IndexError) * m); // for order
 #ifdef REORDER_CONSTRAINTS
@@ -1851,7 +1777,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
   size_t res = 0;
 
   res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invI
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for I needed by preconditioner
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for I (inertia) needed by preconditioner
   res += dEFFICIENT_SIZE(sizeof(dReal) * nb); // for invM
 
   {
