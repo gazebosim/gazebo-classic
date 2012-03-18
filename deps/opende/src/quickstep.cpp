@@ -439,21 +439,9 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       multiply_J (m,J,jb,tmp1,rhs_precon);
 
       //
-      // TODO: rhs_precon = J * inv(M) * c / h - J * (M*v/h + fe)
+      // no need to add constraint violation correction tterm if we assume acceleration is 0
       //
-      // c is the acceleration in the direction of the constraint, i.e. J * accel_inertial_frame
-      // so here, we want the forces forces in the constraint directions.
-      //
-      // analogously, we can view them as either velocity vs. momentum (m*v)
-      //  basically one is mass * the other one.
-      //
-      // The problem here is... everything is ok if velocity/acceleration is zero, but
-      //   momentum/forces are NOT zero even if velocity is zero.
-      //
-      // Question, can we do:  JM .dot. Jv (or JM .dot. c) for momentum/force
-      //   in the direction of the constraints?
-      //
-      for (int i=0; i<m; i++) rhs_precon[i] = 0*c[i]*stepsize1 - rhs_precon[i];
+      for (int i=0; i<m; i++) rhs_precon[i] = - rhs_precon[i];
 
 
       /*  DEBUG PRINTOUTS
@@ -462,9 +450,6 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       printf("\n");
       */
     } END_STATE_SAVE(context, tmp2state);
-
-    // complete rhs
-    //for (int i=0; i<m; i++) rhs_precon[i] = - rhs_precon[i];
 }
 
 static inline dReal dot6(dRealPtr a, dRealPtr b)
