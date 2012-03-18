@@ -75,6 +75,8 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      private: void OnKeyReleaseRing(QKeyEvent *_event);
+
       private: void OnMouseMoveRing();
       private: void OnMouseMoveNormal();
       private: void OnMouseMoveMakeEntity();
@@ -86,6 +88,8 @@ namespace gazebo
       private: void OnMousePressRing();
       private: void OnMousePressNormal();
       private: void OnMousePressMakeEntity();
+
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void SmartMoveVisual(rendering::VisualPtr _vis);
 
@@ -111,6 +115,10 @@ namespace gazebo
 
       /// \brief Copy an object by name
       private: void Paste(const std::string &_object);
+
+      private: void PushHistory(const std::string &_visName,
+                                const math::Pose &_pose);
+      private: void PopHistory();
 
       private: int windowId;
 
@@ -139,7 +147,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
-      private: transport::SubscriberPtr selectionSub;
+      private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
@@ -147,9 +155,10 @@ namespace gazebo
       private: math::Pose mouseMoveVisStartPose;
 
       private: std::string copiedObject;
-      private: bool copy;
 
       private: std::string state;
+
+      private: std::list<std::pair<std::string, math::Pose> > moveHistory;
     };
   }
 }
