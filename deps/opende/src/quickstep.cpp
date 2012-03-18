@@ -113,14 +113,14 @@ struct dxSORLCPParameters {
     dRealMutablePtr vnew;
     dRealMutablePtr b;
     dRealMutablePtr J;
-    dRealMutablePtr ac;
+    dRealMutablePtr caccel;
     dRealMutablePtr lambda;
     dRealMutablePtr iMJ;
     dRealMutablePtr delta_error ;
     dRealMutablePtr b_precon ;
     dRealMutablePtr J_precon ;
     dRealMutablePtr J_orig ;
-    dRealMutablePtr fc ;
+    dRealMutablePtr cforce ;
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;
 #endif
@@ -284,7 +284,7 @@ static inline void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 
 static void CG_LCP (dxWorldProcessContext *context,
   int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr fc, dRealMutablePtr b,
+  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr b,
   dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
   dxQuickStepParameters *qs)
 {
@@ -317,7 +317,7 @@ static void CG_LCP (dxWorldProcessContext *context,
 
 #ifdef WARM_STARTING
   // compute residual r = b - A*lambda
-  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,fc,lambda,r);
+  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
   for (int k=0; k<m; k++) r[k] = b[k] - r[k];
 #else
   dSetZero (lambda,m);
@@ -344,7 +344,7 @@ static void CG_LCP (dxWorldProcessContext *context,
     }
 
     // compute q = (J*inv(M)*J')*p
-    multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,fc,p,q);
+    multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,p,q);
 
     dReal alpha = rho/dot (m,p,q);		// alpha = rho/(p'*q)
     add (m,lambda,lambda,p,alpha);		// lambda = lambda + alpha*p
@@ -352,12 +352,12 @@ static void CG_LCP (dxWorldProcessContext *context,
     last_rho = rho;
   }
 
-  // compute fc = inv(M)*J'*lambda
-  multiply_invM_JT (m,nb,iMJ,jb,lambda,fc);
+  // compute cforce = inv(M)*J'*lambda
+  multiply_invM_JT (m,nb,iMJ,jb,lambda,cforce);
 
 #if 0
   // measure solution error
-  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,fc,lambda,r);
+  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
   dReal error = 0;
   for (int i=0; i<m; i++) error += dFabs(r[i] - b[i]);
   printf ("lambda error = %10.6e\n",error);
@@ -374,8 +374,8 @@ static void CG_LCP (dxWorldProcessContext *context,
 // jb is an array of first and second body numbers for each constraint row
 // invI is the global frame inverse inertia for each body (stacked 3x3 matrices)
 //
-// this returns lambda and fc (the constraint force).
-// note: fc is returned as inv(M)*J'*lambda, the constraint force is actually J'*lambda
+// this returns lambda and cforce (the constraint force).
+// note: cforce is returned as inv(M)*J'*lambda, the constraint force is actually J'*lambda
 //
 // b, lo and hi are modified on exit
 
@@ -403,11 +403,11 @@ static int compare_index_error (const void *a, const void *b)
 
 #endif
 
-void updateVnew(const int nb, dRealPtr invI, dRealPtr ac, dxBody * const * body, dReal stepsize, dRealMutablePtr vnew)
+void updateVnew(const int nb, dRealPtr invI, dRealPtr caccel, dxBody * const * body, dReal stepsize, dRealMutablePtr vnew)
 {
   /****************************************************************/
-  /* compute vnew per ac update                                   */
-  /*   based on all external forces fe, ac                        */
+  /* compute vnew per caccel update                               */
+  /*   based on all external forces fe, caccel                    */
   /*   vnew should have started out same as v(n)                  */
   /*   vnew should end up being v(n+1)                            */
   /*                                                              */
@@ -418,19 +418,19 @@ void updateVnew(const int nb, dRealPtr invI, dRealPtr ac, dxBody * const * body,
     const dReal *invIrow = invI;
     dRealMutablePtr vnew_ptr = vnew;
     dxBody *const *const bodyend = body + nb;
-    const dReal *ac_ptr = ac;
+    const dReal *caccel_ptr = caccel;
 
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; ac_ptr+=6, invIrow += 12, vnew_ptr+=6, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccel_ptr+=6, invIrow += 12, vnew_ptr+=6, bodycurr++) {
       // compute the velocity update:
       // add stepsize * invM * f_all to the body velocity
       dxBody *b = *bodycurr;
       dReal body_invMass_mul_stepsize = stepsize * b->invMass;
       dReal tmp3[3];
       for (int j=0; j<3; j++) {
-        // note that (ac) is an acceleration, hence there is
-        // add stepsize * ac to the body velocity
-        vnew_ptr[j]   = b->lvel[j] + stepsize * ac_ptr[j]   + body_invMass_mul_stepsize * b->facc[j];
-        vnew_ptr[j+3] = b->avel[j] + stepsize * ac_ptr[j+3];
+        // note that (caccel) is an acceleration, hence there is
+        // add stepsize * caccel to the body velocity
+        vnew_ptr[j]   = b->lvel[j] + stepsize * caccel_ptr[j]   + body_invMass_mul_stepsize * b->facc[j];
+        vnew_ptr[j+3] = b->avel[j] + stepsize * caccel_ptr[j+3];
 
         // accumulate step*torques
         tmp3[j] = stepsize*b->tacc[j];
@@ -581,7 +581,7 @@ static void ComputeRows(
   //printf("thread %d started at time %f\n",thread_id,cur_time);
   #endif
 
-  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in ac read/writes?
+  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
   dxQuickStepParameters *qs    = params.qs;
   int startRow                 = params.nStart;   // 0
   int nRows                    = params.nChunkSize; // m
@@ -602,7 +602,7 @@ static void ComputeRows(
   //dRealMutablePtr vnew         = params.vnew;
   dRealMutablePtr b            = params.b;
   dRealMutablePtr J            = params.J;
-  dRealMutablePtr ac           = params.ac;
+  dRealMutablePtr caccel       = params.caccel;
   dRealMutablePtr lambda       = params.lambda;
   dRealMutablePtr iMJ          = params.iMJ;
 #ifdef RECOMPUTE_RMS
@@ -611,7 +611,7 @@ static void ComputeRows(
   dRealMutablePtr b_precon     = params.b_precon;
   dRealMutablePtr J_precon     = params.J_precon;
   dRealMutablePtr J_orig       = params.J_orig;
-  dRealMutablePtr fc           = params.fc;
+  dRealMutablePtr cforce       = params.cforce;
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params.last_lambda;
 #endif
@@ -756,10 +756,10 @@ static void ComputeRows(
 
     //dSetZero (delta_error,m);
 
-    dRealMutablePtr ac_ptr1;
-    dRealMutablePtr ac_ptr2;
-    dRealMutablePtr fc_ptr1;
-    dRealMutablePtr fc_ptr2;
+    dRealMutablePtr caccel_ptr1;
+    dRealMutablePtr caccel_ptr2;
+    dRealMutablePtr cforce_ptr1;
+    dRealMutablePtr cforce_ptr2;
     for (int i=startRow; i<startRow+nRows; i++) {
       //boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
 
@@ -775,10 +775,10 @@ static void ComputeRows(
       {
         int b1 = jb[index*2];
         int b2 = jb[index*2+1];
-        ac_ptr1 = ac + 6*b1;
-        ac_ptr2 = (b2 >= 0) ? ac + 6*b2 : NULL;
-        fc_ptr1 = fc + 6*b1;
-        fc_ptr2 = (b2 >= 0) ? fc + 6*b2 : NULL;
+        caccel_ptr1 = caccel + 6*b1;
+        caccel_ptr2 = (b2 >= 0) ? caccel + 6*b2 : NULL;
+        cforce_ptr1 = cforce + 6*b1;
+        cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
       }
 
       dReal old_lambda = lambda[index];
@@ -788,29 +788,29 @@ static void ComputeRows(
         // update delta
         delta = b_precon[index] /* + vnew[index] */ - old_lambda*Adcfm_precon[index];
 
-        // ac is constraint acceleration in the non-precon case,
-        //  and fc is the actual constraint force in the precon case
+        // caccel is constraint acceleration in the non-precon case,
+        //  and cforce is the actual constraint force in the precon case
         // J_precon and J differs essentially in Ad and Ad_precon,
         //  Ad is derived from diagonal of J inv(M) J'
         //  Ad_precon is derived from diagonal of J J'
         dRealPtr J_ptr = J_precon + index*12;
 
-        // for preconditioned case, update delta using fc, not ac
+        // for preconditioned case, update delta using cforce, not caccel
 
-        delta -= dot6(fc_ptr1, J_ptr);
-        if (fc_ptr2)
-          delta -= dot6(fc_ptr2, J_ptr + 6);
+        delta -= dot6(cforce_ptr1, J_ptr);
+        if (cforce_ptr2)
+          delta -= dot6(cforce_ptr2, J_ptr + 6);
       } else {
         delta = b[index] - old_lambda*Adcfm[index];
         // update vnew,
-        //updateVnew(nb, invI, ac, body, stepsize, vnew);
+        //updateVnew(nb, invI, caccel, body, stepsize, vnew);
         // compute J * M * vnew / stepsize and store in vnew
         //multiply_JM (nb, m, J, I, body, jb, stepsize, vnew);
 
         dRealPtr J_ptr = J + index*12;
-        delta -= dot6(ac_ptr1, J_ptr);
-        if (ac_ptr2) {
-          delta -= dot6(ac_ptr2, J_ptr + 6);
+        delta -= dot6(caccel_ptr1, J_ptr);
+        if (caccel_ptr2) {
+          delta -= dot6(caccel_ptr2, J_ptr + 6);
         }
       }
 
@@ -870,23 +870,23 @@ static void ComputeRows(
         // to clarify, iMJ is really computed as the inv(M) * J without any further modification
         //if (preconditioning)
         {
-          // for preconditioning case, compute fc
+          // for preconditioning case, compute cforce
           dRealPtr J_ptr = J_orig + index*12; // FIXME: need un-altered unscaled J, not J_precon!!
 
-          // update fc.
-          sum6(fc_ptr1, delta, J_ptr);
-          if (fc_ptr2)
-            sum6(fc_ptr2, delta, J_ptr + 6);
+          // update cforce.
+          sum6(cforce_ptr1, delta, J_ptr);
+          if (cforce_ptr2)
+            sum6(cforce_ptr2, delta, J_ptr + 6);
         }
         //else
         {
-          // for non-precon case, update ac
+          // for non-precon case, update caccel
           dRealPtr iMJ_ptr = iMJ + index*12;
 
-          // update ac.
-          sum6(ac_ptr1, delta, iMJ_ptr);
-          if (ac_ptr2)
-            sum6(ac_ptr2, delta, iMJ_ptr + 6);
+          // update caccel.
+          sum6(caccel_ptr1, delta, iMJ_ptr);
+          if (caccel_ptr2)
+            sum6(caccel_ptr2, delta, iMJ_ptr + 6);
         }
       }
     } // end of for loop on m
@@ -964,7 +964,7 @@ static void ComputeRows(
 
 static void SOR_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr ac, dRealMutablePtr fc, dRealMutablePtr b, dRealMutablePtr b_precon,
+  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr caccel, dRealMutablePtr cforce, dRealMutablePtr b, dRealMutablePtr b_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs,
   dRealMutablePtr /*JiM*/, dRealMutablePtr JiMratio,
@@ -987,14 +987,14 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
   compute_invM_JT (m,J,iMJ,jb,body,invI);
 
-  // compute fc=(inv(M)*J')*lambda. we will incrementally maintain fc
+  // compute cforce=(inv(M)*J')*lambda. we will incrementally maintain cforce
   // as we change lambda.
 #ifdef WARM_STARTING
-  multiply_invM_JT (m,nb,J,jb,lambda,fc);
-  multiply_invM_JT (m,nb,iMJ,jb,lambda,ac);
+  multiply_invM_JT (m,nb,J,jb,lambda,cforce);
+  multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
 #else
-  dSetZero (ac,nb*6);
-  dSetZero (fc,nb*6);
+  dSetZero (caccel,nb*6);
+  dSetZero (cforce,nb*6);
 #endif
 
   dReal *Ad = context->AllocateArray<dReal> (m);
@@ -1174,14 +1174,14 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].JiMratio = JiMratio;
     params[thread_id].b = b;
     params[thread_id].J = J;
-    params[thread_id].ac = ac;
+    params[thread_id].caccel = caccel;
     params[thread_id].lambda = lambda;
     params[thread_id].iMJ = iMJ;
     params[thread_id].delta_error  = delta_error ;
     params[thread_id].b_precon  = b_precon ;
     params[thread_id].J_precon  = J_precon ;
     params[thread_id].J_orig  = J_orig ;
-    params[thread_id].fc  = fc ;
+    params[thread_id].cforce  = cforce ;
 #ifdef REORDER_CONSTRAINTS
     params[thread_id].last_lambda  = last_lambda ;
 #endif
@@ -1673,11 +1673,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     {
       IFTIMING (dTimerNow ("velocity update due to constraint forces"));
-      // note that cforce is really not a force but an acceleration, hence there is
-      // no premultiplying of invM here (compare to update due to external force 'facc' below)
       //
-      // add stepsize * cforce to the body velocity
-      // or better named,
+      // update new velocity
       // add stepsize * caccel to the body velocity
       //
       const dReal *caccelcurr = caccel;
