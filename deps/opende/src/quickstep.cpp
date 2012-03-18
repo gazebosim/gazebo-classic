@@ -101,22 +101,20 @@ struct dxSORLCPParameters {
     dReal stepsize;
     int* jb;
     const int* findex;
-    dRealPtr Ad;
     dRealPtr hi;
     dRealPtr lo;
-    dRealPtr Adcfm;
     dRealPtr invI;
     dRealPtr I;
-    dRealPtr Ad_precon;
+    dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
     dRealPtr JiMratio;
-    dRealMutablePtr b;
+    dRealMutablePtr rhs;
     dRealMutablePtr J;
     dRealMutablePtr caccel;
     dRealMutablePtr lambda;
     dRealMutablePtr iMJ;
     dRealMutablePtr delta_error ;
-    dRealMutablePtr b_precon ;
+    dRealMutablePtr rhs_precon ;
     dRealMutablePtr J_precon ;
     dRealMutablePtr J_orig ;
     dRealMutablePtr cforce ;
@@ -283,7 +281,7 @@ static inline void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 
 static void CG_LCP (dxWorldProcessContext *context,
   int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr b,
+  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
   dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
   dxQuickStepParameters *qs)
 {
@@ -315,12 +313,12 @@ static void CG_LCP (dxWorldProcessContext *context,
   }
 
 #ifdef WARM_STARTING
-  // compute residual r = b - A*lambda
+  // compute residual r = rhs - A*lambda
   multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
-  for (int k=0; k<m; k++) r[k] = b[k] - r[k];
+  for (int k=0; k<m; k++) r[k] = rhs[k] - r[k];
 #else
   dSetZero (lambda,m);
-  memcpy (r,b,m*sizeof(dReal));		// residual r = b - A*lambda
+  memcpy (r,rhs,m*sizeof(dReal));		// residual r = rhs - A*lambda
 #endif
 
   for (int iteration=0; iteration < num_iterations; iteration++) {
@@ -358,7 +356,7 @@ static void CG_LCP (dxWorldProcessContext *context,
   // measure solution error
   multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
   dReal error = 0;
-  for (int i=0; i<m; i++) error += dFabs(r[i] - b[i]);
+  for (int i=0; i<m; i++) error += dFabs(r[i] - rhs[i]);
   printf ("lambda error = %10.6e\n",error);
 #endif
 }
@@ -376,7 +374,7 @@ static void CG_LCP (dxWorldProcessContext *context,
 // this returns lambda and cforce (the constraint force).
 // note: cforce is returned as inv(M)*J'*lambda, the constraint force is actually J'*lambda
 //
-// b, lo and hi are modified on exit
+// rhs, lo and hi are modified on exit
 
 struct IndexError {
 #ifdef REORDER_CONSTRAINTS
@@ -511,16 +509,14 @@ static void ComputeRows(
   //dReal stepsize               = params.stepsize;
   int* jb                      = params.jb;
   const int* findex            = params.findex;
-  //dRealPtr        Ad           = params.Ad;
   dRealPtr        hi           = params.hi;
   dRealPtr        lo           = params.lo;
-  dRealPtr        Adcfm        = params.Adcfm;
   //dRealPtr        invI         = params.invI;
   //dRealPtr        I            = params.I;
-  //dRealPtr        Ad_precon    = params.Ad_precon;
+  dRealPtr        Adcfm        = params.Adcfm;
   dRealPtr        Adcfm_precon = params.Adcfm_precon;
   //dRealPtr        JiMratio     = params.JiMratio;
-  dRealMutablePtr b            = params.b;
+  dRealMutablePtr rhs          = params.rhs;
   dRealMutablePtr J            = params.J;
   dRealMutablePtr caccel       = params.caccel;
   dRealMutablePtr lambda       = params.lambda;
@@ -528,7 +524,7 @@ static void ComputeRows(
 #ifdef RECOMPUTE_RMS
   dRealMutablePtr delta_error  = params.delta_error;
 #endif
-  dRealMutablePtr b_precon     = params.b_precon;
+  dRealMutablePtr rhs_precon   = params.rhs_precon;
   dRealMutablePtr J_precon     = params.J_precon;
   dRealMutablePtr J_orig       = params.J_orig;
   dRealMutablePtr cforce       = params.cforce;
@@ -553,7 +549,7 @@ static void ComputeRows(
   }
   printf("\n");
 
-  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and b_precon and b
+  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
   printf("J_precon\n");
   for (int i=0; i < m ; i++) {
     for (int j=0; j < 12 ; j++) {
@@ -572,12 +568,12 @@ static void ComputeRows(
   }
   printf("\n");
 
-  printf("b_precon\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",b_precon[i]);
+  printf("rhs_precon\n");
+  for (int i=0; i < m ; i++) printf("	%12.6f",rhs_precon[i]);
   printf("\n");
 
-  printf("b\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",b[i]);
+  printf("rhs\n");
+  for (int i=0; i < m ; i++) printf("	%12.6f",rhs[i]);
   printf("\n");
 */
 
@@ -705,7 +701,7 @@ static void ComputeRows(
 
       if (preconditioning) {
         // update delta
-        delta = b_precon[index] - old_lambda*Adcfm_precon[index];
+        delta = rhs_precon[index] - old_lambda*Adcfm_precon[index];
 
         // caccel is constraint acceleration in the non-precon case,
         //  and cforce is the actual constraint force in the precon case
@@ -720,7 +716,7 @@ static void ComputeRows(
         if (cforce_ptr2)
           delta -= dot6(cforce_ptr2, J_ptr + 6);
       } else {
-        delta = b[index] - old_lambda*Adcfm[index];
+        delta = rhs[index] - old_lambda*Adcfm[index];
 
         dRealPtr J_ptr = J + index*12;
         delta -= dot6(caccel_ptr1, J_ptr);
@@ -879,7 +875,7 @@ static void ComputeRows(
 
 static void SOR_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr caccel, dRealMutablePtr cforce, dRealMutablePtr b, dRealMutablePtr b_precon,
+  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr caccel, dRealMutablePtr cforce, dRealMutablePtr rhs, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs,
   dRealMutablePtr /*JiM*/, dRealMutablePtr JiMratio,
@@ -964,7 +960,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     // NOTE: This may seem unnecessary but it's indeed an optimization 
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
-    // scale J_precon and b_precon by Ad
+    // scale J_precon and rhs_precon by Ad
     // copy J_orig
     dRealMutablePtr J_ptr = J;
     dRealMutablePtr J_precon_ptr = J_precon;
@@ -975,7 +971,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
         J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
         J_orig_ptr[j] = J_ptr[j]; //copy J
       }
-      b_precon[i] *= Ad_precon_i;
+      rhs_precon[i] *= Ad_precon_i;
       // scale Ad by CFM. N.B. this should be done last since it is used above
       Adcfm_precon[i] = Ad_precon_i * cfm[i];
     }
@@ -988,14 +984,14 @@ static void SOR_LCP (dxWorldProcessContext *context,
     // NOTE: This may seem unnecessary but it's indeed an optimization 
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
-    // scale J and b by Ad
+    // scale J and rhs by Ad
     dRealMutablePtr J_ptr = J;
     for (int i=0; i<m; J_ptr += 12, i++) {
       dReal Ad_i = Ad[i];
       for (int j=0; j<12; j++) {
         J_ptr[j] *= Ad_i;
       }
-      b[i] *= Ad_i;
+      rhs[i] *= Ad_i;
       // scale Ad by CFM. N.B. this should be done last since it is used above
       Adcfm[i] = Ad_i * cfm[i];
     }
@@ -1075,22 +1071,20 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].stepsize = stepsize;
     params[thread_id].jb = jb;
     params[thread_id].findex = findex;
-    params[thread_id].Ad = Ad;
     params[thread_id].hi = hi;
     params[thread_id].lo = lo;
-    params[thread_id].Adcfm = Adcfm;
     params[thread_id].invI = invI;
     params[thread_id].I= I;
-    params[thread_id].Ad_precon = Ad_precon;
+    params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
     params[thread_id].JiMratio = JiMratio;
-    params[thread_id].b = b;
+    params[thread_id].rhs = rhs;
     params[thread_id].J = J;
     params[thread_id].caccel = caccel;
     params[thread_id].lambda = lambda;
     params[thread_id].iMJ = iMJ;
     params[thread_id].delta_error  = delta_error ;
-    params[thread_id].b_precon  = b_precon ;
+    params[thread_id].rhs_precon  = rhs_precon ;
     params[thread_id].J_precon  = J_precon ;
     params[thread_id].J_orig  = J_orig ;
     params[thread_id].cforce  = cforce ;
