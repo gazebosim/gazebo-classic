@@ -503,15 +503,11 @@ static void ComputeRows(
   dxQuickStepParameters *qs    = params.qs;
   int startRow                 = params.nStart;   // 0
   int nRows                    = params.nChunkSize; // m
-  //int m                        = params.m; // m
-  //int nb                       = params.nb;
-  //dReal stepsize               = params.stepsize;
+  int m                        = params.m; // m used for rms error computation
   int* jb                      = params.jb;
   const int* findex            = params.findex;
   dRealPtr        hi           = params.hi;
   dRealPtr        lo           = params.lo;
-  //dRealPtr        invI         = params.invI;
-  //dRealPtr        I            = params.I;
   dRealPtr        Adcfm        = params.Adcfm;
   dRealPtr        Adcfm_precon = params.Adcfm_precon;
   dRealMutablePtr rhs          = params.rhs;
@@ -598,7 +594,6 @@ static void ComputeRows(
       // for the first two iterations, solve the constraints in
       // the given order
       IndexError *ordercurr = order+startRow;
-      //for (int i = 0; i != m; ordercurr++, i++) { }
       for (int i = startRow; i != startRow+nRows; ordercurr++, i++) {
         ordercurr->error = i;
         ordercurr->findex = findex[i];
@@ -608,7 +603,6 @@ static void ComputeRows(
     else {
       // sort the constraints so that the ones converging slowest
       // get solved last. use the absolute (not relative) error.
-      //for (int i=0; i<m; i++) { }
       for (int i=startRow; i<startRow+nRows; i++) {
         dReal v1 = dFabs (lambda[i]);
         dReal v2 = dFabs (last_lambda[i]);
@@ -627,13 +621,11 @@ static void ComputeRows(
 
     //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("=====> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
 
-    //qsort (order,m,sizeof(IndexError),&compare_index_error);
     qsort (order+startRow,nRows,sizeof(IndexError),&compare_index_error);
 
     //@@@ potential optimization: swap lambda and last_lambda pointers rather
     //    than copying the data. we must make sure lambda is properly
     //    returned to the caller
-    //memcpy (last_lambda,lambda,m*sizeof(dReal));
     memcpy (last_lambda+startRow,lambda+startRow,nRows*sizeof(dReal));
 
     //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("-----> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
@@ -644,7 +636,6 @@ static void ComputeRows(
       #ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
         boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every swap
       #endif
-      //for (int i=1; i<m; i++) {}   // swap across engire matrix
       //  int swapi = dRandInt(i+1); // swap across engire matrix
       for (int i=startRow+1; i<startRow+nRows; i++) { // swap within boundary of our own segment
         int swapi = dRandInt(i+1-startRow)+startRow; // swap within boundary of our own segment
@@ -667,8 +658,6 @@ static void ComputeRows(
       // }
     }
 #endif
-
-    //dSetZero (delta_error,m);
 
     dRealMutablePtr caccel_ptr1;
     dRealMutablePtr caccel_ptr2;
