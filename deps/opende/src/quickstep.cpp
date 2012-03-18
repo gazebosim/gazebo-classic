@@ -107,7 +107,6 @@ struct dxSORLCPParameters {
     dRealPtr I;
     dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
-    dRealPtr JiMratio;
     dRealMutablePtr rhs;
     dRealMutablePtr J;
     dRealMutablePtr caccel;
@@ -515,7 +514,6 @@ static void ComputeRows(
   //dRealPtr        I            = params.I;
   dRealPtr        Adcfm        = params.Adcfm;
   dRealPtr        Adcfm_precon = params.Adcfm_precon;
-  //dRealPtr        JiMratio     = params.JiMratio;
   dRealMutablePtr rhs          = params.rhs;
   dRealMutablePtr J            = params.J;
   dRealMutablePtr caccel       = params.caccel;
@@ -878,7 +876,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr caccel, dRealMutablePtr cforce, dRealMutablePtr rhs, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs,
-  dRealMutablePtr /*JiM*/, dRealMutablePtr JiMratio,
 #ifdef USE_TPROW
   boost::threadpool::pool* row_threadpool,
 #endif
@@ -1077,7 +1074,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].I= I;
     params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
-    params[thread_id].JiMratio = JiMratio;
     params[thread_id].rhs = rhs;
     params[thread_id].J = J;
     params[thread_id].caccel = caccel;
@@ -1272,8 +1268,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J = NULL;
   dReal *J_precon = NULL;
   dReal *J_orig = NULL;
-  dReal *JiM = NULL;
-  dReal *JiMratio = NULL;
   int *jb = NULL;
 
   if (m > 0) {
@@ -1311,13 +1305,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
       rhs_precon = context->AllocateArray<dReal> (mlocal);
 
       Jcopy = context->AllocateArray<dReal> (mfb*12);
-      JiM = context->AllocateArray<dReal> (mlocal*12); // not used
-      dSetZero (JiM,jelements);
-      // JiMratio is the element-wise maximum ratio between
-      //   Ja*inv(Ma) and Jb*inv(Mb) for a joint
-      // if the joint is one sided, then we preset it to 1
-      JiMratio = context->AllocateArray<dReal> (mlocal); // test variable
-      dSetZero (JiMratio,mlocal);
     }
 
     BEGIN_STATE_SAVE(context, cstate) {
@@ -1431,72 +1418,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
         // put J*tmp1 into rhs
         multiply_J (m,J,jb,tmp1,rhs);
-        /*************************************************************/
-        /* compute J*inv(M) here JiM, it does not change             */
-        /*************************************************************/
-        {
-          dRealPtr J_ptr = J;
-          dRealMutablePtr JiM_ptr = JiM; // intermediate solution storage
-          dRealMutablePtr JiMratio_ptr = JiMratio; // intermediate solution storage
-          for (int i=0; i<m;J_ptr+=12,JiM_ptr+=12, i++) {
-
-            // compute JiM = J * invM
-            int b1 = jb[i*2];
-            int b2 = jb[i*2+1];
-            dReal k1 = body[b1]->invMass;
-
-            for (int j=0; j<3 ; j++) JiM_ptr[j] = J_ptr[j]*k1;
-
-
-            const dReal *invI_ptr1 = invI + 12*b1;
-            for (int j=0;j<3;j++) {
-              JiM_ptr[3+j] = 0;
-              for (int k=0;k<3;k++){
-                JiM_ptr[3+j] += J_ptr[3+k]*invI_ptr1[k*4+j];
-              }
-            }
-
-            // preset JiMratio to 1
-            JiMratio_ptr[0] = 1.0;
-
-            if (b2 >= 0){
-              dReal k2 = body[b2]->invMass;
-              for (int j=0; j<3 ; j++) JiM_ptr[j+6] = k2*J_ptr[j+6];
-              const dReal *invI_ptr2 = invI + 12*b2;
-              for (int j=0;j<3;j++) {
-                JiM_ptr[9+j] = 0;
-                for (int k=0;k<3;k++) JiM_ptr[9+j] += J_ptr[9+k]*invI_ptr2[k*4+j];
-              }
-
-              // check element-wise ratio for JiMratio
-              JiMratio_ptr[0] = 1.0;
-              for (int j=0;j<3;j++)
-              {
-                if (!_dequal(JiM_ptr[j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[6+j]/JiM_ptr[  j]);
-                }
-                if (!_dequal(JiM_ptr[3+j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[9+j]/JiM_ptr[3+j]);
-                }
-                if (!_dequal(JiM_ptr[6+j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[  j]/JiM_ptr[6+j]);
-                }
-                if (!_dequal(JiM_ptr[9+j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[3+j]/JiM_ptr[9+j]);
-                }
-              }
-            }
-          }
-        }
-      
       } END_STATE_SAVE(context, tmp1state);
 
       // complete rhs
@@ -1550,7 +1471,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
       IFTIMING (dTimerNow ("solving LCP problem"));
       // solve the LCP problem and get lambda and invM*constraint_force
       SOR_LCP (context,m,nb,J,J_precon,J_orig,jb,body,invI,I,lambda,caccel,cforce,rhs,rhs_precon,lo,hi,cfm,findex,&world->qs,
-      JiM,JiMratio,
 #ifdef USE_TPROW
                world->row_threadpool,
 #endif
@@ -1772,8 +1692,6 @@ size_t dxEstimateQuickStepMemoryRequirements (
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * 2 * m); // for jb            FIXME: shoulbe be 2 not 12?
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for findex
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * mfb); // for Jcopy
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for JiM
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for JiMratio
       {
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for c
         //sub2_res1 += dEFFICIENT_SIZE(sizeof(int)   * 6 * nb); // for JTJfindex
