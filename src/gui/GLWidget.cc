@@ -1136,7 +1136,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
   {
     if (this->hoverVis && this->hoverVis->GetName() == _msg->data())
       this->hoverVis.reset();
-    if (this->moveMoveVis && this->mouseMoveVis->GetName() == _msg->data())
+    if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
       this->mouseMoveVis.reset();
   }
 }
