@@ -140,6 +140,9 @@ namespace gazebo
       /// \brief access functions to set ODE parameters
       public: virtual int GetMaxContacts() {return 0;}
 
+      /// \brief Debug print out of the physic engine state
+      public: virtual void DebugPrint() const = 0;
+
       public: boost::recursive_mutex* GetRayMutex() const
               { return this->rayMutex; }
 

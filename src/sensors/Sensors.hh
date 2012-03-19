@@ -38,6 +38,9 @@ namespace gazebo
                               const std::string &_worldName,
                               const std::string &_parentName);
 
+    /// \brief Remove a sensor by name
+    void remove_sensor(const std::string &_sensorName);
+
     /// \brief Run the sensor generation one step.
     /// \param force: If true, all sensors are forced to update. Otherwise
     ///        a sensor will update based on it's Hz rate.

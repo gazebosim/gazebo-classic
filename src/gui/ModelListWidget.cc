@@ -171,7 +171,7 @@ void ModelListWidget::Update()
   }
 
   this->ProcessPoseMsgs();
-  QTimer::singleShot(500, this, SLOT(Update()));
+  QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -267,6 +267,7 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
       this->propTreeBrowser->clear();
       this->selectedModelName.clear();
       this->sdfElement.reset();
+      this->fillPropertyTree = false;
     }
   }
 }

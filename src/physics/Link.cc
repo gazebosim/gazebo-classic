@@ -252,8 +252,11 @@ void Link::Fini()
 
   this->parentJoints.clear();
   this->childJoints.clear();
-  this->sensors.clear();
   this->inertial.reset();
+
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+    sensors::remove_sensor(*iter);
+  this->sensors.clear();
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
   {

@@ -74,6 +74,12 @@ std::string sensors::create_sensor(sdf::ElementPtr _elem,
 }
 
 /////////////////////////////////////////////////
+void sensors::remove_sensor(const std::string &_sensorName)
+{
+  sensors::SensorManager::Instance()->RemoveSensor(_sensorName);
+}
+
+/////////////////////////////////////////////////
 void sensors::run()
 {
   sensors::SensorManager::Instance()->Run();

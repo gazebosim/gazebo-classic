@@ -178,6 +178,8 @@ namespace gazebo
 
       public: void ProcessContactFeedback(ContactFeedback* feedback);
 
+      public: virtual void DebugPrint() const;
+
       protected: virtual void OnRequest(
                    ConstRequestPtr &/*_msg*/);
 
@@ -233,9 +235,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-
-
-
-

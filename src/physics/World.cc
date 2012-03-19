@@ -192,6 +192,7 @@ void World::Load(sdf::ElementPtr _sdf)
   // this->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
+
 }
 
 //////////////////////////////////////////////////
@@ -788,10 +789,12 @@ void World::ProcessEntityMsgs()
     this->rootElement->RemoveChild((*iter));
   }
 
-  if (this->deleteEntity.size() >0)
+  if (this->deleteEntity.size() > 0)
   {
     this->EnableAllModels();
     this->deleteEntity.clear();
+
+    this->physicsEngine->DebugPrint();
   }
 }
 

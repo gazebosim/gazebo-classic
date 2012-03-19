@@ -53,6 +53,9 @@ extern "C" {
  */
 ODE_API dWorldID dWorldCreate(void);
 
+ODE_API int dWorldGetBodyCount(dWorldID world);
+ODE_API dBodyID dWorldGetBody(dWorldID world, int id);
+
 
 /**
  * @brief Destroy a world and everything in it.
