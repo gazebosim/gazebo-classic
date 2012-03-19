@@ -104,17 +104,18 @@ namespace gazebo
     public: static void CreateSky(std::string material);
 
     /// \brief Create a new window
-    public: Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 
-                                             unsigned int width, 
-                                             unsigned int height);
+    public: Ogre::RenderWindow *CreateWindow(const std::string &_handle, 
+                                             int width, 
+                                             int height);
 
 
     /// \brief Create a window for Ogre
-    public: Ogre::RenderWindow *CreateWindow(Display *display, 
+    /*public: Ogre::RenderWindow *CreateWindow(Display *display, 
                                              int screen, 
                                              int32_t winId, 
-                                             unsigned int width, 
-                                             unsigned int height);
+                                             int width, 
+                                             int height);
+*/
 
     /// \brief Insert a mesh into Ogre 
     public: static void InsertMesh( const Mesh *mesh);

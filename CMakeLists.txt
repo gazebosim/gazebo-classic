@@ -14,6 +14,20 @@ set (GAZEBO_PATCH_VERSION 0) # change to 1 for ode damping
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
 
+# with -fPIC
+if(UNIX AND NOT WIN32)
+  find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
+  if(CMAKE_UNAME)
+    exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
+    set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
+      "processor type (i386 and x86_64)")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+      ADD_DEFINITIONS(-fPIC)
+    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+  endif(CMAKE_UNAME)
+endif(UNIX AND NOT WIN32)
+
+
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
@@ -114,8 +128,8 @@ else (build_errors)
     add_subdirectory(libgazebo)
     add_subdirectory(server)
     add_subdirectory(worlds)
-    add_subdirectory(tools)
-    add_subdirectory(benchmarks)
+    # add_subdirectory(tools)
+    # add_subdirectory(benchmarks)
     add_subdirectory(Media)
     
     if (INCLUDE_PLAYER)

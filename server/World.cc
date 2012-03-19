@@ -46,8 +46,6 @@
 #include "World.hh"
 #include "Logger.hh"
 
-#include "OpenAL.hh"
-
 #include "Geom.hh"
 
 using namespace gazebo;
@@ -201,13 +199,6 @@ void World::Load(XMLConfigNode *rootNode, int serverId)
     this->graphics->Load("default");
   }
 
-  // Load OpenAL audio 
-  if (rootNode && rootNode->GetChild("openal","audio"))
-  {
-    this->openAL = OpenAL::Instance();
-    this->openAL->Load(rootNode->GetChild("openal", "audio"));
-  }
-
   XMLConfigNode *physicsNode = NULL;
   if (rootNode )
     physicsNode = rootNode->GetChildByNSPrefix("physics");
@@ -286,10 +277,6 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
-
-  // Initialize openal
-  if (this->openAL)
-    this->openAL->Init();
 
   this->toDeleteEntities.clear();
   this->toLoadEntities.clear();
@@ -424,10 +411,6 @@ void World::Fini()
   {
     gzthrow(e);
   }
-
-  // Close the openal server
-  if (this->openAL)
-    this->openAL->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

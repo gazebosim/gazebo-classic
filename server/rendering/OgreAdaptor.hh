@@ -130,6 +130,8 @@ namespace gazebo
     private: void SetupResources();
     private: void SetupRenderSystem();
 
+    private: void CreateContext();
+
     /// Pointer to the root scene node
     public: Ogre::Root *root;
   

@@ -12,15 +12,17 @@ string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
 string (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
 string (REPLACE " " ";" parallel_quickstep_library_dirs_split "${parallel_quickstep_library_dirs}")
 
+add_definitions(${QT_DEFINITIONS})
+include (${QT_USE_FILE})
 
 include_directories(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
-  gui 
+  qt_gui 
+  ${CMAKE_BINARY_DIR}/server/qt_gui
   physics 
   physics/ode
   physics/bullet
-  audio_video
   controllers 
   rendering 
   sensors 
@@ -44,7 +46,7 @@ include_directories(
 
 link_directories(  
  ${CMAKE_BINARY_DIR}/libgazebo 
- ${CMAKE_BINARY_DIR}/server/gui 
+ ${CMAKE_BINARY_DIR}/server/qt_gui 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
  ${boost_library_dirs_split} 
  ${assimp_library_dirs_split} 
@@ -65,9 +67,9 @@ endif (use_internal_assimp)
 add_subdirectory(rendering)
 add_subdirectory(physics)
 add_subdirectory(sensors)
-add_subdirectory(gui)
+# add_subdirectory(gui)
+add_subdirectory(qt_gui)
 add_subdirectory(controllers)
-add_subdirectory(audio_video)
 
 ########################################
 # Process all the subdirectories
@@ -173,9 +175,9 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    ${boost_libraries} 
                                    ${assimp_libraries} 
                                    ${freeimage_library} 
+                                   ${QT_LIBRARIES}
                                    gazebo_server
                                    gazebo_rendering
-                                   gazebo_av-shared
                                    gazebo_gui
                                    gazebo_physics
                                    gazeboshm 
@@ -184,20 +186,11 @@ target_link_libraries( gazebo-exec ${libtool_library}
 )
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
-                      -lassimp -lgazebo_physics -lgazebo_av -lgazebo_gui 
+                      -lassimp -lgazebo_physics -lgazebo_gui 
                       -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics assimp rt)
-
-if (INCLUDE_BULLET)
-  target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
-  target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
-
-  APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
-                      ${gazeboserver_ldflags_desc} 
-                      -lgazebo_physics_bullet)
-endif (INCLUDE_BULLET)
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} ${boost_libraries} gazeboshm gazebo_gui gazebo_rendering gazebo_physics assimp rt)
 
 if (INCLUDE_ODE)
   target_link_libraries(gazebo_server ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})

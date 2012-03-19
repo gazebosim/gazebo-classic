@@ -36,7 +36,6 @@
 #include "OgreCreator.hh"
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
-#include "World.hh"
 #include "UserCamera.hh"   
 
 using namespace gazebo;
@@ -50,15 +49,15 @@ UserCamera::UserCamera(GLWindow *parentWindow)
 {
   std::stringstream stream;
 
-  this->window = OgreCreator::Instance()->CreateWindow(parentWindow, 
-                         parentWindow->w(), parentWindow->h());
-
+  this->window = OgreCreator::Instance()->CreateWindow(
+      parentWindow->GetOgreHandle(), 
+      parentWindow->width(), parentWindow->height());
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
 
   this->viewport = NULL;
 
-  World::Instance()->ConnectShowCamerasSignal( boost::bind(&UserCamera::ShowVisual, this, _1) );
+  //World::Instance()->ConnectShowCamerasSignal(boost::bind(&UserCamera::ShowVisual, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,6 +161,7 @@ void UserCamera::Init()
   RTShaderSystem::AttachViewport(this->viewport);
 }
 
+/////////////////////////////////////////////////
 void UserCamera::SetCamera( OgreCamera *cam )
 {
   this->window->removeAllViewports();
@@ -171,13 +171,12 @@ void UserCamera::SetCamera( OgreCamera *cam )
 
   this->viewport = this->window->addViewport(cam->GetOgreCamera());
 
-  this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
-
+  this->SetAspectRatio(
+      Ogre::Real(this->viewport->getActualWidth()) /
+      Ogre::Real(this->viewport->getActualHeight()));
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// Update
+/////////////////////////////////////////////////
 void UserCamera::Update()
 {
   if (Simulator::Instance()->GetRealTime() - this->lastUpdate < this->renderPeriod)
@@ -226,8 +225,11 @@ void UserCamera::Fini()
 /// Resize the camera
 void UserCamera::Resize(unsigned int w, unsigned int h)
 {
-  this->window->resize(w, h);
-  this->window->windowMovedOrResized();
+  if (this->window)
+  {
+    this->window->resize(w, h);
+    this->window->windowMovedOrResized();
+  }
 
   if (this->viewport)
     this->viewport->setDimensions(0,0,1,1);

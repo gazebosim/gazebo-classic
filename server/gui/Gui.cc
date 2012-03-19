@@ -115,7 +115,6 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 
   Fl::check();
   Fl::wait(0.3);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

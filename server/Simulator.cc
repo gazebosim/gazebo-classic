@@ -52,6 +52,7 @@
 
 using namespace gazebo;
 
+extern Gui *g_gui;
 std::string Simulator::defaultWorld = 
 "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >\
   <physics:ode>\
@@ -179,11 +180,11 @@ void Simulator::Close()
   if (!this->loaded)
     return;
 
-  if (this->gui)
+  /*if (this->gui)
   {
     delete this->gui;
     this->gui = NULL;
-  }
+  }*/
 
 
   gazebo::World::Instance()->Close();
@@ -252,7 +253,7 @@ void Simulator::Load(gazebo::XMLConfig *worldConfig, int serverId )
   }
 
   // Load the Ogre rendering system
-  if (this->renderEngineEnabled)
+  //if (this->renderEngineEnabled)
     OgreAdaptor::Instance()->Load(rootNode);
 
   // Create and initialize the Gui
@@ -280,10 +281,12 @@ void Simulator::Load(gazebo::XMLConfig *worldConfig, int serverId )
         // Create the GUI
       if (childNode || !rootNode)
       {
-        this->gui = new Gui(x, y, width, height, "Gazebo");
+        //this->gui = new Gui(x, y, width, height, "Gazebo");
 
-        this->gui->Load(childNode);
-        this->gui->CreateCameras();
+        // g_gui = new  Gui(x, y, width, height, "Gazebo");
+        // g_gui->show();
+        // g_gui->Load(childNode);
+        g_gui->CreateCameras();
       }
     }
     catch (GazeboError e)
@@ -311,9 +314,9 @@ void Simulator::Load(gazebo::XMLConfig *worldConfig, int serverId )
   }
 
   // Initialize the GUI
-  if (this->gui)
+  if (g_gui)
   {
-    this->gui->Init();
+    g_gui->Init();
   }
 
   //Create the world
@@ -411,7 +414,7 @@ void Simulator::Save(const std::string& filename)
       output << "\n";
     }
 
-    this->gui->Save(prefix, output);
+    // this->gui->Save(prefix, output);
     output << "\n";
 
     World::Instance()->Save(prefix, output);
@@ -465,11 +468,11 @@ void Simulator::MainLoop()
     {
       lastTime = Time::GetWallTime();
 
-      if (this->gui && (currTime - lastGuiTime > 1.0/this->gui->GetUpdateRate()))
+      if (g_gui)// && (currTime - lastGuiTime > 1.0/this->gui->GetUpdateRate()))
       {
         lastGuiTime = Time::GetWallTime();
         DIAGNOSTICTIMER(timer1("GUI update",6));
-        this->gui->Update();
+        g_gui->Update();
       }
 
       if (this->renderEngineEnabled)
@@ -562,7 +565,7 @@ void Simulator::SetPaused(bool p)
   if (this->pause == p)
     return;
 
-  this->pauseSignal(p);
+  //this->pauseSignal(p);
   this->pause = p;
 }
 
@@ -613,7 +616,7 @@ void Simulator::SetStepInc(bool step)
 {
   boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
   this->stepInc = step;
-  this->stepSignal(step);
+  //this->stepSignal(step);
 
   this->SetPaused(!step);
 }

@@ -28,7 +28,7 @@
 
 #include <string>
 #include <boost/thread.hpp>
-#include <boost/signal.hpp>
+// #include <boost/signal.hpp>
 
 #include "Time.hh"
 #include "SingletonT.hh"
@@ -207,16 +207,16 @@ namespace gazebo
 
     /// \brief Connect a boost::slot the the pause signal
     public: template<typename T>
-            void ConnectPauseSignal( T subscriber )
+            void ConnectPauseSignal( T /*subscriber*/ )
             {
-              pauseSignal.connect(subscriber);
+              //pauseSignal.connect(subscriber);
             }
 
      /// \brief Connect a boost::slot the the step signal
     public: template<typename T>
-            void ConnectStepSignal( T subscriber )
+            void ConnectStepSignal( T /*subscriber*/ )
             {
-              stepSignal.connect(subscriber);
+              //stepSignal.connect(subscriber);
             }
  
     /// \brief Function to run gui. Used by guiThread
@@ -284,8 +284,8 @@ namespace gazebo
 
     private: State state;
 
-    private: boost::signal<void (bool)> pauseSignal;
-    private: boost::signal<void (bool)> stepSignal;
+    // private: boost::signal<void (bool)> pauseSignal;
+    // private: boost::signal<void (bool)> stepSignal;
 
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;

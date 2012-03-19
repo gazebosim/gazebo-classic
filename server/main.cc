@@ -125,6 +125,7 @@ bool optPhysicsEnabled  = true;
 bool optPaused = false;
 bool optOgreLog = false;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
 void PrintUsage()
@@ -249,10 +250,15 @@ void SignalHandler( int /*dummy*/ )
   return;
 }
 
+extern void qt_setup(int argc, char **argv);
+extern void qt_run();
+
 ////////////////////////////////////////////////////////////////////////////////
 // Main function
 int main(int argc, char **argv)
 {
+  qt_setup(argc, argv);
+  //qt_run();
 
 
   // force a cpu affinity for CPU 0, this slow down sim by about 4X
@@ -307,6 +313,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  
   // Main loop of the simulator
   try
   {

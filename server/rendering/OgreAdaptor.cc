@@ -118,6 +118,9 @@ void OgreAdaptor::Close()
 /// Load the parameters for Ogre
 void OgreAdaptor::Load(XMLConfigNode *rootNode)
 {
+  this->CreateContext();
+
+  std::cout << "OgreAdaptor::Load\n";
   // Make the root
   try
   {
@@ -139,12 +142,34 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
 
   // Initialize the root node, and don't create a window
   this->root->initialise(false);
+
+  std::stringstream stream;
+  stream << (int32_t)this->dummyWindowId;
+
+  OgreCreator::Instance()->CreateWindow(stream.str(), 1, 1);
+
+  // Set default mipmap level (NB some APIs ignore this)
+  if (Ogre::TextureManager::getSingletonPtr())
+    Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
+  else
+    gzthrow("Ogre TextureManager initialization failed.  Please double check your world file or glx support from your gpu / gpu driver, thank you.\n");
+
+
+  // Load Resources
+  Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+  Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
+            Ogre::TFO_ANISOTROPIC);
+
+  RTShaderSystem::Instance()->Init();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize ogre
 void OgreAdaptor::Init(XMLConfigNode *rootNode)
 {
+  std::cout << "OgreAdaptor::Init\n";
   XMLConfigNode *node = NULL;
   Ogre::ColourValue ambient;
 
@@ -154,7 +179,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   /// Create a dummy rendering context.
   /// This will allow gazebo to run headless. And it also allows OGRE to 
   /// initialize properly
-  if (!Simulator::Instance()->GetGuiEnabled())
+  /*if (!Simulator::Instance()->GetGuiEnabled())
   {
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay) 
@@ -178,13 +203,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
     OgreCreator::Instance()->CreateWindow(this->dummyDisplay, screen, 
                                           (int32_t)this->dummyWindowId,1,1);
-  }
-
-  // Set default mipmap level (NB some APIs ignore this)
-  if (Ogre::TextureManager::getSingletonPtr())
-    Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
-  else
-    gzthrow("Ogre TextureManager initialization failed.  Please double check your world file or glx support from your gpu / gpu driver, thank you.\n");
+  }*/
 
   // Get the SceneManager, in this case a generic one
   if (node && node->GetChild("bsp"))
@@ -199,9 +218,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
     this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
   }
-
-  // Load Resources
-  Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
   this->ambientP->Load(node);
   this->shadowsP->Load(node);
@@ -286,7 +302,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   if (this->HasGLSL())
   {
-    RTShaderSystem::Instance()->Init();
     RTShaderSystem::Instance()->UpdateShaders();
   }
 }
@@ -297,6 +312,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 /// Finalize
 void OgreAdaptor::Fini()
 {
+  std::cout << "OgreAdaptor::Fini\n";
   if (this->HasGLSL())
     RTShaderSystem::Instance()->Fini();
 }
@@ -326,6 +342,7 @@ void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
 // Load plugins
 void OgreAdaptor::LoadPlugins()
 {
+  std::cout << "OgreAdaptor::LoadPlugins\n";
   std::list<std::string>::iterator iter;
   std::list<std::string> ogrePaths=Simulator::Instance()->GetGazeboConfig()->GetOgrePaths();
  
@@ -372,6 +389,7 @@ void OgreAdaptor::LoadPlugins()
 // Setup resources
 void OgreAdaptor::SetupResources()
 {
+  std::cout << "OgreAdaptor::SetupResources\n";
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::iterator iter;
@@ -386,6 +404,7 @@ void OgreAdaptor::SetupResources()
     }
     closedir(dir);
 
+    std::cout << "ITER[" << (*iter) << "]\n";
     archNames.push_back((*iter)+"/");
     archNames.push_back((*iter)+"/Media");
     archNames.push_back((*iter)+"/Media/fonts");
@@ -429,6 +448,7 @@ void OgreAdaptor::SetupResources()
 // Setup render system
 void OgreAdaptor::SetupRenderSystem()
 {
+  std::cout << "OgreAdaptor::SetupRenderSystem\n";
   Ogre::RenderSystem *renderSys;
   const Ogre::RenderSystemList *rsList;
 
@@ -742,3 +762,32 @@ bool OgreAdaptor::HasGLSL()
 
   return iter != profiles.end();
 }
+
+void OgreAdaptor::CreateContext()
+{
+  this->dummyDisplay = XOpenDisplay(0);
+  if (!this->dummyDisplay)
+    gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
+  
+  int screen = DefaultScreen(this->dummyDisplay);
+  
+  int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16,
+    GLX_STENCIL_SIZE, 8, None };
+    
+  XVisualInfo *dummyVisual = glXChooseVisual(
+      static_cast<Display*>(this->dummyDisplay),
+      screen, static_cast<int *>(attribList));
+
+  this->dummyWindowId = XCreateSimpleWindow(
+      static_cast<Display*>(this->dummyDisplay),
+      RootWindow(static_cast<Display*>(this->dummyDisplay), screen),
+      0, 0, 1, 1, 0, 0, 0);
+
+  this->dummyContext = glXCreateContext(
+      static_cast<Display*>(this->dummyDisplay),
+      dummyVisual, NULL, 1);
+
+  glXMakeCurrent(static_cast<Display*>(this->dummyDisplay),
+      this->dummyWindowId, static_cast<GLXContext>(this->dummyContext));
+}
+

@@ -365,30 +365,59 @@ void OgreCreator::RemoveMesh(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window for Ogre
-Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int width, unsigned int height)
+Ogre::RenderWindow *OgreCreator::CreateWindow(const std::string &_handle, int width, int height)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
 
-  Ogre::RenderWindow *win = NULL;
+  Ogre::StringVector paramsVector;
+  Ogre::NameValuePairList params;
+  Ogre::RenderWindow *window = NULL;
 
-  if (flWindow)
+  params["parentWindowHandle"] = _handle;
+  params["externalGLControl"] = true;
+  params["FSAA"] = "2";
+
+  std::ostringstream stream;
+  stream << "OgreWindow(" << windowCounter++ << ")";
+
+  int attempts = 0;
+  while (window == NULL && (attempts++) < 10)
   {
-    XSync(fl_display, false);
-
-    win = OgreCreator::CreateWindow( fl_display, fl_visual->screen, 
-        (int32_t)(Fl_X::i(flWindow)->xid), width, height);
-    if (win)
-      this->windows.push_back(win);
+    try
+    {
+      window = OgreAdaptor::Instance()->root->createRenderWindow(
+          stream.str(), width, height, false, &params);
+    }
+    catch(...)
+    {
+      std::cerr << " Unable to create the rendering window\n";
+      window = NULL;
+    }
   }
 
-  return win;
+  if (attempts >= 10)
+  {
+    gzthrow("Unable to create the rendering window\n");
+  }
+
+  if (window)
+  {
+    window->setActive(true);
+    // window->setVisible(true);
+    window->setAutoUpdated(false);
+
+    this->windows.push_back(window);
+  }
+
+  return window;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window for Ogre
-Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen, 
-                                              int32_t winId, unsigned int width,                                              unsigned int height)
+/*Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen, 
+                                              int32_t winId, int width,
+                                              int height)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
@@ -398,21 +427,6 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
-
-  /*std::string screenStr = DisplayString((long)display);
-  std::string::size_type dotPos = screenStr.find(".");
-  screenStr = screenStr.substr(dotPos+1, screenStr.size());
-
-  int attrList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
-                    GLX_STENCIL_SIZE, 16, None };
-  XVisualInfo *vi = glXChooseVisual(display, DefaultScreen((long)display), 
-                                    attrList);
-
-  ogreHandle << (unsigned long)display 
-             << ":" << screenStr 
-             << ":" << (unsigned long)winId 
-             << ":" << (unsigned long)vi;
-  */
 
   ogreHandle << winId;
 
@@ -448,7 +462,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
   this->windows.push_back(window);
 
   return window;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a material from a color definition

@@ -13,13 +13,7 @@ LINK_DIRECTORIES(
  ${parallel_quickstep_library_dirs_split} 
 )
 
-if (INCLUDE_ODE)
-  add_subdirectory(ode)
-endif (INCLUDE_ODE)
-
-if (INCLUDE_BULLET)
-  add_subdirectory(bullet)
-endif (INCLUDE_BULLET)
+add_subdirectory(ode)
 
 set (sources Body.cc
              PhysicsFactory.cc

@@ -44,6 +44,25 @@ if (NOT FLTK_FOUND)
   BUILD_ERROR("FLTK libraries and development files not found. See the following website for installation instructions: http://fltk.org")
 endif (NOT FLTK_FOUND)
 
+find_package (Qt4 REQUIRED QtCore QtGui QtXml QtUiTools)
+if (NOT QT4_FOUND)
+  BUILD_ERROR("Missing: Qt4")
+endif()
+
+include (FindOpenGL)
+if (NOT OPENGL_FOUND)
+  BUILD_ERROR ("Missing: OpenGL")
+else ()
+  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+    ${gazeboserver_include_dirs_desc} 
+    ${OPENGL_INCLUDE_DIR})
+  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+    ${gazeboserver_link_libs_desc} 
+    ${OPENGL_LIBRARIES})
+endif ()
+
+
+
 
 ########################################
 # Find packages
@@ -81,15 +100,15 @@ if (PKG_CONFIG_FOUND)
   #   patched ode version with joint damping   #
   #                                            #
   ##############################################
-  SET(ODE_WG_PATCHES_VERSION 0.11.1.68 CACHE INTERNAL "ODE version with joint damping" FORCE)
-  pkg_check_modules(ODE_WG_PATCHES ode>=${ODE_WG_PATCHES_VERSION})
-  IF (NOT ODE_WG_PATCHES_FOUND)
+  #SET(ODE_WG_PATCHES_VERSION 0.11.1.68 CACHE INTERNAL "ODE version with joint damping" FORCE)
+  #pkg_check_modules(ODE_WG_PATCHES ode>=${ODE_WG_PATCHES_VERSION})
+  #IF (NOT ODE_WG_PATCHES_FOUND)
     SET (INCLUDE_ODE_JOINT_DAMPING FALSE CACHE BOOL "No support for ODE damping")
     SET (QUICKSTEP_EXPERIMENTAL FALSE CACHE BOOL "support for ODE quickstep experimental stuff")
-  ELSE (NOT ODE_WG_PATCHES_FOUND)
-    SET (INCLUDE_ODE_JOINT_DAMPING TRUE CACHE BOOL "Include support for ODE damping")
-    SET (QUICKSTEP_EXPERIMENTAL TRUE CACHE BOOL "support for ODE quickstep experimental stuff")
-  ENDIF (NOT ODE_WG_PATCHES_FOUND)
+    #ELSE (NOT ODE_WG_PATCHES_FOUND)
+    #  SET (INCLUDE_ODE_JOINT_DAMPING TRUE CACHE BOOL "Include support for ODE damping")
+    #  SET (QUICKSTEP_EXPERIMENTAL TRUE CACHE BOOL "support for ODE quickstep experimental stuff")
+    #ENDIF (NOT ODE_WG_PATCHES_FOUND)
 
   ##############################################
   #                                            #
@@ -97,52 +116,52 @@ if (PKG_CONFIG_FOUND)
   #     min_depth contact velocity limits      #
   #                                            #
   ##############################################
-  SET(ODE_WG_MAXVEL_PATCHES_VERSION 0.11.1.69 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
-  pkg_check_modules(ODE_WG_MAXVEL_PATCHES ode>=${ODE_WG_MAXVEL_PATCHES_VERSION})
-  IF (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
-    SET (ODE_CONTACT_BODY_MAXVEL FALSE CACHE BOOL "support for ODE quickstep experimental contact stuff")
-  ELSE (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
-    SET (ODE_CONTACT_BODY_MAXVEL TRUE CACHE BOOL "support for ODE quickstep experimental contact stuff")
-  ENDIF (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
+  #  SET(ODE_WG_MAXVEL_PATCHES_VERSION 0.11.1.69 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
+  #  pkg_check_modules(ODE_WG_MAXVEL_PATCHES ode>=${ODE_WG_MAXVEL_PATCHES_VERSION})
+  #  IF (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
+      SET (ODE_CONTACT_BODY_MAXVEL FALSE CACHE BOOL "support for ODE quickstep experimental contact stuff")
+  #  ELSE (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
+  #    SET (ODE_CONTACT_BODY_MAXVEL TRUE CACHE BOOL "support for ODE quickstep experimental contact stuff")
+  #  ENDIF (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
 
   ##############################################
   #                                            #
   #   patched ode version with screw joint     #
   #                                            #
   ##############################################
-  SET(ODE_WG_SCREW_PATCHES_VERSION 0.11.1.70 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
-  pkg_check_modules(ODE_WG_SCREW_PATCHES ode>=${ODE_WG_SCREW_PATCHES_VERSION})
-  IF (NOT ODE_WG_SCREW_PATCHES_FOUND)
-    SET (ODE_SCREW_JOINT FALSE CACHE BOOL "support for ODE quickstep experimental screw stuff")
-  ELSE (NOT ODE_WG_SCREW_PATCHES_FOUND)
-    SET (ODE_SCREW_JOINT TRUE CACHE BOOL "support for ODE quickstep experimental screw stuff")
-  ENDIF (NOT ODE_WG_SCREW_PATCHES_FOUND)
+  # SET(ODE_WG_SCREW_PATCHES_VERSION 0.11.1.70 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
+  # pkg_check_modules(ODE_WG_SCREW_PATCHES ode>=${ODE_WG_SCREW_PATCHES_VERSION})
+  # IF (NOT ODE_WG_SCREW_PATCHES_FOUND)
+     SET (ODE_SCREW_JOINT FALSE CACHE BOOL "support for ODE quickstep experimental screw stuff")
+  # ELSE (NOT ODE_WG_SCREW_PATCHES_FOUND)
+  #   SET (ODE_SCREW_JOINT TRUE CACHE BOOL "support for ODE quickstep experimental screw stuff")
+  # ENDIF (NOT ODE_WG_SCREW_PATCHES_FOUND)
 
   ###################################################
   #                                                 #
   #   patched ode version with precon pgs (ppgs)    #
   #                                                 #
   ###################################################
-  SET(ODE_WG_PRECON_PATCHES_VERSION 0.11.1.71 CACHE INTERNAL "ODE version with precon pgs" FORCE)
-  pkg_check_modules(ODE_WG_PRECON_PATCHES ode>=${ODE_WG_PRECON_PATCHES_VERSION})
-  IF (NOT ODE_WG_PRECON_PATCHES_FOUND)
-    SET (ODE_PRECON_PGS FALSE CACHE BOOL "support for ODE quickstep experimental precon stuff")
-  ELSE (NOT ODE_WG_PRECON_PATCHES_FOUND)
-    SET (ODE_PRECON_PGS TRUE CACHE BOOL "support for ODE quickstep experimental precon stuff")
-  ENDIF (NOT ODE_WG_PRECON_PATCHES_FOUND)
+  # SET(ODE_WG_PRECON_PATCHES_VERSION 0.11.1.71 CACHE INTERNAL "ODE version with precon pgs" FORCE)
+  # pkg_check_modules(ODE_WG_PRECON_PATCHES ode>=${ODE_WG_PRECON_PATCHES_VERSION})
+  # IF (NOT ODE_WG_PRECON_PATCHES_FOUND)
+     SET (ODE_PRECON_PGS FALSE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  # ELSE (NOT ODE_WG_PRECON_PATCHES_FOUND)
+  #   SET (ODE_PRECON_PGS TRUE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  # ENDIF (NOT ODE_WG_PRECON_PATCHES_FOUND)
 
   ###################################################
   #                                                 #
   #   patched ode version with rms error            #
   #                                                 #
   ###################################################
-  SET(ODE_WG_RMS_ERROR_PATCHES_VERSION 0.11.1.72 CACHE INTERNAL "ODE version with precon pgs" FORCE)
-  pkg_check_modules(ODE_WG_RMS_ERROR_PATCHES ode>=${ODE_WG_RMS_ERROR_PATCHES_VERSION})
-  IF (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
-    SET (ODE_RMS_ERROR FALSE CACHE BOOL "support for ODE quickstep experimental precon stuff")
-  ELSE (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
-    SET (ODE_RMS_ERROR TRUE CACHE BOOL "support for ODE quickstep experimental precon stuff")
-  ENDIF (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
+  # SET(ODE_WG_RMS_ERROR_PATCHES_VERSION 0.11.1.72 CACHE INTERNAL "ODE version with precon pgs" FORCE)
+  # pkg_check_modules(ODE_WG_RMS_ERROR_PATCHES ode>=${ODE_WG_RMS_ERROR_PATCHES_VERSION})
+  # IF (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
+     SET (ODE_RMS_ERROR FALSE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  # ELSE (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
+  #   SET (ODE_RMS_ERROR TRUE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  # ENDIF (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
 
   #################################################
   # Find OGRE 
@@ -247,24 +266,24 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find OpenAL
-  pkg_check_modules(OAL openal)
-  if (NOT OAL_FOUND)
-    message (STATUS "Warning: Openal and development files not found. Audio capabilities will be disabled. See the following website: http://connect.creativelabs.com/openal/default.aspx")
-  else (NOT OAL_FOUND)
-    set (HAVE_OPENAL TRUE)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${OAL_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${OAL_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OAL_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OAL_LIBRARIES})
-  endif (NOT OAL_FOUND)
+  #pkg_check_modules(OAL openal)
+  #if (NOT OAL_FOUND)
+  #  message (STATUS "Warning: Openal and development files not found. Audio capabilities will be disabled. See the following website: http://connect.creativelabs.com/openal/default.aspx")
+  #else (NOT OAL_FOUND)
+  #  set (HAVE_OPENAL TRUE)
+  #  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+  #                        ${gazeboserver_include_dirs_desc} 
+  #                        ${OAL_INCLUDE_DIRS})
+  #  APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+  #                        ${gazeboserver_link_dirs_desc} 
+  #                        ${OAL_LIBRARY_DIRS})
+  #  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+  #                        ${gazeboserver_link_libs_desc} 
+  #                        ${OAL_LINK_LIBS})
+  #  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+  #                        ${gazeboserver_link_libs_desc} 
+  #                        ${OAL_LIBRARIES})
+  #endif (NOT OAL_FOUND)
 
   ########################################
   # Find AV format
@@ -350,34 +369,70 @@ endif (PKG_CONFIG_FOUND)
 
 ########################################
 # Find Boost, if not specified manually
-IF (NOT DEFINED boost_include_dirs AND NOT DEFINED boost_library_dirs AND NOT DEFINED boost_libraries )
+#IF (NOT DEFINED boost_include_dirs AND NOT DEFINED boost_library_dirs AND NOT DEFINED boost_libraries )
+#
+#  # Clear some variables to ensure that the checks for boost are 
+#  # always run
+#  SET (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
+#  SET (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
+#
+#  SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
+#  INCLUDE (FindBoost)
+#
+#  FIND_PACKAGE( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex)
+#
+#  IF (NOT Boost_FOUND)
+#    SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
+#    MESSAGE (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
+#  ENDIF (NOT Boost_FOUND)
+#
+#  SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
+#    "Boost include paths. Use this to override automatic detection." FORCE)
+#
+#  SET (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
+#    "Boost link dirs. Use this to override automatic detection." FORCE)
+#
+#  LIST_TO_STRING(tmp "${Boost_LIBRARIES}")
+#  SET (boost_libraries ${tmp} CACHE STRING 
+#    "Boost libraries. Use this to override automatic detection." FORCE )
+#
+#ENDIF (NOT DEFINED boost_include_dirs AND NOT DEFINED boost_library_dirs AND NOT DEFINED boost_libraries ) 
+#
+#STRING(REGEX REPLACE "(^| )-L" " " boost_library_dirs "${boost_library_dirs}")
+#STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
+##STRING(STRIP ${boost_library_dirs} boost_library_dirs)
+##STRING(STRIP ${boost_libraries} boost_libraries)
+#STRING(REGEX REPLACE " " ";" boost_libraries "${boost_libraries}")
+if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
 
   # Clear some variables to ensure that the checks for boost are 
   # always run
-  SET (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
-  SET (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
+  set (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
+  set (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
 
-  SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
-  INCLUDE (FindBoost)
+  set(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
 
-  FIND_PACKAGE( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex)
+  include (FindBoost)
+  find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem)
 
-  IF (NOT Boost_FOUND)
-    SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-    MESSAGE (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
-  ENDIF (NOT Boost_FOUND)
+  if (NOT Boost_FOUND)
+    set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
+    BUILD_ERROR ("Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
+  endif (NOT Boost_FOUND)
 
-  SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
+  set (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
     "Boost include paths. Use this to override automatic detection." FORCE)
 
-  SET (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
+  set (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
     "Boost link dirs. Use this to override automatic detection." FORCE)
 
   LIST_TO_STRING(tmp "${Boost_LIBRARIES}")
-  SET (boost_libraries ${tmp} CACHE STRING 
+  set (boost_libraries ${tmp} CACHE STRING 
     "Boost libraries. Use this to override automatic detection." FORCE )
 
-ENDIF (NOT DEFINED boost_include_dirs AND NOT DEFINED boost_library_dirs AND NOT DEFINED boost_libraries ) 
+endif (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
+
+set (Boost_DIR "" CACHE INTERNAL "" FORCE)
 
 STRING(REGEX REPLACE "(^| )-L" " " boost_library_dirs "${boost_library_dirs}")
 STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
@@ -560,138 +615,140 @@ endif (NOT DEFINED assimp_include_dirs AND NOT DEFINED assimp_library_dirs AND N
 
 ########################################
 # Find bullet
-if (NOT DEFINED bullet_include_dirs AND NOT DEFINED bullet_library_dirs AND NOT DEFINED bullet_lflags )
+# if (NOT DEFINED bullet_include_dirs AND NOT DEFINED bullet_library_dirs AND NOT DEFINED bullet_lflags )
+# 
+#   find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
+#   
+#   if (NOT DEFINED bullet_include_dir)
+#     #BUILD_ERROR("bullet not found. See the following website for installation instructions: http://bullet.sourceforge.net")
+#     message (STATUS "Looking for btBulletDynamicsCommon.h - not found.")
+#     set (bullet_include_dirs /usr/include CACHE STRING
+#       "bullet include paths. Use this to override automatic detection.")
+#   else (NOT DEFINED bullet_include_dir)
+#     message (STATUS "Looking for btBulletDynamicsCommon.h - found")
+#     set (bullet_include_dirs ${bullet_include_dir} CACHE STRING
+#       "bullet include paths. Use this to override automatic detection.")
+#   endif (NOT DEFINED bullet_include_dir)
+#   
+#   find_library(bullet_math_library LinearMath ENV LD_LIBRARY_PATH)
+#   find_library(bullet_collision_library BulletCollision ENV LD_LIBRARY_PATH)
+#   find_library(bullet_softbody_library BulletSoftBody  ENV LD_LIBRARY_PATH)
+#   find_library(bullet_dynamics_library BulletDynamics ENV LD_LIBRARY_PATH)
+#   
+#   if (NOT DEFINED bullet_dynamics_library)
+#     message (STATUS "Looking for libBulletDynamics - not found.")
+#   else (NOT DEFINED bullet_dynamics_library)
+#     message (STATUS "Looking for libBulletDynamics - found")
+#     APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletDynamics)
+#   endif (NOT DEFINED bullet_dynamics_library)
+# 
+#   if (NOT DEFINED bullet_collision_library)
+#     message (STATUS "Looking for libBulletCollision - not found.")
+#   else (NOT DEFINED bullet_collision_library)
+#     message (STATUS "Looking for libBulletCollision - found")
+#     APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletCollision)
+#   endif (NOT DEFINED bullet_collision_library)
+#   
+#   if (NOT DEFINED bullet_math_library)
+#     message (STATUS "Looking for libLinearMath - not found.")
+#   else (NOT DEFINED bullet_math_library)
+#     message (STATUS "Looking for libLinearMath - found")
+#     APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lLinearMath)
+#   endif (NOT DEFINED bullet_math_library)
+# 
+#   if (NOT DEFINED bullet_softbody_library)
+#     message (STATUS "Looking for libBulletSoftBody - not found.")
+#   else (NOT DEFINED bullet_softbody_library)
+#     message (STATUS "Looking for libBulletSoftBody - found")
+#     APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
+#   endif (NOT DEFINED bullet_softbody_library)
+# 
+#   APPEND_TO_CACHED_LIST(gazeboserver_ldflags
+#                         ${gazeboserver_ldflags_desc} 
+#                         ${bullet_lflags})
+# 
+#   if (NOT DEFINED bullet_include_dir OR NOT DEFINED bullet_dynamics_library)
+#     set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
+#   else (NOT DEFINED bullet_include_dir OR NOT DEFINED bullet_dynamics_library)
+#     set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
+#   endif (NOT DEFINED bullet_include_dir OR NOT DEFINED bullet_dynamics_library)
+# 
+# else (NOT DEFINED bullet_include_dirs AND NOT DEFINED bullet_library_dirs AND NOT DEFINED bullet_lflags )
+#   set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
+# endif (NOT DEFINED bullet_include_dirs AND NOT DEFINED bullet_library_dirs AND NOT DEFINED bullet_lflags )
+# 
+# # Check to make sure bullet was compiled with DOUBLE_PRECISION
+# if (INCLUDE_BULLET)
+#   set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
+# int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
+# 
+#   set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
+#   STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
+#   STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
+#   set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
+#   set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
+#   set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
+#   CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
+#   set (CMAKE_REQUIRED_LIBRARIES)
+#   set (CMAKE_REQUIRED_DEFINITIONS)
+#   set( CMAKE_REQUIRED_INCLUDES)
+#   set( CMAKE_REQUIRED_FLAGS)
+# 
+#   if (NOT BULLET_DOUBLE_PRECISION)
+#     BUILD_ERROR("bullet was not compiled to use double precision.")
+#     set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
+#   endif (NOT BULLET_DOUBLE_PRECISION)
+# endif (INCLUDE_BULLET)
 
-  find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
-  
-  if (NOT DEFINED bullet_include_dir)
-    #BUILD_ERROR("bullet not found. See the following website for installation instructions: http://bullet.sourceforge.net")
-    message (STATUS "Looking for btBulletDynamicsCommon.h - not found.")
-    set (bullet_include_dirs /usr/include CACHE STRING
-      "bullet include paths. Use this to override automatic detection.")
-  else (NOT DEFINED bullet_include_dir)
-    message (STATUS "Looking for btBulletDynamicsCommon.h - found")
-    set (bullet_include_dirs ${bullet_include_dir} CACHE STRING
-      "bullet include paths. Use this to override automatic detection.")
-  endif (NOT DEFINED bullet_include_dir)
-  
-  find_library(bullet_math_library LinearMath ENV LD_LIBRARY_PATH)
-  find_library(bullet_collision_library BulletCollision ENV LD_LIBRARY_PATH)
-  find_library(bullet_softbody_library BulletSoftBody  ENV LD_LIBRARY_PATH)
-  find_library(bullet_dynamics_library BulletDynamics ENV LD_LIBRARY_PATH)
-  
-  if (NOT DEFINED bullet_dynamics_library)
-    message (STATUS "Looking for libBulletDynamics - not found.")
-  else (NOT DEFINED bullet_dynamics_library)
-    message (STATUS "Looking for libBulletDynamics - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletDynamics)
-  endif (NOT DEFINED bullet_dynamics_library)
-
-  if (NOT DEFINED bullet_collision_library)
-    message (STATUS "Looking for libBulletCollision - not found.")
-  else (NOT DEFINED bullet_collision_library)
-    message (STATUS "Looking for libBulletCollision - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletCollision)
-  endif (NOT DEFINED bullet_collision_library)
-  
-  if (NOT DEFINED bullet_math_library)
-    message (STATUS "Looking for libLinearMath - not found.")
-  else (NOT DEFINED bullet_math_library)
-    message (STATUS "Looking for libLinearMath - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lLinearMath)
-  endif (NOT DEFINED bullet_math_library)
-
-  if (NOT DEFINED bullet_softbody_library)
-    message (STATUS "Looking for libBulletSoftBody - not found.")
-  else (NOT DEFINED bullet_softbody_library)
-    message (STATUS "Looking for libBulletSoftBody - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
-  endif (NOT DEFINED bullet_softbody_library)
-
-  APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                        ${gazeboserver_ldflags_desc} 
-                        ${bullet_lflags})
-
-  if (NOT DEFINED bullet_include_dir OR NOT DEFINED bullet_dynamics_library)
-    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-  else (NOT DEFINED bullet_include_dir OR NOT DEFINED bullet_dynamics_library)
-    set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
-  endif (NOT DEFINED bullet_include_dir OR NOT DEFINED bullet_dynamics_library)
-
-else (NOT DEFINED bullet_include_dirs AND NOT DEFINED bullet_library_dirs AND NOT DEFINED bullet_lflags )
-  set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
-endif (NOT DEFINED bullet_include_dirs AND NOT DEFINED bullet_library_dirs AND NOT DEFINED bullet_lflags )
-
-# Check to make sure bullet was compiled with DOUBLE_PRECISION
-if (INCLUDE_BULLET)
-  set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
-int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
-
-  set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
-  STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
-  STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
-  set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
-  set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
-  set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
-  CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
-  set (CMAKE_REQUIRED_LIBRARIES)
-  set (CMAKE_REQUIRED_DEFINITIONS)
-  set( CMAKE_REQUIRED_INCLUDES)
-  set( CMAKE_REQUIRED_FLAGS)
-
-  if (NOT BULLET_DOUBLE_PRECISION)
-    BUILD_ERROR("bullet was not compiled to use double precision.")
-    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-  endif (NOT BULLET_DOUBLE_PRECISION)
-endif (INCLUDE_BULLET)
+set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
 
 ##############################################
 #                                            #
 #       Find parallel_quickstep              #
 #                                            #
 ##############################################
-if (DEFINED parallel_quickstep_library_dirs)
-  STRING(REPLACE " " ";" parallel_quickstep_include_dirs_search_path ${parallel_quickstep_include_dirs})
-  find_path( parallel_quickstep_include_found
-      NAMES parallel_quickstep.h parallel_quickstep/parallel_quickstep.h
-      PATHS ${parallel_quickstep_include_dirs_search_path}
-      DOC "parallel_quickstep includes location"
-      NO_DEFAULT_PATH
-      )
-  if (NOT parallel_quickstep_include_found)
-    message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs_search_path} - not found ${parallel_quickstep_include_found}")
-  else (NOT parallel_quickstep_include_found)
-    message (STATUS "Looking for parallel_quickstep.h - found")
-  endif (NOT parallel_quickstep_include_found)
-endif (DEFINED parallel_quickstep_library_dirs)
-
-
-if (DEFINED parallel_quickstep_library_dirs)
-  STRING(REPLACE " " ";" parallel_quickstep_library_dirs_search_path ${parallel_quickstep_library_dirs})
-  find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs_search_path} )
-  if (NOT parallel_quickstep_library_found)
-    message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs_search_path} - not found")
-  else (NOT parallel_quickstep_library_found)
-    message (STATUS "Looking for libparallel_quickstep.so - found")
-  endif (NOT parallel_quickstep_library_found)
-endif (DEFINED parallel_quickstep_library_dirs)
-
-if (parallel_quickstep_library_found AND parallel_quickstep_include_found)
-  message (STATUS "building gazebo with parallel_quickstep support")
-  SET (PARALLEL_QUICKSTEP ON CACHE BOOL "Build gazebo with parallel_quickstep support" FORCE)
-else (parallel_quickstep_library_found AND parallel_quickstep_include_found)
-  message (STATUS "building gazebo without parallel_quickstep support")
-  SET (PARALLEL_QUICKSTEP OFF CACHE BOOL "Build gazebo without parallel_quickstep support" FORCE)
-  # clear out parallel_quickstep flags if not library or includes found
-  set (parallel_quickstep_include_dirs "" )
-  set (parallel_quickstep_library_dirs "" )
-  set (parallel_quickstep_library "" )
-  set (parallel_quickstep_lflags "" )
-  set (parallel_quickstep_cflags "" )
-endif (parallel_quickstep_library_found AND parallel_quickstep_include_found)
-
-STRING(REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
-set( CMAKE_REQUIRED_INCLUDES ${parallel_quickstep_include_dirs_split} )
-set( CMAKE_REQUIRED_LIBRARIES ${parallel_quickstep_library} )
-set( CMAKE_REQUIRED_FLAGS  ${parallel_quickstep_lflags} )
+#if (DEFINED parallel_quickstep_library_dirs)
+#  STRING(REPLACE " " ";" parallel_quickstep_include_dirs_search_path ${parallel_quickstep_include_dirs})
+#  find_path( parallel_quickstep_include_found
+#      NAMES parallel_quickstep.h parallel_quickstep/parallel_quickstep.h
+#      PATHS ${parallel_quickstep_include_dirs_search_path}
+#      DOC "parallel_quickstep includes location"
+#      NO_DEFAULT_PATH
+#      )
+#  if (NOT parallel_quickstep_include_found)
+#    message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs_search_path} - not found ${parallel_quickstep_include_found}")
+#  else (NOT parallel_quickstep_include_found)
+#    message (STATUS "Looking for parallel_quickstep.h - found")
+#  endif (NOT parallel_quickstep_include_found)
+#endif (DEFINED parallel_quickstep_library_dirs)
+#
+#
+#if (DEFINED parallel_quickstep_library_dirs)
+#  STRING(REPLACE " " ";" parallel_quickstep_library_dirs_search_path ${parallel_quickstep_library_dirs})
+#  find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs_search_path} )
+#  if (NOT parallel_quickstep_library_found)
+#    message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs_search_path} - not found")
+#  else (NOT parallel_quickstep_library_found)
+#    message (STATUS "Looking for libparallel_quickstep.so - found")
+#  endif (NOT parallel_quickstep_library_found)
+#endif (DEFINED parallel_quickstep_library_dirs)
+#
+#if (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+#  message (STATUS "building gazebo with parallel_quickstep support")
+#  SET (PARALLEL_QUICKSTEP ON CACHE BOOL "Build gazebo with parallel_quickstep support" FORCE)
+#else (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+#  message (STATUS "building gazebo without parallel_quickstep support")
+#  SET (PARALLEL_QUICKSTEP OFF CACHE BOOL "Build gazebo without parallel_quickstep support" FORCE)
+#  # clear out parallel_quickstep flags if not library or includes found
+#  set (parallel_quickstep_include_dirs "" )
+#  set (parallel_quickstep_library_dirs "" )
+#  set (parallel_quickstep_library "" )
+#  set (parallel_quickstep_lflags "" )
+#  set (parallel_quickstep_cflags "" )
+#endif (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+#
+#STRING(REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
+#set( CMAKE_REQUIRED_INCLUDES ${parallel_quickstep_include_dirs_split} )
+#set( CMAKE_REQUIRED_LIBRARIES ${parallel_quickstep_library} )
+#set( CMAKE_REQUIRED_FLAGS  ${parallel_quickstep_lflags} )
  
