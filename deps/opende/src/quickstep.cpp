@@ -1061,6 +1061,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
         J_ptr[j] *= Ad_i;
       }
       rhs[i] *= Ad_i;
+      rhs_erp[i] *= Ad_i;
       // scale Ad by CFM. N.B. this should be done last since it is used above
       Adcfm[i] = Ad_i * cfm[i];
     }
@@ -1148,6 +1149,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
     params[thread_id].rhs = rhs;
+    params[thread_id].rhs_erp = rhs_erp;
     params[thread_id].J = J;
     params[thread_id].caccel = caccel;
     params[thread_id].caccel_erp = caccel_erp;
@@ -1346,6 +1348,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J_orig = NULL;
   int *jb = NULL;
 
+  dReal *cforce = context->AllocateArray<dReal> (nb*6);
+  dReal *caccel = context->AllocateArray<dReal> (nb*6);
+  dReal *caccel_erp = context->AllocateArray<dReal> (nb*6);
+
   if (m > 0) {
     dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon, *Jcopy;
     int *findex;
@@ -1492,9 +1498,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
           for (int j=0; j<3; j++)
-            tmp1curr[j] = -b_ptr->facc[j]*body_invMass-b_ptr->lvel[j]*stepsize1;
+            tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
           dMultiply0_331 (tmp1curr + 3,invIrow,b_ptr->tacc);
-          for (int k=0; k<3; k++) tmp1curr[3+k] -= b_ptr->avel[k] * stepsize1;
+          for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
         }
 
         // put J*tmp1 into rhs
@@ -1502,8 +1508,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
       } END_STATE_SAVE(context, tmp1state);
 
       // complete rhs
-      for (int i=0; i<m; i++)
-        rhs_erp[i] = c[i]*stepsize1 + rhs[i];
+      for (int i=0; i<m; i++) {
+        rhs_erp[i] =  5.0*c[i]*stepsize1 - rhs[i];
+        rhs[i]     = 20.0*c[i]           - rhs[i];
+      }
 
 
 
@@ -1546,10 +1554,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
 #endif
-
-    dReal *cforce = context->AllocateArray<dReal> (nb*6);
-    dReal *caccel = context->AllocateArray<dReal> (nb*6);
-    dReal *caccel_erp = context->AllocateArray<dReal> (nb*6);
 
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING (dTimerNow ("solving LCP problem"));
@@ -1698,6 +1702,30 @@ void dxQuickStepper (dxWorldProcessContext *context,
     }
   }
 
+  // revert lvel and avel with the non-erp version of caccel
+  if (m > 0) {
+    IFTIMING (dTimerNow ("velocity update due to constraint forces"));
+    // remove caccel_erp
+    const dReal *caccelcurr = caccel_erp;
+    dxBody *const *const bodyend = body + nb;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+      dxBody *b_ptr = *bodycurr;
+      for (int j=0; j<3; j++) {
+        b_ptr->lvel[j] -= stepsize * caccelcurr[j];
+        b_ptr->avel[j] -= stepsize * caccelcurr[3+j];
+      }
+    }
+    // use caccel without erp
+    caccelcurr = caccel;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+      dxBody *b_ptr = *bodycurr;
+      for (int j=0; j<3; j++) {
+        b_ptr->lvel[j] += stepsize * caccelcurr[j];
+        b_ptr->avel[j] += stepsize * caccelcurr[3+j];
+      }
+    }
+  }
+
   {
     IFTIMING (dTimerNow ("tidy up"));
     // zero all force accumulators
@@ -1777,8 +1805,8 @@ size_t dxEstimateQuickStepMemoryRequirements (
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_precon
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_orig
-      sub1_res2 += 4 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm, lo, hi, rhs
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs_erp
+      sub1_res2 += 3 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm, lo, hi
+      sub1_res2 += 2 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs, rhs_erp
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs_precon
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * 2 * m); // for jb
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for findex
