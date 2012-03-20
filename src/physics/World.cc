@@ -227,6 +227,8 @@ void World::Init()
 
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  this->physicsEngine->DebugPrint();
 }
 
 //////////////////////////////////////////////////
@@ -793,8 +795,6 @@ void World::ProcessEntityMsgs()
   {
     this->EnableAllModels();
     this->deleteEntity.clear();
-
-    this->physicsEngine->DebugPrint();
   }
 }
 

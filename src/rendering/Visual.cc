@@ -1116,6 +1116,7 @@ void Visual::SetPosition(const math::Vector3 &_pos)
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  std::cout << "Visual::SetRotation[" << this->GetName() << "][" << _rot << "]\n";
   this->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
 }
@@ -1123,6 +1124,7 @@ void Visual::SetRotation(const math::Quaternion &_rot)
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
+  std::cout << "Visual::SetPose[" << this->GetName() << "][" << _pose << "]\n";
   this->SetPosition(_pose.pos);
   this->SetRotation(_pose.rot);
 }
@@ -1151,6 +1153,7 @@ math::Pose Visual::GetPose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose _pose)
 {
+  std::cout << "Visual::SetWorldPose[" << this->GetName() << "][" << _pose << "]\n";
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
 }

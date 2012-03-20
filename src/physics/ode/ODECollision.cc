@@ -32,7 +32,8 @@
 using namespace gazebo;
 using namespace physics;
 
-  ODECollision::ODECollision(LinkPtr _link)
+//////////////////////////////////////////////////
+ODECollision::ODECollision(LinkPtr _link)
 : Collision(_link)
 {
   this->SetName("ODE_Collision");
@@ -40,6 +41,7 @@ using namespace physics;
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 }
 
+//////////////////////////////////////////////////
 ODECollision::~ODECollision()
 {
   if (this->collisionId)
@@ -47,6 +49,7 @@ ODECollision::~ODECollision()
   this->collisionId = NULL;
 }
 
+//////////////////////////////////////////////////
 void ODECollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
@@ -61,6 +64,7 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
   }
 }
 
+//////////////////////////////////////////////////
 void ODECollision::Fini()
 {
   /*
@@ -76,6 +80,7 @@ void ODECollision::Fini()
   Collision::Fini();
 }
 
+//////////////////////////////////////////////////
 void ODECollision::OnPoseChange()
 {
   // Update all the models
@@ -135,7 +140,6 @@ int ODECollision::GetCollisionClass() const
   return result;
 }
 
-
 //////////////////////////////////////////////////
 void ODECollision::SetCategoryBits(unsigned int _bits)
 {
@@ -183,6 +187,7 @@ void ODECollision::SetSpaceId(dSpaceID _spaceid)
   this->spaceId = _spaceid;
 }
 
+/////////////////////////////////////////////////
 void ODECollision::OnPoseChangeGlobal()
 {
   dQuaternion q;
@@ -204,6 +209,7 @@ void ODECollision::OnPoseChangeGlobal()
   dGeomSetQuaternion(this->collisionId, q);
 }
 
+/////////////////////////////////////////////////
 void ODECollision::OnPoseChangeRelative()
 {
   dQuaternion q;
@@ -224,13 +230,10 @@ void ODECollision::OnPoseChangeRelative()
   dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
       localPose.pos.z);
   dGeomSetOffsetQuaternion(this->collisionId, q);
+  std::cout << this->GetScopedName() << "Offset[" << localPose.pos << "]\n";
 }
 
+/////////////////////////////////////////////////
 void ODECollision::OnPoseChangeNull()
 {
 }
-
-
-
-
-

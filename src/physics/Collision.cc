@@ -412,9 +412,10 @@ msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
-  msg.set_parent_name(this->GetScopedName());
+  msg.set_parent_name(this->parent->GetScopedName());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
+  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
   msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
   msgs::Geometry *geom = msg.mutable_geometry();
 
@@ -465,7 +466,6 @@ msgs::Visual Collision::CreateCollisionVisual()
   else
     gzerr << "Unknown shape[" << this->shape->GetType() << "]\n";
 
-  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
 
   return msg;
 }

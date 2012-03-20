@@ -962,11 +962,16 @@ void ODEPhysics::DebugPrint() const
     math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
 
     std::cout << "Body[" << link->GetScopedName() << "]\n";
-    std::cout << "  Pos[" << dpos << "] Rot[" << drot << "]\n";
+    std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
     if (pose.pos != dpos)
-      std::cout << "  Incorrect world pos[" << pose.pos << "]\n";
+      std::cout << "    Incorrect world pos[" << pose.pos << "]\n";
     if (pose.rot != drot)
-      std::cout << "  Incorrect world rot[" << pose.rot << "]\n";
+      std::cout << "    Incorrect world rot[" << pose.rot << "]\n";
+
+    dMass mass;
+    dBodyGetMass(b, &mass);
+    std::cout << "  Mass[" << mass.mass << "] COG[" << mass.c[0]
+              << " " << mass.c[1] << " " << mass.c[2] << "]\n";
 
     dGeomID g = dBodyGetFirstGeom(b);
     while (g)
@@ -980,12 +985,12 @@ void ODEPhysics::DebugPrint() const
       drot.Set(grot[0], grot[1], grot[2], grot[3]);
 
       std::cout << "    Geom[" << coll->GetScopedName() << "]\n";
-      std::cout << "      Pos[" << dpos << "] Rot[" << drot << "]\n";
+      std::cout << "      World: Pos[" << dpos << "] Rot[" << drot << "]\n";
 
       if (pose.pos != dpos)
-        std::cout << "  Incorrect world pos[" << pose.pos << "]\n";
+        std::cout << "      Incorrect world pos[" << pose.pos << "]\n";
       if (pose.rot != drot)
-        std::cout << "  Incorrect world rot[" << pose.rot << "]\n";
+        std::cout << "      Incorrect world rot[" << pose.rot << "]\n";
 
       g = dBodyGetNextGeom(g);
     }

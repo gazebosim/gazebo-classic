@@ -23,6 +23,8 @@
 
 std::vector<std::string> params;
 
+// To Render high quality: povray +H480 +W640 +R5 +AM2 +A0.3 +Q11 <filename>
+
 // Convert radians to degrees
 #define RTOD(r) ((r) * 180 / M_PI)
 
@@ -134,7 +136,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
       if (!mat->GetTextureImage().empty())
       {
         printf("    uv_mapping pigment { image_map ");
-        printf("{ tiff \"/home/nkoenig/%s\" } }\n",
+        printf("{ tiff \"%s\" } }\n",
             mat->GetTextureImage().c_str());
       }
       else
@@ -275,14 +277,14 @@ void ProcessScene(sdf::ElementPtr _elem)
         // color.R(), color.G(), color.B());
   }
 
-  int count = 35;
-  // int count = 1600;
+  // int count = 35;
+   int count = 1600;
 
-  int recursionLimit = 3;
-  // int recursionLimit = 20;
+  //int recursionLimit = 3;
+   int recursionLimit = 20;
 
-  float errorBound = 1.8;
-  // float errorBound = 1.0;
+  //float errorBound = 1.8;
+   float errorBound = 1.0;
 
   // Note: Extreme quality
   printf("global_settings { radiosity{\n");

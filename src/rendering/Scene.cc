@@ -1199,7 +1199,6 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 //////////////////////////////////////////////////
 void Scene::OnSensorMsg(ConstSensorPtr &_msg)
 {
-  std::cout << "OnSensorMsg[" << _msg->DebugString() << "]\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sensorMsgs.push_back(_msg);
 }
