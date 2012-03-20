@@ -32,8 +32,6 @@
 
 #include "msgs/msgs.h"
 
-#include "sensors/SensorTypes.hh"
-
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
 
