@@ -192,7 +192,6 @@ void World::Load(sdf::ElementPtr _sdf)
   // this->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
-
 }
 
 //////////////////////////////////////////////////
@@ -227,8 +226,6 @@ void World::Init()
 
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
-
-  this->physicsEngine->DebugPrint();
 }
 
 //////////////////////////////////////////////////
@@ -935,7 +932,11 @@ void World::ProcessModelMsgs()
       this->modelPub->Publish(msg);
     }
   }
-  this->modelMsgs.clear();
+  if (this->modelMsgs.size())
+  {
+    this->EnableAllModels();
+    this->modelMsgs.clear();
+  }
 }
 
 //////////////////////////////////////////////////

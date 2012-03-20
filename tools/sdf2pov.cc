@@ -278,13 +278,13 @@ void ProcessScene(sdf::ElementPtr _elem)
   }
 
   // int count = 35;
-   int count = 1600;
+  int count = 1600;
 
-  //int recursionLimit = 3;
-   int recursionLimit = 20;
+  // int recursionLimit = 3;
+  int recursionLimit = 20;
 
-  //float errorBound = 1.8;
-   float errorBound = 1.0;
+  // float errorBound = 1.8;
+  float errorBound = 1.0;
 
   // Note: Extreme quality
   printf("global_settings { radiosity{\n");

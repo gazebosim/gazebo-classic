@@ -19,6 +19,8 @@
 
 #include <string>
 #include <vector>
+#include <utility>
+#include <list>
 
 #include "gui/qt.h"
 #include "rendering/RenderTypes.hh"

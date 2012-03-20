@@ -103,8 +103,6 @@ void Sensor::Init()
 
   msgs::Sensor msg;
   this->FillMsg(msg);
-  std::cout << msg.DebugString();
-
   this->sensorPub->Publish(msg);
 }
 

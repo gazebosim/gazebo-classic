@@ -284,7 +284,7 @@ void ModelMaker::CreateTheEntity()
   else
   {
     msgs::Set(msg.mutable_pose(), this->modelVisual->GetWorldPose());
-    msg.set_clone_model_name(this->modelVisual->GetName().substr(0, 
+    msg.set_clone_model_name(this->modelVisual->GetName().substr(0,
                              this->modelVisual->GetName().find("_clone_tmp")));
   }
 

@@ -18,6 +18,7 @@
 #define MODELMAKER_HH
 
 #include <list>
+#include <string>
 
 #include "sdf/sdf.h"
 #include "gui/EntityMaker.hh"

@@ -42,8 +42,7 @@ namespace gazebo
       private slots: void Update();
 
       private: void OnFullScreen(bool &_value);
-      private: void OnStats(
-                   ConstWorldStatisticsPtr &_msg);
+      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       private slots: void OnTimeReset();
 
@@ -66,5 +65,3 @@ namespace gazebo
 }
 
 #endif
-
-

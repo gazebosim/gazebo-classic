@@ -951,7 +951,7 @@ void ODEPhysics::DebugPrint() const
 {
   dBodyID b;
   std::cout << "Debug Print[" << dWorldGetBodyCount(this->worldId) << "]\n";
-  for (int i=0; i < dWorldGetBodyCount(this->worldId); i++)
+  for (int i = 0; i < dWorldGetBodyCount(this->worldId); ++i)
   {
     b = dWorldGetBody(this->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));

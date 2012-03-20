@@ -93,6 +93,7 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
       private: void OnManipMode(const std::string &_mode);
+      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;
@@ -144,7 +145,7 @@ namespace gazebo
       private: transport::PublisherPtr requestPub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr guiSub;
-      private: transport::SubscriberPtr newEntitySub;
+      private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;

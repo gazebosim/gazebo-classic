@@ -328,7 +328,6 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     this->OnMousePressMakeEntity();
   else
     this->OnMousePressNormal();
-
 }
 
 /////////////////////////////////////////////////
@@ -537,7 +536,7 @@ void GLWidget::OnMouseMoveRing()
       if (this->hoverVis)
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
 
-      this->hoverVis = this->scene->GetVisual(newHoverVis->GetName().substr(0, 
+      this->hoverVis = this->scene->GetVisual(newHoverVis->GetName().substr(0,
             newHoverVis->GetName().find("::")));
 
       this->setCursor(Qt::PointingHandCursor);
@@ -840,7 +839,6 @@ void GLWidget::OnCreateEntity(const std::string &_type,
     this->state = "normal";
     // TODO: make sure cursor state stays at the default
   }
-
 }
 
 /////////////////////////////////////////////////
@@ -1125,7 +1123,6 @@ void GLWidget::PopHistory()
     this->modelPub->Publish(msg);
 
     this->moveHistory.pop_back();
-
   }
 }
 

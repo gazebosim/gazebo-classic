@@ -230,7 +230,6 @@ void ODECollision::OnPoseChangeRelative()
   dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
       localPose.pos.z);
   dGeomSetOffsetQuaternion(this->collisionId, q);
-  std::cout << this->GetScopedName() << "Offset[" << localPose.pos << "]\n";
 }
 
 /////////////////////////////////////////////////

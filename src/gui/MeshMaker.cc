@@ -45,7 +45,6 @@ MeshMaker::MeshMaker()
             math::Quaternion());
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(),
             math::Vector3());
-
 }
 
 /////////////////////////////////////////////////

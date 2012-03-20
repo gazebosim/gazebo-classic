@@ -159,16 +159,12 @@ void TimePanel::Update()
 
   common::Time simAvg, realAvg;
   std::list<common::Time>::iterator simIter, realIter;
-  simIter = this->simTimes.begin();
-  realIter = this->realTimes.begin();
-  simIter++;
-  realIter++;
+  simIter = ++(this->simTimes.begin());
+  realIter = ++(this->realTimes.begin());
   while (simIter != this->simTimes.end() && realIter != this->realTimes.end())
   {
-    common::Time s = ((*simIter) - this->simTimes.front());
-    common::Time r = ((*realIter) - this->realTimes.front());
-    simAvg += s;
-    realAvg += r;
+    simAvg += ((*simIter) - this->simTimes.front());
+    realAvg += ((*realIter) - this->realTimes.front());
     ++simIter;
     ++realIter;
   }

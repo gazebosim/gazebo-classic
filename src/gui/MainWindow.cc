@@ -55,6 +55,8 @@ MainWindow::MainWindow()
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this);
+  this->statsSub =
+    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
@@ -784,4 +786,19 @@ void MainWindow::OnManipMode(const std::string &_mode)
     this->arrowAct->setChecked(true);
   else if (_mode == "ring")
     this->ringPoseAct->setChecked(true);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  if (_msg->paused() && this->playAct->isChecked())
+  {
+    this->playAct->setChecked(false);
+    this->pauseAct->setChecked(true);
+  }
+  else if (!_msg->paused() && !this->playAct->isChecked())
+  {
+    this->playAct->setChecked(true);
+    this->pauseAct->setChecked(false);
+  }
 }

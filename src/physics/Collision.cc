@@ -126,7 +126,7 @@ void Collision::Init()
   else
     this->SetRelativePose(
         math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
-    
+
   this->shape->Init();
 }
 
