@@ -66,6 +66,7 @@ GLWindow::~GLWindow()
 void GLWindow::Init()
 {
   this->userCamera->Init();
+  this->FrontView();
 }
 
 /////////////////////////////////////////////////
@@ -105,7 +106,6 @@ void GLWindow::showEvent(QShowEvent *_event)
   //  rendering::WindowManager::Instance()->SetCamera(this->windowId,
   //                                                  this->userCamera);
   this->setFocus();
-
 }
 
 
