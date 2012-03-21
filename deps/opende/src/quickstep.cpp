@@ -1354,6 +1354,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
   if (m > 0) {
     dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon, *Jcopy;
+    dReal *c_v_max;
     int *findex;
 
     {
@@ -1379,6 +1380,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       findex = context->AllocateArray<int> (mlocal);
       for (int i=0; i<mlocal; i++) findex[i] = -1;
+
+      c_v_max = context->AllocateArray<dReal> (mlocal);
+      for (int i=0; i<mlocal; i++) c_v_max[i] = world->contactp.max_vel; // init all to world max surface vel
 
       const unsigned jbelements = mlocal*2;
       jb = context->AllocateArray<int> (jbelements);
@@ -1429,6 +1433,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
           Jinfo.lo = lo + ofsi;
           Jinfo.hi = hi + ofsi;
           Jinfo.findex = findex + ofsi;
+          Jinfo.c_v_max = c_v_max + ofsi;
 
           // now write all information into J
           dxJoint *joint = jicurr->joint;
@@ -1509,8 +1514,11 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       // complete rhs
       for (int i=0; i<m; i++) {
-        rhs_erp[i] =  5.0*c[i]*stepsize1 - rhs[i];
-        rhs[i]     = 20.0*c[i]           - rhs[i];
+        rhs_erp[i] =      c[i]*stepsize1 - rhs[i];
+        if (dFabs(c[i]) > world->contactp.max_vel)
+          rhs[i]   = c_v_max[i]*stepsize1 - rhs[i];
+        else
+          rhs[i]   = c[i]*stepsize1 - rhs[i];
       }
 
 
@@ -1704,6 +1712,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
   // revert lvel and avel with the non-erp version of caccel
   if (m > 0) {
+    dReal erp_removal = 1.00;
     IFTIMING (dTimerNow ("velocity update due to constraint forces"));
     // remove caccel_erp
     const dReal *caccelcurr = caccel_erp;
@@ -1711,8 +1720,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
     for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] -= stepsize * caccelcurr[j];
-        b_ptr->avel[j] -= stepsize * caccelcurr[3+j];
+        b_ptr->lvel[j] -= erp_removal * stepsize * caccelcurr[j];
+        b_ptr->avel[j] -= erp_removal * stepsize * caccelcurr[3+j];
       }
     }
     // use caccel without erp
@@ -1720,8 +1729,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
     for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] += stepsize * caccelcurr[j];
-        b_ptr->avel[j] += stepsize * caccelcurr[3+j];
+        b_ptr->lvel[j] += erp_removal * stepsize * caccelcurr[j];
+        b_ptr->avel[j] += erp_removal * stepsize * caccelcurr[3+j];
       }
     }
   }
@@ -1810,6 +1819,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs_precon
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * 2 * m); // for jb
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for findex
+      sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for c_v_max
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * mfb); // for Jcopy
       {
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for c
