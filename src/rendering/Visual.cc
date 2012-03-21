@@ -304,6 +304,9 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_cast_shadows())
     this->sdf->GetAttribute("cast_shadows")->Set(_msg->cast_shadows());
 
+  if (_msg->has_laser_retro())
+    this->sdf->GetAttribute("laser_retro")->Set(_msg->laser_retro());
+
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -373,6 +376,14 @@ void Visual::Load()
   {
     this->AttachObject(obj);
     obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
+  }
+
+  Ogre::Entity *ent = (Ogre::Entity *) obj;
+  
+  if (ent)
+  {
+    for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
+      ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(this->sdf->GetValueDouble("laser_retro"),0.0,0.0,0.0));
   }
 
   // Set the pose of the scene node
@@ -1396,7 +1407,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       Ogre::HardwareVertexBufferSharedPtr vBuf;
       Ogre::HardwareIndexBufferSharedPtr iBuf;
       float *vertices;
-      uint16_t *indices;
+      uint32_t *indices;
 
       size_t currOffset = 0;
 
@@ -1414,6 +1425,8 @@ void Visual::InsertMesh(const common::Mesh *mesh)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
       else if (subMesh->GetPrimitiveType() == common::SubMesh::TRISTRIPS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
+      else if (subMesh->GetPrimitiveType() == common::SubMesh::POINTS)
+        ogreSubMesh->operationType = Ogre::RenderOperation::OT_POINT_LIST;
       else
         gzerr << "Unknown primitive type["
               << subMesh->GetPrimitiveType() << "]\n";
@@ -1468,13 +1481,13 @@ void Visual::InsertMesh(const common::Mesh *mesh)
 
       ogreSubMesh->indexData->indexBuffer =
         Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-            Ogre::HardwareIndexBuffer::IT_16BIT,
+            Ogre::HardwareIndexBuffer::IT_32BIT,
             ogreSubMesh->indexData->indexCount,
             Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
             false);
 
       iBuf = ogreSubMesh->indexData->indexBuffer;
-      indices = static_cast<uint16_t*>(
+      indices = static_cast<uint32_t*>(
           iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
       unsigned int j;

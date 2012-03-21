@@ -15,6 +15,7 @@
  *
 */
 #include "plugins/VisualLaserPlugin.hh"
+#include "rendering/VisualLaser.hh"
 
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(VisualLaserPlugin)

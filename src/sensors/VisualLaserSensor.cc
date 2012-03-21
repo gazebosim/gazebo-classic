@@ -85,8 +85,10 @@ void VisualLaserSensor::Load(const std::string &_worldName)
   width_2nd = this->GetRangeCount();
   height_2nd = this->GetVerticalRangeCount();
 
-  ratio_2nd = width_2nd / height_2nd;
+  if (height_1st == 1)
+    height_2nd = 1;
 
+  ratio_2nd = width_2nd / height_2nd;
 
   near = this->GetRangeMin();
   far = this->GetRangeMax();
@@ -94,18 +96,26 @@ void VisualLaserSensor::Load(const std::string &_worldName)
   hfov = this->GetAngleMax().GetAsRadian() - this->GetAngleMin().GetAsRadian();
   vfov = this->GetVerticalAngleMax().GetAsRadian() - this->GetVerticalAngleMin().GetAsRadian();
 
-  ratio_1st = tan(hfov/2.0) / tan(vfov/2.0);
+  if (height_1st > 1)
+  {
+    chfov = 2 * atan(tan(hfov/2) / cos(vfov/2));
+    std::cerr<<"Corrected HFOV: "<<chfov<<" (HFOV: "<<hfov<<")\n";
 
-  if (height_1st < width_1st) 
-    height_1st = width_1st / ratio_1st;
-  else
+    ratio_1st = tan(chfov/2.0) / tan(vfov/2.0);
+
     width_1st = height_1st * ratio_1st;
+  }
+  else
+  {
+    vfov = 2.0 * atan(tan(hfov / 2.0) / ratio_1st);
+    chfov = hfov;
+  }
 
   this->cameraElem.reset(new sdf::Element);
   sdf::initFile("sdf/camera.sdf", this->cameraElem);
 
   sdf::ElementPtr ptr = this->cameraElem->GetOrCreateElement("horizontal_fov");
-  ptr->GetAttribute("angle")->Set(hfov);
+  ptr->GetAttribute("angle")->Set(chfov);
 
   ptr = this->cameraElem->GetOrCreateElement("image");
   ptr->GetAttribute("width")->Set(width_1st);
@@ -168,6 +178,12 @@ void VisualLaserSensor::Fini()
 double VisualLaserSensor::GetHFOV()
 {
   return this->hfov;
+}
+
+//////////////////////////////////////////////////
+double VisualLaserSensor::GetCHFOV()
+{
+  return this->chfov;
 }
 
 //////////////////////////////////////////////////

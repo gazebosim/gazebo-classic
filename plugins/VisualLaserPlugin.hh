@@ -23,7 +23,7 @@
 #include "common/Plugin.hh"
 #include "sensors/VisualLaserSensor.hh"
 #include "sensors/CameraSensor.hh"
-#include "rendering/VisualLaser.hh"
+#include "rendering/RenderTypes.hh"
 #include "gazebo.h"
 
 namespace gazebo

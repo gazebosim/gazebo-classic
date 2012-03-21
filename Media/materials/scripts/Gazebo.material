@@ -75,6 +75,7 @@ fragment_program Gazebo/LaserScan1stFS glsl
   
   default_params
   {
+    param_named retro float 0.0
     param_named_auto near near_clip_distance
     param_named_auto far far_clip_distance
   }
@@ -86,6 +87,7 @@ fragment_program Gazebo/LaserScan1stDBGFS glsl
   
   default_params
   {
+    param_named retro float 0.0
     param_named_auto near near_clip_distance
     param_named_auto far far_clip_distance
   }

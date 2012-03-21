@@ -60,7 +60,10 @@ vec4 texture2D_bilinear( in vec2 uv )
 
 void main()
 {
-  gl_FragColor = texture2D( tex, gl_TexCoord[0].st);
-  //gl_FragColor = texture2D_bilinear( gl_TexCoord[0].st);
-  //gl_FragColor = vec4(gl_FragCoord.x /160, gl_FragCoord.y/120,0,1);
+  if ((gl_TexCoord[0].s < 0) || (gl_TexCoord[0].s > 1) || 
+      (gl_TexCoord[0].t < 0) || (gl_TexCoord[0].t > 1))
+    gl_FragColor = vec4(0,1,1,1);
+  else
+    gl_FragColor = texture2D( tex, gl_TexCoord[0].st);
+    //gl_FragColor = texture2D_bilinear( gl_TexCoord[0].st);
 }

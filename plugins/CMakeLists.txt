@@ -1,8 +1,11 @@
-include_directories( 
+include_directories(
   ${PROJECT_BINARY_DIR}/src 
   ${PROJECT_SOURCE_DIR}/src 
   ${PROTOBUF_INCLUDE_DIR}
+  ${OGRE_INCLUDE_DIRS}
 )
+
+message(STATUS "OGRE include: ${OGRE_INCLUDE_DIRS}")
 
 set (plugins CameraPlugin
              DepthCameraPlugin

@@ -113,7 +113,7 @@ namespace gazebo
     /// \brief A child mesh
     class SubMesh
     {
-      public: enum PrimitiveType {LINES, LINESTRIPS, TRIANGLES,
+      public: enum PrimitiveType {POINTS, LINES, LINESTRIPS, TRIANGLES,
                 TRIFANS, TRISTRIPS};
 
       /// \brief Constructor

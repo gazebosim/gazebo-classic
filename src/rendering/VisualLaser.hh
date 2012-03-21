@@ -24,6 +24,7 @@
 #include <string>
 
 #include "rendering/Camera.hh"
+#include "OGRE/OgreRenderObjectListener.h"
 #include "sensors/SensorTypes.hh"
 
 #include "common/Event.hh"
@@ -38,7 +39,6 @@
 namespace Ogre
 {
   class Material;
-  class RenderObjectListener;
   class Renderable;
   class Pass;
   class AutoParamDataSource;
@@ -68,7 +68,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class VisualLaser : public Camera
+    class VisualLaser : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
       public: VisualLaser(const std::string &_namePrefix,
@@ -109,10 +109,13 @@ namespace gazebo
 
       public: void SetParentSensor(sensors::VisualLaserSensor *parent);
 
+      public: virtual void notifyRenderSingleObject (Ogre::Renderable *rend, const Ogre::Pass* /*pass*/, 
+              const Ogre::AutoParamDataSource* /*source*/, const Ogre::LightList* /*lights*/, bool /*supp*/);
+
       private: virtual void RenderImpl();
 
       private: void UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material *material, 
-              std::string matName, Ogre::Camera *cam);
+              Ogre::Camera *cam);
 
       private: void CreateOrthoCam();
 
@@ -123,6 +126,7 @@ namespace gazebo
       private: Ogre::Matrix4 BuildScaledOrthoMatrix(float left, float right, float bottom, float top, float near, float far);
 
       private: float *laserBuffer;
+      private: float *laserScan;
       private: unsigned char *imageBuffer;
       private: unsigned char *_1stBuffer;
 
@@ -160,6 +164,9 @@ namespace gazebo
       protected: virtual void Set1stTarget(Ogre::RenderTarget *target);
       protected: virtual void Set2ndTarget(Ogre::RenderTarget *target);
 
+      protected: Ogre::RenderTarget *current_target;
+      private: Ogre::Material *current_mat;
+      
       protected: Ogre::Camera *orthoCam;
       
       protected: Ogre::SceneNode *origParentNode_ortho;

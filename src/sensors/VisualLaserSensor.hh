@@ -155,6 +155,8 @@ namespace gazebo
       public: double Get2ndRatio();
       
       public: double GetHFOV();
+      
+      public: double GetCHFOV();
 
       public: double GetVFOV();
       
@@ -168,7 +170,7 @@ namespace gazebo
       protected: sdf::ElementPtr rangeElem;
       protected: sdf::ElementPtr cameraElem;
 
-      protected: double hfov, vfov;
+      protected: double hfov, vfov, chfov;
       protected: double near, far;
       protected: unsigned int width_1st, height_1st;
       protected: unsigned int width_2nd, height_2nd;
