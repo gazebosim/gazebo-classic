@@ -127,17 +127,12 @@ namespace gazebo
 
       private: float *laserBuffer;
       private: float *laserScan;
-      private: unsigned char *imageBuffer;
-      private: unsigned char *_1stBuffer;
-
       private: Ogre::Material *mat_1st_pass;
       private: Ogre::Material *mat_2nd_pass;
 
       private: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newLaserFrame;
 
-      private: void Publish1stTexture();
-      private: void Publish2ndTexture();
       public: template<typename T>
               event::ConnectionPtr ConnectNewImage2Frame(T subscriber)
               { return newImage2Frame.Connect(subscriber); }
@@ -153,14 +148,20 @@ namespace gazebo
       protected: Ogre::RenderTarget *_2ndTarget;
       protected: Ogre::Viewport *_1stViewport;
       protected: Ogre::Viewport *_2ndViewport;
-      protected: Ogre::Texture *_1stTexture_dbg;
-      protected: Ogre::Texture *_2ndTexture_dbg;
-      protected: Ogre::RenderTarget *_1stTarget_dbg;
-      protected: Ogre::RenderTarget *_2ndTarget_dbg;
-      protected: Ogre::Viewport *_1stViewport_dbg;
-      protected: Ogre::Viewport *_2ndViewport_dbg;
-      private: Ogre::Material *mat_1st_pass_dbg;
-      private: Ogre::Material *mat_2nd_pass_dbg;
+      
+      //private: unsigned char *imageBuffer;
+      //private: unsigned char *_1stBuffer;
+      //private: void Publish1stTexture();
+      //private: void Publish2ndTexture();
+      //protected: Ogre::Texture *_1stTexture_dbg;
+      //protected: Ogre::Texture *_2ndTexture_dbg;
+      //protected: Ogre::RenderTarget *_1stTarget_dbg;
+      //protected: Ogre::RenderTarget *_2ndTarget_dbg;
+      //protected: Ogre::Viewport *_1stViewport_dbg;
+      //protected: Ogre::Viewport *_2ndViewport_dbg;
+      //private: Ogre::Material *mat_1st_pass_dbg;
+      //private: Ogre::Material *mat_2nd_pass_dbg;
+      
       protected: virtual void Set1stTarget(Ogre::RenderTarget *target);
       protected: virtual void Set2ndTarget(Ogre::RenderTarget *target);
 

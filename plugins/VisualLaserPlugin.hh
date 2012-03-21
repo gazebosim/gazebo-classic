@@ -38,13 +38,13 @@ namespace gazebo
                 unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
-    public: virtual void OnNewImageFrame(const unsigned char *_image,
+    /*public: virtual void OnNewImageFrame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
     public: virtual void OnNewImage2Frame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,
-                              unsigned int _depth, const std::string &_format);
+                              unsigned int _depth, const std::string &_format);*/
 
     protected: unsigned int width, height/*, depth*/;
 //    protected: std::string format;

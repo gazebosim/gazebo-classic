@@ -96,6 +96,9 @@ void VisualLaserSensor::Load(const std::string &_worldName)
   hfov = this->GetAngleMax().GetAsRadian() - this->GetAngleMin().GetAsRadian();
   vfov = this->GetVerticalAngleMax().GetAsRadian() - this->GetVerticalAngleMin().GetAsRadian();
 
+  hang = (this->GetAngleMax().GetAsRadian() + this->GetAngleMin().GetAsRadian()) / 2.0;
+  vang = (this->GetVerticalAngleMax().GetAsRadian() + this->GetVerticalAngleMin().GetAsRadian()) / 2.0;
+
   if (height_1st > 1)
   {
     chfov = 2 * atan(tan(hfov/2) / cos(vfov/2));
@@ -110,6 +113,8 @@ void VisualLaserSensor::Load(const std::string &_worldName)
     vfov = 2.0 * atan(tan(hfov / 2.0) / ratio_1st);
     chfov = hfov;
   }
+
+  std::cerr<<"Final texture size: "<<width_1st<<" x "<<height_1st<<"\n"; 
 
   this->cameraElem.reset(new sdf::Element);
   sdf::initFile("sdf/camera.sdf", this->cameraElem);
@@ -172,6 +177,18 @@ void VisualLaserSensor::Fini()
   this->laserCam->Fini();
   this->laserCam.reset();
   this->scene.reset();
+}
+
+//////////////////////////////////////////////////
+double VisualLaserSensor::GetHAngle()
+{
+  return this->hang;
+}
+
+//////////////////////////////////////////////////
+double VisualLaserSensor::GetVAngle()
+{
+  return this->vang;
 }
 
 //////////////////////////////////////////////////

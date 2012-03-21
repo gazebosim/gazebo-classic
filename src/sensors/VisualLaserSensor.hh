@@ -159,6 +159,10 @@ namespace gazebo
       public: double GetCHFOV();
 
       public: double GetVFOV();
+
+      public: double GetHAngle();
+
+      public: double GetVAngle();
       
       private: void OnPose(ConstPosePtr &_msg);
 
@@ -170,7 +174,7 @@ namespace gazebo
       protected: sdf::ElementPtr rangeElem;
       protected: sdf::ElementPtr cameraElem;
 
-      protected: double hfov, vfov, chfov;
+      protected: double hfov, vfov, chfov, hang, vang;
       protected: double near, far;
       protected: unsigned int width_1st, height_1st;
       protected: unsigned int width_2nd, height_2nd;
