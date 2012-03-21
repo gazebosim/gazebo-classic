@@ -124,19 +124,31 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     // experimental - check relative acceleration at the contact
 
     dReal depth;
+    dReal min_min_depth;
     if (node[0].body->contactp != NULL && (node[1].body && node[1].body->contactp != NULL))
-      depth = contact.geom.depth - std::min(node[0].body->contactp->min_depth,node[1].body->contactp->min_depth);
+    {
+      min_min_depth = std::min(node[0].body->contactp->min_depth,node[1].body->contactp->min_depth);
+      depth = contact.geom.depth - min_min_depth;
+    }
     else if (node[0].body->contactp != NULL)
-      depth = contact.geom.depth - node[0].body->contactp->min_depth;
+    {
+      min_min_depth = node[0].body->contactp->min_depth;
+      depth = contact.geom.depth - min_min_depth;
+    }
     else if (node[1].body && node[1].body->contactp != NULL)
-      depth = contact.geom.depth - node[1].body->contactp->min_depth;
+    {
+      min_min_depth = node[1].body->contactp->min_depth;
+      depth = contact.geom.depth - min_min_depth;
+    }
     else
-      depth = contact.geom.depth - world->contactp.min_depth;
+    {
+      min_min_depth = world->contactp.min_depth;
+      depth = contact.geom.depth - min_min_depth;
+    }
     if ( depth < 0 ) depth = 0;
 
     if ( contact.surface.mode & dContactSoftCFM )
         info->cfm[0] = contact.surface.soft_cfm;
-
 
     dReal motionN = 0;
     if ( contact.surface.mode & dContactMotionN )
@@ -155,8 +167,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
       maxvel = node[1].body->contactp->max_vel;
     else
       maxvel = world->contactp.max_vel;
-    if ( info->c[0] > maxvel )
-        info->c[0] = maxvel;
+    info->c_v_max[0] = maxvel;
 
     // deal with bounce
     if ( contact.surface.mode & dContactBounce )

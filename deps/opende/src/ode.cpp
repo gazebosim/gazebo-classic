@@ -1509,6 +1509,7 @@ void dJointSetScrewThreadPitch (dxJoint *joint, dReal thread_pitch)
   {
     // set joint thread_pitch
     ((dxJointScrew*)joint)->thread_pitch = thread_pitch;
+    //printf("setting thread_pitch to %f\n",thread_pitch);
   }
 }
 
@@ -1692,7 +1693,6 @@ dBodyID dWorldGetBody(dxWorld *w, int id)
   else
     return 0;
 }
-
 
 void dWorldDestroy (dxWorld *w)
 {
