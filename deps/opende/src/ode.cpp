@@ -1157,6 +1157,11 @@ void dBodySetMovedCallback(dBodyID b, void (*callback)(dBodyID))
         b->moved_callback = callback;
 }
 
+void dBodySetDisabledCallback(dBodyID b, void (*callback)(dBodyID))
+{
+  dAASSERT(b);
+  b->disabled_callback = callback;
+}
 
 dGeomID dBodyGetFirstGeom(dBodyID b)
 {

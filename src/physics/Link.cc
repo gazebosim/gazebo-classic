@@ -587,6 +587,7 @@ void Link::FillLinkMsg(msgs::Link &_msg)
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
+  _msg.set_enabled(this->GetEnabled());
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());

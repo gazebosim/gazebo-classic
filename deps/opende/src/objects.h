@@ -153,6 +153,7 @@ struct dxBody : public dObject {
   int average_ready;            // indicates ( with = 1 ), if the Body's buffers are ready for average-calculations
 
   void (*moved_callback)(dxBody*); // let the user know the body moved
+  void (*disabled_callback)(dxBody*); // let the user know the body was disabled
   dxDampingParameters dampingp; // damping parameters, depends on flags
   dReal max_angular_speed;      // limit the angular velocity to this magnitude
 

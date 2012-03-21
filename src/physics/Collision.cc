@@ -55,25 +55,11 @@ Collision::Collision(LinkPtr _link)
   this->contactsEnabled = false;
 
   this->surface.reset(new SurfaceParams());
-
-  this->connections.push_back(
-      event::Events::ConnectShowBoundingBoxes(
-        boost::bind(&Collision::ShowBoundingBox, this, _1)));
-  this->connections.push_back(
-      this->link->ConnectEnabled(
-        boost::bind(&Collision::EnabledCB, this, _1)));
 }
 
 //////////////////////////////////////////////////
 Collision::~Collision()
 {
-  if (!this->bbVisual.empty())
-  {
-    msgs::Visual msg;
-    msg.set_name(this->bbVisual);
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -130,39 +116,6 @@ void Collision::Init()
   this->shape->Init();
 }
 
-//////////////////////////////////////////////////
-void Collision::CreateBoundingBox()
-{
-  // Create the bounding box
-  if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
-  {
-    math::Box box;
-
-    box = this->GetBoundingBox();
-
-    std::ostringstream visname;
-    visname << this->GetScopedName() << "::BBVISUAL";
-
-    msgs::Visual msg;
-    msg.mutable_geometry()->set_type(msgs::Geometry::BOX);
-    msg.set_parent_name(this->GetScopedName());
-    msg.set_name(this->GetScopedName() + "_BBVISUAL");
-    msg.set_cast_shadows(false);
-
-    if (this->IsStatic())
-      msg.mutable_material()->set_script("Gazebo/YellowTransparent");
-    else
-      msg.mutable_material()->set_script("Gazebo/GreenTransparent");
-
-    msgs::Set(msg.mutable_geometry()->mutable_box()->mutable_size(),
-               (box.max - box.min) * 1.05);
-    msgs::Set(msg.mutable_pose()->mutable_position(),
-              math::Vector3(0, 0, 0.0));
-    msgs::Set(msg.mutable_pose()->mutable_orientation(),
-              math::Quaternion(1, 0, 0, 0));
-    msg.set_transparency(.5);
-  }
-}
 
 //////////////////////////////////////////////////
 void Collision::SetCollision(bool _placeable)
@@ -199,20 +152,6 @@ void Collision::SetLaserRetro(float _retro)
 float Collision::GetLaserRetro() const
 {
   return this->sdf->GetValueDouble("laser_retro");
-}
-
-
-//////////////////////////////////////////////////
-void Collision::ShowBoundingBox(const bool &_show)
-{
-  if (!this->bbVisual.empty())
-  {
-    msgs::Visual msg;
-    msg.set_name(this->bbVisual);
-    msg.set_visible(_show);
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -266,20 +205,6 @@ void Collision::AddContact(const Contact &_contact)
     return;
 
   this->contact(this->GetName(), _contact);
-}
-
-//////////////////////////////////////////////////
-void Collision::EnabledCB(bool _enabled)
-{
-  msgs::Visual msg;
-  msg.set_name(this->bbVisual);
-
-  if (_enabled)
-    msg.mutable_material()->set_script("Gazebo/GreenTransparent");
-  else
-    msg.mutable_material()->set_script("Gazebo/RedTransparent");
-
-  this->visPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////

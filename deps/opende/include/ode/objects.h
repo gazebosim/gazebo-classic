@@ -1418,6 +1418,7 @@ ODE_API int dBodyGetGravityMode (dBodyID b);
  */
 ODE_API void dBodySetMovedCallback(dBodyID b, void (*callback)(dBodyID));
 
+ODE_API void dBodySetDisabledCallback(dBodyID b, void (*callback)(dBodyID));
 
 /**
  * @brief Return the first geom associated with the body.

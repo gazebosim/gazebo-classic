@@ -120,7 +120,14 @@ void ODELink::Init()
   if (this->linkId)
   {
     dBodySetMovedCallback(this->linkId, MoveCallback);
+    dBodySetDisabledCallback(this->linkId, DisabledCallback);
   }
+}
+
+//////////////////////////////////////////////////
+void ODELink::DisabledCallback(dBodyID _id)
+{
+  printf("Disabled\n");
 }
 
 //////////////////////////////////////////////////

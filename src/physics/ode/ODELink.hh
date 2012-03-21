@@ -137,6 +137,7 @@ namespace gazebo
       /// \brief Set the angular damping factor
       public: virtual void SetAngularDamping(double damping);
 
+      public: static void DisabledCallback(dBodyID _id);
       public: static void MoveCallback(dBodyID id);
 
       /// \brief Set whether this link is in the kinematic state
