@@ -51,7 +51,10 @@
 #include "Simulator.hh"
 
 using namespace gazebo;
+int g_argc = 1;
+char **g_argv;
 
+extern void qt_setup(int argc, char **argv);
 extern Gui *g_gui;
 std::string Simulator::defaultWorld = 
 "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >\
@@ -117,6 +120,15 @@ Simulator::Simulator()
   physicsEnabled(true),
   timeout(-1)
 {
+  g_argv = new char*[g_argc];
+  for (int i = 0; i < g_argc; i++)
+  {
+    g_argv[i] = new char[strlen("gazebo")];
+    snprintf(g_argv[i], strlen("gazebo"), "gazebo");
+  }
+
+  qt_setup(g_argc, g_argv);
+
   this->render_mutex = new boost::recursive_mutex();
   this->model_delete_mutex = new boost::recursive_mutex();
   this->startTime = Time::GetWallTime();

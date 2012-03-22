@@ -19,7 +19,7 @@ QT4_WRAP_UI(UI_SRCS ${ui_files})
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-add_library(gazebo_gui ${sources} ${UI_SRCS} ${headers_MOC} ${headers} ${resources_RCC})
+add_library(gazebo_gui SHARED ${sources} ${UI_SRCS} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui ${QT_LIBRARIES} 
                                  ${ogre_libraries} 
