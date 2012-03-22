@@ -150,12 +150,12 @@ endforeach (header ${gazeboserver_headers_nopath})
 add_library(gazebo_server SHARED ${gazeboserver_sources})
 set_target_properties(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
 
-#add_executable(gazebo-exec main.cc)
-#set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo-non-ros")
+add_executable(gazebo-exec main.cc)
+set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo-non-ros")
 
 # Removes colon separated rpath. This breaks Ubuntu-intrepid 
 # (possibly gcc-4.3.2).
-# set_target_properties(gazebo-exec PROPERTIES SKIP_BUILD_RPATH TRUE)
+set_target_properties(gazebo-exec PROPERTIES SKIP_BUILD_RPATH TRUE)
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
 
@@ -164,37 +164,38 @@ set_source_files_properties(${gazeboserver_sources} PROPERTIES COMPILE_FLAGS "${
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  #set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
+  set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  #set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+  set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 
-#target_link_libraries( gazebo-exec ${libtool_library}
-#                                   ${gazeboserver_link_libs} 
-#                                   ${boost_libraries} 
-#                                   ${assimp_libraries} 
-#                                   ${freeimage_library} 
-#                                   ${QT_LIBRARIES}
-#                                   gazebo_server
-#                                   gazebo_rendering
-#                                   gazebo_gui
-#                                   gazebo_physics
-#                                   gazeboshm 
-#                                   assimp
-#                                   pthread
-#)
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} ${boost_libraries} gazeboshm gazebo_gui gazebo_rendering gazebo_physics assimp rt)
+
+target_link_libraries( gazebo-exec ${libtool_library}
+                                   ${gazeboserver_link_libs} 
+                                   ${boost_libraries} 
+                                   ${assimp_libraries} 
+                                   ${freeimage_library} 
+                                   ${QT_LIBRARIES}
+                                   gazebo_server
+                                   gazebo_rendering
+                                   gazebo_gui
+                                   gazebo_physics
+                                   gazeboshm 
+                                   assimp
+                                   pthread
+)
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
                       -lassimp -lgazebo_physics -lgazebo_gui 
                       -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} ${boost_libraries} gazeboshm gazebo_gui gazebo_rendering gazebo_physics assimp rt)
 
 if (INCLUDE_ODE)
   target_link_libraries(gazebo_server ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})
-  #target_link_libraries(gazebo-exec ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo-exec ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})
   APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
                       -lgazebo_physics_ode)
@@ -212,5 +213,5 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc DESTINATION ${CMAKE_IN
 
 
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-# install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)

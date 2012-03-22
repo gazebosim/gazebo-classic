@@ -6,5 +6,5 @@ Name: gazeboserver
 Description: Gazebo server
 Version: @GAZEBO_VERSION@
 Requires:
-Libs: -L${libdir} -lgazebo_server -lgazebo @gazeboserver_ldflags@ 
+Libs: -L${libdir} -lgazebo_gui -lgazebo_server  -lgazebo @gazeboserver_ldflags@ 
 CFlags: -I${includedir} @gazeboserver_cflags@

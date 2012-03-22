@@ -20,37 +20,14 @@
 #include "GLWindow.hh"
 #include "Gui.hh"
 
-using namespace gazebo;
-QApplication *g_app = NULL;
-Gui *g_gui = NULL;
 
-void qt_setup(int argc, char **argv)
-{
-  g_app = new QApplication(argc, argv);
-
-  /*QMainWindow *window = new QMainWindow;
-  Ui::SharonWindow ui;
-  ui.setupUi(window);
-  window->show();
-  */
-
-  /*QUiLoader loader;
-  QFile file("/u/nkoenig/Downloads/sharon_simple.ui");
-  file.open(QFile::ReadOnly);
-  QMainWindow *formWidget = static_cast<QMainWindow*>(loader.load(&file));
-  file.close();
-
-  formWidget->show();
-  */
-  g_gui = new Gui(0,0,0,0,"hello");
-  g_gui->show();
-  g_gui->Load(NULL);
-}
-
-void qt_run()
+/* void my_qt_run()
 {
   g_app->exec();
 }
+*/
+
+using namespace gazebo;
 
 /////////////////////////////////////////////////
 Gui::Gui(int x, int y, int width, int height, const std::string &_name)
@@ -127,6 +104,6 @@ void Gui::CreateCameras()
 /////////////////////////////////////////////////
 void Gui::Update()
 {
-  g_app->processEvents();
+  // g_app->processEvents();
   //this->renderWidget->paintEvent();
 }

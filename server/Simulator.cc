@@ -50,12 +50,22 @@
 
 #include "Simulator.hh"
 
+#include <QApplication>
 using namespace gazebo;
 int g_argc = 1;
 char **g_argv;
 
-extern void qt_setup(int argc, char **argv);
-extern Gui *g_gui;
+QApplication *g_app = NULL;
+gazebo::Gui *g_gui = NULL;
+
+void my_qt_setup(int argc, char **argv)
+{
+  printf("\n\n\n CREATE GUI \n\n\n");
+  // g_app = new QApplication(argc, argv);
+
+};
+// extern void qt_setup(int argc, char **argv);
+// extern Gui *g_gui;
 std::string Simulator::defaultWorld = 
 "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >\
   <physics:ode>\
@@ -120,14 +130,14 @@ Simulator::Simulator()
   physicsEnabled(true),
   timeout(-1)
 {
-  g_argv = new char*[g_argc];
+  /*g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
   {
     g_argv[i] = new char[strlen("gazebo")];
     snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
-
-  qt_setup(g_argc, g_argv);
+  my_qt_setup(g_argc, g_argv);
+  */
 
   this->render_mutex = new boost::recursive_mutex();
   this->model_delete_mutex = new boost::recursive_mutex();
@@ -239,6 +249,11 @@ void Simulator::LoadWorldString(const std::string &worldString, int serverId)
 
 void Simulator::Load(gazebo::XMLConfig *worldConfig, int serverId )
 {
+  g_gui = new gazebo::Gui(0,0,0,0,"hello");
+  g_gui->show();
+  g_gui->Load(NULL);
+
+
   this->state = LOAD;
 
   if (loaded)
@@ -382,6 +397,7 @@ void Simulator::Init()
   // This is not a debug line. This is useful for external programs that 
   // launch Gazebo and wait till it is ready   
   std::cout << "Gazebo successfully initialized" << std::endl;
+  // my_qt_run();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -484,7 +500,8 @@ void Simulator::MainLoop()
       {
         lastGuiTime = Time::GetWallTime();
         DIAGNOSTICTIMER(timer1("GUI update",6));
-        g_gui->Update();
+        // g_gui->Update();
+        g_app->processEvents();
       }
 
       if (this->renderEngineEnabled)
@@ -572,7 +589,7 @@ bool Simulator::IsPaused() const
 /// Set whether the simulation is paused
 void Simulator::SetPaused(bool p)
 {
-  boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
+  // boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
 
   if (this->pause == p)
     return;

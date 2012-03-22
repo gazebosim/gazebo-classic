@@ -250,14 +250,14 @@ void SignalHandler( int /*dummy*/ )
   return;
 }
 
-extern void qt_setup(int argc, char **argv);
+extern void my_qt_setup(int argc, char **argv);
 extern void qt_run();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main function
 int main(int argc, char **argv)
 {
-  qt_setup(argc, argv);
+  my_qt_setup(argc, argv);
   //qt_run();
 
 

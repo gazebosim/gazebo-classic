@@ -20,9 +20,11 @@
 #include "ui_sharon_simple.h"
 #include "qt.h"
 
+// void my_qt_setup(int argc, char **argv);
+// void my_qt_run();
+
 namespace gazebo
 {
-  void qt_setup(int argc, char **argv);
 
   class GLWindow;
   class XMLConfigNode;
