@@ -161,6 +161,7 @@ void MultiRayShape::Update()
   }
 
   this->UpdateRays();
+  this->newLaserScans();
 }
 
 //////////////////////////////////////////////////
