@@ -86,9 +86,6 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
-  this->connections.push_back(
-     event::Events::ConnectDeleteEntity(
-       boost::bind(&World::DeleteEntityCB, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -403,17 +400,12 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
-void World::DeleteEntityCB(const std::string &/*_name*/)
-{
-  // TODO: Implement this function
-}
-
-//////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
   return this->rootElement->GetByName(_name);
 }
 
+/////////////////////////////////////////////////
 ModelPtr World::GetModelById(unsigned int _id)
 {
   return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
@@ -780,10 +772,27 @@ void World::ProcessEntityMsgs()
   for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); ++iter)
   {
+    // Remove all the dirty poses from the delete entity.
+    for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
+         iter2 != this->dirtyPoses.end();)
+    {
+      if ((*iter2)->GetName() == *iter ||
+          (*iter2)->GetParent()->GetName() == *iter)
+      {
+        this->dirtyPoses.erase(iter2++);
+      }
+      else
+        ++iter2;
+    }
+
     this->rootElement->RemoveChild((*iter));
   }
 
-  this->deleteEntity.clear();
+  if (this->deleteEntity.size() > 0)
+  {
+    this->EnableAllModels();
+    this->deleteEntity.clear();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -923,7 +932,11 @@ void World::ProcessModelMsgs()
       this->modelPub->Publish(msg);
     }
   }
-  this->modelMsgs.clear();
+  if (this->modelMsgs.size())
+  {
+    this->EnableAllModels();
+    this->modelMsgs.clear();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1146,4 +1159,18 @@ void World::UpdateSDFFromState(const WorldState &_state)
       childElem = childElem->GetNextElement();
     }
   }
+}
+
+//////////////////////////////////////////////////
+void World::EnableAllModels()
+{
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+    this->GetModel(i)->SetEnabled(true);
+}
+
+//////////////////////////////////////////////////
+void World::DisableAllModels()
+{
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+    this->GetModel(i)->SetEnabled(false);
 }

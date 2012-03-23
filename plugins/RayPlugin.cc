@@ -52,4 +52,12 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
   this->world = physics::get_world(this->parentSensor->GetWorldName());
+
+  this->newLaserScansConnection = this->parentSensor->GetLaserShape()->ConnectNewLaserScans(
+      boost::bind(&RayPlugin::OnNewLaserScans, this));
+}
+
+void RayPlugin::OnNewLaserScans()
+{
+  /* overload with useful callback here */
 }

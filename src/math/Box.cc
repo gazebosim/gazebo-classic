@@ -151,3 +151,9 @@ bool Box::operator==(const Box &_b)
 {
   return this->min == _b.min && this->max == _b.max;
 }
+
+//////////////////////////////////////////////////
+Box Box::operator-(const Vector3 &_v)
+{
+  return Box(this->min - _v, this->max - _v);
+}

@@ -258,6 +258,9 @@ namespace gazebo
                                    double _time,
                                    boost::function<void()> _onComplete);
 
+      /// \brief Set visibility flags for this visual and all children
+      public: void SetVisibilityFlags(uint32_t _flags);
+
       public: void ShowBoundingBox();
       public: void ShowCollision(bool _show);
 

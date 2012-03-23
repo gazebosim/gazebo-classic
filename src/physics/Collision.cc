@@ -55,25 +55,11 @@ Collision::Collision(LinkPtr _link)
   this->contactsEnabled = false;
 
   this->surface.reset(new SurfaceParams());
-
-  this->connections.push_back(
-      event::Events::ConnectShowBoundingBoxes(
-        boost::bind(&Collision::ShowBoundingBox, this, _1)));
-  this->connections.push_back(
-      this->link->ConnectEnabled(
-        boost::bind(&Collision::EnabledCB, this, _1)));
 }
 
 //////////////////////////////////////////////////
 Collision::~Collision()
 {
-  if (!this->bbVisual.empty())
-  {
-    msgs::Visual msg;
-    msg.set_name(this->bbVisual);
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -90,12 +76,17 @@ void Collision::Fini()
   this->connections.clear();
 }
 
-
-
 //////////////////////////////////////////////////
 void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
+
+  if (this->sdf->HasElement("origin"))
+      this->SetRelativePose(
+        this->sdf->GetElement("origin")->GetValuePose("pose"));
+  else
+    this->SetRelativePose(
+        math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
 
   if (this->sdf->HasElement("surface"))
     this->surface->Load(this->sdf->GetElement("surface"));
@@ -121,42 +112,10 @@ void Collision::Init()
   else
     this->SetRelativePose(
         math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
+
   this->shape->Init();
 }
 
-//////////////////////////////////////////////////
-void Collision::CreateBoundingBox()
-{
-  // Create the bounding box
-  if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
-  {
-    math::Box box;
-
-    box = this->GetBoundingBox();
-
-    std::ostringstream visname;
-    visname << this->GetScopedName() << "::BBVISUAL";
-
-    msgs::Visual msg;
-    msg.mutable_geometry()->set_type(msgs::Geometry::BOX);
-    msg.set_parent_name(this->GetScopedName());
-    msg.set_name(this->GetScopedName() + "_BBVISUAL");
-    msg.set_cast_shadows(false);
-
-    if (this->IsStatic())
-      msg.mutable_material()->set_script("Gazebo/YellowTransparent");
-    else
-      msg.mutable_material()->set_script("Gazebo/GreenTransparent");
-
-    msgs::Set(msg.mutable_geometry()->mutable_box()->mutable_size(),
-               (box.max - box.min) * 1.05);
-    msgs::Set(msg.mutable_pose()->mutable_position(),
-              math::Vector3(0, 0, 0.0));
-    msgs::Set(msg.mutable_pose()->mutable_orientation(),
-              math::Quaternion(1, 0, 0, 0));
-    msg.set_transparency(.5);
-  }
-}
 
 //////////////////////////////////////////////////
 void Collision::SetCollision(bool _placeable)
@@ -193,20 +152,6 @@ void Collision::SetLaserRetro(float _retro)
 float Collision::GetLaserRetro() const
 {
   return this->sdf->GetValueDouble("laser_retro");
-}
-
-
-//////////////////////////////////////////////////
-void Collision::ShowBoundingBox(const bool &_show)
-{
-  if (!this->bbVisual.empty())
-  {
-    msgs::Visual msg;
-    msg.set_name(this->bbVisual);
-    msg.set_visible(_show);
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -260,20 +205,6 @@ void Collision::AddContact(const Contact &_contact)
     return;
 
   this->contact(this->GetName(), _contact);
-}
-
-//////////////////////////////////////////////////
-void Collision::EnabledCB(bool _enabled)
-{
-  msgs::Visual msg;
-  msg.set_name(this->bbVisual);
-
-  if (_enabled)
-    msg.mutable_material()->set_script("Gazebo/GreenTransparent");
-  else
-    msg.mutable_material()->set_script("Gazebo/RedTransparent");
-
-  this->visPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
@@ -406,9 +337,10 @@ msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
-  msg.set_parent_name(this->GetScopedName());
+  msg.set_parent_name(this->parent->GetScopedName());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
+  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
   msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
   msgs::Geometry *geom = msg.mutable_geometry();
 
@@ -459,7 +391,6 @@ msgs::Visual Collision::CreateCollisionVisual()
   else
     gzerr << "Unknown shape[" << this->shape->GetType() << "]\n";
 
-  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
 
   return msg;
 }

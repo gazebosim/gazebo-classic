@@ -81,9 +81,6 @@ namespace gazebo
       /// \brief Get the laser retro reflectiveness
       public: float GetLaserRetro() const;
 
-      /// \brief Set the visibility of the bounding box
-      public: void ShowBoundingBox(const bool &show);
-
       /// \brief Get the link this collision belongs to
       public: LinkPtr GetLink() const;
 
@@ -152,12 +149,6 @@ namespace gazebo
 
       /// \brief Update parameters from a message
       public: void ProcessMsg(const msgs::Collision &_msg);
-
-      /// \brief Enable callback: Called when the link changes
-      private: void EnabledCB(bool enabled);
-
-      /// \brief Create the bounding box for the collision
-      private: void CreateBoundingBox();
 
       private: msgs::Visual CreateCollisionVisual();
 

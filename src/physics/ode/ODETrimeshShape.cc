@@ -92,56 +92,34 @@ void ODETrimeshShape::Load(sdf::ElementPtr _sdf)
   TrimeshShape::Load(_sdf);
 }
 
+//////////////////////////////////////////////////
 void ODETrimeshShape::Init()
 {
+  TrimeshShape::Init();
+
   ODECollisionPtr pcollision =
     boost::shared_static_cast<ODECollision>(this->collisionParent);
 
-  TrimeshShape::Init();
-
-  unsigned int i = 0;
-
-  const common::SubMesh *subMesh = NULL;
-  if (this->mesh->GetSubMeshCount() > 0)
-  {
-    subMesh = this->mesh->GetSubMesh(i);
-    if (subMesh->GetVertexCount() < 3)
-    {
-      gzerr << "ODETrimesh invalid mesh\n";
-      return;
-    }
-  }
-
   /// This will hold the vertex data of the triangle mesh
   if (this->odeData == NULL)
-  {
     this->odeData = dGeomTriMeshDataCreate();
-  }
 
-  unsigned int numVertices = 0;
-  unsigned int numIndices = 0;
+  unsigned int numVertices = this->mesh->GetVertexCount();
+  unsigned int numIndices = this->mesh->GetIndexCount();
   this->vertices = NULL;
   this->indices = NULL;
 
-  if (subMesh)
-  {
-    subMesh->FillArrays(&this->vertices, &this->indices);
-    numIndices = subMesh->GetIndexCount();
-    numVertices = subMesh->GetVertexCount();
-  }
-  else
-  {
-    numIndices = 0;
-    numVertices = 0;
-  }
+  // Get all the vertex and index data
+  this->mesh->FillArrays(&this->vertices, &this->indices);
 
+  // Scale the vertex data
   for (unsigned int j = 0;  j < numVertices; j++)
   {
-    this->vertices[j*3+0] = this-> vertices[j*3+0] *
+    this->vertices[j*3+0] = this->vertices[j*3+0] *
       this->sdf->GetValueVector3("scale").x;
-    this->vertices[j*3+1] = this-> vertices[j*3+1] *
+    this->vertices[j*3+1] = this->vertices[j*3+1] *
       this->sdf->GetValueVector3("scale").y;
-    this->vertices[j*3+2] = this-> vertices[j*3+2] *
+    this->vertices[j*3+2] = this->vertices[j*3+2] *
       this->sdf->GetValueVector3("scale").z;
   }
 
@@ -164,9 +142,3 @@ void ODETrimeshShape::Init()
   memset(this->matrix_dblbuff, 0, 32*sizeof(dReal));
   this->last_matrix_index = 0;
 }
-
-
-
-
-
-

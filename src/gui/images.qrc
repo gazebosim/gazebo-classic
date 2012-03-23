@@ -11,5 +11,7 @@
   <file>images/directionallight.png</file>
   <file>images/gazebo.svg</file>
   <file>images/insertModel.png</file>
+  <file>images/translate.png</file>
+  <file>images/arrow.png</file>
 </qresource>
 </RCC>

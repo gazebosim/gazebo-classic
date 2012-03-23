@@ -172,6 +172,10 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   {
     result->children.push_back((*iter)->Clone((*iter)->GetName(), result));
   }
+
+  result->SetWorldPose(this->GetWorldPose());
+  result->ShowCollision(false);
+
   return result;
 }
 
@@ -583,23 +587,23 @@ void Visual::MakeStatic()
 }
 
 //////////////////////////////////////////////////
-void Visual::AttachMesh(const std::string &meshName)
+void Visual::AttachMesh(const std::string &_meshName)
 {
   std::ostringstream stream;
   Ogre::MovableObject *obj;
-  stream << this->sceneNode->getName() << "_ENTITY_" << meshName;
+  stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
 
   // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(meshName) &&
-      common::MeshManager::Instance()->HasMesh(meshName))
+  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+      common::MeshManager::Instance()->HasMesh(_meshName))
   {
     const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(meshName);
+      common::MeshManager::Instance()->GetMesh(_meshName);
     this->InsertMesh(mesh);
   }
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
+    (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
 
   this->AttachObject(obj);
 }
@@ -902,7 +906,7 @@ void Visual::SetSpecular(const common::Color &_color)
   }
 }
 
-
+/////////////////////////////////////////////////
 void Visual::AttachAxes()
 {
   std::ostringstream nodeName;
@@ -1064,7 +1068,7 @@ void Visual::SetEmissive(const common::Color &_color)
 
   for (unsigned int i = 0; i < this->children.size(); ++i)
   {
-    this->children[i]->SetSpecular(_color);
+    this->children[i]->SetEmissive(_color);
   }
 }
 
@@ -1616,7 +1620,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
-    math::Vector3 scale;
+    math::Vector3 scale(1, 1, 1);
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
@@ -1645,7 +1649,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
       scale = msgs::Convert(_msg->geometry().heightmap().size());
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
-      scale = msgs::Convert(_msg->geometry().mesh().scale());
+    {
+      if (_msg->geometry().mesh().has_scale())
+        scale = msgs::Convert(_msg->geometry().mesh().scale());
+      else
+        scale.x = scale.y = scale.z = 1.0;
+    }
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -1808,5 +1817,20 @@ void Visual::ShowCollision(bool _show)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->ShowCollision(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::SetVisibilityFlags(uint32_t _flags)
+{
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetVisibilityFlags(_flags);
+  }
+
+  for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
+  {
+    this->sceneNode->getAttachedObject(i)->setVisibilityFlags(_flags);
   }
 }

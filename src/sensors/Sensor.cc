@@ -82,6 +82,7 @@ void Sensor::Load(const std::string &_worldName)
   this->lastUpdateTime = this->world->GetSimTime();
 
   this->node->Init(this->world->GetName());
+  this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
 }
 
 //////////////////////////////////////////////////
@@ -99,7 +100,10 @@ void Sensor::Init()
       pluginElem = pluginElem->GetNextElement();
     }
   }
-  // SensorManager::Instance()->AddSensor(shared_from_this());
+
+  msgs::Sensor msg;
+  this->FillMsg(msg);
+  this->sensorPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
@@ -124,20 +128,6 @@ void Sensor::Update(bool _force)
       this->UpdateImpl(_force);
     }
   }
-
-  // DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
-
-  // Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();
-
-  // if (((this->GetWorld()->GetSimTime() -
-  //      this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
-  {
-    // this->lastUpdate = this->GetWorld()->GetSimTime();
-  }
-
-  // update any controllers that are children of sensors, e.g. ros_bumper
-  // if (this->controller)
-    // this->controller->Update();
 }
 
 //////////////////////////////////////////////////

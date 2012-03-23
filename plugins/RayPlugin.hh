@@ -42,6 +42,10 @@ namespace gazebo
     /// \brief  Destructor
     public: ~RayPlugin();
 
+    // update callback
+    public: virtual void OnNewLaserScans();
+    private: event::ConnectionPtr newLaserScansConnection;
+
     /// \brief Load the plugin
     /// \param take in SDF root element
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);

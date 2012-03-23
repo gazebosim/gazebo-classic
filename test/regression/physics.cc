@@ -67,11 +67,11 @@ TEST_F(PhysicsTest, State)
 
   // Move the box
   world->GetModel("box")->SetWorldPose(
-      math::Pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 0)));
+      math::Pose(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0)));
 
   // Make sure the box has been moved
   physics::ModelState modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 0));
+  pose.Set(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
 
   // Reset world state, and check for correctness

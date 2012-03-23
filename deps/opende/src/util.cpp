@@ -236,6 +236,8 @@ void dInternalHandleAutoDisabling (dxWorld *world, dReal stepsize)
 		if ( bb->adis_stepsleft <= 0 && bb->adis_timeleft <= 0 )
 		{
 			bb->flags |= dxBodyDisabled; // set the disable flag
+      if (bb->disabled_callback)
+        bb->disabled_callback(bb);
 
 			// disabling bodies should also include resetting the velocity
 			// should prevent jittering in big "islands"

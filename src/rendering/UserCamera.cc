@@ -64,7 +64,7 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
 
   this->orbitViewController = new OrbitViewController(this);
   this->fpsViewController = new FPSViewController(this);
-  this->viewController = this->fpsViewController;
+  this->viewController = this->orbitViewController;
 }
 
 //////////////////////////////////////////////////
@@ -156,10 +156,15 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::SetWorldPose(const math::Pose &_pose)
+{
+  Camera::SetWorldPose(_pose);
+  this->viewController->Init();
+}
+
+//////////////////////////////////////////////////
 void UserCamera::Update()
 {
-  this->viewController->Update();
-
   Camera::Update();
 
   if (this->animState)
@@ -385,7 +390,7 @@ void UserCamera::MoveToVisual(const std::string &_name)
 //////////////////////////////////////////////////
 void UserCamera::MoveToVisual(VisualPtr _visual)
 {
-    if (!_visual)
+  if (!_visual)
     return;
 
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
@@ -404,7 +409,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   math::Box box = _visual->GetBoundingBox();
   math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
-
 
   math::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
@@ -464,6 +468,18 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->orbitViewController->SetFocalPoint(_visual->GetWorldPose().pos);
+  this->onAnimationComplete =
+    boost::bind(&UserCamera::OnMoveToVisualComplete, this);
+}
+
+/////////////////////////////////////////////////
+void UserCamera::OnMoveToVisualComplete()
+{
+  this->orbitViewController->SetYaw(this->GetWorldPose().rot.GetAsEuler().z);
+  this->orbitViewController->SetPitch(this->GetWorldPose().rot.GetAsEuler().y);
+  this->orbitViewController->SetDistance(this->GetWorldPose().pos.Distance(
+        this->orbitViewController->GetFocalPoint()));
 }
 
 /////////////////////////////////////////////////
@@ -516,6 +532,7 @@ bool UserCamera::MoveToPosition(const math::Vector3 &_end,
   return true;
 }
 
+/////////////////////////////////////////////////
 bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
                                  double _time,
                                  boost::function<void()> _onComplete)

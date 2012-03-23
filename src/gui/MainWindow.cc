@@ -55,6 +55,8 @@ MainWindow::MainWindow()
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this);
+  this->statsSub =
+    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
@@ -121,8 +123,8 @@ MainWindow::MainWindow()
         boost::bind(&MainWindow::OnMoveMode, this, _1)));
 
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
+      gui::Events::ConnectManipMode(
+        boost::bind(&MainWindow::OnManipMode, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -171,6 +173,24 @@ void MainWindow::Open()
     msgs::ServerControl msg;
     msg.set_open_filename(filename);
     this->serverControlPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Import()
+{
+  std::string filename = QFileDialog::getOpenFileName(this,
+      tr("Import Collada Mesh"), "",
+      tr("SDF Files (*.dae *.zip)")).toStdString();
+
+  if (!filename.empty())
+  {
+    if (filename.find(".dae") != std::string::npos)
+    {
+      gui::Events::createEntity("mesh", filename);
+    }
+    else
+      gzerr << "Unable to import mesh[" << filename << "]\n";
   }
 }
 
@@ -265,6 +285,12 @@ void MainWindow::EditWorldProperties()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Arrow()
+{
+  gui::Events::manipMode("normal");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::RingPose()
 {
   gui::Events::manipMode("ring");
@@ -273,43 +299,50 @@ void MainWindow::RingPose()
 /////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
-  gui::Events::createEntity("box");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("box", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSphere()
 {
-  gui::Events::createEntity("sphere");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("sphere", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateCylinder()
 {
-  gui::Events::createEntity("cylinder");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("cylinder", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMesh()
 {
-  gui::Events::createEntity("mesh");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("mesh", "mesh");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreatePointLight()
 {
-  gui::Events::createEntity("pointlight");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("pointlight", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSpotLight()
 {
-  gui::Events::createEntity("spotlight");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("spotlight", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateDirectionalLight()
 {
-  gui::Events::createEntity("directionallight");
+  this->arrowAct->setChecked(true);
+  gui::Events::createEntity("directionallight", "");
 }
 
 /////////////////////////////////////////////////
@@ -328,6 +361,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->removeDockWidget(this->insertModelsDock);
     this->playToolbar->hide();
     this->editToolbar->hide();
+    this->mouseToolbar->hide();
     this->menuBar()->hide();
   }
   else
@@ -340,10 +374,18 @@ void MainWindow::OnFullScreen(bool _value)
     this->insertModelsDock->show();
     this->playToolbar->show();
     this->editToolbar->show();
+    this->mouseToolbar->show();
     this->menuBar()->show();
 
     this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
   }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ViewReset()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0));
 }
 
 /////////////////////////////////////////////////
@@ -377,6 +419,12 @@ void MainWindow::CreateActions()
   this->openAct->setShortcut(tr("Ctrl+O"));
   this->openAct->setStatusTip(tr("Open an world file"));
   connect(this->openAct, SIGNAL(triggered()), this, SLOT(Open()));
+
+  this->importAct = new QAction(tr("&Import Mesh"), this);
+  this->importAct->setShortcut(tr("Ctrl+I"));
+  this->importAct->setStatusTip(tr("Import a Collada mesh"));
+  connect(this->importAct, SIGNAL(triggered()), this, SLOT(Import()));
+
 
   this->saveAct = new QAction(tr("&Save"), this);
   this->saveAct->setShortcut(tr("Ctrl+S"));
@@ -418,20 +466,32 @@ void MainWindow::CreateActions()
   this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   this->playAct->setStatusTip(tr("Run the world"));
   this->playAct->setCheckable(true);
+  this->playAct->setChecked(true);
   connect(this->playAct, SIGNAL(triggered()), this, SLOT(Play()));
 
   this->pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   this->pauseAct->setStatusTip(tr("Pause the world"));
   this->pauseAct->setCheckable(true);
+  this->pauseAct->setChecked(false);
   connect(this->pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
   this->stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
   this->stepAct->setStatusTip(tr("Step the world"));
   connect(this->stepAct, SIGNAL(triggered()), this, SLOT(Step()));
 
-  this->ringPoseAct = new QAction(QIcon(":/images/end.png"),
+
+  this->arrowAct = new QAction(QIcon(":/images/arrow.png"),
+      tr("Position object"), this);
+  this->arrowAct->setStatusTip(tr("Move camera"));
+  this->arrowAct->setCheckable(true);
+  this->arrowAct->setChecked(true);
+  connect(this->arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
+
+  this->ringPoseAct = new QAction(QIcon(":/images/translate.png"),
       tr("Position object"), this);
   this->ringPoseAct->setStatusTip(tr("Position object"));
+  this->ringPoseAct->setCheckable(true);
+  this->ringPoseAct->setChecked(false);
   connect(this->ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
 
 
@@ -483,6 +543,11 @@ void MainWindow::CreateActions()
   connect(this->dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
 
+  this->viewResetAct = new QAction(tr("Reset View"), this);
+  this->viewResetAct->setStatusTip(tr("Move camera to origin"));
+  connect(this->viewResetAct, SIGNAL(triggered()), this,
+      SLOT(ViewReset()));
+
   this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
   this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
   connect(this->viewFullScreenAct, SIGNAL(triggered()), this,
@@ -502,6 +567,7 @@ void MainWindow::CreateMenus()
 {
   this->fileMenu = this->menuBar()->addMenu(tr("&File"));
   this->fileMenu->addAction(this->openAct);
+  this->fileMenu->addAction(this->importAct);
   this->fileMenu->addAction(this->newAct);
   this->fileMenu->addAction(this->saveAct);
   this->fileMenu->addAction(this->saveAsAct);
@@ -513,6 +579,7 @@ void MainWindow::CreateMenus()
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
+  this->viewMenu->addAction(this->viewResetAct);
   this->viewMenu->addAction(this->viewFullScreenAct);
   this->viewMenu->addAction(this->viewFPSAct);
   this->viewMenu->addAction(this->viewOrbitAct);
@@ -531,8 +598,14 @@ void MainWindow::CreateToolbars()
   this->playToolbar->addAction(this->pauseAct);
   this->playToolbar->addAction(this->stepAct);
 
+  QActionGroup *actionGroup = new QActionGroup(this);
+  this->mouseToolbar = this->addToolBar(tr("Mouse"));
+  actionGroup->addAction(this->arrowAct);
+  actionGroup->addAction(this->ringPoseAct);
+  this->mouseToolbar->addAction(this->arrowAct);
+  this->mouseToolbar->addAction(this->ringPoseAct);
+
   this->editToolbar = this->addToolBar(tr("Edit"));
-  this->editToolbar->addAction(this->ringPoseAct);
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);
@@ -659,27 +732,6 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnSetSelectedEntity(const std::string &_name)
-{
-  std::map<std::string, unsigned int>::iterator iter;
-  std::string name = _name;
-  boost::replace_first(name, gui::get_world()+"::", "");
-
-  msgs::Selection msg;
-  msg.set_name(name);
-
-  iter = this->entities.find(name);
-  if (iter != this->entities.end())
-    msg.set_id(iter->second);
-  else
-  {
-    gzerr << "Unable to find model[" << _name << "]\n";
-  }
-
-  this->selectionPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
 unsigned int MainWindow::GetEntityId(const std::string &_name)
 {
   unsigned int result = 0;
@@ -725,4 +777,28 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnManipMode(const std::string &_mode)
+{
+  if (_mode != "ring")
+    this->arrowAct->setChecked(true);
+  else if (_mode == "ring")
+    this->ringPoseAct->setChecked(true);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  if (_msg->paused() && this->playAct->isChecked())
+  {
+    this->playAct->setChecked(false);
+    this->pauseAct->setChecked(true);
+  }
+  else if (!_msg->paused() && !this->playAct->isChecked())
+  {
+    this->playAct->setChecked(true);
+    this->pauseAct->setChecked(false);
+  }
 }

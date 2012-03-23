@@ -147,6 +147,9 @@ namespace gazebo
       ///         SetActive(true).
       public: int GetFiducial(int index);
 
+      public: physics::MultiRayShapePtr GetLaserShape() const
+              {return this->laserShape;}
+
       private: physics::LinkPtr link;
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;

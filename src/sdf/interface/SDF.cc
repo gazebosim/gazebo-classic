@@ -205,7 +205,7 @@ ElementPtr Element::Clone() const
   ElementPtr clone(new Element);
   clone->name = this->name;
   clone->required = this->required;
-  clone->parent = this->parent;
+  // clone->parent = this->parent;
   clone->copyChildren = this->copyChildren;
   clone->includeFilename = this->includeFilename;
 
@@ -226,6 +226,7 @@ ElementPtr Element::Clone() const
   for (eiter = this->elements.begin(); eiter != this->elements.end(); ++eiter)
   {
     clone->elements.push_back((*eiter)->Clone());
+    clone->elements.back()->parent = clone;
   }
 
   if (this->value)
@@ -509,7 +510,9 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
         this->parent->elements.end(), shared_from_this());
 
     if (iter == this->parent->elements.end())
+    {
       return ElementPtr();
+    }
 
     for (iter++; iter != this->parent->elements.end(); ++iter)
     {

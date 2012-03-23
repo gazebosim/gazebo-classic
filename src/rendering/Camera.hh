@@ -119,7 +119,7 @@ namespace gazebo
       public: math::Quaternion GetWorldRotation() const;
 
       /// \brief Set the global pose of the camera
-      public: void SetWorldPose(const math::Pose &_pose);
+      public: virtual void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the world position
       public: void SetWorldPosition(const math::Vector3 &_pos);

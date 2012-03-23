@@ -245,8 +245,8 @@ void Mesh::FillArrays(float **_vertArr, int **_indArr) const
   if (*_indArr)
     delete [] *_indArr;
 
-  *_vertArr = new float[ vertCount * 3 ];
-  *_indArr = new int[ indCount ];
+  *_vertArr = new float[vertCount * 3];
+  *_indArr = new int[indCount];
 
   float *vPtr = *_vertArr;
   unsigned int index = 0;

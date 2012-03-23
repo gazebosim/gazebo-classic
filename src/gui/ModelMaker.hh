@@ -14,10 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef BOXMAKER_HH
-#define BOXMAKER_HH
+#ifndef MODELMAKER_HH
+#define MODELMAKER_HH
 
-#include "math/Vector2i.hh"
+#include <list>
+#include <string>
+
+#include "sdf/sdf.h"
 #include "gui/EntityMaker.hh"
 
 namespace gazebo
@@ -29,11 +32,13 @@ namespace gazebo
 
   namespace gui
   {
-    class BoxMaker : public EntityMaker
+    class ModelMaker : public EntityMaker
     {
-      public: BoxMaker();
-      public: virtual ~BoxMaker();
+      public: ModelMaker();
+      public: virtual ~ModelMaker();
 
+      public: void InitFromModel(const std::string &_modelName);
+      public: void InitFromFile(const std::string &_filename);
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       public: virtual void Stop();
@@ -48,9 +53,12 @@ namespace gazebo
       private: int state;
       private: bool leftMousePressed;
       private: math::Vector2i mousePushPos, mouseReleasePos;
-      private: msgs::Visual *visualMsg;
 
-      private: static unsigned int counter;
+      private: rendering::VisualPtr modelVisual;
+      private: std::list<rendering::VisualPtr> visuals;
+      private: sdf::SDFPtr modelSDF;
+
+      private: bool clone;
     };
   }
 }

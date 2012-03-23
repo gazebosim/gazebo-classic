@@ -53,6 +53,9 @@ extern "C" {
  */
 ODE_API dWorldID dWorldCreate(void);
 
+ODE_API int dWorldGetBodyCount(dWorldID world);
+ODE_API dBodyID dWorldGetBody(dWorldID world, int id);
+
 
 /**
  * @brief Destroy a world and everything in it.
@@ -1415,6 +1418,7 @@ ODE_API int dBodyGetGravityMode (dBodyID b);
  */
 ODE_API void dBodySetMovedCallback(dBodyID b, void (*callback)(dBodyID));
 
+ODE_API void dBodySetDisabledCallback(dBodyID b, void (*callback)(dBodyID));
 
 /**
  * @brief Return the first geom associated with the body.

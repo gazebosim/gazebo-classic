@@ -252,8 +252,11 @@ void Link::Fini()
 
   this->parentJoints.clear();
   this->childJoints.clear();
-  this->sensors.clear();
   this->inertial.reset();
+
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+    sensors::remove_sensor(*iter);
+  this->sensors.clear();
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
   {
@@ -584,6 +587,7 @@ void Link::FillLinkMsg(msgs::Link &_msg)
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
+  _msg.set_enabled(this->GetEnabled());
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());

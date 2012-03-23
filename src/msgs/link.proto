@@ -19,10 +19,11 @@ message Link
   optional bool self_collide    = 3;
   optional bool gravity         = 4;
   optional bool kinematic       = 5;
-  optional Inertial inertial    = 6;
-  optional Pose pose            = 7;
-  repeated Visual visual        = 8;
-  repeated Collision collision  = 9;
-  repeated Sensor sensor        = 10;
+  optional bool enabled         = 6;
+  optional Inertial inertial    = 7;
+  optional Pose pose            = 8;
+  repeated Visual visual        = 9;
+  repeated Collision collision  = 10;
+  repeated Sensor sensor        = 11;
 }
 /// \endverbatim

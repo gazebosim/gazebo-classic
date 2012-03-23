@@ -922,6 +922,7 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback)
   _feedback->contact.collision2->AddContact(_feedback->contact);
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
                                      ODECollision *_collision2)
 {
@@ -933,6 +934,7 @@ void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
   this->trimeshCollidersCount++;
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::AddCollider(ODECollision *_collision1,
                               ODECollision *_collision2)
 {
@@ -944,6 +946,53 @@ void ODEPhysics::AddCollider(ODECollision *_collision1,
   this->collidersCount++;
 }
 
+/////////////////////////////////////////////////
+void ODEPhysics::DebugPrint() const
+{
+  dBodyID b;
+  std::cout << "Debug Print[" << dWorldGetBodyCount(this->worldId) << "]\n";
+  for (int i = 0; i < dWorldGetBodyCount(this->worldId); ++i)
+  {
+    b = dWorldGetBody(this->worldId, i);
+    ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
+    math::Pose pose = link->GetWorldPose();
+    const dReal *pos = dBodyGetPosition(b);
+    const dReal *rot = dBodyGetRotation(b);
+    math::Vector3 dpos(pos[0], pos[1], pos[2]);
+    math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
 
+    std::cout << "Body[" << link->GetScopedName() << "]\n";
+    std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
+    if (pose.pos != dpos)
+      std::cout << "    Incorrect world pos[" << pose.pos << "]\n";
+    if (pose.rot != drot)
+      std::cout << "    Incorrect world rot[" << pose.rot << "]\n";
 
+    dMass mass;
+    dBodyGetMass(b, &mass);
+    std::cout << "  Mass[" << mass.mass << "] COG[" << mass.c[0]
+              << " " << mass.c[1] << " " << mass.c[2] << "]\n";
 
+    dGeomID g = dBodyGetFirstGeom(b);
+    while (g)
+    {
+      ODECollision *coll = static_cast<ODECollision*>(dGeomGetData(g));
+
+      pose = coll->GetWorldPose();
+      const dReal *gpos = dGeomGetPosition(g);
+      const dReal *grot = dGeomGetRotation(g);
+      dpos.Set(gpos[0], gpos[1], gpos[2]);
+      drot.Set(grot[0], grot[1], grot[2], grot[3]);
+
+      std::cout << "    Geom[" << coll->GetScopedName() << "]\n";
+      std::cout << "      World: Pos[" << dpos << "] Rot[" << drot << "]\n";
+
+      if (pose.pos != dpos)
+        std::cout << "      Incorrect world pos[" << pose.pos << "]\n";
+      if (pose.rot != drot)
+        std::cout << "      Incorrect world rot[" << pose.rot << "]\n";
+
+      g = dBodyGetNextGeom(g);
+    }
+  }
+}

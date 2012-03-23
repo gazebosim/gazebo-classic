@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef BOXMAKER_HH
-#define BOXMAKER_HH
+#ifndef MESHMAKER_HH
+#define MESHMAKER_HH
 
-#include "math/Vector2i.hh"
+#include <string>
 #include "gui/EntityMaker.hh"
 
 namespace gazebo
@@ -29,11 +29,12 @@ namespace gazebo
 
   namespace gui
   {
-    class BoxMaker : public EntityMaker
+    class MeshMaker : public EntityMaker
     {
-      public: BoxMaker();
-      public: virtual ~BoxMaker();
+      public: MeshMaker();
+      public: virtual ~MeshMaker();
 
+      public: void Init(const std::string &_filename);
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       public: virtual void Stop();

@@ -174,21 +174,27 @@ void SelectionObj::Attach(VisualPtr _visual)
     math::Box box = _visual->GetBoundingBox();
     _visual->AttachVisual(this->node);
 
+    box = box - _visual->GetPose().pos;
+
     transNode = this->node->GetSceneNode()->getChild("trans_node");
     transNode->getChild("selection_transX0")->setPosition(
-        -box.GetXLength()*0.5 - this->boxSize, 0, 0);
+        -box.GetXLength()*0.5 - this->boxSize, 0,
+        box.GetZLength()*0.5 + box.min.z);
     transNode->getChild("selection_transX1")->setPosition(
-        box.GetXLength()*0.5 + this->boxSize, 0, 0);
+        box.GetXLength()*0.5 + this->boxSize, 0,
+        box.GetZLength()*0.5 + box.min.z);
 
     transNode->getChild("selection_transY0")->setPosition(0,
-        -box.GetYLength()*0.5 - this->boxSize, 0);
+        -box.GetYLength()*0.5 - this->boxSize,
+        box.GetZLength()*0.5 + box.min.z);
     transNode->getChild("selection_transY1")->setPosition(0,
-        box.GetYLength()*0.5 + this->boxSize, 0);
+        box.GetYLength()*0.5 + this->boxSize,
+        box.GetZLength()*0.5 + box.min.z);
 
     transNode->getChild("selection_transZ0")->setPosition(0, 0,
-        -box.GetYLength()*0.5 - this->boxSize);
+        box.min.z - this->boxSize);
     transNode->getChild("selection_transZ1")->setPosition(0, 0,
-        box.GetYLength()*0.5 + this->boxSize);
+        box.max.z + this->boxSize);
 
     this->node->SetVisible(true);
     this->visualName = _visual->GetName();
@@ -207,21 +213,25 @@ void SelectionObj::Clear()
   this->node->SetVisible(false);
 }
 
+//////////////////////////////////////////////////
 std::string SelectionObj::GetVisualName() const
 {
   return this->visualName;
 }
 
+//////////////////////////////////////////////////
 bool SelectionObj::IsActive() const
 {
   return this->active;
 }
 
+//////////////////////////////////////////////////
 void SelectionObj::SetActive(bool _active)
 {
   this->active = _active;
 }
 
+//////////////////////////////////////////////////
 void SelectionObj::SetHighlight(const std::string &_mod)
 {
   Ogre::ColourValue color;
@@ -241,20 +251,22 @@ void SelectionObj::SetHighlight(const std::string &_mod)
     {
       Ogre::Technique *technique = mat->getTechnique(0);
       Ogre::Pass *pass = technique->getPass(0);
-      Ogre::TextureUnitState *texState = pass->getTextureUnitState(1);
 
       if (iter->first != _mod)
-        texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-            Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
+      {
+        pass->setDepthWriteEnabled(false);
+        pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+      }
       else
       {
-        texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-            Ogre::LBS_CURRENT, Ogre::ColourValue(.2, .2, .2));
+        pass->setDepthWriteEnabled(true);
+        pass->setSceneBlending(Ogre::SBT_REPLACE);
       }
     }
   }
 }
 
+//////////////////////////////////////////////////
 void SelectionObj::CreateMaterials()
 {
   Ogre::MaterialPtr mat;
@@ -267,6 +279,7 @@ void SelectionObj::CreateMaterials()
   tech = mat->getTechnique(0);
   pass = tech->getPass(0);
   tech->setLightingEnabled(false);
+  tech->setDepthWriteEnabled(false);
   pass->setAmbient(1.0, 0.0, 0.0);
   pass->setDiffuse(1.0, 0.0, 0.0, 0.5);
   pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
@@ -275,16 +288,13 @@ void SelectionObj::CreateMaterials()
                                Ogre::LBS_CURRENT, 0.5);
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 0));
-  texState = pass->createTextureUnitState();
-  texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
-
 
   mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_TRANSY_SELECTION_MATERIAL__", "General");
   tech = mat->getTechnique(0);
   pass = tech->getPass(0);
   tech->setLightingEnabled(false);
+  tech->setDepthWriteEnabled(false);
   pass->setAmbient(0.0, 1.0, 0.0);
   pass->setDiffuse(0.0, 1.0, 0.0, 0.5);
   pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
@@ -293,15 +303,13 @@ void SelectionObj::CreateMaterials()
                                Ogre::LBS_CURRENT, 0.5);
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(0, 1, 0));
-  texState = pass->createTextureUnitState();
-  texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
 
   mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_TRANSZ_SELECTION_MATERIAL__", "General");
   tech = mat->getTechnique(0);
   pass = tech->getPass(0);
   tech->setLightingEnabled(false);
+  tech->setDepthWriteEnabled(false);
   pass->setAmbient(0.0, 0.0, 1.0);
   pass->setDiffuse(0.0, 0.0, 1.0, 0.5);
   pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
@@ -310,7 +318,4 @@ void SelectionObj::CreateMaterials()
                                Ogre::LBS_CURRENT, 0.5);
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 1));
-  texState = pass->createTextureUnitState();
-  texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
 }

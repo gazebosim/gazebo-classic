@@ -18,6 +18,7 @@
 #define TIME_PANEL_HH
 
 #include <vector>
+#include <list>
 
 #include "gui/qt.h"
 #include "transport/TransportTypes.hh"
@@ -41,8 +42,7 @@ namespace gazebo
       private slots: void Update();
 
       private: void OnFullScreen(bool &_value);
-      private: void OnStats(
-                   ConstWorldStatisticsPtr &_msg);
+      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       private slots: void OnTimeReset();
 
@@ -59,10 +59,9 @@ namespace gazebo
       private: transport::PublisherPtr worldControlPub;
 
       private: std::vector<event::ConnectionPtr> connections;
+      private: std::list<common::Time> simTimes, realTimes;
     };
   }
 }
 
 #endif
-
-

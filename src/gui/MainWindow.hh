@@ -55,6 +55,7 @@ namespace gazebo
 
       private slots: void New();
       private slots: void Open();
+      private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
       private slots: void About();
@@ -64,6 +65,7 @@ namespace gazebo
 
       private slots: void NewModel();
       private slots: void EditWorldProperties();
+      private slots: void Arrow();
       private slots: void RingPose();
 
       private slots: void CreateBox();
@@ -74,6 +76,7 @@ namespace gazebo
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
+      private slots: void ViewReset();
       private slots: void ViewFullScreen();
       private slots: void ViewFPS();
       private slots: void ViewOrbit();
@@ -87,21 +90,22 @@ namespace gazebo
       private: void CreateToolbars();
 
       private: void OnModel(ConstModelPtr &_msg);
-      private: void OnSetSelectedEntity(const std::string &_name);
-      private: void OnResponse(
-                   ConstResponsePtr &_msg);
-      private: void OnWorldModify(
-                   ConstWorldModifyPtr &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
+      private: void OnWorldModify(ConstWorldModifyPtr &_msg);
+      private: void OnManipMode(const std::string &_mode);
+      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;
       private: QMenu *viewMenu;
       private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
+      private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
       private: QAction *newAct;
       private: QAction *openAct;
+      private: QAction *importAct;
       private: QAction *saveAct;
       private: QAction *saveAsAct;
       private: QAction *aboutAct;
@@ -115,6 +119,7 @@ namespace gazebo
       private: QAction *pauseAct;
       private: QAction *stepAct;
 
+      private: QAction *arrowAct;
       private: QAction *ringPoseAct;
 
       private: QAction *boxCreateAct;
@@ -125,6 +130,7 @@ namespace gazebo
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;
 
+      private: QAction *viewResetAct;
       private: QAction *viewFullScreenAct;
       private: QAction *viewFPSAct;
       private: QAction *viewOrbitAct;
@@ -139,7 +145,7 @@ namespace gazebo
       private: transport::PublisherPtr requestPub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr guiSub;
-      private: transport::SubscriberPtr newEntitySub;
+      private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
@@ -157,5 +163,3 @@ namespace gazebo
 }
 
 #endif
-
-

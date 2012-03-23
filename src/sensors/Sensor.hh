@@ -112,6 +112,7 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
       protected: transport::NodePtr node;
       protected: transport::SubscriberPtr poseSub;
+      private: transport::PublisherPtr sensorPub;
 
       protected: std::string parentName;
       protected: std::vector<SensorPluginPtr> plugins;
@@ -124,4 +125,3 @@ namespace gazebo
   }
 }
 #endif
-

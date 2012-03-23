@@ -393,6 +393,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   return true;
 }
 
+/////////////////////////////////////////////////
 void RTShaderSystem::RemoveShadows(Scene *_scene)
 {
   if (!this->initialized)
@@ -426,12 +427,11 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
     this->shaderGenerator->getRenderState(_scene->GetName() +
         Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-  // T: sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
   // 3 textures per directional light
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-  //sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 3);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 3);
   sceneMgr->setShadowTextureCount(3);
   sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_RGB);
@@ -444,7 +444,7 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   // Set up caster material - this is just a standard depth/shadow map caster
   sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
   // sceneMgr->setShadowTextureCasterMaterial("Ogre/shadow/depth/caster");
-  
+
   sceneMgr->setShadowCasterRenderBackFaces(true);
 
   // Disable fog on the caster pass.

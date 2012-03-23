@@ -97,8 +97,3 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   this->AttachObject(planeEnt);
   this->camera->AttachToVisual(this->GetName(), true);
 }
-
-
-
-
-

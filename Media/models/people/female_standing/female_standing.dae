@@ -41,7 +41,7 @@
                      <color>0.000000 0.000000 0.000000 1</color>
                   </emission>
                   <ambient>
-                     <color>0.000000 0.000000 0.000000 1</color>
+                     <color>0.400000 0.400000 0.400000 1</color>
                   </ambient>
                   <diffuse>
                      <texture texture="material0-image-sampler" texcoord="UVSET0"/>
@@ -78,7 +78,7 @@
                      <color>0.000000 0.000000 0.000000 1</color>
                   </emission>
                   <ambient>
-                     <color>0.000000 0.000000 0.000000 1</color>
+                     <color>0.400000 0.400000 0.400000 1</color>
                   </ambient>
                   <diffuse>
                      <color>1.000000 1.000000 1.000000 1</color>

@@ -58,6 +58,12 @@ double Vector3::Distance(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
+double Vector3::Distance(double _x, double _y, double _z) const
+{
+  return this->Distance(Vector3(_x, _y, _z));
+}
+
+//////////////////////////////////////////////////
 double Vector3::GetLength() const
 {
   return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);

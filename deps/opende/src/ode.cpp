@@ -1157,6 +1157,11 @@ void dBodySetMovedCallback(dBodyID b, void (*callback)(dBodyID))
         b->moved_callback = callback;
 }
 
+void dBodySetDisabledCallback(dBodyID b, void (*callback)(dBodyID))
+{
+  dAASSERT(b);
+  b->disabled_callback = callback;
+}
 
 dGeomID dBodyGetFirstGeom(dBodyID b)
 {
@@ -1669,6 +1674,30 @@ dxWorld * dWorldCreate()
   return w;
 }
 
+int dWorldGetBodyCount(dxWorld *w)
+{
+  int c = 0;
+  dxBody *b = w->firstbody;
+  while (b)
+  {
+    c++;
+    b = (dxBody*)b->next;
+  }
+
+  return c;
+}
+
+dBodyID dWorldGetBody(dxWorld *w, int id)
+{
+  int c = 0;
+  dxBody *b = w->firstbody;
+  for (; c < id && b; c++, b = (dxBody*)b->next);
+
+  if (c == id)
+    return b;
+  else
+    return 0;
+}
 
 void dWorldDestroy (dxWorld *w)
 {

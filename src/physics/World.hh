@@ -32,8 +32,6 @@
 
 #include "msgs/msgs.h"
 
-#include "sensors/SensorTypes.hh"
-
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
 
@@ -182,6 +180,12 @@ namespace gazebo
       /// \brief Return a version of the name with "<world_name>::" removed
       public: std::string StripWorldName(const std::string &_name) const;
 
+      /// \brief Enable all links in all the models
+      public: void EnableAllModels();
+
+      /// \brief Disable all links in all the models
+      public: void DisableAllModels();
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load
@@ -205,10 +209,6 @@ namespace gazebo
       private: void OnControl(ConstWorldControlPtr &data);
 
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      /// \brief Delete an entity by name
-      /// \param name The name of the entity to delete
-      private: void DeleteEntityCB(const std::string &name);
 
       /// \brief Set the selected entity
       private: void SetSelectedEntityCB(const std::string &name);

@@ -15,24 +15,7 @@
       </ode>
     </physics>
 
-
-    <!-- Ground Plane -->
-    <model name="plane" static="true">
-      <link name="body">
-        <collision name="plane_geom">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual" cast_shadows="false">
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-          <material script="Gazebo/Gold"/>
-        </visual>
-      </link>
-    </model>
+    <include filename="ground_plane.model"/>
 
     <model name="box" static="true">
       <origin pose="0 0 .5 0 0 0"/>

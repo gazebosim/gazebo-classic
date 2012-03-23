@@ -34,7 +34,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    // Prototype for sensor factory functions
+    // Prototype for physics factory functions
     typedef PhysicsEnginePtr (*PhysicsFactoryFn) (WorldPtr world);
 
     /// \brief The physics factory
@@ -43,24 +43,24 @@ namespace gazebo
       /// \brief Register everything
       public: static void RegisterAll();
 
-              /// \brief Register a physics class.
+      /// \brief Register a physics class.
       public: static void RegisterPhysicsEngine(std::string classname,
                   PhysicsFactoryFn factoryfn);
 
-              /// \brief Create a new instance of a physics engine.
+      /// \brief Create a new instance of a physics engine.
       public: static PhysicsEnginePtr NewPhysicsEngine(
                   const std::string &classname, WorldPtr world);
 
-              /// \brief A list of registered physics classes
+      /// \brief A list of registered physics classes
       private: static std::map<std::string, PhysicsFactoryFn> engines;
     };
 
 
-    /// \brief Static sensor registration macro
+    /// \brief Static physics registration macro
     ///
-    /// Use this macro to register sensors with the server.
+    /// Use this macro to register physics engine with the server.
     /// @param name Physics type name, as it appears in the world file.
-    /// @param classname C++ class name for the sensor.
+    /// @param classname C++ class name for the physics engine.
 #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
     PhysicsEnginePtr New##classname(WorldPtr world) \
     { \

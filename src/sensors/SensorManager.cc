@@ -191,9 +191,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
       break;
 
   if (iter != this->sensors.end())
-  {
     this->sensors.erase(iter);
-  }
   this->mutex->unlock();
 }
 

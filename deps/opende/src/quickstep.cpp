@@ -101,28 +101,28 @@ struct dxSORLCPParameters {
     dReal stepsize;
     int* jb;
     const int* findex;
-    dRealPtr Ad;
     dRealPtr hi;
     dRealPtr lo;
-    dRealPtr Adcfm;
     dRealPtr invI;
     dRealPtr I;
-    dRealPtr Ad_precon;
+    dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
-    dRealPtr JiMratio;
-    dRealMutablePtr vnew;
-    dRealMutablePtr b;
+    dRealMutablePtr rhs;
+    dRealMutablePtr rhs_erp;
     dRealMutablePtr J;
-    dRealMutablePtr ac;
+    dRealMutablePtr caccel;
+    dRealMutablePtr caccel_erp;
     dRealMutablePtr lambda;
+    dRealMutablePtr lambda_erp;
     dRealMutablePtr iMJ;
     dRealMutablePtr delta_error ;
-    dRealMutablePtr b_precon ;
+    dRealMutablePtr rhs_precon ;
     dRealMutablePtr J_precon ;
     dRealMutablePtr J_orig ;
-    dRealMutablePtr fc ;
+    dRealMutablePtr cforce ;
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;
+    dRealMutablePtr last_lambda_erp ;
 #endif
 };
 
@@ -284,7 +284,7 @@ static inline void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 
 static void CG_LCP (dxWorldProcessContext *context,
   int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr fc, dRealMutablePtr b,
+  dRealPtr invI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
   dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
   dxQuickStepParameters *qs)
 {
@@ -316,12 +316,12 @@ static void CG_LCP (dxWorldProcessContext *context,
   }
 
 #ifdef WARM_STARTING
-  // compute residual r = b - A*lambda
-  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,fc,lambda,r);
-  for (int k=0; k<m; k++) r[k] = b[k] - r[k];
+  // compute residual r = rhs - A*lambda
+  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
+  for (int k=0; k<m; k++) r[k] = rhs[k] - r[k];
 #else
   dSetZero (lambda,m);
-  memcpy (r,b,m*sizeof(dReal));		// residual r = b - A*lambda
+  memcpy (r,rhs,m*sizeof(dReal));		// residual r = rhs - A*lambda
 #endif
 
   for (int iteration=0; iteration < num_iterations; iteration++) {
@@ -344,7 +344,7 @@ static void CG_LCP (dxWorldProcessContext *context,
     }
 
     // compute q = (J*inv(M)*J')*p
-    multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,fc,p,q);
+    multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,p,q);
 
     dReal alpha = rho/dot (m,p,q);		// alpha = rho/(p'*q)
     add (m,lambda,lambda,p,alpha);		// lambda = lambda + alpha*p
@@ -352,32 +352,20 @@ static void CG_LCP (dxWorldProcessContext *context,
     last_rho = rho;
   }
 
-  // compute fc = inv(M)*J'*lambda
-  multiply_invM_JT (m,nb,iMJ,jb,lambda,fc);
+  // compute cforce = inv(M)*J'*lambda
+  multiply_invM_JT (m,nb,iMJ,jb,lambda,cforce);
 
 #if 0
   // measure solution error
-  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,fc,lambda,r);
+  multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,lambda,r);
   dReal error = 0;
-  for (int i=0; i<m; i++) error += dFabs(r[i] - b[i]);
+  for (int i=0; i<m; i++) error += dFabs(r[i] - rhs[i]);
   printf ("lambda error = %10.6e\n",error);
 #endif
 }
 
 #endif
 
-//***************************************************************************
-// SOR-LCP method
-
-// nb is the number of bodies in the body array.
-// J is an m*12 matrix of constraint rows
-// jb is an array of first and second body numbers for each constraint row
-// invI is the global frame inverse inertia for each body (stacked 3x3 matrices)
-//
-// this returns lambda and fc (the constraint force).
-// note: fc is returned as inv(M)*J'*lambda, the constraint force is actually J'*lambda
-//
-// b, lo and hi are modified on exit
 
 struct IndexError {
 #ifdef REORDER_CONSTRAINTS
@@ -403,76 +391,16 @@ static int compare_index_error (const void *a, const void *b)
 
 #endif
 
-void updateVnew(const int nb, dRealPtr invI, dRealPtr ac, dxBody * const * body, dReal stepsize, dRealMutablePtr vnew)
-{
-  /****************************************************************/
-  /* compute vnew per ac update                                   */
-  /*   based on all external forces fe, ac                        */
-  /*   vnew should have started out same as v(n)                  */
-  /*   vnew should end up being v(n+1)                            */
-  /*                                                              */
-  /*  vnew = v_current + stepsize * invM * f_all                  */
-  /*                                                              */
-  /****************************************************************/
-  {
-    const dReal *invIrow = invI;
-    dRealMutablePtr vnew_ptr = vnew;
-    dxBody *const *const bodyend = body + nb;
-    const dReal *ac_ptr = ac;
-
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; ac_ptr+=6, invIrow += 12, vnew_ptr+=6, bodycurr++) {
-      // compute the velocity update:
-      // add stepsize * invM * f_all to the body velocity
-      dxBody *b = *bodycurr;
-      dReal body_invMass_mul_stepsize = stepsize * b->invMass;
-      dReal tmp3[3];
-      for (int j=0; j<3; j++) {
-        // note that (ac) is an acceleration, hence there is
-        // add stepsize * ac to the body velocity
-        vnew_ptr[j]   = b->lvel[j] + stepsize * ac_ptr[j]   + body_invMass_mul_stepsize * b->facc[j];
-        vnew_ptr[j+3] = b->avel[j] + stepsize * ac_ptr[j+3];
-
-        // accumulate step*torques
-        tmp3[j] = stepsize*b->tacc[j];
-      }
-      // vnew = invI * f_all
-      dMultiplyAdd0_331 (vnew_ptr+3, invIrow, tmp3);
-
-    }
-  }
-}
-
-// vnew = J * M * vnew / stepsize
-inline static void multiply_JM (const int nb, const int m, dRealPtr J, dRealPtr I, dxBody * const *body, int *jb, dReal stepsize, dRealMutablePtr vnew)
-{
-  const dReal stepsize1 = dRecip(stepsize);
-  dReal *tmp1 = new dReal[nb*6];
-  dReal *tmp1curr = tmp1;
-  dRealPtr vnewcurr = vnew;
-  const dReal *Irow = I;
-  dxBody *const *const bodyend = body + nb;
-  for (dxBody *const *bodycurr = body; bodycurr != bodyend; vnewcurr+=6, tmp1curr+=6, Irow+=12, bodycurr++) {
-    dxBody *b_ptr = *bodycurr;
-    dReal body_mass = b_ptr->mass.mass;
-    for (int j=0; j<3; j++) tmp1curr[j] = body_mass * vnewcurr[j] * stepsize1;
-    dReal tmpa[3];
-    for (int j=0; j<3; j++) tmpa[j] = vnewcurr[j+3] * stepsize1;
-    dMultiply0_331 (tmp1curr + 3,Irow,tmpa);
-  }
-  multiply_J (m,J,jb,tmp1,vnew);
-  delete tmp1;
-  tmp1 = 0;
-}
-
-void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb, dRealPtr /*invI*/, dRealPtr I, dxBody * const *body, const dReal stepsize1, dRealMutablePtr c, dRealMutablePtr J, int *jb, dRealMutablePtr rhs_precon)
+void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
+                      dRealPtr I, dxBody * const *body,
+                      const dReal stepsize1, dRealMutablePtr c, dRealMutablePtr J,
+                      int *jb, dRealMutablePtr rhs_precon)
 {
     /************************************************************************************/
     /*                                                                                  */
     /*               compute preconditioned rhs                                         */
     /*                                                                                  */
-    /*  J J' lambda = J * ( M * (vnew - v) / h + fe )                                   */
-    /*                                                                                  */
-    /*  initiallly vnew is zero                                                         */
+    /*  J J' lambda = J * ( M * dv / dt + fe )                                          */
     /*                                                                                  */
     /************************************************************************************/
     // mimic computation of rhs, but do it with J*M*inv(J) prefixed for preconditioned case.
@@ -503,21 +431,9 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       multiply_J (m,J,jb,tmp1,rhs_precon);
 
       //
-      // TODO: rhs_precon = J * inv(M) * c / h - J * (M*v/h + fe)
+      // no need to add constraint violation correction tterm if we assume acceleration is 0
       //
-      // c is the acceleration in the direction of the constraint, i.e. J * accel_inertial_frame
-      // so here, we want the forces forces in the constraint directions.
-      //
-      // analogously, we can view them as either velocity vs. momentum (m*v)
-      //  basically one is mass * the other one.
-      //
-      // The problem here is... everything is ok if velocity/acceleration is zero, but
-      //   momentum/forces are NOT zero even if velocity is zero.
-      //
-      // Question, can we do:  JM .dot. Jv (or JM .dot. c) for momentum/force
-      //   in the direction of the constraints?
-      //
-      for (int i=0; i<m; i++) rhs_precon[i] = 0*c[i]*stepsize1 - rhs_precon[i];
+      for (int i=0; i<m; i++) rhs_precon[i] = - rhs_precon[i];
 
 
       /*  DEBUG PRINTOUTS
@@ -526,9 +442,6 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       printf("\n");
       */
     } END_STATE_SAVE(context, tmp2state);
-
-    // complete rhs
-    //for (int i=0; i<m; i++) rhs_precon[i] = - rhs_precon[i];
 }
 
 static inline dReal dot6(dRealPtr a, dRealPtr b)
@@ -581,39 +494,35 @@ static void ComputeRows(
   //printf("thread %d started at time %f\n",thread_id,cur_time);
   #endif
 
-  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in ac read/writes?
+  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
   dxQuickStepParameters *qs    = params.qs;
   int startRow                 = params.nStart;   // 0
   int nRows                    = params.nChunkSize; // m
-  //int m                        = params.m; // m
-  //int nb                       = params.nb;
-  //dReal stepsize               = params.stepsize;
+  int m                        = params.m; // m used for rms error computation
   int* jb                      = params.jb;
   const int* findex            = params.findex;
-  //dRealPtr        Ad           = params.Ad;
   dRealPtr        hi           = params.hi;
   dRealPtr        lo           = params.lo;
   dRealPtr        Adcfm        = params.Adcfm;
-  //dRealPtr        invI         = params.invI;
-  //dRealPtr        I            = params.I;
-  //dRealPtr        Ad_precon    = params.Ad_precon;
   dRealPtr        Adcfm_precon = params.Adcfm_precon;
-  //dRealPtr        JiMratio     = params.JiMratio;
-  //dRealMutablePtr vnew         = params.vnew;
-  dRealMutablePtr b            = params.b;
+  dRealMutablePtr rhs          = params.rhs;
+  dRealMutablePtr rhs_erp      = params.rhs_erp;
   dRealMutablePtr J            = params.J;
-  dRealMutablePtr ac           = params.ac;
+  dRealMutablePtr caccel       = params.caccel;
+  dRealMutablePtr caccel_erp   = params.caccel_erp;
   dRealMutablePtr lambda       = params.lambda;
+  dRealMutablePtr lambda_erp   = params.lambda_erp;
   dRealMutablePtr iMJ          = params.iMJ;
 #ifdef RECOMPUTE_RMS
   dRealMutablePtr delta_error  = params.delta_error;
 #endif
-  dRealMutablePtr b_precon     = params.b_precon;
+  dRealMutablePtr rhs_precon   = params.rhs_precon;
   dRealMutablePtr J_precon     = params.J_precon;
   dRealMutablePtr J_orig       = params.J_orig;
-  dRealMutablePtr fc           = params.fc;
+  dRealMutablePtr cforce       = params.cforce;
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params.last_lambda;
+  dRealMutablePtr last_lambda_erp  = params.last_lambda_erp;
 #endif
 
   //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
@@ -633,7 +542,7 @@ static void ComputeRows(
   }
   printf("\n");
 
-  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and b_precon and b
+  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
   printf("J_precon\n");
   for (int i=0; i < m ; i++) {
     for (int j=0; j < 12 ; j++) {
@@ -652,12 +561,12 @@ static void ComputeRows(
   }
   printf("\n");
 
-  printf("b_precon\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",b_precon[i]);
+  printf("rhs_precon\n");
+  for (int i=0; i < m ; i++) printf("	%12.6f",rhs_precon[i]);
   printf("\n");
 
-  printf("b\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",b[i]);
+  printf("rhs\n");
+  for (int i=0; i < m ; i++) printf("	%12.6f",rhs[i]);
   printf("\n");
 */
 
@@ -678,13 +587,12 @@ static void ComputeRows(
     if (iteration < precon_iterations) preconditioning = true;
     else                               preconditioning = false;
 
-#ifdef REORDER_CONSTRAINTS
+#ifdef REORDER_CONSTRAINTS //FIXME: do it for lambda_erp and last_lambda_erp
     // constraints with findex < 0 always come first.
     if (iteration < 2) {
       // for the first two iterations, solve the constraints in
       // the given order
       IndexError *ordercurr = order+startRow;
-      //for (int i = 0; i != m; ordercurr++, i++) { }
       for (int i = startRow; i != startRow+nRows; ordercurr++, i++) {
         ordercurr->error = i;
         ordercurr->findex = findex[i];
@@ -694,7 +602,6 @@ static void ComputeRows(
     else {
       // sort the constraints so that the ones converging slowest
       // get solved last. use the absolute (not relative) error.
-      //for (int i=0; i<m; i++) { }
       for (int i=startRow; i<startRow+nRows; i++) {
         dReal v1 = dFabs (lambda[i]);
         dReal v2 = dFabs (last_lambda[i]);
@@ -713,13 +620,11 @@ static void ComputeRows(
 
     //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("=====> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
 
-    //qsort (order,m,sizeof(IndexError),&compare_index_error);
     qsort (order+startRow,nRows,sizeof(IndexError),&compare_index_error);
 
     //@@@ potential optimization: swap lambda and last_lambda pointers rather
     //    than copying the data. we must make sure lambda is properly
     //    returned to the caller
-    //memcpy (last_lambda,lambda,m*sizeof(dReal));
     memcpy (last_lambda+startRow,lambda+startRow,nRows*sizeof(dReal));
 
     //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("-----> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
@@ -730,7 +635,6 @@ static void ComputeRows(
       #ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
         boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every swap
       #endif
-      //for (int i=1; i<m; i++) {}   // swap across engire matrix
       //  int swapi = dRandInt(i+1); // swap across engire matrix
       for (int i=startRow+1; i<startRow+nRows; i++) { // swap within boundary of our own segment
         int swapi = dRandInt(i+1-startRow)+startRow; // swap within boundary of our own segment
@@ -754,12 +658,12 @@ static void ComputeRows(
     }
 #endif
 
-    //dSetZero (delta_error,m);
-
-    dRealMutablePtr ac_ptr1;
-    dRealMutablePtr ac_ptr2;
-    dRealMutablePtr fc_ptr1;
-    dRealMutablePtr fc_ptr2;
+    dRealMutablePtr caccel_ptr1;
+    dRealMutablePtr caccel_ptr2;
+    dRealMutablePtr caccel_erp_ptr1;
+    dRealMutablePtr caccel_erp_ptr2;
+    dRealMutablePtr cforce_ptr1;
+    dRealMutablePtr cforce_ptr2;
     for (int i=startRow; i<startRow+nRows; i++) {
       //boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
 
@@ -770,53 +674,59 @@ static void ComputeRows(
 
       int index = order[i].index;
 
-      dReal delta;
+      dReal delta,delta_erp;
 
       {
         int b1 = jb[index*2];
         int b2 = jb[index*2+1];
-        ac_ptr1 = ac + 6*b1;
-        ac_ptr2 = (b2 >= 0) ? ac + 6*b2 : NULL;
-        fc_ptr1 = fc + 6*b1;
-        fc_ptr2 = (b2 >= 0) ? fc + 6*b2 : NULL;
+        caccel_ptr1 = caccel + 6*b1;
+        caccel_ptr2 = (b2 >= 0) ? caccel + 6*b2 : NULL;
+        caccel_erp_ptr1 = caccel_erp + 6*b1;
+        caccel_erp_ptr2 = (b2 >= 0) ? caccel_erp + 6*b2 : NULL;
+        cforce_ptr1 = cforce + 6*b1;
+        cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
       }
 
-      dReal old_lambda = lambda[index];
+      dReal old_lambda     = lambda[index];
+      dReal old_lambda_erp = lambda_erp[index];
 
+      //
+      // caccel is the constraint accel in the non-precon case
+      // cforce is the constraint force in the     precon case
+      // J_precon and J differs essentially in Ad and Ad_precon,
+      //  Ad is derived from diagonal of J inv(M) J'
+      //  Ad_precon is derived from diagonal of J J'
+      //
+      // caccel_erp is from the non-precon case with erp turned on
+      //
       if (preconditioning) {
-        // modify rhs_precon by adding J * M * vnew / stepsize
         // update delta
-        delta = b_precon[index] /* + vnew[index] */ - old_lambda*Adcfm_precon[index];
+        delta = rhs_precon[index] - old_lambda*Adcfm_precon[index];
 
-        // ac is constraint acceleration in the non-precon case,
-        //  and fc is the actual constraint force in the precon case
-        // J_precon and J differs essentially in Ad and Ad_precon,
-        //  Ad is derived from diagonal of J inv(M) J'
-        //  Ad_precon is derived from diagonal of J J'
         dRealPtr J_ptr = J_precon + index*12;
 
-        // for preconditioned case, update delta using fc, not ac
+        // for preconditioned case, update delta using cforce, not caccel
 
-        delta -= dot6(fc_ptr1, J_ptr);
-        if (fc_ptr2)
-          delta -= dot6(fc_ptr2, J_ptr + 6);
+        delta -= dot6(cforce_ptr1, J_ptr);
+        if (cforce_ptr2)
+          delta -= dot6(cforce_ptr2, J_ptr + 6);
       } else {
-        delta = b[index] - old_lambda*Adcfm[index];
-        // update vnew,
-        //updateVnew(nb, invI, ac, body, stepsize, vnew);
-        // compute J * M * vnew / stepsize and store in vnew
-        //multiply_JM (nb, m, J, I, body, jb, stepsize, vnew);
-
+        // erp = 0
+        delta = rhs[index] - old_lambda*Adcfm[index];
         dRealPtr J_ptr = J + index*12;
-        delta -= dot6(ac_ptr1, J_ptr);
-        if (ac_ptr2) {
-          delta -= dot6(ac_ptr2, J_ptr + 6);
-        }
+        delta -= dot6(caccel_ptr1, J_ptr);
+        if (caccel_ptr2)
+          delta -= dot6(caccel_ptr2, J_ptr + 6);
+
+        // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
+        delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+        J_ptr = J + index*12;
+        delta_erp -= dot6(caccel_erp_ptr1, J_ptr);
+        if (caccel_erp_ptr2)
+          delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
       }
 
       {
-        dReal hi_act, lo_act;
-
         // set the limits for this constraint. 
         // this is the place where the QuickStep method differs from the
         // direct LCP solving method, since that method only performs this
@@ -824,6 +734,7 @@ static void ComputeRows(
         // once per iteration per constraint row.
         // the constraints are ordered so that all lambda[] values needed have
         // already been computed.
+        dReal hi_act, lo_act;
         if (findex[index] >= 0) {
           hi_act = dFabs (hi[index] * lambda[findex[index]]);
           lo_act = -hi_act;
@@ -855,7 +766,49 @@ static void ComputeRows(
 #endif
       }
 
-      // record error
+      if (!preconditioning)
+      {
+        // for the _erp version
+        // set the limits for this constraint. 
+        // this is the place where the QuickStep method differs from the
+        // direct LCP solving method, since that method only performs this
+        // limit adjustment once per time step, whereas this method performs
+        // once per iteration per constraint row.
+        // the constraints are ordered so that all lambda_erp[] values needed have
+        // already been computed.
+        dReal hi_act, lo_act;
+        if (findex[index] >= 0) {
+          hi_act = dFabs (hi[index] * lambda_erp[findex[index]]);
+          lo_act = -hi_act;
+        } else {
+          hi_act = hi[index];
+          lo_act = lo[index];
+        }
+
+        // compute lambda and clamp it to [lo,hi].
+        // @@@ SSE not a win here
+#if 1
+        dReal new_lambda_erp = old_lambda_erp + delta_erp;
+        if (new_lambda_erp < lo_act) {
+          delta_erp = lo_act-old_lambda_erp;
+          lambda_erp[index] = lo_act;
+        }
+        else if (new_lambda_erp > hi_act) {
+          delta_erp = hi_act-old_lambda_erp;
+          lambda_erp[index] = hi_act;
+        }
+        else {
+          lambda_erp[index] = new_lambda_erp;
+        }
+#else
+        dReal nl = old_lambda_erp + delta_erp;
+        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+        lambda_erp[index] = nl;
+        delta_erp = nl - old_lambda_erp;
+#endif
+      }
+
+      // record error (for the non-erp version)
       rms_error += delta*delta;
 #ifdef RECOMPUTE_RMS
       delta_error[index] = dFabs(delta);
@@ -865,29 +818,36 @@ static void ComputeRows(
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
       //delta *= ramp;
       
+      // update cforce (this is strictly for the precon case)
       {
-        // no longer need iMJ, just need J' herea
-        // to clarify, iMJ is really computed as the inv(M) * J without any further modification
-        //if (preconditioning)
-        {
-          // for preconditioning case, compute fc
-          dRealPtr J_ptr = J_orig + index*12; // FIXME: need un-altered unscaled J, not J_precon!!
+        // for preconditioning case, compute cforce
+        dRealPtr J_ptr = J_orig + index*12; // FIXME: need un-altered unscaled J, not J_precon!!
 
-          // update fc.
-          sum6(fc_ptr1, delta, J_ptr);
-          if (fc_ptr2)
-            sum6(fc_ptr2, delta, J_ptr + 6);
-        }
-        //else
-        {
-          // for non-precon case, update ac
-          dRealPtr iMJ_ptr = iMJ + index*12;
+        // update cforce.
+        sum6(cforce_ptr1, delta, J_ptr);
+        if (cforce_ptr2)
+          sum6(cforce_ptr2, delta, J_ptr + 6);
+      }
+      // update caccel
+      {
+        // for non-precon case, update caccel
+        dRealPtr iMJ_ptr = iMJ + index*12;
 
-          // update ac.
-          sum6(ac_ptr1, delta, iMJ_ptr);
-          if (ac_ptr2)
-            sum6(ac_ptr2, delta, iMJ_ptr + 6);
-        }
+        // update caccel.
+        sum6(caccel_ptr1, delta, iMJ_ptr);
+        if (caccel_ptr2)
+          sum6(caccel_ptr2, delta, iMJ_ptr + 6);
+      }
+      // update caccel_erp
+      if (!preconditioning)
+      {
+        // for non-precon case, update caccel_erp
+        dRealPtr iMJ_ptr = iMJ + index*12;
+
+        // update caccel_erp.
+        sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+        if (caccel_erp_ptr2)
+          sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
       }
     } // end of for loop on m
 
@@ -962,12 +922,27 @@ static void ComputeRows(
   #endif
 }
 
+//***************************************************************************
+// SOR_LCP method
+//
+// nb is the number of bodies in the body array.
+// J is an m*12 matrix of constraint rows
+// jb is an array of first and second body numbers for each constraint row
+// invI is the global frame inverse inertia for each body (stacked 3x3 matrices)
+//
+// this returns lambda and cforce (the constraint force).
+// note: cforce is returned as inv(M)*J'*lambda,
+//   the constraint force is actually J'*lambda
+//
+// rhs, lo and hi are modified on exit
+//
 static void SOR_LCP (dxWorldProcessContext *context,
   const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, int *jb, dxBody * const *body,
-  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr ac, dRealMutablePtr fc, dRealMutablePtr b, dRealMutablePtr b_precon,
+  dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
+  dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs,
-  dRealMutablePtr /*JiM*/, dRealMutablePtr JiMratio,
 #ifdef USE_TPROW
   boost::threadpool::pool* row_threadpool,
 #endif
@@ -977,24 +952,29 @@ static void SOR_LCP (dxWorldProcessContext *context,
   {
     // for warm starting, this seems to be necessary to prevent
     // jerkiness in motor-driven joints. i have no idea why this works.
-    for (int i=0; i<m; i++) lambda[i] *= 0.9;
+    for (int i=0; i<m; i++) {
+      lambda[i] *= 0.9;
+      lambda_erp[i] *= 0.9;
+    }
   }
 #else
   dSetZero (lambda,m);
+  dSetZero (lambda_erp,m);
 #endif
 
   // precompute iMJ = inv(M)*J'
   dReal *iMJ = context->AllocateArray<dReal> (m*12);
   compute_invM_JT (m,J,iMJ,jb,body,invI);
 
-  // compute fc=(inv(M)*J')*lambda. we will incrementally maintain fc
+  // compute cforce=(inv(M)*J')*lambda. we will incrementally maintain cforce
   // as we change lambda.
 #ifdef WARM_STARTING
-  multiply_invM_JT (m,nb,J,jb,lambda,fc);
-  multiply_invM_JT (m,nb,iMJ,jb,lambda,ac);
+  multiply_invM_JT (m,nb,J,jb,lambda,cforce);
+  multiply_invM_JT (m,nb,iMJ,jb,lambda,caccel);
 #else
-  dSetZero (ac,nb*6);
-  dSetZero (fc,nb*6);
+  dSetZero (caccel,nb*6);
+  dSetZero (caccel_erp,nb*6);
+  dSetZero (cforce,nb*6);
 #endif
 
   dReal *Ad = context->AllocateArray<dReal> (m);
@@ -1034,8 +1014,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
     }
   }
 
-  dReal *vnew = context->AllocateArray<dReal> (nb*6);
-
   /********************************/
   /* allocate for Adcfm           */
   /* which is a mX1 column vector */
@@ -1051,7 +1029,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     // NOTE: This may seem unnecessary but it's indeed an optimization 
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
-    // scale J_precon and b_precon by Ad
+    // scale J_precon and rhs_precon by Ad
     // copy J_orig
     dRealMutablePtr J_ptr = J;
     dRealMutablePtr J_precon_ptr = J_precon;
@@ -1062,7 +1040,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
         J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
         J_orig_ptr[j] = J_ptr[j]; //copy J
       }
-      b_precon[i] *= Ad_precon_i;
+      rhs_precon[i] *= Ad_precon_i;
       // scale Ad by CFM. N.B. this should be done last since it is used above
       Adcfm_precon[i] = Ad_precon_i * cfm[i];
     }
@@ -1075,14 +1053,15 @@ static void SOR_LCP (dxWorldProcessContext *context,
     // NOTE: This may seem unnecessary but it's indeed an optimization 
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
-    // scale J and b by Ad
+    // scale J and rhs by Ad
     dRealMutablePtr J_ptr = J;
     for (int i=0; i<m; J_ptr += 12, i++) {
       dReal Ad_i = Ad[i];
       for (int j=0; j<12; j++) {
         J_ptr[j] *= Ad_i;
       }
-      b[i] *= Ad_i;
+      rhs[i] *= Ad_i;
+      rhs_erp[i] *= Ad_i;
       // scale Ad by CFM. N.B. this should be done last since it is used above
       Adcfm[i] = Ad_i * cfm[i];
     }
@@ -1117,6 +1096,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   // the lambda computed at the previous iteration.
   // this is used to measure error for when we are reordering the indexes.
   dReal *last_lambda = context->AllocateArray<dReal> (m);
+  dReal *last_lambda_erp = context->AllocateArray<dReal> (m);
 #endif
 
   boost::recursive_mutex* mutex = new boost::recursive_mutex();
@@ -1162,28 +1142,28 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].stepsize = stepsize;
     params[thread_id].jb = jb;
     params[thread_id].findex = findex;
-    params[thread_id].Ad = Ad;
     params[thread_id].hi = hi;
     params[thread_id].lo = lo;
-    params[thread_id].Adcfm = Adcfm;
     params[thread_id].invI = invI;
     params[thread_id].I= I;
-    params[thread_id].Ad_precon = Ad_precon;
+    params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
-    params[thread_id].vnew = vnew;
-    params[thread_id].JiMratio = JiMratio;
-    params[thread_id].b = b;
+    params[thread_id].rhs = rhs;
+    params[thread_id].rhs_erp = rhs_erp;
     params[thread_id].J = J;
-    params[thread_id].ac = ac;
+    params[thread_id].caccel = caccel;
+    params[thread_id].caccel_erp = caccel_erp;
     params[thread_id].lambda = lambda;
+    params[thread_id].lambda_erp = lambda_erp;
     params[thread_id].iMJ = iMJ;
     params[thread_id].delta_error  = delta_error ;
-    params[thread_id].b_precon  = b_precon ;
+    params[thread_id].rhs_precon  = rhs_precon ;
     params[thread_id].J_precon  = J_precon ;
     params[thread_id].J_orig  = J_orig ;
-    params[thread_id].fc  = fc ;
+    params[thread_id].cforce  = cforce ;
 #ifdef REORDER_CONSTRAINTS
     params[thread_id].last_lambda  = last_lambda ;
+    params[thread_id].last_lambda_erp  = last_lambda_erp ;
 #endif
 
 #ifdef REPORT_MONITOR
@@ -1366,12 +1346,15 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J = NULL;
   dReal *J_precon = NULL;
   dReal *J_orig = NULL;
-  dReal *JiM = NULL;
-  dReal *JiMratio = NULL;
   int *jb = NULL;
 
+  dReal *cforce = context->AllocateArray<dReal> (nb*6);
+  dReal *caccel = context->AllocateArray<dReal> (nb*6);
+  dReal *caccel_erp = context->AllocateArray<dReal> (nb*6);
+
   if (m > 0) {
-    dReal *cfm, *lo, *hi, *rhs, *rhs_precon, *Jcopy;
+    dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon, *Jcopy;
+    dReal *c_v_max;
     int *findex;
 
     {
@@ -1398,20 +1381,17 @@ void dxQuickStepper (dxWorldProcessContext *context,
       findex = context->AllocateArray<int> (mlocal);
       for (int i=0; i<mlocal; i++) findex[i] = -1;
 
+      c_v_max = context->AllocateArray<dReal> (mlocal);
+      for (int i=0; i<mlocal; i++) c_v_max[i] = world->contactp.max_vel; // init all to world max surface vel
+
       const unsigned jbelements = mlocal*2;
       jb = context->AllocateArray<int> (jbelements);
 
       rhs = context->AllocateArray<dReal> (mlocal);
+      rhs_erp = context->AllocateArray<dReal> (mlocal);
       rhs_precon = context->AllocateArray<dReal> (mlocal);
 
       Jcopy = context->AllocateArray<dReal> (mfb*12);
-      JiM = context->AllocateArray<dReal> (mlocal*12); // not used
-      dSetZero (JiM,jelements);
-      // JiMratio is the element-wise maximum ratio between
-      //   Ja*inv(Ma) and Jb*inv(Mb) for a joint
-      // if the joint is one sided, then we preset it to 1
-      JiMratio = context->AllocateArray<dReal> (mlocal); // test variable
-      dSetZero (JiMratio,mlocal);
     }
 
     BEGIN_STATE_SAVE(context, cstate) {
@@ -1453,6 +1433,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
           Jinfo.lo = lo + ofsi;
           Jinfo.hi = hi + ofsi;
           Jinfo.findex = findex + ofsi;
+          Jinfo.c_v_max = c_v_max + ofsi;
 
           // now write all information into J
           dxJoint *joint = jicurr->joint;
@@ -1511,90 +1492,38 @@ void dxQuickStepper (dxWorldProcessContext *context,
         IFTIMING (dTimerNow ("compute rhs"));
         // compute the right hand side `rhs'
         dReal *tmp1 = context->AllocateArray<dReal> (nb*6);
+        dSetZero(tmp1,nb*6);
         // put v/h + invM*fe into tmp1
         dReal *tmp1curr = tmp1;
         const dReal *invIrow = invI;
         dxBody *const *const bodyend = body + nb;
-        for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, invIrow+=12, bodycurr++) {
+        for (dxBody *const *bodycurr = body;
+             bodycurr != bodyend;
+             tmp1curr+=6, invIrow+=12, bodycurr++) {
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
-          for (int j=0; j<3; j++) tmp1curr[j] = b_ptr->facc[j] * body_invMass + b_ptr->lvel[j] * stepsize1;
+          for (int j=0; j<3; j++)
+            tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
           dMultiply0_331 (tmp1curr + 3,invIrow,b_ptr->tacc);
           for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
         }
 
         // put J*tmp1 into rhs
         multiply_J (m,J,jb,tmp1,rhs);
-        /*************************************************************/
-        /* compute J*inv(M) here JiM, it does not change             */
-        /*************************************************************/
-        {
-          dRealPtr J_ptr = J;
-          dRealMutablePtr JiM_ptr = JiM; // intermediate solution storage
-          dRealMutablePtr JiMratio_ptr = JiMratio; // intermediate solution storage
-          for (int i=0; i<m;J_ptr+=12,JiM_ptr+=12, i++) {
-
-            // compute JiM = J * invM
-            int b1 = jb[i*2];
-            int b2 = jb[i*2+1];
-            dReal k1 = body[b1]->invMass;
-
-            for (int j=0; j<3 ; j++) JiM_ptr[j] = J_ptr[j]*k1;
-
-
-            const dReal *invI_ptr1 = invI + 12*b1;
-            for (int j=0;j<3;j++) {
-              JiM_ptr[3+j] = 0;
-              for (int k=0;k<3;k++){
-                JiM_ptr[3+j] += J_ptr[3+k]*invI_ptr1[k*4+j];
-              }
-            }
-
-            // preset JiMratio to 1
-            JiMratio_ptr[0] = 1.0;
-
-            if (b2 >= 0){
-              dReal k2 = body[b2]->invMass;
-              for (int j=0; j<3 ; j++) JiM_ptr[j+6] = k2*J_ptr[j+6];
-              const dReal *invI_ptr2 = invI + 12*b2;
-              for (int j=0;j<3;j++) {
-                JiM_ptr[9+j] = 0;
-                for (int k=0;k<3;k++) JiM_ptr[9+j] += J_ptr[9+k]*invI_ptr2[k*4+j];
-              }
-
-              // check element-wise ratio for JiMratio
-              JiMratio_ptr[0] = 1.0;
-              for (int j=0;j<3;j++)
-              {
-                if (!_dequal(JiM_ptr[j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[6+j]/JiM_ptr[  j]);
-                }
-                if (!_dequal(JiM_ptr[3+j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[9+j]/JiM_ptr[3+j]);
-                }
-                if (!_dequal(JiM_ptr[6+j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[  j]/JiM_ptr[6+j]);
-                }
-                if (!_dequal(JiM_ptr[9+j], 0.0))
-                {
-                  JiMratio_ptr[0] =
-                    std::max(JiMratio_ptr[0],JiM_ptr[3+j]/JiM_ptr[9+j]);
-                }
-              }
-            }
-          }
-        }
-      
       } END_STATE_SAVE(context, tmp1state);
 
       // complete rhs
-      for (int i=0; i<m; i++) rhs[i] = c[i]*stepsize1 - rhs[i];
+      for (int i=0; i<m; i++) {
+        rhs_erp[i] = c[i]*stepsize1 - rhs[i];
+        if (dFabs(c[i]) > c_v_max[i])
+        {
+          rhs[i]   = c_v_max[i]*stepsize1 - rhs[i];
+        }
+        else
+        {
+          rhs[i]   = c[i]*stepsize1 - rhs[i];
+        }
+      }
 
 
 
@@ -1603,7 +1532,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
 
       // compute rhs_precon
-      computeRHSPrecon(context, m, nb, invI, I, body, stepsize1, c, J, jb, rhs_precon);
+      computeRHSPrecon(context,m,nb,I,body,stepsize1,c,J,jb,rhs_precon);
 
 
 
@@ -1623,8 +1552,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     // load lambda from the value saved on the previous iteration
     dReal *lambda = context->AllocateArray<dReal> (m);
+    dReal *lambda_erp = context->AllocateArray<dReal> (m);
 
-#ifdef WARM_STARTING
+#ifdef WARM_STARTING //FIXME: add for lambda_erp
     {
       dReal *lambdscurr = lambda;
       const dJointWithInfo1 *jicurr = jointiinfos;
@@ -1637,14 +1567,15 @@ void dxQuickStepper (dxWorldProcessContext *context,
     }
 #endif
 
-    dReal *cforce = context->AllocateArray<dReal> (nb*6);
-    dReal *caccel = context->AllocateArray<dReal> (nb*6);
-
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING (dTimerNow ("solving LCP problem"));
       // solve the LCP problem and get lambda and invM*constraint_force
-      SOR_LCP (context,m,nb,J,J_precon,J_orig,jb,body,invI,I,lambda,caccel,cforce,rhs,rhs_precon,lo,hi,cfm,findex,&world->qs,
-      JiM,JiMratio,
+      SOR_LCP (context,m,nb,J,J_precon,J_orig,jb,body,
+               invI,I,lambda,lambda_erp,
+               caccel,caccel_erp,cforce,
+               rhs,rhs_erp,rhs_precon,
+               lo,hi,cfm,findex,
+               &world->qs,
 #ifdef USE_TPROW
                world->row_threadpool,
 #endif
@@ -1652,7 +1583,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     } END_STATE_SAVE(context, lcpstate);
 
-#ifdef WARM_STARTING
+#ifdef WARM_STARTING //FIXME: add for lambda_erp
     {
       // save lambda for the next iteration
       //@@@ note that this doesn't work for contact joints yet, as they are
@@ -1673,16 +1604,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
     {
       IFTIMING (dTimerNow ("velocity update due to constraint forces"));
-      // note that cforce is really not a force but an acceleration, hence there is
-      // no premultiplying of invM here (compare to update due to external force 'facc' below)
       //
-      // add stepsize * cforce to the body velocity
-      // or better named,
-      // add stepsize * caccel to the body velocity
+      // update new velocity
+      // add stepsize * caccel_erp to the body velocity
       //
-      const dReal *caccelcurr = caccel;
+      const dReal *caccelcurr = caccel_erp;
       dxBody *const *const bodyend = body + nb;
-      // update assuming caccel is already acceleration
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         for (int j=0; j<3; j++) {
@@ -1693,6 +1620,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
     }
 
     if (mfb > 0) {
+      // force feedback without erp is better
       // straightforward computation of joint constraint forces:
       // multiply related lambdas with respective J' block for joints
       // where feedback was requested
@@ -1786,6 +1714,39 @@ void dxQuickStepper (dxWorldProcessContext *context,
     }
   }
 
+  // revert lvel and avel with the non-erp version of caccel
+  if (m > 0) {
+    dReal erp_removal = 1.00;
+    IFTIMING (dTimerNow ("velocity update due to constraint forces"));
+    // remove caccel_erp
+    const dReal *caccelcurr = caccel_erp;
+    dxBody *const *const bodyend = body + nb;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+      dxBody *b_ptr = *bodycurr;
+      for (int j=0; j<3; j++) {
+        b_ptr->lvel[j] -= erp_removal * stepsize * caccelcurr[j];
+        b_ptr->avel[j] -= erp_removal * stepsize * caccelcurr[3+j];
+      }
+    }
+    // use caccel without erp
+    caccelcurr = caccel;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+      dxBody *b_ptr = *bodycurr;
+      for (int j=0; j<3; j++) {
+        b_ptr->lvel[j] += erp_removal * stepsize * caccelcurr[j];
+        b_ptr->avel[j] += erp_removal * stepsize * caccelcurr[3+j];
+      }
+    }
+  }
+
+  // potentially, recompute J*v(n+1)
+  // then, re-update v(n+1) -= inv(M)*J'*J*v(n+1)
+
+
+
+
+
+
   {
     IFTIMING (dTimerNow ("tidy up"));
     // zero all force accumulators
@@ -1817,11 +1778,11 @@ static size_t EstimateSOR_LCPMemoryRequirements(int m,int nb)
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Ad_precon
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Adcfm_precon
-  res += dEFFICIENT_SIZE(sizeof(dReal) * nb*6); // for vnew
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for delta_error
   res += dEFFICIENT_SIZE(sizeof(IndexError) * m); // for order
 #ifdef REORDER_CONSTRAINTS
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda
+  res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda_erp
 #endif
   return res;
 }
@@ -1854,7 +1815,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
   size_t res = 0;
 
   res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invI
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for I needed by preconditioner
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for I (inertia) needed by preconditioner
   res += dEFFICIENT_SIZE(sizeof(dReal) * nb); // for invM
 
   {
@@ -1865,20 +1826,15 @@ size_t dxEstimateQuickStepMemoryRequirements (
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_precon
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_orig
-      sub1_res2 += 4 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm, lo, hi, rhs
+      sub1_res2 += 3 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm, lo, hi
+      sub1_res2 += 2 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs, rhs_erp
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for rhs_precon
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * 2 * m); // for jb            FIXME: shoulbe be 2 not 12?
+      sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * 2 * m); // for jb
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for findex
+      sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for c_v_max
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * mfb); // for Jcopy
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for JiM
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for JiMratio
       {
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for c
-        //sub2_res1 += dEFFICIENT_SIZE(sizeof(int)   * 6 * nb); // for JTJfindex
-        //sub2_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb * 6 * nb); // for JTJ
-        //sub2_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for JTrhs
-        sub2_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for invJrhs
-        sub2_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for invJrhs_updated
         {
           size_t sub3_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for tmp1
     
@@ -1888,8 +1844,10 @@ size_t dxEstimateQuickStepMemoryRequirements (
         }
 
         size_t sub2_res2 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for lambda
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for lambda_erp
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for cforce
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel_erp
         {
           size_t sub3_res1 = EstimateSOR_LCPMemoryRequirements(m,nb); // for SOR_LCP
 

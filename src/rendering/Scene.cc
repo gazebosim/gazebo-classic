@@ -79,6 +79,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
+  this->sensorSub = this->node->Subscribe("~/sensor",
+                                          &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
@@ -204,6 +206,7 @@ void Scene::Load()
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
 }
 
+//////////////////////////////////////////////////
 VisualPtr Scene::GetWorldVisual() const
 {
   return this->worldVisual;
@@ -524,6 +527,21 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
   return cam;
 }
 
+//////////////////////////////////////////////////
+VisualPtr Scene::CreateVisual(const std::string &_name)
+{
+  if (this->GetVisual(_name) != NULL)
+  {
+    gzerr << "Visual with name[" << _name << "] already exists\n";
+    return VisualPtr();
+  }
+
+  VisualPtr result(new Visual(_name, this->worldVisual));
+  result->Load();
+  this->visuals[_name] = result;
+
+  return result;
+}
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(const std::string &_name) const
@@ -586,6 +604,58 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
   }
 
   return visual;
+}
+
+//////////////////////////////////////////////////
+VisualPtr Scene::GetModelVisualAt(CameraPtr _camera, math::Vector2i _mousePos)
+{
+  VisualPtr vis = this->GetVisualAt(_camera, _mousePos);
+  if (vis)
+    vis = this->GetVisual(vis->GetName().substr(0, vis->GetName().find("::")));
+
+  return vis;
+}
+
+//////////////////////////////////////////////////
+void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
+{
+  VisualPtr visBelow = this->GetVisualBelow(_visualName);
+  VisualPtr vis = this->GetVisual(_visualName);
+
+  if (vis && visBelow)
+  {
+    math::Vector3 pos = vis->GetWorldPose().pos;
+    double dz = vis->GetBoundingBox().min.z - visBelow->GetBoundingBox().max.z;
+    pos.z -= dz;
+    vis->SetWorldPosition(pos);
+  }
+}
+
+//////////////////////////////////////////////////
+VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
+{
+  VisualPtr result;
+  VisualPtr vis = this->GetVisual(_visualName);
+
+  if (vis)
+  {
+    std::vector<VisualPtr> below;
+    this->GetVisualsBelowPoint(vis->GetWorldPose().pos, below);
+
+    double maxZ = -10000;
+
+    for (unsigned int i = 0; i < below.size(); ++i)
+    {
+      if (below[i]->GetName().find(vis->GetName()) != 0
+          && below[i]->GetBoundingBox().max.z > maxZ)
+      {
+        maxZ = below[i]->GetBoundingBox().max.z;
+        result = below[i];
+      }
+    }
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -1004,6 +1074,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
@@ -1138,6 +1209,13 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 }
 
 //////////////////////////////////////////////////
+void Scene::OnSensorMsg(ConstSensorPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sensorMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
 void Scene::OnSceneMsg(ConstScenePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -1164,13 +1242,6 @@ void Scene::PreRender()
   JointMsgs_L::iterator jIter;
   SensorMsgs_L::iterator sensorIter;
 
-  for (sensorIter = this->sensorMsgs.begin();
-       sensorIter != this->sensorMsgs.end(); ++sensorIter)
-  {
-    this->ProcessSensorMsg(*sensorIter);
-  }
-  this->sensorMsgs.clear();
-
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
        sIter != this->sceneMsgs.end(); ++sIter)
@@ -1178,6 +1249,15 @@ void Scene::PreRender()
     this->ProcessSceneMsg(*sIter);
   }
   this->sceneMsgs.clear();
+
+  sensorIter = this->sensorMsgs.begin();
+  while (sensorIter != this->sensorMsgs.end())
+  {
+    if (this->ProcessSensorMsg(*sensorIter))
+      this->sensorMsgs.erase(sensorIter++);
+    else
+      ++sensorIter;
+  }
 
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
@@ -1256,10 +1336,10 @@ void Scene::OnJointMsg(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
+bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
   if (!this->enableVisualizations)
-    return;
+    return true;
 
   if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
@@ -1267,7 +1347,7 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
-        gzerr << "Unable to find parent visual[" << _msg->parent() << "]\n";
+        return false;
 
       LaserVisualPtr laserVis(new LaserVisual(
             _msg->name()+"_laser_vis", parentVis, _msg->topic()));
@@ -1278,6 +1358,9 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   else if (_msg->type() == "camera" && _msg->visualize())
   {
     VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
     CameraVisualPtr cameraVis(new CameraVisual(
           _msg->name()+"_camera_vis", parentVis));
 
@@ -1288,15 +1371,19 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     this->visuals[cameraVis->GetName()] = cameraVis;
   }
-  if (_msg->type() == "contact" && _msg->visualize() && !_msg->topic().empty())
+  else if (_msg->type() == "contact" && _msg->visualize() &&
+           !_msg->topic().empty())
   {
     ContactVisualPtr contactVis(new ContactVisual(
           _msg->name()+"_contact_vis", this->worldVisual, _msg->topic()));
 
     this->visuals[contactVis->GetName()] = contactVis;
   }
+
+  return true;
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
 {
   // TODO: Fix this
@@ -1466,6 +1553,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   this->selectionMsg = _msg;

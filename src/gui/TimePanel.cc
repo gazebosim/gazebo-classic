@@ -107,7 +107,15 @@ TimePanel::~TimePanel()
 /////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  this->simTime  = msgs::Convert(_msg->sim_time());
+  this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  if (this->simTimes.size() > 20)
+    this->simTimes.pop_front();
+
+  this->realTimes.push_back(msgs::Convert(_msg->real_time()));
+  if (this->realTimes.size() > 20)
+    this->realTimes.pop_front();
+
+  this->simTime = msgs::Convert(_msg->sim_time());
   this->realTime = msgs::Convert(_msg->real_time());
   if (_msg->paused())
     this->pauseLabel->setText(
@@ -149,9 +157,21 @@ void TimePanel::Update()
   else
     real << std::fixed << std::setprecision(2) << realDbl << " sec";
 
-  if (simDbl > 0)
-    percent << std::fixed << std::setprecision(2)
-      << (this->simTime / this->realTime).Double();
+  common::Time simAvg, realAvg;
+  std::list<common::Time>::iterator simIter, realIter;
+  simIter = ++(this->simTimes.begin());
+  realIter = ++(this->realTimes.begin());
+  while (simIter != this->simTimes.end() && realIter != this->realTimes.end())
+  {
+    simAvg += ((*simIter) - this->simTimes.front());
+    realAvg += ((*realIter) - this->realTimes.front());
+    ++simIter;
+    ++realIter;
+  }
+  simAvg = simAvg / realAvg;
+
+  if (simAvg > 0)
+    percent << std::fixed << std::setprecision(2) << simAvg.Double();
   else
     percent << "0";
 

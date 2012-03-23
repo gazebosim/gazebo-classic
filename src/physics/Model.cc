@@ -690,7 +690,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     return;
   }
   else if ((_msg.has_id() && _msg.id() != this->GetId()) &&
-      _msg.name() != this->GetScopedName())
+            _msg.name() != this->GetScopedName())
   {
     gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
       << "]\n";
@@ -1034,4 +1034,13 @@ void Model::SetState(const ModelState &_state)
     else
       gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void Model::SetEnabled(bool _enabled)
+{
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+    if (*iter && (*iter)->HasType(LINK))
+      boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
 }

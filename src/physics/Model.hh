@@ -197,6 +197,9 @@ namespace gazebo
       /// \brief Set the current model state
       public: void SetState(const ModelState &_state);
 
+      /// \brief Enable all the links in all the models
+      public: void SetEnabled(bool _enabled);
+
       protected: virtual void OnPoseChange();
 
       private: void RotateBodyAndChildren(LinkPtr _body1,
