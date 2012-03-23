@@ -1514,11 +1514,15 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
       // complete rhs
       for (int i=0; i<m; i++) {
-        rhs_erp[i] =      c[i]*stepsize1 - rhs[i];
+        rhs_erp[i] = c[i]*stepsize1 - rhs[i];
         if (dFabs(c[i]) > c_v_max[i])
-          rhs[i]   =  - rhs[i];
+        {
+          rhs[i]   = c_v_max[i]*stepsize1 - rhs[i];
+        }
         else
+        {
           rhs[i]   = c[i]*stepsize1 - rhs[i];
+        }
       }
 
 
@@ -1734,6 +1738,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
       }
     }
   }
+
+  // potentially, recompute J*v(n+1)
+  // then, re-update v(n+1) -= inv(M)*J'*J*v(n+1)
+
+
+
+
+
 
   {
     IFTIMING (dTimerNow ("tidy up"));
