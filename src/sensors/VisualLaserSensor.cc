@@ -93,16 +93,33 @@ void VisualLaserSensor::Load(const std::string &_worldName)
   near = this->GetRangeMin();
   far = this->GetRangeMax();
 
-  hfov = this->GetAngleMax().GetAsRadian() - this->GetAngleMin().GetAsRadian();
-  vfov = this->GetVerticalAngleMax().GetAsRadian() - this->GetVerticalAngleMin().GetAsRadian();
+  hfov = (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian();
+  vfov = (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).GetAsRadian();
 
-  hang = (this->GetAngleMax().GetAsRadian() + this->GetAngleMin().GetAsRadian()) / 2.0;
-  vang = (this->GetVerticalAngleMax().GetAsRadian() + this->GetVerticalAngleMin().GetAsRadian()) / 2.0;
+  hang = (this->GetAngleMax() + this->GetAngleMin()).GetAsRadian() / 2.0;
+  vang = (this->GetVerticalAngleMax() + this->GetVerticalAngleMin()).GetAsRadian() / 2.0;
+
+  if (hfov > 2 * M_PI)
+    hfov = 2*M_PI;
+
+  this->cameraCount = 1;
+
+  if (hfov > 2.8)
+    if (hfov > 5.6)
+      this->cameraCount = 3;
+    else
+      this->cameraCount = 2;
+
+  hfov /= this->cameraCount;
+  width_1st /= this->cameraCount;
+
+  gzwarn << "Camera count: " << this->cameraCount << 
+            " Camera width: " << width_1st << "\n";
 
   if (height_1st > 1)
   {
     chfov = 2 * atan(tan(hfov/2) / cos(vfov/2));
-    std::cerr<<"Corrected HFOV: "<<chfov<<" (HFOV: "<<hfov<<")\n";
+    gzwarn << "Corrected HFOV: " << chfov << " (HFOV: " << hfov << ")\n";
 
     ratio_1st = tan(chfov/2.0) / tan(vfov/2.0);
 
@@ -114,7 +131,7 @@ void VisualLaserSensor::Load(const std::string &_worldName)
     chfov = hfov;
   }
 
-  std::cerr<<"Final texture size: "<<width_1st<<" x "<<height_1st<<"\n"; 
+  gzwarn << "Final texture size: " << width_1st << " x " << height_1st << "\n"; 
 
   this->cameraElem.reset(new sdf::Element);
   sdf::initFile("sdf/camera.sdf", this->cameraElem);
@@ -179,6 +196,12 @@ void VisualLaserSensor::Fini()
   this->scene.reset();
 }
 
+//////////////////////////////////////////////////
+unsigned int VisualLaserSensor::GetCameraCount()
+{
+  return this->cameraCount;
+}
+  
 //////////////////////////////////////////////////
 double VisualLaserSensor::GetHAngle()
 {

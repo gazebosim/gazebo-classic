@@ -140,30 +140,31 @@ namespace gazebo
               { newImage2Frame.Disconnect(c); }
 
       private: event::EventT<void(const unsigned char *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newImage2Frame;
+                   unsigned int, unsigned int)> newImage2Frame;
 
-      protected: Ogre::Texture *_1stTexture;
-      protected: Ogre::Texture *_2ndTexture;
-      protected: Ogre::RenderTarget *_1stTarget;
-      protected: Ogre::RenderTarget *_2ndTarget;
-      protected: Ogre::Viewport *_1stViewport;
-      protected: Ogre::Viewport *_2ndViewport;
+      protected: Ogre::Texture *_1stPassTextures[3];
+      protected: Ogre::Texture *_2ndPassTexture;
+      protected: Ogre::RenderTarget *_1stPassTargets[3];
+      protected: Ogre::RenderTarget *_2ndPassTarget;
+      protected: Ogre::Viewport *_1stPassViewports[3];
+      protected: Ogre::Viewport *_2ndPassViewport;
+
+      protected: unsigned int _textureCount;
+      protected: double cameraYaws[4];
       
-      //private: unsigned char *imageBuffer;
-      //private: unsigned char *_1stBuffer;
-      //private: void Publish1stTexture();
-      //private: void Publish2ndTexture();
-      //protected: Ogre::Texture *_1stTexture_dbg;
-      //protected: Ogre::Texture *_2ndTexture_dbg;
-      //protected: Ogre::RenderTarget *_1stTarget_dbg;
-      //protected: Ogre::RenderTarget *_2ndTarget_dbg;
-      //protected: Ogre::Viewport *_1stViewport_dbg;
-      //protected: Ogre::Viewport *_2ndViewport_dbg;
-      //private: Ogre::Material *mat_1st_pass_dbg;
-      //private: Ogre::Material *mat_2nd_pass_dbg;
+      private: void PublishTexture(Ogre::Texture *tex, Ogre::Viewport *vp, unsigned int index);
+
+      protected: Ogre::Texture *_1stPassTextures_dbg[3];
+      protected: Ogre::Texture *_2ndPassTexture_dbg;
+      protected: Ogre::RenderTarget *_1stPassTargets_dbg[3];
+      protected: Ogre::RenderTarget *_2ndPassTarget_dbg;
+      protected: Ogre::Viewport *_1stPassViewports_dbg[3];
+      protected: Ogre::Viewport *_2ndPassViewport_dbg;
+      private: Ogre::Material *mat_1st_pass_dbg;
+      private: Ogre::Material *mat_2nd_pass_dbg;
       
-      protected: virtual void Set1stTarget(Ogre::RenderTarget *target);
-      protected: virtual void Set2ndTarget(Ogre::RenderTarget *target);
+      protected: virtual void Set1stPassTarget(Ogre::RenderTarget *target, unsigned int index);
+      protected: virtual void Set2ndPassTarget(Ogre::RenderTarget *target);
 
       protected: Ogre::RenderTarget *current_target;
       private: Ogre::Material *current_mat;

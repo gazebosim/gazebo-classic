@@ -49,18 +49,16 @@ VisualLaser::VisualLaser(const std::string &_namePrefix, Scene *_scene,
                          bool _autoRender)
 : Camera(_namePrefix, _scene, _autoRender)
 {
-  this->_1stTarget = NULL;
-  this->_2ndTarget = NULL;
-  //this->_1stTarget_dbg = NULL;
-  //this->_2ndTarget_dbg = NULL;
   this->laserBuffer = NULL;
   this->laserScan = NULL;
+  this->_1stPassTargets_dbg[0] = NULL;
+  this->_1stPassTargets_dbg[1] = NULL;
+  this->_1stPassTargets_dbg[2] = NULL;
+  this->_2ndPassTarget_dbg = NULL;
   this->mat_1st_pass = NULL;
   this->mat_2nd_pass = NULL;
-  //this->imageBuffer = NULL;
-  //this->_1stBuffer = NULL;
-  //this->mat_1st_pass_dbg = NULL;
-  //this->mat_2nd_pass_dbg = NULL;
+  this->mat_1st_pass_dbg = NULL;
+  this->mat_2nd_pass_dbg = NULL;
   this->w2nd = 0;
   this->h2nd = 0;
   this->visual.reset();
@@ -105,41 +103,60 @@ void VisualLaser::CreateLaserTexture(const std::string &_textureName)
   this->camera->pitch(Ogre::Radian(this->parent_sensor->GetVAngle()));
   
   this->CreateOrthoCam();
-  
-  this->_1stTexture = Ogre::TextureManager::getSingleton().createManual(
-      _textureName + "_1st_pass",
-      "General",
-      Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(), this->GetImageHeight(), 0,
-      Ogre::PF_FLOAT32_RGB,
-      Ogre::TU_RENDERTARGET).getPointer();
 
-  /*this->_1stTexture_dbg = Ogre::TextureManager::getSingleton().createManual(
-      _textureName + "_1st_pass_dbg",
-      "General",
-      Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(), this->GetImageHeight(), 0,
-      Ogre::PF_BYTE_RGB,
-      Ogre::TU_RENDERTARGET).getPointer();*/
-
-  this->Set1stTarget(this->_1stTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->_1stViewport, this->GetScene());
-  this->_1stTarget->setAutoUpdated(false);
+  this->_textureCount = this->parent_sensor->GetCameraCount();
   
-  //RTShaderSystem::AttachViewport(this->_1stViewport_dbg, this->GetScene());
-  //this->_1stTarget_dbg->setAutoUpdated(false);
+  if (this->_textureCount == 2)
+  {
+    cameraYaws[0] = -this->parent_sensor->GetHFOV()/2;
+    cameraYaws[1] = +this->parent_sensor->GetHFOV()/2;
+    cameraYaws[2] = 0;
+    cameraYaws[3] = -this->parent_sensor->GetHFOV()/2;
+  }
+  else
+  {
+    cameraYaws[0] = -this->parent_sensor->GetHFOV();
+    cameraYaws[1] = +this->parent_sensor->GetHFOV();
+    cameraYaws[2] = +this->parent_sensor->GetHFOV();
+    cameraYaws[3] = -this->parent_sensor->GetHFOV();
+  }
+  
+  for (unsigned int i = 0; i < this->_textureCount; i++)
+  {
+    std::stringstream texName;
+    texName<< _textureName << "_1st_pass_"<<i;
+    this->_1stPassTextures[i] = Ogre::TextureManager::getSingleton().createManual(
+      texName.str(), "General", Ogre::TEX_TYPE_2D,
+      this->GetImageWidth(), this->GetImageHeight(), 0,
+      Ogre::PF_FLOAT32_RGB, Ogre::TU_RENDERTARGET).getPointer();
+
+    std::stringstream texName_dbg;
+    texName_dbg << _textureName << "_1st_passi_dbg_"<<i;
+
+    this->_1stPassTextures_dbg[i] = Ogre::TextureManager::getSingleton().createManual(
+        texName_dbg.str(), "General", Ogre::TEX_TYPE_2D,
+        this->GetImageWidth(), this->GetImageHeight(), 0,
+        Ogre::PF_BYTE_RGB, Ogre::TU_RENDERTARGET).getPointer();
+
+    this->Set1stPassTarget(this->_1stPassTextures[i]->getBuffer()->getRenderTarget(), i);
+    RTShaderSystem::AttachViewport(this->_1stPassViewports[i], this->GetScene());
+    this->_1stPassTargets[i]->setAutoUpdated(false);
+  
+    RTShaderSystem::AttachViewport(this->_1stPassViewports_dbg[i], this->GetScene());
+    this->_1stPassTargets_dbg[i]->setAutoUpdated(false);
+  }
 
   this->mat_1st_pass = (Ogre::Material*)(
       Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1st").getPointer());
 
   this->mat_1st_pass->load();
  
-  //this->mat_1st_pass_dbg = (Ogre::Material*)(
-  //    Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1stDBG").getPointer());
+  this->mat_1st_pass_dbg = (Ogre::Material*)(
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1stDBG").getPointer());
 
-  //this->mat_1st_pass_dbg->load();
- 
-  this->_2ndTexture = Ogre::TextureManager::getSingleton().createManual(
+  this->mat_1st_pass_dbg->load();
+
+  this->_2ndPassTexture = Ogre::TextureManager::getSingleton().createManual(
       _textureName + "_2nd_pass",
       "General",
       Ogre::TEX_TYPE_2D,
@@ -147,38 +164,42 @@ void VisualLaser::CreateLaserTexture(const std::string &_textureName)
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
 
-  /*this->_2ndTexture_dbg = Ogre::TextureManager::getSingleton().createManual(
+  this->_2ndPassTexture_dbg = Ogre::TextureManager::getSingleton().createManual(
       _textureName + "_2nd_pass_dbg",
       "General",
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(), this->GetImageHeight(), 0,
       Ogre::PF_BYTE_RGB,
-      Ogre::TU_RENDERTARGET).getPointer();*/
+      Ogre::TU_RENDERTARGET).getPointer();
 
-  this->Set2ndTarget(this->_2ndTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->_2ndViewport, this->GetScene());
-  this->_2ndTarget->setAutoUpdated(false);
+  this->Set2ndPassTarget(this->_2ndPassTexture->getBuffer()->getRenderTarget());
+  RTShaderSystem::AttachViewport(this->_2ndPassViewport, this->GetScene());
+  this->_2ndPassTarget->setAutoUpdated(false);
   
-  //RTShaderSystem::AttachViewport(this->_2ndViewport_dbg, this->GetScene());
-  //this->_2ndTarget_dbg->setAutoUpdated(false);
+  RTShaderSystem::AttachViewport(this->_2ndPassViewport_dbg, this->GetScene());
+  this->_2ndPassTarget_dbg->setAutoUpdated(false);
   
   this->mat_2nd_pass = (Ogre::Material*)(
       Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan2nd").getPointer());
 
   this->mat_2nd_pass->load();
   
-  Ogre::TextureUnitState *tex_unit = 
-    this->mat_2nd_pass->getTechnique(0)->getPass(0)->createTextureUnitState(this->_1stTexture->getName());
+  this->mat_2nd_pass_dbg = (Ogre::Material*)(
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan2ndDBG").getPointer());
+  this->mat_2nd_pass_dbg->load();
+  
+  Ogre::TextureUnitState *tex_unit;
+  for (unsigned int i = 0; i < this->_textureCount; i++)
+  {
+    tex_unit = this->mat_2nd_pass->getTechnique(0)->getPass(0)->createTextureUnitState(this->_1stPassTextures[i]->getName());
 
-  tex_unit->setTextureFiltering(Ogre::TFO_NONE);
-  tex_unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    tex_unit->setTextureFiltering(Ogre::TFO_NONE);
+    tex_unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
 
-  //this->mat_2nd_pass_dbg = (Ogre::Material*)(
-  //    Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan2ndDBG").getPointer());
-  //this->mat_2nd_pass_dbg->load();
-  //tex_unit = this->mat_2nd_pass_dbg->getTechnique(0)->getPass(0)->createTextureUnitState(this->_1stTexture_dbg->getName());
-  //tex_unit->setTextureFiltering(Ogre::TFO_NONE);
-  //tex_unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    tex_unit = this->mat_2nd_pass_dbg->getTechnique(0)->getPass(0)->createTextureUnitState(this->_1stPassTextures_dbg[i]->getName());
+    tex_unit->setTextureFiltering(Ogre::TFO_NONE);
+    tex_unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+  }
 
   this->CreateCanvas();
 }
@@ -186,22 +207,27 @@ void VisualLaser::CreateLaserTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void VisualLaser::PostRender()
 {
-  this->_1stTarget->swapBuffers();
-  //this->_1stTarget_dbg->swapBuffers();
-  this->_2ndTarget->swapBuffers();
-  //this->_2ndTarget_dbg->swapBuffers();
+  for (unsigned int i = 0; i<this->_textureCount; i++)
+  {
+    this->_1stPassTargets[i]->swapBuffers();
+    this->_1stPassTargets_dbg[i]->swapBuffers();
+  }
+  this->_2ndPassTarget->swapBuffers();
+  this->_2ndPassTarget_dbg->swapBuffers();
+  
   if (this->newData && this->captureData)
   {
-    //this->Publish1stTexture();
-    //this->Publish2ndTexture();
+    for (unsigned int i=0; i<this->_textureCount; i++)
+      this->PublishTexture(this->_1stPassTextures_dbg[i], this->_1stPassViewports_dbg[i], i);
+    this->PublishTexture(this->_2ndPassTexture_dbg, this->_2ndPassViewport_dbg, 3);
 
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
-    unsigned int width = this->_2ndViewport->getActualWidth();
-    unsigned int height = this->_2ndViewport->getActualHeight();
+    unsigned int width = this->_2ndPassViewport->getActualWidth();
+    unsigned int height = this->_2ndPassViewport->getActualHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->_2ndTexture->getBuffer();
+    pixelBuffer = this->_2ndPassTexture->getBuffer();
 
     size_t size = Ogre::PixelUtil::getMemorySize(width, height, 1, Ogre::PF_FLOAT32_RGB);
 
@@ -221,67 +247,44 @@ void VisualLaser::PostRender()
 
     memcpy(this->laserScan, this->laserBuffer, this->w2nd*this->h2nd*3*sizeof(float));
   
-    //this->newLaserFrame(this->laserBuffer, width, height, 3,"BLABLA");
     this->newLaserFrame(this->laserScan, this->w2nd, this->h2nd, 3,"BLABLA");
   }
 
   this->newData = false;
 }
 
-/*void VisualLaser::Publish1stTexture()
+void VisualLaser::PublishTexture(Ogre::Texture *tex, Ogre::Viewport *vp, unsigned int index)
 {
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
-  unsigned int w1 = this->_1stViewport_dbg->getActualWidth();
-  unsigned int h1 = this->_1stViewport_dbg->getActualHeight();
+  unsigned int w1 = vp->getActualWidth();
+  unsigned int h1 = vp->getActualHeight();
 
   // Get access to the buffer and make an image and write it to file
-  pixelBuffer = this->_1stTexture_dbg->getBuffer();
+  pixelBuffer = tex->getBuffer();
 
   size_t size = Ogre::PixelUtil::getMemorySize(w1, h1, 1, Ogre::PF_BYTE_RGB);
 
-  if (!this->_1stBuffer)
-    this->_1stBuffer = new unsigned char[size];
+  unsigned char *buffer = new unsigned char[size];
   
-  memset(this->_1stBuffer, 255, size);
+  memset(buffer, 255, size);
       
   Ogre::PixelBox dst_box(w1, h1,
-      1, Ogre::PF_BYTE_RGB, this->_1stBuffer);
+      1, Ogre::PF_BYTE_RGB, buffer);
 
   pixelBuffer->blitToMemory(dst_box);
 
-  this->newImage2Frame(this->_1stBuffer, w1, h1, 3, "BLABLA");
+  if (index==3)
+  {
+    unsigned char *result = new unsigned char[this->w2nd*this->h2nd*3];
+    memcpy(result, buffer, this->w2nd*this->h2nd*3);
+    this->newImage2Frame(result, this->w2nd, this->h2nd, 3, index+1);
+    delete result;
+  }
+  else
+    this->newImage2Frame(buffer, w1, h1, 3, index+1);
+  delete buffer;
 }
-
-void VisualLaser::Publish2ndTexture()
-{
-  Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-
-  unsigned int width = this->_2ndViewport_dbg->getActualWidth();
-  unsigned int height = this->_2ndViewport_dbg->getActualHeight();
-
-  // Get access to the buffer and make an image and write it to file
-  pixelBuffer = this->_2ndTexture_dbg->getBuffer();
-
-  size_t size = Ogre::PixelUtil::getMemorySize(width, height, 1, Ogre::PF_BYTE_RGB);
-
-  if (!this->imageBuffer)
-    this->imageBuffer = new unsigned char[size];
-  
-  memset(this->imageBuffer, 255, size);
-      
-  Ogre::PixelBox dst_box(width, height,
-      1, Ogre::PF_BYTE_RGB, this->imageBuffer);
-
-  pixelBuffer->blitToMemory(dst_box);
-
-  unsigned char *result = new unsigned char[this->w2nd*this->h2nd*3];
-
-  memcpy(result, this->imageBuffer, this->w2nd*this->h2nd*3);
-
-  this->newImageFrame(result, this->w2nd, this->h2nd, 3, "BLABLA");
-  //this->newImageFrame(this->imageBuffer, width, height, 3, "BLABLA");
-}*/
 
 void VisualLaser::UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material *material, Ogre::Camera *cam)
 {
@@ -303,6 +306,8 @@ void VisualLaser::UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material 
   Ogre::AutoParamDataSource autoParamDataSource;
 
   vp = target->getViewport(0);
+  
+  //Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, material->getName(), true);
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
@@ -406,27 +411,35 @@ void VisualLaser::RenderImpl()
 
   sceneMgr->addRenderObjectListener(this);
 
-  //this->current_mat = this->mat_1st_pass_dbg;
-  //this->current_target = this->_1stTarget_dbg;
+  for (unsigned int i=0; i<this->_textureCount; i++)
+  {
+    if (this->_textureCount>1)
+      this->camera->yaw(Ogre::Radian(this->cameraYaws[i]));
+    this->current_mat = this->mat_1st_pass_dbg;
+    this->current_target = this->_1stPassTargets_dbg[i];
 
-  //this->UpdateRenderTarget(this->_1stTarget_dbg, this->mat_1st_pass_dbg, this->camera);
-  //this->_1stTarget_dbg->update(false);
+    this->UpdateRenderTarget(this->_1stPassTargets_dbg[i], this->mat_1st_pass_dbg, this->camera);
+    this->_1stPassTargets_dbg[i]->update(false);
   
-  this->current_mat = this->mat_1st_pass;
-  this->current_target = this->_1stTarget;
+    this->current_mat = this->mat_1st_pass;
+    this->current_target = this->_1stPassTargets[i];
 
-  //this->UpdateRenderTarget(this->_1stTarget, this->mat_1st_pass, this->camera);
-  this->_1stTarget->update(false);
-
+    this->UpdateRenderTarget(this->_1stPassTargets[i], this->mat_1st_pass, this->camera);
+    this->_1stPassTargets[i]->update(false);
+  }
+  
+  if (this->_textureCount > 1)
+    this->camera->yaw(Ogre::Radian(this->cameraYaws[3]));
+  
   sceneMgr->removeRenderObjectListener(this);
   
   this->visual->SetVisible(true);
   
-  this->UpdateRenderTarget(this->_2ndTarget, this->mat_2nd_pass, this->orthoCam);
-  this->_2ndTarget->update(false);
+  this->UpdateRenderTarget(this->_2ndPassTarget, this->mat_2nd_pass, this->orthoCam);
+  this->_2ndPassTarget->update(false);
   
-  //this->UpdateRenderTarget(this->_2ndTarget_dbg, this->mat_2nd_pass_dbg, this->orthoCam);
-  //this->_2ndTarget_dbg->update(false);
+  this->UpdateRenderTarget(this->_2ndPassTarget_dbg, this->mat_2nd_pass_dbg, this->orthoCam);
+  this->_2ndPassTarget_dbg->update(false);
   
   this->visual->SetVisible(false);
 
@@ -489,48 +502,51 @@ Ogre::Matrix4 VisualLaser::BuildScaledOrthoMatrix(float left, float right, float
 }
 
 //////////////////////////////////////////////////
-void VisualLaser::Set1stTarget(Ogre::RenderTarget *target)
+void VisualLaser::Set1stPassTarget(Ogre::RenderTarget *target, unsigned int index)
 {
-  this->_1stTarget = target;
-  //this->_1stTarget_dbg = this->_1stTexture_dbg->getBuffer()->getRenderTarget();
+  this->_1stPassTargets[index] = target;
+  this->_1stPassTargets_dbg[index] = this->_1stPassTextures_dbg[index]->getBuffer()->getRenderTarget();
 
-  if (this->_1stTarget)
+  if (this->_1stPassTargets[index])
   {
     // Setup the viewport to use the texture
-    this->_1stViewport = this->_1stTarget->addViewport(this->camera);
-    this->_1stViewport->setClearEveryFrame(true);
-    this->_1stViewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,0.0));
-    this->_1stViewport->setVisibilityMask(
+    this->_1stPassViewports[index] = this->_1stPassTargets[index]->addViewport(this->camera);
+    this->_1stPassViewports[index]->setClearEveryFrame(true);
+    this->_1stPassViewports[index]->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
+    this->_1stPassViewports[index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
-    //this->_1stViewport_dbg = this->_1stTarget_dbg->addViewport(this->camera);
-    //this->_1stViewport_dbg->setClearEveryFrame(true);
-    //this->_1stViewport_dbg->setBackgroundColour(Ogre::ColourValue(0.0,0.0,0.0));
-    //this->_1stViewport_dbg->setVisibilityMask(
-    //    GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->_1stPassViewports_dbg[index] = this->_1stPassTargets_dbg[index]->addViewport(this->camera);
+    this->_1stPassViewports_dbg[index]->setClearEveryFrame(true);
+    this->_1stPassViewports_dbg[index]->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
+    this->_1stPassViewports_dbg[index]->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
   }
-  this->camera->setAspectRatio(this->parent_sensor->Get1stRatio());
-  this->camera->setFOVy(Ogre::Radian(this->parent_sensor->GetVFOV()));
+  if (index == 0)
+  {
+    this->camera->setAspectRatio(this->parent_sensor->Get1stRatio());
+    this->camera->setFOVy(Ogre::Radian(this->parent_sensor->GetVFOV()));
+  }
 }
 
 //////////////////////////////////////////////////
-void VisualLaser::Set2ndTarget(Ogre::RenderTarget *target)
+void VisualLaser::Set2ndPassTarget(Ogre::RenderTarget *target)
 {
-  this->_2ndTarget = target;
-  //this->_2ndTarget_dbg = this->_2ndTexture_dbg->getBuffer()->getRenderTarget();
+  this->_2ndPassTarget = target;
+  this->_2ndPassTarget_dbg = this->_2ndPassTexture_dbg->getBuffer()->getRenderTarget();
 
-  if (this->_2ndTarget)
+  if (this->_2ndPassTarget)
   {
     // Setup the viewport to use the texture
-    this->_2ndViewport = this->_2ndTarget->addViewport(this->orthoCam);
-    this->_2ndViewport->setClearEveryFrame(true);
-    this->_2ndViewport->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
-    this->_2ndViewport->setVisibilityMask(
+    this->_2ndPassViewport = this->_2ndPassTarget->addViewport(this->orthoCam);
+    this->_2ndPassViewport->setClearEveryFrame(true);
+    this->_2ndPassViewport->setBackgroundColour(Ogre::ColourValue(0.0,1.0,0.0));
+    this->_2ndPassViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
-    //this->_2ndViewport_dbg = this->_2ndTarget_dbg->addViewport(this->orthoCam);
-    //this->_2ndViewport_dbg->setClearEveryFrame(true);
-    //this->_2ndViewport_dbg->setBackgroundColour(Ogre::ColourValue(0.0,0.0,1.0));
-    //this->_2ndViewport_dbg->setVisibilityMask(
-    //    GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->_2ndPassViewport_dbg = this->_2ndPassTarget_dbg->addViewport(this->orthoCam);
+    this->_2ndPassViewport_dbg->setClearEveryFrame(true);
+    this->_2ndPassViewport_dbg->setBackgroundColour(Ogre::ColourValue(0.0,1.0,0.0));
+    this->_2ndPassViewport_dbg->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(0, (float) (this->GetImageWidth()/10.0),
                        0, (float)(this->GetImageHeight()/10.0), 0.01, 0.02);
@@ -573,10 +589,8 @@ void VisualLaser::CreateMesh()
   double start_x = dx;
   double start_y = view_height;
 
-  double theta = this->parent_sensor->GetHFOV() / 2;
   double phi = this->parent_sensor->GetVFOV() / 2;
 
-  double h_ang_min = -theta;
   double v_ang_min = -phi;
 
   if (this->GetImageHeight() == 1)
@@ -591,6 +605,25 @@ void VisualLaser::CreateMesh()
       gamma = ((2 * phi / (this->h2nd - 1)) * j) + v_ang_min;
     for (unsigned int i = 0; i < this->w2nd; i++)
     {
+      double hfov = this->_textureCount * this->parent_sensor->GetHFOV();
+      double theta = this->parent_sensor->GetHFOV() / 2;
+      double delta = ((hfov / (this->w2nd - 1)) * i);
+
+      //double gdelta = delta;
+
+      unsigned int texture = delta / this->parent_sensor->GetHFOV();
+      
+      if (texture > this->_textureCount-1)
+        texture = this->_textureCount-1;
+
+      delta = delta - (texture * this->parent_sensor->GetHFOV());
+      delta = delta - this->parent_sensor->GetHFOV() / 2.0;
+
+      //assert((delta > -this->parent_sensor->GetHFOV() / 2.0) && (delta < this->parent_sensor->GetHFOV() / 2.0));
+
+      //if (j ==0)
+      //  gzwarn <<" t: "<<texture<<" delta: "<<delta<<" gdelta: "<<gdelta<<" i: "<<i<<"\n";
+      
       start_x -= dx;
       if (pts_on_line == this->GetImageWidth())
       {
@@ -599,12 +632,14 @@ void VisualLaser::CreateMesh()
         start_y -= dy;
       }
       pts_on_line++;
-      submesh->AddVertex(0, start_x, start_y );
+      submesh->AddVertex(texture/1000.0, start_x, start_y );
 
-      double delta = ((2 * theta / (this->w2nd - 1)) * i) + h_ang_min;
       
       double u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
       double v = -tan(gamma)/(2 * tan(phi)) + 0.5;
+
+      //if (j==0)
+      //gzerr<<"u: "<<u<<" v: "<<v<<"\n";
 
       submesh->AddTexCoord(u, v);
     }
@@ -632,13 +667,11 @@ void VisualLaser::CreateCanvas()
   parent->removeChild(this->visual->GetSceneNode());
 
   this->pitchNode_ortho->addChild(this->visual->GetSceneNode());
-  //this->visual->AttachMesh(this->undist_mesh->GetName());
 
   this->visual->InsertMesh(this->undist_mesh);
 
   std::ostringstream stream;
   std::string meshName = this->undist_mesh->GetName();
-  //meshName = "unit_box";
   stream << this->visual->GetSceneNode()->getName() << "_ENTITY_" << meshName;
 
   this->object = (Ogre::MovableObject*) 

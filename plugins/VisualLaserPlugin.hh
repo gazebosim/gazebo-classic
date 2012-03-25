@@ -38,13 +38,9 @@ namespace gazebo
                 unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
-    /*public: virtual void OnNewImageFrame(const unsigned char *_image,
+    public: virtual void OnNewImageFrame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,
-                              unsigned int _depth, const std::string &_format);
-
-    public: virtual void OnNewImage2Frame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height,
-                              unsigned int _depth, const std::string &_format);*/
+                              unsigned int _depth, unsigned int cam);
 
     protected: unsigned int width, height/*, depth*/;
 //    protected: std::string format;
@@ -54,7 +50,6 @@ namespace gazebo
 
     private: event::ConnectionPtr newLaserFrameConnection;
     private: event::ConnectionPtr newImageFrameConnection;
-    private: event::ConnectionPtr newImage2FrameConnection;
   };
 }
 #endif

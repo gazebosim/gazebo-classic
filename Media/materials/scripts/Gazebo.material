@@ -132,6 +132,9 @@ fragment_program Gazebo/LaserScan2ndFS glsl
   
   default_params
   {
+    param_named tex1 int 0
+    param_named tex2 int 1
+    param_named tex3 int 2
     param_named_auto texSize texture_size 0
   }
 }

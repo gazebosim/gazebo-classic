@@ -150,6 +150,8 @@ namespace gazebo
       ///         SetActive(true).
       public: int GetFiducial(int index);
 
+      public: unsigned int GetCameraCount();
+
       public: double Get1stRatio();
 
       public: double Get2ndRatio();
@@ -173,6 +175,8 @@ namespace gazebo
       protected: sdf::ElementPtr vertElem;
       protected: sdf::ElementPtr rangeElem;
       protected: sdf::ElementPtr cameraElem;
+
+      protected: unsigned int cameraCount;
 
       protected: double hfov, vfov, chfov, hang, vang;
       protected: double near, far;

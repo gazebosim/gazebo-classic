@@ -48,13 +48,9 @@ void VisualLaserPlugin::Load(sensors::SensorPtr _sensor,
       boost::bind(&VisualLaserPlugin::OnNewLaserFrame,
         this, _1, _2, _3, _4, _5));
 
-  /*this->newImageFrameConnection = this->laserCam->ConnectNewImageFrame(
+  this->newImageFrameConnection = this->laserCam->ConnectNewImage2Frame(
       boost::bind(&VisualLaserPlugin::OnNewImageFrame,
         this, _1, _2, _3, _4, _5));
-
-  this->newImage2FrameConnection = this->laserCam->ConnectNewImage2Frame(
-      boost::bind(&VisualLaserPlugin::OnNewImage2Frame,
-        this, _1, _2, _3, _4, _5));*/
 
   this->parentSensor->SetActive(true);
 }
@@ -66,28 +62,12 @@ void VisualLaserPlugin::OnNewLaserFrame(const float *_image,
 {
 }
     
-///////////////////////////////////////////////////
-//void VisualLaserPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
-//                              unsigned int /*_width*/,
-//                              unsigned int /*_height*/,
-//                              unsigned int /*_depth*/,
-//                              const std::string &/*_format*/)
-//{
-//  /*rendering::Camera::SaveFrame(_image, this->width,
-//    this->height, this->depth, this->format,
-//    "/tmp/laserCam/me.jpg");
-//    */
-//}
-//
-///////////////////////////////////////////////////
-//void VisualLaserPlugin::OnNewImage2Frame(const unsigned char * /*_image*/,
-//                              unsigned int /*_width*/,
-//                              unsigned int /*_height*/,
-//                              unsigned int /*_depth*/,
-//                              const std::string &/*_format*/)
-//{
-//  /*rendering::Camera::SaveFrame(_image, this->width,
-//    this->height, this->depth, this->format,
-//    "/tmp/laserCam/me.jpg");
-//    */
-//}
+/////////////////////////////////////////////////
+void VisualLaserPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
+                              unsigned int /*_width*/,
+                              unsigned int /*_height*/,
+                              unsigned int /*_depth*/,
+                              unsigned int/*_format*/)
+{
+}
+
