@@ -150,6 +150,8 @@ int RaySensor::GetRayCount() const
 //////////////////////////////////////////////////
 int RaySensor::GetRangeCount() const
 {
+  // todo: maybe should check against this->laserMsg.ranges_size()
+  //       as users use this to loop through GetRange() calls
   return this->laserShape->GetSampleCount() *
          this->laserShape->GetScanResolution();
 }
@@ -191,6 +193,11 @@ void RaySensor::GetRanges(std::vector<double> &_ranges)
 //////////////////////////////////////////////////
 double RaySensor::GetRange(int _index)
 {
+  if (this->laserMsg.ranges_size() == 0)
+  {
+    gzwarn << "ranges not constructed yet (zero sized)\n";
+    return 0.0;
+  }
   if (_index < 0 || _index >= this->laserMsg.ranges_size())
   {
     gzerr << "Invalid range index[" << _index << "]\n";
@@ -218,13 +225,14 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
+  // do the collision checks
   this->laserShape->Update();
 
   this->mutex->lock();
 
   this->lastUpdateTime = this->world->GetSimTime();
 
-  // Store the latest laser scan.
+  // Store the latest laser scans into laserMsg
   msgs::Set(this->laserMsg.mutable_offset(), this->GetPose());
   this->laserMsg.set_angle_min(this->GetAngleMin().GetAsRadian());
   this->laserMsg.set_angle_max(this->GetAngleMax().GetAsRadian());

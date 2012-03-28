@@ -160,7 +160,10 @@ void MultiRayShape::Update()
     this->rays[i]->Update();
   }
 
+  // do actual collision checks
   this->UpdateRays();
+
+  // for plugin
   this->newLaserScans();
 }
 

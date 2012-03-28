@@ -79,7 +79,7 @@ void Sensor::Load(const std::string &_worldName)
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
-  this->lastUpdateTime = this->world->GetSimTime();
+  this->lastUpdateTime = common::Time(0.0); // loaded, but not updated
 
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
