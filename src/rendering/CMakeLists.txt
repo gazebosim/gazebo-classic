@@ -45,6 +45,7 @@ set (headers MovableText.hh
              DepthCamera.hh
              UserCamera.hh
              Light.hh
+             RTShaderSystem.hh
              SelectionObj.hh
              ViewController.hh
              FPSViewController.hh
