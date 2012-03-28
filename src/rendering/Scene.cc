@@ -1547,6 +1547,7 @@ void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
   this->selectionMsg = _msg;
 }
 
+/////////////////////////////////////////////////
 void Scene::SetSky(const std::string &_material)
 {
   this->sdf->GetOrCreateElement("background")->GetOrCreateElement(
@@ -1558,7 +1559,7 @@ void Scene::SetSky(const std::string &_material)
     orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1, 0, 0));
     double curvature = 10;  // ogre recommended default
     double tiling = 8;  // ogre recommended default
-    double distance = 4000;  // ogre recommended default
+    double distance = 100;  // ogre recommended default
     this->manager->setSkyDome(true, _material, curvature,
         tiling, distance, true, orientation);
   }
@@ -1568,7 +1569,7 @@ void Scene::SetSky(const std::string &_material)
   }
 }
 
-/// Set whether shadows are on or off
+/////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
@@ -1582,18 +1583,20 @@ void Scene::SetShadowsEnabled(bool _value)
   }
 }
 
-/// Get whether shadows are on or off
+/////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
   return shadowElem->GetValueBool("enabled");
 }
 
+/////////////////////////////////////////////////
 void Scene::AddVisual(VisualPtr &_vis)
 {
   this->visuals[_vis->GetName()] = _vis;
 }
 
+/////////////////////////////////////////////////
 void Scene::RemoveVisual(VisualPtr _vis)
 {
   if (_vis)
@@ -1610,6 +1613,7 @@ void Scene::RemoveVisual(VisualPtr _vis)
   }
 }
 
+/////////////////////////////////////////////////
 std::string Scene::GetUniqueName(const std::string &_prefix)
 {
   std::ostringstream test;
@@ -1625,11 +1629,13 @@ std::string Scene::GetUniqueName(const std::string &_prefix)
   return test.str();
 }
 
+/////////////////////////////////////////////////
 SelectionObj *Scene::GetSelectionObj() const
 {
   return this->selectionObj;
 }
 
+/////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
   if (_enabled)

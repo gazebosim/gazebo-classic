@@ -96,7 +96,7 @@ void UserCamera::Init()
 {
   Camera::Init();
   this->SetHFOV(GZ_DTOR(60));
-  this->SetClipDist(0.001, 100);
+  this->SetClipDist(0.001, 500);
 
   /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
 

@@ -539,8 +539,10 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
         Convert(elem->GetValueColor("rgba")));
 
     if (elem->HasElement("sky"))
+    {
       result.set_sky_material(
           elem->GetElement("sky")->GetValueString("material"));
+    }
   }
 
   if (_sdf->HasElement("fog"))
