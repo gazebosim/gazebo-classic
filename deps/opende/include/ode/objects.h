@@ -470,6 +470,14 @@ ODE_API void dWorldSetQuickStepPreconIterations (dWorldID, int num);
 ODE_API int dWorldGetQuickStepNumIterations (dWorldID);
 
 /**
+ * @brief Get the number of iterations that the QuickStep method performs per
+ *        step.
+ * @ingroup world
+ * @return nr of iterations
+ */
+ODE_API int dWorldGetQuickStepPreconIterations (dWorldID);
+
+/**
  * @brief Set the SOR over-relaxation parameter
  * @ingroup world
  * @param over_relaxation value to use by SOR

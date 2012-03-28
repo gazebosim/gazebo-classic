@@ -114,6 +114,8 @@ namespace gazebo
       /// \brief access functions to set ODE parameters
       public: virtual void SetAutoDisableFlag(bool /*autoDisable_*/) {}
       /// \brief access functions to set ODE parameters
+      public: virtual void SetSORPGSPreconIters(unsigned int /*iters_*/) {}
+      /// \brief access functions to set ODE parameters
       public: virtual void SetSORPGSIters(unsigned int /*iters_*/) {}
       /// \brief access functions to set ODE parameters
       public: virtual void SetSORPGSW(double /*w_*/) {}
@@ -129,6 +131,8 @@ namespace gazebo
       public: virtual double GetWorldERP() {return 0;}
       /// \brief access functions to set ODE parameters
       public: virtual bool GetAutoDisableFlag() {return 0;}
+      /// \brief access functions to set ODE parameters
+      public: virtual int GetSORPGSPreconIters() {return 0;}
       /// \brief access functions to set ODE parameters
       public: virtual int GetSORPGSIters() {return 0;}
       /// \brief access functions to set ODE parameters

@@ -94,8 +94,12 @@ public:
 
   void quickStep(dReal stepsize)
     { dWorldQuickStep (get_id(), stepsize); }
+  void setQuickStepPreconIterations(int num)
+    { dWorldSetQuickStepPreconIterations (get_id(), num); }
   void setQuickStepNumIterations(int num)
     { dWorldSetQuickStepNumIterations (get_id(), num); }
+  int getQuickStepPreconIterations() const
+    { return dWorldGetQuickStepPreconIterations (get_id()); }
   int getQuickStepNumIterations() const
     { return dWorldGetQuickStepNumIterations (get_id()); }
   void setQuickStepW(dReal over_relaxation)

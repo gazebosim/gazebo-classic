@@ -512,6 +512,18 @@ void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *_engineMass)
 }
 
 //////////////////////////////////////////////////
+void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
+{
+  if (!this->sdf->GetElement("ode")->GetElement(
+      "solver")->HasAttribute("percon_iters"))
+    this->sdf->GetElement("ode")->GetElement(
+      "solver")->AddAttribute("percon_iters","int","0",false);
+  this->sdf->GetElement("ode")->GetElement(
+      "solver")->GetAttribute("percon_iters")->Set(_iters);
+  dWorldSetQuickStepPreconIterations(this->worldId, _iters);
+}
+
+//////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement(
@@ -569,6 +581,16 @@ void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
       "max_contacts")->GetValue()->Set(_maxContacts);
 }
 
+//////////////////////////////////////////////////
+int ODEPhysics::GetSORPGSPreconIters()
+{
+  if (!this->sdf->GetElement("ode")->GetElement(
+      "solver")->HasAttribute("percon_iters"))
+    this->sdf->GetElement("ode")->GetElement(
+      "solver")->AddAttribute("percon_iters","int","0",false);
+  return this->sdf->GetElement("ode")->GetElement(
+      "solver")->GetValueInt("precon_iters");
+}
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSIters()
 {
