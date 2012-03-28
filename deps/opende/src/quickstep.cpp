@@ -1571,7 +1571,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
         //if (dFabs(c[i]) > c_v_max[i])
         //  rhs[i]   =  c_v_max[i]*stepsize1 - rhs[i];
         if (dFabs(c[i]) > world->contactp.max_vel)
-          rhs[i]   =  0*world->contactp.max_vel*stepsize1 - rhs[i];
+          rhs[i]   =  world->contactp.max_vel*stepsize1 - rhs[i];
         else
           rhs[i]   = c[i]*stepsize1 - rhs[i];
       }
