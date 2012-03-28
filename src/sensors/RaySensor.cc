@@ -191,7 +191,7 @@ void RaySensor::GetRanges(std::vector<double> &_ranges)
 //////////////////////////////////////////////////
 double RaySensor::GetRange(int _index)
 {
-  if (_index < 0 || _index > this->laserMsg.ranges_size())
+  if (_index < 0 || _index >= this->laserMsg.ranges_size())
   {
     gzerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
@@ -219,6 +219,9 @@ int RaySensor::GetFiducial(int index)
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
   this->laserShape->Update();
+
+  this->mutex->lock();
+
   this->lastUpdateTime = this->world->GetSimTime();
 
   // Store the latest laser scan.
@@ -230,7 +233,6 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   this->laserMsg.set_range_min(this->GetRangeMin());
   this->laserMsg.set_range_max(this->GetRangeMax());
 
-  this->mutex->lock();
   this->laserMsg.clear_ranges();
   this->laserMsg.clear_intensities();
 
