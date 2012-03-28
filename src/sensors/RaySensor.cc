@@ -218,7 +218,6 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  this->mutex->lock();
   this->laserShape->Update();
   this->lastUpdateTime = this->world->GetSimTime();
 
@@ -230,12 +229,16 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
   this->laserMsg.set_range_min(this->GetRangeMin());
   this->laserMsg.set_range_max(this->GetRangeMax());
+
+  this->mutex->lock();
   this->laserMsg.clear_ranges();
   this->laserMsg.clear_intensities();
 
-  for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
+  // todo: add loop for vertical range count
+  for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
+  for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
   {
-    this->laserMsg.add_ranges(this->laserShape->GetRange(i));
+    this->laserMsg.add_ranges(this->laserShape->GetRange(j*this->GetRayCount()+i));
     this->laserMsg.add_intensities(0);
   }
   this->mutex->unlock();
