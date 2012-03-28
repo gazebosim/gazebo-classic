@@ -235,8 +235,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   this->laserMsg.clear_intensities();
 
   // todo: add loop for vertical range count
+  for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
   for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
-  for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); i++)
   {
     this->laserMsg.add_ranges(this->laserShape->GetRange(j*this->GetRayCount()+i));
     this->laserMsg.add_intensities(0);
