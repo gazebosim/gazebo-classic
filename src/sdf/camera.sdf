@@ -15,4 +15,7 @@
     <attribute name="enabled" type="bool" default="false" required="1"/>
     <attribute name="path" type="string" default="__default__" required="1"/>
   </element> <!-- End Save -->
+  <element name="depth_camera" required="0">
+    <attribute name="output" type="string" default="depths" required="1"/>
+  </element> <!-- End Save -->
 </element> <!-- End Camera -->

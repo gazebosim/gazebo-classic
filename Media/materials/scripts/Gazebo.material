@@ -34,6 +34,139 @@ material Gazebo/DepthMap
   }
 }
 
+vertex_program Gazebo/XYZRGBPointsVS glsl
+{
+  source depth_points_map.vert
+}
+
+fragment_program Gazebo/XYZRGBPointsFS glsl
+{
+  source depth_points_map.frag
+  
+  default_params
+  {
+    param_named_auto width viewport_width
+    param_named_auto height viewport_height
+  }
+}
+
+material Gazebo/XYZRGBPoints
+{
+  technique
+  {
+    pass pcd_tex
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/XYZRGBPointsVS { }
+      fragment_program_ref Gazebo/XYZRGBPointsFS { }
+    }
+  }
+}
+
+vertex_program Gazebo/LaserScan1stVS glsl
+{
+  source laser_1st_pass.vert
+}
+
+fragment_program Gazebo/LaserScan1stFS glsl
+{
+  source laser_1st_pass.frag
+  
+  default_params
+  {
+    param_named retro float 0.0
+    param_named_auto near near_clip_distance
+    param_named_auto far far_clip_distance
+  }
+}
+
+fragment_program Gazebo/LaserScan1stDBGFS glsl
+{
+  source laser_1st_pass_dbg.frag
+  
+  default_params
+  {
+    param_named retro float 0.0
+    param_named_auto near near_clip_distance
+    param_named_auto far far_clip_distance
+  }
+}
+
+material Gazebo/LaserScan1st
+{
+  technique
+  {
+    pass laser_tex
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/LaserScan1stVS { }
+      fragment_program_ref Gazebo/LaserScan1stFS { }
+    }
+  }
+}
+
+material Gazebo/LaserScan1stDBG
+{
+  technique
+  {
+    pass laser_tex
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/LaserScan1stVS { }
+      fragment_program_ref Gazebo/LaserScan1stDBGFS { }
+    }
+  }
+}
+
+vertex_program Gazebo/LaserScan2ndVS glsl
+{
+  source laser_2nd_pass.vert
+}
+
+fragment_program Gazebo/LaserScan2ndFS glsl
+{
+  source laser_2nd_pass.frag
+  
+  default_params
+  {
+    param_named tex1 int 0
+    param_named tex2 int 1
+    param_named tex3 int 2
+    param_named_auto texSize texture_size 0
+  }
+}
+
+material Gazebo/LaserScan2nd
+{
+  technique
+  {
+    pass laser_tex_2nd
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/LaserScan2ndVS { }
+      fragment_program_ref Gazebo/LaserScan2ndFS { }
+    }
+  }
+}
+
+material Gazebo/LaserScan2ndDBG
+{
+  technique
+  {
+    pass laser_tex_2nd
+    {
+      separate_scene_blend one zero one zero
+
+      vertex_program_ref Gazebo/LaserScan2ndVS { }
+      fragment_program_ref Gazebo/LaserScan2ndFS { }
+    }
+  }
+}
+
 material Gazebo/Grey
 {
 	receive_shadows on
@@ -44,20 +177,6 @@ material Gazebo/Grey
       ambient .1 .1 .1  1.0
       diffuse .5 .5 .5  1.0
 			specular 0.1 0.1 0.1 1.000000 12.500000
-    }
-  }
-}
-
-material Gazebo/RibbonTrail
-{
-  technique
-  {
-    pass
-    {
-      lighting off
-      scene_blend add
-      depth_write off
-      diffuse vertexcolour
     }
   }
 }

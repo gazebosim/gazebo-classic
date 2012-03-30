@@ -38,6 +38,11 @@ namespace gazebo
                 unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
+    /// \brief Update the controller
+    public: virtual void OnNewRGBPointCloud(const float *_pcd,
+                unsigned int _width, unsigned int _height,
+                unsigned int _depth, const std::string &_format);
+
     public: virtual void OnNewImageFrame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
@@ -49,6 +54,7 @@ namespace gazebo
     protected: rendering::DepthCameraPtr depthCamera;
 
     private: event::ConnectionPtr newDepthFrameConnection;
+    private: event::ConnectionPtr newRGBPointCloudConnection;
     private: event::ConnectionPtr newImageFrameConnection;
   };
 }
