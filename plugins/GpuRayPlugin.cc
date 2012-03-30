@@ -14,28 +14,28 @@
  * limitations under the License.
  *
 */
-#include "plugins/VisualLaserPlugin.hh"
-#include "rendering/VisualLaser.hh"
+#include "plugins/GpuRayPlugin.hh"
+#include "rendering/GpuLaser.hh"
 
 using namespace gazebo;
-GZ_REGISTER_SENSOR_PLUGIN(VisualLaserPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(GpuRayPlugin)
 
 /////////////////////////////////////////////////
-VisualLaserPlugin::VisualLaserPlugin() : SensorPlugin()
+GpuRayPlugin::GpuRayPlugin() : SensorPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-void VisualLaserPlugin::Load(sensors::SensorPtr _sensor,
+void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::shared_dynamic_cast<sensors::VisualLaserSensor>(_sensor);
+    boost::shared_dynamic_cast<sensors::GpuRaySensor>(_sensor);
   this->laserCam = this->parentSensor->GetLaserCamera();
 
   if (!this->parentSensor)
   {
-    gzerr << "VisualLaserPlugin not attached to a VisualLaser sensor\n";
+    gzerr << "GpuRayPlugin not attached to a GpuLaser sensor\n";
     return;
   }
 
@@ -45,29 +45,29 @@ void VisualLaserPlugin::Load(sensors::SensorPtr _sensor,
 //  this->format = this->laserCam->GetImageFormat();
 
   this->newLaserFrameConnection = this->laserCam->ConnectNewLaserFrame(
-      boost::bind(&VisualLaserPlugin::OnNewLaserFrame,
+      boost::bind(&GpuRayPlugin::OnNewLaserFrame,
         this, _1, _2, _3, _4, _5));
 
-  this->newImageFrameConnection = this->laserCam->ConnectNewImage2Frame(
-      boost::bind(&VisualLaserPlugin::OnNewImageFrame,
-        this, _1, _2, _3, _4, _5));
+//  this->newImageFrameConnection = this->laserCam->ConnectNewImage2Frame(
+//      boost::bind(&GpuRayPlugin::OnNewImageFrame,
+//        this, _1, _2, _3, _4, _5));
 
   this->parentSensor->SetActive(true);
 }
 
 /////////////////////////////////////////////////
-void VisualLaserPlugin::OnNewLaserFrame(const float *_image,
+void GpuRayPlugin::OnNewLaserFrame(const float *_image,
     unsigned int _width, unsigned int _height,
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
 }
     
-/////////////////////////////////////////////////
-void VisualLaserPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
-                              unsigned int /*_width*/,
-                              unsigned int /*_height*/,
-                              unsigned int /*_depth*/,
-                              unsigned int/*_format*/)
-{
-}
+///////////////////////////////////////////////////
+//void GpuRayPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
+//                              unsigned int /*_width*/,
+//                              unsigned int /*_height*/,
+//                              unsigned int /*_depth*/,
+//                              unsigned int/*_format*/)
+//{
+//}
 

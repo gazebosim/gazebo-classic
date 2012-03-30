@@ -9,7 +9,7 @@ message(STATUS "OGRE include: ${OGRE_INCLUDE_DIRS}")
 
 set (plugins CameraPlugin
              DepthCameraPlugin
-             VisualLaserPlugin
+             GpuRayPlugin
              ContactPlugin
              RayPlugin
              Pioneer2dxPlugin)

@@ -7,6 +7,7 @@ varying vec4 point;
 
 void main()
 {
+  //vec3 p = vec3(point.x, point.y, point.z - near);
   float l = length(point.xyz);
 
   if (l>far)

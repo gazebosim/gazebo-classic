@@ -17,7 +17,7 @@ set (sources MovableText.cc
              Visual.cc
              Camera.cc
              DepthCamera.cc
-             VisualLaser.cc
+             GpuLaser.cc
              UserCamera.cc
              Heightmap.cc
              Light.cc
@@ -44,7 +44,7 @@ set (headers MovableText.hh
              Visual.hh
              Camera.hh
              DepthCamera.hh
-             VisualLaser.hh
+             GpuLaser.hh
              UserCamera.hh
              Light.hh
              SelectionObj.hh

@@ -15,22 +15,22 @@
  *
 */
 
-#ifndef __GAZEBO_VISUAL_LASER_PLUGIN_HH__
-#define __GAZEBO_VISUAL_LASER_PLUGIN_HH__
+#ifndef __GAZEBO_GPU_LASER_PLUGIN_HH__
+#define __GAZEBO_GPU_LASER_PLUGIN_HH__
 
 #include <string>
 
 #include "common/Plugin.hh"
-#include "sensors/VisualLaserSensor.hh"
+#include "sensors/GpuRaySensor.hh"
 #include "sensors/CameraSensor.hh"
 #include "rendering/RenderTypes.hh"
 #include "gazebo.h"
 
 namespace gazebo
 {
-  class VisualLaserPlugin : public SensorPlugin
+  class GpuRayPlugin : public SensorPlugin
   {
-    public: VisualLaserPlugin();
+    public: GpuRayPlugin();
 
     public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
@@ -38,18 +38,18 @@ namespace gazebo
                 unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
-    public: virtual void OnNewImageFrame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height,
-                              unsigned int _depth, unsigned int cam);
+    //public: virtual void OnNewImageFrame(const unsigned char *_image,
+    //                          unsigned int _width, unsigned int _height,
+    //                          unsigned int _depth, unsigned int cam);
 
     protected: unsigned int width, height/*, depth*/;
 //    protected: std::string format;
 
-    protected: sensors::VisualLaserSensorPtr parentSensor;
-    protected: rendering::VisualLaserPtr laserCam;
+    protected: sensors::GpuRaySensorPtr parentSensor;
+    protected: rendering::GpuLaserPtr laserCam;
 
     private: event::ConnectionPtr newLaserFrameConnection;
-    private: event::ConnectionPtr newImageFrameConnection;
+    //private: event::ConnectionPtr newImageFrameConnection;
   };
 }
 #endif

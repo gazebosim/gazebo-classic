@@ -121,7 +121,7 @@ namespace gazebo
                                                bool _autoRender = true);
 
       /// \brief Create visual laser
-      public: VisualLaserPtr CreateVisualLaser(const std::string &_name,
+      public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
                                                bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene

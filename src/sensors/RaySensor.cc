@@ -193,7 +193,7 @@ double RaySensor::GetRange(int _index)
 {
   if (_index < 0 || _index > this->laserMsg.ranges_size())
   {
-    gzerr << "Invalid range index[" << _index << "]\n";
+    //gzerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
   }
 
@@ -218,7 +218,6 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  this->mutex->lock();
   this->laserShape->Update();
   this->lastUpdateTime = this->world->GetSimTime();
 
@@ -230,14 +229,17 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
   this->laserMsg.set_range_min(this->GetRangeMin());
   this->laserMsg.set_range_max(this->GetRangeMax());
+  this->mutex->lock();
   this->laserMsg.clear_ranges();
   this->laserMsg.clear_intensities();
 
-  for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
-  {
-    this->laserMsg.add_ranges(this->laserShape->GetRange(i));
-    this->laserMsg.add_intensities(0);
-  }
+  for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
+    for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
+    {
+      int index = j * this->GetRayCount() + i;
+      this->laserMsg.add_ranges(this->laserShape->GetRange(index));
+      this->laserMsg.add_intensities(0);
+    }
   this->mutex->unlock();
 
   if (this->scanPub)

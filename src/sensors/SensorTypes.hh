@@ -32,20 +32,20 @@ namespace gazebo
     class CameraSensor;
     class DepthCameraSensor;
     class ContactSensor;
-    class VisualLaserSensor;
+    class GpuRaySensor;
 
     typedef boost::shared_ptr<Sensor> SensorPtr;
     typedef boost::shared_ptr<RaySensor> RaySensorPtr;
     typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
     typedef boost::shared_ptr<DepthCameraSensor> DepthCameraSensorPtr;
     typedef boost::shared_ptr<ContactSensor> ContactSensorPtr;
-    typedef boost::shared_ptr<VisualLaserSensor> VisualLaserSensorPtr;
+    typedef boost::shared_ptr<GpuRaySensor> GpuRaySensorPtr;
     typedef std::vector<SensorPtr> Sensor_V;
     typedef std::vector<RaySensorPtr> RaySensor_V;
     typedef std::vector<CameraSensorPtr> CameraSensor_V;
     typedef std::vector<DepthCameraSensorPtr> DepthCameraSensor_V;
     typedef std::vector<ContactSensorPtr> ContactSensor_V;
-    typedef std::vector<VisualLaserSensorPtr> VisualLaserSensor_V;
+    typedef std::vector<GpuRaySensorPtr> GpuRaySensor_V;
   }
 }
 

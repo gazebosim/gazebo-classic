@@ -34,7 +34,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/Camera.hh"
 #include "rendering/DepthCamera.hh"
-#include "rendering/VisualLaser.hh"
+#include "rendering/GpuLaser.hh"
 #include "rendering/Grid.hh"
 #include "rendering/SelectionObj.hh"
 #include "rendering/DynamicLines.hh"
@@ -458,10 +458,10 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-VisualLaserPtr Scene::CreateVisualLaser(const std::string &_name,
+GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
                                         bool _autoRender)
 {
-  VisualLaserPtr camera(new VisualLaser(this->name + "::" + _name,
+  GpuLaserPtr camera(new GpuLaser(this->name + "::" + _name,
         this, _autoRender));
   this->cameras.push_back(camera);
 

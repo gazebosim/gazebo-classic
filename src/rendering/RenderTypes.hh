@@ -34,7 +34,7 @@ namespace gazebo
     class Camera;
     class UserCamera;
     class DepthCamera;
-    class VisualLaser;
+    class GpuLaser;
     class DynamicLines;
     class SelectionObj;
     class Visual;
@@ -47,7 +47,7 @@ namespace gazebo
     typedef boost::shared_ptr<Camera> CameraPtr;
     typedef boost::shared_ptr<UserCamera> UserCameraPtr;
     typedef boost::shared_ptr<DepthCamera> DepthCameraPtr;
-    typedef boost::shared_ptr<VisualLaser> VisualLaserPtr;
+    typedef boost::shared_ptr<GpuLaser> GpuLaserPtr;
     typedef boost::shared_ptr<DynamicLines> DynamicLinesPtr;
     typedef boost::shared_ptr<Visual> VisualPtr;
     typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;

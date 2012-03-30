@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: A persepective OGRE Camera with Depth Sensor
- * Author: Nate Koenig
- * Date: 15 July 2003
+/* Desc: A laser sensor using OpenGL
+ * Author: Mihai Emanuel Dolha
+ * Date: 29 March 2012
  */
 
-#ifndef RENDERING_VISUALLASER_HH
-#define RENDERING_VISUALLASER_HH
+#ifndef RENDERING_GPULASER_HH
+#define RENDERING_GPULASER_HH
 #include <string>
 
 #include "rendering/Camera.hh"
@@ -68,14 +68,14 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class VisualLaser : public Camera, public Ogre::RenderObjectListener
+    class GpuLaser : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
-      public: VisualLaser(const std::string &_namePrefix,
+      public: GpuLaser(const std::string &_namePrefix,
                           Scene *_scene, bool _autoRender = true);
 
       /// \brief Destructor
-      public: virtual ~VisualLaser();
+      public: virtual ~GpuLaser();
 
       /// \brief Load the camera with a set of parmeters
       /// \param _sdf The SDF camera info
@@ -107,7 +107,7 @@ namespace gazebo
 
       public: void SetRangeCount(unsigned int _w, unsigned int _h = 1);
 
-      public: void SetParentSensor(sensors::VisualLaserSensor *parent);
+      public: void SetParentSensor(sensors::GpuRaySensor *parent);
 
       public: virtual void notifyRenderSingleObject (Ogre::Renderable *rend, const Ogre::Pass* /*pass*/, 
               const Ogre::AutoParamDataSource* /*source*/, const Ogre::LightList* /*lights*/, bool /*supp*/);
@@ -133,15 +133,6 @@ namespace gazebo
       private: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newLaserFrame;
 
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewImage2Frame(T subscriber)
-              { return newImage2Frame.Connect(subscriber); }
-      public: void DisconnectNewImage2Frame(event::ConnectionPtr &c)
-              { newImage2Frame.Disconnect(c); }
-
-      private: event::EventT<void(const unsigned char *, unsigned int, unsigned int,
-                   unsigned int, unsigned int)> newImage2Frame;
-
       protected: Ogre::Texture *_1stPassTextures[3];
       protected: Ogre::Texture *_2ndPassTexture;
       protected: Ogre::RenderTarget *_1stPassTargets[3];
@@ -152,16 +143,25 @@ namespace gazebo
       protected: unsigned int _textureCount;
       protected: double cameraYaws[4];
       
-      private: void PublishTexture(Ogre::Texture *tex, Ogre::Viewport *vp, unsigned int index);
+      //public: template<typename T>
+      //        event::ConnectionPtr ConnectNewImage2Frame(T subscriber)
+      //        { return newImage2Frame.Connect(subscriber); }
+      //public: void DisconnectNewImage2Frame(event::ConnectionPtr &c)
+      //        { newImage2Frame.Disconnect(c); }
 
-      protected: Ogre::Texture *_1stPassTextures_dbg[3];
-      protected: Ogre::Texture *_2ndPassTexture_dbg;
-      protected: Ogre::RenderTarget *_1stPassTargets_dbg[3];
-      protected: Ogre::RenderTarget *_2ndPassTarget_dbg;
-      protected: Ogre::Viewport *_1stPassViewports_dbg[3];
-      protected: Ogre::Viewport *_2ndPassViewport_dbg;
-      private: Ogre::Material *mat_1st_pass_dbg;
-      private: Ogre::Material *mat_2nd_pass_dbg;
+      //private: event::EventT<void(const unsigned char *, unsigned int, unsigned int,
+      //             unsigned int, unsigned int)> newImage2Frame;
+
+      //private: void PublishTexture(Ogre::Texture *tex, Ogre::Viewport *vp, unsigned int index);
+
+      //protected: Ogre::Texture *_1stPassTextures_dbg[3];
+      //protected: Ogre::Texture *_2ndPassTexture_dbg;
+      //protected: Ogre::RenderTarget *_1stPassTargets_dbg[3];
+      //protected: Ogre::RenderTarget *_2ndPassTarget_dbg;
+      //protected: Ogre::Viewport *_1stPassViewports_dbg[3];
+      //protected: Ogre::Viewport *_2ndPassViewport_dbg;
+      //private: Ogre::Material *mat_1st_pass_dbg;
+      //private: Ogre::Material *mat_2nd_pass_dbg;
       
       protected: virtual void Set1stPassTarget(Ogre::RenderTarget *target, unsigned int index);
       protected: virtual void Set2ndPassTarget(Ogre::RenderTarget *target);
@@ -183,7 +183,7 @@ namespace gazebo
       protected: unsigned int w2nd;
       protected: unsigned int h2nd;
 
-      protected: sensors::VisualLaserSensor *parent_sensor;
+      protected: sensors::GpuRaySensor *parent_sensor;
     };
 
     /// \}

@@ -15,12 +15,12 @@
  *
 */
 /* Desc: RaySensor proximity sensor
- * Author: Nate Koenig
- * Date: 23 february 2004
+ * Author: Mihai Emanuel Dolha
+ * Date: 29 March 2012
 */
 
-#ifndef VISUALLASERSENSOR_HH
-#define VISUALLASERSENSOR_HH
+#ifndef GPURAYSENSOR_HH
+#define GPURAYSENSOR_HH
 
 #include <vector>
 
@@ -33,8 +33,6 @@
 namespace gazebo
 {
   class OgreDynamicLines;
-  class Collision;
-  class MultiRayShape;
 
   namespace sensors
   {
@@ -45,13 +43,13 @@ namespace gazebo
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
-    class VisualLaserSensor: public Sensor
+    class GpuRaySensor: public Sensor
     {
       /// \brief Constructor
-      public: VisualLaserSensor();
+      public: GpuRaySensor();
 
       /// \brief Destructor
-      public: virtual ~VisualLaserSensor();
+      public: virtual ~GpuRaySensor();
 
       /// Load the ray using parameter from an SDF
       /// \param node The XMLConfig node
@@ -69,16 +67,24 @@ namespace gazebo
       /// Finalize the ray
       protected: virtual void Fini();
 
-      public: rendering::VisualLaserPtr GetLaserCamera() const
+      public: rendering::GpuLaserPtr GetLaserCamera() const
               {return this->laserCam;}
 
       /// \brief Get the minimum angle
       /// \return The minimum angle
       public: math::Angle GetAngleMin() const;
 
+      /// \brief Set the scan minimum angle
+      /// \param The minimum angle 
+      public: void SetAngleMin(double angle);
+
       /// \brief Get the maximum angle
       /// \return the maximum angle
       public: math::Angle GetAngleMax() const;
+
+      /// \brief Set the scan maximum angle
+      /// \param The maximum angle 
+      public: void SetAngleMax(double angle);
 
       /// \brief Get radians between each range
       public: double GetAngleResolution() const;
@@ -113,10 +119,19 @@ namespace gazebo
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
       public: math::Angle GetVerticalAngleMin() const;
+      
+      /// \brief Set the vertical scan bottom angle
+      /// \param The minimum angle of the scan block
+      public: void SetVerticalAngleMin(double angle);
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
       public: math::Angle GetVerticalAngleMax() const;
+      
+      /// \brief Set the vertical scan line top angle
+      /// \param The Maximum angle of the scan block
+      public: void SetVerticalAngleMax(double angle);
+
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -152,6 +167,8 @@ namespace gazebo
 
       public: unsigned int GetCameraCount();
 
+      public: bool IsHorizontal();
+
       public: double Get1stRatio();
 
       public: double Get2ndRatio();
@@ -161,6 +178,8 @@ namespace gazebo
       public: double GetCHFOV();
 
       public: double GetVFOV();
+
+      public: double GetCVFOV();
 
       public: double GetHAngle();
 
@@ -178,13 +197,14 @@ namespace gazebo
 
       protected: unsigned int cameraCount;
 
-      protected: double hfov, vfov, chfov, hang, vang;
+      protected: double hfov, vfov, chfov, cvfov, hang, vang;
       protected: double near, far;
       protected: unsigned int width_1st, height_1st;
       protected: unsigned int width_2nd, height_2nd;
       protected: double ratio_1st, ratio_2nd;
+      protected: bool isHorizontal;
       
-      private: rendering::VisualLaserPtr laserCam;
+      private: rendering::GpuLaserPtr laserCam;
       private: rendering::ScenePtr scene;
 
       private: transport::NodePtr node;

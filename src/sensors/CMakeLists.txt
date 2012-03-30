@@ -7,7 +7,7 @@ set (sources Sensors.cc
              CameraSensor.cc
              DepthCameraSensor.cc
              RaySensor.cc
-             VisualLaserSensor.cc
+             GpuRaySensor.cc
              ContactSensor.cc
 ) 
 
@@ -19,7 +19,7 @@ set (headers Sensors.hh
              CameraSensor.hh
              DepthCameraSensor.hh
              RaySensor.hh
-             VisualLaserSensor.hh
+             GpuRaySensor.hh
              ContactSensor.hh
 )
 

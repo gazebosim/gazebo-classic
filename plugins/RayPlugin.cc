@@ -55,6 +55,7 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 
   this->newLaserScansConnection = this->parentSensor->GetLaserShape()->ConnectNewLaserScans(
       boost::bind(&RayPlugin::OnNewLaserScans, this));
+  gzwarn <<"ray plugin loaded\n";
 }
 
 void RayPlugin::OnNewLaserScans()
