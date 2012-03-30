@@ -32,8 +32,6 @@
 
 namespace gazebo
 {
-  class OgreDynamicLines;
-
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
@@ -186,6 +184,17 @@ namespace gazebo
       public: double GetVAngle();
       
       private: void OnPose(ConstPosePtr &_msg);
+      
+      /// \brief Connect a to the add entity signal
+      public: event::ConnectionPtr ConnectNewLaserFrame(boost::function<void(const float *, 
+              unsigned int, unsigned int, unsigned int, const std::string &)> subscriber);
+
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &c);
+
+      //public: event::ConnectionPtr ConnectNewImage2Frame(boost::function<void(const unsigned char *,
+      //           unsigned int, unsigned int, unsigned int, unsigned int)> subscriber);
+      //
+      //public: void DisconnectNewImage2Frame(event::ConnectionPtr &c);
 
       protected: math::Vector3 offset;
       protected: sdf::ElementPtr rayElem;

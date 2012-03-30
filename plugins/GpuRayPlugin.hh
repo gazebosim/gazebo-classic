@@ -21,7 +21,6 @@
 #include <string>
 
 #include "common/Plugin.hh"
-#include "sensors/GpuRaySensor.hh"
 #include "sensors/CameraSensor.hh"
 #include "rendering/RenderTypes.hh"
 #include "gazebo.h"
@@ -46,7 +45,6 @@ namespace gazebo
 //    protected: std::string format;
 
     protected: sensors::GpuRaySensorPtr parentSensor;
-    protected: rendering::GpuLaserPtr laserCam;
 
     private: event::ConnectionPtr newLaserFrameConnection;
     //private: event::ConnectionPtr newImageFrameConnection;

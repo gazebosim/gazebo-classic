@@ -71,8 +71,6 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->horzElem = this->scanElem->GetElement("horizontal");
   this->rangeElem = this->rayElem->GetElement("range");
 
-  this->isHorizontal = (this->scanElem->GetValueString("sensor_plane") == "horizontal") ? true : false;
-
   if (this->scanElem->HasElement("vertical"))
     this->vertElem = this->scanElem->GetElement("vertical");
 
@@ -88,7 +86,12 @@ void GpuRaySensor::Load(const std::string &_worldName)
   height_2nd = this->GetVerticalRangeCount();
 
   if (height_1st == 1)
+  {
     height_2nd = 1;
+    this->isHorizontal = true;
+  }
+  else
+    this->isHorizontal = false;
 
   ratio_2nd = width_2nd / height_2nd;
 
@@ -123,12 +126,6 @@ void GpuRaySensor::Load(const std::string &_worldName)
     vfov = M_PI / 2;
     this->SetVerticalAngleMin(vang - (vfov / 2)); 
     this->SetVerticalAngleMax(vang + (vfov / 2)); 
-  }
-
-  if (height_1st > 1 && this->IsHorizontal() && this->cameraCount > 1)
-  {
-    gzwarn << "For horizontal FOV greater than 160 degrees consider using vertical sensor model for block lasers.\n";
-    gzwarn << "Using horizontal model will output incorrect ranges.\n";
   }
 
   if ((width_1st * height_1st) < (width_2nd * height_2nd))
@@ -251,6 +248,31 @@ void GpuRaySensor::Fini()
   this->laserCam.reset();
   this->scene.reset();
 }
+
+//////////////////////////////////////////////////
+event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(boost::function<void(const float *, 
+              unsigned int, unsigned int, unsigned int, const std::string &)> subscriber)
+{ 
+  return this->laserCam->ConnectNewLaserFrame(subscriber); 
+}
+
+//////////////////////////////////////////////////
+void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &c)
+{ 
+  this->laserCam->DisconnectNewLaserFrame(c); 
+}
+
+////////////////////////////////////////////////////
+//event::ConnectionPtr GpuRaySensor::ConnectNewImage2Frame(T subscriber)
+//{ 
+//  return this->laserCam->ConnectNewImage2Frame(subscriber); 
+//}
+//
+////////////////////////////////////////////////////
+//void GpuRaySensor::DisconnectNewImage2Frame(event::ConnectionPtr &c)
+//{ 
+//  this->laserCami->DisconnectNewImage2Frame(c); 
+//}
 
 //////////////////////////////////////////////////
 unsigned int GpuRaySensor::GetCameraCount()

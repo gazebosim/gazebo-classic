@@ -15,7 +15,7 @@
  *
 */
 #include "plugins/GpuRayPlugin.hh"
-#include "rendering/GpuLaser.hh"
+#include "sensors/GpuRaySensor.hh"
 
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(GpuRayPlugin)
@@ -31,8 +31,7 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
 {
   this->parentSensor =
     boost::shared_dynamic_cast<sensors::GpuRaySensor>(_sensor);
-  this->laserCam = this->parentSensor->GetLaserCamera();
-
+  
   if (!this->parentSensor)
   {
     gzerr << "GpuRayPlugin not attached to a GpuLaser sensor\n";
@@ -41,14 +40,12 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
 
   this->width = this->parentSensor->GetRangeCount();
   this->height = this->parentSensor->GetVerticalRangeCount();
-//  this->depth = 3;
-//  this->format = this->laserCam->GetImageFormat();
 
-  this->newLaserFrameConnection = this->laserCam->ConnectNewLaserFrame(
+  this->newLaserFrameConnection = this->parentSensor->ConnectNewLaserFrame(
       boost::bind(&GpuRayPlugin::OnNewLaserFrame,
         this, _1, _2, _3, _4, _5));
 
-//  this->newImageFrameConnection = this->laserCam->ConnectNewImage2Frame(
+//  this->newImageFrameConnection = this->parentSensor->ConnectNewImage2Frame(
 //      boost::bind(&GpuRayPlugin::OnNewImageFrame,
 //        this, _1, _2, _3, _4, _5));
 

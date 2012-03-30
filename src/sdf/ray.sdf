@@ -1,6 +1,5 @@
 <element name="ray" required="0">
   <element name="scan" required="1">
-    <attribute name="sensor_plane" type="string" default="horizontal" required="0"/>
     <element name="horizontal" required="1">
       <attribute name="samples" type="unsigned int" default="1" required="1"/>
       <attribute name="resolution" type="double" default="1" required="0"/>
