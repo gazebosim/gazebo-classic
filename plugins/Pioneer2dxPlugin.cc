@@ -15,6 +15,7 @@
  *
 */
 
+#include "transport/transport.h"
 #include "plugins/Pioneer2dxPlugin.hh"
 
 using namespace gazebo;
@@ -30,6 +31,13 @@ void Pioneer2dxPlugin::Load(physics::ModelPtr _model,
                             sdf::ElementPtr /*_sdf*/)
 {
   this->model = _model;
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(model->GetWorld()->GetName());
+
+  this->velSub = this->node->Subscribe(std::string("~/") +
+      this->model->GetName() + "/vel_cmd", &Pioneer2dxPlugin::OnVelMsg, this); 
+
   this->leftJoint = _model->GetJoint("left_wheel_hinge");
   this->rightJoint = _model->GetJoint("right_wheel_hinge");
   this->updateConnection = event::Events::ConnectWorldUpdateStart(
@@ -37,10 +45,18 @@ void Pioneer2dxPlugin::Load(physics::ModelPtr _model,
 }
 
 /////////////////////////////////////////////////
+void Pioneer2dxPlugin::OnVelMsg(ConstPosePtr &_msg)
+{
+  std::cout << "OnVelMsg[" << _msg->DebugString() << "]\n";
+}
+
+/////////////////////////////////////////////////
 void Pioneer2dxPlugin::OnUpdate()
 {
+  /*
   this->leftJoint->SetVelocity(0, 0.2);
   this->rightJoint->SetVelocity(0, .2);
   this->leftJoint->SetForce(0, 0.2);
   this->rightJoint->SetForce(0, 0.2);
+  */
 }

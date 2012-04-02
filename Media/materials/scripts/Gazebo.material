@@ -169,14 +169,14 @@ material Gazebo/LaserScan2ndDBG
 
 material Gazebo/Grey
 {
-	receive_shadows on
+  receive_shadows on
   technique
   {
     pass
     {
       ambient .1 .1 .1  1.0
       diffuse .5 .5 .5  1.0
-			specular 0.1 0.1 0.1 1.000000 12.500000
+      specular 0.1 0.1 0.1 1.000000 12.500000
     }
   }
 }

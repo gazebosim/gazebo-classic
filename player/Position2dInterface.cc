@@ -35,6 +35,9 @@
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
+
+#include "transport/transport.h"
+#include "msgs/msgs.h"
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
 
@@ -47,6 +50,11 @@ Position2dInterface::Position2dInterface(player_devaddr_t _addr,
     : GazeboInterface(_addr, _driver, _cf, _section)
 {
   this->datatime = -1;
+  this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  this->node->Init(this->worldName);
+  this->modelName = _cf->ReadString(_section, "model_name", "default");
+  this->velPub = this->node->Advertise<gazebo::msgs::Pose>(
+      std::string("~/") + this->modelName + "/vel_cmd");
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
@@ -61,7 +69,7 @@ Position2dInterface::~Position2dInterface()
 //////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
-                                        player_msghdr_t *_hdr, void * /*_data*/)
+                                        player_msghdr_t *_hdr, void *_data)
 {
   int result = 0;
 
@@ -71,9 +79,11 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
   if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
         PLAYER_POSITION2D_CMD_VEL, this->device_addr))
   {
-    // player_position2d_cmd_vel_t *cmd;
-    // cmd = (player_position2d_cmd_vel_t*)_data;
 
+    player_position2d_cmd_vel_t *cmd;
+    cmd = (player_position2d_cmd_vel_t*)_data;
+
+    std::cout << "Player: CMD VelX[" << cmd->vel.px << "] VelY[" << cmd->vel.py << "] VelA[" << cmd->vel.pa << "]\n";
     /*this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
     this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
     this->iface->data->cmdVelocity.yaw = cmd->vel.pa;

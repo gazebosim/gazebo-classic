@@ -19,12 +19,14 @@
  * Date: 2 March 2006
  */
 
+#include "transport/transport.h"
 #include "GazeboInterface.hh"
 #include "GazeboDriver.hh"
 
 GazeboInterface::GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
                                  ConfigFile * /*cf*/, int /*section*/)
 {
+  printf("GazeboInterface \n");
   this->device_addr = _addr;
   this->driver = _driver;
 }
@@ -32,5 +34,3 @@ GazeboInterface::GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
 GazeboInterface::~GazeboInterface()
 {
 }
-
-

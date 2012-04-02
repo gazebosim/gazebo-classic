@@ -87,7 +87,6 @@ class SimulationInterface : public GazeboInterface
   private: player_simulation_pose2d_req_t pose2dReq;
   private: static boost::recursive_mutex *mutex;
 
-  private: gazebo::transport::NodePtr node;
   private: gazebo::transport::SubscriberPtr statsSub;
   private: gazebo::transport::PublisherPtr modelPub;
   private: double simTime, realTime, pauseTime;

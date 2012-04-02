@@ -64,6 +64,8 @@ class Position2dInterface : public GazeboInterface
   private: double datatime;
 
   private: static boost::recursive_mutex *mutex;
+  private: gazebo::transport::PublisherPtr velPub;
+  private: std::string modelName;
 };
 
 /// \}

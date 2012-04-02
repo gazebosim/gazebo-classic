@@ -19,6 +19,7 @@
 
 #include "common/common.h"
 #include "physics/physics.h"
+#include "transport/TransportTypes.hh"
 #include "gazebo.h"
 
 namespace gazebo
@@ -29,10 +30,14 @@ namespace gazebo
     public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     private: void OnUpdate();
 
+    private: void OnVelMsg(ConstPosePtr &_msg);
+
+    private: transport::NodePtr node;
+    private: transport::SubscriberPtr velSub;
+
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;
     private: event::ConnectionPtr updateConnection;
   };
 }
 #endif
-
