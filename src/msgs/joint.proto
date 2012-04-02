@@ -17,6 +17,7 @@ message Joint
     PRISMATIC = 3;
     UNIVERSAL = 4;
     BALL      = 5;
+    SCREW     = 6;
   }
 
   required string name           = 1;

@@ -454,7 +454,7 @@ void GpuRaySensor::SetVerticalAngleMax(double angle)
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::GetRanges(std::vector<double> &_ranges)
+void GpuRaySensor::GetRanges(std::vector<double> &/*_ranges*/)
 {
   /*boost::mutex::scoped_lock(*this->mutex);
   _ranges.resize(this->laserMsg.ranges_size());
@@ -476,17 +476,19 @@ double GpuRaySensor::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRetro(int index)
+double GpuRaySensor::GetRetro(int /*index*/)
 {
   //boost::mutex::scoped_lock(*this->mutex);
   //return this->laserShape->GetRetro(index);
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
-int GpuRaySensor::GetFiducial(int index)
+int GpuRaySensor::GetFiducial(int /*index*/)
 {
   //boost::mutex::scoped_lock(*this->mutex);
   //return this->laserShape->GetFiducial(index);
+  return 0;
 }
 
 //////////////////////////////////////////////////

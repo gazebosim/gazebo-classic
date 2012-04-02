@@ -393,7 +393,7 @@ static int compare_index_error (const void *a, const void *b)
 
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
                       dRealPtr I, dxBody * const *body,
-                      const dReal stepsize1, dRealMutablePtr c, dRealMutablePtr J,
+                      const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
                       int *jb, dRealMutablePtr rhs_precon)
 {
     /************************************************************************************/
@@ -418,7 +418,7 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       dxBody *const *const bodyend = body + nb;
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, Irow+=12, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
-        dReal body_mass = b_ptr->mass.mass;
+        // dReal body_mass = b_ptr->mass.mass;
         for (int j=0; j<3; j++)
           tmp1curr[j] = b_ptr->facc[j]; // +  body_mass * b_ptr->lvel[j] * stepsize1;
         dReal tmpa[3];
@@ -1842,7 +1842,7 @@ static size_t EstimateGR_LCPMemoryRequirements(int m)
 }
 #endif
 
-static size_t EstimateSOR_LCPMemoryRequirements(int m,int nb)
+static size_t EstimateSOR_LCPMemoryRequirements(int m,int /*nb*/)
 {
   size_t res = dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for Ad

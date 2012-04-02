@@ -14,24 +14,36 @@
  * limitations under the License.
  *
 */
-#ifndef RENDERING_MATERIAL_HH
-#define RENDERING_MATERIAL_HH
+/* Desc: Arrow Visualization Class
+ * Author: Nate Koenig
+ */
 
-#include "common/Material.hh"
+#ifndef __ARROWVISUAL_HH__
+#define __ARROWVISUAL_HH__
+
+#include <string>
+#include "rendering/Visual.hh"
+
+namespace ogre
+{
+  class SceneNode;
+}
 
 namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering
-    /// \{
-    /// \brief Rendering material. Just a helper function for now
-    class Material
+    class ArrowVisual : public Visual
     {
-      public: static void CreateMaterials();
-      public: static void Update(const gazebo::common::Material *_mat);
+      public: ArrowVisual(const std::string &_name, VisualPtr _vis);
+      public: virtual ~ArrowVisual();
+
+      /// \brief Load the visual with default parameters
+      public: virtual void Load();
+
+      private: Ogre::SceneNode *headNode;
+      private: Ogre::SceneNode *shaftNode;
     };
-    /// \}
   }
 }
 #endif

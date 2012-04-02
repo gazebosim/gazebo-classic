@@ -579,19 +579,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     gzthrow("can't have two joint with the same name");
 
   msgs::Joint msg;
-  msg.set_name(joint->GetName());
-  msg.set_type(msgs::Joint::REVOLUTE);
-
-  if (joint->GetParent())
-    msg.set_parent(joint->GetParent()->GetScopedName());
-  else
-    msg.set_parent("world");
-
-  if (joint->GetChild())
-    msg.set_child(joint->GetChild()->GetScopedName());
-  else
-    msg.set_child("world");
-
+  joint->FillJointMsg(msg);
   this->jointPub->Publish(msg);
 
   this->joints.push_back(joint);
@@ -1042,5 +1030,5 @@ void Model::SetEnabled(bool _enabled)
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
+      boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
 }

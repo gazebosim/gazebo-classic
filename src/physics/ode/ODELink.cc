@@ -125,7 +125,7 @@ void ODELink::Init()
 }
 
 //////////////////////////////////////////////////
-void ODELink::DisabledCallback(dBodyID _id)
+void ODELink::DisabledCallback(dBodyID /*_id*/)
 {
   printf("Disabled\n");
 }

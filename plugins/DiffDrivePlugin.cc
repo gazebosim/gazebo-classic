@@ -23,6 +23,7 @@ GZ_REGISTER_MODEL_PLUGIN(DiffDrivePlugin)
 
 /////////////////////////////////////////////////
 DiffDrivePlugin::DiffDrivePlugin()
+  : speed(0)
 {
 }
 
@@ -50,28 +51,21 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
     gzerr << "Unable to find right joint[" 
           << _sdf->GetElement("right_joint")->GetValueString() << "]\n";
 
-  /*this->updateConnection = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateStart(
           boost::bind(&DiffDrivePlugin::OnUpdate, this));
-          */
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
-  std::cout << "OnVelMsg[" << _msg->DebugString() << "]\n";
-  this->leftJoint->SetVelocity(0, _msg->position().x());
-  this->rightJoint->SetVelocity(0, _msg->position().x());
-  this->leftJoint->SetForce(0, 0.2);
-  this->rightJoint->SetForce(0, 0.2);
+  this->speed = _msg->position().x();
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  /*
-  this->leftJoint->SetVelocity(0, 0.2);
-  this->rightJoint->SetVelocity(0, .2);
-  this->leftJoint->SetForce(0, 0.2);
-  this->rightJoint->SetForce(0, 0.2);
-  */
+  this->leftJoint->SetVelocity(0, this->speed);
+  this->rightJoint->SetVelocity(0, this->speed);
+  this->leftJoint->SetMaxForce(0, 5);
+  this->rightJoint->SetMaxForce(0, 5);
 }

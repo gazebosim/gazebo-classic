@@ -14,24 +14,32 @@
  * limitations under the License.
  *
 */
-#ifndef RENDERING_MATERIAL_HH
-#define RENDERING_MATERIAL_HH
+/* Desc: 3D Axis Visualization Class
+ * Author: Nate Koenig
+ */
 
-#include "common/Material.hh"
+#ifndef AXISVISUAL_HH
+#define AXISVISUAL_HH
+
+#include <string>
+
+#include "rendering/Visual.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering
-    /// \{
-    /// \brief Rendering material. Just a helper function for now
-    class Material
+    class AxisVisual : public Visual
     {
-      public: static void CreateMaterials();
-      public: static void Update(const gazebo::common::Material *_mat);
+      public: AxisVisual(const std::string &_name, VisualPtr _vis);
+      public: virtual ~AxisVisual();
+
+      public: virtual void Load();
+
+      private: ArrowVisualPtr xAxis;
+      private: ArrowVisualPtr yAxis;
+      private: ArrowVisualPtr zAxis;
     };
-    /// \}
   }
 }
 #endif

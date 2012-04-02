@@ -38,6 +38,7 @@ namespace gazebo
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;
     private: event::ConnectionPtr updateConnection;
+    private: double speed;
   };
 }
 #endif

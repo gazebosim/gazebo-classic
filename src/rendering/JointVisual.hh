@@ -14,24 +14,33 @@
  * limitations under the License.
  *
 */
-#ifndef RENDERING_MATERIAL_HH
-#define RENDERING_MATERIAL_HH
+/* Desc: Joint Visualization Class
+ * Author: Nate Koenig
+ */
 
-#include "common/Material.hh"
+#ifndef JOINTVISUAL_HH
+#define JOINTVISUAL_HH
+
+#include <string>
+#include "rendering/Visual.hh"
+
+namespace ogre
+{
+  class SceneNode;
+}
 
 namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering
-    /// \{
-    /// \brief Rendering material. Just a helper function for now
-    class Material
+    class JointVisual : public Visual
     {
-      public: static void CreateMaterials();
-      public: static void Update(const gazebo::common::Material *_mat);
+      public: JointVisual(const std::string &_name, VisualPtr _vis);
+      public: virtual ~JointVisual();
+
+      public: void Load(ConstJointPtr &_msg);
+      private: AxisVisualPtr axisVisual;
     };
-    /// \}
   }
 }
 #endif

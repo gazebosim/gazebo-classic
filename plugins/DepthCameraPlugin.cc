@@ -85,11 +85,10 @@ void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
 }
     
 /////////////////////////////////////////////////
-void DepthCameraPlugin::OnNewRGBPointCloud(const float *_pcd,
-                unsigned int _width, unsigned int _height,
-                unsigned int _depth, const std::string &_format)
+void DepthCameraPlugin::OnNewRGBPointCloud(const float * /*_pcd*/,
+                unsigned int /*_width*/, unsigned int /*_height*/,
+                unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-
 }
 
 /////////////////////////////////////////////////

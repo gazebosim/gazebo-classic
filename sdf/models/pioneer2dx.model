@@ -5,21 +5,16 @@
     <link name="chassis">
       <origin pose="0.0 0.0 0.16 0 0 0"/>
    
-      <inertial mass="1.0">
+      <inertial mass="2.0">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu="1"/>
-          </friction>
-        </surface>
       </collision>
     
-      <visual name="visual1">
+      <visual name="visual">
         <origin pose="0 0 0.04 0 0 0"/>
         <geometry>
           <mesh filename="pioneer2dx/chassis.dae"/>
@@ -28,13 +23,13 @@
     </link>
     
     <link name="right_wheel">
-      <origin pose="0.1 -.17 0.11 0 1.5707 1.5707"/>
+      <origin pose="0.1 -.17 0.11 0 1.5707 -1.5707"/>
   
-      <inertial mass="0.1">
+      <inertial mass="0.5">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
   
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
         </geometry>
@@ -51,11 +46,11 @@
     <link name="left_wheel">
       <origin pose="0.1 .17 0.11 0 1.5707 1.5707"/>
   
-      <inertial mass="0.1">
+      <inertial mass="0.5">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
   
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
         </geometry>
@@ -72,11 +67,11 @@
     <link name="castor">
       <origin pose="-0.200 0 0.04 0 0 0"/>
   
-      <inertial mass="0.1">
+      <inertial mass="0.5">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
   
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <sphere radius="0.04"/>
         </geometry>

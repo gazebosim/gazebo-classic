@@ -593,14 +593,7 @@ void Visual::AttachMesh(const std::string &_meshName)
   Ogre::MovableObject *obj;
   stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
 
-  // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
-      common::MeshManager::Instance()->HasMesh(_meshName))
-  {
-    const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(_meshName);
-    this->InsertMesh(mesh);
-  }
+  this->InsertMesh(_meshName);
 
   obj = (Ogre::MovableObject*)
     (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
@@ -666,14 +659,14 @@ math::Vector3 Visual::GetScale()
 
 
 //////////////////////////////////////////////////
-void Visual::SetMaterial(const std::string &materialName)
+void Visual::SetMaterial(const std::string &_materialName)
 {
-  if (materialName.empty() || materialName == "__default__")
+  if (_materialName.empty() || _materialName == "__default__")
     return;
 
   // Create a custom material name
   std::string newMaterialName;
-  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
+  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
 
   if (this->GetMaterialName() == newMaterialName)
     return;
@@ -684,21 +677,21 @@ void Visual::SetMaterial(const std::string &materialName)
 
   try
   {
-    this->origMaterialName = materialName;
+    this->origMaterialName = _materialName;
     // Get the original material
     origMaterial =
-      Ogre::MaterialManager::getSingleton().getByName(materialName);
+      Ogre::MaterialManager::getSingleton().getByName(_materialName);
   }
   catch(Ogre::Exception &e)
   {
-    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
+    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
     return;
   }
 
   if (origMaterial.isNull())
   {
-    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
+    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white\n";
     return;
   }
@@ -720,7 +713,6 @@ void Visual::SetMaterial(const std::string &materialName)
     myMaterial = origMaterial->clone(this->myMaterialName);
   }
 
-
   try
   {
     for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
@@ -732,12 +724,32 @@ void Visual::SetMaterial(const std::string &materialName)
       else
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
+
+    /*for (unsigned int i=0; i < this->sceneNode->numChildren(); ++i)
+    {
+      for (int j = 0; j < this->sceneNode->getChild(i)->numAttachedObjects();
+           j++)
+      {
+        Ogre::MovableObject *obj = this->sceneNode->getChild(i)->getAttachedObject(j);
+
+        if (dynamic_cast<Ogre::Entity*>(obj))
+          ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
+        else
+          ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
+      }
+    }*/
   }
   catch(Ogre::Exception &e)
   {
     gzwarn << "Unable to set Material[" << this->myMaterialName
            << "] to Geometry["
            << this->sceneNode->getName() << ". Object will appear white.\n";
+  }
+
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetMaterial(_materialName);
   }
 
   RTShaderSystem::Instance()->UpdateShaders();
@@ -1383,6 +1395,19 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
   {
     Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
     this->GetBoundsHelper(next, box);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::InsertMesh(const std::string &_meshName)
+{
+  // Add the mesh into OGRE
+  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+      common::MeshManager::Instance()->HasMesh(_meshName))
+  {
+    const common::Mesh *mesh =
+      common::MeshManager::Instance()->GetMesh(_meshName);
+    this->InsertMesh(mesh);
   }
 }
 

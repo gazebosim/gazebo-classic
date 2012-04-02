@@ -204,9 +204,9 @@ material Gazebo/FlatBlack
 	{
 		pass
 		{
-			ambient 0 0 0
+			ambient 0.1 0.1 0.1
       diffuse 0.1 0.1 0.1
-      specular 0.01 0.01 0.01 0
+      specular 0.01 0.01 0.01 1.0 1.0
     }
 	}
 }

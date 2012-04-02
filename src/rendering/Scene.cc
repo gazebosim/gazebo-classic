@@ -26,6 +26,7 @@
 #include "rendering/RenderEvents.hh"
 #include "rendering/LaserVisual.hh"
 #include "rendering/CameraVisual.hh"
+#include "rendering/JointVisual.hh"
 #include "rendering/ContactVisual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
@@ -1387,8 +1388,25 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
+void Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
+  VisualPtr parentVis = this->GetVisual(_msg->parent());
+  VisualPtr childVis;
+
+  if (_msg->child() == "world")
+    childVis = this->worldVisual;
+  else
+    childVis = this->GetVisual(_msg->child());
+
+  if (!parentVis)
+    return;
+
+  JointVisualPtr jointVis(new JointVisual(
+          _msg->name()+"_joint_vis", childVis));
+  jointVis->Load(_msg);
+
+  this->visuals[jointVis->GetName()] = jointVis;
+
   // TODO: Fix this
   /*VisualPtr parentVis = this->GetVisual(_msg->parent());
   VisualPtr childVis;
