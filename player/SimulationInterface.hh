@@ -78,7 +78,7 @@ class SimulationInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: void OnStats(ConstWorldStatisticsPtr &_msg);
+  // private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
   private: QueuePointer *responseQueue;
 

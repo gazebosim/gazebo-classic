@@ -41,6 +41,7 @@ GazeboTime::~GazeboTime()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void GazeboTime::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   this->simTime  = gazebo::msgs::Convert(_msg->sim_time());
@@ -62,5 +63,3 @@ int GazeboTime::GetTimeDouble(double *_time)
   *_time = this->simTime.Double();
   return 0;
 }
-
-

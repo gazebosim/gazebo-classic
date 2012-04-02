@@ -26,7 +26,6 @@
 GazeboInterface::GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
                                  ConfigFile * /*cf*/, int /*section*/)
 {
-  printf("GazeboInterface \n");
   this->device_addr = _addr;
   this->driver = _driver;
 }

@@ -46,8 +46,8 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
   gazebo::init();
   gazebo::run();
 
-  this->worldName = _cf->ReadString(_section, "world_name", "default");
-  std::cout << "Simulation Interface WorldName[" << this->worldName << "]\n";
+  worldName = _cf->ReadString(_section, "world_name", "default");
+  // std::cout << "Simulation Interface WorldName[" << this->worldName << "]\n";
 
   // steal the global clock - a bit aggressive, but a simple approach
   if (GlobalTime)
@@ -59,12 +59,13 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
   GlobalTime = new GazeboTime();
   assert(GlobalTime != 0);
 
-  // this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
-  // this->node->Init(this->worldName);
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &SimulationInterface::OnStats, this);
+  /*this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  this->node->Init(this->worldName);
+  // this->statsSub =
+  // this->node->Subscribe("~/world_stats", &SimulationInterface::OnStats, this);
 
   this->modelPub = this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
+  */
 
   this->responseQueue = NULL;
 
@@ -79,7 +80,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
 // Destructor
 SimulationInterface::~SimulationInterface()
 {
-  gazebo::fini();
+  // gazebo::fini();
   if (this->responseQueue)
   {
     delete this->responseQueue;
@@ -106,7 +107,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose3d_req_t *req =
       static_cast<player_simulation_pose3d_req_t*>(_data);
 
-    gazebo::math::Pose pose(
+    /* gazebo::math::Pose pose(
         gazebo::math::Vector3(req->pose.px, req->pose.py, req->pose.pz),
         gazebo::math::Quaternion(req->pose.proll, req->pose.ppitch,
                                  req->pose.pyaw));
@@ -119,6 +120,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     this->driver->Publish(this->device_addr, _respQueue,
                           PLAYER_MSGTYPE_RESP_ACK,
                           PLAYER_SIMULATION_REQ_SET_POSE3D);
+                          */
   }
 
   /// Set a 2D pose
@@ -129,7 +131,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose2d_req_t *req =
       static_cast<player_simulation_pose2d_req_t*>(_data);
 
-    gazebo::math::Pose pose(
+    /* gazebo::math::Pose pose(
         gazebo::math::Vector3(req->pose.px, req->pose.py, 0),
         gazebo::math::Quaternion(0, 0, req->pose.pa));
 
@@ -137,6 +139,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     msg.set_name(req->name);
     gazebo::msgs::Set(msg.mutable_pose(), pose);
     this->modelPub->Publish(msg);
+    */
 
     this->driver->Publish(this->device_addr, _respQueue,
                           PLAYER_MSGTYPE_RESP_ACK,
@@ -151,7 +154,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose3d_req_t *req =
       static_cast<player_simulation_pose3d_req_t*>(_data);
 
-    std::map<std::string, gazebo::math::Pose>::iterator iter;
+    /* std::map<std::string, gazebo::math::Pose>::iterator iter;
 
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
@@ -172,6 +175,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     this->driver->Publish(this->device_addr, *(this->responseQueue),
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
         &this->pose3dReq, sizeof(this->pose3dReq), NULL);
+        */
   }
 
   /// Get a 2D pose
@@ -179,7 +183,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
                                  PLAYER_SIMULATION_REQ_GET_POSE2D,
                                  this->device_addr))
   {
-    player_simulation_pose2d_req_t *req =
+    /*player_simulation_pose2d_req_t *req =
       static_cast<player_simulation_pose2d_req_t*>(_data);
 
     std::map<std::string, gazebo::math::Pose>::iterator iter;
@@ -198,6 +202,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     this->driver->Publish(this->device_addr, *(this->responseQueue),
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
         &this->pose2dReq, sizeof(this->pose2dReq), NULL);
+        */
   }
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_SIMULATION_REQ_GET_PROPERTY,
@@ -253,8 +258,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
       }
       else
       {
-        gzerr << "The object [" << name
+        /* gzerr << "The object [" << name
           << "] does not have the property [" << prop << "].\n";
+          */
       }
     }
   }
@@ -317,10 +323,10 @@ void SimulationInterface::Unsubscribe()
 {
 }
 
-void SimulationInterface::OnStats(ConstWorldStatisticsPtr &_msg)
+/*void SimulationInterface::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   this->simTime  = gazebo::msgs::Convert(_msg->sim_time()).Double();
   this->realTime  = gazebo::msgs::Convert(_msg->real_time()).Double();
   this->pauseTime  = gazebo::msgs::Convert(_msg->pause_time()).Double();
   this->paused  = _msg->paused();
-}
+}*/
