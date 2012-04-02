@@ -16,19 +16,19 @@
 */
 
 #include "transport/transport.h"
-#include "plugins/Pioneer2dxPlugin.hh"
+#include "plugins/DiffDrivePlugin.hh"
 
 using namespace gazebo;
-GZ_REGISTER_MODEL_PLUGIN(Pioneer2dxPlugin)
+GZ_REGISTER_MODEL_PLUGIN(DiffDrivePlugin)
 
 /////////////////////////////////////////////////
-Pioneer2dxPlugin::Pioneer2dxPlugin()
+DiffDrivePlugin::DiffDrivePlugin()
 {
 }
 
 /////////////////////////////////////////////////
-void Pioneer2dxPlugin::Load(physics::ModelPtr _model,
-                            sdf::ElementPtr /*_sdf*/)
+void DiffDrivePlugin::Load(physics::ModelPtr _model,
+                            sdf::ElementPtr _sdf)
 {
   this->model = _model;
 
@@ -36,22 +36,37 @@ void Pioneer2dxPlugin::Load(physics::ModelPtr _model,
   this->node->Init(model->GetWorld()->GetName());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
-      this->model->GetName() + "/vel_cmd", &Pioneer2dxPlugin::OnVelMsg, this); 
+      this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this); 
 
-  this->leftJoint = _model->GetJoint("left_wheel_hinge");
-  this->rightJoint = _model->GetJoint("right_wheel_hinge");
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
-          boost::bind(&Pioneer2dxPlugin::OnUpdate, this));
+  this->leftJoint = _model->GetJoint(
+      _sdf->GetElement("left_joint")->GetValueString());
+  this->rightJoint = _model->GetJoint(
+      _sdf->GetElement("right_joint")->GetValueString());
+
+  if (!this->leftJoint)
+    gzerr << "Unable to find left joint["
+          << _sdf->GetElement("left_joint")->GetValueString() << "]\n";
+  if (!this->rightJoint)
+    gzerr << "Unable to find right joint[" 
+          << _sdf->GetElement("right_joint")->GetValueString() << "]\n";
+
+  /*this->updateConnection = event::Events::ConnectWorldUpdateStart(
+          boost::bind(&DiffDrivePlugin::OnUpdate, this));
+          */
 }
 
 /////////////////////////////////////////////////
-void Pioneer2dxPlugin::OnVelMsg(ConstPosePtr &_msg)
+void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
   std::cout << "OnVelMsg[" << _msg->DebugString() << "]\n";
+  this->leftJoint->SetVelocity(0, _msg->position().x());
+  this->rightJoint->SetVelocity(0, _msg->position().x());
+  this->leftJoint->SetForce(0, 0.2);
+  this->rightJoint->SetForce(0, 0.2);
 }
 
 /////////////////////////////////////////////////
-void Pioneer2dxPlugin::OnUpdate()
+void DiffDrivePlugin::OnUpdate()
 {
   /*
   this->leftJoint->SetVelocity(0, 0.2);

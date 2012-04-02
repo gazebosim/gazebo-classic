@@ -9,7 +9,7 @@ set (plugins CameraPlugin
              GpuRayPlugin
              ContactPlugin
              RayPlugin
-             Pioneer2dxPlugin)
+             DiffDrivePlugin)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)

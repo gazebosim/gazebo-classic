@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_PIONNEER2DX_PLUGIN_HH__
-#define __GAZEBO_PIONNEER2DX_PLUGIN_HH__
+#ifndef __GAZEBO_DIFFDRIVE_PLUGIN_HH__
+#define __GAZEBO_DIFFDRIVE_PLUGIN_HH__
 
 #include "common/common.h"
 #include "physics/physics.h"
@@ -24,9 +24,9 @@
 
 namespace gazebo
 {
-  class Pioneer2dxPlugin : public ModelPlugin
+  class DiffDrivePlugin : public ModelPlugin
   {
-    public: Pioneer2dxPlugin();
+    public: DiffDrivePlugin();
     public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     private: void OnUpdate();
 

@@ -38,6 +38,7 @@
 
 #include "transport/transport.h"
 #include "msgs/msgs.h"
+#include "math/gzmath.h"
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
 
@@ -83,11 +84,12 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
     player_position2d_cmd_vel_t *cmd;
     cmd = (player_position2d_cmd_vel_t*)_data;
 
-    std::cout << "Player: CMD VelX[" << cmd->vel.px << "] VelY[" << cmd->vel.py << "] VelA[" << cmd->vel.pa << "]\n";
-    /*this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
-    this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
-    this->iface->data->cmdVelocity.yaw = cmd->vel.pa;
-    */
+    gazebo::msgs::Pose msg;
+    gazebo::msgs::Set(msg.mutable_position(),
+                      gazebo::math::Vector3(cmd->vel.px, cmd->vel.py, 0));
+    gazebo::msgs::Set(msg.mutable_orientation(),
+                      gazebo::math::Quaternion(0, 0, cmd->vel.pa));
+    this->velPub->Publish(msg);
 
     result = 0;
   }
@@ -261,5 +263,3 @@ void Position2dInterface::Subscribe()
 void Position2dInterface::Unsubscribe()
 {
 }
-
-

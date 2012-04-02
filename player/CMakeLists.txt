@@ -2,9 +2,8 @@ set (sources GazeboDriver.cc
              GazeboInterface.cc
              GazeboTime.cc
              SimulationInterface.cc
+             Position2dInterface.cc
 )
-
-             # Position2dInterface.cc
              #Position3dInterface.cc
              #LaserInterface.cc
              #CameraInterface.cc
@@ -35,7 +34,7 @@ target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
   gazebo_transport
   gazebo_msgs
   gazebo_math
-  )
+)
 
 INSTALL_LIBRARY(gazebo_player)
 #INSTALL_INCLUDES("player" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)

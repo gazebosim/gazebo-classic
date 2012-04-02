@@ -24,7 +24,7 @@
 
 #include "GazeboInterface.hh"
 #include "SimulationInterface.hh"
-// #include "Position2dInterface.hh"
+#include "Position2dInterface.hh"
 // #include "Graphics3dInterface.hh"
 // #include "LaserInterface.hh"
 // #include "CameraInterface.hh"
@@ -248,11 +248,10 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
         ifsrc = new SimulationInterface(playerAddr, this, _cf, _section);
         break;
 
-      /* case PLAYER_POSITION2D_CODE:
+      case PLAYER_POSITION2D_CODE:
         if (!player_quiet_startup) printf(" a position2d interface.\n");
         ifsrc = new Position2dInterface(playerAddr, this, _cf, _section);
         break;
-        */
 
       /*case PLAYER_GRAPHICS3D_CODE:
         if (!player_quiet_startup) printf(" a graphics3d interface.\n");

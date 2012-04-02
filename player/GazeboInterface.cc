@@ -23,6 +23,8 @@
 #include "GazeboInterface.hh"
 #include "GazeboDriver.hh"
 
+std::string GazeboInterface::worldName = "default";
+
 GazeboInterface::GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
                                  ConfigFile * /*cf*/, int /*section*/)
 {
