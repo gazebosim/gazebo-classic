@@ -71,7 +71,7 @@ foreach (hdr ${headers})
 endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/rendering.h.in ${CMAKE_CURRENT_BINARY_DIR}/rendering.h )
 
-add_library(gazebo_rendering SHARED ${sources})
+gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering gazebo_common 
                                         gazebo_sdf_interface
