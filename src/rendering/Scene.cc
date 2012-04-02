@@ -1050,11 +1050,11 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     Ogre::IndexData* index_data = submesh->indexData;
     Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
 
-    uint64_t*  pLong = static_cast<uint64_t*>(
-        ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-
     if ((ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT))
     {
+      uint32_t*  pLong = static_cast<uint32_t*>(
+          ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
+
       for (size_t k = 0; k < index_data->indexCount; k++)
       {
         indices[index_offset++] = pLong[k];
@@ -1062,6 +1062,9 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     }
     else
     {
+      uint64_t*  pLong = static_cast<uint64_t*>(
+          ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
+
       uint16_t* pShort = reinterpret_cast<uint16_t*>(pLong);
       for (size_t k = 0; k < index_data->indexCount; k++)
       {
