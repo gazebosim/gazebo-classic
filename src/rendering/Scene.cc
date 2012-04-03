@@ -1110,7 +1110,7 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
             _msg->model(i).visual(j)));
       this->visualMsgs.push_back(vm);
     }
-    
+
     for (int j = 0; j < _msg->model(i).joint_size(); j++)
     {
       boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(

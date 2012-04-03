@@ -84,9 +84,8 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
   if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
         PLAYER_POSITION2D_CMD_VEL, this->device_addr))
   {
-
     player_position2d_cmd_vel_t *cmd;
-    cmd = (player_position2d_cmd_vel_t*)_data;
+    cmd = static_cast<player_position2d_cmd_vel_t*>(_data);
 
     gazebo::msgs::Pose msg;
     gazebo::msgs::Set(msg.mutable_position(),
@@ -260,5 +259,5 @@ void Position2dInterface::OnPoseMsg(ConstPosePtr &_msg)
   this->driver->Publish(this->device_addr,
       PLAYER_MSGTYPE_DATA,
       PLAYER_POSITION2D_DATA_STATE,
-      (void*)&data, sizeof(data), &this->datatime);
+      static_cast<void*>(&data), sizeof(data), &this->datatime);
 }

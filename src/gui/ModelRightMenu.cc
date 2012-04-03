@@ -65,7 +65,6 @@ ModelRightMenu::ModelRightMenu()
   this->showJointsAction->setCheckable(true);
   connect(this->showJointsAction, SIGNAL(triggered()), this,
           SLOT(OnShowJoints()));
-
 }
 
 /////////////////////////////////////////////////

@@ -75,7 +75,7 @@ void ArrowVisual::Load()
 void ArrowVisual::ShowRotation()
 {
   common::MeshManager::Instance()->CreateTube("rotation_tube",
-      0.035, 0.04, 0.01,1, 32);
+      0.035, 0.04, 0.01, 1, 32);
   this->InsertMesh("rotation_tube");
 
   Ogre::MovableObject *rotationObj =

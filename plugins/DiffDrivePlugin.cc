@@ -37,7 +37,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   this->node->Init(model->GetWorld()->GetName());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
-      this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this); 
+      this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
 
   this->leftJoint = _model->GetJoint(
       _sdf->GetElement("left_joint")->GetValueString());
@@ -48,7 +48,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
     gzerr << "Unable to find left joint["
           << _sdf->GetElement("left_joint")->GetValueString() << "]\n";
   if (!this->rightJoint)
-    gzerr << "Unable to find right joint[" 
+    gzerr << "Unable to find right joint["
           << _sdf->GetElement("right_joint")->GetValueString() << "]\n";
 
   this->updateConnection = event::Events::ConnectWorldUpdateStart(

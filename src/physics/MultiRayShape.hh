@@ -132,8 +132,6 @@ namespace gazebo
       public: void DisconnectNewLaserScans(event::ConnectionPtr &c)
               { newLaserScans.Disconnect(c); }
       protected: event::EventT<void()> newLaserScans;
-
-
     };
     /// \}
   }

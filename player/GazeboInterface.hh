@@ -22,8 +22,9 @@
 #ifndef GAZEBO_PLAYER_INTERFACE_HH
 #define GAZEBO_PLAYER_INTERFACE_HH
 
-#include "transport/TransportTypes.hh"
 #include <libplayercore/playercore.h>
+#include <string>
+#include "transport/TransportTypes.hh"
 
 /// \addtogroup player
 /// \brief Base class for all the player interfaces

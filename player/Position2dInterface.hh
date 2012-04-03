@@ -22,6 +22,7 @@
 #ifndef GAZEBO_POSITION2DINTERFACE_HH
 #define GAZEBO_POSITION2DINTERFACE_HH
 
+#include <string>
 #include "GazeboInterface.hh"
 
 namespace boost
