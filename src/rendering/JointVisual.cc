@@ -48,6 +48,15 @@ void JointVisual::Load(ConstJointPtr &_msg)
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   this->axisVisual->Load();
 
-  this->SetWorldRotation(math::Quaternion(0,0,0));//msgs::Convert(_msg->pose().orientation()));
-  this->SetPosition(msgs::Convert(_msg->pose().position()));
+  this->SetWorldPosition(msgs::Convert(_msg->pose().position()));
+  this->SetWorldRotation(msgs::Convert(_msg->pose().orientation()));
+
+  if (math::equal(_msg->axis1().xyz().x(), 1))
+    this->axisVisual->ShowRotation(0);
+
+  if (math::equal(_msg->axis1().xyz().y(), 1))
+    this->axisVisual->ShowRotation(1);
+
+  if (math::equal(_msg->axis1().xyz().z(), 1))
+    this->axisVisual->ShowRotation(2);
 }

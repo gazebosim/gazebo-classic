@@ -18,6 +18,8 @@
  * Author: Nate Koenig
  */
 
+#include "common/MeshManager.hh"
+
 #include "rendering/ogre.h"
 #include "rendering/Scene.hh"
 #include "rendering/ArrowVisual.hh"
@@ -31,6 +33,7 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
 {
   this->headNode = NULL;
   this->shaftNode = NULL;
+  this->rotationNode = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -66,4 +69,24 @@ void ArrowVisual::Load()
   this->headNode->setPosition(0, 0, 0.24);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+}
+
+/////////////////////////////////////////////////
+void ArrowVisual::ShowRotation()
+{
+  common::MeshManager::Instance()->CreateTube("rotation_tube",
+      0.035, 0.04, 0.01,1, 32);
+  this->InsertMesh("rotation_tube");
+
+  Ogre::MovableObject *rotationObj =
+    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+          this->GetName()+"__ROTATION__", "rotation_tube"));
+  rotationObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  ((Ogre::Entity*)rotationObj)->setMaterialName(this->GetMaterialName());
+
+  this->rotationNode =
+    this->sceneNode->createChildSceneNode(this->GetName() + "_ROTATION");
+  this->rotationNode->attachObject(rotationObj);
+  this->rotationNode->setPosition(0, 0, 0.24);
+  this->rotationNode->setVisible(this->GetVisible());
 }

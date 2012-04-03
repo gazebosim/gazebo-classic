@@ -39,15 +39,15 @@ math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
 }
 
 //////////////////////////////////////////////////
-Ogre::Quaternion Conversions::Convert(const math::Quaternion &v)
+Ogre::Quaternion Conversions::Convert(const math::Quaternion &_v)
 {
-  return Ogre::Quaternion(v.w, v.x, v.y, v.z);
+  return Ogre::Quaternion(_v.w, _v.x, _v.y, _v.z);
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Conversions::Convert(const Ogre::Quaternion &v)
+math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
 {
-  return math::Quaternion(v.w, v.x, v.y, v.z);
+  return math::Quaternion(_v.w, _v.x, _v.y, _v.z);
 }
 
 

@@ -1189,8 +1189,7 @@ void Visual::SetWorldPosition(const math::Vector3 &_pos)
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
-  Ogre::Quaternion vquatern(_q.w, _q.x, _q.y, _q.z);
-  this->sceneNode->_setDerivedOrientation(vquatern);
+  this->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
 //////////////////////////////////////////////////
@@ -1850,8 +1849,8 @@ void Visual::ShowCollision(bool _show)
 //////////////////////////////////////////////////
 void Visual::SetVisibilityFlags(uint32_t _flags)
 {
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
   {
     (*iter)->SetVisibilityFlags(_flags);
   }
@@ -1859,6 +1858,14 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
   for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
   {
     this->sceneNode->getAttachedObject(i)->setVisibilityFlags(_flags);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numChildren(); ++i)
+  {
+    Ogre::SceneNode *sn = (Ogre::SceneNode*)(this->sceneNode->getChild(i));
+
+    for (int j = 0; j < sn->numAttachedObjects(); ++j)
+      sn->getAttachedObject(j)->setVisibilityFlags(_flags);
   }
 }
 

@@ -41,8 +41,11 @@ namespace gazebo
       /// \brief Load the visual with default parameters
       public: virtual void Load();
 
+      public: void ShowRotation();
+
       private: Ogre::SceneNode *headNode;
       private: Ogre::SceneNode *shaftNode;
+      private: Ogre::SceneNode *rotationNode;
     };
   }
 }

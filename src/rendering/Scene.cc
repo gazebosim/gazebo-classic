@@ -1115,7 +1115,6 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
     {
       boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
             _msg->model(i).joint(j)));
-      std::cout << "Add joint msg[" << jm->name() << "]\n";
       this->jointMsgs.push_back(jm);
     }
 

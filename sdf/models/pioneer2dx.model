@@ -23,7 +23,7 @@
     </link>
     
     <link name="right_wheel">
-      <origin pose="0.1 -.17 0.11 0 1.5707 -1.5707"/>
+      <origin pose="0.1 -.17 0.11 0 1.5707 1.5707"/>
   
       <inertial mass="0.5">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
@@ -86,14 +86,14 @@
     </link>
   
     <joint type="revolute" name="left_wheel_hinge">
-      <origin pose="0 0 0.04 0 0 0"/>
+      <origin pose="0 0 -0.04 0 0 0"/>
       <child link="left_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
     
     <joint type="revolute" name="right_wheel_hinge">
-      <origin pose="0 0 -0.04 0 0 0"/>
+      <origin pose="0 0 0.04 0 0 0"/>
       <child link="right_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>

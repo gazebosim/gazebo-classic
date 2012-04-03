@@ -36,6 +36,15 @@ namespace gazebo
 
       public: virtual void Load();
 
+      public: void ShowRotation(unsigned int _axis);
+
+      public: void ScaleXAxis(const math::Vector3 &_scale);
+      public: void ScaleYAxis(const math::Vector3 &_scale);
+      public: void ScaleZAxis(const math::Vector3 &_scale);
+
+      public: void SetAxisMaterial(unsigned int _axis,
+                                   const std::string &_material);
+
       private: ArrowVisualPtr xAxis;
       private: ArrowVisualPtr yAxis;
       private: ArrowVisualPtr zAxis;

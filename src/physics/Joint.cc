@@ -240,6 +240,11 @@ void Joint::FillJointMsg(msgs::Joint &_msg)
     msgs::Set(_msg.mutable_pose(),
               this->sdf->GetElement("origin")->GetValuePose("pose"));
   }
+  else
+    msgs::Set(_msg.mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));
+
+  msgs::Set(_msg.mutable_pose()->mutable_position(), this->anchorPos);
+
   
   if (this->HasType(Base::HINGE_JOINT))
     _msg.set_type(msgs::Joint::REVOLUTE);

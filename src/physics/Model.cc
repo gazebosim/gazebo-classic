@@ -654,20 +654,17 @@ void Model::FillModelMsg(msgs::Model &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (unsigned int j = 0; j < this->GetChildCount(); j++)
+  for (unsigned int j = 0; j < this->GetChildCount(); ++j)
   {
     if (this->GetChild(j)->HasType(Base::LINK))
     {
       LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
       link->FillLinkMsg(*_msg.add_link());
     }
-    if (this->GetChild(j)->HasType(Base::JOINT))
-    {
-      printf("HERE\n");
-      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(j));
-      joint->FillJointMsg(*_msg.add_joint());
-    }
   }
+
+  for (unsigned int j = 0; j < this->joints.size(); ++j)
+    this->joints[j]->FillJointMsg(*_msg.add_joint());
 }
 
 //////////////////////////////////////////////////

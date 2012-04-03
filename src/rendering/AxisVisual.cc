@@ -18,6 +18,8 @@
  * Author: Nate Koenig
  */
 
+#include "common/MeshManager.hh"
+
 #include "rendering/ogre.h"
 #include "rendering/Scene.hh"
 #include "rendering/ArrowVisual.hh"
@@ -67,4 +69,63 @@ void AxisVisual::Load()
       math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ScaleXAxis(const math::Vector3 &_scale)
+{
+  this->xAxis->SetScale(_scale);
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ScaleYAxis(const math::Vector3 &_scale)
+{
+  this->yAxis->SetScale(_scale);
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ScaleZAxis(const math::Vector3 &_scale)
+{
+  this->zAxis->SetScale(_scale);
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::SetAxisMaterial(unsigned int _axis,
+                                 const std::string &_material)
+{
+  switch (_axis)
+  {
+    case 0:
+      this->xAxis->SetMaterial(_material);
+      break;
+    case 1:
+      this->yAxis->SetMaterial(_material);
+      break;
+    case 2:
+      this->zAxis->SetMaterial(_material);
+      break;
+    default:
+      gzerr << "Invlid axis index[" << _axis << "]\n";
+      break;
+  };
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ShowRotation(unsigned int _axis)
+{
+  switch (_axis)
+  {
+    case 0:
+      this->xAxis->ShowRotation();
+      break;
+    case 1:
+      this->yAxis->ShowRotation();
+      break;
+    case 2:
+      this->zAxis->ShowRotation();
+      break;
+    default:
+      gzerr << "Invlid axis index[" << _axis << "]\n";
+      break;
+  };
 }
