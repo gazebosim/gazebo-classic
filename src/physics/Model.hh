@@ -249,5 +249,3 @@ namespace gazebo
   }
 }
 #endif
-
-

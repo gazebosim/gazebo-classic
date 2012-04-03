@@ -23,6 +23,8 @@
 #define GAZEBO_PLAYER_INTERFACE_HH
 
 #include <libplayercore/playercore.h>
+#include <string>
+#include "transport/TransportTypes.hh"
 
 /// \addtogroup player
 /// \brief Base class for all the player interfaces
@@ -60,10 +62,12 @@ class GazeboInterface
 
   /// \brief Driver instance that created this device
   public: GazeboDriver *driver;
+
+  protected: static std::string worldName;
+
+  protected: gazebo::transport::NodePtr node;
 };
 
 /// \}
 
 #endif
-
-

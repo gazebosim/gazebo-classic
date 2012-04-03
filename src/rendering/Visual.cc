@@ -594,14 +594,7 @@ void Visual::AttachMesh(const std::string &_meshName)
   Ogre::MovableObject *obj;
   stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
 
-  // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
-      common::MeshManager::Instance()->HasMesh(_meshName))
-  {
-    const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(_meshName);
-    this->InsertMesh(mesh);
-  }
+  this->InsertMesh(_meshName);
 
   obj = (Ogre::MovableObject*)
     (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
@@ -667,14 +660,14 @@ math::Vector3 Visual::GetScale()
 
 
 //////////////////////////////////////////////////
-void Visual::SetMaterial(const std::string &materialName)
+void Visual::SetMaterial(const std::string &_materialName)
 {
-  if (materialName.empty() || materialName == "__default__")
+  if (_materialName.empty() || _materialName == "__default__")
     return;
 
   // Create a custom material name
   std::string newMaterialName;
-  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
+  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
 
   if (this->GetMaterialName() == newMaterialName)
     return;
@@ -685,21 +678,21 @@ void Visual::SetMaterial(const std::string &materialName)
 
   try
   {
-    this->origMaterialName = materialName;
+    this->origMaterialName = _materialName;
     // Get the original material
     origMaterial =
-      Ogre::MaterialManager::getSingleton().getByName(materialName);
+      Ogre::MaterialManager::getSingleton().getByName(_materialName);
   }
   catch(Ogre::Exception &e)
   {
-    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
+    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
     return;
   }
 
   if (origMaterial.isNull())
   {
-    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
+    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white\n";
     return;
   }
@@ -721,7 +714,6 @@ void Visual::SetMaterial(const std::string &materialName)
     myMaterial = origMaterial->clone(this->myMaterialName);
   }
 
-
   try
   {
     for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
@@ -733,12 +725,34 @@ void Visual::SetMaterial(const std::string &materialName)
       else
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
+
+    // Apply material to all child scene nodes
+    for (unsigned int i = 0; i < this->sceneNode->numChildren(); ++i)
+    {
+      Ogre::SceneNode *sn = (Ogre::SceneNode*)(this->sceneNode->getChild(i));
+      for (int j = 0; j < sn->numAttachedObjects(); j++)
+      {
+        Ogre::MovableObject *obj = sn->getAttachedObject(j);
+
+        if (dynamic_cast<Ogre::Entity*>(obj))
+          ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
+        else
+          ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
+      }
+    }
   }
   catch(Ogre::Exception &e)
   {
     gzwarn << "Unable to set Material[" << this->myMaterialName
            << "] to Geometry["
            << this->sceneNode->getName() << ". Object will appear white.\n";
+  }
+
+  // Apply material to all child visuals
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetMaterial(_materialName);
   }
 
   RTShaderSystem::Instance()->UpdateShaders();
@@ -1176,8 +1190,7 @@ void Visual::SetWorldPosition(const math::Vector3 &_pos)
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
-  Ogre::Quaternion vquatern(_q.w, _q.x, _q.y, _q.z);
-  this->sceneNode->_setDerivedOrientation(vquatern);
+  this->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
 //////////////////////////////////////////////////
@@ -1384,6 +1397,19 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
   {
     Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
     this->GetBoundsHelper(next, box);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::InsertMesh(const std::string &_meshName)
+{
+  // Add the mesh into OGRE
+  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+      common::MeshManager::Instance()->HasMesh(_meshName))
+  {
+    const common::Mesh *mesh =
+      common::MeshManager::Instance()->GetMesh(_meshName);
+    this->InsertMesh(mesh);
   }
 }
 
@@ -1824,8 +1850,8 @@ void Visual::ShowCollision(bool _show)
 //////////////////////////////////////////////////
 void Visual::SetVisibilityFlags(uint32_t _flags)
 {
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
   {
     (*iter)->SetVisibilityFlags(_flags);
   }
@@ -1833,5 +1859,26 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
   for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
   {
     this->sceneNode->getAttachedObject(i)->setVisibilityFlags(_flags);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numChildren(); ++i)
+  {
+    Ogre::SceneNode *sn = (Ogre::SceneNode*)(this->sceneNode->getChild(i));
+
+    for (int j = 0; j < sn->numAttachedObjects(); ++j)
+      sn->getAttachedObject(j)->setVisibilityFlags(_flags);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowJoints(bool _show)
+{
+  if (this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowJoints(_show);
   }
 }

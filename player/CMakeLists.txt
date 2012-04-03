@@ -1,6 +1,6 @@
 set (sources GazeboDriver.cc
-             GazeboTime.cc
              GazeboInterface.cc
+             GazeboTime.cc
              SimulationInterface.cc
              Position2dInterface.cc
 )
@@ -28,10 +28,13 @@ include_directories(
 
 link_directories(${PLAYER_LINK_DIRS} ${boost_library_dirs})
 add_library(gazebo_player SHARED ${sources})
-target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS} 
+message (STATUS "PLAYER ${PLAYER_LINK_LIBS}")
+target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
   gazebo_common
   gazebo_transport
-  gazebo_msgs)
+  gazebo_msgs
+  gazebo_math
+)
 
 INSTALL_LIBRARY(gazebo_player)
 #INSTALL_INCLUDES("player" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)

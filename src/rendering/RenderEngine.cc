@@ -43,6 +43,7 @@
 #include "common/Console.hh"
 #include "common/SystemPaths.hh"
 
+#include "rendering/Material.hh"
 #include "rendering/RenderEvents.hh"
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/WindowManager.hh"
@@ -243,6 +244,8 @@ void RenderEngine::Init()
     this->scenes[i]->Init();
 
   this->initialized = true;
+
+  rendering::Material::CreateMaterials();
 }
 
 

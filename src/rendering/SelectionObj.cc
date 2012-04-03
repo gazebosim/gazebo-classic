@@ -32,7 +32,6 @@ SelectionObj::SelectionObj(Scene *scene_)
   : scene(scene_)
 {
   this->active = false;
-  this->CreateMaterials();
 }
 
 //////////////////////////////////////////////////
@@ -77,7 +76,7 @@ void SelectionObj::Init()
   boxObjX1->setCastShadows(false);
   boxObjX1->setUserAny(Ogre::Any(std::string("transx")));
   ((Ogre::Entity*)boxObjX1)->setMaterialName(
-    "__GAZEBO_TRANSX_SELECTION_MATERIAL__");
+    "__GAZEBO_TRANS_RED_MATERIAL__");
   boxObjX1->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::MovableObject *boxObjX2 =
@@ -86,7 +85,7 @@ void SelectionObj::Init()
   boxObjX2->setCastShadows(false);
   boxObjX2->setUserAny(Ogre::Any(std::string("transx")));
   ((Ogre::Entity*)boxObjX2)->setMaterialName(
-    "__GAZEBO_TRANSX_SELECTION_MATERIAL__");
+    "__GAZEBO_TRANS_RED_MATERIAL__");
   boxObjX2->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
 
@@ -96,7 +95,7 @@ void SelectionObj::Init()
   boxObjY1->setCastShadows(false);
   boxObjY1->setUserAny(Ogre::Any(std::string("transy")));
   ((Ogre::Entity*)boxObjY1)->setMaterialName(
-    "__GAZEBO_TRANSY_SELECTION_MATERIAL__");
+    "__GAZEBO_TRANS_GREEN_MATERIAL__");
   boxObjY1->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::MovableObject *boxObjY2 =
@@ -105,7 +104,7 @@ void SelectionObj::Init()
   boxObjY2->setCastShadows(false);
   boxObjY2->setUserAny(Ogre::Any(std::string("transy")));
   ((Ogre::Entity*)boxObjY2)->setMaterialName(
-    "__GAZEBO_TRANSY_SELECTION_MATERIAL__");
+    "__GAZEBO_TRANS_GREEN_MATERIAL__");
   boxObjY2->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
 
@@ -115,7 +114,7 @@ void SelectionObj::Init()
   boxObjZ1->setCastShadows(false);
   boxObjZ1->setUserAny(Ogre::Any(std::string("transz")));
   ((Ogre::Entity*)boxObjZ1)->setMaterialName(
-    "__GAZEBO_TRANSZ_SELECTION_MATERIAL__");
+    "__GAZEBO_TRANS_BLUE_MATERIAL__");
   boxObjZ1->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::MovableObject *boxObjZ2 =
@@ -124,7 +123,7 @@ void SelectionObj::Init()
   boxObjZ2->setCastShadows(false);
   boxObjZ2->setUserAny(Ogre::Any(std::string("transz")));
   ((Ogre::Entity*)boxObjZ2)->setMaterialName(
-    "__GAZEBO_TRANSZ_SELECTION_MATERIAL__");
+    "__GAZEBO_TRANS_BLUE_MATERIAL__");
   boxObjZ2->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->boxSize = 0.2;
@@ -237,9 +236,9 @@ void SelectionObj::SetHighlight(const std::string &_mod)
   Ogre::ColourValue color;
 
   std::map<std::string, std::string> matNames;
-  matNames["transx"] = "__GAZEBO_TRANSX_SELECTION_MATERIAL__";
-  matNames["transy"] = "__GAZEBO_TRANSY_SELECTION_MATERIAL__";
-  matNames["transz"] = "__GAZEBO_TRANSZ_SELECTION_MATERIAL__";
+  matNames["transx"] = "__GAZEBO_TRANS_RED_MATERIAL__";
+  matNames["transy"] = "__GAZEBO_TRANS_GREEN_MATERIAL__";
+  matNames["transz"] = "__GAZEBO_TRANS_BLUE_MATERIAL__";
 
   std::map<std::string, std::string >::iterator iter;
   for (iter = matNames.begin(); iter != matNames.end(); ++iter)
@@ -264,58 +263,4 @@ void SelectionObj::SetHighlight(const std::string &_mod)
       }
     }
   }
-}
-
-//////////////////////////////////////////////////
-void SelectionObj::CreateMaterials()
-{
-  Ogre::MaterialPtr mat;
-  Ogre::Technique *tech;
-  Ogre::Pass *pass;
-  Ogre::TextureUnitState *texState;
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_TRANSX_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  tech->setDepthWriteEnabled(false);
-  pass->setAmbient(1.0, 0.0, 0.0);
-  pass->setDiffuse(1.0, 0.0, 0.0, 0.5);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  texState = pass->createTextureUnitState();
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 0));
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_TRANSY_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  tech->setDepthWriteEnabled(false);
-  pass->setAmbient(0.0, 1.0, 0.0);
-  pass->setDiffuse(0.0, 1.0, 0.0, 0.5);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  texState = pass->createTextureUnitState();
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 1, 0));
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_TRANSZ_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  tech->setDepthWriteEnabled(false);
-  pass->setAmbient(0.0, 0.0, 1.0);
-  pass->setDiffuse(0.0, 0.0, 1.0, 0.5);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  texState = pass->createTextureUnitState();
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 1));
 }

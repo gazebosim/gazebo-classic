@@ -1,25 +1,20 @@
 <gazebo version='1.0'>
-  <model name="default_pioneer_model">
+  <model name="pioneer2dx">
   <origin pose="0 0 0 0 0 0"/>
 
     <link name="chassis">
       <origin pose="0.0 0.0 0.16 0 0 0"/>
    
-      <inertial mass="1.0">
+      <inertial mass="2.0">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu="1"/>
-          </friction>
-        </surface>
       </collision>
     
-      <visual name="visual1">
+      <visual name="visual">
         <origin pose="0 0 0.04 0 0 0"/>
         <geometry>
           <mesh filename="pioneer2dx/chassis.dae"/>
@@ -30,11 +25,11 @@
     <link name="right_wheel">
       <origin pose="0.1 -.17 0.11 0 1.5707 1.5707"/>
   
-      <inertial mass="0.1">
+      <inertial mass="0.5">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
   
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
         </geometry>
@@ -51,11 +46,11 @@
     <link name="left_wheel">
       <origin pose="0.1 .17 0.11 0 1.5707 1.5707"/>
   
-      <inertial mass="0.1">
+      <inertial mass="0.5">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
   
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
         </geometry>
@@ -72,11 +67,11 @@
     <link name="castor">
       <origin pose="-0.200 0 0.04 0 0 0"/>
   
-      <inertial mass="0.1">
+      <inertial mass="0.5">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
   
-      <collision name="geom">
+      <collision name="collision">
         <geometry>
           <sphere radius="0.04"/>
         </geometry>
@@ -91,14 +86,14 @@
     </link>
   
     <joint type="revolute" name="left_wheel_hinge">
-      <origin pose="0 0 0.04 0 0 0"/>
+      <origin pose="0 0 -0.04 0 0 0"/>
       <child link="left_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
     
     <joint type="revolute" name="right_wheel_hinge">
-      <origin pose="0 0 -0.04 0 0 0"/>
+      <origin pose="0 0 0.04 0 0 0"/>
       <child link="right_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>
@@ -108,7 +103,11 @@
       <child link="castor"/>
       <parent link="chassis"/>
     </joint>
-    <plugin filename="libPioneer2dxPlugin.so" name="plugin"/>
-  </model>
 
+    <plugin filename="libDiffDrivePlugin.so" name="diff_drive">
+      <left_joint>left_wheel_hinge</left_joint>
+      <right_joint>right_wheel_hinge</right_joint>
+    </plugin>
+
+  </model>
 </gazebo>

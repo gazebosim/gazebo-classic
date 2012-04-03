@@ -24,6 +24,7 @@
 
 #include <libplayercore/playercore.h>
 
+
 #include "common/CommonTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "msgs/msgs.h"
@@ -56,5 +57,3 @@ class GazeboTime : public PlayerTime
 /// \}
 
 #endif
-
-

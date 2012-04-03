@@ -19,8 +19,11 @@
  * Date: 2 March 2006
  */
 
+#include "transport/transport.h"
 #include "GazeboInterface.hh"
 #include "GazeboDriver.hh"
+
+std::string GazeboInterface::worldName = "default";
 
 GazeboInterface::GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
                                  ConfigFile * /*cf*/, int /*section*/)
@@ -32,5 +35,3 @@ GazeboInterface::GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
 GazeboInterface::~GazeboInterface()
 {
 }
-
-

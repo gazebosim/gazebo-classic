@@ -579,19 +579,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     gzthrow("can't have two joint with the same name");
 
   msgs::Joint msg;
-  msg.set_name(joint->GetName());
-  msg.set_type(msgs::Joint::REVOLUTE);
-
-  if (joint->GetParent())
-    msg.set_parent(joint->GetParent()->GetScopedName());
-  else
-    msg.set_parent("world");
-
-  if (joint->GetChild())
-    msg.set_child(joint->GetChild()->GetScopedName());
-  else
-    msg.set_child("world");
-
+  joint->FillJointMsg(msg);
   this->jointPub->Publish(msg);
 
   this->joints.push_back(joint);
@@ -666,19 +654,17 @@ void Model::FillModelMsg(msgs::Model &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (unsigned int j = 0; j < this->GetChildCount(); j++)
+  for (unsigned int j = 0; j < this->GetChildCount(); ++j)
   {
     if (this->GetChild(j)->HasType(Base::LINK))
     {
       LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
       link->FillLinkMsg(*_msg.add_link());
     }
-    if (this->GetChild(j)->HasType(Base::JOINT))
-    {
-      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(j));
-      joint->FillJointMsg(*_msg.add_joints());
-    }
   }
+
+  for (unsigned int j = 0; j < this->joints.size(); ++j)
+    this->joints[j]->FillJointMsg(*_msg.add_joint());
 }
 
 //////////////////////////////////////////////////
@@ -1042,5 +1028,5 @@ void Model::SetEnabled(bool _enabled)
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
+      boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
 }

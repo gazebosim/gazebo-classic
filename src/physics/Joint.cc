@@ -163,9 +163,9 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
 {
   math::Vector3 vec;
 
-  if (_index == 0)
+  if (_index == 0 && this->sdf->HasElement("axis"))
     vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
-  else
+  else if (this->sdf->HasElement("axis2"))
     vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
 
   return vec;
@@ -231,8 +231,51 @@ LinkPtr Joint::GetParent() const
 }
 
 //////////////////////////////////////////////////
-void Joint::FillJointMsg(msgs::Joint &/*_msg*/)
+void Joint::FillJointMsg(msgs::Joint &_msg)
 {
+  _msg.set_name(this->GetScopedName());
+
+  if (this->sdf->HasElement("origin"))
+  {
+    msgs::Set(_msg.mutable_pose(),
+              this->sdf->GetElement("origin")->GetValuePose("pose"));
+  }
+  else
+    msgs::Set(_msg.mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));
+
+  msgs::Set(_msg.mutable_pose()->mutable_position(), this->anchorPos);
+
+
+  if (this->HasType(Base::HINGE_JOINT))
+    _msg.set_type(msgs::Joint::REVOLUTE);
+  else if (this->HasType(Base::HINGE2_JOINT))
+    _msg.set_type(msgs::Joint::REVOLUTE2);
+  else if (this->HasType(Base::BALL_JOINT))
+    _msg.set_type(msgs::Joint::BALL);
+  else if (this->HasType(Base::SLIDER_JOINT))
+    _msg.set_type(msgs::Joint::PRISMATIC);
+  else if (this->HasType(Base::SCREW_JOINT))
+    _msg.set_type(msgs::Joint::SCREW);
+  else if (this->HasType(Base::UNIVERSAL_JOINT))
+    _msg.set_type(msgs::Joint::UNIVERSAL);
+
+  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetLocalAxis(0));
+  _msg.mutable_axis1()->set_limit_lower(0);
+  _msg.mutable_axis1()->set_limit_upper(0);
+  _msg.mutable_axis1()->set_limit_effort(0);
+  _msg.mutable_axis1()->set_limit_velocity(0);
+  _msg.mutable_axis1()->set_damping(0);
+  _msg.mutable_axis1()->set_friction(0);
+
+  if (this->GetParent())
+    _msg.set_parent(this->GetParent()->GetScopedName());
+  else
+    _msg.set_parent("world");
+
+  if (this->GetChild())
+    _msg.set_child(this->GetChild()->GetScopedName());
+  else
+    _msg.set_child("world");
 }
 
 //////////////////////////////////////////////////

@@ -83,7 +83,7 @@ namespace gazebo
       public: void Load(sdf::ElementPtr sdf);
 
       /// \brief Load the visual with default parameters
-      public: void Load();
+      public: virtual void Load();
 
       /// \brief Update the visual.
       public: void Update();
@@ -231,6 +231,8 @@ namespace gazebo
       /// \brief Get the name of the material
       public: std::string GetMaterialName() const;
 
+      /// \brief Insert a mesh into Ogre
+      public: void InsertMesh(const std::string &_meshName);
 
       /// \brief Insert a mesh into Ogre
       public: static void InsertMesh(const common::Mesh *mesh);
@@ -266,6 +268,7 @@ namespace gazebo
 
       public: void SetScene(ScenePtr _scene);
       public: ScenePtr GetScene() const;
+      public: void ShowJoints(bool _show);
 
       private: void GetBoundsHelper(Ogre::SceneNode *node,
                                     math::Box &box) const;

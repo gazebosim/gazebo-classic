@@ -40,6 +40,9 @@ namespace gazebo
     class Visual;
     class LaserVisual;
     class CameraVisual;
+    class JointVisual;
+    class AxisVisual;
+    class ArrowVisual;
     class ContactVisual;
 
     typedef boost::shared_ptr<Scene> ScenePtr;
@@ -52,7 +55,10 @@ namespace gazebo
     typedef boost::shared_ptr<Visual> VisualPtr;
     typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
+    typedef boost::shared_ptr<JointVisual> JointVisualPtr;
     typedef boost::shared_ptr<ContactVisual> ContactVisualPtr;
+    typedef boost::shared_ptr<ArrowVisual> ArrowVisualPtr;
+    typedef boost::shared_ptr<AxisVisual> AxisVisualPtr;
 
     enum RenderOpType
     {

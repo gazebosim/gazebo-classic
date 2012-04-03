@@ -46,6 +46,8 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
   gazebo::init();
   gazebo::run();
 
+  worldName = _cf->ReadString(_section, "world_name", "default");
+
   // steal the global clock - a bit aggressive, but a simple approach
   if (GlobalTime)
   {
@@ -57,9 +59,9 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
   assert(GlobalTime != 0);
 
   this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
-  this->node->Init(_cf->ReadString(_section, "world_name", "default"));
+  this->node->Init(this->worldName);
   this->statsSub =
-    this->node->Subscribe("~/world_stats", &SimulationInterface::OnStats, this);
+  this->node->Subscribe("~/world_stats", &SimulationInterface::OnStats, this);
 
   this->modelPub = this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 

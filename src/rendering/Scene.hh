@@ -269,7 +269,7 @@ namespace gazebo
       private: void OnJointMsg(ConstJointPtr &_msg);
 
       private: bool ProcessSensorMsg(ConstSensorPtr &_msg);
-      private: void ProcessJointMsg(ConstJointPtr &_msg);
+      private: bool ProcessJointMsg(ConstJointPtr &_msg);
 
       private: void ProcessSceneMsg(ConstScenePtr &_msg);
 

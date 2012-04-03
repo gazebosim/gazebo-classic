@@ -2,8 +2,8 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.0 0.0 0.0 1"/>
-      <background rgba="0 0 0 1.0"/>
+      <ambient rgba="0 0 0 1"/>
+      <background rgba="0 0 0 1"/>
       <shadows enabled="false"/>
     </scene>
 
@@ -18,15 +18,29 @@
     <include filename="ground_plane.model"/>
 
     <light type="point" name="point" cast_shadows="false">
-      <origin pose="0 0 2 0 0 0"/>
+      <origin pose="0 2 2 0 0 0"/>
       <diffuse rgba="1 0 0 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20" constant="0.8" linear="0.2" quadratic="0.01"/>
     </light>
 
-    <!--
+    <light type="point" name="point1" cast_shadows="false">
+      <origin pose="0 1 2 0 0 0"/>
+      <diffuse rgba="0 1 0 1"/>
+      <specular rgba=".1 .1 .1 1"/>
+      <attenuation range="20" constant="0.8" linear="0.2" quadratic="0.01"/>
+    </light>
+
+    <light type="point" name="point2" cast_shadows="false">
+      <origin pose="0 0 2 0 0 0"/>
+      <diffuse rgba="0 0 1 1"/>
+      <specular rgba=".1 .1 .1 1"/>
+      <attenuation range="20" constant="0.8" linear="0.2" quadratic="0.01"/>
+    </light>
+
+
     <light type="spot" name="spot" cast_shadows="false">
-      <origin pose="0 2 2 0 0 0"/>
+      <origin pose="0 -1 2 0 0 0"/>
       <diffuse rgba="0 1 0 1"/>
       <specular rgba=".2 .2 .2 1"/>
       <attenuation range="10" constant="0.2" linear="0.01" quadratic="0.0"/>
@@ -36,12 +50,10 @@
 
     <light type="directional" name="directional" cast_shadows="true">
       <origin pose="0 -2 2 0 0 0"/>
-      <diffuse rgba="0 0 1 1"/>
+      <diffuse rgba="0.2 0.2 .2 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="100" constant="0.2" linear="0.01" quadratic="0.0"/>
       <direction xyz="0 0 -1"/>
     </light>
-    -->
-
   </world>
 </gazebo>

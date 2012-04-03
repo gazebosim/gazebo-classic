@@ -14,25 +14,33 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_PIONNEER2DX_PLUGIN_HH__
-#define __GAZEBO_PIONNEER2DX_PLUGIN_HH__
+/* Desc: Joint Visualization Class
+ * Author: Nate Koenig
+ */
 
-#include "common/common.h"
-#include "physics/physics.h"
-#include "gazebo.h"
+#ifndef JOINTVISUAL_HH
+#define JOINTVISUAL_HH
+
+#include <string>
+#include "rendering/Visual.hh"
+
+namespace ogre
+{
+  class SceneNode;
+}
 
 namespace gazebo
 {
-  class Pioneer2dxPlugin : public ModelPlugin
+  namespace rendering
   {
-    public: Pioneer2dxPlugin();
-    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-    private: void OnUpdate();
+    class JointVisual : public Visual
+    {
+      public: JointVisual(const std::string &_name, VisualPtr _vis);
+      public: virtual ~JointVisual();
 
-    private: physics::ModelPtr model;
-    private: physics::JointPtr leftJoint, rightJoint;
-    private: event::ConnectionPtr updateConnection;
-  };
+      public: void Load(ConstJointPtr &_msg);
+      private: AxisVisualPtr axisVisual;
+    };
+  }
 }
 #endif
-

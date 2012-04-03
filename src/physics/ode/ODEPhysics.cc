@@ -517,7 +517,7 @@ void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
   if (!this->sdf->GetElement("ode")->GetElement(
       "solver")->HasAttribute("percon_iters"))
     this->sdf->GetElement("ode")->GetElement(
-      "solver")->AddAttribute("percon_iters","int","0",false);
+      "solver")->AddAttribute("percon_iters", "int", "0", false);
   this->sdf->GetElement("ode")->GetElement(
       "solver")->GetAttribute("percon_iters")->Set(_iters);
   dWorldSetQuickStepPreconIterations(this->worldId, _iters);
@@ -587,7 +587,7 @@ int ODEPhysics::GetSORPGSPreconIters()
   if (!this->sdf->GetElement("ode")->GetElement(
       "solver")->HasAttribute("percon_iters"))
     this->sdf->GetElement("ode")->GetElement(
-      "solver")->AddAttribute("percon_iters","int","0",false);
+      "solver")->AddAttribute("percon_iters", "int", "0", false);
   return this->sdf->GetElement("ode")->GetElement(
       "solver")->GetValueInt("precon_iters");
 }

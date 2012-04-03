@@ -59,6 +59,12 @@ ModelRightMenu::ModelRightMenu()
   this->transparentAction->setCheckable(true);
   connect(this->transparentAction, SIGNAL(triggered()), this,
           SLOT(OnTransparent()));
+
+  this->showJointsAction = new QAction(tr("Joints"), this);
+  this->showJointsAction->setStatusTip(tr("Show joints"));
+  this->showJointsAction->setCheckable(true);
+  connect(this->showJointsAction, SIGNAL(triggered()), this,
+          SLOT(OnShowJoints()));
 }
 
 /////////////////////////////////////////////////
@@ -77,6 +83,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(this->moveToAction);
   menu.addAction(this->followAction);
   menu.addAction(this->showCollisionAction);
+  menu.addAction(this->showJointsAction);
   menu.addAction(this->transparentAction);
   menu.addAction(this->deleteAction);
 
@@ -117,6 +124,20 @@ void ModelRightMenu::OnShowCollision()
     this->requestMsg = msgs::CreateRequest("show_collision", this->modelName);
   else
     this->requestMsg = msgs::CreateRequest("hide_collision", this->modelName);
+
+  this->requestPub->Publish(*this->requestMsg);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnShowJoints()
+{
+  this->showJointsActionState[this->modelName] =
+    this->showJointsAction->isChecked();
+
+  if (this->showJointsAction->isChecked())
+    this->requestMsg = msgs::CreateRequest("show_joints", this->modelName);
+  else
+    this->requestMsg = msgs::CreateRequest("hide_joints", this->modelName);
 
   this->requestPub->Publish(*this->requestMsg);
 }
