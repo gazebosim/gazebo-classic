@@ -40,6 +40,7 @@ namespace gazebo
       private slots: void OnDelete();
       private slots: void OnFollow();
       private slots: void OnShowCollision();
+      private slots: void OnShowJoints();
       private slots: void OnTransparent();
 
       private: std::string modelName;
@@ -50,12 +51,14 @@ namespace gazebo
       private: QAction *followAction;
       private: QAction *showCollisionAction;
       private: QAction *transparentAction;
+      private: QAction *showJointsAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub;
       private: msgs::Request *requestMsg;
 
       private: std::map<std::string, bool> showCollisionsActionState;
+      private: std::map<std::string, bool> showJointsActionState;
       private: std::map<std::string, bool> transparentActionState;
     };
   }

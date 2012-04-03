@@ -1402,8 +1402,9 @@ void Scene::ProcessJointMsg(ConstJointPtr &_msg)
     return;
 
   JointVisualPtr jointVis(new JointVisual(
-          _msg->name()+"_joint_vis", childVis));
+          _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
+  // jointVis->SetVisible(false);
 
   this->visuals[jointVis->GetName()] = jointVis;
 
@@ -1467,6 +1468,20 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     VisualPtr vis = this->GetVisual(_msg->data());
     if (vis)
       vis->ShowCollision(false);
+  }
+  else if (_msg->request() == "show_joints")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data() + "_JOINT_VISUAL__");
+    if (vis)
+      vis->SetVisible(true);
+    else
+      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+  }
+  else if (_msg->request() == "hide_joints")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data() + "_JOINT_VISUAL__");
+    if (vis)
+      vis->SetVisible(false);
   }
   else if (_msg->request() == "set_transparency")
   {
