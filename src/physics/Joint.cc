@@ -233,7 +233,13 @@ LinkPtr Joint::GetParent() const
 //////////////////////////////////////////////////
 void Joint::FillJointMsg(msgs::Joint &_msg)
 {
-  _msg.set_name(this->GetName());
+  _msg.set_name(this->GetScopedName());
+
+  if (this->sdf->HasElement("origin"))
+  {
+    msgs::Set(_msg.mutable_pose(),
+              this->sdf->GetElement("origin")->GetValuePose("pose"));
+  }
   
   if (this->HasType(Base::HINGE_JOINT))
     _msg.set_type(msgs::Joint::REVOLUTE);

@@ -43,7 +43,6 @@ AxisVisual::~AxisVisual()
 /////////////////////////////////////////////////
 void AxisVisual::Load()
 {
-  printf("AxisVisual::Load\n");
   Visual::Load();
 
   this->xAxis.reset(new ArrowVisual(this->GetName() +
@@ -54,23 +53,18 @@ void AxisVisual::Load()
   this->yAxis.reset(new ArrowVisual(this->GetName() +
       "_Y_AXIS", shared_from_this()));
   this->yAxis->Load();
-  this->xAxis->SetMaterial("__GAZEBO_TRANS_GREEN_MATERIAL__");
+  this->yAxis->SetMaterial("__GAZEBO_TRANS_GREEN_MATERIAL__");
 
   this->zAxis.reset(new ArrowVisual(this->GetName() +
       "_Z_AXIS", shared_from_this()));
   this->zAxis->Load();
-  this->xAxis->SetMaterial("__GAZEBO_TRANS_BLUE_MATERIAL__");
+  this->zAxis->SetMaterial("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
-  double length = 0.2;
-  this->xAxis->SetPosition(math::Vector3(length/2.0, 0.0, 0.0));
   this->xAxis->SetRotation(
-      math::Quaternion(math::Vector3(0, 0, 1), GZ_DTOR(-90)));
+      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
 
-  this->yAxis->SetPosition(math::Vector3(0.0, length/2.0, 0.0));
-
-  this->zAxis->SetPosition(math::Vector3(0.0, 0.0, length/2.0));
-  this->zAxis->SetRotation(
-      math::Quaternion(math::Vector3(1, 0 ,0), GZ_DTOR(90)));
+  this->yAxis->SetRotation(
+      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

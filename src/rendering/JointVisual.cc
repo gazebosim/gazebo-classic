@@ -31,7 +31,6 @@ using namespace rendering;
 JointVisual::JointVisual(const std::string &_name, VisualPtr _vis)
   : Visual(_name, _vis)
 {
-  std::cout << "New JointVis[" << this->GetName() << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -45,40 +44,10 @@ void JointVisual::Load(ConstJointPtr &_msg)
 {
   Visual::Load();
 
-  printf("JointVisual::Load\n");
   this->axisVisual.reset(
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   this->axisVisual->Load();
 
-/*  this->InsertMesh("axis_shaft");
-  this->InsertMesh("axis_head");
-
-  Ogre::MovableObject *shaftObj =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          this->GetName()+"__SHAFT__", "axis_shaft"));
-
-  Ogre::MovableObject *headObj =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          this->GetName()+"__HEAD__", "axis_head"));
-
-  this->shaftNode =
-    this->sceneNode->createChildSceneNode(this->GetName() + "_shaft");
-  this->shaftNode->attachObject(shaftObj);
-  this->shaftNode->setPosition(0, 0, 0.1);
-
-  this->headNode =
-    this->sceneNode->createChildSceneNode(this->GetName() + "_head");
-  this->headNode->attachObject(headObj);
-  this->headNode->setPosition(0, 0, 0.2);
-
-
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  //this->AttachMesh("axis_shaft");
-  // this->SetScale(math::Vector3(0.02, 0.02, 0.1));
-
-  std::cout << "JointVis Axis[" 
-    << _msg->axis1().xyz().x()
-    << " " << _msg->axis1().xyz().y()
-    << " " << _msg->axis1().xyz().z() << "]\n";
-    */
+  this->SetWorldRotation(math::Quaternion(0,0,0));//msgs::Convert(_msg->pose().orientation()));
+  this->SetPosition(msgs::Convert(_msg->pose().position()));
 }

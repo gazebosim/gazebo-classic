@@ -1110,6 +1110,14 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
             _msg->model(i).visual(j)));
       this->visualMsgs.push_back(vm);
     }
+    
+    for (int j = 0; j < _msg->model(i).joint_size(); j++)
+    {
+      boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
+            _msg->model(i).joint(j)));
+      std::cout << "Add joint msg[" << jm->name() << "]\n";
+      this->jointMsgs.push_back(jm);
+    }
 
     for (int j = 0; j < _msg->model(i).link_size(); j++)
     {
@@ -1283,12 +1291,14 @@ void Scene::PreRender()
   this->lightMsgs.clear();
 
   // Process the joint messages
-  for (jIter =  this->jointMsgs.begin();
-       jIter != this->jointMsgs.end(); ++jIter)
+  jIter = this->jointMsgs.begin();
+  while (jIter != this->jointMsgs.end())
   {
-    this->ProcessJointMsg(*jIter);
+    if (this->ProcessJointMsg(*jIter))
+      this->jointMsgs.erase(jIter++);
+    else
+      ++jIter;
   }
-  this->jointMsgs.clear();
 
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
@@ -1388,9 +1398,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessJointMsg(ConstJointPtr &_msg)
+bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  VisualPtr parentVis = this->GetVisual(_msg->parent());
   VisualPtr childVis;
 
   if (_msg->child() == "world")
@@ -1398,42 +1407,16 @@ void Scene::ProcessJointMsg(ConstJointPtr &_msg)
   else
     childVis = this->GetVisual(_msg->child());
 
-  if (!parentVis)
-    return;
+  if (!childVis)
+    return false;
 
   JointVisualPtr jointVis(new JointVisual(
           _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
-  // jointVis->SetVisible(false);
+  jointVis->SetVisible(false);
 
   this->visuals[jointVis->GetName()] = jointVis;
-
-  // TODO: Fix this
-  /*VisualPtr parentVis = this->GetVisual(_msg->parent());
-  VisualPtr childVis;
-
-  if (_msg->child() == "world")
-    childVis = this->worldVisual;
-  else
-    childVis = this->GetVisual(_msg->child());
-
-  if (parentVis && childVis)
-  {
-    DynamicLines *line = parentVis->CreateDynamicLine();
-    // this->worldVisual->AttachObject(line);
-
-    line->AddPoint(math::Vector3(0, 0, 0));
-    line->AddPoint(math::Vector3(0, 0, 0));
-
-    // parentVis->AttachLineVertex(line, 0);
-    childVis->AttachLineVertex(line, 1);
-  }
-  else
-  {
-    gzwarn << "Unable to create joint visual. Parent["
-           << _msg->parent() << "] Child[" << _msg->child() << "].\n";
-  }
-  */
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -1471,17 +1454,17 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "show_joints")
   {
-    VisualPtr vis = this->GetVisual(_msg->data() + "_JOINT_VISUAL__");
+    VisualPtr vis = this->GetVisual(_msg->data());
     if (vis)
-      vis->SetVisible(true);
+      vis->ShowJoints(true);
     else
       gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
   }
   else if (_msg->request() == "hide_joints")
   {
-    VisualPtr vis = this->GetVisual(_msg->data() + "_JOINT_VISUAL__");
+    VisualPtr vis = this->GetVisual(_msg->data());
     if (vis)
-      vis->SetVisible(false);
+      vis->ShowJoints(false);
   }
   else if (_msg->request() == "set_transparency")
   {
@@ -1586,6 +1569,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
     Light *light = new Light(this);
     light->LoadFromMsg(_msg);
     this->lights[_msg->name()] = light;
+    RTShaderSystem::Instance()->UpdateShaders();
   }
 }
 

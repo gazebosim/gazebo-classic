@@ -32,7 +32,6 @@ SelectionObj::SelectionObj(Scene *scene_)
   : scene(scene_)
 {
   this->active = false;
-  this->CreateMaterials();
 }
 
 //////////////////////////////////////////////////
@@ -264,59 +263,4 @@ void SelectionObj::SetHighlight(const std::string &_mod)
       }
     }
   }
-}
-
-//////////////////////////////////////////////////
-void SelectionObj::CreateMaterials()
-{
-/*  Ogre::MaterialPtr mat;
-  Ogre::Technique *tech;
-  Ogre::Pass *pass;
-  Ogre::TextureUnitState *texState;
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_TRANSX_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  tech->setDepthWriteEnabled(false);
-  pass->setAmbient(1.0, 0.0, 0.0);
-  pass->setDiffuse(1.0, 0.0, 0.0, 0.5);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  texState = pass->createTextureUnitState();
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 0));
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_TRANSY_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  tech->setDepthWriteEnabled(false);
-  pass->setAmbient(0.0, 1.0, 0.0);
-  pass->setDiffuse(0.0, 1.0, 0.0, 0.5);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  texState = pass->createTextureUnitState();
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 1, 0));
-
-  mat = Ogre::MaterialManager::getSingleton().create(
-      "__GAZEBO_TRANSZ_SELECTION_MATERIAL__", "General");
-  tech = mat->getTechnique(0);
-  pass = tech->getPass(0);
-  tech->setLightingEnabled(false);
-  tech->setDepthWriteEnabled(false);
-  pass->setAmbient(0.0, 0.0, 1.0);
-  pass->setDiffuse(0.0, 0.0, 1.0, 0.5);
-  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  texState = pass->createTextureUnitState();
-  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-                               Ogre::LBS_CURRENT, 0.5);
-  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
-      Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 1));
-      */
 }

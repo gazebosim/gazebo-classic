@@ -268,6 +268,7 @@ namespace gazebo
 
       public: void SetScene(ScenePtr _scene);
       public: ScenePtr GetScene() const;
+      public: void ShowJoints(bool _show);
 
       private: void GetBoundsHelper(Ogre::SceneNode *node,
                                     math::Box &box) const;

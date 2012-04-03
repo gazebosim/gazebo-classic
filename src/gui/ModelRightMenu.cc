@@ -84,6 +84,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(this->moveToAction);
   menu.addAction(this->followAction);
   menu.addAction(this->showCollisionAction);
+  menu.addAction(this->showJointsAction);
   menu.addAction(this->transparentAction);
   menu.addAction(this->deleteAction);
 

@@ -54,8 +54,12 @@ Position2dInterface::Position2dInterface(player_devaddr_t _addr,
   this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   this->node->Init(this->worldName);
   this->modelName = _cf->ReadString(_section, "model_name", "default");
+
   this->velPub = this->node->Advertise<gazebo::msgs::Pose>(
       std::string("~/") + this->modelName + "/vel_cmd");
+
+  this->poseSub = this->node->Subscribe("~/pose/info",
+      &Position2dInterface::OnPoseMsg, this);
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
@@ -141,9 +145,7 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
     else
     {
       // player_position2d_power_config_t *power;
-
       // power = (player_position2d_power_config_t*)_data;
-
       // this->iface->data->cmdEnableMotors = power->state;
 
       this->driver->Publish(this->device_addr, _respQueue,
@@ -216,50 +218,47 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
 // called from GazeboDriver::Update
 void Position2dInterface::Update()
 {
-  /*
-  player_position2d_data_t data;
-  struct timeval ts;
-
-  memset(&data, 0, sizeof(data));
-
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  // Only Update when new data is present
-  if (this->iface->data->head.time > this->datatime)
-  {
-    this->datatime = this->iface->data->head.time;
-
-    ts.tv_sec = (int) (this->iface->data->head.time);
-    ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
-
-    data.pos.px = this->iface->data->pose.pos.x;
-    data.pos.py = this->iface->data->pose.pos.y;
-    data.pos.pa = this->iface->data->pose.yaw;
-
-    data.vel.px = this->iface->data->velocity.pos.x;
-    data.vel.py = this->iface->data->velocity.pos.y;
-    data.vel.pa = this->iface->data->velocity.yaw;
-
-    data.stall = (uint8_t) this->iface->data->stall;
-
-    this->driver->Publish(this->device_addr,
-        PLAYER_MSGTYPE_DATA,
-        PLAYER_POSITION2D_DATA_STATE,
-        (void*)&data, sizeof(data), &this->datatime);
-
-  }
-  */
+  printf("Position2dInterface::Update\n");
 }
 
 
 //////////////////////////////////////////////////
-// Open a SHM interface when a subscription is received. This is called from
-// GazeboDriver::Subscribe
 void Position2dInterface::Subscribe()
 {
 }
 
 //////////////////////////////////////////////////
-// Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void Position2dInterface::Unsubscribe()
 {
+}
+
+//////////////////////////////////////////////////
+void Position2dInterface::OnPoseMsg(ConstPosePtr &_msg)
+{
+  if (_msg->name() != this->modelName)
+    return;
+
+  player_position2d_data_t data;
+  struct timeval ts;
+
+  memset(&data, 0, sizeof(data));
+
+  /*ts.tv_sec = (int) (this->iface->data->head.time);
+  ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
+
+  data.pos.px = _msg->position().x();
+  data.pos.py = _msg->position().y();
+  data.pos.pa = _msg->position().z();
+
+  data.vel.px = this->iface->data->velocity.pos.x;
+  data.vel.py = this->iface->data->velocity.pos.y;
+  data.vel.pa = this->iface->data->velocity.yaw;
+
+  data.stall = (uint8_t) this->iface->data->stall;
+  */
+
+  this->driver->Publish(this->device_addr,
+      PLAYER_MSGTYPE_DATA,
+      PLAYER_POSITION2D_DATA_STATE,
+      (void*)&data, sizeof(data), &this->datatime);
 }

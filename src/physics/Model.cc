@@ -663,8 +663,9 @@ void Model::FillModelMsg(msgs::Model &_msg)
     }
     if (this->GetChild(j)->HasType(Base::JOINT))
     {
+      printf("HERE\n");
       JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(j));
-      joint->FillJointMsg(*_msg.add_joints());
+      joint->FillJointMsg(*_msg.add_joint());
     }
   }
 }

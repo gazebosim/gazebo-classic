@@ -725,19 +725,20 @@ void Visual::SetMaterial(const std::string &_materialName)
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
 
-    /*for (unsigned int i=0; i < this->sceneNode->numChildren(); ++i)
+    // Apply material to all child scene nodes
+    for (unsigned int i=0; i < this->sceneNode->numChildren(); ++i)
     {
-      for (int j = 0; j < this->sceneNode->getChild(i)->numAttachedObjects();
-           j++)
+      Ogre::SceneNode *sn = (Ogre::SceneNode*)(this->sceneNode->getChild(i));
+      for (int j = 0; j < sn->numAttachedObjects(); j++)
       {
-        Ogre::MovableObject *obj = this->sceneNode->getChild(i)->getAttachedObject(j);
+        Ogre::MovableObject *obj = sn->getAttachedObject(j); 
 
         if (dynamic_cast<Ogre::Entity*>(obj))
           ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
         else
           ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
       }
-    }*/
+    }
   }
   catch(Ogre::Exception &e)
   {
@@ -746,6 +747,7 @@ void Visual::SetMaterial(const std::string &_materialName)
            << this->sceneNode->getName() << ". Object will appear white.\n";
   }
 
+  // Apply material to all child visuals
   for (std::vector<VisualPtr>::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
@@ -1857,5 +1859,18 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
   for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
   {
     this->sceneNode->getAttachedObject(i)->setVisibilityFlags(_flags);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowJoints(bool _show)
+{
+  if (this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowJoints(_show);
   }
 }

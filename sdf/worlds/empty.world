@@ -21,7 +21,7 @@
 
     <model name="test">
       <link name="link1">
-        <origin pose="1.0 0 0.5 0 0 0"/>
+        <origin pose="0.0 1.0 0.5 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -40,7 +40,7 @@
       </link>
 
       <link name="link2">
-        <origin pose="-1.0 0.0 0.5 0 0 0"/>
+        <origin pose="0.0 -1.0 0.5 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -59,7 +59,7 @@
       </link>
 
       <joint type="revolute" name="middle_hinge">
-        <origin pose="0 0 0 0 0 0"/>
+        <origin pose="0 -1.0 0 0 0 0"/>
         <child link="link1"/>
         <parent link="link2"/>
         <axis xyz="0 1 0"/>

@@ -29,7 +29,6 @@ using namespace rendering;
 ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
   : Visual(_name, _vis)
 {
-  printf("New Arrow Visual\n");
   this->headNode = NULL;
   this->shaftNode = NULL;
 }
@@ -42,7 +41,6 @@ ArrowVisual::~ArrowVisual()
 /////////////////////////////////////////////////
 void ArrowVisual::Load()
 {
-  printf("ArrowVisual::Load\n");
   Visual::Load();
 
   // Make sure the meshes are in Ogre
@@ -65,7 +63,7 @@ void ArrowVisual::Load()
   this->headNode =
     this->sceneNode->createChildSceneNode(this->GetName() + "_HEAD");
   this->headNode->attachObject(headObj);
-  this->headNode->setPosition(0, 0, 0.2);
+  this->headNode->setPosition(0, 0, 0.24);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

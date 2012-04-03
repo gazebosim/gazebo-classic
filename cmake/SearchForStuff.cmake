@@ -208,13 +208,13 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find OpenAL
-  pkg_check_modules(OAL openal)
-  if (NOT OAL_FOUND)
-    BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
-    set (HAVE_OPENAL FALSE)
-  else (NOT OAL_FOUND)
-    set (HAVE_OPENAL TRUE)
-  endif (NOT OAL_FOUND)
+  # pkg_check_modules(OAL openal)
+  # if (NOT OAL_FOUND)
+  #   BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
+  #   set (HAVE_OPENAL FALSE)
+  # else (NOT OAL_FOUND)
+  #   set (HAVE_OPENAL TRUE)
+  # endif (NOT OAL_FOUND)
 
   ########################################
   # Find AV format
