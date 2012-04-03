@@ -65,7 +65,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
   this->poseSub = this->node->Subscribe("~/pose",
                                         &GpuRaySensor::OnPose, this);
-  
+
   this->rayElem = this->sdf->GetElement("ray");
   this->scanElem = this->rayElem->GetElement("scan");
   this->horzElem = this->scanElem->GetElement("horizontal");
@@ -81,7 +81,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   {
     gzthrow("GpuRaySensor: Image has 0 size!");
   }
-  
+
   width_2nd = this->GetRangeCount();
   height_2nd = this->GetVerticalRangeCount();
 
@@ -99,10 +99,12 @@ void GpuRaySensor::Load(const std::string &_worldName)
   far = this->GetRangeMax();
 
   hfov = (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian();
-  vfov = (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).GetAsRadian();
+  vfov = (this->GetVerticalAngleMax()
+          - this->GetVerticalAngleMin()).GetAsRadian();
 
   hang = (this->GetAngleMax() + this->GetAngleMin()).GetAsRadian() / 2.0;
-  vang = (this->GetVerticalAngleMax() + this->GetVerticalAngleMin()).GetAsRadian() / 2.0;
+  vang = (this->GetVerticalAngleMax()
+          + this->GetVerticalAngleMin()).GetAsRadian() / 2.0;
 
   if (hfov > 2 * M_PI)
     hfov = 2*M_PI;
@@ -122,10 +124,10 @@ void GpuRaySensor::Load(const std::string &_worldName)
 
   if (vfov > M_PI / 2)
   {
-    gzwarn << "Vertical FOV for block GPU laser model is capped at 90 degrees.\n";
+    gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
     vfov = M_PI / 2;
-    this->SetVerticalAngleMin(vang - (vfov / 2)); 
-    this->SetVerticalAngleMax(vang + (vfov / 2)); 
+    this->SetVerticalAngleMin(vang - (vfov / 2));
+    this->SetVerticalAngleMax(vang + (vfov / 2));
   }
 
   if ((width_1st * height_1st) < (width_2nd * height_2nd))
@@ -134,11 +136,6 @@ void GpuRaySensor::Load(const std::string &_worldName)
     height_1st = std::max(height_1st, height_2nd);
   }
 
-  //gzwarn <<"Sensor plane: " << ((this->isHorizontal) ? "horizontal":"vertical") <<"\n";
-  //gzwarn << "Camera count: " << this->cameraCount << 
-  //          " Camera width: " << width_1st << 
-  //          " height: " << height_1st << "\n";
-
   if (this->isHorizontal)
   {
     if (height_1st > 1)
@@ -146,9 +143,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
       chfov = 2 * atan(tan(hfov/2) / cos(vfov/2));
       cvfov = vfov;
       ratio_1st = tan(chfov/2.0) / tan(vfov/2.0);
-      
-      //gzwarn << "Corrected HFOV: " << chfov << " (HFOV: " << hfov << ")\n";
-      
+
       if ((width_1st / ratio_1st) > height_1st)
         height_1st = width_1st / ratio_1st;
       else
@@ -167,9 +162,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
       chfov = hfov;
       cvfov = 2 * atan(tan(vfov/2) / cos(hfov/2));
       ratio_1st = tan(hfov/2.0) / tan(cvfov/2.0);
-    
-      //gzwarn << "Corrected VFOV: " << cvfov << " (VFOV: " << vfov << ")\n";
-      
+
       if ((width_1st / ratio_1st) > height_1st)
         height_1st = width_1st / ratio_1st;
       else
@@ -181,10 +174,6 @@ void GpuRaySensor::Load(const std::string &_worldName)
       cvfov = vfov;
     }
   }
-    
-  //gzwarn << "CHFOV: " << chfov << " CVFOV: " << cvfov << "\n";
-  //gzwarn << "Final texture size: " << width_1st << " x " << height_1st << "\n";
-  //gzwarn << "Range configuration: " << width_2nd << " x " << height_2nd << "\n";
 
   this->cameraElem.reset(new sdf::Element);
   sdf::initFile("sdf/camera.sdf", this->cameraElem);
@@ -196,7 +185,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   ptr->GetAttribute("width")->Set(width_1st);
   ptr->GetAttribute("height")->Set(height_1st);
   ptr->GetAttribute("format")->Set("R8G8B8");
-  
+
   ptr = this->cameraElem->GetOrCreateElement("clip");
   ptr->GetAttribute("near")->Set(near);
   ptr->GetAttribute("far")->Set(far);
@@ -250,42 +239,31 @@ void GpuRaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
-event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(boost::function<void(const float *, 
-              unsigned int, unsigned int, unsigned int, const std::string &)> subscriber)
-{ 
-  return this->laserCam->ConnectNewLaserFrame(subscriber); 
+event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
+  boost::function<void(const float *, unsigned int, unsigned int, unsigned int,
+  const std::string &)> subscriber)
+{
+  return this->laserCam->ConnectNewLaserFrame(subscriber);
 }
 
 //////////////////////////////////////////////////
 void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &c)
-{ 
-  this->laserCam->DisconnectNewLaserFrame(c); 
+{
+  this->laserCam->DisconnectNewLaserFrame(c);
 }
-
-////////////////////////////////////////////////////
-//event::ConnectionPtr GpuRaySensor::ConnectNewImage2Frame(T subscriber)
-//{ 
-//  return this->laserCam->ConnectNewImage2Frame(subscriber); 
-//}
-//
-////////////////////////////////////////////////////
-//void GpuRaySensor::DisconnectNewImage2Frame(event::ConnectionPtr &c)
-//{ 
-//  this->laserCami->DisconnectNewImage2Frame(c); 
-//}
 
 //////////////////////////////////////////////////
 unsigned int GpuRaySensor::GetCameraCount()
 {
   return this->cameraCount;
 }
-  
+
 //////////////////////////////////////////////////
 bool GpuRaySensor::IsHorizontal()
 {
   return this->isHorizontal;
 }
-  
+
 //////////////////////////////////////////////////
 double GpuRaySensor::GetHAngle()
 {
@@ -341,7 +319,7 @@ math::Angle GpuRaySensor::GetAngleMin() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::SetAngleMin(double angle) 
+void GpuRaySensor::SetAngleMin(double angle)
 {
   this->horzElem->GetAttribute("min_angle")->Set(angle);
 }
@@ -374,7 +352,7 @@ double GpuRaySensor::GetRangeMax() const
 double GpuRaySensor::GetAngleResolution() const
 {
   return (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian() /
-   (this->GetRangeCount()-1);
+    (this->GetRangeCount()-1);
 }
 
 //////////////////////////////////////////////////
@@ -478,34 +456,22 @@ double GpuRaySensor::GetRange(int _index)
 //////////////////////////////////////////////////
 double GpuRaySensor::GetRetro(int index)
 {
-  //boost::mutex::scoped_lock(*this->mutex);
-  //return this->laserShape->GetRetro(index);
 }
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetFiducial(int index)
 {
-  //boost::mutex::scoped_lock(*this->mutex);
-  //return this->laserShape->GetFiducial(index);
 }
 
 //////////////////////////////////////////////////
 void GpuRaySensor::UpdateImpl(bool /*_force*/)
 {
-  //this->mutex->lock();
-
-  // Sensor::Update(force);
   if (this->laserCam)\
   {
     this->laserCam->Render();
     this->laserCam->PostRender();
     this->lastUpdateTime = this->world->GetSimTime();
   }
-  
-  //this->mutex->unlock();
-
-  //if (this->scanPub)
-  //  this->scanPub->Publish(this->laserMsg);
 }
 
 void GpuRaySensor::OnPose(ConstPosePtr &/*_msg*/)

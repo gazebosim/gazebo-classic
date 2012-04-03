@@ -48,7 +48,6 @@ namespace Ogre
 
 namespace gazebo
 {
-
   namespace common
   {
     class Mesh;
@@ -109,13 +108,14 @@ namespace gazebo
 
       public: void SetParentSensor(sensors::GpuRaySensor *parent);
 
-      public: virtual void notifyRenderSingleObject (Ogre::Renderable *rend, const Ogre::Pass* /*pass*/, 
-              const Ogre::AutoParamDataSource* /*source*/, const Ogre::LightList* /*lights*/, bool /*supp*/);
+      public: virtual void notifyRenderSingleObject(Ogre::Renderable *rend,
+              const Ogre::Pass* /*p*/, const Ogre::AutoParamDataSource* /*s*/,
+              const Ogre::LightList* /*ll*/, bool /*supp*/);
 
       private: virtual void RenderImpl();
 
-      private: void UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material *material, 
-              Ogre::Camera *cam);
+      private: void UpdateRenderTarget(Ogre::RenderTarget *target,
+               Ogre::Material *material, Ogre::Camera *cam);
 
       private: void CreateOrthoCam();
 
@@ -123,7 +123,8 @@ namespace gazebo
 
       private: void CreateCanvas();
 
-      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float left, float right, float bottom, float top, float near, float far);
+      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float left, float right,
+               float bottom, float top, float near, float far);
 
       private: float *laserBuffer;
       private: float *laserScan;
@@ -142,35 +143,17 @@ namespace gazebo
 
       protected: unsigned int _textureCount;
       protected: double cameraYaws[4];
-      
-      //public: template<typename T>
-      //        event::ConnectionPtr ConnectNewImage2Frame(T subscriber)
-      //        { return newImage2Frame.Connect(subscriber); }
-      //public: void DisconnectNewImage2Frame(event::ConnectionPtr &c)
-      //        { newImage2Frame.Disconnect(c); }
 
-      //private: event::EventT<void(const unsigned char *, unsigned int, unsigned int,
-      //             unsigned int, unsigned int)> newImage2Frame;
+      protected: virtual void Set1stPassTarget(Ogre::RenderTarget *target,
+                  unsigned int index);
 
-      //private: void PublishTexture(Ogre::Texture *tex, Ogre::Viewport *vp, unsigned int index);
-
-      //protected: Ogre::Texture *_1stPassTextures_dbg[3];
-      //protected: Ogre::Texture *_2ndPassTexture_dbg;
-      //protected: Ogre::RenderTarget *_1stPassTargets_dbg[3];
-      //protected: Ogre::RenderTarget *_2ndPassTarget_dbg;
-      //protected: Ogre::Viewport *_1stPassViewports_dbg[3];
-      //protected: Ogre::Viewport *_2ndPassViewport_dbg;
-      //private: Ogre::Material *mat_1st_pass_dbg;
-      //private: Ogre::Material *mat_2nd_pass_dbg;
-      
-      protected: virtual void Set1stPassTarget(Ogre::RenderTarget *target, unsigned int index);
       protected: virtual void Set2ndPassTarget(Ogre::RenderTarget *target);
 
       protected: Ogre::RenderTarget *current_target;
       private: Ogre::Material *current_mat;
-      
+
       protected: Ogre::Camera *orthoCam;
-      
+
       protected: Ogre::SceneNode *origParentNode_ortho;
       protected: Ogre::SceneNode *pitchNode_ortho;
 

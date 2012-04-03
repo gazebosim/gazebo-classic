@@ -37,17 +37,11 @@ namespace gazebo
                 unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
-    //public: virtual void OnNewImageFrame(const unsigned char *_image,
-    //                          unsigned int _width, unsigned int _height,
-    //                          unsigned int _depth, unsigned int cam);
-
     protected: unsigned int width, height/*, depth*/;
-//    protected: std::string format;
 
     protected: sensors::GpuRaySensorPtr parentSensor;
 
     private: event::ConnectionPtr newLaserFrameConnection;
-    //private: event::ConnectionPtr newImageFrameConnection;
   };
 }
 #endif

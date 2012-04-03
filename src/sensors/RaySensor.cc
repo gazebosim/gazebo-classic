@@ -248,7 +248,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
   for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
   {
-    this->laserMsg.add_ranges(this->laserShape->GetRange(j*this->GetRayCount()+i));
+    this->laserMsg.add_ranges(
+      this->laserShape->GetRange(j * this->GetRayCount() + i));
     this->laserMsg.add_intensities(0);
   }
   this->mutex->unlock();

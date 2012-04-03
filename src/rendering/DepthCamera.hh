@@ -97,8 +97,8 @@ namespace gazebo
               { newDepthFrame.Disconnect(c); }
       private: virtual void RenderImpl();
 
-      private: void UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material *material, 
-              std::string matName);
+      private: void UpdateRenderTarget(Ogre::RenderTarget *target,
+               Ogre::Material *material, std::string matName);
 
       private: float *depthBuffer;
 
@@ -111,9 +111,9 @@ namespace gazebo
       protected: Ogre::RenderTarget *depthTarget;
       public: virtual void SetDepthTarget(Ogre::RenderTarget *target);
       protected: Ogre::Viewport *depthViewport;
-      
+
       private: bool output_points;
-      
+
       /// \brief Connect a to the add entity signal
       public: template<typename T>
               event::ConnectionPtr ConnectNewRGBPointCloud(T subscriber)
@@ -123,7 +123,7 @@ namespace gazebo
 
       private: float *pcdBuffer;
       protected: Ogre::Viewport *pcdViewport;
-      
+
       private: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newRGBPointCloud;
 

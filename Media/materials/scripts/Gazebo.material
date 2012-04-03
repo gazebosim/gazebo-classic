@@ -34,12 +34,12 @@ material Gazebo/DepthMap
   }
 }
 
-vertex_program Gazebo/XYZRGBPointsVS glsl
+vertex_program Gazebo/XYZPointsVS glsl
 {
   source depth_points_map.vert
 }
 
-fragment_program Gazebo/XYZRGBPointsFS glsl
+fragment_program Gazebo/XYZPointsFS glsl
 {
   source depth_points_map.frag
   
@@ -50,7 +50,7 @@ fragment_program Gazebo/XYZRGBPointsFS glsl
   }
 }
 
-material Gazebo/XYZRGBPoints
+material Gazebo/XYZPoints
 {
   technique
   {
@@ -58,8 +58,8 @@ material Gazebo/XYZRGBPoints
     {
       separate_scene_blend one zero one zero
 
-      vertex_program_ref Gazebo/XYZRGBPointsVS { }
-      fragment_program_ref Gazebo/XYZRGBPointsFS { }
+      vertex_program_ref Gazebo/XYZPointsVS { }
+      fragment_program_ref Gazebo/XYZPointsFS { }
     }
   }
 }

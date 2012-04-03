@@ -64,7 +64,7 @@ DepthCamera::~DepthCamera()
 void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
-  if (_sdf->GetElement("depth_camera") && 
+  if (_sdf->GetElement("depth_camera") &&
       _sdf->GetElement("depth_camera")->GetValueString("output") == "points")
     this->output_points = true;
 }
@@ -123,7 +123,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
       _textureName);
 
   this->depthMaterial = (Ogre::Material*)(
-      Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap").getPointer());
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap").get());
 
   this->depthMaterial->load();
 
@@ -139,7 +139,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 
     this->pcdTarget = this->pcdTexture->getBuffer()->getRenderTarget();
     this->pcdTarget->setAutoUpdated(false);
-    
+
     this->pcdViewport = this->pcdTarget->addViewport(this->camera);
     this->pcdViewport->setClearEveryFrame(true);
     this->pcdViewport->setBackgroundColour(
@@ -149,9 +149,10 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
     this->pcdMaterial = (Ogre::Material*)(
-      Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZRGBPoints").getPointer());
+    Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());
 
-    this->pcdMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(this->renderTexture->getName());
+    this->pcdMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(
+              this->renderTexture->getName());
 
     this->pcdMaterial->load();
   }
@@ -205,7 +206,7 @@ void DepthCamera::PostRender()
     pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 
     this->newDepthFrame(this->depthBuffer, width, height, 1, "FLOAT32");
-    
+
     if (this->output_points)
     {
       this->pcdTarget->swapBuffers();
@@ -240,7 +241,8 @@ void DepthCamera::PostRender()
   this->newData = false;
 }
 
-void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material *material, std::string matName)
+void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target,
+          Ogre::Material *material, std::string matName)
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
@@ -264,7 +266,8 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target, Ogre::Material 
   // return 0 in case no renderable object is inside frustrum
   vp->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
 
-  Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, matName, true);
+  Ogre::CompositorManager::getSingleton().setCompositorEnabled(
+                                                vp, matName, true);
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
@@ -327,8 +330,9 @@ void DepthCamera::RenderImpl()
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   sceneMgr->_suppressRenderStateChanges(true);
 
-  this->UpdateRenderTarget(this->depthTarget, this->depthMaterial, "Gazebo/DepthMap");
-  
+  this->UpdateRenderTarget(this->depthTarget,
+                  this->depthMaterial, "Gazebo/DepthMap");
+
   // Does actual rendering
   this->depthTarget->update(false);
 
@@ -337,20 +341,21 @@ void DepthCamera::RenderImpl()
 
   // for camera image
   Camera::RenderImpl();
-  
+
   if (this->output_points)
   {
     sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
     sceneMgr->_suppressRenderStateChanges(true);
 
-    this->UpdateRenderTarget(this->pcdTarget, this->pcdMaterial, "Gazebo/XYZRGBPoints");
-    
+    this->UpdateRenderTarget(this->pcdTarget,
+                  this->pcdMaterial, "Gazebo/XYZPoints");
+
     this->pcdTarget->update(false);
-    
+
     sceneMgr->_suppressRenderStateChanges(false);
-    sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+    sceneMgr->setShadowTechnique(
+            Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
   }
-  
 }
 
 //////////////////////////////////////////////////

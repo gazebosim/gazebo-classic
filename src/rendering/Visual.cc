@@ -383,11 +383,12 @@ void Visual::Load()
   }
 
   Ogre::Entity *ent = (Ogre::Entity *) obj;
-  
+
   if (ent)
   {
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
-      ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(this->sdf->GetValueDouble("laser_retro"),0.0,0.0,0.0));
+      ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
+          this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
   }
 
   // Set the pose of the scene node

@@ -23,6 +23,7 @@
 #define GPURAYSENSOR_HH
 
 #include <vector>
+#include <string>
 
 #include "math/Angle.hh"
 #include "math/Pose.hh"
@@ -73,7 +74,7 @@ namespace gazebo
       public: math::Angle GetAngleMin() const;
 
       /// \brief Set the scan minimum angle
-      /// \param The minimum angle 
+      /// \param The minimum angle
       public: void SetAngleMin(double angle);
 
       /// \brief Get the maximum angle
@@ -81,7 +82,7 @@ namespace gazebo
       public: math::Angle GetAngleMax() const;
 
       /// \brief Set the scan maximum angle
-      /// \param The maximum angle 
+      /// \param The maximum angle
       public: void SetAngleMax(double angle);
 
       /// \brief Get radians between each range
@@ -117,7 +118,7 @@ namespace gazebo
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
       public: math::Angle GetVerticalAngleMin() const;
-      
+
       /// \brief Set the vertical scan bottom angle
       /// \param The minimum angle of the scan block
       public: void SetVerticalAngleMin(double angle);
@@ -125,7 +126,7 @@ namespace gazebo
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
       public: math::Angle GetVerticalAngleMax() const;
-      
+
       /// \brief Set the vertical scan line top angle
       /// \param The Maximum angle of the scan block
       public: void SetVerticalAngleMax(double angle);
@@ -170,9 +171,9 @@ namespace gazebo
       public: double Get1stRatio();
 
       public: double Get2ndRatio();
-      
+
       public: double GetHFOV();
-      
+
       public: double GetCHFOV();
 
       public: double GetVFOV();
@@ -182,19 +183,15 @@ namespace gazebo
       public: double GetHAngle();
 
       public: double GetVAngle();
-      
+
       private: void OnPose(ConstPosePtr &_msg);
-      
+
       /// \brief Connect a to the add entity signal
-      public: event::ConnectionPtr ConnectNewLaserFrame(boost::function<void(const float *, 
-              unsigned int, unsigned int, unsigned int, const std::string &)> subscriber);
+      public: event::ConnectionPtr ConnectNewLaserFrame(
+        boost::function<void(const float *, unsigned int, unsigned int,
+        unsigned int, const std::string &)> subscriber);
 
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &c);
-
-      //public: event::ConnectionPtr ConnectNewImage2Frame(boost::function<void(const unsigned char *,
-      //           unsigned int, unsigned int, unsigned int, unsigned int)> subscriber);
-      //
-      //public: void DisconnectNewImage2Frame(event::ConnectionPtr &c);
 
       protected: math::Vector3 offset;
       protected: sdf::ElementPtr rayElem;
@@ -212,7 +209,7 @@ namespace gazebo
       protected: unsigned int width_2nd, height_2nd;
       protected: double ratio_1st, ratio_2nd;
       protected: bool isHorizontal;
-      
+
       private: rendering::GpuLaserPtr laserCam;
       private: rendering::ScenePtr scene;
 
