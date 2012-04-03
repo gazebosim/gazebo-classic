@@ -1,0 +1,8 @@
+<!-- Actor -->
+<element name="actor" required="*">
+  <attribute name="name" type="string" default="__default__" required="1"/>
+  <attribute name="filename" type="string" default="__default__" required="1"/>
+  <element name="origin" required="0">
+    <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+  </element> <!-- End Origin -->
+</element> <!-- End Actor -->

@@ -9,6 +9,7 @@ set (sdfs gazebo.sdf
           light.sdf 
           link.sdf 
           model.sdf 
+          actor.sdf 
           physics.sdf 
           plugin.sdf 
           scene.sdf 

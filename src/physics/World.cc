@@ -42,6 +42,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Model.hh"
+#include "physics/Actor.hh"
 #include "physics/World.hh"
 
 #include "physics/Collision.hh"
@@ -452,6 +453,22 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
+ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
+{
+  ActorPtr actor(new Actor(_parent));
+  actor->SetWorld(shared_from_this());
+  actor->Load(_sdf);
+
+  /*event::Events::addEntity(model->GetScopedName());
+
+  msgs::Model msg;
+  model->FillModelMsg(msg);
+  this->modelPub->Publish(msg);*/
+
+  return actor;
+}
+
+//////////////////////////////////////////////////
 void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   if (_sdf->HasElement("light"))
@@ -476,6 +493,18 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 
       // TODO : Put back in the ability to nest models. We should do this
       // without requiring a joint.
+
+      childElem = childElem->GetNextElement();
+    }
+  }
+
+  if (_sdf->HasElement("actor"))
+  {
+    sdf::ElementPtr childElem = _sdf->GetElement("actor");
+
+    while (childElem)
+    {
+      this->LoadActor(childElem, _parent);
 
       childElem = childElem->GetNextElement();
     }

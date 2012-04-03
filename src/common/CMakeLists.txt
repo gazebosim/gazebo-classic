@@ -9,6 +9,7 @@ set ( sources ColladaLoader.cc
               Exception.cc
               Console.cc
               Mesh.cc
+              Skeleton.cc
               MeshLoader.cc
               MeshManager.cc
               STLLoader.cc
@@ -30,6 +31,7 @@ set ( headers CommonTypes.hh
               Exception.hh
               Console.hh
               Mesh.hh
+              Skeleton.hh
               MeshLoader.hh
               MeshManager.hh
               Plugin.hh

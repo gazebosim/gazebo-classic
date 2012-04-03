@@ -194,6 +194,9 @@ namespace gazebo
       /// \brief Load a model
       private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr parent);
 
+      /// \brief Load an actor
+      private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr parent);
+
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
 

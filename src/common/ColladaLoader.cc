@@ -103,6 +103,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
   TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
   while (nodeXml)
   {
+    std::cerr << "new root\n";
     this->LoadNode(nodeXml , _mesh, math::Matrix4::IDENTITY);
     nodeXml = nodeXml->NextSiblingElement("node");
   }
@@ -117,6 +118,8 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
 
   math::Matrix4 transform = this->LoadNodeTransform(_elem);
   transform = _transform * transform;
+
+  std::cerr << "node: " << _elem->Attribute("name") << "\n";
 
   nodeXml = _elem->FirstChildElement("node");
   while (nodeXml)
@@ -169,6 +172,40 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
 
     this->LoadGeometry(geomXml, transform, _mesh);
     instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
+  }
+
+  TiXmlElement *instContrXml =
+    nodeXml->FirstChildElement("instance_controller");
+  while (instContrXml)
+  {
+    std::string contrURL = instContrXml->Attribute("url");
+    TiXmlElement *contrXml = this->GetElementId("controller", contrURL);
+
+    TiXmlElement *instSkelXml = instContrXml->FirstChildElement("skeleton");
+    std::string rootURL = instSkelXml->GetText();
+    TiXmlElement *rootNodeXml = this->GetElementId("node", rootURL);
+
+    this->materialMap.clear();
+    TiXmlElement *bindMatXml, *techniqueXml, *matXml;
+    bindMatXml = instContrXml->FirstChildElement("bind_material");
+    while (bindMatXml)
+    {
+      if ((techniqueXml = bindMatXml->FirstChildElement("technique_common")))
+      {
+        matXml = techniqueXml->FirstChildElement("instance_material");
+        while (matXml)
+        {
+          std::string symbol = matXml->Attribute("symbol");
+          std::string target = matXml->Attribute("target");
+          this->materialMap[symbol] = target;
+          matXml = matXml->NextSiblingElement("instance_material");
+        }
+      }
+      bindMatXml = bindMatXml->NextSiblingElement("bind_material");
+    }
+
+    this->LoadController(contrXml, rootNodeXml, transform, _mesh);
+    instContrXml = instContrXml->NextSiblingElement("instance_controller");
   }
 }
 
@@ -231,6 +268,12 @@ math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
   }
 
   return transform;
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::LoadController(TiXmlElement *_contrXml,
+      TiXmlElement *_skelXml, const math::Matrix4 &_transform, Mesh *_mesh)
+{
 }
 
 /////////////////////////////////////////////////

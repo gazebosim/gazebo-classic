@@ -19,8 +19,9 @@
 
     <include filename="ground_plane.model"/>
 
-    <actor name="actor1" filename="file.dae">
+    <actor name="actor1" filename="test.dae">
       <origin pose="0 0 0 0 0 0"/>
+    </actor>
 
     <!-- Light Source -->
     <light type="directional" name="sun" cast_shadows="true">
