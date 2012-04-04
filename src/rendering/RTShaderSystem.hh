@@ -112,8 +112,6 @@ namespace gazebo
 
       private: boost::mutex *entityMutex;
       private: friend class SingletonT<RTShaderSystem>;
-
-      private: std::map<std::string, bool> set;
     };
     /// \}
   }

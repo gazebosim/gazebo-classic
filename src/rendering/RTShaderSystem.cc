@@ -191,8 +191,6 @@ void RTShaderSystem::UpdateShaders()
 
   std::list<Visual*>::iterator iter;
 
-  this->shaderGenerator->flushShaderCache();
-
   this->entityMutex->lock();
   // Update all the shaders
   for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
@@ -221,12 +219,6 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
       for (unsigned int s = 0; s < this->scenes.size(); s++)
       {
-        std::map<std::string, bool>::const_iterator citer = this->set.find(curMaterialName);
-        if (citer != this->set.end() && citer->second)
-          continue;
-
-        std::cout << "CreateShaderBaseTech[" << curMaterialName << "]\n";
-
         try
         {
           success = this->shaderGenerator->createShaderBasedTechnique(
@@ -235,14 +227,12 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
               this->scenes[s]->GetName() +
               Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         }
-        catch (Ogre::Exception e)
+        catch(Ogre::Exception &e)
         {
           gzerr << "Unable to create shader technique for material["
             << curMaterialName << "]\n";
           success = false;
         }
-
-        this->set[curMaterialName] = success;
 
         // Setup custom shader sub render states according to current setup.
         if (success)
@@ -318,8 +308,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
               Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
               curMaterialName);
         }
-
-       }
+      }
     }
   }
 }

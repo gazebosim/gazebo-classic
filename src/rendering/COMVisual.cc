@@ -45,7 +45,7 @@ void COMVisual::Load()
 
   this->AttachMesh("unit_box");
   this->SetScale(math::Vector3(0.02, 0.02, 0.02));
-  // this->SetMaterial("Gazebo/RedTransparent", false);
+  this->SetMaterial("Gazebo/RedTransparent", false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
