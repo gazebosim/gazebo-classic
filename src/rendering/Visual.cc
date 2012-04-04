@@ -527,7 +527,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    RTShaderSystem::Instance()->UpdateShaders();
+    // RTShaderSystem::Instance()->UpdateShaders();
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
@@ -1046,7 +1046,7 @@ void Visual::SetTransparency(float _trans)
       }
     }
   }
-  RTShaderSystem::Instance()->UpdateShaders();
+  // RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1260,7 +1260,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetOrCreateElement("normal_map")->GetValue()->Set(_nmap);
-  RTShaderSystem::Instance()->UpdateShaders();
+  // RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1275,7 +1275,7 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetAttribute("type")->Set(_type);
-  RTShaderSystem::Instance()->UpdateShaders();
+  // RTShaderSystem::Instance()->UpdateShaders();
 }
 
 

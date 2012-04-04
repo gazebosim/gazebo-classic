@@ -1301,24 +1301,24 @@ void Scene::PreRender()
   this->lightMsgs.clear();
 
   // Process the joint messages
-  jIter = this->jointMsgs.begin();
+  /*jIter = this->jointMsgs.begin();
   while (jIter != this->jointMsgs.end())
   {
     if (this->ProcessJointMsg(*jIter))
       this->jointMsgs.erase(jIter++);
     else
       ++jIter;
-  }
+  }*/
 
   // Process the link messages
-  linkIter = this->linkMsgs.begin();
+  /*linkIter = this->linkMsgs.begin();
   while (linkIter != this->linkMsgs.end())
   {
     if (this->ProcessLinkMsg(*linkIter))
       this->linkMsgs.erase(linkIter++);
     else
       ++linkIter;
-  }
+  }*/
 
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates

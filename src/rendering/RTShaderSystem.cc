@@ -191,6 +191,8 @@ void RTShaderSystem::UpdateShaders()
 
   std::list<Visual*>::iterator iter;
 
+  this->shaderGenerator->flushShaderCache();
+
   this->entityMutex->lock();
   // Update all the shaders
   for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
@@ -219,8 +221,12 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
       for (unsigned int s = 0; s < this->scenes.size(); s++)
       {
-        // Create the shader based technique of this material.
+        std::map<std::string, bool>::const_iterator citer = this->set.find(curMaterialName);
+        if (citer != this->set.end() && citer->second)
+          continue;
+
         std::cout << "CreateShaderBaseTech[" << curMaterialName << "]\n";
+
         try
         {
           success = this->shaderGenerator->createShaderBasedTechnique(
@@ -231,8 +237,12 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
         }
         catch (Ogre::Exception e)
         {
+          gzerr << "Unable to create shader technique for material["
+            << curMaterialName << "]\n";
           success = false;
         }
+
+        this->set[curMaterialName] = success;
 
         // Setup custom shader sub render states according to current setup.
         if (success)
@@ -271,45 +281,45 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
           /// This doesn't seem to work properly.
           /*if (vis->GetShaderType() == "normal_map_object_space")
-          {
+            {
             Ogre::RTShader::SubRenderState* subRenderState =
-              this->shaderGenerator->createSubRenderState(
-                  Ogre::RTShader::NormalMapLighting::Type);
+            this->shaderGenerator->createSubRenderState(
+            Ogre::RTShader::NormalMapLighting::Type);
 
             Ogre::RTShader::NormalMapLighting* normalMapSubRS =
-              static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
+            static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
 
             normalMapSubRS->setNormalMapSpace(
-                Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
+            Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
 
             normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
-          }
-          else if (vis->GetShaderType() ==)
-          {
+            }
+            else if (vis->GetShaderType() ==)
+            {
             Ogre::RTShader::SubRenderState* subRenderState =
-              this->shaderGenerator->createSubRenderState(
-                  Ogre::RTShader::NormalMapLighting::Type);
+            this->shaderGenerator->createSubRenderState(
+            Ogre::RTShader::NormalMapLighting::Type);
 
             Ogre::RTShader::NormalMapLighting* normalMapSubRS =
-              static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
+            static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
 
             normalMapSubRS->setNormalMapSpace(
-                Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
+            Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
 
             normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
-          }
-          */
+            }
+            */
+          // Invalidate this material in order to re-generate its shaders.
+          this->shaderGenerator->invalidateMaterial(
+              this->scenes[s]->GetName() +
+              Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+              curMaterialName);
         }
 
-      // Invalidate this material in order to re-generate its shaders.
-      this->shaderGenerator->invalidateMaterial(
-          this->scenes[s]->GetName() +
-          Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-          curMaterialName);
-      }
+       }
     }
   }
 }

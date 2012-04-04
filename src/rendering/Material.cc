@@ -40,8 +40,6 @@ void Material::CreateMaterials()
   texState = pass->createTextureUnitState();
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 1));
-      */
-
 
   mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_RED_MATERIAL__", "General");
@@ -138,6 +136,7 @@ void Material::CreateMaterials()
                                Ogre::LBS_CURRENT, 0.5);
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 1));
+  */
 }
 
 //////////////////////////////////////////////////
