@@ -66,7 +66,7 @@ ModelRightMenu::ModelRightMenu()
   connect(this->showJointsAction, SIGNAL(triggered()), this,
           SLOT(OnShowJoints()));
 
-  this->showCOMAction = new QAction(tr("COM"), this);
+  this->showCOMAction = new QAction(tr("Center of Mass"), this);
   this->showCOMAction->setStatusTip(tr("Show Center of Mass"));
   this->showCOMAction->setCheckable(true);
   connect(this->showCOMAction, SIGNAL(triggered()), this,
