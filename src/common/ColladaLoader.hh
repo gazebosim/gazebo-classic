@@ -47,8 +47,11 @@ namespace gazebo
       /// \brief Load a mesh
       public: virtual Mesh *Load(const std::string &filename);
 
-      public: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml, const math::Matrix4 &_transform, Mesh *_mesh);
+      private: void LoadController(TiXmlElement *_contrXml,
+          TiXmlElement *_skelXml, const math::Matrix4 _transform, Mesh *_mesh);
+
+      private: SkeletonNode* LoadSkeletonNodes(TiXmlElement *_xml,
+                                          SkeletonNode *_parent);
 
       private: void LoadGeometry(TiXmlElement *_xml,
                                  const math::Matrix4 &_transform, Mesh *_mesh);

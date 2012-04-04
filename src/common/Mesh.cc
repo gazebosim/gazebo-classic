@@ -22,6 +22,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
+#include "common/Skeleton.hh"
 #include "gazebo_config.h"
 
 using namespace gazebo;
@@ -32,6 +33,7 @@ using namespace common;
 Mesh::Mesh()
 {
   this->name = "unknown";
+  this->skeleton = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -41,6 +43,7 @@ Mesh::~Mesh()
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
     delete *iter;
   this->submeshes.clear();
+  delete this->skeleton;
 }
 
 //////////////////////////////////////////////////
@@ -285,7 +288,26 @@ void Mesh::RecalculateNormals()
     (*iter)->RecalculateNormals();
 }
 
+//////////////////////////////////////////////////
+void Mesh::SetSkeleton(Skeleton* _skel)
+{
+  this->skeleton = _skel;
+}
 
+//////////////////////////////////////////////////
+Skeleton* Mesh::GetSkeleton() const
+{
+  return this->skeleton;
+}
+
+//////////////////////////////////////////////////
+bool Mesh::HasSkeleton() const
+{
+  if (this->skeleton)
+    return true;
+  else
+    return false;
+}
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -302,6 +324,7 @@ SubMesh::~SubMesh()
 {
   this->vertices.clear();
   this->indices.clear();
+  this->nodeAssignments.clear();
 }
 
 //////////////////////////////////////////////////
@@ -401,6 +424,18 @@ void SubMesh::AddTexCoord(double _u, double _v)
 }
 
 //////////////////////////////////////////////////
+void SubMesh::AddNodeAssignment(unsigned int _vertex, unsigned int _node,
+                                     float _weight)
+{
+  NodeAssignment na;
+  na.vertexIndex = _vertex;
+  na.nodeIndex = _node;
+  na.weight = _weight;
+
+  this->nodeAssignments.push_back(na);
+}
+
+//////////////////////////////////////////////////
 math::Vector3 SubMesh::GetVertex(unsigned int _i) const
 {
   if (_i >= this->vertices.size())
@@ -443,6 +478,15 @@ math::Vector2d SubMesh::GetTexCoord(unsigned int _i) const
     gzthrow("Index too large");
 
   return this->texCoords[_i];
+}
+
+//////////////////////////////////////////////////
+NodeAssignment SubMesh::GetNodeAssignment(unsigned int _i) const
+{
+  if (_i >= this->nodeAssignments.size())
+    gzthrow("Index too large");
+
+  return this->nodeAssignments[_i];
 }
 
 //////////////////////////////////////////////////
@@ -525,6 +569,12 @@ unsigned int SubMesh::GetIndexCount() const
 unsigned int SubMesh::GetTexCoordCount() const
 {
   return this->texCoords.size();
+}
+
+//////////////////////////////////////////////////
+unsigned int SubMesh::GetNodeAssignmentsCount() const
+{
+  return this->nodeAssignments.size();
 }
 
 //////////////////////////////////////////////////

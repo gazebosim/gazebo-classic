@@ -24,6 +24,8 @@ namespace gazebo
   namespace common
   {
     class Mesh;
+    class Skeleton;
+    class SkeletonNode;
 
     /// \addtogroup gazebo_common Common
     /// \{

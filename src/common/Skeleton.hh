@@ -19,6 +19,8 @@
 
 #include <vector>
 #include <string>
+#include <map>
+#include <utility>
 
 #include "math/Matrix4.hh"
 
@@ -26,7 +28,7 @@ namespace gazebo
 {
   namespace common
   {
-    class Node;
+    class SkeletonNode;
 
     /// \addtogroup gazebo_common Common
     /// \{
@@ -36,33 +38,51 @@ namespace gazebo
       /// \brief Constructor
       public: Skeleton();
 
+      public: Skeleton(SkeletonNode *_root);
+
       /// \brief Destructor
       public: virtual ~Skeleton();
 
-      public: void SetRootNode(Node* _node);
+      public: void SetRootNode(SkeletonNode* _node);
 
-      public: Node* GetRootNode();
+      public: SkeletonNode* GetRootNode();
 
-      public: Node* GetNodeByName(std::string _name);
+      public: SkeletonNode* GetNodeByName(std::string _name);
 
-      public: Node* GetNodeById(std::string _id);
+      public: SkeletonNode* GetNodeById(std::string _id);
 
-      protected: Node *root;
+      public: SkeletonNode* GetNodeByHandle(unsigned int _handle);
+
+      public: void SetBindShapeTransform(math::Matrix4 _trans);
+
+      public: math::Matrix4 GetBindShapeTransform();
+
+      public: void PrintTransforms();
+
+      protected: void BuildNodeMap();
+
+      protected: SkeletonNode *root;
+
+      protected: std::map<unsigned int, SkeletonNode*> nodes;
+
+      protected: math::Matrix4 bindShapeTransform;
+
+      public: std::vector<std::vector<std::pair<std::string, float> > > rawNW;
     };
 
     /// \brief A node
-    class Node
+    class SkeletonNode
     {
-      public: enum NodeType {NODE, JOINT};
+      public: enum SkeletonNodeType {NODE, JOINT};
 
       /// \brief Constructor
-      public: Node(Node* _parent);
+      public: SkeletonNode(SkeletonNode* _parent);
 
-      public: Node(Node* _parent, std::string _name, std::string _id,
-                  NodeType _type = NODE);
+      public: SkeletonNode(SkeletonNode* _parent, std::string _name,
+                std::string _id, SkeletonNodeType _type = JOINT);
 
       /// \brief Destructor
-      public: virtual ~Node();
+      public: virtual ~SkeletonNode();
 
       public: void SetName(std::string _name);
 
@@ -72,7 +92,7 @@ namespace gazebo
 
       public: std::string GetId();
 
-      public: void SetType(NodeType _type);
+      public: void SetType(SkeletonNodeType _type);
 
       public: bool IsJoint();
 
@@ -81,44 +101,51 @@ namespace gazebo
       /// \brief Get transform relative to parent
       public: math::Matrix4 GetTransform();
 
-      /// \brief Get transform relative to skeleton origin
-      public: math::Matrix4 GetGlobalTransform();
+      public: void SetParent(SkeletonNode* _parent);
 
-      public: void SetParent(Node* _parent);
+      public: SkeletonNode* GetParent();
 
-      public: Node* GetParent();
+      public: bool IsRootSkeletonNode();
 
-      public: bool IsRootNode();
-
-      public: void AddChild(Node* _child);
+      public: void AddChild(SkeletonNode* _child);
 
       public: unsigned int GetChildCount();
 
-      public: Node* GetChild(unsigned int _index);
+      public: SkeletonNode* GetChild(unsigned int _index);
 
       /// \brief Get child by name
-      public: Node* GetChildByName(std::string _name);
+      public: SkeletonNode* GetChildByName(std::string _name);
 
       /// \brief Get child by id
-      public: Node* GetChildById(std::string _id);
+      public: SkeletonNode* GetChildById(std::string _id);
 
-      /// \brief Get node by name
-      public: Node* GetByName(std::string _name);
+      public: void SetHandle(unsigned int _h);
 
-      /// \brief Get node by id
-      public: Node* GetById(std::string _id);
+      public: unsigned int GetHandle();
+
+      public: void SetInverseBindTransform(math::Matrix4 _invBM);
+
+      public: math::Matrix4 GetInverseBindTransform();
+
+      public: math::Matrix4 GetWorldTransform();
 
       protected: std::string name;
 
       protected: std::string id;
 
-      protected: NodeType type;
+      protected: SkeletonNodeType type;
 
       protected: math::Matrix4 transform;
 
-      protected: Node *parent;
+      protected: math::Matrix4 worldTransform;
 
-      protected: std::vector<Node*> children;
+      protected: math::Matrix4 invBindTransform;
+
+      protected: SkeletonNode *parent;
+
+      protected: std::vector<SkeletonNode*> children;
+
+      protected: unsigned int handle;
     };
     /// \}
   }

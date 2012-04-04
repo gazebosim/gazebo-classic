@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+#include <list>
+
 #include "common/Skeleton.hh"
 
 using namespace gazebo;
@@ -25,37 +27,115 @@ Skeleton::Skeleton()
 }
 
 //////////////////////////////////////////////////
+Skeleton::Skeleton(SkeletonNode *_root)
+{
+  this->root = _root;
+  this->BuildNodeMap();
+}
+
+//////////////////////////////////////////////////
 Skeleton::~Skeleton()
 {
   delete this->root;
 }
 
 //////////////////////////////////////////////////
-void Skeleton::SetRootNode(Node* _node)
+void Skeleton::SetRootNode(SkeletonNode* _node)
 {
   this->root = _node;
+  this->BuildNodeMap();
 }
 
 //////////////////////////////////////////////////
-Node* Skeleton::GetRootNode()
+SkeletonNode* Skeleton::GetRootNode()
 {
   return this->root;
 }
 
 //////////////////////////////////////////////////
-Node* Skeleton::GetNodeByName(std::string _name)
+SkeletonNode* Skeleton::GetNodeByName(std::string _name)
 {
-  return this->root->GetByName(_name);
+  for (std::map<unsigned int, SkeletonNode*>::iterator iter =
+      this->nodes.begin(); iter != this->nodes.end(); ++iter)
+    if (iter->second->GetName() == _name)
+      return iter->second;
+
+  return NULL;
 }
 
 //////////////////////////////////////////////////
-Node* Skeleton::GetNodeById(std::string _name)
+SkeletonNode* Skeleton::GetNodeById(std::string _id)
 {
-  return this->root->GetById(_name);
+  for (std::map<unsigned int, SkeletonNode*>::iterator iter =
+      this->nodes.begin(); iter != this->nodes.end(); ++iter)
+    if (iter->second->GetId() == _id)
+      return iter->second;
+
+  return NULL;
 }
 
 //////////////////////////////////////////////////
-Node::Node(Node* _parent)
+SkeletonNode* Skeleton::GetNodeByHandle(unsigned int _handle)
+{
+  return this->nodes[_handle];
+}
+
+//////////////////////////////////////////////////
+void Skeleton::BuildNodeMap()
+{
+  std::list<SkeletonNode*> toVisit;
+  toVisit.push_front(this->root);
+
+  unsigned int handle = 0;
+
+  while (!toVisit.empty())
+  {
+    SkeletonNode *node = toVisit.front();
+    toVisit.pop_front();
+
+    for (int i = (node->GetChildCount() - 1); i >= 0; i--)
+      toVisit.push_front(node->GetChild(i));
+
+    node->SetHandle(handle);
+    this->nodes[handle] = node;
+    handle++;
+  }
+}
+
+//////////////////////////////////////////////////
+void Skeleton::SetBindShapeTransform(math::Matrix4 _trans)
+{
+  this->bindShapeTransform = _trans;
+}
+
+//////////////////////////////////////////////////
+math::Matrix4 Skeleton::GetBindShapeTransform()
+{
+  return this->bindShapeTransform;
+}
+
+//////////////////////////////////////////////////
+void Skeleton::PrintTransforms()
+{
+  for (std::map<unsigned int, SkeletonNode*>::iterator iter =
+      this->nodes.begin(); iter != this->nodes.end(); ++iter)
+  {
+    SkeletonNode *node = iter->second;
+    std::cerr << "---------------\n" << node->GetName() << "\n";
+    std::cerr << node->GetWorldTransform() << "\n";
+
+    if (node->IsJoint())
+      std::cerr << node->GetInverseBindTransform() << "\n";
+  }
+}
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////
+SkeletonNode::SkeletonNode(SkeletonNode* _parent)
 {
   this->parent = _parent;
 
@@ -64,7 +144,8 @@ Node::Node(Node* _parent)
 }
 
 //////////////////////////////////////////////////
-Node::Node(Node* _parent, std::string _name, std::string _id, NodeType _type)
+SkeletonNode::SkeletonNode(SkeletonNode* _parent, std::string _name,
+                std::string _id, SkeletonNodeType _type)
 {
   this->parent = _parent;
 
@@ -77,43 +158,43 @@ Node::Node(Node* _parent, std::string _name, std::string _id, NodeType _type)
 }
 
 //////////////////////////////////////////////////
-Node::~Node()
+SkeletonNode::~SkeletonNode()
 {
   this->children.clear();
 }
 
 //////////////////////////////////////////////////
-void Node::SetName(std::string _name)
+void SkeletonNode::SetName(std::string _name)
 {
   this->name = _name;
 }
 
 //////////////////////////////////////////////////
-std::string Node::GetName()
+std::string SkeletonNode::GetName()
 {
   return this->name;
 }
 
 //////////////////////////////////////////////////
-void Node::SetId(std::string _id)
+void SkeletonNode::SetId(std::string _id)
 {
   this->id = _id;
 }
 
 //////////////////////////////////////////////////
-std::string Node::GetId()
+std::string SkeletonNode::GetId()
 {
   return this->id;
 }
 
 //////////////////////////////////////////////////
-void Node::SetType(NodeType _type)
+void SkeletonNode::SetType(SkeletonNodeType _type)
 {
   this->type = _type;
 }
 
 //////////////////////////////////////////////////
-bool Node::IsJoint()
+bool SkeletonNode::IsJoint()
 {
   if (this->type == JOINT)
     return true;
@@ -122,46 +203,58 @@ bool Node::IsJoint()
 }
 
 //////////////////////////////////////////////////
-void Node::SetTransform(math::Matrix4 _trans)
+void SkeletonNode::SetTransform(math::Matrix4 _trans)
 {
   this->transform = _trans;
+
+  if (this->parent == NULL)
+    this->worldTransform = _trans;
+  else
+    this->worldTransform = this->parent->GetWorldTransform() * _trans;
+
+  /// propagate the change to the children nodes
+  std::list<SkeletonNode*> toVisit;
+  for (unsigned int i = 0; i < this->children.size(); i++)
+    toVisit.push_back(this->children[i]);
+
+  while (!toVisit.empty())
+  {
+    SkeletonNode *node = toVisit.front();
+    toVisit.pop_front();
+
+    for (int i = (node->GetChildCount() - 1); i >= 0; i++)
+      toVisit.push_front(node->GetChild(i));
+
+    node->worldTransform = node->GetParent()->worldTransform * node->transform;
+  }
 }
 
 //////////////////////////////////////////////////
-math::Matrix4 Node::GetTransform()
+math::Matrix4 SkeletonNode::GetTransform()
 {
   return this->transform;
 }
 
 //////////////////////////////////////////////////
-math::Matrix4 Node::GetGlobalTransform()
+math::Matrix4 SkeletonNode::GetWorldTransform()
 {
-  math::Matrix4 trans = transform;
-  Node *node = this->parent;
-
-  while (node)
-  {
-    trans = node->GetTransform() * trans;
-    node = node->GetParent();
-  }
-
-  return trans;
+  return this->worldTransform;
 }
 
 //////////////////////////////////////////////////
-void Node::SetParent(Node* _parent)
+void SkeletonNode::SetParent(SkeletonNode* _parent)
 {
   this->parent = _parent;
 }
 
 //////////////////////////////////////////////////
-Node* Node::GetParent()
+SkeletonNode* SkeletonNode::GetParent()
 {
   return this->parent;
 }
 
 //////////////////////////////////////////////////
-bool Node::IsRootNode()
+bool SkeletonNode::IsRootSkeletonNode()
 {
   if (!this->parent)
     return true;
@@ -170,25 +263,25 @@ bool Node::IsRootNode()
 }
 
 //////////////////////////////////////////////////
-void Node::AddChild(Node* _child)
+void SkeletonNode::AddChild(SkeletonNode* _child)
 {
   this->children.push_back(_child);
 }
 
 //////////////////////////////////////////////////
-unsigned int Node::GetChildCount()
+unsigned int SkeletonNode::GetChildCount()
 {
   return this->children.size();
 }
 
 //////////////////////////////////////////////////
-Node* Node::GetChild(unsigned int _index)
+SkeletonNode* SkeletonNode::GetChild(unsigned int _index)
 {
   return this->children[_index];
 }
 
 //////////////////////////////////////////////////
-Node* Node::GetChildByName(std::string _name)
+SkeletonNode* SkeletonNode::GetChildByName(std::string _name)
 {
   for (unsigned int i = 0; i < this->children.size(); i++)
     if (this->children[i]->GetName() == _name)
@@ -198,7 +291,7 @@ Node* Node::GetChildByName(std::string _name)
 }
 
 //////////////////////////////////////////////////
-Node* Node::GetChildById(std::string _id)
+SkeletonNode* SkeletonNode::GetChildById(std::string _id)
 {
   for (unsigned int i = 0; i < this->children.size(); i++)
     if (this->children[i]->GetId() == _id)
@@ -208,35 +301,24 @@ Node* Node::GetChildById(std::string _id)
 }
 
 //////////////////////////////////////////////////
-Node* Node::GetByName(std::string _name)
+void SkeletonNode::SetHandle(unsigned int _handle)
 {
-  if (this->name == _name)
-    return this;
-  else
-  {
-    for (unsigned int i = 0; i < this->children.size(); i++)
-    {
-      Node* node = this->children[i]->GetByName(_name);
-      if (node)
-        return node;
-    }
-    return NULL;
-  }
+  this->handle = _handle;
 }
 
 //////////////////////////////////////////////////
-Node* Node::GetById(std::string _id)
+unsigned int SkeletonNode::GetHandle()
 {
-  if (this->id == _id)
-    return this;
-  else
-  {
-    for (unsigned int i = 0; i < this->children.size(); i++)
-    {
-      Node* node = this->children[i]->GetById(_id);
-      if (node)
-        return node;
-    }
-    return NULL;
-  }
+  return this->handle;
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::SetInverseBindTransform(math::Matrix4 _invBM)
+{
+  this->invBindTransform = _invBM;
+}
+
+math::Matrix4 SkeletonNode::GetInverseBindTransform()
+{
+  return this->invBindTransform;
 }
