@@ -7,11 +7,11 @@
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
   </element> <!-- End Origin -->
 
-  <element name="diffuse" required="0">
+  <element name="diffuse" required="1">
     <attribute name="rgba" type="color" default="1 1 1 1" required="1"/>
   </element> <!-- End Diffuse -->
 
-  <element name="specular" required="0">
+  <element name="specular" required="1">
     <attribute name="rgba" type="color" default=".1 .1 .1 1" required="1"/>
   </element> <!-- End Specular -->
 
@@ -22,7 +22,7 @@
     <attribute name="quadratic" type="double" default="0" required="0"/>
   </element> <!-- End Attenuation -->
 
-  <element name="direction" required="0">
+  <element name="direction" required="1">
     <attribute name="xyz" type="vector3" default="0 0 -1" required="1"/>
   </element><!-- End Directional -->
 
