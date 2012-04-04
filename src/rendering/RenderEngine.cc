@@ -239,13 +239,12 @@ void RenderEngine::Init()
       Ogre::TFO_ANISOTROPIC);
 
   RTShaderSystem::Instance()->Init();
+  rendering::Material::CreateMaterials();
 
   for (unsigned int i = 0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();
 
   this->initialized = true;
-
-  rendering::Material::CreateMaterials();
 }
 
 

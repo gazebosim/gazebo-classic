@@ -241,15 +241,15 @@ void GpuRaySensor::Fini()
 //////////////////////////////////////////////////
 event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
   boost::function<void(const float *, unsigned int, unsigned int, unsigned int,
-  const std::string &)> subscriber)
+  const std::string &)> _subscriber)
 {
-  return this->laserCam->ConnectNewLaserFrame(subscriber);
+  return this->laserCam->ConnectNewLaserFrame(_subscriber);
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &c)
+void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
 {
-  this->laserCam->DisconnectNewLaserFrame(c);
+  this->laserCam->DisconnectNewLaserFrame(_c);
 }
 
 //////////////////////////////////////////////////
@@ -319,9 +319,9 @@ math::Angle GpuRaySensor::GetAngleMin() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::SetAngleMin(double angle)
+void GpuRaySensor::SetAngleMin(double _angle)
 {
-  this->horzElem->GetAttribute("min_angle")->Set(angle);
+  this->horzElem->GetAttribute("min_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -331,9 +331,9 @@ math::Angle GpuRaySensor::GetAngleMax() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::SetAngleMax(double angle)
+void GpuRaySensor::SetAngleMax(double _angle)
 {
-  this->horzElem->GetAttribute("max_angle")->Set(angle);
+  this->horzElem->GetAttribute("max_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -409,10 +409,10 @@ math::Angle GpuRaySensor::GetVerticalAngleMin() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::SetVerticalAngleMin(double angle)
+void GpuRaySensor::SetVerticalAngleMin(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
-    this->vertElem->GetAttribute("min_angle")->Set(angle);
+    this->vertElem->GetAttribute("min_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -425,14 +425,14 @@ math::Angle GpuRaySensor::GetVerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::SetVerticalAngleMax(double angle)
+void GpuRaySensor::SetVerticalAngleMax(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
-    this->vertElem->GetAttribute("max_angle")->Set(angle);
+    this->vertElem->GetAttribute("max_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::GetRanges(std::vector<double> &_ranges)
+void GpuRaySensor::GetRanges(std::vector<double> &/*_ranges*/)
 {
   /*boost::mutex::scoped_lock(*this->mutex);
   _ranges.resize(this->laserMsg.ranges_size());
@@ -454,19 +454,21 @@ double GpuRaySensor::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRetro(int index)
+double GpuRaySensor::GetRetro(int /*_index*/)
 {
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
-int GpuRaySensor::GetFiducial(int index)
+int GpuRaySensor::GetFiducial(int /*_index*/)
 {
+  return 0;
 }
 
 //////////////////////////////////////////////////
 void GpuRaySensor::UpdateImpl(bool /*_force*/)
 {
-  if (this->laserCam)\
+  if (this->laserCam)
   {
     this->laserCam->Render();
     this->laserCam->PostRender();
@@ -474,8 +476,7 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
   }
 }
 
+//////////////////////////////////////////////////
 void GpuRaySensor::OnPose(ConstPosePtr &/*_msg*/)
 {
 }
-
-

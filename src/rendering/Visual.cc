@@ -46,8 +46,10 @@ SelectionObj *Visual::selectionObj = 0;
 unsigned int Visual::visualCounter = 0;
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, VisualPtr _parent)
+Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->useRTShader = _useRTShader;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
 
@@ -77,8 +79,10 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 }
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, ScenePtr _scene)
+Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->useRTShader = _useRTShader;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
 
@@ -218,7 +222,8 @@ void Visual::Init()
   this->ribbonTrail = NULL;
   this->staticGeom = NULL;
 
-  RTShaderSystem::Instance()->AttachEntity(this);
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->AttachEntity(this);
 }
 
 //////////////////////////////////////////////////
@@ -344,29 +349,7 @@ void Visual::Load()
     {
       // Create the visual
       stream << "VISUAL_" << this->sceneNode->getName();
-
-      const common::Mesh *mesh;
-      if (!common::MeshManager::Instance()->HasMesh(meshName))
-      {
-        mesh = common::MeshManager::Instance()->Load(meshName);
-        if (mesh)
-          RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-        else
-          gzthrow("Unable to create a mesh from " + meshName);
-      }
-      else
-      {
-        mesh = common::MeshManager::Instance()->GetMesh(meshName);
-      }
-
-      // Add the mesh into OGRE
-      this->InsertMesh(mesh);
-
-      Ogre::SceneManager *mgr = this->sceneNode->getCreator();
-      if (mgr->hasEntity(stream.str()))
-        obj = (Ogre::MovableObject*)mgr->getEntity(stream.str());
-      else
-        obj = (Ogre::MovableObject*)mgr->createEntity(stream.str(), meshName);
+      obj = this->AttachMesh(meshName, stream.str());
     }
     catch(Ogre::Exception &e)
     {
@@ -375,15 +358,7 @@ void Visual::Load()
     }
   }
 
-  // Attach the entity to the node
-  if (obj)
-  {
-    this->AttachObject(obj);
-    obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
-  }
-
-  Ogre::Entity *ent = (Ogre::Entity *) obj;
-
+  Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
   if (ent)
   {
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
@@ -396,9 +371,7 @@ void Visual::Load()
 
   // Get the size of the mesh
   if (obj)
-  {
     meshSize = obj->getBoundingBox().getSize();
-  }
 
   math::Vector3 scale = this->GetScale();
   this->sceneNode->setScale(scale.x, scale.y, scale.z);
@@ -527,12 +500,15 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    RTShaderSystem::Instance()->UpdateShaders();
+    if (this->useRTShader)
+      RTShaderSystem::Instance()->UpdateShaders();
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
     gzerr << "Visual[" << this->GetName() << "] already has object["
           << _obj->getName() << "] attached.";
+
+  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
 }
 
 //////////////////////////////////////////////////
@@ -588,18 +564,24 @@ void Visual::MakeStatic()
 }
 
 //////////////////////////////////////////////////
-void Visual::AttachMesh(const std::string &_meshName)
+Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
+                                        const std::string &_objName)
 {
-  std::ostringstream stream;
+  if (_meshName.empty())
+    return NULL;
+
   Ogre::MovableObject *obj;
-  stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
+  std::string objName = _objName;
+  if (objName.empty())
+    objName = this->sceneNode->getName() + "_ENTITY_" + _meshName;
 
   this->InsertMesh(_meshName);
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
+    (this->sceneNode->getCreator()->createEntity(objName, _meshName));
 
   this->AttachObject(obj);
+  return obj;
 }
 
 //////////////////////////////////////////////////
@@ -660,59 +642,65 @@ math::Vector3 Visual::GetScale()
 
 
 //////////////////////////////////////////////////
-void Visual::SetMaterial(const std::string &_materialName)
+void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 {
   if (_materialName.empty() || _materialName == "__default__")
     return;
 
-  // Create a custom material name
-  std::string newMaterialName;
-  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
-
-  if (this->GetMaterialName() == newMaterialName)
-    return;
-
-  this->myMaterialName = newMaterialName;
-
-  Ogre::MaterialPtr origMaterial;
-
-  try
+  if (_unique)
   {
-    this->origMaterialName = _materialName;
-    // Get the original material
-    origMaterial =
-      Ogre::MaterialManager::getSingleton().getByName(_materialName);
-  }
-  catch(Ogre::Exception &e)
-  {
-    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
-    << this->sceneNode->getName() << ". Object will appear white.\n";
-    return;
-  }
+    // Create a custom material name
+    std::string newMaterialName;
+    newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
 
-  if (origMaterial.isNull())
-  {
-    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
-    << this->sceneNode->getName() << ". Object will appear white\n";
-    return;
-  }
+    if (this->GetMaterialName() == newMaterialName)
+      return;
 
+    this->myMaterialName = newMaterialName;
 
-  Ogre::MaterialPtr myMaterial;
+    Ogre::MaterialPtr origMaterial;
+    try
+    {
+      this->origMaterialName = _materialName;
+      // Get the original material
+      origMaterial =
+        Ogre::MaterialManager::getSingleton().getByName(_materialName);
+    }
+    catch(Ogre::Exception &e)
+    {
+      gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
+        << this->sceneNode->getName() << ". Object will appear white.\n";
+      return;
+    }
 
-  // Clone the material. This will allow us to change the look of each geom
-  // individually.
-  if (Ogre::MaterialManager::getSingleton().resourceExists(
-        this->myMaterialName))
-  {
-    myMaterial =
-      (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(
-            this->myMaterialName));
+    if (origMaterial.isNull())
+    {
+      gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
+        << this->sceneNode->getName() << ". Object will appear white\n";
+      return;
+    }
+
+    Ogre::MaterialPtr myMaterial;
+
+    // Clone the material. This will allow us to change the look of each geom
+    // individually.
+    if (Ogre::MaterialManager::getSingleton().resourceExists(
+          this->myMaterialName))
+    {
+      myMaterial =
+        (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(
+              this->myMaterialName));
+    }
+    else
+    {
+      myMaterial = origMaterial->clone(this->myMaterialName);
+    }
   }
   else
   {
-    myMaterial = origMaterial->clone(this->myMaterialName);
+    this->myMaterialName = _materialName;
   }
+
 
   try
   {
@@ -752,13 +740,14 @@ void Visual::SetMaterial(const std::string &_materialName)
   for (std::vector<VisualPtr>::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
-    (*iter)->SetMaterial(_materialName);
+    (*iter)->SetMaterial(_materialName, _unique);
   }
 
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
-/// Set the ambient color of the visual
+/////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color)
 {
   if (this->myMaterialName.empty())
@@ -1040,7 +1029,9 @@ void Visual::SetTransparency(float _trans)
       }
     }
   }
-  RTShaderSystem::Instance()->UpdateShaders();
+
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1254,7 +1245,8 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetOrCreateElement("normal_map")->GetValue()->Set(_nmap);
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1269,7 +1261,8 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetAttribute("type")->Set(_type);
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 
@@ -1403,14 +1396,31 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 //////////////////////////////////////////////////
 void Visual::InsertMesh(const std::string &_meshName)
 {
+  const common::Mesh *mesh;
+  if (!common::MeshManager::Instance()->HasMesh(_meshName))
+  {
+    mesh = common::MeshManager::Instance()->Load(_meshName);
+    if (mesh)
+      RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+    else
+      gzthrow("Unable to create a mesh from " + _meshName);
+  }
+  else
+  {
+    mesh = common::MeshManager::Instance()->GetMesh(_meshName);
+  }
+
+  this->InsertMesh(mesh);
+
+
   // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+  /*if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
       common::MeshManager::Instance()->HasMesh(_meshName))
   {
     const common::Mesh *mesh =
       common::MeshManager::Instance()->GetMesh(_meshName);
     this->InsertMesh(mesh);
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
@@ -1423,6 +1433,10 @@ void Visual::InsertMesh(const common::Mesh *mesh)
     gzerr << "Visual::InsertMesh no submeshes, this is an invalid mesh\n";
     return;
   }
+
+  // Don't re-add existing meshes
+  if (Ogre::MeshManager::getSingleton().resourceExists(mesh->GetName()))
+    return;
 
   try
   {
@@ -1880,5 +1894,18 @@ void Visual::ShowJoints(bool _show)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->ShowJoints(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowCOM(bool _show)
+{
+  if (this->GetName().find("COM_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowCOM(_show);
   }
 }

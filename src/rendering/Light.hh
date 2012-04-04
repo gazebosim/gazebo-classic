@@ -118,8 +118,6 @@ namespace gazebo
       /// \private Helper node to create a visual representation of the light
       private: void CreateVisual();
 
-      private: void SetupShadows();
-
       protected: virtual void OnPoseChange() {}
       /// The OGRE light source
       private: Ogre::Light *light;

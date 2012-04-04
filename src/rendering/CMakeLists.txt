@@ -39,6 +39,7 @@ set (sources MovableText.cc
              JointVisual.cc
              AxisVisual.cc
              ArrowVisual.cc
+             COMVisual.cc
 )
 
 set (headers MovableText.hh
@@ -67,6 +68,7 @@ set (headers MovableText.hh
              JointVisual.hh
              AxisVisual.hh
              ArrowVisual.hh
+             COMVisual.hh
              ogre.h
              cegui.h
 )

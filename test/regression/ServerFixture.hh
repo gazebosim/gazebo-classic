@@ -102,6 +102,7 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename)
              {
                ASSERT_NO_THROW(this->server = new Server());
+               printf("Load world[%s]\n", _worldFilename.c_str());
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->server->Run();

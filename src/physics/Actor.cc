@@ -62,14 +62,11 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
   std::string filename = _sdf->GetValueString("filename");
 
-  std::cerr << filename <<"\n";
-
   MeshManager::Instance()->Load(filename);
 
   if (MeshManager::Instance()->HasMesh(filename))
   {
-    const Mesh *mesh = MeshManager::Instance()->GetMesh(filename);
-    std::cerr << "mesh has " << mesh->GetVertexCount() << " vertices\n";
+    /*const Mesh *mesh =*/ MeshManager::Instance()->GetMesh(filename);
   }
   else
     std::cerr << "no mesh\n";
@@ -96,7 +93,7 @@ void Actor::Fini()
 }
 
 //////////////////////////////////////////////////
-void Actor::UpdateParameters(sdf::ElementPtr _sdf)
+void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
 //  Model::UpdateParameters(_sdf);
 }

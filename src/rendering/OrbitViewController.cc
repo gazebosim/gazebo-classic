@@ -155,8 +155,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   if (_event.buttons & common::MouseEvent::LEFT)
   {
     this->refVisual->SetVisible(true);
-    this->yaw += drag.x * _event.moveScale * -0.1;
-    this->pitch += drag.y * _event.moveScale * 0.1;
+    this->yaw += drag.x * _event.moveScale * -0.2;
+    this->pitch += drag.y * _event.moveScale * 0.2;
 
     this->NormalizeYaw(this->yaw);
     this->NormalizePitch(this->pitch);

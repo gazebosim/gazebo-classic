@@ -60,7 +60,7 @@ MainWindow::MainWindow()
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
-      &MainWindow::OnResponse, this);
+      &MainWindow::OnResponse, this, true);
 
   this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
                                             &MainWindow::OnWorldModify, this);

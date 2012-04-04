@@ -100,12 +100,8 @@ void Light::Load()
       this->sdf->GetOrCreateElement("diffuse")->GetValueColor("rgba"));
   this->SetSpecularColor(
       this->sdf->GetOrCreateElement("specular")->GetValueColor("rgba"));
-
-  if (this->sdf->HasElement("direction"))
-  {
-    this->SetDirection(
-        this->sdf->GetElement("direction")->GetValueVector3("xyz"));
-  }
+  this->SetDirection(
+      this->sdf->GetOrCreateElement("direction")->GetValueVector3("xyz"));
 
   if (this->sdf->HasElement("attenuation"))
   {
@@ -128,7 +124,6 @@ void Light::Load()
   this->visual->AttachObject(this->light);
 
   this->CreateVisual();
-  // this->SetupShadows();
 }
 
 //////////////////////////////////////////////////
@@ -396,14 +391,14 @@ void Light::SetLightType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void Light::SetDiffuseColor(const common::Color &color)
+void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("diffuse");
 
-  if (elem->GetValueColor("rgba") != color)
-    elem->GetAttribute("rgba")->Set(color);
+  if (elem->GetValueColor("rgba") != _color)
+    elem->GetAttribute("rgba")->Set(_color);
 
-  this->light->setDiffuseColour(color.R(), color.G(), color.B());
+  this->light->setDiffuseColour(_color.R(), _color.G(), _color.B());
 }
 
 //////////////////////////////////////////////////
@@ -418,10 +413,10 @@ void Light::SetSpecularColor(const common::Color &color)
 }
 
 //////////////////////////////////////////////////
-void Light::SetDirection(const math::Vector3 &dir)
+void Light::SetDirection(const math::Vector3 &_dir)
 {
   // Set the direction which the light points
-  math::Vector3 vec = dir;
+  math::Vector3 vec = _dir;
   vec.Normalize();
 
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("direction");
@@ -528,74 +523,3 @@ void Light::SetSpotFalloff(const double &_angle)
         elem->GetValueDouble("falloff"));
   }
 }
-
-//////////////////////////////////////////////////
-void Light::SetupShadows()
-{
-  if (this->light->getType() == Ogre::Light::LT_DIRECTIONAL)
-  {
-    unsigned int numShadowTextures = 3;
-
-    // shadow camera setup
-    Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
-
-    Ogre::PSSMShadowCameraSetup::SplitPointList splitPointList =
-      pssmSetup->getSplitPoints();
-
-    // These were hand tuned by me (Nate)...hopefully they work for all cases.
-    splitPointList[0] = 0.5;
-    splitPointList[1] = 5.5;
-    splitPointList[2] = 20.0;
-
-    pssmSetup->setSplitPoints(splitPointList);
-    pssmSetup->setSplitPadding(5.0);
-    pssmSetup->setUseSimpleOptimalAdjust(true);
-
-    // set the LISPM adjustment factor (see API documentation for these)
-    /*pssmSetup->setOptimalAdjustFactor(0, 5.0);
-    pssmSetup->setOptimalAdjustFactor(1, 3.0);
-    pssmSetup->setOptimalAdjustFactor(2, 1.0);
-    */
-
-    this->light->setCustomShadowCameraSetup(
-        Ogre::ShadowCameraSetupPtr(pssmSetup));
-
-    Ogre::Vector4 splitPoints;
-    for (unsigned int i = 0; i < numShadowTextures; ++i)
-      splitPoints[i] = splitPointList[i];
-
-    Ogre::MaterialManager::ResourceMapIterator iter =
-      Ogre::MaterialManager::getSingleton().getResourceIterator();
-
-    // Iterate over all the materials, and set the pssm split points
-    while (iter.hasMoreElements())
-    {
-      Ogre::MaterialPtr mat = iter.getNext();
-      for (int i = 0; i < mat->getNumTechniques(); i++)
-      {
-        Ogre::Technique *tech = mat->getTechnique(i);
-        for (int j = 0; j < tech->getNumPasses(); j++)
-        {
-          Ogre::Pass *pass = tech->getPass(j);
-          if (pass->hasFragmentProgram())
-          {
-            Ogre::GpuProgramParametersSharedPtr params =
-              pass->getFragmentProgramParameters();
-            if (params->_findNamedConstantDefinition("pssm_split_points"))
-              params->setNamedConstant("pssm_split_points", splitPoints);
-          }
-        }
-      }
-    }
-  }
-  /*else if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
-  {
-    this->light->setCustomShadowCameraSetup(
-    Ogre::ShadowCameraSetupPtr(new Ogre::DefaultShadowCameraSetup()));
-  }
-  */
-}
-
-
-
-

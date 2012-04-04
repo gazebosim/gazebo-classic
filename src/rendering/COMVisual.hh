@@ -14,35 +14,36 @@
  * limitations under the License.
  *
 */
-#ifndef MESHLOADER_HH
-#define MESHLOADER_HH
+/* Desc: Center of Mass Visualization Class
+ * Author: Nate Koenig
+ */
+
+#ifndef COMVISUAL_HH
+#define COMVISUAL_HH
 
 #include <string>
 
+#include "rendering/Visual.hh"
+
+namespace ogre
+{
+  class SceneNode;
+}
+
 namespace gazebo
 {
-  namespace common
+  namespace rendering
   {
-    class Mesh;
-    class Skeleton;
-    class SkeletonNode;
-
-    /// \addtogroup gazebo_common Common
-    /// \{
-    /// \brief Base class for loading meshes
-    class MeshLoader
+    class DynamicLines;
+    class COMVisual : public Visual
     {
-      /// \brief Constructor
-      public: MeshLoader();
+      public: COMVisual(const std::string &_name, VisualPtr _vis);
+      public: virtual ~COMVisual();
 
-      /// \brief Destructor
-      public: virtual ~MeshLoader();
-
-      /// \brief Load a 3D mesh
-      public: virtual Mesh *Load(const std::string &filename) = 0;
+      public: virtual void Load();
+      private: DynamicLines *crossLines;
+      private: Ogre::SceneNode *boxNode;
     };
-    /// \}
   }
 }
 #endif
-
