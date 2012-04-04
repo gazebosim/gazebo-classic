@@ -44,6 +44,7 @@ namespace gazebo
     class AxisVisual;
     class ArrowVisual;
     class ContactVisual;
+    class COMVisual;
 
     typedef boost::shared_ptr<Scene> ScenePtr;
     typedef boost::shared_ptr<Light> LightPtr;
@@ -59,6 +60,7 @@ namespace gazebo
     typedef boost::shared_ptr<ContactVisual> ContactVisualPtr;
     typedef boost::shared_ptr<ArrowVisual> ArrowVisualPtr;
     typedef boost::shared_ptr<AxisVisual> AxisVisualPtr;
+    typedef boost::shared_ptr<COMVisual> COMVisualPtr;
 
     enum RenderOpType
     {

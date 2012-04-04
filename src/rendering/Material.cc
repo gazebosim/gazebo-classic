@@ -31,6 +31,18 @@ void Material::CreateMaterials()
   Ogre::TextureUnitState *texState;
 
   mat = Ogre::MaterialManager::getSingleton().create(
+      "__GAZEBO_PURPLE_MATERIAL__", "General");
+  tech = mat->getTechnique(0);
+  pass = tech->getPass(0);
+  tech->setLightingEnabled(false);
+  pass->setAmbient(1.0, 0.0, 1.0);
+  pass->setDiffuse(1.0, 0.0, 1.0, 0.5);
+  texState = pass->createTextureUnitState();
+  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
+      Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 1));
+
+
+  mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_RED_MATERIAL__", "General");
   tech = mat->getTechnique(0);
   pass = tech->getPass(0);
@@ -110,6 +122,21 @@ void Material::CreateMaterials()
                                Ogre::LBS_CURRENT, 0.5);
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 1));
+
+  mat = Ogre::MaterialManager::getSingleton().create(
+      "__GAZEBO_TRANS_PURPLE_MATERIAL__", "General");
+  tech = mat->getTechnique(0);
+  pass = tech->getPass(0);
+  tech->setLightingEnabled(false);
+  tech->setDepthWriteEnabled(false);
+  pass->setAmbient(1.0, 0.0, 1.0);
+  pass->setDiffuse(1.0, 0.0, 1.0, 0.5);
+  pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+  texState = pass->createTextureUnitState();
+  texState->setAlphaOperation(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
+                               Ogre::LBS_CURRENT, 0.5);
+  texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
+      Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 1));
 }
 
 //////////////////////////////////////////////////

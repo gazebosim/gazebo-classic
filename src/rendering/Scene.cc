@@ -27,6 +27,7 @@
 #include "rendering/LaserVisual.hh"
 #include "rendering/CameraVisual.hh"
 #include "rendering/JointVisual.hh"
+#include "rendering/COMVisual.hh"
 #include "rendering/ContactVisual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
@@ -107,6 +108,7 @@ void Scene::Clear()
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
+  this->linkMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
 
@@ -154,6 +156,7 @@ Scene::~Scene()
   Visual_M::iterator iter;
   this->visuals.clear();
   this->jointMsgs.clear();
+  this->linkMsgs.clear();
   this->sceneMsgs.clear();
   this->poseMsgs.clear();
   this->lightMsgs.clear();
@@ -1126,6 +1129,13 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       pm2->set_name(linkName);
       this->poseMsgs.push_front(pm2);
 
+      if (_msg->model(i).link(j).has_inertial())
+      {
+        boost::shared_ptr<msgs::Link> lm(
+            new msgs::Link(_msg->model(i).link(j)));
+        this->linkMsgs.push_back(lm);
+      }
+
       for (int k = 0; k < _msg->model(i).link(j).visual_size(); k++)
       {
         boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
@@ -1245,13 +1255,14 @@ void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
-  RequestMsgs_L::iterator rIter;
-  SceneMsgs_L::iterator sIter;
-  VisualMsgs_L::iterator vIter;
-  LightMsgs_L::iterator lIter;
-  PoseMsgs_L::iterator pIter;
-  JointMsgs_L::iterator jIter;
-  SensorMsgs_L::iterator sensorIter;
+  static RequestMsgs_L::iterator rIter;
+  static SceneMsgs_L::iterator sIter;
+  static VisualMsgs_L::iterator vIter;
+  static LightMsgs_L::iterator lIter;
+  static PoseMsgs_L::iterator pIter;
+  static JointMsgs_L::iterator jIter;
+  static SensorMsgs_L::iterator sensorIter;
+  static LinkMsgs_L::iterator linkIter;
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
@@ -1297,6 +1308,16 @@ void Scene::PreRender()
       this->jointMsgs.erase(jIter++);
     else
       ++jIter;
+  }
+
+  // Process the link messages
+  linkIter = this->linkMsgs.begin();
+  while (linkIter != this->linkMsgs.end())
+  {
+    if (this->ProcessLinkMsg(*linkIter))
+      this->linkMsgs.erase(linkIter++);
+    else
+      ++linkIter;
   }
 
   // Process all the model messages last. Remove pose message from the list
@@ -1392,6 +1413,20 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     this->visuals[contactVis->GetName()] = contactVis;
   }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
+{
+  VisualPtr linkVis = this->GetVisual(_msg->name());
+  if (!linkVis)
+    return false;
+
+  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
+  comVis->Load();
+  this->visuals[comVis->GetName()] = comVis;
 
   return true;
 }
