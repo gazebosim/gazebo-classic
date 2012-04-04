@@ -32,6 +32,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
 {
   this->mutex = new boost::recursive_mutex();
+  this->prevMsg = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -85,10 +86,9 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   google::protobuf::Message *msg = _message.New();
   msg->CopyFrom(_message);
 
-  if (this->latch)
-  {
-    msg->SerializeToString(&this->prevMsg);
-  }
+  if (this->prevMsg == NULL)
+    this->prevMsg = _message.New();
+  this->prevMsg->CopyFrom(_message);
 
   this->mutex->lock();
   this->messages.push_back(msg);
@@ -123,6 +123,7 @@ void Publisher::SendMessage()
   this->mutex->unlock();
 }
 
+//////////////////////////////////////////////////
 unsigned int Publisher::GetOutgoingCount() const
 {
   this->mutex->lock();
@@ -148,19 +149,23 @@ void Publisher::OnPublishComplete()
 {
 }
 
+//////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 {
   this->publications[_i] = _publication;
 }
 
+//////////////////////////////////////////////////
 bool Publisher::GetLatching() const
 {
   return this->latch;
 }
 
+//////////////////////////////////////////////////
 std::string Publisher::GetPrevMsg() const
 {
-  return this->prevMsg;
+  std::string result;
+  if (this->prevMsg)
+    this->prevMsg->SerializeToString(&result);
+  return result;
 }
-
-

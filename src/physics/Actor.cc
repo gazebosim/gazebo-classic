@@ -66,7 +66,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
   if (MeshManager::Instance()->HasMesh(filename))
   {
-    const Mesh *mesh = MeshManager::Instance()->GetMesh(filename);
+    /*const Mesh *mesh =*/ MeshManager::Instance()->GetMesh(filename);
   }
   else
     std::cerr << "no mesh\n";
@@ -93,7 +93,7 @@ void Actor::Fini()
 }
 
 //////////////////////////////////////////////////
-void Actor::UpdateParameters(sdf::ElementPtr _sdf)
+void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
 //  Model::UpdateParameters(_sdf);
 }

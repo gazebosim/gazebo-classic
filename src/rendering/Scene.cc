@@ -254,9 +254,10 @@ void Scene::Init()
   // Send a request to get the current world state
   this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
   this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this);
+      &Scene::OnResponse, this, true);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
+  std::cout << "Request Msg Id[" << this->requestMsg->id() << "]\n";
   this->requestPub->Publish(*this->requestMsg);
 
   // Register this scene the the real time shaders system
@@ -1087,8 +1088,8 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene());
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   if (_msg->has_type() && _msg->type() == sm->GetTypeName())
   {
     sm->ParseFromString(_msg->serialized_data());
@@ -1300,25 +1301,6 @@ void Scene::PreRender()
   }
   this->lightMsgs.clear();
 
-  // Process the joint messages
-  /*jIter = this->jointMsgs.begin();
-  while (jIter != this->jointMsgs.end())
-  {
-    if (this->ProcessJointMsg(*jIter))
-      this->jointMsgs.erase(jIter++);
-    else
-      ++jIter;
-  }*/
-
-  // Process the link messages
-  /*linkIter = this->linkMsgs.begin();
-  while (linkIter != this->linkMsgs.end())
-  {
-    if (this->ProcessLinkMsg(*linkIter))
-      this->linkMsgs.erase(linkIter++);
-    else
-      ++linkIter;
-  }*/
 
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
@@ -1354,6 +1336,25 @@ void Scene::PreRender()
   }
   this->requestMsgs.clear();
 
+  // Process the joint messages
+  /*jIter = this->jointMsgs.begin();
+  while (jIter != this->jointMsgs.end())
+  {
+    if (this->ProcessJointMsg(*jIter))
+      this->jointMsgs.erase(jIter++);
+    else
+      ++jIter;
+  }*/
+
+  // Process the link messages
+  linkIter = this->linkMsgs.begin();
+  while (linkIter != this->linkMsgs.end())
+  {
+    if (this->ProcessLinkMsg(*linkIter))
+      this->linkMsgs.erase(linkIter++);
+    else
+      ++linkIter;
+  }
 
   if (this->selectionMsg)
   {
@@ -1421,6 +1422,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 {
   VisualPtr linkVis = this->GetVisual(_msg->name());
+
   if (!linkVis)
     return false;
 

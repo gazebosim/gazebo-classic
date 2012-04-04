@@ -473,7 +473,6 @@ material Gazebo/RedTransparent
       }
     }
 	}
-
 }
 
 material Gazebo/GreenTransparent

@@ -117,7 +117,8 @@ namespace gazebo
       public: VisualPtr GetChild(unsigned int _num);
 
       /// \brief Attach a mesh to this visual by name
-      public: void AttachMesh(const std::string &meshName);
+      public: Ogre::MovableObject *AttachMesh(const std::string &_meshName,
+                                              const std::string &_objName="");
 
       /// \brief Set the scale
       public: void SetScale(const math::Vector3 &scale);

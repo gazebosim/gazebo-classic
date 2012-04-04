@@ -344,29 +344,7 @@ void Visual::Load()
     {
       // Create the visual
       stream << "VISUAL_" << this->sceneNode->getName();
-
-      const common::Mesh *mesh;
-      if (!common::MeshManager::Instance()->HasMesh(meshName))
-      {
-        mesh = common::MeshManager::Instance()->Load(meshName);
-        if (mesh)
-          RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-        else
-          gzthrow("Unable to create a mesh from " + meshName);
-      }
-      else
-      {
-        mesh = common::MeshManager::Instance()->GetMesh(meshName);
-      }
-
-      // Add the mesh into OGRE
-      this->InsertMesh(mesh);
-
-      Ogre::SceneManager *mgr = this->sceneNode->getCreator();
-      if (mgr->hasEntity(stream.str()))
-        obj = (Ogre::MovableObject*)mgr->getEntity(stream.str());
-      else
-        obj = (Ogre::MovableObject*)mgr->createEntity(stream.str(), meshName);
+      obj = this->AttachMesh(meshName, stream.str());
     }
     catch(Ogre::Exception &e)
     {
@@ -375,15 +353,7 @@ void Visual::Load()
     }
   }
 
-  // Attach the entity to the node
-  if (obj)
-  {
-    this->AttachObject(obj);
-    obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
-  }
-
-  Ogre::Entity *ent = (Ogre::Entity *) obj;
-  
+  Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
   if (ent)
   {
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
@@ -396,9 +366,7 @@ void Visual::Load()
 
   // Get the size of the mesh
   if (obj)
-  {
     meshSize = obj->getBoundingBox().getSize();
-  }
 
   math::Vector3 scale = this->GetScale();
   this->sceneNode->setScale(scale.x, scale.y, scale.z);
@@ -527,12 +495,14 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    // RTShaderSystem::Instance()->UpdateShaders();
+    RTShaderSystem::Instance()->UpdateShaders();
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
     gzerr << "Visual[" << this->GetName() << "] already has object["
           << _obj->getName() << "] attached.";
+
+  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
 }
 
 //////////////////////////////////////////////////
@@ -588,18 +558,24 @@ void Visual::MakeStatic()
 }
 
 //////////////////////////////////////////////////
-void Visual::AttachMesh(const std::string &_meshName)
+Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
+                                        const std::string &_objName)
 {
-  std::ostringstream stream;
+  if (_meshName.empty())
+    return NULL;
+
   Ogre::MovableObject *obj;
-  stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
+  std::string objName = _objName;
+  if (objName.empty())
+    objName = this->sceneNode->getName() + "_ENTITY_" + _meshName;
 
   this->InsertMesh(_meshName);
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
+    (this->sceneNode->getCreator()->createEntity(objName, _meshName));
 
   this->AttachObject(obj);
+  return obj;
 }
 
 //////////////////////////////////////////////////
@@ -1046,7 +1022,7 @@ void Visual::SetTransparency(float _trans)
       }
     }
   }
-  // RTShaderSystem::Instance()->UpdateShaders();
+  RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1409,14 +1385,31 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 //////////////////////////////////////////////////
 void Visual::InsertMesh(const std::string &_meshName)
 {
+  const common::Mesh *mesh;
+  if (!common::MeshManager::Instance()->HasMesh(_meshName))
+  {
+    mesh = common::MeshManager::Instance()->Load(_meshName);
+    if (mesh)
+      RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+    else
+      gzthrow("Unable to create a mesh from " + _meshName);
+  }
+  else
+  {
+    mesh = common::MeshManager::Instance()->GetMesh(_meshName);
+  }
+
+  this->InsertMesh(mesh);
+
+
   // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+  /*if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
       common::MeshManager::Instance()->HasMesh(_meshName))
   {
     const common::Mesh *mesh =
       common::MeshManager::Instance()->GetMesh(_meshName);
     this->InsertMesh(mesh);
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
@@ -1429,6 +1422,10 @@ void Visual::InsertMesh(const common::Mesh *mesh)
     gzerr << "Visual::InsertMesh no submeshes, this is an invalid mesh\n";
     return;
   }
+
+  // Don't re-add existing meshes
+  if (Ogre::MeshManager::getSingleton().resourceExists(mesh->GetName()))
+    return;
 
   try
   {

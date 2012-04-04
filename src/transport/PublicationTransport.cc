@@ -24,6 +24,7 @@ using namespace transport;
 
 int PublicationTransport::counter = 0;
 
+/////////////////////////////////////////////////
 PublicationTransport::PublicationTransport(const std::string &_topic,
                                            const std::string &_msgType)
 : topic(_topic), msgType(_msgType)
@@ -32,6 +33,7 @@ PublicationTransport::PublicationTransport(const std::string &_topic,
   TopicManager::Instance()->UpdatePublications(this->topic, this->msgType);
 }
 
+/////////////////////////////////////////////////
 PublicationTransport::~PublicationTransport()
 {
   if (this->connection)
@@ -52,6 +54,7 @@ PublicationTransport::~PublicationTransport()
   this->callback.clear();
 }
 
+/////////////////////////////////////////////////
 void PublicationTransport::Init(const ConnectionPtr &conn_)
 {
   this->connection = conn_;
@@ -72,16 +75,19 @@ void PublicationTransport::Init(const ConnectionPtr &conn_)
       boost::bind(&PublicationTransport::OnConnectionShutdown, this));
 }
 
+/////////////////////////////////////////////////
 void PublicationTransport::OnConnectionShutdown()
 {
 }
 
+/////////////////////////////////////////////////
 void PublicationTransport::AddCallback(
     const boost::function<void(const std::string &)> &cb_)
 {
   this->callback = cb_;
 }
 
+/////////////////////////////////////////////////
 void PublicationTransport::OnPublish(const std::string &_data)
 {
   if (this->connection && this->connection->IsOpen())
@@ -97,21 +103,25 @@ void PublicationTransport::OnPublish(const std::string &_data)
   }
 }
 
+/////////////////////////////////////////////////
 const ConnectionPtr PublicationTransport::GetConnection() const
 {
   return this->connection;
 }
 
+/////////////////////////////////////////////////
 std::string PublicationTransport::GetTopic() const
 {
   return this->topic;
 }
 
+/////////////////////////////////////////////////
 std::string PublicationTransport::GetMsgType() const
 {
   return this->msgType;
 }
 
+/////////////////////////////////////////////////
 void PublicationTransport::Fini()
 {
   /// Cancel all async operatiopns.

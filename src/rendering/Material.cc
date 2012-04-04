@@ -30,7 +30,7 @@ void Material::CreateMaterials()
   Ogre::Pass *pass;
   Ogre::TextureUnitState *texState;
 
-  /*mat = Ogre::MaterialManager::getSingleton().create(
+  mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_PURPLE_MATERIAL__", "General");
   tech = mat->getTechnique(0);
   pass = tech->getPass(0);
@@ -136,7 +136,6 @@ void Material::CreateMaterials()
                                Ogre::LBS_CURRENT, 0.5);
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(1, 0, 1));
-  */
 }
 
 //////////////////////////////////////////////////
