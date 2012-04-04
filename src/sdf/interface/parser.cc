@@ -558,6 +558,11 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               << "], child of element[" << _sdf->GetName() << "]\n";
             return false;
           }
+          else
+          {
+            // Add default element
+            _sdf->AddElement(elemDesc->GetName());
+          }
         }
       }
     }
