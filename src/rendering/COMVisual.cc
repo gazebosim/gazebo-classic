@@ -20,6 +20,7 @@
 
 #include "common/MeshManager.hh"
 
+#include "rendering/DynamicLines.hh"
 #include "rendering/ogre.h"
 #include "rendering/Scene.hh"
 #include "rendering/COMVisual.hh"
@@ -29,13 +30,16 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(_name, _vis)
+  : Visual(_name, _vis, false)
 {
 }
 
 /////////////////////////////////////////////////
 COMVisual::~COMVisual()
 {
+  delete this->crossLines;
+  this->crossLines = NULL;
+
 }
 
 /////////////////////////////////////////////////
@@ -43,9 +47,29 @@ void COMVisual::Load()
 {
   Visual::Load();
 
-  this->AttachMesh("unit_box");
-  this->SetScale(math::Vector3(0.02, 0.02, 0.02));
-  this->SetMaterial("Gazebo/RedTransparent", false);
+  this->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  this->crossLines->setMaterial("Gazebo/Green");
+
+  this->crossLines->AddPoint(math::Vector3(0, 0, -0.04));
+  this->crossLines->AddPoint(math::Vector3(0, 0, 0.04));
+
+  this->crossLines->AddPoint(math::Vector3(0, -0.04, 0));
+  this->crossLines->AddPoint(math::Vector3(0, 0.04, 0));
+
+  this->crossLines->AddPoint(math::Vector3(-0.04, 0, 0));
+  this->crossLines->AddPoint(math::Vector3(0.04, 0, 0));
+
+  Ogre::MovableObject *boxObj =
+    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
+          this->GetName()+"__BOX__", "unit_box"));
+  boxObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  ((Ogre::Entity*)boxObj)->setMaterialName("__GAZEBO_TRANS_PURPLE_MATERIAL__");
+
+  this->boxNode =
+    this->sceneNode->createChildSceneNode(this->GetName() + "_BOX");
+
+  this->boxNode->attachObject(boxObj);
+  this->boxNode->setScale(0.02, 0.02, 0.02);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

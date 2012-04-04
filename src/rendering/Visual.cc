@@ -46,8 +46,10 @@ SelectionObj *Visual::selectionObj = 0;
 unsigned int Visual::visualCounter = 0;
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, VisualPtr _parent)
+Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->useRTShader = _useRTShader;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
 
@@ -77,8 +79,10 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 }
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, ScenePtr _scene)
+Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->useRTShader = _useRTShader;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
 
@@ -218,7 +222,8 @@ void Visual::Init()
   this->ribbonTrail = NULL;
   this->staticGeom = NULL;
 
-  RTShaderSystem::Instance()->AttachEntity(this);
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->AttachEntity(this);
 }
 
 //////////////////////////////////////////////////
@@ -495,7 +500,8 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    RTShaderSystem::Instance()->UpdateShaders();
+    if (this->useRTShader)
+      RTShaderSystem::Instance()->UpdateShaders();
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
@@ -737,7 +743,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     (*iter)->SetMaterial(_materialName, _unique);
   }
 
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 /////////////////////////////////////////////////
@@ -1022,7 +1029,9 @@ void Visual::SetTransparency(float _trans)
       }
     }
   }
-  RTShaderSystem::Instance()->UpdateShaders();
+
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1236,7 +1245,8 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetOrCreateElement("normal_map")->GetValue()->Set(_nmap);
-  // RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1251,7 +1261,8 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetAttribute("type")->Set(_type);
-  // RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 
@@ -1883,5 +1894,18 @@ void Visual::ShowJoints(bool _show)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->ShowJoints(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowCOM(bool _show)
+{
+  if (this->GetName().find("COM_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowCOM(_show);
   }
 }

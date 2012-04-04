@@ -25,16 +25,24 @@
 
 #include "rendering/Visual.hh"
 
+namespace ogre
+{
+  class SceneNode;
+}
+
 namespace gazebo
 {
   namespace rendering
   {
+    class DynamicLines;
     class COMVisual : public Visual
     {
       public: COMVisual(const std::string &_name, VisualPtr _vis);
       public: virtual ~COMVisual();
 
       public: virtual void Load();
+      private: DynamicLines *crossLines;
+      private: Ogre::SceneNode *boxNode;
     };
   }
 }

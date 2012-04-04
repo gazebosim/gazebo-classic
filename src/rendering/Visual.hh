@@ -60,10 +60,12 @@ namespace gazebo
     class Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
-      public: Visual(const std::string &_name, VisualPtr _parent);
+      public: Visual(const std::string &_name, VisualPtr _parent,
+                     bool _useRTShader = true);
 
       /// \brief Constructor
-      public: Visual(const std::string &_name, ScenePtr _scene);
+      public: Visual(const std::string &_name, ScenePtr _scene,
+                     bool _useRTShader = true);
 
       /// \brief Destructor
       public: virtual ~Visual();
@@ -271,6 +273,7 @@ namespace gazebo
       public: void SetScene(ScenePtr _scene);
       public: ScenePtr GetScene() const;
       public: void ShowJoints(bool _show);
+      public: void ShowCOM(bool _show);
 
       private: void GetBoundsHelper(Ogre::SceneNode *node,
                                     math::Box &box) const;
@@ -315,6 +318,8 @@ namespace gazebo
       private: Ogre::AnimationState *animState;
       private: boost::function<void()> onAnimationComplete;
       protected: ScenePtr scene;
+
+      private: bool useRTShader;
     };
     /// \}
   }

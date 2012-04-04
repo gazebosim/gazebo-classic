@@ -257,13 +257,13 @@ void Scene::Init()
       &Scene::OnResponse, this, true);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
-  std::cout << "Request Msg Id[" << this->requestMsg->id() << "]\n";
   this->requestPub->Publish(*this->requestMsg);
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 }
 
+/////////////////////////////////////////////////
 // TODO: put this back in, and disable PSSM shadows in the RTShader.
 void Scene::InitShadows()
 {
@@ -1337,14 +1337,14 @@ void Scene::PreRender()
   this->requestMsgs.clear();
 
   // Process the joint messages
-  /*jIter = this->jointMsgs.begin();
+  jIter = this->jointMsgs.begin();
   while (jIter != this->jointMsgs.end())
   {
     if (this->ProcessJointMsg(*jIter))
       this->jointMsgs.erase(jIter++);
     else
       ++jIter;
-  }*/
+  }
 
   // Process the link messages
   linkIter = this->linkMsgs.begin();
@@ -1428,6 +1428,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 
   COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
   comVis->Load();
+  comVis->SetVisible(false);
   this->visuals[comVis->GetName()] = comVis;
 
   return true;
@@ -1501,6 +1502,20 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     VisualPtr vis = this->GetVisual(_msg->data());
     if (vis)
       vis->ShowJoints(false);
+  }
+  else if (_msg->request() == "show_com")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCOM(true);
+    else
+      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+  }
+  else if (_msg->request() == "hide_com")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCOM(false);
   }
   else if (_msg->request() == "set_transparency")
   {

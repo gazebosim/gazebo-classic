@@ -592,6 +592,7 @@ material Gazebo/BlueLaser
     {
       scene_blend alpha_blend
       depth_write off
+      cull_hardware none
 
       ambient 0.0 0.0 1.0 1
       diffuse 0.0 0.0 1.0 1
