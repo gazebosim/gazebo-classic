@@ -215,17 +215,24 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
     {
       Ogre::SubEntity* curSubEntity = entity->getSubEntity(i);
       const Ogre::String& curMaterialName = curSubEntity->getMaterialName();
-      bool success;
+      bool success = false;
 
       for (unsigned int s = 0; s < this->scenes.size(); s++)
       {
         // Create the shader based technique of this material.
-        success = this->shaderGenerator->createShaderBasedTechnique(
-            curMaterialName,
-            Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-            this->scenes[s]->GetName() +
-            Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
+        std::cout << "CreateShaderBaseTech[" << curMaterialName << "]\n";
+        try
+        {
+          success = this->shaderGenerator->createShaderBasedTechnique(
+              curMaterialName,
+              Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+              this->scenes[s]->GetName() +
+              Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        }
+        catch (Ogre::Exception e)
+        {
+          success = false;
+        }
 
         // Setup custom shader sub render states according to current setup.
         if (success)

@@ -31,7 +31,6 @@ using namespace rendering;
 COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
   : Visual(_name, _vis)
 {
-  std::cout << "New COMVIsual[" << this->GetName() << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -46,7 +45,8 @@ void COMVisual::Load()
 
   this->AttachMesh("unit_box");
   this->SetScale(math::Vector3(0.02, 0.02, 0.02));
-  this->SetMaterial("__GAZEBO_RED_MATERIAL__");
+  this->SetMaterial("Gazebo/RedTransparent", false);
+  // this->SetMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__", false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

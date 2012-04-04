@@ -126,7 +126,7 @@ namespace gazebo
       public: math::Vector3 GetScale();
 
       /// \brief Set the material
-      public: void SetMaterial(const std::string &materialName);
+      public: void SetMaterial(const std::string &materialName, bool _unique=true);
 
       /// \brief Set the ambient color of the visual
       public: void SetAmbient(const common::Color &_color);

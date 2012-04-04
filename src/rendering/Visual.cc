@@ -383,7 +383,7 @@ void Visual::Load()
   }
 
   Ogre::Entity *ent = (Ogre::Entity *) obj;
-
+  
   if (ent)
   {
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
@@ -660,59 +660,65 @@ math::Vector3 Visual::GetScale()
 
 
 //////////////////////////////////////////////////
-void Visual::SetMaterial(const std::string &_materialName)
+void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 {
   if (_materialName.empty() || _materialName == "__default__")
     return;
 
-  // Create a custom material name
-  std::string newMaterialName;
-  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
-
-  if (this->GetMaterialName() == newMaterialName)
-    return;
-
-  this->myMaterialName = newMaterialName;
-
-  Ogre::MaterialPtr origMaterial;
-
-  try
+  if (_unique)
   {
-    this->origMaterialName = _materialName;
-    // Get the original material
-    origMaterial =
-      Ogre::MaterialManager::getSingleton().getByName(_materialName);
-  }
-  catch(Ogre::Exception &e)
-  {
-    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
-    << this->sceneNode->getName() << ". Object will appear white.\n";
-    return;
-  }
+    // Create a custom material name
+    std::string newMaterialName;
+    newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
 
-  if (origMaterial.isNull())
-  {
-    gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
-    << this->sceneNode->getName() << ". Object will appear white\n";
-    return;
-  }
+    if (this->GetMaterialName() == newMaterialName)
+      return;
 
+    this->myMaterialName = newMaterialName;
 
-  Ogre::MaterialPtr myMaterial;
+    Ogre::MaterialPtr origMaterial;
+    try
+    {
+      this->origMaterialName = _materialName;
+      // Get the original material
+      origMaterial =
+        Ogre::MaterialManager::getSingleton().getByName(_materialName);
+    }
+    catch(Ogre::Exception &e)
+    {
+      gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
+        << this->sceneNode->getName() << ". Object will appear white.\n";
+      return;
+    }
 
-  // Clone the material. This will allow us to change the look of each geom
-  // individually.
-  if (Ogre::MaterialManager::getSingleton().resourceExists(
-        this->myMaterialName))
-  {
-    myMaterial =
-      (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(
-            this->myMaterialName));
+    if (origMaterial.isNull())
+    {
+      gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
+        << this->sceneNode->getName() << ". Object will appear white\n";
+      return;
+    }
+
+    Ogre::MaterialPtr myMaterial;
+
+    // Clone the material. This will allow us to change the look of each geom
+    // individually.
+    if (Ogre::MaterialManager::getSingleton().resourceExists(
+          this->myMaterialName))
+    {
+      myMaterial =
+        (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(
+              this->myMaterialName));
+    }
+    else
+    {
+      myMaterial = origMaterial->clone(this->myMaterialName);
+    }
   }
   else
   {
-    myMaterial = origMaterial->clone(this->myMaterialName);
+    this->myMaterialName = _materialName;
   }
+
 
   try
   {
@@ -752,13 +758,13 @@ void Visual::SetMaterial(const std::string &_materialName)
   for (std::vector<VisualPtr>::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
-    (*iter)->SetMaterial(_materialName);
+    (*iter)->SetMaterial(_materialName, _unique);
   }
 
   RTShaderSystem::Instance()->UpdateShaders();
 }
 
-/// Set the ambient color of the visual
+/////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color)
 {
   if (this->myMaterialName.empty())
