@@ -28,7 +28,7 @@ include_directories(
 
 link_directories(${PLAYER_LINK_DIRS} ${boost_library_dirs})
 add_library(gazebo_player SHARED ${sources})
-message (STATUS "PLAYER ${PLAYER_LINK_LIBS}")
+
 target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
   gazebo_common
   gazebo_transport
