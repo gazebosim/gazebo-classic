@@ -27,6 +27,7 @@
 #include "common/Exception.hh"
 #include "math/Vector3.hh"
 #include "common/Time.hh"
+#include "common/Timer.hh"
 
 #include "transport/Publisher.hh"
 
@@ -86,28 +87,26 @@ class Colliders_TBB
 {
   public: Colliders_TBB(
               std::vector<std::pair<ODECollision*, ODECollision*> > *_colliders,
-              ODEPhysics *_engine) :
-    colliders(_colliders), engine(_engine)
+              ODEPhysics *_engine,
+              dContactGeom* _contactCollisions) :
+    colliders(_colliders), engine(_engine), contactCollisions(_contactCollisions)
   {
-    dAllocateODEDataForThread(dAllocateMaskAll);
+    //dAllocateODEDataForThread(dAllocateMaskAll);
   }
 
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
-    dContactGeom *contactCollisions = new dContactGeom[MAX_DCOLLIDE_RETURNS];
-
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
       ODECollision *collision1 = (*this->colliders)[i].first;
       ODECollision *collision2 = (*this->colliders)[i].second;
       this->engine->Collide(collision1, collision2, contactCollisions);
     }
-
-    delete [] contactCollisions;
   }
 
   private: std::vector< std::pair<ODECollision*, ODECollision*> > *colliders;
   private: ODEPhysics *engine;
+  private: dContactGeom* contactCollisions;
 };
 
 //////////////////////////////////////////////////
@@ -126,6 +125,8 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
+
+  //this->lastCollisionUpdateTime = common::Time(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -305,6 +306,14 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
+  //common::Time current_time = this->world->GetSimTime();
+  //if (current_time - this->lastCollisionUpdateTime < common::Time(0.01))
+  //  return;
+  //this->lastCollisionUpdateTime = current_time;
+
+  //common::Timer timer1;
+  //timer1.Start();
+
   this->contactPairs.clear();
 
   this->collidersCount = 0;
@@ -313,25 +322,36 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
 
+  //gzerr << "dSpaceCollide [" << timer1.GetElapsed() << "]\n";
+  //timer1.Start();
+
   for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
     delete this->contactFeedbacks[i];
   this->contactFeedbacks.clear();
+
+  //gzerr << "  clear [" << this->contactFeedbacks.size()
+  //      << "] feedbacks [" << timer1.GetElapsed() << "]\n";
+  //timer1.Start();
 
   // Collide all the collisions
   // if (this->colliders.size() < 50)
   // if (this->collidersCount < 50)
   // {
-    for (unsigned int i = 0; i < this->collidersCount; i++)
-    {
-      this->Collide(this->colliders[i].first,
-                    this->colliders[i].second, this->contactCollisions);
-    }
+      for (unsigned int i = 0; i < this->collidersCount; i++)
+      {
+        this->Collide(this->colliders[i].first,
+                      this->colliders[i].second, this->contactCollisions);
+      }
   // }
   // else
   // {
-  //  tbb::parallel_for(tbb::blocked_range<size_t>(0,
-  //        this->collidersCount, 10), Colliders_TBB(&this->colliders, this));
+  // tbb::parallel_for(tbb::blocked_range<size_t>(0,
+  //       this->collidersCount, 10), Colliders_TBB(&this->colliders, this, this->contactCollisions));
   // }
+
+  //gzerr << "  udpate [" << this->collidersCount
+  //      << "] colliders [" << timer1.GetElapsed() << "]\n";
+  //timer1.Start();
 
   // Trimesh collision must happen in this thread sequentially
   for (unsigned int i = 0; i < this->trimeshCollidersCount; i++)
@@ -341,6 +361,8 @@ void ODEPhysics::UpdateCollision()
     this->Collide(collision1, collision2, this->contactCollisions);
   }
 
+  //gzerr << "  udpate [" << this->trimeshCollidersCount
+  //      << "  trimesh colliders [" << timer1.GetElapsed() << "]\n";
 
   // printf("ContactFeedbacks[%d]\n", this->contactFeedbacks.size());
   // Process all the contact feedbacks
@@ -760,8 +782,9 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     if (collision1 && collision2)
     {
-      if (collision1->GetShapeType() == Base::TRIMESH_SHAPE ||
-          collision2->GetShapeType() == Base::TRIMESH_SHAPE)
+      // BUG: == is not right, should use &
+      if (collision1->HasType(Base::TRIMESH_SHAPE) ||
+          collision2->HasType(Base::TRIMESH_SHAPE))
         self->AddTrimeshCollider(collision1, collision2);
       else
         self->AddCollider(collision1, collision2);
@@ -777,6 +800,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   int numc = 0;
   dContact contact;
 
+  //common::Timer timer1;
+  //timer1.Start();
+
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
   if (this->GetMaxContacts() < MAX_CONTACT_JOINTS)
@@ -784,6 +810,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
       MAX_DCOLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
+
+  //gzerr << " dCollide [" << timer1.GetElapsed() << "]\n";
+  //timer1.Start();
 
   if (numc <= 0)
     return;
@@ -904,6 +933,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     LinkPtr link2 = _collision2->GetLink();
     this->AddLinkPair(link1, link2);
   }
+  //gzerr << " reset of Collide [" << timer1.GetElapsed() << "]\n";
+  //timer1.Start();
 }
 
 //////////////////////////////////////////////////
