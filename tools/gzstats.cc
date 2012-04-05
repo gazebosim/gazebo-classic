@@ -27,6 +27,8 @@
 
 using namespace gazebo;
 
+std::list<common::Time> simTimes, realTimes;
+
 /////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
 {
@@ -57,18 +59,15 @@ void cb(ConstWorldStatisticsPtr &_msg)
   simAvg = simAvg / realAvg;
 
   if (simAvg > 0)
-    percent << std::fixed << std::setprecision(2) << simAvg.Double();
+    percent = simAvg.Double();
   else
-    percent << "0";
+    percent = 0;
 
 
   if (_msg->paused())
     paused = 'T';
   else
     paused = 'F';
-
-  if (simTime.Double() > 0)
-    percent  = (simTime / realTime).Double();
 
   printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
       percent, simTime.Double(), realTime.Double(), paused);
