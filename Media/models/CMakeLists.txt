@@ -13,6 +13,7 @@ add_subdirectory(chair3)
 add_subdirectory(wg)
 add_subdirectory(frypan)
 add_subdirectory(people)
+add_subdirectory(youbot)
 
 set (files willowgarage.dae
            hanoi_red_disk.dae
