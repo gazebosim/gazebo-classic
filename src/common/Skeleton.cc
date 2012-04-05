@@ -130,6 +130,57 @@ void Skeleton::PrintTransforms()
 }
 
 //////////////////////////////////////////////////
+NodeMap Skeleton::GetNodes()
+{
+  return this->nodes;
+}
+
+//////////////////////////////////////////////////
+void Skeleton::SetNumVertAttached(unsigned int _vertices)
+{
+  this->rawNW.resize(_vertices);
+}
+
+//////////////////////////////////////////////////
+void Skeleton::AddVertNodeWeight(unsigned int _vertex, std::string _node,
+                       double _weight)
+{
+  this->rawNW[_vertex].push_back(std::make_pair(_node, _weight));
+}
+
+//////////////////////////////////////////////////
+unsigned int Skeleton::GetNumVertNodeWeights(unsigned int _vertex)
+{
+  return this->rawNW[_vertex].size();
+}
+
+//////////////////////////////////////////////////
+std::pair<std::string, double> Skeleton::GetVertNodeWeight(unsigned int _v,
+                                     unsigned int _i)
+{
+  return this->rawNW[_v][_i];
+}
+
+//////////////////////////////////////////////////
+unsigned int Skeleton::GetNumAnimations()
+{
+  return this->animations.size();
+}
+
+//////////////////////////////////////////////////
+RawAnimationListIter Skeleton::GetAnimationListIter()
+{
+  return this->animations.begin();
+}
+
+//////////////////////////////////////////////////
+void Skeleton::AddAnimation(std::string _name, RawAnimation _anim)
+{
+  this->animations[_name] = _anim;
+}
+
+
+//////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
@@ -254,7 +305,7 @@ SkeletonNode* SkeletonNode::GetParent()
 }
 
 //////////////////////////////////////////////////
-bool SkeletonNode::IsRootSkeletonNode()
+bool SkeletonNode::IsRootNode()
 {
   if (!this->parent)
     return true;

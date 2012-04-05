@@ -276,6 +276,11 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
   _mesh->SetSkeleton(skeleton);
 
+  TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
+
+  this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
+        skeleton);
+
   TiXmlElement *skinXml = _contrXml->FirstChildElement("skin");
   std::string geomURL = skinXml->Attribute("source");
 
@@ -403,22 +408,51 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   for (unsigned int i = 0; i < vStrs.size(); i++)
     v.push_back(math::parseInt(vStrs[i]));
 
-  skeleton->rawNW.resize(vCount.size());
+  skeleton->SetNumVertAttached(vCount.size());
 
   unsigned int vIndex = 0;
   for (unsigned int i = 0; i < vCount.size(); i++)
   {
-    skeleton->rawNW[i].resize(vCount[i]);
-    for (unsigned int j = 0; j < skeleton->rawNW[i].size(); j++)
+    for (unsigned int j = 0; j < vCount[i]; j++)
     {
-      skeleton->rawNW[i][j] = std::make_pair(joints[v[vIndex + jOffset]],
-                                 weights[v[vIndex + wOffset]]);
+      skeleton->AddVertNodeWeight(i, joints[v[vIndex + jOffset]],
+                                    weights[v[vIndex + wOffset]]);
       vIndex += (jOffset + wOffset + 1);
     }
   }
 
   TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
   this->LoadGeometry(geomXml, _transform, _mesh);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::LoadAnimations(TiXmlElement *_xml, Skeleton *_skel)
+{
+  TiXmlElement *childXml = _xml->FirstChildElement("animation");
+  if (childXml->FirstChildElement("animation"))
+  {
+    while (childXml)
+    {
+      this->LoadAnimation(childXml, _skel);
+      childXml->NextSiblingElement("animation");
+    }
+  }
+  else
+    this->LoadAnimation(_xml, _skel);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::LoadAnimation(TiXmlElement *_xml, Skeleton *_skel)
+{
+  std::stringstream animName;
+  if (_xml->Attribute("name"))
+    animName << _xml->Attribute("name");
+  else
+    animName << "animation" << (_skel->GetNumAnimations() + 1);
+
+  RawAnimation anim;
+
+  _skel->AddAnimation(animName.str(), anim);
 }
 
 /////////////////////////////////////////////////
@@ -1004,14 +1038,16 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           subMesh->AddNormal(norms[values[iter->second]]);
         if (_mesh->HasSkeleton())
         {
-          std::vector<std::pair<std::string, float> > nodeWeights =
-              _mesh->GetSkeleton()->rawNW[values[iter->second]];
-          for (unsigned int i = 0; i < nodeWeights.size(); i++)
+          Skeleton *skel = _mesh->GetSkeleton();
+          for (unsigned int i = 0;
+                  i < skel->GetNumVertNodeWeights(values[iter->second]); i++)
           {
+            std::pair<std::string, double> node_weight =
+                              skel->GetVertNodeWeight(values[iter->second], i);
             SkeletonNode *node =
-                _mesh->GetSkeleton()->GetNodeByName(nodeWeights[i].first);
+                _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
             subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
-                            node->GetHandle(), nodeWeights[i].second);
+                            node->GetHandle(), node_weight.second);
           }
         }
       }
