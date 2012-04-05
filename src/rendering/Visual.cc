@@ -1367,7 +1367,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
   for (int i = 0; i < node->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = node->getAttachedObject(i);
-    if (obj->isVisible() && obj->getMovableType() != "gazebo::ogredynamiclines")
+    if (obj->isVisible() && obj->getMovableType() != "gazebo::ogredynamiclines"
+        && obj->getVisibilityFlags() != GZ_VISIBILITY_GUI)
     {
       Ogre::Any any = obj->getUserAny();
       if (any.getType() == typeid(std::string))

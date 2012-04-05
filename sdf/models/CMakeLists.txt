@@ -9,6 +9,7 @@ set (files pioneer2dx.model
            female_standing.model
            cylinder.model
            ground_plane.model
+           youbot.model
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/models/)
