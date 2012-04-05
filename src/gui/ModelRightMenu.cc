@@ -65,6 +65,12 @@ ModelRightMenu::ModelRightMenu()
   this->showJointsAction->setCheckable(true);
   connect(this->showJointsAction, SIGNAL(triggered()), this,
           SLOT(OnShowJoints()));
+
+  this->showCOMAction = new QAction(tr("Center of Mass"), this);
+  this->showCOMAction->setStatusTip(tr("Show Center of Mass"));
+  this->showCOMAction->setCheckable(true);
+  connect(this->showCOMAction, SIGNAL(triggered()), this,
+          SLOT(OnShowCOM()));
 }
 
 /////////////////////////////////////////////////
@@ -84,6 +90,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(this->followAction);
   menu.addAction(this->showCollisionAction);
   menu.addAction(this->showJointsAction);
+  menu.addAction(this->showCOMAction);
   menu.addAction(this->transparentAction);
   menu.addAction(this->deleteAction);
 
@@ -143,6 +150,20 @@ void ModelRightMenu::OnShowJoints()
 }
 
 /////////////////////////////////////////////////
+void ModelRightMenu::OnShowCOM()
+{
+  this->showCOMActionState[this->modelName] =
+    this->showCOMAction->isChecked();
+
+  if (this->showCOMAction->isChecked())
+    this->requestMsg = msgs::CreateRequest("show_com", this->modelName);
+  else
+    this->requestMsg = msgs::CreateRequest("hide_com", this->modelName);
+
+  this->requestPub->Publish(*this->requestMsg);
+}
+
+/////////////////////////////////////////////////
 void ModelRightMenu::OnTransparent()
 {
   this->transparentActionState[this->modelName] =
@@ -175,3 +196,5 @@ void ModelRightMenu::OnDelete()
   this->requestMsg = msgs::CreateRequest("entity_delete", this->modelName);
   this->requestPub->Publish(*this->requestMsg);
 }
+
+

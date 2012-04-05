@@ -27,6 +27,7 @@
 #include "rendering/LaserVisual.hh"
 #include "rendering/CameraVisual.hh"
 #include "rendering/JointVisual.hh"
+#include "rendering/COMVisual.hh"
 #include "rendering/ContactVisual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
@@ -107,6 +108,7 @@ void Scene::Clear()
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
+  this->linkMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
 
@@ -154,6 +156,7 @@ Scene::~Scene()
   Visual_M::iterator iter;
   this->visuals.clear();
   this->jointMsgs.clear();
+  this->linkMsgs.clear();
   this->sceneMsgs.clear();
   this->poseMsgs.clear();
   this->lightMsgs.clear();
@@ -251,7 +254,7 @@ void Scene::Init()
   // Send a request to get the current world state
   this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
   this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this);
+      &Scene::OnResponse, this, true);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
@@ -260,6 +263,7 @@ void Scene::Init()
   this->selectionObj->Init();
 }
 
+/////////////////////////////////////////////////
 // TODO: put this back in, and disable PSSM shadows in the RTShader.
 void Scene::InitShadows()
 {
@@ -1084,8 +1088,8 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene());
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   if (_msg->has_type() && _msg->type() == sm->GetTypeName())
   {
     sm->ParseFromString(_msg->serialized_data());
@@ -1125,6 +1129,13 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
           new msgs::Pose(_msg->model(i).link(j).pose()));
       pm2->set_name(linkName);
       this->poseMsgs.push_front(pm2);
+
+      if (_msg->model(i).link(j).has_inertial())
+      {
+        boost::shared_ptr<msgs::Link> lm(
+            new msgs::Link(_msg->model(i).link(j)));
+        this->linkMsgs.push_back(lm);
+      }
 
       for (int k = 0; k < _msg->model(i).link(j).visual_size(); k++)
       {
@@ -1245,13 +1256,14 @@ void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
-  RequestMsgs_L::iterator rIter;
-  SceneMsgs_L::iterator sIter;
-  VisualMsgs_L::iterator vIter;
-  LightMsgs_L::iterator lIter;
-  PoseMsgs_L::iterator pIter;
-  JointMsgs_L::iterator jIter;
-  SensorMsgs_L::iterator sensorIter;
+  static RequestMsgs_L::iterator rIter;
+  static SceneMsgs_L::iterator sIter;
+  static VisualMsgs_L::iterator vIter;
+  static LightMsgs_L::iterator lIter;
+  static PoseMsgs_L::iterator pIter;
+  static JointMsgs_L::iterator jIter;
+  static SensorMsgs_L::iterator sensorIter;
+  static LinkMsgs_L::iterator linkIter;
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
@@ -1289,15 +1301,6 @@ void Scene::PreRender()
   }
   this->lightMsgs.clear();
 
-  // Process the joint messages
-  jIter = this->jointMsgs.begin();
-  while (jIter != this->jointMsgs.end())
-  {
-    if (this->ProcessJointMsg(*jIter))
-      this->jointMsgs.erase(jIter++);
-    else
-      ++jIter;
-  }
 
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
@@ -1333,6 +1336,25 @@ void Scene::PreRender()
   }
   this->requestMsgs.clear();
 
+  // Process the joint messages
+  jIter = this->jointMsgs.begin();
+  while (jIter != this->jointMsgs.end())
+  {
+    if (this->ProcessJointMsg(*jIter))
+      this->jointMsgs.erase(jIter++);
+    else
+      ++jIter;
+  }
+
+  // Process the link messages
+  linkIter = this->linkMsgs.begin();
+  while (linkIter != this->linkMsgs.end())
+  {
+    if (this->ProcessLinkMsg(*linkIter))
+      this->linkMsgs.erase(linkIter++);
+    else
+      ++linkIter;
+  }
 
   if (this->selectionMsg)
   {
@@ -1392,6 +1414,22 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
     this->visuals[contactVis->GetName()] = contactVis;
   }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
+{
+  VisualPtr linkVis = this->GetVisual(_msg->name());
+
+  if (!linkVis)
+    return false;
+
+  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
+  comVis->Load();
+  comVis->SetVisible(false);
+  this->visuals[comVis->GetName()] = comVis;
 
   return true;
 }
@@ -1464,6 +1502,20 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     VisualPtr vis = this->GetVisual(_msg->data());
     if (vis)
       vis->ShowJoints(false);
+  }
+  else if (_msg->request() == "show_com")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCOM(true);
+    else
+      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+  }
+  else if (_msg->request() == "hide_com")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCOM(false);
   }
   else if (_msg->request() == "set_transparency")
   {

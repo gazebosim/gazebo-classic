@@ -149,7 +149,7 @@ void Actor::Fini()
 }
 
 //////////////////////////////////////////////////
-void Actor::UpdateParameters(sdf::ElementPtr _sdf)
+void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
 //  Model::UpdateParameters(_sdf);
 }

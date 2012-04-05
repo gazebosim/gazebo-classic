@@ -63,6 +63,7 @@ void Publication::AddSubscription(const CallbackHelperPtr &_callback)
 {
   std::list< CallbackHelperPtr >::iterator iter;
   iter = std::find(this->callbacks.begin(), this->callbacks.end(), _callback);
+
   if (iter == this->callbacks.end())
   {
     this->callbacks.push_back(_callback);
@@ -71,7 +72,7 @@ void Publication::AddSubscription(const CallbackHelperPtr &_callback)
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
          ++pubIter)
     {
-      if ((*pubIter)->GetLatching())
+      if ((*pubIter)->GetLatching() || _callback->GetLatching())
       {
         _callback->HandleData((*pubIter)->GetPrevMsg());
       }
@@ -238,14 +239,13 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 
   std::list<CallbackHelperPtr>::iterator cbIter;
   cbIter = this->callbacks.begin();
+
   while (cbIter != this->callbacks.end())
   {
     if ((*cbIter)->HandleData(data))
       ++cbIter;
     else
-    {
       this->callbacks.erase(cbIter++);
-    }
   }
 
   if (_cb)

@@ -29,7 +29,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(_name, _vis)
+  : Visual(_name, _vis, false)
 {
   this->headNode = NULL;
   this->shaftNode = NULL;

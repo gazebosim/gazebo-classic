@@ -60,10 +60,12 @@ namespace gazebo
     class Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
-      public: Visual(const std::string &_name, VisualPtr _parent);
+      public: Visual(const std::string &_name, VisualPtr _parent,
+                     bool _useRTShader = true);
 
       /// \brief Constructor
-      public: Visual(const std::string &_name, ScenePtr _scene);
+      public: Visual(const std::string &_name, ScenePtr _scene,
+                     bool _useRTShader = true);
 
       /// \brief Destructor
       public: virtual ~Visual();
@@ -117,7 +119,8 @@ namespace gazebo
       public: VisualPtr GetChild(unsigned int _num);
 
       /// \brief Attach a mesh to this visual by name
-      public: void AttachMesh(const std::string &meshName);
+      public: Ogre::MovableObject *AttachMesh(const std::string &_meshName,
+                                              const std::string &_objName="");
 
       /// \brief Set the scale
       public: void SetScale(const math::Vector3 &scale);
@@ -126,7 +129,8 @@ namespace gazebo
       public: math::Vector3 GetScale();
 
       /// \brief Set the material
-      public: void SetMaterial(const std::string &materialName);
+      public: void SetMaterial(const std::string &materialName,
+                               bool _unique = true);
 
       /// \brief Set the ambient color of the visual
       public: void SetAmbient(const common::Color &_color);
@@ -269,6 +273,7 @@ namespace gazebo
       public: void SetScene(ScenePtr _scene);
       public: ScenePtr GetScene() const;
       public: void ShowJoints(bool _show);
+      public: void ShowCOM(bool _show);
 
       private: void GetBoundsHelper(Ogre::SceneNode *node,
                                     math::Box &box) const;
@@ -313,6 +318,8 @@ namespace gazebo
       private: Ogre::AnimationState *animState;
       private: boost::function<void()> onAnimationComplete;
       protected: ScenePtr scene;
+
+      private: bool useRTShader;
     };
     /// \}
   }

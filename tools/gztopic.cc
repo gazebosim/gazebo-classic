@@ -20,6 +20,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "common/Time.hh"
+
 #include "transport/Transport.hh"
 #include "transport/TransportTypes.hh"
 #include "transport/Node.hh"
@@ -31,11 +33,21 @@ using namespace gazebo;
 // transport::ConnectionPtr connection(new transport::Connection());
 std::vector<std::string> params;
 
+common::Time hz_prev_time;
+
+/////////////////////////////////////////////////
 void help()
 {
-  std::cout << "Help message\n";
+  std::cerr << "This tool lists information about published topics on a "
+            << "Gazebo master.\n"
+            << "    list         : List all topics\n"
+            << "    info <topic> : Get information about a topic\n"
+            << "    echo <topic> : Output topic data to screen\n"
+            << "    hz <topic>   : Get publish frequency\n"
+            << "    help         : This help text\n";
 }
 
+/////////////////////////////////////////////////
 bool parse(int argc, char **argv)
 {
   if (argc == 1 || std::string(argv[1]) == "help")
@@ -72,6 +84,7 @@ bool parse(int argc, char **argv)
   return true;
 }
 
+/////////////////////////////////////////////////
 transport::ConnectionPtr connect_to_master(const std::string &host,
                                            unsigned short port)
 {
@@ -99,6 +112,7 @@ transport::ConnectionPtr connect_to_master(const std::string &host,
   return connection;
 }
 
+/////////////////////////////////////////////////
 void list()
 {
   std::string data;
@@ -126,36 +140,52 @@ void list()
   connection.reset();
 }
 
+/////////////////////////////////////////////////
 void echo_cb(ConstStringPtr &_data)
 {
   std::cout << _data->data() << "\n";
 }
 
+/////////////////////////////////////////////////
+void hz_cb(ConstStringPtr &/*_data*/)
+{
+  common::Time cur_time = common::Time::GetWallTime();
+
+  if (hz_prev_time != common::Time(0, 0))
+    printf("Hz: %6.2f\n", 1.0 / (cur_time - hz_prev_time).Double());
+
+  hz_prev_time = cur_time;
+}
+
+/////////////////////////////////////////////////
 msgs::TopicInfo get_topic_info(const std::string &_topic)
 {
   msgs::TopicInfo topic_info;
   std::string data;
-  msgs::Request request;
+  msgs::Request *request = msgs::CreateRequest("topic_info", _topic);
   msgs::Packet packet;
 
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
-  request.set_request("topic_info");
-  request.set_data(_topic);
-  connection->EnqueueMsg(msgs::Package("request", request), true);
-  connection->Read(data);
+  connection->EnqueueMsg(msgs::Package("request", *request), true);
 
-  packet.ParseFromString(data);
-  if (packet.type() == "topic_info_response")
+  int i = 0;
+  do
   {
-    topic_info.ParseFromString(packet.serialized_data());
-  }
-  else
-    std::cerr << "Invalid response\n";
+    connection->Read(data);
+    packet.ParseFromString(data);
+  } while (packet.type() != "topic_info_response" && ++i < 10);
 
+  if (i <10)
+    topic_info.ParseFromString(packet.serialized_data());
+  else
+    std::cerr << "Unable to get topic info.\n";
+
+  delete request;
   return topic_info;
 }
 
+/////////////////////////////////////////////////
 void print_topic_info(const std::string &_topic)
 {
   msgs::TopicInfo info = get_topic_info(_topic);
@@ -177,12 +207,19 @@ void print_topic_info(const std::string &_topic)
   std::cout << "\n";
 }
 
+/////////////////////////////////////////////////
 void echo()
 {
+  if (params[1].empty())
+  {
+    std::cerr << "Error: No topic specified.\n";
+    return;
+  }
+
   transport::init();
 
   transport::NodePtr node(new transport::Node());
-  node->Init("default");
+  node->Init();
 
   std::string topic = params[1];
   topic +=  "/__dbg";
@@ -198,6 +235,35 @@ void echo()
   transport::fini();
 }
 
+/////////////////////////////////////////////////
+void hz()
+{
+  if (params[1].empty())
+  {
+    std::cerr << "Error: No topic specified.\n";
+    return;
+  }
+
+  transport::init();
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  std::string topic = params[1];
+  topic +=  "/__dbg";
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, hz_cb);
+
+  // Run the transport loop: starts a new thread
+  transport::run();
+
+  while (true)
+    common::Time::MSleep(10);
+
+  transport::fini();
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   if (!parse(argc, argv))
@@ -209,4 +275,6 @@ int main(int argc, char **argv)
     print_topic_info(params[1]);
   else if (params[0] == "echo")
     echo();
+  else if (params[0] == "hz")
+    hz();
 }

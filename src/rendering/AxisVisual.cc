@@ -30,7 +30,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 AxisVisual::AxisVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(_name, _vis)
+  : Visual(_name, _vis, false)
 {
 }
 
