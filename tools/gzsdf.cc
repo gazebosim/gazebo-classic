@@ -21,18 +21,19 @@ std::vector<std::string> params;
 
 using namespace sdf;
 
+/////////////////////////////////////////////////
 void help()
 {
-  std::cout << "gzsdf is a command-line tool for getting information "
-            << "about SDF files.\n\n";
-  std::cout << "gzsdf <option> [sdf file]\n\n";
+  std::cout << "This tool provides information about SDF files.\n\n";
+  std::cout << "gzsdf <command> [file]\n\n";
   std::cout << "Commands:\n";
-  std::cout << "\tgzsdf describe\tPrint the SDF format\n";
-  std::cout << "\tgzsdf check\tCheck the SDF format for the given file\n\n";
-  std::cout << "\tgzsdf print\tPrints SDF, useful for debugging parser "
-            << "and as a conversion tool\n\n";
+  std::cout << "    describe   Print the SDF format.\n";
+  std::cout << "    check      Check the SDF format for the given file.\n";
+  std::cout << "    print      Prints SDF, useful for debugging parser "
+            << "and as a conversion tool.\n\n";
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char** argv)
 {
   // Get parameters from command line

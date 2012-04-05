@@ -27,34 +27,78 @@
 
 using namespace gazebo;
 
+std::list<common::Time> simTimes, realTimes;
+
+/////////////////////////////////////////////////
+void help()
+{
+  std::cerr << "This tool displays statistics about a running Gazebo world.\n"
+            << "  Usage: gzstats <world_name>\n"
+            << "    <world_name> : Output statistics for the given world. "
+            << " (Default = \"default\")\n"
+            << "    help         : This help text\n";
+}
+
+/////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
 {
   double percent = 0;
   char paused;
   common::Time simTime  = msgs::Convert(_msg->sim_time());
   common::Time realTime = msgs::Convert(_msg->real_time());
+  
+  simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  if (simTimes.size() > 20)
+    simTimes.pop_front();
+
+  realTimes.push_back(msgs::Convert(_msg->real_time()));
+  if (realTimes.size() > 20)
+    realTimes.pop_front();
+
+  common::Time simAvg, realAvg;
+  std::list<common::Time>::iterator simIter, realIter;
+  simIter = ++(simTimes.begin());
+  realIter = ++(realTimes.begin());
+  while (simIter != simTimes.end() && realIter != realTimes.end())
+  {
+    simAvg += ((*simIter) - simTimes.front());
+    realAvg += ((*realIter) - realTimes.front());
+    ++simIter;
+    ++realIter;
+  }
+  simAvg = simAvg / realAvg;
+
+  if (simAvg > 0)
+    percent = simAvg.Double();
+  else
+    percent = 0;
+
 
   if (_msg->paused())
     paused = 'T';
   else
     paused = 'F';
 
-  if (simTime.Double() > 0)
-    percent  = (simTime / realTime).Double();
-
   printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
       percent, simTime.Double(), realTime.Double(), paused);
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  transport::init();
-
-  transport::NodePtr node(new transport::Node());
-
   std::string worldName = "default";
   if (argc > 1)
     worldName = argv[1];
+
+  if (worldName == "help")
+  {
+    help();
+    return -1;
+  }
+
+  transport::init();
+
+  transport::NodePtr node(new transport::Node());
 
   node->Init(worldName);
 
@@ -68,4 +112,3 @@ int main(int argc, char **argv)
 
   transport::fini();
 }
-

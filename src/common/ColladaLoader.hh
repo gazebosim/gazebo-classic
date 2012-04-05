@@ -50,6 +50,10 @@ namespace gazebo
       private: void LoadController(TiXmlElement *_contrXml,
           TiXmlElement *_skelXml, const math::Matrix4 _transform, Mesh *_mesh);
 
+      private: void LoadAnimations(TiXmlElement *_xml, Skeleton *_skel);
+
+      private: void LoadAnimation(TiXmlElement *_xml, Skeleton *_skel);
+
       private: SkeletonNode* LoadSkeletonNodes(TiXmlElement *_xml,
                                           SkeletonNode *_parent);
 
