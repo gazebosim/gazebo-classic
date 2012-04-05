@@ -27,12 +27,40 @@
 
 using namespace gazebo;
 
+/////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
 {
   double percent = 0;
   char paused;
   common::Time simTime  = msgs::Convert(_msg->sim_time());
   common::Time realTime = msgs::Convert(_msg->real_time());
+  
+  simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  if (simTimes.size() > 20)
+    simTimes.pop_front();
+
+  realTimes.push_back(msgs::Convert(_msg->real_time()));
+  if (realTimes.size() > 20)
+    realTimes.pop_front();
+
+  common::Time simAvg, realAvg;
+  std::list<common::Time>::iterator simIter, realIter;
+  simIter = ++(simTimes.begin());
+  realIter = ++(realTimes.begin());
+  while (simIter != simTimes.end() && realIter != realTimes.end())
+  {
+    simAvg += ((*simIter) - simTimes.front());
+    realAvg += ((*realIter) - realTimes.front());
+    ++simIter;
+    ++realIter;
+  }
+  simAvg = simAvg / realAvg;
+
+  if (simAvg > 0)
+    percent << std::fixed << std::setprecision(2) << simAvg.Double();
+  else
+    percent << "0";
+
 
   if (_msg->paused())
     paused = 'T';
@@ -46,6 +74,7 @@ void cb(ConstWorldStatisticsPtr &_msg)
       percent, simTime.Double(), realTime.Double(), paused);
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   transport::init();

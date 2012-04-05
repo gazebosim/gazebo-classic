@@ -22,7 +22,7 @@ using namespace gazebo;
 
 void help()
 {
-  std::cout << "This tool spawns models into a running Gazebo simulation.\n\n"
+  std::cerr << "This tool spawns models into a running Gazebo simulation.\n\n"
             << "  gzfactory <world_name> <model_filename>\n"
             << "    world_name     : Name of the world in which to spawn "
             << "the model.\n"
