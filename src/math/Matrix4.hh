@@ -27,6 +27,8 @@ namespace gazebo
 {
   namespace math
   {
+    class Quaternion;
+
     /// \addtogroup gazebo_math
     /// \{
     /// \brief A 3x3 matrix class
@@ -91,6 +93,12 @@ namespace gazebo
       /// \brief Set the translational values [ (0, 3) (1, 3) (2, 3) ]
       /// \param _t Values to set
       public: void SetTranslate(const Vector3 &_t);
+
+      /// \brief Get the translational values as a Vector3
+      public: Vector3 GetTranslation();
+
+      /// \brief Get the rotation as a quaternion
+      public: Quaternion GetRotation();
 
       /// \brief Set the scale
       /// \param _s scale

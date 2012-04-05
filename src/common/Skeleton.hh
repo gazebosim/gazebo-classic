@@ -30,6 +30,21 @@ namespace gazebo
   {
     class SkeletonNode;
 
+    typedef std::map<unsigned int, SkeletonNode*> NodeMap;
+    typedef std::map<unsigned int, SkeletonNode*>::iterator NodeMapIter;
+
+    typedef std::map<double, math::Matrix4> RawNodeAnimation;
+    typedef std::map<double, math::Matrix4>::iterator RawNodeAnimationIter;
+
+    typedef std::map<std::string, RawNodeAnimation> RawAnimation;
+    typedef std::map<std::string, RawNodeAnimation>::iterator RawAnimationIter;
+
+    typedef std::map<std::string, RawAnimation> RawAnimationList;
+    typedef std::map<std::string, RawAnimation>::iterator RawAnimationListIter;
+
+    typedef std::vector<std::vector<std::pair<std::string, double> > >
+                                                                 RawNodeWeights;
+
     /// \addtogroup gazebo_common Common
     /// \{
     /// \brief A skeleton
@@ -59,15 +74,35 @@ namespace gazebo
 
       public: void PrintTransforms();
 
+      public: NodeMap GetNodes();
+
+      public: void SetNumVertAttached(unsigned int _vertices);
+
+      public: void AddVertNodeWeight(unsigned int _vertex, std::string _node,
+                                     double _weight);
+
+      public: unsigned int GetNumVertNodeWeights(unsigned int _vertex);
+
+      public: std::pair<std::string, double> GetVertNodeWeight(unsigned int _v,
+                                     unsigned int _i);
+
+      public: unsigned int GetNumAnimations();
+
+      public: RawAnimationListIter GetAnimationListIter();
+
+      public: void AddAnimation(std::string _name, RawAnimation _anim);
+
       protected: void BuildNodeMap();
 
       protected: SkeletonNode *root;
 
-      protected: std::map<unsigned int, SkeletonNode*> nodes;
+      protected: NodeMap nodes;
 
       protected: math::Matrix4 bindShapeTransform;
 
-      public: std::vector<std::vector<std::pair<std::string, float> > > rawNW;
+      protected: RawNodeWeights rawNW;
+
+      protected: RawAnimationList animations;
     };
 
     /// \brief A node
@@ -105,7 +140,7 @@ namespace gazebo
 
       public: SkeletonNode* GetParent();
 
-      public: bool IsRootSkeletonNode();
+      public: bool IsRootNode();
 
       public: void AddChild(SkeletonNode* _child);
 

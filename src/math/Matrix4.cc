@@ -18,6 +18,7 @@
 
 #include "math/Helpers.hh"
 #include "math/Matrix4.hh"
+#include "math/Quaternion.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -98,6 +99,52 @@ void Matrix4::SetTranslate(const Vector3 &_t)
   this->m[0][3] = _t.x;
   this->m[1][3] = _t.y;
   this->m[2][3] = _t.z;
+}
+
+//////////////////////////////////////////////////
+Vector3 Matrix4::GetTranslation()
+{
+  return Vector3(this->m[0][3], this->m[1][3], this->m[2][3]);
+}
+
+//////////////////////////////////////////////////
+Quaternion Matrix4::GetRotation()
+{
+  Quaternion q;
+  /// algorithm from Ogre::Quaternion source, which in turn is based on
+  /// Ken Shoemake's article "Quaternion Calculus and Fast Animation".
+  double trace = this->m[0][0] + this->m[1][1] + this->m[2][2];
+  double root;
+  if (trace > 0)
+  {
+    root = sqrt(trace + 1.0);
+    q.w = root / 2.0;
+    root = 1.0 / (2.0 * root);
+    q.x = (this->m[2][1] - this->m[1][2]) * root;
+    q.y = (this->m[0][2] - this->m[2][0]) * root;
+    q.z = (this->m[1][0] - this->m[0][1]) * root;
+  }
+  else
+  {
+    static unsigned int s_iNext[3] = {1, 2, 0};
+    unsigned int i = 0;
+    if (this->m[1][1] > this->m[0][0])
+      i = 1;
+    if (this->m[2][2] > this->m[i][i])
+      i = 2;
+    unsigned int j = s_iNext[i];
+    unsigned int k = s_iNext[j];
+
+    root = sqrt(this->m[i][i] - this->m[j][j] - this->m[k][k] + 1.0);
+    double* xyzQ[3] = { &q.x, &q.y, &q.z};
+    *xyzQ[i] = root / 2.0;
+    root = 1.0 / (2.0 * root);
+    q.w = (this->m[k][j] - this->m[j][k]) * root;
+    *xyzQ[j] = (this->m[j][i] - this->m[i][j]) * root;
+    *xyzQ[k] = (this->m[k][i] - this->m[i][k]) * root;
+  }
+
+  return q;
 }
 
 //////////////////////////////////////////////////
