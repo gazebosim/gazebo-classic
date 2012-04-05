@@ -30,6 +30,16 @@ using namespace gazebo;
 std::list<common::Time> simTimes, realTimes;
 
 /////////////////////////////////////////////////
+void help()
+{
+  std::cerr << "This tool displays statistics about a running Gazebo world.\n"
+            << "  Usage: gzstats <world_name>\n"
+            << "    <world_name> : Output statistics for the given world. "
+            << " (Default = \"default\")\n"
+            << "    help         : This help text\n";
+}
+
+/////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
 {
   double percent = 0;
@@ -76,13 +86,19 @@ void cb(ConstWorldStatisticsPtr &_msg)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  transport::init();
-
-  transport::NodePtr node(new transport::Node());
-
   std::string worldName = "default";
   if (argc > 1)
     worldName = argv[1];
+
+  if (worldName == "help")
+  {
+    help();
+    return -1;
+  }
+
+  transport::init();
+
+  transport::NodePtr node(new transport::Node());
 
   node->Init(worldName);
 
@@ -96,4 +112,3 @@ int main(int argc, char **argv)
 
   transport::fini();
 }
-
