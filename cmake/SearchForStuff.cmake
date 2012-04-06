@@ -192,8 +192,18 @@ if (PKG_CONFIG_FOUND)
       set(ogre_libraries ${OGRE_LIBRARIES})
       set(ogre_cflags ${OGRE_CFLAGS})
     endif (NOT OGRE_FOUND)
-      
   endif (OGRE-RTShaderSystem_FOUND)
+
+  pkg_check_modules(OGRE-Terrain OGRE-Terrain)
+  if (OGRE-Terrain_FOUND)
+    set(ogre_ldflags ${ogre_ldflags} ${OGRE-Terrain_LDFLAGS})
+    set(ogre_include_dirs ${ogre_include_dirs} ${OGRE-Terrain_INCLUDE_DIRS})
+    set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Terrain_LIBRARY_DIRS})
+    set(ogre_libraries ${ogre_libraries} ${OGRE-Terrain_LIBRARIES})
+    set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
+  endif()
+
+
 
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")

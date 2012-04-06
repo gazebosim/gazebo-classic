@@ -28,6 +28,17 @@
 
     <include filename="willowgarage_visual.model"/>
 
+    <model name="terrain" static="true">
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <heightmap filename="canyon.png" size="513 513 10"
+              offset="0 0 0"/>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
     <!--
     <include filename="pr2_visual_only.model" model_name="pr2_0"
              model_pose="0 5 0 0 0 3.1415"/>

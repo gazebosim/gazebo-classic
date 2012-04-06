@@ -1743,7 +1743,7 @@ std::string Visual::GetMeshName() const
       return "unit_cylinder";
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
-    else if (geomElem->HasElement("mesh"))
+    else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
       return geomElem->GetElement("mesh")->GetValueString("filename");
   }
 

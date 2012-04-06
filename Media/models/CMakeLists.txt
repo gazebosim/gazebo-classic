@@ -15,6 +15,7 @@ add_subdirectory(frypan)
 add_subdirectory(people)
 add_subdirectory(youbot)
 add_subdirectory(hokuyo)
+add_subdirectory(quadrotor)
 
 set (files willowgarage.dae
            hanoi_red_disk.dae
