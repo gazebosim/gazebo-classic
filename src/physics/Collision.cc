@@ -96,8 +96,8 @@ void Collision::Load(sdf::ElementPtr _sdf)
   else
     gzwarn << "No shape has been specified. Error!!!\n";
 
-  if (this->shape->GetType() != MULTIRAY_SHAPE &&
-      this->shape->GetType() != RAY_SHAPE)
+  if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
+      !this->shape->HasType(Base::RAY_SHAPE))
   {
     this->visPub->Publish(this->CreateCollisionVisual());
   }
@@ -200,8 +200,8 @@ bool Collision::GetContactsEnabled() const
 void Collision::AddContact(const Contact &_contact)
 {
   if (!this->GetContactsEnabled() ||
-      this->GetShapeType() == RAY_SHAPE ||
-      this->GetShapeType() == PLANE_SHAPE)
+      this->HasType(Base::RAY_SHAPE) ||
+      this->HasType(Base::PLANE_SHAPE))
     return;
 
   this->contact(this->GetName(), _contact);

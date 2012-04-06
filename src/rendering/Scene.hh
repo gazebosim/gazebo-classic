@@ -142,6 +142,9 @@ namespace gazebo
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(uint32_t index) const;
 
+      /// \brief Get a light by name
+      public: LightPtr GetLight(const std::string &_name) const;
+
       /// \brief Create a visual
       public: VisualPtr CreateVisual(const std::string &_name);
 
@@ -333,7 +336,7 @@ namespace gazebo
       typedef std::map<std::string, VisualPtr> Visual_M;
       private: Visual_M visuals;
 
-      typedef std::map<std::string, Light*> Light_M;
+      typedef std::map<std::string, LightPtr> Light_M;
       private: Light_M lights;
 
       private: boost::shared_ptr<msgs::Selection const> selectionMsg;

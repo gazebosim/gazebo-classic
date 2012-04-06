@@ -1,0 +1,35 @@
+<gazebo version="1.0">
+<model name="warehouse_interior" static="true">
+  <link name="link">
+    <visual name="left_wall">
+      <origin pose="0 8 3.5 0 0 0"/>
+      <geometry>
+        <box size="16 0.2 7"/>
+      </geometry>
+    </visual>
+
+    <visual name="right_wall">
+      <origin pose="2 -8 3.5 0 0 0"/>
+      <geometry>
+        <box size="12 0.2 7"/>
+      </geometry>
+    </visual>
+
+    <visual name="back_wall">
+      <origin pose="8 0 3.5 0 0 0"/>
+      <geometry>
+        <box size="0.2 16 7"/>
+      </geometry>
+    </visual>
+
+    <!--
+    <visual name="ceiling">
+      <origin pose="0 0 7 0 0 0"/>
+      <geometry>
+        <box size="16 16 .1"/>
+      </geometry>
+    </visual>
+    -->
+
+  </link>
+</model>

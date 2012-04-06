@@ -18,6 +18,7 @@
     </physics>
 
     <include filename="ground_plane.model"/>
+    <include filename="youbot.model"/>
 
     <!-- Light Source -->
     <light type="directional" name="sun" cast_shadows="true">

@@ -194,6 +194,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     // set LCP limits for normal
     info->lo[0] = 0;
     info->hi[0] = dInfinity;
+    info->findex[0] = -2;
 
     // now do jacobian for tangential forces
     dVector3 t1, t2; // two vectors tangential to normal

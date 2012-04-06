@@ -231,6 +231,7 @@ namespace gazebo
       private: int (*physicsStepFunc)(dxWorld*, dReal);
 
       private: int indices[MAX_CONTACT_JOINTS];
+      //private: common::Time lastCollisionUpdateTime;
     };
     typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
 
