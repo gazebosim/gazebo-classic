@@ -1,6 +1,6 @@
 <gazebo version='1.0'>
   <model name='youbot' static='0'>
-    <origin pose='0.000000 0.000000 0.083637 0.000000 -0.000000 0.000000'/>
+    <origin pose='0.000000 0.000000 0.09 0.000000 -0.000000 0.000000'/>
     <link name='base_footprint' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.100000'>
@@ -379,7 +379,7 @@
       <visual name='wheel_link_bl_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <sphere radius='0.025000'/>
+          <mesh filename="youbot/base/back-left_wheel.dae"/>
         </geometry>
         <material script='youbot/Orange'/>
       </visual>
@@ -415,7 +415,7 @@
       <visual name='wheel_link_br_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <sphere radius='0.025000'/>
+          <mesh filename="youbot/base/back-right_wheel.dae"/>
         </geometry>
         <material script='youbot/Orange'/>
       </visual>
@@ -451,7 +451,7 @@
       <visual name='wheel_link_fl_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <sphere radius='0.025000'/>
+          <mesh filename="youbot/base/front-left_wheel.dae"/>
         </geometry>
         <material script='youbot/Orange'/>
       </visual>
@@ -487,7 +487,7 @@
       <visual name='wheel_link_fr_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <sphere radius='0.025000'/>
+          <mesh filename="youbot/base/front-right_wheel.dae"/>
         </geometry>
         <material script='youbot/Orange'/>
       </visual>
