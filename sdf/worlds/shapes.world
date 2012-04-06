@@ -2,7 +2,7 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.2 0.2 0.2 1"/>
+      <ambient rgba="1.0 1.0 1.0 1"/>
       <background rgba="0 0 0 1.0"/>
       <shadows enabled="true"/>
     </scene>

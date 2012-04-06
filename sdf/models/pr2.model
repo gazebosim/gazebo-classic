@@ -1,5 +1,5 @@
 <gazebo version='1.0'>
-  <model name='pr2' static='0'>
+  <model name='pr2' static='1'>
     <origin pose='0 0 0 0 -0 0'/>
 
     <link name='base_footprint' gravity='1' self_collide='0' kinematic='0'>

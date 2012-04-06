@@ -111,6 +111,7 @@ void Scene::Clear()
   this->linkMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
+  this->lights.clear();
 
 
   while (this->visuals.size() > 0)
@@ -119,17 +120,10 @@ void Scene::Clear()
   }
   this->visuals.clear();
 
-  for (Light_M::iterator iter = this->lights.begin();
-      iter != this->lights.end(); ++iter)
-  {
-    delete iter->second;
-  }
-
   for (uint32_t i = 0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
 
-  this->lights.clear();
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
 }
@@ -164,11 +158,6 @@ Scene::~Scene()
 
   this->worldVisual.reset();
   this->selectionMsg.reset();
-  for (Light_M::iterator lightIter = this->lights.begin();
-       lightIter != this->lights.end(); ++lightIter)
-  {
-    delete lightIter->second;
-  }
   this->lights.clear();
 
   // Remove a scene
@@ -545,6 +534,16 @@ VisualPtr Scene::CreateVisual(const std::string &_name)
   result->Load();
   this->visuals[_name] = result;
 
+  return result;
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::GetLight(const std::string &_name) const
+{
+  LightPtr result;
+  Light_M::const_iterator iter = this->lights.find(_name);
+  if (iter != this->lights.end())
+    result = iter->second;
   return result;
 }
 
@@ -1618,7 +1617,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 
   if (iter == this->lights.end())
   {
-    Light *light = new Light(this);
+    LightPtr light(new Light(this));
     light->LoadFromMsg(_msg);
     this->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1756,3 +1755,4 @@ std::string Scene::StripSceneName(const std::string &_name) const
   else
     return _name;
 }
+

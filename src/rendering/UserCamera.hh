@@ -106,7 +106,7 @@ namespace gazebo
 
       public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete);
+                                   boost::function<void()> _onComplete = NULL);
 
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
