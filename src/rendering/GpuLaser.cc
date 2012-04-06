@@ -32,6 +32,7 @@
 #include "common/Exception.hh"
 #include "common/Mesh.hh"
 #include "common/MeshManager.hh"
+#include "common/Timer.hh"
 #include "sensors/GpuRaySensor.hh"
 #include "math/Pose.hh"
 
@@ -173,6 +174,9 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void GpuLaser::PostRender()
 {
+  common::Timer postRenderT, blitT;
+  postRenderT.Start();
+  double blitDur, postRenderDur;
   for (unsigned int i = 0; i < this->_textureCount; i++)
     this->_1stPassTargets[i]->swapBuffers();
 
@@ -200,7 +204,10 @@ void GpuLaser::PostRender()
     Ogre::PixelBox dst_box(width, height,
         1, Ogre::PF_FLOAT32_RGB, this->laserBuffer);
 
+    sleep(0.3);
+    blitT.Start();
     pixelBuffer->blitToMemory(dst_box);
+    blitDur = blitT.GetElapsed().Double();
 
     if (!this->laserScan)
       this->laserScan =  new float[this->w2nd * this->h2nd * 3];
@@ -212,6 +219,14 @@ void GpuLaser::PostRender()
   }
 
   this->newData = false;
+  postRenderDur = postRenderT.GetElapsed().Double();
+
+  std::cerr << " Render: " << this->lastRenderDuration * 1000
+            << " BLIT: " << blitDur * 1000
+            << " postRender: " << postRenderDur * 1000
+            << " TOTAL: " << (this->lastRenderDuration + postRenderDur) * 1000
+            << " Total - BLIT: " << (this->lastRenderDuration + postRenderDur
+            - blitDur ) * 1000 << "\n";
 }
 
 void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
@@ -335,6 +350,10 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *rend,
 //////////////////////////////////////////////////
 void GpuLaser::RenderImpl()
 {
+  common::Timer _1stPassTimer, _2ndPassTimer;
+
+  _1stPassTimer.Start();
+
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
 
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
@@ -360,6 +379,9 @@ void GpuLaser::RenderImpl()
 
   sceneMgr->removeRenderObjectListener(this);
 
+  double _1stPassDur = _1stPassTimer.GetElapsed().Double();
+  _2ndPassTimer.Start();
+
   this->visual->SetVisible(true);
 
   this->UpdateRenderTarget(this->_2ndPassTarget,
@@ -370,6 +392,9 @@ void GpuLaser::RenderImpl()
 
   sceneMgr->_suppressRenderStateChanges(false);
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+
+  double _2ndPassDur = _2ndPassTimer.GetElapsed().Double();
+  this->lastRenderDuration = _1stPassDur + _2ndPassDur;
 }
 
 //////////////////////////////////////////////////
