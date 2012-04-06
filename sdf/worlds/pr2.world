@@ -2,16 +2,16 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.05 0.05 0.05 1"/>
+      <ambient rgba="0.5 0.5 0.5 1"/>
       <background rgba="0 0 0 1.0"/>
       <shadows enabled="false"/>
       <grid enabled="false"/>
     </scene>
 
-    <physics type="ode">
+    <physics type="ode" update_rate="10000">
       <gravity xyz="0 0 -9.8"/>
       <ode>
-        <solver type="quick" dt="0.001" iters="10" sor="1.3"/>
+        <solver type="quick" dt="0.01" iters="10" sor="1.3"/>
         <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
       </ode>
     </physics>
@@ -23,128 +23,14 @@
              model_pose="0 0 0 0 0 3.1415">
       <plugin filename="libmovie_pr2.so" name="movie"/>
     </include>
-    <!--
-    <include filename="pr2_visual_only.model" model_name="pr2_0"
-             model_pose="0 5 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_1"
-             model_pose="0 4 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_2"
-             model_pose="0 3 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_3"
-             model_pose="0 2 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_4"
-             model_pose="0 1 0 0 0 3.1415"/>
 
-    <include filename="pr2_visual_only.model" model_name="pr2_6"
-             model_pose="0 -1 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_7"
-             model_pose="0 -2 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_8"
-             model_pose="0 -3 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_9"
-             model_pose="0 -4 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_10"
-             model_pose="0 -5 0 0 0 3.1415"/>
-
-    <include filename="pr2_visual_only.model" model_name="pr2_0_a"
-             model_pose="2 5 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_1_a"
-             model_pose="2 4 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_2_a"
-             model_pose="2 3 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_3_a"
-             model_pose="2 2 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_4_a"
-             model_pose="2 1 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_5_a"
-             model_pose="2 0 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_6_a"
-             model_pose="2 -1 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_7_a"
-             model_pose="2 -2 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_8_a"
-             model_pose="2 -3 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_9_a"
-             model_pose="2 -4 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_10_a"
-             model_pose="2 -5 0 0 0 3.1415"/>
-
-    <include filename="pr2_visual_only.model" model_name="pr2_0_b"
-             model_pose="4 5 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_1_b"
-             model_pose="4 4 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_2_b"
-             model_pose="4 3 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_3_b"
-             model_pose="4 2 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_4_b"
-             model_pose="4 1 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_5_b"
-             model_pose="4 0 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_6_b"
-             model_pose="4 -1 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_7_b"
-             model_pose="4 -2 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_8_b"
-             model_pose="4 -3 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_9_b"
-             model_pose="4 -4 0 0 0 3.1415"/>
-    <include filename="pr2_visual_only.model" model_name="pr2_10_b"
-             model_pose="4 -5 0 0 0 3.1415"/>
-             -->
-
-   <light type="spot" name="spot1" cast_shadows="false">
-      <origin pose="0 0 6 0 0 0"/>
-      <diffuse rgba="0 0 0 1"/>
-      <specular rgba="0.8 0.8 0.8 1"/>
-      <attenuation range="10" constant="0.2" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 0.0 -1.0"/>
-      <spot inner_angle="0.1" outer_angle="0.7" falloff="1.2"/>
-    </light>
-
-   <light type="spot" name="spot2" cast_shadows="false">
-      <origin pose="0 4 6 0 0 0"/>
-      <diffuse rgba="0 0 0 1"/>
-      <specular rgba="0.8 0.8 0.8 1"/>
-      <attenuation range="10" constant="0.2" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 0.0 -1.0"/>
-      <spot inner_angle="0.1" outer_angle="0.7" falloff="1.2"/>
-    </light>
-
-   <light type="spot" name="spot3" cast_shadows="false">
-      <origin pose="0 -4 6 0 0 0"/>
-      <diffuse rgba="0 0 0 1"/>
-      <specular rgba="0.8 0.8 0.8 1"/>
-      <attenuation range="10" constant="0.2" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 0.0 -1.0"/>
-      <spot inner_angle="0.1" outer_angle="0.7" falloff="1.2"/>
-    </light>
-
-   <light type="spot" name="spot4" cast_shadows="false">
-      <origin pose="4 -2 6 0 0 0"/>
-      <diffuse rgba="0 0 0 1"/>
-      <specular rgba="0.8 0.8 0.8 1"/>
-      <attenuation range="10" constant="0.2" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 0.0 -1.0"/>
-      <spot inner_angle="0.1" outer_angle="0.7" falloff="1.2"/>
-    </light>
-    
-   <light type="spot" name="spot5" cast_shadows="false">
-      <origin pose="4 2 6 0 0 0"/>
-      <diffuse rgba="0 0 0 1"/>
-      <specular rgba="0.8 0.8 0.8 1"/>
-      <attenuation range="10" constant="0.2" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 0.0 -1.0"/>
-      <spot inner_angle="0.1" outer_angle="0.7" falloff="1.2"/>
-    </light>
-
-    <!--   <light type="directional" name="sun" cast_shadows="false">
+    <light type="directional" name="sun" cast_shadows="false">
       <origin pose="0 0 10 0 0 0"/>
       <diffuse rgba="0.1 0.1 0.1 1"/>
       <specular rgba="0 0 0 1"/>
       <attenuation range="20" constant="0.8" linear="0.01" quadratic="0.0"/>
       <direction xyz="0.0 -0.2 -0.8"/>
     </light>
-    -->
+
   </world>
 </gazebo>

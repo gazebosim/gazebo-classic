@@ -59,6 +59,8 @@ set (msgs axis.proto
           gui.proto
           track_visual.proto
           test.proto
+          pose_animation.proto
+          joint_animation.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

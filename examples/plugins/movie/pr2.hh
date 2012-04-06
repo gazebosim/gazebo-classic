@@ -29,6 +29,10 @@ namespace gazebo
     public: virtual void Init();
 
     private: void TuckArms();
+    private: void OnJointAnimation(ConstJointAnimationPtr &_anim);
+
+    private: transport::NodePtr node;
+    private: transport::SubscriberPtr jointAnimSub;
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr pr2;

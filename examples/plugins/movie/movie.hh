@@ -32,8 +32,10 @@ namespace gazebo
     private: void Init();
     
     private: void PreRender();
+    private: void OnCamComplete();
     
     private: transport::NodePtr node;
+    private: transport::PublisherPtr jointAnimPub;
 
     private: std::vector<event::ConnectionPtr> connections;
     private: rendering::UserCameraPtr userCamera;

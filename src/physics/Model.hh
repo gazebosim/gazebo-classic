@@ -181,7 +181,7 @@ namespace gazebo
 
       public: void SetJointAnimation(
                   const std::map<std::string, common::NumericAnimationPtr> anim,
-                  boost::function<void()> _onComplete);
+                  boost::function<void()> _onComplete = NULL);
 
       /// \brief Stop the current animations
       public: virtual void StopAnimation();

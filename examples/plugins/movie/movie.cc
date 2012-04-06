@@ -31,18 +31,24 @@ using namespace gazebo;
 // Register this plugin with the simulator
 GZ_REGISTER_SYSTEM_PLUGIN(Movie)
 
+/////////////////////////////////////////////////
 Movie::Movie()
 {
 }
 
+/////////////////////////////////////////////////
 Movie::~Movie()
 {
 }
 
+/////////////////////////////////////////////////
 void Movie::Load()
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
+  this->jointAnimPub =
+    this->node->Advertise<msgs::JointAnimation>("~/joint_animation");
+
   this->connections.push_back( 
       event::Events::ConnectPreRender( 
         boost::bind(&Movie::PreRender, this) ) );
@@ -130,18 +136,30 @@ void Movie::Load()
         0, GZ_DTOR(11.31), 0));
 }
 
+/////////////////////////////////////////////////
 void Movie::Init()
 {
   this->userCamera = gui::get_active_camera();
   this->userCamera->SetWorldPose(this->viewPoses[0]);
 }
 
+/////////////////////////////////////////////////
+void Movie::OnCamComplete()
+{
+  msgs::JointAnimation msg;
+  msg.set_model_name("pr2");
+
+  this->jointAnimPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
 void Movie::PreRender()
 {
   if (this->startTime == common::Time(0,0))
   {
     this->startTime = common::Time::GetWallTime();
-    this->userCamera->MoveToPositions(this->viewPoses, 1.0);
+    this->userCamera->MoveToPositions(this->viewPoses, 1.0,
+        boost::bind(&Movie::OnCamComplete, this));
   }
 
   common::Time currTime = common::Time::GetWallTime();

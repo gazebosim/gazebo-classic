@@ -12,13 +12,13 @@
 
       <collision name='collision'>
         <geometry>
-          <mesh filename='willowgarage2.dae' scale='0.0254 0.0254 0.0254'/>
+          <mesh filename='willowgarage.dae' scale='0.0254 0.0254 0.0254'/>
         </geometry>
       </collision>
 
       <visual name='visual' cast_shadows='false'>
         <geometry>
-          <mesh filename='willowgarage2.dae' scale='0.0254 0.0254 0.0254'/>
+          <mesh filename='willowgarage.dae' scale='0.0254 0.0254 0.0254'/>
         </geometry>
       </visual>
     </link>
