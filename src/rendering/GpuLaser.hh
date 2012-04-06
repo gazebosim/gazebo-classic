@@ -167,6 +167,7 @@ namespace gazebo
       protected: unsigned int h2nd;
 
       protected: sensors::GpuRaySensor *parent_sensor;
+      protected: double lastRenderDuration;
     };
 
     /// \}
