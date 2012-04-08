@@ -29,21 +29,18 @@ namespace gazebo
   namespace common
   {
     class SkeletonNode;
+    class NodeTransform;
 
     typedef std::map<unsigned int, SkeletonNode*> NodeMap;
     typedef std::map<unsigned int, SkeletonNode*>::iterator NodeMapIter;
 
-    typedef std::map<double, math::Matrix4> RawNodeAnimation;
-    typedef std::map<double, math::Matrix4>::iterator RawNodeAnimationIter;
-
-    typedef std::map<std::string, RawNodeAnimation> RawAnimation;
-    typedef std::map<std::string, RawNodeAnimation>::iterator RawAnimationIter;
-
-    typedef std::map<std::string, RawAnimation> RawAnimationList;
-    typedef std::map<std::string, RawAnimation>::iterator RawAnimationListIter;
+    typedef std::map<double, std::vector<NodeTransform> > RawNodeAnimation;
+    typedef std::map<std::string, RawNodeAnimation> RawSkeletonAnimation;
+    typedef std::map<double, math::Matrix4> NodeAnimation;
+    typedef std::map<std::string, NodeAnimation> SkeletonAnimation;
 
     typedef std::vector<std::vector<std::pair<std::string, double> > >
-                                                                 RawNodeWeights;
+                                                              RawNodeWeights;
 
     /// \addtogroup gazebo_common Common
     /// \{
@@ -68,6 +65,10 @@ namespace gazebo
 
       public: SkeletonNode* GetNodeByHandle(unsigned int _handle);
 
+      public: unsigned int GetNumNodes();
+
+      public: unsigned int GetNumJoints();
+
       public: void SetBindShapeTransform(math::Matrix4 _trans);
 
       public: math::Matrix4 GetBindShapeTransform();
@@ -88,9 +89,9 @@ namespace gazebo
 
       public: unsigned int GetNumAnimations();
 
-      public: RawAnimationListIter GetAnimationListIter();
+      public: std::map<std::string, SkeletonAnimation> GetAnimationList();
 
-      public: void AddAnimation(std::string _name, RawAnimation _anim);
+      public: void AddAnimation(std::string _name, SkeletonAnimation _anim);
 
       protected: void BuildNodeMap();
 
@@ -102,7 +103,7 @@ namespace gazebo
 
       protected: RawNodeWeights rawNW;
 
-      protected: RawAnimationList animations;
+      protected: std::map<std::string, SkeletonAnimation> animations;
     };
 
     /// \brief A node
@@ -164,6 +165,16 @@ namespace gazebo
 
       public: math::Matrix4 GetWorldTransform();
 
+      public: std::vector<NodeTransform> GetRawTransforms();
+
+      public: unsigned int GetNumRawTrans();
+
+      public: NodeTransform GetRawTransform(unsigned int _i);
+
+      public: void AddRawTransform(NodeTransform _t);
+
+      public: std::vector<NodeTransform> GetTransforms();
+
       protected: std::string name;
 
       protected: std::string id;
@@ -181,6 +192,58 @@ namespace gazebo
       protected: std::vector<SkeletonNode*> children;
 
       protected: unsigned int handle;
+
+      protected: std::vector<NodeTransform> rawTransforms;
+    };
+
+    class NodeTransform
+    {
+      public: enum TransformType {TRANSLATE, ROTATE, SCALE, MATRIX};
+
+      public: NodeTransform(TransformType _type = MATRIX);
+
+      public: NodeTransform(math::Matrix4 _mat, std::string _sid = "_default_",
+                                                TransformType _type = MATRIX);
+
+      public: ~NodeTransform();
+
+      public: void Set(math::Matrix4 _mat);
+
+      public: void SetType(TransformType _type);
+
+      public: void SetSID(std::string _sid);
+
+      public: math::Matrix4 Get();
+
+      public: TransformType GetType();
+
+      public: std::string GetSID();
+
+      public: void SetComponent(unsigned int _idx, double _value);
+
+      public: void SetSourceValues(math::Matrix4 _mat);
+
+      public: void SetSourceValues(math::Vector3 _vec);
+
+      public: void SetSourceValues(math::Vector3 _axis, double _angle);
+
+      public: void RecalculateMatrix();
+
+      public: void PrintSource();
+
+      public: math::Matrix4 operator() ();
+
+      public: math::Matrix4 operator* (NodeTransform _t);
+
+      public: math::Matrix4 operator* (math::Matrix4 _m);
+
+      protected: std::string sid;
+
+      protected: TransformType type;
+
+      protected: math::Matrix4 transform;
+
+      protected: std::vector<double> source;
     };
     /// \}
   }

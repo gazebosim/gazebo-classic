@@ -17,6 +17,7 @@
 #include <list>
 
 #include "common/Skeleton.hh"
+#include "math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -81,6 +82,24 @@ SkeletonNode* Skeleton::GetNodeByHandle(unsigned int _handle)
 }
 
 //////////////////////////////////////////////////
+unsigned int Skeleton::GetNumNodes()
+{
+  return this->nodes.size();
+}
+
+//////////////////////////////////////////////////
+unsigned int Skeleton::GetNumJoints()
+{
+  unsigned int c = 0;
+  for (std::map<unsigned int, SkeletonNode*>::iterator iter =
+      this->nodes.begin(); iter != this->nodes.end(); ++iter)
+    if (iter->second->IsJoint())
+      c++;
+
+  return c;
+}
+
+//////////////////////////////////////////////////
 void Skeleton::BuildNodeMap()
 {
   std::list<SkeletonNode*> toVisit;
@@ -122,6 +141,24 @@ void Skeleton::PrintTransforms()
   {
     SkeletonNode *node = iter->second;
     std::cerr << "---------------\n" << node->GetName() << "\n";
+
+    for (unsigned int i = 0; i < node->GetNumRawTrans(); i++)
+    {
+      NodeTransform nt = node->GetRawTransform(i);
+      std::cerr << "\t" << nt.GetSID();
+      if (nt.GetType() == NodeTransform::MATRIX)
+        std::cerr << " MATRIX\n";
+      else
+        if (nt.GetType() == NodeTransform::TRANSLATE)
+          std::cerr << " TRANSLATE\n";
+        else
+          if (nt.GetType() == NodeTransform::ROTATE)
+            std::cerr << " ROTATE\n";
+          else
+            std::cerr << " SCALE\n";
+      std::cerr << nt() << "\n+++++++++++\n";
+    }
+
     std::cerr << node->GetWorldTransform() << "\n";
 
     if (node->IsJoint())
@@ -168,13 +205,13 @@ unsigned int Skeleton::GetNumAnimations()
 }
 
 //////////////////////////////////////////////////
-RawAnimationListIter Skeleton::GetAnimationListIter()
+std::map<std::string, SkeletonAnimation> Skeleton::GetAnimationList()
 {
-  return this->animations.begin();
+  return this->animations;
 }
 
 //////////////////////////////////////////////////
-void Skeleton::AddAnimation(std::string _name, RawAnimation _anim)
+void Skeleton::AddAnimation(std::string _name, SkeletonAnimation _anim)
 {
   this->animations[_name] = _anim;
 }
@@ -369,7 +406,212 @@ void SkeletonNode::SetInverseBindTransform(math::Matrix4 _invBM)
   this->invBindTransform = _invBM;
 }
 
+//////////////////////////////////////////////////
 math::Matrix4 SkeletonNode::GetInverseBindTransform()
 {
   return this->invBindTransform;
+}
+
+//////////////////////////////////////////////////
+std::vector<NodeTransform> SkeletonNode::GetRawTransforms()
+{
+  return this->rawTransforms;
+}
+
+//////////////////////////////////////////////////
+unsigned int SkeletonNode::GetNumRawTrans()
+{
+  return this->rawTransforms.size();
+}
+
+//////////////////////////////////////////////////
+NodeTransform SkeletonNode::GetRawTransform(unsigned int _i)
+{
+  return this->rawTransforms[_i];
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::AddRawTransform(NodeTransform _t)
+{
+  this->rawTransforms.push_back(_t);
+}
+
+//////////////////////////////////////////////////
+std::vector<NodeTransform> SkeletonNode::GetTransforms()
+{
+  return this->rawTransforms;
+}
+
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////
+NodeTransform::NodeTransform(TransformType _type)
+{
+  this->sid = "_default_";
+  this->type = _type;
+  this->transform = math::Matrix4(math::Matrix4::IDENTITY);
+}
+
+//////////////////////////////////////////////////
+NodeTransform::NodeTransform(math::Matrix4 _mat, std::string _sid,
+                                    TransformType _type)
+{
+  this->sid = _sid;
+  this->type = _type;
+  this->transform = _mat;
+}
+
+//////////////////////////////////////////////////
+NodeTransform::~NodeTransform()
+{
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::Set(math::Matrix4 _mat)
+{
+  this->transform = _mat;
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::SetType(TransformType _type)
+{
+  this->type = _type;
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::SetSID(std::string _sid)
+{
+  this->sid = _sid;
+}
+
+//////////////////////////////////////////////////
+math::Matrix4 NodeTransform::Get()
+{
+  return this->transform;
+}
+
+//////////////////////////////////////////////////
+NodeTransform::TransformType NodeTransform::GetType()
+{
+  return this->type;
+}
+
+//////////////////////////////////////////////////
+std::string NodeTransform::GetSID()
+{
+  return this->sid;
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::SetComponent(unsigned int _idx, double _value)
+{
+  this->source[_idx] = _value;
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::SetSourceValues(math::Matrix4 _mat)
+{
+  double *row;
+  this->source.resize(16);
+  unsigned int idx = 0;
+  for (unsigned int i = 0; i < 4; i++)
+  {
+    row = _mat[i];
+    for (unsigned int j = 0; j < 4; j++)
+    {
+      this->source[idx] = row[j];
+      idx++;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::SetSourceValues(math::Vector3 _vec)
+{
+  this->source.resize(3);
+  this->source[0] = _vec.x;
+  this->source[1] = _vec.y;
+  this->source[2] = _vec.z;
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::SetSourceValues(math::Vector3 _axis, double _angle)
+{
+  this->source.resize(4);
+  this->source[0] = _axis.x;
+  this->source[1] = _axis.y;
+  this->source[2] = _axis.z;
+  this->source[3] = _angle;
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::RecalculateMatrix()
+{
+  if (this->type == MATRIX)
+  {
+    this->transform.Set(this->source[0], this->source[1], this->source[2],
+                        this->source[3], this->source[4], this->source[5],
+                        this->source[6], this->source[7], this->source[8],
+                        this->source[9], this->source[10], this->source[11],
+                        this->source[12], this->source[13], this->source[14],
+                        this->source[15]);
+  }
+  else
+    if (this->type == TRANSLATE)
+    {
+      this->transform.SetTranslate(math::Vector3(this->source[0],
+                                            this->source[1], this->source[2]));
+    }
+    else
+      if (this->type == ROTATE)
+      {
+        math::Matrix3 mat;
+        mat.SetFromAxis(math::Vector3(this->source[0], this->source[1],
+          this->source[2]), GZ_DTOR(this->source[3]));
+        this->transform = mat;
+      }
+      else
+      {
+        this->transform.SetScale(math::Vector3(this->source[0], this->source[1],
+                                            this->source[2]));
+      }
+}
+
+//////////////////////////////////////////////////
+math::Matrix4 NodeTransform::operator() ()
+{
+  return this->transform;
+}
+
+//////////////////////////////////////////////////
+math::Matrix4 NodeTransform::operator* (NodeTransform _t)
+{
+  math::Matrix4 m;
+
+  m = this->transform * _t();
+
+  return m;
+}
+
+//////////////////////////////////////////////////
+math::Matrix4 NodeTransform::operator* (math::Matrix4 _m)
+{
+  math::Matrix4 m;
+
+  m = this->transform * _m;
+
+  return m;
+}
+
+//////////////////////////////////////////////////
+void NodeTransform::PrintSource()
+{
+  std::cerr << this->sid;
+  for (unsigned int i = 0; i < this->source.size(); i++)
+    std::cerr << " " << this->source[i];
+  std::cerr << "\n";
 }

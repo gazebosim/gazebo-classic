@@ -52,10 +52,13 @@ namespace gazebo
 
       private: void LoadAnimations(TiXmlElement *_xml, Skeleton *_skel);
 
-      private: void LoadAnimation(TiXmlElement *_xml, Skeleton *_skel);
+      private: void LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel);
 
       private: SkeletonNode* LoadSkeletonNodes(TiXmlElement *_xml,
                                           SkeletonNode *_parent);
+
+      private: void SetSkeletonNodeTransform(TiXmlElement *_elem,
+                                          SkeletonNode *_node);
 
       private: void LoadGeometry(TiXmlElement *_xml,
                                  const math::Matrix4 &_transform, Mesh *_mesh);
