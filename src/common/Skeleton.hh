@@ -163,7 +163,7 @@ namespace gazebo
 
       public: math::Matrix4 GetInverseBindTransform();
 
-      public: math::Matrix4 GetWorldTransform();
+      public: math::Matrix4 GetModelTransform();
 
       public: std::vector<NodeTransform> GetRawTransforms();
 
@@ -183,7 +183,7 @@ namespace gazebo
 
       protected: math::Matrix4 transform;
 
-      protected: math::Matrix4 worldTransform;
+      protected: math::Matrix4 modelTransform;
 
       protected: math::Matrix4 invBindTransform;
 

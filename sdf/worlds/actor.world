@@ -19,7 +19,7 @@
 
     <include filename="ground_plane.model"/>
 
-    <actor name="actor1" filename="test.dae">
+    <actor name="actor1" filename="human.dae">
       <origin pose="0 0 0 0 0 0"/>
     </actor>
 

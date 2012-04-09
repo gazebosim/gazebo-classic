@@ -159,7 +159,7 @@ void Skeleton::PrintTransforms()
       std::cerr << nt() << "\n+++++++++++\n";
     }
 
-    std::cerr << node->GetWorldTransform() << "\n";
+    std::cerr << node->GetModelTransform() << "\n";
 
     if (node->IsJoint())
       std::cerr << node->GetInverseBindTransform() << "\n";
@@ -296,9 +296,9 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
   this->transform = _trans;
 
   if (this->parent == NULL)
-    this->worldTransform = _trans;
+    this->modelTransform = _trans;
   else
-    this->worldTransform = this->parent->GetWorldTransform() * _trans;
+    this->modelTransform = this->parent->GetModelTransform() * _trans;
 
   /// propagate the change to the children nodes
   std::list<SkeletonNode*> toVisit;
@@ -313,7 +313,7 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
     for (int i = (node->GetChildCount() - 1); i >= 0; i++)
       toVisit.push_front(node->GetChild(i));
 
-    node->worldTransform = node->GetParent()->worldTransform * node->transform;
+    node->modelTransform = node->GetParent()->modelTransform * node->transform;
   }
 }
 
@@ -324,9 +324,9 @@ math::Matrix4 SkeletonNode::GetTransform()
 }
 
 //////////////////////////////////////////////////
-math::Matrix4 SkeletonNode::GetWorldTransform()
+math::Matrix4 SkeletonNode::GetModelTransform()
 {
-  return this->worldTransform;
+  return this->modelTransform;
 }
 
 //////////////////////////////////////////////////

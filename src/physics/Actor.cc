@@ -34,7 +34,7 @@
 
 #include "physics/Joint.hh"
 #include "physics/Link.hh"
-#include "physics/World.hh"
+#include "physics/Model.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Actor.hh"
 
@@ -70,14 +70,15 @@ void Actor::Load(sdf::ElementPtr _sdf)
     if (!mesh->HasSkeleton())
       gzthrow("Collada file does not contain skeletal animation.");
 
+    /// create the link sdfs for the model
     NodeMap nodes = mesh->GetSkeleton()->GetNodes();
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
       SkeletonNode* bone = iter->second;
 
-      if (!bone->IsJoint())
-        continue;
+      //  if (!bone->IsJoint())
+      //    continue;
 
       sdf::ElementPtr linkSdf;
       if (bone->IsRootNode())
@@ -88,8 +89,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
       linkSdf->GetAttribute("name")->Set(bone->GetName());
       linkSdf->GetAttribute("gravity")->Set(false);
       sdf::ElementPtr linkPose = linkSdf->GetOrCreateElement("origin");
-      math::Pose pose(bone->GetWorldTransform().GetTranslation(),
-                      bone->GetWorldTransform().GetRotation());
+      math::Pose pose(bone->GetModelTransform().GetTranslation(),
+                      bone->GetModelTransform().GetRotation());
       linkPose->GetAttribute("pose")->Set(pose);
 
       /// FIXME hardcoded inertia of a sphere with mass 1.0 and radius 0.05
@@ -121,11 +122,111 @@ void Actor::Load(sdf::ElementPtr _sdf)
       sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
       colorSdf->GetAttribute("rgba")->Set(Color::Red);
     }
+
+    /// we are ready to load the links
+    Model::Load(_sdf);
+
+    /// create the pose animations based on the skeletal animations
+    std::map<std::string, PoseAnimationPtr> animations;
+    SkeletonAnimation skelAnim =
+        mesh->GetSkeleton()->GetAnimationList().begin()->second;
+
+    for (unsigned int i = 0; i < mesh->GetSkeleton()->GetNumNodes(); i++)
+    {
+      SkeletonNode *skelNode = mesh->GetSkeleton()->GetNodeByHandle(i);
+      if (skelAnim.find(skelNode->GetId()) != skelAnim.end())
+      {
+        NodeAnimation *nodeAnim = &skelAnim[skelNode->GetId()];
+        double startTime = (*nodeAnim).begin()->first;
+        double endTime = (*nodeAnim).rbegin()->first;
+        double duration = endTime - startTime;
+
+        PoseAnimationPtr anim(
+            new PoseAnimation(skelNode->GetName() + "_anim", duration, true));
+
+        for (NodeAnimation::iterator iter = (*nodeAnim).begin();
+                iter != (*nodeAnim).end(); ++iter)
+        {
+          double frameTime = iter->first;
+          math::Matrix4 trans = iter->second;
+
+          PoseKeyFrame *key;
+
+          if (skelNode->IsRootNode())
+          {
+            key = anim->CreateKeyFrame(frameTime);
+            key->SetTranslation(trans.GetTranslation());
+            key->SetRotation(trans.GetRotation());
+          }
+          else
+          {
+            SkeletonNode *nodeParent = skelNode->GetParent();
+
+            if (animations.find(nodeParent->GetName()) != animations.end())
+            {
+              PoseAnimationPtr parentAnim = animations[nodeParent->GetName()];
+              parentAnim->SetTime(frameTime);
+              PoseKeyFrame parentFrame(frameTime);
+              parentAnim->GetInterpolatedKeyFrame(parentFrame);
+              math::Matrix4 parentTrans =
+                  parentFrame.GetRotation().GetAsMatrix4();
+
+              parentTrans.SetTranslate(parentFrame.GetTranslation());
+
+              math::Matrix4 frameTrans = parentTrans * trans;
+              key = anim->CreateKeyFrame(frameTime);
+              key->SetTranslation(frameTrans.GetTranslation());
+              key->SetRotation(frameTrans.GetRotation());
+            }
+            else
+            {
+              std::cerr << "parent not found in animation list.\n";
+            }
+          }
+        }
+        animations[skelNode->GetName()] = anim;
+        LinkPtr link = this->GetChildLink(skelNode->GetName());
+        link->SetAnimation(anim);
+      }
+      else /* if node is not skeleton animated */
+      {
+        /// we need the transform from this node to the first animated node in
+        /// its parent node structure
+        SkeletonNode *nodeParent = skelNode->GetParent();
+        math::Matrix4 trans = skelNode->GetTransform();
+        while (animations.find(nodeParent->GetName()) == animations.end())
+        {
+          trans = nodeParent->GetTransform() * trans;
+          nodeParent = nodeParent->GetParent();
+        }
+        PoseAnimationPtr parentAnim = animations[nodeParent->GetName()];
+        PoseAnimationPtr anim( new PoseAnimation(skelNode->GetName() + "_anim",
+            parentAnim->GetLength(), true));
+
+        for (unsigned int j = 0; j < parentAnim->GetNumKeyFrames(); j++)
+        {
+          PoseKeyFrame *parentFrame =
+              reinterpret_cast<PoseKeyFrame*>(parentAnim->GetKeyFrame(j));
+
+          math::Matrix4 parentTrans =
+            parentFrame->GetRotation().GetAsMatrix4();
+          parentTrans.SetTranslate(parentFrame->GetTranslation());
+          double frameTime = parentFrame->GetTime();
+          math::Matrix4 frameTrans = parentTrans * trans;
+
+          PoseKeyFrame *key;
+          key = anim->CreateKeyFrame(frameTime);
+          key->SetTranslation(frameTrans.GetTranslation());
+          key->SetRotation(frameTrans.GetRotation());
+        }
+        animations[skelNode->GetName()] = anim;
+        LinkPtr link = this->GetChildLink(skelNode->GetName());
+        link->SetAnimation(anim);
+      }
+    }
   }
   else
     std::cerr << "no mesh\n";
-
-  Model::Load(_sdf);
 }
 
 //////////////////////////////////////////////////

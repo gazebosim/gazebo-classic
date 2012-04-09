@@ -46,6 +46,9 @@ namespace gazebo
       public: void AddTime(double _time);
       public: double GetTime() const;
 
+      public: unsigned int GetNumKeyFrames() const;
+      public: KeyFrame* GetKeyFrame(unsigned int _index) const;
+
       protected: double GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
                                            KeyFrame **_kf2,
                                            unsigned int &_firstKeyIndex) const;

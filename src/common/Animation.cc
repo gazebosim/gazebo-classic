@@ -63,18 +63,21 @@ void Animation::SetTime(double _time)
   if (!math::equal(_time, this->timePos))
   {
     this->timePos = _time;
-    if (this->loop)
+    if (this->timePos > this->length)
     {
-      this->timePos = fmod(this->timePos, this->length);
-      if (this->timePos < 0)
-        this->timePos += this->length;
-    }
-    else
-    {
-      if (this->timePos < 0)
-        this->timePos = 0;
-      else if (this->timePos > this->length)
-        this->timePos = this->length;
+      if (this->loop)
+      {
+        this->timePos = fmod(this->timePos, this->length);
+        if (this->timePos < 0)
+          this->timePos += this->length;
+      }
+      else
+      {
+        if (this->timePos < 0)
+          this->timePos = 0;
+        else if (this->timePos > this->length)
+          this->timePos = this->length;
+      }
     }
   }
 }
@@ -87,6 +90,16 @@ void Animation::AddTime(double _time)
 double Animation::GetTime() const
 {
   return this->timePos;
+}
+
+unsigned int Animation::GetNumKeyFrames() const
+{
+  return this->keyFrames.size();
+}
+
+KeyFrame* Animation::GetKeyFrame(unsigned int _index) const
+{
+  return this->keyFrames[_index];
 }
 
 double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
@@ -220,6 +233,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
   if (math::equal(t, 0.0))
   {
     _kf.SetTranslation(k1->GetTranslation());
+    _kf.SetRotation(k1->GetRotation());
   }
   else
   {
