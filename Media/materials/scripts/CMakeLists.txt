@@ -6,6 +6,7 @@ SET (files Gazebo.material
            blur.compositor
            blur.material
            pssm.material
+           youbot.material
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/scripts/)

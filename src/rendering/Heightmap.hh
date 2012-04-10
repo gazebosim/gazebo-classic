@@ -52,6 +52,9 @@ namespace gazebo
       /// \brief Load the heightmap
       public: virtual void Load();
 
+      /// \brief Get the height at a location
+      public: double GetHeight(double x, double y);
+
       private: void InitBlendMaps(Ogre::Terrain *_terrain);
       private: void ConfigureTerrainDefaults();
       private: void DefineTerrain(int x, int y);

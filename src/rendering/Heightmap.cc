@@ -109,7 +109,7 @@ void Heightmap::ConfigureTerrainDefaults()
 
   defaultimp.terrainSize = 513;
   defaultimp.worldSize = 513.0f;
-  defaultimp.inputScale = 6;
+  defaultimp.inputScale = 100;
   defaultimp.minBatchSize = 33;
   defaultimp.maxBatchSize = 65;
 
@@ -123,19 +123,19 @@ void Heightmap::ConfigureTerrainDefaults()
 
     // The worldSize decides how big each splat of textures will be.
     // A smaller value will increase the resolution
-    defaultimp.layerList[0].worldSize = 100;
+    defaultimp.layerList[0].worldSize = 10;
     defaultimp.layerList[0].textureNames.push_back(
         "dirt_grayrocky_diffusespecular.dds");
     defaultimp.layerList[0].textureNames.push_back(
         "dirt_grayrocky_normalheight.dds");
 
-    defaultimp.layerList[1].worldSize = 30;
+    defaultimp.layerList[1].worldSize = 3;
     defaultimp.layerList[1].textureNames.push_back(
         "grass_green-01_diffusespecular.dds");
     defaultimp.layerList[1].textureNames.push_back(
         "grass_green-01_normalheight.dds");
 
-    defaultimp.layerList[2].worldSize = 200;
+    defaultimp.layerList[2].worldSize = 20;
     defaultimp.layerList[2].textureNames.push_back(
         "growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back(
@@ -158,7 +158,7 @@ void Heightmap::DefineTerrain(int x, int y)
     bool flipX = x % 2 != 0;
     bool flipY = y % 2 != 0;
 
-    img.load("terrain.png",
+    img.load("canyon.png",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     if (flipX)
@@ -177,10 +177,10 @@ void Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 {
   Ogre::TerrainLayerBlendMap* blendMap0 = _terrain->getLayerBlendMap(1);
   Ogre::TerrainLayerBlendMap* blendMap1 = _terrain->getLayerBlendMap(2);
-  Ogre::Real minHeight0 = 70;
-  Ogre::Real fadeDist0 = 40;
-  Ogre::Real minHeight1 = 70;
-  Ogre::Real fadeDist1 = 15;
+  Ogre::Real minHeight0 = 30;
+  Ogre::Real fadeDist0 = 20;
+  Ogre::Real minHeight1 = 31;
+  Ogre::Real fadeDist1 = 10;
   float* pBlend0 = blendMap0->getBlendPointer();
   float* pBlend1 = blendMap1->getBlendPointer();
   for (Ogre::uint16 y = 0; y < _terrain->getLayerBlendMapSize(); ++y)
@@ -204,4 +204,10 @@ void Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
   blendMap1->dirty();
   blendMap0->update();
   blendMap1->update();
+}
+
+/////////////////////////////////////////////////
+double Heightmap::GetHeight(double x, double y)
+{
+  return this->terrainGroup->getHeightAtWorldPosition(x, y, 600);
 }

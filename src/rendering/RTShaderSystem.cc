@@ -27,7 +27,7 @@
 #include "common/Console.hh"
 #include "rendering/RTShaderSystem.hh"
 
-#define MINOR_VERSION 7
+#define MINOR_VERSION 700
 using namespace gazebo;
 using namespace rendering;
 
@@ -423,6 +423,7 @@ void RTShaderSystem::RemoveShadows(Scene *_scene)
 /////////////////////////////////////////////////
 void RTShaderSystem::ApplyShadows(Scene *_scene)
 {
+  return;
   if (!this->initialized)
     return;
 

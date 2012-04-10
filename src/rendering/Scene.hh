@@ -60,6 +60,7 @@ namespace gazebo
     class Grid;
     class Camera;
     class UserCamera;
+    class Heightmap;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -225,9 +226,6 @@ namespace gazebo
       private: void PrintSceneGraphHelper(const std::string &prefix,
                                           Ogre::Node *node);
 
-      /// \brief Deprecated: use RTShader::ApplyShadows
-      public: void InitShadows();
-
       public: void SetSky(const std::string &_material);
 
       /// \brief Set whether shadows are on or off
@@ -255,6 +253,8 @@ namespace gazebo
 
 
       public: std::string StripSceneName(const std::string &_name) const;
+
+      public: Heightmap *GetHeightmap() const;
 
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
@@ -363,6 +363,8 @@ namespace gazebo
 
       private: bool enableVisualizations;
       private: bool clearAll;
+
+      private: Heightmap *heightmap;
     };
     /// \}
   }

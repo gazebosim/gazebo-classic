@@ -69,6 +69,7 @@ set (headers MovableText.hh
              AxisVisual.hh
              ArrowVisual.hh
              COMVisual.hh
+             Heightmap.hh
              ogre.h
              cegui.h
 )

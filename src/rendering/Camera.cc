@@ -223,16 +223,6 @@ void Camera::SetScene(Scene *scene_)
 //////////////////////////////////////////////////
 void Camera::Update()
 {
-  // if (this->sceneNode)
-  // {
-    // Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
-  // }
-
-  // if (this->pitchNode)
-  // {
-  //  Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
-  // }
-
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
   {
@@ -255,6 +245,13 @@ void Camera::Update()
       iter = this->requests.erase(iter);
     else
       ++iter;
+  }
+
+  if (this->trackedVisual)
+  {
+    math::Pose displacement = this->trackedVisual->GetWorldPose() -
+      this->GetWorldPose();
+    this->sceneNode->translate(Conversions::Convert(displacement.pos));
   }
 }
 
@@ -1101,6 +1098,7 @@ void Camera::TrackVisual(const std::string &_name)
   this->requests.push_back(request);
 }
 
+//////////////////////////////////////////////////
 bool Camera::AttachToVisualImpl(const std::string &_name,
     bool _inheritOrientation, double _minDist, double _maxDist)
 {
@@ -1109,6 +1107,7 @@ bool Camera::AttachToVisualImpl(const std::string &_name,
                                   _minDist, _maxDist);
 }
 
+//////////////////////////////////////////////////
 bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     double /*_minDist*/, double /*_maxDist*/)
 {
@@ -1127,6 +1126,7 @@ bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   return false;
 }
 
+//////////////////////////////////////////////////
 bool Camera::TrackVisualImpl(const std::string &_name)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
@@ -1145,15 +1145,16 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
 
   if (_visual)
   {
-    _visual->GetSceneNode()->addChild(this->sceneNode);
     this->camera->setAutoTracking(true, _visual->GetSceneNode());
+    this->trackedVisual = _visual;
   }
   else
   {
-    this->origParentNode->addChild(this->sceneNode);
+    this->trackedVisual.reset();
+    // this->origParentNode->addChild(this->sceneNode);
     this->camera->setAutoTracking(false, NULL);
-    this->camera->setPosition(Ogre::Vector3(0, 0, 0));
-    this->camera->setOrientation(Ogre::Quaternion(-.5, -.5, .5, .5));
+    // this->camera->setPosition(Ogre::Vector3(0, 0, 0));
+    // this->camera->setOrientation(Ogre::Quaternion(-.5, -.5, .5, .5));
   }
   return true;
 }

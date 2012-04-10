@@ -100,6 +100,8 @@ namespace gazebo
       /// Finalize the camera
       public: void Fini();
 
+      public: inline bool IsInitialized() const {return this->initialized;}
+
       /// \brief Set the ID of the window this camera is rendering into.
       public: void SetWindowId(unsigned int windowId);
 
@@ -393,7 +395,8 @@ namespace gazebo
 
       private: sdf::ElementPtr imageElem;
 
-      public: bool initialized;
+      protected: bool initialized;
+      private: VisualPtr trackedVisual;
     };
 
     /// \}

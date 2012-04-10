@@ -31,6 +31,7 @@ SET (files
             terrain_detail.jpg
             terrain.png
             terrain_texture.jpg
+            canyon.png
             willowMap.png
             WoodPallet.png 
             test.png

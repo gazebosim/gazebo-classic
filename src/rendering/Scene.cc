@@ -23,6 +23,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
+#include "rendering/Heightmap.hh"
 #include "rendering/RenderEvents.hh"
 #include "rendering/LaserVisual.hh"
 #include "rendering/CameraVisual.hh"
@@ -97,6 +98,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   sdf::initFile("sdf/scene.sdf", this->sdf);
 
   this->clearAll = false;
+  this->heightmap = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -250,100 +252,10 @@ void Scene::Init()
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
+
+  // HACK: for stencil shadows...should use PSSM shadows
+  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
 }
-
-/////////////////////////////////////////////////
-// TODO: put this back in, and disable PSSM shadows in the RTShader.
-void Scene::InitShadows()
-{
-  // Allow a total of 3 shadow casters per scene
-  const int numShadowTextures = 3;
-
-  // this->manager->setShadowFarDistance(500);
-  // this->manager->setShadowTextureCount(numShadowTextures);
-
-  // this->manager->setShadowTextureSize(1024);
-  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_RGB);
-  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-  // this->manager->setShadowTextureSelfShadow(false);
-  // this->manager->setShadowCasterRenderBackFaces(true);
-  // this->manager->setShadowTechnique(
-  // Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-  this->manager->setShadowTextureCasterMaterial("shadow_caster");
-
-  // const unsigned numShadowRTTs = this->manager->getShadowTextureCount();
-
-  /*for (unsigned i = 0; i < numShadowRTTs; ++i)
-  {
-    Ogre::TexturePtr tex = this->manager->getShadowTexture(i);
-    Ogre::Viewport *vp = tex->getBuffer()->getRenderTarget()->getViewport(0);
-    vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0, 1));
-    vp->setClearEveryFrame(true);
-
-    // Ogre::CompositorManager::getSingleton().addCompositor(vp, "blur");
-    // Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "blur",
-    // true);
-  }
-  // END
-  */
-
-  this->manager->setShadowTechnique(
-      Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-
-  // Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
-      // Ogre::TFO_ANISOTROPIC);
-
-  this->manager->setShadowFarDistance(500);
-  this->manager->setShadowTextureCount(numShadowTextures);
-  this->manager->setShadowTextureSize(1024);
-  this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL,
-      numShadowTextures);
-  this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-
-  // this->manager->setShadowTextureCount(numShadowTextures+1);
-
-  this->manager->setShadowTextureCasterMaterial("shadow_caster");
-  this->manager->setShadowCasterRenderBackFaces(true);
-  this->manager->setShadowTextureSelfShadow(false);
-
-  // PSSM Stuff
-  this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT32_RGB);
-  this->manager->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_RGB);
-  this->manager->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_RGB);
-  // this->manager->setShadowTextureConfig(3, 512, 512, Ogre::PF_FLOAT32_RGB);
-
-
-  // DEBUG CODE: Will display three overlay panels that show the contents of
-  // the shadow maps
-  // add the overlay elements to show the shadow maps:
-  // init overlay elements
-  /*Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
-  Ogre::Overlay* overlay = mgr.create("DebugOverlay");
-  for (size_t i = 0; i < 3; ++i)
-  {
-    Ogre::TexturePtr tex = this->manager->getShadowTexture(i);
-
-    // Set up a debug panel to display the shadow
-    Ogre::MaterialPtr debugMat = Ogre:: MaterialManager::getSingleton().create(
-        "Ogre/DebugTexture" + Ogre::StringConverter::toString(i),
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-    Ogre::TextureUnitState *t =
-      debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(
-          tex->getName());
-    t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
-
-    Ogre::OverlayContainer* debugPanel = (Ogre::OverlayContainer*)
-      (Ogre::OverlayManager::getSingleton().createOverlayElement(
-        "Panel", "Ogre/DebugTexPanel" + Ogre::StringConverter::toString(i)));
-    debugPanel->_setPosition(0.8, i*0.25);
-    debugPanel->_setDimensions(0.2, 0.24);
-    debugPanel->setMaterialName(debugMat->getName());
-    overlay->add2D(debugPanel);
-    overlay->show();
-  }*/
-}
-
 
 //////////////////////////////////////////////////
 Ogre::SceneManager *Scene::GetManager() const
@@ -1549,6 +1461,14 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
   {
     VisualPtr visual;
 
+    // TODO: A bit of a hack.
+    if (_msg->has_geometry() &&
+        _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+    {
+      this->heightmap = new Heightmap(shared_from_this());
+      this->heightmap->Load();
+    }
+
     // If the visual has a parent which is not the name of the scene...
     if (_msg->has_parent_name() && _msg->parent_name() != this->GetName())
     {
@@ -1756,3 +1676,8 @@ std::string Scene::StripSceneName(const std::string &_name) const
     return _name;
 }
 
+//////////////////////////////////////////////////
+Heightmap *Scene::GetHeightmap() const
+{
+  return this->heightmap;
+}

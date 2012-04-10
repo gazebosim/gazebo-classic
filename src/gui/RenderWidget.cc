@@ -194,7 +194,7 @@ void RenderWidget::update()
 
   rendering::UserCameraPtr cam = this->glWidget->GetCamera();
 
-  if (!cam || !cam->initialized)
+  if (!cam || !cam->IsInitialized())
   {
     event::Events::preRender();
     return;
