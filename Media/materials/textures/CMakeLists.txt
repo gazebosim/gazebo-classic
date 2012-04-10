@@ -43,8 +43,15 @@ SET (files
             granite.jpg
             granite2.jpg
             grass.jpg
+            dirt_grayrocky_diffusespecular.dds
+            dirt_grayrocky_normalheight.dds
+            grass_green-01_diffusespecular.dds
+            grass_green-01_normalheight.dds
+            growth_weirdfungus-03_diffusespecular.dds
+            growth_weirdfungus-03_normalheight.dds
 )
 
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/textures/)
+
 
