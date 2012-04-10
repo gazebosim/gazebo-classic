@@ -19,6 +19,7 @@
 #include "math/Helpers.hh"
 #include "math/Matrix4.hh"
 #include "math/Quaternion.hh"
+#include "math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -102,13 +103,13 @@ void Matrix4::SetTranslate(const Vector3 &_t)
 }
 
 //////////////////////////////////////////////////
-Vector3 Matrix4::GetTranslation()
+Vector3 Matrix4::GetTranslation() const
 {
   return Vector3(this->m[0][3], this->m[1][3], this->m[2][3]);
 }
 
 //////////////////////////////////////////////////
-Quaternion Matrix4::GetRotation()
+Quaternion Matrix4::GetRotation() const
 {
   Quaternion q;
   /// algorithm from Ogre::Quaternion source, which in turn is based on
@@ -350,4 +351,80 @@ bool Matrix4::operator==(const Matrix4 &_m) const
          math::equal(this->m[3][1], _m[3][1]) &&
          math::equal(this->m[3][2], _m[3][2]) &&
          math::equal(this->m[3][3], _m[3][3]);
+}
+
+//////////////////////////////////////////////////
+Matrix4 Matrix4::Inverse() const
+{
+  double v0 = this->m[2][0] * this->m[3][1] - this->m[2][1] * this->m[3][0];
+  double v1 = this->m[2][0] * this->m[3][2] - this->m[2][2] * this->m[3][0];
+  double v2 = this->m[2][0] * this->m[3][3] - this->m[2][3] * this->m[3][0];
+  double v3 = this->m[2][1] * this->m[3][2] - this->m[2][2] * this->m[3][1];
+  double v4 = this->m[2][1] * this->m[3][3] - this->m[2][3] * this->m[3][1];
+  double v5 = this->m[2][2] * this->m[3][3] - this->m[2][3] * this->m[3][2];
+
+  double t00 = + (v5 * this->m[1][1] - v4 * this->m[1][2] + v3 * this->m[1][3]);
+  double t10 = - (v5 * this->m[1][0] - v2 * this->m[1][2] + v1 * this->m[1][3]);
+  double t20 = + (v4 * this->m[1][0] - v2 * this->m[1][1] + v0 * this->m[1][3]);
+  double t30 = - (v3 * this->m[1][0] - v1 * this->m[1][1] + v0 * this->m[1][2]);
+
+  double invDet = 1 / (t00 * this->m[0][0] + t10 * this->m[0][1] +
+                       t20 * this->m[0][2] + t30 * this->m[0][3]);
+
+  double d00 = t00 * invDet;
+  double d10 = t10 * invDet;
+  double d20 = t20 * invDet;
+  double d30 = t30 * invDet;
+
+  double d01 = - (v5 * this->m[0][1] - v4 * this->m[0][2] + v3 * this->m[0][3])
+               * invDet;
+  double d11 = + (v5 * this->m[0][0] - v2 * this->m[0][2] + v1 * this->m[0][3])
+               * invDet;
+  double d21 = - (v4 * this->m[0][0] - v2 * this->m[0][1] + v0 * this->m[0][3])
+               * invDet;
+  double d31 = + (v3 * this->m[0][0] - v1 * this->m[0][1] + v0 * this->m[0][2])
+               * invDet;
+
+  v0 = this->m[1][0] * this->m[3][1] - this->m[1][1] * this->m[3][0];
+  v1 = this->m[1][0] * this->m[3][2] - this->m[1][2] * this->m[3][0];
+  v2 = this->m[1][0] * this->m[3][3] - this->m[1][3] * this->m[3][0];
+  v3 = this->m[1][1] * this->m[3][2] - this->m[1][2] * this->m[3][1];
+  v4 = this->m[1][1] * this->m[3][3] - this->m[1][3] * this->m[3][1];
+  v5 = this->m[1][2] * this->m[3][3] - this->m[1][3] * this->m[3][2];
+
+  double d02 = + (v5 * this->m[0][1] - v4 * this->m[0][2] + v3 * this->m[0][3])
+               * invDet;
+  double d12 = - (v5 * this->m[0][0] - v2 * this->m[0][2] + v1 * this->m[0][3])
+               * invDet;
+  double d22 = + (v4 * this->m[0][0] - v2 * this->m[0][1] + v0 * this->m[0][3])
+               * invDet;
+  double d32 = - (v3 * this->m[0][0] - v1 * this->m[0][1] + v0 * this->m[0][2])
+               * invDet;
+
+  v0 = this->m[2][1] * this->m[1][0] - this->m[2][0] * this->m[1][1];
+  v1 = this->m[2][2] * this->m[1][0] - this->m[2][0] * this->m[1][2];
+  v2 = this->m[2][3] * this->m[1][0] - this->m[2][0] * this->m[1][3];
+  v3 = this->m[2][2] * this->m[1][1] - this->m[2][1] * this->m[1][2];
+  v4 = this->m[2][3] * this->m[1][1] - this->m[2][1] * this->m[1][3];
+  v5 = this->m[2][3] * this->m[1][2] - this->m[2][2] * this->m[1][3];
+
+  double d03 = - (v5 * this->m[0][1] - v4 * this->m[0][2] + v3 * this->m[0][3])
+               * invDet;
+  double d13 = + (v5 * this->m[0][0] - v2 * this->m[0][2] + v1 * this->m[0][3])
+               * invDet;
+  double d23 = - (v4 * this->m[0][0] - v2 * this->m[0][1] + v0 * this->m[0][3])
+               * invDet;
+  double d33 = + (v3 * this->m[0][0] - v1 * this->m[0][1] + v0 * this->m[0][2])
+               * invDet;
+
+  return Matrix4(d00, d01, d02, d03,
+                 d10, d11, d12, d13,
+                 d20, d21, d22, d23,
+                 d30, d31, d32, d33);
+}
+
+//////////////////////////////////////////////////
+math::Pose Matrix4::GetAsPose() const
+{
+  return math::Pose(this->GetTranslation(), this->GetRotation());
 }

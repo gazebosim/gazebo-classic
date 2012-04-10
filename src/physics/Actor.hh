@@ -23,9 +23,15 @@
 #define ACTOR_HH
 
 #include "physics/Model.hh"
+#include "common/Time.hh"
+#include "common/Skeleton.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Mesh;
+  }
   namespace physics
   {
     /// \addtogroup gazebo_physics
@@ -58,6 +64,20 @@ namespace gazebo
 
       /// \brief Get the SDF values for the actor
       public: virtual const sdf::ElementPtr GetSDF();
+
+      protected: const common::Mesh *mesh;
+
+      protected: common::Skeleton *skeleton;
+
+      protected: std::string fileName;
+
+      protected: double timeFactor;
+
+      protected: common::Time prevSkelAnim;
+
+      protected: common::SkeletonAnimation skelAnimation;
+
+      protected: math::Quaternion lastQuat;
     };
     /// \}
   }

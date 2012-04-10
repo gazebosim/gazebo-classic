@@ -39,6 +39,7 @@ namespace gazebo
       public: static const Color Red;
       public: static const Color Green;
       public: static const Color Blue;
+      public: static const Color Yellow;
 
       /// \brief Constructor
       public: Color();
