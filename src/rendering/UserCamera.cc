@@ -169,7 +169,10 @@ void UserCamera::Update()
 
   if (this->animState)
   {
-    this->animState->addTime(0.01);
+    this->animState->addTime(
+        (common::Time::GetWallTime() - this->prevAnimTime).Double());
+    this->prevAnimTime = common::Time::GetWallTime();
+
     if (this->animState->hasEnded())
     {
       this->animState = NULL;
@@ -468,6 +471,8 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
+
   this->orbitViewController->SetFocalPoint(_visual->GetWorldPose().pos);
   this->onAnimationComplete =
     boost::bind(&UserCamera::OnMoveToVisualComplete, this);
@@ -529,6 +534,8 @@ bool UserCamera::MoveToPosition(const math::Vector3 &_end,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
+
   return true;
 }
 
@@ -561,17 +568,20 @@ bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
 
   double dt = _time / (_pts.size()-1);
   double tt = 0;
+
+  double prevYaw = this->GetWorldRotation().GetAsEuler().z;
   for (unsigned int i = 0; i < _pts.size(); i++)
   {
     math::Vector3 pos = _pts[i].pos;
     math::Vector3 rpy = _pts[i].rot.GetAsEuler();
-    double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
+    double dyaw = prevYaw - rpy.z;
 
     if (dyaw > M_PI)
       rpy.z += 2*M_PI;
     else if (dyaw < -M_PI)
       rpy.z -= 2*M_PI;
 
+    prevYaw = rpy.z;
     Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
     Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
 
@@ -591,6 +601,8 @@ bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
+
   return true;
 }
 

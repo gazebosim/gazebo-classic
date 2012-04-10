@@ -420,9 +420,12 @@ void Visual::Update()
 
   if (this->animState)
   {
-    this->animState->addTime(0.01);
+    this->animState->addTime(
+        (common::Time::GetWallTime() - this->prevAnimTime).Double());
+    this->prevAnimTime = common::Time::GetWallTime();
     if (this->animState->hasEnded())
     {
+      std::cout << "Ended. Time[" << this->animState->getTimePosition() << "] Length[" << this->animState->getLength() << "]\n";
       this->animState = NULL;
       this->sceneNode->getCreator()->destroyAnimation(
           this->GetName() + "_animation");
@@ -1751,7 +1754,7 @@ std::string Visual::GetMeshName() const
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
+void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
                              double _time,
                              boost::function<void()> _onComplete)
 {
@@ -1777,8 +1780,9 @@ void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
   for (unsigned int i = 0; i < _pts.size(); i++)
   {
     key = strack->createNodeKeyFrame(tt);
-    key->setTranslate(Ogre::Vector3(_pts[i].x, _pts[i].y, _pts[i].z));
-    key->setRotation(this->sceneNode->getOrientation());
+    key->setTranslate(Ogre::Vector3(
+          _pts[i].pos.x, _pts[i].pos.y, _pts[i].pos.z));
+    key->setRotation(Conversions::Convert(_pts[i].rot));
 
     tt += dt;
   }
@@ -1789,6 +1793,7 @@ void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
 
   if (!this->preRenderConnection)
     this->preRenderConnection =
@@ -1826,6 +1831,7 @@ void Visual::MoveToPosition(const math::Vector3 &_end,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
 
   this->preRenderConnection =
     event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));

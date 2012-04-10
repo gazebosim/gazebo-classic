@@ -2,9 +2,11 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.2 0.2 0.2 1"/>
-      <background rgba="0 0 0 1.0"/>
-      <shadows enabled="false"/>
+      <ambient rgba="0.1 0.1 0.1 1"/>
+      <background rgba="0 0 0 1.0">
+        <sky material="Gazebo/CloudySky"/>
+      </background>
+      <shadows enabled="true"/>
       <grid enabled="false"/>
     </scene>
 
@@ -16,17 +18,41 @@
       </ode>
     </physics>
 
-    <include filename="ground_plane.model"/>
+    <model name="plane1_model" static="true">
+      <origin pose="174.4 -71 2.0 0 0 0"/>
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+        </collision>
 
-    <include filename="youbot_static.model"
-             model_pose="-4 -5 0.083637 0 0 1.5707"/>
+        <visual name="visual" cast_shadows="false">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <material script="Gazebo/Grey"/>
+        </visual>
+      </link>
+    </model>
 
-    <include filename="pr2.model" model_name="pr2"
-             model_pose="-3 -5 0 0 0 -1.5707">
-      <plugin filename="libmovie_pr2.so" name="movie"/>
-    </include>
+    <include filename="quadrotor.model" model_pose="-90 42 30 0 0 0"/>
 
-    <include filename="willowgarage_visual.model"/>
+    <!--<plugin filename="libmovie_pr2.so" name="movie"/>-->
+    <!--
+    <include filename="pr2_visual_only.model" model_name="pr2"
+      model_pose="167 -75 2 0 0 -1.5707"/>
+             -->
+    <!--<include filename="youbot_static.model"
+             model_pose="166 -75 2.09 0 0 1.5707"/>
+             -->
+
+    <include filename="pr2_visual_only.model" model_name="pr2"
+      model_pose="161.0 -92 2 0 0 1.5707"/>
+
+
+    <include filename="willowgarage_visual.model" model_name="wg"
+      model_pose="150 -90 2.0 0 0 0"/>
 
     <model name="terrain" static="true">
       <link name="link">
@@ -156,12 +182,12 @@
     </light>
     -->
 
-    <light type="directional" name="sun" cast_shadows="false">
-      <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba="0.9 0.9 0.9 1"/>
-      <specular rgba="0 0 0 1"/>
-      <attenuation range="20" constant="0.8" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 -0.2 -0.8"/>
+    <light type="directional" name="sun" cast_shadows="true">
+      <origin pose="0 0 500 0 0 0"/>
+      <diffuse rgba="1.0 1.0 1.0 1"/>
+      <specular rgba="0.2 0.2 0.2 1"/>
+      <attenuation range="200" constant="0.8" linear="0.0" quadratic="0.0"/>
+      <direction xyz="0.0 0.2 -1.0"/>
     </light>
   </world>
 </gazebo>

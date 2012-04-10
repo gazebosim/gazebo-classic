@@ -143,6 +143,7 @@ namespace gazebo
       private: FPSViewController *fpsViewController;
 
       private: Ogre::AnimationState *animState;
+      private: common::Time prevAnimTime;
       private: boost::function<void()> onAnimationComplete;
 
       private: GUIOverlay *gui;

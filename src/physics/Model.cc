@@ -710,7 +710,6 @@ void Model::SetJointPositions(
     JointPtr joint = *iter;
 
     jiter = _jointPositions.find(joint->GetName());
-    unsigned int jtype = joint->GetType();
 
     // only deal with hinge and revolute joints in the user
     // request joint_names list

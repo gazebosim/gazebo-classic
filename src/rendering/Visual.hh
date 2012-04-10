@@ -260,9 +260,9 @@ namespace gazebo
       public: void MoveToPosition(const math::Vector3 &_end,
                                    double _pitch, double _yaw, double _time);
 
-      public: void MoveToPositions(const std::vector<math::Vector3> &_pts,
+      public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete);
+                                   boost::function<void()> _onComplete=NULL);
 
       /// \brief Set visibility flags for this visual and all children
       public: void SetVisibilityFlags(uint32_t _flags);
@@ -316,6 +316,7 @@ namespace gazebo
       public: std::vector<VisualPtr> children;
 
       private: Ogre::AnimationState *animState;
+      private: common::Time prevAnimTime;
       private: boost::function<void()> onAnimationComplete;
       protected: ScenePtr scene;
 

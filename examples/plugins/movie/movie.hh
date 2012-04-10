@@ -33,6 +33,8 @@ namespace gazebo
     
     private: void PreRender();
     private: void OnCamComplete();
+    private: void OnRotorComplete();
+    private: void OnRotorLand();
     
     private: transport::NodePtr node;
     private: transport::PublisherPtr jointAnimPub;
