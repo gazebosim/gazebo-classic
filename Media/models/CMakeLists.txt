@@ -16,9 +16,9 @@ add_subdirectory(people)
 add_subdirectory(youbot)
 add_subdirectory(hokuyo)
 add_subdirectory(quadrotor)
+add_subdirectory(willowgarage)
 
-set (files willowgarage.dae
-           hanoi_red_disk.dae
+set (files hanoi_red_disk.dae
            hanoi_green_disk.dae
            hanoi_blue_disk.dae
            bowl.dae

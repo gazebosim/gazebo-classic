@@ -33,11 +33,12 @@ namespace gazebo
     
     private: void PreRender();
     private: void OnCamComplete();
+    private: void OnCamPioneerComplete();
     private: void OnRotorComplete();
     private: void OnRotorLand();
     
     private: transport::NodePtr node;
-    private: transport::PublisherPtr jointAnimPub;
+    private: transport::PublisherPtr jointAnimPub, poseAnimPub, modelPub;
 
     private: std::vector<event::ConnectionPtr> connections;
     private: rendering::UserCameraPtr userCamera;
@@ -53,5 +54,6 @@ namespace gazebo
     private: std::list<std::pair<common::Time, common::Color> > spot5Pattern;
 
     private: common::Time startTime;
+    private: rendering::CameraPtr camera;
   };
 }

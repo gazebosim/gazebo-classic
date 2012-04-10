@@ -1465,8 +1465,14 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     if (_msg->has_geometry() &&
         _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
     {
-      this->heightmap = new Heightmap(shared_from_this());
-      this->heightmap->Load();
+      try
+      {
+        this->heightmap = new Heightmap(shared_from_this());
+        this->heightmap->Load();
+      } catch(...)
+      {
+        return false;
+      }
     }
 
     // If the visual has a parent which is not the name of the scene...

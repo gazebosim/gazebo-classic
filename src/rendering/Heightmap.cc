@@ -40,7 +40,6 @@ using namespace rendering;
 Heightmap::Heightmap(ScenePtr _scene)
 {
   this->scene = _scene;
-  this->terrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
 }
 
 //////////////////////////////////////////////////
@@ -52,6 +51,7 @@ Heightmap::~Heightmap()
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
+  this->terrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
   this->terrainGroup = OGRE_NEW Ogre::TerrainGroup(this->scene->GetManager(),
       Ogre::Terrain::ALIGN_X_Y, 513, 513.0f);
   this->terrainGroup->setFilenameConvention(

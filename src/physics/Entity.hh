@@ -148,7 +148,7 @@ namespace gazebo
       /// \brief Set an animation for this entity
       public: void SetAnimation(const common::PoseAnimationPtr &_anim,
                                 boost::function<void()> _onComplete);
-      public: void SetAnimation(const common::PoseAnimationPtr &_anim);
+      public: void SetAnimation(common::PoseAnimationPtr _anim);
 
       /// \brief Stop the current animation, if any
       public: virtual void StopAnimation();

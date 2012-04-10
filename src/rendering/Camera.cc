@@ -50,6 +50,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/camera.sdf", this->sdf);
 
+  this->animState = NULL;
   this->windowId = 0;
   this->scene = scene_;
 
@@ -247,12 +248,37 @@ void Camera::Update()
       ++iter;
   }
 
-  if (this->trackedVisual)
+  // Update animations
+  if (this->animState)
+  {
+    this->animState->addTime(
+        (common::Time::GetWallTime() - this->prevAnimTime).Double());
+    this->prevAnimTime = common::Time::GetWallTime();
+
+    if (this->animState->hasEnded())
+    {
+      try
+      {
+        this->scene->GetManager()->destroyAnimation(
+            this->animState->getAnimationName());
+        this->scene->GetManager()->destroyAnimationState(
+            this->animState->getAnimationName());
+      } catch(Ogre::Exception &_e)
+      {
+      }
+      this->animState = NULL;
+      if (this->onAnimationComplete)
+        this->onAnimationComplete();
+    }
+  }
+
+  // TODO: this doesn't work properly
+  /*if (this->trackedVisual)
   {
     math::Pose displacement = this->trackedVisual->GetWorldPose() -
       this->GetWorldPose();
     this->sceneNode->translate(Conversions::Convert(displacement.pos));
-  }
+  }*/
 }
 
 
@@ -601,6 +627,10 @@ void Camera::EnableSaveFrame(bool enable)
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
+
+  /*if (!this->renderTexture)
+    this->CreateRenderTexture("saveframes_render_texture");
+    */
 }
 
 //////////////////////////////////////////////////
@@ -1133,7 +1163,10 @@ bool Camera::TrackVisualImpl(const std::string &_name)
   if (visual)
     return this->TrackVisualImpl(visual);
   else
-    gzdbg << "Unable to find visual[" << _name << "]\n";
+  {
+    this->trackedVisual.reset();
+    this->camera->setAutoTracking(false, NULL);
+  }
 
   return false;
 }
@@ -1194,3 +1227,138 @@ bool Camera::GetInitialized() const
   return this->initialized;
 }
 
+/////////////////////////////////////////////////
+bool Camera::MoveToPosition(const math::Vector3 &_end,
+                                 double _pitch, double _yaw, double _time)
+{
+  if (this->animState)
+    return false;
+
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  double dyaw =  this->GetWorldRotation().GetAsEuler().z - _yaw;
+
+  if (dyaw > M_PI)
+    _yaw += 2*M_PI;
+  else if (dyaw < -M_PI)
+    _yaw -= 2*M_PI;
+
+  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0, 0, 1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0, 1, 0));
+
+  std::string trackName = "cameratrack";
+  int i = 0;
+  while (this->scene->GetManager()->hasAnimation(trackName))
+  {
+    trackName = std::string("cameratrack_") +
+      boost::lexical_cast<std::string>(i);
+    i++;
+  }
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation(trackName, _time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  key = strack->createNodeKeyFrame(_time);
+  key->setTranslate(Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setRotation(yawFinal);
+
+  key = ptrack->createNodeKeyFrame(_time);
+  key->setRotation(pitchFinal);
+
+  this->animState =
+    this->scene->GetManager()->createAnimationState(trackName);
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
+                                 double _time,
+                                 boost::function<void()> _onComplete)
+{
+  if (this->animState)
+    return false;
+
+  this->onAnimationComplete = _onComplete;
+
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  std::string trackName = "cameratrack";
+  int i = 0;
+  while (this->scene->GetManager()->hasAnimation(trackName))
+  {
+    trackName = std::string("cameratrack_") +
+      boost::lexical_cast<std::string>(i);
+    i++;
+  }
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation(trackName, _time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  double dt = _time / (_pts.size()-1);
+  double tt = 0;
+
+  double prevYaw = this->GetWorldRotation().GetAsEuler().z;
+  for (unsigned int i = 0; i < _pts.size(); i++)
+  {
+    math::Vector3 pos = _pts[i].pos;
+    math::Vector3 rpy = _pts[i].rot.GetAsEuler();
+    double dyaw = prevYaw - rpy.z;
+
+    if (dyaw > M_PI)
+      rpy.z += 2*M_PI;
+    else if (dyaw < -M_PI)
+      rpy.z -= 2*M_PI;
+
+    prevYaw = rpy.z;
+    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
+    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
+
+    key = strack->createNodeKeyFrame(tt);
+    key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
+    key->setRotation(yawFinal);
+
+    key = ptrack->createNodeKeyFrame(tt);
+    key->setRotation(pitchFinal);
+
+    tt += dt;
+  }
+
+  this->animState = this->scene->GetManager()->createAnimationState(trackName);
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
+
+  return true;
+}

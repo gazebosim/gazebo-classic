@@ -21,23 +21,20 @@
 
 namespace gazebo
 { 
-  class MoviePR2 : public ModelPlugin
+  class MoviePioneer2dx : public ModelPlugin
   {
-    public: MoviePR2();
+    public: MoviePioneer2dx();
 
     public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
 
-    private: void TuckArms();
-    private: void OnJointAnimation(ConstJointAnimationPtr &_anim);
-
-    private: std::map<std::string, double> initJointAngles;
+    private: void OnPoseAnimation(ConstPoseAnimationPtr &_anim);
 
     private: transport::NodePtr node;
-    private: transport::SubscriberPtr jointAnimSub;
+    private: transport::SubscriberPtr poseAnimSub;
 
     private: physics::WorldPtr world;
-    private: physics::ModelPtr pr2;
+    private: physics::ModelPtr pioneer2dx;
     private: event::Connection_V connections;
   };
 }

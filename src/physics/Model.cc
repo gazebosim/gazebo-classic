@@ -782,7 +782,8 @@ void Model::SetJointPositions(
   for (jiter = _jointPositions.begin(); jiter != _jointPositions.end(); ++jiter)
   {
     JointPtr joint = this->GetJoint(jiter->first);
-    joint->SetAngle(0, jiter->second);
+    if (joint)
+      joint->SetAngle(0, jiter->second);
   }
 }
 
