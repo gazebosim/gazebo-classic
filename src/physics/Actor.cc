@@ -71,74 +71,58 @@ void Actor::Load(sdf::ElementPtr _sdf)
   if (MeshManager::Instance()->HasMesh(this->fileName))
   {
     this->mesh = MeshManager::Instance()->GetMesh(this->fileName);
-
     if (!this->mesh->HasSkeleton())
       gzthrow("Collada file does not contain skeletal animation.");
-
     this->skeleton = mesh->GetSkeleton();
+    this->skelAnimation = this->skeleton->GetAnimationList().begin()->second;
 
     /// create the link sdfs for the model
     NodeMap nodes = this->skeleton->GetNodes();
+
+    sdf::ElementPtr linkSdf;
+    linkSdf = _sdf->GetOrCreateElement("link");
+    linkSdf->GetAttribute("name")->Set(this->GetName() + "_origin");
+    linkSdf->GetAttribute("gravity")->Set(false);
+    sdf::ElementPtr linkPose = linkSdf->GetOrCreateElement("origin");
+
+    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
+    this->AddSphereCollision(linkSdf, this->GetName() + "_origin_col",
+                                             math::Pose(), 0.02);
+    this->AddSphereVisual(linkSdf, this->GetName() + "_origin_vis",
+                    math::Pose(), 0.05, "Gazebo/White", Color::White);
+
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
       SkeletonNode* bone = iter->second;
 
-      sdf::ElementPtr linkSdf;
-      if (bone->IsRootNode())
-        linkSdf = _sdf->GetOrCreateElement("link");
-      else
-        linkSdf = _sdf->AddElement("link");
+      linkSdf = _sdf->AddElement("link");
 
       linkSdf->GetAttribute("name")->Set(bone->GetName());
       linkSdf->GetAttribute("gravity")->Set(false);
-      sdf::ElementPtr linkPose = linkSdf->GetOrCreateElement("origin");
+      linkPose = linkSdf->GetOrCreateElement("origin");
       math::Pose pose(bone->GetModelTransform().GetTranslation(),
                       bone->GetModelTransform().GetRotation());
       linkPose->GetAttribute("pose")->Set(pose);
 
       /// FIXME hardcoded inertia of a sphere with mass 1.0 and radius 0.01
-      sdf::ElementPtr inertialSdf = linkSdf->GetOrCreateElement("inertial");
-      inertialSdf->GetAttribute("mass")->Set(1.0);
-      sdf::ElementPtr tensorSdf = inertialSdf->GetOrCreateElement("inertia");
-      tensorSdf->GetAttribute("ixx")->Set(0.00004);
-      tensorSdf->GetAttribute("ixy")->Set(0.00);
-      tensorSdf->GetAttribute("ixz")->Set(0.00);
-      tensorSdf->GetAttribute("iyy")->Set(0.00004);
-      tensorSdf->GetAttribute("iyz")->Set(0.00);
-      tensorSdf->GetAttribute("izz")->Set(0.00004);
+      this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
 
       /// FIXME hardcoded collision to sphere with radius 0.02
-      sdf::ElementPtr collisionSdf = linkSdf->GetOrCreateElement("collision");
-      collisionSdf->GetAttribute("name")->Set(bone->GetName()+"_collision");
-      sdf::ElementPtr geomColSdf = collisionSdf->GetOrCreateElement("geometry");
-      sdf::ElementPtr sphereColSdf = geomColSdf->GetOrCreateElement("sphere");
-      sphereColSdf->GetAttribute("radius")->Set(0.02);
+      this->AddSphereCollision(linkSdf, bone->GetName() + "_collision",
+                       math::Pose(), 0.02);
 
       /// FIXME hardcoded visual to red sphere with radius 0.02
-      sdf::ElementPtr visualSdf = linkSdf->GetOrCreateElement("visual");
-      visualSdf->GetAttribute("name")->Set(bone->GetName()+"_visual");
-      sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
-      sdf::ElementPtr sphereVisSdf = geomVisSdf->GetOrCreateElement("sphere");
-      sphereVisSdf->GetAttribute("radius")->Set(0.02);
-      sdf::ElementPtr matSdf = visualSdf->GetOrCreateElement("material");
-      sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
       if (bone->IsRootNode())
-      {
-        matSdf->GetAttribute("script")->Set("Gazebo/Blue");
-        colorSdf->GetAttribute("rgba")->Set(Color::Blue);
-      }
+        this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+                            math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
       else
         if (bone->GetChildCount() == 0)
-        {
-          matSdf->GetAttribute("script")->Set("Gazebo/Yellow");
-          colorSdf->GetAttribute("rgba")->Set(Color::Yellow);
-        }
+          this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+                            math::Pose(), 0.02, "Gazebo/Yellow", Color::Yellow);
         else
-        {
-          matSdf->GetAttribute("script")->Set("Gazebo/Red");
-          colorSdf->GetAttribute("rgba")->Set(Color::Red);
-        }
+          this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+                            math::Pose(), 0.02, "Gazebo/Red", Color::Red);
 
       for (unsigned int i = 0; i < bone->GetChildCount(); i++)
       {
@@ -149,159 +133,17 @@ void Actor::Load(sdf::ElementPtr _sdf)
         double length = r.GetLength();
         double theta = atan2(r.y, r.x);
 
-        double phi = acos( r.z / length);
+        double phi = acos(r.z / length);
         math::Pose bonePose(linkPos, math::Quaternion(0.0, phi, theta));
 
-        visualSdf = linkSdf->AddElement("visual");
-        visualSdf->GetAttribute("name")->Set(curChild->GetName()+"_link_vis");
-        sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
-        visualPoseSdf->GetAttribute("pose")->Set(bonePose);
-        geomVisSdf = visualSdf->GetOrCreateElement("geometry");
-        sdf::ElementPtr boxSdf = geomVisSdf->GetOrCreateElement("box");
-        boxSdf->GetAttribute("size")->Set(math::Vector3(0.02, 0.02, length));
-        matSdf = visualSdf->GetOrCreateElement("material");
-        matSdf->GetAttribute("script")->Set("Gazebo/Green");
-        colorSdf = matSdf->GetOrCreateElement("ambient");
-        colorSdf->GetAttribute("rgba")->Set(Color::Green);
+        this->AddBoxVisual(linkSdf, bone->GetName() + "_" + curChild->GetName()
+          + "_link", bonePose, math::Vector3(0.02, 0.02, length),
+          "Gazebo/Green", Color::Green);
       }
-
-//       if (!bone->IsRootNode())
-//       {
-//         unsigned int jointCount = 3;
-//         if (!bone->IsJoint())
-//           jointCount = 1;
-//         for (unsigned int i = 0; i < jointCount; i++)
-//         {
-//           math::Vector3 axis = math::Vector3(0.0, 0.0, 1.0);
-//           std::string name = "_joint";
-//           if (jointCount == 3)
-//           {
-//             switch (i)
-//             {
-//               case 0: axis = math::Vector3(0.0, 0.0, 1.0);
-//                       name = "_joint_Z";
-//                       break;
-//               case 1: axis = math::Vector3(1.0, 0.0, 0.0);
-//                       name = "_joint_X";
-//                       break;
-//               default: axis = math::Vector3(0.0, 1.0, 0.0);
-//                        name = "_joint_Y";
-//                        break;
-//             }
-//           }
-//           sdf::ElementPtr jointSdf = _sdf->AddElement("joint");
-//           jointSdf->GetAttribute("name")->Set(bone->GetName() + name);
-//           jointSdf->GetAttribute("type")->Set("revolute");
-//           sdf::ElementPtr parentSdf = jointSdf->GetOrCreateElement("parent");
-//           parentSdf->GetAttribute("link")->Set(bone->GetParent()->GetName());
-//           sdf::ElementPtr childSdf = jointSdf->GetOrCreateElement("child");
-//           childSdf->GetAttribute("link")->Set(bone->GetName());
-//           sdf::ElementPtr axisSdf = jointSdf->GetOrCreateElement("axis");
-//           axisSdf->GetAttribute("xyz")->Set(axis);
-//         }
-//      }
     }
 
     /// we are ready to load the links
     Model::Load(_sdf);
-
-    SkeletonAnimation skelAnim =
-            this->skeleton->GetAnimationList().begin()->second;
-
-    PoseAnimationPtr baseAnimation;
-    SkeletonNode *skelNode = this->skeleton->GetNodeByHandle(0);
-    if (skelAnim.find(skelNode->GetId()) != skelAnim.end())
-    {
-      NodeAnimation *nodeAnim = &skelAnim[skelNode->GetId()];
-      double startTime = (*nodeAnim).begin()->first;
-      double endTime = (*nodeAnim).rbegin()->first;
-      double duration = (endTime - startTime) * this->timeFactor;
-
-      baseAnimation.reset(new PoseAnimation(skelNode->GetName() + "_anim",
-                duration, true));
-
-      for (NodeAnimation::iterator iter = (*nodeAnim).begin();
-              iter != (*nodeAnim).end(); ++iter)
-      {
-        double frameTime = iter->first * this->timeFactor;
-        math::Matrix4 trans = iter->second;
-
-        PoseKeyFrame *key;
-        key = baseAnimation->CreateKeyFrame(frameTime);
-        key->SetTranslation(trans.GetTranslation());
-        key->SetRotation(trans.GetRotation());
-      }
-    }
-
-
-//     std::map<std::string, NumericAnimationPtr> jointAnims;
-//     for (unsigned int i = 1; i < this->skeleton->GetNumNodes(); i++)
-//     {
-//       *skelNode = this->skeleton->GetNodeByHandle(i);
-//       if (skelAnim.find(skelNode->GetId()) != skelAnim.end())
-//       {
-//         NodeAnimation *nodeAnim = &skelAnim[skelNode->GetId()];
-//         double startTime = (*nodeAnim).begin()->first;
-//         double endTime = (*nodeAnim).rbegin()->first;
-//         double duration = (endTime - startTime) * this->timeFactor;
-
-//         NumericAnimationPtr jAnimZ, jAnimY, jAnimX;
-//         double jAnimZVal = 0.0;
-//         double jAnimYVal = 0.0;
-//         double jAnimXVal = 0.0;
-//         bool usejAnimZ = false;
-//         bool usejAnimY = false;
-//         bool usejAnimX = false;
-
-//         jAnimZ.reset(new NumericAnimation(skelNode->GetName()+"_Zanim",
-//                      duration, true));
-//         jAnimX.reset(new NumericAnimation(skelNode->GetName()+"_Xanim",
-//                      duration, true));
-//         jAnimY.reset(new NumericAnimation(skelNode->GetName()+"_Yanim",
-//                      duration, true));
-//         for (NodeAnimation::iterator iter = (*nodeAnim).begin();
-//                 iter != (*nodeAnim).end(); ++iter)
-//         {
-//           double frameTime = iter->first * this->timeFactor;
-//           math::Matrix4 trans = iter->second;
-
-//           math::Vector3 angles = trans.GetRotation().GetAsEuler();
-//           NumericKeyFrame *key;
-//           key = jAnimZ->CreateKeyFrame(frameTime);
-//           key->SetValue(angles.z);
-//           key = jAnimX->CreateKeyFrame(frameTime);
-//           key->SetValue(angles.x);
-//           key = jAnimY->CreateKeyFrame(frameTime);
-//           key->SetValue(angles.y);
-//           if (iter == (*nodeAnim).begin())
-//           {
-//             jAnimZVal = angles.z;
-//             jAnimYVal = angles.y;
-//             jAnimXVal = angles.x;
-//           }
-//           else
-//           {
-//             if (!math::equal(angles.z, jAnimZVal))
-//               usejAnimZ = true;
-//             if (!math::equal(angles.x, jAnimXVal))
-//               usejAnimX = true;
-//             if (!math::equal(angles.y, jAnimYVal))
-//               usejAnimY = true;
-//           }
-
-//         }
-//         if (usejAnimZ)
-//           jointAnims[skelNode->GetName()+"_joint_Z"] = jAnimZ;
-//         if (usejAnimX)
-//           jointAnims[skelNode->GetName()+"_joint_X"] = jAnimX;
-//         if (usejAnimY)
-//           jointAnims[skelNode->GetName()+"_joint_Y"] = jAnimY;
-
-//       }
-//    }
-    //this->SetAnimation(baseAnimation);
-    this->skelAnimation = this->skeleton->GetAnimationList().begin()->second;
-    //this->SetJointAnimation(jointAnims);
   }
   else
     std::cerr << "no mesh\n";
@@ -326,8 +168,7 @@ void Actor::Update()
   if (timeSinceAnimUpdate < (1.0 / 30.0))
     return;
 
-  /// start at second node, root node animation is applied to whole model
-  for (unsigned int i = 1; i < this->skeleton->GetNumNodes(); i++)
+  for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
   {
     SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
     SkeletonNode *parentBone = bone->GetParent();
@@ -358,12 +199,13 @@ void Actor::Update()
         math::Vector3 nextPos = nextTransform.GetTranslation();
         math::Quaternion prevQ = prevTransform.GetRotation();
         math::Quaternion nextQ = nextTransform.GetRotation();
+        math::Quaternion curQ;
 
         math::Vector3 curPos =
               math::Vector3(prevPos.x + (nextPos.x - prevPos.x) * t,
                            prevPos.y + (nextPos.y - prevPos.y) * t,
                            prevPos.z + (nextPos.z - prevPos.z) * t);
-        math::Quaternion curQ = math::Quaternion::Slerp(t, prevQ, nextQ, true);
+        curQ = math::Quaternion::Slerp(t, prevQ, nextQ, true);
 
         transform = curQ.GetAsMatrix4();
         transform.SetTranslate(curPos);
@@ -374,17 +216,19 @@ void Actor::Update()
     else
       transform = bone->GetTransform();
 
-    LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
     LinkPtr currentLink = this->GetChildLink(bone->GetName());
-
-    math::Matrix4 parentTrans(math::Matrix4::IDENTITY);
-    math::Pose parentPose = parentLink->GetRelativePose();
-    parentTrans = parentPose.rot.GetAsMatrix4();
-    parentTrans.SetTranslate(parentPose.pos);
-
-    transform = parentTrans * transform;
-    currentLink->SetRelativePose(transform.GetAsPose());
+    if (parentBone)
+    {
+      LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
+      math::Pose parentPose = parentLink->GetWorldPose();
+      math::Matrix4 parentTrans(math::Matrix4::IDENTITY);
+      parentTrans = parentPose.rot.GetAsMatrix4();
+      parentTrans.SetTranslate(parentPose.pos);
+      transform = parentTrans * transform;
+    }
+    currentLink->SetWorldPose(transform.GetAsPose());
   }
+
   this->prevSkelAnim = this->world->GetSimTime();
 }
 
@@ -406,3 +250,67 @@ const sdf::ElementPtr Actor::GetSDF()
   return Model::GetSDF();
 }
 
+//////////////////////////////////////////////////
+void Actor::AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
+            double mass, double radius)
+{
+  double ixx = 2.0 * mass * radius * radius / 5.0;
+  sdf::ElementPtr inertialSdf = linkSdf->GetOrCreateElement("inertial");
+  sdf::ElementPtr inertialPoseSdf = inertialSdf->GetOrCreateElement("origin");
+  inertialPoseSdf->GetAttribute("pose")->Set(pose);
+  inertialSdf->GetAttribute("mass")->Set(mass);
+  sdf::ElementPtr tensorSdf = inertialSdf->GetOrCreateElement("inertia");
+  tensorSdf->GetAttribute("ixx")->Set(ixx);
+  tensorSdf->GetAttribute("ixy")->Set(0.00);
+  tensorSdf->GetAttribute("ixz")->Set(0.00);
+  tensorSdf->GetAttribute("iyy")->Set(ixx);
+  tensorSdf->GetAttribute("iyz")->Set(0.00);
+  tensorSdf->GetAttribute("izz")->Set(ixx);
+}
+
+//////////////////////////////////////////////////
+void Actor::AddSphereCollision(sdf::ElementPtr linkSdf, std::string name,
+            math::Pose pose, double radius)
+{
+  sdf::ElementPtr collisionSdf = linkSdf->GetOrCreateElement("collision");
+  collisionSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr collPoseSdf = collisionSdf->GetOrCreateElement("origin");
+  collPoseSdf->GetAttribute("pose")->Set(pose);
+  sdf::ElementPtr geomColSdf = collisionSdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr sphereColSdf = geomColSdf->GetOrCreateElement("sphere");
+  sphereColSdf->GetAttribute("radius")->Set(radius);
+}
+
+//////////////////////////////////////////////////
+void Actor::AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
+            math::Pose pose, double radius, std::string material, Color ambient)
+{
+  sdf::ElementPtr visualSdf = linkSdf->GetOrCreateElement("visual");
+  visualSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
+  visualPoseSdf->GetAttribute("pose")->Set(pose);
+  sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr sphereVisSdf = geomVisSdf->GetOrCreateElement("sphere");
+  sphereVisSdf->GetAttribute("radius")->Set(radius);
+  sdf::ElementPtr matSdf = visualSdf->GetOrCreateElement("material");
+  matSdf->GetAttribute("script")->Set(material);
+  sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
+  colorSdf->GetAttribute("rgba")->Set(ambient);
+}
+
+//////////////////////////////////////////////////
+void Actor::AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
+    math::Pose pose, math::Vector3 size, std::string material, Color ambient)
+{
+  sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
+  visualSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
+  visualPoseSdf->GetAttribute("pose")->Set(pose);
+  sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr boxSdf = geomVisSdf->GetOrCreateElement("box");
+  boxSdf->GetAttribute("size")->Set(size);
+  sdf::ElementPtr matSdf = visualSdf->GetOrCreateElement("material");
+  matSdf->GetAttribute("script")->Set(material);
+  sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
+  colorSdf->GetAttribute("rgba")->Set(ambient);
+}
