@@ -141,8 +141,8 @@ Quaternion Matrix4::GetRotation() const
     *xyzQ[i] = root / 2.0;
     root = 1.0 / (2.0 * root);
     q.w = (this->m[k][j] - this->m[j][k]) * root;
-    *xyzQ[j] = (this->m[j][i] - this->m[i][j]) * root;
-    *xyzQ[k] = (this->m[k][i] - this->m[i][k]) * root;
+    *xyzQ[j] = (this->m[j][i] + this->m[i][j]) * root;
+    *xyzQ[k] = (this->m[k][i] + this->m[i][k]) * root;
   }
 
   return q;

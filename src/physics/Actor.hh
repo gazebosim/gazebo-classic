@@ -22,6 +22,8 @@
 #ifndef ACTOR_HH
 #define ACTOR_HH
 
+#include <string>
+
 #include "physics/Model.hh"
 #include "common/Time.hh"
 #include "common/Skeleton.hh"
@@ -31,6 +33,7 @@ namespace gazebo
   namespace common
   {
     class Mesh;
+    class Color;
   }
   namespace physics
   {
@@ -64,6 +67,20 @@ namespace gazebo
 
       /// \brief Get the SDF values for the actor
       public: virtual const sdf::ElementPtr GetSDF();
+
+      private: void AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
+                        double mass, double radius);
+
+      private: void AddSphereCollision(sdf::ElementPtr linkSdf,
+                        std::string name, math::Pose pose, double radius);
+
+      private: void AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
+                        math::Pose pose, double radius, std::string material,
+                        common::Color ambient);
+
+      private: void AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
+                      math::Pose pose, math::Vector3 size, std::string material,
+                      common::Color ambient);
 
       protected: const common::Mesh *mesh;
 

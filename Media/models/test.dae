@@ -174,7 +174,7 @@
 			</source>
 			<source id="human_skeleton_J2-rotationZ-output">
 				<float_array id="human_skeleton_J2-rotationZ-output-array" count="3">
-					0 0 0 
+					0 45 90 
 				</float_array>
 				<technique_common>
 					<accessor source="#human_skeleton_J2-rotationZ-output-array" count="3" stride="1">
@@ -212,7 +212,7 @@
 			</source>
 			<source id="human_skeleton_J2-rotationX-output">
 				<float_array id="human_skeleton_J2-rotationX-output-array" count="3">
-					0 0 0 
+					0 45 90 
 				</float_array>
 				<technique_common>
 					<accessor source="#human_skeleton_J2-rotationX-output-array" count="3" stride="1">

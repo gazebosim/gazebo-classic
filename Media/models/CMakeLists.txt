@@ -23,6 +23,7 @@ set (files hanoi_red_disk.dae
            hanoi_blue_disk.dae
            bowl.dae
            test.dae
+           human.dae
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models)
