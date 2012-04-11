@@ -127,8 +127,12 @@ void Actor::Load(sdf::ElementPtr _sdf)
       }
       else
         if (bone->GetChildCount() == 0)
-          this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+        {
+          /// FIXME hack to hide the gaze link visual for now
+          if (bone->GetName().find("SEH") == std::string::npos)
+            this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
                             math::Pose(), 0.02, "Gazebo/Yellow", Color::Yellow);
+        }
         else
           this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
                             math::Pose(), 0.02, "Gazebo/Red", Color::Red);
@@ -136,6 +140,10 @@ void Actor::Load(sdf::ElementPtr _sdf)
       for (unsigned int i = 0; i < bone->GetChildCount(); i++)
       {
         SkeletonNode *curChild = bone->GetChild(i);
+
+        /// FIXME hack to hide the gaze link visual for now
+        if (curChild->GetName().find("SEH") != std::string::npos)
+          continue;
 
         math::Vector3 r = curChild->GetTransform().GetTranslation();
         math::Vector3 linkPos = math::Vector3(r.x / 2.0, r.y / 2.0, r.z / 2.0);
@@ -255,8 +263,8 @@ void Actor::Update()
     currentLink->SetWorldPose(transform.GetAsPose());
   }
 
-  if (this->bonePosePub && this->bonePosePub->HasConnections())
-    this->bonePosePub->Publish(msg);
+ if (this->bonePosePub && this->bonePosePub->HasConnections())
+   this->bonePosePub->Publish(msg);
 
   this->prevSkelAnim = this->world->GetSimTime();
 }
@@ -355,4 +363,10 @@ void Actor::AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
   sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetOrCreateElement("mesh");
   meshSdf->GetAttribute("filename")->Set(this->fileName);
+
+  /// use a material with shading for now
+  sdf::ElementPtr matSdf = visualSdf->GetOrCreateElement("material");
+  matSdf->GetAttribute("script")->Set("Gazebo/Blue");
+  sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
+  colorSdf->GetAttribute("rgba")->Set(Color::Blue);
 }

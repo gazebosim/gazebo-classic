@@ -257,7 +257,7 @@ void Scene::Init()
   this->selectionObj->Init();
 
   // HACK: for stencil shadows...should use PSSM shadows
-  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+  //this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
 }
 
 //////////////////////////////////////////////////

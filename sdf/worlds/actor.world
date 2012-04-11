@@ -3,7 +3,7 @@
   <world name="default">
     <scene>
       <ambient rgba="0.5 0.5 0.5 1"/>
-      <background rgba="0 0 0 1"/>
+      <background rgba="1 1 1 1"/>
       <shadows enabled="true"/>
     </scene>
 
@@ -17,7 +17,23 @@
       </ode>
     </physics>
 
-    <include filename="ground_plane.model"/>
+    <model name="plane1_model" static="true">
+      <origin pose="0 0 -0.07 0 0 0" />
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual" cast_shadows="false">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <material script="Gazebo/Grey"/>
+        </visual>
+      </link>
+    </model>
 
     <actor name="actor1" filename="human.dae" time_factor="1" static="true">
       <origin pose="0 0 0 0 0 0"/>

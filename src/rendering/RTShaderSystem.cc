@@ -27,7 +27,7 @@
 #include "common/Console.hh"
 #include "rendering/RTShaderSystem.hh"
 
-#define MINOR_VERSION 700
+#define MINOR_VERSION 7
 using namespace gazebo;
 using namespace rendering;
 
@@ -423,7 +423,6 @@ void RTShaderSystem::RemoveShadows(Scene *_scene)
 /////////////////////////////////////////////////
 void RTShaderSystem::ApplyShadows(Scene *_scene)
 {
-  return;
   if (!this->initialized)
     return;
 
@@ -464,7 +463,7 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
-  pssmSetup->calculateSplitPoints(3, 1 *.5, 50);
+  pssmSetup->calculateSplitPoints(3, 1, 100);
   pssmSetup->setSplitPadding(1);
   pssmSetup->setOptimalAdjustFactor(0, 2);
   pssmSetup->setOptimalAdjustFactor(1, 1);
