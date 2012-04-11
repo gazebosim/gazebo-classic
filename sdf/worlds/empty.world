@@ -2,9 +2,9 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.1 0.1 0.1 1"/>
+      <ambient rgba="0.8 0.8 0.8 1"/>
       <background rgba="0 0 0 1"/>
-      <shadows enabled="true"/>
+      <shadows enabled="false"/>
     </scene>
 
     <!-- Physics Engine Parameters -->
@@ -18,6 +18,7 @@
     </physics>
 
     <include filename="ground_plane.model"/>
+    <include filename="pioneer2dx.model"/>
 
     <!-- Light Source -->
     <light type="directional" name="sun" cast_shadows="true">

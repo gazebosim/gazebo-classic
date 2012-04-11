@@ -58,7 +58,6 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   this->connections.push_back(
       event::Events::ConnectShowCameras(
         boost::bind(&UserCamera::ToggleShowVisual, this)));
-  this->animState = NULL;
 
   this->gui = new GUIOverlay();
 
@@ -96,7 +95,7 @@ void UserCamera::Init()
 {
   Camera::Init();
   this->SetHFOV(GZ_DTOR(60));
-  this->SetClipDist(0.001, 500);
+  this->SetClipDist(1.0, 100);
 
   /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
 
@@ -166,23 +165,6 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 void UserCamera::Update()
 {
   Camera::Update();
-
-  if (this->animState)
-  {
-    this->animState->addTime(
-        (common::Time::GetWallTime() - this->prevAnimTime).Double());
-    this->prevAnimTime = common::Time::GetWallTime();
-
-    if (this->animState->hasEnded())
-    {
-      this->animState = NULL;
-
-      this->scene->GetManager()->destroyAnimation("cameratrack");
-      this->scene->GetManager()->destroyAnimationState("cameratrack");
-      if (this->onAnimationComplete)
-        this->onAnimationComplete();
-    }
-  }
 
   if (this->gui)
     this->gui->Update();
@@ -485,125 +467,6 @@ void UserCamera::OnMoveToVisualComplete()
   this->orbitViewController->SetPitch(this->GetWorldPose().rot.GetAsEuler().y);
   this->orbitViewController->SetDistance(this->GetWorldPose().pos.Distance(
         this->orbitViewController->GetFocalPoint()));
-}
-
-/////////////////////////////////////////////////
-bool UserCamera::MoveToPosition(const math::Vector3 &_end,
-                                 double _pitch, double _yaw, double _time)
-{
-  if (this->animState)
-    return false;
-
-  Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
-
-  double dyaw =  this->GetWorldRotation().GetAsEuler().z - _yaw;
-
-  if (dyaw > M_PI)
-    _yaw += 2*M_PI;
-  else if (dyaw < -M_PI)
-    _yaw -= 2*M_PI;
-
-  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0, 0, 1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0, 1, 0));
-
-  Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", _time);
-  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
-
-  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
-
-  key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
-  key->setRotation(this->sceneNode->getOrientation());
-
-  key = ptrack->createNodeKeyFrame(0);
-  key->setRotation(this->pitchNode->getOrientation());
-
-  key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_end.x, _end.y, _end.z));
-  key->setRotation(yawFinal);
-
-  key = ptrack->createNodeKeyFrame(_time);
-  key->setRotation(pitchFinal);
-
-  this->animState =
-    this->scene->GetManager()->createAnimationState("cameratrack");
-
-  this->animState->setTimePosition(0);
-  this->animState->setEnabled(true);
-  this->animState->setLoop(false);
-  this->prevAnimTime = common::Time::GetWallTime();
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
-                                 double _time,
-                                 boost::function<void()> _onComplete)
-{
-  if (this->animState)
-    return false;
-
-  this->onAnimationComplete = _onComplete;
-
-  Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
-
-  Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", _time);
-  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
-
-  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
-
-  key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
-  key->setRotation(this->sceneNode->getOrientation());
-
-  key = ptrack->createNodeKeyFrame(0);
-  key->setRotation(this->pitchNode->getOrientation());
-
-  double dt = _time / (_pts.size()-1);
-  double tt = 0;
-
-  double prevYaw = this->GetWorldRotation().GetAsEuler().z;
-  for (unsigned int i = 0; i < _pts.size(); i++)
-  {
-    math::Vector3 pos = _pts[i].pos;
-    math::Vector3 rpy = _pts[i].rot.GetAsEuler();
-    double dyaw = prevYaw - rpy.z;
-
-    if (dyaw > M_PI)
-      rpy.z += 2*M_PI;
-    else if (dyaw < -M_PI)
-      rpy.z -= 2*M_PI;
-
-    prevYaw = rpy.z;
-    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
-    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
-
-    key = strack->createNodeKeyFrame(tt);
-    key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
-    key->setRotation(yawFinal);
-
-    key = ptrack->createNodeKeyFrame(tt);
-    key->setRotation(pitchFinal);
-
-    tt += dt;
-  }
-
-  this->animState = this->scene->GetManager()->createAnimationState(
-      "cameratrack");
-
-  this->animState->setTimePosition(0);
-  this->animState->setEnabled(true);
-  this->animState->setLoop(false);
-  this->prevAnimTime = common::Time::GetWallTime();
-
-  return true;
 }
 
 //////////////////////////////////////////////////

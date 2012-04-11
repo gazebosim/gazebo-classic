@@ -50,6 +50,10 @@ void Movie::Load()
   this->node->Init();
   this->jointAnimPub =
     this->node->Advertise<msgs::JointAnimation>("~/joint_animation");
+  this->poseAnimPub =
+    this->node->Advertise<msgs::PoseAnimation>("~/pose_animation");
+
+  this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
 
   this->connections.push_back( 
       event::Events::ConnectPreRender( 
@@ -145,11 +149,24 @@ void Movie::Load()
 /////////////////////////////////////////////////
 void Movie::Init()
 {
+  /*
+  this->camera = this->scene->CreateCamera("recorder");
+  this->camera->Load();
+  this->camera->Init();
+  this->camera->SetClipDist(1, 100);
+  this->camera->SetHFOV(1.047);
+  this->camera->SetImageSize(1920, 1080);
+  this->camera->CreateRenderTexture("RTT");
+  this->camera->EnableSaveFrame(true);
+  this->camera->SetSaveFramePathname("/tmp/drc/");
+
+  this->camera->SetWorldPose(math::Pose(-180, -202, 20, 0, 0, 1.75));
+  */
+
   this->userCamera = gui::get_active_camera();
   //this->userCamera->SetWorldPose(math::Pose(-180, -202, 20, 0, 0, 1.75));
-
   this->userCamera->SetWorldPose(
-      math::Pose(156.84, -97.43, 4.56, 0, GZ_DTOR(25.45), GZ_DTOR(59.02)));
+      math::Pose(161.93, -99.14, 3.58, 0, GZ_DTOR(1.94), GZ_DTOR(95.12)));
 }
 
 /////////////////////////////////////////////////
@@ -162,13 +179,26 @@ void Movie::OnCamComplete()
   */
 }
 
+void Movie::OnCamPioneerComplete()
+{
+  /*this->viewPoses.clear();
+  this->viewPoses.push_back(this->userCamera->GetWorldPose());
+
+  this->viewPoses.push_back(
+      math::Pose(180.38, -75.81, 4.02, 0, GZ_DTOR(25.20), GZ_DTOR(139.47)));
+
+  this->userCamera->MoveToPositions(this->viewPoses, 15.0,
+        boost::bind(&Movie::OnCamPioneerComplete, this));
+        */
+}
+
 /////////////////////////////////////////////////
 void Movie::PreRender()
 {
 
   if (this->startTime == common::Time(0,0) && this->scene->GetHeightmap())
   {
-    std::vector<math::Pose> quadPoses;
+    /*std::vector<math::Pose> quadPoses;
 
     rendering::Heightmap *map = this->scene->GetHeightmap();
 
@@ -203,23 +233,27 @@ void Movie::PreRender()
     }
 
     this->viewPoses.push_back(
-        math::Pose(156.84, -97.43, 4.56, 0, GZ_DTOR(25.45), GZ_DTOR(59.02)));
+        math::Pose(161.93, -99.14, 3.58, 0, GZ_DTOR(3), GZ_DTOR(95.12)));
 
     quadPoses.push_back(
         math::Pose(159.89, -94.83, 10.18, 0, 0, GZ_DTOR(90)));
 
     rendering::VisualPtr quadRotor = this->scene->GetVisual("quadrotor");
-    quadRotor->MoveToPositions(quadPoses, 1.0,
+    quadRotor->MoveToPositions(quadPoses, 30.0,
         boost::bind(&Movie::OnRotorComplete, this));
+        */
 
     this->startTime = common::Time::GetWallTime();
   }
 
-  /*if (common::Time::GetWallTime() - this->startTime > 1.0 &&
+  /*
+  if (common::Time::GetWallTime() - this->startTime > 1.0 &&
       this->viewPoses.size() > 0)
   {
-    this->userCamera->MoveToPositions(this->viewPoses, 20.0,
+    this->userCamera->MoveToPositions(this->viewPoses, 30.0,
         boost::bind(&Movie::OnCamComplete, this));
+    this->camera->MoveToPositions(this->viewPoses, 30.0);
+
 
     this->viewPoses.clear();
   }*/
@@ -299,14 +333,50 @@ void Movie::OnRotorLand()
 {
   std::vector<math::Pose> poses;
 
-  poses.push_back(math::Pose(161, -92, 2, 0, 0, GZ_DTOR(90)));
-  poses.push_back(math::Pose(161, -79, 2, 0, 0, GZ_DTOR(90)));
-  poses.push_back(math::Pose(162, -77.7, 2, 0, 0, GZ_DTOR(0)));
-  poses.push_back(math::Pose(171, -77.7, 2, 0, 0, GZ_DTOR(0)));
-  poses.push_back(math::Pose(178, -75.15, 2, 0, 0, GZ_DTOR(90)));
+  msgs::PoseAnimation msg;
+  msg.set_model_name("pioneer2dx");
 
-  rendering::VisualPtr pr2 = this->scene->GetVisual("pr2");
+  double step = 30.0 / 7.0;
 
-  pr2->MoveToPositions(poses, 20.0);
-  this->userCamera->TrackVisual("pr2");
+  msgs::Set(msg.add_time(), common::Time(step * msg.pose_size(), 0));
+  msgs::Set(msg.add_pose(), math::Pose(161, -92, 2, 0, 0, GZ_DTOR(90)));
+
+  msgs::Set(msg.add_time(), common::Time(step * msg.pose_size(), 0));
+  msgs::Set(msg.add_pose(), math::Pose(161, -79, 2, 0, 0, GZ_DTOR(90)));
+
+  msgs::Set(msg.add_time(), common::Time(step * msg.pose_size(), 0));
+  msgs::Set(msg.add_pose(), math::Pose(162, -77.7, 2, 0, 0, GZ_DTOR(0)));
+
+  msgs::Set(msg.add_time(), common::Time(step * msg.pose_size(), 0));
+  msgs::Set(msg.add_pose(), math::Pose(171, -77.7, 2, 0, 0, GZ_DTOR(0)));
+
+  msgs::Set(msg.add_time(), common::Time(step * msg.pose_size(), 0));
+  msgs::Set(msg.add_pose(), math::Pose(183, -80.0, 2, 0, 0, GZ_DTOR(0)));
+
+  msgs::Set(msg.add_time(), common::Time(step * msg.pose_size(), 0));
+  msgs::Set(msg.add_pose(), math::Pose(186, -80.0, 2, 0, 0, GZ_DTOR(0)));
+
+  this->poseAnimPub->Publish(msg);
+
+
+  this->viewPoses.clear();
+  this->viewPoses.push_back(this->userCamera->GetWorldPose());
+
+  this->viewPoses.push_back(
+      math::Pose(160.41, -90.14, 6.61, 0, GZ_DTOR(23.80), GZ_DTOR(79.70)));
+
+  this->viewPoses.push_back(
+      math::Pose(157.67, -77.00, 8.56, 0, GZ_DTOR(41.90), GZ_DTOR(-17.70)));
+
+  this->viewPoses.push_back(
+      math::Pose(181.24, -81.87, 5.07, 0, GZ_DTOR(41.70), GZ_DTOR(126.50)));
+
+  this->viewPoses.push_back(
+      math::Pose(180.38, -75.81, 4.02, 0, GZ_DTOR(25.20), GZ_DTOR(139.47)));
+
+  this->userCamera->MoveToPositions(this->viewPoses, 17.0,
+        boost::bind(&Movie::OnCamPioneerComplete, this));
+  this->camera->MoveToPositions(this->viewPoses, 17.0,
+        boost::bind(&Movie::OnCamPioneerComplete, this));
+
 }

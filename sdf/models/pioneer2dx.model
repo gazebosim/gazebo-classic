@@ -1,5 +1,5 @@
 <gazebo version='1.0'>
-  <model name="pioneer2dx">
+  <model name="pioneer2dx" static="1">
   <origin pose="0 0 0 0 0 0"/>
 
     <link name="chassis">
@@ -83,6 +83,26 @@
         </geometry>
         <material script="Gazebo/FlatBlack"/>
       </visual>
+    </link>
+
+    <link name="laser">
+      <origin pose="0.2 0 0.3 0 0 0"/>
+      <visual name="visual">
+        <geometry>
+          <mesh filename="hokuyo/hokuyo.dae"/>
+        </geometry>
+      </visual>
+      <sensor name='base_laser' type='ray' always_on='1' update_rate='60' visualize='true'>
+        <origin pose='0.01 0 0.03 0 -0 0'/>
+        <topic>~/laser_scan</topic>
+        <ray>
+          <scan>
+            <horizontal samples='640' resolution='1' min_angle='-2.2688999999959423' max_angle='2.2688999999959423'/>
+          </scan>
+          <range min='0.080000000000000002' max='10' resolution='0.01'/>
+        </ray>
+        <plugin name='laser' filename='libRayPlugin.so'/>
+      </sensor>
     </link>
   
     <joint type="revolute" name="left_wheel_hinge">

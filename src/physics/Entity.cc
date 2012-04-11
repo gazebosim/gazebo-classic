@@ -175,7 +175,7 @@ void Entity::SetCanonicalLink(bool _value)
 }
 
 //////////////////////////////////////////////////
-void Entity::SetAnimation(const common::PoseAnimationPtr &_anim)
+void Entity::SetAnimation(common::PoseAnimationPtr _anim)
 {
   this->animationStartPose = this->worldPose;
 

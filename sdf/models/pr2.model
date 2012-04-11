@@ -1936,6 +1936,7 @@
         <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0'/>
       </axis>
     </joint>
+    <!--
     <joint name='r_gripper_r_parallel_root_joint' type='revolute'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='r_gripper_r_parallel_link'/>
@@ -2026,5 +2027,6 @@
         <limit lower='0' upper='0' effort='0' velocity='0'/>
       </axis>
     </joint>
+    -->
   </model>
 </gazebo>

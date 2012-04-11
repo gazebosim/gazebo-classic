@@ -16,6 +16,11 @@ add_library(movie_pr2 SHARED pr2.cc)
 target_link_libraries(movie_pr2 ${GAZEBO_libraries})
 install(TARGETS movie_pr2 DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/gazebo-${GAZEBO_VERSION}/plugins)
 
+add_library(movie_pioneer2dx SHARED pioneer2dx.cc)
+target_link_libraries(movie_pioneer2dx ${GAZEBO_libraries})
+install(TARGETS movie_pioneer2dx DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/gazebo-${GAZEBO_VERSION}/plugins)
+
+
 add_library(movie SHARED movie.cc)
 target_link_libraries(movie ${GAZEBO_libraries} ${OGRE_libraries})
 install(TARGETS movie DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/gazebo-${GAZEBO_VERSION}/plugins)
