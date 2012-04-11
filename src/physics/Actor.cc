@@ -21,6 +21,8 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
+#include <msgs/msgs.h>
+
 #include "common/KeyFrame.hh"
 #include "common/Animation.hh"
 #include "common/Plugin.hh"
@@ -58,11 +60,13 @@ Actor::Actor(BasePtr _parent)
 Actor::~Actor()
 {
   this->skelAnimation.clear();
+  this->bonePosePub.reset();
 }
 
 //////////////////////////////////////////////////
 void Actor::Load(sdf::ElementPtr _sdf)
 {
+  std::string name = _sdf->GetValueString("name");
   this->fileName = _sdf->GetValueString("filename");
   this->timeFactor = _sdf->GetValueDouble("time_factor");
 
@@ -114,8 +118,13 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
       /// FIXME hardcoded visual to red sphere with radius 0.02
       if (bone->IsRootNode())
+      {
         this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
                             math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
+        this->AddActorVisual(linkSdf, name + "_visual", math::Pose());
+        this->visualName = name + "::" + bone->GetName()
+                             + "::" + name + "_visual";
+      }
       else
         if (bone->GetChildCount() == 0)
           this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
@@ -144,6 +153,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
     /// we are ready to load the links
     Model::Load(_sdf);
+    this->bonePosePub = this->node->Advertise<msgs::PoseAnimation>(
+                                       "~/skeleton_pose/info", 10);
   }
   else
     std::cerr << "no mesh\n";
@@ -167,6 +178,10 @@ void Actor::Update()
 
   if (timeSinceAnimUpdate < (1.0 / 30.0))
     return;
+
+  msgs::PoseAnimation msg;
+
+  msg.set_model_name(this->visualName);
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
   {
@@ -219,6 +234,17 @@ void Actor::Update()
     LinkPtr currentLink = this->GetChildLink(bone->GetName());
     if (parentBone)
     {
+      if (bone->GetChildCount() > 0)
+      {
+        math::Pose bonePose;
+        bonePose.pos = transform.GetTranslation();
+        bonePose.rot = transform.GetRotation();
+        msgs::Pose *msg_pose = msg.add_pose();
+        msg_pose->set_name(bone->GetName());
+        msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
+        msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
+      }
+
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
       math::Pose parentPose = parentLink->GetWorldPose();
       math::Matrix4 parentTrans(math::Matrix4::IDENTITY);
@@ -228,6 +254,9 @@ void Actor::Update()
     }
     currentLink->SetWorldPose(transform.GetAsPose());
   }
+
+  if (this->bonePosePub && this->bonePosePub->HasConnections())
+    this->bonePosePub->Publish(msg);
 
   this->prevSkelAnim = this->world->GetSimTime();
 }
@@ -313,4 +342,17 @@ void Actor::AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
   matSdf->GetAttribute("script")->Set(material);
   sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
   colorSdf->GetAttribute("rgba")->Set(ambient);
+}
+
+//////////////////////////////////////////////////
+void Actor::AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
+    math::Pose pose)
+{
+  sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
+  visualSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
+  visualPoseSdf->GetAttribute("pose")->Set(pose);
+  sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr meshSdf = geomVisSdf->GetOrCreateElement("mesh");
+  meshSdf->GetAttribute("filename")->Set(this->fileName);
 }

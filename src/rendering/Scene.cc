@@ -87,6 +87,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
+          &Scene::OnSkeletonPoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection",
       &Scene::OnSelectionMsg, this);
   this->requestSub = this->node->Subscribe("~/request",
@@ -143,6 +145,7 @@ Scene::~Scene()
   this->visSub.reset();
   this->lightSub.reset();
   this->poseSub.reset();
+  this->skeletonPoseSub.reset();
   this->selectionSub.reset();
   this->responseSub.reset();
   this->requestSub.reset();
@@ -1172,6 +1175,7 @@ void Scene::PreRender()
   static VisualMsgs_L::iterator vIter;
   static LightMsgs_L::iterator lIter;
   static PoseMsgs_L::iterator pIter;
+  static SkeletonPoseMsgs_L::iterator spIter;
   static JointMsgs_L::iterator jIter;
   static SensorMsgs_L::iterator sensorIter;
   static LinkMsgs_L::iterator linkIter;
@@ -1237,6 +1241,21 @@ void Scene::PreRender()
     }
     else
       ++pIter;
+  }
+
+  // process skeleton pose msgs
+  spIter = this->skeletonPoseMsgs.begin();
+  while (spIter != this->skeletonPoseMsgs.end())
+  {
+    Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
+    if (iter != this->visuals.end())
+    {
+      iter->second->SetSkeletonPose(*(*spIter).get());
+      SkeletonPoseMsgs_L::iterator prev = spIter++;
+      this->skeletonPoseMsgs.erase(prev);
+    }
+    else
+      ++spIter;
   }
 
   // Process the request messages
@@ -1521,6 +1540,27 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
 
   this->poseMsgs.push_back(_msg);
 }
+
+/////////////////////////////////////////////////
+void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  SkeletonPoseMsgs_L::iterator iter;
+
+  // Find an old model message, and remove them
+  for (iter = this->skeletonPoseMsgs.begin();
+        iter != this->skeletonPoseMsgs.end(); ++iter)
+  {
+    if ((*iter)->model_name() == _msg->model_name())
+    {
+      this->skeletonPoseMsgs.erase(iter);
+      break;
+    }
+  }
+
+  this->skeletonPoseMsgs.push_back(_msg);
+}
+
 
 /////////////////////////////////////////////////
 void Scene::OnLightMsg(ConstLightPtr &_msg)

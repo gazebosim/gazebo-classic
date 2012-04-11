@@ -290,6 +290,8 @@ namespace gazebo
 
       private: void OnPoseMsg(ConstPosePtr &_msg);
 
+      private: void OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg);
+
       public: void Clear();
 
       // private: void ClearImpl();
@@ -339,6 +341,10 @@ namespace gazebo
       typedef std::map<std::string, LightPtr> Light_M;
       private: Light_M lights;
 
+      typedef std::list<boost::shared_ptr<msgs::PoseAnimation const> >
+                                                          SkeletonPoseMsgs_L;
+      private: SkeletonPoseMsgs_L skeletonPoseMsgs;
+
       private: boost::shared_ptr<msgs::Selection const> selectionMsg;
 
       private: boost::mutex *receiveMutex;
@@ -352,6 +358,7 @@ namespace gazebo
       private: transport::SubscriberPtr selectionSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
+      private: transport::SubscriberPtr skeletonPoseSub;
       private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;

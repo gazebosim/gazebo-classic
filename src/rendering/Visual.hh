@@ -48,6 +48,7 @@ namespace Ogre
   class RibbonTrail;
   class AxisAlignedBox;
   class AnimationState;
+  class SkeletonInstance;
 }
 
 namespace gazebo
@@ -275,6 +276,8 @@ namespace gazebo
       public: void ShowJoints(bool _show);
       public: void ShowCOM(bool _show);
 
+      public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
+
       private: void GetBoundsHelper(Ogre::SceneNode *node,
                                     math::Box &box) const;
 
@@ -303,6 +306,8 @@ namespace gazebo
       private: static SelectionObj *selectionObj;
 
       private: Ogre::RibbonTrail *ribbonTrail;
+
+      private: Ogre::SkeletonInstance *skeleton;
 
       private: event::ConnectionPtr preRenderConnection;
 

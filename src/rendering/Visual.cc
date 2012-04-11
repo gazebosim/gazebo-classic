@@ -35,6 +35,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Mesh.hh"
+#include "common/Skeleton.hh"
 #include "rendering/Material.hh"
 #include "rendering/Visual.hh"
 
@@ -89,6 +90,7 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
+  this->skeleton = NULL;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -361,6 +363,9 @@ void Visual::Load()
   Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
   if (ent)
   {
+    if (ent->hasSkeleton())
+      this->skeleton = ent->getSkeleton();
+
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
           this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
@@ -1448,6 +1453,37 @@ void Visual::InsertMesh(const common::Mesh *mesh)
     ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+    Ogre::SkeletonPtr ogreSkeleton;
+
+    if (mesh->HasSkeleton())
+    {
+      common::Skeleton *skel = mesh->GetSkeleton();
+      ogreSkeleton = Ogre::SkeletonManager::getSingleton().create(
+        mesh->GetName() + "_skeleton",
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        true);
+
+      for (unsigned int i = 0; i < skel->GetNumNodes(); i++)
+      {
+        common::SkeletonNode *node = skel->GetNodeByHandle(i);
+        if (node->GetChildCount() == 0)
+          continue;
+        Ogre::Bone *bone = ogreSkeleton->createBone(node->GetName());
+
+        if (node->GetParent())
+          ogreSkeleton->getBone(node->GetParent()->GetName())->addChild(bone);
+
+        math::Matrix4 trans = node->GetTransform();
+        math::Vector3 pos = trans.GetTranslation();
+        math::Quaternion q = trans.GetRotation();
+        bone->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
+        bone->setOrientation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
+        bone->setInheritOrientation(true);
+        bone->setManuallyControlled(true);
+        bone->setInitialState();
+      }
+      ogreMesh->setSkeletonName(mesh->GetName() + "_skeleton");
+    }
     for (unsigned int i = 0; i < mesh->GetSubMeshCount(); i++)
     {
       Ogre::SubMesh *ogreSubMesh;
@@ -1525,6 +1561,21 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       vertices = static_cast<float*>(vBuf->lock(
                       Ogre::HardwareBuffer::HBL_DISCARD));
 
+      if (mesh->HasSkeleton())
+      {
+        common::Skeleton *skel = mesh->GetSkeleton();
+        for (unsigned int j = 0; j < subMesh->GetNodeAssignmentsCount(); j++)
+        {
+          common::NodeAssignment na = subMesh->GetNodeAssignment(j);
+          Ogre::VertexBoneAssignment vba;
+          vba.vertexIndex = na.vertexIndex;
+          vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
+                              na.nodeIndex)->GetName())->getHandle();
+          vba.weight = na.weight;
+          ogreSubMesh->addBoneAssignment(vba);
+        }
+      }
+
       // allocate index buffer
       ogreSubMesh->indexData->indexCount = subMesh->GetIndexCount();
 
@@ -1581,6 +1632,12 @@ void Visual::InsertMesh(const common::Mesh *mesh)
 
     math::Vector3 max = mesh->GetMax();
     math::Vector3 min = mesh->GetMin();
+
+    if (mesh->HasSkeleton())
+    {
+      min = math::Vector3(-10, -10, -10);
+      max = math::Vector3(10, 10, 10);
+    }
 
     if (!max.IsFinite())
       gzthrow("Max bounding box is not finite[" << max << "]\n");
@@ -1914,5 +1971,33 @@ void Visual::ShowCOM(bool _show)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->ShowCOM(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
+{
+  if (!this->skeleton)
+  {
+    gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
+    return;
+  }
+
+  for (int i = 0; i < _pose.pose_size(); i++)
+  {
+    const msgs::Pose& bonePose = _pose.pose(i);
+    Ogre::Bone *bone = this->skeleton->getBone(bonePose.name());
+    if (!bone)
+    {
+      gzerr << "Bone " << bonePose.name() << " not found.\n";
+      return;
+    }
+
+    const msgs::Vector3d& pos = bonePose.position();
+    const msgs::Quaternion& rot = bonePose.orientation();
+
+    bone->setManuallyControlled(true);
+    bone->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+    bone->setOrientation(Ogre::Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
   }
 }

@@ -82,6 +82,9 @@ namespace gazebo
                       math::Pose pose, math::Vector3 size, std::string material,
                       common::Color ambient);
 
+      private: void AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
+                      math::Pose pose);
+
       protected: const common::Mesh *mesh;
 
       protected: common::Skeleton *skeleton;
@@ -94,7 +97,9 @@ namespace gazebo
 
       protected: common::SkeletonAnimation skelAnimation;
 
-      protected: math::Quaternion lastQuat;
+      protected: std::string visualName;
+
+      protected: transport::PublisherPtr bonePosePub;
     };
     /// \}
   }
