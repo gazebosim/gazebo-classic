@@ -29,6 +29,7 @@
 #include "physics/World.hh"
 #include "physics/Model.hh"
 #include "physics/ode/ODECollision.hh"
+#include "physics/SurfaceParams.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODELink.hh"
 
@@ -109,6 +110,10 @@ void ODELink::Init()
           dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
               localPose.pos.y, localPose.pos.z);
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
+
+          // Set max_vel and min_depth
+          dBodySetMaxVel(this->linkId, g->surface->maxVel);
+          dBodySetMinDepth(this->linkId, g->surface->minDepth);
         }
       }
     }

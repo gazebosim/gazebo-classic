@@ -28,20 +28,6 @@ using namespace physics;
 //////////////////////////////////////////////////
 ODESurfaceParams::ODESurfaceParams()
 {
-  this->kp = 1000000.0;
-  this->kd = 10000.0;
-
-  this->bounce = 0.0;
-  this->bounceThreshold = 10.0;
-
-  this->softCFM = 0.0;
-  this->softERP = 0.2;
-
-  this->mu1 = 0.0;
-  this->mu2 = 0.0;
-  this->slip1 = 0.0;
-  this->slip2 = 0.0;
-  this->fdir1 = math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////

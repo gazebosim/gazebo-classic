@@ -1666,10 +1666,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
       // complete rhs
       for (int i=0; i<m; i++) {
         rhs_erp[i] =      c[i]*stepsize1 - rhs[i];
-        //if (dFabs(c[i]) > c_v_max[i])
-        //  rhs[i]   =  c_v_max[i]*stepsize1 - rhs[i];
-        if (dFabs(c[i]) > world->contactp.max_vel)
-          rhs[i]   =  world->contactp.max_vel*stepsize1 - rhs[i];
+        if (dFabs(c[i]) > c_v_max[i])
+          rhs[i]   =  c_v_max[i]*stepsize1 - rhs[i];
+        //if (dFabs(c[i]) > world->contactp.max_vel)
+        //  rhs[i]   =  world->contactp.max_vel*stepsize1 - rhs[i];
         else
           rhs[i]   = c[i]*stepsize1 - rhs[i];
       }

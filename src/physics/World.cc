@@ -1043,9 +1043,14 @@ void World::ProcessFactoryMsgs()
     }
     else
     {
+      //gzerr << "sdf: " << factorySDF->ToString() << "\n\n";
       sdf::ElementPtr elem = factorySDF->root->GetElement("model");
       if (!elem && factorySDF->root->GetElement("world"))
         elem = factorySDF->root->GetElement("world")->GetElement("model");
+      if (!elem && factorySDF->root->GetElement("gazebo"))
+        elem = factorySDF->root->GetElement("gazebo")->GetElement("model");
+      if (!elem && factorySDF->root->GetElement("gazebo")->GetElement("world"))
+        elem = factorySDF->root->GetElement("gazebo")->GetElement("world")->GetElement("model");
 
       if (!elem)
       {

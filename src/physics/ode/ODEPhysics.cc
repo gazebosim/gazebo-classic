@@ -849,8 +849,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   double h = this->stepTimeDouble;
 
-  contact.surface.mode =  // dContactFDir1 |
-                         dContactBounce |
+  contact.surface.mode = dContactBounce |
                          dContactMu2 |
                          dContactSoftERP |
                          dContactSoftCFM |
@@ -863,19 +862,25 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   double kp = 1.0 /
     (1.0 / _collision1->surface->kp + 1.0 / _collision2->surface->kp);
   double kd = _collision1->surface->kd + _collision2->surface->kd;
+
   contact.surface.soft_erp = h * kp / (h * kp + kd);
   contact.surface.soft_cfm = 1.0 / (h * kp + kd);
+
   // contact.surface.soft_erp = 0.5*(_collision1->surface->softERP +
   //                                _collision2->surface->softERP);
   // contact.surface.soft_cfm = 0.5*(_collision1->surface->softCFM +
   //                                _collision2->surface->softCFM);
 
-  // contact.fdir1[0] = 0.5*
-  // (_collision1->surface->fdir1.x+_collision2->surface->fdir1.x);
-  // contact.fdir1[1] = 0.5*
-  // (_collision1->surface->fdir1.y+_collision2->surface->fdir1.y);
-  // contact.fdir1[2] = 0.5*
-  // (_collision1->surface->fdir1.z+_collision2->surface->fdir1.z);
+  
+  // assign fdir1 if not set as 0
+  math::Vector3 fd = (_collision1->surface->fdir1 +_collision2->surface->fdir1)*0.5;
+  if (fd != math::Vector3(0,0,0))
+  {
+    contact.surface.mode = dContactFDir1 | contact.surface.mode;
+    contact.fdir1[0] = fd.x;
+    contact.fdir1[1] = fd.y;
+    contact.fdir1[2] = fd.z;
+  }
 
   contact.surface.mu = std::min(_collision1->surface->mu1,
                                 _collision2->surface->mu1);
@@ -891,6 +896,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                     _collision2->surface->bounce);
   contact.surface.bounce_vel = std::min(_collision1->surface->bounceThreshold,
                                         _collision2->surface->bounceThreshold);
+
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
