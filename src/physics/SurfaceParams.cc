@@ -45,12 +45,10 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
     this->bounceThreshold = bounceElem->GetValueDouble("threshold");
   }
 
-  if (_sdf->HasElement("friction"))
   {
-    sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
-    if (frictionElem->HasElement("ode"))
+    sdf::ElementPtr frictionElem = _sdf->GetOrCreateElement("friction");
     {
-      sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
+      sdf::ElementPtr frictionOdeElem = frictionElem->GetOrCreateElement("ode");
       this->mu1 = frictionOdeElem->GetValueDouble("mu");
       this->mu2 = frictionOdeElem->GetValueDouble("mu2");
       this->slip1 = frictionOdeElem->GetValueDouble("slip1");
@@ -59,12 +57,10 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (_sdf->HasElement("contact"))
   {
-    sdf::ElementPtr contactElem = _sdf->GetElement("contact");
-    if (contactElem->HasElement("ode"))
+    sdf::ElementPtr contactElem = _sdf->GetOrCreateElement("contact");
     {
-      sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
+      sdf::ElementPtr contactOdeElem = contactElem->GetOrCreateElement("ode");
       this->kp = contactOdeElem->GetValueDouble("kp");
       this->kd = contactOdeElem->GetValueDouble("kd");
       this->cfm = contactOdeElem->GetValueDouble("soft_cfm");

@@ -38,33 +38,7 @@ ODESurfaceParams::~ODESurfaceParams()
 //////////////////////////////////////////////////
 void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 {
-  if (_sdf->HasElement("friction"))
-  {
-    sdf::ElementPtr friction = _sdf->GetElement("friction")->GetElement("ode");
-    this->mu1 = friction->GetValueDouble("mu");
-    this->mu2 = friction->GetValueDouble("mu2");
-    this->slip1 = friction->GetValueDouble("slip1");
-    this->slip2 = friction->GetValueDouble("slip2");
-    this->fdir1 = friction->GetValueVector3("fdir1");
-  }
-
-  if (_sdf->HasElement("bounce"))
-  {
-    sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-    this->bounce = bounceElem->GetValueDouble("restitution_coefficient");
-    this->bounceThreshold = bounceElem->GetValueDouble("threshold");
-  }
-
-  if (_sdf->HasElement("contact"))
-  {
-    sdf::ElementPtr contact = _sdf->GetElement("contact")->GetElement("ode");
-    this->softCFM = contact->GetValueDouble("soft_cfm");
-    this->softERP = contact->GetValueDouble("soft_erp");
-    this->kp = contact->GetValueDouble("kp");
-    this->kd = contact->GetValueDouble("kd");
-    this->maxVel = contact->GetValueDouble("max_vel");
-    this->minDepth = contact->GetValueDouble("min_depth");
-  }
+  SurfaceParams::Load(_sdf);
 }
 
 
