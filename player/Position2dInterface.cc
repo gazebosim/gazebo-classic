@@ -238,7 +238,7 @@ void Position2dInterface::OnPoseMsg(ConstPosePtr &_msg)
     return;
 
   player_position2d_data_t data;
-  struct timeval ts;
+  // struct timeval ts;
 
   memset(&data, 0, sizeof(data));
 

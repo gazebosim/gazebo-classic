@@ -49,8 +49,8 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
 }
 
 /////////////////////////////////////////////////
-void GpuRayPlugin::OnNewLaserFrame(const float *_image,
-    unsigned int _width, unsigned int _height,
+void GpuRayPlugin::OnNewLaserFrame(const float * /*_image*/,
+    unsigned int /*_width*/, unsigned int /*_height*/,
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
 }

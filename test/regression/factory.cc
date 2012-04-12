@@ -34,6 +34,7 @@ TEST_F(FactoryTest, Box)
 {
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
+  SetPause(true);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -53,6 +54,7 @@ TEST_F(FactoryTest, Sphere)
 {
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
+  SetPause(true);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -72,6 +74,7 @@ TEST_F(FactoryTest, Cylinder)
 {
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
+  SetPause(true);
 
   for (unsigned int i = 0; i < 100; i++)
   {

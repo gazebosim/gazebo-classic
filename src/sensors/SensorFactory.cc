@@ -29,6 +29,8 @@ void RegisterDepthCameraSensor();
 void RegisterGpuRaySensor();
 void RegisterRaySensor();
 void RegisterContactSensor();
+void RegisterRFIDSensor();
+void RegisterRFIDTag();
 
 using namespace gazebo;
 using namespace sensors;
@@ -43,6 +45,8 @@ void SensorFactory::RegisterAll()
   RegisterGpuRaySensor();
   RegisterRaySensor();
   RegisterContactSensor();
+  RegisterRFIDSensor();
+  RegisterRFIDTag();
 }
 
 /////////////////////////////////////////////////

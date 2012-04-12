@@ -30,14 +30,18 @@ namespace gazebo
 
     private: void TuckArms();
     private: void OnJointAnimation(ConstJointAnimationPtr &_anim);
+    private: void OnPoseAnimation(ConstPoseAnimationPtr &_anim);
 
     private: std::map<std::string, double> initJointAngles;
+    private: std::vector<math::Pose> boxPoses;
 
     private: transport::NodePtr node;
-    private: transport::SubscriberPtr jointAnimSub;
+    private: transport::SubscriberPtr jointAnimSub, poseAnimSub;
 
     private: physics::WorldPtr world;
-    private: physics::ModelPtr pr2;
+    private: physics::ModelPtr pr2, box;
     private: event::Connection_V connections;
+
+    private: std::map<std::string, common::NumericAnimationPtr> myAnim;
   };
 }

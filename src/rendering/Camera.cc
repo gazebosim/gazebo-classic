@@ -1328,10 +1328,10 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   double tt = 0;
 
   double prevYaw = this->GetWorldRotation().GetAsEuler().z;
-  for (unsigned int i = 0; i < _pts.size(); i++)
+  for (unsigned int j = 0; j < _pts.size(); j++)
   {
-    math::Vector3 pos = _pts[i].pos;
-    math::Vector3 rpy = _pts[i].rot.GetAsEuler();
+    math::Vector3 pos = _pts[j].pos;
+    math::Vector3 rpy = _pts[j].rot.GetAsEuler();
     double dyaw = prevYaw - rpy.z;
 
     if (dyaw > M_PI)

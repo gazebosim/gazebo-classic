@@ -92,7 +92,7 @@
           <mesh filename="hokuyo/hokuyo.dae"/>
         </geometry>
       </visual>
-      <sensor name='base_laser' type='ray' always_on='1' update_rate='60' visualize='true'>
+      <sensor name='base_laser' type='ray' always_on='1' update_rate='30' visualize='true'>
         <origin pose='0.01 0 0.03 0 -0 0'/>
         <topic>~/laser_scan</topic>
         <ray>
@@ -104,7 +104,7 @@
         <plugin name='laser' filename='libRayPlugin.so'/>
       </sensor>
     </link>
-  
+
     <joint type="revolute" name="left_wheel_hinge">
       <origin pose="0 0 -0.04 0 0 0"/>
       <child link="left_wheel"/>

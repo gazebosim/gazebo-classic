@@ -485,7 +485,7 @@ static inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 static void ComputeRows(
                 int /*thread_id*/,
                 IndexError* order,
-                dxBody* const * body,
+                dxBody* const * /*body*/,
                 dxSORLCPParameters params,
                 boost::recursive_mutex* /*mutex*/)
 {
@@ -505,8 +505,11 @@ static void ComputeRows(
 #ifdef USE_1NORM
   int m                        = params.m; // m used for rms error computation
 #endif
-  int nb                       = params.nb;
+  // int nb                       = params.nb;
+#ifdef PENETRATION_JVERROR_CORRECTION
   dReal stepsize               = params.stepsize;
+  dRealMutablePtr vnew         = params.vnew;
+#endif
   int* jb                      = params.jb;
   const int* findex            = params.findex;
   dRealPtr        hi           = params.hi;
@@ -528,7 +531,6 @@ static void ComputeRows(
   dRealMutablePtr J_precon     = params.J_precon;
   dRealMutablePtr J_orig       = params.J_orig;
   dRealMutablePtr cforce       = params.cforce;
-  dRealMutablePtr vnew         = params.vnew;
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params.last_lambda;
   dRealMutablePtr last_lambda_erp  = params.last_lambda_erp;
@@ -589,7 +591,10 @@ static void ComputeRows(
   // FIME: preconditioning can be defined insdie iterations loop now, becareful to match last iteration with
   //       velocity update
   bool preconditioning;
+
+#ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
+#endif
   for (int iteration=0; iteration < num_iterations + precon_iterations; iteration++) {
 
     rms_error = 0;
@@ -672,12 +677,15 @@ static void ComputeRows(
     dRealMutablePtr caccel_ptr2;
     dRealMutablePtr caccel_erp_ptr1;
     dRealMutablePtr caccel_erp_ptr2;
+
+#ifdef PENETRATION_JVERROR_CORRECTION
     dRealMutablePtr vnew_ptr1;
     dRealMutablePtr vnew_ptr2;
-    dRealMutablePtr cforce_ptr1;
-    dRealMutablePtr cforce_ptr2;
     const dReal stepsize1 = dRecip(stepsize);
     dReal Jvnew = 0;
+#endif
+    dRealMutablePtr cforce_ptr1;
+    dRealMutablePtr cforce_ptr2;
     for (int i=startRow; i<startRow+nRows; i++) {
       //boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
 
@@ -698,8 +706,10 @@ static void ComputeRows(
         caccel_ptr2 = (b2 >= 0) ? caccel + 6*b2 : NULL;
         caccel_erp_ptr1 = caccel_erp + 6*b1;
         caccel_erp_ptr2 = (b2 >= 0) ? caccel_erp + 6*b2 : NULL;
+#ifdef PENETRATION_JVERROR_CORRECTION
         vnew_ptr1 = vnew + 6*b1;
         vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
+#endif
         cforce_ptr1 = cforce + 6*b1;
         cforce_ptr2 = (b2 >= 0) ? cforce + 6*b2 : NULL;
       }
@@ -1470,7 +1480,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *J_orig = NULL;
   int *jb = NULL;
 
-  dReal *vnew;
+  dReal *vnew = NULL;
 #ifdef PENETRATION_JVERROR_CORRECTION
   // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
   vnew = context->AllocateArray<dReal> (nb*6);

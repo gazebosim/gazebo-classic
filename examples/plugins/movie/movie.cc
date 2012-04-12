@@ -36,6 +36,9 @@ GZ_REGISTER_SYSTEM_PLUGIN(Movie)
 /////////////////////////////////////////////////
 Movie::Movie()
 {
+  this->debug = false;
+  this->joined = false;
+  this->stop = false;
 }
 
 /////////////////////////////////////////////////
@@ -60,113 +63,35 @@ void Movie::Load()
         boost::bind(&Movie::PreRender, this) ) );
 
   this->scene = rendering::get_scene("default");
-
-  /*
-  this->spot1Pattern.push_back(
-      std::make_pair(common::Time(1,0), common::Color(.2, .2, .2)));
-  this->spot1Pattern.push_back(
-      std::make_pair(common::Time(1,100000000), common::Color(0, 0, 0)));
-  this->spot1Pattern.push_back(
-      std::make_pair(common::Time(1,400000000), common::Color(.2, .2, .2)));
-  this->spot1Pattern.push_back(
-      std::make_pair(common::Time(1,800000000), common::Color(0, 0, 0)));
-  this->spot1Pattern.push_back(
-      std::make_pair(common::Time(2,200000000), common::Color(.5, .5, .5)));
-  this->spot1Pattern.push_back(
-      std::make_pair(common::Time(2,500000000), common::Color(0, 0, 0)));
-  this->spot1Pattern.push_back(
-      std::make_pair(common::Time(3,0), common::Color(.8, .8, .8)));
-
-  this->spot2Pattern.push_back(
-      std::make_pair(common::Time(0,800000000), common::Color(.2, .2, .2)));
-  this->spot2Pattern.push_back(
-      std::make_pair(common::Time(0,900000000), common::Color(0, 0, 0)));
-  this->spot2Pattern.push_back(
-      std::make_pair(common::Time(1,200000000), common::Color(.2, .2, .2)));
-  this->spot2Pattern.push_back(
-      std::make_pair(common::Time(1,800000000), common::Color(0, 0, 0)));
-  this->spot2Pattern.push_back(
-      std::make_pair(common::Time(1,900000000), common::Color(.5, .5, .5)));
-  this->spot2Pattern.push_back(
-      std::make_pair(common::Time(2,200000000), common::Color(0, 0, 0)));
-  this->spot2Pattern.push_back(
-      std::make_pair(common::Time(2,500000000), common::Color(.8, .8, .8)));
-
-  this->spot3Pattern.push_back(
-      std::make_pair(common::Time(0,900000000), common::Color(.2, .2, .2)));
-  this->spot3Pattern.push_back(
-      std::make_pair(common::Time(1,200000000), common::Color(0, 0, 0)));
-  this->spot3Pattern.push_back(
-      std::make_pair(common::Time(1,600000000), common::Color(.2, .2, .2)));
-  this->spot3Pattern.push_back(
-      std::make_pair(common::Time(1,900000000), common::Color(0, 0, 0)));
-  this->spot3Pattern.push_back(
-      std::make_pair(common::Time(2,0), common::Color(.5, .5, .5)));
-  this->spot3Pattern.push_back(
-      std::make_pair(common::Time(2,100000000), common::Color(0, 0, 0)));
-  this->spot3Pattern.push_back(
-      std::make_pair(common::Time(2,300000000), common::Color(.8, .8, .8)));
-
-  this->spot4Pattern.push_back(
-      std::make_pair(common::Time(0,200000000), common::Color(.2, .2, .2)));
-  this->spot4Pattern.push_back(
-      std::make_pair(common::Time(0,500000000), common::Color(0, 0, 0)));
-  this->spot4Pattern.push_back(
-      std::make_pair(common::Time(0,800000000), common::Color(.2, .2, .2)));
-  this->spot4Pattern.push_back(
-      std::make_pair(common::Time(1,100000000), common::Color(0, 0, 0)));
-  this->spot4Pattern.push_back(
-      std::make_pair(common::Time(1,5), common::Color(.5, .5, .5)));
-  this->spot4Pattern.push_back(
-      std::make_pair(common::Time(1,600000000), common::Color(0, 0, 0)));
-  this->spot4Pattern.push_back(
-      std::make_pair(common::Time(2,100000000), common::Color(.8, .8, .8)));
-  
-  this->spot5Pattern.push_back(
-      std::make_pair(common::Time(0,400000000), common::Color(.2, .2, .2)));
-  this->spot5Pattern.push_back(
-      std::make_pair(common::Time(0,600000000), common::Color(0, 0, 0)));
-  this->spot5Pattern.push_back(
-      std::make_pair(common::Time(0,900000000), common::Color(.2, .2, .2)));
-  this->spot5Pattern.push_back(
-      std::make_pair(common::Time(1,0), common::Color(0, 0, 0)));
-  this->spot5Pattern.push_back(
-      std::make_pair(common::Time(1,1), common::Color(.5, .5, .5)));
-  this->spot5Pattern.push_back(
-      std::make_pair(common::Time(1,400000000), common::Color(0, 0, 0)));
-  this->spot5Pattern.push_back(
-      std::make_pair(common::Time(1,900000000), common::Color(.8, .8, .8)));
-
-  this->viewPoses.push_back(math::Pose(-3.49, 5.48, 7.02,
-        0, GZ_DTOR(47.64), GZ_DTOR(-38.62)));
-  this->viewPoses.push_back(math::Pose(-5, 0, 1,
-        0, GZ_DTOR(11.31), 0));
-  */
-
 }
 
 
 /////////////////////////////////////////////////
 void Movie::Init()
 {
-  /*
-  this->camera = this->scene->CreateCamera("recorder");
-  this->camera->Load();
-  this->camera->Init();
-  this->camera->SetClipDist(1, 100);
-  this->camera->SetHFOV(1.047);
-  this->camera->SetImageSize(1920, 1080);
-  this->camera->CreateRenderTexture("RTT");
-  this->camera->EnableSaveFrame(true);
-  this->camera->SetSaveFramePathname("/tmp/drc/");
-
-  this->camera->SetWorldPose(math::Pose(-180, -202, 20, 0, 0, 1.75));
-  */
-
   this->userCamera = gui::get_active_camera();
-  //this->userCamera->SetWorldPose(math::Pose(-180, -202, 20, 0, 0, 1.75));
-  this->userCamera->SetWorldPose(
-      math::Pose(161.93, -99.14, 3.58, 0, GZ_DTOR(1.94), GZ_DTOR(95.12)));
+
+  if (this->debug)
+  { 
+    this->userCamera->SetWorldPose(
+        math::Pose(161.93, -99.14, 3.58, 0, GZ_DTOR(1.94), GZ_DTOR(95.12)));
+  }
+  else
+  {
+    this->camera = this->scene->CreateCamera("recorder");
+    this->camera->Load();
+    this->camera->Init();
+    this->camera->SetClipDist(1, 100);
+    this->camera->SetHFOV(1.047);
+    this->camera->SetImageSize(1920, 1080);
+    this->camera->CreateRenderTexture("RTT");
+    this->camera->EnableSaveFrame(true);
+    this->camera->SetSaveFramePathname("/tmp/drc/");
+
+    this->camera->SetWorldPose(math::Pose(-180, -202, 20, 0, 0, 1.75));
+
+    this->userCamera->SetWorldPose(math::Pose(-180, -202, 20, 0, 0, 1.75));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -181,6 +106,12 @@ void Movie::OnCamComplete()
 
 void Movie::OnCamPioneerComplete()
 {
+
+  /*msgs::PoseAnimation msg;
+  msg.set_model_name("box1");
+  this->poseAnimPub->Publish(msg);
+  */
+
   /*this->viewPoses.clear();
   this->viewPoses.push_back(this->userCamera->GetWorldPose());
 
@@ -195,122 +126,106 @@ void Movie::OnCamPioneerComplete()
 /////////////////////////////////////////////////
 void Movie::PreRender()
 {
-
   if (this->startTime == common::Time(0,0) && this->scene->GetHeightmap())
   {
-    /*std::vector<math::Pose> quadPoses;
-
-    rendering::Heightmap *map = this->scene->GetHeightmap();
-
-    double imageX[37] = {76, 72, 67, 63, 62, 69, 76, 82, 91, 100, 108, 118, 127, 134,146, 158, 172, 186, 198, 206, 209, 212, 221, 234, 245, 259, 275, 295, 318, 322, 323, 323, 329, 346, 364, 391, 412};
-    double imageY[37] = {458, 436, 411, 374, 353, 340, 328, 318, 313, 312, 319, 331, 338, 343, 345, 348, 349, 347, 341, 331, 320, 311, 304, 291, 286, 282, 279, 281, 289, 298, 319, 334, 343, 351, 354, 353, 349};
-
-    for (unsigned int i=0; i < 36; i++)
+    if (!this->debug)
     {
-      double wx = imageX[i] - 256;
-      double wy = 256-imageY[i];
+      std::vector<math::Pose> quadPoses;
 
-      double wx1 = imageX[i+1] - 256;
-      double wy1 = 256-imageY[i+1];
+      rendering::Heightmap *map = this->scene->GetHeightmap();
 
-      double theta = atan2(wy1 - wy, wx1 - wx);
-      double z = map->GetHeight(wx, wy);
+      double imageX[37] = {76, 72, 67, 63, 62, 69, 76, 82, 91, 100, 108, 118, 127, 134,146, 158, 172, 186, 198, 206, 209, 212, 221, 234, 245, 259, 275, 295, 318, 322, 323, 323, 329, 346, 364, 391, 412};
+      double imageY[37] = {458, 436, 411, 374, 353, 340, 328, 318, 313, 312, 319, 331, 338, 343, 345, 348, 349, 347, 341, 331, 320, 311, 304, 291, 286, 282, 279, 281, 289, 298, 319, 334, 343, 351, 354, 353, 349};
+
+      for (unsigned int i=0; i < 36; i++)
+      {
+        double wx = imageX[i] - 256;
+        double wy = 256-imageY[i];
+
+        double wx1 = imageX[i+1] - 256;
+        double wy1 = 256-imageY[i+1];
+
+        double theta = atan2(wy1 - wy, wx1 - wx);
+        double z = map->GetHeight(wx, wy);
 
 
-      if (z < 20)
-        this->viewPoses.push_back(
-            math::Pose(wx, wy, 25, 0, GZ_DTOR(10), theta));
-      else if (z < 30)
-        this->viewPoses.push_back(
-            math::Pose(wx, wy, 35, 0, GZ_DTOR(10), theta));
-      else
-        this->viewPoses.push_back(
-            math::Pose(wx, wy, z+4, 0, GZ_DTOR(10), theta));
+        if (z < 20)
+          this->viewPoses.push_back(
+              math::Pose(wx, wy, 25, 0, GZ_DTOR(10), theta));
+        else if (z < 30)
+          this->viewPoses.push_back(
+              math::Pose(wx, wy, 35, 0, GZ_DTOR(10), theta));
+        else
+          this->viewPoses.push_back(
+              math::Pose(wx, wy, z+4, 0, GZ_DTOR(10), theta));
 
         quadPoses.push_back(
             math::Pose(wx+.5, wy+.5, z+4, 0, 0, theta));
 
+      }
+
+      this->viewPoses.push_back(
+          math::Pose(161.93, -102.14, 3.58, 0, GZ_DTOR(3), GZ_DTOR(95.12)));
+
+      quadPoses.push_back(
+          math::Pose(159.89, -94.83, 10.18, 0, 0, GZ_DTOR(90)));
+
+      rendering::VisualPtr quadRotor = this->scene->GetVisual("quadrotor");
+      quadRotor->MoveToPositions(quadPoses, 35.0,
+          boost::bind(&Movie::OnRotorComplete, this));
     }
-
-    this->viewPoses.push_back(
-        math::Pose(161.93, -99.14, 3.58, 0, GZ_DTOR(3), GZ_DTOR(95.12)));
-
-    quadPoses.push_back(
-        math::Pose(159.89, -94.83, 10.18, 0, 0, GZ_DTOR(90)));
-
-    rendering::VisualPtr quadRotor = this->scene->GetVisual("quadrotor");
-    quadRotor->MoveToPositions(quadPoses, 30.0,
-        boost::bind(&Movie::OnRotorComplete, this));
-        */
 
     this->startTime = common::Time::GetWallTime();
   }
 
-  /*
-  if (common::Time::GetWallTime() - this->startTime > 1.0 &&
-      this->viewPoses.size() > 0)
+  if (!this->debug)
   {
-    this->userCamera->MoveToPositions(this->viewPoses, 30.0,
-        boost::bind(&Movie::OnCamComplete, this));
-    this->camera->MoveToPositions(this->viewPoses, 30.0);
+    if (common::Time::GetWallTime() - this->startTime > 0.8 &&
+        this->viewPoses.size() > 0)
+    {
+      this->userCamera->MoveToPositions(this->viewPoses, 35.0,
+          boost::bind(&Movie::OnCamComplete, this));
+      this->camera->MoveToPositions(this->viewPoses, 35.0);
 
 
-    this->viewPoses.clear();
-  }*/
+      this->viewPoses.clear();
+    }
+  }
+
+  //this->scene->PrintSceneGraph();
+  //usleep(1000000);
+  rendering::VisualPtr fingerVis = this->scene->GetVisual("pr2::r_gripper_r_finger_link");
+  rendering::VisualPtr boxVis = this->scene->GetVisual("box1");
+
+  if (fingerVis && boxVis && !this->stop)
+  {
+    if (!this->joined)
+    {
+      if (fingerVis->GetWorldPose().pos.Distance(
+            boxVis->GetWorldPose().pos) < 0.1)
+      {
+        this->joined = true;
+        this->posOffset = boxVis->GetWorldPose().pos -
+                          fingerVis->GetWorldPose().pos;
+        this->posOffset.x -= 0.025;
+        std::cout << "PoseOffset[" << this->posOffset << "]\n";
+      }
+    }
+    else
+    {
+      std::cout << "Set[" <<
+        fingerVis->GetWorldPose().CoordPositionAdd(this->posOffset) << "]\n";
+      boxVis->SetPosition(fingerVis->GetWorldPose().CoordPositionAdd(
+            this->posOffset));
+      boxVis->SetRotation(fingerVis->GetWorldPose().rot);
+      if (fingerVis->GetWorldPose().CoordPositionAdd(this->posOffset).z <= 2.26)
+      {
+        this->stop = true;
+      }
+    }
+  }
 
   common::Time currTime = common::Time::GetWallTime();
-
-  /*rendering::LightPtr spot1 = this->scene->GetLight("spot1");
-  rendering::LightPtr spot2 = this->scene->GetLight("spot2");
-  rendering::LightPtr spot3 = this->scene->GetLight("spot3");
-  rendering::LightPtr spot4 = this->scene->GetLight("spot4");
-  rendering::LightPtr spot5 = this->scene->GetLight("spot5");
-
-  if (spot1 && this->spot1Pattern.size() > 0)
-  {
-    if (currTime - this->startTime > this->spot1Pattern.front().first)
-    {
-      spot1->SetDiffuseColor(this->spot1Pattern.front().second);
-      this->spot1Pattern.pop_front();
-    }
-  }
-
-  if (spot2 && this->spot2Pattern.size() > 0)
-  {
-    if (currTime - this->startTime > this->spot2Pattern.front().first)
-    {
-      spot2->SetDiffuseColor(this->spot2Pattern.front().second);
-      this->spot2Pattern.pop_front();
-    }
-  }
-
-  if (spot3 && this->spot3Pattern.size() > 0)
-  {
-    if (currTime - this->startTime > this->spot3Pattern.front().first)
-    {
-      spot3->SetDiffuseColor(this->spot3Pattern.front().second);
-      this->spot3Pattern.pop_front();
-    }
-  }
-
-  if (spot4 && this->spot4Pattern.size() > 0)
-  {
-    if (currTime - this->startTime > this->spot4Pattern.front().first)
-    {
-      spot4->SetDiffuseColor(this->spot4Pattern.front().second);
-      this->spot4Pattern.pop_front();
-    }
-  }
-
-  if (spot5 && this->spot5Pattern.size() > 0)
-  {
-    if (currTime - this->startTime > this->spot5Pattern.front().first)
-    {
-      spot5->SetDiffuseColor(this->spot5Pattern.front().second);
-      this->spot5Pattern.pop_front();
-    }
-  }
-  */
 }
 
 void Movie::OnRotorComplete()
@@ -336,7 +251,7 @@ void Movie::OnRotorLand()
   msgs::PoseAnimation msg;
   msg.set_model_name("pioneer2dx");
 
-  double step = 30.0 / 7.0;
+  double step = 25.0 / 7.0;
 
   msgs::Set(msg.add_time(), common::Time(step * msg.pose_size(), 0));
   msgs::Set(msg.add_pose(), math::Pose(161, -92, 2, 0, 0, GZ_DTOR(90)));
@@ -372,11 +287,13 @@ void Movie::OnRotorLand()
       math::Pose(181.24, -81.87, 5.07, 0, GZ_DTOR(41.70), GZ_DTOR(126.50)));
 
   this->viewPoses.push_back(
-      math::Pose(180.38, -75.81, 4.02, 0, GZ_DTOR(25.20), GZ_DTOR(139.47)));
+      math::Pose(181.38, -76.81, 4.02, 0, GZ_DTOR(26.20), GZ_DTOR(139.47)));
+
+  msgs::PoseAnimation msg2;
+  msg2.set_model_name("pr2");
+  this->poseAnimPub->Publish(msg2);
 
   this->userCamera->MoveToPositions(this->viewPoses, 17.0,
         boost::bind(&Movie::OnCamPioneerComplete, this));
-  this->camera->MoveToPositions(this->viewPoses, 17.0,
-        boost::bind(&Movie::OnCamPioneerComplete, this));
-
+  this->camera->MoveToPositions(this->viewPoses, 17.0);
 }

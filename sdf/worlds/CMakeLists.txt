@@ -6,6 +6,7 @@ set (files empty.world
            test_ambient.world
            test_collada_quad.world
            actor.world
+           weshare2012.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)

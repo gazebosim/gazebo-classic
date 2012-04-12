@@ -26,6 +26,7 @@
 #include <string>
 
 #include "transport/transport.h"
+#include "physics/Physics.hh"
 #include "sensors/sensors.h"
 #include "rendering/rendering.h"
 #include "msgs/msgs.h"
@@ -121,6 +122,11 @@ class ServerFixture : public testing::Test
                  (this->simTime / this->realTime).Double();
 
                this->serverRunning = true;
+             }
+
+  protected: void SetPause(bool _pause)
+             {
+               physics::pause_worlds(_pause);
              }
 
   protected: double GetPercentRealTime() const

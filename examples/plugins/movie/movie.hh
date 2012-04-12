@@ -55,5 +55,8 @@ namespace gazebo
 
     private: common::Time startTime;
     private: rendering::CameraPtr camera;
+    private: bool debug, stop;
+    private: bool joined;
+    private: math::Vector3 posOffset;
   };
 }
