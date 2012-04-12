@@ -79,8 +79,6 @@ namespace gazebo
 
       public: bool SaveFrame(const std::string &_filename);
 
-      private: void OnPose(ConstPosePtr &_msg);
-
       private: rendering::CameraPtr camera;
 
       private: rendering::ScenePtr scene;

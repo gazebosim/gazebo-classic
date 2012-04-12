@@ -45,6 +45,8 @@ namespace gazebo
     class ArrowVisual;
     class ContactVisual;
     class COMVisual;
+    class RFIDVisual;
+    class RFIDTagVisual;
 
     typedef boost::shared_ptr<Scene> ScenePtr;
     typedef boost::shared_ptr<Light> LightPtr;
@@ -61,6 +63,8 @@ namespace gazebo
     typedef boost::shared_ptr<ArrowVisual> ArrowVisualPtr;
     typedef boost::shared_ptr<AxisVisual> AxisVisualPtr;
     typedef boost::shared_ptr<COMVisual> COMVisualPtr;
+    typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
+    typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
 
     enum RenderOpType
     {

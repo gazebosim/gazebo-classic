@@ -41,6 +41,8 @@
 #include "rendering/Grid.hh"
 #include "rendering/SelectionObj.hh"
 #include "rendering/DynamicLines.hh"
+#include "rendering/RFIDVisual.hh"
+#include "rendering/RFIDTagVisual.hh"
 
 #include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
@@ -1344,6 +1346,30 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
           this->worldVisual, _msg->topic()));
 
     this->visuals[contactVis->GetName()] = contactVis;
+  }
+  else if (_msg->type() == "rfidtag" && _msg->visualize() &&
+           !_msg->topic().empty())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
+    RFIDTagVisualPtr rfidVis(new RFIDTagVisual(
+          _msg->name() + "_rfidtag_vis", parentVis, _msg->topic()));
+
+    std::cout << "rfid vis message recieved" << std::endl;
+    this->visuals[rfidVis->GetName()] = rfidVis;
+  }
+  else if (_msg->type() == "rfid" && _msg->visualize() &&
+           !_msg->topic().empty())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
+    RFIDVisualPtr rfidVis(new RFIDVisual(
+          _msg->name() + "_rfid_vis", parentVis, _msg->topic()));
+    this->visuals[rfidVis->GetName()] = rfidVis;
   }
 
   return true;

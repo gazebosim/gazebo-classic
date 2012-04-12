@@ -67,8 +67,6 @@ void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->poseSub = this->node->Subscribe("~/pose",
-                                        &CameraSensor::OnPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -140,11 +138,6 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
     this->camera->PostRender();
     this->lastUpdateTime = this->world->GetSimTime();
   }
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::OnPose(ConstPosePtr &/*_msg*/)
-{
 }
 
 //////////////////////////////////////////////////

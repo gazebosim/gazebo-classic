@@ -35,9 +35,11 @@
 
     <include filename="weshare2012_pioneer.model"/>
     <include filename="weshare2012_apartment.model"/>
+    <!--
     <include filename="weshare2012_bookshelf.model" model_name="bookshelf1" model_pose="0 9.8 0.0 0 0 0" />
     <include filename="weshare2012_bookshelf.model" model_name="bookshelf2" model_pose="2 9.8 0.0 0 0 0" />
     <include filename="table.model" model_name="table" model_pose="4.0 9.5 0 0 0 0" />  
+    -->
 
     <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>

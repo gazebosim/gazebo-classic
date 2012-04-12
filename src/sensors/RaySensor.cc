@@ -72,7 +72,7 @@ void RaySensor::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(this->world->GetName());
+    this->node->Init(_worldName);
     this->scanPub = this->node->Advertise<msgs::LaserScan>(
         this->sdf->GetElement("topic")->GetValueString());
   }

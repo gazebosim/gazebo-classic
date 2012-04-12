@@ -53,7 +53,6 @@ RFIDTag::RFIDTag()
 /////////////////////////////////////////////////
 RFIDTag::~RFIDTag()
 {
-  // this->link.reset();
 }
 
 /////////////////////////////////////////////////
@@ -74,7 +73,7 @@ void RFIDTag::Load(const std::string &_worldName)
         this->sdf->GetElement("topic")->GetValueString());
   }
 
-  entity = this->world->GetEntity(this->GetParentName());
+  this->entity = this->world->GetEntity(this->parentName);
 
   RFIDTagManager::Instance()->AddTaggedModel(this);
 }
@@ -83,6 +82,7 @@ void RFIDTag::Load(const std::string &_worldName)
 void RFIDTag::Fini()
 {
   Sensor::Fini();
+  this->entity.reset();
 }
 
 //////////////////////////////////////////////////
@@ -97,7 +97,6 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
   if (this->scanPub)
   {
     msgs::Pose msg;
-
     msgs::Set(&msg, entity->GetWorldPose());
 
     // msg.set_position(link->GetWorldPose().pos);

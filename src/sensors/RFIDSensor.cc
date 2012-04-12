@@ -63,6 +63,7 @@ RFIDSensor::~RFIDSensor()
 void RFIDSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf )
 {
   Sensor::Load(_worldName, _sdf);
+
 }
 
 /////////////////////////////////////////////////
@@ -70,7 +71,7 @@ void RFIDSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  std::cout << "load rfid sensor" << std::endl;
+  // std::cout << "load rfid sensor" << std::endl;
 
   if (this->sdf->GetElement("topic"))
   {
@@ -78,22 +79,20 @@ void RFIDSensor::Load(const std::string &_worldName)
     this->scanPub = this->node->Advertise<msgs::Pose>(
         this->sdf->GetElement("topic")->GetValueString());
   }
-
-  this->sdf->PrintDescription("something");
-
-  entity = this->world->GetEntity(this->GetParentName());
+  this->entity = this->world->GetEntity(this->parentName);
 
   this->rtm = RFIDTagManager::Instance();
 
-  std::cout << " setup ray" << std::endl;
+  // this->sdf->PrintDescription("something");
+  /*std::cout << " setup ray" << std::endl;
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
   //trying to use just "ray" gives a seg fault
   this->laserCollision = physicsEngine->CreateCollision("multiray",
       this->parentName);
 
-  this->laserCollision->SetName("ray_sensor_collision");
-  this->laserCollision->SetRelativePose(entity->GetWorldPose());
+  this->laserCollision->SetName("rfid_sensor_collision");
+  this->laserCollision->SetRelativePose(this->pose);
 
   this->laserShape = boost::dynamic_pointer_cast<physics::RayShape>(
       this->laserCollision->GetShape());
@@ -101,6 +100,7 @@ void RFIDSensor::Load(const std::string &_worldName)
   this->laserShape->Load(this->sdf);
 
   this->laserShape->Init();
+  */
 
   /*** Tried to use rendering, but says rendering engine isnt initialized which is understandable */
 
@@ -140,7 +140,6 @@ void RFIDSensor::UpdateImpl(bool /*_force*/)
     msgs::Pose msg;
     msgs::Set(&msg, entity->GetWorldPose());
     this->scanPub->Publish(msg);
-
   }
 }
 
@@ -154,7 +153,7 @@ void RFIDSensor::EvaluateTags()
   for(ci = tags.begin(); ci != tags.end(); ++ci)
   {
     // physics::LinkPtr tagLinkPtr = (*ci)->getLinkPtr();
-    math::Pose pos = (*ci)->getTagPose();
+    math::Pose pos = (*ci)->GetTagPose();
     // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
     // std::cout << "link pos: x" << pos.pos.x
     //     << " y:" << pos.pos.y 
@@ -170,18 +169,17 @@ bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
   math::Vector3 v;
   v = _pose.pos - this->entity->GetWorldPose().pos;
 
-  std::cout << v.GetLength() << std::endl;
+  // std::cout << v.GetLength() << std::endl;
 
   if (v.GetLength() <= 5.0)
   {
-    std::cout << "detected " <<  v.GetLength() << std::endl;
+    // std::cout << "detected " <<  v.GetLength() << std::endl;
     return true;
   }
 
   // this->CheckRayIntersection(link);
   return false;
 }
-
 
 //////////////////////////////////////////////////
 bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
@@ -197,4 +195,5 @@ bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
   Ogre::RaySceneQueryResult &result = query->execute();
   return false;
    **/
+  return false;
 }

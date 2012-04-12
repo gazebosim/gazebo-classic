@@ -40,6 +40,8 @@ set (sources MovableText.cc
              AxisVisual.cc
              ArrowVisual.cc
              COMVisual.cc
+             RFIDVisual.cc
+             RFIDTagVisual.cc
 )
 
 set (headers MovableText.hh
@@ -70,6 +72,8 @@ set (headers MovableText.hh
              ArrowVisual.hh
              COMVisual.hh
              Heightmap.hh
+             RFIDVisual.hh
+             RFIDTagVisual.hh
              ogre.h
              cegui.h
 )

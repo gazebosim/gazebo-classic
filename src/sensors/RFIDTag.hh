@@ -53,10 +53,9 @@ namespace gazebo
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
-      public: math::Pose getTagPose() {return entity->GetWorldPose();}
+      public: math::Pose GetTagPose() {return entity->GetWorldPose();}
 
       private: physics::EntityPtr entity;
-
       private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
     };
