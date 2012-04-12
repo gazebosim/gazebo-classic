@@ -38,9 +38,8 @@ SurfaceParams::~SurfaceParams()
 //////////////////////////////////////////////////
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
-  if (_sdf->HasElement("bounce"))
   {
-    sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
+    sdf::ElementPtr bounceElem = _sdf->GetOrCreateElement("bounce");
     this->bounce = bounceElem->GetValueDouble("restitution_coefficient");
     this->bounceThreshold = bounceElem->GetValueDouble("threshold");
   }
@@ -64,6 +63,7 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
       this->kp = contactOdeElem->GetValueDouble("kp");
       this->kd = contactOdeElem->GetValueDouble("kd");
       this->cfm = contactOdeElem->GetValueDouble("soft_cfm");
+      this->erp = contactOdeElem->GetValueDouble("soft_erp");
       this->maxVel = contactOdeElem->GetValueDouble("max_vel");
       this->minDepth = contactOdeElem->GetValueDouble("min_depth");
     }
