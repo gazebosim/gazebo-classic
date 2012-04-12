@@ -176,6 +176,8 @@ namespace gazebo
       public: void SetInertial(const InertialPtr &_inertial);
 
       public: virtual void UpdateMass() {}
+      public: virtual void UpdateSurface() {}
+
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision
       private: void LoadCollision(sdf::ElementPtr _sdf);

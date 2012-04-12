@@ -681,6 +681,8 @@ void Link::ProcessMsg(const msgs::Link &_msg)
     if (coll)
       coll->ProcessMsg(_msg.collision(i));
   }
+  if (_msg.collision_size()>0)
+    this->UpdateSurface();
 }
 
 

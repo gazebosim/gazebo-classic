@@ -269,6 +269,25 @@ bool ODELink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////////////////////////
+void ODELink::UpdateSurface()
+{
+  Base_V::iterator iter;
+  Base_V::iterator iter_end = this->children.end();
+  for (iter = this->children.begin(); iter != iter_end; ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+    {
+      ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
+      if (g->IsPlaceable() && g->GetCollisionId())
+      {
+        // Set surface properties max_vel and min_depth
+        dBodySetMaxVel(this->linkId, g->surface->maxVel);
+        dBodySetMinDepth(this->linkId, g->surface->minDepth);
+      }
+    }
+  }
+}
+/////////////////////////////////////////////////////////////////////
 void ODELink::UpdateMass()
 {
   if (!this->linkId)

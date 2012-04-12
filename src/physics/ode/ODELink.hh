@@ -76,6 +76,9 @@ namespace gazebo
       /// \brief Update the mass matrix
       public: virtual void UpdateMass();
 
+      /// \brief Update other parameters for ODE
+      public: virtual void UpdateSurface();
+
       /// \brief Set the linear velocity of the link
       public: virtual void SetLinearVel(const math::Vector3 &vel);
 
