@@ -17,6 +17,7 @@ add_subdirectory(youbot)
 add_subdirectory(hokuyo)
 add_subdirectory(quadrotor)
 add_subdirectory(willowgarage)
+add_subdirectory(kitchen)
 
 set (files hanoi_red_disk.dae
            hanoi_green_disk.dae

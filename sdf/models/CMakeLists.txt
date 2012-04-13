@@ -17,6 +17,7 @@ set (files pioneer2dx.model
            weshare2012_apartment.model
            weshare2012_pioneer.model
            weshare2012_bookshelf.model
+           kitchen.model
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/models/)
