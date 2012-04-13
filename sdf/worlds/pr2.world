@@ -8,7 +8,7 @@
       <grid enabled="true"/>
     </scene>
 
-    <physics type="ode" update_rate="10000">
+    <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
         <solver type="quick" dt="0.01" iters="10" sor="1.3"/>

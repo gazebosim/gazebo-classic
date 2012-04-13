@@ -96,7 +96,7 @@ bool ParseArgs(int argc, char **argv)
     plugins.push_back(vm["plugin"].as<std::string>());
 
   if (vm.count("world_file"))
-    config_filename = vm.count("world_file");
+    config_filename = vm["world_file"].as<std::string>();
   else
     config_filename = "worlds/empty.world";
 
