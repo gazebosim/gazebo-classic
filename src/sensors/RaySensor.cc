@@ -66,16 +66,18 @@ void RaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+std::string RaySensor::GetTopic() const
+{
+  return std::string("~/") + this->GetName() + "/scan";
+}
+
+//////////////////////////////////////////////////
 void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (this->sdf->GetElement("topic"))
-  {
-    this->node->Init(_worldName);
-    this->scanPub = this->node->Advertise<msgs::LaserScan>(
-        this->sdf->GetElement("topic")->GetValueString());
-  }
+  this->node->Init(_worldName);
+  this->scanPub = this->node->Advertise<msgs::LaserScan>(this->GetTopic());
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
   this->laserCollision = physicsEngine->CreateCollision("multiray",

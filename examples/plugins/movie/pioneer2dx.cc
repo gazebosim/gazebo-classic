@@ -68,10 +68,8 @@ void MoviePioneer2dx::OnPoseAnimation(ConstPoseAnimationPtr &_anim)
   {
     common::PoseAnimationPtr anim(new common::PoseAnimation("move", 20, false));
 
-    double stepSize = 20.0 / _anim->pose_size();
     for (unsigned int i=0; i < _anim->pose_size(); ++i)
     {
-      double time = i*stepSize;
       common::PoseKeyFrame *key = anim->CreateKeyFrame(
           msgs::Convert(_anim->time(i)).Double());
       key->SetTranslation(msgs::Convert(_anim->pose(i).position()));

@@ -430,7 +430,6 @@ void Visual::Update()
     this->prevAnimTime = common::Time::GetWallTime();
     if (this->animState->hasEnded())
     {
-      std::cout << "Ended. Time[" << this->animState->getTimePosition() << "] Length[" << this->animState->getLength() << "]\n";
       this->animState = NULL;
       this->sceneNode->getCreator()->destroyAnimation(
           this->GetName() + "_animation");

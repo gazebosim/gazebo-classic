@@ -69,6 +69,8 @@ namespace gazebo
       /// Finalize the ray
       protected: virtual void Fini();
 
+      public: virtual std::string GetTopic() const;
+
       /// \brief Get the minimum angle
       /// \return The minimum angle
       public: math::Angle GetAngleMin() const;

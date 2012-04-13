@@ -86,7 +86,6 @@
       </sensor>
       <!--<sensor name='base_laser' type='ray' always_on='1' update_rate='20' visualize='false'>
         <origin pose='0.275 0 0.303 0 -0 0'/>
-        <topic>~/laser_scan</topic>
         <ray>
           <scan>
             <horizontal samples='640' resolution='1' min_angle='-2.2688999999959423' max_angle='2.2688999999959423'/>

@@ -257,9 +257,6 @@ void Scene::Init()
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
-
-  // HACK: for stencil shadows...should use PSSM shadows
-  //this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
 }
 
 //////////////////////////////////////////////////

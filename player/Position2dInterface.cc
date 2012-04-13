@@ -58,9 +58,6 @@ Position2dInterface::Position2dInterface(player_devaddr_t _addr,
   this->velPub = this->node->Advertise<gazebo::msgs::Pose>(
       std::string("~/") + this->modelName + "/vel_cmd");
 
-  this->poseSub = this->node->Subscribe("~/pose/info",
-      &Position2dInterface::OnPoseMsg, this);
-
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
 }
@@ -224,11 +221,14 @@ void Position2dInterface::Update()
 //////////////////////////////////////////////////
 void Position2dInterface::Subscribe()
 {
+  this->poseSub = this->node->Subscribe("~/pose/info",
+      &Position2dInterface::OnPoseMsg, this);
 }
 
 //////////////////////////////////////////////////
 void Position2dInterface::Unsubscribe()
 {
+  this->poseSub.reset();
 }
 
 //////////////////////////////////////////////////
@@ -238,16 +238,18 @@ void Position2dInterface::OnPoseMsg(ConstPosePtr &_msg)
     return;
 
   player_position2d_data_t data;
-  // struct timeval ts;
-
   memset(&data, 0, sizeof(data));
 
-  /*ts.tv_sec = (int) (this->iface->data->head.time);
-  ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
-
+  this->datatime = gazebo::common::Time::GetWallTime().Double();
   data.pos.px = _msg->position().x();
   data.pos.py = _msg->position().y();
   data.pos.pa = _msg->position().z();
+
+  // TODO:
+  /*
+  struct timeval ts;
+  ts.tv_sec = (int) (this->iface->data->head.time);
+  ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
   data.vel.px = this->iface->data->velocity.pos.x;
   data.vel.py = this->iface->data->velocity.pos.y;

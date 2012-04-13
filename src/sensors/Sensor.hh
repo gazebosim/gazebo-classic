@@ -95,7 +95,7 @@ namespace gazebo
 
       public: bool GetVisualize() const;
 
-      public: std::string GetTopic() const;
+      public: virtual std::string GetTopic() const;
 
       public: void FillMsg(msgs::Sensor &_msg);
 

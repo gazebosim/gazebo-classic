@@ -19,9 +19,6 @@
  * Date: 2 March 2006
  */
 
-/* TODO
-*/
-
 #include <math.h>
 #include <iostream>
 
@@ -38,65 +35,52 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
-  /*
-  // Get the ID of the interface
-  this->gz_id = (char*) calloc(1024, sizeof(char));
-  strcat(this->gz_id, GazeboClient::prefixId);
-  strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
-
-  // Allocate a Position Interface
-  this->iface = new LaserIface();
-
-  this->scanId = 0;
-
   this->datatime = -1;
 
+  this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  this->node->Init(this->worldName);
+  this->laserName = _cf->ReadString(_section, "laser_name", "default");
+
+  this->scanId = 0;
   memset(&this->data, 0, sizeof(this->data));
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
-*/
 }
 
 /////////////////////////////////////////////////
 LaserInterface::~LaserInterface()
 {
-  /*
   player_laser_data_t_cleanup(&this->data);
-
-  // Release this interface
-  delete this->iface;
-  */
 }
 
 /////////////////////////////////////////////////
 int LaserInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
-  /*
+  int result = -1;
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
   // Is it a request to set the laser's config?
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-        PLAYER_LASER_REQ_SET_CONFIG,
-        this->device_addr))
+                            PLAYER_LASER_REQ_SET_CONFIG,
+                            this->device_addr))
   {
     // player_laser_config_t* plc = (player_laser_config_t*)data;
 
     if (hdr->size == sizeof(player_laser_config_t))
     {
       // TODO: Complete this
-
       this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK,
-          PLAYER_LASER_REQ_SET_CONFIG);
-      return(0);
+                            PLAYER_MSGTYPE_RESP_ACK,
+                            PLAYER_LASER_REQ_SET_CONFIG);
+      result = 0;
     }
     else
     {
       printf("config request len is invalid (%d != %d)",
           (int)hdr->size, (int)sizeof(player_laser_config_t));
-
-      return(-1);
+      result = -1;
     }
   }
 
@@ -107,7 +91,8 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
   {
     if (hdr->size == 0)
     {
-      int intensity = 1; // todo
+      /* TODO:
+      int intensity = 1;
 
       player_laser_config_t plc;
       memset(&plc, 0, sizeof(plc));
@@ -123,21 +108,20 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
           PLAYER_MSGTYPE_RESP_ACK,
           PLAYER_LASER_REQ_GET_CONFIG,
           (void*)&plc, sizeof(plc), NULL);
-      return(0);
+          */
+      result = 0;
     }
     else
     {
       printf("config request len is invalid (%d != %d)", (int)hdr->size, 0);
-      return(-1);
+      result = -1;
     }
   }
-
-
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-        PLAYER_LASER_REQ_GET_GEOM, this->device_addr))
+           PLAYER_LASER_REQ_GET_GEOM, this->device_addr))
   {
+    /* TODO:
     player_laser_geom_t rep;
-
 
     // TODO: get geometry from somewhere
     memset(&rep.pose, 0, sizeof(rep.pose));
@@ -154,11 +138,12 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
         PLAYER_MSGTYPE_RESP_ACK,
         PLAYER_LASER_REQ_GET_GEOM,
         &rep, sizeof(rep), NULL);
+        */
 
-    return 0;
+    result = 0;
   }
-*/
-  return -1;
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -230,29 +215,13 @@ void LaserInterface::Update()
 /////////////////////////////////////////////////
 void LaserInterface::Subscribe()
 {
-  /*
-  // Open the interface
-  try
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->mutex);
-    this->iface->Open(GazeboClient::client, this->gz_id);
-  }
-  catch (std::string &e)
-  {
-    // std::ostringstream stream;
-    std::cout << "Error Subscribing to Gazebo Laser Interface\n"
-      << e << "\n";
-    // gzthrow(stream.str());
-    exit(0);
-  }
-  */
+  this->laserScanSub = this->node->Subscribe(
+      std::string("~/") + this->laserName + "/scan",
+      &LaserInterface::OnScan, this);
 }
 
 /////////////////////////////////////////////////
 void LaserInterface::Unsubscribe()
 {
-  /*
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  this->iface->Close();
-  */
+  this->laserScanSub.reset();
 }
