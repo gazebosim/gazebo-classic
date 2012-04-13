@@ -1,0 +1,20 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Image
+/// \brief Message for an image
+/// \verbatim
+
+import "time.proto";
+
+message Image
+{
+  required Time time          = 1; // Time when the data was captured
+  required uint32 width       = 2; // Image width (number of columns)
+  required uint32 height      = 3; // Image height (number of rows)
+  required string encoding    = 4;
+  required uint32 step        = 5; // Full row length in bytes
+  required bytes data         = 6; // Actual data, size if (step * rows)
+}
+
+/// \endverbatim
