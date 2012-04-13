@@ -33,11 +33,11 @@ TEST_F(PR2Test, Load)
   EXPECT_LT(i, 40);
 
   sensors::SensorPtr sensor =
-    sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
+    sensors::get_sensor("head_mount_sensor");
   EXPECT_TRUE(sensor);
 
-  sensors::CameraSensorPtr camSensor =
-    boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+  sensors::DepthCameraSensorPtr camSensor =
+    boost::shared_dynamic_cast<sensors::DepthCameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
   while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))
