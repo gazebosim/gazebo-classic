@@ -4,8 +4,8 @@ set (sources GazeboDriver.cc
              SimulationInterface.cc
              Position2dInterface.cc
 )
-             #Position3dInterface.cc
              #LaserInterface.cc
+             #Position3dInterface.cc
              #CameraInterface.cc
              #FiducialInterface.cc
              #PTZInterface.cc

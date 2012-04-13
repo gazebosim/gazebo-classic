@@ -176,7 +176,8 @@ void GpuLaser::PostRender()
 {
   common::Timer postRenderT, blitT;
   postRenderT.Start();
-  double blitDur, postRenderDur;
+  double blitDur = 0.0;
+  double postRenderDur = 0.0;
   for (unsigned int i = 0; i < this->_textureCount; i++)
     this->_1stPassTargets[i]->swapBuffers();
 
@@ -226,7 +227,7 @@ void GpuLaser::PostRender()
             << " postRender: " << postRenderDur * 1000
             << " TOTAL: " << (this->lastRenderDuration + postRenderDur) * 1000
             << " Total - BLIT: " << (this->lastRenderDuration + postRenderDur
-            - blitDur ) * 1000 << "\n";
+            - blitDur) * 1000 << "\n";
 }
 
 void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,

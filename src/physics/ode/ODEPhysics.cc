@@ -89,9 +89,10 @@ class Colliders_TBB
               std::vector<std::pair<ODECollision*, ODECollision*> > *_colliders,
               ODEPhysics *_engine,
               dContactGeom* _contactCollisions) :
-    colliders(_colliders), engine(_engine), contactCollisions(_contactCollisions)
+    colliders(_colliders),
+              engine(_engine), contactCollisions(_contactCollisions)
   {
-    //dAllocateODEDataForThread(dAllocateMaskAll);
+    // dAllocateODEDataForThread(dAllocateMaskAll);
   }
 
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
@@ -126,7 +127,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->contactGroup = dJointGroupCreate(0);
 
-  //this->lastCollisionUpdateTime = common::Time(0.0);
+  // this->lastCollisionUpdateTime = common::Time(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -306,14 +307,6 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
-  //common::Time current_time = this->world->GetSimTime();
-  //if (current_time - this->lastCollisionUpdateTime < common::Time(0.01))
-  //  return;
-  //this->lastCollisionUpdateTime = current_time;
-
-  //common::Timer timer1;
-  //timer1.Start();
-
   this->contactPairs.clear();
 
   this->collidersCount = 0;
@@ -322,16 +315,9 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
 
-  //gzerr << "dSpaceCollide [" << timer1.GetElapsed() << "]\n";
-  //timer1.Start();
-
   for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
     delete this->contactFeedbacks[i];
   this->contactFeedbacks.clear();
-
-  //gzerr << "  clear [" << this->contactFeedbacks.size()
-  //      << "] feedbacks [" << timer1.GetElapsed() << "]\n";
-  //timer1.Start();
 
   // Collide all the collisions
   // if (this->colliders.size() < 50)
@@ -346,12 +332,9 @@ void ODEPhysics::UpdateCollision()
   // else
   // {
   // tbb::parallel_for(tbb::blocked_range<size_t>(0,
-  //       this->collidersCount, 10), Colliders_TBB(&this->colliders, this, this->contactCollisions));
+  //       this->collidersCount, 10),
+  //       Colliders_TBB(&this->colliders, this, this->contactCollisions));
   // }
-
-  //gzerr << "  udpate [" << this->collidersCount
-  //      << "] colliders [" << timer1.GetElapsed() << "]\n";
-  //timer1.Start();
 
   // Trimesh collision must happen in this thread sequentially
   for (unsigned int i = 0; i < this->trimeshCollidersCount; i++)
@@ -360,9 +343,6 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
-
-  //gzerr << "  udpate [" << this->trimeshCollidersCount
-  //      << "  trimesh colliders [" << timer1.GetElapsed() << "]\n";
 
   // printf("ContactFeedbacks[%d]\n", this->contactFeedbacks.size());
   // Process all the contact feedbacks
@@ -800,9 +780,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   int numc = 0;
   dContact contact;
 
-  //common::Timer timer1;
-  //timer1.Start();
-
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
   if (this->GetMaxContacts() < MAX_CONTACT_JOINTS)
@@ -810,9 +787,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
       MAX_DCOLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
-
-  //gzerr << " dCollide [" << timer1.GetElapsed() << "]\n";
-  //timer1.Start();
 
   if (numc <= 0)
     return;
@@ -871,10 +845,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // contact.surface.soft_cfm = 0.5*(_collision1->surface->softCFM +
   //                                _collision2->surface->softCFM);
 
-  
   // assign fdir1 if not set as 0
-  math::Vector3 fd = (_collision1->surface->fdir1 +_collision2->surface->fdir1)*0.5;
-  if (fd != math::Vector3(0,0,0))
+  math::Vector3 fd =
+    (_collision1->surface->fdir1 +_collision2->surface->fdir1) * 0.5;
+  if (fd != math::Vector3(0, 0, 0))
   {
     contact.surface.mode = dContactFDir1 | contact.surface.mode;
     contact.fdir1[0] = fd.x;
@@ -939,8 +913,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     LinkPtr link2 = _collision2->GetLink();
     this->AddLinkPair(link1, link2);
   }
-  //gzerr << " reset of Collide [" << timer1.GetElapsed() << "]\n";
-  //timer1.Start();
 }
 
 //////////////////////////////////////////////////

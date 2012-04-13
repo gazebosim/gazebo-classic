@@ -18,7 +18,8 @@
 #define GAZEBO_SENSORS_HH
 
 #include <string>
-#include "SensorTypes.hh"
+#include "sdf/sdf.h"
+#include "sensors/SensorTypes.hh"
 
 namespace gazebo
 {

@@ -410,13 +410,8 @@ namespace gazebo
       protected: Ogre::AnimationState *animState;
       protected: common::Time prevAnimTime;
       protected: boost::function<void()> onAnimationComplete;
-
     };
-
     /// \}
   }
 }
 #endif
-
-
-

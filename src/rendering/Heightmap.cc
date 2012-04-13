@@ -22,7 +22,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "rendering/ogre.h"
 #include <Terrain/OgreTerrain.h>
 #include <Terrain/OgreTerrainGroup.h>
 
@@ -72,7 +71,7 @@ void Heightmap::Load()
   {
     Ogre::TerrainGroup::TerrainIterator ti =
       this->terrainGroup->getTerrainIterator();
-    while(ti.hasMoreElements())
+    while (ti.hasMoreElements())
     {
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);

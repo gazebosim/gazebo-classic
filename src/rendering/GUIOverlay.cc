@@ -32,6 +32,7 @@
 using namespace gazebo;
 using namespace rendering;
 
+/////////////////////////////////////////////////
 GUIOverlay::GUIOverlay()
 {
   this->initialized = false;
@@ -45,6 +46,7 @@ GUIOverlay::GUIOverlay()
   this->rttImageSetCount = 0;
 }
 
+/////////////////////////////////////////////////
 GUIOverlay::~GUIOverlay()
 {
   this->initialized = false;
@@ -53,6 +55,7 @@ GUIOverlay::~GUIOverlay()
 #endif
 }
 
+/////////////////////////////////////////////////
 void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
 {
   if (this->initialized)
@@ -99,6 +102,7 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
   this->initialized = true;
 }
 
+/////////////////////////////////////////////////
 void GUIOverlay::Hide()
 {
 #ifdef HAVE_CEGUI
@@ -106,6 +110,7 @@ void GUIOverlay::Hide()
 #endif
 }
 
+/////////////////////////////////////////////////
 void GUIOverlay::Show()
 {
 #ifdef HAVE_CEGUI
@@ -113,6 +118,7 @@ void GUIOverlay::Show()
 #endif
 }
 
+/////////////////////////////////////////////////
 void GUIOverlay::Update()
 {
 #ifdef HAVE_CEGUI
@@ -120,6 +126,7 @@ void GUIOverlay::Update()
 #endif
 }
 
+/////////////////////////////////////////////////
 void GUIOverlay::CreateWindow(const std::string &_type,
                                const std::string &_name,
                                const std::string &_parent,
@@ -145,6 +152,7 @@ void GUIOverlay::CreateWindow(const std::string &_type,
 #endif
 }
 
+/////////////////////////////////////////////////
 bool GUIOverlay::HandleKeyPressEvent(const std::string &_key)
 {
 #ifdef HAVE_CEGUI
@@ -158,6 +166,7 @@ bool GUIOverlay::HandleKeyPressEvent(const std::string &_key)
   return true;
 }
 
+/////////////////////////////////////////////////
 bool GUIOverlay::HandleKeyReleaseEvent(const std::string &_key)
 {
 #ifdef HAVE_CEGUI
@@ -169,6 +178,7 @@ bool GUIOverlay::HandleKeyReleaseEvent(const std::string &_key)
   return true;
 }
 
+/////////////////////////////////////////////////
 bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   bool result = false;
@@ -212,6 +222,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
   return result;
 }
 
+/////////////////////////////////////////////////
 bool GUIOverlay::IsInitialized()
 {
 #ifdef HAVE_CEGUI
@@ -221,12 +232,13 @@ bool GUIOverlay::IsInitialized()
 #endif
 }
 
-/// Load a CEGUI layout file
+/////////////////////////////////////////////////
 void GUIOverlay::LoadLayout(const std::string &_filename)
 {
   this->layoutFilename = _filename;
 }
 
+/////////////////////////////////////////////////
 void GUIOverlay::PreRender()
 {
 #ifdef HAVE_CEGUI
@@ -238,7 +250,7 @@ void GUIOverlay::PreRender()
 #endif
 }
 
-/// Load a CEGUI layout file
+/////////////////////////////////////////////////
 #ifdef HAVE_CEGUI
 CEGUI::Window *GUIOverlay::LoadLayoutImpl(const std::string &_filename)
 {
@@ -286,6 +298,7 @@ void GUIOverlay::Resize(unsigned int _width, unsigned int _height)
 #endif
 }
 
+/////////////////////////////////////////////////
 bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
                                      const std::string &_windowName)
 {
@@ -293,6 +306,7 @@ bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
   return this->AttachCameraToImage(cam , _windowName);
 }
 
+/////////////////////////////////////////////////
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
                                      const std::string &_windowName)
 {
@@ -343,6 +357,7 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
   return result;
 }
 
+/////////////////////////////////////////////////
 #ifdef HAVE_CEGUI
 bool GUIOverlay::OnButtonClicked(const CEGUI::EventArgs& _e)
 {
@@ -357,11 +372,13 @@ bool GUIOverlay::OnButtonClicked(const CEGUI::EventArgs& _e)
   return true;
 }
 
+/////////////////////////////////////////////////
 CEGUI::Window *GUIOverlay::GetWindow(const std::string &_name)
 {
   return CEGUI::WindowManager::getSingletonPtr()->getWindow(_name);
 }
 
+/////////////////////////////////////////////////
 int GUIOverlay::GetKeyCode(const std::string  &_unicode)
 {
   switch (_unicode[0])

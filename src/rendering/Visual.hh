@@ -263,7 +263,7 @@ namespace gazebo
 
       public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete=NULL);
+                                   boost::function<void()> _onComplete = NULL);
 
       /// \brief Set visibility flags for this visual and all children
       public: void SetVisibilityFlags(uint32_t _flags);

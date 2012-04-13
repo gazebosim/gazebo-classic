@@ -39,7 +39,6 @@ COMVisual::~COMVisual()
 {
   delete this->crossLines;
   this->crossLines = NULL;
-
 }
 
 /////////////////////////////////////////////////

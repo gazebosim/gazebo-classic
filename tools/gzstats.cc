@@ -46,7 +46,7 @@ void cb(ConstWorldStatisticsPtr &_msg)
   char paused;
   common::Time simTime  = msgs::Convert(_msg->sim_time());
   common::Time realTime = msgs::Convert(_msg->real_time());
-  
+
   simTimes.push_back(msgs::Convert(_msg->sim_time()));
   if (simTimes.size() > 20)
     simTimes.pop_front();

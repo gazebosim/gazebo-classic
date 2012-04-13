@@ -18,10 +18,10 @@
  * Author: Nathan Koenig and Andrew Howard
  * Date: 8 May 2003
  */
+#include <msgs/msgs.h>
+
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
-
-#include <msgs/msgs.h>
 
 #include "common/KeyFrame.hh"
 #include "common/Animation.hh"
@@ -263,8 +263,8 @@ void Actor::Update()
     currentLink->SetWorldPose(transform.GetAsPose());
   }
 
- if (this->bonePosePub && this->bonePosePub->HasConnections())
-   this->bonePosePub->Publish(msg);
+  if (this->bonePosePub && this->bonePosePub->HasConnections())
+    this->bonePosePub->Publish(msg);
 
   this->prevSkelAnim = this->world->GetSimTime();
 }
