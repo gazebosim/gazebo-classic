@@ -2,6 +2,3 @@ syntax: glob
 
 build
 Ogre.log
-.*.swp
-*.orig
-*~
