@@ -147,4 +147,10 @@ void DepthCameraSensor::OnPose(ConstPosePtr &/*_msg*/)
 {
 }
 
+//////////////////////////////////////////////////
+bool DepthCameraSensor::SaveFrame(const std::string &_filename)
+{
+  this->SetActive(true);
+  return this->camera->SaveFrame(_filename);
+}
 

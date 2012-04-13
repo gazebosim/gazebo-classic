@@ -73,6 +73,8 @@ namespace gazebo
       public: rendering::DepthCameraPtr GetDepthCamera() const
               {return this->camera;}
 
+      public: bool SaveFrame(const std::string &_filename);
+
       private: void OnPose(ConstPosePtr &_msg);
 
       private: rendering::DepthCameraPtr camera;
