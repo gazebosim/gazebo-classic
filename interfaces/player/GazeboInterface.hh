@@ -22,7 +22,7 @@
 #ifndef GAZEBO_PLAYER_INTERFACE_HH
 #define GAZEBO_PLAYER_INTERFACE_HH
 
-#include <libplayercore/playercore.h>
+#include "player.h"
 #include <string>
 #include "transport/TransportTypes.hh"
 

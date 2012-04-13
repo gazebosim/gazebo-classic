@@ -95,6 +95,8 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserShape->Load(this->sdf);
 
   this->laserShape->Init();
+
+  this->parentEntity = this->world->GetEntity(this->parentName);
 }
 
 //////////////////////////////////////////////////
@@ -239,7 +241,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   this->lastUpdateTime = this->world->GetSimTime();
 
   // Store the latest laser scans into laserMsg
-  msgs::Set(this->laserMsg.mutable_offset(), this->GetPose());
+  msgs::Set(this->laserMsg.mutable_offset(),
+      this->parentEntity->GetWorldPose() + this->GetPose());
   this->laserMsg.set_angle_min(this->GetAngleMin().GetAsRadian());
   this->laserMsg.set_angle_max(this->GetAngleMax().GetAsRadian());
   this->laserMsg.set_angle_step(this->GetAngleResolution());

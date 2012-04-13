@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <libplayercore/playercore.h>
+#include "player.h"
 
 /// \addtogroup player
 /// \brief Gazebo player driver

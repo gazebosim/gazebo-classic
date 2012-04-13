@@ -205,7 +205,6 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
 // called from GazeboDriver::Update
 void Position2dInterface::Update()
 {
-  printf("Position2dInterface::Update\n");
 }
 
 

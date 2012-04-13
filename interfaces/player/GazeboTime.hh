@@ -22,8 +22,7 @@
 #ifndef GAZEBO_PLAYER_TIME_HH
 #define GAZEBO_PLAYER_TIME_HH
 
-#include <libplayercore/playercore.h>
-
+#include "player.h"
 
 #include "common/CommonTypes.hh"
 #include "transport/TransportTypes.hh"

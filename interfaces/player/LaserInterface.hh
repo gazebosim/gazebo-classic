@@ -71,7 +71,8 @@ class LaserInterface : public GazeboInterface
   private: double datatime;
 
   private: int scanId;
-  private: player_laser_data_t data;
+  //private: player_laser_data_t data;
+  private: player_laser_data_scanpose_t data;
   private: gazebo::transport::SubscriberPtr laserScanSub;
 };
 /// \}

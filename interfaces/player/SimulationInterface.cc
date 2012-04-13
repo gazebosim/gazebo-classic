@@ -20,7 +20,7 @@
  */
 
 #include <time.h>
-#include <libplayercore/playercore.h>
+#include "player.h"
 
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>

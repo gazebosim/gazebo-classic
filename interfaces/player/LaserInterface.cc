@@ -22,6 +22,7 @@
 #include <math.h>
 #include <iostream>
 
+#include "math/gzmath.h"
 #include "transport/transport.h"
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"
@@ -45,12 +46,12 @@ LaserInterface::LaserInterface(player_devaddr_t _addr,
 /////////////////////////////////////////////////
 LaserInterface::~LaserInterface()
 {
-  player_laser_data_t_cleanup(&this->data);
+  player_laser_data_scanpose_t_cleanup(&this->data);
 }
 
 /////////////////////////////////////////////////
 int LaserInterface::ProcessMessage(QueuePointer &_respQueue,
-    player_msghdr_t *_hdr, void *_data)
+    player_msghdr_t *_hdr, void * /*_data*/)
 {
   int result = -1;
 
@@ -163,42 +164,45 @@ void LaserInterface::Unsubscribe()
 void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
 {
   int i;
-  float rangeRes;
-  float angleRes;
 
   //TODO: fix the time to get the time the laser scan was generated
   this->datatime = gazebo::common::Time::GetWallTime().Double();
 
-  double oldCount = this->data.ranges_count;
+  double oldCount = this->data.scan.ranges_count;
 
-  this->data.min_angle = _msg->angle_min();
-  this->data.max_angle = _msg->angle_max();
-  this->data.resolution = _msg->angle_step();
-  this->data.max_range = _msg->range_max();
-  this->data.ranges_count =
-    this->data.intensity_count = _msg->ranges_size();
-  this->data.id = this->scanId++;
+  this->data.scan.min_angle = _msg->angle_min();
+  this->data.scan.max_angle = _msg->angle_max();
+  this->data.scan.resolution = _msg->angle_step();
+  this->data.scan.max_range = _msg->range_max();
+  this->data.scan.ranges_count =
+    this->data.scan.intensity_count = _msg->ranges_size();
+  this->data.scan.id = this->scanId++;
 
-  if (oldCount != this->data.ranges_count)
+  if (!gazebo::math::equal(oldCount, this->data.scan.ranges_count))
   {
-    delete [] this->data.ranges;
-    delete [] this->data.intensity;
+    delete [] this->data.scan.ranges;
+    delete [] this->data.scan.intensity;
 
-    this->data.ranges = new float[data.ranges_count];
-    this->data.intensity = new uint8_t[data.intensity_count];
+    this->data.scan.ranges = new float[this->data.scan.ranges_count];
+    this->data.scan.intensity = new uint8_t[this->data.scan.intensity_count];
   }
 
   for (i = 0; i < _msg->ranges_size(); ++i)
-    this->data.ranges[i] = _msg->ranges(i);
+    this->data.scan.ranges[i] = _msg->ranges(i);
 
   for (i = 0; i < _msg->intensities_size(); ++i)
-    this->data.intensity[i] = (uint8_t)_msg->intensities(i);
+    this->data.scan.intensity[i] = (uint8_t)_msg->intensities(i);
 
-  if (this->data.ranges_count > 0)
+  this->data.pose.px = _msg->offset().position().x();
+  this->data.pose.py = _msg->offset().position().y();
+  this->data.pose.pa = gazebo::msgs::Convert(
+      _msg->offset().orientation()).GetAsEuler().z;
+
+  if (this->data.scan.ranges_count > 0)
   {
     this->driver->Publish(this->device_addr,
         PLAYER_MSGTYPE_DATA,
-        PLAYER_LASER_DATA_SCAN,
+        PLAYER_LASER_DATA_SCANPOSE,
         (void*)&this->data, sizeof(this->data), &this->datatime);
   }
 }
