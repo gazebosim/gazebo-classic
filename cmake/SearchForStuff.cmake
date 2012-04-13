@@ -195,6 +195,9 @@ if (PKG_CONFIG_FOUND)
     endif (NOT OGRE_FOUND)
   endif (OGRE-RTShaderSystem_FOUND)
 
+  set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
+  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
+
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
   if (OGRE-Terrain_FOUND)
     set(ogre_ldflags ${ogre_ldflags} ${OGRE-Terrain_LDFLAGS})
@@ -204,10 +207,6 @@ if (PKG_CONFIG_FOUND)
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
 
-
-
-  set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
-  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
 
   #################################################
   # Find XML

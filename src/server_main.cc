@@ -88,15 +88,19 @@ bool ParseArgs(int argc, char **argv)
   }
 
   if (vm.count("pause"))
-    params["pause"] = true;
+    params["pause"] = "true";
+  else
+    params["pause"] = "false";
 
   if (vm.count("plugin"))
     plugins.push_back(vm["plugin"].as<std::string>());
 
   if (vm.count("world_file"))
     config_filename = vm.count("world_file");
+  else
+    config_filename = "worlds/empty.world";
 
-  return false;
+  return true;
 }
 
 //////////////////////////////////////////////////

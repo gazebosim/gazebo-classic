@@ -441,7 +441,7 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
   sceneMgr->setShadowTextureCount(3);
   sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_RGB);
-  sceneMgr->setShadowTextureConfig(1, 1024, 1024, Ogre::PF_FLOAT32_RGB);
+  sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_RGB);
   sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_RGB);
   sceneMgr->setShadowTextureSelfShadow(true);
 
@@ -463,12 +463,15 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
-  pssmSetup->calculateSplitPoints(3, 1, 100);
-  pssmSetup->setSplitPadding(1);
+  double shadowFarDistance = 100;
+  double cameraNearClip = 0.1;
+  sceneMgr->setShadowFarDistance(shadowFarDistance);
+
+  pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
+  pssmSetup->setSplitPadding(cameraNearClip);
   pssmSetup->setOptimalAdjustFactor(0, 2);
   pssmSetup->setOptimalAdjustFactor(1, 1);
   pssmSetup->setOptimalAdjustFactor(2, 0.5);
-
 
   this->shadowRenderState = this->shaderGenerator->createSubRenderState(
       Ogre::RTShader::IntegratedPSSM3::Type);
