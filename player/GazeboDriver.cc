@@ -25,9 +25,9 @@
 #include "GazeboInterface.hh"
 #include "SimulationInterface.hh"
 #include "Position2dInterface.hh"
+#include "LaserInterface.hh"
+#include "CameraInterface.hh"
 // #include "Graphics3dInterface.hh"
-// #include "LaserInterface.hh"
-// #include "CameraInterface.hh"
 // #include "FiducialInterface.hh"
 // #include "Position3dInterface.hh"
 // #include "ActarrayInterface.hh"
@@ -253,11 +253,6 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
         ifsrc = new Position2dInterface(playerAddr, this, _cf, _section);
         break;
 
-      /*case PLAYER_GRAPHICS3D_CODE:
-        if (!player_quiet_startup) printf(" a graphics3d interface.\n");
-        ifsrc = new Graphics3dInterface(playerAddr, this, _cf, _section);
-        break;
-
       case PLAYER_LASER_CODE:
         if (!player_quiet_startup) printf(" a laser interface.\n");
         ifsrc = new LaserInterface(playerAddr, this, _cf, _section);
@@ -267,6 +262,12 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
         if (!player_quiet_startup) printf(" a camera interface.\n");
         ifsrc = new CameraInterface(playerAddr, this, _cf, _section);
         break;
+
+      /*case PLAYER_GRAPHICS3D_CODE:
+        if (!player_quiet_startup) printf(" a graphics3d interface.\n");
+        ifsrc = new Graphics3dInterface(playerAddr, this, _cf, _section);
+        break;
+
 
       case PLAYER_FIDUCIAL_CODE:
         if (!player_quiet_startup) printf(" a fiducial interface.\n");

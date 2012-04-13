@@ -3,10 +3,10 @@ set (sources GazeboDriver.cc
              GazeboTime.cc
              SimulationInterface.cc
              Position2dInterface.cc
+             LaserInterface.cc
+             CameraInterface.cc
 )
-             #LaserInterface.cc
              #Position3dInterface.cc
-             #CameraInterface.cc
              #FiducialInterface.cc
              #PTZInterface.cc
              #OpaqueInterface.cc

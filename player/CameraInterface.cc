@@ -21,52 +21,38 @@
 
 #include <math.h>
 #include <iostream>
-#include <boost/thread/recursive_mutex.hpp>
 
+#include "transport/transport.h"
+#include "msgs/msgs.h"
 #include "GazeboDriver.hh"
 #include "CameraInterface.hh"
 
-using namespace libgazebo;
-
-boost::recursive_mutex *CameraInterface::mutex = NULL;
-
 /////////////////////////////////////////////////
-CameraInterface::CameraInterface(player_devaddr_t addr,
-    GazeboDriver *driver, ConfigFile *cf, int section)
-: GazeboInterface(addr, driver, cf, section)
+CameraInterface::CameraInterface(player_devaddr_t _addr,
+    GazeboDriver *_driver, ConfigFile *_cf, int _section)
+: GazeboInterface(_addr, _driver, _cf, _section)
 {
-  /*
-  // Get the ID of the interface
-  this->gz_id = (char*) calloc(1024, sizeof(char));
-  strcat(this->gz_id, GazeboClient::prefixId);
-  strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
-
-  // Allocate a Camera Interface
-  this->iface = new CameraIface();
-
-  // Save frames?
-  this->save = cf->ReadInt(section, "save", 0);
-  this->frameno = 0;
-
   this->datatime = -1;
 
-  if (this->mutex == NULL)
-    this->mutex = new boost::recursive_mutex();
-    */
+  this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  this->node->Init(this->worldName);
+  this->cameraName = _cf->ReadString(_section, "camera_name", "default");
+
+  memset(&this->data, 0, sizeof(this->data));
+
+  // Save frames?
+  this->save = _cf->ReadInt(_section, "save", 0);
+  this->frameno = 0;
 }
 
 /////////////////////////////////////////////////
 CameraInterface::~CameraInterface()
 {
-  /*
-  // Delete this interface
-  delete this->iface;
-  */
 }
 
 /////////////////////////////////////////////////
-int CameraInterface::ProcessMessage(QueuePointer &respQueue,
-    player_msghdr_t *hdr, void *data)
+int CameraInterface::ProcessMessage(QueuePointer & /*_respQueue*/,
+    player_msghdr_t * /*_hdr*/, void * /*_data*/)
 {
   return -1;
 }
@@ -74,96 +60,69 @@ int CameraInterface::ProcessMessage(QueuePointer &respQueue,
 /////////////////////////////////////////////////
 void CameraInterface::Update()
 {
-  /*
-  char filename[256];
+}
 
-  struct timeval ts;
+/////////////////////////////////////////////////
+void CameraInterface::OnImage(ConstImagePtr &_msg)
+{
+  // char filename[256];
 
-  // Thread safe locking
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  this->iface->Lock(1);
+  size_t size;
 
-  // Only Update when new data is present
-  if (this->iface->data->head.time > this->datatime)
+  this->datatime = gazebo::msgs::Convert(_msg->time()).Double();
+
+  // Set the image properties
+  this->data.width = _msg->width();
+  this->data.height = _msg->height();
+  this->data.bpp = (_msg->step() / _msg->width()) * 8;
+  this->data.fdiv = 1;
+  this->data.format = PLAYER_CAMERA_FORMAT_RGB888;
+  this->data.compression = PLAYER_CAMERA_COMPRESS_RAW;
+
+  unsigned int oldCount = this->data.image_count;
+  this->data.image_count = _msg->data().size();
+
+  if (oldCount != this->data.image_count)
   {
-    size_t size;
-    this->datatime = this->iface->data->head.time;
-
-    ts.tv_sec = (int) (this->iface->data->head.time);
-    ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
-
-    // Set the image properties
-    this->data.width = this->iface->data->width;
-    this->data.height = this->iface->data->height;
-    this->data.bpp = 24;
-    this->data.fdiv = 1;
-    this->data.format = PLAYER_CAMERA_FORMAT_RGB888;
-    this->data.compression = PLAYER_CAMERA_COMPRESS_RAW;
-
-    unsigned int oldCount = this->data.image_count;
-    this->data.image_count = this->iface->data->image_size;
-
-    if (oldCount != this->data.image_count)
-    {
-      delete this->data.image;
-      this->data.image = new uint8_t[this->data.image_count];
-    }
-
-    // Set the image pixels
-    memcpy(this->data.image, this->iface->data->image,
-        this->iface->data->image_size);
-
-    size = sizeof(this->data) - sizeof(this->data.image) +
-      this->iface->data->image_size;
-
-    // Send data to server
-    this->driver->Publish(this->device_addr,
-        PLAYER_MSGTYPE_DATA,
-        PLAYER_CAMERA_DATA_STATE,
-        (void*)&this->data, size, &this->datatime);
-
-    // Save frames
-    if (this->save)
-    {
-      snprintf(filename, sizeof(filename), "click-%04d.ppm", this->frameno++);
-      this->SaveFrame(filename);
-    }
+    delete this->data.image;
+    this->data.image = new uint8_t[this->data.image_count];
   }
 
-  // Done with the interface
-  this->iface->Unlock();
-  */
+  // Set the image pixels
+  memcpy(this->data.image, _msg->data().c_str(), _msg->data().size());
+
+  size = sizeof(this->data) - sizeof(this->data.image) + _msg->data().size();
+
+  // Send data to server
+  this->driver->Publish(this->device_addr, PLAYER_MSGTYPE_DATA,
+                        PLAYER_CAMERA_DATA_STATE,
+                        (void*)&this->data, size, &this->datatime);
+
+  // Save frames
+  /*if (this->save)
+  {
+    snprintf(filename, sizeof(filename), "click-%04d.ppm", this->frameno++);
+    this->SaveFrame(filename);
+  }*/
 }
 
 /////////////////////////////////////////////////
 void CameraInterface::Subscribe()
 {
-  /*
-  // Open the interface
-  try
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->mutex);
-    this->iface->Open(GazeboClient::client, this->gz_id);
-  }
-  catch (std::string &e)
-  {
-    // std::ostringstream stream;
-    std::cout << "Error Subscribing to Gazebo Camera Interface["
-      << this->gz_id << "]\n" << e << "\n";
-    // gzthrow(stream.str());
-    exit(0);
-  }
-  */
+  std::string topic = "~/";
+  topic += this->cameraName + "/image";
+  boost::replace_all(topic,"::","/");
+
+  std::cout << "Topic[" << topic << "]\n";
+  this->cameraSub = this->node->Subscribe(topic,
+                                          &CameraInterface::OnImage, this);
 }
 
 /////////////////////////////////////////////////
 void CameraInterface::Unsubscribe()
 {
-  /*
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  this->iface->Close();
-  */
+  this->cameraSub->Unsubscribe();
+  this->cameraSub.reset();
 }
 
 /////////////////////////////////////////////////

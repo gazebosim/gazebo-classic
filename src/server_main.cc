@@ -31,9 +31,9 @@ gazebo::Server *server = NULL;
 
 std::string config_filename = "";
 gazebo::common::StrStr_M params;
-std::vector<std::string> plugins;
 
 namespace po = boost::program_options;
+po::variables_map vm;
 
 //////////////////////////////////////////////////
 void PrintUsage()
@@ -55,7 +55,7 @@ bool ParseArgs(int argc, char **argv)
   v_desc.add_options()
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
-    ("plugin,p", po::value<std::string>(), "Load a plugin.");
+    ("plugin,p", po::value<std::vector<std::string> >(), "Load a plugin.");
 
   po::options_description h_desc("Hidden options");
   h_desc.add_options()
@@ -67,7 +67,6 @@ bool ParseArgs(int argc, char **argv)
   po::positional_options_description p_desc;
   p_desc.add("world_file", 1);
 
-  po::variables_map vm;
   try
   {
     po::store(po::command_line_parser(argc,
@@ -91,9 +90,6 @@ bool ParseArgs(int argc, char **argv)
     params["pause"] = "true";
   else
     params["pause"] = "false";
-
-  if (vm.count("plugin"))
-    plugins.push_back(vm["plugin"].as<std::string>());
 
   if (vm.count("world_file"))
     config_filename = vm["world_file"].as<std::string>();
@@ -134,12 +130,16 @@ int main(int argc, char **argv)
     config_filename = "worlds/empty.world";
   }
 
-  // Construct plugins
   /// Load all the plugins specified on the command line
-  for (std::vector<std::string>::iterator iter = plugins.begin();
-       iter != plugins.end(); ++iter)
+  if (vm.count("plugin"))
   {
-    server->LoadPlugin(*iter);
+    std::vector<std::string> pp = vm["plugin"].as<std::vector<std::string> >();
+
+    for (std::vector<std::string>::iterator iter = pp.begin();
+         iter != pp.end(); ++iter)
+    {
+      server->LoadPlugin(*iter);
+    }
   }
 
   if (!server->Load(config_filename))

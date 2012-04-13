@@ -22,12 +22,8 @@
 #ifndef LASERINTERFACE_HH
 #define LASERINTERFACE_HH
 
+#include "transport/TransportTypes.hh"
 #include "GazeboInterface.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 /// \addtogroup player_iface Interfaces
 /// \{
@@ -67,14 +63,16 @@ class LaserInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: std::string modelName;
+  private: void OnScan(ConstLaserScanPtr &_msg);
+
+  private: std::string laserName;
 
   /// \brief Timestamp on last data update
   private: double datatime;
 
-  private: static boost::recursive_mutex *mutex;
   private: int scanId;
   private: player_laser_data_t data;
+  private: gazebo::transport::SubscriberPtr laserScanSub;
 };
 /// \}
 /// \}

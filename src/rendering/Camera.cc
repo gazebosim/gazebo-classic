@@ -739,7 +739,7 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 //////////////////////////////////////////////////
 const unsigned char *Camera::GetImageData(unsigned int _i)
 {
-  if (_i!= 0)
+  if (_i != 0)
     gzerr << "Camera index must be zero for cam";
 
   // do last minute conversion if Bayer pattern is requested, go from R8G8B8

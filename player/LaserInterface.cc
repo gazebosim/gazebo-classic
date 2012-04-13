@@ -22,18 +22,15 @@
 #include <math.h>
 #include <iostream>
 
-#include <boost/thread/recursive_mutex.hpp>
-
+#include "transport/transport.h"
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"
 
-using namespace libgazebo;
-boost::recursive_mutex *LaserInterface::mutex = NULL;
 
 /////////////////////////////////////////////////
-LaserInterface::LaserInterface(player_devaddr_t addr,
-    GazeboDriver *driver, ConfigFile *cf, int section)
-: GazeboInterface(addr, driver, cf, section)
+LaserInterface::LaserInterface(player_devaddr_t _addr,
+    GazeboDriver *_driver, ConfigFile *_cf, int _section)
+: GazeboInterface(_addr, _driver, _cf, _section)
 {
   this->datatime = -1;
 
@@ -43,9 +40,6 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
 
   this->scanId = 0;
   memset(&this->data, 0, sizeof(this->data));
-
-  if (this->mutex == NULL)
-    this->mutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
@@ -55,23 +49,22 @@ LaserInterface::~LaserInterface()
 }
 
 /////////////////////////////////////////////////
-int LaserInterface::ProcessMessage(QueuePointer &respQueue,
-    player_msghdr_t *hdr, void *data)
+int LaserInterface::ProcessMessage(QueuePointer &_respQueue,
+    player_msghdr_t *_hdr, void *_data)
 {
   int result = -1;
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Is it a request to set the laser's config?
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+  if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
                             PLAYER_LASER_REQ_SET_CONFIG,
                             this->device_addr))
   {
-    // player_laser_config_t* plc = (player_laser_config_t*)data;
+    // player_laser_config_t* plc = (player_laser_config_t*)_data;
 
-    if (hdr->size == sizeof(player_laser_config_t))
+    if (_hdr->size == sizeof(player_laser_config_t))
     {
       // TODO: Complete this
-      this->driver->Publish(this->device_addr, respQueue,
+      this->driver->Publish(this->device_addr, _respQueue,
                             PLAYER_MSGTYPE_RESP_ACK,
                             PLAYER_LASER_REQ_SET_CONFIG);
       result = 0;
@@ -79,17 +72,17 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
     else
     {
       printf("config request len is invalid (%d != %d)",
-          (int)hdr->size, (int)sizeof(player_laser_config_t));
+          (int)_hdr->size, (int)sizeof(player_laser_config_t));
       result = -1;
     }
   }
 
   // Is it a request to get the laser's config?
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-        PLAYER_LASER_REQ_GET_CONFIG,
-        this->device_addr))
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_LASER_REQ_GET_CONFIG,
+                                 this->device_addr))
   {
-    if (hdr->size == 0)
+    if (_hdr->size == 0)
     {
       /* TODO:
       int intensity = 1;
@@ -104,7 +97,7 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
       plc.range_res = this->iface->data->res_range;
       plc.intensity = intensity;
 
-      this->driver->Publish(this->device_addr, respQueue,
+      this->driver->Publish(this->device_addr, _respQueue,
           PLAYER_MSGTYPE_RESP_ACK,
           PLAYER_LASER_REQ_GET_CONFIG,
           (void*)&plc, sizeof(plc), NULL);
@@ -113,18 +106,17 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
     }
     else
     {
-      printf("config request len is invalid (%d != %d)", (int)hdr->size, 0);
+      printf("config request len is invalid (%d != %d)", (int)_hdr->size, 0);
       result = -1;
     }
   }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
            PLAYER_LASER_REQ_GET_GEOM, this->device_addr))
   {
-    /* TODO:
     player_laser_geom_t rep;
 
     // TODO: get geometry from somewhere
-    memset(&rep.pose, 0, sizeof(rep.pose));
+    /*memset(&rep.pose, 0, sizeof(rep.pose));
     memset(&rep.size, 0, sizeof(rep.size));
 
     rep.pose.px = this->iface->data->pose.pos.x;
@@ -133,13 +125,11 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
 
     rep.size.sw = this->iface->data->size.x;
     rep.size.sl = this->iface->data->size.y;
-
-    this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK,
-        PLAYER_LASER_REQ_GET_GEOM,
-        &rep, sizeof(rep), NULL);
         */
 
+    this->driver->Publish(this->device_addr, _respQueue,
+        PLAYER_MSGTYPE_RESP_ACK,
+        PLAYER_LASER_REQ_GET_GEOM, &rep, sizeof(rep), NULL);
     result = 0;
   }
 
@@ -149,79 +139,66 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
 /////////////////////////////////////////////////
 void LaserInterface::Update()
 {
-  /*
-  struct timeval ts;
-
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (this->iface->Lock(1))
-  {
-    // Only Update when new data is present
-    if (this->iface->data->head.time > this->datatime)
-    {
-      int i;
-      float rangeRes;
-      float angleRes;
-
-      this->datatime = this->iface->data->head.time;
-
-      ts.tv_sec = (int) (this->iface->data->head.time);
-      ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
-
-      rangeRes = this->iface->data->res_range;
-      angleRes = this->iface->data->res_angle;
-
-      double oldCount = this->data.ranges_count;
-
-      this->data.min_angle = this->iface->data->min_angle;
-      this->data.max_angle = this->iface->data->max_angle;
-      this->data.resolution = angleRes;
-      this->data.max_range = this->iface->data->max_range;
-      this->data.ranges_count =
-        this->data.intensity_count = this->iface->data->range_count;
-      this->data.id = this->scanId++;
-
-      if (oldCount != this->data.ranges_count)
-      {
-        delete [] this->data.ranges;
-        delete [] this->data.intensity;
-
-        this->data.ranges = new float[data.ranges_count];
-        this->data.intensity = new uint8_t[data.intensity_count];
-      }
-
-      for (i = 0; i < this->iface->data->range_count; i++)
-      {
-        this->data.ranges[i] = this->iface->data->ranges[i] / rangeRes;
-        this->data.intensity[i] =
-          (uint8_t) (int) this->iface->data->intensity[i];
-      }
-
-      if (this->data.ranges_count > 0)
-      {
-        this->driver->Publish(this->device_addr,
-            PLAYER_MSGTYPE_DATA,
-            PLAYER_LASER_DATA_SCAN,
-            (void*)&this->data, sizeof(this->data), &this->datatime);
-      }
-    }
-
-    this->iface->Unlock();
-  }
-  else
-    this->Unsubscribe();
-    */
 }
 
 /////////////////////////////////////////////////
 void LaserInterface::Subscribe()
 {
-  this->laserScanSub = this->node->Subscribe(
-      std::string("~/") + this->laserName + "/scan",
+  std::string topic = "~/";
+  topic += this->laserName + "/scan";
+  boost::replace_all(topic,"::","/");
+
+  this->laserScanSub = this->node->Subscribe(topic,
       &LaserInterface::OnScan, this);
 }
 
 /////////////////////////////////////////////////
 void LaserInterface::Unsubscribe()
 {
+  this->laserScanSub->Unsubscribe();
   this->laserScanSub.reset();
+}
+
+/////////////////////////////////////////////////
+void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
+{
+  int i;
+  float rangeRes;
+  float angleRes;
+
+  //TODO: fix the time to get the time the laser scan was generated
+  this->datatime = gazebo::common::Time::GetWallTime().Double();
+
+  double oldCount = this->data.ranges_count;
+
+  this->data.min_angle = _msg->angle_min();
+  this->data.max_angle = _msg->angle_max();
+  this->data.resolution = _msg->angle_step();
+  this->data.max_range = _msg->range_max();
+  this->data.ranges_count =
+    this->data.intensity_count = _msg->ranges_size();
+  this->data.id = this->scanId++;
+
+  if (oldCount != this->data.ranges_count)
+  {
+    delete [] this->data.ranges;
+    delete [] this->data.intensity;
+
+    this->data.ranges = new float[data.ranges_count];
+    this->data.intensity = new uint8_t[data.intensity_count];
+  }
+
+  for (i = 0; i < _msg->ranges_size(); ++i)
+    this->data.ranges[i] = _msg->ranges(i);
+
+  for (i = 0; i < _msg->intensities_size(); ++i)
+    this->data.intensity[i] = (uint8_t)_msg->intensities(i);
+
+  if (this->data.ranges_count > 0)
+  {
+    this->driver->Publish(this->device_addr,
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_LASER_DATA_SCAN,
+        (void*)&this->data, sizeof(this->data), &this->datatime);
+  }
 }

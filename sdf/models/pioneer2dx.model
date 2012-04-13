@@ -94,7 +94,6 @@
       </visual>
       <sensor name='base_laser' type='ray' always_on='1' update_rate='30' visualize='true'>
         <origin pose='0.01 0 0.03 0 -0 0'/>
-        <topic>~/laser_scan</topic>
         <ray>
           <scan>
             <horizontal samples='640' resolution='1' min_angle='-2.2688999999959423' max_angle='2.2688999999959423'/>
@@ -102,6 +101,23 @@
           <range min='0.080000000000000002' max='10' resolution='0.01'/>
         </ray>
         <plugin name='laser' filename='libRayPlugin.so'/>
+      </sensor>
+    </link>
+
+    <link name="camera">
+      <origin pose="0.2 0 0.5 0 0 0"/>
+      <visual name="visual">
+        <geometry>
+          <box size="0.1 0.1 0.1"/>
+        </geometry>
+      </visual>
+
+      <sensor name='mono' type='camera' always_on='1' update_rate='30' visualize='true'>
+        <camera>
+          <horizontal_fov angle='1.047'/>
+          <image width='320' height='240'/>
+          <clip near='0.1' far='100'/>
+        </camera>
       </sensor>
     </link>
 

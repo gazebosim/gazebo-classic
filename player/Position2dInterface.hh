@@ -25,11 +25,6 @@
 #include <string>
 #include "GazeboInterface.hh"
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 /// \addtogroup player_iface
 /// \{
 /// \defgroup position2d_player Position2d Interface
@@ -65,7 +60,6 @@ class Position2dInterface : public GazeboInterface
   /// \brief Timestamp on last data update
   private: double datatime;
 
-  private: static boost::recursive_mutex *mutex;
   private: gazebo::transport::PublisherPtr velPub;
   private: gazebo::transport::SubscriberPtr poseSub;
   private: std::string modelName;

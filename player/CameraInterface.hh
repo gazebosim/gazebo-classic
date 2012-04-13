@@ -24,66 +24,56 @@
 
 #include "GazeboInterface.hh"
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
-namespace libgazebo
-{
 /// \addtogroup player_iface
 /// \{
 /// \defgroup camera_player Camera interface
 /// \brief Camera interface
 /// \{
-  class CameraIface;
+/// \brief Camera interface
+class CameraInterface : public GazeboInterface
+{
+  /// \brief Constructor
+  public: CameraInterface(player_devaddr_t _addr, GazeboDriver *_driver,
+                          ConfigFile *_cf, int _section);
 
-  /// \brief Camera interface
-  class CameraInterface : public GazeboInterface
-  {
-    /// \brief Constructor
-    public: CameraInterface(player_devaddr_t addr, GazeboDriver *driver,
-                ConfigFile *cf, int section);
+  /// \brief Destructor
+  public: virtual ~CameraInterface();
 
-    /// \brief Destructor
-    public: virtual ~CameraInterface();
+  /// \brief Handle all messages. This is called from GazeboDriver
+  public: virtual int ProcessMessage(QueuePointer &_respQueue,
+                                     player_msghdr_t *_hdr, void *_data);
 
-    /// \brief Handle all messages. This is called from GazeboDriver
-    public: virtual int ProcessMessage(QueuePointer &respQueue,
-                player_msghdr_t *hdr, void *data);
+  /// \brief Update this interface, publish new info.
+  public: virtual void Update();
 
-    /// \brief Update this interface, publish new info.
-    public: virtual void Update();
+  /// \brief Open a SHM interface when a subscription is received.
+  ///        This is called fromGazeboDriver::Subscribe
+  public: virtual void Subscribe();
 
-    /// \brief Open a SHM interface when a subscription is received.
-    ///        This is called fromGazeboDriver::Subscribe
-    public: virtual void Subscribe();
+  /// \brief Close a SHM interface. This is called from
+  ///        GazeboDriver::Unsubscribe
+  public: virtual void Unsubscribe();
 
-    /// \brief Close a SHM interface. This is called from
-    ///        GazeboDriver::Unsubscribe
-    public: virtual void Unsubscribe();
+  private: void OnImage(ConstImagePtr &_msg);
 
-    /// Save a camera frame
-    private: void SaveFrame(const char *filename);
+  /// Save a camera frame
+  private: void SaveFrame(const char *filename);
 
-    private: CameraIface *iface;
+  /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+  private: std::string cameraName;
 
-    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-    private: char *gz_id;
+  /// \brief Timestamp on last data update
+  private: double datatime;
 
-    /// \brief Timestamp on last data update
-    private: double datatime;
+  /// Most recent data
+  private: player_camera_data_t data;
 
-    /// Most recent data
-    private: player_camera_data_t data;
+  private: gazebo::transport::SubscriberPtr cameraSub;
 
-    // Save image frames?
-    private: int save;
-    private: int frameno;
-
-    private: static boost::recursive_mutex *mutex;
-  };
+  // Save image frames?
+  private: int save;
+  private: int frameno;
+};
 /// \}
 /// \}
-}
 #endif

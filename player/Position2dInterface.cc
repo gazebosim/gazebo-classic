@@ -33,16 +33,12 @@
 */
 #include <math.h>
 #include <iostream>
-#include <boost/thread/recursive_mutex.hpp>
-
 
 #include "transport/transport.h"
 #include "msgs/msgs.h"
 #include "math/gzmath.h"
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
-
-boost::recursive_mutex *Position2dInterface::mutex = NULL;
 
 //////////////////////////////////////////////////
 // Constructor
@@ -57,9 +53,6 @@ Position2dInterface::Position2dInterface(player_devaddr_t _addr,
 
   this->velPub = this->node->Advertise<gazebo::msgs::Pose>(
       std::string("~/") + this->modelName + "/vel_cmd");
-
-  if (this->mutex == NULL)
-    this->mutex = new boost::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
@@ -74,8 +67,6 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
                                         player_msghdr_t *_hdr, void *_data)
 {
   int result = 0;
-
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // COMMAND VELOCITY:
   if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,

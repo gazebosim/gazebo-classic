@@ -68,7 +68,11 @@ void RaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 std::string RaySensor::GetTopic() const
 {
-  return std::string("~/") + this->GetName() + "/scan";
+  std::string topicName = "~/";
+  topicName += this->parentName + "/" + this->GetName() + "/scan";
+  boost::replace_all(topicName,"::","/");
+
+  return topicName;
 }
 
 //////////////////////////////////////////////////
