@@ -622,7 +622,7 @@
         </geometry>
         <material script='Gazebo/Grey'/>
       </visual>
-      <sensor name='head_mount_sensor' type='depth' always_on='0' update_rate='1.000000' visualize='0'>
+      <sensor name='head_mount_sensor' type='camera' always_on='0' update_rate='1.000000' visualize='0'>
         <origin pose='-0.147067 0.012500 0.291953 0.000000 -0.000000 0.000000'/>
         <camera>
           <horizontal_fov angle='0.994838'/>
@@ -630,7 +630,7 @@
           <clip near='0.010000' far='5.000000'/>
         </camera>
       </sensor>
-      <sensor name='head_mount_sensor' type='depth' always_on='0' update_rate='1.000000' visualize='0'>
+      <sensor name='head_mount_sensor' type='camera' always_on='0' update_rate='1.000000' visualize='0'>
         <origin pose='-0.147067 -0.017500 0.291953 0.000000 -0.000000 0.000000'/>
         <camera>
           <horizontal_fov angle='0.994838'/>
@@ -638,7 +638,7 @@
           <clip near='0.010000' far='5.000000'/>
         </camera>
       </sensor>
-      <sensor name='head_mount_prosilica_link_sensor' type='depth' always_on='0' update_rate='1.000000' visualize='0'>
+      <sensor name='head_mount_prosilica_link_sensor' type='camera' always_on='0' update_rate='1.000000' visualize='0'>
         <origin pose='-0.161257 0.012500 0.244421 0.000000 -0.000000 0.000000'/>
         <camera>
           <horizontal_fov angle='1.120501'/>
@@ -646,7 +646,7 @@
           <clip near='0.100000' far='100.000000'/>
         </camera>
       </sensor>
-      <sensor name='head_mount_prosilica_link_sim_pcd_sensor' type='depth' always_on='0' update_rate='1.000000' visualize='0'>
+      <sensor name='head_mount_prosilica_link_sim_pcd_sensor' type='camera' always_on='0' update_rate='1.000000' visualize='0'>
         <origin pose='-0.161257 0.012500 0.244421 0.000000 -0.000000 0.000000'/>
         <camera>
           <horizontal_fov angle='1.120501'/>
@@ -876,7 +876,7 @@
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1.000000 1.000000 1.000000'/>
         </geometry>
       </visual>
-      <sensor name='l_forearm_cam_sensor' type='depth' always_on='0' update_rate='25.000000' visualize='0'>
+      <sensor name='l_forearm_cam_sensor' type='camera' always_on='0' update_rate='25.000000' visualize='0'>
         <origin pose='0.135000 0.000000 0.044000 -1.570800 -0.562869 0.000000'/>
         <camera>
           <horizontal_fov angle='1.570796'/>
@@ -1339,7 +1339,7 @@
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1.000000 1.000000 1.000000'/>
         </geometry>
       </visual>
-      <sensor name='r_forearm_cam_sensor' type='depth' always_on='0' update_rate='25.000000' visualize='0'>
+      <sensor name='r_forearm_cam_sensor' type='camera' always_on='0' update_rate='25.000000' visualize='0'>
         <origin pose='0.135000 0.000000 0.044000 1.570800 -0.562869 -0.000000'/>
         <camera>
           <horizontal_fov angle='1.570796'/>
