@@ -366,7 +366,6 @@ namespace gazebo
 
       protected: Ogre::Camera *camera;
       protected: Ogre::Viewport *viewport;
-      protected: Ogre::SceneNode *origParentNode;
       protected: Ogre::SceneNode *sceneNode;
       protected: Ogre::SceneNode *pitchNode;
 

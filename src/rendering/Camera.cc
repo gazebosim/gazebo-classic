@@ -78,7 +78,6 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
-  this->origParentNode = NULL;
 
   // Connect to the render signal
   this->connections.push_back(
@@ -188,8 +187,6 @@ void Camera::Init()
   this->camera->setAutoAspectRatio(true);
 
   this->saveCount = 0;
-
-  this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 
   this->SetClipDist();
 }
@@ -1184,7 +1181,6 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   else
   {
     this->trackedVisual.reset();
-    // this->origParentNode->addChild(this->sceneNode);
     this->camera->setAutoTracking(false, NULL);
     // this->camera->setPosition(Ogre::Vector3(0, 0, 0));
     // this->camera->setOrientation(Ogre::Quaternion(-.5, -.5, .5, .5));

@@ -181,7 +181,7 @@ material Gazebo/Grey
   }
 }
 
-material Gazebo/White : perpixel_template
+material Gazebo/White
 {
 	technique
 	{
