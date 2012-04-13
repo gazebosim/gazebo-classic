@@ -477,7 +477,11 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
         SDFPtr includeSDF(new SDF);
         init(includeSDF);
 
-        readFile(filename, includeSDF);
+        if (!readFile(filename, includeSDF))
+        {
+          gzerr << "Unable to read file[" << filename << "]\n";
+          return false;
+        }
 
         includeSDF->root->GetFirstElement()->SetParent(_sdf);
         _sdf->InsertElement(includeSDF->root->GetFirstElement());

@@ -37,8 +37,6 @@ COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 COMVisual::~COMVisual()
 {
-  delete this->crossLines;
-  this->crossLines = NULL;
 }
 
 /////////////////////////////////////////////////

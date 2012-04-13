@@ -118,9 +118,10 @@ Visual::~Visual()
     event::Events::DisconnectPreRender(this->preRenderConnection);
 
   // delete instance from lines vector
-  for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
+  /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
        iter!= this->lines.end(); ++iter)
     delete *iter;
+    */
   this->lines.clear();
 
 

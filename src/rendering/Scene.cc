@@ -121,9 +121,7 @@ void Scene::Clear()
 
 
   while (this->visuals.size() > 0)
-  {
     this->RemoveVisual(this->visuals.begin()->second);
-  }
   this->visuals.clear();
 
   for (uint32_t i = 0; i < this->grids.size(); i++)
