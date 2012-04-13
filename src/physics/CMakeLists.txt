@@ -1,7 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_subdirectory(ode)
 
-set (sources Base.cc
+set (sources Actor.cc
+             Base.cc
              Link.cc
              LinkState.cc
              BoxShape.cc
@@ -32,7 +33,8 @@ set (sources Base.cc
              JointState.cc
 ) 
 
-set (headers BallJoint.hh
+set (headers Actor.hh
+             BallJoint.hh
              Base.hh
              Link.hh
              LinkState.hh

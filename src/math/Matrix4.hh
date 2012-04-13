@@ -27,6 +27,9 @@ namespace gazebo
 {
   namespace math
   {
+    class Quaternion;
+    class Pose;
+
     /// \addtogroup gazebo_math
     /// \{
     /// \brief A 3x3 matrix class
@@ -92,6 +95,15 @@ namespace gazebo
       /// \param _t Values to set
       public: void SetTranslate(const Vector3 &_t);
 
+      /// \brief Get the translational values as a Vector3
+      public: Vector3 GetTranslation() const;
+
+      /// \brief Get the rotation as a quaternion
+      public: Quaternion GetRotation() const;
+
+      /// \brief Get the transformation as math::Pose
+      public: math::Pose GetAsPose() const;
+
       /// \brief Set the scale
       /// \param _s scale
       public: void SetScale(const Vector3 &_s);
@@ -104,6 +116,9 @@ namespace gazebo
       /// \param _v Vector3 value for the transformation
       /// \return The result of the transformation
       public: Vector3 TransformAffine(const Vector3 &_v) const;
+
+      /// \brief Return the inverse matrix
+      public: Matrix4 Inverse() const;
 
       /// \brief Equal operator. this = _mat
       /// \param _mat Incoming matrix

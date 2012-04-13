@@ -89,7 +89,7 @@ namespace gazebo
       private: PublicationPtr publications[2];
 
       private: bool latch;
-      private: std::string prevMsg;
+      private: google::protobuf::Message *prevMsg;
     };
     /// \}
   }

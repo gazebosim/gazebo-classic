@@ -23,9 +23,12 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
+#include "rendering/Heightmap.hh"
 #include "rendering/RenderEvents.hh"
 #include "rendering/LaserVisual.hh"
 #include "rendering/CameraVisual.hh"
+#include "rendering/JointVisual.hh"
+#include "rendering/COMVisual.hh"
 #include "rendering/ContactVisual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
@@ -34,9 +37,12 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/Camera.hh"
 #include "rendering/DepthCamera.hh"
+#include "rendering/GpuLaser.hh"
 #include "rendering/Grid.hh"
 #include "rendering/SelectionObj.hh"
 #include "rendering/DynamicLines.hh"
+#include "rendering/RFIDVisual.hh"
+#include "rendering/RFIDTagVisual.hh"
 
 #include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
@@ -78,9 +84,13 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
+  this->sensorSub = this->node->Subscribe("~/sensor",
+                                          &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
+          &Scene::OnSkeletonPoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection",
       &Scene::OnSelectionMsg, this);
   this->requestSub = this->node->Subscribe("~/request",
@@ -92,6 +102,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   sdf::initFile("sdf/scene.sdf", this->sdf);
 
   this->clearAll = false;
+  this->heightmap = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -103,27 +114,20 @@ void Scene::Clear()
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
+  this->linkMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
+  this->lights.clear();
 
 
   while (this->visuals.size() > 0)
-  {
     this->RemoveVisual(this->visuals.begin()->second);
-  }
   this->visuals.clear();
-
-  for (Light_M::iterator iter = this->lights.begin();
-      iter != this->lights.end(); ++iter)
-  {
-    delete iter->second;
-  }
 
   for (uint32_t i = 0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
 
-  this->lights.clear();
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
 }
@@ -141,6 +145,7 @@ Scene::~Scene()
   this->visSub.reset();
   this->lightSub.reset();
   this->poseSub.reset();
+  this->skeletonPoseSub.reset();
   this->selectionSub.reset();
   this->responseSub.reset();
   this->requestSub.reset();
@@ -150,6 +155,7 @@ Scene::~Scene()
   Visual_M::iterator iter;
   this->visuals.clear();
   this->jointMsgs.clear();
+  this->linkMsgs.clear();
   this->sceneMsgs.clear();
   this->poseMsgs.clear();
   this->lightMsgs.clear();
@@ -157,11 +163,6 @@ Scene::~Scene()
 
   this->worldVisual.reset();
   this->selectionMsg.reset();
-  for (Light_M::iterator lightIter = this->lights.begin();
-       lightIter != this->lights.end(); ++lightIter)
-  {
-    delete lightIter->second;
-  }
   this->lights.clear();
 
   // Remove a scene
@@ -203,6 +204,7 @@ void Scene::Load()
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
 }
 
+//////////////////////////////////////////////////
 VisualPtr Scene::GetWorldVisual() const
 {
   return this->worldVisual;
@@ -246,7 +248,7 @@ void Scene::Init()
   // Send a request to get the current world state
   this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
   this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this);
+      &Scene::OnResponse, this, true);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
@@ -254,98 +256,6 @@ void Scene::Init()
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 }
-
-// TODO: put this back in, and disable PSSM shadows in the RTShader.
-void Scene::InitShadows()
-{
-  // Allow a total of 3 shadow casters per scene
-  const int numShadowTextures = 3;
-
-  // this->manager->setShadowFarDistance(500);
-  // this->manager->setShadowTextureCount(numShadowTextures);
-
-  // this->manager->setShadowTextureSize(1024);
-  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_RGB);
-  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-  // this->manager->setShadowTextureSelfShadow(false);
-  // this->manager->setShadowCasterRenderBackFaces(true);
-  // this->manager->setShadowTechnique(
-  // Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-  this->manager->setShadowTextureCasterMaterial("shadow_caster");
-
-  // const unsigned numShadowRTTs = this->manager->getShadowTextureCount();
-
-  /*for (unsigned i = 0; i < numShadowRTTs; ++i)
-  {
-    Ogre::TexturePtr tex = this->manager->getShadowTexture(i);
-    Ogre::Viewport *vp = tex->getBuffer()->getRenderTarget()->getViewport(0);
-    vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0, 1));
-    vp->setClearEveryFrame(true);
-
-    // Ogre::CompositorManager::getSingleton().addCompositor(vp, "blur");
-    // Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "blur",
-    // true);
-  }
-  // END
-  */
-
-  this->manager->setShadowTechnique(
-      Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-
-  // Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
-      // Ogre::TFO_ANISOTROPIC);
-
-  this->manager->setShadowFarDistance(500);
-  this->manager->setShadowTextureCount(numShadowTextures);
-  this->manager->setShadowTextureSize(1024);
-  this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL,
-      numShadowTextures);
-  this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-
-  // this->manager->setShadowTextureCount(numShadowTextures+1);
-
-  this->manager->setShadowTextureCasterMaterial("shadow_caster");
-  this->manager->setShadowCasterRenderBackFaces(true);
-  this->manager->setShadowTextureSelfShadow(false);
-
-  // PSSM Stuff
-  this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT32_RGB);
-  this->manager->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_RGB);
-  this->manager->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_RGB);
-  // this->manager->setShadowTextureConfig(3, 512, 512, Ogre::PF_FLOAT32_RGB);
-
-
-  // DEBUG CODE: Will display three overlay panels that show the contents of
-  // the shadow maps
-  // add the overlay elements to show the shadow maps:
-  // init overlay elements
-  /*Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
-  Ogre::Overlay* overlay = mgr.create("DebugOverlay");
-  for (size_t i = 0; i < 3; ++i)
-  {
-    Ogre::TexturePtr tex = this->manager->getShadowTexture(i);
-
-    // Set up a debug panel to display the shadow
-    Ogre::MaterialPtr debugMat = Ogre:: MaterialManager::getSingleton().create(
-        "Ogre/DebugTexture" + Ogre::StringConverter::toString(i),
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-    Ogre::TextureUnitState *t =
-      debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(
-          tex->getName());
-    t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
-
-    Ogre::OverlayContainer* debugPanel = (Ogre::OverlayContainer*)
-      (Ogre::OverlayManager::getSingleton().createOverlayElement(
-        "Panel", "Ogre/DebugTexPanel" + Ogre::StringConverter::toString(i)));
-    debugPanel->_setPosition(0.8, i*0.25);
-    debugPanel->_setDimensions(0.2, 0.24);
-    debugPanel->setMaterialName(debugMat->getName());
-    overlay->add2D(debugPanel);
-    overlay->show();
-  }*/
-}
-
 
 //////////////////////////////////////////////////
 Ogre::SceneManager *Scene::GetManager() const
@@ -454,6 +364,17 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
+GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
+                                        bool _autoRender)
+{
+  GpuLaserPtr camera(new GpuLaser(this->name + "::" + _name,
+        this, _autoRender));
+  this->cameras.push_back(camera);
+
+  return camera;
+}
+
+//////////////////////////////////////////////////
 uint32_t Scene::GetCameraCount() const
 {
   return this->cameras.size();
@@ -529,6 +450,16 @@ VisualPtr Scene::CreateVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+LightPtr Scene::GetLight(const std::string &_name) const
+{
+  LightPtr result;
+  Light_M::const_iterator iter = this->lights.find(_name);
+  if (iter != this->lights.end())
+    result = iter->second;
+  return result;
+}
+
+//////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(const std::string &_name) const
 {
   VisualPtr result;
@@ -589,6 +520,58 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
   }
 
   return visual;
+}
+
+//////////////////////////////////////////////////
+VisualPtr Scene::GetModelVisualAt(CameraPtr _camera, math::Vector2i _mousePos)
+{
+  VisualPtr vis = this->GetVisualAt(_camera, _mousePos);
+  if (vis)
+    vis = this->GetVisual(vis->GetName().substr(0, vis->GetName().find("::")));
+
+  return vis;
+}
+
+//////////////////////////////////////////////////
+void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
+{
+  VisualPtr visBelow = this->GetVisualBelow(_visualName);
+  VisualPtr vis = this->GetVisual(_visualName);
+
+  if (vis && visBelow)
+  {
+    math::Vector3 pos = vis->GetWorldPose().pos;
+    double dz = vis->GetBoundingBox().min.z - visBelow->GetBoundingBox().max.z;
+    pos.z -= dz;
+    vis->SetWorldPosition(pos);
+  }
+}
+
+//////////////////////////////////////////////////
+VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
+{
+  VisualPtr result;
+  VisualPtr vis = this->GetVisual(_visualName);
+
+  if (vis)
+  {
+    std::vector<VisualPtr> below;
+    this->GetVisualsBelowPoint(vis->GetWorldPose().pos, below);
+
+    double maxZ = -10000;
+
+    for (unsigned int i = 0; i < below.size(); ++i)
+    {
+      if (below[i]->GetName().find(vis->GetName()) != 0
+          && below[i]->GetBoundingBox().max.z > maxZ)
+      {
+        maxZ = below[i]->GetBoundingBox().max.z;
+        result = below[i];
+      }
+    }
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -983,11 +966,11 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     Ogre::IndexData* index_data = submesh->indexData;
     Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
 
-    uint64_t*  pLong = static_cast<uint64_t*>(
-        ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-
     if ((ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT))
     {
+      uint32_t*  pLong = static_cast<uint32_t*>(
+          ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
+
       for (size_t k = 0; k < index_data->indexCount; k++)
       {
         indices[index_offset++] = pLong[k];
@@ -995,6 +978,9 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     }
     else
     {
+      uint64_t*  pLong = static_cast<uint64_t*>(
+          ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
+
       uint16_t* pShort = reinterpret_cast<uint16_t*>(pLong);
       for (size_t k = 0; k < index_data->indexCount; k++)
       {
@@ -1007,13 +993,14 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene());
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   if (_msg->has_type() && _msg->type() == sm->GetTypeName())
   {
     sm->ParseFromString(_msg->serialized_data());
@@ -1039,6 +1026,13 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       this->visualMsgs.push_back(vm);
     }
 
+    for (int j = 0; j < _msg->model(i).joint_size(); j++)
+    {
+      boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
+            _msg->model(i).joint(j)));
+      this->jointMsgs.push_back(jm);
+    }
+
     for (int j = 0; j < _msg->model(i).link_size(); j++)
     {
       linkName = modelName +_msg->model(i).link(j).name();
@@ -1046,6 +1040,13 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
           new msgs::Pose(_msg->model(i).link(j).pose()));
       pm2->set_name(linkName);
       this->poseMsgs.push_front(pm2);
+
+      if (_msg->model(i).link(j).has_inertial())
+      {
+        boost::shared_ptr<msgs::Link> lm(
+            new msgs::Link(_msg->model(i).link(j)));
+        this->linkMsgs.push_back(lm);
+      }
 
       for (int k = 0; k < _msg->model(i).link(j).visual_size(); k++)
       {
@@ -1141,6 +1142,13 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 }
 
 //////////////////////////////////////////////////
+void Scene::OnSensorMsg(ConstSensorPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sensorMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
 void Scene::OnSceneMsg(ConstScenePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -1159,20 +1167,15 @@ void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
-  RequestMsgs_L::iterator rIter;
-  SceneMsgs_L::iterator sIter;
-  VisualMsgs_L::iterator vIter;
-  LightMsgs_L::iterator lIter;
-  PoseMsgs_L::iterator pIter;
-  JointMsgs_L::iterator jIter;
-  SensorMsgs_L::iterator sensorIter;
-
-  for (sensorIter = this->sensorMsgs.begin();
-       sensorIter != this->sensorMsgs.end(); ++sensorIter)
-  {
-    this->ProcessSensorMsg(*sensorIter);
-  }
-  this->sensorMsgs.clear();
+  static RequestMsgs_L::iterator rIter;
+  static SceneMsgs_L::iterator sIter;
+  static VisualMsgs_L::iterator vIter;
+  static LightMsgs_L::iterator lIter;
+  static PoseMsgs_L::iterator pIter;
+  static SkeletonPoseMsgs_L::iterator spIter;
+  static JointMsgs_L::iterator jIter;
+  static SensorMsgs_L::iterator sensorIter;
+  static LinkMsgs_L::iterator linkIter;
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
@@ -1181,6 +1184,15 @@ void Scene::PreRender()
     this->ProcessSceneMsg(*sIter);
   }
   this->sceneMsgs.clear();
+
+  sensorIter = this->sensorMsgs.begin();
+  while (sensorIter != this->sensorMsgs.end())
+  {
+    if (this->ProcessSensorMsg(*sensorIter))
+      this->sensorMsgs.erase(sensorIter++);
+    else
+      ++sensorIter;
+  }
 
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
@@ -1201,13 +1213,6 @@ void Scene::PreRender()
   }
   this->lightMsgs.clear();
 
-  // Process the joint messages
-  for (jIter =  this->jointMsgs.begin();
-       jIter != this->jointMsgs.end(); ++jIter)
-  {
-    this->ProcessJointMsg(*jIter);
-  }
-  this->jointMsgs.clear();
 
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
@@ -1235,6 +1240,21 @@ void Scene::PreRender()
       ++pIter;
   }
 
+  // process skeleton pose msgs
+  spIter = this->skeletonPoseMsgs.begin();
+  while (spIter != this->skeletonPoseMsgs.end())
+  {
+    Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
+    if (iter != this->visuals.end())
+    {
+      iter->second->SetSkeletonPose(*(*spIter).get());
+      SkeletonPoseMsgs_L::iterator prev = spIter++;
+      this->skeletonPoseMsgs.erase(prev);
+    }
+    else
+      ++spIter;
+  }
+
   // Process the request messages
   for (rIter =  this->requestMsgs.begin();
        rIter != this->requestMsgs.end(); ++rIter)
@@ -1243,6 +1263,25 @@ void Scene::PreRender()
   }
   this->requestMsgs.clear();
 
+  // Process the joint messages
+  jIter = this->jointMsgs.begin();
+  while (jIter != this->jointMsgs.end())
+  {
+    if (this->ProcessJointMsg(*jIter))
+      this->jointMsgs.erase(jIter++);
+    else
+      ++jIter;
+  }
+
+  // Process the link messages
+  linkIter = this->linkMsgs.begin();
+  while (linkIter != this->linkMsgs.end())
+  {
+    if (this->ProcessLinkMsg(*linkIter))
+      this->linkMsgs.erase(linkIter++);
+    else
+      ++linkIter;
+  }
 
   if (this->selectionMsg)
   {
@@ -1259,10 +1298,10 @@ void Scene::OnJointMsg(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
+bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
   if (!this->enableVisualizations)
-    return;
+    return true;
 
   if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
@@ -1270,10 +1309,10 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
-        gzerr << "Unable to find parent visual[" << _msg->parent() << "]\n";
+        return false;
 
       LaserVisualPtr laserVis(new LaserVisual(
-            _msg->name()+"_laser_vis", parentVis, _msg->topic()));
+            _msg->name()+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
       this->visuals[_msg->name()+"_laser_vis"] = laserVis;
     }
@@ -1281,8 +1320,11 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   else if (_msg->type() == "camera" && _msg->visualize())
   {
     VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
     CameraVisualPtr cameraVis(new CameraVisual(
-          _msg->name()+"_camera_vis", parentVis));
+          _msg->name()+"_GUIONLY_camera_vis", parentVis));
 
     cameraVis->SetPose(msgs::Convert(_msg->pose()));
 
@@ -1295,17 +1337,58 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
            !_msg->topic().empty())
   {
     ContactVisualPtr contactVis(new ContactVisual(
-          _msg->name()+"_contact_vis", this->worldVisual, _msg->topic()));
+          _msg->name()+"_GUIONLY_contact_vis",
+          this->worldVisual, _msg->topic()));
 
     this->visuals[contactVis->GetName()] = contactVis;
   }
+  else if (_msg->type() == "rfidtag" && _msg->visualize() &&
+           !_msg->topic().empty())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
+    RFIDTagVisualPtr rfidVis(new RFIDTagVisual(
+          _msg->name() + "_rfidtag_vis", parentVis, _msg->topic()));
+
+    std::cout << "rfid vis message recieved" << std::endl;
+    this->visuals[rfidVis->GetName()] = rfidVis;
+  }
+  else if (_msg->type() == "rfid" && _msg->visualize() &&
+           !_msg->topic().empty())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent());
+    if (!parentVis)
+      return false;
+
+    RFIDVisualPtr rfidVis(new RFIDVisual(
+          _msg->name() + "_rfid_vis", parentVis, _msg->topic()));
+    this->visuals[rfidVis->GetName()] = rfidVis;
+  }
+
+  return true;
 }
 
 /////////////////////////////////////////////////
-void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
+bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 {
-  // TODO: Fix this
-  /*VisualPtr parentVis = this->GetVisual(_msg->parent());
+  VisualPtr linkVis = this->GetVisual(_msg->name());
+
+  if (!linkVis)
+    return false;
+
+  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
+  comVis->Load();
+  comVis->SetVisible(false);
+  this->visuals[comVis->GetName()] = comVis;
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
+{
   VisualPtr childVis;
 
   if (_msg->child() == "world")
@@ -1313,23 +1396,16 @@ void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
   else
     childVis = this->GetVisual(_msg->child());
 
-  if (parentVis && childVis)
-  {
-    DynamicLines *line = parentVis->CreateDynamicLine();
-    // this->worldVisual->AttachObject(line);
+  if (!childVis)
+    return false;
 
-    line->AddPoint(math::Vector3(0, 0, 0));
-    line->AddPoint(math::Vector3(0, 0, 0));
+  JointVisualPtr jointVis(new JointVisual(
+          _msg->name() + "_JOINT_VISUAL__", childVis));
+  jointVis->Load(_msg);
+  jointVis->SetVisible(false);
 
-    // parentVis->AttachLineVertex(line, 0);
-    childVis->AttachLineVertex(line, 1);
-  }
-  else
-  {
-    gzwarn << "Unable to create joint visual. Parent["
-           << _msg->parent() << "] Child[" << _msg->child() << "].\n";
-  }
-  */
+  this->visuals[jointVis->GetName()] = jointVis;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -1365,6 +1441,34 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     if (vis)
       vis->ShowCollision(false);
   }
+  else if (_msg->request() == "show_joints")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowJoints(true);
+    else
+      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+  }
+  else if (_msg->request() == "hide_joints")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowJoints(false);
+  }
+  else if (_msg->request() == "show_com")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCOM(true);
+    else
+      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+  }
+  else if (_msg->request() == "hide_com")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCOM(false);
+  }
   else if (_msg->request() == "set_transparency")
   {
     VisualPtr vis = this->GetVisual(_msg->data());
@@ -1396,6 +1500,20 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
   else
   {
     VisualPtr visual;
+
+    // TODO: A bit of a hack.
+    if (_msg->has_geometry() &&
+        _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+    {
+      try
+      {
+        this->heightmap = new Heightmap(shared_from_this());
+        this->heightmap->Load();
+      } catch(...)
+      {
+        return false;
+      }
+    }
 
     // If the visual has a parent which is not the name of the scene...
     if (_msg->has_parent_name() && _msg->parent_name() != this->GetName())
@@ -1451,6 +1569,27 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  SkeletonPoseMsgs_L::iterator iter;
+
+  // Find an old model message, and remove them
+  for (iter = this->skeletonPoseMsgs.begin();
+        iter != this->skeletonPoseMsgs.end(); ++iter)
+  {
+    if ((*iter)->model_name() == _msg->model_name())
+    {
+      this->skeletonPoseMsgs.erase(iter);
+      break;
+    }
+  }
+
+  this->skeletonPoseMsgs.push_back(_msg);
+}
+
+
+/////////////////////////////////////////////////
 void Scene::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -1465,9 +1604,10 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 
   if (iter == this->lights.end())
   {
-    Light *light = new Light(this);
+    LightPtr light(new Light(this));
     light->LoadFromMsg(_msg);
     this->lights[_msg->name()] = light;
+    RTShaderSystem::Instance()->UpdateShaders();
   }
 }
 
@@ -1477,6 +1617,7 @@ void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
   this->selectionMsg = _msg;
 }
 
+/////////////////////////////////////////////////
 void Scene::SetSky(const std::string &_material)
 {
   this->sdf->GetOrCreateElement("background")->GetOrCreateElement(
@@ -1488,7 +1629,7 @@ void Scene::SetSky(const std::string &_material)
     orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1, 0, 0));
     double curvature = 10;  // ogre recommended default
     double tiling = 8;  // ogre recommended default
-    double distance = 4000;  // ogre recommended default
+    double distance = 100;  // ogre recommended default
     this->manager->setSkyDome(true, _material, curvature,
         tiling, distance, true, orientation);
   }
@@ -1498,7 +1639,7 @@ void Scene::SetSky(const std::string &_material)
   }
 }
 
-/// Set whether shadows are on or off
+/////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
@@ -1512,18 +1653,20 @@ void Scene::SetShadowsEnabled(bool _value)
   }
 }
 
-/// Get whether shadows are on or off
+/////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
   return shadowElem->GetValueBool("enabled");
 }
 
+/////////////////////////////////////////////////
 void Scene::AddVisual(VisualPtr &_vis)
 {
   this->visuals[_vis->GetName()] = _vis;
 }
 
+/////////////////////////////////////////////////
 void Scene::RemoveVisual(VisualPtr _vis)
 {
   if (_vis)
@@ -1540,6 +1683,7 @@ void Scene::RemoveVisual(VisualPtr _vis)
   }
 }
 
+/////////////////////////////////////////////////
 std::string Scene::GetUniqueName(const std::string &_prefix)
 {
   std::ostringstream test;
@@ -1555,11 +1699,13 @@ std::string Scene::GetUniqueName(const std::string &_prefix)
   return test.str();
 }
 
+/////////////////////////////////////////////////
 SelectionObj *Scene::GetSelectionObj() const
 {
   return this->selectionObj;
 }
 
+/////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
   if (_enabled)
@@ -1595,4 +1741,10 @@ std::string Scene::StripSceneName(const std::string &_name) const
     return _name.substr(this->GetName().size() + 2);
   else
     return _name;
+}
+
+//////////////////////////////////////////////////
+Heightmap *Scene::GetHeightmap() const
+{
+  return this->heightmap;
 }

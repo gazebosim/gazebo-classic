@@ -457,12 +457,14 @@ void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
   this->listMutex->unlock();
 }
 
+//////////////////////////////////////////////////
 void ConnectionManager::Unsubscribe(const msgs::Subscribe &_sub)
 {
   // Inform the master that we want to unsubscribe from a topic.
   this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", _sub), true);
 }
 
+//////////////////////////////////////////////////
 void ConnectionManager::Unsubscribe(const std::string &_topic,
                                      const std::string &_msgType)
 {
@@ -476,6 +478,7 @@ void ConnectionManager::Unsubscribe(const std::string &_topic,
   this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
 }
 
+//////////////////////////////////////////////////
 void ConnectionManager::Subscribe(const std::string &_topic,
                                   const std::string &_msgType,
                                   bool _latching)

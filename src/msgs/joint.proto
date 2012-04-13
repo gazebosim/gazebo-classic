@@ -7,6 +7,7 @@ package gazebo.msgs;
 
 import "vector3d.proto";
 import "axis.proto";
+import "pose.proto";
 
 message Joint
 {
@@ -17,22 +18,24 @@ message Joint
     PRISMATIC = 3;
     UNIVERSAL = 4;
     BALL      = 5;
+    SCREW     = 6;
   }
 
   required string name           = 1;
   optional Type type             = 2;
   optional string parent         = 3;
   optional string child          = 4;
-  optional Axis axis1            = 5;
-  optional Axis axis2            = 6;
+  optional Pose pose             = 5;
+  optional Axis axis1            = 6;
+  optional Axis axis2            = 7;
 
-  optional double cfm            = 7;
-  optional double bounce         = 8;
-  optional double velocity       = 9;
-  optional double fudge_factor   = 10;
-  optional double limit_cfm      = 11;
-  optional double limit_erp      = 12;
-  optional double suspension_cfm = 13;
-  optional double suspension_erp = 14;
+  optional double cfm            = 8;
+  optional double bounce         = 9;
+  optional double velocity       = 10;
+  optional double fudge_factor   = 11;
+  optional double limit_cfm      = 12;
+  optional double limit_erp      = 13;
+  optional double suspension_cfm = 14;
+  optional double suspension_erp = 15;
 }
 /// \endverbatim

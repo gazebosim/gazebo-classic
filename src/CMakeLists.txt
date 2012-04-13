@@ -47,15 +47,15 @@ target_link_libraries(gzmaster gazebo_common
                                 ${PROTOBUF_LIBRARY})
 
 target_link_libraries(gzserver gazebo_common
-                                gazebo_sdf_interface
-                                gazebo_transport
-                                gazebo_physics
-                                gazebo_sensors
-                                gazebo_rendering
-                                gazebo_msgs
-                                pthread
-                                ${tinyxml_libraries}
-                                )
+                               gazebo_sdf_interface
+                               gazebo_transport
+                               gazebo_physics
+                               gazebo_sensors
+                               gazebo_rendering
+                               gazebo_msgs
+                               pthread
+                               ${tinyxml_libraries}
+                               boost_program_options)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)

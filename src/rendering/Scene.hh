@@ -60,6 +60,7 @@ namespace gazebo
     class Grid;
     class Camera;
     class UserCamera;
+    class Heightmap;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -120,6 +121,10 @@ namespace gazebo
       public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
                                                bool _autoRender = true);
 
+      /// \brief Create visual laser
+      public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
+                                               bool _autoRender = true);
+
       /// \brief Get the number of cameras in this scene
       public: uint32_t GetCameraCount() const;
 
@@ -138,6 +143,9 @@ namespace gazebo
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(uint32_t index) const;
 
+      /// \brief Get a light by name
+      public: LightPtr GetLight(const std::string &_name) const;
+
       /// \brief Create a visual
       public: VisualPtr CreateVisual(const std::string &_name);
 
@@ -146,6 +154,7 @@ namespace gazebo
 
       public: VisualPtr SelectVisualAt(CameraPtr camera,
                                        math::Vector2i mousePos);
+
 
       /// \brief Select a visual by name
       public: void SelectVisual(const std::string &_name) const;
@@ -160,8 +169,19 @@ namespace gazebo
                                     math::Vector2i mousePos,
                                     std::string &mod);
 
+      public: void SnapVisualToNearestBelow(const std::string &_visualName);
+
       /// \brief Get a visual at a mouse position
-      public: VisualPtr GetVisualAt(CameraPtr camera, math::Vector2i mousePos);
+      public: VisualPtr GetVisualAt(CameraPtr _camera,
+                                    math::Vector2i _mousePos);
+
+      /// \brief Get a model's visual at a mouse position
+      public: VisualPtr GetModelVisualAt(CameraPtr _camera,
+                                         math::Vector2i _mousePos);
+
+
+      /// \brief Get the closest visual below a given visual
+      public: VisualPtr GetVisualBelow(const std::string &_visualName);
 
       /// \brief Get a visual directly below a point
       public: void GetVisualsBelowPoint(const math::Vector3 &_pt,
@@ -206,9 +226,6 @@ namespace gazebo
       private: void PrintSceneGraphHelper(const std::string &prefix,
                                           Ogre::Node *node);
 
-      /// \brief Deprecated: use RTShader::ApplyShadows
-      public: void InitShadows();
-
       public: void SetSky(const std::string &_material);
 
       /// \brief Set whether shadows are on or off
@@ -237,6 +254,8 @@ namespace gazebo
 
       public: std::string StripSceneName(const std::string &_name) const;
 
+      public: Heightmap *GetHeightmap() const;
+
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
       private: void GetMeshInformation(const Ogre::Mesh *mesh,
@@ -252,12 +271,14 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnJointMsg(ConstJointPtr &_msg);
 
-      private: void ProcessSensorMsg(ConstSensorPtr &_msg);
-      private: void ProcessJointMsg(ConstJointPtr &_msg);
+      private: bool ProcessSensorMsg(ConstSensorPtr &_msg);
+      private: bool ProcessJointMsg(ConstJointPtr &_msg);
+      private: bool ProcessLinkMsg(ConstLinkPtr &_msg);
 
       private: void ProcessSceneMsg(ConstScenePtr &_msg);
 
       private: void OnSceneMsg(ConstScenePtr &_msg);
+      private: void OnSensorMsg(ConstSensorPtr &_msg);
       private: void OnVisualMsg(ConstVisualPtr &_msg);
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
 
@@ -268,6 +289,8 @@ namespace gazebo
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: void OnPoseMsg(ConstPosePtr &_msg);
+
+      private: void OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg);
 
       public: void Clear();
 
@@ -303,6 +326,9 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Joint const> > JointMsgs_L;
       private: JointMsgs_L jointMsgs;
 
+      typedef std::list<boost::shared_ptr<msgs::Link const> > LinkMsgs_L;
+      private: LinkMsgs_L linkMsgs;
+
       typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
       private: SensorMsgs_L sensorMsgs;
 
@@ -312,8 +338,12 @@ namespace gazebo
       typedef std::map<std::string, VisualPtr> Visual_M;
       private: Visual_M visuals;
 
-      typedef std::map<std::string, Light*> Light_M;
+      typedef std::map<std::string, LightPtr> Light_M;
       private: Light_M lights;
+
+      typedef std::list<boost::shared_ptr<msgs::PoseAnimation const> >
+                                                          SkeletonPoseMsgs_L;
+      private: SkeletonPoseMsgs_L skeletonPoseMsgs;
 
       private: boost::shared_ptr<msgs::Selection const> selectionMsg;
 
@@ -321,12 +351,14 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::SubscriberPtr sceneSub;
+      private: transport::SubscriberPtr sensorSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;
       private: transport::SubscriberPtr selectionSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
+      private: transport::SubscriberPtr skeletonPoseSub;
       private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;
@@ -338,6 +370,8 @@ namespace gazebo
 
       private: bool enableVisualizations;
       private: bool clearAll;
+
+      private: Heightmap *heightmap;
     };
     /// \}
   }

@@ -18,7 +18,8 @@
 #define GAZEBO_SENSORS_HH
 
 #include <string>
-#include "SensorTypes.hh"
+#include "sdf/sdf.h"
+#include "sensors/SensorTypes.hh"
 
 namespace gazebo
 {
@@ -37,6 +38,9 @@ namespace gazebo
     std::string create_sensor(sdf::ElementPtr _elem,
                               const std::string &_worldName,
                               const std::string &_parentName);
+
+    /// \brief Remove a sensor by name
+    void remove_sensor(const std::string &_sensorName);
 
     /// \brief Run the sensor generation one step.
     /// \param force: If true, all sensors are forced to update. Otherwise

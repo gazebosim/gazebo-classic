@@ -29,6 +29,7 @@ namespace gazebo
   {
     class Material;
     class SubMesh;
+    class Skeleton;
 
     /// \addtogroup gazebo_common Common
     /// \{
@@ -104,16 +105,34 @@ namespace gazebo
       ///        from center
       public: void GenSphericalTexCoord(const math::Vector3 &_center);
 
+      /// \brief Get the skeleton to which this mesh is attached.
+      /// \return pointer to skeleton, or NULL if none is present.
+      public: Skeleton* GetSkeleton() const;
+
+      /// \brief Set the mesh skeleton
+      public: void SetSkeleton(Skeleton *_skel);
+
+      /// \brief Return true if mesh is attached to a skeleton.
+      public: bool HasSkeleton() const;
+
       private: std::string name;
       private: std::string path;
       private: std::vector<SubMesh *> submeshes;
       private: std::vector<Material *> materials;
+      private: Skeleton *skeleton;
+    };
+
+    struct NodeAssignment
+    {
+      unsigned int vertexIndex;
+      unsigned int nodeIndex;
+      float weight;
     };
 
     /// \brief A child mesh
     class SubMesh
     {
-      public: enum PrimitiveType {LINES, LINESTRIPS, TRIANGLES,
+      public: enum PrimitiveType {POINTS, LINES, LINESTRIPS, TRIANGLES,
                 TRIFANS, TRISTRIPS};
 
       /// \brief Constructor
@@ -164,6 +183,10 @@ namespace gazebo
       /// \brief Add a texture coord to the mesh
       public: void AddTexCoord(double _u, double _v);
 
+      /// \brief Add a vertex - skeleton node assignment
+      public: void AddNodeAssignment(unsigned int _vertex, unsigned int _node,
+                                     float _weight);
+
       /// \brief Get a vertex
       public: math::Vector3 GetVertex(unsigned int _i) const;
 
@@ -178,6 +201,9 @@ namespace gazebo
 
       /// \brief Get a tex coord
       public: math::Vector2d GetTexCoord(unsigned int _i) const;
+
+      /// \brief Get a vertex - skeleton node assignment
+      public: NodeAssignment GetNodeAssignment(unsigned int _i) const;
 
       /// \brief Set a tex coord
       public: void SetTexCoord(unsigned int _i, const math::Vector2d &_t);
@@ -202,6 +228,9 @@ namespace gazebo
 
       /// \brief Return the number of texture coordinates
       public: unsigned int GetTexCoordCount() const;
+
+      /// \brief Return the number of vertex - skeleton node assignments
+      public: unsigned int GetNodeAssignmentsCount() const;
 
       /// \brief Get the highest index value
       public: unsigned int GetMaxIndex() const;
@@ -236,6 +265,7 @@ namespace gazebo
       private: std::vector< math::Vector3 > normals;
       private: std::vector< math::Vector2d > texCoords;
       private: std::vector<unsigned int> indices;
+      private: std::vector<NodeAssignment> nodeAssignments;
 
       private: PrimitiveType primitiveType;
 

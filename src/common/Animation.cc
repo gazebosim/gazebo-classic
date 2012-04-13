@@ -37,6 +37,7 @@ namespace
 }
 
 
+/////////////////////////////////////////////////
 Animation::Animation(const std::string &_name, double _length, bool _loop)
 : name(_name), length(_length), loop(_loop)
 {
@@ -44,20 +45,24 @@ Animation::Animation(const std::string &_name, double _length, bool _loop)
   this->build = false;
 }
 
+/////////////////////////////////////////////////
 Animation::~Animation()
 {
 }
 
+/////////////////////////////////////////////////
 double Animation::GetLength() const
 {
   return this->length;
 }
 
+/////////////////////////////////////////////////
 void Animation::SetLength(double _len)
 {
   this->length = _len;
 }
 
+/////////////////////////////////////////////////
 void Animation::SetTime(double _time)
 {
   if (!math::equal(_time, this->timePos))
@@ -79,16 +84,31 @@ void Animation::SetTime(double _time)
   }
 }
 
+/////////////////////////////////////////////////
 void Animation::AddTime(double _time)
 {
   this->SetTime(this->timePos + _time);
 }
 
+/////////////////////////////////////////////////
 double Animation::GetTime() const
 {
   return this->timePos;
 }
 
+/////////////////////////////////////////////////
+unsigned int Animation::GetNumKeyFrames() const
+{
+  return this->keyFrames.size();
+}
+
+/////////////////////////////////////////////////
+KeyFrame* Animation::GetKeyFrame(unsigned int _index) const
+{
+  return this->keyFrames[_index];
+}
+
+/////////////////////////////////////////////////
 double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
     KeyFrame **_kf2,
     unsigned int &_firstKeyIndex) const
@@ -144,6 +164,7 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
 
 
 
+/////////////////////////////////////////////////
 PoseAnimation::PoseAnimation(const std::string &_name,
     double _length, bool _loop)
 : Animation(_name, _length, _loop)
@@ -152,12 +173,14 @@ PoseAnimation::PoseAnimation(const std::string &_name,
   this->rotationSpline = NULL;
 }
 
+/////////////////////////////////////////////////
 PoseAnimation::~PoseAnimation()
 {
   delete this->positionSpline;
   delete this->rotationSpline;
 }
 
+/////////////////////////////////////////////////
 PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
 {
   PoseKeyFrame *frame = new PoseKeyFrame(_time);
@@ -171,6 +194,7 @@ PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
   return frame;
 }
 
+/////////////////////////////////////////////////
 void PoseAnimation::BuildInterpolationSplines() const
 {
   if (!this->positionSpline)
@@ -198,11 +222,13 @@ void PoseAnimation::BuildInterpolationSplines() const
   this->build = false;
 }
 
+/////////////////////////////////////////////////
 void PoseAnimation::GetInterpolatedKeyFrame(PoseKeyFrame &_kf) const
 {
   this->GetInterpolatedKeyFrame(this->timePos, _kf);
 }
 
+/////////////////////////////////////////////////
 void PoseAnimation::GetInterpolatedKeyFrame(double _time,
                                             PoseKeyFrame &_kf) const
 {
@@ -220,6 +246,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
   if (math::equal(t, 0.0))
   {
     _kf.SetTranslation(k1->GetTranslation());
+    _kf.SetRotation(k1->GetRotation());
   }
   else
   {
@@ -228,16 +255,26 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
   }
 }
 
+
+
+
+
+
+
+
+/////////////////////////////////////////////////
 NumericAnimation::NumericAnimation(const std::string &_name,
     double _length, bool _loop)
 : Animation(_name, _length, _loop)
 {
 }
 
+/////////////////////////////////////////////////
 NumericAnimation::~NumericAnimation()
 {
 }
 
+/////////////////////////////////////////////////
 NumericKeyFrame *NumericAnimation::CreateKeyFrame(double _time)
 {
   NumericKeyFrame *frame = new NumericKeyFrame(_time);
@@ -251,6 +288,7 @@ NumericKeyFrame *NumericAnimation::CreateKeyFrame(double _time)
   return frame;
 }
 
+/////////////////////////////////////////////////
 void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
 {
   // Keyframe pointers

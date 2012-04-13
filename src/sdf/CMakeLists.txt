@@ -9,6 +9,7 @@ set (sdfs gazebo.sdf
           light.sdf 
           link.sdf 
           model.sdf 
+          actor.sdf 
           physics.sdf 
           plugin.sdf 
           scene.sdf 
@@ -21,6 +22,8 @@ set (sdfs gazebo.sdf
           contact.sdf
           gui.sdf
           state.sdf
+          rfidtag.sdf
+          rfid.sdf
 )
 
 INSTALL_INCLUDES("sdf" ${headers})

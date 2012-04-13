@@ -23,53 +23,46 @@
 #define HEIGHTMAP_HH
 #include <string>
 
-// TODO: remove this line
-#include "rendering/ogre.h"
-
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
+#include "rendering/Scene.hh"
+
+namespace Ogre
+{
+  class TerrainGlobalOptions;
+  class TerrainGroup;
+  class Terrain;
+}
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
-
     /// \addtogroup gazebo_rendering
     /// \{
     /// \brief Height map geom
-    class Heightmap : public Ogre::RaySceneQueryListener
+    class Heightmap
     {
       /// \brief Constructor
-      public: Heightmap(Scene *scene);
+      public: Heightmap(ScenePtr scene);
 
       /// \brief Destructor
       public: virtual ~Heightmap();
 
-      /// \brief Get the height of the heightmap as a specific coordinate
-      public: float GetHeightAt(const math::Vector2d &pos);
-
-      /// \brief Overloaded Ogre function for Ray Scene Queries
-      public: virtual bool queryResult(Ogre::MovableObject *obj,
-                                       Ogre::Real dist);
-
-      /// \brief Overloaded Ogre function for Ray Scene Queries
-      public: virtual bool queryResult(Ogre::SceneQuery::WorldFragment *frag,
-                                       Ogre::Real dist);
-
       /// \brief Load the heightmap
-      public: virtual void Load(std::string imageFilename,
-                                std::string worldTexture,
-                                std::string detialTexture,
-                                math::Vector3 terrainSize);
+      public: virtual void Load();
 
-      private: math::Vector3 terrainSize;
+      /// \brief Get the height at a location
+      public: double GetHeight(double x, double y);
 
-      private: Ogre::Ray ray;
-      private: Ogre::RaySceneQuery *rayQuery;
+      private: void InitBlendMaps(Ogre::Terrain *_terrain);
+      private: void ConfigureTerrainDefaults();
+      private: void DefineTerrain(int x, int y);
 
-      private: double distToTerrain;
-      private: Scene *scene;
+      private: ScenePtr scene;
+      private: Ogre::TerrainGlobalOptions *terrainGlobals;
+      private: Ogre::TerrainGroup *terrainGroup;
+      private: bool terrainsImported;
     };
     /// \}
   }

@@ -374,6 +374,7 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
   result.set_name(_sdf->GetValueString("name"));
   result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
   result.set_transparency(_sdf->GetValueDouble("transparency"));
+  result.set_laser_retro(_sdf->GetValueDouble("laser_retro"));
 
   // Load the geometry
   if (_sdf->HasElement("geometry"))
@@ -539,8 +540,10 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
         Convert(elem->GetValueColor("rgba")));
 
     if (elem->HasElement("sky"))
+    {
       result.set_sky_material(
           elem->GetElement("sky")->GetValueString("material"));
+    }
   }
 
   if (_sdf->HasElement("fog"))

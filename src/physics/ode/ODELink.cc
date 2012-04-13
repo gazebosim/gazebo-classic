@@ -29,6 +29,7 @@
 #include "physics/World.hh"
 #include "physics/Model.hh"
 #include "physics/ode/ODECollision.hh"
+#include "physics/SurfaceParams.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODELink.hh"
 
@@ -74,9 +75,8 @@ void ODELink::Init()
     // Only use auto disable if no joints are present
     if (this->GetModel()->GetJointCount() == 0)
     {
-      /*dBodySetAutoDisableDefaults(this->linkId);
-      dBodySetAutoDisableFlag(this->linkId, 1);
-      */
+      //dBodySetAutoDisableDefaults(this->linkId);
+      //dBodySetAutoDisableFlag(this->linkId, 0);
     }
   }
 
@@ -84,7 +84,7 @@ void ODELink::Init()
 
   if (this->linkId)
   {
-    math::Vector3 cog_vec = this->inertial->GetCoG();
+    math::Vector3 cogVec = this->inertial->GetCoG();
     Base_V::iterator iter;
     for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     {
@@ -97,7 +97,7 @@ void ODELink::Init()
 
           // update pose immediately
           math::Pose localPose = g->GetRelativePose();
-          localPose.pos -= cog_vec;
+          localPose.pos -= cogVec;
 
           dQuaternion q;
           q[0] = localPose.rot.w;
@@ -110,6 +110,10 @@ void ODELink::Init()
           dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
               localPose.pos.y, localPose.pos.z);
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
+
+          // Set max_vel and min_depth
+          dBodySetMaxVel(this->linkId, g->surface->maxVel);
+          dBodySetMinDepth(this->linkId, g->surface->minDepth);
         }
       }
     }
@@ -121,7 +125,14 @@ void ODELink::Init()
   if (this->linkId)
   {
     dBodySetMovedCallback(this->linkId, MoveCallback);
+    dBodySetDisabledCallback(this->linkId, DisabledCallback);
   }
+}
+
+//////////////////////////////////////////////////
+void ODELink::DisabledCallback(dBodyID /*_id*/)
+{
+  printf("Disabled\n");
 }
 
 //////////////////////////////////////////////////
@@ -139,10 +150,10 @@ void ODELink::MoveCallback(dBodyID _id)
   self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
-  math::Vector3 cog_vec = self->dirtyPose.rot.RotateVector(
+  math::Vector3 cog = self->dirtyPose.rot.RotateVector(
       self->inertial->GetCoG());
 
-  self->dirtyPose.pos -= cog_vec;
+  self->dirtyPose.pos -= cog;
 
   // TODO: this is an ugly line of code. It's like this for speed.
   self->world->dirtyPoses.push_back(self);
@@ -209,13 +220,13 @@ void ODELink::OnPoseChange()
 
   const math::Pose myPose = this->GetWorldPose();
 
-  math::Vector3 cog_vec = myPose.rot.RotateVector(this->inertial->GetCoG());
+  math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
   dBodySetPosition(this->linkId,
-      myPose.pos.x + cog_vec.x,
-      myPose.pos.y + cog_vec.y,
-      myPose.pos.z + cog_vec.z);
+      myPose.pos.x + cog.x,
+      myPose.pos.y + cog.y,
+      myPose.pos.z + cog.z);
 
   dQuaternion q;
   q[0] = myPose.rot.w;
@@ -258,6 +269,25 @@ bool ODELink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////////////////////////
+void ODELink::UpdateSurface()
+{
+  Base_V::iterator iter;
+  Base_V::iterator iter_end = this->children.end();
+  for (iter = this->children.begin(); iter != iter_end; ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+    {
+      ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
+      if (g->IsPlaceable() && g->GetCollisionId())
+      {
+        // Set surface properties max_vel and min_depth
+        dBodySetMaxVel(this->linkId, g->surface->maxVel);
+        dBodySetMinDepth(this->linkId, g->surface->minDepth);
+      }
+    }
+  }
+}
+/////////////////////////////////////////////////////////////////////
 void ODELink::UpdateMass()
 {
   if (!this->linkId)
@@ -280,7 +310,7 @@ void ODELink::UpdateMass()
   if (this->inertial->GetMass() > 0)
     dBodySetMass(this->linkId, &odeMass);
   else
-    gzthrow("Setting custom link " + this->GetName()+"mass to zero!");
+    gzthrow("Setting custom link " + this->GetName() + "mass to zero!");
 }
 
 //////////////////////////////////////////////////

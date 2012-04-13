@@ -107,6 +107,7 @@ if (PKG_CONFIG_FOUND)
       set (HAVE_CEGUI FALSE)
     else()
       set (HAVE_CEGUI TRUE)
+      set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
       message (STATUS "Looking for CEGUI-OGRE, found")
     endif()
   endif()
@@ -192,11 +193,20 @@ if (PKG_CONFIG_FOUND)
       set(ogre_libraries ${OGRE_LIBRARIES})
       set(ogre_cflags ${OGRE_CFLAGS})
     endif (NOT OGRE_FOUND)
-      
   endif (OGRE-RTShaderSystem_FOUND)
 
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
+
+  pkg_check_modules(OGRE-Terrain OGRE-Terrain)
+  if (OGRE-Terrain_FOUND)
+    set(ogre_ldflags ${ogre_ldflags} ${OGRE-Terrain_LDFLAGS})
+    set(ogre_include_dirs ${ogre_include_dirs} ${OGRE-Terrain_INCLUDE_DIRS})
+    set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Terrain_LIBRARY_DIRS})
+    set(ogre_libraries ${ogre_libraries} ${OGRE-Terrain_LIBRARIES})
+    set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
+  endif()
+
 
   #################################################
   # Find XML
@@ -208,13 +218,13 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find OpenAL
-  pkg_check_modules(OAL openal)
-  if (NOT OAL_FOUND)
-    BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
-    set (HAVE_OPENAL FALSE)
-  else (NOT OAL_FOUND)
-    set (HAVE_OPENAL TRUE)
-  endif (NOT OAL_FOUND)
+  # pkg_check_modules(OAL openal)
+  # if (NOT OAL_FOUND)
+  #   BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
+  #   set (HAVE_OPENAL FALSE)
+  # else (NOT OAL_FOUND)
+  #   set (HAVE_OPENAL TRUE)
+  # endif (NOT OAL_FOUND)
 
   ########################################
   # Find AV format
@@ -279,7 +289,7 @@ if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   set(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
 
   include (FindBoost)
-  find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem)
+  find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options)
 
   if (NOT Boost_FOUND)
     set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)

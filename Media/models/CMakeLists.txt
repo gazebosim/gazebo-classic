@@ -13,12 +13,18 @@ add_subdirectory(chair3)
 add_subdirectory(wg)
 add_subdirectory(frypan)
 add_subdirectory(people)
+add_subdirectory(youbot)
+add_subdirectory(hokuyo)
+add_subdirectory(quadrotor)
+add_subdirectory(willowgarage)
+add_subdirectory(kitchen)
 
-set (files willowgarage.dae
-           hanoi_red_disk.dae
+set (files hanoi_red_disk.dae
            hanoi_green_disk.dae
            hanoi_blue_disk.dae
            bowl.dae
+           test.dae
+           human.dae
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models)

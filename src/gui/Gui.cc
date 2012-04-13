@@ -22,6 +22,7 @@
 #include "common/Plugin.hh"
 #include "common/CommonTypes.hh"
 #include "gui/MainWindow.hh"
+#include "gui/ModelRightMenu.hh"
 #include "gui/Gui.hh"
 
 // These are needed by QT. They need to stay valid during the entire
@@ -33,6 +34,8 @@ char **g_argv;
 
 using namespace gazebo;
 
+gui::ModelRightMenu *g_modelRightMenu = NULL;
+
 std::string g_worldname = "default";
 std::vector<SystemPluginPtr> g_plugins;
 
@@ -43,6 +46,7 @@ bool g_fullscreen = false;
 
 void gui::load()
 {
+  g_modelRightMenu = new gui::ModelRightMenu();
   rendering::load();
   rendering::init();
 

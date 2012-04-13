@@ -27,6 +27,7 @@
 #include "common/Exception.hh"
 #include "math/Vector3.hh"
 #include "common/Time.hh"
+#include "common/Timer.hh"
 
 #include "transport/Publisher.hh"
 
@@ -86,28 +87,27 @@ class Colliders_TBB
 {
   public: Colliders_TBB(
               std::vector<std::pair<ODECollision*, ODECollision*> > *_colliders,
-              ODEPhysics *_engine) :
-    colliders(_colliders), engine(_engine)
+              ODEPhysics *_engine,
+              dContactGeom* _contactCollisions) :
+    colliders(_colliders),
+              engine(_engine), contactCollisions(_contactCollisions)
   {
-    dAllocateODEDataForThread(dAllocateMaskAll);
+    // dAllocateODEDataForThread(dAllocateMaskAll);
   }
 
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
-    dContactGeom *contactCollisions = new dContactGeom[MAX_DCOLLIDE_RETURNS];
-
     for (size_t i = _r.begin(); i != _r.end(); i++)
     {
       ODECollision *collision1 = (*this->colliders)[i].first;
       ODECollision *collision2 = (*this->colliders)[i].second;
       this->engine->Collide(collision1, collision2, contactCollisions);
     }
-
-    delete [] contactCollisions;
   }
 
   private: std::vector< std::pair<ODECollision*, ODECollision*> > *colliders;
   private: ODEPhysics *engine;
+  private: dContactGeom* contactCollisions;
 };
 
 //////////////////////////////////////////////////
@@ -126,6 +126,8 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
+
+  // this->lastCollisionUpdateTime = common::Time(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -321,16 +323,17 @@ void ODEPhysics::UpdateCollision()
   // if (this->colliders.size() < 50)
   // if (this->collidersCount < 50)
   // {
-    for (unsigned int i = 0; i < this->collidersCount; i++)
-    {
-      this->Collide(this->colliders[i].first,
-                    this->colliders[i].second, this->contactCollisions);
-    }
+      for (unsigned int i = 0; i < this->collidersCount; i++)
+      {
+        this->Collide(this->colliders[i].first,
+                      this->colliders[i].second, this->contactCollisions);
+      }
   // }
   // else
   // {
-  //  tbb::parallel_for(tbb::blocked_range<size_t>(0,
-  //        this->collidersCount, 10), Colliders_TBB(&this->colliders, this));
+  // tbb::parallel_for(tbb::blocked_range<size_t>(0,
+  //       this->collidersCount, 10),
+  //       Colliders_TBB(&this->colliders, this, this->contactCollisions));
   // }
 
   // Trimesh collision must happen in this thread sequentially
@@ -340,7 +343,6 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
-
 
   // printf("ContactFeedbacks[%d]\n", this->contactFeedbacks.size());
   // Process all the contact feedbacks
@@ -512,6 +514,18 @@ void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *_engineMass)
 }
 
 //////////////////////////////////////////////////
+void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
+{
+  if (!this->sdf->GetElement("ode")->GetElement(
+      "solver")->HasAttribute("percon_iters"))
+    this->sdf->GetElement("ode")->GetElement(
+      "solver")->AddAttribute("percon_iters", "int", "0", false);
+  this->sdf->GetElement("ode")->GetElement(
+      "solver")->GetAttribute("percon_iters")->Set(_iters);
+  dWorldSetQuickStepPreconIterations(this->worldId, _iters);
+}
+
+//////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement(
@@ -569,6 +583,16 @@ void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
       "max_contacts")->GetValue()->Set(_maxContacts);
 }
 
+//////////////////////////////////////////////////
+int ODEPhysics::GetSORPGSPreconIters()
+{
+  if (!this->sdf->GetElement("ode")->GetElement(
+      "solver")->HasAttribute("percon_iters"))
+    this->sdf->GetElement("ode")->GetElement(
+      "solver")->AddAttribute("percon_iters", "int", "0", false);
+  return this->sdf->GetElement("ode")->GetElement(
+      "solver")->GetValueInt("precon_iters");
+}
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSIters()
 {
@@ -738,8 +762,9 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     if (collision1 && collision2)
     {
-      if (collision1->GetShapeType() == Base::TRIMESH_SHAPE ||
-          collision2->GetShapeType() == Base::TRIMESH_SHAPE)
+      // BUG: == is not right, should use &
+      if (collision1->HasType(Base::TRIMESH_SHAPE) ||
+          collision2->HasType(Base::TRIMESH_SHAPE))
         self->AddTrimeshCollider(collision1, collision2);
       else
         self->AddCollider(collision1, collision2);
@@ -798,8 +823,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   double h = this->stepTimeDouble;
 
-  contact.surface.mode =  // dContactFDir1 |
-                         dContactBounce |
+  contact.surface.mode = dContactBounce |
                          dContactMu2 |
                          dContactSoftERP |
                          dContactSoftCFM |
@@ -812,19 +836,25 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   double kp = 1.0 /
     (1.0 / _collision1->surface->kp + 1.0 / _collision2->surface->kp);
   double kd = _collision1->surface->kd + _collision2->surface->kd;
+
   contact.surface.soft_erp = h * kp / (h * kp + kd);
   contact.surface.soft_cfm = 1.0 / (h * kp + kd);
+
   // contact.surface.soft_erp = 0.5*(_collision1->surface->softERP +
   //                                _collision2->surface->softERP);
   // contact.surface.soft_cfm = 0.5*(_collision1->surface->softCFM +
   //                                _collision2->surface->softCFM);
 
-  // contact.fdir1[0] = 0.5*
-  // (_collision1->surface->fdir1.x+_collision2->surface->fdir1.x);
-  // contact.fdir1[1] = 0.5*
-  // (_collision1->surface->fdir1.y+_collision2->surface->fdir1.y);
-  // contact.fdir1[2] = 0.5*
-  // (_collision1->surface->fdir1.z+_collision2->surface->fdir1.z);
+  // assign fdir1 if not set as 0
+  math::Vector3 fd =
+    (_collision1->surface->fdir1 +_collision2->surface->fdir1) * 0.5;
+  if (fd != math::Vector3(0, 0, 0))
+  {
+    contact.surface.mode = dContactFDir1 | contact.surface.mode;
+    contact.fdir1[0] = fd.x;
+    contact.fdir1[1] = fd.y;
+    contact.fdir1[2] = fd.z;
+  }
 
   contact.surface.mu = std::min(_collision1->surface->mu1,
                                 _collision2->surface->mu1);
@@ -840,6 +870,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                     _collision2->surface->bounce);
   contact.surface.bounce_vel = std::min(_collision1->surface->bounceThreshold,
                                         _collision2->surface->bounceThreshold);
+
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
@@ -922,6 +953,7 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback)
   _feedback->contact.collision2->AddContact(_feedback->contact);
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
                                      ODECollision *_collision2)
 {
@@ -933,6 +965,7 @@ void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
   this->trimeshCollidersCount++;
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::AddCollider(ODECollision *_collision1,
                               ODECollision *_collision2)
 {
@@ -944,6 +977,53 @@ void ODEPhysics::AddCollider(ODECollision *_collision1,
   this->collidersCount++;
 }
 
+/////////////////////////////////////////////////
+void ODEPhysics::DebugPrint() const
+{
+  dBodyID b;
+  std::cout << "Debug Print[" << dWorldGetBodyCount(this->worldId) << "]\n";
+  for (int i = 0; i < dWorldGetBodyCount(this->worldId); ++i)
+  {
+    b = dWorldGetBody(this->worldId, i);
+    ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
+    math::Pose pose = link->GetWorldPose();
+    const dReal *pos = dBodyGetPosition(b);
+    const dReal *rot = dBodyGetRotation(b);
+    math::Vector3 dpos(pos[0], pos[1], pos[2]);
+    math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
 
+    std::cout << "Body[" << link->GetScopedName() << "]\n";
+    std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
+    if (pose.pos != dpos)
+      std::cout << "    Incorrect world pos[" << pose.pos << "]\n";
+    if (pose.rot != drot)
+      std::cout << "    Incorrect world rot[" << pose.rot << "]\n";
 
+    dMass mass;
+    dBodyGetMass(b, &mass);
+    std::cout << "  Mass[" << mass.mass << "] COG[" << mass.c[0]
+              << " " << mass.c[1] << " " << mass.c[2] << "]\n";
 
+    dGeomID g = dBodyGetFirstGeom(b);
+    while (g)
+    {
+      ODECollision *coll = static_cast<ODECollision*>(dGeomGetData(g));
+
+      pose = coll->GetWorldPose();
+      const dReal *gpos = dGeomGetPosition(g);
+      const dReal *grot = dGeomGetRotation(g);
+      dpos.Set(gpos[0], gpos[1], gpos[2]);
+      drot.Set(grot[0], grot[1], grot[2], grot[3]);
+
+      std::cout << "    Geom[" << coll->GetScopedName() << "]\n";
+      std::cout << "      World: Pos[" << dpos << "] Rot[" << drot << "]\n";
+
+      if (pose.pos != dpos)
+        std::cout << "      Incorrect world pos[" << pose.pos << "]\n";
+      if (pose.rot != drot)
+        std::cout << "      Incorrect world rot[" << pose.rot << "]\n";
+
+      g = dBodyGetNextGeom(g);
+    }
+  }
+}

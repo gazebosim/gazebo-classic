@@ -14,7 +14,7 @@ set (GAZEBO_MAJOR_VERSION 1)
 set (GAZEBO_MINOR_VERSION 0)
 set (GAZEBO_PATCH_VERSION 0)
 
-set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION}-RC3)
+set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
@@ -126,7 +126,7 @@ set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-
 #####################################
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE "release" CACHE STRING 
+  set (CMAKE_BUILD_TYPE "RELEASE" CACHE STRING 
     "Choose the type of build, options are: debug release profile check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
@@ -203,10 +203,7 @@ else (build_errors)
     add_subdirectory(test)
     add_subdirectory(tools)
     add_subdirectory(plugins)
-   
-    if (INCLUDE_PLAYER)
-      add_subdirectory(player)
-    endif (INCLUDE_PLAYER)
+    add_subdirectory(interfaces)
   endif (BUILD_GAZEBO)
 
   ########################################

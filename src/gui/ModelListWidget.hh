@@ -17,7 +17,6 @@
 #ifndef MODEL_LIST_WIDGET_HH
 #define MODEL_LIST_WIDGET_HH
 
-#include <map>
 #include <string>
 #include <list>
 #include <vector>
@@ -59,14 +58,8 @@ namespace gazebo
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private slots: void Update();
       private slots: void OnPropertyChanged(QtProperty *_item);
-      private slots: void OnMoveTo();
-      private slots: void OnDelete();
-      private slots: void OnFollow();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
-      private slots: void OnShowCollision();
-      private slots: void OnTransparent();
-
       private: void OnSetSelectedEntity(const std::string &_name);
       private: void OnResponse(ConstResponsePtr &_msg);
 
@@ -155,11 +148,6 @@ namespace gazebo
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
-      private: QAction *moveToAction;
-      private: QAction *deleteAction;
-      private: QAction *followAction;
-      private: QAction *showCollisionAction;
-      private: QAction *transparentAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub, modelPub;
@@ -181,9 +169,6 @@ namespace gazebo
 
       typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
       private: PoseMsgs_L poseMsgs;
-
-      private: std::map<std::string, bool> showCollisionsActionState;
-      private: std::map<std::string, bool> transparentActionState;
 
       private: msgs::Model modelMsg;
       private: bool fillPropertyTree;

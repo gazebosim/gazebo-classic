@@ -29,6 +29,7 @@ namespace gazebo
     class Entity;
     class World;
     class Model;
+    class Actor;
     class Link;
     class Collision;
     class Joint;
@@ -46,6 +47,7 @@ namespace gazebo
     typedef boost::shared_ptr<Entity> EntityPtr;
     typedef boost::shared_ptr<World> WorldPtr;
     typedef boost::shared_ptr<Model> ModelPtr;
+    typedef boost::shared_ptr<Actor> ActorPtr;
     typedef boost::shared_ptr<Link> LinkPtr;
     typedef boost::shared_ptr<Collision> CollisionPtr;
     typedef boost::shared_ptr<Joint> JointPtr;
@@ -58,6 +60,7 @@ namespace gazebo
 
     typedef std::vector<BasePtr> Base_V;
     typedef std::vector<ModelPtr> Model_V;
+    typedef std::vector<ActorPtr> Actor_V;
     typedef std::vector<JointPtr> Joint_V;
     typedef std::vector<LinkPtr>  Link_V;
     typedef std::vector<CollisionPtr>  Collision_V;

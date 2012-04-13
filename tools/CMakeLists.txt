@@ -9,7 +9,7 @@ include_directories(
 link_directories(${tinyxml_library_dirs})
 add_definitions(${tinyxml_cflags})
 
-add_executable( gzsdf check_sdf.cc )
+add_executable( gzsdf gzsdf.cc )
 target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface)
 INSTALL_EXECUTABLE( gzsdf )
 
@@ -26,6 +26,6 @@ target_link_libraries(sdf2pov gazebo_common gazebo_sdf_interface)
 INSTALL_EXECUTABLE( sdf2pov )
 
 add_executable( gzfactory gzfactory.cc )
-target_link_libraries(gzfactory gazebo_common gazebo_transport)
+target_link_libraries(gzfactory gazebo_common gazebo_transport boost_program_options)
 INSTALL_EXECUTABLE( gzfactory )
 

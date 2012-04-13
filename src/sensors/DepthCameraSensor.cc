@@ -59,7 +59,7 @@ void DepthCameraSensor::SetParent(const std::string &_name)
 
 //////////////////////////////////////////////////
 void DepthCameraSensor::Load(const std::string &_worldName,
-                             sdf::ElementPtr _sdf)
+                                   sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }

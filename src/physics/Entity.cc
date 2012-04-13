@@ -175,7 +175,7 @@ void Entity::SetCanonicalLink(bool _value)
 }
 
 //////////////////////////////////////////////////
-void Entity::SetAnimation(const common::PoseAnimationPtr &_anim)
+void Entity::SetAnimation(common::PoseAnimationPtr _anim)
 {
   this->animationStartPose = this->worldPose;
 
@@ -230,17 +230,12 @@ math::Pose Entity::GetRelativePose() const
 {
   if (this->IsCanonicalLink())
   {
-    // this should never change for canonical
     return this->initialRelativePose;
   }
   else if (this->parent && this->parentEntity)
-  {
     return this->worldPose - this->parentEntity->GetWorldPose();
-  }
   else
-  {
     return this->worldPose;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -334,7 +329,12 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
   // also update parent model's pose
   if (this->parentEntity->HasType(MODEL))
   {
-    this->parentEntity->worldPose = _pose - this->initialRelativePose;
+    this->parentEntity->worldPose.pos = _pose.pos -
+      this->parentEntity->worldPose.rot.RotateVector(
+          this->initialRelativePose.pos);
+    this->parentEntity->worldPose.rot = _pose.rot *
+      this->initialRelativePose.rot.GetInverse();
+
     this->parentEntity->worldPose.Correct();
 
     if (_notify)
@@ -620,4 +620,3 @@ void Entity::PlaceOnNearestEntityBelow()
     this->SetWorldPose(p);
   }
 }
-

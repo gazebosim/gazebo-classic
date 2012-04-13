@@ -28,6 +28,7 @@ namespace gazebo
     /// \brief Rendering material. Just a helper function for now
     class Material
     {
+      public: static void CreateMaterials();
       public: static void Update(const gazebo::common::Material *_mat);
     };
     /// \}

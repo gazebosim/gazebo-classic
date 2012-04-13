@@ -95,7 +95,7 @@ namespace gazebo
 
       public: bool GetVisualize() const;
 
-      public: std::string GetTopic() const;
+      public: virtual std::string GetTopic() const;
 
       public: void FillMsg(msgs::Sensor &_msg);
 
@@ -112,6 +112,7 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
       protected: transport::NodePtr node;
       protected: transport::SubscriberPtr poseSub;
+      private: transport::PublisherPtr sensorPub;
 
       protected: std::string parentName;
       protected: std::vector<SensorPluginPtr> plugins;

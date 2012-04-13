@@ -160,7 +160,11 @@ void MultiRayShape::Update()
     this->rays[i]->Update();
   }
 
+  // do actual collision checks
   this->UpdateRays();
+
+  // for plugin
+  this->newLaserScans();
 }
 
 //////////////////////////////////////////////////
@@ -220,24 +224,36 @@ math::Angle MultiRayShape::GetMaxAngle() const
 //////////////////////////////////////////////////
 int MultiRayShape::GetVerticalSampleCount() const
 {
-  return this->vertElem->GetValueUInt("samples");
+  if (this->vertElem)
+    return this->vertElem->GetValueUInt("samples");
+  else
+    return 1;
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetVerticalScanResolution() const
 {
-  return this->vertElem->GetValueDouble("resolution");
+  if (this->vertElem)
+    return this->vertElem->GetValueDouble("resolution");
+  else
+    return 1;
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
-  return this->vertElem->GetValueDouble("min_angle");
+  if (this->vertElem)
+    return this->vertElem->GetValueDouble("min_angle");
+  else
+    return math::Angle(0);
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
-  return this->vertElem->GetValueDouble("max_angle");
+  if (this->vertElem)
+    return this->vertElem->GetValueDouble("max_angle");
+  else
+    return math::Angle(0);
 }
 

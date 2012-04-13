@@ -47,6 +47,7 @@ namespace Ogre
   class Camera;
   class Viewport;
   class SceneNode;
+  class AnimationState;
 }
 
 namespace gazebo
@@ -99,6 +100,8 @@ namespace gazebo
 
       /// Finalize the camera
       public: void Fini();
+
+      public: inline bool IsInitialized() const {return this->initialized;}
 
       /// \brief Set the ID of the window this camera is rendering into.
       public: void SetWindowId(unsigned int windowId);
@@ -318,6 +321,14 @@ namespace gazebo
       /// \brief Returns true if initialized
       public: bool GetInitialized() const;
 
+      public: bool MoveToPosition(const math::Vector3 &_end,
+                                  double _pitch, double _yaw, double _time);
+
+      public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
+                                   double _time,
+                                   boost::function<void()> _onComplete = NULL);
+
+
       protected: bool TrackVisualImpl(const std::string &_visualName);
 
       /// \brief Set the camera to track a scene node
@@ -355,7 +366,6 @@ namespace gazebo
 
       protected: Ogre::Camera *camera;
       protected: Ogre::Viewport *viewport;
-      protected: Ogre::SceneNode *origParentNode;
       protected: Ogre::SceneNode *sceneNode;
       protected: Ogre::SceneNode *pitchNode;
 
@@ -393,13 +403,14 @@ namespace gazebo
 
       private: sdf::ElementPtr imageElem;
 
-      public: bool initialized;
-    };
+      protected: bool initialized;
+      private: VisualPtr trackedVisual;
 
+      protected: Ogre::AnimationState *animState;
+      protected: common::Time prevAnimTime;
+      protected: boost::function<void()> onAnimationComplete;
+    };
     /// \}
   }
 }
 #endif
-
-
-

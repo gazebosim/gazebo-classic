@@ -29,11 +29,6 @@
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
 
-namespace Ogre
-{
-  class AnimationState;
-}
-
 namespace gazebo
 {
   namespace rendering
@@ -101,13 +96,6 @@ namespace gazebo
       public: void MoveToVisual(VisualPtr _visual);
       public: void MoveToVisual(const std::string &_visualName);
 
-      public: bool MoveToPosition(const math::Vector3 &_end,
-                                  double _pitch, double _yaw, double _time);
-
-      public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
-                                   double _time,
-                                   boost::function<void()> _onComplete);
-
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
                      bool _inheritOrientation, double _minDist = 0,
@@ -141,9 +129,6 @@ namespace gazebo
       private: ViewController *viewController;
       private: OrbitViewController *orbitViewController;
       private: FPSViewController *fpsViewController;
-
-      private: Ogre::AnimationState *animState;
-      private: boost::function<void()> onAnimationComplete;
 
       private: GUIOverlay *gui;
     };

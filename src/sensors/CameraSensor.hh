@@ -26,6 +26,7 @@
 
 #include "sensors/Sensor.hh"
 #include "msgs/MessageTypes.hh"
+#include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -61,6 +62,8 @@ namespace gazebo
       /// \brief Initialize the camera
       public: virtual void Init();
 
+      public: virtual std::string GetTopic() const;
+
       /// \brief Update the sensor information
       protected: virtual void UpdateImpl(bool _force);
 
@@ -79,11 +82,11 @@ namespace gazebo
 
       public: bool SaveFrame(const std::string &_filename);
 
-      private: void OnPose(ConstPosePtr &_msg);
-
       private: rendering::CameraPtr camera;
-
       private: rendering::ScenePtr scene;
+
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr imagePub;
     };
     /// \}
   }

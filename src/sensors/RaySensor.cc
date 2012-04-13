@@ -66,16 +66,22 @@ void RaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+std::string RaySensor::GetTopic() const
+{
+  std::string topicName = "~/";
+  topicName += this->parentName + "/" + this->GetName() + "/scan";
+  boost::replace_all(topicName,"::","/");
+
+  return topicName;
+}
+
+//////////////////////////////////////////////////
 void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (this->sdf->GetElement("topic"))
-  {
-    this->node->Init(this->world->GetName());
-    this->scanPub = this->node->Advertise<msgs::LaserScan>(
-        this->sdf->GetElement("topic")->GetValueString());
-  }
+  this->node->Init(_worldName);
+  this->scanPub = this->node->Advertise<msgs::LaserScan>(this->GetTopic());
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
   this->laserCollision = physicsEngine->CreateCollision("multiray",
@@ -89,6 +95,8 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserShape->Load(this->sdf);
 
   this->laserShape->Init();
+
+  this->parentEntity = this->world->GetEntity(this->parentName);
 }
 
 //////////////////////////////////////////////////
@@ -150,6 +158,8 @@ int RaySensor::GetRayCount() const
 //////////////////////////////////////////////////
 int RaySensor::GetRangeCount() const
 {
+  // todo: maybe should check against this->laserMsg.ranges_size()
+  //       as users use this to loop through GetRange() calls
   return this->laserShape->GetSampleCount() *
          this->laserShape->GetScanResolution();
 }
@@ -191,7 +201,12 @@ void RaySensor::GetRanges(std::vector<double> &_ranges)
 //////////////////////////////////////////////////
 double RaySensor::GetRange(int _index)
 {
-  if (_index < 0 || _index > this->laserMsg.ranges_size())
+  if (this->laserMsg.ranges_size() == 0)
+  {
+    gzwarn << "ranges not constructed yet (zero sized)\n";
+    return 0.0;
+  }
+  if (_index < 0 || _index >= this->laserMsg.ranges_size())
   {
     gzerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
@@ -218,24 +233,32 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  this->mutex->lock();
+  // do the collision checks
   this->laserShape->Update();
+
+  this->mutex->lock();
+
   this->lastUpdateTime = this->world->GetSimTime();
 
-  // Store the latest laser scan.
-  msgs::Set(this->laserMsg.mutable_offset(), this->GetPose());
+  // Store the latest laser scans into laserMsg
+  msgs::Set(this->laserMsg.mutable_offset(),
+      this->parentEntity->GetWorldPose() + this->GetPose());
   this->laserMsg.set_angle_min(this->GetAngleMin().GetAsRadian());
   this->laserMsg.set_angle_max(this->GetAngleMax().GetAsRadian());
   this->laserMsg.set_angle_step(this->GetAngleResolution());
 
   this->laserMsg.set_range_min(this->GetRangeMin());
   this->laserMsg.set_range_max(this->GetRangeMax());
+
   this->laserMsg.clear_ranges();
   this->laserMsg.clear_intensities();
 
-  for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
+  // todo: add loop for vertical range count
+  for (unsigned int j = 0; j < (unsigned int)this->GetVerticalRayCount(); j++)
+  for (unsigned int i = 0; i < (unsigned int)this->GetRayCount(); i++)
   {
-    this->laserMsg.add_ranges(this->laserShape->GetRange(i));
+    this->laserMsg.add_ranges(
+      this->laserShape->GetRange(j * this->GetRayCount() + i));
     this->laserMsg.add_intensities(0);
   }
   this->mutex->unlock();

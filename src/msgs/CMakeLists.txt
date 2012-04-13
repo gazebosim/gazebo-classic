@@ -16,6 +16,7 @@ set (msgs axis.proto
           header.proto
           heightmapgeom.proto
           imagegeom.proto
+          image.proto
           inertial.proto
           int.proto
           joint.proto
@@ -59,6 +60,8 @@ set (msgs axis.proto
           gui.proto
           track_visual.proto
           test.proto
+          pose_animation.proto
+          joint_animation.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

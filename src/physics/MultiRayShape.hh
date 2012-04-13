@@ -123,6 +123,15 @@ namespace gazebo
       protected: sdf::ElementPtr horzElem;
       protected: sdf::ElementPtr vertElem;
       protected: sdf::ElementPtr rangeElem;
+
+
+      /// \brief Connect a to the add entity signal
+      public: template<typename T>
+              event::ConnectionPtr ConnectNewLaserScans(T subscriber)
+              { return newLaserScans.Connect(subscriber); }
+      public: void DisconnectNewLaserScans(event::ConnectionPtr &c)
+              { newLaserScans.Disconnect(c); }
+      protected: event::EventT<void()> newLaserScans;
     };
     /// \}
   }

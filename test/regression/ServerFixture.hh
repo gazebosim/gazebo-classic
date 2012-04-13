@@ -26,6 +26,7 @@
 #include <string>
 
 #include "transport/transport.h"
+#include "physics/Physics.hh"
 #include "sensors/sensors.h"
 #include "rendering/rendering.h"
 #include "msgs/msgs.h"
@@ -102,6 +103,7 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename)
              {
                ASSERT_NO_THROW(this->server = new Server());
+               printf("Load world[%s]\n", _worldFilename.c_str());
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->server->Run();
@@ -120,6 +122,11 @@ class ServerFixture : public testing::Test
                  (this->simTime / this->realTime).Double();
 
                this->serverRunning = true;
+             }
+
+  protected: void SetPause(bool _pause)
+             {
+               physics::pause_worlds(_pause);
              }
 
   protected: double GetPercentRealTime() const

@@ -19,7 +19,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
-#include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#include <boost/program_options.hpp>
 
 #include "gazebo_config.h"
 #include "common/CommonTypes.hh"
@@ -31,14 +31,15 @@ gazebo::Server *server = NULL;
 
 std::string config_filename = "";
 gazebo::common::StrStr_M params;
-std::vector<std::string> plugins;
 
-boost::interprocess::interprocess_semaphore sem(0);
+namespace po = boost::program_options;
+po::variables_map vm;
 
 //////////////////////////////////////////////////
 void PrintUsage()
 {
-  std::cerr << "Usage: gzserver\n";
+  std::cerr << "Run the Gazebo server.\n\n"
+    << "Usage: gzserver [options] <world_file>\n\n";
 }
 
 //////////////////////////////////////////////////
@@ -48,45 +49,55 @@ void PrintVersion()
 }
 
 //////////////////////////////////////////////////
-int ParseArgs(int argc, char **argv)
+bool ParseArgs(int argc, char **argv)
 {
-  // FILE *tmpFile;
-  int ch;
+  po::options_description v_desc("Allowed options");
+  v_desc.add_options()
+    ("help,h", "Produce this help message.")
+    ("pause,u", "Start the server in a paused state.")
+    ("plugin,p", po::value<std::vector<std::string> >(), "Load a plugin.");
 
-  char *flags = const_cast<char*>("up:");
-  // Get letter options
-  while ((ch = getopt(argc, argv, flags)) != -1)
+  po::options_description h_desc("Hidden options");
+  h_desc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.");
+
+  po::options_description desc("Allowed options");
+  desc.add(v_desc).add(h_desc);
+
+  po::positional_options_description p_desc;
+  p_desc.add("world_file", 1);
+
+  try
   {
-    switch (ch)
-    {
-      case 'p':
-        {
-          if (optarg != NULL)
-            plugins.push_back(std::string(optarg));
-          else
-            gzerr << "Missing plugin filename with -p argument\n";
-          break;
-        }
-
-      case 'u':
-        params["pause"] = "true";
-        break;
-      default:
-        PrintUsage();
-        return -1;
-    }
+    po::store(po::command_line_parser(argc,
+          argv).options(desc).positional(p_desc).run(), vm);
+    po::notify(vm);
+  } catch(boost::exception &_e)
+  {
+    std::cerr << "Error. Invalid arguments\n";
+    // std::cerr << boost::diagnostic_information(_e) << "\n";
+    return false;
   }
 
-  argc -= optind;
-  argv += optind;
+  if (vm.count("help"))
+  {
+    PrintUsage();
+    std::cerr << v_desc << "\n";
+    return false;
+  }
 
-  // Get the world file name
-  if (argc >= 1)
-    config_filename = argv[0];
+  if (vm.count("pause"))
+    params["pause"] = "true";
+  else
+    params["pause"] = "false";
 
-  return 0;
+  if (vm.count("world_file"))
+    config_filename = vm["world_file"].as<std::string>();
+  else
+    config_filename = "worlds/empty.world";
+
+  return true;
 }
-
 
 //////////////////////////////////////////////////
 void SignalHandler(int)
@@ -94,11 +105,15 @@ void SignalHandler(int)
   server->Stop();
 }
 
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   // Application Setup
-  if (ParseArgs(argc, argv) != 0)
+  if (!ParseArgs(argc, argv))
+  {
     return -1;
+  }
 
   PrintVersion();
 
@@ -115,12 +130,16 @@ int main(int argc, char **argv)
     config_filename = "worlds/empty.world";
   }
 
-  // Construct plugins
   /// Load all the plugins specified on the command line
-  for (std::vector<std::string>::iterator iter = plugins.begin();
-       iter != plugins.end(); ++iter)
+  if (vm.count("plugin"))
   {
-    server->LoadPlugin(*iter);
+    std::vector<std::string> pp = vm["plugin"].as<std::vector<std::string> >();
+
+    for (std::vector<std::string>::iterator iter = pp.begin();
+         iter != pp.end(); ++iter)
+    {
+      server->LoadPlugin(*iter);
+    }
   }
 
   if (!server->Load(config_filename))
@@ -142,5 +161,3 @@ int main(int argc, char **argv)
   printf("\n");
   return 0;
 }
-
-

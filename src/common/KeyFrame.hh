@@ -54,7 +54,6 @@ namespace gazebo
       public: NumericKeyFrame(double _time);
       public: virtual ~NumericKeyFrame();
 
-
       public: void SetValue(const double &_value);
       public: const double &GetValue() const;
 

@@ -34,23 +34,37 @@ namespace gazebo
     class Camera;
     class UserCamera;
     class DepthCamera;
+    class GpuLaser;
     class DynamicLines;
     class SelectionObj;
     class Visual;
     class LaserVisual;
     class CameraVisual;
+    class JointVisual;
+    class AxisVisual;
+    class ArrowVisual;
     class ContactVisual;
+    class COMVisual;
+    class RFIDVisual;
+    class RFIDTagVisual;
 
     typedef boost::shared_ptr<Scene> ScenePtr;
     typedef boost::shared_ptr<Light> LightPtr;
     typedef boost::shared_ptr<Camera> CameraPtr;
     typedef boost::shared_ptr<UserCamera> UserCameraPtr;
     typedef boost::shared_ptr<DepthCamera> DepthCameraPtr;
+    typedef boost::shared_ptr<GpuLaser> GpuLaserPtr;
     typedef boost::shared_ptr<DynamicLines> DynamicLinesPtr;
     typedef boost::shared_ptr<Visual> VisualPtr;
     typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
+    typedef boost::shared_ptr<JointVisual> JointVisualPtr;
     typedef boost::shared_ptr<ContactVisual> ContactVisualPtr;
+    typedef boost::shared_ptr<ArrowVisual> ArrowVisualPtr;
+    typedef boost::shared_ptr<AxisVisual> AxisVisualPtr;
+    typedef boost::shared_ptr<COMVisual> COMVisualPtr;
+    typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
+    typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
 
     enum RenderOpType
     {

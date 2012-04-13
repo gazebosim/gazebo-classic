@@ -55,10 +55,12 @@ MainWindow::MainWindow()
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this);
+  this->statsSub =
+    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
-      &MainWindow::OnResponse, this);
+      &MainWindow::OnResponse, this, true);
 
   this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
                                             &MainWindow::OnWorldModify, this);
@@ -380,6 +382,13 @@ void MainWindow::OnFullScreen(bool _value)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewReset()
+{
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0));
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
@@ -534,6 +543,11 @@ void MainWindow::CreateActions()
   connect(this->dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
 
+  this->viewResetAct = new QAction(tr("Reset View"), this);
+  this->viewResetAct->setStatusTip(tr("Move camera to origin"));
+  connect(this->viewResetAct, SIGNAL(triggered()), this,
+      SLOT(ViewReset()));
+
   this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
   this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
   connect(this->viewFullScreenAct, SIGNAL(triggered()), this,
@@ -565,6 +579,7 @@ void MainWindow::CreateMenus()
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
+  this->viewMenu->addAction(this->viewResetAct);
   this->viewMenu->addAction(this->viewFullScreenAct);
   this->viewMenu->addAction(this->viewFPSAct);
   this->viewMenu->addAction(this->viewOrbitAct);
@@ -767,8 +782,23 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnManipMode(const std::string &_mode)
 {
-  if (_mode == "normal")
+  if (_mode != "ring")
     this->arrowAct->setChecked(true);
   else if (_mode == "ring")
     this->ringPoseAct->setChecked(true);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  if (_msg->paused() && this->playAct->isChecked())
+  {
+    this->playAct->setChecked(false);
+    this->pauseAct->setChecked(true);
+  }
+  else if (!_msg->paused() && !this->playAct->isChecked())
+  {
+    this->playAct->setChecked(true);
+    this->pauseAct->setChecked(false);
+  }
 }

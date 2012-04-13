@@ -26,6 +26,8 @@ set (sources main.cc
              GuiEvents.cc
              ModelEditWidget.cc
              MeshMaker.cc
+             ModelMaker.cc
+             ModelRightMenu.cc
 )
 
 set (qt_headers MainWindow.hh 
@@ -36,6 +38,7 @@ set (qt_headers MainWindow.hh
                 ModelListWidget.hh
                 WorldPropertiesWidget.hh
                 ModelEditWidget.hh
+                ModelRightMenu.hh
 )
 
 set (headers Gui.hh
@@ -44,6 +47,7 @@ set (headers Gui.hh
              SphereMaker.hh
              CylinderMaker.hh
              MeshMaker.hh
+             ModelMaker.hh
              GuiEvents.hh
              LightMaker.hh
              qt.h

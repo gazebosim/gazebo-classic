@@ -43,6 +43,7 @@
 #include "common/Console.hh"
 #include "common/SystemPaths.hh"
 
+#include "rendering/Material.hh"
 #include "rendering/RenderEvents.hh"
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/WindowManager.hh"
@@ -238,6 +239,7 @@ void RenderEngine::Init()
       Ogre::TFO_ANISOTROPIC);
 
   RTShaderSystem::Instance()->Init();
+  rendering::Material::CreateMaterials();
 
   for (unsigned int i = 0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();

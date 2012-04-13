@@ -140,6 +140,8 @@ namespace gazebo
       /// \brief access functions to set ODE parameters
       public: void SetWorldERP(double erp);
       /// \brief access functions to set ODE parameters
+      public: void SetSORPGSPreconIters(unsigned int iters);
+      /// \brief access functions to set ODE parameters
       public: void SetSORPGSIters(unsigned int iters);
       /// \brief access functions to set ODE parameters
       public: void SetSORPGSW(double w);
@@ -154,6 +156,8 @@ namespace gazebo
       public: double GetWorldCFM();
       /// \brief access functions to set ODE parameters
       public: double GetWorldERP();
+      /// \brief access functions to set ODE parameters
+      public: int GetSORPGSPreconIters();
       /// \brief access functions to set ODE parameters
       public: int GetSORPGSIters();
       /// \brief access functions to set ODE parameters
@@ -177,6 +181,8 @@ namespace gazebo
                            dContactGeom *contactCollisions);
 
       public: void ProcessContactFeedback(ContactFeedback* feedback);
+
+      public: virtual void DebugPrint() const;
 
       protected: virtual void OnRequest(
                    ConstRequestPtr &/*_msg*/);
@@ -233,9 +239,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-
-
-
-

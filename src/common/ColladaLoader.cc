@@ -30,8 +30,10 @@
 #include "common/Console.hh"
 #include "common/Material.hh"
 #include "common/Mesh.hh"
+#include "common/Skeleton.hh"
 #include "common/ColladaLoader.hh"
 #include "common/SystemPaths.hh"
+#include "common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -170,6 +172,40 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     this->LoadGeometry(geomXml, transform, _mesh);
     instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
   }
+
+  TiXmlElement *instContrXml =
+    nodeXml->FirstChildElement("instance_controller");
+  while (instContrXml)
+  {
+    std::string contrURL = instContrXml->Attribute("url");
+    TiXmlElement *contrXml = this->GetElementId("controller", contrURL);
+
+    TiXmlElement *instSkelXml = instContrXml->FirstChildElement("skeleton");
+    std::string rootURL = instSkelXml->GetText();
+    TiXmlElement *rootNodeXml = this->GetElementId("node", rootURL);
+
+    this->materialMap.clear();
+    TiXmlElement *bindMatXml, *techniqueXml, *matXml;
+    bindMatXml = instContrXml->FirstChildElement("bind_material");
+    while (bindMatXml)
+    {
+      if ((techniqueXml = bindMatXml->FirstChildElement("technique_common")))
+      {
+        matXml = techniqueXml->FirstChildElement("instance_material");
+        while (matXml)
+        {
+          std::string symbol = matXml->Attribute("symbol");
+          std::string target = matXml->Attribute("target");
+          this->materialMap[symbol] = target;
+          matXml = matXml->NextSiblingElement("instance_material");
+        }
+      }
+      bindMatXml = bindMatXml->NextSiblingElement("bind_material");
+    }
+
+    this->LoadController(contrXml, rootNodeXml, transform, _mesh);
+    instContrXml = instContrXml->NextSiblingElement("instance_controller");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -233,6 +269,446 @@ math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
   return transform;
 }
 
+/////////////////////////////////////////////////
+void ColladaLoader::LoadController(TiXmlElement *_contrXml,
+      TiXmlElement *_skelXml, const math::Matrix4 _transform, Mesh *_mesh)
+{
+  Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
+  _mesh->SetSkeleton(skeleton);
+
+  TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
+
+  this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
+        skeleton);
+
+  TiXmlElement *skinXml = _contrXml->FirstChildElement("skin");
+  std::string geomURL = skinXml->Attribute("source");
+
+  math::Matrix4 bindTrans;
+  std::string matrixStr =
+        skinXml->FirstChildElement("bind_shape_matrix")->GetText();
+  std::istringstream iss(matrixStr);
+  std::vector<double> values(16);
+  for (unsigned int i = 0; i < 16; i++)
+    iss >> values[i];
+  bindTrans.Set(values[0], values[1], values[2], values[3],
+                values[4], values[5], values[6], values[7],
+                values[8], values[9], values[10], values[11],
+                values[12], values[13], values[14], values[15]);
+
+  skeleton->SetBindShapeTransform(bindTrans);
+
+  TiXmlElement *jointsXml = skinXml->FirstChildElement("joints");
+  std::string jointsURL, invBindMatURL;
+  TiXmlElement *inputXml = jointsXml->FirstChildElement("input");
+  while (inputXml)
+  {
+    std::string semantic = inputXml->Attribute("semantic");
+    std::string source = inputXml->Attribute("source");
+    if (semantic == "JOINT")
+      jointsURL = source;
+    else
+    {
+      if (semantic == "INV_BIND_MATRIX")
+        invBindMatURL = source;
+    }
+    inputXml = inputXml->NextSiblingElement("input");
+  }
+
+  jointsXml = this->GetElementId("source", jointsURL);
+
+  if (!jointsXml)
+  {
+    gzerr << "Could not find node[" << jointsURL << "]\n";
+    gzthrow("Faild to parse skinning information in Collada file.");
+  }
+
+  std::string jointsStr = jointsXml->FirstChildElement("Name_array")->GetText();
+
+  std::vector<std::string> joints;
+  boost::split(joints, jointsStr, boost::is_any_of("   "));
+
+  TiXmlElement *invBMXml = this->GetElementId("source", invBindMatURL);
+
+  if (!invBMXml)
+  {
+    gzerr << "Could not find node[" << invBindMatURL << "]\n";
+    gzthrow("Faild to parse skinning information in Collada file.");
+  }
+
+  std::string posesStr = invBMXml->FirstChildElement("float_array")->GetText();
+
+  std::vector<std::string> strs;
+  boost::split(strs, posesStr, boost::is_any_of("   "));
+
+  for (unsigned int i = 0; i < joints.size(); i++)
+  {
+    unsigned int id = i * 16;
+    math::Matrix4 mat;
+    mat.Set(math::parseFloat(strs[id +  0]), math::parseFloat(strs[id +  1]),
+            math::parseFloat(strs[id +  2]), math::parseFloat(strs[id +  3]),
+            math::parseFloat(strs[id +  4]), math::parseFloat(strs[id +  5]),
+            math::parseFloat(strs[id +  6]), math::parseFloat(strs[id +  7]),
+            math::parseFloat(strs[id +  8]), math::parseFloat(strs[id +  9]),
+            math::parseFloat(strs[id + 10]), math::parseFloat(strs[id + 11]),
+            math::parseFloat(strs[id + 12]), math::parseFloat(strs[id + 13]),
+            math::parseFloat(strs[id + 14]), math::parseFloat(strs[id + 15]));
+
+    skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
+  }
+
+  TiXmlElement *vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
+
+  inputXml = vertWeightsXml->FirstChildElement("input");
+  unsigned int jOffset = 0;
+  unsigned int wOffset = 0;
+  std::string weightsURL;
+  while (inputXml)
+  {
+    std::string semantic = inputXml->Attribute("semantic");
+    std::string source = inputXml->Attribute("source");
+    int offset;
+    inputXml->Attribute("offset", &offset);
+
+    if (semantic == "JOINT")
+      jOffset = offset;
+    else
+      if (semantic == "WEIGHT")
+      {
+        weightsURL = source;
+        wOffset = offset;
+      }
+    inputXml = inputXml->NextSiblingElement("input");
+  }
+
+  TiXmlElement *weightsXml = this->GetElementId("source", weightsURL);
+
+  std::string wString = weightsXml->FirstChildElement("float_array")->GetText();
+  std::vector<std::string> wStrs;
+  boost::split(wStrs, wString, boost::is_any_of("   "));
+
+  std::vector<float> weights;
+  for (unsigned int i = 0; i < wStrs.size(); i++)
+    weights.push_back(math::parseFloat(wStrs[i]));
+
+  std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
+  std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
+  std::vector<std::string> vCountStrs;
+  std::vector<std::string> vStrs;
+
+  boost::split(vCountStrs, cString, boost::is_any_of("   "));
+  boost::split(vStrs, vString, boost::is_any_of("   "));
+
+  std::vector<unsigned int> vCount;
+  std::vector<unsigned int> v;
+
+  for (unsigned int i = 0; i < vCountStrs.size(); i++)
+    vCount.push_back(math::parseInt(vCountStrs[i]));
+
+  for (unsigned int i = 0; i < vStrs.size(); i++)
+    v.push_back(math::parseInt(vStrs[i]));
+
+  skeleton->SetNumVertAttached(vCount.size());
+
+  unsigned int vIndex = 0;
+  for (unsigned int i = 0; i < vCount.size(); i++)
+  {
+    for (unsigned int j = 0; j < vCount[i]; j++)
+    {
+      skeleton->AddVertNodeWeight(i, joints[v[vIndex + jOffset]],
+                                    weights[v[vIndex + wOffset]]);
+      vIndex += (jOffset + wOffset + 1);
+    }
+  }
+
+  TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
+  this->LoadGeometry(geomXml, _transform, _mesh);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::LoadAnimations(TiXmlElement *_xml, Skeleton *_skel)
+{
+  TiXmlElement *childXml = _xml->FirstChildElement("animation");
+  if (childXml->FirstChildElement("animation"))
+  {
+    while (childXml)
+    {
+      this->LoadAnimationSet(childXml, _skel);
+      childXml->NextSiblingElement("animation");
+    }
+  }
+  else
+    this->LoadAnimationSet(_xml, _skel);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
+{
+  std::stringstream animName;
+  if (_xml->Attribute("name"))
+    animName << _xml->Attribute("name");
+  else
+    if (_xml->Attribute("id"))
+      animName << _xml->Attribute("id");
+    else
+      animName << "animation" << (_skel->GetNumAnimations() + 1);
+
+  RawSkeletonAnimation animation;
+
+  TiXmlElement *animXml = _xml->FirstChildElement("animation");
+  while (animXml)
+  {
+    TiXmlElement *chanXml = animXml->FirstChildElement("channel");
+
+    while (chanXml)
+    {
+      std::string sourceURL = chanXml->Attribute("source");
+      std::string targetStr = chanXml->Attribute("target");
+
+      std::string targetBone = targetStr.substr(0, targetStr.find('/'));
+      char sep = '0';
+      if (targetStr.find('(') != std::string::npos)
+        sep = '(';
+      else
+        if (targetStr.find('.') != std::string::npos)
+          sep = '.';
+
+      std::string targetTrans;
+      if (sep == '0')
+        targetTrans = targetStr.substr(targetStr.find('/') + 1);
+      else
+        targetTrans = targetStr.substr(targetStr.find('/') + 1,
+                          targetStr.find(sep) - targetStr.find('/') - 1);
+
+      std::string idxStr = targetStr.substr(targetStr.find(sep) + 1);
+      int idx1 = -1;
+      int idx2 = -1;
+
+      if (sep == '.')
+        idx1 = (idxStr == "X") ? 0 : ((idxStr == "Y") ? 1 : ((idxStr == "Z")
+            ? 2 : ((idxStr == "ANGLE") ? 3 : -1)));
+      else
+        if (sep == '(')
+        {
+          std::string idx1Str = idxStr.substr(0, 1);
+          idx1 = math::parseInt(idx1Str);
+          if (idxStr.length() > 4)
+          {
+            std::string idx2Str = idxStr.substr(3, 1);
+            idx2 = math::parseInt(idx2Str);
+          }
+        }
+
+      TiXmlElement *frameTimesXml = NULL;
+      TiXmlElement *frameTransXml = NULL;
+
+      TiXmlElement *sampXml = this->GetElementId("sampler", sourceURL);
+      TiXmlElement *inputXml = sampXml->FirstChildElement("input");
+      while (inputXml)
+      {
+        std::string semantic = inputXml->Attribute("semantic");
+        if (semantic == "INPUT")
+          frameTimesXml = this->GetElementId("source",
+                              inputXml->Attribute("source"));
+        else
+          if (semantic == "OUTPUT")
+            frameTransXml = this->GetElementId("source",
+                              inputXml->Attribute("source"));
+        /// FIXME interpolation semantic?
+
+        inputXml = inputXml->NextSiblingElement("input");
+      }
+      TiXmlElement *timeArray = frameTimesXml->FirstChildElement("float_array");
+      std::string timeStr = timeArray->GetText();
+      std::vector<std::string> timeStrs;
+      boost::split(timeStrs, timeStr, boost::is_any_of("   "));
+
+      std::vector<double> times;
+      for (unsigned int i = 0; i < timeStrs.size(); i++)
+        times.push_back(math::parseFloat(timeStrs[i]));
+
+      TiXmlElement *output = frameTransXml->FirstChildElement("float_array");
+      std::string outputStr = output->GetText();
+      std::vector<std::string> outputStrs;
+      boost::split(outputStrs, outputStr, boost::is_any_of("   "));
+
+      std::vector<double> values;
+      for (unsigned int i = 0; i < outputStrs.size(); i++)
+        values.push_back(math::parseFloat(outputStrs[i]));
+
+      TiXmlElement *accesor =
+        frameTransXml->FirstChildElement("technique_common");
+      accesor  = accesor->FirstChildElement("accessor");
+
+      unsigned int stride = math::parseInt(accesor->Attribute("stride"));
+
+      for (unsigned int i = 0; i < times.size(); i++)
+      {
+        if (animation[targetBone].find(times[i]) == animation[targetBone].end())
+          animation[targetBone][times[i]] =
+                      _skel->GetNodeById(targetBone)->GetTransforms();
+
+        std::vector<NodeTransform> *frame = &animation[targetBone][times[i]];
+
+        for (unsigned int j = 0; j < (*frame).size(); j++)
+        {
+          NodeTransform *nt = &((*frame)[j]);
+          if (nt->GetSID() == targetTrans)
+          {
+            if (idx1 != -1)
+            {
+              int index = (idx2 == -1) ? idx1 : (idx1 * 4) + idx2;
+              nt->SetComponent(index, values[i]);
+            }
+            else
+              for (unsigned int k = 0; k < stride; k++)
+                nt->SetComponent(k, values[(i*stride) + k]);
+          }
+        }
+      }
+
+      chanXml = chanXml->NextSiblingElement("channel");
+    }
+
+    animXml = animXml->NextSiblingElement("animation");
+  }
+
+  SkeletonAnimation anim;
+
+  for (RawSkeletonAnimation::iterator iter = animation.begin();
+        iter != animation.end(); ++iter)
+    for (RawNodeAnimation::iterator niter = iter->second.begin();
+          niter != iter->second.end(); ++niter)
+    {
+      math::Matrix4 transform(math::Matrix4::IDENTITY);
+      for (unsigned int i = 0; i < niter->second.size(); i++)
+      {
+        niter->second[i].RecalculateMatrix();
+        transform = transform * niter->second[i]();
+      }
+      anim[iter->first][niter->first] = transform;
+    }
+
+  _skel->AddAnimation(animName.str(), anim);
+}
+
+/////////////////////////////////////////////////
+SkeletonNode* ColladaLoader::LoadSkeletonNodes(TiXmlElement *_xml,
+      SkeletonNode *_parent)
+{
+  std::string name;
+  if (_xml->Attribute("sid"))
+    name = _xml->Attribute("sid");
+  else
+    name = _xml->Attribute("name");
+
+  SkeletonNode* node = new SkeletonNode(_parent, name, _xml->Attribute("id"));
+
+  if (std::string(_xml->Attribute("type")) == std::string("NODE"))
+    node->SetType(SkeletonNode::NODE);
+
+  this->SetSkeletonNodeTransform(_xml, node);
+
+  TiXmlElement *childXml = _xml->FirstChildElement("node");
+  while (childXml)
+  {
+    this->LoadSkeletonNodes(childXml, node);
+    childXml = childXml->NextSiblingElement("node");
+  }
+  return node;
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
+      SkeletonNode *_node)
+{
+  math::Matrix4 transform(math::Matrix4::IDENTITY);
+
+  if (_elem->FirstChildElement("matrix"))
+  {
+    std::string matrixStr = _elem->FirstChildElement("matrix")->GetText();
+    std::istringstream iss(matrixStr);
+    std::vector<double> values(16);
+    for (unsigned int i = 0; i < 16; i++)
+      iss >> values[i];
+    transform.Set(values[0], values[1], values[2], values[3],
+        values[4], values[5], values[6], values[7],
+        values[8], values[9], values[10], values[11],
+        values[12], values[13], values[14], values[15]);
+
+    NodeTransform nt(transform);
+    nt.SetSourceValues(transform);
+    if (_elem->FirstChildElement("matrix")->Attribute("sid"))
+      nt.SetSID(_elem->FirstChildElement("matrix")->Attribute("sid"));
+    _node->AddRawTransform(nt);
+  }
+  else
+  {
+    if (_elem->FirstChildElement("translate"))
+    {
+      std::string transStr = _elem->FirstChildElement("translate")->GetText();
+      math::Vector3 translate;
+      translate = boost::lexical_cast<math::Vector3>(transStr);
+      // translate *= this->meter;
+      transform.SetTranslate(translate);
+
+      NodeTransform nt(transform);
+      if (_elem->FirstChildElement("translate")->Attribute("sid"))
+        nt.SetSID(_elem->FirstChildElement("translate")->Attribute("sid"));
+      nt.SetType(NodeTransform::TRANSLATE);
+      nt.SetSourceValues(translate);
+      _node->AddRawTransform(nt);
+    }
+
+    TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
+    while (rotateXml)
+    {
+      math::Matrix3 mat;
+      math::Vector3 axis;
+      double angle;
+
+      std::string rotateStr = rotateXml->GetText();
+      std::istringstream iss(rotateStr);
+
+      iss >> axis.x >> axis.y >> axis.z;
+      iss >> angle;
+      mat.SetFromAxis(axis, GZ_DTOR(angle));
+
+      math::Matrix4 mat4(math::Matrix4::IDENTITY);
+      mat4 = mat;
+      NodeTransform nt(mat4);
+      if (rotateXml->Attribute("sid"))
+        nt.SetSID(rotateXml->Attribute("sid"));
+      nt.SetType(NodeTransform::ROTATE);
+      nt.SetSourceValues(axis, angle);
+      _node->AddRawTransform(nt);
+
+      transform = transform * mat;
+
+      rotateXml = rotateXml->NextSiblingElement("rotate");
+    }
+
+    if (_elem->FirstChildElement("scale"))
+    {
+      std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
+      math::Vector3 scale;
+      scale = boost::lexical_cast<math::Vector3>(scaleStr);
+      math::Matrix4 scaleMat;
+      scaleMat.SetScale(scale);
+
+      NodeTransform nt(scaleMat);
+      if (_elem->FirstChildElement("matrix")->Attribute("sid"))
+        nt.SetSID(_elem->FirstChildElement("matrix")->Attribute("sid"));
+      nt.SetType(NodeTransform::SCALE);
+      nt.SetSourceValues(scale);
+      _node->AddRawTransform(nt);
+
+      transform = transform * scaleMat;
+    }
+  }
+
+  _node->SetTransform(transform);
+}
 /////////////////////////////////////////////////
 void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
                                  const math::Matrix4 &_transform, Mesh *_mesh)
@@ -793,6 +1269,20 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         subMesh->AddIndex(subMesh->GetVertexCount()-1);
         if (combinedVertNorms)
           subMesh->AddNormal(norms[values[iter->second]]);
+        if (_mesh->HasSkeleton())
+        {
+          Skeleton *skel = _mesh->GetSkeleton();
+          for (unsigned int i = 0;
+                  i < skel->GetNumVertNodeWeights(values[iter->second]); i++)
+          {
+            std::pair<std::string, double> node_weight =
+                              skel->GetVertNodeWeight(values[iter->second], i);
+            SkeletonNode *node =
+                _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
+            subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
+                            node->GetHandle(), node_weight.second);
+          }
+        }
       }
       else if (iter->first == "NORMAL")
       {

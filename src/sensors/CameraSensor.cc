@@ -25,6 +25,7 @@
 #include "common/Exception.hh"
 
 #include "transport/transport.h"
+#include "msgs/msgs.h"
 
 #include "physics/World.hh"
 
@@ -44,6 +45,7 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
+  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
@@ -64,11 +66,21 @@ void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+std::string CameraSensor::GetTopic() const
+{
+  std::string topicName = "~/";
+  topicName += this->parentName + "/" + this->GetName() + "/image";
+  boost::replace_all(topicName,"::","/");
+
+  return topicName;
+}
+
+//////////////////////////////////////////////////
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->poseSub = this->node->Subscribe("~/pose",
-                                        &CameraSensor::OnPose, this);
+  this->node->Init(_worldName);
+  this->imagePub = this->node->Advertise<msgs::Image>(this->GetTopic());
 }
 
 //////////////////////////////////////////////////
@@ -139,12 +151,19 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
     this->camera->Render();
     this->camera->PostRender();
     this->lastUpdateTime = this->world->GetSimTime();
-  }
-}
 
-//////////////////////////////////////////////////
-void CameraSensor::OnPose(ConstPosePtr &/*_msg*/)
-{
+    if (this->imagePub->HasConnections())
+    {
+      msgs::Image msg;
+      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+      msg.set_width(this->camera->GetImageWidth());
+      msg.set_height(this->camera->GetImageHeight());
+      msg.set_encoding(this->camera->GetImageFormat());
+      msg.set_step(this->camera->GetImageWidth() * 3);
+      msg.set_data(this->camera->GetImageData(), msg.width()*3*msg.height());
+      this->imagePub->Publish(msg);
+    }
+  }
 }
 
 //////////////////////////////////////////////////

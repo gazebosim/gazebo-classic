@@ -72,16 +72,17 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("origin"))
   {
-    this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
+    this->pose = this->sdf->GetElement("origin")->GetValuePose("pose");
   }
 
   if (this->sdf->GetValueBool("always_on"))
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
-  this->lastUpdateTime = this->world->GetSimTime();
+  this->lastUpdateTime = common::Time(0.0);  // loaded, but not updated
 
   this->node->Init(this->world->GetName());
+  this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
 }
 
 //////////////////////////////////////////////////
@@ -99,7 +100,10 @@ void Sensor::Init()
       pluginElem = pluginElem->GetNextElement();
     }
   }
-  // SensorManager::Instance()->AddSensor(shared_from_this());
+
+  msgs::Sensor msg;
+  this->FillMsg(msg);
+  this->sensorPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////

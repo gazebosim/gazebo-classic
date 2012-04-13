@@ -76,6 +76,9 @@ namespace gazebo
       /// \brief Update the mass matrix
       public: virtual void UpdateMass();
 
+      /// \brief Update other parameters for ODE
+      public: virtual void UpdateSurface();
+
       /// \brief Set the linear velocity of the link
       public: virtual void SetLinearVel(const math::Vector3 &vel);
 
@@ -137,6 +140,7 @@ namespace gazebo
       /// \brief Set the angular damping factor
       public: virtual void SetAngularDamping(double damping);
 
+      public: static void DisabledCallback(dBodyID _id);
       public: static void MoveCallback(dBodyID id);
 
       /// \brief Set whether this link is in the kinematic state

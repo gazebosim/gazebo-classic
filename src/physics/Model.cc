@@ -579,19 +579,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     gzthrow("can't have two joint with the same name");
 
   msgs::Joint msg;
-  msg.set_name(joint->GetName());
-  msg.set_type(msgs::Joint::REVOLUTE);
-
-  if (joint->GetParent())
-    msg.set_parent(joint->GetParent()->GetScopedName());
-  else
-    msg.set_parent("world");
-
-  if (joint->GetChild())
-    msg.set_child(joint->GetChild()->GetScopedName());
-  else
-    msg.set_child("world");
-
+  joint->FillJointMsg(msg);
   this->jointPub->Publish(msg);
 
   this->joints.push_back(joint);
@@ -666,19 +654,17 @@ void Model::FillModelMsg(msgs::Model &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (unsigned int j = 0; j < this->GetChildCount(); j++)
+  for (unsigned int j = 0; j < this->GetChildCount(); ++j)
   {
     if (this->GetChild(j)->HasType(Base::LINK))
     {
       LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
       link->FillLinkMsg(*_msg.add_link());
     }
-    if (this->GetChild(j)->HasType(Base::JOINT))
-    {
-      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(j));
-      joint->FillJointMsg(*_msg.add_joints());
-    }
   }
+
+  for (unsigned int j = 0; j < this->joints.size(); ++j)
+    this->joints[j]->FillJointMsg(*_msg.add_joint());
 }
 
 //////////////////////////////////////////////////
@@ -690,7 +676,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     return;
   }
   else if ((_msg.has_id() && _msg.id() != this->GetId()) &&
-      _msg.name() != this->GetScopedName())
+            _msg.name() != this->GetScopedName())
   {
     gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
       << "]\n";
@@ -714,7 +700,6 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 //////////////////////////////////////////////////
 void Model::SetJointPositions(
     const std::map<std::string, double> &_jointPositions)
-
 {
   // go through all joints in this model and update each one
   //   for each joint update, recursively update all children
@@ -725,12 +710,11 @@ void Model::SetJointPositions(
     JointPtr joint = *iter;
 
     jiter = _jointPositions.find(joint->GetName());
-    unsigned int jtype = joint->GetType();
 
     // only deal with hinge and revolute joints in the user
     // request joint_names list
-    if ((jtype == Base::HINGE_JOINT || jtype == Base::SLIDER_JOINT) &&
-        jiter != _jointPositions.end())
+    if ((joint->HasType(Base::HINGE_JOINT) ||
+         joint->HasType(Base::SLIDER_JOINT)) && jiter != _jointPositions.end())
     {
       LinkPtr parentLink = joint->GetParent();
       LinkPtr childLink = joint->GetChild();
@@ -739,63 +723,57 @@ void Model::SetJointPositions(
           parentLink->GetName() != childLink->GetName())
       {
         // transform about the current anchor, about the axis
-        switch (jtype)
+        if (joint->HasType(Base::HINGE_JOINT))
         {
-          case Base::HINGE_JOINT:
-            {
-              // rotate child (childLink) about anchor point, by delta-angle
-              // along axis
-              double dangle = jiter->second - joint->GetAngle(0).GetAsRadian();
+          // rotate child (childLink) about anchor point, by delta-angle
+          // along axis
+          double dangle = jiter->second - joint->GetAngle(0).GetAsRadian();
 
-              math::Vector3 anchor;
-              math::Vector3 axis;
+          math::Vector3 anchor;
+          math::Vector3 axis;
 
-              if (this->IsStatic())
-              {
-                math::Pose linkWorldPose = childLink->GetWorldPose();
-                axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
-                anchor = linkWorldPose.pos;
-              }
-              else
-              {
-                anchor = joint->GetAnchor(0);
-                axis = joint->GetGlobalAxis(0);
-              }
+          if (this->IsStatic())
+          {
+            math::Pose linkWorldPose = childLink->GetWorldPose();
+            axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
+            anchor = linkWorldPose.pos;
+          }
+          else
+          {
+            anchor = joint->GetAnchor(0);
+            axis = joint->GetGlobalAxis(0);
+          }
 
-              this->RotateBodyAndChildren(childLink, anchor,
-                                          axis, dangle, true);
-              break;
-            }
-          case Base::SLIDER_JOINT:
-            {
-              double dposition = jiter->second -
-                                joint->GetAngle(0).GetAsRadian();
+          this->RotateBodyAndChildren(childLink, anchor,
+              axis, dangle, true);
+        }
+        else if (joint->HasType(Base::SLIDER_JOINT))
+        {
+          double dposition = jiter->second -
+            joint->GetAngle(0).GetAsRadian();
 
-              math::Vector3 anchor;
-              math::Vector3 axis;
+          math::Vector3 anchor;
+          math::Vector3 axis;
 
-              if (this->IsStatic())
-              {
-                math::Pose linkWorldPose = childLink->GetWorldPose();
-                axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
-                anchor = linkWorldPose.pos;
-              }
-              else
-              {
-                anchor = joint->GetAnchor(0);
-                axis = joint->GetGlobalAxis(0);
-              }
+          if (this->IsStatic())
+          {
+            math::Pose linkWorldPose = childLink->GetWorldPose();
+            axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
+            anchor = linkWorldPose.pos;
+          }
+          else
+          {
+            anchor = joint->GetAnchor(0);
+            axis = joint->GetGlobalAxis(0);
+          }
 
-              this->SlideBodyAndChildren(childLink, anchor,
-                                         axis, dposition, true);
-              break;
-            }
-          default:
-            {
-              gzwarn << "Setting non HINGE/SLIDER joint types not"
-                       << "implemented [" << joint->GetName() << "]\n";
-              break;
-            }
+          this->SlideBodyAndChildren(childLink, anchor,
+              axis, dposition, true);
+        }
+        else
+        {
+          gzwarn << "Setting non HINGE/SLIDER joint types not"
+            << "implemented [" << joint->GetName() << "]\n";
         }
       }
     }
@@ -804,7 +782,8 @@ void Model::SetJointPositions(
   for (jiter = _jointPositions.begin(); jiter != _jointPositions.end(); ++jiter)
   {
     JointPtr joint = this->GetJoint(jiter->first);
-    joint->SetAngle(0, jiter->second);
+    if (joint)
+      joint->SetAngle(0, jiter->second);
   }
 }
 
@@ -1034,4 +1013,13 @@ void Model::SetState(const ModelState &_state)
     else
       gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void Model::SetEnabled(bool _enabled)
+{
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+    if (*iter && (*iter)->HasType(LINK))
+      boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
 }

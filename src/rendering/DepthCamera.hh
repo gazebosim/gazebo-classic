@@ -37,6 +37,10 @@
 namespace Ogre
 {
   class Material;
+  class RenderObjectListener;
+  class Renderable;
+  class Pass;
+  class AutoParamDataSource;
 }
 
 namespace gazebo
@@ -66,7 +70,7 @@ namespace gazebo
 
       /// \brief Load the camera with a set of parmeters
       /// \param _sdf The SDF camera info
-      public: void Load(sdf::ElementPtr _sdf);
+      public: void Load(sdf::ElementPtr &_sdf);
 
        /// \brief Load the camera with default parmeters
       public: void Load();
@@ -93,7 +97,11 @@ namespace gazebo
               { newDepthFrame.Disconnect(c); }
       private: virtual void RenderImpl();
 
+      private: void UpdateRenderTarget(Ogre::RenderTarget *target,
+               Ogre::Material *material, std::string matName);
+
       private: float *depthBuffer;
+
       private: Ogre::Material *depthMaterial;
 
       private: event::EventT<void(const float *, unsigned int, unsigned int,
@@ -103,6 +111,26 @@ namespace gazebo
       protected: Ogre::RenderTarget *depthTarget;
       public: virtual void SetDepthTarget(Ogre::RenderTarget *target);
       protected: Ogre::Viewport *depthViewport;
+
+      private: bool output_points;
+
+      /// \brief Connect a to the add entity signal
+      public: template<typename T>
+              event::ConnectionPtr ConnectNewRGBPointCloud(T subscriber)
+              { return newRGBPointCloud.Connect(subscriber); }
+      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &c)
+              { newRGBPointCloud.Disconnect(c); }
+
+      private: float *pcdBuffer;
+      protected: Ogre::Viewport *pcdViewport;
+
+      private: event::EventT<void(const float *, unsigned int, unsigned int,
+                   unsigned int, const std::string &)> newRGBPointCloud;
+
+      private: Ogre::Material *pcdMaterial;
+
+      protected: Ogre::Texture *pcdTexture;
+      protected: Ogre::RenderTarget *pcdTarget;
     };
 
     /// \}

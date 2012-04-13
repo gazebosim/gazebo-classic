@@ -35,6 +35,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Mesh.hh"
+#include "common/Skeleton.hh"
 #include "rendering/Material.hh"
 #include "rendering/Visual.hh"
 
@@ -46,8 +47,10 @@ SelectionObj *Visual::selectionObj = 0;
 unsigned int Visual::visualCounter = 0;
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, VisualPtr _parent)
+Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->useRTShader = _useRTShader;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
 
@@ -77,14 +80,17 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 }
 
 //////////////////////////////////////////////////
-Visual::Visual(const std::string &_name, ScenePtr _scene)
+Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->useRTShader = _useRTShader;
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
 
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
+  this->skeleton = NULL;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -112,9 +118,10 @@ Visual::~Visual()
     event::Events::DisconnectPreRender(this->preRenderConnection);
 
   // delete instance from lines vector
-  for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
+  /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
        iter!= this->lines.end(); ++iter)
     delete *iter;
+    */
   this->lines.clear();
 
 
@@ -172,6 +179,10 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   {
     result->children.push_back((*iter)->Clone((*iter)->GetName(), result));
   }
+
+  result->SetWorldPose(this->GetWorldPose());
+  result->ShowCollision(false);
+
   return result;
 }
 
@@ -214,7 +225,8 @@ void Visual::Init()
   this->ribbonTrail = NULL;
   this->staticGeom = NULL;
 
-  RTShaderSystem::Instance()->AttachEntity(this);
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->AttachEntity(this);
 }
 
 //////////////////////////////////////////////////
@@ -304,6 +316,9 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_cast_shadows())
     this->sdf->GetAttribute("cast_shadows")->Set(_msg->cast_shadows());
 
+  if (_msg->has_laser_retro())
+    this->sdf->GetAttribute("laser_retro")->Set(_msg->laser_retro());
+
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -337,29 +352,7 @@ void Visual::Load()
     {
       // Create the visual
       stream << "VISUAL_" << this->sceneNode->getName();
-
-      const common::Mesh *mesh;
-      if (!common::MeshManager::Instance()->HasMesh(meshName))
-      {
-        mesh = common::MeshManager::Instance()->Load(meshName);
-        if (mesh)
-          RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-        else
-          gzthrow("Unable to create a mesh from " + meshName);
-      }
-      else
-      {
-        mesh = common::MeshManager::Instance()->GetMesh(meshName);
-      }
-
-      // Add the mesh into OGRE
-      this->InsertMesh(mesh);
-
-      Ogre::SceneManager *mgr = this->sceneNode->getCreator();
-      if (mgr->hasEntity(stream.str()))
-        obj = (Ogre::MovableObject*)mgr->getEntity(stream.str());
-      else
-        obj = (Ogre::MovableObject*)mgr->createEntity(stream.str(), meshName);
+      obj = this->AttachMesh(meshName, stream.str());
     }
     catch(Ogre::Exception &e)
     {
@@ -368,11 +361,15 @@ void Visual::Load()
     }
   }
 
-  // Attach the entity to the node
-  if (obj)
+  Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
+  if (ent)
   {
-    this->AttachObject(obj);
-    obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
+    if (ent->hasSkeleton())
+      this->skeleton = ent->getSkeleton();
+
+    for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
+      ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
+          this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
   }
 
   // Set the pose of the scene node
@@ -380,9 +377,7 @@ void Visual::Load()
 
   // Get the size of the mesh
   if (obj)
-  {
     meshSize = obj->getBoundingBox().getSize();
-  }
 
   math::Vector3 scale = this->GetScale();
   this->sceneNode->setScale(scale.x, scale.y, scale.z);
@@ -431,7 +426,9 @@ void Visual::Update()
 
   if (this->animState)
   {
-    this->animState->addTime(0.01);
+    this->animState->addTime(
+        (common::Time::GetWallTime() - this->prevAnimTime).Double());
+    this->prevAnimTime = common::Time::GetWallTime();
     if (this->animState->hasEnded())
     {
       this->animState = NULL;
@@ -511,12 +508,15 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    RTShaderSystem::Instance()->UpdateShaders();
+    if (this->useRTShader)
+      RTShaderSystem::Instance()->UpdateShaders();
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
     gzerr << "Visual[" << this->GetName() << "] already has object["
           << _obj->getName() << "] attached.";
+
+  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
 }
 
 //////////////////////////////////////////////////
@@ -572,25 +572,24 @@ void Visual::MakeStatic()
 }
 
 //////////////////////////////////////////////////
-void Visual::AttachMesh(const std::string &_meshName)
+Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
+                                        const std::string &_objName)
 {
-  std::ostringstream stream;
-  Ogre::MovableObject *obj;
-  stream << this->sceneNode->getName() << "_ENTITY_" << _meshName;
+  if (_meshName.empty())
+    return NULL;
 
-  // Add the mesh into OGRE
-  if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
-      common::MeshManager::Instance()->HasMesh(_meshName))
-  {
-    const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(_meshName);
-    this->InsertMesh(mesh);
-  }
+  Ogre::MovableObject *obj;
+  std::string objName = _objName;
+  if (objName.empty())
+    objName = this->sceneNode->getName() + "_ENTITY_" + _meshName;
+
+  this->InsertMesh(_meshName);
 
   obj = (Ogre::MovableObject*)
-    (this->sceneNode->getCreator()->createEntity(stream.str(), _meshName));
+    (this->sceneNode->getCreator()->createEntity(objName, _meshName));
 
   this->AttachObject(obj);
+  return obj;
 }
 
 //////////////////////////////////////////////////
@@ -651,58 +650,63 @@ math::Vector3 Visual::GetScale()
 
 
 //////////////////////////////////////////////////
-void Visual::SetMaterial(const std::string &materialName)
+void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 {
-  if (materialName.empty() || materialName == "__default__")
+  if (_materialName.empty() || _materialName == "__default__")
     return;
 
-  // Create a custom material name
-  std::string newMaterialName;
-  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
-
-  if (this->GetMaterialName() == newMaterialName)
-    return;
-
-  this->myMaterialName = newMaterialName;
-
-  Ogre::MaterialPtr origMaterial;
-
-  try
+  if (_unique)
   {
-    this->origMaterialName = materialName;
-    // Get the original material
-    origMaterial =
-      Ogre::MaterialManager::getSingleton().getByName(materialName);
-  }
-  catch(Ogre::Exception &e)
-  {
-    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
-    << this->sceneNode->getName() << ". Object will appear white.\n";
-    return;
-  }
+    // Create a custom material name
+    std::string newMaterialName;
+    newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
 
-  if (origMaterial.isNull())
-  {
-    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
-    << this->sceneNode->getName() << ". Object will appear white\n";
-    return;
-  }
+    if (this->GetMaterialName() == newMaterialName)
+      return;
 
+    this->myMaterialName = newMaterialName;
 
-  Ogre::MaterialPtr myMaterial;
+    Ogre::MaterialPtr origMaterial;
+    try
+    {
+      this->origMaterialName = _materialName;
+      // Get the original material
+      origMaterial =
+        Ogre::MaterialManager::getSingleton().getByName(_materialName);
+    }
+    catch(Ogre::Exception &e)
+    {
+      gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
+        << this->sceneNode->getName() << ". Object will appear white.\n";
+      return;
+    }
 
-  // Clone the material. This will allow us to change the look of each geom
-  // individually.
-  if (Ogre::MaterialManager::getSingleton().resourceExists(
-        this->myMaterialName))
-  {
-    myMaterial =
-      (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(
-            this->myMaterialName));
+    if (origMaterial.isNull())
+    {
+      gzwarn << "Unable to get Material[" << _materialName << "] for Geometry["
+        << this->sceneNode->getName() << ". Object will appear white\n";
+      return;
+    }
+
+    Ogre::MaterialPtr myMaterial;
+
+    // Clone the material. This will allow us to change the look of each geom
+    // individually.
+    if (Ogre::MaterialManager::getSingleton().resourceExists(
+          this->myMaterialName))
+    {
+      myMaterial =
+        (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(
+              this->myMaterialName));
+    }
+    else
+    {
+      myMaterial = origMaterial->clone(this->myMaterialName);
+    }
   }
   else
   {
-    myMaterial = origMaterial->clone(this->myMaterialName);
+    this->myMaterialName = _materialName;
   }
 
 
@@ -717,6 +721,21 @@ void Visual::SetMaterial(const std::string &materialName)
       else
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
+
+    // Apply material to all child scene nodes
+    for (unsigned int i = 0; i < this->sceneNode->numChildren(); ++i)
+    {
+      Ogre::SceneNode *sn = (Ogre::SceneNode*)(this->sceneNode->getChild(i));
+      for (int j = 0; j < sn->numAttachedObjects(); j++)
+      {
+        Ogre::MovableObject *obj = sn->getAttachedObject(j);
+
+        if (dynamic_cast<Ogre::Entity*>(obj))
+          ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
+        else
+          ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
+      }
+    }
   }
   catch(Ogre::Exception &e)
   {
@@ -725,10 +744,18 @@ void Visual::SetMaterial(const std::string &materialName)
            << this->sceneNode->getName() << ". Object will appear white.\n";
   }
 
-  RTShaderSystem::Instance()->UpdateShaders();
+  // Apply material to all child visuals
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetMaterial(_materialName, _unique);
+  }
+
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
-/// Set the ambient color of the visual
+/////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color)
 {
   if (this->myMaterialName.empty())
@@ -1010,7 +1037,9 @@ void Visual::SetTransparency(float _trans)
       }
     }
   }
-  RTShaderSystem::Instance()->UpdateShaders();
+
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1053,7 +1082,7 @@ void Visual::SetEmissive(const common::Color &_color)
 
   for (unsigned int i = 0; i < this->children.size(); ++i)
   {
-    this->children[i]->SetSpecular(_color);
+    this->children[i]->SetEmissive(_color);
   }
 }
 
@@ -1160,8 +1189,7 @@ void Visual::SetWorldPosition(const math::Vector3 &_pos)
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
-  Ogre::Quaternion vquatern(_q.w, _q.x, _q.y, _q.z);
-  this->sceneNode->_setDerivedOrientation(vquatern);
+  this->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
 //////////////////////////////////////////////////
@@ -1225,7 +1253,8 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetOrCreateElement("normal_map")->GetValue()->Set(_nmap);
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 //////////////////////////////////////////////////
@@ -1240,7 +1269,8 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
       "shader")->GetAttribute("type")->Set(_type);
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (this->useRTShader)
+    RTShaderSystem::Instance()->UpdateShaders();
 }
 
 
@@ -1345,7 +1375,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
   for (int i = 0; i < node->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = node->getAttachedObject(i);
-    if (obj->isVisible() && obj->getMovableType() != "gazebo::ogredynamiclines")
+    if (obj->isVisible() && obj->getMovableType() != "gazebo::ogredynamiclines"
+        && obj->getVisibilityFlags() != GZ_VISIBILITY_GUI)
     {
       Ogre::Any any = obj->getUserAny();
       if (any.getType() == typeid(std::string))
@@ -1372,6 +1403,36 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 }
 
 //////////////////////////////////////////////////
+void Visual::InsertMesh(const std::string &_meshName)
+{
+  const common::Mesh *mesh;
+  if (!common::MeshManager::Instance()->HasMesh(_meshName))
+  {
+    mesh = common::MeshManager::Instance()->Load(_meshName);
+    if (mesh)
+      RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+    else
+      gzthrow("Unable to create a mesh from " + _meshName);
+  }
+  else
+  {
+    mesh = common::MeshManager::Instance()->GetMesh(_meshName);
+  }
+
+  this->InsertMesh(mesh);
+
+
+  // Add the mesh into OGRE
+  /*if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
+      common::MeshManager::Instance()->HasMesh(_meshName))
+  {
+    const common::Mesh *mesh =
+      common::MeshManager::Instance()->GetMesh(_meshName);
+    this->InsertMesh(mesh);
+  }*/
+}
+
+//////////////////////////////////////////////////
 void Visual::InsertMesh(const common::Mesh *mesh)
 {
   Ogre::MeshPtr ogreMesh;
@@ -1382,12 +1443,47 @@ void Visual::InsertMesh(const common::Mesh *mesh)
     return;
   }
 
+  // Don't re-add existing meshes
+  if (Ogre::MeshManager::getSingleton().resourceExists(mesh->GetName()))
+    return;
+
   try
   {
     // Create a new mesh specifically for manual definition.
     ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+    Ogre::SkeletonPtr ogreSkeleton;
+
+    if (mesh->HasSkeleton())
+    {
+      common::Skeleton *skel = mesh->GetSkeleton();
+      ogreSkeleton = Ogre::SkeletonManager::getSingleton().create(
+        mesh->GetName() + "_skeleton",
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        true);
+
+      for (unsigned int i = 0; i < skel->GetNumNodes(); i++)
+      {
+        common::SkeletonNode *node = skel->GetNodeByHandle(i);
+        if (node->GetChildCount() == 0)
+          continue;
+        Ogre::Bone *bone = ogreSkeleton->createBone(node->GetName());
+
+        if (node->GetParent())
+          ogreSkeleton->getBone(node->GetParent()->GetName())->addChild(bone);
+
+        math::Matrix4 trans = node->GetTransform();
+        math::Vector3 pos = trans.GetTranslation();
+        math::Quaternion q = trans.GetRotation();
+        bone->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
+        bone->setOrientation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
+        bone->setInheritOrientation(true);
+        bone->setManuallyControlled(true);
+        bone->setInitialState();
+      }
+      ogreMesh->setSkeletonName(mesh->GetName() + "_skeleton");
+    }
     for (unsigned int i = 0; i < mesh->GetSubMeshCount(); i++)
     {
       Ogre::SubMesh *ogreSubMesh;
@@ -1396,7 +1492,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       Ogre::HardwareVertexBufferSharedPtr vBuf;
       Ogre::HardwareIndexBufferSharedPtr iBuf;
       float *vertices;
-      uint16_t *indices;
+      uint32_t *indices;
 
       size_t currOffset = 0;
 
@@ -1414,6 +1510,8 @@ void Visual::InsertMesh(const common::Mesh *mesh)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
       else if (subMesh->GetPrimitiveType() == common::SubMesh::TRISTRIPS)
         ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
+      else if (subMesh->GetPrimitiveType() == common::SubMesh::POINTS)
+        ogreSubMesh->operationType = Ogre::RenderOperation::OT_POINT_LIST;
       else
         gzerr << "Unknown primitive type["
               << subMesh->GetPrimitiveType() << "]\n";
@@ -1463,18 +1561,33 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       vertices = static_cast<float*>(vBuf->lock(
                       Ogre::HardwareBuffer::HBL_DISCARD));
 
+      if (mesh->HasSkeleton())
+      {
+        common::Skeleton *skel = mesh->GetSkeleton();
+        for (unsigned int j = 0; j < subMesh->GetNodeAssignmentsCount(); j++)
+        {
+          common::NodeAssignment na = subMesh->GetNodeAssignment(j);
+          Ogre::VertexBoneAssignment vba;
+          vba.vertexIndex = na.vertexIndex;
+          vba.boneIndex = ogreSkeleton->getBone(skel->GetNodeByHandle(
+                              na.nodeIndex)->GetName())->getHandle();
+          vba.weight = na.weight;
+          ogreSubMesh->addBoneAssignment(vba);
+        }
+      }
+
       // allocate index buffer
       ogreSubMesh->indexData->indexCount = subMesh->GetIndexCount();
 
       ogreSubMesh->indexData->indexBuffer =
         Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-            Ogre::HardwareIndexBuffer::IT_16BIT,
+            Ogre::HardwareIndexBuffer::IT_32BIT,
             ogreSubMesh->indexData->indexCount,
             Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
             false);
 
       iBuf = ogreSubMesh->indexData->indexBuffer;
-      indices = static_cast<uint16_t*>(
+      indices = static_cast<uint32_t*>(
           iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
       unsigned int j;
@@ -1519,6 +1632,12 @@ void Visual::InsertMesh(const common::Mesh *mesh)
 
     math::Vector3 max = mesh->GetMax();
     math::Vector3 min = mesh->GetMin();
+
+    if (mesh->HasSkeleton())
+    {
+      min = math::Vector3(-10, -10, -10);
+      max = math::Vector3(10, 10, 10);
+    }
 
     if (!max.IsFinite())
       gzthrow("Max bounding box is not finite[" << max << "]\n");
@@ -1684,7 +1803,7 @@ std::string Visual::GetMeshName() const
       return "unit_cylinder";
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
-    else if (geomElem->HasElement("mesh"))
+    else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
       return geomElem->GetElement("mesh")->GetValueString("filename");
   }
 
@@ -1692,7 +1811,7 @@ std::string Visual::GetMeshName() const
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
+void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
                              double _time,
                              boost::function<void()> _onComplete)
 {
@@ -1718,8 +1837,9 @@ void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
   for (unsigned int i = 0; i < _pts.size(); i++)
   {
     key = strack->createNodeKeyFrame(tt);
-    key->setTranslate(Ogre::Vector3(_pts[i].x, _pts[i].y, _pts[i].z));
-    key->setRotation(this->sceneNode->getOrientation());
+    key->setTranslate(Ogre::Vector3(
+          _pts[i].pos.x, _pts[i].pos.y, _pts[i].pos.z));
+    key->setRotation(Conversions::Convert(_pts[i].rot));
 
     tt += dt;
   }
@@ -1730,6 +1850,7 @@ void Visual::MoveToPositions(const std::vector<math::Vector3> &_pts,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
 
   if (!this->preRenderConnection)
     this->preRenderConnection =
@@ -1767,6 +1888,7 @@ void Visual::MoveToPosition(const math::Vector3 &_end,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
 
   this->preRenderConnection =
     event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
@@ -1800,5 +1922,82 @@ void Visual::ShowCollision(bool _show)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->ShowCollision(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::SetVisibilityFlags(uint32_t _flags)
+{
+  for (std::vector<VisualPtr>::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
+  {
+    (*iter)->SetVisibilityFlags(_flags);
+  }
+
+  for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
+  {
+    this->sceneNode->getAttachedObject(i)->setVisibilityFlags(_flags);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numChildren(); ++i)
+  {
+    Ogre::SceneNode *sn = (Ogre::SceneNode*)(this->sceneNode->getChild(i));
+
+    for (int j = 0; j < sn->numAttachedObjects(); ++j)
+      sn->getAttachedObject(j)->setVisibilityFlags(_flags);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowJoints(bool _show)
+{
+  if (this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowJoints(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowCOM(bool _show)
+{
+  if (this->GetName().find("COM_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowCOM(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
+{
+  if (!this->skeleton)
+  {
+    gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
+    return;
+  }
+
+  for (int i = 0; i < _pose.pose_size(); i++)
+  {
+    const msgs::Pose& bonePose = _pose.pose(i);
+    Ogre::Bone *bone = this->skeleton->getBone(bonePose.name());
+    if (!bone)
+    {
+      gzerr << "Bone " << bonePose.name() << " not found.\n";
+      return;
+    }
+
+    const msgs::Vector3d& pos = bonePose.position();
+    const msgs::Quaternion& rot = bonePose.orientation();
+
+    bone->setManuallyControlled(true);
+    bone->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
+    bone->setOrientation(Ogre::Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
   }
 }

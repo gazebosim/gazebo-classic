@@ -37,11 +37,13 @@ namespace Ogre
   class RenderTarget;
 }
 
+#ifdef HAVE_CEGUI
 namespace CEGUI
 {
   class OgreRenderer;
   class Window;
 }
+#endif
 
 namespace gazebo
 {
@@ -125,5 +127,3 @@ namespace gazebo
 }
 
 #endif
-
-

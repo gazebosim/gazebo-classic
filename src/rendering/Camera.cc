@@ -50,6 +50,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/camera.sdf", this->sdf);
 
+  this->animState = NULL;
   this->windowId = 0;
   this->scene = scene_;
 
@@ -77,7 +78,6 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
-  this->origParentNode = NULL;
 
   // Connect to the render signal
   this->connections.push_back(
@@ -188,8 +188,6 @@ void Camera::Init()
 
   this->saveCount = 0;
 
-  this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
-
   this->SetClipDist();
 }
 
@@ -223,16 +221,6 @@ void Camera::SetScene(Scene *scene_)
 //////////////////////////////////////////////////
 void Camera::Update()
 {
-  // if (this->sceneNode)
-  // {
-    // Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
-  // }
-
-  // if (this->pitchNode)
-  // {
-  //  Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
-  // }
-
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
   {
@@ -256,6 +244,38 @@ void Camera::Update()
     else
       ++iter;
   }
+
+  // Update animations
+  if (this->animState)
+  {
+    this->animState->addTime(
+        (common::Time::GetWallTime() - this->prevAnimTime).Double());
+    this->prevAnimTime = common::Time::GetWallTime();
+
+    if (this->animState->hasEnded())
+    {
+      try
+      {
+        this->scene->GetManager()->destroyAnimation(
+            this->animState->getAnimationName());
+        this->scene->GetManager()->destroyAnimationState(
+            this->animState->getAnimationName());
+      } catch(Ogre::Exception &_e)
+      {
+      }
+      this->animState = NULL;
+      if (this->onAnimationComplete)
+        this->onAnimationComplete();
+    }
+  }
+
+  // TODO: this doesn't work properly
+  /*if (this->trackedVisual)
+  {
+    math::Pose displacement = this->trackedVisual->GetWorldPose() -
+      this->GetWorldPose();
+    this->sceneNode->translate(Conversions::Convert(displacement.pos));
+  }*/
 }
 
 
@@ -429,6 +449,7 @@ void Camera::SetClipDist()
   {
     this->camera->setNearClipDistance(clipElem->GetValueDouble("near"));
     this->camera->setFarClipDistance(clipElem->GetValueDouble("far"));
+    this->camera->setFarClipDistance(0);
     this->camera->setRenderingDistance(clipElem->GetValueDouble("far"));
   }
   else
@@ -603,6 +624,10 @@ void Camera::EnableSaveFrame(bool enable)
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
+
+  /*if (!this->renderTexture)
+    this->CreateRenderTexture("saveframes_render_texture");
+    */
 }
 
 //////////////////////////////////////////////////
@@ -714,7 +739,7 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 //////////////////////////////////////////////////
 const unsigned char *Camera::GetImageData(unsigned int _i)
 {
-  if (_i!= 0)
+  if (_i != 0)
     gzerr << "Camera index must be zero for cam";
 
   // do last minute conversion if Bayer pattern is requested, go from R8G8B8
@@ -1100,6 +1125,7 @@ void Camera::TrackVisual(const std::string &_name)
   this->requests.push_back(request);
 }
 
+//////////////////////////////////////////////////
 bool Camera::AttachToVisualImpl(const std::string &_name,
     bool _inheritOrientation, double _minDist, double _maxDist)
 {
@@ -1108,6 +1134,7 @@ bool Camera::AttachToVisualImpl(const std::string &_name,
                                   _minDist, _maxDist);
 }
 
+//////////////////////////////////////////////////
 bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     double /*_minDist*/, double /*_maxDist*/)
 {
@@ -1126,13 +1153,17 @@ bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   return false;
 }
 
+//////////////////////////////////////////////////
 bool Camera::TrackVisualImpl(const std::string &_name)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
     return this->TrackVisualImpl(visual);
   else
-    gzdbg << "Unable to find visual[" << _name << "]\n";
+  {
+    this->trackedVisual.reset();
+    this->camera->setAutoTracking(false, NULL);
+  }
 
   return false;
 }
@@ -1144,15 +1175,15 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
 
   if (_visual)
   {
-    _visual->GetSceneNode()->addChild(this->sceneNode);
     this->camera->setAutoTracking(true, _visual->GetSceneNode());
+    this->trackedVisual = _visual;
   }
   else
   {
-    this->origParentNode->addChild(this->sceneNode);
+    this->trackedVisual.reset();
     this->camera->setAutoTracking(false, NULL);
-    this->camera->setPosition(Ogre::Vector3(0, 0, 0));
-    this->camera->setOrientation(Ogre::Quaternion(-.5, -.5, .5, .5));
+    // this->camera->setPosition(Ogre::Vector3(0, 0, 0));
+    // this->camera->setOrientation(Ogre::Quaternion(-.5, -.5, .5, .5));
   }
   return true;
 }
@@ -1192,3 +1223,138 @@ bool Camera::GetInitialized() const
   return this->initialized;
 }
 
+/////////////////////////////////////////////////
+bool Camera::MoveToPosition(const math::Vector3 &_end,
+                                 double _pitch, double _yaw, double _time)
+{
+  if (this->animState)
+    return false;
+
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  double dyaw =  this->GetWorldRotation().GetAsEuler().z - _yaw;
+
+  if (dyaw > M_PI)
+    _yaw += 2*M_PI;
+  else if (dyaw < -M_PI)
+    _yaw -= 2*M_PI;
+
+  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0, 0, 1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0, 1, 0));
+
+  std::string trackName = "cameratrack";
+  int i = 0;
+  while (this->scene->GetManager()->hasAnimation(trackName))
+  {
+    trackName = std::string("cameratrack_") +
+      boost::lexical_cast<std::string>(i);
+    i++;
+  }
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation(trackName, _time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  key = strack->createNodeKeyFrame(_time);
+  key->setTranslate(Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setRotation(yawFinal);
+
+  key = ptrack->createNodeKeyFrame(_time);
+  key->setRotation(pitchFinal);
+
+  this->animState =
+    this->scene->GetManager()->createAnimationState(trackName);
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
+                                 double _time,
+                                 boost::function<void()> _onComplete)
+{
+  if (this->animState)
+    return false;
+
+  this->onAnimationComplete = _onComplete;
+
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  std::string trackName = "cameratrack";
+  int i = 0;
+  while (this->scene->GetManager()->hasAnimation(trackName))
+  {
+    trackName = std::string("cameratrack_") +
+      boost::lexical_cast<std::string>(i);
+    i++;
+  }
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation(trackName, _time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  double dt = _time / (_pts.size()-1);
+  double tt = 0;
+
+  double prevYaw = this->GetWorldRotation().GetAsEuler().z;
+  for (unsigned int j = 0; j < _pts.size(); j++)
+  {
+    math::Vector3 pos = _pts[j].pos;
+    math::Vector3 rpy = _pts[j].rot.GetAsEuler();
+    double dyaw = prevYaw - rpy.z;
+
+    if (dyaw > M_PI)
+      rpy.z += 2*M_PI;
+    else if (dyaw < -M_PI)
+      rpy.z -= 2*M_PI;
+
+    prevYaw = rpy.z;
+    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
+    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
+
+    key = strack->createNodeKeyFrame(tt);
+    key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
+    key->setRotation(yawFinal);
+
+    key = ptrack->createNodeKeyFrame(tt);
+    key->setRotation(pitchFinal);
+
+    tt += dt;
+  }
+
+  this->animState = this->scene->GetManager()->createAnimationState(trackName);
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+  this->prevAnimTime = common::Time::GetWallTime();
+
+  return true;
+}

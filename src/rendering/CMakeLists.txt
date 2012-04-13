@@ -3,10 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
-  ${CEGUI_include_dirs}
   ${CEGUI_INCLUDE_DIRS}
-  ${CEGUI_OGRE_include_dirs}
-  ${CEGUI_OGRE_INCLUDE_DIRS}
 )
 
 set (sources MovableText.cc
@@ -17,6 +14,7 @@ set (sources MovableText.cc
              Visual.cc
              Camera.cc
              DepthCamera.cc
+             GpuLaser.cc
              UserCamera.cc
              Heightmap.cc
              Light.cc
@@ -35,6 +33,12 @@ set (sources MovableText.cc
              LaserVisual.cc
              CameraVisual.cc
              ContactVisual.cc
+             JointVisual.cc
+             AxisVisual.cc
+             ArrowVisual.cc
+             COMVisual.cc
+             RFIDVisual.cc
+             RFIDTagVisual.cc
 )
 
 set (headers MovableText.hh
@@ -43,8 +47,10 @@ set (headers MovableText.hh
              Visual.hh
              Camera.hh
              DepthCamera.hh
+             GpuLaser.hh
              UserCamera.hh
              Light.hh
+             RTShaderSystem.hh
              SelectionObj.hh
              ViewController.hh
              FPSViewController.hh
@@ -58,6 +64,13 @@ set (headers MovableText.hh
              LaserVisual.hh
              CameraVisual.hh
              ContactVisual.hh
+             JointVisual.hh
+             AxisVisual.hh
+             ArrowVisual.hh
+             COMVisual.hh
+             Heightmap.hh
+             RFIDVisual.hh
+             RFIDTagVisual.hh
              ogre.h
              cegui.h
 )
@@ -69,12 +82,13 @@ endforeach()
 configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/rendering.h.in ${CMAKE_CURRENT_BINARY_DIR}/rendering.h )
 
 gz_add_library(gazebo_rendering ${sources})
+
 target_link_libraries( gazebo_rendering gazebo_common 
                                         gazebo_sdf_interface
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 
                                         ${CEGUI_LIBRARIES}
-                                        ${CEGUI_OGRE_LIBRARIES}
                                         X11 )
+
 INSTALL_LIBRARY(gazebo_rendering)
 INSTALL_INCLUDES("rendering" ${headers})

@@ -188,10 +188,9 @@ void CylinderMaker::CreateTheEntity()
     <model name ='custom_user_cylinder" << counter << "_model'>\
       <origin pose ='" << this->visualMsg->pose().position().x() << " "
                        << this->visualMsg->pose().position().y() << " "
-                       << " 0 0 0 0'/>\
+                       << this->visualMsg->pose().position().z()
+                       << " 0 0 0'/>\
       <link name ='body'>\
-        <origin pose='0 0 " << this->visualMsg->pose().position().z()
-                            << " 0 0 0'/>\
         <inertial mass ='1.0'>\
             <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
         </inertial>\

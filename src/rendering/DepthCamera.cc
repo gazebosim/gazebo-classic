@@ -49,6 +49,10 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene,
   this->depthTarget = NULL;
   this->depthBuffer = NULL;
   this->depthMaterial = NULL;
+  this->pcdTarget = NULL;
+  this->pcdBuffer = NULL;
+  this->pcdMaterial = NULL;
+  this->output_points = false;
 }
 
 //////////////////////////////////////////////////
@@ -57,9 +61,12 @@ DepthCamera::~DepthCamera()
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::Load(sdf::ElementPtr _sdf)
+void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
+  if (_sdf->GetElement("depth_camera") &&
+      _sdf->GetElement("depth_camera")->GetValueString("output") == "points")
+    this->output_points = true;
 }
 
 //////////////////////////////////////////////////
@@ -116,10 +123,39 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
       _textureName);
 
   this->depthMaterial = (Ogre::Material*)(
-      Ogre::MaterialManager::getSingleton().getByName(
-        "Gazebo/DepthMap").getPointer());
+      Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap").get());
 
   this->depthMaterial->load();
+
+  if (this->output_points)
+  {
+    this->pcdTexture = Ogre::TextureManager::getSingleton().createManual(
+        _textureName + "_pcd",
+        "General",
+        Ogre::TEX_TYPE_2D,
+        this->GetImageWidth(), this->GetImageHeight(), 0,
+        Ogre::PF_FLOAT32_RGBA,
+        Ogre::TU_RENDERTARGET).getPointer();
+
+    this->pcdTarget = this->pcdTexture->getBuffer()->getRenderTarget();
+    this->pcdTarget->setAutoUpdated(false);
+
+    this->pcdViewport = this->pcdTarget->addViewport(this->camera);
+    this->pcdViewport->setClearEveryFrame(true);
+    this->pcdViewport->setBackgroundColour(
+        Conversions::Convert(this->scene->GetBackgroundColor()));
+    this->pcdViewport->setOverlaysEnabled(false);
+    this->pcdViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+
+    this->pcdMaterial = (Ogre::Material*)(
+    Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());
+
+    this->pcdMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(
+              this->renderTexture->getName());
+
+    this->pcdMaterial->load();
+  }
 
 /*
   // Create a custom render queue invocation sequence for the depth
@@ -170,6 +206,33 @@ void DepthCamera::PostRender()
     pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 
     this->newDepthFrame(this->depthBuffer, width, height, 1, "FLOAT32");
+
+    if (this->output_points)
+    {
+      this->pcdTarget->swapBuffers();
+      Ogre::HardwarePixelBufferSharedPtr pcdPixelBuffer;
+
+      // Get access to the buffer and make an image and write it to file
+      pcdPixelBuffer = this->pcdTexture->getBuffer();
+
+      Ogre::PixelFormat pcdFormat = pcdPixelBuffer->getFormat();
+
+      size_t size = Ogre::PixelUtil::getMemorySize(width, height, 1, pcdFormat);
+
+      // Blit the depth buffer if needed
+      if (!this->pcdBuffer)
+        this->pcdBuffer = new float[size];
+
+      memset(this->pcdBuffer, 128, size);
+
+      Ogre::Box pcd_src_box(0, 0, width, height);
+      Ogre::PixelBox pcd_dst_box(width, height,
+          1, Ogre::PF_FLOAT32_RGBA, this->pcdBuffer);
+
+      pcdPixelBuffer->blitToMemory(pcd_src_box, pcd_dst_box);
+
+      this->newRGBPointCloud(this->pcdBuffer, width, height, 1, "RGBPOINTS");
+    }
   }
 
   // also new image frame for camera texture
@@ -178,8 +241,8 @@ void DepthCamera::PostRender()
   this->newData = false;
 }
 
-//////////////////////////////////////////////////
-void DepthCamera::RenderImpl()
+void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target,
+          Ogre::Material *material, std::string matName)
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
@@ -187,11 +250,8 @@ void DepthCamera::RenderImpl()
   Ogre::Pass *pass;
 
   renderSys = this->scene->GetManager()->getDestinationRenderSystem();
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
-  sceneMgr->_suppressRenderStateChanges(true);
-
   // Get pointer to the material pass
-  pass = this->depthMaterial->getBestTechnique()->getPass(0);
+  pass = material->getBestTechnique()->getPass(0);
 
   // Render the depth texture
   // OgreSceneManager::_render function automatically sets farClip to 0.
@@ -201,28 +261,22 @@ void DepthCamera::RenderImpl()
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  vp = this->depthTarget->getViewport(0);
+  vp = target->getViewport(0);
 
   // return 0 in case no renderable object is inside frustrum
   vp->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
 
-  Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp,
-      "Gazebo/DepthMap", true);
+  Ogre::CompositorManager::getSingleton().setCompositorEnabled(
+                                                vp, matName, true);
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
   sceneMgr->_setPass(pass, true, false);
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(this->depthTarget);
+  autoParamDataSource.setCurrentRenderTarget(target);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
   autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
-
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
-  pass->_updateAutoParamsNoLights(&autoParamDataSource);
-#else
-  pass->_updateAutoParams(&autoParamDataSource, 1);
-#endif
 
   renderSys->setLightingEnabled(false);
   renderSys->_setFog(Ogre::FOG_NONE);
@@ -231,6 +285,12 @@ void DepthCamera::RenderImpl()
   renderSys->_setProjectionMatrix(
       this->GetOgreCamera()->getProjectionMatrixRS());
   renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+  pass->_updateAutoParamsNoLights(&autoParamDataSource);
+#else
+  pass->_updateAutoParams(&autoParamDataSource, 1);
+#endif
 
   // NOTE: We MUST bind parameters AFTER updating the autos
   if (pass->hasVertexProgram())
@@ -260,6 +320,18 @@ void DepthCamera::RenderImpl()
       pass->getFragmentProgramParameters(), 1);
 #endif
   }
+}
+
+//////////////////////////////////////////////////
+void DepthCamera::RenderImpl()
+{
+  Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+  sceneMgr->_suppressRenderStateChanges(true);
+
+  this->UpdateRenderTarget(this->depthTarget,
+                  this->depthMaterial, "Gazebo/DepthMap");
 
   // Does actual rendering
   this->depthTarget->update(false);
@@ -269,6 +341,21 @@ void DepthCamera::RenderImpl()
 
   // for camera image
   Camera::RenderImpl();
+
+  if (this->output_points)
+  {
+    sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+    sceneMgr->_suppressRenderStateChanges(true);
+
+    this->UpdateRenderTarget(this->pcdTarget,
+                  this->pcdMaterial, "Gazebo/XYZPoints");
+
+    this->pcdTarget->update(false);
+
+    sceneMgr->_suppressRenderStateChanges(false);
+    sceneMgr->setShadowTechnique(
+            Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+  }
 }
 
 //////////////////////////////////////////////////

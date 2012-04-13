@@ -1,0 +1,517 @@
+<gazebo version="1.0">
+<model name="apartment" static="true">
+  <!--<origin pose="0 0 0 0 0 0"/>-->
+
+  <link name="wooden-floor">
+    <visual name="visual2">
+      <origin pose="0 0 0 0 0 0"/>
+      <geometry>
+        <box size="24.5 20 0.03"/>
+      </geometry>
+    <material script="Kitchen/WoodFloor"/>
+    </visual>
+  </link>
+
+
+  <link name="wall1east">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="0 -10.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="24.5 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="0 -10.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="24.5 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+
+  <link name="wall2west">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall2surface">
+      <origin pose="0 10.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="24.5 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="wall2visual">
+      <origin pose="0 10.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="24.5 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <link name="wall3north-right">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall2surface">
+      <origin pose="12 -7.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="wall2visual">
+      <origin pose="12 -7.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <link name="wall3north-left">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall2surface">
+      <origin pose="12 4.0 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="12.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="wall2visual">
+      <origin pose="12 4.0 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="12.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+
+  <link name="wall4southleft">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall4side1surface">
+      <origin pose="-12 8.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+
+    <visual name="wall4side1visual">
+      <origin pose="-12 8.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <link name="wall4southwindowwallleft">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall4side1surface">
+      <origin pose="-12 4.5 1.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 2.0"/>
+      </geometry>
+    </collision>
+
+
+    <visual name="wall4side1visual">
+      <origin pose="-12 4.5 1.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 2.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+
+  </link>
+
+  <link name="wall4southwindowwindowleft">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall4side1surface">
+      <origin pose="-12 4.5 3.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 2.0"/>
+      </geometry>
+    </collision>
+
+
+    <visual name="wall4side1visual">
+      <origin pose="-12 4.5 3.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 2.0"/>
+      </geometry>
+    <material script="Gazebo/BlueTransparent"/>
+    </visual>
+  </link>
+
+ <link name="wall4southright">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall4side1surface">
+      <origin pose="-12 0.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+
+    <visual name="wall4side1visual">
+      <origin pose="-12 0.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+
+ <link name="wall4southrightwindowwall">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall4side1surface">
+      <origin pose="-12 -2.5 1.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 2.0"/>
+      </geometry>
+    </collision>
+
+
+    <visual name="wall4side1visual">
+      <origin pose="-12 -2.5 1.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 2.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+ <link name="wall4southrightwindowwindow">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall4side1surface">
+      <origin pose="-12 -2.5 3.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 2.0"/>
+      </geometry>
+    </collision>
+
+
+    <visual name="wall4side1visual">
+      <origin pose="-12 -2.5 3.0 0 0 1.5707"/>
+      <geometry>
+        <box size="3.0 0.5 2.0"/>
+      </geometry>
+    <material script="Gazebo/BlueTransparent"/>
+    </visual>
+
+
+  </link>
+
+
+ <link name="wall4southrightright">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall4side1surface">
+      <origin pose="-12 -7.0 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="6.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+
+    <visual name="wall4side1visual">
+      <origin pose="-12 -7.0 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="6.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <!--BATHROOM-->
+  <!-- WALLS -->
+  <link name="bathroom-south">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall2surface">
+      <origin pose="5 -7.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="wall2visual">
+      <origin pose="5 -7.5 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="5.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+
+  <link name="bathroom-west">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall2surface">
+      <origin pose="10 -5.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="4.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="wall2visual">
+      <origin pose="10 -5.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="4.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <!-- //BATHROOM -->
+
+  <!-- BEDROOM -->
+  <!-- WALLS -->
+
+  <link name="bedroom-north">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="wall2surface">
+      <origin pose="2 -7.0 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="6.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="wall2visual">
+      <origin pose="2 -7.0 2.0 0 0 1.5707"/>
+      <geometry>
+        <box size="6.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <link name="bedroom-west">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="5 -1.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="14.0 0.5 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="-5 -1.0 2.0 0 0 0"/>
+      <geometry>
+        <box size="14.0 0.5 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <!-- //BEDROOM -->
+
+  <!-- KITCHEN -->
+
+  <!-- KITCHEN/HALLWAY STORAGE -->
+  <link name="kitchen-hallway-storage">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="10 0 2.0 0 0 0"/>
+      <geometry>
+        <box size="4.0 4.0 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="10 0 2.0 0 0 0"/>
+      <geometry>
+        <box size="4.0 4.0 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+  <!-- HALLWAY COAT CLOSET -->
+  <link name="hallway-coat-closet">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="6.5 -0.5 2.0 0 0 0"/>
+      <geometry>
+        <box size="3.0 3.0 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="6.5 -0.5 2.0 0 0 0"/>
+      <geometry>
+        <box size="3.0 3.0 4.0"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+  </link>
+
+  <!-- KITCHEN BANKS -->
+  <link name="kitchen bank1">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="9 6 0.75 0 0 0"/>
+      <geometry>
+        <box size="2 8 1.5"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="11 6 0.75 0 0 0"/>
+      <geometry>
+        <box size="2 8 1.5"/>
+      </geometry>
+    <material script="Kitchen/Cabinet"/>
+    </visual>
+
+
+  </link>
+
+  <link name="kitchen bank1top">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="9 6 1.55 0 0 0"/>
+      <geometry>
+        <box size="2.0 8 0.5"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="11 6 1.55 0 0 0"/>
+      <geometry>
+        <box size="2.0 8 0.5"/>
+      </geometry>
+    <material script="Kitchen/CounterTop"/>
+    </visual>
+  </link>
+
+  <link name="kitchen bank2">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="7.5 9 0.75 0 0 0"/>
+      <geometry>
+        <box size="5 2 1.5"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="7.5 9 0.75 0 0 0"/>
+      <geometry>
+        <box size="5 2 1.5"/>
+      </geometry>
+    <material script="Kitchen/Cabinet"/>
+    </visual>
+
+
+
+  </link>
+
+  <link name="kitchen bank2top">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="7.5 9 1.55 0 0 0"/>
+      <geometry>
+        <box size="5 2 0.5"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="7.5 9 1.55 0 0 0"/>
+      <geometry>
+        <box size="5 2 0.5"/>
+      </geometry>
+    <material script="Kitchen/CounterTop_H"/>
+    </visual>
+  </link>
+
+  <!-- FRIDGE -->
+  <link name="fridge">
+    <origin pose="6.5 1.5 2.0 0 0 0"/>
+
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+    
+      <geometry>
+        <box size="3.0 3.0 4.0"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+     
+      <geometry>
+        <box size="2.0 2.0 3.5"/>
+      </geometry>
+    <material script="Gazebo/White"/>
+    </visual>
+
+    <sensor name='bank_sensor' type='rfid' always_on='1' update_rate='100' visualize='true'>
+      <topic>~/rfid</topic>
+    </sensor>
+  </link>
+</model>

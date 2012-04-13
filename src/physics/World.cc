@@ -42,6 +42,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Model.hh"
+#include "physics/Actor.hh"
 #include "physics/World.hh"
 
 #include "physics/Collision.hh"
@@ -86,9 +87,6 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
-  this->connections.push_back(
-     event::Events::ConnectDeleteEntity(
-       boost::bind(&World::DeleteEntityCB, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -403,17 +401,12 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
-void World::DeleteEntityCB(const std::string &/*_name*/)
-{
-  // TODO: Implement this function
-}
-
-//////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
   return this->rootElement->GetByName(_name);
 }
 
+/////////////////////////////////////////////////
 ModelPtr World::GetModelById(unsigned int _id)
 {
   return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
@@ -460,6 +453,22 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
+ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
+{
+  ActorPtr actor(new Actor(_parent));
+  actor->SetWorld(shared_from_this());
+  actor->Load(_sdf);
+
+  /*event::Events::addEntity(model->GetScopedName());
+
+  msgs::Model msg;
+  model->FillModelMsg(msg);
+  this->modelPub->Publish(msg);*/
+
+  return actor;
+}
+
+//////////////////////////////////////////////////
 void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   if (_sdf->HasElement("light"))
@@ -484,6 +493,18 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 
       // TODO : Put back in the ability to nest models. We should do this
       // without requiring a joint.
+
+      childElem = childElem->GetNextElement();
+    }
+  }
+
+  if (_sdf->HasElement("actor"))
+  {
+    sdf::ElementPtr childElem = _sdf->GetElement("actor");
+
+    while (childElem)
+    {
+      this->LoadActor(childElem, _parent);
 
       childElem = childElem->GetNextElement();
     }
@@ -796,7 +817,11 @@ void World::ProcessEntityMsgs()
     this->rootElement->RemoveChild((*iter));
   }
 
-  this->deleteEntity.clear();
+  if (this->deleteEntity.size() > 0)
+  {
+    this->EnableAllModels();
+    this->deleteEntity.clear();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -936,7 +961,11 @@ void World::ProcessModelMsgs()
       this->modelPub->Publish(msg);
     }
   }
-  this->modelMsgs.clear();
+  if (this->modelMsgs.size())
+  {
+    this->EnableAllModels();
+    this->modelMsgs.clear();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1017,6 +1046,13 @@ void World::ProcessFactoryMsgs()
       sdf::ElementPtr elem = factorySDF->root->GetElement("model");
       if (!elem && factorySDF->root->GetElement("world"))
         elem = factorySDF->root->GetElement("world")->GetElement("model");
+      if (!elem && factorySDF->root->GetElement("gazebo"))
+        elem = factorySDF->root->GetElement("gazebo")->GetElement("model");
+      if (!elem && factorySDF->root->GetElement("gazebo")->GetElement("world"))
+      {
+        elem = factorySDF->root->GetElement("gazebo")->GetElement(
+            "world")->GetElement("model");
+      }
 
       if (!elem)
       {
@@ -1159,4 +1195,18 @@ void World::UpdateSDFFromState(const WorldState &_state)
       childElem = childElem->GetNextElement();
     }
   }
+}
+
+//////////////////////////////////////////////////
+void World::EnableAllModels()
+{
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+    this->GetModel(i)->SetEnabled(true);
+}
+
+//////////////////////////////////////////////////
+void World::DisableAllModels()
+{
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+    this->GetModel(i)->SetEnabled(false);
 }
