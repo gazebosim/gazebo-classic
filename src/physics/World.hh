@@ -295,6 +295,7 @@ namespace gazebo
       /// TODO: Add an accessor for this, and make it private
       /// lock all pose updates when worldPose is being updated for a model
       public: boost::recursive_mutex *modelWorldPoseUpdateMutex;
+      public: boost::recursive_mutex *pauseMutex;
 
       private: sdf::ElementPtr sdf;
 

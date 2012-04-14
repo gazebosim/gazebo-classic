@@ -150,6 +150,9 @@ namespace gazebo
       public: boost::recursive_mutex* GetRayMutex() const
               { return this->rayMutex; }
 
+      public: boost::recursive_mutex* GetResetPhysicsMutex() const
+              { return this->resetPhysicsMutex; }
+
       protected: virtual void OnRequest(ConstRequestPtr &/*_msg*/) {}
 
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/) {}
@@ -161,6 +164,7 @@ namespace gazebo
       protected: transport::PublisherPtr responsePub;
       protected: transport::SubscriberPtr physicsSub, requestSub;
       protected: boost::recursive_mutex *rayMutex;
+      protected: boost::recursive_mutex *resetPhysicsMutex;
 
       public: std::map<LinkPtr, LinkPtr> contactPairs;
       public: void AddLinkPair(LinkPtr link1, LinkPtr link2)

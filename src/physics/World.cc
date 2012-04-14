@@ -81,6 +81,7 @@ World::World(const std::string &_name)
   this->name = _name;
 
   this->modelWorldPoseUpdateMutex = new boost::recursive_mutex();
+  this->pauseMutex = new boost::recursive_mutex();
 
   this->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
@@ -94,6 +95,8 @@ World::~World()
 {
   delete this->modelWorldPoseUpdateMutex;
   this->modelWorldPoseUpdateMutex = NULL;
+  delete this->pauseMutex;
+  this->pauseMutex = NULL;
 
   this->connections.clear();
   this->Fini();
@@ -266,6 +269,7 @@ void World::RunLoop()
   common::Time prevUpdateTime = common::Time::GetWallTime();
   while (!this->stop)
   {
+    this->pauseMutex->lock();
     // Send statistics about the world simulation
     if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
     {
@@ -306,6 +310,7 @@ void World::RunLoop()
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
+    this->pauseMutex->unlock();
   }
 }
 
@@ -675,7 +680,10 @@ void World::SetPaused(bool _p)
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
   event::Events::pause(_p);
+
+  this->pauseMutex->lock();
   this->pause = _p;
+  this->pauseMutex->unlock();
 }
 
 
