@@ -110,7 +110,7 @@ void Load()
       gzthrow("Failed to load the World\n"  << e);
     }
 
-    worldElem = worldElem->GetNextElement();
+    worldElem = worldElem->GetNextElement("world");
   }
 
   gazebo::physics::init_worlds();

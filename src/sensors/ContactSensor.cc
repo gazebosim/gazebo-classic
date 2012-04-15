@@ -103,7 +103,7 @@ void ContactSensor::Load(const std::string &_worldName)
       this->connections.push_back(collision->ConnectContact(
             boost::bind(&ContactSensor::OnContact, this, _1, _2)));
     }
-    collisionElem = collisionElem->GetNextElement();
+    collisionElem = collisionElem->GetNextElement("collision");
   }
 }
 

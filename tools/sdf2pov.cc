@@ -396,7 +396,7 @@ int main(int argc, char **argv)
       while (lightElem)
       {
         ProcessLight(lightElem);
-        lightElem = lightElem->GetNextElement();
+        lightElem = lightElem->GetNextElement("light");
       }
     }
 
@@ -424,13 +424,13 @@ int main(int argc, char **argv)
             sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
             ProcessGeometry(geomElem, visualPose);
 
-            visualElem = visualElem->GetNextElement();
+            visualElem = visualElem->GetNextElement("visual");
           }
         }
-        linkElem = linkElem->GetNextElement();
+        linkElem = linkElem->GetNextElement("link");
       }
-      modelElem = modelElem->GetNextElement();
+      modelElem = modelElem->GetNextElement("model");
     }
-    worldElem = worldElem->GetNextElement();
+    worldElem = worldElem->GetNextElement("world");
   }
 }

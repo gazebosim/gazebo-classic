@@ -113,7 +113,7 @@ void Model::Load(sdf::ElementPtr _sdf)
       // Load the link using the config node. This also loads all of the
       // bodies collisionetries
       link->Load(linkElem);
-      linkElem = linkElem->GetNextElement();
+      linkElem = linkElem->GetNextElement("link");
     }
   }
 
@@ -124,7 +124,7 @@ void Model::Load(sdf::ElementPtr _sdf)
     while (jointElem)
     {
       this->LoadJoint(jointElem);
-      jointElem = jointElem->GetNextElement();
+      jointElem = jointElem->GetNextElement("joint");
     }
   }
 
@@ -135,7 +135,7 @@ void Model::Load(sdf::ElementPtr _sdf)
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement();
+      pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
 }
@@ -282,7 +282,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
       LinkPtr link = boost::shared_dynamic_cast<Link>(
           this->GetChild(linkElem->GetValueString("name")));
       link->UpdateParameters(linkElem);
-      linkElem = linkElem->GetNextElement();
+      linkElem = linkElem->GetNextElement("link");
     }
   }
   /*
@@ -294,7 +294,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     {
       JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
       joint->UpdateParameters(jointElem);
-      jointElem = jointElem->GetNextElement();
+      jointElem = jointElem->GetNextElement("joint");
     }
   }
   */

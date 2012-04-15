@@ -97,7 +97,7 @@ void Sensor::Init()
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement();
+      pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
 

@@ -158,13 +158,14 @@ ODEPhysics::~ODEPhysics()
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
-  sdf::ElementPtr odeElem = _sdf->GetElement("ode");
+  sdf::ElementPtr odeElem = this->sdf->GetOrCreateElement("ode");
+  sdf::ElementPtr solverElem = odeElem->GetOrCreateElement("solver");
 
-  this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
-  this->stepType = odeElem->GetElement("solver")->GetValueString("type");
+  this->stepTimeDouble = solverElem->GetValueDouble("dt");
+  this->stepType = solverElem->GetValueString("type");
 
-  if (_sdf->HasAttribute("update_rate"))
-    this->SetUpdateRate(_sdf->GetValueDouble("update_rate"));
+  if (this->sdf->HasAttribute("update_rate"))
+    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,
@@ -245,8 +246,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
-void ODEPhysics::OnPhysicsMsg(
-    ConstPhysicsPtr &_msg)
+void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_dt())
   {

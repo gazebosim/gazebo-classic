@@ -62,6 +62,8 @@ namespace sdf
   bool readXml(TiXmlElement *_xml, ElementPtr _sdf);
 
   void copyChildren(ElementPtr _sdf, TiXmlElement *_xml);
+
+  void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF);
 }
 
 #endif
