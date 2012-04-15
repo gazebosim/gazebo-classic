@@ -7,7 +7,7 @@
       <shadows enabled="true"/>
     </scene>
 
-    <physics type="ode">
+    <physics type="ode" update_rate="100">
       <gravity xyz="0 0 -9.8"/>
       <ode>
         <solver type="quick" dt="0.01" iters="100" sor="1.3"/>
@@ -17,7 +17,7 @@
     <!-- Ground Plane -->
     <include filename="ground_plane.model"/>
    
-    <model name="box">
+    <model name="box" static="true">
       <link name="base_link">
         <origin pose="0 0 0.5 0 0 0"/>
         <inertial mass="1.0">
@@ -59,9 +59,7 @@
       <joint name="my_joint" type="prismatic">
         <parent link="base_link"/>
         <child link="top_link"/>
-        <axis xyz="0 0 1">
-          <limit lower='0' upper='5' effort='0' velocity='0'/>
-        </axis>
+        <axis xyz="0 0 1"/>
       </joint>
 
       <plugin name="animate_joints" filename="libanimate_joints.so"/>

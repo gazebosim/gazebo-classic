@@ -16,24 +16,24 @@
 */
 #include <map>
 #include "gazebo.h"
+#include "common/common.h"
 #include "physics/physics.h"
 
 namespace gazebo
 {   
   class AnimateJoints : public ModelPlugin
   {
-    public: AnimateJoints() : ModelPlugin() {}
-                                    
-    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/)
     {
       std::map<std::string, common::NumericAnimationPtr> anim;
 
       // Create a new animation for the "my_joint" define in the SDF file.
       // The animation will last for 5.0 seconds, and it will repeat
-      anim["my_joint"].reset(new NumericAnimation("my_animation", 5.0, true));
+      anim["my_joint"].reset(new common::NumericAnimation(
+            "my_animation", 5.0, true));
 
       // Create a key frame for the starting position of the joint
-      NumericKeyFrame *key = anim["my_joint"]->CreateKeyFrame(0.0);
+      common::NumericKeyFrame *key = anim["my_joint"]->CreateKeyFrame(0.0);
       key->SetValue(0.1);
 
       // Create a key frame half-way through the animation 
