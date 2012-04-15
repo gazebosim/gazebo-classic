@@ -313,7 +313,7 @@ class ServerFixture : public testing::Test
                  << "      <horizontal_fov angle ='0.78539816339744828'/>"
                  << "      <image width ='320' height ='240' format ='R8G8B8'/>"
                  << "      <clip near ='0.10000000000000001' far ='100'/>"
-                 << "      <save enabled ='true' path ='/tmp/camera/'/>"
+                 // << "      <save enabled ='true' path ='/tmp/camera/'/>"
                  << "    </camera>"
                  << "  </sensor>"
                  << "</link>"

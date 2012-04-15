@@ -827,9 +827,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactMu2 |
                          dContactSoftERP |
                          dContactSoftCFM |
-                         dContactSlip1 |
-                         dContactSlip2 |
                          dContactApprox1;
+  //                       dContactSlip1 |
+  //                       dContactSlip2 |
 
   // Compute the CFM and ERP by assuming the two bodies form a
   // spring-damper system.

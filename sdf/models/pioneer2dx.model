@@ -105,6 +105,7 @@
     <plugin filename="libDiffDrivePlugin.so" name="diff_drive">
       <left_joint>left_wheel_hinge</left_joint>
       <right_joint>right_wheel_hinge</right_joint>
+      <torque>5</torque>
     </plugin>
 
   </model>
