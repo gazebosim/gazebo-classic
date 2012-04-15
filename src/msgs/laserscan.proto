@@ -10,7 +10,7 @@ import "pose.proto";
 message LaserScan
 {
   required string frame       = 1;
-  required Pose offset        = 2;
+  required Pose world_pose    = 2;
   required double angle_min   = 3;
   required double angle_max   = 4;
   required double angle_step  = 5;

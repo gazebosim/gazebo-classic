@@ -514,22 +514,23 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
       return ElementPtr();
     }
 
-    for (iter++; iter != this->parent->elements.end(); ++iter)
+    ++iter;
+    if (iter == this->parent->elements.end())
+      return ElementPtr();
+    else if (_name.empty())
+      return *(iter);
+    else
     {
-      if ((*iter)->GetName() == _name)
-        return (*iter);
+      for (; iter != this->parent->elements.end(); ++iter)
+      {
+        if ((*iter)->GetName() == _name)
+          return (*iter);
+      }
     }
   }
 
   return ElementPtr();
 }
-
-/////////////////////////////////////////////////
-ElementPtr Element::GetNextElement() const
-{
-  return this->GetNextElement(this->name);
-}
-
 
 /////////////////////////////////////////////////
 boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
@@ -544,6 +545,24 @@ boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
 void Element::InsertElement(ElementPtr _elem)
 {
   this->elements.push_back(_elem);
+}
+
+/////////////////////////////////////////////////
+bool Element::HasElementDescription(const std::string &_name)
+{
+  bool result = false;
+  ElementPtr_V::const_iterator iter;
+  for (iter = this->elementDescriptions.begin();
+       iter != this->elementDescriptions.end(); ++iter)
+  {
+    if ((*iter)->name == _name)
+    {
+      result = true;
+      break;
+    }
+  }
+   
+  return result;
 }
 
 /////////////////////////////////////////////////

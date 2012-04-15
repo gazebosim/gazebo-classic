@@ -68,7 +68,7 @@ void ModelState::Load(sdf::ElementPtr _elem)
       LinkState state;
       state.Load(childElem);
       this->linkStates.push_back(state);
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("link");
     }
   }
 }
@@ -109,7 +109,7 @@ void ModelState::UpdateModelSDF(sdf::ElementPtr _elem)
         }
       }
 
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("link");
     }
   }
 }

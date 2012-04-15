@@ -147,10 +147,10 @@ void ModelMaker::InitFromFile(const std::string &_filename)
         visVisual->Load(visualElem);
         this->visuals.push_back(visVisual);
 
-        visualElem = visualElem->GetNextElement();
+        visualElem = visualElem->GetNextElement("visual");
       }
 
-      linkElem = linkElem->GetNextElement();
+      linkElem = linkElem->GetNextElement("link");
     }
   }
   catch(common::Exception &_e)
