@@ -1,21 +1,8 @@
 <?xml version="1.0"?> 
 <gazebo version="1.0">
   <world name="default">
-    <scene>
-      <ambient rgba="1.0 1.0 1.0 1"/>
-      <background rgba="0 0 0 1.0"/>
-      <shadows enabled="true"/>
-    </scene>
-
-    <physics type="ode">
-      <gravity xyz="0 0 -9.8"/>
-      <ode>
-        <solver type="quick" dt="0.001" iters="10" sor="1.3"/>
-        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
-      </ode>
-    </physics>
-
     <include filename="ground_plane.model"/>
+    <include filename="sun.light"/>
 
     <model name="box" static="true">
       <origin pose="0 0 .5 0 0 0"/>
@@ -82,14 +69,6 @@
         </visual>
       </link>
     </model>
-
-    <light type="directional" name="sun" cast_shadows="true">
-      <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba=".8 .8 .8 1"/>
-      <specular rgba=".1 .1 .1 1"/>
-      <attenuation range="10" constant="0.8" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0 .5 -.5"/>
-    </light>
 
   </world>
 </gazebo>

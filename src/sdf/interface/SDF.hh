@@ -88,6 +88,9 @@ namespace sdf
     /// \brief Get an attribute using an index
     public: ElementPtr GetElementDescription(unsigned int _index) const;
 
+    /// \brief Return true if an element description exists
+    public: bool HasElementDescription(const std::string &_name);
+
     public: bool HasAttribute(const std::string &_key);
 
     /// \brief Get the param of the elements value
@@ -112,9 +115,7 @@ namespace sdf
     public: ElementPtr GetElement(const std::string &_name) const;
     public: ElementPtr GetFirstElement() const;
 
-    public: ElementPtr GetNextElement(const std::string &_name) const;
-    public: ElementPtr GetNextElement() const;
-
+    public: ElementPtr GetNextElement(const std::string &_name = "") const;
 
     public: ElementPtr GetOrCreateElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);

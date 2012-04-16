@@ -87,8 +87,8 @@ target_link_libraries( gazebo_rendering gazebo_common
                                         gazebo_sdf_interface
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 
-                                        ${CEGUI_LIBRARIES}
                                         X11 )
+                                      # ${CEGUI_LIBRARIES}
 
 INSTALL_LIBRARY(gazebo_rendering)
 INSTALL_INCLUDES("rendering" ${headers})

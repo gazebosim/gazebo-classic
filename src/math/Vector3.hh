@@ -47,6 +47,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Vector3();
 
+      /// \brief Return the sum of the values
+      public: double GetSum() const;
+
       /// \brief Calc distance to the given point
       public: double Distance(const Vector3 &_pt) const;
 

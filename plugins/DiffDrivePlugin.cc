@@ -15,21 +15,24 @@
  *
 */
 
+#include "physics/physics.h"
 #include "transport/transport.h"
 #include "plugins/DiffDrivePlugin.hh"
 
 using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(DiffDrivePlugin)
 
+enum {RIGHT, LEFT};
+
 /////////////////////////////////////////////////
 DiffDrivePlugin::DiffDrivePlugin()
-  : speed(0)
 {
+  this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::Load(physics::ModelPtr _model,
-                            sdf::ElementPtr _sdf)
+                           sdf::ElementPtr _sdf)
 {
   this->model = _model;
 
@@ -39,10 +42,24 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
 
+  if (!_sdf->HasElement("left_joint"))
+    gzerr << "DiffDrive plugin missing <left_joint> element\n";
+
+  if (!_sdf->HasElement("right_joint"))
+    gzerr << "DiffDrive plugin missing <right_joint> element\n";
+
   this->leftJoint = _model->GetJoint(
       _sdf->GetElement("left_joint")->GetValueString());
   this->rightJoint = _model->GetJoint(
       _sdf->GetElement("right_joint")->GetValueString());
+
+  if (_sdf->HasElement("torque"))
+    this->torque = _sdf->GetElement("torque")->GetValueDouble();
+  else
+  {
+    gzwarn << "No torque value set for the DiffDrive plugin.\n";
+    this->torque = 5.0;
+  }
 
   if (!this->leftJoint)
     gzerr << "Unable to find left joint["
@@ -56,16 +73,56 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
 }
 
 /////////////////////////////////////////////////
+void DiffDrivePlugin::Init()
+{
+  this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
+      this->rightJoint->GetAnchor(0));
+
+  physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+      this->leftJoint->GetChild());
+
+  math::Box bb = parent->GetBoundingBox();
+  math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
+
+  this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.5;
+}
+
+/////////////////////////////////////////////////
 void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
-  this->speed = _msg->position().x();
+  double vr, va;
+
+  vr = _msg->position().x();
+  va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
+
+
+  this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2;
+  this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2;
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  this->leftJoint->SetVelocity(0, this->speed);
-  this->rightJoint->SetVelocity(0, this->speed);
-  this->leftJoint->SetMaxForce(0, 5);
-  this->rightJoint->SetMaxForce(0, 5);
+  double d1, d2;
+  double dr, da;
+  common::Time stepTime;
+  common::Time currTime = this->model->GetWorld()->GetSimTime();
+
+  stepTime = currTime - this->prevUpdateTime;
+  this->prevUpdateTime = currTime; 
+
+  // Distance travelled by front wheels
+  d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->GetVelocity(0);
+  d2 = stepTime.Double() * this->wheelRadius * this->rightJoint->GetVelocity(0);
+
+  dr = (d1 + d2) / 2;
+  da = (d1 - d2) / this->wheelSeparation;
+
+  this->leftJoint->SetVelocity(0, this->wheelSpeed[LEFT] / this->wheelRadius);
+  this->rightJoint->SetVelocity(0, this->wheelSpeed[RIGHT] / this->wheelRadius);
+
+  this->leftJoint->SetVelocity(0, this->wheelSpeed[LEFT]);
+  this->rightJoint->SetVelocity(0, this->wheelSpeed[RIGHT]);
+  this->leftJoint->SetMaxForce(0, this->torque);
+  this->rightJoint->SetMaxForce(0, this->torque);
 }

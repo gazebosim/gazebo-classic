@@ -27,7 +27,9 @@ namespace gazebo
   class DiffDrivePlugin : public ModelPlugin
   {
     public: DiffDrivePlugin();
-    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: virtual void Init();
+
     private: void OnUpdate();
 
     private: void OnVelMsg(ConstPosePtr &_msg);
@@ -38,7 +40,11 @@ namespace gazebo
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;
     private: event::ConnectionPtr updateConnection;
-    private: double speed;
+    private: double wheelSpeed[2];
+    private: double torque;
+    private: double wheelSeparation;
+    private: double wheelRadius;
+    private: common::Time prevUpdateTime;
   };
 }
 #endif

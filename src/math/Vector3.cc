@@ -64,6 +64,12 @@ double Vector3::Distance(double _x, double _y, double _z) const
 }
 
 //////////////////////////////////////////////////
+double Vector3::GetSum() const
+{
+  return this->x + this->y + this->z;
+}
+
+//////////////////////////////////////////////////
 double Vector3::GetLength() const
 {
   return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);

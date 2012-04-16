@@ -176,7 +176,7 @@ void World::Load(sdf::ElementPtr _sdf)
       this->UpdateSDFFromState(state);
       // this->SetState(state);
 
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("state");
 
       // TODO: We currently load just the first state data. Need to
       // implement a better mechanism for handling multiple states
@@ -484,7 +484,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
       msgs::Light *lm = this->sceneMsg.add_light();
       lm->CopyFrom(msgs::LightFromSDF(childElem));
 
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("light");
     }
   }
 
@@ -499,7 +499,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
       // TODO : Put back in the ability to nest models. We should do this
       // without requiring a joint.
 
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("model");
     }
   }
 
@@ -511,7 +511,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
     {
       this->LoadActor(childElem, _parent);
 
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("actor");
     }
   }
 
@@ -522,7 +522,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement();
+      pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
 }
@@ -1200,7 +1200,7 @@ void World::UpdateSDFFromState(const WorldState &_state)
         }
       }
 
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("model");
     }
   }
 }
