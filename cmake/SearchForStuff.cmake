@@ -197,6 +197,12 @@ if (PKG_CONFIG_FOUND)
     endif (NOT OGRE_FOUND)
   endif (OGRE-RTShaderSystem_FOUND)
 
+  # Bug in libogre-dev ubuntu install package which cause ogre_library_dirs to 
+  # be empty
+  if (NOT SET ${ogre_library_dirs})
+    set (ogre_library_dirs "/usr/lib")
+  endif()
+
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
 
