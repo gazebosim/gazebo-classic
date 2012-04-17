@@ -147,11 +147,8 @@ namespace gazebo
       /// \brief Debug print out of the physic engine state
       public: virtual void DebugPrint() const = 0;
 
-      public: boost::recursive_mutex* GetRayMutex() const
-              { return this->rayMutex; }
-
-      public: boost::recursive_mutex* GetResetPhysicsMutex() const
-              { return this->resetPhysicsMutex; }
+      public: boost::recursive_mutex* GetPhysicsUpdateMutex() const
+              { return this->physicsUpdateMutex; }
 
       protected: virtual void OnRequest(ConstRequestPtr &/*_msg*/) {}
 
@@ -163,8 +160,7 @@ namespace gazebo
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr responsePub;
       protected: transport::SubscriberPtr physicsSub, requestSub;
-      protected: boost::recursive_mutex *rayMutex;
-      protected: boost::recursive_mutex *resetPhysicsMutex;
+      protected: boost::recursive_mutex *physicsUpdateMutex;
 
       public: std::map<LinkPtr, LinkPtr> contactPairs;
       public: void AddLinkPair(LinkPtr link1, LinkPtr link2)

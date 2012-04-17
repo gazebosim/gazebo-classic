@@ -108,13 +108,13 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
     Intersection intersection;
     intersection.depth = 1000;
 
-    this->physicsEngine->GetRayMutex()->lock();
+    this->physicsEngine->GetPhysicsUpdateMutex()->lock();
 
     // Do collision detection
     dSpaceCollide2(this->geomId,
         (dGeomID)(this->physicsEngine->GetSpaceId()),
         &intersection, &UpdateCallback);
-    this->physicsEngine->GetRayMutex()->unlock();
+    this->physicsEngine->GetPhysicsUpdateMutex()->unlock();
 
     _dist = intersection.depth;
     _entity = intersection.name;
