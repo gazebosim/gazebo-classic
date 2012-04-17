@@ -127,7 +127,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
       this->visuals.push_back(msg.name());
 
-      visualElem = visualElem->GetNextElement();
+      visualElem = visualElem->GetNextElement("visual");
     }
   }
 
@@ -139,7 +139,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     {
       // Create and Load a collision, which will belong to this body.
       this->LoadCollision(collisionElem);
-      collisionElem = collisionElem->GetNextElement();
+      collisionElem = collisionElem->GetNextElement("collision");
     }
   }
 
@@ -152,7 +152,7 @@ void Link::Load(sdf::ElementPtr _sdf)
         sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
                                this->GetScopedName());
       this->sensors.push_back(sensorName);
-      sensorElem = sensorElem->GetNextElement();
+      sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
 }
@@ -324,7 +324,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 
       this->visPub->Publish(msg);
 
-      visualElem = visualElem->GetNextElement();
+      visualElem = visualElem->GetNextElement("visual");
     }
   }
 
@@ -338,7 +338,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 
       if (collision)
         collision->UpdateParameters(collisionElem);
-      collisionElem = collisionElem->GetNextElement();
+      collisionElem = collisionElem->GetNextElement("collision");
     }
   }
 }
@@ -634,7 +634,7 @@ void Link::FillLinkMsg(msgs::Link &_msg)
       vis->set_name(this->GetScopedName() + "::" + vis->name());
       vis->set_parent_name(this->GetScopedName());
 
-      visualElem = visualElem->GetNextElement();
+      visualElem = visualElem->GetNextElement("visual");
     }
   }
 }

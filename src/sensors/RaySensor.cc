@@ -241,7 +241,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   this->lastUpdateTime = this->world->GetSimTime();
 
   // Store the latest laser scans into laserMsg
-  msgs::Set(this->laserMsg.mutable_offset(),
+  msgs::Set(this->laserMsg.mutable_world_pose(),
       this->parentEntity->GetWorldPose() + this->GetPose());
   this->laserMsg.set_angle_min(this->GetAngleMin().GetAsRadian());
   this->laserMsg.set_angle_max(this->GetAngleMax().GetAsRadian());

@@ -89,7 +89,6 @@ TEST_F(FactoryTest, Cylinder)
   }
 }
 
-
 TEST_F(FactoryTest, BlackCamera)
 {
   math::Pose setPose, testPose;
@@ -106,7 +105,7 @@ TEST_F(FactoryTest, BlackCamera)
   ASSERT_EQ(height, 240);
 
   unsigned char *trueImage = new unsigned char[width * height * 3];
-  memset(trueImage, 0, width*height*3);
+  memset(trueImage, 255, width*height*3);
 
   unsigned int diffMax = 0;
   unsigned int diffSum = 0;
@@ -124,13 +123,13 @@ TEST_F(FactoryTest, Camera)
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
   setPose.Set(math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera("camera_model", "camera_sensor", setPose.pos,
+  SpawnCamera("camera_model", "camera_sensor2", setPose.pos,
       setPose.rot.GetAsEuler());
 
   unsigned char *img = NULL;
   unsigned int width;
   unsigned int height;
-  GetFrame("camera_sensor", &img, width, height);
+  GetFrame("camera_sensor2", &img, width, height);
   ASSERT_EQ(width, 320);
   ASSERT_EQ(height, 240);
 

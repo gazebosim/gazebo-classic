@@ -34,7 +34,7 @@
           </geometry>
         </visual>
       </link>
-      <plugin filename="libanimation_pose_tutorials.so" name="pose_animation"/>
+      <plugin filename="libanimate_pose.so" name="pose_animation"/>
     </model>
 
     <!-- Light Source -->

@@ -1,0 +1,77 @@
+<?xml version="1.0"?> 
+<gazebo version="1.0">
+  <world name="default">
+    <scene>
+      <ambient rgba="0.0 0.0 0.0 1"/>
+      <background rgba="1 1 1 1"/>
+      <shadows enabled="true"/>
+    </scene>
+
+    <physics type="ode" update_rate="100">
+      <gravity xyz="0 0 -9.8"/>
+      <ode>
+        <solver type="quick" dt="0.01" iters="100" sor="1.3"/>
+      </ode>
+    </physics>
+
+    <!-- Ground Plane -->
+    <include filename="ground_plane.model"/>
+   
+    <model name="box" static="true">
+      <link name="base_link">
+        <origin pose="0 0 0.5 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="top_link">
+        <origin pose="0 0 1.3 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box size=".5 .5 .5"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size=".5 .5 .5"/>
+          </geometry>
+        </visual>
+      </link>
+
+      <joint name="my_joint" type="prismatic">
+        <parent link="base_link"/>
+        <child link="top_link"/>
+        <axis xyz="0 0 1"/>
+      </joint>
+
+      <plugin name="animate_joints" filename="libanimate_joints.so"/>
+    </model>
+
+    <light type="directional" name="sun" cast_shadows="true">
+      <origin pose="0 0 10 0 0 0"/>
+      <diffuse rgba="1.0 1.0 1.0 1"/>
+      <specular rgba=".1 .1 .1 1"/>
+      <attenuation range="10" constant="0.8" linear="0.01" quadratic="0.0"/>
+      <direction xyz="0 .2 -1.0"/>
+    </light>
+
+  </world>
+</gazebo>

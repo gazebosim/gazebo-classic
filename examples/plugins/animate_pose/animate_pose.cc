@@ -22,9 +22,9 @@
 
 namespace gazebo
 {
-  class AnimationPose : public ModelPlugin
+  class AnimatePose : public ModelPlugin
   {
-    public: void Load(physics::ModelPtr &_parent, sdf::ElementPtr & /*_sdf*/)
+    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
       gazebo::common::PoseAnimationPtr anim(
           new gazebo::common::PoseAnimation("test", 1000.0, true));
@@ -32,11 +32,11 @@ namespace gazebo
       gazebo::common::PoseKeyFrame *key;
 
       key = anim->CreateKeyFrame(0);
-      key->SetTranslate(math::Vector3(0, 0, 0));
+      key->SetTranslation(math::Vector3(0, 0, 0));
       key->SetRotation(math::Quaternion(0, 0, 0));
 
       key = anim->CreateKeyFrame(1000.0);
-      key->SetTranslate(math::Vector3(5, 0, 0));
+      key->SetTranslation(math::Vector3(5, 0, 0));
       key->SetRotation(math::Quaternion(0, 0, 1.5707));
 
       _parent->SetAnimation(anim);
@@ -44,5 +44,5 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_WORLD_PLUGIN(AnimationPose)
+  GZ_REGISTER_MODEL_PLUGIN(AnimatePose)
 }

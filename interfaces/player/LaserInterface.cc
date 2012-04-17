@@ -193,10 +193,10 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
   for (i = 0; i < _msg->intensities_size(); ++i)
     this->data.scan.intensity[i] = (uint8_t)_msg->intensities(i);
 
-  this->data.pose.px = _msg->offset().position().x();
-  this->data.pose.py = _msg->offset().position().y();
+  this->data.pose.px = _msg->world_pose().position().x();
+  this->data.pose.py = _msg->world_pose().position().y();
   this->data.pose.pa = gazebo::msgs::Convert(
-      _msg->offset().orientation()).GetAsEuler().z;
+      _msg->world_pose().orientation()).GetAsEuler().z;
 
   if (this->data.scan.ranges_count > 0)
   {
