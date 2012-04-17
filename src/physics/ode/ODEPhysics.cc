@@ -786,7 +786,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     maxCollide = this->GetMaxContacts();
 
   numc = dCollide(_collision1->GetCollisionId(), _collision2->GetCollisionId(),
-      MAX_DCOLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
+      MAX_COLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
 
   if (numc <= 0)
     return;

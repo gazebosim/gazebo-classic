@@ -199,7 +199,7 @@ if (PKG_CONFIG_FOUND)
 
   # Bug in libogre-dev ubuntu install package which cause ogre_library_dirs to 
   # be empty
-  if (NOT SET ${ogre_library_dirs})
+  if (${ogre_library_dirs} STREQUAL "")
     set (ogre_library_dirs "/usr/lib")
   endif()
 
