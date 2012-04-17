@@ -659,5 +659,4 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
     elem = nextElem;
   }
 }
-
 }

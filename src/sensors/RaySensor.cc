@@ -70,7 +70,7 @@ std::string RaySensor::GetTopic() const
 {
   std::string topicName = "~/";
   topicName += this->parentName + "/" + this->GetName() + "/scan";
-  boost::replace_all(topicName,"::","/");
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }

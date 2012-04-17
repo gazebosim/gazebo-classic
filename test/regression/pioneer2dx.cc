@@ -41,7 +41,7 @@ TEST_F(PR2Test, StraightLine)
 
   common::Time startTime = this->simTime;
   common::Time currTime = this->simTime;
-  while (currTime - startTime < common::Time(10,0))
+  while (currTime - startTime < common::Time(10, 0))
   {
     usleep(1000);
     currTime = this->simTime;

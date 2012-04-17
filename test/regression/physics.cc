@@ -97,7 +97,7 @@ TEST_F(PhysicsTest, DropSphere)
       {
         math::Pose pose = modelState.GetPose();
         gzerr << "z: " << pose.pos.z << "\n";
-        //EXPECT_TRUE(pose == modelState.GetPose());
+        // EXPECT_TRUE(pose == modelState.GetPose());
       }
     }
     else if (modelState.GetName() == "sphere")
@@ -106,12 +106,7 @@ TEST_F(PhysicsTest, DropSphere)
     else if (modelState.GetName() == "cylinder")
     {
     }
-
   }
-
-
-
-
 }
 
 int main(int argc, char **argv)

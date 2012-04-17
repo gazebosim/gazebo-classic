@@ -561,7 +561,7 @@ bool Element::HasElementDescription(const std::string &_name)
       break;
     }
   }
-   
+
   return result;
 }
 

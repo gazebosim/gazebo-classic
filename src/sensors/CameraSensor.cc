@@ -70,7 +70,7 @@ std::string CameraSensor::GetTopic() const
 {
   std::string topicName = "~/";
   topicName += this->parentName + "/" + this->GetName() + "/image";
-  boost::replace_all(topicName,"::","/");
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }
