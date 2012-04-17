@@ -80,8 +80,8 @@ World::World(const std::string &_name)
 
   this->name = _name;
 
-  this->modelWorldPoseUpdateMutex = new boost::recursive_mutex();
-  this->pauseMutex = new boost::recursive_mutex();
+  this->setWorldPoseMutex = new boost::recursive_mutex();
+  this->worldUpdateMutex = new boost::recursive_mutex();
 
   this->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
@@ -93,10 +93,10 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
-  delete this->modelWorldPoseUpdateMutex;
-  this->modelWorldPoseUpdateMutex = NULL;
-  delete this->pauseMutex;
-  this->pauseMutex = NULL;
+  delete this->setWorldPoseMutex;
+  this->setWorldPoseMutex = NULL;
+  delete this->worldUpdateMutex;
+  this->worldUpdateMutex = NULL;
 
   this->connections.clear();
   this->Fini();
@@ -269,7 +269,7 @@ void World::RunLoop()
   common::Time prevUpdateTime = common::Time::GetWallTime();
   while (!this->stop)
   {
-    this->pauseMutex->lock();
+    this->worldUpdateMutex->lock();
     // Send statistics about the world simulation
     if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
     {
@@ -310,7 +310,7 @@ void World::RunLoop()
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
-    this->pauseMutex->unlock();
+    this->worldUpdateMutex->unlock();
   }
 }
 
@@ -681,9 +681,9 @@ void World::SetPaused(bool _p)
 
   event::Events::pause(_p);
 
-  this->pauseMutex->lock();
+  this->worldUpdateMutex->lock();
   this->pause = _p;
-  this->pauseMutex->unlock();
+  this->worldUpdateMutex->unlock();
 }
 
 

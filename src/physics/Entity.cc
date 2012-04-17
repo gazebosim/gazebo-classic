@@ -390,11 +390,11 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
 //
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
 {
-  this->GetWorld()->modelWorldPoseUpdateMutex->lock();
+  this->GetWorld()->setWorldPoseMutex->lock();
 
   (*this.*setWorldPoseFunc)(_pose, _notify);
 
-  this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
+  this->GetWorld()->setWorldPoseMutex->unlock();
 
   this->PublishPose();
 }
@@ -492,14 +492,14 @@ void Entity::Fini()
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
-  this->GetWorld()->modelWorldPoseUpdateMutex->lock();
+  this->GetWorld()->setWorldPoseMutex->lock();
   Base::Reset();
 
   if (this->HasType(Base::MODEL))
     this->SetWorldPose(this->initialRelativePose);
   else
     this->SetRelativePose(this->initialRelativePose);
-  this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
+  this->GetWorld()->setWorldPoseMutex->unlock();
 }
 
 //////////////////////////////////////////////////
