@@ -3,7 +3,7 @@
     <link name="chassis">
       <origin pose="0.0 0.0 0.16 0 0 0"/>
 
-      <inertial mass="2.0">
+      <inertial mass="5.0">
         <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
       <collision name="collision">
@@ -31,6 +31,16 @@
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu='100.000000' mu2='100.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+          </contact>
+        </surface>
+
       </collision>
    
       <visual name="visual">
@@ -52,6 +62,16 @@
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu='100.000000' mu2='100.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+          </contact>
+        </surface>
+
       </collision>
 
       <visual name="visual">
@@ -73,6 +93,16 @@
         <geometry>
           <sphere radius="0.04"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu='100.000000' mu2='100.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+          </contact>
+        </surface>
+
       </collision>
     
       <visual name="visual">
@@ -105,7 +135,7 @@
     <plugin filename="libDiffDrivePlugin.so" name="diff_drive">
       <left_joint>left_wheel_hinge</left_joint>
       <right_joint>right_wheel_hinge</right_joint>
-      <torque>5</torque>
+      <torque>10</torque>
     </plugin>
 
   </model>
