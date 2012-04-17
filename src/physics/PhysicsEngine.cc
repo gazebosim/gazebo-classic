@@ -51,7 +51,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->requestSub = this->node->Subscribe("~/request",
                                            &PhysicsEngine::OnRequest, this);
 
-  this->rayMutex = new boost::recursive_mutex();
+  this->physicsUpdateMutex = new boost::recursive_mutex();
 }
 
 void PhysicsEngine::Fini()
@@ -65,8 +65,8 @@ PhysicsEngine::~PhysicsEngine()
 {
   this->sdf->Reset();
   this->sdf.reset();
-  delete this->rayMutex;
-  this->rayMutex = NULL;
+  delete this->physicsUpdateMutex;
+  this->physicsUpdateMutex = NULL;
   this->responsePub.reset();
   this->requestSub.reset();
   this->node.reset();

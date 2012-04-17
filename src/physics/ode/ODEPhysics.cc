@@ -363,19 +363,19 @@ void ODEPhysics::UpdateCollision()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdatePhysics()
 {
+  // need to lock, otherwise might conflict with world resetting
   {
-    this->rayMutex->lock();
+    this->physicsUpdateMutex->lock();
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
-    this->rayMutex->unlock();
 
     // put contact forces into contact feedbacks
     for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
       this->ProcessContactFeedback(this->contactFeedbacks[i]);
-  }
 
-  // Very important to clear out the contact group
-  dJointGroupEmpty(this->contactGroup);
+    dJointGroupEmpty(this->contactGroup);
+    this->physicsUpdateMutex->unlock();
+  }
 }
 
 
@@ -387,8 +387,10 @@ void ODEPhysics::Fini()
 
 void ODEPhysics::Reset()
 {
+  this->physicsUpdateMutex->lock();
   // Very important to clear out the contact group
   dJointGroupEmpty(this->contactGroup);
+  this->physicsUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////

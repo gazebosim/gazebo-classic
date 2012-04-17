@@ -233,12 +233,12 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  // do the collision checks
-  this->laserShape->Update();
-
   this->mutex->lock();
 
   this->lastUpdateTime = this->world->GetSimTime();
+
+  // do the collision checks
+  this->laserShape->Update();
 
   // Store the latest laser scans into laserMsg
   msgs::Set(this->laserMsg.mutable_world_pose(),

@@ -81,6 +81,39 @@ TEST_F(PhysicsTest, State)
   EXPECT_TRUE(pose == modelState2.GetPose());
 }
 
+TEST_F(PhysicsTest, DropSphere)
+{
+  Load("worlds/drop_test.world");
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+
+  for (unsigned int i = 0; i < world->GetState().GetModelStateCount(); ++i)
+  {
+    physics::ModelState modelState = world->GetState().GetModelState(i);
+    if (modelState.GetName() == "box")
+    {
+      if (world->GetSimTime().Double() < 1)
+      {
+        math::Pose pose = modelState.GetPose();
+        gzerr << "z: " << pose.pos.z << "\n";
+        //EXPECT_TRUE(pose == modelState.GetPose());
+      }
+    }
+    else if (modelState.GetName() == "sphere")
+    {
+    }
+    else if (modelState.GetName() == "cylinder")
+    {
+    }
+
+  }
+
+
+
+
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
