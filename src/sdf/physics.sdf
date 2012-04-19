@@ -22,7 +22,7 @@
       <attribute name="cfm" type="double" default="0" required="1"/>
       <attribute name="erp" type="double" default="0.2" required="1"/>
       <attribute name="contact_max_correcting_vel" type="double" default="100" required="1"/>
-      <attribute name="contact_surface_layer" type="double" default="0" required="1"/>
+      <attribute name="contact_surface_layer" type="double" default="0.001" required="1"/>
     </element> <!-- End Constraints -->
   </element> <!-- ODE -->
 
