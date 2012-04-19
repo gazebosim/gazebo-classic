@@ -26,5 +26,5 @@ using namespace sensors;
 void RFIDTagManager::AddTaggedModel(RFIDTag *_model)
 {
   this->taggedModels.push_back(_model);
-  std::cout << " added tagged model to the queue" << std::endl;;
+  std::cout << " added tagged model to the queue" << std::endl;
 }

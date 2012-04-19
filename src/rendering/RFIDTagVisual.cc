@@ -29,14 +29,14 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-RFIDTagVisual::RFIDTagVisual (const std::string &_name, VisualPtr _vis,
-                          const std::string &_topicName)
- : Visual(_name, _vis)
+RFIDTagVisual::RFIDTagVisual(const std::string &_name, VisualPtr _vis,
+                             const std::string &_topicName)
+  : Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName, 
+  this->laserScanSub = this->node->Subscribe(_topicName,
       &RFIDTagVisual::OnScan, this);
 
   common::MeshManager::Instance()->CreateSphere("contact_sphere", .2, 10, 10);
@@ -44,7 +44,7 @@ RFIDTagVisual::RFIDTagVisual (const std::string &_name, VisualPtr _vis,
   this->AttachMesh("contact_sphere");
   this->SetMaterial("Gazebo/OrangeTransparent");
 }
- 
+
 /////////////////////////////////////////////////
 RFIDTagVisual::~RFIDTagVisual()
 {

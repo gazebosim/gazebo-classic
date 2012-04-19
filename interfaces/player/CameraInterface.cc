@@ -126,7 +126,7 @@ void CameraInterface::Unsubscribe()
 }
 
 /////////////////////////////////////////////////
-void CameraInterface::SaveFrame(const char *filename)
+const void CameraInterface::SaveFrame(const char *filename)
 {
   /*
   int width, height;

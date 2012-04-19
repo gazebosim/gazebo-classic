@@ -21,6 +21,7 @@
 #define RFIDTAG_HH
 
 #include <vector>
+#include <string>
 
 #include "transport/TransportTypes.hh"
 #include "sensors/Sensor.hh"
@@ -40,7 +41,7 @@ namespace gazebo
       /// \brief Load the sensor with SDF parameters
       /// \param _sdf SDF Sensor parameteres
       public: virtual void Load(const std::string & _worldName,
-                                sdf::ElementPtr &_sdf );
+                                sdf::ElementPtr &_sdf);
 
       /// \brief Load the sensor with default parameters
       public: virtual void Load(const std::string & _worldName);
