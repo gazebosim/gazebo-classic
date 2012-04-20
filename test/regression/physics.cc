@@ -91,7 +91,7 @@ TEST_F(PhysicsTest, DropStuff)
 
 
   double last_time = world->GetSimTime().Double();
-  while( world->GetSimTime().Double() < 10.0 )
+  while( world->GetSimTime().Double() < 2.0 )
   {
     world->SetPaused(true);
     if (world->GetSimTime().Double() > last_time)
@@ -102,7 +102,7 @@ TEST_F(PhysicsTest, DropStuff)
         math::Pose pose = box_model->GetWorldPose();
         gzdbg << "box z: " << pose.pos.z << "\n";
         double t = world->GetSimTime().Double();
-        if (t > 5) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
+        if (t > 1.42784312) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
       }
 
       physics::ModelPtr sphere_model = world->GetModel("sphere");
@@ -111,7 +111,7 @@ TEST_F(PhysicsTest, DropStuff)
         math::Pose pose = sphere_model->GetWorldPose();
         gzdbg << "sphere z: " << pose.pos.z << "\n";
         double t = world->GetSimTime().Double();
-        if (t > 5) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
+        if (t > 1.42784312) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
       }
 
       physics::ModelPtr cylinder_model = world->GetModel("cylinder");
@@ -120,7 +120,7 @@ TEST_F(PhysicsTest, DropStuff)
         math::Pose pose = cylinder_model->GetWorldPose();
         gzdbg << "cylinder z: " << pose.pos.z << "\n";
         double t = world->GetSimTime().Double();
-        if (t > 5) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
+        if (t > 1.42784312) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
       }
 
     }
