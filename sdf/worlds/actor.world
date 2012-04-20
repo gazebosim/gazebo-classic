@@ -5,8 +5,12 @@
     <include filename="ground_plane.model"/>
     <include filename="sun.light"/>
 
-    <actor name="actor1" filename="human.dae" time_factor="1" static="true">
+    <actor name="actor1" static="true">
       <origin pose="0 0 0 0 0 0"/>
+      <skin filename="poses000.s1.dae"/>
+      <animation loop="true" delay_start="0.0" time_scale="1.0">
+        <external filename="poses000.s1.dae" scale="1"/>
+      </animation>
     </actor>
 
   </world>

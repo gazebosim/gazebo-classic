@@ -1466,8 +1466,6 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       for (unsigned int i = 0; i < skel->GetNumNodes(); i++)
       {
         common::SkeletonNode *node = skel->GetNodeByHandle(i);
-        if (node->GetChildCount() == 0)
-          continue;
         Ogre::Bone *bone = ogreSkeleton->createBone(node->GetName());
 
         if (node->GetParent())

@@ -23,6 +23,7 @@
 #define ACTOR_HH
 
 #include <string>
+#include <map>
 
 #include "physics/Model.hh"
 #include "common/Time.hh"
@@ -87,11 +88,27 @@ namespace gazebo
 
       protected: const common::Mesh *mesh;
 
-      protected: common::Skeleton *skeleton;
+      protected: common::Skeleton *skinSkeleton;
 
-      protected: std::string fileName;
+      protected: common::Skeleton *animationSkeleton;
 
-      protected: double timeFactor;
+      protected: std::map<std::string, std::string> skelTranslator;
+
+      protected: std::string skinFile;
+
+      protected: std::string animationFile;
+
+      protected: double timeScale;
+
+      protected: double skinScale;
+
+      protected: double animationScale;
+
+      protected: double startDelay;
+
+      protected: bool loop;
+
+      protected: bool useExternalAnim;
 
       protected: common::Time prevSkelAnim;
 

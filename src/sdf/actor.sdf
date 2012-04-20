@@ -1,13 +1,26 @@
 <!-- Actor -->
 <element name="actor" required="*">
   <attribute name="name" type="string" default="__default__" required="1"/>
-  <attribute name="filename" type="string" default="__default__" required="1"/>
   <attribute name="static" type="bool" default="false" required="0"/>
-  <attribute name="time_factor" type="double" default="1.0" required="0"/>
-  
+
   <element name="origin" required="0">
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
   </element> <!-- End Origin -->
+
+  <element name="skin" required="1">
+    <attribute name="filename" type="string" default="__default__" required="1"/>
+    <attribute name="scale" type="double" default="1.0" required="0"/> 
+  </element> <!-- End Skin -->
+
+  <element name="animation" required="0">
+    <attribute name="time_scale" type="double" default="1.0" required="0"/>
+    <attribute name="loop" type="bool" default="true" required="0"/>
+    <attribute name="delay_start" type="double" default="0.0" required="0"/>
+    <element name="external" required="0">
+      <attribute name="filename" type="string" default="__default__" required="1"/>
+      <attribute name="scale" type="double" default="1.0" required="0"/>
+    </element> <!-- End External -->
+  </element> <!-- End Animation -->
   
   <include filename="link.sdf" required="+"/>
   <include filename="joint.sdf" required="*"/>
