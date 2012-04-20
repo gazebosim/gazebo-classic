@@ -26,8 +26,10 @@ enum {RIGHT, LEFT};
 
 /////////////////////////////////////////////////
 DiffDrivePlugin::DiffDrivePlugin()
+  : leftPID(0.01, 0.0, 0.001), rightPID(0.01, 0.0, 0.001)
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
+  this->sum = 0;
 }
 
 /////////////////////////////////////////////////
@@ -35,6 +37,9 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
                            sdf::ElementPtr _sdf)
 {
   this->model = _model;
+  this->link = this->model->GetLink();
+  this->leftWheelLink = this->model->GetLink("left_wheel");
+  this->rightWheelLink = this->model->GetLink("right_wheel");
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(model->GetWorld()->GetName());
@@ -85,6 +90,9 @@ void DiffDrivePlugin::Init()
   math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
 
   this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.5;
+
+  // this->wheelSpeed[LEFT] = 0.2;
+  // this->wheelSpeed[RIGHT] = 0.2;
 }
 
 /////////////////////////////////////////////////
@@ -94,7 +102,6 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 
   vr = _msg->position().x();
   va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
-
 
   this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2;
   this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2;
@@ -117,12 +124,29 @@ void DiffDrivePlugin::OnUpdate()
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
+  double leftVel = this->leftJoint->GetVelocity(0);
+  double rightVel = this->rightJoint->GetVelocity(0);
 
-  this->leftJoint->SetVelocity(0, this->wheelSpeed[LEFT] / this->wheelRadius);
-  this->rightJoint->SetVelocity(0, this->wheelSpeed[RIGHT] / this->wheelRadius);
+  double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
+  double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
-  this->leftJoint->SetVelocity(0, this->wheelSpeed[LEFT]);
-  this->rightJoint->SetVelocity(0, this->wheelSpeed[RIGHT]);
-  this->leftJoint->SetMaxForce(0, this->torque);
-  this->rightJoint->SetMaxForce(0, this->torque);
+  double leftErr = leftVel - leftVelDesired;
+  double rightErr = rightVel - rightVelDesired;
+
+  double leftForce = this->leftPID.Update(leftErr, stepTime);
+  double rightForce = this->rightPID.Update(leftErr, stepTime);
+
+  if (leftForce < -this->torque)
+    leftForce = -this->torque;
+  if (leftForce > this->torque)
+    leftForce = this->torque;
+
+  if (rightForce < -this->torque)
+    rightForce = -this->torque;
+  if (rightForce > this->torque)
+    rightForce = this->torque;
+
+  // printf("LV[%7.4f] LD[%7.4f] LF[%7.4f] RV[%7.4f] RD[%7.4f] RF[%7.4f]\n", leftVel, leftVelDesired, leftForce, rightVel, rightVelDesired, rightForce);
+  this->leftJoint->SetForce(0, leftForce);
+  this->rightJoint->SetForce(0, rightForce);
 }

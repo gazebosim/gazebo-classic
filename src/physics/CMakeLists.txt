@@ -1,6 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_subdirectory(ode)
 
+#if (HAVE_BULLET)
+#  add_subdirectory(bullet)
+#endif()
+
 set (sources Actor.cc
              Base.cc
              Link.cc

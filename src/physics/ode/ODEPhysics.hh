@@ -227,7 +227,7 @@ namespace gazebo
 
       private: tbb::spin_mutex collideMutex;
 
-      private: dContactGeom contactCollisions[MAX_DCOLLIDE_RETURNS];
+      private: dContactGeom contactCollisions[MAX_COLLIDE_RETURNS];
       private: int (*physicsStepFunc)(dxWorld*, dReal);
 
       private: int indices[MAX_CONTACT_JOINTS];

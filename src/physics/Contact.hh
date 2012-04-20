@@ -29,10 +29,10 @@
 #include "JointFeedback.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
-// MAX_DCOLLIDE_RETURNS limits contact detection, needs to be large
+// MAX_COLLIDE_RETURNS limits contact detection, needs to be large
 //                      for proper contact dynamics.
 // MAX_CONTACT_JOINTS truncates <max_contacts> specified in SDF
-#define MAX_DCOLLIDE_RETURNS 250
+#define MAX_COLLIDE_RETURNS 250
 #define MAX_CONTACT_JOINTS 20
 
 namespace gazebo

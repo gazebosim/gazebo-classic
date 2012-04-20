@@ -1021,7 +1021,7 @@ void Visual::SetTransparency(float _trans)
           if (this->transparency > 0.0)
           {
             pass->setDepthWriteEnabled(false);
-            pass->setDepthCheckEnabled(false);
+            pass->setDepthCheckEnabled(true);
           }
           else
           {
