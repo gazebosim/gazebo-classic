@@ -41,8 +41,15 @@ TEST_F(PR2Test, StraightLine)
 
   common::Time startTime = this->simTime;
   common::Time currTime = this->simTime;
+
+  struct timespec interval;
+  struct timespec remainder;
+  interval.tv_sec = 1 / 1000;
+  interval.tv_nsec = (1 % 1000) * 1000000;
+
   while (currTime - startTime < common::Time(10, 0))
   {
+    nanosleep(&interval, &remainder);
     usleep(1000);
     currTime = this->simTime;
   }

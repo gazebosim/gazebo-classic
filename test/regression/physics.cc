@@ -91,7 +91,7 @@ TEST_F(PhysicsTest, DropStuff)
 
 
   double last_time = world->GetSimTime().Double();
-  while( world->GetSimTime().Double() < 2.0 )
+  while (world->GetSimTime().Double() < 2.0)
   {
     world->SetPaused(true);
     if (world->GetSimTime().Double() > last_time)
@@ -122,7 +122,6 @@ TEST_F(PhysicsTest, DropStuff)
         double t = world->GetSimTime().Double();
         if (t > 1.42784312) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
       }
-
     }
     world->SetPaused(false);
   }

@@ -123,11 +123,12 @@ void DiffDrivePlugin::OnUpdate()
   da = (d1 - d2) / this->wheelSeparation;
   std::cout << "DR[" << dr << "]\n";
   */
-  //std::cout << "JS[" << this->leftJoint->GetVelocity(0) << " "
-  //  << this->rightJoint->GetVelocity(0) << "]\n";
-
-  //this->leftJoint->SetVelocity(0, this->wheelSpeed[LEFT] / this->wheelRadius);
-  //this->rightJoint->SetVelocity(0, this->wheelSpeed[RIGHT] / this->wheelRadius);
+  // std::cout << "JS[" << this->leftJoint->GetVelocity(0) << " "
+  //    << this->rightJoint->GetVelocity(0) << "]\n";
+  /*
+  this->leftJoint->SetVelocity(0, this->wheelSpeed[LEFT]/this->wheelRadius);
+  this->rightJoint->SetVelocity(0, this->wheelSpeed[RIGHT]/this->wheelRadius);
+  */
   double leftVel = this->leftJoint->GetVelocity(0);
   double rightVel = this->leftJoint->GetVelocity(0);
 
