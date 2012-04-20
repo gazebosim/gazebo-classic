@@ -40,7 +40,7 @@
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("rfidtag",RFIDTag)
+GZ_REGISTER_STATIC_SENSOR("rfidtag", RFIDTag)
 
 /////////////////////////////////////////////////
 RFIDTag::RFIDTag()

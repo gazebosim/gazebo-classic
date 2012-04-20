@@ -21,6 +21,8 @@
 #ifndef RFIDTAGVISUAL_HH
 #define RFIDTAGVISUAL_HH
 
+#include <string>
+
 #include "rendering/Visual.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
@@ -31,7 +33,7 @@ namespace gazebo
   {
     class RFIDTagVisual : public Visual
     {
-      public: RFIDTagVisual(const std::string &_name, VisualPtr _vis, 
+      public: RFIDTagVisual(const std::string &_name, VisualPtr _vis,
                             const std::string &_topicName);
 
       public: virtual ~RFIDTagVisual();

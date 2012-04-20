@@ -12,6 +12,7 @@ set ( sources ColladaLoader.cc
               Skeleton.cc
               MeshLoader.cc
               MeshManager.cc
+              Pid.cc
               STLLoader.cc
               Time.cc
               Timer.cc
@@ -35,6 +36,7 @@ set ( headers CommonTypes.hh
               Skeleton.hh
               MeshLoader.hh
               MeshManager.hh
+              Pid.hh
               Plugin.hh
               SingletonT.hh
               STLLoader.hh

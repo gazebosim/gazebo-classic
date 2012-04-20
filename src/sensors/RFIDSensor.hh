@@ -21,6 +21,7 @@
 #define RFIDSENSOR_HH
 
 #include <vector>
+#include <string>
 
 #include "transport/TransportTypes.hh"
 
