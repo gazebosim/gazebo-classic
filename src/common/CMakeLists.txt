@@ -19,6 +19,7 @@ set ( sources ColladaLoader.cc
               Material.cc
               KeyFrame.cc
               Animation.cc
+              BVHLoader.cc
 )
 
 set ( headers CommonTypes.hh
@@ -44,6 +45,7 @@ set ( headers CommonTypes.hh
               MouseEvent.hh
               KeyFrame.hh
               Animation.hh
+              BVHLoader.hh
 )
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)

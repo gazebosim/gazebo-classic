@@ -1167,6 +1167,20 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             subMesh->AddIndex(subMesh->GetVertexCount()-1);
             if (combinedVertNorms)
               subMesh->AddNormal(norms[values[iter->second]]);
+            if (_mesh->HasSkeleton())
+            {
+              Skeleton *skel = _mesh->GetSkeleton();
+              for (unsigned int i = 0;
+                  i < skel->GetNumVertNodeWeights(values[iter->second]); i++)
+              {
+                std::pair<std::string, double> node_weight =
+                              skel->GetVertNodeWeight(values[iter->second], i);
+                SkeletonNode *node =
+                  _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
+                subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
+                            node->GetHandle(), node_weight.second);
+              }
+            }
           }
           else if (iter->first == "NORMAL")
           {
