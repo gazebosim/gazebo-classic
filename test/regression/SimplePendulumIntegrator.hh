@@ -63,7 +63,7 @@ double PendulumAngle(double g, double l, double theta_i,
     theta_3 = theta_2;
     theta_2 = theta_1;
     theta_1 = theta_f;
-    //printf("debug t[%f] t_f[%f] theta_f[%f]\n", t, t_f, theta_f);
+    // printf("debug t[%f] t_f[%f] theta_f[%f]\n", t, t_f, theta_f);
   }
   if (fabs(t - t_f) > 0.000001)
     printf("time mismatch t[%f] t_f[%f] theta_f[%f]\n", t, t_f, theta_f);

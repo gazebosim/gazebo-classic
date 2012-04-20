@@ -16,6 +16,7 @@
 */
 #include "ServerFixture.hh"
 #include "physics/physics.h"
+#include "common/Time.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture
@@ -50,7 +51,7 @@ TEST_F(PR2Test, StraightLine)
   while (currTime - startTime < common::Time(10, 0))
   {
     nanosleep(&interval, &remainder);
-    usleep(1000);
+    common::Time::MSleep(1000);
     currTime = this->simTime;
   }
 

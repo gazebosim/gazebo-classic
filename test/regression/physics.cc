@@ -85,13 +85,13 @@ TEST_F(PhysicsTest, State)
 
 TEST_F(PhysicsTest, DropStuff)
 {
-  Load("worlds/drop_test.world",true);
+  Load("worlds/drop_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
 
   {
-    world->StepWorld(1428); // theoretical contact, but
+    world->StepWorld(1428);  // theoretical contact, but
     world->StepWorld(100);  // integration error requires few more steps
     gzdbg << "time is now [" << world->GetSimTime().Double() << "]\n";
     {
@@ -128,7 +128,7 @@ TEST_F(PhysicsTest, DropStuff)
 
 TEST_F(PhysicsTest, SimplePendulumTest)
 {
-  Load("worlds/simple_pendulums.world",true);
+  Load("worlds/simple_pendulums.world", true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 

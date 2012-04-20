@@ -87,7 +87,8 @@ class ServerFixture : public testing::Test
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
-                  boost::bind(&ServerFixture::RunServer, this, _worldFilename, _paused));
+                  boost::bind(&ServerFixture::RunServer, this, _worldFilename,
+                              _paused));
 
                // Wait for the server to come up
                while (!this->server || !this->server->GetInitialized())
