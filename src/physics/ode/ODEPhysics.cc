@@ -378,13 +378,13 @@ void ODEPhysics::UpdatePhysics()
   }
 }
 
-
 //////////////////////////////////////////////////
 void ODEPhysics::Fini()
 {
   PhysicsEngine::Fini();
 }
 
+//////////////////////////////////////////////////
 void ODEPhysics::Reset()
 {
   this->physicsUpdateMutex->lock();

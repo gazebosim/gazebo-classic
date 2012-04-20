@@ -182,7 +182,7 @@ bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
+bool RFIDSensor::CheckRayIntersection(const math::Pose &/*_pose*/)
 {
   /** rendering code below to check for intersections
 
