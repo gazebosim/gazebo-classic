@@ -21,32 +21,52 @@
 #include <math.h>
 
 // integrate d^2 theta / dt^2 = - g * sin(theta) / l
-// by discretizing it as
-//   theta_2^2 - 2*theta_1 + theta_0 / dt^2 = -g * sin(theta_1) / l
+// by discretizing via central differencing (requires very small dt)
+//   (theta_2 - 2*theta_1 + theta_2) / dt^2 = -g * sin(theta_1) / l
 //
-// where thata_0 is theta(t_1 - 2*dt)
-//       thata_1 is theta(t_1)
+//   or euler + 3-4-1 backward Euler is 2nd order:
+//
+//   (2*theta_2 - 5*theta_1 + 4*theta_2 -theta_3) / dt^2
+//     = -g * sin(theta_1) / l
+//
+// where thata_3 is theta(t - 3*dt)
+//       thata_2 is theta(t - 2*dt)
+//       thata_1 is theta(t -   dt)
 //       and
 //       thata_f or theta(t_f) is the solution returned
 //
-// If pendulum starts out stationary, one can assume theta_0 = theta_1
+// If pendulum starts out stationary, one can assume
+//   theta_3 = theta_2 = theta_1 = theta_i
 //
-double PendulumAngle(double g, double l, double theta_0, double theta_1,
-                     double t_1, double t_f , double dt)
+double PendulumAngle(double g, double l, double theta_i,
+                     double t_i, double t_f , double dt)
 {
-  double theta_f = theta_1;
-  int steps = ceil((t_f - t_1) / dt);
-  double t = t_1;
+  double theta_3 = theta_i;
+  double theta_2 = theta_i;
+  double theta_1 = theta_i;
+  double theta_f = theta_i;
+  int steps = ceil((t_f - t_i) / dt);
+  double t = t_i;
   for (int i = 0 ; i < steps; i++)
   {
     t += dt;
-    theta_f = -dt*dt*g*sin(theta_1)/l - theta_0 + 2.0*theta_1;
+    theta_f = (-dt*dt*g*sin(theta_1)/l
+                + theta_3
+                - 4.0*theta_2
+                + 5.0*theta_1)/2.0;
+    /*
+    theta_f = (-dt*dt*g*sin(theta_1)/l
+                - 1.0*theta_2
+                + 2.0*theta_1);
+    */
     // next step
-    theta_0 = theta_1;
+    theta_3 = theta_2;
+    theta_2 = theta_1;
     theta_1 = theta_f;
+    //printf("debug t[%f] t_f[%f] theta_f[%f]\n", t, t_f, theta_f);
   }
-  if (t != t_f) printf("time mismatch t[%f] t_f[%f] theta_f[%f]\n", t, t_f,
-                       theta_f);
+  if (fabs(t - t_f) > 0.000001)
+    printf("time mismatch t[%f] t_f[%f] theta_f[%f]\n", t, t_f, theta_f);
 
   return theta_f;
 }

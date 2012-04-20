@@ -85,16 +85,15 @@ TEST_F(PhysicsTest, State)
 
 TEST_F(PhysicsTest, DropStuff)
 {
-  Load("worlds/drop_test.world");
+  Load("worlds/drop_test.world",true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
 
-  double last_time = world->GetSimTime().Double();
-  while (world->GetSimTime().Double() < 2.0)
   {
-    world->SetPaused(true);
-    if (world->GetSimTime().Double() > last_time)
+    world->StepWorld(1428); // theoretical contact, but
+    world->StepWorld(100);  // integration error requires few more steps
+    gzdbg << "time is now [" << world->GetSimTime().Double() << "]\n";
     {
       physics::ModelPtr box_model = world->GetModel("box");
       if (box_model)
@@ -123,23 +122,19 @@ TEST_F(PhysicsTest, DropStuff)
         if (t > 1.42784312) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
       }
     }
-    world->SetPaused(false);
   }
   Unload();
 }
 
 TEST_F(PhysicsTest, SimplePendulumTest)
 {
-  Load("worlds/simple_pendulums.world");
+  Load("worlds/simple_pendulums.world",true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
 
-  double last_time = world->GetSimTime().Double();
-  while (world->GetSimTime().Double() < 2.0)
+  world->StepWorld(2000);
   {
-    world->SetPaused(true);
-    if (world->GetSimTime().Double() > last_time)
     {
       physics::ModelPtr model = world->GetModel("model_1");
       if (model)
@@ -148,7 +143,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
         if (joint)
         {
           double integ_theta = (1.5707963 -
-            PendulumAngle(-9.81, 10.0, 1.57079633, 1.57079633, 0,
+            PendulumAngle(-9.81, 10.0, 1.57079633, 0.0,
                           world->GetSimTime().Double(), 0.000001));
           double actual_theta = joint->GetAngle(0).GetAsRadian();
           gzdbg << "time [" << world->GetSimTime().Double()
@@ -159,9 +154,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
            EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
         }
       }
-      last_time = world->GetSimTime().Double();
     }
-    world->SetPaused(false);
   }
   Unload();
 }
