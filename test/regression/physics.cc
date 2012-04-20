@@ -18,6 +18,7 @@
 #include "ServerFixture.hh"
 #include "physics/Physics.hh"
 #include "physics/physics.h"
+#include "SimplePendulumIntegrator.hh"
 
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
@@ -79,34 +80,91 @@ TEST_F(PhysicsTest, State)
   modelState2 = world->GetState().GetModelState("box");
   pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
+  Unload();
 }
 
-TEST_F(PhysicsTest, DropSphere)
+TEST_F(PhysicsTest, DropStuff)
 {
   Load("worlds/drop_test.world");
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
 
-  for (unsigned int i = 0; i < world->GetState().GetModelStateCount(); ++i)
+  double last_time = world->GetSimTime().Double();
+  while( world->GetSimTime().Double() < 10.0 )
   {
-    physics::ModelState modelState = world->GetState().GetModelState(i);
-    if (modelState.GetName() == "box")
+    world->SetPaused(true);
+    if (world->GetSimTime().Double() > last_time)
     {
-      if (world->GetSimTime().Double() < 1)
+      physics::ModelPtr box_model = world->GetModel("box");
+      if (box_model)
       {
-        math::Pose pose = modelState.GetPose();
-        gzerr << "z: " << pose.pos.z << "\n";
-        // EXPECT_TRUE(pose == modelState.GetPose());
+        math::Pose pose = box_model->GetWorldPose();
+        gzdbg << "box z: " << pose.pos.z << "\n";
+        double t = world->GetSimTime().Double();
+        if (t > 5) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
       }
+
+      physics::ModelPtr sphere_model = world->GetModel("sphere");
+      if (sphere_model)
+      {
+        math::Pose pose = sphere_model->GetWorldPose();
+        gzdbg << "sphere z: " << pose.pos.z << "\n";
+        double t = world->GetSimTime().Double();
+        if (t > 5) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
+      }
+
+      physics::ModelPtr cylinder_model = world->GetModel("cylinder");
+      if (cylinder_model)
+      {
+        math::Pose pose = cylinder_model->GetWorldPose();
+        gzdbg << "cylinder z: " << pose.pos.z << "\n";
+        double t = world->GetSimTime().Double();
+        if (t > 5) EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.0001);
+      }
+
     }
-    else if (modelState.GetName() == "sphere")
-    {
-    }
-    else if (modelState.GetName() == "cylinder")
-    {
-    }
+    world->SetPaused(false);
   }
+  Unload();
+}
+
+TEST_F(PhysicsTest, SimplePendulumTest)
+{
+  Load("worlds/simple_pendulums.world");
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+
+  double last_time = world->GetSimTime().Double();
+  while (world->GetSimTime().Double() < 2.0)
+  {
+    world->SetPaused(true);
+    if (world->GetSimTime().Double() > last_time)
+    {
+      physics::ModelPtr model = world->GetModel("model_1");
+      if (model)
+      {
+        physics::JointPtr joint = model->GetJoint("joint_0");
+        if (joint)
+        {
+          double integ_theta = (1.5707963 -
+            PendulumAngle(-9.81, 10.0, 1.57079633, 1.57079633, 0,
+                          world->GetSimTime().Double(), 0.000001));
+          double actual_theta = joint->GetAngle(0).GetAsRadian();
+          gzdbg << "time [" << world->GetSimTime().Double()
+                << "] exact [" << integ_theta
+                << "] actual [" << actual_theta
+                << "] pose [" << model->GetWorldPose()
+                << "]\n";
+           EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
+        }
+      }
+      last_time = world->GetSimTime().Double();
+    }
+    world->SetPaused(false);
+  }
+  Unload();
 }
 
 int main(int argc, char **argv)

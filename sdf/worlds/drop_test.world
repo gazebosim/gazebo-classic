@@ -10,8 +10,8 @@
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
-        <solver type="quick" dt="0.001" iters="10" sor="1.3"/>
-        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
+        <solver type="quick" dt="0.001" iters="1000" sor="1.3"/>
+        <constraints cfm="0.0" erp="1.0" contact_max_correcting_vel="0.0" contact_surface_layer="0.0"/>
       </ode>
     </physics>
 
@@ -28,6 +28,11 @@
           <geometry>
             <box size="1 1 1"/>
           </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="0" max_vel="0"/>
+            </contact>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -50,6 +55,11 @@
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="0" max_vel="0"/>
+            </contact>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -72,6 +82,11 @@
           <geometry>
             <cylinder radius="0.5" length="1.0"/>
           </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="0" max_vel="0"/>
+            </contact>
+          </surface>
         </collision>
 
         <visual name="visual">
