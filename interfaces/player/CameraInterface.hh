@@ -22,6 +22,7 @@
 #ifndef CAMERAINTERFACE_HH
 #define CAMERAINTERFACE_HH
 
+#include <string>
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface

@@ -106,7 +106,7 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  double d1, d2;
+  /* double d1, d2;
   double dr, da;
   common::Time stepTime;
   common::Time currTime = this->model->GetWorld()->GetSimTime();
@@ -120,6 +120,7 @@ void DiffDrivePlugin::OnUpdate()
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
+  */
 
   double leftVel = this->leftJoint->GetVelocity(0);
   double rightVel = this->rightJoint->GetVelocity(0);
@@ -131,7 +132,7 @@ void DiffDrivePlugin::OnUpdate()
   double rightErr = rightVel - rightVelDesired;
 
   double leftForce = this->leftPID.Update(leftErr, stepTime);
-  double rightForce = this->rightPID.Update(leftErr, stepTime);
+  double rightForce = this->rightPID.Update(rightErr, stepTime);
 
   if (leftForce < -this->torque)
     leftForce = -this->torque;
@@ -143,7 +144,8 @@ void DiffDrivePlugin::OnUpdate()
   if (rightForce > this->torque)
     rightForce = this->torque;
 
-  // printf("LV[%7.4f] LD[%7.4f] LF[%7.4f] RV[%7.4f] RD[%7.4f] RF[%7.4f]\n", leftVel, leftVelDesired, leftForce, rightVel, rightVelDesired, rightForce);
+  // printf("LV[%7.4f] LD[%7.4f] LF[%7.4f] RV[%7.4f] RD[%7.4f] RF[%7.4f]\n",
+  // leftVel, leftVelDesired, leftForce, rightVel, rightVelDesired, rightForce);
   this->leftJoint->SetForce(0, leftForce);
   this->rightJoint->SetForce(0, rightForce);
 }

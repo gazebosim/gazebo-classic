@@ -23,10 +23,8 @@ namespace gazebo
   {
     class PID
     {
-
       ///  \brief Constructor, zeros out Pid values when created and
       ///  initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].
-      ///  
       ///  \param _p  The proportional gain.
       ///  \param _i  The integral gain.
       ///  \param _d  The derivative gain.

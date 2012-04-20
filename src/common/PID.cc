@@ -59,45 +59,45 @@ void PID::Reset()
 /////////////////////////////////////////////////
 double PID::Update(double _error, common::Time _dt)
 {
-   double pTerm, dTerm, iTerm;
-   this->pErr = _error; //this is pError = pState-pTarget
- 
-   if (_dt == common::Time(0,0) || isnan(_error) || isinf(_error))
-     return 0.0;
- 
-   // Calculate proportional contribution to command
-   pTerm = this->pGain * this->pErr;
- 
-   // Calculate the integral error
-   this->iErr = this->iErr + _dt.Double() * this->pErr;
- 
-   //Calculate integral contribution to command
-   iTerm = this->iGain * this->iErr;
- 
-   // Limit iTerm so that the limit is meaningful in the output
-   if (iTerm > this->iMax)
-   {
-     iTerm = this->iMax;
-     this->iErr = iTerm / this->iGain;
-   }
-   else if (iTerm < this->iMin)
-   {
-     iTerm = this->iMin;
-     this->iErr = iTerm / this->iGain;
-   }
- 
-   // Calculate the derivative error
-   if (_dt != common::Time(0, 0))
-   {
-     this->dErr = (this->pErr - this->pErrLast) / _dt.Double();
-     this->pErrLast = this->pErr;
-   }
+  double pTerm, dTerm, iTerm;
+  this->pErr = _error;
 
-   // Calculate derivative contribution to command
-   dTerm = this->dGain * this->dErr;
-   this->cmd = -pTerm - iTerm - dTerm;
- 
-   return this->cmd;
+  if (_dt == common::Time(0, 0) || isnan(_error) || isinf(_error))
+    return 0.0;
+
+  // Calculate proportional contribution to command
+  pTerm = this->pGain * this->pErr;
+
+  // Calculate the integral error
+  this->iErr = this->iErr + _dt.Double() * this->pErr;
+
+  // Calculate integral contribution to command
+  iTerm = this->iGain * this->iErr;
+
+  // Limit iTerm so that the limit is meaningful in the output
+  if (iTerm > this->iMax)
+  {
+    iTerm = this->iMax;
+    this->iErr = iTerm / this->iGain;
+  }
+  else if (iTerm < this->iMin)
+  {
+    iTerm = this->iMin;
+    this->iErr = iTerm / this->iGain;
+  }
+
+  // Calculate the derivative error
+  if (_dt != common::Time(0, 0))
+  {
+    this->dErr = (this->pErr - this->pErrLast) / _dt.Double();
+    this->pErrLast = this->pErr;
+  }
+
+  // Calculate derivative contribution to command
+  dTerm = this->dGain * this->dErr;
+  this->cmd = -pTerm - iTerm - dTerm;
+
+  return this->cmd;
 }
 
 /////////////////////////////////////////////////

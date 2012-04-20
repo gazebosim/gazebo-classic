@@ -23,11 +23,10 @@
 #define BULLETPHYSICS_HH
 #include <string>
 
-#include "physics/bullet/bullet_inc.h"
-
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include "physics/bullet/bullet_inc.h"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Collision.hh"
 #include "physics/Shape.hh"
