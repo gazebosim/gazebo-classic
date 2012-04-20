@@ -4,7 +4,7 @@
       <origin pose="0.0 0.0 0.16 0 0 0"/>
 
       <inertial mass="5.0">
-        <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
       </inertial> 
       <collision name="collision">
         <geometry>
@@ -24,7 +24,7 @@
       <origin pose="0.1 -.17 0.11 0 1.5707 1.5707"/>
   
       <inertial mass="0.5">
-        <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
       </inertial> 
   
       <collision name="collision">
@@ -55,7 +55,7 @@
       <origin pose="0.1 .17 0.11 0 1.5707 1.5707"/>
   
       <inertial mass="0.5">
-        <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
       </inertial> 
   
       <collision name="collision">
@@ -86,7 +86,7 @@
       <origin pose="-0.200 0 0.04 0 0 0"/>
   
       <inertial mass="0.1">
-        <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
       </inertial> 
   
       <collision name="collision">
