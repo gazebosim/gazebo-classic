@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Joint Command
+/// \brief Message for joint command
+/// \verbatim
+
+import "vector3d.proto";
+import "axis.proto";
+import "pose.proto";
+
+message JointCmd
+{
+  required string name     = 1;
+  optional double force    = 2;
+  optional double position = 3;
+}

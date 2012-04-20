@@ -62,6 +62,7 @@ set (msgs axis.proto
           test.proto
           pose_animation.proto
           joint_animation.proto
+          joint_cmd.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

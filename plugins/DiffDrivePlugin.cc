@@ -38,7 +38,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->GetName());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
@@ -108,10 +108,7 @@ void DiffDrivePlugin::OnUpdate()
 {
   /* double d1, d2;
   double dr, da;
-  common::Time stepTime;
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
 
-  stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime; 
 
   // Distance travelled by front wheels
@@ -121,6 +118,8 @@ void DiffDrivePlugin::OnUpdate()
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
   */
+  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time stepTime = currTime - this->prevUpdateTime;
 
   double leftVel = this->leftJoint->GetVelocity(0);
   double rightVel = this->rightJoint->GetVelocity(0);

@@ -1,0 +1,165 @@
+<gazebo version='1.0'>
+  <model name="simple_gripper" static="false">
+    <link name="riser">
+      <origin pose="-0.15 0.0 0.5 0 0 0"/>
+      <inertial mass="10.0">
+        <origin pose="0 0 -0.5 0 0 0"/>
+      </inertial> 
+
+      <collision name="collision">
+        <geometry>
+          <box size="0.2 0.2 1.0"/>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box size="0.2 0.2 1.1"/>
+        </geometry>
+        <material script="Gazebo/Purple"/>
+      </visual>
+    </link>
+
+    <link name="palm">
+      <origin pose="0.0 0.0 0.05 0 0 0"/>
+      <inertial mass="0.1">
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
+      </inertial> 
+
+      <collision name="collision">
+        <geometry>
+          <box size="0.1 0.2 0.1"/>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box size="0.1 0.2 0.1"/>
+        </geometry>
+        <material script="Gazebo/Red"/>
+      </visual>
+    </link>
+
+    <link name="left_finger">
+      <origin pose="0.1 0.2 0.05 0 0 -0.78539"/>
+      <inertial mass="0.01">
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
+      </inertial> 
+
+
+      <collision name="collision">
+        <geometry>
+          <box size="0.1 0.3 0.1"/>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box size="0.1 0.3 0.1"/>
+        </geometry>
+        <material script="Gazebo/Blue"/>
+      </visual>
+    </link>
+
+    <link name="left_finger_tip">
+      <origin pose="0.336 0.3 0.05 0 0 1.5707"/>
+      <inertial mass="0.01">
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
+      </inertial> 
+
+
+      <collision name="collision">
+        <geometry>
+          <box size="0.1 0.2 0.1"/>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box size="0.1 0.2 0.1"/>
+        </geometry>
+        <material script="Gazebo/Blue"/>
+      </visual>
+    </link>
+
+    <link name="right_finger">
+      <origin pose="0.1 -0.2 0.05 0 0 .78539"/>
+      <inertial mass="0.01">
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
+      </inertial> 
+
+      <collision name="collision">
+        <geometry>
+          <box size="0.1 0.3 0.1"/>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box size="0.1 0.3 0.1"/>
+        </geometry>
+        <material script="Gazebo/Green"/>
+      </visual>
+    </link>
+
+    <link name="right_finger_tip">
+      <origin pose="0.336 -0.3 0.05 0 0 1.5707"/>
+      <inertial mass="0.01">
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
+      </inertial> 
+
+      <collision name="collision">
+        <geometry>
+          <box size="0.1 0.2 0.1"/>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box size="0.1 0.2 0.1"/>
+        </geometry>
+        <material script="Gazebo/Green"/>
+      </visual>
+    </link>
+
+    <joint name="palm_left_finger" type="revolute">
+      <origin pose="0 -0.15 0 0 0 0"/>
+      <child link="left_finger"/>
+      <parent link="palm"/>
+      <axis xyz="0 0 1">
+        <limit lower="-0.4" upper="0"/> 
+      </axis>
+    </joint>
+
+    <joint name="left_finger_tip" type="revolute">
+      <origin pose="0 0.1 0 0 0 0"/>
+      <child link="left_finger_tip"/>
+      <parent link="left_finger"/>
+      <axis xyz="0 0 1">
+        <limit lower="-0.4" upper="0"/> 
+      </axis>
+    </joint>
+
+    <joint name="palm_right_finger" type="revolute">
+      <origin pose="0 0.15 0 0 0 0"/>
+      <child link="right_finger"/>
+      <parent link="palm"/>
+      <axis xyz="0 0 1">
+        <limit lower="0" upper="0.4"/> 
+      </axis>
+    </joint>
+
+    <joint name="right_finger_tip" type="revolute">
+      <origin pose="0 0.1 0 0 0 0"/>
+      <child link="right_finger_tip"/>
+      <parent link="right_finger"/>
+      <axis xyz="0 0 1">
+        <limit lower="0" upper="0.4"/> 
+      </axis>
+    </joint>
+
+    <joint name="palm_riser" type="prismatic">
+      <child link="palm"/>
+      <parent link="riser"/>
+      <axis xyz="0 0 1">
+        <limit lower="0" upper="0.9"/> 
+      </axis>
+    </joint>
+
+    <plugin filename="libJointControllerPlugin.so" name="joint_controller"/>
+  </model>
+</gazebo>

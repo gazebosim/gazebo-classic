@@ -235,15 +235,9 @@ material Gazebo/Red
 		pass ambient
 		{
 			ambient 1 0 0 
+      diffuse 1 0 0
+      specular 0.1 0.1 0.1 1 1
 		}
-
-    pass light
-    {
-			diffuse 1 0 0 
-			specular .1 .1 .1 128 
-    }
-
-
 	}
 }
 
@@ -253,13 +247,9 @@ material Gazebo/Green
 	{
 		pass ambient
 		{
-			ambient 0 1 0 
-		}
-
-		pass light
-		{
-			diffuse 0 1 0 
-			specular .1 .1 .1 128 
+			ambient 0 1 0
+      diffuse 0 1 0
+      specular 0.1 0.1 0.1 1 1
 		}
 	}
 }
@@ -270,14 +260,9 @@ material Gazebo/Blue
 	{
     pass ambient
     {
-			ambient 0 0 1 
-    }
-
-    pass light
-    {
-			diffuse 0 0 1 
-			specular .1 .1 .1 128 
-      emissive 0 0 0
+			ambient 0 0 1
+      diffuse 0 0 1
+      specular 0.1 0.1 0.1 1 1
     }
 	}
 }
@@ -288,13 +273,9 @@ material Gazebo/Yellow
 	{
 		pass ambient
 		{
-			ambient 1 1 0 
-		}
-
-    pass light
-    {
-			diffuse 1 1 0 
-			specular .1 .1 .1 128 
+			ambient 1 1 0
+      diffuse 1 1 0
+      specular 0.1 0.1 0.1 1 1
     }
 	}
 }
@@ -305,14 +286,10 @@ material Gazebo/Purple
 	{
 		pass ambient
 		{
-			ambient 1 0 1 
+			ambient 1 0 1
+      diffuse 1 0 1
+      specular 0.1 0.1 0.1 1 1
 		}
-
-    pass light
-    {
-			diffuse 1 0 1 
-			specular .1 .1 .1 128 
-    }
 	}
 }
 
@@ -322,14 +299,10 @@ material Gazebo/Turquoise
 	{
 		pass ambient
 		{
-			ambient 0 1 1 
+			ambient 0 1 1
+      diffuse 0 1 1
+      specular 0.1 0.1 0.1 1 1
 		}
-
-    pass light
-    {
-			diffuse 0 1 1 
-			specular .1 .1 .1 128 
-    }
 	}
 }
 
