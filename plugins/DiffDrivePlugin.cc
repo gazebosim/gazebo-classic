@@ -15,23 +15,31 @@
  *
 */
 
+#include "physics/physics.h"
 #include "transport/transport.h"
 #include "plugins/DiffDrivePlugin.hh"
 
 using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(DiffDrivePlugin)
 
+enum {RIGHT, LEFT};
+
 /////////////////////////////////////////////////
 DiffDrivePlugin::DiffDrivePlugin()
-  : speed(0)
+  : leftPID(0.01, 0.0, 0.001), rightPID(0.01, 0.0, 0.001)
 {
+  this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
+  this->sum = 0;
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::Load(physics::ModelPtr _model,
-                            sdf::ElementPtr _sdf)
+                           sdf::ElementPtr _sdf)
 {
   this->model = _model;
+  this->link = this->model->GetLink();
+  this->leftWheelLink = this->model->GetLink("left_wheel");
+  this->rightWheelLink = this->model->GetLink("right_wheel");
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(model->GetWorld()->GetName());
@@ -39,10 +47,24 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
 
+  if (!_sdf->HasElement("left_joint"))
+    gzerr << "DiffDrive plugin missing <left_joint> element\n";
+
+  if (!_sdf->HasElement("right_joint"))
+    gzerr << "DiffDrive plugin missing <right_joint> element\n";
+
   this->leftJoint = _model->GetJoint(
       _sdf->GetElement("left_joint")->GetValueString());
   this->rightJoint = _model->GetJoint(
       _sdf->GetElement("right_joint")->GetValueString());
+
+  if (_sdf->HasElement("torque"))
+    this->torque = _sdf->GetElement("torque")->GetValueDouble();
+  else
+  {
+    gzwarn << "No torque value set for the DiffDrive plugin.\n";
+    this->torque = 5.0;
+  }
 
   if (!this->leftJoint)
     gzerr << "Unable to find left joint["
@@ -56,16 +78,75 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
 }
 
 /////////////////////////////////////////////////
+void DiffDrivePlugin::Init()
+{
+  this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
+      this->rightJoint->GetAnchor(0));
+
+  physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+      this->leftJoint->GetChild());
+
+  math::Box bb = parent->GetBoundingBox();
+  math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
+
+  this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.5;
+
+  // this->wheelSpeed[LEFT] = 0.2;
+  // this->wheelSpeed[RIGHT] = 0.2;
+}
+
+/////////////////////////////////////////////////
 void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
-  this->speed = _msg->position().x();
+  double vr, va;
+
+  vr = _msg->position().x();
+  va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
+
+  this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2;
+  this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2;
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  this->leftJoint->SetVelocity(0, this->speed);
-  this->rightJoint->SetVelocity(0, this->speed);
-  this->leftJoint->SetMaxForce(0, 5);
-  this->rightJoint->SetMaxForce(0, 5);
+  double d1, d2;
+  double dr, da;
+  common::Time stepTime;
+  common::Time currTime = this->model->GetWorld()->GetSimTime();
+
+  stepTime = currTime - this->prevUpdateTime;
+  this->prevUpdateTime = currTime; 
+
+  // Distance travelled by front wheels
+  d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->GetVelocity(0);
+  d2 = stepTime.Double() * this->wheelRadius * this->rightJoint->GetVelocity(0);
+
+  dr = (d1 + d2) / 2;
+  da = (d1 - d2) / this->wheelSeparation;
+  double leftVel = this->leftJoint->GetVelocity(0);
+  double rightVel = this->rightJoint->GetVelocity(0);
+
+  double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
+  double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
+
+  double leftErr = leftVel - leftVelDesired;
+  double rightErr = rightVel - rightVelDesired;
+
+  double leftForce = this->leftPID.Update(leftErr, stepTime);
+  double rightForce = this->rightPID.Update(leftErr, stepTime);
+
+  if (leftForce < -this->torque)
+    leftForce = -this->torque;
+  if (leftForce > this->torque)
+    leftForce = this->torque;
+
+  if (rightForce < -this->torque)
+    rightForce = -this->torque;
+  if (rightForce > this->torque)
+    rightForce = this->torque;
+
+  // printf("LV[%7.4f] LD[%7.4f] LF[%7.4f] RV[%7.4f] RD[%7.4f] RF[%7.4f]\n", leftVel, leftVelDesired, leftForce, rightVel, rightVelDesired, rightForce);
+  this->leftJoint->SetForce(0, leftForce);
+  this->rightJoint->SetForce(0, rightForce);
 }

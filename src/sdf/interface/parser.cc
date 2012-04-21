@@ -483,11 +483,6 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
           return false;
         }
 
-        includeSDF->root->GetFirstElement()->SetParent(_sdf);
-        _sdf->InsertElement(includeSDF->root->GetFirstElement());
-        includeSDF->root->GetFirstElement()->SetInclude(elemXml->Attribute(
-              "filename"));
-
         if (elemXml->Attribute("model_name"))
           includeSDF->root->GetElement("model")->GetAttribute(
               "name")->SetFromString(elemXml->Attribute("model_name"));
@@ -511,6 +506,19 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
                 childElemXml->Attribute("name"));
           }
         }
+
+        if (_sdf->GetName() == "model")
+        {
+          addNestedModel(_sdf, includeSDF->root);
+        }
+        else
+        {
+          includeSDF->root->GetFirstElement()->SetParent(_sdf);
+          _sdf->InsertElement(includeSDF->root->GetFirstElement());
+          includeSDF->root->GetFirstElement()->SetInclude(elemXml->Attribute(
+                "filename"));
+        }
+
         continue;
       }
 
@@ -595,5 +603,61 @@ void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
     _sdf->InsertElement(element);
   }
 }
+
+/////////////////////////////////////////////////
+void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
+{
+  ElementPtr modelPtr = _includeSDF->GetElement("model");
+  ElementPtr elem = modelPtr->GetFirstElement();
+  std::map<std::string, std::string> replace;
+
+  gazebo::math::Pose modelPose =
+    modelPtr->GetOrCreateElement("origin")->GetValuePose("pose");
+
+  std::string modelName = modelPtr->GetValueString("name");
+  while (elem)
+  {
+    std::string elemName = elem->GetValueString("name");
+    std::string newName =  modelName + "__" + elemName;
+    replace[elemName] = newName;
+    if (elem->HasElementDescription("origin"))
+    {
+      ElementPtr originElem = elem->GetOrCreateElement("origin");
+      gazebo::math::Pose newPose = modelPose + originElem->GetValuePose("pose");
+      originElem->GetAttribute("pose")->Set(newPose);
+    }
+
+    elem = elem->GetNextElement();
+  }
+
+  std::string str = _includeSDF->ToString("");
+  for (std::map<std::string, std::string>::iterator iter = replace.begin();
+       iter != replace.end(); ++iter)
+  {
+    boost::replace_all(str, std::string("\"")+iter->first + "\"",
+                       std::string("\"") + iter->second + "\"");
+    boost::replace_all(str, std::string("'")+iter->first + "'",
+                       std::string("'") + iter->second + "'");
+    boost::replace_all(str, std::string(">")+iter->first + "<",
+                       std::string(">") + iter->second + "<");
+  }
+
+  _includeSDF->ClearElements();
+  readString(str, _includeSDF);
+
+  elem = _includeSDF->GetElement("model")->GetFirstElement();
+  ElementPtr nextElem;
+  while (elem)
+  {
+    nextElem = elem->GetNextElement();
+
+    if (elem->GetName() != "origin")
+    {
+      elem->SetParent(_sdf);
+      _sdf->InsertElement(elem);
+    }
+    elem = nextElem;
+  }
 }
 
+}

@@ -89,6 +89,7 @@ target_link_libraries( gazebo_rendering gazebo_common
                                         ${OPENGL_LIBRARIES} 
                                         ${CEGUI_LIBRARIES}
                                         X11 )
+                                      
 
 INSTALL_LIBRARY(gazebo_rendering)
 INSTALL_INCLUDES("rendering" ${headers})

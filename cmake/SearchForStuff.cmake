@@ -13,11 +13,6 @@ set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to overri
 set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
 set (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
 
-set (bullet_include_dirs "" CACHE STRING "Bullet include paths. Use this to override automatic detection.")
-set (bullet_library_dirs "" CACHE STRING "Bullet library paths. Use this to override automatic detection.")
-set (bullet_lflags "" CACHE STRING "Bullet lflags Use this to override automatic detection.")
-set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
-
 SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
 
 SET (general_libraries "" CACHE STRING "general libraries")
@@ -113,6 +108,15 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
+  # Find bullet
+  pkg_check_modules(BULLET bullet)
+  if (BULLET_FOUND)
+    set (HAVE_BULLET TRUE)
+  else()
+    set (HAVE_BULLET FALSE)
+  endif()
+  
+  #################################################
   # Find tinyxml
   pkg_check_modules(tinyxml tinyxml)
   if (NOT tinyxml_FOUND)
@@ -174,12 +178,12 @@ if (PKG_CONFIG_FOUND)
     set(ogre_ldflags ${OGRE-RTShaderSystem_LDFLAGS})
     set(ogre_include_dirs ${OGRE-RTShaderSystem_INCLUDE_DIRS})
     set(ogre_library_dirs ${OGRE-RTShaderSystem_LIBRARY_DIRS})
-    set(ogre_libraries ${OGRE-RTShaderSystem_LIBRARIES})
+    set(ogre_libraries "OgreRTShaderSystem")
     set(ogre_cflags ${OGRE-RTShaderSystem_CFLAGS})
 
     set (INCLUDE_RTSHADER ON CACHE BOOL "Enable GPU shaders")
 
-  else (OGRE-RTShaderSystem_FOUND)
+  else ()
 
     set (INCLUDE_RTSHADER OFF CACHE BOOL "Enable GPU shaders")
 
@@ -190,10 +194,15 @@ if (PKG_CONFIG_FOUND)
       set(ogre_ldflags ${OGRE_LDFLAGS})
       set(ogre_include_dirs ${OGRE_INCLUDE_DIRS})
       set(ogre_library_dirs ${OGRE_LIBRARY_DIRS})
-      set(ogre_libraries ${OGRE_LIBRARIES})
       set(ogre_cflags ${OGRE_CFLAGS})
     endif (NOT OGRE_FOUND)
   endif (OGRE-RTShaderSystem_FOUND)
+
+  # Bug in libogre-dev ubuntu install package which cause ogre_library_dirs to 
+  # be empty
+  if ("${ogre_library_dirs}" STREQUAL "")
+    set (ogre_library_dirs "/usr/lib")
+  endif()
 
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
@@ -203,10 +212,11 @@ if (PKG_CONFIG_FOUND)
     set(ogre_ldflags ${ogre_ldflags} ${OGRE-Terrain_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE-Terrain_INCLUDE_DIRS})
     set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Terrain_LIBRARY_DIRS})
-    set(ogre_libraries ${ogre_libraries} ${OGRE-Terrain_LIBRARIES})
+    set(ogre_libraries "${ogre_libraries};OgreTerrain;OgrePaging")
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
 
+  set(ogre_libraries "${ogre_libraries};OgreMain")
 
   #################################################
   # Find XML
@@ -289,7 +299,7 @@ if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   set(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
 
   include (FindBoost)
-  find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options)
+  find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex)
 
   if (NOT Boost_FOUND)
     set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
@@ -402,89 +412,3 @@ if (libdl_library AND libdl_include_dir)
 else (libdl_library AND libdl_include_dir)
   SET (HAVE_DL FALSE)
 endif (libdl_library AND libdl_include_dir)
-
-########################################
-# Find bullet
-#if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
-#
-#  find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
-#  
-#  if (NOT bullet_include_dir)
-#    message (STATUS "Looking for btBulletDynamicsCommon.h - not found.")
-#    set (bullet_include_dirs /usr/include CACHE STRING
-#      "bullet include paths. Use this to override automatic detection.")
-#  else (NOT bullet_include_dir)
-#    message (STATUS "Looking for btBulletDynamicsCommon.h - found")
-#    set (bullet_include_dirs ${bullet_include_dir} CACHE STRING
-#      "bullet include paths. Use this to override automatic detection.")
-#  endif (NOT bullet_include_dir)
-#  
-#  find_library(bullet_math_library LinearMath ENV LD_LIBRARY_PATH)
-#  find_library(bullet_collision_library BulletCollision ENV LD_LIBRARY_PATH)
-#  find_library(bullet_softbody_library BulletSoftBody  ENV LD_LIBRARY_PATH)
-#  find_library(bullet_dynamics_library BulletDynamics ENV LD_LIBRARY_PATH)
-#  
-#  if (NOT bullet_dynamics_library)
-#    message (STATUS "Looking for libBulletDynamics - not found.")
-#  else (NOT bullet_dynamics_library)
-#    message (STATUS "Looking for libBulletDynamics - found")
-#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletDynamics)
-#  endif (NOT bullet_dynamics_library)
-#
-#  if (NOT bullet_collision_library)
-#    message (STATUS "Looking for libBulletCollision - not found.")
-#  else (NOT bullet_collision_library)
-#    message (STATUS "Looking for libBulletCollision - found")
-#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletCollision)
-#  endif (NOT bullet_collision_library)
-#  
-#  if (NOT bullet_math_library)
-#    message (STATUS "Looking for libLinearMath - not found.")
-#  else (NOT bullet_math_library)
-#    message (STATUS "Looking for libLinearMath - found")
-#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lLinearMath)
-#  endif (NOT bullet_math_library)
-#
-#  if (NOT bullet_softbody_library)
-#    message (STATUS "Looking for libBulletSoftBody - not found.")
-#  else (NOT bullet_softbody_library)
-#    message (STATUS "Looking for libBulletSoftBody - found")
-#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
-#  endif (NOT bullet_softbody_library)
-#
-#  if (NOT bullet_include_dir OR NOT bullet_dynamics_library)
-#    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-#  else (NOT bullet_include_dir OR NOT bullet_dynamics_library)
-#    set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
-#  endif (NOT bullet_include_dir OR NOT bullet_dynamics_library)
-#
-#else (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
-#  set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
-#endif (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
-
-set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-
-# Check to make sure bullet was compiled with DOUBLE_PRECISION
-#if (INCLUDE_BULLET)
-#  set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
-#int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
-#
-#  set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
-#  STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
-#  STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
-#  set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
-#  set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
-#  set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
-#  CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
-#  set (CMAKE_REQUIRED_LIBRARIES)
-#  set (CMAKE_REQUIRED_DEFINITIONS)
-#  set( CMAKE_REQUIRED_INCLUDES)
-#  set( CMAKE_REQUIRED_FLAGS)
-#
-#  if (NOT BULLET_DOUBLE_PRECISION)
-#    BUILD_ERROR("Dependency: bullet was not compiled to use double precision.")
-#    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-#  endif (NOT BULLET_DOUBLE_PRECISION)
-#endif (INCLUDE_BULLET)
-
-

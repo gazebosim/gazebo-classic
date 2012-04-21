@@ -1,5 +1,4 @@
 import * from "shadow_receiver.program"
-import * from "perpixel.program"
 
 vertex_program Gazebo/DepthMapVS glsl
 {
@@ -211,7 +210,7 @@ material Gazebo/FlatBlack
 	}
 }
 
-material Gazebo/Black : perpixel_template
+material Gazebo/Black
 {
 	technique
 	{
@@ -229,7 +228,7 @@ material Gazebo/Black : perpixel_template
 }
 
 
-material Gazebo/Red : perpixel_template
+material Gazebo/Red
 {
 	technique
 	{
@@ -248,7 +247,7 @@ material Gazebo/Red : perpixel_template
 	}
 }
 
-material Gazebo/Green : perpixel_template
+material Gazebo/Green
 {
 	technique
 	{
@@ -265,7 +264,7 @@ material Gazebo/Green : perpixel_template
 	}
 }
 
-material Gazebo/Blue : perpixel_template
+material Gazebo/Blue
 {
 	technique
 	{
@@ -283,7 +282,7 @@ material Gazebo/Blue : perpixel_template
 	}
 }
 
-material Gazebo/Yellow : perpixel_template
+material Gazebo/Yellow
 {
 	technique
 	{
@@ -300,7 +299,7 @@ material Gazebo/Yellow : perpixel_template
 	}
 }
 
-material Gazebo/Purple : perpixel_template
+material Gazebo/Purple
 {
 	technique
 	{
@@ -317,7 +316,7 @@ material Gazebo/Purple : perpixel_template
 	}
 }
 
-material Gazebo/Turquoise : perpixel_template
+material Gazebo/Turquoise
 {
 	technique
 	{

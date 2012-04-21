@@ -1,12 +1,12 @@
 <!-- Scene -->
 <element name="scene" required="1">
   <element name="ambient" required="0">
-    <attribute name="rgba" type="color" default="0.5 0.5 0.5 1.0" required="1"/>
+    <attribute name="rgba" type="color" default="0.0 0.0 0.0 1.0" required="1"/>
   </element>
   <element name="background" required="0">
-    <attribute name="rgba" type="color" default="0 0 0 1.0" required="1"/>
+    <attribute name="rgba" type="color" default="1 1 1 1" required="1"/>
     <element name="sky" required="0">
-      <attribute name="material" type="string" default="__default__" required="1"/>
+      <attribute name="material" type="string" default="Gazebo/CloudySky" required="1"/>
     </element>
   </element>
 

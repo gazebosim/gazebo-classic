@@ -71,7 +71,7 @@ void WorldState::Load(sdf::ElementPtr _elem)
       ModelState state;
       state.Load(childElem);
       this->modelStates.push_back(state);
-      childElem = childElem->GetNextElement();
+      childElem = childElem->GetNextElement("model");
     }
   }
 }

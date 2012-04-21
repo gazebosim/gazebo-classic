@@ -50,6 +50,12 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
       sdf::ElementPtr frictionOdeElem = frictionElem->GetOrCreateElement("ode");
       this->mu1 = frictionOdeElem->GetValueDouble("mu");
       this->mu2 = frictionOdeElem->GetValueDouble("mu2");
+
+      if (this->mu1 < 0)
+        this->mu1 = FLT_MAX;
+      if (this->mu2 < 0)
+        this->mu2 = FLT_MAX;
+
       this->slip1 = frictionOdeElem->GetValueDouble("slip1");
       this->slip2 = frictionOdeElem->GetValueDouble("slip2");
       this->fdir1 = frictionOdeElem->GetValueVector3("fdir1");
@@ -104,6 +110,11 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
       this->slip2 = _msg.friction().slip2();
     if (_msg.friction().has_fdir1())
       this->fdir1 = msgs::Convert(_msg.friction().fdir1());
+
+    if (this->mu1 < 0)
+      this->mu1 = FLT_MAX;
+    if (this->mu2 < 0)
+      this->mu2 = FLT_MAX;
   }
 
   if (_msg.has_restitution_coefficient())

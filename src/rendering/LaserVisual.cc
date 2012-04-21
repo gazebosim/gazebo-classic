@@ -58,7 +58,7 @@ void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
   double angle = _msg->angle_min();
   double r;
   math::Vector3 pt;
-  math::Pose offset = msgs::Convert(_msg->offset());
+  math::Pose offset = msgs::Convert(_msg->world_pose()) - this->GetWorldPose();
 
   this->rayFan->SetPoint(0, offset.pos);
   for (int i = 0; i < _msg->ranges_size(); i++)
