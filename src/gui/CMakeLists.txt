@@ -29,6 +29,7 @@ set (sources main.cc
              ModelMaker.cc
              ModelRightMenu.cc
 )
+             #             JointControlWidget.cc
 
 set (qt_headers MainWindow.hh 
                 RenderWidget.hh 
@@ -40,6 +41,7 @@ set (qt_headers MainWindow.hh
                 ModelEditWidget.hh
                 ModelRightMenu.hh
 )
+                #JointControlWidget.hh
 
 set (headers Gui.hh
              EntityMaker.hh

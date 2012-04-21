@@ -43,6 +43,7 @@ namespace gazebo
       private slots: void OnShowJoints();
       private slots: void OnShowCOM();
       private slots: void OnTransparent();
+      private slots: void OnJointControl();
 
       private: std::string modelName;
 
@@ -54,6 +55,7 @@ namespace gazebo
       private: QAction *transparentAction;
       private: QAction *showJointsAction;
       private: QAction *showCOMAction;
+      private: QAction *jointControlAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub;
