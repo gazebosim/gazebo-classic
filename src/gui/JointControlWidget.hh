@@ -13,30 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#ifndef GAZEBO_GUI_HH
-#define GAZEBO_GUI_HH
+ */
+#ifndef JOINT_CONTROL_WIDGET_HH
+#define JOINT_CONTROL_WIDGET_HH
 
 #include <string>
-#include "rendering/Rendering.hh"
+#include "msgs/msgs.h"
+#include "gui/qt.h"
+#include "transport/TransportTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    bool run(int _argc, char **_argv);
-    void stop();
+    class JointControlWidget : public QWidget
+    {
+      Q_OBJECT
+      public: JointControlWidget(const std::string &_model,
+                                 QWidget *_parent = 0);
+      public: virtual ~JointControlWidget();
 
-    void set_world(const std::string& _name);
-    std::string get_world();
+      public: void Load(const std::string &_modelName);
+      private slots: void OnChanged(int _index, int _value);
 
-    void set_active_camera(rendering::UserCameraPtr _cam);
-    rendering::UserCameraPtr get_active_camera();
-    void clear_active_camera();
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr jointPub;
 
-    unsigned int get_entity_id(const std::string &_name);
-    bool has_entity_name(const std::string &_name);
+      private: msgs::Request *requestMsg;
+    };
   }
 }
-#endif
 
+#endif
