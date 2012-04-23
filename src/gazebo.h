@@ -17,6 +17,8 @@
 #ifndef GAZEBO_HH
 #define GAZEBO_HH
 
+#include <string>
+
 namespace gazebo
 {
   void print_version();

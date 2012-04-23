@@ -17,6 +17,8 @@
 #ifndef JOINTCONTROLLER_HH
 #define JOINTCONTROLLER_HH
 
+#include <map>
+#include <string>
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "msgs/msgs.h"
@@ -29,11 +31,13 @@ namespace gazebo
     {
       public: JointController(ModelPtr _model);
       public: void AddJoint(JointPtr _joint);
+      public: void Update();
 
       private: void OnJointCmd(ConstJointCmdPtr &_msg);
 
       private: ModelPtr model;
-      private: std::vector<JointPtr> joints;
+      private: std::map<std::string, JointPtr> joints;
+      private: std::map<std::string, double> forces;
       private: transport::NodePtr node;
       private: transport::SubscriberPtr jointCmdSub;
     };

@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+#include <string>
+#include <vector>
 #include "transport/transport.h"
 #include "common/common.h"
 #include "math/gzmath.h"

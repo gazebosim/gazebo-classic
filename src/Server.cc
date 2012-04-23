@@ -33,7 +33,6 @@
 #include "physics/World.hh"
 #include "physics/Base.hh"
 
-#include "gazebo.h"
 #include "Master.hh"
 #include "Server.hh"
 
@@ -76,7 +75,8 @@ bool Server::ParseArgs(int argc, char **argv)
   v_desc.add_options()
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
-    ("plugin,p", po::value<std::vector<std::string> >(), "Load a plugin.");
+    ("server-plugin,s", po::value<std::vector<std::string> >(),
+     "Load a plugin.");
 
   po::options_description h_desc("Hidden options");
   h_desc.add_options()
@@ -90,8 +90,9 @@ bool Server::ParseArgs(int argc, char **argv)
 
   try
   {
-    po::store(po::command_line_parser(argc,
-          argv).options(desc).positional(p_desc).allow_unregistered().run(), vm);
+    po::store(
+        po::command_line_parser(argc, argv).options(desc).positional(
+          p_desc).allow_unregistered().run(), vm);
     po::notify(vm);
   } catch(boost::exception &_e)
   {
@@ -108,9 +109,10 @@ bool Server::ParseArgs(int argc, char **argv)
   }
 
   /// Load all the plugins specified on the command line
-  if (vm.count("plugin"))
+  if (vm.count("server-plugin"))
   {
-    std::vector<std::string> pp = vm["plugin"].as<std::vector<std::string> >();
+    std::vector<std::string> pp =
+      vm["server-plugin"].as<std::vector<std::string> >();
 
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)

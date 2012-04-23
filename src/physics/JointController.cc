@@ -40,10 +40,28 @@ JointController::JointController(ModelPtr _model)
 /////////////////////////////////////////////////
 void JointController::AddJoint(JointPtr _joint)
 {
-  this->joints.push_back(_joint);
+  this->joints[_joint->GetName()] = _joint;
+}
+
+/////////////////////////////////////////////////
+void JointController::Update()
+{
+  std::map<std::string, double>::iterator iter;
+  for (iter = this->forces.begin(); iter != this->forces.end(); ++iter)
+  {
+    this->joints[iter->first]->SetForce(0, iter->second);
+  }
 }
 
 /////////////////////////////////////////////////
 void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 {
+  std::map<std::string, JointPtr>::iterator iter;
+  iter = this->joints.find(_msg->name());
+  if (iter != this->joints.end())
+  {
+    this->forces[_msg->name()] = _msg->force();
+  }
+  else
+    gzerr << "Unable to find joint[" << _msg->name() << "]\n";
 }

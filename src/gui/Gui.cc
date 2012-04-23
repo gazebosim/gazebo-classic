@@ -76,14 +76,15 @@ bool parse_args(int _argc, char **_argv)
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "Produce this help message.")
-    ("plugin,p", po::value<std::vector<std::string> >(), "Load a plugin.");
+    ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
   po::options_description desc("Allowed options");
   desc.add(v_desc);
 
   try
   {
-    po::store(po::command_line_parser(_argc, _argv).options(desc).allow_unregistered().run(), vm);
+    po::store(po::command_line_parser(_argc,
+          _argv).options(desc).allow_unregistered().run(), vm);
     po::notify(vm);
   } catch(boost::exception &_e)
   {
@@ -99,9 +100,10 @@ bool parse_args(int _argc, char **_argv)
   }
 
   /// Load all the plugins specified on the command line
-  if (vm.count("plugin"))
+  if (vm.count("gui-plugin"))
   {
-    std::vector<std::string> pp = vm["plugin"].as<std::vector<std::string> >();
+    std::vector<std::string> pp =
+      vm["gui-plugin"].as<std::vector<std::string> >();
 
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
@@ -123,18 +125,18 @@ namespace gazebo
       g_modelRightMenu = new gui::ModelRightMenu();
       rendering::load();
       rendering::init();
-    
+
       g_argv = new char*[g_argc];
       for (int i = 0; i < g_argc; i++)
       {
         g_argv[i] = new char[strlen("gazebo")];
         snprintf(g_argv[i], strlen("gazebo"), "gazebo");
       }
-    
+
       g_app = new QApplication(g_argc, g_argv);
-    
+
       g_main_win = new gui::MainWindow();
-    
+
       g_main_win->Load();
       g_main_win->resize(1024, 768);
     }

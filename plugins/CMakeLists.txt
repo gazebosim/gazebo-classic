@@ -9,8 +9,7 @@ set (plugins CameraPlugin
              GpuRayPlugin
              ContactPlugin
              RayPlugin
-             DiffDrivePlugin
-             JointControllerPlugin)
+             DiffDrivePlugin)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)

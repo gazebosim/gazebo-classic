@@ -4,6 +4,7 @@
       <origin pose="-0.15 0.0 0.5 0 0 0"/>
       <inertial mass="10.0">
         <origin pose="0 0 -0.5 0 0 0"/>
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
       </inertial> 
 
       <collision name="collision">
@@ -21,9 +22,9 @@
 
     <link name="palm">
       <origin pose="0.0 0.0 0.05 0 0 0"/>
-      <inertial mass="0.1">
+      <inertial mass="0.5">
         <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+      </inertial>
 
       <collision name="collision">
         <geometry>
@@ -40,9 +41,9 @@
 
     <link name="left_finger">
       <origin pose="0.1 0.2 0.05 0 0 -0.78539"/>
-      <inertial mass="0.01">
+      <inertial mass="0.1">
         <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+      </inertial>
 
 
       <collision name="collision">
@@ -60,9 +61,9 @@
 
     <link name="left_finger_tip">
       <origin pose="0.336 0.3 0.05 0 0 1.5707"/>
-      <inertial mass="0.01">
+      <inertial mass="0.1">
         <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+      </inertial>
 
 
       <collision name="collision">
@@ -80,9 +81,10 @@
 
     <link name="right_finger">
       <origin pose="0.1 -0.2 0.05 0 0 .78539"/>
-      <inertial mass="0.01">
+      <inertial mass="0.1">
         <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+      </inertial>
+
 
       <collision name="collision">
         <geometry>
@@ -99,9 +101,10 @@
 
     <link name="right_finger_tip">
       <origin pose="0.336 -0.3 0.05 0 0 1.5707"/>
-      <inertial mass="0.01">
+      <inertial mass="0.1">
         <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+      </inertial>
+
 
       <collision name="collision">
         <geometry>
@@ -121,7 +124,7 @@
       <child link="left_finger"/>
       <parent link="palm"/>
       <axis xyz="0 0 1">
-        <limit lower="-0.4" upper="0"/> 
+        <limit lower="-0.4" upper="0.4"/> 
       </axis>
     </joint>
 
@@ -130,7 +133,7 @@
       <child link="left_finger_tip"/>
       <parent link="left_finger"/>
       <axis xyz="0 0 1">
-        <limit lower="-0.4" upper="0"/> 
+        <limit lower="-0.4" upper="0.4"/> 
       </axis>
     </joint>
 
@@ -139,7 +142,7 @@
       <child link="right_finger"/>
       <parent link="palm"/>
       <axis xyz="0 0 1">
-        <limit lower="0" upper="0.4"/> 
+        <limit lower="-0.4" upper="0.4"/> 
       </axis>
     </joint>
 
@@ -148,7 +151,7 @@
       <child link="right_finger_tip"/>
       <parent link="right_finger"/>
       <axis xyz="0 0 1">
-        <limit lower="0" upper="0.4"/> 
+        <limit lower="-0.4" upper="0.4"/> 
       </axis>
     </joint>
 
@@ -160,6 +163,5 @@
       </axis>
     </joint>
 
-    <plugin filename="libJointControllerPlugin.so" name="joint_controller"/>
   </model>
 </gazebo>

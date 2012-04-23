@@ -181,6 +181,11 @@ void Model::Update()
 {
   this->updateMutex->lock();
 
+  if (this->jointController)
+  {
+    this->jointController->Update();
+  }
+
   if (this->jointAnimations.size() > 0)
   {
     common::NumericKeyFrame kf(0);

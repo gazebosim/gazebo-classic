@@ -18,6 +18,7 @@
 #define JOINT_CONTROL_WIDGET_HH
 
 #include <string>
+#include <map>
 #include "msgs/msgs.h"
 #include "gui/qt.h"
 #include "transport/TransportTypes.hh"
@@ -26,6 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class MySlider;
     class JointControlWidget : public QWidget
     {
       Q_OBJECT
@@ -34,12 +36,25 @@ namespace gazebo
       public: virtual ~JointControlWidget();
 
       public: void Load(const std::string &_modelName);
-      private slots: void OnChanged(int _index, int _value);
+      private slots: void OnChanged(double _value, const std::string &_name);
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr jointPub;
 
       private: msgs::Request *requestMsg;
+      private: std::map<std::string, MySlider*> sliders;
+    };
+
+    class MySlider : public QWidget
+    {
+      Q_OBJECT
+      public: MySlider(const std::string &_name, QWidget *_parent);
+      public slots: void OnChanged(int _value);
+      Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
+      private: std::string name;
+      private: QSlider *slider;
+      private: QLabel *label;
+      private: QDoubleSpinBox *multiplier;
     };
   }
 }

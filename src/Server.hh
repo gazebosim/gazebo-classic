@@ -59,7 +59,7 @@ namespace gazebo
 
     public: bool GetInitialized() const;
 
-    private: static void SigInt(int);
+    private: static void SigInt(int _v);
 
     private: void ProcessParams();
 

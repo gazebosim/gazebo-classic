@@ -12,6 +12,7 @@ import "pose.proto";
 message JointCmd
 {
   required string name     = 1;
-  optional double force    = 2;
-  optional double position = 3;
+  required int axis        = 2 [default=0];
+  optional double force    = 3;
+  optional double position = 4;
 }
