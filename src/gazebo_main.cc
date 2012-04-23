@@ -14,29 +14,30 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_HH
-#define GAZEBO_GUI_HH
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include "Server.hh"
+#include "gui/Gui.hh"
 
-#include <string>
-#include "rendering/Rendering.hh"
-
-namespace gazebo
+int main(int _argc, char **_argv)
 {
-  namespace gui
+  pid_t pid = fork();
+
+  if (pid)
   {
-    bool run(int _argc, char **_argv);
-    void stop();
-
-    void set_world(const std::string& _name);
-    std::string get_world();
-
-    void set_active_camera(rendering::UserCameraPtr _cam);
-    rendering::UserCameraPtr get_active_camera();
-    void clear_active_camera();
-
-    unsigned int get_entity_id(const std::string &_name);
-    bool has_entity_name(const std::string &_name);
+    gazebo::gui::run(_argc, _argv);
+    kill(pid, SIGINT);
   }
-}
-#endif
+  else
+  {
+    gazebo::Server *server = new gazebo::Server();
+    if (!server->ParseArgs(_argc, _argv))
+      return -1;
+    server->Run();
+    server->Fini();
+    delete server;
+  }
 
+  return 0;
+}

@@ -207,6 +207,6 @@ void ModelRightMenu::OnDelete()
 /////////////////////////////////////////////////
 void ModelRightMenu::OnJointControl()
 {
-  // JointControlWidget *jc = new JointControlWidget(this->modelName);
-  // jc->show();
+  JointControlWidget *jc = new JointControlWidget(this->modelName);
+  jc->show();
 }

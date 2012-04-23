@@ -18,7 +18,9 @@
 #define JOINT_CONTROL_WIDGET_HH
 
 #include <string>
+#include "msgs/msgs.h"
 #include "gui/qt.h"
+#include "transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -32,6 +34,12 @@ namespace gazebo
       public: virtual ~JointControlWidget();
 
       public: void Load(const std::string &_modelName);
+      private slots: void OnChanged(int _index, int _value);
+
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr jointPub;
+
+      private: msgs::Request *requestMsg;
     };
   }
 }

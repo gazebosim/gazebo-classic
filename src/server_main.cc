@@ -14,150 +14,18 @@
  * limitations under the License.
  *
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <errno.h>
-#include <iostream>
-#include <boost/program_options.hpp>
-
-#include "gazebo_config.h"
-#include "common/CommonTypes.hh"
-#include "rendering/Rendering.hh"
-#include "common/SystemPaths.hh"
 #include "Server.hh"
-
-gazebo::Server *server = NULL;
-
-std::string config_filename = "";
-gazebo::common::StrStr_M params;
-
-namespace po = boost::program_options;
-po::variables_map vm;
-
-//////////////////////////////////////////////////
-void PrintUsage()
-{
-  std::cerr << "Run the Gazebo server.\n\n"
-    << "Usage: gzserver [options] <world_file>\n\n";
-}
-
-//////////////////////////////////////////////////
-void PrintVersion()
-{
-  fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
-}
-
-//////////////////////////////////////////////////
-bool ParseArgs(int argc, char **argv)
-{
-  po::options_description v_desc("Allowed options");
-  v_desc.add_options()
-    ("help,h", "Produce this help message.")
-    ("pause,u", "Start the server in a paused state.")
-    ("plugin,p", po::value<std::vector<std::string> >(), "Load a plugin.");
-
-  po::options_description h_desc("Hidden options");
-  h_desc.add_options()
-    ("world_file", po::value<std::string>(), "SDF world to load.");
-
-  po::options_description desc("Allowed options");
-  desc.add(v_desc).add(h_desc);
-
-  po::positional_options_description p_desc;
-  p_desc.add("world_file", 1);
-
-  try
-  {
-    po::store(po::command_line_parser(argc,
-          argv).options(desc).positional(p_desc).run(), vm);
-    po::notify(vm);
-  } catch(boost::exception &_e)
-  {
-    std::cerr << "Error. Invalid arguments\n";
-    // std::cerr << boost::diagnostic_information(_e) << "\n";
-    return false;
-  }
-
-  if (vm.count("help"))
-  {
-    PrintUsage();
-    std::cerr << v_desc << "\n";
-    return false;
-  }
-
-  if (vm.count("pause"))
-    params["pause"] = "true";
-  else
-    params["pause"] = "false";
-
-  if (vm.count("world_file"))
-    config_filename = vm["world_file"].as<std::string>();
-  else
-    config_filename = "worlds/empty.world";
-
-  return true;
-}
-
-//////////////////////////////////////////////////
-void SignalHandler(int)
-{
-  server->Stop();
-}
-
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  // Application Setup
-  if (!ParseArgs(argc, argv))
-  {
+  gazebo::Server *server = new gazebo::Server();
+  if (!server->ParseArgs(argc, argv))
     return -1;
-  }
-
-  PrintVersion();
-
-  if (signal(SIGINT, SignalHandler) == SIG_ERR)
-  {
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
-    return -1;
-  }
-
-  server = new gazebo::Server();
-  if (config_filename.empty())
-  {
-    printf("Warning: no world filename specified, using default world\n");
-    config_filename = "worlds/empty.world";
-  }
-
-  /// Load all the plugins specified on the command line
-  if (vm.count("plugin"))
-  {
-    std::vector<std::string> pp = vm["plugin"].as<std::vector<std::string> >();
-
-    for (std::vector<std::string>::iterator iter = pp.begin();
-         iter != pp.end(); ++iter)
-    {
-      server->LoadPlugin(*iter);
-    }
-  }
-
-  if (!server->Load(config_filename))
-  {
-    gzerr << "Could not open file[" << config_filename << "]\n";
-    return -1;
-  }
-
-  server->SetParams(params);
-  server->Init();
 
   server->Run();
-
   server->Fini();
 
   delete server;
-  server = NULL;
-
-  printf("\n");
   return 0;
 }

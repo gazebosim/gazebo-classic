@@ -17,39 +17,16 @@
 #ifndef GAZEBO_HH
 #define GAZEBO_HH
 
-#include "transport/transport.h"
-#include "common/common.h"
-#include "math/gzmath.h"
-#include "gazebo_config.h"
-
 namespace gazebo
 {
-  bool load()
-  {
-    // Start the transport system by connecting to the master.
-    return gazebo::transport::init();
-  }
+  void print_version();
+  void add_plugin(const std::string &_filename);
 
-  bool init()
-  {
-    return true;
-  }
-
-  void run()
-  {
-    // Run transport loop. Starts a thread
-    gazebo::transport::run();
-  }
-
-  void stop()
-  {
-    gazebo::transport::stop();
-  }
-
-  void fini()
-  {
-    gazebo::transport::fini();
-  }
+  bool load();
+  bool init();
+  void run();
+  void stop();
+  void fini();
 }
-#endif
 
+#endif
