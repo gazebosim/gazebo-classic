@@ -55,7 +55,7 @@ namespace gazebo
 
       public: std::string GetFilename() const;
       public: math::Vector3 GetSize() const;
-      public: math::Vector3 GetOffset() const;
+      public: math::Vector3 GetOrigin() const;
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
 

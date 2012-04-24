@@ -403,15 +403,18 @@ void Element::ToString(const std::string &_prefix,
 /////////////////////////////////////////////////
 bool Element::HasAttribute(const std::string &_key)
 {
-  Param_V::const_iterator iter;
-  for (iter = this->attributes.begin();
-      iter != this->attributes.end(); ++iter)
-  {
-    if ((*iter)->GetKey() == _key)
-      return true;
-  }
+  return this->GetAttribute(_key) != NULL;
+}
 
-  return false;
+/////////////////////////////////////////////////
+bool Element::GetAttributeSet(const std::string &_key)
+{
+  bool result = false;
+  ParamPtr p = this->GetAttribute(_key);
+  if (p)
+    result = p->GetSet();
+
+  return result;
 }
 
 /////////////////////////////////////////////////

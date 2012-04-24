@@ -51,6 +51,11 @@ namespace gazebo
       return roundf(_a * pow(10, _precision)) / pow(10, _precision);
     }
 
+    inline bool isPowerOfTwo(unsigned int _x)
+    {
+      return ((_x != 0) && ((_x & (~_x + 1)) == _x));
+    }
+
     inline int parseInt(const std::string& input)
     {
       const char *p = input.c_str();

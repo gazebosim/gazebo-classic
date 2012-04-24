@@ -220,6 +220,12 @@ std::string Light::GetName() const
 }
 
 //////////////////////////////////////////////////
+std::string Light::GetType() const
+{
+  return this->sdf->GetValueString("type");
+}
+
+//////////////////////////////////////////////////
 void Light::CreateVisual()
 {
   // The lines draw a visualization of the camera
@@ -402,6 +408,12 @@ void Light::SetDiffuseColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
+common::Color Light::GetDiffuseColor() const
+{
+  return this->sdf->GetOrCreateElement("diffuse")->GetValueColor("rgba");
+}
+
+//////////////////////////////////////////////////
 void Light::SetSpecularColor(const common::Color &color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("specular");
@@ -424,6 +436,12 @@ void Light::SetDirection(const math::Vector3 &_dir)
     elem->GetAttribute("xyz")->Set(vec);
 
   this->light->setDirection(vec.x, vec.y, vec.z);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Light::GetDirection() const
+{
+  return this->sdf->GetOrCreateElement("direction")->GetValueVector3("xyz");
 }
 
 //////////////////////////////////////////////////

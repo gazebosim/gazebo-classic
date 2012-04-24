@@ -93,6 +93,9 @@ namespace sdf
 
     public: bool HasAttribute(const std::string &_key);
 
+    /// \brief Return true if the attribute was set (i.e. not default value)
+    public: bool GetAttributeSet(const std::string &_key);
+
     /// \brief Get the param of the elements value
     public: ParamPtr GetValue();
 

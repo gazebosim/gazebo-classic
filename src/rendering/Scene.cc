@@ -460,6 +460,31 @@ LightPtr Scene::GetLight(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+unsigned int Scene::GetLightCount() const
+{
+  return this->lights.size();
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::GetLight(unsigned int _index) const
+{
+  LightPtr result;
+  if (_index < this->lights.size())
+  {
+    Light_M::const_iterator iter = this->lights.begin();
+    std::advance(iter, _index);
+    result = iter->second;
+  }
+  else
+  {
+    gzerr << "Error: light index(" << _index << ") larger than light count("
+          << this->lights.size() << "\n";
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(const std::string &_name) const
 {
   VisualPtr result;

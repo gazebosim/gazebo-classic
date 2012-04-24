@@ -5,8 +5,8 @@
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
-        <solver type="quick" dt="0.001" iters="10" sor="1.3"/>
-        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="10.0" contact_surface_layer="0.001"/>
+        <solver type="quick" dt="0.0001" iters="10" sor="1.3"/>
+        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="0.0" contact_surface_layer="0.001"/>
       </ode>
     </physics>
 
@@ -14,10 +14,29 @@
     <!-- A global light source -->
     <include filename="sun.light"/>
 
+    <!--
+  <model name="plane1_model" static="true">
+    <link name="body">
+      <collision name="geom">
+        <geometry>
+          <plane normal="0 0 1"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual" cast_shadows="false">
+        <geometry>
+          <box size="10 10 2"/>
+        </geometry>
+        <material script="Gazebo/Grey"/>
+      </visual>
+    </link>
+  </model>
+  -->
+
     <model name="sphere">
-      <origin pose="10 0 2.0 0 0 0"/>
+      <origin pose="4 0 3.0 0 0 0"/>
       <link name="link">
-        <inertial mass="1.0">
+        <inertial mass="0.1">
           <inertia ixx=".01" ixy="0" ixz="0" iyy=".01" iyz="0" izz=".01"/>
         </inertial>
 
@@ -40,12 +59,12 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <heightmap filename="heightmap_bowl.png" size="100 100 1" offset="0 0 0"/>
+            <heightmap filename="heightmap_bowl.png" size="50 50 2" origin="0 0 0"/>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
-            <heightmap filename="terrain.png" size="10 10 10" offset="0 0 0"/>
+            <heightmap filename="heightmap_bowl.png" size="50 50 2" origin="0 0 0"/>
           </geometry>
         </visual>
       </link>

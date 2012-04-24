@@ -26,13 +26,10 @@
 using namespace gazebo;
 using namespace physics;
 
-ODEHeightmapShape *ODEHeightmapShape::self = NULL;
-
 //////////////////////////////////////////////////
 ODEHeightmapShape::ODEHeightmapShape(CollisionPtr _parent)
     : HeightmapShape(_parent)
 {
-  self = this;
 }
 
 //////////////////////////////////////////////////
@@ -68,16 +65,19 @@ void ODEHeightmapShape::FillHeightMap()
       this->heights[y * this->odeVertSize + x] = h;
     }
   }
+
+  std::cout << "Height At[0,0]" << this->heights[0] << "\n";
+  std::cout << "Height At[25,25]" << this->heights[24*this->odeVertSize+24] << "\n";
+  std::cout << "Height At[49,49]" << this->heights[49*this->odeVertSize+49] << "\n";
 }
 
 //////////////////////////////////////////////////
 dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
 {
-  //ODEHeightmapShape *collision = static_cast<ODEHeightmapShape*>(_data);
+  ODEHeightmapShape *collision = static_cast<ODEHeightmapShape*>(_data);
 
   // Return the height at a specific vertex
-  //return collision->heights[_y * collision->odeVertSize + _x];
-  return self->heights[_y * self->odeVertSize + _x];
+  return collision->heights[_y * collision->odeVertSize + _x];
 }
 
 //////////////////////////////////////////////////

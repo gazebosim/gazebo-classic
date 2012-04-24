@@ -51,15 +51,15 @@ void HeightmapShape::Update()
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
-  std::cout << "Heightmap Load\n";
   Base::Load(_sdf);
 
   // Use the image to get the size of the heightmap
   this->img.Load(this->sdf->GetValueString("filename"));
 
-  // Width and height must be the same
   if (this->img.GetWidth() != this->img.GetHeight())
-    gzthrow("Heightmap image must be square\n");
+  {
+    gzthrow("Heightmap image must be square and a power of 2\n");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -76,13 +76,13 @@ std::string HeightmapShape::GetFilename() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return math::Vector3();
+  return this->sdf->GetValueVector3("size");
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetOffset() const
+math::Vector3 HeightmapShape::GetOrigin() const
 {
-  return math::Vector3();
+  return this->sdf->GetValueVector3("origin");
 }
 
 //////////////////////////////////////////////////
@@ -91,7 +91,7 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
   _msg.mutable_heightmap()->set_filename(this->GetFilename());
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
-  msgs::Set(_msg.mutable_heightmap()->mutable_offset(), this->GetOffset());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetOrigin());
 }
 
 //////////////////////////////////////////////////

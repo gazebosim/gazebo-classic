@@ -60,10 +60,6 @@ namespace gazebo
       private: math::Vector3 odeScale;
 
       private: std::vector<double> heights;
-
-      /// Warning: This is here for performance improvement, bu as a side 
-      /// effect it will only allow one heightmap per world.
-      private: static ODEHeightmapShape *self;
     };
 
     /// \}

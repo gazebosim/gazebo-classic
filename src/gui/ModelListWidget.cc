@@ -535,9 +535,9 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     pz = this->variantManager->value(
          this->GetChildItem(offsetProp, "z")).toDouble();
 
-    heightmapMessage->mutable_offset()->set_x(px);
-    heightmapMessage->mutable_offset()->set_y(py);
-    heightmapMessage->mutable_offset()->set_z(pz);
+    heightmapMessage->mutable_origin()->set_x(px);
+    heightmapMessage->mutable_origin()->set_y(py);
+    heightmapMessage->mutable_origin()->set_z(pz);
   }
   else if (type == "mesh")
   {
@@ -1323,7 +1323,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
         QtVariantPropertyManager::groupTypeId(),
         tr("offset"));
     _parent->addSubProperty(sizeItem);
-    this->FillVector3dProperty(_msg.heightmap().offset(), sizeItem);
+    this->FillVector3dProperty(_msg.heightmap().origin(), sizeItem);
   }
 }
 

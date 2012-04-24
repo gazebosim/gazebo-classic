@@ -58,13 +58,16 @@ namespace gazebo
       /// \brief Get the height at a location
       public: double GetHeight(double x, double y);
 
-      private: void InitBlendMaps(Ogre::Terrain *_terrain);
+      private: bool InitBlendMaps(Ogre::Terrain *_terrain);
       private: void ConfigureTerrainDefaults();
       private: void DefineTerrain(int x, int y);
 
       private: ScenePtr scene;
       private: std::string heightImage;
       private: math::Vector3 terrainSize;
+      private: unsigned int imageSize;
+      private: common::Color maxPixel;
+      private: math::Vector3 terrainOrigin;
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
       private: Ogre::TerrainGroup *terrainGroup;
       private: bool terrainsImported;

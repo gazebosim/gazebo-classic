@@ -40,7 +40,7 @@ namespace gazebo
     class Image
     {
       /// \brief Constructor
-      public: Image();
+      public: Image(const std::string &_filename="");
 
       /// \brief Destructor
       public: virtual ~Image();
