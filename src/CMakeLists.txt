@@ -37,7 +37,7 @@ add_dependencies(gazebo_sensors gazebo_rendering)
 
 gz_add_executable(gzmaster master_main.cc Master.cc gazebo.cc)
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
-gz_add_executable(gazebo-exec gazebo_main.cc Server.cc Master.cc gazebo.cc)
+gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 
 target_link_libraries(gzmaster gazebo_common
                                gazebo_transport
@@ -58,17 +58,17 @@ target_link_libraries(gzserver gazebo_common
                                ${tinyxml_libraries}
                                boost_program_options)
 
-target_link_libraries(gazebo-exec gazebo_common
-                                  gazebo_sdf_interface
-                                  gazebo_transport
-                                  gazebo_physics
-                                  gazebo_sensors
-                                  gazebo_rendering
-                                  gazebo_msgs
-                                  gazebo_gui
-                                  pthread
-                                  ${tinyxml_libraries}
-                                  boost_program_options)
+target_link_libraries(gazebo gazebo_common
+                             gazebo_sdf_interface
+                             gazebo_transport
+                             gazebo_physics
+                             gazebo_sensors
+                             gazebo_rendering
+                             gazebo_msgs
+                             gazebo_gui
+                             pthread
+                             ${tinyxml_libraries}
+                             boost_program_options)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)
