@@ -186,6 +186,9 @@ namespace gazebo
       /// \brief Disable all links in all the models
       public: void DisableAllModels();
 
+      /// \brief Step callback
+      public: void StepWorld(int _steps);
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load
@@ -199,6 +202,10 @@ namespace gazebo
 
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
+      private: void Step();
+
+      /// \brief For keeping track of time step throttling
+      private: common::Time prevStepWallTime;
 
       /// \brief Update the world
       private: void Update();
@@ -267,7 +274,7 @@ namespace gazebo
       /// Current simulation time
       private: common::Time simTime, pauseTime, startTime;
       private: bool pause;
-      private: bool stepInc;
+      private: int stepInc;
 
       private: event::Connection_V connections;
 

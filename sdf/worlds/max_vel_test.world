@@ -1,0 +1,107 @@
+<gazebo version="1.0">
+  <world name="default">
+
+    <include filename="ground_plane.model"/>
+
+    <scene>
+      <ambient rgba="0.5 0.5 0.5 1"/>
+      <background rgba="0.5 0.5 0.5 1"/>
+      <shadows enabled="false"/>
+    </scene>
+
+    <include filename="sun.light"/>
+
+    <physics type="ode">
+      <gravity xyz="0.0 0.0 -9.81"/>
+      <ode>
+        <solver type="quick" dt="0.001" iters="10" sor="1.0"/>
+        <constraints cfm="0" erp="1.0" contact_max_correcting_vel="0.0" contact_surface_layer="0.0"/>
+      </ode>
+    </physics>
+
+    <model name="model_1" static="false">
+
+      <origin pose="0.0 0.0 0.5 0.0 0.0 0.0"/>
+
+      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
+
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+
+        <inertial mass="10.0">
+          <origin pose="0.5 0.0 0.0 0.0 0.0 0.0"/>
+          <damping linear="0.0" angular="0.0" />
+          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                   iyy="1.0" iyz="0.0"
+                   izz="1.0"/>
+        </inertial>
+
+        <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/Green"/>
+        </visual>
+
+        <collision name="collision_box" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <surface>
+            <contact>
+              <ode max_vel="0"/>
+            </contact>
+          </surface>
+        </collision>
+
+      </link>
+
+    </model>
+
+
+
+    <model name="model_2" static="false">
+
+      <origin pose="0.0 1.5 0.5 0 0.0 0.0"/>
+
+      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
+
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+
+        <inertial mass="10.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <damping linear="0.0" angular="0.0" />
+          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                   iyy="1.0" iyz="0.0"
+                   izz="1.0"/>
+        </inertial>
+
+        <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/Green"/>
+        </visual>
+
+        <collision name="collision_box" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <surface>
+            <contact>
+              <ode max_vel="0"/>
+            </contact>
+          </surface>
+        </collision>
+
+      </link>
+
+    </model>
+
+  </world>
+</gazebo>

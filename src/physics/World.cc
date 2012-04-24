@@ -74,7 +74,7 @@ World::World(const std::string &_name)
   this->receiveMutex = new boost::mutex();
 
   this->needsReset = false;
-  this->stepInc = false;
+  this->stepInc = 0;
   this->pause = false;
   this->thread = NULL;
 
@@ -258,58 +258,86 @@ void World::RunLoop()
 {
   this->physicsEngine->InitForThread();
 
-  common::Time step = this->physicsEngine->GetStepTime();
-
   this->startTime = common::Time::GetWallTime();
 
   // This fixes a minor issue when the world is paused before it's started
   if (this->IsPaused())
     this->pauseStartTime = this->startTime;
 
-  common::Time prevUpdateTime = common::Time::GetWallTime();
+  this->prevStepWallTime = common::Time::GetWallTime();
+
   while (!this->stop)
+    this->Step();
+}
+
+//////////////////////////////////////////////////
+void World::Step()
+{
+  this->worldUpdateMutex->lock();
+  // Send statistics about the world simulation
+  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
+    msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
+    msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
+    msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
+    this->worldStatsMsg.set_paused(this->IsPaused());
+
+    this->statPub->Publish(this->worldStatsMsg);
+    this->prevStatTime = common::Time::GetWallTime();
+  }
+
+  if (this->IsPaused() && !this->stepInc > 0)
+    this->pauseTime += this->physicsEngine->GetStepTime();
+  else
+  {
+    // throttling update rate
+    if (common::Time::GetWallTime() - this->prevStepWallTime
+           >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+    {
+      this->prevStepWallTime = common::Time::GetWallTime();
+      // query timestep to allow dynamic time step size updates
+      this->simTime += this->physicsEngine->GetStepTime();
+      this->Update();
+    }
+  }
+
+  // TODO: Fix timeout:  this belongs in simulator.cc
+  /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
+  {
+    this->stop = true;
+    break;
+  }*/
+
+  if (this->IsPaused() && this->stepInc > 0)
+    this->stepInc--;
+
+  this->ProcessEntityMsgs();
+  this->ProcessRequestMsgs();
+  this->ProcessFactoryMsgs();
+  this->ProcessModelMsgs();
+  this->worldUpdateMutex->unlock();
+}
+
+//////////////////////////////////////////////////
+void World::StepWorld(int _steps)
+{
+  if (!this->IsPaused())
+  {
+    gzwarn << "Calling World::StepWorld(steps) while world is not paused\n";
+    this->SetPaused(true);
+  }
+
+  this->worldUpdateMutex->lock();
+  this->stepInc = _steps;
+  this->worldUpdateMutex->unlock();
+
+  // block on completion
+  bool wait = true;
+  while (wait)
+  {
+    common::Time::MSleep(1);
     this->worldUpdateMutex->lock();
-    // Send statistics about the world simulation
-    if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
-    {
-      msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
-      msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
-      msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
-      this->worldStatsMsg.set_paused(this->IsPaused());
-
-      this->statPub->Publish(this->worldStatsMsg);
-      this->prevStatTime = common::Time::GetWallTime();
-    }
-
-    if (this->IsPaused() && !this->stepInc)
-      this->pauseTime += step;
-    else
-    {
-      // throttling update rate
-      if (common::Time::GetWallTime() - prevUpdateTime
-             >= common::Time(this->physicsEngine->GetUpdatePeriod()))
-      {
-        prevUpdateTime = common::Time::GetWallTime();
-        this->simTime += step;
-        this->Update();
-      }
-    }
-
-    // TODO: Fix timeout:  this belongs in simulator.cc
-    /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
-    {
-      this->stop = true;
-      break;
-    }*/
-
-    if (this->IsPaused() && this->stepInc)
-      this->stepInc = false;
-
-    this->ProcessEntityMsgs();
-    this->ProcessRequestMsgs();
-    this->ProcessFactoryMsgs();
-    this->ProcessModelMsgs();
+    if (this->stepInc == 0 || this->stop) wait = false;
     this->worldUpdateMutex->unlock();
   }
 }
@@ -336,6 +364,11 @@ void World::Update()
   {
     this->physicsEngine->UpdateCollision();
 
+    this->physicsEngine->UpdatePhysics();
+
+    // do this after physics update as
+    //   ode --> MoveCallback sets the dirtyPoses
+    //           and we need to propagate it into Entity::worldPose
     for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
         iter != this->dirtyPoses.end(); ++iter)
     {
@@ -343,7 +376,6 @@ void World::Update()
     }
     this->dirtyPoses.clear();
 
-    this->physicsEngine->UpdatePhysics();
   }
 
   event::Events::worldUpdateEnd();
@@ -575,7 +607,7 @@ void World::Reset(bool _resetTime)
 //////////////////////////////////////////////////
 void World::OnStep()
 {
-  this->stepInc = true;
+  this->stepInc = 1;
 }
 
 //////////////////////////////////////////////////
