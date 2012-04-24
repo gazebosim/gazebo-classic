@@ -337,7 +337,7 @@ void World::StepWorld(int _steps)
   {
     common::Time::MSleep(1);
     this->worldUpdateMutex->lock();
-    if (this->stepInc == 0) wait = false;
+    if (this->stepInc == 0 || this->stop) wait = false;
     this->worldUpdateMutex->unlock();
   }
 }
@@ -364,6 +364,11 @@ void World::Update()
   {
     this->physicsEngine->UpdateCollision();
 
+    this->physicsEngine->UpdatePhysics();
+
+    // do this after physics update as
+    //   ode --> MoveCallback sets the dirtyPoses
+    //           and we need to propagate it into Entity::worldPose
     for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
         iter != this->dirtyPoses.end(); ++iter)
     {
@@ -371,7 +376,6 @@ void World::Update()
     }
     this->dirtyPoses.clear();
 
-    this->physicsEngine->UpdatePhysics();
   }
 
   event::Events::worldUpdateEnd();

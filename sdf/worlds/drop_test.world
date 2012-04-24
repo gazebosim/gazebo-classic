@@ -8,7 +8,7 @@
     </scene>
 
     <physics type="ode">
-      <gravity xyz="0 0 -9.8"/>
+      <gravity xyz="0 0 -10.0"/>
       <ode>
         <solver type="quick" dt="0.001" iters="1000" sor="1.3"/>
         <constraints cfm="0.0" erp="1.0" contact_max_correcting_vel="0.0" contact_surface_layer="0.0"/>
