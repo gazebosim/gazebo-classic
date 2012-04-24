@@ -22,8 +22,8 @@
 #ifndef GAZEBO_PLAYER_INTERFACE_HH
 #define GAZEBO_PLAYER_INTERFACE_HH
 
-#include "player.h"
 #include <string>
+#include "player.h"
 #include "transport/TransportTypes.hh"
 
 /// \addtogroup player

@@ -14,9 +14,13 @@
  * limitations under the License.
  *
 */
+#include <stdio.h>
+#include <signal.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "gazebo.h"
+#include "transport/transport.h"
 #include "common/Timer.hh"
 #include "common/Exception.hh"
 #include "common/Plugin.hh"
@@ -29,24 +33,111 @@
 #include "physics/World.hh"
 #include "physics/Base.hh"
 
-#include "gazebo.h"
 #include "Master.hh"
 #include "Server.hh"
 
 using namespace gazebo;
 
+bool Server::stop = true;
+
 /////////////////////////////////////////////////
 Server::Server()
 {
-  this->stop = true;
   this->receiveMutex = new boost::mutex();
+  gazebo::print_version();
+
+  if (signal(SIGINT, Server::SigInt) == SIG_ERR)
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
 }
 
 /////////////////////////////////////////////////
 Server::~Server()
 {
+  printf("Server complete\n");
+  fflush(stdout);
   delete this->receiveMutex;
   delete this->master;
+}
+
+/////////////////////////////////////////////////
+void Server::PrintUsage()
+{
+  std::cerr << "Run the Gazebo server.\n\n"
+    << "Usage: gzserver [options] <world_file>\n\n";
+}
+
+/////////////////////////////////////////////////
+bool Server::ParseArgs(int argc, char **argv)
+{
+  std::string configFilename;
+
+  po::options_description v_desc("Allowed options");
+  v_desc.add_options()
+    ("help,h", "Produce this help message.")
+    ("pause,u", "Start the server in a paused state.")
+    ("server-plugin,s", po::value<std::vector<std::string> >(),
+     "Load a plugin.");
+
+  po::options_description h_desc("Hidden options");
+  h_desc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.");
+
+  po::options_description desc("Allowed options");
+  desc.add(v_desc).add(h_desc);
+
+  po::positional_options_description p_desc;
+  p_desc.add("world_file", 1);
+
+  try
+  {
+    po::store(
+        po::command_line_parser(argc, argv).options(desc).positional(
+          p_desc).allow_unregistered().run(), vm);
+    po::notify(vm);
+  } catch(boost::exception &_e)
+  {
+    std::cerr << "Error. Invalid arguments\n";
+    // std::cerr << boost::diagnostic_information(_e) << "\n";
+    return false;
+  }
+
+  if (vm.count("help"))
+  {
+    this->PrintUsage();
+    std::cerr << v_desc << "\n";
+    return false;
+  }
+
+  /// Load all the plugins specified on the command line
+  if (vm.count("server-plugin"))
+  {
+    std::vector<std::string> pp =
+      vm["server-plugin"].as<std::vector<std::string> >();
+
+    for (std::vector<std::string>::iterator iter = pp.begin();
+         iter != pp.end(); ++iter)
+    {
+      gazebo::add_plugin(*iter);
+    }
+  }
+
+  if (vm.count("pause"))
+    this->params["pause"] = "true";
+  else
+    this->params["pause"] = "false";
+
+  if (vm.count("world_file"))
+    configFilename = vm["world_file"].as<std::string>();
+  else
+    configFilename = "worlds/empty.world";
+
+  if (!this->Load(configFilename))
+    return false;
+
+  this->ProcessParams();
+  this->Init();
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -56,21 +147,16 @@ bool Server::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-void Server::LoadPlugin(const std::string &_filename)
-{
-  gazebo::SystemPluginPtr plugin = gazebo::SystemPlugin::Create(_filename,
-                                                                _filename);
-  this->plugins.push_back(plugin);
-}
-
-/////////////////////////////////////////////////
 bool Server::Load(const std::string &_filename)
 {
   // Quick test for a valid file
   FILE *test = fopen(common::SystemPaths::Instance()->FindFileWithGazeboPaths(
         _filename).c_str(), "r");
   if (!test)
+  {
+    gzerr << "Could not open file[" << _filename << "]\n";
     return false;
+  }
   fclose(test);
 
   std::string host = "";
@@ -81,12 +167,6 @@ bool Server::Load(const std::string &_filename)
   this->master = new gazebo::Master();
   this->master->Init(port);
   this->master->RunThread();
-
-  for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
-       this->plugins.begin(); iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Load();
-  }
 
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
@@ -153,6 +233,12 @@ void Server::Init()
 }
 
 /////////////////////////////////////////////////
+void Server::SigInt(int)
+{
+  stop = true;
+}
+
+/////////////////////////////////////////////////
 void Server::Stop()
 {
   this->stop = true;
@@ -205,10 +291,10 @@ void Server::Run()
 }
 
 /////////////////////////////////////////////////
-void Server::SetParams(const common::StrStr_M &params)
+void Server::ProcessParams()
 {
   common::StrStr_M::const_iterator iter;
-  for (iter = params.begin(); iter != params.end(); ++iter)
+  for (iter = this->params.begin(); iter != this->params.end(); ++iter)
   {
     if (iter->first == "pause")
     {
@@ -235,6 +321,14 @@ void Server::SetParams(const common::StrStr_M &params)
       physics::pause_worlds(p);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void Server::SetParams(const common::StrStr_M &_params)
+{
+  common::StrStr_M::const_iterator iter;
+  for (iter = _params.begin(); iter != _params.end(); ++iter)
+    this->params[iter->first] = iter->second;
 }
 
 /////////////////////////////////////////////////

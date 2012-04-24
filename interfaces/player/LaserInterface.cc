@@ -73,7 +73,8 @@ int LaserInterface::ProcessMessage(QueuePointer &_respQueue,
     else
     {
       printf("config request len is invalid (%d != %d)",
-          (int)_hdr->size, (int)sizeof(player_laser_config_t));
+          static_cast<int>(_hdr->size),
+          static_cast<int>(sizeof(player_laser_config_t)));
       result = -1;
     }
   }
@@ -107,7 +108,8 @@ int LaserInterface::ProcessMessage(QueuePointer &_respQueue,
     }
     else
     {
-      printf("config request len is invalid (%d != %d)", (int)_hdr->size, 0);
+      printf("config request len is invalid (%d != %d)",
+          static_cast<int>(_hdr->size), 0);
       result = -1;
     }
   }
@@ -147,7 +149,7 @@ void LaserInterface::Subscribe()
 {
   std::string topic = "~/";
   topic += this->laserName + "/scan";
-  boost::replace_all(topic,"::","/");
+  boost::replace_all(topic, "::", "/");
 
   this->laserScanSub = this->node->Subscribe(topic,
       &LaserInterface::OnScan, this);
@@ -165,7 +167,7 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
 {
   int i;
 
-  //TODO: fix the time to get the time the laser scan was generated
+  // TODO: fix the time to get the time the laser scan was generated
   this->datatime = gazebo::common::Time::GetWallTime().Double();
 
   double oldCount = this->data.scan.ranges_count;
@@ -203,6 +205,6 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
     this->driver->Publish(this->device_addr,
         PLAYER_MSGTYPE_DATA,
         PLAYER_LASER_DATA_SCANPOSE,
-        (void*)&this->data, sizeof(this->data), &this->datatime);
+        static_cast<void*>(&this->data), sizeof(this->data), &this->datatime);
   }
 }

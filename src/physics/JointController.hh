@@ -14,29 +14,33 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_HH
-#define GAZEBO_GUI_HH
+#ifndef JOINTCONTROLLER_HH
+#define JOINTCONTROLLER_HH
 
+#include <map>
 #include <string>
-#include "rendering/Rendering.hh"
+#include "physics/PhysicsTypes.hh"
+#include "transport/TransportTypes.hh"
+#include "msgs/msgs.h"
 
 namespace gazebo
 {
-  namespace gui
+  namespace physics
   {
-    bool run(int _argc, char **_argv);
-    void stop();
+    class JointController
+    {
+      public: JointController(ModelPtr _model);
+      public: void AddJoint(JointPtr _joint);
+      public: void Update();
 
-    void set_world(const std::string& _name);
-    std::string get_world();
+      private: void OnJointCmd(ConstJointCmdPtr &_msg);
 
-    void set_active_camera(rendering::UserCameraPtr _cam);
-    rendering::UserCameraPtr get_active_camera();
-    void clear_active_camera();
-
-    unsigned int get_entity_id(const std::string &_name);
-    bool has_entity_name(const std::string &_name);
+      private: ModelPtr model;
+      private: std::map<std::string, JointPtr> joints;
+      private: std::map<std::string, double> forces;
+      private: transport::NodePtr node;
+      private: transport::SubscriberPtr jointCmdSub;
+    };
   }
 }
 #endif
-

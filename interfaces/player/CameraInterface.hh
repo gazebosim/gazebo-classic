@@ -22,6 +22,7 @@
 #ifndef CAMERAINTERFACE_HH
 #define CAMERAINTERFACE_HH
 
+#include <string>
 #include "GazeboInterface.hh"
 
 /// \addtogroup player_iface
@@ -57,7 +58,7 @@ class CameraInterface : public GazeboInterface
   private: void OnImage(ConstImagePtr &_msg);
 
   /// Save a camera frame
-  private: const void SaveFrame(const char *filename);
+  private: void SaveFrame(const char *filename) const;
 
   /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: std::string cameraName;

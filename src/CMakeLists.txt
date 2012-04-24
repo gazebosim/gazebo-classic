@@ -35,16 +35,17 @@ add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gazebo_rendering gazebo_msgs)
 add_dependencies(gazebo_sensors gazebo_rendering)
 
-gz_add_executable(gzmaster master_main.cc Master.cc)
-gz_add_executable(gzserver server_main.cc Server.cc Master.cc)
+gz_add_executable(gzmaster master_main.cc Master.cc gazebo.cc)
+gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
+gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 
 target_link_libraries(gzmaster gazebo_common
-                                gazebo_transport
-                                gazebo_sdf_interface
-                                gazebo_msgs
-                                ${boost_libraries}
-                                ${freeimage_library}
-                                ${PROTOBUF_LIBRARY})
+                               gazebo_transport
+                               gazebo_sdf_interface
+                               gazebo_msgs
+                               ${boost_libraries}
+                               ${freeimage_library}
+                               ${PROTOBUF_LIBRARY})
 
 target_link_libraries(gzserver gazebo_common
                                gazebo_sdf_interface
@@ -57,6 +58,18 @@ target_link_libraries(gzserver gazebo_common
                                ${tinyxml_libraries}
                                boost_program_options)
 
+target_link_libraries(gazebo gazebo_common
+                             gazebo_sdf_interface
+                             gazebo_transport
+                             gazebo_physics
+                             gazebo_sensors
+                             gazebo_rendering
+                             gazebo_msgs
+                             gazebo_gui
+                             pthread
+                             ${tinyxml_libraries}
+                             boost_program_options)
+
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)
 endif()
@@ -64,8 +77,9 @@ endif()
 
 INSTALL_EXECUTABLE(gzmaster)
 INSTALL_EXECUTABLE(gzserver)
+INSTALL_EXECUTABLE(gazebo)
 
-gz_add_library(gazebo_server Server.cc Master.cc ${sources})
+gz_add_library(gazebo_server Server.cc Master.cc gazebo.cc ${sources})
 target_link_libraries(gazebo_server gazebo_common
                                      gazebo_transport
                                      gazebo_physics

@@ -14,29 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_HH
-#define GAZEBO_GUI_HH
 
-#include <string>
-#include "rendering/Rendering.hh"
+#ifndef ODE_INC_H_
+#define ODE_INC_H_
 
-namespace gazebo
-{
-  namespace gui
-  {
-    bool run(int _argc, char **_argv);
-    void stop();
+// This disables warning messages for ODE
+#pragma GCC system_header
+#include <btBulletDynamicsCommon.h>
+#include <btBulletCollisionCommon.h>
 
-    void set_world(const std::string& _name);
-    std::string get_world();
 
-    void set_active_camera(rendering::UserCameraPtr _cam);
-    rendering::UserCameraPtr get_active_camera();
-    void clear_active_camera();
-
-    unsigned int get_entity_id(const std::string &_name);
-    bool has_entity_name(const std::string &_name);
-  }
-}
 #endif
-

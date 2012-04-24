@@ -51,7 +51,7 @@ RFIDTagVisual::~RFIDTagVisual()
 }
 
 /////////////////////////////////////////////////
-void RFIDTagVisual::OnScan(ConstPosePtr &_msg)
+void RFIDTagVisual::OnScan(ConstPosePtr &/*_msg*/)
 {
   // math::Vector3 pt = msgs::Convert(_msg->position());
   // this->sceneNode->setPosition(Conversions::Convert(pt));
