@@ -91,6 +91,12 @@ TEST_F(PhysicsTest, DropStuff)
 
 
   {
+    double t = world->GetSimTime().Double();
+    for (int i = 0; i < t/world->GetPhysicsEngine()->GetStepTime(); i++)
+    {
+      // integrate here to see when the collision should happen
+    }
+
     world->StepWorld(1428);  // theoretical contact, but
     world->StepWorld(100);  // integration error requires few more steps
     gzdbg << "time is now [" << world->GetSimTime().Double() << "]\n";
