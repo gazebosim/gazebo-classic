@@ -48,11 +48,22 @@ Heightmap::~Heightmap()
 }
 
 //////////////////////////////////////////////////
+void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
+{
+  this->heightImage = _msg->geometry().heightmap().filename();
+  this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
+
+  this->Load();
+}
+
+//////////////////////////////////////////////////
 void Heightmap::Load()
 {
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
+  /*Nate: this->terrainGroup = new Ogre::TerrainGroup(this->scene->GetManager(),
+      Ogre::Terrain::ALIGN_X_Y, 513, 513.0f);*/
   this->terrainGroup = new Ogre::TerrainGroup(this->scene->GetManager(),
-      Ogre::Terrain::ALIGN_X_Y, 513, 513.0f);
+      Ogre::Terrain::ALIGN_X_Y, this->terrainSize.x, this->terrainSize.y);
   this->terrainGroup->setFilenameConvention(
       Ogre::String("BasicTutorial3Terrain"), Ogre::String("dat"));
   this->terrainGroup->setOrigin(Ogre::Vector3::ZERO);
@@ -106,9 +117,13 @@ void Heightmap::ConfigureTerrainDefaults()
   Ogre::Terrain::ImportData &defaultimp =
     this->terrainGroup->getDefaultImportSettings();
 
-  defaultimp.terrainSize = 513;
+  /* Nate: defaultimp.terrainSize = 513;
   defaultimp.worldSize = 513.0f;
-  defaultimp.inputScale = 1;
+  */
+  defaultimp.terrainSize = this->terrainSize.x;
+  defaultimp.worldSize = this->terrainSize.x;
+
+  defaultimp.inputScale = 100;
   defaultimp.minBatchSize = 33;
   defaultimp.maxBatchSize = 65;
 
@@ -157,7 +172,7 @@ void Heightmap::DefineTerrain(int x, int y)
     bool flipX = x % 2 != 0;
     bool flipY = y % 2 != 0;
 
-    img.load("canyon.png",
+    img.load(this->heightImage,
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     if (flipX)

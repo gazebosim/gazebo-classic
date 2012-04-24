@@ -11,9 +11,6 @@
     </physics>
 
 
-    <!-- A ground plane -->
-    <!-- <include filename="ground_plane.model"/>-->
-
     <!-- A global light source -->
     <include filename="sun.light"/>
 
@@ -48,8 +45,7 @@
         </collision>
         <visual name="visual">
           <geometry>
-            <plane normal="0 0 1"/>
-            <!-- <heightmap filename="terrain.png" size="10 10 10" offset="0 0 0"/>-->
+            <heightmap filename="terrain.png" size="10 10 10" offset="0 0 0"/>
           </geometry>
         </visual>
       </link>

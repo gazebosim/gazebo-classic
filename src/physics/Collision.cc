@@ -35,6 +35,7 @@
 #include "physics/CylinderShape.hh"
 #include "physics/TrimeshShape.hh"
 #include "physics/SphereShape.hh"
+#include "physics/HeightmapShape.hh"
 #include "physics/SurfaceParams.hh"
 #include "physics/Model.hh"
 #include "physics/Link.hh"
@@ -359,7 +360,12 @@ msgs::Visual Collision::CreateCollisionVisual()
 
   else if (this->shape->HasType(HEIGHTMAP_SHAPE))
   {
-    msg.mutable_geometry()->set_type(msgs::Geometry::HEIGHTMAP);
+    HeightmapShape *hgt = static_cast<HeightmapShape*>(this->shape.get());
+    geom->set_type(msgs::Geometry::HEIGHTMAP);
+
+    geom->mutable_heightmap()->set_filename(hgt->GetFilename());
+    msgs::Set(geom->mutable_heightmap()->mutable_size(), hgt->GetSize());
+    msgs::Set(geom->mutable_heightmap()->mutable_offset(), hgt->GetOffset());
   }
 
   else if (this->shape->HasType(MAP_SHAPE))
