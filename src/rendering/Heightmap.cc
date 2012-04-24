@@ -50,8 +50,8 @@ Heightmap::~Heightmap()
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
-  this->terrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
-  this->terrainGroup = OGRE_NEW Ogre::TerrainGroup(this->scene->GetManager(),
+  this->terrainGlobals = new Ogre::TerrainGlobalOptions();
+  this->terrainGroup = new Ogre::TerrainGroup(this->scene->GetManager(),
       Ogre::Terrain::ALIGN_X_Y, 513, 513.0f);
   this->terrainGroup->setFilenameConvention(
       Ogre::String("BasicTutorial3Terrain"), Ogre::String("dat"));
@@ -108,7 +108,7 @@ void Heightmap::ConfigureTerrainDefaults()
 
   defaultimp.terrainSize = 513;
   defaultimp.worldSize = 513.0f;
-  defaultimp.inputScale = 100;
+  defaultimp.inputScale = 1;
   defaultimp.minBatchSize = 33;
   defaultimp.maxBatchSize = 65;
 

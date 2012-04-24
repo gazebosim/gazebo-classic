@@ -4,9 +4,9 @@
   <element name="origin" required="0">
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
   </element> <!-- End Origin -->
-  <element name="damping" required="0">
-    <attribute name="linear" type="double" default="0" required="0"/>
-    <attribute name="angular" type="double" default="0" required="0"/>
+  <element name="damping" required="1">
+    <attribute name="linear" type="double" default="0.0001" required="1"/>
+    <attribute name="angular" type="double" default="0.0001" required="1"/>
   </element> <!-- End damping -->
   <element name="inertia" required="0">
     <attribute name="ixx" type="double" default="0.0" required="1"/>

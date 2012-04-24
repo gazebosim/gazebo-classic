@@ -36,14 +36,11 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
     : Shape(_parent)
 {
   this->AddType(Base::HEIGHTMAP_SHAPE);
-  // TODO this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
-
 
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
-  // TODO delete this->ogreHeightmap;
 }
 
 //////////////////////////////////////////////////
@@ -54,6 +51,7 @@ void HeightmapShape::Update()
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
+  std::cout << "Heightmap Load\n";
   Base::Load(_sdf);
 
   // Use the image to get the size of the heightmap
@@ -69,21 +67,25 @@ void HeightmapShape::Init()
 {
 }
 
+//////////////////////////////////////////////////
 std::string HeightmapShape::GetFilename() const
 {
   return this->sdf->GetValueString("filename");
 }
 
+//////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
   return math::Vector3();
 }
 
+//////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetOffset() const
 {
   return math::Vector3();
 }
 
+//////////////////////////////////////////////////
 void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
@@ -92,8 +94,8 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
   msgs::Set(_msg.mutable_heightmap()->mutable_offset(), this->GetOffset());
 }
 
+//////////////////////////////////////////////////
 void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
-
