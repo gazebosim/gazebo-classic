@@ -77,7 +77,7 @@ endif()
 
 INSTALL_EXECUTABLE(gzmaster)
 INSTALL_EXECUTABLE(gzserver)
-INSTALL_EXECUTABLE(gazebo-exec)
+INSTALL_EXECUTABLE(gazebo)
 
 gz_add_library(gazebo_server Server.cc Master.cc gazebo.cc ${sources})
 target_link_libraries(gazebo_server gazebo_common
