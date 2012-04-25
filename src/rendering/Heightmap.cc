@@ -64,16 +64,18 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 void Heightmap::Load()
 {
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
-  /*Nate: this->terrainGroup = new Ogre::TerrainGroup(this->scene->GetManager(),
-      Ogre::Terrain::ALIGN_X_Y, 513, 513.0f);*/
   common::Image img(this->heightImage);
 
-  if (img.GetWidth() != img.GetHeight())
+  if (img.GetWidth() != img.GetHeight() ||
+      !math::isPowerOfTwo(img.GetWidth() - 1))
   {
-    gzthrow("Heightmap image must be square and a power of 2\n");
+    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
   }
+
   this->imageSize = img.GetWidth();
-  this->maxPixel = img.GetMaxColor();
+  this->maxPixel = img.GetMaxColor().R();
+  if (math::equal(this->maxPixel, 0))
+    this->maxPixel = 1.0;
 
   std::cout << "TerrainSize[" << this->terrainSize << "] Width["
             << img.GetWidth() << "] Height[" << img.GetHeight() << "]\n";
@@ -115,6 +117,15 @@ void Heightmap::Load()
   }
 
   this->terrainGroup->freeTemporaryResources();
+
+  for (double ym = -5; ym < 5; ym += 1.0)
+  {
+    for (double xm = -5; xm < 5; xm += 1.0) 
+    {
+      std::cout << "GetHeight At [" << xm << "," << ym << "]="
+                << this->GetHeight(xm,ym) << "]\n";
+    }
+  }
 }
 
 ///////////////////////////////////////////////////
@@ -125,7 +136,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(8);
+  this->terrainGlobals->setMaxPixelError(0);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -172,8 +183,8 @@ void Heightmap::ConfigureTerrainDefaults()
   defaultimp.terrainSize = this->imageSize;
   defaultimp.worldSize = this->terrainSize.x;
 
-  defaultimp.inputScale = this->terrainSize.z / this->maxPixel.R();
-  std::cout << "MaxPixel[" << this->maxPixel.R() << "] Scale[" << defaultimp.inputScale << "]\n";
+  defaultimp.inputScale = this->terrainSize.z / this->maxPixel;
+  std::cout << "MaxPixel[" << this->maxPixel << "] Scale[" << defaultimp.inputScale << "]\n";
   defaultimp.minBatchSize = 33;
   defaultimp.maxBatchSize = 65;
 

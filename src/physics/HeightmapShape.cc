@@ -56,9 +56,10 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   // Use the image to get the size of the heightmap
   this->img.Load(this->sdf->GetValueString("filename"));
 
-  if (this->img.GetWidth() != this->img.GetHeight())
+  if (this->img.GetWidth() != this->img.GetHeight() ||
+      !math::isPowerOfTwo(this->img.GetWidth()-1))
   {
-    gzthrow("Heightmap image must be square and a power of 2\n");
+    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
   }
 }
 

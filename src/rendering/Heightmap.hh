@@ -66,7 +66,7 @@ namespace gazebo
       private: std::string heightImage;
       private: math::Vector3 terrainSize;
       private: unsigned int imageSize;
-      private: common::Color maxPixel;
+      private: double maxPixel;
       private: math::Vector3 terrainOrigin;
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
       private: Ogre::TerrainGroup *terrainGroup;

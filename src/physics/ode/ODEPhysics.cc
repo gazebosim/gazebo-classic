@@ -174,7 +174,6 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
       odeElem->GetOrCreateElement("constraints")->GetValueDouble(
         "contact_max_correcting_vel"));
 
-  std::cout << "MAX CV[" <<  odeElem->GetOrCreateElement("constraints")->GetValueDouble( "contact_max_correcting_vel") << "]\n";
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId, 
        odeElem->GetOrCreateElement("constraints")->GetValueDouble(
@@ -891,14 +890,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     }
 
     contact.geom = _contactCollisions[this->indices[j]];
-
-    if (contact.geom.depth > 0.0)
-    {
-      /*printf("Contact Depth[%f] Pos[%f %f %f]\n",contact.geom.depth,
-        contact.geom.pos[0], contact.geom.pos[1], contact.geom.pos[2]);
-        */
-      // contact.geom.depth = 0.0;
-    }
 
     dJointID contact_joint =
       dJointCreateContact(this->worldId, this->contactGroup, &contact);

@@ -66,9 +66,17 @@ void ODEHeightmapShape::FillHeightMap()
     }
   }
 
-  std::cout << "Height At[0,0]" << this->heights[0] << "\n";
-  std::cout << "Height At[25,25]" << this->heights[24*this->odeVertSize+24] << "\n";
-  std::cout << "Height At[49,49]" << this->heights[49*this->odeVertSize+49] << "\n";
+  double ym = 0.0;
+  //for (double ym = 0; ym < 5; ym += 1.0)
+  {
+    for (double xm = -64; xm < 65; xm += 1.0) 
+    {
+      x = (xm/this->odeScale.x) + this->img.GetWidth() * 0.5;
+      y = (ym/this->odeScale.y) + this->img.GetHeight() * 0.5;
+      std::cout << "Physics: Height At[" << xm << "," << ym << "]=" 
+        << this->heights[y*this->odeVertSize+x] << "\n";
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -77,7 +85,7 @@ dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
   ODEHeightmapShape *collision = static_cast<ODEHeightmapShape*>(_data);
 
   // Return the height at a specific vertex
-  return collision->heights[_y * collision->odeVertSize + _x];
+  return collision->heights[_y * collision->odeVertSize + _x] + 0.1;
 }
 
 //////////////////////////////////////////////////
@@ -89,10 +97,13 @@ void ODEHeightmapShape::Init()
   math::Vector3 terrainSize = this->sdf->GetValueVector3("size");
 
   // sampling size along image width and height
-  this->odeVertSize = this->img.GetWidth();// * 4;
+  this->odeVertSize = this->img.GetWidth();
   this->odeScale.x = terrainSize.x / this->odeVertSize;
   this->odeScale.y = terrainSize.y / this->odeVertSize;
-  this->odeScale.z = terrainSize.z / this->img.GetMaxColor().R();
+  if (math::equal(this->img.GetMaxColor().R(), 0))
+    this->odeScale.z = terrainSize.z;
+  else
+    this->odeScale.z = terrainSize.z / this->img.GetMaxColor().R();
 
   std::cout << "Terrain Size[" << terrainSize << "]\n";
   std::cout << "Max[" << this->img.GetMaxColor().R() << "]\n";
