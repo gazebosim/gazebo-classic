@@ -22,6 +22,8 @@ set (models
   hokuyo.model
   camera.model
   simple_gripper.model
+  14_4v_cordless_drill.model
+  coke_can.model
   )
 
 set (lights

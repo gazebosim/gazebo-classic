@@ -25,6 +25,8 @@ set (files hanoi_red_disk.dae
            bowl.dae
            test.dae
            human.dae
+           coke_can.dae
+           14_4v_cordless_drill.dae
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models)

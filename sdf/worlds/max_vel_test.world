@@ -12,13 +12,15 @@
     <include filename="sun.light"/>
 
     <physics type="ode">
-      <gravity xyz="0.0 0.0 -9.81"/>
+      <gravity xyz="0.0 0.0 -10.0"/>
       <ode>
-        <solver type="quick" dt="0.001" iters="10" sor="1.0"/>
-        <constraints cfm="0" erp="1.0" contact_max_correcting_vel="0.0" contact_surface_layer="0.0"/>
+        <solver type="quick" dt="0.001" iters="100" sor="1.0"/>
+        <constraints cfm="0" erp="1.0" contact_max_correcting_vel="0" contact_surface_layer="0.0"/>
       </ode>
     </physics>
 
+
+    <!-- model slides when cg is 0.3 0 0 -->
     <model name="model_1" static="false">
 
       <origin pose="0.0 0.0 0.5 0.0 0.0 0.0"/>
@@ -27,8 +29,8 @@
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
-        <inertial mass="10.0">
-          <origin pose="0.5 0.0 0.0 0.0 0.0 0.0"/>
+        <inertial mass="10000.0">
+          <origin pose="0.3 0.0 0.0 0.0 0.0 0.0"/>
           <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
@@ -51,7 +53,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode max_vel="0"/>
+              <ode kp="1000000000000.0" kd="100000000.0" max_vel="0"/>
             </contact>
           </surface>
         </collision>
@@ -61,7 +63,7 @@
     </model>
 
 
-
+<!-- by shifting cg down, the block will not slide at all, why? -->
     <model name="model_2" static="false">
 
       <origin pose="0.0 1.5 0.5 0 0.0 0.0"/>
@@ -70,8 +72,8 @@
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
-        <inertial mass="10.0">
-          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+        <inertial mass="10000.0">
+          <origin pose="0.3 0.0 -0.5 0.0 0.0 0.0"/>
           <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
@@ -94,7 +96,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode max_vel="0"/>
+              <ode kp="1000000000000.0" kd="100000000.0" max_vel="0"/>
             </contact>
           </surface>
         </collision>
