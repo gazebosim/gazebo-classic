@@ -50,16 +50,16 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   math::Vector3 xyz(_msg->inertial().pose().position().x(),
                     _msg->inertial().pose().position().y(),
                     _msg->inertial().pose().position().z());
-  math::Quaternion q( _msg->inertial().pose().orientation().w(),
-                      _msg->inertial().pose().orientation().x(),
-                      _msg->inertial().pose().orientation().y(),
-                      _msg->inertial().pose().orientation().z() );
+  math::Quaternion q(_msg->inertial().pose().orientation().w(),
+                     _msg->inertial().pose().orientation().x(),
+                     _msg->inertial().pose().orientation().y(),
+                     _msg->inertial().pose().orientation().z());
   math::Vector3 p1(0, 0, -0.04);
-  math::Vector3 p2(0, 0,  0.04);
+  math::Vector3 p2(0, 0, 00.04);
   math::Vector3 p3(0, -0.04, 0);
-  math::Vector3 p4(0,  0.04, 0);
+  math::Vector3 p4(0, 00.04, 0);
   math::Vector3 p5(-0.04, 0, 0);
-  math::Vector3 p6( 0.04, 0, 0);
+  math::Vector3 p6(00.04, 0, 0);
   p1 += xyz;
   p2 += xyz;
   p3 += xyz;
@@ -93,7 +93,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
 
   this->boxNode->attachObject(boxObj);
   this->boxNode->setScale(0.02, 0.02, 0.02);
-  this->boxNode->setPosition(xyz.x,xyz.y,xyz.z);
+  this->boxNode->setPosition(xyz.x, xyz.y, xyz.z);
   this->boxNode->setOrientation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
