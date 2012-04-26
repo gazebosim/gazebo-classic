@@ -77,9 +77,6 @@ void Heightmap::Load()
   if (math::equal(this->maxPixel, 0))
     this->maxPixel = 1.0;
 
-  std::cout << "TerrainSize[" << this->terrainSize << "] Width["
-            << img.GetWidth() << "] Height[" << img.GetHeight() << "]\n";
-
   // Create terrain group, which holds all the individual terrain instances.
   // Param 1: Pointer to the scene manager
   // Param 2: Alignment plane
@@ -117,15 +114,6 @@ void Heightmap::Load()
   }
 
   this->terrainGroup->freeTemporaryResources();
-
-  for (double ym = -5; ym < 5; ym += 1.0)
-  {
-    for (double xm = -5; xm < 5; xm += 1.0) 
-    {
-      std::cout << "GetHeight At [" << xm << "," << ym << "]="
-                << this->GetHeight(xm,ym) << "]\n";
-    }
-  }
 }
 
 ///////////////////////////////////////////////////

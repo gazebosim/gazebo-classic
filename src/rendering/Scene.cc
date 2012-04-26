@@ -1531,7 +1531,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
         _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
     {
       // Ignore collision visuals for the heightmap
-      if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos)
+      if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
+          this->heightmap == NULL)
       {
         try
         {
@@ -1542,6 +1543,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
           return false;
         }
       }
+      return true;
     }
 
     // If the visual has a parent which is not the name of the scene...

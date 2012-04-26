@@ -5,7 +5,7 @@
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
-        <solver type="quick" dt="0.00001" iters="100" sor="1.3"/>
+        <solver type="quick" dt="0.001" iters="100" sor="1.3"/>
         <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="0.0" contact_surface_layer="0.0001"/>
       </ode>
     </physics>
@@ -14,30 +14,10 @@
     <!-- A global light source -->
     <include filename="sun.light"/>
 
-    <!--
-  <model name="plane1_model" static="true">
-    <origin pose="0 0 -1 0 0 0"/>
-    <link name="body">
-      <collision name="geom">
-        <geometry>
-          <plane normal="0 0 1"/>
-        </geometry>
-      </collision>
-
-      <visual name="visual" cast_shadows="false">
-        <geometry>
-          <box size="200 200 1"/>
-        </geometry>
-        <material script="Gazebo/Grey"/>
-      </visual>
-    </link>
-  </model>
-  -->
-
     <model name="sphere">
-      <origin pose="1.0 0 2.5 0 0 0"/>
+      <origin pose="0.0 0 11.0 0 0 0"/>
       <link name="link">
-        <inertial mass="1.1">
+        <inertial mass="2.1">
           <inertia ixx=".01" ixy="0" ixz="0" iyy=".01" iyz="0" izz=".01"/>
         </inertial>
 
@@ -54,6 +34,7 @@
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
+      <plugin filename="libmodel_push.so" name="test"/>
     </model>
 
     <model name="heightmap" static="true">

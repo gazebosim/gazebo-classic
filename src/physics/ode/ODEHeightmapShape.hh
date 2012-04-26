@@ -58,6 +58,7 @@ namespace gazebo
 
       private: unsigned int odeVertSize;
       private: math::Vector3 odeScale;
+      private: int subSampling;
 
       private: std::vector<double> heights;
     };

@@ -157,6 +157,12 @@ void Image::SetFromData(const unsigned char *data, unsigned int width,
 }
 
 //////////////////////////////////////////////////
+int Image::GetPitch() const
+{
+  return FreeImage_GetPitch(this->bitmap);
+}
+
+//////////////////////////////////////////////////
 void Image::GetData(unsigned char **_data, unsigned int &_count)
 {
   int redmask = FI_RGBA_RED_MASK;
