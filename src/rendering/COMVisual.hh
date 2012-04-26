@@ -24,6 +24,7 @@
 #include <string>
 
 #include "rendering/Visual.hh"
+#include "msgs/msgs.h"
 
 namespace ogre
 {
@@ -40,7 +41,7 @@ namespace gazebo
       public: COMVisual(const std::string &_name, VisualPtr _vis);
       public: virtual ~COMVisual();
 
-      public: virtual void Load();
+      public: virtual void Load(ConstLinkPtr &_msg);
       private: DynamicLines *crossLines;
       private: Ogre::SceneNode *boxNode;
     };
