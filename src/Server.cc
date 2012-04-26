@@ -53,7 +53,6 @@ Server::Server()
 /////////////////////////////////////////////////
 Server::~Server()
 {
-  printf("Server complete\n");
   fflush(stdout);
   delete this->receiveMutex;
   delete this->master;

@@ -153,7 +153,6 @@ namespace gazebo
     {
       gui::clear_active_camera();
       rendering::fini();
-      printf("GUI Complete.\n");
       fflush(stdout);
     }
   }
