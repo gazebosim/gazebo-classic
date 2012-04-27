@@ -30,7 +30,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode soft_erp="0" max_vel="0"/>
+              <ode soft_erp="1" max_vel="0"/>
             </contact>
           </surface>
         </collision>
@@ -57,7 +57,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode soft_erp="0" max_vel="0"/>
+              <ode soft_erp="1" max_vel="0"/>
             </contact>
           </surface>
         </collision>
@@ -84,7 +84,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode soft_erp="0" max_vel="0"/>
+              <ode soft_erp="1" max_vel="0"/>
             </contact>
           </surface>
         </collision>
