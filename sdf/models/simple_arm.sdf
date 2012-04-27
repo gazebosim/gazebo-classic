@@ -1,3 +1,119 @@
+[1;36mDbg[0m Node[physical] Has empty key value[static]
+[1;36mDbg[0m Node[empty] Has empty key value[]
+[1;36mDbg[0m Node[box] Has empty key value[mu1]
+[1;36mDbg[0m Node[box] Has empty key value[mu2]
+[1;36mDbg[0m Node[box] Has empty key value[fdir1]
+[1;36mDbg[0m Node[box] Has empty key value[slip1]
+[1;36mDbg[0m Node[box] Has empty key value[slip2]
+[1;36mDbg[0m Node[box] Has empty key value[bounce]
+[1;36mDbg[0m Node[box] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[box] Has empty key value[kp]
+[1;36mDbg[0m Node[box] Has empty key value[kd]
+[1;36mDbg[0m Node[box] Has empty key value[softCFM]
+[1;36mDbg[0m Node[box] Has empty key value[maxVel]
+[1;36mDbg[0m Node[box] Has empty key value[minDepth]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[fdir1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounce]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kp]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kd]
+[1;36mDbg[0m Node[cylinder] Has empty key value[softCFM]
+[1;36mDbg[0m Node[cylinder] Has empty key value[maxVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[minDepth]
+[1;36mDbg[0m Node[empty] Has empty key value[]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[fdir1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounce]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kp]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kd]
+[1;36mDbg[0m Node[cylinder] Has empty key value[softCFM]
+[1;36mDbg[0m Node[cylinder] Has empty key value[maxVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[minDepth]
+[1;36mDbg[0m Node[empty] Has empty key value[]
+[1;36mDbg[0m Node[box] Has empty key value[mu1]
+[1;36mDbg[0m Node[box] Has empty key value[mu2]
+[1;36mDbg[0m Node[box] Has empty key value[fdir1]
+[1;36mDbg[0m Node[box] Has empty key value[slip1]
+[1;36mDbg[0m Node[box] Has empty key value[slip2]
+[1;36mDbg[0m Node[box] Has empty key value[bounce]
+[1;36mDbg[0m Node[box] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[box] Has empty key value[kp]
+[1;36mDbg[0m Node[box] Has empty key value[kd]
+[1;36mDbg[0m Node[box] Has empty key value[softCFM]
+[1;36mDbg[0m Node[box] Has empty key value[maxVel]
+[1;36mDbg[0m Node[box] Has empty key value[minDepth]
+[1;36mDbg[0m Node[empty] Has empty key value[]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[fdir1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounce]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kp]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kd]
+[1;36mDbg[0m Node[cylinder] Has empty key value[softCFM]
+[1;36mDbg[0m Node[cylinder] Has empty key value[maxVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[minDepth]
+[1;36mDbg[0m Node[empty] Has empty key value[]
+[1;36mDbg[0m Node[box] Has empty key value[mu1]
+[1;36mDbg[0m Node[box] Has empty key value[mu2]
+[1;36mDbg[0m Node[box] Has empty key value[fdir1]
+[1;36mDbg[0m Node[box] Has empty key value[slip1]
+[1;36mDbg[0m Node[box] Has empty key value[slip2]
+[1;36mDbg[0m Node[box] Has empty key value[bounce]
+[1;36mDbg[0m Node[box] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[box] Has empty key value[kp]
+[1;36mDbg[0m Node[box] Has empty key value[kd]
+[1;36mDbg[0m Node[box] Has empty key value[softCFM]
+[1;36mDbg[0m Node[box] Has empty key value[maxVel]
+[1;36mDbg[0m Node[box] Has empty key value[minDepth]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[fdir1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounce]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kp]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kd]
+[1;36mDbg[0m Node[cylinder] Has empty key value[softCFM]
+[1;36mDbg[0m Node[cylinder] Has empty key value[maxVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[minDepth]
+[1;36mDbg[0m Node[empty] Has empty key value[]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[fdir1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounce]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kp]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kd]
+[1;36mDbg[0m Node[cylinder] Has empty key value[softCFM]
+[1;36mDbg[0m Node[cylinder] Has empty key value[maxVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[minDepth]
+[1;36mDbg[0m Node[empty] Has empty key value[]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[mu2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[fdir1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip1]
+[1;36mDbg[0m Node[cylinder] Has empty key value[slip2]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounce]
+[1;36mDbg[0m Node[cylinder] Has empty key value[bounceVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kp]
+[1;36mDbg[0m Node[cylinder] Has empty key value[kd]
+[1;36mDbg[0m Node[cylinder] Has empty key value[softCFM]
+[1;36mDbg[0m Node[cylinder] Has empty key value[maxVel]
+[1;36mDbg[0m Node[cylinder] Has empty key value[minDepth]
 <gazebo version='1.0'>
   <model name='simple_arm' static='0'>
     <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
@@ -197,9 +313,9 @@
         <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.001000'/>
       </inertial>
       <collision name='arm_wrist_lift_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
+        <origin pose='0.000000 0.000000 0.500000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <cylinder radius='0.030000' length='0.300000'/>
+          <cylinder radius='0.030000' length='1.000000'/>
         </geometry>
         <surface>
           <friction>
@@ -212,9 +328,9 @@
         </surface>
       </collision>
       <visual name='arm_wrist_lift_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
+        <origin pose='0.000000 0.000000 0.500000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <cylinder radius='0.030000' length='0.300000'/>
+          <cylinder radius='0.030000' length='1.000000'/>
         </geometry>
         <material script='Gazebo/Yellow'/>
       </visual>
@@ -299,7 +415,7 @@
       <child link='arm_wrist_lift'/>
       <axis xyz='0.000000 0.000000 1.000000'>
         <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-0.100000' upper='0.100000' effort='0.000000' velocity='0.000000'/>
+        <limit lower='-0.800000' upper='0.100000' effort='0.000000' velocity='0.000000'/>
       </axis>
     </joint>
     <joint name='arm_wrist_roll_joint' type='revolute'>
