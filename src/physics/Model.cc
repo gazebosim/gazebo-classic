@@ -398,7 +398,7 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearVel();
   else
     return math::Vector3(0, 0, 0);
@@ -407,7 +407,7 @@ math::Vector3 Model::GetRelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearVel();
   else
     return math::Vector3(0, 0, 0);
@@ -416,7 +416,7 @@ math::Vector3 Model::GetWorldLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularVel();
   else
     return math::Vector3(0, 0, 0);
@@ -425,7 +425,7 @@ math::Vector3 Model::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularVel();
   else
     return math::Vector3(0, 0, 0);
@@ -435,7 +435,7 @@ math::Vector3 Model::GetWorldAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearAccel();
   else
     return math::Vector3(0, 0, 0);
@@ -444,7 +444,7 @@ math::Vector3 Model::GetRelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearAccel();
   else
     return math::Vector3(0, 0, 0);
@@ -453,7 +453,7 @@ math::Vector3 Model::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularAccel();
   else
     return math::Vector3(0, 0, 0);
@@ -462,7 +462,7 @@ math::Vector3 Model::GetRelativeAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularAccel();
   else
     return math::Vector3(0, 0, 0);
