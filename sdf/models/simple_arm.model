@@ -261,7 +261,7 @@
       <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='world'/>
       <child link='arm_shoulder_pan'/>
-      <axis xyz='1.000000 0.000000 0.000000'>
+      <axis xyz='0.000000 0.000000 1.000000'>
         <dynamics damping='0.000000' friction='0.000000'/>
         <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
       </axis>
@@ -270,7 +270,7 @@
       <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='arm_shoulder_pan'/>
       <child link='arm_shoulder'/>
-      <axis xyz='1.000000 0.000000 0.000000'>
+      <axis xyz='0.000000 0.000000 1.000000'>
         <dynamics damping='0.000000' friction='0.000000'/>
         <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
       </axis>
@@ -279,7 +279,7 @@
       <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='arm_shoulder'/>
       <child link='arm_elbow_pan'/>
-      <axis xyz='1.000000 0.000000 0.000000'>
+      <axis xyz='0.000000 0.000000 1.000000'>
         <dynamics damping='0.000000' friction='0.000000'/>
         <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
       </axis>
@@ -288,7 +288,7 @@
       <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='arm_elbow_pan'/>
       <child link='arm_elbow'/>
-      <axis xyz='1.000000 0.000000 0.000000'>
+      <axis xyz='0.000000 0.000000 1.000000'>
         <dynamics damping='0.000000' friction='0.000000'/>
         <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
       </axis>
