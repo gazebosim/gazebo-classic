@@ -542,10 +542,10 @@ static void ComputeRows(
 
 
 
-/*  DEBUG PRINTOUTS
+  /*  DEBUG PRINTOUTS
   // print J_orig
   printf("J_orig\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
       printf("	%12.6f",J_orig[i*12+j]);
     }
@@ -555,7 +555,7 @@ static void ComputeRows(
 
   // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
   printf("J_precon\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
       printf("	%12.6f",J_precon[i*12+j]);
     }
@@ -564,7 +564,7 @@ static void ComputeRows(
   printf("\n");
 
   printf("J\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
       printf("	%12.6f",J[i*12+j]);
     }
@@ -573,14 +573,15 @@ static void ComputeRows(
   printf("\n");
 
   printf("rhs_precon\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",rhs_precon[i]);
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("	%12.6f",rhs_precon[i]);
   printf("\n");
 
   printf("rhs\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",rhs[i]);
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("	%12.6f",rhs[i]);
   printf("\n");
-*/
-
+  */
 
   double rms_error = 0;
   int num_iterations = qs->num_iterations;
@@ -1775,6 +1776,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
           b_ptr->lvel[j] += stepsize * caccelcurr[j];
           b_ptr->avel[j] += stepsize * caccelcurr[3+j];
         }
+        // printf("caccel [%f %f %f] [%f %f %f]\n"
+        //   ,caccelcurr[0] ,caccelcurr[1] ,caccelcurr[2]
+        //   ,caccelcurr[3] ,caccelcurr[4] ,caccelcurr[5]);
+        // printf("  vel [%f %f %f] [%f %f %f]\n"
+        //   ,b_ptr->lvel[0] ,b_ptr->lvel[1] ,b_ptr->lvel[2]
+        //   ,b_ptr->avel[0] ,b_ptr->avel[1] ,b_ptr->avel[2]);
       }
     }
 
@@ -1835,6 +1842,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
         b_ptr->tacc[j] *= stepsize;
       }
       dMultiplyAdd0_331 (b_ptr->avel, invIrow, b_ptr->tacc);
+      // printf("fe [%f %f %f] [%f %f %f]\n"
+      //   ,b_ptr->facc[0] ,b_ptr->facc[1] ,b_ptr->facc[2]
+      //   ,b_ptr->tacc[0] ,b_ptr->tacc[1] ,b_ptr->tacc[2]);
+      /* DEBUG PRINTOUTS
+      printf("uncorrect vel [%f %f %f] [%f %f %f]\n"
+        ,b_ptr->lvel[0] ,b_ptr->lvel[1] ,b_ptr->lvel[2]
+        ,b_ptr->avel[0] ,b_ptr->avel[1] ,b_ptr->avel[2]);
+      */
     }
   }
 
@@ -1903,11 +1918,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
         b_ptr->lvel[j] += erp_removal * stepsize * caccelcurr[j];
         b_ptr->avel[j] += erp_removal * stepsize * caccelcurr[3+j];
       }
-      //printf(" %f  %f  %f  %f  %f  %f ",
-      //  b_ptr->lvel[0], b_ptr->lvel[1], b_ptr->lvel[2],
-      //  b_ptr->avel[0], b_ptr->avel[1], b_ptr->avel[2]);
+      /* DEBUG PRINTOUTS
+      printf("corrected vel [%f %f %f] [%f %f %f]\n\n",
+        b_ptr->lvel[0], b_ptr->lvel[1], b_ptr->lvel[2],
+        b_ptr->avel[0], b_ptr->avel[1], b_ptr->avel[2]);
+      */
     }
-    //printf("\n");
 
 #ifdef POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
     // ADD CACCEL CORRECTION FROM VELOCITY CONSTRAINT VIOLATION
