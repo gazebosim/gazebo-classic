@@ -9,6 +9,7 @@ set (plugins CameraPlugin
              GpuRayPlugin
              ContactPlugin
              RayPlugin
+             JointPIDControl
              DiffDrivePlugin)
 
 foreach (src ${plugins})
