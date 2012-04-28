@@ -54,9 +54,9 @@
     </link>
     <link name='arm_shoulder_pan' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.000000 0.000000 1.100000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='0.100000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.001000'/>
+      <inertial mass='1.100000'>
+        <origin pose='0.045455 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.011000' ixy='0.000000' ixz='0.000000' iyy='0.022500' iyz='0.000000' izz='0.013500'/>
       </inertial>
       <collision name='arm_shoulder_pan_geom' laser_retro='0.000000'>
         <origin pose='0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
@@ -80,15 +80,8 @@
         </geometry>
         <material script='Gazebo/Yellow'/>
       </visual>
-    </link>
-    <link name='arm_shoulder' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='0.050000 0.000000 1.100000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='1.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.001000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
-      </inertial>
-      <collision name='arm_shoulder_geom' laser_retro='0.000000'>
-        <origin pose='0.500000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_shoulder_pan_geom_arm_shoulder' laser_retro='0.000000'>
+        <origin pose='0.550000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='1.000000 0.050000 0.100000'/>
         </geometry>
@@ -102,8 +95,8 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_shoulder_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.500000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <visual name='arm_shoulder_pan_geom_arm_shoulder_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.550000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='1.000000 0.050000 0.100000'/>
         </geometry>
@@ -112,9 +105,9 @@
     </link>
     <link name='arm_elbow_pan' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='1.050000 0.000000 1.100000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='0.100000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.001000'/>
+      <inertial mass='1.200000'>
+        <origin pose='0.087500 0.000000 0.083333 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.031000' ixy='0.000000' ixz='-0.005000' iyy='0.072750' iyz='0.000000' izz='0.044750'/>
       </inertial>
       <collision name='arm_elbow_pan_geom' laser_retro='0.000000'>
         <origin pose='0.000000 0.000000 0.100000 0.000000 -0.000000 0.000000'/>
@@ -138,15 +131,8 @@
         </geometry>
         <material script='Gazebo/Red'/>
       </visual>
-    </link>
-    <link name='arm_elbow' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='1.100000 0.000000 1.200000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='1.100000'>
-        <origin pose='0.045455 0.000000 -0.009091 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.012000' ixy='0.000000' ixz='0.005000' iyy='0.046000' iyz='0.000000' izz='0.036000'/>
-      </inertial>
-      <collision name='arm_elbow_geom' laser_retro='0.000000'>
-        <origin pose='0.250000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_elbow_pan_geom_arm_elbow' laser_retro='0.000000'>
+        <origin pose='0.300000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.500000 0.030000 0.100000'/>
         </geometry>
@@ -160,15 +146,15 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_elbow_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.250000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <visual name='arm_elbow_pan_geom_arm_elbow_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.300000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.500000 0.030000 0.100000'/>
         </geometry>
         <material script='Gazebo/Yellow'/>
       </visual>
-      <collision name='arm_elbow_geom_arm_wrist' laser_retro='0.000000'>
-        <origin pose='0.500000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_elbow_pan_geom_arm_wrist' laser_retro='0.000000'>
+        <origin pose='0.550000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.050000' length='0.300000'/>
         </geometry>
@@ -182,8 +168,8 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_elbow_geom_arm_wrist_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.500000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <visual name='arm_elbow_pan_geom_arm_wrist_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.550000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.050000' length='0.300000'/>
         </geometry>
@@ -266,28 +252,10 @@
         <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
       </axis>
     </joint>
-    <joint name='arm_shoulder_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <parent link='arm_shoulder_pan'/>
-      <child link='arm_shoulder'/>
-      <axis xyz='0.000000 0.000000 1.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
-      </axis>
-    </joint>
     <joint name='arm_elbow_pan_joint' type='revolute'>
       <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <parent link='arm_shoulder'/>
+      <parent link='arm_shoulder_pan'/>
       <child link='arm_elbow_pan'/>
-      <axis xyz='0.000000 0.000000 1.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
-      </axis>
-    </joint>
-    <joint name='arm_elbow_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <parent link='arm_elbow_pan'/>
-      <child link='arm_elbow'/>
       <axis xyz='0.000000 0.000000 1.000000'>
         <dynamics damping='0.000000' friction='0.000000'/>
         <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
@@ -295,7 +263,7 @@
     </joint>
     <joint name='arm_wrist_lift_joint' type='prismatic'>
       <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <parent link='arm_elbow'/>
+      <parent link='arm_elbow_pan'/>
       <child link='arm_wrist_lift'/>
       <axis xyz='0.000000 0.000000 1.000000'>
         <dynamics damping='0.000000' friction='0.000000'/>
