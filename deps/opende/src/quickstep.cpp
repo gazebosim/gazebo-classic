@@ -1907,6 +1907,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
       for (int j=0; j<3; j++) {
         dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
         dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
+        b_ptr->lvel[j] += dv;
+        b_ptr->avel[j] += da;
+        /*
         dReal v0 = b_ptr->lvel[j];
         dReal a0 = b_ptr->avel[j];
         if (v0 * dv < 0) {
@@ -1921,6 +1924,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
           else
             b_ptr->avel[j] += da;
         }
+        */
         /*  DEBUG PRINTOUTS
         printf(" i[%d] v[%f] dv[%f] vf[%f] a[%f] da[%f] af[%f] debug[%f - %f]\n"
                ,j, v0, dv, b_ptr->lvel[j]

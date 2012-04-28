@@ -191,28 +191,51 @@ TEST_F(PhysicsTest, SimplePendulumTest)
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
+  physics::ModelPtr model = world->GetModel("model_1");
+  EXPECT_TRUE(model);
 
+  double g = 9.81;
+  double l = 10.0;
+  double m = 10.0;
+
+  double e;
+
+  {
+    // check velocity / energy
+    math::Vector3 vel = model->GetWorldLinearVel();
+    math::Pose pos = model->GetWorldPose();
+    double pe = 9.81 * m * pos.pos.z;
+    double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+    e = pe + ke;
+    gzerr << "total energy [" << e << "]\n";
+
+  }
   world->StepWorld(2000);
   {
     {
-      physics::ModelPtr model = world->GetModel("model_1");
-      if (model)
-      {
-        physics::JointPtr joint = model->GetJoint("joint_0");
-        if (joint)
-        {
-          double integ_theta = (1.5707963 -
-            PendulumAngle(-9.81, 10.0, 1.57079633, 0.0,
-                          world->GetSimTime().Double(), 0.000001));
-          double actual_theta = joint->GetAngle(0).GetAsRadian();
-          gzdbg << "time [" << world->GetSimTime().Double()
-                << "] exact [" << integ_theta
-                << "] actual [" << actual_theta
-                << "] pose [" << model->GetWorldPose()
-                << "]\n";
-           EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
-        }
-      }
+      // check velocity / energy
+      math::Vector3 vel = model->GetWorldLinearVel();
+      math::Pose pos = model->GetWorldPose();
+      double pe = 9.81 * m * pos.pos.z;
+      double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+      e = pe + ke;
+      gzerr << "total energy [" << e << "]\n";
+
+    }
+
+    physics::JointPtr joint = model->GetJoint("joint_0");
+    if (joint)
+    {
+      double integ_theta = (1.5707963 -
+        PendulumAngle(g, l, 1.57079633, 0.0,
+                      world->GetSimTime().Double(), 0.000001));
+      double actual_theta = joint->GetAngle(0).GetAsRadian();
+      gzdbg << "time [" << world->GetSimTime().Double()
+            << "] exact [" << integ_theta
+            << "] actual [" << actual_theta
+            << "] pose [" << model->GetWorldPose()
+            << "]\n";
+       EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
     }
   }
   Unload();
