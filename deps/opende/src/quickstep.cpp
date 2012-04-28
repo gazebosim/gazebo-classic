@@ -1898,28 +1898,38 @@ void dxQuickStepper (dxWorldProcessContext *context,
     dReal erp_removal = 1.00;
     IFTIMING (dTimerNow ("velocity update due to constraint forces"));
     // remove caccel_erp
-    const dReal *caccelcurr = caccel_erp;
+    const dReal *caccel_erp_curr = caccel_erp;
+    const dReal *caccel_curr = caccel;
     dxBody *const *const bodyend = body + nb;
     for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-         caccelcurr+=6, bodycurr++) {
+         caccel_curr+=6, caccel_erp_curr+=6, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] -= erp_removal * stepsize * caccelcurr[j];
-        b_ptr->avel[j] -= erp_removal * stepsize * caccelcurr[3+j];
+        dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
+        dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
+        dReal v0 = b_ptr->lvel[j];
+        dReal a0 = b_ptr->avel[j];
+        if (v0 * dv < 0) {
+          if (fabs(v0) < fabs(dv))
+            b_ptr->lvel[j] = 0.0;
+          else
+            b_ptr->lvel[j] += dv;
+        }
+        if (a0 * da < 0) {
+          if (fabs(a0) < fabs(da))
+            b_ptr->avel[j] = 0.0;
+          else
+            b_ptr->avel[j] += da;
+        }
+        /*  DEBUG PRINTOUTS
+        printf(" i[%d] v[%f] dv[%f] vf[%f] a[%f] da[%f] af[%f] debug[%f - %f]\n"
+               ,j, v0, dv, b_ptr->lvel[j]
+                 , a0, da, b_ptr->avel[j]
+               ,caccel_curr[j], caccel_erp_curr[j]);
+        */
       }
-    }
-    // use caccel without erp
-    caccelcurr = caccel;
-    //printf(" vel: ");
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-         caccelcurr+=6, bodycurr++) {
-      dxBody *b_ptr = *bodycurr;
-      for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] += erp_removal * stepsize * caccelcurr[j];
-        b_ptr->avel[j] += erp_removal * stepsize * caccelcurr[3+j];
-      }
-      /* DEBUG PRINTOUTS
-      printf("corrected vel [%f %f %f] [%f %f %f]\n\n",
+      /*  DEBUG PRINTOUTS
+      printf("corrected vel [%f %f %f] [%f %f %f]\n",
         b_ptr->lvel[0], b_ptr->lvel[1], b_ptr->lvel[2],
         b_ptr->avel[0], b_ptr->avel[1], b_ptr->avel[2]);
       */
