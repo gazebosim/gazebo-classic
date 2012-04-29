@@ -26,7 +26,6 @@ enum {RIGHT, LEFT};
 
 /////////////////////////////////////////////////
 DiffDrivePlugin::DiffDrivePlugin()
-  : leftPID(0.01, 0.0, 0.001), rightPID(0.01, 0.0, 0.001)
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
 }
@@ -86,9 +85,6 @@ void DiffDrivePlugin::Init()
   math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
 
   this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.5;
-
-  // this->wheelSpeed[LEFT] = 0.2;
-  // this->wheelSpeed[RIGHT] = 0.2;
 }
 
 /////////////////////////////////////////////////
@@ -117,34 +113,15 @@ void DiffDrivePlugin::OnUpdate()
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
-  */
   common::Time currTime = this->model->GetWorld()->GetSimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
-
-  double leftVel = this->leftJoint->GetVelocity(0);
-  double rightVel = this->rightJoint->GetVelocity(0);
+  */
 
   double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
   double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
-  double leftErr = leftVel - leftVelDesired;
-  double rightErr = rightVel - rightVelDesired;
-
-  double leftForce = this->leftPID.Update(leftErr, stepTime);
-  double rightForce = this->rightPID.Update(rightErr, stepTime);
-
-  if (leftForce < -this->torque)
-    leftForce = -this->torque;
-  if (leftForce > this->torque)
-    leftForce = this->torque;
-
-  if (rightForce < -this->torque)
-    rightForce = -this->torque;
-  if (rightForce > this->torque)
-    rightForce = this->torque;
-
-  // printf("LV[%7.4f] LD[%7.4f] LF[%7.4f] RV[%7.4f] RD[%7.4f] RF[%7.4f]\n",
-  // leftVel, leftVelDesired, leftForce, rightVel, rightVelDesired, rightForce);
-  this->leftJoint->SetForce(0, leftForce);
-  this->rightJoint->SetForce(0, rightForce);
+  this->leftJoint->SetVelocity(0, leftVelDesired);
+  this->rightJoint->SetVelocity(0, rightVelDesired);
+  this->leftJoint->SetMaxForce(0, this->torque);
+  this->rightJoint->SetMaxForce(0, this->torque);
 }

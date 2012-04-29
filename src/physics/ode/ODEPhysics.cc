@@ -662,8 +662,13 @@ void ODEPhysics::ConvertMass(void *_engineMass, const InertialPtr &_inertial)
   odeMass->I[2*4+2] = _inertial->GetPrincipalMoments()[2];
 
   odeMass->I[0*4+1] = _inertial->GetProductsofInertia()[0];
+  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[0];
+
   odeMass->I[0*4+2] = _inertial->GetProductsofInertia()[1];
+  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[1];
+
   odeMass->I[1*4+2] = _inertial->GetProductsofInertia()[2];
+  odeMass->I[2*4+1] = _inertial->GetProductsofInertia()[2];
 }
 
 //////////////////////////////////////////////////

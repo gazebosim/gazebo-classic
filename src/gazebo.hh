@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GAZEBO_HH
-#define GAZEBO_HH
+#ifndef __GAZEBO_HH__
+#define __GAZEBO_HH__
 
 #include <string>
 

@@ -16,7 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include "physics/physics.h"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 #include "transport/TransportTypes.hh"
 #include "msgs/MessageTypes.hh"

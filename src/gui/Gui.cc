@@ -18,7 +18,7 @@
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include "gui/qt.h"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"

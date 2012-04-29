@@ -19,7 +19,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "gazebo.h"
+#include "gazebo.hh"
 #include "transport/transport.h"
 #include "common/Timer.hh"
 #include "common/Exception.hh"

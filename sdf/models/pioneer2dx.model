@@ -3,9 +3,11 @@
     <link name="chassis">
       <origin pose="0.0 0.0 0.16 0 0 0"/>
 
-      <inertial mass="5.0">
+      <inertial mass="5.0"/>
+        <!--<origin pose="0.0 0 -0.07 0 0 0"/>
         <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+      </inertial> -->
+
       <collision name="collision">
         <geometry>
           <box size="0.445 0.277 0.17"/>
@@ -18,14 +20,38 @@
           <mesh filename="pioneer2dx/chassis.dae"/>
         </geometry>
       </visual>
+
+
+      <collision name="castor_collision">
+        <origin pose="-0.200 0 -0.12 0 0 0"/>
+        <geometry>
+          <sphere radius="0.04"/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu="0" mu2="0" slip1="1.0" slip2="1.0"/>
+          </friction>
+        </surface>
+      </collision>
+    
+      <visual name="castor_visual">
+        <origin pose="-0.200 0 -0.12 0 0 0"/>
+        <geometry>
+          <sphere radius="0.04"/>
+        </geometry>
+        <material script="Gazebo/FlatBlack"/>
+      </visual>
+
     </link>
     
     <link name="right_wheel">
       <origin pose="0.1 -.17 0.11 0 1.5707 1.5707"/>
   
       <inertial mass="0.5">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+        <inertia ixx='0.001' ixy='0.0' ixz='0'
+                 iyy='0.001' iyz='0.0'
+                 izz='0.001'/>
+      </inertial>
   
       <collision name="collision">
         <geometry>
@@ -33,13 +59,9 @@
         </geometry>
         <surface>
           <friction>
-            <ode mu='100.0' mu2='100.0'/>
+            <ode mu="100000.0" mu2="100000.0" slip1="0.0" slip2="0.0"/>
           </friction>
-          <contact>
-            <ode kp='1000000.0' kd='1.0'/>
-          </contact>
         </surface>
-
       </collision>
    
       <visual name="visual">
@@ -54,8 +76,11 @@
       <origin pose="0.1 .17 0.11 0 1.5707 1.5707"/>
   
       <inertial mass="0.5">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> 
+        <inertia ixx='0.001' ixy='0.0' ixz='0'
+                 iyy='0.001' iyz='0.0'
+                 izz='0.001'/>
+      </inertial>
+      
   
       <collision name="collision">
         <geometry>
@@ -63,48 +88,14 @@
         </geometry>
         <surface>
           <friction>
-            <ode mu='100.0' mu2='100.0'/>
+            <ode mu="100000.0" mu2="100000.0" slip1="0.0" slip2="0.0"/>
           </friction>
-          <contact>
-            <ode kp='1000000.0' kd='1.0'/>
-          </contact>
         </surface>
-
       </collision>
 
       <visual name="visual">
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
-        </geometry>
-        <material script="Gazebo/FlatBlack"/>
-      </visual>
-    </link>
-
-    <link name="castor">
-      <origin pose="-0.200 0 0.04 0 0 0"/>
-  
-      <inertial mass="0.1">
-        <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
-      </inertial> 
-  
-      <collision name="collision">
-        <geometry>
-          <sphere radius="0.04"/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='100.000000' mu2='100.0'/>
-          </friction>
-          <contact>
-            <ode kp='1000000.0' kd='1.0'/>
-          </contact>
-        </surface>
-
-      </collision>
-    
-      <visual name="visual">
-        <geometry>
-          <sphere radius="0.04"/>
         </geometry>
         <material script="Gazebo/FlatBlack"/>
       </visual>
@@ -124,17 +115,10 @@
       <axis xyz="0 1 0"/>
     </joint>
 
-    <joint type="ball" name="ball_joint">
-      <child link="castor"/>
-      <parent link="chassis"/>
-    </joint>
-
-    <!--
     <plugin filename="libDiffDrivePlugin.so" name="diff_drive">
       <left_joint>left_wheel_hinge</left_joint>
       <right_joint>right_wheel_hinge</right_joint>
       <torque>5</torque>
     </plugin>
-    -->
   </model>
 </gazebo>

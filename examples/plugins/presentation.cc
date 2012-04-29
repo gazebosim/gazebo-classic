@@ -25,7 +25,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/GUIOverlay.hh"
 #include "rendering/Visual.hh"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 namespace gazebo
 {

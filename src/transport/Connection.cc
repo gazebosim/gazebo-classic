@@ -477,10 +477,16 @@ std::string Connection::GetLocalAddress() const
 //////////////////////////////////////////////////
 unsigned int Connection::GetLocalPort() const
 {
-  if (this->socket && this->socket->is_open())
-    return this->socket->local_endpoint().port();
-  else if (this->acceptor)
-    return this->acceptor->local_endpoint().port();
+  try
+  {
+    if (this->socket && this->socket->is_open())
+      return this->socket->local_endpoint().port();
+    else if (this->acceptor)
+      return this->acceptor->local_endpoint().port();
+  }
+  catch (...)
+  {
+  }
 
   return 0;
 }
