@@ -15,6 +15,9 @@
  *
 */
 
+#ifndef __GAZEBO_PID_HH__
+#define __GAZEBO_PID_HH__
+
 #include "common/Time.hh"
 
 namespace gazebo
@@ -95,3 +98,4 @@ namespace gazebo
     };
   }
 }
+#endif

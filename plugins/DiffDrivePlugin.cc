@@ -84,7 +84,7 @@ void DiffDrivePlugin::Init()
   math::Box bb = parent->GetBoundingBox();
   math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
 
-  this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.5;
+  this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.25;
 }
 
 /////////////////////////////////////////////////
@@ -95,8 +95,8 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   vr = _msg->position().x();
   va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
 
-  this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2;
-  this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2;
+  this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2.0;
+  this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2.0;
 }
 
 /////////////////////////////////////////////////

@@ -31,8 +31,8 @@ set (gtest_sources
   pr2.cc
   common.cc
   laser.cc
-  file_handling.cc)
-# pioneer2dx.cc)
+  file_handling.cc
+  pioneer2dx.cc)
 
 foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})

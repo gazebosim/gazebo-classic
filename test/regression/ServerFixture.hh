@@ -491,7 +491,7 @@ class ServerFixture : public testing::Test
   private: unsigned char **imgData;
   private: int gotImage;
 
-  private: common::Time simTime, realTime, pauseTime;
+  protected: common::Time simTime, realTime, pauseTime;
   private: double percentRealTime;
   private: bool paused;
   private: bool serverRunning;

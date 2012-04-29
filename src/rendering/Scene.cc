@@ -1404,7 +1404,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
 
   COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
-  comVis->Load();
+  comVis->Load(_msg);
   comVis->SetVisible(false);
   this->visuals[comVis->GetName()] = comVis;
 

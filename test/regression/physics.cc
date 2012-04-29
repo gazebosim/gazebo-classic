@@ -98,8 +98,8 @@ TEST_F(PhysicsTest, DropStuff)
     double g = -10.0;
     double dt = world->GetPhysicsEngine()->GetStepTime();
 
-    //world->StepWorld(1428);  // theoretical contact, but
-    //world->StepWorld(100);  // integration error requires few more steps
+    // world->StepWorld(1428);  // theoretical contact, but
+    // world->StepWorld(100);  // integration error requires few more steps
 
     int steps = test_duration/dt;
     bool post_contact_correction = false;
@@ -116,37 +116,67 @@ TEST_F(PhysicsTest, DropStuff)
         physics::ModelPtr box_model = world->GetModel("box");
         if (box_model)
         {
+          math::Vector3 vel = box_model->GetWorldLinearVel();
           math::Pose pose = box_model->GetWorldPose();
-          gzdbg << "time [" << world->GetSimTime().Double()
-                << "] box z [" << pose.pos.z << "] computed z [" << z << "]\n";
+          gzdbg << "box time [" << world->GetSimTime().Double()
+                << "] sim z [" << pose.pos.z
+                << "] exact z [" << z
+                << "] sim vz [" << vel.z
+                << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
             EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+          }
           else
+          {
+            EXPECT_TRUE(fabs(vel.z) < 0.0017);
             EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+          }
         }
 
         physics::ModelPtr sphere_model = world->GetModel("sphere");
         if (sphere_model)
         {
+          math::Vector3 vel = sphere_model->GetWorldLinearVel();
           math::Pose pose = sphere_model->GetWorldPose();
-          gzdbg << "time [" << world->GetSimTime().Double()
-                << "] sphere z [" << pose.pos.z << "] computed z [" << z << "]\n";
+          gzdbg << "sphere time [" << world->GetSimTime().Double()
+                << "] sim z [" << pose.pos.z
+                << "] exact z [" << z
+                << "] sim vz [" << vel.z
+                << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
             EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+          }
           else
+          {
+            EXPECT_TRUE(fabs(vel.z) < 3e-5);
             EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+          }
         }
 
         physics::ModelPtr cylinder_model = world->GetModel("cylinder");
         if (cylinder_model)
         {
+          math::Vector3 vel = cylinder_model->GetWorldLinearVel();
           math::Pose pose = cylinder_model->GetWorldPose();
-          gzdbg << "time [" << world->GetSimTime().Double()
-                << "] cylinder z [" << pose.pos.z << "] computed z [" << z << "]\n";
+          gzdbg << "cylinder time [" << world->GetSimTime().Double()
+                << "] sim z [" << pose.pos.z
+                << "] exact z [" << z
+                << "] sim vz [" << vel.z
+                << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
             EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+          }
           else
+          {
+            EXPECT_TRUE(fabs(vel.z) < 0.011);
             EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+          }
         }
       }
       if (z < 0.5) post_contact_correction = true;
