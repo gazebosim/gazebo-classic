@@ -172,7 +172,7 @@ void Heightmap::ConfigureTerrainDefaults()
   defaultimp.worldSize = this->terrainSize.x;
 
   defaultimp.inputScale = this->terrainSize.z / this->maxPixel;
-  std::cout << "MaxPixel[" << this->maxPixel << "] Scale[" << defaultimp.inputScale << "]\n";
+
   defaultimp.minBatchSize = 33;
   defaultimp.maxBatchSize = 65;
 
@@ -229,7 +229,6 @@ void Heightmap::DefineTerrain(int x, int y)
     if (flipY)
       img.flipAroundX();
 
-    std::cout << "Define terrain[" << x << " " << y << "]HeightImage[" << this->heightImage << "]\n";
     // this->GetTerrainImage(x % 2 != 0, y % 2 != 0, img);
     this->terrainGroup->defineTerrain(x, y, &img);
     this->terrainsImported = true;

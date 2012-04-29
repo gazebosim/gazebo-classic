@@ -70,8 +70,8 @@ namespace gazebo
 
       /// \brief Get the name of the visual
       public: std::string GetName() const;
-             
-      /// \brief Get the type of the light 
+
+      /// \brief Get the type of the light
       public: std::string GetType() const;
 
       /// \brief Set the position of the light

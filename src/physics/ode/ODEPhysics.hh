@@ -180,7 +180,8 @@ namespace gazebo
       public: void Collide(ODECollision *collision1, ODECollision *collision2,
                            dContactGeom *contactCollisions);
 
-      public: void ProcessContactFeedback(ContactFeedback* feedback);
+      public: void ProcessContactFeedback(ContactFeedback* feedback,
+                                          msgs::Contact *_msg);
 
       public: virtual void DebugPrint() const;
 
@@ -216,6 +217,7 @@ namespace gazebo
       private: std::string stepType;
 
       private: std::vector<ContactFeedback*> contactFeedbacks;
+      private: unsigned int contactFeedbackIndex;
 
       private: std::map<std::string, dSpaceID> spaces;
 

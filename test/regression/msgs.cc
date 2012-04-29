@@ -551,7 +551,7 @@ TEST_F(MsgsTest, SDF)
            <visual name='visual' cast_shadows='false'>\
              <origin pose='1 1 1 1 2 3'/>\
              <geometry>\
-               <heightmap size='1 2 3' filename='test.mesh' offset='0 0 1'/>\
+               <heightmap size='1 2 3' filename='test.mesh' origin='0 0 0'/>\
              </geometry>\
              <material script='Gazebo/Grey'>\
              <shader type='throw'/>\

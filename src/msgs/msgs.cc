@@ -494,8 +494,6 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
   return result;
 }
 
-
-
 msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Fog result;

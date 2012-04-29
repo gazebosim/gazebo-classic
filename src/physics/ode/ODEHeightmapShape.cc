@@ -93,7 +93,7 @@ void ODEHeightmapShape::FillHeightMap()
       px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       h2 = (px3 - ((px3 - px4) * dx));
 
-      h = (h1 - ((h1 - h2) * dy)) * this->odeScale.z; 
+      h = (h1 - ((h1 - h2) * dy)) * this->odeScale.z;
 
       // Store the height for future use
       this->heights[y * this->odeVertSize + x] = h;

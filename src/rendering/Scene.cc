@@ -255,6 +255,13 @@ void Scene::Init()
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
+
+  /* TODO: Add GUI option to view all contacts
+  ContactVisualPtr contactVis(new ContactVisual(
+        "_GUIONLY_world_contact_vis",
+        this->worldVisual, "~/physics/contacts"));
+  this->visuals[contactVis->GetName()] = contactVis;
+  */
 }
 
 //////////////////////////////////////////////////
@@ -1375,7 +1382,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       return false;
 
     RFIDTagVisualPtr rfidVis(new RFIDTagVisual(
-          _msg->name() + "_rfidtag_vis", parentVis, _msg->topic()));
+          _msg->name() + "_GUIONLY_rfidtag_vis", parentVis, _msg->topic()));
 
     std::cout << "rfid vis message recieved" << std::endl;
     this->visuals[rfidVis->GetName()] = rfidVis;
@@ -1388,7 +1395,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       return false;
 
     RFIDVisualPtr rfidVis(new RFIDVisual(
-          _msg->name() + "_rfid_vis", parentVis, _msg->topic()));
+          _msg->name() + "_GUIONLY_rfid_vis", parentVis, _msg->topic()));
     this->visuals[rfidVis->GetName()] = rfidVis;
   }
 

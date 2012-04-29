@@ -4,7 +4,7 @@
     <include filename="ground_plane.model"/>
     <include filename="sun.light"/>
 
-    <model name="box" static="true">
+    <model name="box">
       <origin pose="0 0 .5 0 0 0"/>
       <link name="link">
         <inertial mass="1.0">

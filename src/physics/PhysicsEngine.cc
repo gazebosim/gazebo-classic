@@ -47,13 +47,18 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->physicsSub = this->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->responsePub =
+    this->node->Advertise<msgs::Response>("~/response");
+  this->contactPub =
+    this->node->Advertise<msgs::Contacts>("~/physics/contacts");
+
   this->requestSub = this->node->Subscribe("~/request",
                                            &PhysicsEngine::OnRequest, this);
 
   this->physicsUpdateMutex = new boost::recursive_mutex();
 }
 
+//////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
   this->world.reset();

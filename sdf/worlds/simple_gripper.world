@@ -5,8 +5,8 @@
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
-        <solver type="quick" dt="0.003" iters="10" sor="1.3"/>
-        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="5.0" contact_surface_layer="0.001"/>
+        <solver type="quick" dt="0.003" iters="100" sor="1.3"/>
+        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="0.0" contact_surface_layer="0.001"/>
       </ode>
     </physics>
 
@@ -18,18 +18,18 @@
 
     <include filename="simple_gripper.model"/>
 
-    <model name="box">
+    <model name="cylinder">
       <origin pose="0.25 0 0.2 0 0 0"/>
       <link name="link">
         <inertial mass="0.01"/>
         <collision name="collision">
           <geometry>
-            <box size="0.25 0.25 0.4"/>
+            <cylinder radius="0.125" length="0.4"/>
           </geometry>
         </collision>
         <visual name="virtual">
           <geometry>
-            <box size="0.25 0.25 0.4"/>
+            <cylinder radius="0.13" length="0.4"/>
           </geometry>
         </visual>
       </link>

@@ -484,7 +484,7 @@ unsigned int Connection::GetLocalPort() const
     else if (this->acceptor)
       return this->acceptor->local_endpoint().port();
   }
-  catch (...)
+  catch(...)
   {
   }
 

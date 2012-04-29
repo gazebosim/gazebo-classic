@@ -175,7 +175,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
         "contact_max_correcting_vel"));
 
   // This helps prevent jittering problems.
-  dWorldSetContactSurfaceLayer(this->worldId, 
+  dWorldSetContactSurfaceLayer(this->worldId,
        odeElem->GetOrCreateElement("constraints")->GetValueDouble(
         "contact_surface_layer"));
 
@@ -309,57 +309,28 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
-  this->contactPairs.clear();
-
+  unsigned int i = 0;
   this->collidersCount = 0;
   this->trimeshCollidersCount = 0;
 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
 
-  for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
-    delete this->contactFeedbacks[i];
-  this->contactFeedbacks.clear();
+  this->contactFeedbackIndex = 0;
 
-  // Collide all the collisions
-  // if (this->colliders.size() < 50)
-  // if (this->collidersCount < 50)
-  // {
-      for (unsigned int i = 0; i < this->collidersCount; i++)
-      {
-        this->Collide(this->colliders[i].first,
-                      this->colliders[i].second, this->contactCollisions);
-      }
-  // }
-  // else
-  // {
-  // tbb::parallel_for(tbb::blocked_range<size_t>(0,
-  //       this->collidersCount, 10),
-  //       Colliders_TBB(&this->colliders, this, this->contactCollisions));
-  // }
+  for (i = 0; i < this->collidersCount; ++i)
+  {
+    this->Collide(this->colliders[i].first,
+        this->colliders[i].second, this->contactCollisions);
+  }
 
   // Trimesh collision must happen in this thread sequentially
-  for (unsigned int i = 0; i < this->trimeshCollidersCount; i++)
+  for (i = 0; i < this->trimeshCollidersCount; ++i)
   {
     ODECollision *collision1 = this->trimeshColliders[i].first;
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
-
-  // printf("ContactFeedbacks[%d]\n", this->contactFeedbacks.size());
-  // Process all the contact feedbacks
-  // tbb not has memeory issues
-  // if (this->contactFeedbacks.size() < 50)
-  // {
-  // }
-  // else
-  // {
-  //  // Process all the contacts, get the feedback info, and call the collision
-  //  // callbacks
-  //  tbb::parallel_for(tbb::blocked_range<size_t>(0,
-  //        this->contactFeedbacks.size(), MAX_CONTACT_JOINTS),
-  //      ContactUpdate_TBB(&this->contactFeedbacks));
-  // }
 }
 
 //////////////////////////////////////////////////
@@ -368,12 +339,18 @@ void ODEPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   {
     this->physicsUpdateMutex->lock();
+
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
 
+    msgs::Contacts msg;
+
     // put contact forces into contact feedbacks
-    for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
-      this->ProcessContactFeedback(this->contactFeedbacks[i]);
+    for (unsigned int i = 0; i < this->contactFeedbackIndex; ++i)
+      this->ProcessContactFeedback(this->contactFeedbacks[i],
+                                   msg.add_contact());
+
+    this->contactPub->Publish(msg);
 
     dJointGroupEmpty(this->contactGroup);
     this->physicsUpdateMutex->unlock();
@@ -819,15 +796,22 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   ContactFeedback *contactFeedback = NULL;
 
-  if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
+  //if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
   {
-    contactFeedback = new ContactFeedback();
+    if (this->contactFeedbackIndex < this->contactFeedbacks.size())
+      contactFeedback = this->contactFeedbacks[this->contactFeedbackIndex++];
+    else
+    {
+      contactFeedback = new ContactFeedback();
+      this->contactFeedbacks.push_back(contactFeedback);
+      this->contactFeedbackIndex = this->contactFeedbacks.size();
+    }
+
     contactFeedback->contact.collision1 = _collision1;
     contactFeedback->contact.collision2 = _collision2;
     contactFeedback->feedbackCount = 0;
     contactFeedback->contact.count = 0;
     contactFeedback->contact.time = this->world->GetSimTime();
-    this->contactFeedbacks.push_back(contactFeedback);
   }
 
   double h = this->stepTimeDouble;
@@ -916,18 +900,13 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       dJointSetFeedback(contact_joint, &(contactFeedback->feedbacks[j]));
     }
 
-
     dJointAttach(contact_joint, b1, b2);
-
-    // my joints map
-    LinkPtr link1 = _collision1->GetLink();
-    LinkPtr link2 = _collision2->GetLink();
-    this->AddLinkPair(link1, link2);
   }
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback)
+void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
+                                        msgs::Contact *_msg)
 {
   if (_feedback->contact.collision1 == NULL)
     gzerr << "collision update Collision1 is null\n";
@@ -935,9 +914,16 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback)
   if (_feedback->contact.collision2 == NULL)
     gzerr << "Collision update Collision2 is null\n";
 
+  _msg->set_collision1(_feedback->contact.collision1->GetScopedName());
+  _msg->set_collision2(_feedback->contact.collision2->GetScopedName());
+
   // Copy all the joint forces to the contact
   for (int i = 0; i < _feedback->feedbackCount; i++)
   {
+    msgs::Set(_msg->add_position(), _feedback->contact.positions[i]);
+    msgs::Set(_msg->add_normal(), _feedback->contact.normals[i]);
+    _msg->add_depth(_feedback->contact.depths[i]);
+
     _feedback->contact.forces[i].body1Force.Set(
         _feedback->feedbacks[i].f1[0],
         _feedback->feedbacks[i].f1[1],
