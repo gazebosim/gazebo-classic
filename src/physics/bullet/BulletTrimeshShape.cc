@@ -79,20 +79,42 @@ void BulletTrimeshShape::Init()
     vertices[j*3+2] = vertices[j*3+2] * this->sdf->GetValueVector3("scale").z;
   }
 
+  printf("Num Indices[%d] Vertices[%d]\n", numIndices, numVertices);
+
   // Create the Bullet trimesh
-  for (unsigned int j = 0; j < numIndices; j += 3)
+  for (unsigned int j = 0; j+3 < numIndices; j += 3)
   {
+    /*
+    printf("J[%d] [%d][%d][%d]\n",j, indices[j], indices[j]+1, indices[j]+2);
+    printf("J[%d] [%d][%d][%d]\n",j+1, indices[j+1], indices[j+1]+1,indices[j+1]+2);
+    printf("J[%d] [%d][%d][%d]\n",j+2, indices[j+2], indices[j+2]+1,indices[j+2]+2);
+    math::Vector3 v0(vertices[indices[j]+0],
+                     vertices[indices[j]+1],
+                     vertices[indices[j]+2]);
+
+    math::Vector3 v1(vertices[indices[j+1]+0],
+                     vertices[indices[j+1]+1],
+                     vertices[indices[j+1]+2]);
+
+    math::Vector3 v2(vertices[indices[j+2]+0],
+                     vertices[indices[j+2]+1],
+                     vertices[indices[j+2]+2]);
+
+    std::cout << "\n-----------------\n";
+    std::cout << v0 << "\n" << v1 << "\n" << v2 << "\n--------------------\n";
+    */
+
     btVector3 v0(vertices[indices[j]+0],
-                 vertices[indices[j]+1],
-                 vertices[indices[j]+2]);
+               vertices[indices[j]+1],
+               vertices[indices[j]+2]);
 
     btVector3 v1(vertices[indices[j+1]+0],
-                 vertices[indices[j+1]+1],
-                 vertices[indices[j+1]+2]);
+               vertices[indices[j+1]+1],
+               vertices[indices[j+1]+2]);
 
     btVector3 v2(vertices[indices[j+2]+0],
-                 vertices[indices[j+2]+1],
-                 vertices[indices[j+2]+2]);
+                     vertices[indices[j+2]+1],
+                     vertices[indices[j+2]+2]);
 
     mTriMesh->addTriangle(v0,v1,v2);
   }
