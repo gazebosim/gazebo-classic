@@ -59,6 +59,12 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 }
 
 //////////////////////////////////////////////////
+void PhysicsEngine::Load(sdf::ElementPtr _sdf)
+{
+  this->sdf->Copy(_sdf);
+}
+
+//////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
   this->world.reset();
@@ -97,4 +103,26 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
     result = this->CreateCollision(_shapeType, link);
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetUpdateRate(double _value)
+{
+  this->sdf->GetAttribute("update_rate")->Set(_value);
+  this->updateRateDouble = _value;
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetUpdateRate()
+{
+  return this->updateRateDouble;
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetUpdatePeriod()
+{
+  if (this->updateRateDouble > 0)
+    return 1.0/this->updateRateDouble;
+  else
+    return 0;
 }

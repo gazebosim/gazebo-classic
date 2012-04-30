@@ -121,13 +121,10 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->worldId = dWorldCreate();
 
-  // this->spaceId = dSimpleSpaceCreate(0);
   this->spaceId = dHashSpaceCreate(0);
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
-
-  // this->lastCollisionUpdateTime = common::Time(0.0);
 }
 
 //////////////////////////////////////////////////
@@ -157,7 +154,8 @@ ODEPhysics::~ODEPhysics()
 //////////////////////////////////////////////////
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf->Copy(_sdf);
+  PhysicsEngine::Load(_sdf);
+
   sdf::ElementPtr odeElem = this->sdf->GetOrCreateElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetOrCreateElement("solver");
 
@@ -219,6 +217,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
     gzthrow(std::string("Invalid step type[") + this->stepType);
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 {
   msgs::Response response;
@@ -248,6 +247,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_dt())
@@ -372,27 +372,7 @@ void ODEPhysics::Reset()
   this->physicsUpdateMutex->unlock();
 }
 
-//////////////////////////////////////////////////
-void ODEPhysics::SetUpdateRate(double _value)
-{
-  this->sdf->GetAttribute("update_rate")->Set(_value);
-  this->updateRateDouble = _value;
-}
 
-//////////////////////////////////////////////////
-double ODEPhysics::GetUpdateRate()
-{
-  return this->updateRateDouble;
-}
-
-//////////////////////////////////////////////////
-double ODEPhysics::GetUpdatePeriod()
-{
-  if (this->updateRateDouble > 0)
-    return 1.0/this->updateRateDouble;
-  else
-    return 0;
-}
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetStepTime(double _value)
@@ -408,7 +388,6 @@ double ODEPhysics::GetStepTime()
 {
   return this->stepTimeDouble;
 }
-
 
 //////////////////////////////////////////////////
 LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
@@ -483,7 +462,7 @@ dWorldID ODEPhysics::GetWorldId()
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *_engineMass)
+void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 
@@ -625,7 +604,7 @@ int ODEPhysics::GetMaxContacts()
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ConvertMass(void *_engineMass, const InertialPtr &_inertial)
+void ODEPhysics::ConvertMass(void *_engineMass, InertialPtr _inertial)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 

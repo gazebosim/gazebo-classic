@@ -18,58 +18,47 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
-/*
-#include <sstream>
 
 #include "common/Console.hh"
-
-#include "physics/Collision.hh"
-#include "BulletMotionState.hh"
-#include "math/Quaternion.hh"
 #include "common/Exception.hh"
-#include "BulletPhysics.hh"
-#include "PhysicsEngine.hh"
-#include "rendering/Visual.hh"
 
-#include "BulletBody.hh"
-*/
+#include "physics/World.hh"
+
+#include "physics/bullet/bullet_inc.h"
+#include "physics/bullet/BulletCollision.hh"
+#include "physics/bullet/BulletMotionState.hh"
+#include "physics/bullet/BulletPhysics.hh"
+#include "physics/bullet/BulletLink.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
-BulletLink::BulletLink(Entity *_parent)
-    : Link(parent)
+BulletLink::BulletLink(EntityPtr _parent)
+    : Link(_parent)
 {
-  this->bulletPhysics = dynamic_cast<BulletPhysics*>(this->physicsEngine);
-
   this->rigidLink = NULL;
-  this->compoundShape = new btCompoundShape;
+  // this->compoundShape = new btCompoundShape;
   this->motionState = new BulletMotionState(this);
-
-  if (this->bulletPhysics == NULL)
-    gzthrow("Not using the bullet physics engine");
 }
-
 
 //////////////////////////////////////////////////
 BulletLink::~BulletLink()
 {
-  delete this->rigidLink;
 }
 
 //////////////////////////////////////////////////
-void BulletLink::Load(common::XMLConfigNode *_node)
+void BulletLink::Load(sdf::ElementPtr _sdf)
 {
-  Link::Load(_node);
-  btScalar btMass = 0.0;
-  btmath::Vector3 fallInertia(0, 0, 0);
+  this->bulletPhysics = boost::shared_dynamic_cast<BulletPhysics>(
+      this->GetWorld()->GetPhysicsEngine());
 
-  // Set the initial pose of the body
-  this->motionState->SetVisual(this->visualNode);
-  this->motionState->SetWorldPose(this->GetWorldPose());
+  if (this->bulletPhysics == NULL)
+    gzthrow("Not using the bullet physics engine");
 
+  Link::Load(_sdf);
+
+  /*
   btTransform principal;
   btmath::Vector3 principalInertia;
 
@@ -80,64 +69,63 @@ void BulletLink::Load(common::XMLConfigNode *_node)
     this->UpdateCoM();
     btMass = this->mass.GetAsDouble();
 
-    /*int i;
+    //int i;
 
-    btScalar *masses = new btScalar[this->collisions.size()];
-    std::map< std::string, Collision* >::iterator iter;
+    //btScalar *masses = new btScalar[this->collisions.size()];
+    //std::map< std::string, Collision* >::iterator iter;
 
-    // Get a list of all the collision masses
-    for (iter = this->collisions.begin(),
- i = 0; iter != collisions.end(); iter++, i++)
-      masses[i] = iter->second->GetMass().GetAsDouble();
+    //// Get a list of all the collision masses
+    //for (iter = this->collisions.begin(),
+ i =// 0; iter != collisions.end(); iter++, i++)
+    //  masses[i] = iter->second->GetMass().GetAsDouble();
 
-    // Calculate the center of mass of the compound shape
-    this->compoundShape->calculatePrincipalAxisTransform(masses, principal,
-                                                         principalInertia);
+    //// Calculate the center of mass of the compound shape
+    //this->compoundShape->calculatePrincipalAxisTransform(masses, principal,
+    //                                                     principalInertia);
 
-    // Convert to gazebo poses
-    math::Pose princ = BulletPhysics::ConvertPose(principal);
-    math::Pose inverse = BulletPhysics::ConvertPose(principal.inverse());
+    //// Convert to gazebo poses
+    //math::Pose princ = BulletPhysics::ConvertPose(principal);
+    //math::Pose inverse = BulletPhysics::ConvertPose(principal.inverse());
 
-    // Store the Center of Mass offset in the motion state
-    this->motionState->SetCoMOffset(princ);
+    //// Store the Center of Mass offset in the motion state
+    //this->motionState->SetCoMOffset(princ);
 
-    // Move the body visual to match the center of mass offset
-    math::Pose tmp = this->GetRelativePose();
-    tmp.pos += princ.pos;
-    this->SetRelativePose(tmp, false);
+    //// Move the body visual to match the center of mass offset
+    //math::Pose tmp = this->GetRelativePose();
+    //tmp.pos += princ.pos;
+    //this->SetRelativePose(tmp, false);
 
-    // Move all the collisions relative to the center of mass
-    for (iter = this->collisions.begin(),
- i = 0; i < this->collisions.size(); i++, iter++)
-    {
-      math::Pose origPose, newPose;
+    //// Move all the collisions relative to the center of mass
+    //for (iter = this->collisions.begin(),
+ i =// 0; i < this->collisions.size(); i++, iter++)
+    //{
+    //  math::Pose origPose, newPose;
 
-      // The original pose of the collisionetry
-      origPose = BulletPhysics::ConvertPose(
-                                  this->compoundShape->getChildTransform(i));
+    //  // The original pose of the collisionetry
+    //  origPose = BulletPhysics::ConvertPose(
+    //                              this->compoundShape->getChildTransform(i));
 
-      // Rotate the collisionetry around it's own axis. This will allow us to
-      // translate the collision so that the CoG is at the body's (0, 0, 0)
-      newPose.rot = origPose.CoordRotationAdd(princ.rot);
+    //  // Rotate the collisionetry around it's own axis. This will allow us to
+    //  // translate the collision so that the CoG is at the body's (0, 0, 0)
+    //  newPose.rot = origPose.CoordRotationAdd(princ.rot);
 
-      // Translate the collisionetry according the center of mass
-      newPose.pos = origPose.pos;
-      newPose.pos = newPose.CoordPositionAdd(inverse.pos);
+    //  // Translate the collisionetry according the center of mass
+    //  newPose.pos = origPose.pos;
+    //  newPose.pos = newPose.CoordPositionAdd(inverse.pos);
 
-      // Restore the original rotation of the collision.
-      newPose.rot = origPose.rot;
+    //  // Restore the original rotation of the collision.
+    //  newPose.rot = origPose.rot;
 
-      // Set the pose of the collision in Bullet
-      this->compoundShape->updateChildTransform(i,
-          BulletPhysics::ConvertPose(newPose));
+    //  // Set the pose of the collision in Bullet
+    //  this->compoundShape->updateChildTransform(i,
+    //      BulletPhysics::ConvertPose(newPose));
 
-      // Tell the Gazebo Collision that it's pose has changed. This will
-      // change the visual accordingly
-      iter->second->SetRelativePose(newPose);//, false);
+    //  // Tell the Gazebo Collision that it's pose has changed. This will
+    //  // change the visual accordingly
+    //  iter->second->SetRelativePose(newPose);//, false);
 
-      gzmsg << "Orig Pose[" << origPose << "] New Pose[" << newPose << "]\n";
-    }
-    */
+    //  gzmsg << "Orig Pose[" << origPose << "] New Pose[" << newPose << "]\n";
+    //}
 
     // Compute the interia vector
     this->compoundShape->calculateLocalInertia(btMass, fallInertia);
@@ -160,12 +148,55 @@ void BulletLink::Load(common::XMLConfigNode *_node)
   }
 
   this->physicsEngine->AddEntity(this);
+  */
 }
 
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
   Link::Init();
+
+  // Set the initial pose of the body
+  this->motionState->SetWorldPose(this->GetWorldPose());
+
+  std::cout << "GetWOrldPose[" << this->GetWorldPose() << "]\n";
+
+  btScalar btMass = this->inertial->GetMass();
+  btVector3 fallInertia(0, 0, 0);
+
+  btCollisionShape *shape = NULL;
+
+  std::cout << "Mass[" << btMass << "]\n";
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+    {
+      BulletCollisionPtr b = boost::shared_static_cast<BulletCollision>(*iter);
+      shape = b->GetCollisionShape();
+      shape->calculateLocalInertia(btMass, fallInertia);
+      break;
+    }
+  }
+
+  if (shape == NULL)
+    printf("No shapes\n");
+
+  // Create a construction info object
+  btRigidBody::btRigidBodyConstructionInfo
+    rigidLinkCI(btMass, this->motionState, shape, fallInertia);
+
+  // Create the new rigid body
+  this->rigidLink = new btRigidBody(rigidLinkCI);
+  // this->rigidLink->setUserPointer(this);
+  BulletPhysicsPtr phy = boost::shared_dynamic_cast<BulletPhysics>(
+      this->GetWorld()->GetPhysicsEngine());
+
+  btDynamicsWorld *wd = phy->GetDynamicsWorld();
+  if (!wd)
+    printf("error\n");
+
+  wd->addRigidBody(this->rigidLink);
 }
 
 //////////////////////////////////////////////////
@@ -181,8 +212,9 @@ void BulletLink::Update()
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetGravityMode(bool _mode)
+void BulletLink::SetGravityMode(bool /*_mode*/)
 {
+  /*
   if (!this->rigidLink)
     return;
 
@@ -196,6 +228,7 @@ void BulletLink::SetGravityMode(bool _mode)
     this->compoundShape->calculateLocalInertia(btMass, fallInertia);
     this->rigidLink->setMassProps(btMass, fallInertia);
   }
+  */
 }
 
 //////////////////////////////////////////////////
@@ -204,17 +237,16 @@ bool BulletLink::GetGravityMode()
   bool result = false;
   gzerr << "BulletLink::GetGravityMode not implemented, "
         << "returning spurious result\n";
-
   return result;
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetSelfCollide(bool _collide)
+void BulletLink::SetSelfCollide(bool /*_collide*/)
 {
 }
 
 //////////////////////////////////////////////////
-void BulletLink::AttachCollision(Collision *_collision)
+/*void BulletLink::AttachCollision(Collision *_collision)
 {
   Link::AttachCollision(_collision);
 
@@ -230,21 +262,25 @@ void BulletLink::AttachCollision(Collision *_collision)
   bcollision->SetCompoundShapeIndex(this->compoundShape->getNumChildShapes());
   this->compoundShape->addChildShape(trans, bcollision->GetCollisionShape());
 }
+  */
 
 //////////////////////////////////////////////////
 /// changed
 void BulletLink::OnPoseChange()
 {
+  /*
   math::Pose pose = this->GetWorldPose();
 
   this->motionState->SetWorldPose(pose);
   if (this->rigidLink)
     this->rigidLink->setMotionState(this->motionState);
+    */
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetEnabled(bool _enable) const
+void BulletLink::SetEnabled(bool /*_enable*/) const
 {
+  /*
   if (!this->rigidLink)
     return;
 
@@ -252,6 +288,7 @@ void BulletLink::SetEnabled(bool _enable) const
     this->rigidLink->activate(true);
   else
     this->rigidLink->setActivationState(WANTS_DEACTIVATION);
+    */
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -271,62 +308,75 @@ void BulletLink::SetEnabled(bool _enable) const
 */
 void BulletLink::UpdateCoM()
 {
-  Link::UpdateCoM();
+  // Link::UpdateCoM();
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetLinearVel(const math::Vector3 &_vel)
+void BulletLink::SetLinearVel(const math::Vector3 & /*_vel*/)
 {
+  /*
   if (!this->rigidLink)
     return;
 
   this->rigidLink->setLinearVelocity(btmath::Vector3(_vel.x, _vel.y, _vel.z));
+  */
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldLinearVel() const
 {
+  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
   btmath::Vector3 btVec = this->rigidLink->getLinearVelocity();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
+  */
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetAngularVel(const math::Vector3 &_vel)
+void BulletLink::SetAngularVel(const math::Vector3 &/*_vel*/)
 {
+  /*
   if (!this->rigidLink)
     return;
 
   this->rigidLink->setAngularVelocity(btmath::Vector3(_vel.x, _vel.y, _vel.z));
+  */
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldAngularVel() const
 {
+  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
   btmath::Vector3 btVec = this->rigidLink->getAngularVelocity();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
+  */
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetForce(const math::Vector3 &_force)
+void BulletLink::SetForce(const math::Vector3 &/*_force*/)
 {
+  /*
   if (!this->rigidLink)
     return;
 
   this->rigidLink->applyCentralForce(
       btmath::Vector3(_force.x, _force.y, _force.z));
+      */
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldForce() const
 {
+  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
@@ -335,21 +385,26 @@ math::Vector3 BulletLink::GetWorldForce() const
   btVec = this->rigidLink->getTotalForce();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
+  */
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetTorque(const math::Vector3 &_torque)
+void BulletLink::SetTorque(const math::Vector3 &/*_torque*/)
 {
+  /*
   if (!this->rigidLink)
     return;
 
   this->rigidLink->applyTorque(
       btmath::Vector3(_torque.x, _torque.y, _torque.z));
+      */
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldTorque() const
 {
+  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
@@ -358,30 +413,37 @@ math::Vector3 BulletLink::GetWorldTorque() const
   btVec = this->rigidLink->getTotalTorque();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
+  */
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-btRigidLink *BulletLink::GetBulletLink() const
+/*btRigidLink *BulletLink::GetBulletLink() const
 {
   return this->rigidLink;
 }
+*/
 
 //////////////////////////////////////////////////
-void BulletLink::SetLinearDamping(double _damping)
+void BulletLink::SetLinearDamping(double /*_damping*/)
 {
+  /*
   this->rigidLink->setDamping((btScalar)_damping,
       (btScalar)this->rigidLink->getAngularDamping());
+      */
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetAngularDamping(double _damping)
+void BulletLink::SetAngularDamping(double /*_damping*/)
 {
+  /*
   this->rigidLink->setDamping(
       (btScalar)this->rigidLink->getLinearDamping(), (btScalar)_damping);
+      */
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
+/*void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
     const math::Pose &_newPose)
 {
   std::map<std::string, Collision*>::iterator iter;
@@ -400,6 +462,30 @@ void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
     this->compoundShape->updateChildTransform(i,
         BulletPhysics::ConvertPose(_newPose));
   }
+}*/
+
+/////////////////////////////////////////////////
+void BulletLink::AddForce(const math::Vector3 &/*_force*/)
+{
 }
 
+/////////////////////////////////////////////////
+void BulletLink::AddRelativeForce(const math::Vector3 &/*_force*/)
+{
+}
 
+/////////////////////////////////////////////////
+void BulletLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
+                  const math::Vector3 &/*_relpos*/)
+{
+}
+
+/////////////////////////////////////////////////
+void BulletLink::AddTorque(const math::Vector3 &/*_torque*/)
+{
+}
+
+/////////////////////////////////////////////////
+void BulletLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
+{
+}

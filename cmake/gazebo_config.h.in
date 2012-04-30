@@ -19,7 +19,7 @@
 #cmakedefine HAVE_LTDL 1
 #cmakedefine HAVE_DL 1
 #cmakedefine ENABLE_SHADOWS 1
-#cmakedefine INCLUDE_BULLET 1
+#cmakedefine HAVE_BULLET 1
 #cmakedefine INCLUDE_RTSHADER 1
 
 #ifdef BUILD_TYPE_PROFILE

@@ -19,12 +19,14 @@
  * Date: 11 June 2007
  */
 
-// #include "physics/bullet/BulletPlaneShape.hh"
-// #include "physics/bullet/BulletSphereShape.hh"
-// #include "physics/bullet/BulletBoxShape.hh"
-// #include "physics/bullet/BulletCylinderShape.hh"
-// #include "BulletTrimeshShape.hh"
-// #include "MapShape.hh"
+#include "physics/bullet/BulletTypes.hh"
+#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletCollision.hh"
+#include "physics/bullet/BulletPlaneShape.hh"
+#include "physics/bullet/BulletSphereShape.hh"
+#include "physics/bullet/BulletBoxShape.hh"
+#include "physics/bullet/BulletCylinderShape.hh"
+#include "physics/bullet/BulletTrimeshShape.hh"
 
 // #include "physics/bullet/BulletHingeJoint.hh"
 // #include "physics/bullet/BulletHinge2Joint.hh"
@@ -32,9 +34,14 @@
 // #include "physics/bullet/BulletBallJoint.hh"
 // #include "physics/bullet/BulletUniversalJoint.hh"
 
+#include "physics/PhysicsTypes.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/World.hh"
 #include "physics/Entity.hh"
+#include "physics/Model.hh"
+#include "physics/SurfaceParams.hh"
+#include "physics/Collision.hh"
+#include "physics/MapShape.hh"
 
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -45,11 +52,11 @@
 using namespace gazebo;
 using namespace physics;
 
-GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics);
+GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics)
 
 //////////////////////////////////////////////////
-BulletPhysics::BulletPhysics(World *_world)
-    : PhysicsEngine(world)
+BulletPhysics::BulletPhysics(WorldPtr _world)
+    : PhysicsEngine(_world)
 {
   this->collisionConfig = new btDefaultCollisionConfiguration();
 
@@ -84,30 +91,22 @@ BulletPhysics::~BulletPhysics()
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::Load(common::XMLConfigNode *_node)
+void BulletPhysics::Load(sdf::ElementPtr _sdf)
 {
-  common::XMLConfigNode *cnode = _node->GetChild("bullet", "physics");
-  if (cnode == NULL)
-    gzthrow("Must define a <physics:ode> _node in the XML file");
+  PhysicsEngine::Load(_sdf);
 
-  this->stepTimeP->Load(cnode);
+  sdf::ElementPtr bulletElem = this->sdf->GetOrCreateElement("bullet");
 
-  this->gravityP->Load(cnode);
-}
+  this->stepTimeDouble = bulletElem->GetOrCreateElement("dt")->GetValueDouble();
 
-//////////////////////////////////////////////////
-void BulletPhysics::Save(std::string &_prefix, std::ostream &_stream)
-{
-  _stream << _prefix << "<physics:bullet>\n";
-  _stream << _prefix << "  " << *(this->gravityP) << "\n";
-  _stream << _prefix << "</physics:bullet>\n";
+  math::Vector3 g = this->sdf->GetOrCreateElement(
+      "gravity")->GetValueVector3("xyz");
+  this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::Init()
 {
-  math::Vector3 g = this->gravityP->GetValue();
-  this->dynamicsWorld->setGravity(btmath::Vector3(g.x, g.y, g.z));
 }
 
 //////////////////////////////////////////////////
@@ -123,84 +122,103 @@ void BulletPhysics::UpdateCollision()
 //////////////////////////////////////////////////
 void BulletPhysics::UpdatePhysics()
 {
-  /*common::Time time =
- Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
-  int steps = (int) round((time / **this->stepTimeP).Double());
+  // need to lock, otherwise might conflict with world resetting
+  this->physicsUpdateMutex->lock();
 
-  steps = std::max(steps, 1);
+  //int steps = (int) round((time / **this->stepTimeP).Double());
+
+  //steps = std::max(steps, 1);
 
   // time = 0.000001;
   // steps = 1;
   // this->dynamicsWorld->stepSimulation(time, steps, (**this->stepTimeP));
-  this->dynamicsWorld->stepSimulation((**this->stepTimeP).Double());
+  //this->dynamicsWorld->stepSimulation(this->stepTimeDouble);
+  this->dynamicsWorld->stepSimulation(1/60000.0, 10);//this->stepTimeDouble);
 
-  this->lastUpdatecommon::Time = Simulator::Instance()->GetRealTime();
-  */
+  this->physicsUpdateMutex->unlock();
 }
-
 
 //////////////////////////////////////////////////
 void BulletPhysics::Fini()
 {
 }
 
-
 //////////////////////////////////////////////////
-void BulletPhysics::RemoveEntity(Entity *_entity)
+void BulletPhysics::SetStepTime(double _value)
 {
+  this->sdf->GetOrCreateElement("ode")->GetOrCreateElement(
+      "solver")->GetAttribute("dt")->Set(_value);
+
+  this->stepTimeDouble = _value;
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::AddEntity(Entity *_entity)
+double BulletPhysics::GetStepTime()
 {
-  BulletLink *body = dynamic_cast<BulletLink*>(_entity);
-
-  this->dynamicsWorld->addRigidLink(body->GetBulletLink());
+  return this->stepTimeDouble;
 }
 
 //////////////////////////////////////////////////
-Link *BulletPhysics::CreateLink(Entity *parent)
+LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 {
-  BulletLink *body = new BulletLink(parent);
+  if (_parent == NULL)
+    gzthrow("Link must have a parent\n");
 
-  return body;
+  BulletLinkPtr link(new BulletLink(_parent));
+  link->SetWorld(_parent->GetWorld());
+
+  return link;
 }
 
 //////////////////////////////////////////////////
-Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
+CollisionPtr BulletPhysics::CreateCollision(const std::string &_type, 
+                                            LinkPtr _parent)
 {
-  BulletCollision *collision = NULL;
-  /*BulletLink *body = NULL;
-
-  body = dynamic_cast<BulletLink*>(parent);
-
-  if (body == NULL)
-    gzthrow("CreateCollision requires an BulletLink as a parent");
-
-  collision = new BulletCollision(parent);
-
-  if (type == "sphere")
-    new BulletSphereShape(collision);
-  if (type == "box")
-    new BulletBoxShape(collision);
-  if (type == "cylinder")
-    new BulletCylinderShape(collision);
-  if (type == "plane")
-    new BulletPlaneShape(collision);
-  if (type == "trimesh")
-    new BulletTrimeshShape(collision);
-  if (type == "map")
-    new MapShape(collision);
-  else
-    gzthrow("Unable to create a collision of type[" << type << "]");
-    */
-
+  BulletCollisionPtr collision(new BulletCollision(_parent));
+  ShapePtr shape = this->CreateShape(_type, collision);
+  collision->SetShape(shape);
+  shape->SetWorld(_parent->GetWorld());
   return collision;
 }
 
+//////////////////////////////////////////////////
+ShapePtr BulletPhysics::CreateShape(const std::string &_type,
+                                    CollisionPtr _collision)
+{
+  ShapePtr shape;
+  BulletCollisionPtr collision =
+    boost::shared_dynamic_cast<BulletCollision>(_collision);
+
+  if (_type == "plane")
+    shape.reset(new BulletPlaneShape(collision));
+  else if (_type == "sphere")
+    shape.reset(new BulletSphereShape(collision));
+  else if (_type == "box")
+    shape.reset(new BulletBoxShape(collision));
+  else if (_type == "cylinder")
+    shape.reset(new BulletCylinderShape(collision));
+  else if (_type == "mesh" || _type == "trimesh")
+    shape.reset(new BulletTrimeshShape(collision));
+  else 
+    gzerr << "Unable to create collision of type[" << _type << "]\n";
+
+  /*else if (_type == "multiray")
+    shape.reset(new BulletMultiRayShape(collision));
+  else if (_type == "heightmap")
+    shape.reset(new BulletHeightmapShape(collision));
+  else if (_type == "map" || _type == "image")
+    shape.reset(new MapShape(collision));
+  else if (_type == "ray")
+    if (_collision)
+      shape.reset(new BulletRayShape(collision, false));
+    else
+      shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
+    */
+  return shape;
+}
 
 //////////////////////////////////////////////////
-Joint *BulletPhysics::CreateJoint(std::string type)
+JointPtr BulletPhysics::CreateJoint(const std::string &/*_type*/)
 {
   /*if (type == "slider")
     return new BulletSliderJoint(this->dynamicsWorld);
@@ -216,16 +234,16 @@ Joint *BulletPhysics::CreateJoint(std::string type)
     gzthrow("Unable to create joint of type[" << type << "]");
     */
 
-  return NULL;
+  return JointPtr();
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::ConvertMass(Mass *_mass, void *_engineMass)
+void BulletPhysics::ConvertMass(InertialPtr /*_inertial*/, void * /*_engineMass*/)
 {
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::ConvertMass(void *_engineMass, const Mass &_mass)
+void BulletPhysics::ConvertMass(void * /*_engineMass*/, const InertialPtr /*_inertial*/)
 {
 }
 
@@ -236,14 +254,14 @@ void BulletPhysics::ConvertMass(void *_engineMass, const Mass &_mass)
 }*/
 
 //////////////////////////////////////////////////
-math::Pose BulletPhysics::ConvertPose(btTransform _bt)
+math::Pose BulletPhysics::ConvertPose(const btTransform &_bt)
 {
   math::Pose pose;
   pose.pos.x = _bt.getOrigin().getX();
   pose.pos.y = _bt.getOrigin().getY();
   pose.pos.z = _bt.getOrigin().getZ();
 
-  pose.rot.u = _bt.getRotation().getW();
+  pose.rot.w = _bt.getRotation().getW();
   pose.rot.x = _bt.getRotation().getX();
   pose.rot.y = _bt.getRotation().getY();
   pose.rot.z = _bt.getRotation().getZ();
@@ -252,22 +270,25 @@ math::Pose BulletPhysics::ConvertPose(btTransform _bt)
 }
 
 //////////////////////////////////////////////////
-btTransform BulletPhysics::ConvertPose(const math::Pose _pose)
+btTransform BulletPhysics::ConvertPose(const math::Pose &_pose)
 {
   btTransform trans;
 
-  trans.setOrigin(btmath::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
+  trans.setOrigin(btVector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
   trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                   _pose.rot.z, _pose.rot.u));
+                                 _pose.rot.z, _pose.rot.w));
   return trans;
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->gravityP->SetValue(_gravity);
-  this->dynamicsWorld->setGravity(btmath::Vector3(_gravity.x,
+  this->sdf->GetOrCreateElement("gravity")->GetAttribute("xyz")->Set(_gravity);
+  this->dynamicsWorld->setGravity(btVector3(_gravity.x,
         _gravity.y, _gravity.z));
 }
 
-
+//////////////////////////////////////////////////
+void BulletPhysics::DebugPrint() const
+{
+}

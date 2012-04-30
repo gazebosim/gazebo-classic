@@ -19,24 +19,24 @@
  * Date: 25 May 2009
  */
 
-#ifndef BULLETMOTIONSTATE
-#define BULLETMOTIONSTATE
+#ifndef __BULLETMOTIONSTATE_HH__
+#define __BULLETMOTIONSTATE_HH__
 
-#include <btBulletDynamicsCommon.h>
-
+#include "physics/bullet/bullet_inc.h"
+#include "math/MathTypes.hh"
+#include "physics/PhysicsTypes.hh"
 #include "math/Pose.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class Visual;
     class Link;
 
     class BulletMotionState : public btMotionState
     {
       /// \brief Constructor
-      public: BulletMotionState(Link *body);
+      public: BulletMotionState(Link *_link);
 
       /// \brief Constructor
       // public: BulletMotionState(const math::Pose &initPose);
@@ -44,39 +44,33 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletMotionState();
 
-      /// \brief Set the visual
-      public: void SetVisual(Visual *vis);
-
       /// \brief Get the pose
       public: math::Pose GetWorldPose() const;
 
       /// \brief Set the position of the body
       /// \param pos math::Vector position
-      public: virtual void SetWorldPosition(const math::Vector3 &pos);
+      public: virtual void SetWorldPosition(const math::Vector3 &_pos);
 
       /// \brief Set the rotation of the body
       /// \param rot Quaternion rotation
-      public: virtual void SetWorldRotation(const common::Quatern &rot);
+      public: virtual void SetWorldRotation(const math::Quaternion &_rot);
 
       /// \brief Set the pose
-      public: void SetWorldPose(const math::Pose &pose);
+      public: void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the center of mass offset
-      public: void SetCoMOffset(const math::Pose &com);
+      public: void SetCoMOffset(const math::Pose &_com);
 
       /// \brief Get the world transform
-      public: virtual void getWorldTransform(btTransform &worldTrans) const;
+      public: virtual void getWorldTransform(btTransform &_worldTrans) const;
 
       /// \brief Set the world transform
-      public: virtual void setWorldTransform(const btTransform &worldTrans);
+      public: virtual void setWorldTransform(const btTransform &_worldTrans);
 
-      private: Visual *visual;
       private: math::Pose worldPose;
       private: math::Pose comOffset;
-      private: Link *body;
+      private: Link *link;
     };
   }
 }
 #endif
-
-

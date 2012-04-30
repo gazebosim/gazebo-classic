@@ -49,7 +49,7 @@ namespace gazebo
 
       /// \brief Load the physics engine
       /// \param _sdf Pointer to the SDF parameters
-      public: virtual void Load(sdf::ElementPtr _sdf) = 0;
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the physics engine
       public: virtual void Init() = 0;
@@ -65,11 +65,11 @@ namespace gazebo
       public: virtual void UpdateCollision() = 0;
 
       /// \brief Set the simulation update rate
-      public: virtual void SetUpdateRate(double _value) = 0;
+      public: void SetUpdateRate(double _value);
 
       /// \brief Get the simulation update rate
-      public: virtual double GetUpdateRate() = 0;
-      public: virtual double GetUpdatePeriod() = 0;
+      public: double GetUpdateRate();
+      public: double GetUpdatePeriod();
 
       /// \brief Set the simulation step time
       public: virtual void SetStepTime(double _value) = 0;
@@ -161,6 +161,10 @@ namespace gazebo
       protected: transport::PublisherPtr responsePub, contactPub;
       protected: transport::SubscriberPtr physicsSub, requestSub;
       protected: boost::recursive_mutex *physicsUpdateMutex;
+
+      /// Store the value of the updateRate parameter in double form.
+      /// To improve efficiency.
+      private: double updateRateDouble;
     };
 
     /// \}

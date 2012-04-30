@@ -19,36 +19,44 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef BULLETCYLINDERSHAPE_HH
-#define BULLETCYLINDERSHAPE_HH
-/*
-#include "common/Exception.hh"
-#include "BulletPhysics.hh"
-#include "CylinderShape.hh"
-*/
+#ifndef __BULLETCYLINDERSHAPE_HH__
+#define __BULLETCYLINDERSHAPE_HH__
+
+#include "physics/bullet/BulletPhysics.hh"
+#include "physics/CylinderShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet ODE Physics
+    /// \{
+
     /// \brief Cylinder collision
     class BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
-      public: BulletCylinderShape(Collision *parent) : CylinderShape(parent) {}
+      public: BulletCylinderShape(CollisionPtr _parent)
+              : CylinderShape(_parent) {}
+
       /// \brief Destructor
       public: virtual ~BulletCylinderShape() {}
+
       /// \brief Set the size of the cylinder
-      public: void SetSize(const math::Vector2d &size)
+      public: void SetSize(const double &_radius, const double &_length)
               {
-                CylinderShape::SetSize(size);
-                BulletCollision *bParent =
-                  static_cast<BulletCollision*>(this->parent);
+                CylinderShape::SetSize(_radius, _length);
+                BulletCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                    this->collisionParent);
 
                 bParent->SetCollisionShape(new btCylinderShapeZ(
-                    btmath::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)));
+                    btVector3(_radius, _radius, _length * 0.5)));
               }
     };
+    /// \}
     /// \}
   }
 }

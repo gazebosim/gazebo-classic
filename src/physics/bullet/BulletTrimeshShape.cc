@@ -19,20 +19,19 @@
  * Date: 21 May 2009
  */
 
-/*
-#include "BulletPhysics.hh"
-#include "rendering/Visual.hh"
-#include "Link.hh"
-#include "common/Exception.hh"
-#include "BulletTrimeshShape.hh"
-*/
+#include "common/Mesh.hh"
+
+#include "physics/bullet/BulletTypes.hh"
+#include "physics/bullet/BulletCollision.hh"
+#include "physics/bullet/BulletPhysics.hh"
+#include "physics/bullet/BulletTrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletTrimeshShape::BulletTrimeshShape(Collision *_parent)
-  : TrimeshShape(parent)
+BulletTrimeshShape::BulletTrimeshShape(CollisionPtr _parent)
+  : TrimeshShape(_parent)
 {
 }
 
@@ -48,8 +47,55 @@ void BulletTrimeshShape::Update()
 }
 
 //////////////////////////////////////////////////
-void BulletTrimeshShape::Load(common::XMLConfigNode *_node)
+void BulletTrimeshShape::Load(sdf::ElementPtr _sdf)
 {
+  TrimeshShape::Load(_sdf);
 }
 
+//////////////////////////////////////////////////
+void BulletTrimeshShape::Init()
+{
+  TrimeshShape::Init();
 
+  BulletCollisionPtr bParent =
+    boost::shared_static_cast<BulletCollision>(this->collisionParent);
+
+  float *vertices = NULL;
+  int *indices = NULL;
+
+  btTriangleMesh *mTriMesh = new btTriangleMesh();
+
+  unsigned int numVertices = this->mesh->GetVertexCount();
+  unsigned int numIndices = this->mesh->GetIndexCount();
+
+  // Get all the vertex and index data
+  this->mesh->FillArrays(&vertices, &indices);
+
+  // Scale the vertex data
+  for (unsigned int j = 0;  j < numVertices; j++)
+  {
+    vertices[j*3+0] = vertices[j*3+0] * this->sdf->GetValueVector3("scale").x;
+    vertices[j*3+1] = vertices[j*3+1] * this->sdf->GetValueVector3("scale").y;
+    vertices[j*3+2] = vertices[j*3+2] * this->sdf->GetValueVector3("scale").z;
+  }
+
+  // Create the Bullet trimesh
+  for (unsigned int j = 0; j < numIndices; j += 3)
+  {
+    btVector3 v0(vertices[indices[j]+0],
+                 vertices[indices[j]+1],
+                 vertices[indices[j]+2]);
+
+    btVector3 v1(vertices[indices[j+1]+0],
+                 vertices[indices[j+1]+1],
+                 vertices[indices[j+1]+2]);
+
+    btVector3 v2(vertices[indices[j+2]+0],
+                 vertices[indices[j+2]+1],
+                 vertices[indices[j+2]+2]);
+
+    mTriMesh->addTriangle(v0,v1,v2);
+  }
+
+  bParent->SetCollisionShape(new btBvhTriangleMeshShape(mTriMesh, true));
+}

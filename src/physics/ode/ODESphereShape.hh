@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef ODESPHERESHAPE_HH
-#define ODESPHERESHAPE_HH
+#ifndef __ODESPHERESHAPE_HH__
+#define __ODESPHERESHAPE_HH__
 
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODECollision.hh"
@@ -31,23 +31,28 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-    /// \brief And ODE sphere shape
+    /// \brief A ODE sphere shape
     class ODESphereShape : public SphereShape
     {
+      /// \brief Constructor
       public: ODESphereShape(ODECollisionPtr _parent) : SphereShape(_parent) {}
+
+      /// \brief Destructor
       public: virtual ~ODESphereShape() {}
-      public: void SetRadius(const double &radius)
+
+      /// \brief Set the radius
+      public: void SetRadius(const double &_radius)
       {
-        SphereShape::SetRadius(radius);
+        SphereShape::SetRadius(_radius);
         ODECollisionPtr oParent;
         oParent =
           boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
 
         // Create the sphere geometry
         if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateSphere(0, radius), true);
+          oParent->SetCollision(dCreateSphere(0, _radius), true);
         else
-          dGeomSphereSetRadius(oParent->GetCollisionId(), radius);
+          dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
       }
     };
     /// \}

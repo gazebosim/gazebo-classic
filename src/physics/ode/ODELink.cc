@@ -63,7 +63,6 @@ void ODELink::Load(sdf::ElementPtr _sdf)
   Link::Load(_sdf);
 }
 
-
 //////////////////////////////////////////////////
 void ODELink::Init()
 {

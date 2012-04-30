@@ -9,6 +9,10 @@
       <attribute name="xyz" type="vector3" default="0 0 -9.8" required="1"/>
   </element> <!-- End Gravity -->
 
+  <element name="bullet" required="0">
+    <element name="dt" type="double" default="0.003" required="1"/>
+  </element>
+
   <element name="ode" required="0">
     <element name="solver" required="1">
       <attribute name="type" type="string" default="quick" required="1"/>

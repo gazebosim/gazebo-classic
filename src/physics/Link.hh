@@ -172,6 +172,7 @@ namespace gazebo
 
       /// \brief Get the mass of the body
       public: InertialPtr GetInertial() const { return this->inertial; }
+
       /// \brief Set the mass of the body
       public: void SetInertial(const InertialPtr &_inertial);
 
