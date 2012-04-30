@@ -59,7 +59,6 @@ void BulletMotionState::SetWorldRotation(const math::Quaternion &_rot)
 //////////////////////////////////////////////////
 void BulletMotionState::SetWorldPose(const math::Pose &_pose)
 {
-  std::cout << "BulletMotionState::SetWorldPose[" << _pose << "]\n";
   this->worldPose = _pose;
 }
 
@@ -67,7 +66,6 @@ void BulletMotionState::SetWorldPose(const math::Pose &_pose)
 void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 {
   math::Pose result = this->worldPose;
-  // result.pos += this->comOffset.pos;
   _worldTrans = BulletPhysics::ConvertPose(result);
 }
 

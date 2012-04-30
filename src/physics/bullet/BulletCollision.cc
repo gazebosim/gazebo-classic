@@ -37,7 +37,6 @@ using namespace physics;
 BulletCollision::BulletCollision(LinkPtr _parent)
     : Collision(_parent)
 {
-  printf("New Bullet CollisionShape\n");
   this->SetName("Bullet_Collision");
   this->collisionShape = NULL;
 }
@@ -104,7 +103,6 @@ math::Box BulletCollision::GetBoundingBox() const
 //////////////////////////////////////////////////
 void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 {
-  std::cout << "Set CollisionShape\n";
   this->collisionShape = _shape;
 
   //btmath::Vector3 vec;

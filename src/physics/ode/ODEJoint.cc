@@ -108,8 +108,8 @@ LinkPtr ODEJoint::GetJointLink(int _index) const
 
   if (_index == 0 || _index == 1)
   {
-    ODELinkPtr odeLink1 = boost::shared_dynamic_cast<ODELink>(this->childLink);
-    ODELinkPtr odeLink2 = boost::shared_dynamic_cast<ODELink>(this->parentLink);
+    ODELinkPtr odeLink1 = boost::shared_static_cast<ODELink>(this->childLink);
+    ODELinkPtr odeLink2 = boost::shared_static_cast<ODELink>(this->parentLink);
     if (odeLink1 != NULL &&
         dJointGetBody(this->jointId, _index) == odeLink1->GetODEId())
       result = this->childLink;

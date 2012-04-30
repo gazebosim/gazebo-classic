@@ -162,9 +162,6 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   this->stepTimeDouble = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
 
-  if (this->sdf->HasAttribute("update_rate"))
-    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
-
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
   // Help prevent "popping of deeply embedded object
@@ -634,16 +631,18 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type)
 
   if (_type == "prismatic")
     joint.reset(new ODESliderJoint(this->worldId));
-  if (_type == "screw")
+  else if (_type == "screw")
     joint.reset(new ODEScrewJoint(this->worldId));
-  if (_type == "revolute")
+  else if (_type == "revolute")
     joint.reset(new ODEHingeJoint(this->worldId));
-  if (_type == "revolute2")
+  else if (_type == "revolute2")
     joint.reset(new ODEHinge2Joint(this->worldId));
-  if (_type == "ball")
+  else if (_type == "ball")
     joint.reset(new ODEBallJoint(this->worldId));
-  if (_type == "universal")
+  else if (_type == "universal")
     joint.reset(new ODEUniversalJoint(this->worldId));
+  else
+    gzthrow("Unable to create joint of type[" << _type << "]");
 
   return joint;
 }

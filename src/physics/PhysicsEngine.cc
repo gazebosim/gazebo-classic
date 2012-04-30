@@ -56,12 +56,16 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
                                            &PhysicsEngine::OnRequest, this);
 
   this->physicsUpdateMutex = new boost::recursive_mutex();
+
+  this->updateRateDouble = 0.0;
 }
 
 //////////////////////////////////////////////////
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
+  if (this->sdf->HasAttribute("update_rate"))
+    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 }
 
 //////////////////////////////////////////////////

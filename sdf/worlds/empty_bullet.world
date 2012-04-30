@@ -15,6 +15,55 @@
     <!-- A global light source -->
     <include filename="sun.light"/>
 
+    <model name="hinge">
+      <origin pose="0 0 0 0 0 0"/>
+
+      <link name="box">
+        <origin pose="0 0 .5 0 0 0"/>
+        <inertial mass="1.0"/>
+
+        <collision name="collision">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+
+      <link name="sphere">
+        <origin pose="0 0 2 0 0 0"/>
+        <inertial mass="0.5"/>
+
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.2"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.2"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+
+      <joint type="revolute" name="hinge">
+        <origin pose="0 0.05 -0.5 0 0 0"/>
+        <child link="sphere"/>
+        <parent link="box"/>
+        <axis xyz="1 0 0"/>
+      </joint>
+    </model>
+
+
+    <!--
     <model name="sphere">
       <origin pose="0 1.5 2.5 0 0 0"/>
       <link name="link">
@@ -82,7 +131,7 @@
     </model>
 
     <model name="trimesh">
-      <origin pose="0 -4.5 2.5 0 0 0"/>
+      <origin pose="0 3.5 2.5 0 0 0"/>
       <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -90,18 +139,17 @@
 
         <collision name="collision">
           <geometry>
-            <!--<mesh filename="box.stl"/>-->
-            <mesh filename="coke_can.dae" scale="0.0254 .0254 0.0254"/>
+            <mesh filename="coke_can.dae" scale="0.0254 0.0254 0.0254"/>
           </geometry>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <!--<mesh filename="box.stl"/>-->
-            <mesh filename="coke_can.dae" scale="0.0254 .0254 0.0254"/>
+            <mesh filename="coke_can.dae" scale="0.0254 0.0254 0.0254"/>
           </geometry>
         </visual>
       </link>
     </model>
+    -->
   </world>
 </gazebo>

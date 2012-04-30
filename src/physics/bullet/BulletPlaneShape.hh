@@ -53,7 +53,6 @@ namespace gazebo
       /// \brief Create the plane
       public: void CreatePlane()
               {
-                std::cout << "Create BT Plane\n";
                 PlaneShape::CreatePlane();
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(

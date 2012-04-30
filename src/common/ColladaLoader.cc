@@ -1042,7 +1042,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 {
   // This function parses polylist types in collada into
   // a set of triangle meshes.  The assumption is that
-  // each polylist polygon is convex, and we do decomposiont
+  // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
   SubMesh *subMesh = new SubMesh;
   bool combinedVertNorms = false;

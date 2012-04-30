@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Keonig, Andrew Howard
+/* Desc: A ODE hinge joint
+ * Author: Nate Koenig
  * Date: 21 May 2003
  */
 
-#ifndef ODEHINGEJOINT_HH
-#define ODEHINGEJOINT_HH
+#ifndef __ODEHINGEJOINT_HH__
+#define __ODEHINGEJOINT_HH__
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"

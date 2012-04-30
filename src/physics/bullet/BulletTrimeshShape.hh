@@ -41,9 +41,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletTrimeshShape();
 
-      /// \brief Update function
-      public: void Update();
-
       /// \brief Load the trimesh
       public: virtual void Load(sdf::ElementPtr _sdf);
 

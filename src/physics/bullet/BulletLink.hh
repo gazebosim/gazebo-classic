@@ -111,7 +111,7 @@ namespace gazebo
       public: void SetSelfCollide(bool collide);
 
       /// \brief Get the bullet rigid body
-      //public: btRigidLink *GetBulletLink() const;
+      public: btRigidBody *GetBulletLink() const;
 
       /// \brief Set the linear damping factor
       public: virtual void SetLinearDamping(double damping);

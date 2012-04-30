@@ -19,63 +19,24 @@
  * Date: 21 May 2003
  */
 
-#ifndef BULLETHINGEJOINT_HH
-#define BULLETHINGEJOINT_HH
+#ifndef __BULLETHINGEJOINT_HH__
+#define __BULLETHINGEJOINT_HH__
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "BulletJoint.hh"
-#include "HingeJoint.hh"
-#include "BulletPhysics.hh"
+#include "physics/bullet/BulletJoint.hh"
+#include "physics/HingeJoint.hh"
+#include "physics/bullet/BulletPhysics.hh"
+
+class btHingeConstraint; 
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics_joints
+    /// \addtogroup gazebo_physics
     /// \{
-    /** \defgroup gazebo_hinge_joint Hinge Joint
-
-      \brief A two-axis hinge joint.
-
-      \par Attributes
-      - body1 (string)
-        - Name of the first body to attach to the joint
-      - body2 (string)
-        - Name of the second body to attach to the joint
-      - anchor (string)
-        - Name of the body which will act as the anchor to the joint
-      - axis (float, tuple)
-        - Defines the axis of rotation for the first degree of freedom
-        - Default: 0 0 1
-      - lowStop (float, degrees)
-        - The low stop angle for the first degree of freedom
-        - Default: infinity
-      - highStop (float, degrees)
-        - The high stop angle for the first degree of freedom
-        - Default: infinity
-      - erp (double)
-        - Error reduction parameter.
-        - Default = 0.4
-      - cfm (double)
-        - Constraint force mixing.
-        - Default = 0.8
-
-      \par Example
-      \verbatim
-      <joint:hinge name ="hinge_joint>
-        <body1>body1_name</body1>
-        <body2>body2_name</body2>
-        <anchor>anchor_body</anchor>
-        <axis>0 0 1</axis>
-        <lowStop>0</lowStop>
-        <highStop>30</highStop>
-      </joint:hinge>
-      \endverbatim
-    */
-    /// \}
-
-    /// \addtogroup gazebo_hinge_joint
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
     /// \brief A single axis hinge joint
     class BulletHingeJoint : public HingeJoint<BulletJoint>
@@ -87,19 +48,16 @@ namespace gazebo
       public: virtual ~BulletHingeJoint();
 
       /// \brief Load joint
-      protected: virtual void Load(common::XMLConfigNode *node);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(Link *one, Link *two);
+      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
 
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int index) const;
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
-
-      /// \brief Get the axis of rotation
-      public: math::Vector3 GetAxis(int index) const;
 
       /// \brief Set the axis of rotation
       public: void SetAxis(int index, const math::Vector3 &axis);
@@ -139,7 +97,16 @@ namespace gazebo
 
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int index);
+
+      /// Get the axis of rotation
+      public: virtual math::Vector3 GetGlobalAxis(int index) const;
+
+      /// Get the angle of rotation
+      public: virtual math::Angle GetAngleImpl(int index) const;
+
+      private: btHingeConstraint *btHinge;
     };
+    /// \}
     /// \}
   }
 }

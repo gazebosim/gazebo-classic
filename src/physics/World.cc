@@ -337,7 +337,8 @@ void World::StepWorld(int _steps)
   {
     common::Time::MSleep(1);
     this->worldUpdateMutex->lock();
-    if (this->stepInc == 0 || this->stop) wait = false;
+    if (this->stepInc == 0 || this->stop)
+      wait = false;
     this->worldUpdateMutex->unlock();
   }
 }

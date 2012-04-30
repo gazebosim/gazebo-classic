@@ -28,11 +28,12 @@
 #include "physics/bullet/BulletCylinderShape.hh"
 #include "physics/bullet/BulletTrimeshShape.hh"
 
-// #include "physics/bullet/BulletHingeJoint.hh"
-// #include "physics/bullet/BulletHinge2Joint.hh"
-// #include "physics/bullet/BulletSliderJoint.hh"
-// #include "physics/bullet/BulletBallJoint.hh"
-// #include "physics/bullet/BulletUniversalJoint.hh"
+#include "physics/bullet/BulletHingeJoint.hh"
+/*#include "physics/bullet/BulletHinge2Joint.hh"
+#include "physics/bullet/BulletSliderJoint.hh"
+#include "physics/bullet/BulletBallJoint.hh"
+#include "physics/bullet/BulletUniversalJoint.hh"
+*/
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/PhysicsFactory.hh"
@@ -218,23 +219,26 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-JointPtr BulletPhysics::CreateJoint(const std::string &/*_type*/)
+JointPtr BulletPhysics::CreateJoint(const std::string &_type)
 {
-  /*if (type == "slider")
-    return new BulletSliderJoint(this->dynamicsWorld);
-  if (type == "hinge")
-    return new BulletHingeJoint(this->dynamicsWorld);
-  if (type == "hinge2")
-    return new BulletHinge2Joint(this->dynamicsWorld);
-  if (type == "ball")
-    return new BulletBallJoint(this->dynamicsWorld);
-  if (type == "universal")
-    return new BulletUniversalJoint(this->dynamicsWorld);
+  JointPtr joint;
+
+  if (_type == "revolute")
+    joint.reset(new BulletHingeJoint(this->dynamicsWorld));
   else
-    gzthrow("Unable to create joint of type[" << type << "]");
+    gzthrow("Unable to create joint of type[" << _type << "]");
+
+  /*if (type == "slider")
+    joint.reset(new BulletSliderJoint(this->dynamicsWorld));
+  else if (type == "hinge2")
+    joint.reset(new BulletHinge2Joint(this->dynamicsWorld));
+  else if (type == "ball")
+    joint.reset(new BulletBallJoint(this->dynamicsWorld));
+  else if (type == "universal")
+    joint.reset(new BulletUniversalJoint(this->dynamicsWorld));
     */
 
-  return JointPtr();
+  return joint;
 }
 
 //////////////////////////////////////////////////

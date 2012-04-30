@@ -159,14 +159,11 @@ void BulletLink::Init()
   // Set the initial pose of the body
   this->motionState->SetWorldPose(this->GetWorldPose());
 
-  std::cout << "GetWOrldPose[" << this->GetWorldPose() << "]\n";
-
   btScalar btMass = this->inertial->GetMass();
   btVector3 fallInertia(0, 0, 0);
 
   btCollisionShape *shape = NULL;
 
-  std::cout << "Mass[" << btMass << "]\n";
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
@@ -188,7 +185,7 @@ void BulletLink::Init()
 
   // Create the new rigid body
   this->rigidLink = new btRigidBody(rigidLinkCI);
-  // this->rigidLink->setUserPointer(this);
+  this->rigidLink->setUserPointer(this);
   BulletPhysicsPtr phy = boost::shared_dynamic_cast<BulletPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
@@ -418,11 +415,10 @@ math::Vector3 BulletLink::GetWorldTorque() const
 }
 
 //////////////////////////////////////////////////
-/*btRigidLink *BulletLink::GetBulletLink() const
+btRigidBody *BulletLink::GetBulletLink() const
 {
   return this->rigidLink;
 }
-*/
 
 //////////////////////////////////////////////////
 void BulletLink::SetLinearDamping(double /*_damping*/)

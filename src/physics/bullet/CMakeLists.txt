@@ -11,11 +11,11 @@ set (sources
   BulletLink.cc
   BulletCollision.cc
   BulletMotionState.cc
-  BulletTrimeshShape.cc)
+  BulletTrimeshShape.cc
+  BulletJoint.cc
+  BulletHingeJoint.cc)
 
-#             BulletJoint.cc
 #             BulletSliderJoint.cc
-#             BulletHingeJoint.cc
 #             BulletHinge2Joint.cc
 #             BulletUniversalJoint.cc
 #             BulletBallJoint.cc
