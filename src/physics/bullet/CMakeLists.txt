@@ -14,11 +14,11 @@ set (sources
   BulletTrimeshShape.cc
   BulletJoint.cc
   BulletHingeJoint.cc
-  BulletSliderJoint.cc)
+  BulletSliderJoint.cc
+  BulletUniversalJoint.cc
+  BulletBallJoint.cc)
 
 #             BulletHinge2Joint.cc
-#             BulletUniversalJoint.cc
-#             BulletBallJoint.cc
 #             BulletScrewJoint.cc
              #BulletRayGeom.cc
 

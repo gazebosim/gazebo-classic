@@ -29,10 +29,10 @@
 #include "physics/bullet/BulletTrimeshShape.hh"
 
 #include "physics/bullet/BulletHingeJoint.hh"
+#include "physics/bullet/BulletUniversalJoint.hh"
 /*#include "physics/bullet/BulletHinge2Joint.hh"
 #include "physics/bullet/BulletSliderJoint.hh"
 #include "physics/bullet/BulletBallJoint.hh"
-#include "physics/bullet/BulletUniversalJoint.hh"
 */
 
 #include "physics/PhysicsTypes.hh"
@@ -225,17 +225,17 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type)
 
   if (_type == "revolute")
     joint.reset(new BulletHingeJoint(this->dynamicsWorld));
+  else if (_type == "universal")
+    joint.reset(new BulletUniversalJoint(this->dynamicsWorld));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
-  /*if (type == "slider")
+  /*if (_type == "slider")
     joint.reset(new BulletSliderJoint(this->dynamicsWorld));
-  else if (type == "hinge2")
+  else if (_type == "hinge2")
     joint.reset(new BulletHinge2Joint(this->dynamicsWorld));
-  else if (type == "ball")
+  else if (_type == "ball")
     joint.reset(new BulletBallJoint(this->dynamicsWorld));
-  else if (type == "universal")
-    joint.reset(new BulletUniversalJoint(this->dynamicsWorld));
     */
 
   return joint;

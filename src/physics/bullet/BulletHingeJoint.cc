@@ -53,7 +53,6 @@ void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
-  std::cout << "Create Hinge Joint\n";
   HingeJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
@@ -67,18 +66,17 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
   math::Vector3 axis = axisElem->GetValueVector3("xyz");
 
-  math::Vector3 pivotA, pivotB;
-  //btVector3 axisA, axisB;
+  math::Vector3 pivotA, pivotB, axisA, axisB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = (this->anchorPos - this->parentLink->GetWorldPose().pos);
-  pivotB = (this->anchorPos - this->childLink->GetWorldPose().pos);
+  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
+  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
 
-  math::Vector3 axisA =
-    this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis).Round();
+  axisA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis);
+  axisA = axisA.Round();
 
-  math::Vector3 axisB =
-    this->childLink->GetWorldPose().rot.RotateVectorReverse(axis).Round();
+  axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
+  axisB = axisB.Round();
 
   this->btHinge = new btHingeConstraint(
       *bulletParentLink->GetBulletLink(),
@@ -126,7 +124,7 @@ void BulletHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetDamping(int /*index*/, const double /*_damping*/)
+void BulletHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
   gzerr << "Not implemented\n";
 }

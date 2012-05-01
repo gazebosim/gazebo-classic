@@ -21,16 +21,13 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "physics/bullet/BulletBody.hh"
+
+#include "physics/bullet/BulletTypes.hh"
+#include "physics/bullet/BulletLink.hh"
 #include "physics/bullet/BulletBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
-
-using namespace physics;
-
-using namespace physics;
-
 
 //////////////////////////////////////////////////
 BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world)
@@ -45,45 +42,50 @@ BulletBallJoint::~BulletBallJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetAnchor(int _index) const
+math::Vector3 BulletBallJoint::GetAnchor(int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
+void BulletBallJoint::SetAnchor(int /*_index*/,
+                                const math::Vector3 &/*_anchor*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetDamping(int /*index*/, const double _damping)
+void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::Attach(Link *_one, Link *_two)
+void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
   BallJoint<BulletJoint>::Attach(_one, _two);
-  BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
-  BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
-  if (!bulletLink1 || !bulletLink2)
+  BulletLinkPtr bulletChildLink =
+    boost::shared_static_cast<BulletLink>(this->childLink);
+  BulletLinkPtr bulletParentLink =
+    boost::shared_static_cast<BulletLink>(this->parentLink);
+
+  if (!bulletChildLink || !bulletParentLink)
     gzthrow("Requires bullet bodies");
-
-  btRigidLink *rigidLink1 = bulletLink1->GetBulletLink();
-  btRigidLink *rigidLink2 = bulletLink2->GetBulletLink();
 
   math::Vector3 pivotA, pivotB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos - this->body1->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->body2->GetWorldPose().pos;
+  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
+  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
 
-  this->constraint = new btPoint2PointConstraint(*rigidLink1, *rigidLink2,
-      btmath::Vector3(pivotA.x, pivotA.y, pivotA.z),
-      btmath::Vector3(pivotB.x, pivotB.y, pivotB.z));
+  this->btBall = new btPoint2PointConstraint(
+      *bulletParentLink->GetBulletLink(),
+      *bulletChildLink->GetBulletLink(),
+      btVector3(pivotA.x, pivotA.y, pivotA.z),
+      btVector3(pivotB.x, pivotB.y, pivotB.z));
+
+  this->constraint = this->btBall;
 
   // Add the joint to the world
   this->world->addConstraint(this->constraint);
@@ -92,5 +94,48 @@ void BulletBallJoint::Attach(Link *_one, Link *_two)
   this->constraint->enableFeedback(true);
 }
 
+/////////////////////////////////////////////////
+void BulletBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+{
+  gzerr << "Not implemented\n";
+}
 
+/////////////////////////////////////////////////
+double BulletBallJoint::GetVelocity(int _index) const
+{
+  gzerr << "Not implemented\n";
+  return 0;
+}
 
+/////////////////////////////////////////////////
+double BulletBallJoint::GetMaxForce(int /*_index*/)
+{
+  gzerr << "Not implemented\n";
+  return 0;
+}
+
+/////////////////////////////////////////////////
+void BulletBallJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+{
+  gzerr << "Not implemented\n";
+  return;
+}
+
+/////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetAngle(int /*_index*/) const
+{
+  gzerr << "Not implemented\n";
+  return 0;
+}
+
+/////////////////////////////////////////////////
+math::Vector3 BulletBallJoint::GetGlobalAxis(int /*_index*/) const
+{
+  return math::Vector3();
+}
+
+/////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetAngleImpl(int /*_index*/) const
+{
+  return math::Angle();
+}
