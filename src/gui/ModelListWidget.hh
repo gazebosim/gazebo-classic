@@ -143,6 +143,7 @@ namespace gazebo
                                        QtProperty *_parent);
 
       private: void ProcessPoseMsgs();
+      private: void ProcessModelMsgs();
 
       private: void InitTransport(const std::string &_name ="");
 
@@ -169,6 +170,9 @@ namespace gazebo
 
       typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
       private: PoseMsgs_L poseMsgs;
+
+      typedef std::list<msgs::Model> ModelMsgs_L;
+      private: ModelMsgs_L modelMsgs;
 
       private: msgs::Model modelMsg;
       private: bool fillPropertyTree;

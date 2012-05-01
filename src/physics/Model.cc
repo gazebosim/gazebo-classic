@@ -35,6 +35,7 @@
 #include "common/CommonTypes.hh"
 
 #include "physics/Joint.hh"
+#include "physics/JointController.hh"
 #include "physics/Link.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -67,12 +68,14 @@ Model::Model(BasePtr _parent)
 {
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
+  this->jointController = NULL;
 }
 
 //////////////////////////////////////////////////
 Model::~Model()
 {
   delete this->updateMutex;
+  delete this->jointController;
 }
 
 //////////////////////////////////////////////////
@@ -177,6 +180,11 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
+
+  if (this->jointController)
+  {
+    this->jointController->Update();
+  }
 
   if (this->jointAnimations.size() > 0)
   {
@@ -390,7 +398,7 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearVel();
   else
     return math::Vector3(0, 0, 0);
@@ -399,7 +407,7 @@ math::Vector3 Model::GetRelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearVel();
   else
     return math::Vector3(0, 0, 0);
@@ -408,7 +416,7 @@ math::Vector3 Model::GetWorldLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularVel();
   else
     return math::Vector3(0, 0, 0);
@@ -417,7 +425,7 @@ math::Vector3 Model::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularVel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularVel();
   else
     return math::Vector3(0, 0, 0);
@@ -427,7 +435,7 @@ math::Vector3 Model::GetWorldAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearAccel();
   else
     return math::Vector3(0, 0, 0);
@@ -436,7 +444,7 @@ math::Vector3 Model::GetRelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearAccel();
   else
     return math::Vector3(0, 0, 0);
@@ -445,7 +453,7 @@ math::Vector3 Model::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularAccel();
   else
     return math::Vector3(0, 0, 0);
@@ -454,7 +462,7 @@ math::Vector3 Model::GetRelativeAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularAccel() const
 {
-  if (!this->GetLink("canonical"))
+  if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularAccel();
   else
     return math::Vector3(0, 0, 0);
@@ -583,6 +591,11 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   this->jointPub->Publish(msg);
 
   this->joints.push_back(joint);
+
+  if (!this->jointController)
+    this->jointController = new JointController(
+        boost::shared_dynamic_cast<Model>(shared_from_this()));
+  this->jointController->AddJoint(joint);
 }
 
 //////////////////////////////////////////////////

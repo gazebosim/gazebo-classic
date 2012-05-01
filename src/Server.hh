@@ -22,12 +22,15 @@
 #include <list>
 #include <map>
 
+#include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
 #include "transport/TransportTypes.hh"
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/World.hh"
+
+namespace po = boost::program_options;
 
 namespace boost
 {
@@ -43,8 +46,10 @@ namespace gazebo
     public: Server();
     public: virtual ~Server();
 
-    public: void LoadPlugin(const std::string &_filename);
-    public: bool Load(const std::string &filename);
+    public: void PrintUsage();
+    public: bool ParseArgs(int argc, char **argv);
+
+    public: bool Load(const std::string &_filename="worlds/empty.world");
     public: void Init();
     public: void Run();
     public: void Stop();
@@ -54,17 +59,20 @@ namespace gazebo
 
     public: bool GetInitialized() const;
 
+    private: static void SigInt(int _v);
+
+    private: void ProcessParams();
+
     private: void OnControl(ConstServerControlPtr &_msg);
 
     private: bool OpenWorld(const std::string &_filename);
 
     private: void ProcessControlMsgs();
 
-    private: bool stop;
+    private: static bool stop;
 
     private: Master *master;
     private: boost::thread *masterThread;
-    private: std::vector<gazebo::SystemPluginPtr> plugins;
     private: transport::NodePtr node;
     private: transport::SubscriberPtr serverSub;
     private: transport::PublisherPtr worldModPub;
@@ -72,9 +80,10 @@ namespace gazebo
     private: boost::mutex *receiveMutex;
     private: std::list<msgs::ServerControl> controlMsgs;
     private: std::map<std::string, std::string> worldFilenames;
+
+    private: gazebo::common::StrStr_M params;
+    private: po::variables_map vm;
   };
 }
 
 #endif
-
-

@@ -1379,7 +1379,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
 
   COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
-  comVis->Load();
+  comVis->Load(_msg);
   comVis->SetVisible(false);
   this->visuals[comVis->GetName()] = comVis;
 
@@ -1505,13 +1505,17 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     if (_msg->has_geometry() &&
         _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
     {
-      try
+      // Ignore collision visuals for the heightmap
+      if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos)
       {
-        this->heightmap = new Heightmap(shared_from_this());
-        this->heightmap->Load();
-      } catch(...)
-      {
-        return false;
+        try
+        {
+          this->heightmap = new Heightmap(shared_from_this());
+          this->heightmap->LoadFromMsg(_msg);
+        } catch(...)
+        {
+          return false;
+        }
       }
     }
 

@@ -46,8 +46,8 @@ using namespace sensors;
 GZ_REGISTER_STATIC_SENSOR("rfid", RFIDSensor)
 
 /////////////////////////////////////////////////
-  RFIDSensor::RFIDSensor()
- : Sensor()
+RFIDSensor::RFIDSensor()
+  : Sensor()
 {
   this->active = false;
   this->node = transport::NodePtr(new transport::Node());
@@ -182,7 +182,7 @@ bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
+bool RFIDSensor::CheckRayIntersection(const math::Pose &/*_pose*/)
 {
   /** rendering code below to check for intersections
 

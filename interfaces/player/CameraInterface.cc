@@ -96,7 +96,7 @@ void CameraInterface::OnImage(ConstImagePtr &_msg)
   // Send data to server
   this->driver->Publish(this->device_addr, PLAYER_MSGTYPE_DATA,
                         PLAYER_CAMERA_DATA_STATE,
-                        (void*)&this->data, size, &this->datatime);
+                        static_cast<void*>(&this->data), size, &this->datatime);
 
   // Save frames
   /*if (this->save)
@@ -111,7 +111,7 @@ void CameraInterface::Subscribe()
 {
   std::string topic = "~/";
   topic += this->cameraName + "/image";
-  boost::replace_all(topic,"::","/");
+  boost::replace_all(topic, "::", "/");
 
   std::cout << "Topic[" << topic << "]\n";
   this->cameraSub = this->node->Subscribe(topic,
@@ -126,7 +126,7 @@ void CameraInterface::Unsubscribe()
 }
 
 /////////////////////////////////////////////////
-const void CameraInterface::SaveFrame(const char *filename)
+void CameraInterface::SaveFrame(const char * /*filename*/) const
 {
   /*
   int width, height;

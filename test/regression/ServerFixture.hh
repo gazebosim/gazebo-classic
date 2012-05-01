@@ -78,12 +78,17 @@ class ServerFixture : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename)
              {
+               this->Load(_worldFilename, false);
+             }
+  protected: virtual void Load(const std::string &_worldFilename, bool _paused)
+             {
                delete this->server;
                this->server = NULL;
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
-                  boost::bind(&ServerFixture::RunServer, this, _worldFilename));
+                  boost::bind(&ServerFixture::RunServer, this, _worldFilename,
+                              _paused));
 
                // Wait for the server to come up
                while (!this->server || !this->server->GetInitialized())
@@ -102,10 +107,16 @@ class ServerFixture : public testing::Test
 
   protected: void RunServer(const std::string &_worldFilename)
              {
+               this->RunServer(_worldFilename, false);
+             }
+
+  protected: void RunServer(const std::string &_worldFilename, bool _paused)
+             {
                ASSERT_NO_THROW(this->server = new Server());
                printf("Load world[%s]\n", _worldFilename.c_str());
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
+               this->SetPause(_paused);
                this->server->Run();
                ASSERT_NO_THROW(this->server->Fini());
                delete this->server;

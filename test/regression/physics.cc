@@ -18,6 +18,7 @@
 #include "ServerFixture.hh"
 #include "physics/Physics.hh"
 #include "physics/physics.h"
+#include "SimplePendulumIntegrator.hh"
 
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
@@ -79,34 +80,142 @@ TEST_F(PhysicsTest, State)
   modelState2 = world->GetState().GetModelState("box");
   pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
+  Unload();
 }
 
-TEST_F(PhysicsTest, DropSphere)
+TEST_F(PhysicsTest, DropStuff)
 {
-  Load("worlds/drop_test.world");
+  Load("worlds/drop_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
 
-  for (unsigned int i = 0; i < world->GetState().GetModelStateCount(); ++i)
   {
-    physics::ModelState modelState = world->GetState().GetModelState(i);
-    if (modelState.GetName() == "box")
+    // todo: get parameters from drop_test.world
+    double test_duration = 1.5;
+    double z = 10.5;
+    double v = 0.0;
+    double g = -10.0;
+    double dt = world->GetPhysicsEngine()->GetStepTime();
+
+    // world->StepWorld(1428);  // theoretical contact, but
+    // world->StepWorld(100);  // integration error requires few more steps
+
+    int steps = test_duration/dt;
+    bool post_contact_correction = false;
+
+    for (int i = 0; i < steps; i++)
     {
-      if (world->GetSimTime().Double() < 1)
+      // integrate here to see when the collision should happen
+      v = v + dt * g;
+      z = z + dt * v;
+      // gzdbg << "debug v[" << v << "] x[" << z << "]\n";
+
+      world->StepWorld(1);  // theoretical contact, but
       {
-        math::Pose pose = modelState.GetPose();
-        gzerr << "z: " << pose.pos.z << "\n";
-        // EXPECT_TRUE(pose == modelState.GetPose());
+        physics::ModelPtr box_model = world->GetModel("box");
+        if (box_model)
+        {
+          math::Vector3 vel = box_model->GetWorldLinearVel();
+          math::Pose pose = box_model->GetWorldPose();
+          gzdbg << "box time [" << world->GetSimTime().Double()
+                << "] sim z [" << pose.pos.z
+                << "] exact z [" << z
+                << "] sim vz [" << vel.z
+                << "] exact vz [" << v << "]\n";
+          if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
+            EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+          }
+          else
+          {
+            EXPECT_TRUE(fabs(vel.z) < 0.0017);
+            EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+          }
+        }
+
+        physics::ModelPtr sphere_model = world->GetModel("sphere");
+        if (sphere_model)
+        {
+          math::Vector3 vel = sphere_model->GetWorldLinearVel();
+          math::Pose pose = sphere_model->GetWorldPose();
+          gzdbg << "sphere time [" << world->GetSimTime().Double()
+                << "] sim z [" << pose.pos.z
+                << "] exact z [" << z
+                << "] sim vz [" << vel.z
+                << "] exact vz [" << v << "]\n";
+          if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
+            EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+          }
+          else
+          {
+            EXPECT_TRUE(fabs(vel.z) < 3e-5);
+            EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+          }
+        }
+
+        physics::ModelPtr cylinder_model = world->GetModel("cylinder");
+        if (cylinder_model)
+        {
+          math::Vector3 vel = cylinder_model->GetWorldLinearVel();
+          math::Pose pose = cylinder_model->GetWorldPose();
+          gzdbg << "cylinder time [" << world->GetSimTime().Double()
+                << "] sim z [" << pose.pos.z
+                << "] exact z [" << z
+                << "] sim vz [" << vel.z
+                << "] exact vz [" << v << "]\n";
+          if (z > 0.5 || !post_contact_correction)
+          {
+            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
+            EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+          }
+          else
+          {
+            EXPECT_TRUE(fabs(vel.z) < 0.011);
+            EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+          }
+        }
       }
-    }
-    else if (modelState.GetName() == "sphere")
-    {
-    }
-    else if (modelState.GetName() == "cylinder")
-    {
+      if (z < 0.5) post_contact_correction = true;
     }
   }
+  Unload();
+}
+
+TEST_F(PhysicsTest, SimplePendulumTest)
+{
+  Load("worlds/simple_pendulums.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+
+  world->StepWorld(2000);
+  {
+    {
+      physics::ModelPtr model = world->GetModel("model_1");
+      if (model)
+      {
+        physics::JointPtr joint = model->GetJoint("joint_0");
+        if (joint)
+        {
+          double integ_theta = (1.5707963 -
+            PendulumAngle(-9.81, 10.0, 1.57079633, 0.0,
+                          world->GetSimTime().Double(), 0.000001));
+          double actual_theta = joint->GetAngle(0).GetAsRadian();
+          gzdbg << "time [" << world->GetSimTime().Double()
+                << "] exact [" << integ_theta
+                << "] actual [" << actual_theta
+                << "] pose [" << model->GetWorldPose()
+                << "]\n";
+           EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
+        }
+      }
+    }
+  }
+  Unload();
 }
 
 int main(int argc, char **argv)

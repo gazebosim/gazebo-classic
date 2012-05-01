@@ -26,7 +26,7 @@
 #include "physics/physics.h"
 #include "RFIDTag.hh"
 
-namespace gazebo 
+namespace gazebo
 {
   namespace sensors
   {

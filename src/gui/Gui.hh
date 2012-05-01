@@ -24,13 +24,8 @@ namespace gazebo
 {
   namespace gui
   {
-    void load();
-    void init();
-    void run();
+    bool run(int _argc, char **_argv);
     void stop();
-    void fini();
-
-    void load_plugin(const std::string &_filename);
 
     void set_world(const std::string& _name);
     std::string get_world();

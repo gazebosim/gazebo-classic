@@ -76,14 +76,16 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   }
   this->SetCoG(center.x, center.y, center.z);
 
-  sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
-  this->SetInertiaMatrix(
-      inertiaElem->GetValueDouble("ixx"),
-      inertiaElem->GetValueDouble("iyy"),
-      inertiaElem->GetValueDouble("izz"),
-      inertiaElem->GetValueDouble("ixy"),
-      inertiaElem->GetValueDouble("ixz"),
-      inertiaElem->GetValueDouble("iyz"));
+  if (this->sdf->HasElement("inertia"))
+  {
+    sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
+    this->SetInertiaMatrix(
+        inertiaElem->GetValueDouble("ixx"),
+        inertiaElem->GetValueDouble("iyy"),
+        inertiaElem->GetValueDouble("izz"),
+        inertiaElem->GetValueDouble("ixy"),
+        inertiaElem->GetValueDouble("ixz"),
+        inertiaElem->GetValueDouble("iyz"));
 
   inertiaElem->GetAttribute("ixx")->SetUpdateFunc(
       boost::bind(&Inertial::GetIXX, this));
@@ -97,6 +99,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
       boost::bind(&Inertial::GetIXZ, this));
   inertiaElem->GetAttribute("iyz")->SetUpdateFunc(
       boost::bind(&Inertial::GetIYZ, this));
+  }
 
   this->SetMass(this->sdf->GetValueDouble("mass"));
   this->sdf->GetAttribute("mass")->SetUpdateFunc(
@@ -333,4 +336,3 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
   if (_msg.has_izz())
     this->SetIZZ(_msg.izz());
 }
-

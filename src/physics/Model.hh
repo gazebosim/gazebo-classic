@@ -41,6 +41,8 @@ namespace gazebo
 {
   namespace physics
   {
+    class JointController;
+
     /// \addtogroup gazebo_physics
     /// \{
     /// \brief A model
@@ -241,6 +243,7 @@ namespace gazebo
       private: common::Time prevAnimationTime;
 
       private: boost::recursive_mutex *updateMutex;
+      private: JointController *jointController;
 
       protected: std::vector<ModelPtr> attachedModels;
       protected: std::vector<math::Pose> attachedModelsOffset;

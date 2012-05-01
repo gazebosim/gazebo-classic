@@ -85,7 +85,7 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
     }
     else
     {
-      gzwarn << "skipping prefixed element [" << prefix << ":"
+      gzdbg << "skipping prefixed element [" << prefix << ":"
              << (const char*)elemXml->name << "] when copying plugins\n";
       // element->SetName(prefix + ":" + (const char*)elemXml->name);
     }
@@ -1143,7 +1143,7 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
     std::string value = getNodeValue(_node, _key);
     if (value.empty())
     {
-      gzwarn << "Node[" << _node->name << "] Has empty key value["
+      gzdbg << "Node[" << _node->name << "] Has empty key value["
             << _key << "]\n";
       return false;
     }

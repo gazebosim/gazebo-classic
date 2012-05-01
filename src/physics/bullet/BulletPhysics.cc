@@ -18,33 +18,32 @@
  * Author: Nate Koenig
  * Date: 11 June 2007
  */
-/*
-#include "BulletPlaneShape.hh"
-#include "BulletSphereShape.hh"
-#include "BulletBoxShape.hh"
-#include "BulletCylinderShape.hh"
-#include "BulletTrimeshShape.hh"
-#include "MapShape.hh"
 
-#include "BulletHingeJoint.hh"
-#include "BulletHinge2Joint.hh"
-#include "BulletSliderJoint.hh"
-#include "BulletBallJoint.hh"
-#include "BulletUniversalJoint.hh"
+// #include "physics/bullet/BulletPlaneShape.hh"
+// #include "physics/bullet/BulletSphereShape.hh"
+// #include "physics/bullet/BulletBoxShape.hh"
+// #include "physics/bullet/BulletCylinderShape.hh"
+// #include "BulletTrimeshShape.hh"
+// #include "MapShape.hh"
 
-#include "PhysicsFactory.hh"
+// #include "physics/bullet/BulletHingeJoint.hh"
+// #include "physics/bullet/BulletHinge2Joint.hh"
+// #include "physics/bullet/BulletSliderJoint.hh"
+// #include "physics/bullet/BulletBallJoint.hh"
+// #include "physics/bullet/BulletUniversalJoint.hh"
+
+#include "physics/PhysicsFactory.hh"
+#include "physics/World.hh"
+#include "physics/Entity.hh"
+
 #include "common/Console.hh"
 #include "common/Exception.hh"
-#include "World.hh"
 #include "math/Vector3.hh"
-#include "Entity.hh"
 
 #include "BulletPhysics.hh"
-*/
 
 using namespace gazebo;
 using namespace physics;
-
 
 GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics);
 
@@ -64,9 +63,6 @@ BulletPhysics::BulletPhysics(World *_world)
   // Instantiate the world
   this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
       this->broadPhase, this->solver, this->collisionConfig);
-
-  common::Param::Begin(&this->parameters);
-  common::Param::End();
 }
 
 //////////////////////////////////////////////////
@@ -174,7 +170,7 @@ Link *BulletPhysics::CreateLink(Entity *parent)
 Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
 {
   BulletCollision *collision = NULL;
-  BulletLink *body = NULL;
+  /*BulletLink *body = NULL;
 
   body = dynamic_cast<BulletLink*>(parent);
 
@@ -197,6 +193,7 @@ Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
     new MapShape(collision);
   else
     gzthrow("Unable to create a collision of type[" << type << "]");
+    */
 
   return collision;
 }
@@ -205,7 +202,7 @@ Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
 //////////////////////////////////////////////////
 Joint *BulletPhysics::CreateJoint(std::string type)
 {
-  if (type == "slider")
+  /*if (type == "slider")
     return new BulletSliderJoint(this->dynamicsWorld);
   if (type == "hinge")
     return new BulletHingeJoint(this->dynamicsWorld);
@@ -217,6 +214,7 @@ Joint *BulletPhysics::CreateJoint(std::string type)
     return new BulletUniversalJoint(this->dynamicsWorld);
   else
     gzthrow("Unable to create joint of type[" << type << "]");
+    */
 
   return NULL;
 }

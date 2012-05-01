@@ -50,7 +50,10 @@ namespace gazebo
       public: virtual ~Heightmap();
 
       /// \brief Load the heightmap
-      public: virtual void Load();
+      public: void Load();
+
+      /// \brief Load the heightmap from a visual message
+      public: void LoadFromMsg(ConstVisualPtr &_msg);
 
       /// \brief Get the height at a location
       public: double GetHeight(double x, double y);
@@ -60,6 +63,8 @@ namespace gazebo
       private: void DefineTerrain(int x, int y);
 
       private: ScenePtr scene;
+      private: std::string heightImage;
+      private: math::Vector3 terrainSize;
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
       private: Ogre::TerrainGroup *terrainGroup;
       private: bool terrainsImported;

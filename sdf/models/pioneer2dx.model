@@ -11,7 +11,7 @@
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
-    
+   
       <visual name="visual">
         <origin pose="0 0 0.04 0 0 0"/>
         <geometry>
@@ -33,11 +33,10 @@
         </geometry>
         <surface>
           <friction>
-            <ode mu='100.000000' mu2='100.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+            <ode mu='100.0' mu2='100.0'/>
           </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode kp='1000000.0' kd='1.0'/>
           </contact>
         </surface>
 
@@ -64,11 +63,10 @@
         </geometry>
         <surface>
           <friction>
-            <ode mu='100.000000' mu2='100.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+            <ode mu='100.0' mu2='100.0'/>
           </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode kp='1000000.0' kd='1.0'/>
           </contact>
         </surface>
 
@@ -81,12 +79,12 @@
         <material script="Gazebo/FlatBlack"/>
       </visual>
     </link>
-  
+
     <link name="castor">
       <origin pose="-0.200 0 0.04 0 0 0"/>
   
       <inertial mass="0.1">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
+        <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>
       </inertial> 
   
       <collision name="collision">
@@ -95,11 +93,10 @@
         </geometry>
         <surface>
           <friction>
-            <ode mu='100.000000' mu2='100.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+            <ode mu='100.000000' mu2='100.0'/>
           </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode kp='1000000.0' kd='1.0'/>
           </contact>
         </surface>
 
@@ -114,29 +111,30 @@
     </link>
 
     <joint type="revolute" name="left_wheel_hinge">
-      <origin pose="0 0 -0.04 0 0 0"/>
+      <origin pose="0 0 -0.03 0 0 0"/>
       <child link="left_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
     
     <joint type="revolute" name="right_wheel_hinge">
-      <origin pose="0 0 0.04 0 0 0"/>
+      <origin pose="0 0 0.03 0 0 0"/>
       <child link="right_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
-   
+
     <joint type="ball" name="ball_joint">
       <child link="castor"/>
       <parent link="chassis"/>
     </joint>
 
+    <!--
     <plugin filename="libDiffDrivePlugin.so" name="diff_drive">
       <left_joint>left_wheel_hinge</left_joint>
       <right_joint>right_wheel_hinge</right_joint>
-      <torque>10</torque>
+      <torque>5</torque>
     </plugin>
-
+    -->
   </model>
 </gazebo>

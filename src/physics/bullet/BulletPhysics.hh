@@ -23,17 +23,13 @@
 #define BULLETPHYSICS_HH
 #include <string>
 
-/*
-#include <btBulletDynamicsCommon.h>
-#include <btBulletCollisionCommon.h>
-
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "PhysicsEngine.hh"
+#include "physics/bullet/bullet_inc.h"
+#include "physics/PhysicsEngine.hh"
 #include "physics/Collision.hh"
-#include "Shape.hh"
-*/
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
@@ -43,122 +39,86 @@ namespace gazebo
     class XMLConfigNode;
     class Mass;
 
-    /// \addtogroup gazebo_physics_engine
+    /// \addtogroup gazebo_physics
     /// \{
-    /** \defgroup bulletphysicsengine Bullet Physics Engine
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
+    /// \brief Bullet physics engine
+    class BulletPhysics : public PhysicsEngine
+    {
+      /// \brief Constructor
+      public: BulletPhysics(World *world);
 
-      The \c param:physics tag is used to specify certain parameters for the
-      Bullet phyics engine. The following parameters are in addition to those
-      provided by the PhysicsEngine base class.
+      /// \brief Destructor
+      public: virtual ~BulletPhysics();
 
-    \par Attributes
+      /// \brief Load the Bullet engine
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-    - cfm (float)
-      - Global constraint force mixing
-      - Default: 10e-5
-      - Range:  10e-10 to 1.0
-      - Recommended value: 10e-5
-    - erp (float)
-      - Global error reduction parameter
-      - Default: 0.2
-      - Range: 0 to 1.0
-      - Recommended Range: 0.1 to 0.8
-    - stepcommon::Time (float)
-      - Time, in seconds, that elapse for each iteration of the physics engine
-      - Default: 0.025
-    -gravity (float float float)
-      - Gravity vector.
-      - Default: 0 0 -9.8
+      /// \brief Initialize the Bullet engine
+      public: virtual void Init();
 
-    \verbatim
-    <physics:bullet>
-      <stepTime>0.03</stepTime>
-      <gravity>0 0 -9.8</gravity>
-      <cfm>10e-5</cfm>
-      <erp>0.2</erp>
-    </physcis:bullet>
-    \endverbatim
+      /// \brief Init the engine for threads.
+      public: virtual void InitForThread();
 
-    \{
-    */
+      /// \brief Update the Bullet collision
+      public: virtual void UpdateCollision();
 
-  /// \brief Bullet physics engine
-  class BulletPhysics : public PhysicsEngine
-  {
-    /// \brief Constructor
-    public: BulletPhysics(World *world);
+      /// \brief Update the Bullet engine
+      public: virtual void UpdatePhysics();
 
-    /// \brief Destructor
-    public: virtual ~BulletPhysics();
+      /// \brief Finilize the Bullet engine
+      public: virtual void Fini();
 
-    /// \brief Load the Bullet engine
-    public: virtual void Load(common::XMLConfigNode *node);
+      /// \brief Add an entity to the world
+      public: void AddEntity(Entity *entity);
 
-    /// \brief Saves to XMLFile
-    public: void Save(std::string &prefix, std::ostream &stream);
+      /// \brief Remove an entity from the physics engine
+      public: virtual void RemoveEntity(Entity *entity);
 
-    /// \brief Initialize the Bullet engine
-    public: virtual void Init();
+      /// \brief Create a new body
+      public: virtual Link *CreateLink(Entity *parent);
 
-    /// \brief Init the engine for threads.
-    public: virtual void InitForThread();
+      /// \brief Create a new collision
+      public: virtual Collision *CreateCollision(std::string type, Link *body);
 
-    /// \brief Update the Bullet collision
-    public: virtual void UpdateCollision();
+      /// \brief Create a new joint
+      public: virtual Joint *CreateJoint(std::string type);
 
-    /// \brief Update the Bullet engine
-    public: virtual void UpdatePhysics();
+      public: virtual ShapePtr CreateShape(const std::string &_shapeType,
+                                           CollisionPtr _collision);
 
-    /// \brief Finilize the Bullet engine
-    public: virtual void Fini();
+      /// \brief Create a physics based ray sensor
+      // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
 
-    /// \brief Add an entity to the world
-    public: void AddEntity(Entity *entity);
+      /// \brief Convert an bullet mass to a gazebo Mass
+      public: virtual void ConvertMass(Mass *mass, void *engineMass);
 
-    /// \brief Remove an entity from the physics engine
-    public: virtual void RemoveEntity(Entity *entity);
+      /// \brief Convert an gazebo Mass to a bullet Mass
+      public: virtual void ConvertMass(void *engineMass, const Mass &mass);
 
-    /// \brief Create a new body
-    public: virtual Link *CreateLink(Entity *parent);
+      /// \brief Convert a bullet transform to a gazebo pose
+      public: static math::Pose ConvertPose(btTransform bt);
 
-    /// \brief Create a new collision
-    public: virtual Collision *CreateCollision(std::string type, Link *body);
+      /// \brief Convert a gazebo pose to a bullet transform
+      public: static btTransform ConvertPose(const math::Pose pose);
 
-    /// \brief Create a new joint
-    public: virtual Joint *CreateJoint(std::string type);
+      /// \brief Register a joint with the dynamics world
+      public: btDynamicsWorld *GetDynamicsWorld() const
+              {return this->dynamicsWorld;}
+      /// \brief Set the gavity vector
+      public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
 
-    /// \brief Create a physics based ray sensor
-    // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
+      // private: btAxisSweep3 *broadPhase;
+      private: btBroadphaseInterface *broadPhase;
+      private: btDefaultCollisionConfiguration *collisionConfig;
+      private: btCollisionDispatcher *dispatcher;
+      private: btSequentialImpulseConstraintSolver *solver;
+      private: btDiscreteDynamicsWorld *dynamicsWorld;
 
-    /// \brief Convert an bullet mass to a gazebo Mass
-    public: virtual void ConvertMass(Mass *mass, void *engineMass);
+      private: common::Time lastUpdateTime;
+    };
 
-    /// \brief Convert an gazebo Mass to a bullet Mass
-    public: virtual void ConvertMass(void *engineMass, const Mass &mass);
-
-    /// \brief Convert a bullet transform to a gazebo pose
-    public: static math::Pose ConvertPose(btTransform bt);
-
-    /// \brief Convert a gazebo pose to a bullet transform
-    public: static btTransform ConvertPose(const math::Pose pose);
-
-    /// \brief Register a joint with the dynamics world
-    public: btDynamicsWorld *GetDynamicsWorld() const
-            {return this->dynamicsWorld;}
-    /// \brief Set the gavity vector
-    public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
-
-    // private: btAxisSweep3 *broadPhase;
-    private: btBroadphaseInterface *broadPhase;
-    private: btDefaultCollisionConfiguration *collisionConfig;
-    private: btCollisionDispatcher *dispatcher;
-    private: btSequentialImpulseConstraintSolver *solver;
-    private: btDiscreteDynamicsWorld *dynamicsWorld;
-
-    private: common::Time lastUpdateTime;
-  };
-
-  /** \}*/
   /// \}
   }
 }

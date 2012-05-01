@@ -8,6 +8,9 @@ set (files
   lights.world
   model_nesting.world
   pioneer2dx.world
+  drop_test.world
+  simple_pendulums.world
+  double_pendulums.world
   plugin.world
   pr2.world
   presentation.world

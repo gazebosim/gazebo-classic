@@ -167,6 +167,8 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasAttribute("update_rate"))
     this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 
+  dWorldSetDamping(this->worldId, 0.0001, 0.0001);
+
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,
       odeElem->GetOrCreateElement("constraints")->GetValueDouble(
@@ -378,13 +380,13 @@ void ODEPhysics::UpdatePhysics()
   }
 }
 
-
 //////////////////////////////////////////////////
 void ODEPhysics::Fini()
 {
   PhysicsEngine::Fini();
 }
 
+//////////////////////////////////////////////////
 void ODEPhysics::Reset()
 {
   this->physicsUpdateMutex->lock();

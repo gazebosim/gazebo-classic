@@ -49,6 +49,7 @@ SET (files
             grass_green-01_normalheight.dds
             growth_weirdfungus-03_diffusespecular.dds
             growth_weirdfungus-03_normalheight.dds
+            heightmap_bowl.png
 )
 
 

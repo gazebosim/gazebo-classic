@@ -45,6 +45,11 @@ namespace gazebo
     private: double wheelSeparation;
     private: double wheelRadius;
     private: common::Time prevUpdateTime;
+
+    private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
+
+    private: common::PID leftPID, rightPID;
+    private: double sum;
   };
 }
 #endif

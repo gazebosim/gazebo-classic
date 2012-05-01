@@ -10,6 +10,7 @@ add_definitions( ${QT_DEFINITIONS} )
 add_subdirectory(qtpropertybrowser)
 
 set (sources main.cc 
+             ../gazebo.cc
              Gui.cc 
              MainWindow.cc 
              RenderWidget.cc 
@@ -28,6 +29,7 @@ set (sources main.cc
              MeshMaker.cc
              ModelMaker.cc
              ModelRightMenu.cc
+             JointControlWidget.cc
 )
 
 set (qt_headers MainWindow.hh 
@@ -39,6 +41,7 @@ set (qt_headers MainWindow.hh
                 WorldPropertiesWidget.hh
                 ModelEditWidget.hh
                 ModelRightMenu.hh
+                JointControlWidget.hh
 )
 
 set (headers Gui.hh

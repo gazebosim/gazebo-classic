@@ -170,6 +170,7 @@ void ModelListWidget::Update()
     this->receiveMutex->unlock();
   }
 
+  this->ProcessModelMsgs();
   this->ProcessPoseMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
@@ -177,53 +178,72 @@ void ModelListWidget::Update()
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 {
-  std::string name = _msg.name();
+  this->receiveMutex->lock();
+  msgs::Model msg;
+  msg.CopyFrom(_msg);
+  this->modelMsgs.push_back(msg);
+  this->receiveMutex->unlock();
+}
 
-  QTreeWidgetItem *listItem = this->GetModelListItem(_msg.id());
+/////////////////////////////////////////////////
+void ModelListWidget::ProcessModelMsgs()
+{
+  this->receiveMutex->lock();
 
-  if (!listItem)
+  for (ModelMsgs_L::iterator iter = this->modelMsgs.begin();
+       iter != this->modelMsgs.end(); ++iter)
   {
-    if (!_msg.has_deleted() || !_msg.deleted())
+    std::string name = (*iter).name();
+
+    QTreeWidgetItem *listItem = this->GetModelListItem((*iter).id());
+
+    if (!listItem)
     {
-      // Create a top-level tree item for the path
-      QTreeWidgetItem *topItem = new QTreeWidgetItem(
-          static_cast<QTreeWidgetItem*>(0),
-          QStringList(QString("%1").arg(QString::fromStdString(name))));
-
-      topItem->setData(0, Qt::UserRole, QVariant(_msg.id()));
-      topItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
-      this->modelTreeWidget->addTopLevelItem(topItem);
-
-      for (int i = 0; i < _msg.link_size(); i++)
+      if (!(*iter).has_deleted() || !(*iter).deleted())
       {
-        std::string linkName = _msg.link(i).name();
-        int index = linkName.rfind("::") + 2;
-        std::string linkNameShort = linkName.substr(
-            index, linkName.size() - index);
+        // Create a top-level tree item for the path
+        QTreeWidgetItem *topItem = new QTreeWidgetItem(
+            static_cast<QTreeWidgetItem*>(0),
+            QStringList(QString("%1").arg(QString::fromStdString(name))));
 
-        QTreeWidgetItem *linkItem = new QTreeWidgetItem(topItem,
-          QStringList(QString("%1").arg(
-              QString::fromStdString(linkNameShort))));
+        topItem->setData(0, Qt::UserRole, QVariant((*iter).id()));
+        topItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+        this->modelTreeWidget->addTopLevelItem(topItem);
 
-        linkItem->setData(0, Qt::UserRole, QVariant(_msg.link(i).id()));
-        linkItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
-        this->modelTreeWidget->addTopLevelItem(linkItem);
+        for (int i = 0; i < (*iter).link_size(); i++)
+        {
+          std::string linkName = (*iter).link(i).name();
+          int index = linkName.rfind("::") + 2;
+          std::string linkNameShort = linkName.substr(
+              index, linkName.size() - index);
+
+          QTreeWidgetItem *linkItem = new QTreeWidgetItem(topItem,
+              QStringList(QString("%1").arg(
+                  QString::fromStdString(linkNameShort))));
+
+          linkItem->setData(0, Qt::UserRole, QVariant((*iter).link(i).id()));
+          linkItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+          this->modelTreeWidget->addTopLevelItem(linkItem);
+        }
       }
-    }
-  }
-  else
-  {
-    if (_msg.has_deleted() && _msg.deleted())
-    {
-      int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
-      this->modelTreeWidget->takeTopLevelItem(i);
     }
     else
     {
-      listItem->setText(0, _msg.name().c_str());
-      listItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
+      if ((*iter).has_deleted() && (*iter).deleted())
+      {
+        int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
+        this->modelTreeWidget->takeTopLevelItem(i);
+      }
+      else
+      {
+        listItem->setText(0, (*iter).name().c_str());
+        listItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+      }
     }
   }
+  this->modelMsgs.clear();
+
+  this->receiveMutex->unlock();
 }
 
 /////////////////////////////////////////////////

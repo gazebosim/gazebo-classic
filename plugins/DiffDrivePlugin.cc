@@ -26,6 +26,7 @@ enum {RIGHT, LEFT};
 
 /////////////////////////////////////////////////
 DiffDrivePlugin::DiffDrivePlugin()
+  : leftPID(0.01, 0.0, 0.001), rightPID(0.01, 0.0, 0.001)
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
 }
@@ -37,7 +38,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->GetName());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
@@ -86,8 +87,8 @@ void DiffDrivePlugin::Init()
 
   this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.5;
 
-  this->leftJoint->SetMaxForce(0, this->torque);
-  this->rightJoint->SetMaxForce(0, this->torque);
+  // this->wheelSpeed[LEFT] = 0.2;
+  // this->wheelSpeed[RIGHT] = 0.2;
 }
 
 /////////////////////////////////////////////////
@@ -105,41 +106,45 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  /*double d1, d2;
+  /* double d1, d2;
   double dr, da;
-  common::Time stepTime;
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
 
-  stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime; 
-  */
 
   // Distance travelled by front wheels
-  /* 
   d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->GetVelocity(0);
   d2 = stepTime.Double() * this->wheelRadius * this->rightJoint->GetVelocity(0);
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
-  std::cout << "DR[" << dr << "]\n";
   */
-  //std::cout << "JS[" << this->leftJoint->GetVelocity(0) << " "
-  //  << this->rightJoint->GetVelocity(0) << "]\n";
+  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time stepTime = currTime - this->prevUpdateTime;
 
-  //this->leftJoint->SetVelocity(0, this->wheelSpeed[LEFT] / this->wheelRadius);
-  //this->rightJoint->SetVelocity(0, this->wheelSpeed[RIGHT] / this->wheelRadius);
   double leftVel = this->leftJoint->GetVelocity(0);
-  double rightVel = this->leftJoint->GetVelocity(0);
+  double rightVel = this->rightJoint->GetVelocity(0);
 
-  double leftErr = (this->wheelSpeed[LEFT] / this->wheelRadius) - leftVel;
-  double rightErr = (this->wheelSpeed[RIGHT] / this->wheelRadius) - rightVel;
+  double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
+  double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
-  double leftForce = std::min(leftErr * 10, this->torque);
-  double rightForce = std::min(rightErr * 10, this->torque);
+  double leftErr = leftVel - leftVelDesired;
+  double rightErr = rightVel - rightVelDesired;
 
-  printf("Left Vel[%f] Err[%f] Force[%f]\n", leftVel, leftErr, leftForce);
-  printf("Right Vel[%f] Err[%f] Force[%f]\n", rightVel, rightErr, rightForce);
+  double leftForce = this->leftPID.Update(leftErr, stepTime);
+  double rightForce = this->rightPID.Update(rightErr, stepTime);
 
+  if (leftForce < -this->torque)
+    leftForce = -this->torque;
+  if (leftForce > this->torque)
+    leftForce = this->torque;
+
+  if (rightForce < -this->torque)
+    rightForce = -this->torque;
+  if (rightForce > this->torque)
+    rightForce = this->torque;
+
+  // printf("LV[%7.4f] LD[%7.4f] LF[%7.4f] RV[%7.4f] RD[%7.4f] RF[%7.4f]\n",
+  // leftVel, leftVelDesired, leftForce, rightVel, rightVelDesired, rightForce);
   this->leftJoint->SetForce(0, leftForce);
   this->rightJoint->SetForce(0, rightForce);
 }

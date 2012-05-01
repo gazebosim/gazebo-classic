@@ -52,7 +52,7 @@ TEST_F(FileHandling, Save)
 
   // Wait until the file exists
   i = 0;
-  while ((file = fopen(filename.str().c_str(), "r")) == NULL && i < 10)
+  while (i < 10 && (file = fopen(filename.str().c_str(), "r")) == NULL)
   {
     i++;
     common::Time::MSleep(100);
