@@ -142,13 +142,13 @@ namespace gazebo
       public: const Vector3 &operator/=(double _v);
 
       /// \brief Multiplication operators
-      public: const Vector3 operator*(const Vector3 &_pt) const;
+      public: Vector3 operator*(const Vector3 &_pt) const;
 
       /// \brief Multiplication operators
       public: const Vector3 &operator*=(const Vector3 &_pt);
 
       /// \brief Multiplication operators
-      public: const Vector3 operator*(double _v) const;
+      public: Vector3 operator*(double _v) const;
 
       /// \brief Multiplication operators
       public: const Vector3 &operator*=(double _v);

@@ -209,31 +209,37 @@ void BulletLink::Update()
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetGravityMode(bool /*_mode*/)
+void BulletLink::SetGravityMode(bool _mode)
 {
-  /*
   if (!this->rigidLink)
     return;
 
   if (_mode == false)
-    this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
+    this->rigidLink->setGravity(btVector3(0, 0, 0));
+    //this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
   else
   {
-    btScalar btMass = this->mass.GetAsDouble();
+    math::Vector3 g = this->bulletPhysics->GetGravity();
+    this->rigidLink->setGravity(btVector3(g.x, g.y, g.z));
+    /*btScalar btMass = this->mass.GetAsDouble();
     btmath::Vector3 fallInertia(0, 0, 0);
 
     this->compoundShape->calculateLocalInertia(btMass, fallInertia);
     this->rigidLink->setMassProps(btMass, fallInertia);
+    */
   }
-  */
 }
 
 //////////////////////////////////////////////////
 bool BulletLink::GetGravityMode()
 {
   bool result = false;
-  gzerr << "BulletLink::GetGravityMode not implemented, "
-        << "returning spurious result\n";
+  if (this->rigidLink)
+  {
+    btVector3 g = this->rigidLink->getGravity();
+    result = !math::equal(static_cast<double>(g.length()), 0.0);
+  }
+
   return result;
 }
 
@@ -334,28 +340,23 @@ math::Vector3 BulletLink::GetWorldLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 {
-  /*
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->setAngularVelocity(btmath::Vector3(_vel.x, _vel.y, _vel.z));
-  */
+  this->rigidLink->setAngularVelocity(btVector3(_vel.x, _vel.y, _vel.z));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldAngularVel() const
 {
-  /*
   if (!this->rigidLink)
     return math::Vector3(0, 0, 0);
 
-  btmath::Vector3 btVec = this->rigidLink->getAngularVelocity();
+  btVector3 btVec = this->rigidLink->getAngularVelocity();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-  */
-  return math::Vector3();
 }
 
 //////////////////////////////////////////////////

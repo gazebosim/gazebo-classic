@@ -53,33 +53,6 @@ namespace gazebo
 
                    this->SetAxis(1,
                        _sdf->GetElement("axis2")->GetValueVector3("xyz"));
-
-
-                   if (_sdf->GetElement("axis")->HasElement("limit"))
-                   {
-                     sdf::ElementPtr limitElem =
-                       _sdf->GetElement("axis")->GetElement("limit");
-
-                     // Perform this three step ordering to ensure
-                     // the parameters are set properly.
-                     // This is taken from the ODE wiki.
-                     this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-                     this->SetLowStop(0, limitElem->GetValueDouble("lower"));
-                     this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-                   }
-
-                   if (_sdf->GetElement("axis2")->HasElement("limit"))
-                   {
-                     sdf::ElementPtr limitElem =
-                       _sdf->GetElement("axis2")->GetElement("limit");
-                     // Perform this three step ordering to ensure
-                     // the parameters
-
-                     // are set properly. This is taken from the ODE wiki.
-                     this->SetHighStop(1, limitElem->GetValueDouble("upper"));
-                     this->SetLowStop(1, limitElem->GetValueDouble("lower"));
-                     this->SetHighStop(1, limitElem->GetValueDouble("upper"));
-                   }
                  }
     };
     /// \}

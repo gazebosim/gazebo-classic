@@ -119,9 +119,45 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    this->SetAxis(0, axisElem->GetValueVector3("xyz"));
+    //if (axisElem->HasElement("limit"))
+    {
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+      // Perform this three step ordering to ensure the
+      // parameters are set properly.
+      // This is taken from the ODE wiki.
+      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+      this->SetLowStop(0, limitElem->GetValueDouble("lower"));
+      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+    }
+  }
+
+  if (this->sdf->HasElement("axis2"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
+    this->SetAxis(1, axisElem->GetValueVector3("xyz"));
+    if (axisElem->HasElement("limit"))
+    {
+      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
+
+      // Perform this three step ordering to ensure the
+      // parameters  are set properly.
+      // This is taken from the ODE wiki.
+      limitElem = axisElem->GetElement("limit");
+      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
+      this->SetLowStop(1, limitElem->GetValueDouble("lower"));
+      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
+    }
+  }
+
   if (this->parentLink)
   {
     math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
+
     // Set joint axis
     if (this->sdf->HasElement("axis"))
     {

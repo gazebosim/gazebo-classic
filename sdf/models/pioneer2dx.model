@@ -107,7 +107,7 @@
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
-    
+
     <joint type="revolute" name="right_wheel_hinge">
       <origin pose="0 0 0.03 0 0 0"/>
       <child link="right_wheel"/>

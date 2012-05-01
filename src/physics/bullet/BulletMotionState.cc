@@ -73,5 +73,6 @@ void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
 {
   this->worldPose = BulletPhysics::ConvertPose(_worldTrans);
+  //std::cout << "Link[" << this->link->GetScopedName() << "] SetWorldTrans[" << this->worldPose << "]\n";
   this->link->SetWorldPose(this->worldPose, false);
 }

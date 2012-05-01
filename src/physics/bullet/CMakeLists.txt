@@ -13,9 +13,9 @@ set (sources
   BulletMotionState.cc
   BulletTrimeshShape.cc
   BulletJoint.cc
-  BulletHingeJoint.cc)
+  BulletHingeJoint.cc
+  BulletSliderJoint.cc)
 
-#             BulletSliderJoint.cc
 #             BulletHinge2Joint.cc
 #             BulletUniversalJoint.cc
 #             BulletBallJoint.cc

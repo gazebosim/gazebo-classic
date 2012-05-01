@@ -53,8 +53,7 @@ void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
-  std::cout << "BulletHingeJoint::Attach[" << _one->GetScopedName() << "] to [" << _two->GetScopedName() << "]\n";
-
+  std::cout << "Create Hinge Joint\n";
   HingeJoint<BulletJoint>::Attach(_one, _two);
 
   BulletLinkPtr bulletChildLink =
@@ -69,35 +68,33 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 axis = axisElem->GetValueVector3("xyz");
 
   math::Vector3 pivotA, pivotB;
-  btVector3 axisA, axisB;
+  //btVector3 axisA, axisB;
 
   // Compute the pivot point, based on the anchorPos
   pivotA = (this->anchorPos - this->parentLink->GetWorldPose().pos);
   pivotB = (this->anchorPos - this->childLink->GetWorldPose().pos);
 
-  std::cout << "  Child[" << this->childLink->GetScopedName() << "] Parent["
-            << this->parentLink->GetScopedName() << "]\n";
-  std::cout << "  Anchor[" << this->anchorPos << "]\n";
-  std::cout << "  PivotParent[" << pivotA << "] PivotChild[" << pivotB << "] Axis[" << axis << "]\n";
+  math::Vector3 axisA =
+    this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis).Round();
 
-  axisA = btVector3(axis.x, axis.y, axis.z);
-  axisB = btVector3(axis.x, axis.y, axis.z);
+  math::Vector3 axisB =
+    this->childLink->GetWorldPose().rot.RotateVectorReverse(axis).Round();
 
   this->btHinge = new btHingeConstraint(
       *bulletParentLink->GetBulletLink(),
       *bulletChildLink->GetBulletLink(),
       btVector3(pivotA.x, pivotA.y, pivotA.z),
       btVector3(pivotB.x, pivotB.y, pivotB.z),
-      axisA, axisB);
+      btVector3(axisA.x, axisA.y, axisA.z),
+      btVector3(axisB.x, axisB.y, axisB.z));
 
   this->constraint =  this->btHinge;
-  this->btHinge->setLimit(-0.5, 0.5);
 
   // Add the joint to the world
-  this->world->addConstraint(this->btHinge, false);
+  this->world->addConstraint(this->btHinge, true);
 
   // Allows access to impulse
-  // this->btHinge->enableFeedback(true);
+  this->btHinge->enableFeedback(true);
   // this->btHinge->setAngularOnly(true);
 }
 
@@ -112,9 +109,10 @@ math::Vector3 BulletHingeJoint::GetAnchor(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetAnchor(int /*_index*/, const math::Vector3 &/*_anchor*/)
+void BulletHingeJoint::SetAnchor(int /*_index*/,
+                                 const math::Vector3 &/*_anchor*/)
 {
-  gzerr << "Not implemented...\n";
+  // The anchor (pivot in Bullet lingo), can only be set on creation
 }
 
 //////////////////////////////////////////////////
@@ -145,7 +143,11 @@ math::Angle BulletHingeJoint::GetAngle(int /*_index*/) const
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetVelocity(int _index, double _angle)
 {
-  this->btHinge->enableAngularMotor(true, _angle, this->GetMaxForce(_index));
+  //this->btHinge->enableAngularMotor(true, _angle, this->GetMaxForce(_index));
+  math::Vector3 axis = this->GetLocalAxis(_index);
+  axis = axis * _angle;
+  this->childLink->SetAngularVel(axis);
+  this->parentLink->SetAngularVel(axis);
 }
 
 //////////////////////////////////////////////////
@@ -167,7 +169,6 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
   return this->btHinge->getMaxMotorImpulse();
 }
 
-
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetForce(int /*_index*/, double /*_torque*/)
 {
@@ -186,15 +187,18 @@ void BulletHingeJoint::SetHighStop(int _index, math::Angle _angle)
 {
   if (this->btHinge)
   {
-    std::cout << "SetHighStop[" << _angle << "]\n";
+    std::cout << "SetHingeHighStop\n";
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
+    //this->btHinge->setLimit(0,0);
     this->btHinge->setLimit(
         this->GetLowStop(_index).GetAsRadian(), _angle.GetAsRadian());
   }
   else
+  {
     gzthrow("Joint must be created first");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -202,7 +206,7 @@ void BulletHingeJoint::SetLowStop(int _index, math::Angle _angle)
 {
   if (this->btHinge)
   {
-    std::cout << "SetLowStop[" << _angle << "]\n";
+    std::cout << "SetHingeLowStop\n";
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings

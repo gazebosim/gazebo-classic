@@ -48,7 +48,6 @@ namespace gazebo
       public: virtual ~BulletLink();
 
       /// \brief Load the body based on an common::XMLConfig node
-      /// \param node common::XMLConfigNode pointer
       public: virtual void Load(sdf::ElementPtr _ptr);
 
       /// \brief Initialize the body
@@ -59,10 +58,6 @@ namespace gazebo
 
       /// \brief Update the body
       public: virtual void Update();
-
-      /// \brief Attach a collision to this body
-      /// \param collision Collisionetery to attach to this body
-      //public: virtual void AttachCollision(Collision *collision);
 
       /// \brief Called when the pose of the entity (or one of its parents) has
       /// changed
