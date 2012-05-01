@@ -2,6 +2,11 @@
 <gazebo version="1.0">
   <world name="default">
 
+    <scene>
+      <ambient rgba=".1 .1 .1 1"/>
+      <shadows enabled="false"/>
+    </scene>
+
     <physics type="bullet">
       <gravity xyz="0 0 -9.8"/>
       <bullet>
@@ -15,11 +20,9 @@
     <!-- A global light source -->
     <include filename="sun.light"/>
 
-    <model name="hinge">
-      <origin pose="0 0 0 0 0 0"/>
-
-      <link name="box">
-        <origin pose="0 0 .5 0 0 0"/>
+    <model name="box1">
+      <origin pose="0 0 2.5 0 0 0"/>
+      <link name="link">
         <inertial mass="1.0"/>
 
         <collision name="collision">
@@ -35,33 +38,28 @@
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
+    </model>
 
-      <link name="sphere">
-        <origin pose="0 0 2 0 0 0"/>
-        <inertial mass="0.5"/>
+    <model name="box">
+      <origin pose="0 0 0.5 0 0 0"/>
+      <link name="link">
+        <inertial mass="1.0">
+          <origin pose="0 0 -0.5 0 0 0"/>
+        </inertial>
 
         <collision name="collision">
           <geometry>
-            <sphere radius="0.2"/>
+            <box size="1 1 1"/>
           </geometry>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <sphere radius="0.2"/>
+            <box size="1 1 1"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
-
-      <joint type="revolute" name="hinge">
-        <origin pose="0 0.05 -0.5 0 0 0"/>
-        <child link="sphere"/>
-        <parent link="box"/>
-        <axis xyz="1 0 0">
-          <limit lower="-1.5707" upper="1.0"/>
-        </axis>
-      </joint>
     </model>
 
 
@@ -82,28 +80,6 @@
         <visual name="visual">
           <geometry>
             <sphere radius="0.5"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-
-    <model name="box">
-      <origin pose="0 0 2.5 0 0 0"/>
-      <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="collision">
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <box size="1 1 1"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
@@ -131,27 +107,7 @@
         </visual>
       </link>
     </model>
-
-    <model name="trimesh">
-      <origin pose="0 3.5 2.5 0 0 0"/>
-      <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="collision">
-          <geometry>
-            <mesh filename="coke_can.dae" scale="0.0254 0.0254 0.0254"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <mesh filename="coke_can.dae" scale="0.0254 0.0254 0.0254"/>
-          </geometry>
-        </visual>
-      </link>
-    </model>
     -->
+
   </world>
 </gazebo>

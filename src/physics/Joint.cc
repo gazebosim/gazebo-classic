@@ -202,8 +202,10 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   if (_index == 0 && this->sdf->HasElement("axis"))
     vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
   else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz"); 
 
+  vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
+  vec.Round();
   return vec;
 }
 

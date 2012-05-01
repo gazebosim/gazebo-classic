@@ -63,6 +63,14 @@ void BulletMotionState::SetWorldPose(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
+void BulletMotionState::SetCoG(const math::Vector3 &_cog)
+{
+  this->cog = _cog;
+  math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
+  this->worldPose.pos += cg;
+}
+
+//////////////////////////////////////////////////
 void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 {
   math::Pose result = this->worldPose;
@@ -73,6 +81,9 @@ void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
 {
   this->worldPose = BulletPhysics::ConvertPose(_worldTrans);
-  //std::cout << "Link[" << this->link->GetScopedName() << "] SetWorldTrans[" << this->worldPose << "]\n";
+
+  math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
+  this->worldPose.pos -= cg;
+
   this->link->SetWorldPose(this->worldPose, false);
 }

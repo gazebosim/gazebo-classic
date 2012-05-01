@@ -59,7 +59,7 @@ namespace gazebo
       public: void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the center of mass offset
-      public: void SetCoMOffset(const math::Pose &_com);
+      public: void SetCoG(const math::Vector3 &_cog);
 
       /// \brief Get the world transform
       public: virtual void getWorldTransform(btTransform &_worldTrans) const;
@@ -68,7 +68,7 @@ namespace gazebo
       public: virtual void setWorldTransform(const btTransform &_worldTrans);
 
       private: math::Pose worldPose;
-      private: math::Pose comOffset;
+      private: math::Vector3 cog;
       private: Link *link;
     };
   }

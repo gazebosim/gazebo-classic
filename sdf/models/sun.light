@@ -4,7 +4,7 @@
     <origin pose="0 0 100 0 0 0"/>
     <diffuse rgba="1.0 1.0 1.0 1"/>
     <specular rgba="0.2 0.2 0.2 1"/>
-    <attenuation range="100" constant="0.8" linear="0.01" quadratic="0.0"/>
-    <direction xyz="0.0 0.2 -8.0"/>
+    <attenuation range="1000" constant="0.9" linear="0.01" quadratic="0.0"/>
+    <direction xyz="0.8 0.8 -0.8"/>
   </light>
 </gazebo>

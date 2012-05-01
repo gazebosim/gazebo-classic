@@ -982,7 +982,6 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
   TiXmlElement *cgXml = effectXml->FirstChildElement("profile_CG");
   if (cgXml)
     gzerr << "profile_CG unsupported\n";
-
   return mat;
 }
 

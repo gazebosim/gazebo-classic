@@ -22,6 +22,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
+#include "physics/bullet/bullet_inc.h"
 #include "physics/bullet/BulletLink.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletSliderJoint.hh"
@@ -65,10 +66,35 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
   frame1 = btTransform::getIdentity();
   frame2 = btTransform::getIdentity();
 
+  math::Vector3 pivotA, pivotB;
+
+  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
+  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
+
+  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
+  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
+
+  std::cout << "AnchorPos[" << this->anchorPos << "]\n";
+  std::cout << "Slider PivotA[" << pivotA << "] PivotB[" << pivotB << "]\n";
+
+  frame1.setOrigin(btVector3(pivotA.x, pivotA.y, pivotA.z));
+  frame2.setOrigin(btVector3(pivotB.x, pivotB.y, pivotB.z));
+
+  frame1.getBasis().setEulerZYX(0, M_PI*0.5, 0);
+  frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
+
   this->btSlider = new btSliderConstraint(
-      *bulletParentLink->GetBulletLink(),
       *bulletChildLink->GetBulletLink(),
-      frame1, frame2, true);
+      *bulletParentLink->GetBulletLink(),
+      frame2, frame1, true);
+
+  //this->btSlider->setLowerAngLimit(0.0);
+  //this->btSlider->setUpperAngLimit(0.0);
+
+  double pos = this->btSlider->getLinearPos();
+  std::cout << "Pos[" << pos << "]\n";
+  this->btSlider->setLowerLinLimit(pos);
+  this->btSlider->setUpperLinLimit(pos+0.9);
 
   this->constraint = this->btSlider;
 
@@ -113,19 +139,27 @@ void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetForce(int /*_index*/, double _force)
 {
-  gzerr << "Not implemented\n";
+  /*btVector3 hingeAxisLocal = this->btSlider->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
+  btVector3 hingeAxisWorld = this->btSlider->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
+
+  btVector3 hingeTorque = _torque * hingeAxisWorld;
+  */
+
+  btVector3 force(0, 0, _force);
+  this->constraint->getRigidBodyA().applyCentralForce(force);
+  this->constraint->getRigidBodyB().applyCentralForce(-force);
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetHighStop(int /*_index*/, math::Angle _angle)
+void BulletSliderJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
 {
-  this->btSlider->setUpperLinLimit(_angle.GetAsRadian());
+  // this->btSlider->setUpperLinLimit(_angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetLowStop(int /*_index*/, math::Angle _angle)
+void BulletSliderJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
 {
-  this->btSlider->setLowerLinLimit(_angle.GetAsRadian());
+  // this->btSlider->setLowerLinLimit(_angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
@@ -151,3 +185,19 @@ double BulletSliderJoint::GetMaxForce(int /*_index*/)
 {
   return this->btSlider->getMaxLinMotorForce();
 }
+
+//////////////////////////////////////////////////
+math::Vector3 BulletSliderJoint::GetGlobalAxis(int /*_index*/) const
+{
+  gzerr << "Not implemented\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletSliderJoint::GetAngleImpl(int /*_index*/) const
+{
+  gzerr << "Not implemented\n";
+  return math::Angle();
+}
+
+

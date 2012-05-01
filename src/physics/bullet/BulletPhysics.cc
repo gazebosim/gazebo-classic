@@ -30,9 +30,10 @@
 
 #include "physics/bullet/BulletHingeJoint.hh"
 #include "physics/bullet/BulletUniversalJoint.hh"
-/*#include "physics/bullet/BulletHinge2Joint.hh"
-#include "physics/bullet/BulletSliderJoint.hh"
 #include "physics/bullet/BulletBallJoint.hh"
+#include "physics/bullet/BulletSliderJoint.hh"
+
+/*#include "physics/bullet/BulletHinge2Joint.hh"
 */
 
 #include "physics/PhysicsTypes.hh"
@@ -134,7 +135,15 @@ void BulletPhysics::UpdatePhysics()
   // steps = 1;
   // this->dynamicsWorld->stepSimulation(time, steps, (**this->stepTimeP));
   //this->dynamicsWorld->stepSimulation(this->stepTimeDouble);
-  this->dynamicsWorld->stepSimulation(1/60000.0, 10);//this->stepTimeDouble);
+
+  common::Time currTime =  common::Time::GetWallTime();
+  float step = std::max((currTime - this->lastUpdateTime).Float(), 0.00001f); 
+  this->lastUpdateTime = currTime;
+
+  //step = 1.0f/60000.0f;
+  printf("Step[%12.10f] StepTime[%f] F[%f]\n", step, this->stepTimeDouble,1/60000.0);
+  this->dynamicsWorld->stepSimulation(step, 5, 0.001f);
+  //this->dynamicsWorld->stepSimulation(1/60000.0, 7, this->stepTimeDouble);
 
   this->physicsUpdateMutex->unlock();
 }
@@ -227,15 +236,15 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type)
     joint.reset(new BulletHingeJoint(this->dynamicsWorld));
   else if (_type == "universal")
     joint.reset(new BulletUniversalJoint(this->dynamicsWorld));
+  else if (_type == "ball")
+    joint.reset(new BulletBallJoint(this->dynamicsWorld));
+  else if (_type == "prismatic")
+    joint.reset(new BulletSliderJoint(this->dynamicsWorld));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
-  /*if (_type == "slider")
-    joint.reset(new BulletSliderJoint(this->dynamicsWorld));
-  else if (_type == "hinge2")
+  /*  else if (_type == "hinge2")
     joint.reset(new BulletHinge2Joint(this->dynamicsWorld));
-  else if (_type == "ball")
-    joint.reset(new BulletBallJoint(this->dynamicsWorld));
     */
 
   return joint;

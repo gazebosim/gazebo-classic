@@ -101,7 +101,7 @@ void BulletBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 }
 
 /////////////////////////////////////////////////
-double BulletBallJoint::GetVelocity(int _index) const
+double BulletBallJoint::GetVelocity(int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;

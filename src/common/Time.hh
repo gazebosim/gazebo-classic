@@ -77,6 +77,10 @@ namespace gazebo
       /// \return Time as a double
       public: double Double() const;
 
+      /// \brief Get the time as a float
+      /// \return Time as a float
+      public: float Float() const;
+
       /// \brief Millisecond sleep
       public: static Time MSleep(unsigned int _ms);
 

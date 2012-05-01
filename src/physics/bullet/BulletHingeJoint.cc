@@ -18,10 +18,6 @@
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
  */
-/*
-#include "Model.hh"
-#include "World.hh"
-*/
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
@@ -72,6 +68,9 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
   pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
 
+  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
+  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
+
   axisA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis);
   axisA = axisA.Round();
 
@@ -86,14 +85,16 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
       btVector3(axisA.x, axisA.y, axisA.z),
       btVector3(axisB.x, axisB.y, axisB.z));
 
-  this->constraint =  this->btHinge;
+  this->constraint = this->btHinge;
 
+  double angle = this->btHinge->getHingeAngle();
+  std::cout << "Hinge Angle[" << this->btHinge->getHingeAngle() << "]\n";
+  this->btHinge->setLimit(angle - .4, angle + .4);
   // Add the joint to the world
   this->world->addConstraint(this->btHinge, true);
 
   // Allows access to impulse
   this->btHinge->enableFeedback(true);
-  // this->btHinge->setAngularOnly(true);
 }
 
 //////////////////////////////////////////////////
@@ -141,12 +142,7 @@ math::Angle BulletHingeJoint::GetAngle(int /*_index*/) const
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetVelocity(int _index, double _angle)
 {
-  //this->btHinge->enableAngularMotor(true, _angle, this->GetMaxForce(_index));
-  math::Vector3 axis = this->GetLocalAxis(_index);
-  // axis = axis * _angle;
-  std::cout << "Axis[" << axis << "][" << _angle << "]\n";
-  //this->childLink->SetAngularVel(axis);
-  //this->parentLink->SetAngularVel(axis);
+  // this->btHinge->enableAngularMotor(true, -_angle, this->GetMaxForce(_index));
 }
 
 //////////////////////////////////////////////////
@@ -169,15 +165,25 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetForce(int /*_index*/, double /*_torque*/)
+void BulletHingeJoint::SetForce(int _index, double _torque)
 {
-  gzerr << "Not implemented...\n";
+  // math::Vector3 axis = this->GetLocalAxis(_index);
+  // this->btHinge->enableAngularMotor(true);
+
+  btVector3 hingeAxisLocal = this->btHinge->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
+  btVector3 hingeAxisWorld = this->btHinge->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
+
+  btVector3 hingeTorque = _torque * hingeAxisWorld;
+
+  this->btHinge->getRigidBodyA().applyTorque(hingeTorque);
+  this->btHinge->getRigidBodyB().applyTorque(-hingeTorque);
 }
+
 
 //////////////////////////////////////////////////
 double BulletHingeJoint::GetForce(int /*_index*/)
 {
-  gzerr << "Not implemented...\n";
+  return this->btHinge->getAppliedImpulse();
   return 0;
 }
 
@@ -186,13 +192,11 @@ void BulletHingeJoint::SetHighStop(int _index, math::Angle _angle)
 {
   if (this->btHinge)
   {
-    std::cout << "SetHingeHighStop\n";
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    //this->btHinge->setLimit(0,0);
-    this->btHinge->setLimit(
-        this->GetLowStop(_index).GetAsRadian(), _angle.GetAsRadian());
+    //this->btHinge->setLimit(this->btHinge->getLowerLimit(),
+    //                        _angle.GetAsRadian());
   }
   else
   {
@@ -205,12 +209,11 @@ void BulletHingeJoint::SetLowStop(int _index, math::Angle _angle)
 {
   if (this->btHinge)
   {
-    std::cout << "SetHingeLowStop\n";
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    this->btHinge->setLimit(
-        _angle.GetAsRadian(), this->GetHighStop(_index).GetAsRadian());
+    //this->btHinge->setLimit(-_angle.GetAsRadian(),
+    //                        this->btHinge->getUpperLimit());
   }
   else
     gzthrow("Joint must be created first");

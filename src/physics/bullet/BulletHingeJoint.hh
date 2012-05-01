@@ -98,10 +98,10 @@ namespace gazebo
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int _index);
 
-      /// Get the axis of rotation
+      /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// Get the angle of rotation
+      /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
 
       private: btHingeConstraint *btHinge;

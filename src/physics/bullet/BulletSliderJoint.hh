@@ -88,6 +88,12 @@ namespace gazebo
       /// \brief Get the max allowed force of an axis(index).
       public: virtual double GetMaxForce(int _index);
 
+      /// \brief Get the axis of rotation
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+
+      /// \brief Get the angle of rotation
+      public: virtual math::Angle GetAngleImpl(int _index) const;
+
       private: btSliderConstraint *btSlider;
     };
 

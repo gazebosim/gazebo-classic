@@ -2,6 +2,14 @@
 <gazebo version="1.0">
   <world name="default">
 
+    <physics type="bullet">
+      <gravity xyz="0 0 -9.8"/>
+      <bullet>
+        <dt>0.001</dt>
+      </bullet>
+    </physics>
+
+    <!--
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
@@ -9,6 +17,7 @@
         <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="0.0" contact_surface_layer="0.001"/>
       </ode>
     </physics>
+    -->
 
     <!-- A ground plane -->
     <include filename="ground_plane.model"/>
@@ -20,12 +29,18 @@
 
     <model name="cylinder">
       <origin pose="0.25 0 0.2 0 0 0"/>
-      <link name="link">
+      <link name="link" gravity="true">
         <inertial mass="0.01"/>
         <collision name="collision">
           <geometry>
-            <cylinder radius="0.125" length="0.4"/>
+            <cylinder radius="0.13" length="0.4"/>
           </geometry>
+        <surface>
+          <friction>
+            <ode mu="9000000.0" mu2="9000000.0"/>
+          </friction>
+        </surface>
+
         </collision>
         <visual name="virtual">
           <geometry>
