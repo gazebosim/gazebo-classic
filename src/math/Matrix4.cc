@@ -149,6 +149,58 @@ Quaternion Matrix4::GetRotation() const
 }
 
 //////////////////////////////////////////////////
+Vector3 Matrix4::GetEulerRotation(unsigned int solution_number) const
+{
+  Vector3 euler;
+  Vector3 euler2;
+
+  double m31 = this->m[2][0];
+  double m11 = this->m[0][0];
+  double m12 = this->m[0][1];
+  double m13 = this->m[0][2];
+  double m32 = this->m[2][1];
+  double m33 = this->m[2][2];
+  double m21 = this->m[1][0];
+
+  if (fabs(m31) >= 1.0)
+  {
+    euler.z = 0.0;
+    euler2.z = 0.0;
+
+    if (m31 < 0.0)
+    {
+      euler.y = M_PI / 2.0;
+      euler2.y = M_PI / 2.0;
+      euler.x = atan2(m12, m13);
+      euler2.x = atan2(m12, m13);
+    }
+    else
+    {
+      euler.y = -M_PI / 2.0;
+      euler2.y = -M_PI / 2.0;
+      euler.x = atan2(-m12, -m13);
+      euler2.x = atan2(-m12, -m13);
+    }
+  }
+  else
+  {
+    euler.y = -asin(m31);
+    euler2.y = M_PI - euler.y;
+
+    euler.x = atan2(m32 / cos(euler.y), m33 / cos(euler.y));
+    euler2.x = atan2(m32 / cos(euler2.y), m33 / cos(euler2.y));
+
+    euler.z = atan2(m21 / cos(euler.y), m11 / cos(euler.y));
+    euler2.z = atan2(m21 / cos(euler2.y), m11 / cos(euler2.y));
+  }
+
+  if (solution_number == 1)
+    return euler;
+  else
+    return euler2;
+}
+
+//////////////////////////////////////////////////
 void Matrix4::SetScale(const Vector3 &_s)
 {
   this->m[0][0] = _s.x;

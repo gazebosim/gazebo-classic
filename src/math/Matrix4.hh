@@ -101,6 +101,9 @@ namespace gazebo
       /// \brief Get the rotation as a quaternion
       public: Quaternion GetRotation() const;
 
+      /// \brief Get the rotation as a Euler angles
+      public: Vector3 GetEulerRotation(unsigned int solution_number = 1) const;
+
       /// \brief Get the transformation as math::Pose
       public: math::Pose GetAsPose() const;
 
@@ -173,7 +176,7 @@ namespace gazebo
               {
                 for (int j = 0; j < 4; j++)
                 {
-                  _out << _m.m[i][j] << " ";
+                  _out << (fabs(_m.m[i][j]) < 1e-6 ? 0 : _m.m[i][j]) << " ";
                 }
                 _out << "\n";
               }

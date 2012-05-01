@@ -291,7 +291,7 @@ bool SkeletonNode::IsJoint()
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::SetTransform(math::Matrix4 _trans)
+void SkeletonNode::SetTransform(math::Matrix4 _trans, bool _updateChildren)
 {
   this->transform = _trans;
 
@@ -301,6 +301,30 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
     this->modelTransform = this->parent->GetModelTransform() * _trans;
 
   /// propagate the change to the children nodes
+  if (_updateChildren)
+    this->UpdateChildrenTransforms();
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::SetInitialTransform(math::Matrix4 _trans)
+{
+  this->initialTransform = _trans;
+  this->SetTransform(_trans);
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::Reset(bool resetChildren)
+{
+  this->SetTransform(this->initialTransform);
+
+  if (resetChildren)
+    for (unsigned int i = 0; i < this->GetChildCount(); i++)
+      this->GetChild(i)->Reset(true);
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::UpdateChildrenTransforms()
+{
   std::list<SkeletonNode*> toVisit;
   for (unsigned int i = 0; i < this->children.size(); i++)
     toVisit.push_back(this->children[i]);
@@ -310,7 +334,7 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
     SkeletonNode *node = toVisit.front();
     toVisit.pop_front();
 
-    for (int i = (node->GetChildCount() - 1); i >= 0; i++)
+    for (int i = (node->GetChildCount() - 1); i >= 0; i--)
       toVisit.push_front(node->GetChild(i));
 
     node->modelTransform = node->GetParent()->modelTransform * node->transform;
@@ -321,6 +345,23 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
 math::Matrix4 SkeletonNode::GetTransform()
 {
   return this->transform;
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::SetModelTransform(math::Matrix4 _trans, bool _updateChildren)
+{
+  this->modelTransform = _trans;
+
+  if (this->parent == NULL)
+    this->transform = _trans;
+  else
+  {
+    math::Matrix4 invParentTrans = this->parent->GetModelTransform().Inverse();
+    this->transform = invParentTrans * this->modelTransform;
+  }
+
+  if (_updateChildren)
+    this->UpdateChildrenTransforms();
 }
 
 //////////////////////////////////////////////////

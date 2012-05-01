@@ -132,7 +132,17 @@ namespace gazebo
 
       public: bool IsJoint();
 
-      public: void SetTransform(math::Matrix4 _trans);
+      public: void SetTransform(math::Matrix4 _trans,
+                                  bool _updateChildren = true);
+
+      public: void SetModelTransform(math::Matrix4 _trans,
+                                  bool _updateChildren = true);
+
+      public: void UpdateChildrenTransforms();
+
+      public: void SetInitialTransform(math::Matrix4 _tras);
+
+      public: void Reset(bool resetChildren);
 
       /// \brief Get transform relative to parent
       public: math::Matrix4 GetTransform();
@@ -182,6 +192,8 @@ namespace gazebo
       protected: SkeletonNodeType type;
 
       protected: math::Matrix4 transform;
+
+      protected: math::Matrix4 initialTransform;
 
       protected: math::Matrix4 modelTransform;
 
