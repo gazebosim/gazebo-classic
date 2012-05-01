@@ -145,9 +145,10 @@ void BulletHingeJoint::SetVelocity(int _index, double _angle)
 {
   //this->btHinge->enableAngularMotor(true, _angle, this->GetMaxForce(_index));
   math::Vector3 axis = this->GetLocalAxis(_index);
-  axis = axis * _angle;
-  this->childLink->SetAngularVel(axis);
-  this->parentLink->SetAngularVel(axis);
+  // axis = axis * _angle;
+  std::cout << "Axis[" << axis << "][" << _angle << "]\n";
+  //this->childLink->SetAngularVel(axis);
+  //this->parentLink->SetAngularVel(axis);
 }
 
 //////////////////////////////////////////////////

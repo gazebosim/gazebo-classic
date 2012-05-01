@@ -18,16 +18,8 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
-/*
-#include <sstream>
 
-#include "PhysicsEngine.hh"
-#include "BulletPhysics.hh"
-#include "rendering/Visual.hh"
-#include "common/Console.hh"
-#include "World.hh"
-*/
-
+#include "physics/bullet/bullet_inc.h"
 #include "physics/bullet/BulletCollision.hh"
 
 using namespace gazebo;
@@ -87,17 +79,16 @@ void BulletCollision::SetCollideBits(unsigned int /*_bits*/)
 //////////////////////////////////////////////////
 math::Box BulletCollision::GetBoundingBox() const
 {
-  /*
+  math::Box result;
   if (this->collisionShape)
   {
-    btmath::Vector3 btMin, btMax;
+    btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    _min.Set(btMin.x(), btMin.y(), btMin.z());
-    _max.Set(btMax.x(), btMax.y(), btMax.z());
+    result.min.Set(btMin.x(), btMin.y(), btMin.z());
+    result.max.Set(btMax.x(), btMax.y(), btMax.z());
   }
-  */
-  return math::Box();
+  return result;
 }
 
 //////////////////////////////////////////////////

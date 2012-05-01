@@ -82,9 +82,12 @@ void DiffDrivePlugin::Init()
       this->leftJoint->GetChild());
 
   math::Box bb = parent->GetBoundingBox();
+  std::cout << "BB[" << bb << "][" << bb.GetSize() << "]\n";
+  std::cout << "LA[" << this->leftJoint->GetLocalAxis(0) << "]\n";
   math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
 
   this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.25;
+  printf("WheelRadius[%f]\n", this->wheelRadius);
 }
 
 /////////////////////////////////////////////////
