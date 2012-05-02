@@ -9,6 +9,7 @@ set (files
   model_nesting.world
   pioneer2dx.world
   drop_test.world
+  collision_test.world
   simple_pendulums.world
   double_pendulums.world
   plugin.world

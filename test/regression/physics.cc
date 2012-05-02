@@ -83,6 +83,86 @@ TEST_F(PhysicsTest, State)
   Unload();
 }
 
+TEST_F(PhysicsTest, CollisionTest)
+{
+  // check conservation of mementum for linear inelastic collision
+  Load("worlds/collision_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  {
+    // todo: get parameters from drop_test.world
+    double test_duration = 1.1;
+    double dt = world->GetPhysicsEngine()->GetStepTime();
+
+    double f = 1000.0;
+    double v = 0;
+    double x = 0;
+
+    int steps = test_duration/dt;
+
+    for (int i = 0; i < steps; i++)
+    {
+      double t = world->GetSimTime().Double();
+      // gzdbg << "debug v[" << v << "] x[" << z << "]\n";
+
+      world->StepWorld(1);  // theoretical contact, but
+      {
+        physics::ModelPtr box_model = world->GetModel("box");
+        if (box_model)
+        {
+          math::Vector3 vel = box_model->GetWorldLinearVel();
+          math::Pose pose = box_model->GetWorldPose();
+          gzdbg << "box time [" << t
+                << "] sim x [" << pose.pos.x
+                << "] ideal x [" << x
+                << "] sim vx [" << vel.x
+                << "] ideal vx [" << v
+                << "]\n";
+
+          if (i == 0)
+            box_model->GetLink("link")->SetForce(math::Vector3(1000,0,0));
+          EXPECT_TRUE(fabs(pose.pos.x - x) < 0.00001);
+          EXPECT_TRUE(fabs(vel.x - v) < 0.00001);
+        }
+
+        physics::ModelPtr sphere_model = world->GetModel("sphere");
+        if (sphere_model)
+        {
+          math::Vector3 vel = sphere_model->GetWorldLinearVel();
+          math::Pose pose = sphere_model->GetWorldPose();
+          gzdbg << "sphere time [" << world->GetSimTime().Double()
+                << "] sim x [" << pose.pos.x
+                << "] ideal x [" << x
+                << "] sim vx [" << vel.x
+                << "] ideal vx [" << v
+                << "]\n";
+          if (t < 1.001)
+          {
+            EXPECT_TRUE(pose.pos.x == 2);
+            EXPECT_TRUE(vel.x == 0);
+          }
+          else
+          {
+            EXPECT_TRUE(fabs(pose.pos.x - x - 1.0) < 0.00001);
+            EXPECT_TRUE(fabs(vel.x - v) < 0.00001);
+          }
+        }
+
+      }
+
+      // integrate here to see when the collision should happen
+      double impulse = dt*f;
+      if (i == 0) v = v + impulse;
+      else if (t < 1.0) v = v;
+      else        v = dt*f/ 2.0; // perfectly inelastic of equal mass
+      x = x + dt * v;
+
+    }
+  }
+  Unload();
+}
+
 TEST_F(PhysicsTest, DropStuff)
 {
   Load("worlds/drop_test.world", true);
