@@ -1901,17 +1901,23 @@ void dxQuickStepper (dxWorldProcessContext *context,
     const dReal *caccel_erp_curr = caccel_erp;
     const dReal *caccel_curr = caccel;
     dxBody *const *const bodyend = body + nb;
+    int debug_count = 0;
     for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-         caccel_curr+=6, caccel_erp_curr+=6, bodycurr++) {
+         caccel_curr+=6, caccel_erp_curr+=6, bodycurr++, debug_count++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
-        dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
-        b_ptr->lvel[j] += dv;
-        b_ptr->avel[j] += da;
-        /*
         dReal v0 = b_ptr->lvel[j];
         dReal a0 = b_ptr->avel[j];
+        dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
+        dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
+
+        /* default v removal
+        */
+        b_ptr->lvel[j] += dv;
+        b_ptr->avel[j] += da;
+        /* think about minimize J*v somehow without SORLCP...
+        */
+        /* minimize final velocity test 1,
         if (v0 * dv < 0) {
           if (fabs(v0) < fabs(dv))
             b_ptr->lvel[j] = 0.0;
@@ -1925,11 +1931,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
             b_ptr->avel[j] += da;
         }
         */
-        /*  DEBUG PRINTOUTS
-        printf(" i[%d] v[%f] dv[%f] vf[%f] a[%f] da[%f] af[%f] debug[%f - %f]\n"
-               ,j, v0, dv, b_ptr->lvel[j]
+
+        /*  DEBUG PRINTOUTS, total forces/accel on a body
+        printf("nb[%d] m[%d] b[%d] i[%d] v[%f] dv[%f] vf[%f] a[%f] da[%f] af[%f] debug[%f - %f][%f - %f]\n"
+               ,nb, m, debug_count, j, v0, dv, b_ptr->lvel[j]
                  , a0, da, b_ptr->avel[j]
-               ,caccel_curr[j], caccel_erp_curr[j]);
+               ,caccel_curr[j], caccel_erp_curr[j]
+               ,caccel_curr[3+j], caccel_erp_curr[3+j]);
         */
       }
       /*  DEBUG PRINTOUTS
