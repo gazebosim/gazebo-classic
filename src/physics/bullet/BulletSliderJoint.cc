@@ -92,7 +92,6 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
   //this->btSlider->setUpperAngLimit(0.0);
 
   double pos = this->btSlider->getLinearPos();
-  std::cout << "Pos[" << pos << "]\n";
   this->btSlider->setLowerLinLimit(pos);
   this->btSlider->setUpperLinLimit(pos+0.9);
 

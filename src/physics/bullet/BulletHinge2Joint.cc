@@ -190,3 +190,17 @@ math::Angle BulletHinge2Joint::GetLowStop(int _index)
   gzthrow("Unable to get high stop for axis _index[" << _index << "]");
   return 0;
 }
+
+//////////////////////////////////////////////////
+math::Vector3 BulletHinge2Joint::GetGlobalAxis(int /*_index*/) const
+{
+  gzerr << "BulletHinge2Joint::GetGlobalAxis not implemented\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletHinge2Joint::GetAngleImpl(int /*_index*/) const
+{
+  gzerr << "BulletHinge2Joint::GetAngleImpl not implemented\n";
+  return math::Angle();
+}

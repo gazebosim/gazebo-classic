@@ -17,9 +17,9 @@ set (sources
   BulletSliderJoint.cc
   BulletUniversalJoint.cc
   BulletBallJoint.cc
-  BulletHinge2Joint.cc)
+  BulletHinge2Joint.cc
+  BulletScrewJoint.cc)
 
-#             BulletScrewJoint.cc
              #BulletRayGeom.cc
 
 
