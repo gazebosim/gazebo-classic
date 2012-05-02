@@ -22,11 +22,13 @@
 #include "physics/bullet/BulletTypes.hh"
 #include "physics/bullet/BulletLink.hh"
 #include "physics/bullet/BulletCollision.hh"
+
 #include "physics/bullet/BulletPlaneShape.hh"
 #include "physics/bullet/BulletSphereShape.hh"
 #include "physics/bullet/BulletBoxShape.hh"
 #include "physics/bullet/BulletCylinderShape.hh"
 #include "physics/bullet/BulletTrimeshShape.hh"
+#include "physics/bullet/BulletRayShape.hh"
 
 #include "physics/bullet/BulletHingeJoint.hh"
 #include "physics/bullet/BulletUniversalJoint.hh"
@@ -196,6 +198,11 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     shape.reset(new BulletCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new BulletTrimeshShape(collision));
+  else if (_type == "ray")
+    if (_collision)
+      shape.reset(new BulletRayShape(_collision, false));
+    else
+      shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
   else 
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -205,11 +212,6 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     shape.reset(new BulletHeightmapShape(collision));
   else if (_type == "map" || _type == "image")
     shape.reset(new MapShape(collision));
-  else if (_type == "ray")
-    if (_collision)
-      shape.reset(new BulletRayShape(collision, false));
-    else
-      shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
     */
   return shape;
 }

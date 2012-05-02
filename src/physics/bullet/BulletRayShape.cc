@@ -19,34 +19,78 @@
  * Date: 24 May 2009
  */
 
-// #include "Link.hh"
+#include "physics/World.hh"
+#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletPhysics.hh"
+#include "physics/bullet/BulletTypes.hh"
+#include "physics/bullet/BulletCollision.hh"
+#include "physics/bullet/BulletRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
+//////////////////////////////////////////////////
+BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
+  : RayShape(_physicsEngine)
+{
+  this->SetName("ODE Ray Shape");
+
+  this->physicsEngine =
+    boost::shared_static_cast<BulletPhysics>(_physicsEngine);
+}
 
 //////////////////////////////////////////////////
-BulletRayCollision::BulletRayCollision(Link *_body, bool _displayRays)
-    : RayCollision<BulletCollision>(body, displayRays)
+BulletRayShape::BulletRayShape(CollisionPtr _parent, bool _displayRays)
+    : RayShape(_parent, _displayRays)
+{
+  this->SetName("Bullet Ray Shape");
+  this->physicsEngine = boost::shared_static_cast<BulletPhysics>(
+      this->collisionParent->GetWorld()->GetPhysicsEngine());
+}
+
+//////////////////////////////////////////////////
+BulletRayShape::~BulletRayShape()
 {
 }
 
 //////////////////////////////////////////////////
-BulletRayCollision::~BulletRayCollision()
+void BulletRayShape::Update()
 {
 }
 
 //////////////////////////////////////////////////
-void BulletRayCollision::Update()
+void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 {
-  RayCollision<BulletCollision>::Update();
+  _dist = 0;
+  _entity = "";
+
+  if (this->physicsEngine && this->collisionParent)
+  {
+    btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
+        this->globalStartPos.z);
+
+    btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
+        this->globalEndPos.z);
+
+    btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+
+    this->physicsEngine->GetDynamicsWorld()->rayTest(start, end, rayCallback);
+    if (rayCallback.hasHit())
+    {
+      math::Vector3 result(rayCallback.m_hitPointWorld.getX(), 
+                           rayCallback.m_hitPointWorld.getY(),
+                           rayCallback.m_hitPointWorld.getZ());
+      _dist = this->globalStartPos.Distance(result);
+      _entity = static_cast<BulletLink*>(
+          rayCallback.m_collisionObject->getUserPointer())->GetName();
+    }
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletRayCollision::SetPoints(const math::Vector3 &_posStart,
+void BulletRayShape::SetPoints(const math::Vector3 &_posStart,
                                    const math::Vector3 &_posEnd)
 {
-  RayCollision<BulletCollision>::SetPoints(_posStart, _posEnd);
+  this->globalStartPos = _posStart;
+  this->globalEndPos = _posEnd;
 }
-
-

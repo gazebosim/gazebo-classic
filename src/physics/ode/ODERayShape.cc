@@ -33,6 +33,8 @@ using namespace physics;
 ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
   : RayShape(_physicsEngine)
 {
+  this->SetName("ODE Ray Shape");
+
   this->physicsEngine =
     boost::shared_static_cast<ODEPhysics>(_physicsEngine);
   this->geomId = dCreateRay(this->physicsEngine->GetSpaceId(), 2.0);

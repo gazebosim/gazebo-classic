@@ -18,9 +18,8 @@ set (sources
   BulletUniversalJoint.cc
   BulletBallJoint.cc
   BulletHinge2Joint.cc
-  BulletScrewJoint.cc)
-
-             #BulletRayGeom.cc
+  BulletScrewJoint.cc
+  BulletRayShape.cc)
 
 
 gz_add_library(gazebo_physics_bullet ${sources})

@@ -19,54 +19,54 @@
  * Date: 24 May 2009
  */
 
-#ifndef BULLETRAYGEOM_HH
-#define BULLETRAYGEOM_HH
+#ifndef __BULLETRAYGEOM_HH__
+#define __BULLETRAYGEOM_HH__
 
-#include "BulletCollision.hh"
-#include "RayCollision.hh"
+#include <string>
+
+#include "physics/RayShape.hh"
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
   namespace physics
-{
-  class OgreDynamicLines;
-  class Visual;
-
-  /// \addtogroup gazebo_physics_collision
-  /// \{
-  /** \defgroup gazebo_ray_collision Ray collision
-      \brief Ray collision
-
-      This collision is used soley by ray sensors. It should not be directly
-      included in a world file.
-  */
-  /// \}
-  /// \addtogroup gazebo_ray_collision
-  /// \{
-  /// \brief Ray collision
-  class BulletRayCollision : public RayCollision<BulletCollision>
   {
-    /// \brief Constructor
-    /// \param body Link the ray is attached to
-    /// \param displayRays Indicates if the rays should be displayed when
-    ///        rendering images
-    public: BulletRayCollision(Link *body, bool displayRays);
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
+    /// \brief Ray shape
+    class BulletRayShape : public RayShape
+    {
+      public: BulletRayShape(PhysicsEnginePtr _physicsEngine);
 
-    /// \brief Destructor
-    public: virtual ~BulletRayCollision();
+      /// \brief Constructor
+      /// \param body Link the ray is attached to
+      /// \param displayRays Indicates if the rays should be displayed when
+      ///        rendering images
+      public: BulletRayShape(CollisionPtr _collision, bool _displayRays);
+  
+      /// \brief Destructor
+      public: virtual ~BulletRayShape();
 
-    /// \brief Set the ray based on starting and ending points relative to
-    ///        the body
-    /// \param posStart Start position, relative the body
-    /// \param posEnd End position, relative to the body
-    public: void SetPoints(const math::Vector3 &posStart,
-                           const math::Vector3 &posEnd);
+      /// \brief Update the ray collision
+      public: virtual void Update();
 
-    /// \brief Update the tay collision
-    public: void Update();
-  };
+      /// \brief Get the nearest intersection
+      public: virtual void GetIntersection(double &_dist, std::string &_entity);
 
-  /// \}
-}
+      /// \brief Set the ray based on starting and ending points relative to
+      ///        the body
+      /// \param posStart Start position, relative the body
+      /// \param posEnd End position, relative to the body
+      public: void SetPoints(const math::Vector3 &_posStart,
+                             const math::Vector3 &_posEnd);
+
+      private: BulletPhysicsPtr physicsEngine;
+      private: math::Vector3 globalStartPos, globalEndPos;
+    };
+    /// \}
+    /// \}
+  }
 }
 #endif
