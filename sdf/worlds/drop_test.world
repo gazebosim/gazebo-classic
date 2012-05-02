@@ -29,6 +29,9 @@
             <box size="1 1 1"/>
           </geometry>
           <surface>
+            <friction>
+              <ode mu="1" mu2="1"/>
+            </friction>
             <contact>
               <ode soft_erp="1" max_vel="0"/>
             </contact>
@@ -56,6 +59,9 @@
             <sphere radius="0.5"/>
           </geometry>
           <surface>
+            <friction>
+              <ode mu="1" mu2="1"/>
+            </friction>
             <contact>
               <ode soft_erp="1" max_vel="0"/>
             </contact>
@@ -83,6 +89,9 @@
             <cylinder radius="0.5" length="1.0"/>
           </geometry>
           <surface>
+            <friction>
+              <ode mu="1" mu2="1"/>
+            </friction>
             <contact>
               <ode soft_erp="1" max_vel="0"/>
             </contact>
