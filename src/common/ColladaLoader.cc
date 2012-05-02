@@ -1068,6 +1068,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   std::vector<math::Vector3> norms;
   std::vector<math::Vector2d> texcoords;
 
+  math::Matrix4 bindShapeMat(math::Matrix4::IDENTITY);
+  if (_mesh->HasSkeleton())
+    bindShapeMat = _mesh->GetSkeleton()->GetBindShapeTransform();
+
   // read input elements
   std::map<std::string, int> inputs;
   while (polylistInputXml)
@@ -1163,7 +1167,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         {
           if (iter->first == "VERTEX")
           {
-            subMesh->AddVertex(verts[values[iter->second]]);
+            subMesh->AddVertex(bindShapeMat * verts[values[iter->second]]);
             subMesh->AddIndex(subMesh->GetVertexCount()-1);
             if (combinedVertNorms)
               subMesh->AddNormal(norms[values[iter->second]]);
