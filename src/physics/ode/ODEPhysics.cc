@@ -805,8 +805,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Compute the CFM and ERP by assuming the two bodies form a
   // spring-damper system.
   double kp = 1.0 /
-    (1.0 / _collision1->surface->kp + 1.0 / _collision2->surface->kp);
-  double kd = _collision1->surface->kd + _collision2->surface->kd;
+    (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
+  double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
 
   contact.surface.soft_erp = h * kp / (h * kp + kd);
   contact.surface.soft_cfm = 1.0 / (h * kp + kd);
@@ -818,7 +818,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   // assign fdir1 if not set as 0
   math::Vector3 fd =
-    (_collision1->surface->fdir1 +_collision2->surface->fdir1) * 0.5;
+    (_collision1->GetSurface()->fdir1 +_collision2->GetSurface()->fdir1) * 0.5;
   if (fd != math::Vector3(0, 0, 0))
   {
     contact.surface.mode = dContactFDir1 | contact.surface.mode;
@@ -827,20 +827,21 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     contact.fdir1[2] = fd.z;
   }
 
-  contact.surface.mu = std::min(_collision1->surface->mu1,
-                                _collision2->surface->mu1);
-  contact.surface.mu2 = std::min(_collision1->surface->mu2,
-                                 _collision2->surface->mu2);
+  contact.surface.mu = std::min(_collision1->GetSurface()->mu1,
+                                _collision2->GetSurface()->mu1);
+  contact.surface.mu2 = std::min(_collision1->GetSurface()->mu2,
+                                 _collision2->GetSurface()->mu2);
 
-  contact.surface.slip1 = std::min(_collision1->surface->slip1,
-                                   _collision2->surface->slip1);
-  contact.surface.slip2 = std::min(_collision1->surface->slip2,
-                                   _collision2->surface->slip2);
+  contact.surface.slip1 = std::min(_collision1->GetSurface()->slip1,
+                                   _collision2->GetSurface()->slip1);
+  contact.surface.slip2 = std::min(_collision1->GetSurface()->slip2,
+                                   _collision2->GetSurface()->slip2);
 
-  contact.surface.bounce = std::min(_collision1->surface->bounce,
-                                    _collision2->surface->bounce);
-  contact.surface.bounce_vel = std::min(_collision1->surface->bounceThreshold,
-                                        _collision2->surface->bounceThreshold);
+  contact.surface.bounce = std::min(_collision1->GetSurface()->bounce,
+                                    _collision2->GetSurface()->bounce);
+  contact.surface.bounce_vel =
+    std::min(_collision1->GetSurface()->bounceThreshold,
+             _collision2->GetSurface()->bounceThreshold);
 
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());

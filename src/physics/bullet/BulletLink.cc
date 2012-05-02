@@ -95,17 +95,23 @@ void BulletLink::Init()
   btRigidBody::btRigidBodyConstructionInfo
     rigidLinkCI(btMass, this->motionState, this->compoundShape, fallInertia);
 
+  rigidLinkCI.m_linearDamping = this->inertial->GetLinearDamping();
+  rigidLinkCI.m_angularDamping = this->inertial->GetAngularDamping();
+
   // Create the new rigid body
   this->rigidLink = new btRigidBody(rigidLinkCI);
   this->rigidLink->setUserPointer(this);
   BulletPhysicsPtr phy = boost::shared_dynamic_cast<BulletPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
+  if (btMass <= 0.0)
+    this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+
   btDynamicsWorld *wd = phy->GetDynamicsWorld();
 
   wd->addRigidBody(this->rigidLink);
 
-  this->rigidLink->setSleepingThresholds(0,0);
+  // this->rigidLink->setSleepingThresholds(0,0);
 }
 
 //////////////////////////////////////////////////

@@ -150,6 +150,10 @@ namespace gazebo
       /// \brief Update parameters from a message
       public: void ProcessMsg(const msgs::Collision &_msg);
 
+      /// \brief Get the surface parameters
+      public: inline SurfaceParamsPtr GetSurface() const
+              {return this->surface;}
+
       private: msgs::Visual CreateCollisionVisual();
 
       /// The link this collision belongs to
@@ -169,7 +173,7 @@ namespace gazebo
       public: event::EventT<void (const std::string &,
                                   const Contact &)> contact;
 
-      public: SurfaceParamsPtr surface;
+      private: SurfaceParamsPtr surface;
       private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}

@@ -30,7 +30,7 @@
     <model name="cylinder">
       <origin pose="0.25 0 0.2 0 0 0"/>
       <link name="link" gravity="true">
-        <inertial mass="0.01"/>
+        <inertial mass="0.1"/>
         <collision name="collision">
           <geometry>
             <cylinder radius="0.13" length="0.4"/>

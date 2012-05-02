@@ -127,23 +127,11 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   this->physicsUpdateMutex->lock();
 
-  //int steps = (int) round((time / **this->stepTimeP).Double());
+  common::Time currTime =  this->world->GetRealTime();
 
-  //steps = std::max(steps, 1);
-
-  // time = 0.000001;
-  // steps = 1;
-  // this->dynamicsWorld->stepSimulation(time, steps, (**this->stepTimeP));
-  //this->dynamicsWorld->stepSimulation(this->stepTimeDouble);
-
-  common::Time currTime =  common::Time::GetWallTime();
-  float step = std::max((currTime - this->lastUpdateTime).Float(), 0.00001f); 
+  this->dynamicsWorld->stepSimulation(
+      (currTime - this->lastUpdateTime).Float(), 7, this->stepTimeDouble);
   this->lastUpdateTime = currTime;
-
-  //step = 1.0f/60000.0f;
-  printf("Step[%12.10f] StepTime[%f] F[%f]\n", step, this->stepTimeDouble,1/60000.0);
-  this->dynamicsWorld->stepSimulation(step, 5, 0.001f);
-  //this->dynamicsWorld->stepSimulation(1/60000.0, 7, this->stepTimeDouble);
 
   this->physicsUpdateMutex->unlock();
 }

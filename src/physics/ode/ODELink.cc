@@ -111,13 +111,13 @@ void ODELink::Init()
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
 
           // Set max_vel and min_depth
-          if (g->surface->maxVel < 0)
+          if (g->GetSurface()->maxVel < 0)
           {
-            g->surface->maxVel =
+            g->GetSurface()->maxVel =
              this->GetWorld()->GetPhysicsEngine()->GetContactMaxCorrectingVel();
           }
-          dBodySetMaxVel(this->linkId, g->surface->maxVel);
-          dBodySetMinDepth(this->linkId, g->surface->minDepth);
+          dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
+          dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
         }
       }
     }
@@ -285,8 +285,8 @@ void ODELink::UpdateSurface()
       if (g->IsPlaceable() && g->GetCollisionId())
       {
         // Set surface properties max_vel and min_depth
-        dBodySetMaxVel(this->linkId, g->surface->maxVel);
-        dBodySetMinDepth(this->linkId, g->surface->minDepth);
+        dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
+        dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
       }
     }
   }

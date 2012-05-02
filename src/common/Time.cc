@@ -109,8 +109,7 @@ double Time::Double() const
 /////////////////////////////////////////////////
 float Time::Float() const
 {
-  return (static_cast<float>(this->sec) +
-          static_cast<float>(this->nsec*1e-9));
+  return (this->sec + this->nsec * 1e-9f);
 }
 
 /////////////////////////////////////////////////
