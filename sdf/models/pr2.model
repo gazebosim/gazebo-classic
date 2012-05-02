@@ -133,7 +133,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
@@ -161,7 +161,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
@@ -217,7 +217,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
@@ -245,7 +245,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
@@ -301,7 +301,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
@@ -329,7 +329,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
@@ -385,7 +385,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
@@ -413,7 +413,7 @@
           </friction>
           <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
           <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.000000'/>
           </contact>
         </surface>
       </collision>
