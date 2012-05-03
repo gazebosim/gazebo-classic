@@ -2,6 +2,14 @@
 <gazebo version="1.0">
   <world name="default">
 
+    <physics type="bullet">
+      <gravity xyz="0 0 -9.8"/>
+      <bullet>
+        <dt>0.001</dt>
+      </bullet>
+    </physics>
+
+    <!--
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
@@ -9,13 +17,13 @@
         <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="0.0" contact_surface_layer="0.0001"/>
       </ode>
     </physics>
-
+-->
 
     <!-- A global light source -->
     <include filename="sun.light"/>
 
     <model name="sphere">
-      <origin pose="0.0 0 11.0 0 0 0"/>
+      <origin pose="5.0 0 11.0 0 0 0"/>
       <link name="link">
         <inertial mass="2.1">
           <inertia ixx=".01" ixy="0" ixz="0" iyy=".01" iyz="0" izz=".01"/>
@@ -34,7 +42,6 @@
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
-      <plugin filename="libmodel_push.so" name="test"/>
     </model>
 
     <model name="heightmap" static="true">

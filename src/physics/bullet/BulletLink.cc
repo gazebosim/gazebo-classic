@@ -62,6 +62,7 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
+  printf("BulletLink::Init\n");
   Link::Init();
 
   btScalar btMass = this->inertial->GetMass();
@@ -101,14 +102,19 @@ void BulletLink::Init()
   // Create the new rigid body
   this->rigidLink = new btRigidBody(rigidLinkCI);
   this->rigidLink->setUserPointer(this);
-  BulletPhysicsPtr phy = boost::shared_dynamic_cast<BulletPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+  this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
+      btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+
+
+  // Setup motion clamping to prevent objects from moving too fast.
+  // this->rigidLink->setCcdMotionThreshold(1);
+  // math::Vector3 size = this->GetBoundingBox().GetSize();
+  // this->rigidLink->setCcdSweptSphereRadius(size.GetMax()*0.8);
 
   if (btMass <= 0.0)
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
-  btDynamicsWorld *wd = phy->GetDynamicsWorld();
-
+  btDynamicsWorld *wd = this->bulletPhysics->GetDynamicsWorld();
   wd->addRigidBody(this->rigidLink);
 
   // this->rigidLink->setSleepingThresholds(0,0);

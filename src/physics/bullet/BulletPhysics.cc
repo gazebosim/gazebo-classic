@@ -25,6 +25,8 @@
 
 #include "physics/bullet/BulletPlaneShape.hh"
 #include "physics/bullet/BulletSphereShape.hh"
+#include "physics/bullet/BulletHeightmapShape.hh"
+#include "physics/bullet/BulletMultiRayShape.hh"
 #include "physics/bullet/BulletBoxShape.hh"
 #include "physics/bullet/BulletCylinderShape.hh"
 #include "physics/bullet/BulletTrimeshShape.hh"
@@ -57,6 +59,24 @@ using namespace physics;
 
 GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics)
 
+extern ContactAddedCallback gContactAddedCallback;
+extern ContactProcessedCallback gContactProcessedCallback;
+
+//////////////////////////////////////////////////
+bool ContactCallback(btManifoldPoint &_cp, const btCollisionObject *_obj0, int _partId0, int _index0,  const btCollisionObject *_obj1, int _partId1, int _index1)
+{
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool ContactProcessed(btManifoldPoint &_cp, void *_body0, void *_body1)
+{
+  if (_cp.getAppliedImpulse() > 0.03)
+    std::cout << "Impulse[" << _cp.getAppliedImpulse() << "] Dist[" << _cp.m_distance1 << "]\n";
+  // if (_cp.getAppliedImpulse() > 1.0)
+  return true;
+}
+
 //////////////////////////////////////////////////
 BulletPhysics::BulletPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
@@ -73,6 +93,10 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // Instantiate the world
   this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
       this->broadPhase, this->solver, this->collisionConfig);
+
+  // TODO: Enable this to do custom contact setting
+  gContactAddedCallback = ContactCallback;
+  gContactProcessedCallback = ContactProcessed;
 }
 
 //////////////////////////////////////////////////
@@ -105,6 +129,19 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   math::Vector3 g = this->sdf->GetOrCreateElement(
       "gravity")->GetValueVector3("xyz");
   this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
+
+  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+
+  // Split impulse feature. This can leads to improper stacking of objects
+  info.m_splitImpulse = 1;
+  info.m_splitImpulsePenetrationThreshold = -0.02;
+
+  if (bulletElem->HasElement("constraints"))
+  {
+    info.m_globalCfm =
+      bulletElem->GetElement("constraints")->GetValueDouble("cfm");
+    info.m_erp = bulletElem->GetElement("constraints")->GetValueDouble("erp");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -198,6 +235,10 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     shape.reset(new BulletCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new BulletTrimeshShape(collision));
+  else if (_type == "heightmap")
+    shape.reset(new BulletHeightmapShape(collision));
+  else if (_type == "multiray")
+    shape.reset(new BulletMultiRayShape(collision));
   else if (_type == "ray")
     if (_collision)
       shape.reset(new BulletRayShape(_collision));
@@ -206,10 +247,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
   else 
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
-  /*else if (_type == "multiray")
-    shape.reset(new BulletMultiRayShape(collision));
-  else if (_type == "heightmap")
-    shape.reset(new BulletHeightmapShape(collision));
+  /*
   else if (_type == "map" || _type == "image")
     shape.reset(new MapShape(collision));
     */
@@ -294,3 +332,5 @@ void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 void BulletPhysics::DebugPrint() const
 {
 }
+
+

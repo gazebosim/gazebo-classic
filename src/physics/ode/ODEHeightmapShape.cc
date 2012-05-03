@@ -101,19 +101,6 @@ void ODEHeightmapShape::FillHeightMap()
   }
 
   delete [] data;
-
-  /*
-  double ym = 0.0;
-  //for (double ym = 0; ym < 5; ym += 1.0)
-  {
-    for (double xm = -64; xm < 65; xm += 0.1) 
-    {
-      x = (xm/this->odeScale.x) + this->img.GetWidth() * 0.5;
-      y = (ym/this->odeScale.y) + this->img.GetHeight() * 0.5;
-      std::cout << "Physics: Height At[" << xm << "," << ym << "]=" 
-        << this->heights[y*this->odeVertSize+x] << "\n";
-    }
-  }*/
 }
 
 //////////////////////////////////////////////////
@@ -122,7 +109,7 @@ dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
   ODEHeightmapShape *collision = static_cast<ODEHeightmapShape*>(_data);
 
   // Return the height at a specific vertex
-  return collision->heights[_y * collision->odeVertSize + _x] + 0.1;
+  return collision->heights[_y * collision->odeVertSize + _x];
 }
 
 //////////////////////////////////////////////////

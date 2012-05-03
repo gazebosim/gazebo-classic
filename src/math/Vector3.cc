@@ -185,6 +185,17 @@ void Vector3::SetToMin(const Vector3 & _v)
   if (_v.z < this->z) this->z = _v.z;
 }
 
+//////////////////////////////////////////////////
+double Vector3::GetMax() const
+{
+  return std::max(std::max(this->x, this->y), this->z);
+}
+
+//////////////////////////////////////////////////
+double Vector3::GetMin() const
+{
+  return std::min(std::min(this->x, this->y), this->z);
+}
 
 //////////////////////////////////////////////////
 Vector3 &Vector3::operator =(const Vector3 &_pt)
