@@ -92,6 +92,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
     if (!this->mesh->HasSkeleton())
       gzthrow("Collada file does not contain skeletal animation.");
     this->skinSkeleton = mesh->GetSkeleton();
+    this->skinSkeleton->Scale(this->skinScale);
     /// create the link sdfs for the model
     NodeMap nodes = this->skinSkeleton->GetNodes();
 
@@ -133,7 +134,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
       {
         this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
                             math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
-        this->AddActorVisual(linkSdf, name + "_visual", math::Pose());
+        this->AddActorVisual(linkSdf, name + "_visual", pose.GetInverse());
         this->visualName = name + "::" + bone->GetName()
                              + "::" + name + "_visual";
       }
@@ -153,11 +154,14 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
         math::Vector3 r = curChild->GetTransform().GetTranslation();
         math::Vector3 linkPos = math::Vector3(r.x / 2.0, r.y / 2.0, r.z / 2.0);
-        double length = r.GetLength();
-        double theta = atan2(r.y, r.x);
+        math::Vector3 dir = curChild->GetModelTransform().GetTranslation() -
+            bone->GetModelTransform().GetTranslation();
+        double length = dir.GetLength();
+        double theta = atan2(dir.y, dir.x);
+        double phi = acos(dir.z / length);
 
-        double phi = acos(r.z / length);
         math::Pose bonePose(linkPos, math::Quaternion(0.0, phi, theta));
+        bonePose.rot = pose.rot.GetInverse() * bonePose.rot;
 
         this->AddBoxVisual(linkSdf, bone->GetName() + "_" + curChild->GetName()
           + "_link", bonePose, math::Vector3(0.02, 0.02, length),
@@ -434,6 +438,8 @@ void Actor::AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
   sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetOrCreateElement("mesh");
   meshSdf->GetAttribute("filename")->Set(this->skinFile);
+  meshSdf->GetAttribute("scale")->Set(math::Vector3(this->skinScale,
+      this->skinScale, this->skinScale));
 
   /// use a material with shading for now
   sdf::ElementPtr matSdf = visualSdf->GetOrCreateElement("material");
