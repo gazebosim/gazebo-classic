@@ -40,7 +40,7 @@ namespace gazebo
     class ODEHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
-      public: ODEHeightmapShape(CollisionPtr parent);
+      public: ODEHeightmapShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEHeightmapShape();

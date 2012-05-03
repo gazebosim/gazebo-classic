@@ -20,8 +20,8 @@ set (sources
   BulletHinge2Joint.cc
   BulletScrewJoint.cc
   BulletRayShape.cc
-  BulletMultiRayShape.cc)
-
+  BulletMultiRayShape.cc
+  BulletHeightmapShape.cc)
 
 gz_add_library(gazebo_physics_bullet ${sources})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
