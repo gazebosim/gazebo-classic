@@ -200,7 +200,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     shape.reset(new BulletTrimeshShape(collision));
   else if (_type == "ray")
     if (_collision)
-      shape.reset(new BulletRayShape(_collision, false));
+      shape.reset(new BulletRayShape(_collision));
     else
       shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
   else 

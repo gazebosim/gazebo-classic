@@ -45,8 +45,8 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
 
 
 //////////////////////////////////////////////////
-ODERayShape::ODERayShape(CollisionPtr _parent, bool _displayRays)
-    : RayShape(_parent, _displayRays)
+ODERayShape::ODERayShape(CollisionPtr _parent)
+    : RayShape(_parent)
 {
   this->SetName("ODE Ray Shape");
 

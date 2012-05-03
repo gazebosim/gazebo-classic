@@ -443,7 +443,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
     shape.reset(new MapShape(collision));
   else if (_type == "ray")
     if (_collision)
-      shape.reset(new ODERayShape(collision, false));
+      shape.reset(new ODERayShape(collision));
     else
       shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
   else

@@ -23,9 +23,7 @@
 #define __BULLETRAYGEOM_HH__
 
 #include <string>
-
 #include "physics/RayShape.hh"
-#include "physics/Shape.hh"
 
 namespace gazebo
 {
@@ -42,9 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param body Link the ray is attached to
-      /// \param displayRays Indicates if the rays should be displayed when
-      ///        rendering images
-      public: BulletRayShape(CollisionPtr _collision, bool _displayRays);
+      public: BulletRayShape(CollisionPtr _collision);
   
       /// \brief Destructor
       public: virtual ~BulletRayShape();
@@ -63,7 +59,7 @@ namespace gazebo
                              const math::Vector3 &_posEnd);
 
       private: BulletPhysicsPtr physicsEngine;
-      private: math::Vector3 globalStartPos, globalEndPos;
+      private: btCollisionWorld::ClosestRayResultCallback rayCallback;
     };
     /// \}
     /// \}

@@ -16,10 +16,12 @@
 
     <!-- A ground plane -->
     <include filename="ground_plane.model"/>
+    <include filename="hokuyo.model"/>
 
     <!-- A global light source -->
     <include filename="sun.light"/>
 
+    <!--
     <model name="box1">
       <origin pose="0 0 2.5 0 0 0"/>
       <link name="link">
@@ -61,6 +63,7 @@
         </visual>
       </link>
     </model>
+    -->
 
 
     <!--
