@@ -2,11 +2,27 @@
 <gazebo version="1.0">
   <world name="default">
 
+    <scene>
+      <ambient rgba="0.1 0.1 0.1 1"/>
+      <shadows enabled="true"/>
+    </scene>
+
     <!-- A ground plane -->
     <include filename="ground_plane.model"/>
 
     <!-- A global light source -->
     <include filename="sun.light"/>
+
+    <model name="mesh" static="true">
+      <origin pose="0 0 1.0 0 0 0"/>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <mesh filename="pb.dae" scale="0.00254 0.00254 0.00254"/>
+          </geometry>
+        </visual>
+      </link>
+    </model>
 
   </world>
 </gazebo>

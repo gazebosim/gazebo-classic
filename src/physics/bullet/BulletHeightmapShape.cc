@@ -43,7 +43,7 @@ BulletHeightmapShape::~BulletHeightmapShape()
 //////////////////////////////////////////////////
 void BulletHeightmapShape::Init()
 {
-  unsigned int x, y;
+  int x, y;
   float maxHeight = -FLT_MAX;
   float minHeight = FLT_MAX;
 
