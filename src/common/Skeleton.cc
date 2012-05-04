@@ -99,6 +99,44 @@ unsigned int Skeleton::GetNumJoints()
   return c;
 }
 
+
+//////////////////////////////////////////////////
+void Skeleton::Scale(double _scale)
+{
+  //  scale skeleton structure
+  for (NodeMap::iterator iter = this->nodes.begin();
+        iter != this->nodes.end(); ++iter)
+  {
+    SkeletonNode *node = iter->second;
+    math::Matrix4 trans = node->GetTransform();
+    math::Vector3 pos = trans.GetTranslation();
+    trans.SetTranslate(pos * _scale);
+    node->SetTransform(trans, false);
+  }
+
+  //  update the nodes' model transforms
+  this->root->UpdateChildrenTransforms();
+
+  //  scale the animation data
+  for (std::map<std::string, SkeletonAnimation>::iterator it =
+        this->animations.begin(); it != this->animations.end(); ++it)
+  {
+    SkeletonAnimation *anim = &it->second;
+    for (SkeletonAnimation::iterator naIter = anim->begin();
+          naIter != anim->end(); ++naIter)
+    {
+      NodeAnimation *nodeAnim = &naIter->second;
+      for (NodeAnimation::iterator matIter = nodeAnim->begin();
+            matIter != nodeAnim->end(); ++matIter)
+      {
+        math::Matrix4 *mat = &matIter->second;
+        math::Vector3 pos = mat->GetTranslation();
+        mat->SetTranslate(pos * _scale);
+      }
+    }
+  }
+}
+
 //////////////////////////////////////////////////
 void Skeleton::BuildNodeMap()
 {

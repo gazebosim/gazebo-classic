@@ -69,6 +69,8 @@ namespace gazebo
 
       public: unsigned int GetNumJoints();
 
+      public: void Scale(double _scale);
+
       public: void SetBindShapeTransform(math::Matrix4 _trans);
 
       public: math::Matrix4 GetBindShapeTransform();
