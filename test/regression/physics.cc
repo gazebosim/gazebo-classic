@@ -301,43 +301,100 @@ TEST_F(PhysicsTest, SimplePendulumTest)
   }
   physicsEngine->SetStepTime(0.0001);
   physicsEngine->SetSORPGSIters(1000);
-  int steps=10;
-  for (int i = 0; i < steps; i ++)
+
   {
-    world->StepWorld(2000);
+    /* test with global contact_max_correcting_vel at 0 as set by world file
+       here we expect significant energy loss as the velocity correction
+       is set to 0
+    */
+    int steps=10; // @todo: make this more general
+    for (int i = 0; i < steps; i ++)
     {
-      // check velocity / energy
-      math::Vector3 vel = link->GetWorldLinearVel();
-      math::Pose pos = link->GetWorldPose();
-      double pe = 9.81 * m * pos.pos.z;
-      double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
-      double e = pe + ke;
-      double e_tol = 3.0*(double)(i+1) / (double)steps;
-      gzdbg << "total energy [" << e
-            << "] pe[" << pe
-            << "] ke[" << ke
-            << "] p[" << pos.pos.z
-            << "] v[" << vel
-            << "] error[" << e - e_start
-            << "] tol[" << e_tol
-            << "]\n";
+      world->StepWorld(2000);
+      {
+        // check velocity / energy
+        math::Vector3 vel = link->GetWorldLinearVel();
+        math::Pose pos = link->GetWorldPose();
+        double pe = 9.81 * m * pos.pos.z;
+        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        double e = pe + ke;
+        double e_tol = 3.0*(double)(i+1) / (double)steps;
+        gzdbg << "total energy [" << e
+              << "] pe[" << pe
+              << "] ke[" << ke
+              << "] p[" << pos.pos.z
+              << "] v[" << vel
+              << "] error[" << e - e_start
+              << "] tol[" << e_tol
+              << "]\n";
 
-      EXPECT_TRUE(fabs(e - e_start) < e_tol);
+        EXPECT_TRUE(fabs(e - e_start) < e_tol);
+      }
+
+      physics::JointPtr joint = model->GetJoint("joint_0");
+      if (joint)
+      {
+        double integ_theta = (
+          PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(), 0.000001)
+          - 1.5707963);
+        double actual_theta = joint->GetAngle(0).GetAsRadian();
+        gzdbg << "time [" << world->GetSimTime().Double()
+              << "] exact [" << integ_theta
+              << "] actual [" << actual_theta
+              << "] pose [" << model->GetWorldPose()
+              << "]\n";
+         EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
+      }
     }
+  }
 
-    physics::JointPtr joint = model->GetJoint("joint_0");
-    if (joint)
+
+
+  {
+    /* test with global contact_max_correcting_vel at 100
+       here we expect much lower energy loss
+    */
+    world->Reset();
+    physicsEngine->SetContactMaxCorrectingVel(100);
+
+    int steps=10; // @todo: make this more general
+    for (int i = 0; i < steps; i ++)
     {
-      double integ_theta = (
-        PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(), 0.000001)
-        - 1.5707963);
-      double actual_theta = joint->GetAngle(0).GetAsRadian();
-      gzdbg << "time [" << world->GetSimTime().Double()
-            << "] exact [" << integ_theta
-            << "] actual [" << actual_theta
-            << "] pose [" << model->GetWorldPose()
-            << "]\n";
-       EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
+      world->StepWorld(2000);
+      {
+        // check velocity / energy
+        math::Vector3 vel = link->GetWorldLinearVel();
+        math::Pose pos = link->GetWorldPose();
+        double pe = 9.81 * m * pos.pos.z;
+        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        double e = pe + ke;
+        double e_tol = 3.0*(double)(i+1) / (double)steps;
+        gzdbg << "total energy [" << e
+              << "] pe[" << pe
+              << "] ke[" << ke
+              << "] p[" << pos.pos.z
+              << "] v[" << vel
+              << "] error[" << e - e_start
+              << "] tol[" << e_tol
+              << "]\n";
+
+        EXPECT_TRUE(fabs(e - e_start) < e_tol);
+      }
+
+      physics::JointPtr joint = model->GetJoint("joint_0");
+      if (joint)
+      {
+        double integ_theta = (
+          PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(), 0.000001)
+          - 1.5707963);
+        double actual_theta = joint->GetAngle(0).GetAsRadian();
+        gzdbg << "time [" << world->GetSimTime().Double()
+              << "] exact [" << integ_theta
+              << "] actual [" << actual_theta
+              << "] pose [" << model->GetWorldPose()
+              << "]\n";
+         EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
+      }
     }
   }
   Unload();
