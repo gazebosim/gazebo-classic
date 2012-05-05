@@ -375,7 +375,6 @@ void World::Update()
       (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
     this->dirtyPoses.clear();
-
   }
 
   event::Events::worldUpdateEnd();

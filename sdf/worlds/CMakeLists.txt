@@ -9,11 +9,13 @@ set (files
   model_nesting.world
   pioneer2dx.world
   drop_test.world
+  collision_test.world
   simple_pendulums.world
   double_pendulums.world
   plugin.world
   pr2.world
   presentation.world
+  projector_test.world
   shapes.world
   weshare2012.world
   willowgarage.world)

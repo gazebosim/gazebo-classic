@@ -25,7 +25,7 @@
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
-        <inertial mass="10.0">
+        <inertial mass="5.0">
           <origin pose="0.0 0.0 -10.0 0.0 0.0 0.0"/>
           <damping linear="0.0" angular="0.0" />
           <inertia ixx="0.0" ixy="0.0" ixz="0.0"
@@ -36,7 +36,7 @@
         <visual cast_shadows="true" name="visual_cylinder" laser_retro="100.0">
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
           <geometry>
-            <cylinder radius="0.1" length="10.0"/>
+            <cylinder radius="0.05" length="10.0"/>
           </geometry>
           <material script="Gazebo/Green"/>
         </visual>
@@ -45,7 +45,7 @@
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
           <max_contacts>250</max_contacts>
           <geometry>
-            <cylinder radius="0.1" length="10.0"/>
+            <cylinder radius="0.05" length="10.0"/>
           </geometry>
         </collision>
 
@@ -56,6 +56,44 @@
         <child link="link_1"/>
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
         <axis xyz="1.0 0.0 0.0"/>
+      </joint>
+
+      <link name="link_2" self_collide="true" gravity="true" kinematic="false">
+
+        <origin pose="0.0 0.0 -10.0 0.0 0.0 0.0"/>
+
+        <inertial mass="5.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <damping linear="0.0" angular="0.0" />
+          <inertia ixx="0.0" ixy="0.0" ixz="0.0"
+                   iyy="0.0" iyz="0.0"
+                   izz="0.0"/>
+        </inertial>
+
+        <visual cast_shadows="true" name="visual_sphere" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <geometry>
+            <sphere radius="0.1"/>
+          </geometry>
+          <material script="Gazebo/Red"/>
+        </visual>
+
+        <collision name="collision_sphere" laser_retro="100.0">
+          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <sphere radius="0.1"/>
+          </geometry>
+        </collision>
+
+      </link>
+      <joint name="joint_1" type="revolute">
+        <parent link="link_1"/>
+        <child link="link_2"/>
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+        <axis xyz="0 0 1">
+          <limit lower='0' upper='0' effort='0' velocity='0'/>
+        </axis>
       </joint>
 
     </model>
@@ -70,7 +108,7 @@
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
-        <inertial mass="1.0">
+        <inertial mass="10.0">
           <origin pose="0.0 0.0 -10.0 0.0 0.0 0.0"/>
           <damping linear="0.0" angular="0.0" />
           <inertia ixx="0.0" ixy="0.0" ixz="0.0"
