@@ -2,22 +2,22 @@
 <gazebo version="1.0">
   <world name="default">
 
+    <!--
     <physics type="bullet">
       <gravity xyz="0 0 -9.8"/>
       <bullet>
         <dt>0.001</dt>
       </bullet>
     </physics>
+    -->
 
-    <!--
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
-        <solver type="quick" dt="0.003" iters="100" sor="1.3"/>
+        <solver type="quick" dt="0.002" iters="100" sor="1.3"/>
         <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="0.0" contact_surface_layer="0.001"/>
       </ode>
     </physics>
-    -->
 
     <!-- A ground plane -->
     <include filename="ground_plane.model"/>

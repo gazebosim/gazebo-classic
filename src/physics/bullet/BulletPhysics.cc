@@ -71,10 +71,11 @@ bool ContactCallback(btManifoldPoint &/*_cp*/,
 }
 
 //////////////////////////////////////////////////
-bool ContactProcessed(btManifoldPoint &_cp, void *_body0, void *_body1)
+bool ContactProcessed(btManifoldPoint &/*_cp*/, void * /*_body0*/,
+                      void * /*_body1*/)
 {
-  if (_cp.getAppliedImpulse() > 0.03)
-    std::cout << "Impulse[" << _cp.getAppliedImpulse() << "] Dist[" << _cp.m_distance1 << "]\n";
+  // if (_cp.getAppliedImpulse() > 0.03)
+  //  std::cout << "Impulse[" << _cp.getAppliedImpulse() << "] Dist[" << _cp.m_distance1 << "]\n";
   // if (_cp.getAppliedImpulse() > 1.0)
   return true;
 }

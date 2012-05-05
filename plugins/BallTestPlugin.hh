@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_GRIPPER_PLUGIN_HH__
-#define __GAZEBO_GRIPPER_PLUGIN_HH__
-
-#include <map>
-#include <vector>
-#include <string>
+#ifndef __GAZEBO_BALL_TEST_PLUGIN_HH__
+#define __GAZEBO_BALL_TEST_PLUGIN_HH__
 
 #include "common/common.h"
 #include "physics/physics.h"
@@ -27,23 +23,17 @@
 
 namespace gazebo
 {
-  class GripperPlugin : public ModelPlugin
+  class BallTestPlugin : public WorldPlugin
   {
-    public: GripperPlugin();
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: BallTestPlugin();
+    public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
     public: virtual void Init();
 
     private: void OnUpdate();
-    private: void OnContact(const std::string &_collisionName,
-                            const physics::Contact &_contact);
+    private: event::ConnectionPtr updateConnection;
 
-    private: physics::ModelPtr model;
-    private: std::vector<physics::JointPtr> joints;
-    private: std::vector<physics::LinkPtr> links;
-    private: std::vector<event::ConnectionPtr> connections;
-
-    private: std::map<std::string, physics::CollisionPtr> collisions;
-    private: std::vector<physics::Contact> contacts;
+    private: int index;
+    private: physics::WorldPtr world;
   };
 }
 #endif

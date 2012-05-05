@@ -125,6 +125,8 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
+
+  this->colliders.resize(100);
 }
 
 //////////////////////////////////////////////////
@@ -731,7 +733,9 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
           collision2->HasType(Base::TRIMESH_SHAPE))
         self->AddTrimeshCollider(collision1, collision2);
       else
+      {
         self->AddCollider(collision1, collision2);
+      }
     }
   }
 }
@@ -774,7 +778,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   ContactFeedback *contactFeedback = NULL;
 
-  //if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
+  if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
   {
     if (this->contactFeedbackIndex < this->contactFeedbacks.size())
       contactFeedback = this->contactFeedbacks[this->contactFeedbackIndex++];
@@ -943,7 +947,7 @@ void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddCollider(ODECollision *_collision1,
-                              ODECollision *_collision2)
+                             ODECollision *_collision2)
 {
   if (this->collidersCount >= this->colliders.size())
     this->colliders.resize(this->colliders.size() + 100);

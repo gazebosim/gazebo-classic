@@ -108,7 +108,6 @@ void Collision::Init()
   this->shape->Init();
 }
 
-
 //////////////////////////////////////////////////
 void Collision::SetCollision(bool _placeable)
 {
@@ -196,7 +195,7 @@ void Collision::AddContact(const Contact &_contact)
       this->HasType(Base::PLANE_SHAPE))
     return;
 
-  this->contact(this->GetName(), _contact);
+  this->contact(this->GetScopedName(), _contact);
 }
 
 //////////////////////////////////////////////////

@@ -140,7 +140,7 @@ math::Angle BulletHingeJoint::GetAngle(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetVelocity(int _index, double _angle)
+void BulletHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
   // this->btHinge->enableAngularMotor(true, -_angle, this->GetMaxForce(_index));
 }
@@ -165,7 +165,7 @@ double BulletHingeJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetForce(int _index, double _torque)
+void BulletHingeJoint::SetForce(int /*_index*/, double _torque)
 {
   // math::Vector3 axis = this->GetLocalAxis(_index);
   // this->btHinge->enableAngularMotor(true);
@@ -188,7 +188,7 @@ double BulletHingeJoint::GetForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetHighStop(int _index, math::Angle _angle)
+void BulletHingeJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
 {
   if (this->btHinge)
   {
@@ -205,7 +205,7 @@ void BulletHingeJoint::SetHighStop(int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetLowStop(int _index, math::Angle _angle)
+void BulletHingeJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
 {
   if (this->btHinge)
   {
