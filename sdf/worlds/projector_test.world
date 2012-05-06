@@ -81,13 +81,13 @@
 
         <collision name="collision">
           <geometry>
-            <sphere radius="0.1"/>
+            <sphere radius="0.5"/>
           </geometry>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <sphere radius="0.1"/>
+            <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/Grey"/>
         </visual>
