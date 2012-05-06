@@ -147,6 +147,10 @@ void ProjectorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   // UpdateShaders when a new model is added to the world (e.g. via gui)
   this->add_model_event_ = gazebo::event::Events::ConnectAddEntity(
     boost::bind(&ProjectorPlugin::UpdateShaders, this));
+
+  // Start projector
+  this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
+    boost::bind(&ProjectorPlugin::ToggleProjector, this, true));
 }
 
 
@@ -166,16 +170,17 @@ void ProjectorPlugin::LoadImage(const std::string &_texture_name)
 // Toggle the activation of the projector
 void ProjectorPlugin::ToggleProjector(bool _projectorOn)
 {
+  int retry_count = 0;
   // Initialize the projector
-  while (!projector_.isInit)
+  while (!projector_.isInit && retry_count < 10)
   {
     // get scene visual node
     this->scene = rendering::get_scene(this->world->GetName());
     this->myVisual = this->scene->GetVisual(this->myBody->GetScopedName());
     if (!this->myVisual)
     {
-      gzmsg << "visual for bodyName: [" << this->myBody->GetScopedName()
-            << "] not found\n";
+      gzwarn << "visual for bodyName: [" << this->myBody->GetScopedName()
+            << "] not found, simulation is still loading?\n";
     }
     else
     {
@@ -198,19 +203,24 @@ void ProjectorPlugin::ToggleProjector(bool _projectorOn)
 
     if (!projector_.isInit)
     {
-      gzmsg << "starting projector failed, retrying in 1 sec.";
+      gzwarn << "starting projector failed, retrying in 1 sec.\n";
       sleep(1);
+      retry_count++;
     }
   }
 
   // if not headless
+  if (projector_.isInit)
   {
+    //gzmsg << "projector initialized, toggling state to [" << _projectorOn << "]\n";
     this->lock.lock();
     this->projector_.setEnabled(_projectorOn);
     this->lock.unlock();
+    this->UpdateShaders();
   }
+  else
+    gzwarn << "could not start projector, toggle failed\n";
 
-  this->UpdateShaders();
 }
 
 
