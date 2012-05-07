@@ -8,17 +8,15 @@
     </scene>
 
     <physics type="ode">
-      <gravity xyz="0 0 -10.0"/>
+      <gravity xyz="0 0 0"/>
       <ode>
         <solver type="quick" dt="0.001" iters="1000" sor="1.3"/>
         <constraints cfm="0.0" erp="1.0" contact_max_correcting_vel="0.0" contact_surface_layer="0.0"/>
       </ode>
     </physics>
 
-    <include filename="ground_plane.model"/>
-
     <model name="box">
-      <origin pose="0 0 10.5 0 0 0"/>
+      <origin pose="0 0 0 0 0 0"/>
       <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -29,9 +27,6 @@
             <box size="1 1 1"/>
           </geometry>
           <surface>
-            <friction>
-              <ode mu="1" mu2="1"/>
-            </friction>
             <contact>
               <ode soft_erp="1" max_vel="0"/>
             </contact>
@@ -48,7 +43,7 @@
     </model>
 
     <model name="sphere">
-      <origin pose="0 1.5 10.5 0 0 0"/>
+      <origin pose="2 0 0 0 0 0"/>
       <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -59,9 +54,6 @@
             <sphere radius="0.5"/>
           </geometry>
           <surface>
-            <friction>
-              <ode mu="1" mu2="1"/>
-            </friction>
             <contact>
               <ode soft_erp="1" max_vel="0"/>
             </contact>
@@ -71,36 +63,6 @@
         <visual name="visual">
           <geometry>
             <sphere radius="0.5"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-
-    <model name="cylinder">
-      <origin pose="0 -1.5 10.5 0 0 0"/>
-      <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="collision">
-          <geometry>
-            <cylinder radius="0.5" length="1.0"/>
-          </geometry>
-          <surface>
-            <friction>
-              <ode mu="1" mu2="1"/>
-            </friction>
-            <contact>
-              <ode soft_erp="1" max_vel="0"/>
-            </contact>
-          </surface>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <cylinder radius="0.5" length="1.0"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>

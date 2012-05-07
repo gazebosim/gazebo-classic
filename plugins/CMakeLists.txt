@@ -9,6 +9,7 @@ set (plugins
   DepthCameraPlugin
   GpuRayPlugin
   ContactPlugin
+  SimpleArmPlugin
   RayPlugin
   DiffDrivePlugin
   GripperPlugin

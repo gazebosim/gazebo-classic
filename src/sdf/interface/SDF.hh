@@ -107,6 +107,8 @@ namespace sdf
     public: char GetValueChar(const std::string &_key = "");
     public: std::string GetValueString(const std::string &_key = "");
     public: gazebo::math::Vector3 GetValueVector3(const std::string &_key = "");
+    public: gazebo::math::Vector2d GetValueVector2d(
+                const std::string &_key = "");
     public: gazebo::math::Quaternion GetValueQuaternion(
                 const std::string &_key = "");
     public: gazebo::math::Pose GetValuePose(const std::string &_key = "");

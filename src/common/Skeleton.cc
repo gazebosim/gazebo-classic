@@ -99,6 +99,44 @@ unsigned int Skeleton::GetNumJoints()
   return c;
 }
 
+
+//////////////////////////////////////////////////
+void Skeleton::Scale(double _scale)
+{
+  //  scale skeleton structure
+  for (NodeMap::iterator iter = this->nodes.begin();
+        iter != this->nodes.end(); ++iter)
+  {
+    SkeletonNode *node = iter->second;
+    math::Matrix4 trans = node->GetTransform();
+    math::Vector3 pos = trans.GetTranslation();
+    trans.SetTranslate(pos * _scale);
+    node->SetTransform(trans, false);
+  }
+
+  //  update the nodes' model transforms
+  this->root->UpdateChildrenTransforms();
+
+  //  scale the animation data
+  for (std::map<std::string, SkeletonAnimation>::iterator it =
+        this->animations.begin(); it != this->animations.end(); ++it)
+  {
+    SkeletonAnimation *anim = &it->second;
+    for (SkeletonAnimation::iterator naIter = anim->begin();
+          naIter != anim->end(); ++naIter)
+    {
+      NodeAnimation *nodeAnim = &naIter->second;
+      for (NodeAnimation::iterator matIter = nodeAnim->begin();
+            matIter != nodeAnim->end(); ++matIter)
+      {
+        math::Matrix4 *mat = &matIter->second;
+        math::Vector3 pos = mat->GetTranslation();
+        mat->SetTranslate(pos * _scale);
+      }
+    }
+  }
+}
+
 //////////////////////////////////////////////////
 void Skeleton::BuildNodeMap()
 {
@@ -291,7 +329,7 @@ bool SkeletonNode::IsJoint()
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::SetTransform(math::Matrix4 _trans)
+void SkeletonNode::SetTransform(math::Matrix4 _trans, bool _updateChildren)
 {
   this->transform = _trans;
 
@@ -301,6 +339,30 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
     this->modelTransform = this->parent->GetModelTransform() * _trans;
 
   /// propagate the change to the children nodes
+  if (_updateChildren)
+    this->UpdateChildrenTransforms();
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::SetInitialTransform(math::Matrix4 _trans)
+{
+  this->initialTransform = _trans;
+  this->SetTransform(_trans);
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::Reset(bool resetChildren)
+{
+  this->SetTransform(this->initialTransform);
+
+  if (resetChildren)
+    for (unsigned int i = 0; i < this->GetChildCount(); i++)
+      this->GetChild(i)->Reset(true);
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::UpdateChildrenTransforms()
+{
   std::list<SkeletonNode*> toVisit;
   for (unsigned int i = 0; i < this->children.size(); i++)
     toVisit.push_back(this->children[i]);
@@ -310,7 +372,7 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
     SkeletonNode *node = toVisit.front();
     toVisit.pop_front();
 
-    for (int i = (node->GetChildCount() - 1); i >= 0; i++)
+    for (int i = (node->GetChildCount() - 1); i >= 0; i--)
       toVisit.push_front(node->GetChild(i));
 
     node->modelTransform = node->GetParent()->modelTransform * node->transform;
@@ -321,6 +383,23 @@ void SkeletonNode::SetTransform(math::Matrix4 _trans)
 math::Matrix4 SkeletonNode::GetTransform()
 {
   return this->transform;
+}
+
+//////////////////////////////////////////////////
+void SkeletonNode::SetModelTransform(math::Matrix4 _trans, bool _updateChildren)
+{
+  this->modelTransform = _trans;
+
+  if (this->parent == NULL)
+    this->transform = _trans;
+  else
+  {
+    math::Matrix4 invParentTrans = this->parent->GetModelTransform().Inverse();
+    this->transform = invParentTrans * this->modelTransform;
+  }
+
+  if (_updateChildren)
+    this->UpdateChildrenTransforms();
 }
 
 //////////////////////////////////////////////////
