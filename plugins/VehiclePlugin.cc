@@ -25,20 +25,25 @@ GZ_REGISTER_MODEL_PLUGIN(VehiclePlugin)
 /////////////////////////////////////////////////
 VehiclePlugin::VehiclePlugin()
 {
-  this->wheels.resize(4);
+  this->joints.resize(4);
 }
 
 /////////////////////////////////////////////////
 void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   this->model = _model;
-  this->physics = this->model->GetWorld()->GetPhysicsEngine();
+  // this->physics = this->model->GetWorld()->GetPhysicsEngine();
 
-  this->chassis = this->model->GetLink(_sdf->GetElement("chassis"));
-  this->wheels[0] = this->model->GetLink(_sdf->GetElement("front_left"));
-  this->wheels[1] = this->model->GetLink(_sdf->GetElement("front_right"));
-  this->wheels[2] = this->model->GetLink(_sdf->GetElement("back_left"));
-  this->wheels[3] = this->model->GetLink(_sdf->GetElement("back_right"));
+  this->chassis = this->model->GetLink(
+      _sdf->GetElement("chassis")->GetValueString());
+  this->joints[0] = this->model->GetJoint(
+      _sdf->GetElement("front_left")->GetValueString());
+  this->joints[1] = this->model->GetJoint(
+      _sdf->GetElement("front_right")->GetValueString());
+  this->joints[2] = this->model->GetJoint(
+      _sdf->GetElement("back_left")->GetValueString());
+  this->joints[3] = this->model->GetJoint(
+      _sdf->GetElement("back_right")->GetValueString());
 
   if (!this->chassis)
   {
@@ -46,40 +51,51 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
-  if (!this->wheels[0])
+  if (!this->joints[0])
   {
-    gzerr << "Unable to find front_left wheel["
+    gzerr << "Unable to find front_left joint["
           << _sdf->GetElement("front_left") << "]\n";
     return;
   }
 
-  if (!this->wheels[1])
+  if (!this->joints[1])
   {
-    gzerr << "Unable to find front_right wheel["
+    gzerr << "Unable to find front_right joint["
           << _sdf->GetElement("front_right") << "]\n";
     return;
   }
 
-  if (!this->wheels[2])
+  if (!this->joints[2])
   {
-    gzerr << "Unable to find back_left wheel["
+    gzerr << "Unable to find back_left joint["
           << _sdf->GetElement("back_left") << "]\n";
     return;
   }
 
-  if (!this->wheels[3])
+  if (!this->joints[3])
   {
-    gzerr << "Unable to find back_right wheel["
+    gzerr << "Unable to find back_right joint["
           << _sdf->GetElement("back_right") << "]\n";
     return;
   }
 
   std::cout << "Chassis[" << this->chassis->GetScopedName() << "]\n";
   for (int i = 0; i < 4; ++i)
-    std::cout << "Wheel[" << this->wheels[i]->GetScopedName() << "]\n";
+    std::cout << "Joint[" << this->joints[i]->GetScopedName() << "]\n";
 
   this->connections.push_back(event::Events::ConnectWorldUpdateStart(
-          boost::bind(&GripperPlugin::OnUpdate, this)));
+          boost::bind(&VehiclePlugin::OnUpdate, this)));
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->model->GetWorld()->GetName());
+
+  this->velSub = this->node->Subscribe(std::string("~/") +
+      this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
+}
+
+/////////////////////////////////////////////////
+void VehiclePlugin::Init()
+{
 }
 
 /////////////////////////////////////////////////
@@ -88,11 +104,14 @@ void VehiclePlugin::OnUpdate()
   double AERO_LOAD = -0.1;
 
   this->velocity = this->chassis->GetWorldLinearVel();
+  std::cout << "Velocity[" << this->velocity << "]\n";
+  std::cout << "Aero[" << AERO_LOAD * this->velocity.GetSquaredLength() << "]\n";
 
   //  aerodynamics
   this->chassis->AddForce(math::Vector3(0, 0,
         AERO_LOAD * this->velocity.GetSquaredLength()));
 
+  /*
   // Sway bars
   math::Vector3 bodyPoint;
   math::Vector3 hingePoint;
@@ -125,4 +144,5 @@ void VehiclePlugin::OnUpdate()
       dBodyAddForceAtPos( chassisBody_, -axis.x*amt, -axis.y*amt, -axis.z*amt, wp[0], wp[1], wp[2] );
     }
   }
+  */
 }

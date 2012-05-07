@@ -40,8 +40,11 @@ namespace gazebo
     private: void OnUpdate();
     private: std::vector<event::ConnectionPtr> connections;
 
-    private: LinkPtr chassis;
-    private: std::vector<LinkPtr> wheels;
+    private: physics::ModelPtr model;
+    private: physics::LinkPtr chassis;
+    private: std::vector<physics::JointPtr> joints;
+
+    private: math::Vector3 velocity;
   };
 }
 #endif

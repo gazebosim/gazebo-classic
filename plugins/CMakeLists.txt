@@ -12,7 +12,8 @@ set (plugins
   RayPlugin
   DiffDrivePlugin
   GripperPlugin
-  BallTestPlugin)
+  BallTestPlugin
+  VehiclePlugin)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
