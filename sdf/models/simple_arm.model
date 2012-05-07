@@ -288,7 +288,7 @@
       <joint1_pid>1 0.01 0.1</joint1_pid>
       <joint2_pid>1 0.01 0.1</joint2_pid>
       <joint3_pid>1 0.01 0.1</joint3_pid>
-      <joint4_pid>5 0.02 0.2</joint4_pid>
+      <joint4_pid>20 0.05 0.5</joint4_pid>
       <joint5_pid>1 0.01 0.1</joint5_pid>
       <joint1_ilim>-1 1</joint1_ilim>
       <joint2_ilim>-1 1</joint2_ilim>
