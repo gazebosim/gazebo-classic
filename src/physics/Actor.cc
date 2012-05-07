@@ -54,8 +54,7 @@ Actor::Actor(BasePtr _parent)
 {
   this->AddType(ACTOR);
   this->mesh = NULL;
-  this->skinSkeleton = NULL;
-  this->animationSkeleton = NULL;
+  this->skeleton = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -74,16 +73,6 @@ void Actor::Load(sdf::ElementPtr _sdf)
   this->skinFile = skinSdf->GetValueString("filename");
   this->skinScale = skinSdf->GetValueDouble("scale");
 
-  sdf::ElementPtr animSdf = _sdf->GetOrCreateElement("animation");
-  this->loop = animSdf->GetValueBool("loop");
-  this->timeScale = animSdf->GetValueDouble("time_scale");
-  this->startDelay = animSdf->GetValueDouble("delay_start");
-
-  this->useExternalAnim = animSdf->HasElement("external");
-  sdf::ElementPtr externAnimSdf = animSdf->GetOrCreateElement("external");
-  this->animationFile = externAnimSdf->GetValueString("filename");
-  this->animationScale = externAnimSdf->GetValueDouble("scale");
-
   MeshManager::Instance()->Load(this->skinFile);
 
   if (MeshManager::Instance()->HasMesh(this->skinFile))
@@ -91,10 +80,10 @@ void Actor::Load(sdf::ElementPtr _sdf)
     this->mesh = MeshManager::Instance()->GetMesh(this->skinFile);
     if (!this->mesh->HasSkeleton())
       gzthrow("Collada file does not contain skeletal animation.");
-    this->skinSkeleton = mesh->GetSkeleton();
-    this->skinSkeleton->Scale(this->skinScale);
+    this->skeleton = mesh->GetSkeleton();
+    this->skeleton->Scale(this->skinScale);
     /// create the link sdfs for the model
-    NodeMap nodes = this->skinSkeleton->GetNodes();
+    NodeMap nodes = this->skeleton->GetNodes();
 
     sdf::ElementPtr linkSdf;
     linkSdf = _sdf->GetOrCreateElement("link");
@@ -169,70 +158,15 @@ void Actor::Load(sdf::ElementPtr _sdf)
       }
     }
 
-    if (this->useExternalAnim)
-    {
-      std::string extension =
-            this->animationFile.substr(this->animationFile.rfind(".") + 1,
-            this->animationFile.size());
+    sdf::ElementPtr animSdf = _sdf->GetOrCreateElement("animation");
 
-      if (extension == "bvh")
-      {
-        BVHLoader loader;
-        this->animationSkeleton = loader.Load(this->animationFile,
-                                                this->animationScale);
-      }
-      else
-        if (extension == "dae")
-        {
-          MeshManager::Instance()->Load(this->animationFile);
-          const Mesh *animMesh = NULL;
-          if (MeshManager::Instance()->HasMesh(this->animationFile))
-            animMesh = MeshManager::Instance()->GetMesh(this->animationFile);
-          if (!animMesh || !animMesh->HasSkeleton())
-            gzerr << "Failed to load animation.";
-          else
-            this->animationSkeleton = animMesh->GetSkeleton();
-        }
-
-      if (!this->animationSkeleton ||
-            this->animationSkeleton->GetNumAnimations() == 0)
-        gzerr << "Failed to load animation.";
-      else
-      {
-        bool compatible = true;
-        if (this->skinSkeleton->GetNumNodes() !=
-                this->animationSkeleton->GetNumNodes())
-          compatible = false;
-        else
-          for (unsigned int i = 0; i < this->skinSkeleton->GetNumNodes(); i++)
-          {
-            SkeletonNode *skinNode = this->skinSkeleton->GetNodeByHandle(i);
-            SkeletonNode *animNode =
-                                this->animationSkeleton->GetNodeByHandle(i);
-            if (animNode->GetChildCount() != skinNode->GetChildCount())
-              compatible = false;
-            else
-              this->skelTranslator[animNode->GetName()] = skinNode->GetName();
-          }
-        if (!compatible)
-        {
-          gzerr << "Skin and animation skeletons are not compatible.\n";
-          this->animationSkeleton = NULL;
-        }
-        else
-          this->skelAnimation =
-                   this->animationSkeleton->GetAnimationList().begin()->second;
-      }
-    }
-    else
+    while (animSdf)
     {
-      this->animationSkeleton = this->skinSkeleton;
-      for (unsigned int i = 0; i < this->skinSkeleton->GetNumNodes(); i++)
-        this->skelTranslator[this->skinSkeleton->GetNodeByHandle(i)->GetName()]
-          = this->skinSkeleton->GetNodeByHandle(i)->GetName();
-      this->skelAnimation =
-        this->skinSkeleton->GetAnimationList().begin()->second;
+      this->LoadAnimation(animSdf);
+      animSdf = animSdf->GetNextElement("animation");
     }
+
+    this->LoadScript(_sdf->GetOrCreateElement("script"));
 
     /// we are ready to load the links
     Model::Load(_sdf);
@@ -242,55 +176,230 @@ void Actor::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Actor::Init()
+void Actor::LoadScript(sdf::ElementPtr _sdf)
 {
-  this->prevSkelAnim = this->world->GetSimTime();
+  this->loop = _sdf->GetValueBool("loop");
+  this->startDelay = _sdf->GetValueDouble("delay_start");
+  this->autoStart = _sdf->GetValueBool("auto_start");
+  this->active = this->autoStart;
+  double scriptTime = 0;
+
+  sdf::ElementPtr actionSdf = _sdf->GetOrCreateElement("action");
+  while (actionSdf)
+  {
+    std::string actionName = actionSdf->GetValueString("name");
+    ScriptAction action;
+    if (actionName == "__default__")
+    {
+      action.name = this->skelAnimation.begin()->first;
+      action.type = this->skelAnimation.begin()->first;
+      action.duration = 0.0;
+      action.targetPose = math::Pose();
+    }
+    else
+    {
+      action.name = actionName;
+      action.type = actionSdf->GetValueString("type");
+      action.duration = actionSdf->GetValueDouble("duration");
+      action.targetPose = actionSdf->GetValuePose("target_pose");
+      action.startTime = scriptTime;
+      action.endTime = scriptTime + action.duration;
+      scriptTime = action.endTime;
+    }
+
+    this->actions.push_back(action);
+    actionSdf = actionSdf->GetNextElement("action");
+  }
+  this->scriptLength = scriptTime;
 }
 
+//////////////////////////////////////////////////
+void Actor::LoadAnimation(sdf::ElementPtr _sdf)
+{
+  std::string animName = _sdf->GetValueString("name");
+
+  if (animName == "__default__")
+  {
+    this->skelAnimation[this->skinFile] =
+        this->skeleton->GetAnimationList().begin()->second;
+    std::map<std::string, std::string> skelMap;
+    for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+      skelMap[this->skeleton->GetNodeByHandle(i)->GetName()] =
+        this->skeleton->GetNodeByHandle(i)->GetName();
+    this->skelNodesMap[this->skinFile] = skelMap;
+  }
+  else
+  {
+    std::string animFile = _sdf->GetValueString("filename");
+    std::string extension = animFile.substr(animFile.rfind(".") + 1,
+        animFile.size());
+    double scale = _sdf->GetValueDouble("scale");
+    Skeleton *skel;
+
+    if (extension == "bvh")
+    {
+      BVHLoader loader;
+      skel = loader.Load(animFile, scale);
+    }
+    else
+      if (extension == "dae")
+      {
+        MeshManager::Instance()->Load(animFile);
+        const Mesh *animMesh = NULL;
+        if (MeshManager::Instance()->HasMesh(animFile))
+          animMesh = MeshManager::Instance()->GetMesh(animFile);
+        if (animMesh && animMesh->HasSkeleton())
+          skel = animMesh->GetSkeleton();
+        skel->Scale(scale);
+      }
+
+    if (!skel || skel->GetNumAnimations() == 0)
+      gzerr << "Failed to load animation.";
+    else
+    {
+      bool compatible = true;
+      std::map<std::string, std::string> skelMap;
+      if (this->skeleton->GetNumNodes() != skel->GetNumNodes())
+        compatible = false;
+      else
+        for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+        {
+          SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
+          SkeletonNode *animNode = skel->GetNodeByHandle(i);
+          if (animNode->GetChildCount() != skinNode->GetChildCount())
+          {
+            compatible = false;
+            break;
+          }
+          else
+            skelMap[skinNode->GetName()] = animNode->GetName();
+        }
+
+      if (!compatible)
+      {
+        gzerr << "Skin and animation " << animName <<
+              " skeletons are not compatible.\n";
+      }
+      else
+      {
+        this->skelAnimation[animName] =
+            skel->GetAnimationList().begin()->second;
+        this->skelNodesMap[animName] = skelMap;
+      }
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Actor::Init()
+{
+  this->prevFrameTime = this->world->GetSimTime();
+  if (this->autoStart)
+    this->Play();
+}
+
+//////////////////////////////////////////////////
+void Actor::Play()
+{
+  this->active = true;
+  this->playStartTime = this->world->GetSimTime();
+}
+
+//////////////////////////////////////////////////
+void Actor::Stop()
+{
+  this->active = false;
+}
+
+//////////////////////////////////////////////////
+bool Actor::IsActive()
+{
+  return this->active;
+}
 
 ///////////////////////////////////////////////////
 void Actor::Update()
 {
-  if (!this->animationSkeleton)
+  if (!this->active)
     return;
 
-  double timeSinceAnimUpdate = (this->world->GetSimTime()
-            - this->prevSkelAnim).Double();
+  common::Time currentTime = this->world->GetSimTime();
 
-  if (timeSinceAnimUpdate < (1.0 / 30.0))
+  /// do not refresh animation more faster the 30 Hz sim time
+  if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
     return;
+
+  double scriptTime = currentTime.Double() - this->startDelay -
+            this->playStartTime.Double();
+
+  /// waiting for delayed start
+  if (scriptTime < 0)
+    return;
+
+  if (scriptTime >= this->scriptLength)
+  {
+    if (!this->loop)
+      return;
+    else
+    {
+      scriptTime = scriptTime - this->scriptLength;
+      this->playStartTime = currentTime - scriptTime;
+    }
+  }
+
+  /// at this point we are certain that a new frame will be animated
+  this->prevFrameTime = currentTime;
+
+  ScriptAction action;
+
+  for (unsigned int i = 0; i < this->actions.size(); i++)
+    if (this->actions[i].startTime <= scriptTime &&
+          this->actions[i].endTime >= scriptTime)
+    {
+      action = this->actions[i];
+      break;
+    }
+
+  scriptTime = scriptTime - action.startTime;
+
+  SkeletonAnimation *skelAnim = &this->skelAnimation[action.type];
+  std::map<std::string, std::string> skelMap = this->skelNodesMap[action.type];
 
   msgs::PoseAnimation msg;
 
   msg.set_model_name(this->visualName);
 
-  for (unsigned int i = 0; i < this->animationSkeleton->GetNumNodes(); i++)
+  for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
   {
-    SkeletonNode *bone = this->animationSkeleton->GetNodeByHandle(i);
+    SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
     SkeletonNode *parentBone = bone->GetParent();
     math::Matrix4 transform(math::Matrix4::IDENTITY);
-    if (this->skelAnimation.find(bone->GetId()) != this->skelAnimation.end())
+    if (skelAnim->find(skelMap[bone->GetName()]) != skelAnim->end())
     {
-      NodeAnimation *anim = &this->skelAnimation[bone->GetId()];
-      double start = anim->begin()->first * this->timeScale;
-      double end = anim->rbegin()->first * this->timeScale;
-      double duration = end - start;
-      double frameTime = fmod(this->world->GetSimTime().Double(), duration);
+      NodeAnimation *anim = &(*skelAnim)[skelMap[bone->GetName()]];
 
       NodeAnimation::iterator next = anim->begin();
       NodeAnimation::iterator prev = anim->end();
-      while ((next->first * this->timeScale) < frameTime)
+      --prev;
+      while ((next->first) < scriptTime)
       {
         prev = next;
         ++next;
+        if (next == anim->end())
+        {
+          next = anim->begin();
+          scriptTime = scriptTime - prev->first;
+        }
       }
-      double prevTime = prev->first * this->timeScale;
+      double prevTime = prev->first;
+      if (next == anim->begin())
+        prevTime = 0.0;
       math::Matrix4 prevTransform = prev->second;
       if (next != anim->end())
       {
-        double nextTime = next->first * this->timeScale;
+        double nextTime = next->first;
         math::Matrix4 nextTransform = next->second;
-        double t = (frameTime - prevTime) / (nextTime - prevTime);
+        double t = (scriptTime - prevTime) / (nextTime - prevTime);
         math::Vector3 prevPos = prevTransform.GetTranslation();
         math::Vector3 nextPos = nextTransform.GetTranslation();
         math::Quaternion prevQ = prevTransform.GetRotation();
@@ -312,23 +421,26 @@ void Actor::Update()
     else
       transform = bone->GetTransform();
 
-    LinkPtr currentLink = this->GetChildLink(
-                            this->skelTranslator[bone->GetName()]);
+    LinkPtr currentLink = this->GetChildLink(bone->GetName());
     if (parentBone)
     {
-      if (bone->GetChildCount() > 0)
+      math::Pose bonePose;
+      bonePose.pos = transform.GetTranslation();
+      bonePose.rot = transform.GetRotation();
+      if (!bonePose.IsFinite())
       {
-        math::Pose bonePose;
-        bonePose.pos = transform.GetTranslation();
-        bonePose.rot = transform.GetRotation();
-        msgs::Pose *msg_pose = msg.add_pose();
-        msg_pose->set_name(this->skelTranslator[bone->GetName()]);
-        msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
-        msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
+        std::cerr << "ACTOR: " << currentTime << " " << bone->GetName()
+                  << " " << bonePose << "\n";
+        bonePose.Correct();
       }
 
+      msgs::Pose *msg_pose = msg.add_pose();
+      msg_pose->set_name(bone->GetName());
+      msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
+      msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
+
       LinkPtr parentLink = this->GetChildLink(
-                              this->skelTranslator[parentBone->GetName()]);
+                              skelMap[parentBone->GetName()]);
       math::Pose parentPose = parentLink->GetWorldPose();
       math::Matrix4 parentTrans(math::Matrix4::IDENTITY);
       parentTrans = parentPose.rot.GetAsMatrix4();
@@ -337,11 +449,11 @@ void Actor::Update()
     }
     currentLink->SetWorldPose(transform.GetAsPose());
   }
+  msgs::Time *stamp = msg.add_time();
+  stamp->CopyFrom(msgs::Convert(currentTime));
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);
-
-  this->prevSkelAnim = this->world->GetSimTime();
 }
 
 //////////////////////////////////////////////////

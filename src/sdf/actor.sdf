@@ -12,15 +12,24 @@
     <attribute name="scale" type="double" default="1.0" required="0"/> 
   </element> <!-- End Skin -->
 
-  <element name="animation" required="0">
-    <attribute name="time_scale" type="double" default="1.0" required="0"/>
-    <attribute name="loop" type="bool" default="true" required="0"/>
-    <attribute name="delay_start" type="double" default="0.0" required="0"/>
-    <element name="external" required="0">
-      <attribute name="filename" type="string" default="__default__" required="1"/>
-      <attribute name="scale" type="double" default="1.0" required="0"/>
-    </element> <!-- End External -->
+  <element name="animation" required="+">
+    <attribute name="name" type="string" default="__default__" required="1"/>
+    <attribute name="filename" type="string" default="__default__" required="1"/>
+    <attribute name="scale" type="double" default="1.0" required="0"/>
+    <attribute name="linear_vel" type="double" default="0.0" required="0"/>
   </element> <!-- End Animation -->
+
+  <element name="script" required="1">
+    <attribute name="loop" type="bool" default="false" required="0"/>
+    <attribute name="delay_start" type="double" default="0.0" required="0"/>
+    <attribute name="auto_start" type="bool" default="false" required="0"/>
+    <element name="action" required="+">
+      <attribute name="name" type="string" default="__default__" required="1"/>
+      <attribute name="type" type="string" default="__default__" required="1"/>
+      <attribute name="duration" type="double" default="0.0" required="0"/>
+      <attribute name="target_pose" type="pose" default="0 0 0 0 0 0" required="0"/>
+    </element> <!-- End Action -->
+  </element> <!-- End Script -->
   
   <include filename="link.sdf" required="+"/>
   <include filename="joint.sdf" required="*"/>
