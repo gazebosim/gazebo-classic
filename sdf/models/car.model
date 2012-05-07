@@ -20,6 +20,7 @@
       <origin pose="0.8 0.6 0.15 0 1.5707 1.5707"/>
 
       <inertial mass="0.2"/>
+
       <collision name="collision">
         <geometry>
           <cylinder radius="0.3" length="0.1"/>
@@ -37,6 +38,7 @@
       <origin pose="0.8 -0.6 0.15 0  1.5707 1.5707"/>
 
       <inertial mass="0.2"/>
+
       <collision name="collision">
         <geometry>
           <cylinder radius="0.3" length="0.1"/>
@@ -54,6 +56,7 @@
       <origin pose="-0.8 -0.6 0.15 0 1.5707 1.5707"/>
 
       <inertial mass="0.2"/>
+
       <collision name="collision">
         <geometry>
           <cylinder radius="0.3" length="0.1"/>
@@ -71,6 +74,7 @@
       <origin pose="-0.8 0.6 0.15 0 1.5707 1.5707"/>
 
       <inertial mass="0.2"/>
+
       <collision name="collision">
         <geometry>
           <cylinder radius="0.3" length="0.1"/>
@@ -87,15 +91,15 @@
     <joint type="revolute2" name="front_left_joint">
       <parent link="chassis"/>
       <child link="front_left_wheel"/>
-      <axis xyz="0 1 0"/>
-      <axis2 xyz="0 0 1"/>
+      <axis xyz="0 0 1"/>
+      <axis2 xyz="0 1 0"/>
     </joint>
 
     <joint type="revolute2" name="front_right_joint">
       <parent link="chassis"/>
       <child link="front_right_wheel"/>
-      <axis xyz="0 1 0"/>
-      <axis2 xyz="0 0 1"/>
+      <axis xyz="0 0 1"/>
+      <axis2 xyz="0 1 0"/>
     </joint>
 
     <joint type="revolute" name="back_right_joint">

@@ -25,6 +25,7 @@
 
 #include "common/common.h"
 #include "physics/physics.h"
+#include "transport/transport.h"
 #include "gazebo.hh"
 
 namespace gazebo
@@ -38,6 +39,9 @@ namespace gazebo
     public: virtual void Init();
 
     private: void OnUpdate();
+
+    private: void OnVelMsg(ConstPosePtr &_msg);
+
     private: std::vector<event::ConnectionPtr> connections;
 
     private: physics::ModelPtr model;
@@ -45,6 +49,9 @@ namespace gazebo
     private: std::vector<physics::JointPtr> joints;
 
     private: math::Vector3 velocity;
+
+    private: transport::NodePtr node;
+    private: transport::SubscriberPtr velSub;
   };
 }
 #endif

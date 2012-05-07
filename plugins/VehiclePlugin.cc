@@ -90,7 +90,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->node->Init(this->model->GetWorld()->GetName());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
-      this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
+      this->model->GetName() + "/vel_cmd", &VehiclePlugin::OnVelMsg, this);
 }
 
 /////////////////////////////////////////////////
@@ -101,17 +101,31 @@ void VehiclePlugin::Init()
 /////////////////////////////////////////////////
 void VehiclePlugin::OnUpdate()
 {
+  this->joints[0]->SetVelocity(1, 4.5);
+  this->joints[0]->SetMaxForce(1, 50);
+
+  this->joints[1]->SetVelocity(1, 4.5);
+  this->joints[1]->SetMaxForce(1, 50);
+
+  /*this->joints[2]->SetVelocity(1, 4.5);
+  this->joints[2]->SetMaxForce(1, 50);
+
+  this->joints[3]->SetVelocity(1, 4.5);
+  this->joints[3]->SetMaxForce(1, 50);
+  */
+
+
   double AERO_LOAD = -0.1;
+  double SWAY_FORCE = 10;
 
   this->velocity = this->chassis->GetWorldLinearVel();
-  std::cout << "Velocity[" << this->velocity << "]\n";
-  std::cout << "Aero[" << AERO_LOAD * this->velocity.GetSquaredLength() << "]\n";
+  // std::cout << "Velocity[" << this->velocity << "]\n";
+  // std::cout << "Aero[" << AERO_LOAD * this->velocity.GetSquaredLength() << "]\n";
 
   //  aerodynamics
-  this->chassis->AddForce(math::Vector3(0, 0,
+  /*this->chassis->AddForce(math::Vector3(0, 0,
         AERO_LOAD * this->velocity.GetSquaredLength()));
 
-  /*
   // Sway bars
   math::Vector3 bodyPoint;
   math::Vector3 hingePoint;
@@ -119,30 +133,51 @@ void VehiclePlugin::OnUpdate()
 
   double displacement;
 
+  printf("Sway bars\n");
   for (int ix = 0; ix < 4; ++ix)
   {
-    hingePoint = this->hinges[ix]->GetAnchor(0);
+    hingePoint = this->joints[ix]->GetAnchor(0);
     // dJointGetHinge2Anchor(hinges_[ix], &hingePoint.x);
 
-    bodyPoint = this->hinges[ix]->GetAnchor(1);
+    bodyPoint = this->joints[ix]->GetAnchor(1);
     // dJointGetHinge2Anchor2(hinges_[ix], &bodyPoint.x);
 
-    axis = this->hinges[ix]->GetGlobalAxis(0);
+    axis = this->joints[ix]->GetGlobalAxis(0);
     //dJointGetHinge2Axis1(hinges_[ix], &axis.x);
 
-    displacement = (hingePoint - bodyPoint) / axis;
+    displacement = (bodyPoint - hingePoint).GetDotProd(axis);
+
+    std::cout << "Displacement[" << displacement << "]\n";
+
     float amt = displacement * SWAY_FORCE;
-    if( displacement > 0 ) {
-      if( amt > 15 ) {
+    if( displacement > 0 )
+    {
+      if( amt > 15 )
         amt = 15;
-      }
-      dBodyAddForce( wheelBody_[ix], -axis.x * amt, -axis.y * amt, -axis.z * amt );
-      dReal const * wp = dBodyGetPosition( wheelBody_[ix] );
-      dBodyAddForceAtPos( chassisBody_, axis.x*amt, axis.y*amt, axis.z*amt, wp[0], wp[1], wp[2] );
-      dBodyAddForce( wheelBody_[ix^1], axis.x * amt, axis.y * amt, axis.z * amt );
-      wp = dBodyGetPosition( wheelBody_[ix] );
-      dBodyAddForceAtPos( chassisBody_, -axis.x*amt, -axis.y*amt, -axis.z*amt, wp[0], wp[1], wp[2] );
+
+      this->joints[ix]->GetChild()->AddForce(axis * (amt * -1));
+      this->joints[ix^1]->GetChild()->AddForce(axis * amt);
+
+      //dBodyAddForce( wheelBody_[ix], -axis.x * amt, -axis.y * amt, -axis.z * amt );
+
+      //math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();      
+      // dReal const * wp = dBodyGetPosition( wheelBody_[ix] );
+      
+      //this->chassis->AddForceAtRelativePosition(amt*axis, p.pos);
+      //dBodyAddForceAtPos( chassisBody_, axis.x*amt, axis.y*amt, axis.z*amt, wp[0], wp[1], wp[2] );
+      
+      //dBodyAddForce( wheelBody_[ix^1], axis.x * amt, axis.y * amt, axis.z * amt );
+      
+      //wp = dBodyGetPosition( wheelBody_[ix] );
+
+      //this->chassis->AddForceAtRelativePosition(-amt*axis, p.pos);
+      //dBodyAddForceAtPos( chassisBody_, -axis.x*amt, -axis.y*amt, -axis.z*amt, wp[0], wp[1], wp[2] );
     }
   }
   */
+}
+
+/////////////////////////////////////////////////
+void VehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
+{
 }
