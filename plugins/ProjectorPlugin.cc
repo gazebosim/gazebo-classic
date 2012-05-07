@@ -212,7 +212,8 @@ void ProjectorPlugin::ToggleProjector(bool _projectorOn)
   // if not headless
   if (projector_.isInit)
   {
-    //gzmsg << "projector initialized, toggling state to [" << _projectorOn << "]\n";
+    // gzmsg << "projector initialized, toggling state to ["
+    //       << _projectorOn << "]\n";
     this->lock.lock();
     this->projector_.setEnabled(_projectorOn);
     this->lock.unlock();
@@ -220,7 +221,6 @@ void ProjectorPlugin::ToggleProjector(bool _projectorOn)
   }
   else
     gzwarn << "could not start projector, toggle failed\n";
-
 }
 
 

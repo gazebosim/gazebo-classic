@@ -11,6 +11,7 @@ set (plugins CameraPlugin
              ContactPlugin
              ProjectorPlugin
              RayPlugin
+             SimpleArmPlugin
              DiffDrivePlugin)
 
 foreach (src ${plugins})
