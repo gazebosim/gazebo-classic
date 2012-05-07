@@ -542,10 +542,10 @@ static void ComputeRows(
 
 
 
-/*  DEBUG PRINTOUTS
+  /*  DEBUG PRINTOUTS
   // print J_orig
   printf("J_orig\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
       printf("	%12.6f",J_orig[i*12+j]);
     }
@@ -555,7 +555,7 @@ static void ComputeRows(
 
   // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
   printf("J_precon\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
       printf("	%12.6f",J_precon[i*12+j]);
     }
@@ -564,7 +564,7 @@ static void ComputeRows(
   printf("\n");
 
   printf("J\n");
-  for (int i=0; i < m ; i++) {
+  for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
       printf("	%12.6f",J[i*12+j]);
     }
@@ -573,14 +573,15 @@ static void ComputeRows(
   printf("\n");
 
   printf("rhs_precon\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",rhs_precon[i]);
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("	%12.6f",rhs_precon[i]);
   printf("\n");
 
   printf("rhs\n");
-  for (int i=0; i < m ; i++) printf("	%12.6f",rhs[i]);
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("	%12.6f",rhs[i]);
   printf("\n");
-*/
-
+  */
 
   double rms_error = 0;
   int num_iterations = qs->num_iterations;
@@ -1775,6 +1776,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
           b_ptr->lvel[j] += stepsize * caccelcurr[j];
           b_ptr->avel[j] += stepsize * caccelcurr[3+j];
         }
+        // printf("caccel [%f %f %f] [%f %f %f]\n"
+        //   ,caccelcurr[0] ,caccelcurr[1] ,caccelcurr[2]
+        //   ,caccelcurr[3] ,caccelcurr[4] ,caccelcurr[5]);
+        // printf("  vel [%f %f %f] [%f %f %f]\n"
+        //   ,b_ptr->lvel[0] ,b_ptr->lvel[1] ,b_ptr->lvel[2]
+        //   ,b_ptr->avel[0] ,b_ptr->avel[1] ,b_ptr->avel[2]);
       }
     }
 
@@ -1835,6 +1842,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
         b_ptr->tacc[j] *= stepsize;
       }
       dMultiplyAdd0_331 (b_ptr->avel, invIrow, b_ptr->tacc);
+      // printf("fe [%f %f %f] [%f %f %f]\n"
+      //   ,b_ptr->facc[0] ,b_ptr->facc[1] ,b_ptr->facc[2]
+      //   ,b_ptr->tacc[0] ,b_ptr->tacc[1] ,b_ptr->tacc[2]);
+      /* DEBUG PRINTOUTS
+      printf("uncorrect vel [%f %f %f] [%f %f %f]\n"
+        ,b_ptr->lvel[0] ,b_ptr->lvel[1] ,b_ptr->lvel[2]
+        ,b_ptr->avel[0] ,b_ptr->avel[1] ,b_ptr->avel[2]);
+      */
     }
   }
 
@@ -1883,31 +1898,54 @@ void dxQuickStepper (dxWorldProcessContext *context,
     dReal erp_removal = 1.00;
     IFTIMING (dTimerNow ("velocity update due to constraint forces"));
     // remove caccel_erp
-    const dReal *caccelcurr = caccel_erp;
+    const dReal *caccel_erp_curr = caccel_erp;
+    const dReal *caccel_curr = caccel;
     dxBody *const *const bodyend = body + nb;
+    int debug_count = 0;
     for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-         caccelcurr+=6, bodycurr++) {
+         caccel_curr+=6, caccel_erp_curr+=6, bodycurr++, debug_count++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] -= erp_removal * stepsize * caccelcurr[j];
-        b_ptr->avel[j] -= erp_removal * stepsize * caccelcurr[3+j];
+        dReal v0 = b_ptr->lvel[j];
+        dReal a0 = b_ptr->avel[j];
+        dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
+        dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
+
+        /* default v removal
+        */
+        b_ptr->lvel[j] += dv;
+        b_ptr->avel[j] += da;
+        /* think about minimize J*v somehow without SORLCP...
+        */
+        /* minimize final velocity test 1,
+        if (v0 * dv < 0) {
+          if (fabs(v0) < fabs(dv))
+            b_ptr->lvel[j] = 0.0;
+          else
+            b_ptr->lvel[j] += dv;
+        }
+        if (a0 * da < 0) {
+          if (fabs(a0) < fabs(da))
+            b_ptr->avel[j] = 0.0;
+          else
+            b_ptr->avel[j] += da;
+        }
+        */
+
+        /*  DEBUG PRINTOUTS, total forces/accel on a body
+        printf("nb[%d] m[%d] b[%d] i[%d] v[%f] dv[%f] vf[%f] a[%f] da[%f] af[%f] debug[%f - %f][%f - %f]\n"
+               ,nb, m, debug_count, j, v0, dv, b_ptr->lvel[j]
+                 , a0, da, b_ptr->avel[j]
+               ,caccel_curr[j], caccel_erp_curr[j]
+               ,caccel_curr[3+j], caccel_erp_curr[3+j]);
+        */
       }
+      /*  DEBUG PRINTOUTS
+      printf("corrected vel [%f %f %f] [%f %f %f]\n",
+        b_ptr->lvel[0], b_ptr->lvel[1], b_ptr->lvel[2],
+        b_ptr->avel[0], b_ptr->avel[1], b_ptr->avel[2]);
+      */
     }
-    // use caccel without erp
-    caccelcurr = caccel;
-    //printf(" vel: ");
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-         caccelcurr+=6, bodycurr++) {
-      dxBody *b_ptr = *bodycurr;
-      for (int j=0; j<3; j++) {
-        b_ptr->lvel[j] += erp_removal * stepsize * caccelcurr[j];
-        b_ptr->avel[j] += erp_removal * stepsize * caccelcurr[3+j];
-      }
-      //printf(" %f  %f  %f  %f  %f  %f ",
-      //  b_ptr->lvel[0], b_ptr->lvel[1], b_ptr->lvel[2],
-      //  b_ptr->avel[0], b_ptr->avel[1], b_ptr->avel[2]);
-    }
-    //printf("\n");
 
 #ifdef POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
     // ADD CACCEL CORRECTION FROM VELOCITY CONSTRAINT VIOLATION

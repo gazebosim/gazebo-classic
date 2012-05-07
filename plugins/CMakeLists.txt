@@ -1,4 +1,5 @@
 include_directories(
+  ${OGRE_INCLUDE_DIRS}
   ${PROJECT_BINARY_DIR}/src 
   ${PROJECT_SOURCE_DIR}/src 
   ${PROTOBUF_INCLUDE_DIR}
@@ -8,7 +9,9 @@ set (plugins CameraPlugin
              DepthCameraPlugin
              GpuRayPlugin
              ContactPlugin
+             ProjectorPlugin
              RayPlugin
+             SimpleArmPlugin
              DiffDrivePlugin)
 
 foreach (src ${plugins})

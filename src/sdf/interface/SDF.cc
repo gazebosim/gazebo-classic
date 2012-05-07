@@ -17,6 +17,7 @@
 #include "common/Color.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
+#include "math/Vector2d.hh"
 
 #include "sdf/interface/parser.hh"
 #include "sdf/interface/SDF.hh"
@@ -170,6 +171,12 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   {
     boost::shared_ptr<ParamT<gazebo::math::Vector2i> > param(
         new ParamT<gazebo::math::Vector2i>(_key, _defaultValue, _required));
+    return param;
+  }
+  else if (_type == "vector2d")
+  {
+    boost::shared_ptr<ParamT<gazebo::math::Vector2d> > param(
+        new ParamT<gazebo::math::Vector2d>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "pose")
@@ -721,6 +728,23 @@ std::string Element::GetValueString(const std::string &_key)
 gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 {
   gazebo::math::Vector3 result;
+  if (_key.empty())
+    this->value->Get(result);
+  else
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
+{
+  gazebo::math::Vector2d result;
   if (_key.empty())
     this->value->Get(result);
   else
