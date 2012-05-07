@@ -350,8 +350,6 @@ void ODELink::SetAngularVel(const math::Vector3 &_vel)
   }
 }
 
-
-
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldAngularVel() const
 {
@@ -369,30 +367,35 @@ math::Vector3 ODELink::GetWorldAngularVel() const
   return vel;
 }
 
+//////////////////////////////////////////////////
 void ODELink::SetForce(const math::Vector3 &_force)
 {
   if (this->linkId)
     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
 }
 
+//////////////////////////////////////////////////
 void ODELink::SetTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 }
 
+//////////////////////////////////////////////////
 void ODELink::AddForce(const math::Vector3 &_force)
 {
   if (this->linkId)
     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
 }
 
+/////////////////////////////////////////////////
 void ODELink::AddRelativeForce(const math::Vector3 &_force)
 {
   if (this->linkId)
     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
 }
 
+/////////////////////////////////////////////////
 void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
                                const math::Vector3 &_relpos)
 {
@@ -401,18 +404,21 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
                           _relpos.x, _relpos.y, _relpos.z);
 }
 
+/////////////////////////////////////////////////
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 }
 
+/////////////////////////////////////////////////
 void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
     dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 }
 
+/////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldForce() const
 {
   math::Vector3 force;
@@ -430,9 +436,6 @@ math::Vector3 ODELink::GetWorldForce() const
 
   return force;
 }
-
-
-
 
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldTorque() const

@@ -123,7 +123,7 @@ void Inertial::SetAngularDamping(double _damping)
 //////////////////////////////////////////////////
 double Inertial::GetLinearDamping()
 {
-  double value = 0;
+  double value = 0.0;
   if (this->sdf->HasElement("damping"))
   {
     sdf::ElementPtr dampingElem = this->sdf->GetElement("damping");
@@ -136,7 +136,7 @@ double Inertial::GetLinearDamping()
 //////////////////////////////////////////////////
 double Inertial::GetAngularDamping()
 {
-  double value = 0;
+  double value = 0.0;
   if (this->sdf->HasElement("damping"))
   {
     sdf::ElementPtr dampingElem = this->sdf->GetElement("damping");

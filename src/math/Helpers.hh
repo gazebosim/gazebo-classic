@@ -21,6 +21,7 @@
 #include <limits>
 #include <string>
 #include <iostream>
+#include <vector>
 
 namespace gazebo
 {
@@ -28,6 +29,46 @@ namespace gazebo
   {
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
     static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
+
+    template<typename T>
+    inline T mean(const std::vector<T> &_values)
+    {
+      T sum = 0;
+      for (unsigned int i = 0; i < _values.size(); ++i)
+        sum += _values[i];
+      return sum / _values.size();
+    }
+
+    template<typename T>
+    inline T variance(const std::vector<T> &_values)
+    {
+      T avg = mean<T>(_values);
+
+      T sum = 0;
+      for (unsigned int i = 0; i < _values.size(); ++i)
+        sum += (_values[i] - avg) * (_values[i] - avg);
+      return sum / _values.size();
+    }
+
+    template<typename T>
+    inline T max(const std::vector<T> &_values)
+    {
+      T max = std::numeric_limits<T>::min();
+      for (unsigned int i = 0; i < _values.size(); ++i)
+        if (_values[i] > max)
+          max = _values[i];
+      return max;
+    }
+
+    template<typename T>
+    inline T min(const std::vector<T> &_values)
+    {
+      T min = std::numeric_limits<T>::max();
+      for (unsigned int i = 0; i < _values.size(); ++i)
+        if (_values[i] < min)
+          min = _values[i];
+      return min;
+    }
 
     inline bool equal(const double &_a, const double &_b,
                       const double &_epsilon = 1e-6)

@@ -62,7 +62,6 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
-  printf("BulletLink::Init\n");
   Link::Init();
 
   btScalar btMass = this->inertial->GetMass();

@@ -220,6 +220,12 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
+  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+
   // Initialize all the entities
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
@@ -729,7 +735,6 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnControl(ConstWorldControlPtr &_data)
 { 
-  std::cout << "WorldControlPtr[" << _data->DebugString() << "]\n";
   if (_data->has_pause())
     this->SetPaused(_data->pause());
 

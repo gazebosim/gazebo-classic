@@ -29,42 +29,45 @@ BallTestPlugin::BallTestPlugin()
 }
 
 /////////////////////////////////////////////////
-void BallTestPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+void BallTestPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 {
+  this->world = _world;
   this->updateConnection = event::Events::ConnectWorldUpdateEnd(
         boost::bind(&BallTestPlugin::OnUpdate, this));
 }
 
+void BallTestPlugin::Init()
+{
+  printf("Init\n");
+  for (int i = 0; i < 100; ++i)
+  {
+    std::ostringstream newModelStr;
+    newModelStr << "<gazebo version ='1.0'>"
+      << "<model name ='ball_" << i << "'>"
+      << "<origin pose='" << i*0.01 << " 0 " << 10 + i*2 << " 0 0 0'/>"
+      << "<link name ='link'>"
+      << "  <inertial mass ='0.5'/>"
+      << "  <collision name ='collision'>"
+      << "    <geometry>"
+      << "      <sphere radius ='0.5'/>"
+      << "    </geometry>"
+      << "  </collision>"
+      << "  <visual name ='visual' cast_shadows ='true'>"
+      << "    <geometry>"
+      << "      <sphere radius ='0.5'/>"
+      << "    </geometry>"
+      << "  </visual>"
+      << "</link>"
+      << "</model>"
+      << "</gazebo>";
+
+    sdf::SDF sdf;
+    sdf.SetFromString(newModelStr.str());
+    this->world->InsertModel(sdf);
+  }
+}
 
 /////////////////////////////////////////////////
 void BallTestPlugin::OnUpdate()
 {
-  std::ofstringstream newModelStr;
-
-  newModelStr << "<gazebo version ='1.0'>"
-    << "<model name ='ball_" << this->index++ << "'>"
-    << "<origin pose ='0 0 10 0 0 0/>"
-    << "<link name ='link'>"
-    << "  <inertial mass ='1.0'>"
-    << "    <inertia ixx ='.01' ixy ='0' ixz ='0' iyy ='.01'"
-    << " iyz ='0' izz ='0.01'/>"
-    << "  </inertial>"
-    << "  <collision name ='collision'>"
-    << "    <geometry>"
-    << "      <sphere radius ='0.5'/>"
-    << "    </geometry>"
-    << "  </collision>"
-    << "  <visual name ='visual' cast_shadows ='true'>"
-    << "    <geometry>"
-    << "      <sphere radius ='0.5'/>"
-    << "    </geometry>"
-    << "  </visual>"
-    << "</link>"
-    << "</model>"
-    << "</gazebo>";
-
-  sdf::SDFPtr sdf(new SDF());
-  sdf->SetFromString(newModelStr.str());
-
-  this->world->LoadModel(sdf);
 }

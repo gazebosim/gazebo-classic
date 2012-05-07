@@ -27,38 +27,26 @@ MySlider::MySlider(const std::string &_name, QWidget *_parent)
 {
   QHBoxLayout *mainLayout = new QHBoxLayout;
 
-  this->slider = new QSlider(Qt::Horizontal, this);
-  this->slider->setRange(-100, 100);
-  this->slider->setSliderPosition(0);
-  this->slider->setFixedWidth(200);
-
-  this->label = new QLabel(this);
-  this->label->setNum(0);
-  this->label->setFixedWidth(60);
-
   this->multiplier = new QDoubleSpinBox;
-  this->multiplier->setRange(0.01, 10);
+  this->multiplier->setRange(-100.0, 100.0);
   this->multiplier->setSingleStep(0.01);
-  this->multiplier->setValue(0.01);
+  this->multiplier->setValue(0.00);
 
   mainLayout->addWidget(new QLabel(tr(_name.c_str())), 0);
   mainLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum));
   mainLayout->addWidget(this->multiplier, 0);
-  mainLayout->addWidget(this->slider, 0);
-  mainLayout->addWidget(this->label, 0);
+  mainLayout->addWidget(new QLabel("N-m", this),0);
   this->setLayout(mainLayout);
 
-  connect(this->slider, SIGNAL(valueChanged(int)),
-      this, SLOT(OnChanged(int)));
+  connect(this->multiplier, SIGNAL(valueChanged(double)),
+        this, SLOT(OnChanged(double)));
 }
 
 /////////////////////////////////////////////////
-void MySlider::OnChanged(int _value)
+void MySlider::OnChanged(double _value)
 {
-  double value = this->multiplier->value() * _value;
-  this->label->setNum(value);
-  emit changed(value, this->name);
+  emit changed(_value, this->name);
 }
 
 /////////////////////////////////////////////////

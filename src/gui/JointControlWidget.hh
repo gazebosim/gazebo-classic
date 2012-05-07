@@ -49,11 +49,9 @@ namespace gazebo
     {
       Q_OBJECT
       public: MySlider(const std::string &_name, QWidget *_parent);
-      public slots: void OnChanged(int _value);
+      public slots: void OnChanged(double _value);
       Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
       private: std::string name;
-      private: QSlider *slider;
-      private: QLabel *label;
       private: QDoubleSpinBox *multiplier;
     };
   }

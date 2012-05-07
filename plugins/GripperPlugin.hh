@@ -37,13 +37,29 @@ namespace gazebo
     private: void OnContact(const std::string &_collisionName,
                             const physics::Contact &_contact);
 
+    private: void HandleAttach();
+    private: void HandleDetach();
+    private: void ResetDiffs();
+
     private: physics::ModelPtr model;
+    private: physics::PhysicsEnginePtr physics;
+    private: physics::JointPtr fixedJoint;
+
     private: std::vector<physics::JointPtr> joints;
     private: std::vector<physics::LinkPtr> links;
     private: std::vector<event::ConnectionPtr> connections;
 
     private: std::map<std::string, physics::CollisionPtr> collisions;
     private: std::vector<physics::Contact> contacts;
+
+    private: bool attached;
+
+    private: math::Pose prevDiff;
+    private: std::vector<double> diffs;
+    private: int diffIndex;
+
+    private: common::Time updateRate, prevUpdateTime;
+    private: int posCount, zeroCount;
   };
 }
 #endif

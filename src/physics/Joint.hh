@@ -62,6 +62,10 @@ namespace gazebo
       public: virtual ~Joint();
 
       /// \brief Load a joint
+      public: void Load(LinkPtr _parent, LinkPtr _child,
+                        const math::Pose &_origin);
+
+      /// \brief Load a joint
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize a joint
@@ -187,6 +191,8 @@ namespace gazebo
       public: void FillJointMsg(msgs::Joint &_msg);
 
       protected: virtual math::Angle GetAngleImpl(int _index) const = 0;
+
+      private: void LoadImpl(const math::Pose &_origin);
 
       /// The first link this joint connects to
       protected: LinkPtr childLink;

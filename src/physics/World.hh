@@ -19,8 +19,8 @@
  * Date: 3 Apr 2007
  */
 
-#ifndef WORLD_HH
-#define WORLD_HH
+#ifndef __WORLD_HH__
+#define __WORLD_HH__
 
 #include <vector>
 #include <list>

@@ -184,6 +184,15 @@
       </axis>
     </joint>
 
+    <joint name="fixed_riser" type="revolute">
+      <child link="riser"/>
+      <parent link="world"/>
+      <axis xyz="0 0 1">
+        <limit lower="0" upper="0"/> 
+      </axis>
+    </joint>
+
+
     <plugin filename="libGripperPlugin.so" name="gripper">
       <joint>palm_right_finger</joint>
       <joint>right_finger_tip</joint>
