@@ -17,6 +17,7 @@
 #include <list>
 
 #include "common/Skeleton.hh"
+#include "common/SkeletonAnimation.hh"
 #include "math/Angle.hh"
 
 using namespace gazebo;
@@ -118,23 +119,8 @@ void Skeleton::Scale(double _scale)
   this->root->UpdateChildrenTransforms();
 
   //  scale the animation data
-  for (std::map<std::string, SkeletonAnimation>::iterator it =
-        this->animations.begin(); it != this->animations.end(); ++it)
-  {
-    SkeletonAnimation *anim = &it->second;
-    for (SkeletonAnimation::iterator naIter = anim->begin();
-          naIter != anim->end(); ++naIter)
-    {
-      NodeAnimation *nodeAnim = &naIter->second;
-      for (NodeAnimation::iterator matIter = nodeAnim->begin();
-            matIter != nodeAnim->end(); ++matIter)
-      {
-        math::Matrix4 *mat = &matIter->second;
-        math::Vector3 pos = mat->GetTranslation();
-        mat->SetTranslate(pos * _scale);
-      }
-    }
-  }
+  for (unsigned int i = 0; i < this->anims.size(); i++)
+    this->anims[i]->Scale(_scale);
 }
 
 //////////////////////////////////////////////////
@@ -239,19 +225,18 @@ std::pair<std::string, double> Skeleton::GetVertNodeWeight(unsigned int _v,
 //////////////////////////////////////////////////
 unsigned int Skeleton::GetNumAnimations()
 {
-  return this->animations.size();
+  return this->anims.size();
+}
+
+SkeletonAnimation *Skeleton::GetAnimation(const unsigned int _i)
+{
+  return this->anims[_i];
 }
 
 //////////////////////////////////////////////////
-std::map<std::string, SkeletonAnimation> Skeleton::GetAnimationList()
+void Skeleton::AddAnimation(SkeletonAnimation *_anim)
 {
-  return this->animations;
-}
-
-//////////////////////////////////////////////////
-void Skeleton::AddAnimation(std::string _name, SkeletonAnimation _anim)
-{
-  this->animations[_name] = _anim;
+  this->anims.push_back(_anim);
 }
 
 

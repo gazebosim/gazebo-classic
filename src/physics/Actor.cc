@@ -33,6 +33,7 @@
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
 #include "common/Skeleton.hh"
+#include "common/SkeletonAnimation.hh"
 #include "common/BVHLoader.hh"
 
 #include "physics/World.hh"
@@ -221,7 +222,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   if (animName == "__default__")
   {
     this->skelAnimation[this->skinFile] =
-        this->skeleton->GetAnimationList().begin()->second;
+        this->skeleton->GetAnimation(0);
     std::map<std::string, std::string> skelMap;
     for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
       skelMap[this->skeleton->GetNodeByHandle(i)->GetName()] =
@@ -283,7 +284,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       else
       {
         this->skelAnimation[animName] =
-            skel->GetAnimationList().begin()->second;
+            skel->GetAnimation(0);
         this->skelNodesMap[animName] = skelMap;
       }
     }
@@ -362,10 +363,12 @@ void Actor::Update()
 
   scriptTime = scriptTime - action.startTime;
 
-  SkeletonAnimation *skelAnim = &this->skelAnimation[action.type];
+  SkeletonAnimation *skelAnim = this->skelAnimation[action.type];
   std::map<std::string, std::string> skelMap = this->skelNodesMap[action.type];
 
   msgs::PoseAnimation msg;
+
+  std::map<std::string, math::Matrix4> frame = skelAnim->GetPoseAt(scriptTime);
 
   msg.set_model_name(this->visualName);
 
@@ -374,50 +377,8 @@ void Actor::Update()
     SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
     SkeletonNode *parentBone = bone->GetParent();
     math::Matrix4 transform(math::Matrix4::IDENTITY);
-    if (skelAnim->find(skelMap[bone->GetName()]) != skelAnim->end())
-    {
-      NodeAnimation *anim = &(*skelAnim)[skelMap[bone->GetName()]];
-
-      NodeAnimation::iterator next = anim->begin();
-      NodeAnimation::iterator prev = anim->end();
-      --prev;
-      while ((next->first) < scriptTime)
-      {
-        prev = next;
-        ++next;
-        if (next == anim->end())
-        {
-          next = anim->begin();
-          scriptTime = scriptTime - prev->first;
-        }
-      }
-      double prevTime = prev->first;
-      if (next == anim->begin())
-        prevTime = 0.0;
-      math::Matrix4 prevTransform = prev->second;
-      if (next != anim->end())
-      {
-        double nextTime = next->first;
-        math::Matrix4 nextTransform = next->second;
-        double t = (scriptTime - prevTime) / (nextTime - prevTime);
-        math::Vector3 prevPos = prevTransform.GetTranslation();
-        math::Vector3 nextPos = nextTransform.GetTranslation();
-        math::Quaternion prevQ = prevTransform.GetRotation();
-        math::Quaternion nextQ = nextTransform.GetRotation();
-        math::Quaternion curQ;
-
-        math::Vector3 curPos =
-              math::Vector3(prevPos.x + (nextPos.x - prevPos.x) * t,
-                           prevPos.y + (nextPos.y - prevPos.y) * t,
-                           prevPos.z + (nextPos.z - prevPos.z) * t);
-        curQ = math::Quaternion::Slerp(t, prevQ, nextQ, true);
-
-        transform = curQ.GetAsMatrix4();
-        transform.SetTranslate(curPos);
-      }
-      else
-        transform = prevTransform;
-    }
+    if (frame.find(skelMap[bone->GetName()]) != frame.end())
+      transform = frame[skelMap[bone->GetName()]];
     else
       transform = bone->GetTransform();
 

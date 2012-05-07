@@ -23,6 +23,7 @@
 #include "common/BVHLoader.hh"
 #include "common/SystemPaths.hh"
 #include "common/Skeleton.hh"
+#include "common/SkeletonAnimation.hh"
 #include "common/Console.hh"
 #include "math/Matrix3.hh"
 #include "math/Angle.hh"
@@ -166,7 +167,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
   double time = 0.0;
   unsigned int frameNo = 0;
 
-  SkeletonAnimation animation;
+  SkeletonAnimation *animation = new SkeletonAnimation(filename);
 
   while (!file.eof())
   {
@@ -241,7 +242,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
       math::Matrix4 pos(math::Matrix4::IDENTITY);
       pos.SetTranslate(translation);
       transform = pos * transform;
-      animation[node->GetName()][time] = transform;
+      animation->AddKeyFrame(node->GetName(), time, transform);
     }
 
     frameNo++;
@@ -252,7 +253,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
   if (frameNo < frameCount - 1)
     gzwarn << "BVH file ended unexpectedly.\n";
 
-  skeleton->AddAnimation("animation1", animation);
+  skeleton->AddAnimation(animation);
 
   file.close();
   return skeleton;

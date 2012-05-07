@@ -134,7 +134,7 @@ namespace gazebo
 
       protected: common::Time playStartTime;
 
-      protected: std::map<std::string, common::SkeletonAnimation>
+      protected: std::map<std::string, common::SkeletonAnimation*>
                                                             skelAnimation;
 
       protected: std::vector<ScriptAction> actions;
