@@ -9,6 +9,7 @@ set (plugins CameraPlugin
              DepthCameraPlugin
              GpuRayPlugin
              ContactPlugin
+             JointTestPlugin
              ProjectorPlugin
              RayPlugin
              SimpleArmPlugin
