@@ -469,6 +469,22 @@ ElementPtr Element::GetElementDescription(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
+ElementPtr Element::GetElementDescription(const std::string &_key) const
+{
+  ElementPtr_V::const_iterator iter;
+  for (iter = this->elementDescriptions.begin();
+       iter != this->elementDescriptions.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _key)
+      return (*iter);
+  }
+
+  gzdbg << "Unable to find element description with name["
+         << _key << "] return empty\n";
+  return ElementPtr();
+}
+
+/////////////////////////////////////////////////
 ParamPtr Element::GetValue()
 {
   return this->value;
@@ -608,6 +624,8 @@ bool Element::GetValueBool(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueBool();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueBool();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -627,6 +645,8 @@ int Element::GetValueInt(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueInt();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueInt();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -646,6 +666,8 @@ float Element::GetValueFloat(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueFloat();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueFloat();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -670,6 +692,8 @@ double Element::GetValueDouble(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueDouble();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueDouble();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -694,6 +718,8 @@ unsigned int Element::GetValueUInt(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueUInt();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueUInt();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -718,6 +744,8 @@ char Element::GetValueChar(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueChar();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueChar();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -737,6 +765,8 @@ std::string Element::GetValueString(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueString();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueString();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -756,6 +786,8 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueVector3();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueVector3();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -775,6 +807,8 @@ gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueVector2d();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueVector2d();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -794,6 +828,8 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueQuaternion();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueQuaternion();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -813,6 +849,8 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValuePose();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValuePose();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -832,6 +870,8 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
       param->Get(result);
     else if (this->HasElement(_key))
       result = this->GetElement(_key)->GetValueColor();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueColor();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }

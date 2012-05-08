@@ -1,13 +1,24 @@
 <?xml version="1.0"?> 
 <gazebo version="1.0">
   <world name="default">
+
+    <physics type="ode">
+      <gravity xyz="0 0 -9.8"/>
+      <ode>
+        <solver type="quick" dt="0.001" iters="80" sor="1.3"/>
+        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="0.01" contact_surface_layer="0.001"/>
+      </ode>
+    </physics>
+
+
     <!-- A ground plane -->
     <include filename="ground_plane.model"/>
 
     <!-- A global light source -->
     <include filename="sun.light"/>
 
-    <include filename="car.model"/>
+    <!--<include filename="car.model"/>-->
+    <include filename="pioneer2dx.model"/>
   </world>
 </gazebo>
 

@@ -85,8 +85,11 @@ namespace sdf
     /// \brief Get the number of element descriptions
     public: unsigned int GetElementDescriptionCount() const;
 
-    /// \brief Get an attribute using an index
+    /// \brief Get an element description using an index
     public: ElementPtr GetElementDescription(unsigned int _index) const;
+
+    /// \brief Get an element descriptio using a key
+    public: ElementPtr GetElementDescription(const std::string &_key) const;
 
     /// \brief Return true if an element description exists
     public: bool HasElementDescription(const std::string &_name);

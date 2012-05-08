@@ -70,8 +70,10 @@ namespace gazebo
       /// \brief Get the center of gravity
       public: inline const math::Vector3 &GetCoG() const
               { return this->cog; }
+
       public: inline const math::Pose GetPose() const
               { return math::Pose(this->cog, math::Quaternion());}
+
       /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
       public: math::Vector3 GetPrincipalMoments() const;
 
@@ -136,7 +138,13 @@ namespace gazebo
                   const gazebo::physics::Inertial &_inertial)
               {
                 _out << "Mass[" << _inertial.mass << "] CoG["
-                    << _inertial.cog << "]";
+                    << _inertial.cog << "]\n";
+                _out << "IXX[" << _inertial.principals.x << "] "
+                     << "IYY[" << _inertial.principals.y << "] "
+                     << "IZZ[" << _inertial.principals.z << "]\n";
+                _out << "IXY[" << _inertial.products.x << "] "
+                     << "IXZ[" << _inertial.products.y << "] "
+                     << "IYZ[" << _inertial.products.z << "]\n";
                 return _out;
               }
 

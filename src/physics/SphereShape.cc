@@ -67,8 +67,20 @@ void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
 }
 
 //////////////////////////////////////////////////
-double void SphereShape::GetMass(double _density) const
+double SphereShape::GetMass(double _density) const
 {
   double r = this->GetRadius();
   return (4.0/3.0) * M_PI * r * r * r * _density;
+}
+
+//////////////////////////////////////////////////
+void SphereShape::GetInertial(double _mass, InertialPtr _inertial) const
+{
+  double r = this->GetRadius();
+  double ii = 0.4 * _mass * r * r;
+
+  _inertial->SetMass(_mass);
+  _inertial->SetIXX(ii);
+  _inertial->SetIYY(ii);
+  _inertial->SetIZZ(ii);
 }

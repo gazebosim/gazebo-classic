@@ -101,25 +101,23 @@ void VehiclePlugin::Init()
 /////////////////////////////////////////////////
 void VehiclePlugin::OnUpdate()
 {
-  this->joints[0]->SetVelocity(1, 4.5);
-  this->joints[0]->SetMaxForce(1, 50);
+  this->joints[0]->SetVelocity(0, 1.0);
+  this->joints[0]->SetMaxForce(0, 10);
 
-  this->joints[1]->SetVelocity(1, 4.5);
-  this->joints[1]->SetMaxForce(1, 50);
+  this->joints[1]->SetVelocity(0, 1.0);
+  this->joints[1]->SetMaxForce(0, 10);
 
-  /*this->joints[2]->SetVelocity(1, 4.5);
-  this->joints[2]->SetMaxForce(1, 50);
+  this->joints[2]->SetVelocity(0, 1.0);
+  this->joints[2]->SetMaxForce(0, 10);
 
-  this->joints[3]->SetVelocity(1, 4.5);
-  this->joints[3]->SetMaxForce(1, 50);
-  */
-
-
-  double AERO_LOAD = -0.1;
-  double SWAY_FORCE = 10;
+  this->joints[3]->SetVelocity(0, 1.0);
+  this->joints[3]->SetMaxForce(0, 10);
 
   this->velocity = this->chassis->GetWorldLinearVel();
   // std::cout << "Velocity[" << this->velocity << "]\n";
+  // double AERO_LOAD = -0.1;
+  // double SWAY_FORCE = 10;
+
   // std::cout << "Aero[" << AERO_LOAD * this->velocity.GetSquaredLength() << "]\n";
 
   //  aerodynamics

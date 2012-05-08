@@ -153,10 +153,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     if (this->sdf->HasElement("inertial"))
       this->inertial->Load(this->sdf->GetElement("inertial"));
     else
-    {
       this->SetInertialFromCollisions();
-      gzerr << "Non-static body has no interial sdf element.\n";
-    }
   }
 }
 
@@ -771,7 +768,6 @@ void Link::SetInertialFromCollisions()
 {
   Base_V::iterator iter;
 
-  std::cout << "Link UpdateInertial\n";
   CollisionPtr coll;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
@@ -779,7 +775,6 @@ void Link::SetInertialFromCollisions()
     {
       coll = boost::shared_static_cast<Collision>(*iter);
       (*this->inertial) += *(coll->GetInertial());
-      // std::cout << "  Intertial[" << coll->GetInertial() << "]\n";
     }
   }
 }

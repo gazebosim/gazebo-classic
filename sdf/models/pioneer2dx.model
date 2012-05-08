@@ -80,7 +80,6 @@
                  iyy='0.001' iyz='0.0'
                  izz='0.001'/>
       </inertial>
-      
   
       <collision name="collision">
         <geometry>

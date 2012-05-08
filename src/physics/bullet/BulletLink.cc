@@ -344,15 +344,17 @@ btRigidBody *BulletLink::GetBulletLink() const
 //////////////////////////////////////////////////
 void BulletLink::SetLinearDamping(double _damping)
 {
-  this->rigidLink->setDamping((btScalar)_damping,
-      (btScalar)this->rigidLink->getAngularDamping());
+  if (this->rigidLink)
+    this->rigidLink->setDamping((btScalar)_damping,
+        (btScalar)this->rigidLink->getAngularDamping());
 }
 
 //////////////////////////////////////////////////
 void BulletLink::SetAngularDamping(double _damping)
 {
-  this->rigidLink->setDamping(
-      (btScalar)this->rigidLink->getLinearDamping(), (btScalar)_damping);
+  if (this->rigidLink)
+    this->rigidLink->setDamping(
+        (btScalar)this->rigidLink->getLinearDamping(), (btScalar)_damping);
 }
 
 //////////////////////////////////////////////////

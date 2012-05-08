@@ -825,7 +825,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     (_collision1->GetSurface()->fdir1 +_collision2->GetSurface()->fdir1) * 0.5;
   if (fd != math::Vector3(0, 0, 0))
   {
-    contact.surface.mode = dContactFDir1 | contact.surface.mode;
+    contact.surface.mode |= dContactFDir1;
     contact.fdir1[0] = fd.x;
     contact.fdir1[1] = fd.y;
     contact.fdir1[2] = fd.z;
@@ -835,6 +835,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                 _collision2->GetSurface()->mu1);
   contact.surface.mu2 = std::min(_collision1->GetSurface()->mu2,
                                  _collision2->GetSurface()->mu2);
+
 
   contact.surface.slip1 = std::min(_collision1->GetSurface()->slip1,
                                    _collision2->GetSurface()->slip1);

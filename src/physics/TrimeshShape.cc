@@ -92,7 +92,7 @@ void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
 }
 
 //////////////////////////////////////////////////
-double void TrimeshShape::GetMass(double _density) const
+double TrimeshShape::GetMass(double _density) const
 {
   gzerr << "Not implemented\n";
   return _density;

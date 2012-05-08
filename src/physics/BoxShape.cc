@@ -65,8 +65,19 @@ void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 }
 
 //////////////////////////////////////////////////
-double void BoxShape::GetMass(double _density) const
+double BoxShape::GetMass(double _density) const
 {
   math::Vector3 size = this->GetSize();
   return size.x * size.y * size.z * _density;
+}
+
+//////////////////////////////////////////////////
+void BoxShape::GetInertial(double _mass, InertialPtr _inertial) const
+{
+  math::Vector3 size = this->GetSize();
+
+  _inertial->SetMass(_mass);
+  _inertial->SetIXX(_mass / 12.0 * (size.y * size.y + size.z * size.z));
+  _inertial->SetIYY(_mass / 12.0 * (size.x * size.x + size.z * size.z));
+  _inertial->SetIZZ(_mass / 12.0 * (size.x * size.x + size.y * size.y));
 }

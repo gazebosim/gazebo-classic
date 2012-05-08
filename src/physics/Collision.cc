@@ -56,6 +56,7 @@ Collision::Collision(LinkPtr _link)
   this->contactsEnabled = false;
 
   this->surface.reset(new SurfaceParams());
+  this->inertial.reset(new Inertial());
 }
 
 //////////////////////////////////////////////////
@@ -108,7 +109,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   else if (this->sdf->HasElement("density"))
     mass = this->shape->GetMass(this->sdf->HasElement("density"));
 
-  this->shape->SetInertial(this->inertial, mass);
+  this->shape->GetInertial(mass, this->inertial);
 
   // Calculate the inertial properties for the shape
   /*if (this->shape->GetType() == Base::BOX_SHAPE)
@@ -136,7 +137,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
     gzerr << "Unable to set inertial for shape["
       << this->shape->GetType() << "]\n";
       */
-  std::cout << "Collision Mass[" << mass << "] In[" << this->inertial << "]\n";
+  std::cout << "Collision Mass[" << mass << "] In[" << *this->inertial << "]\n";
 }
 
 //////////////////////////////////////////////////

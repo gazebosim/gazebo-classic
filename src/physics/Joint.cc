@@ -42,9 +42,6 @@ Joint::Joint()
 {
   this->AddType(Base::JOINT);
   this->showJoints = false;
-
-  this->showJointsConnection =
-    event::Events::ConnectShowJoints(boost::bind(&Joint::ShowJoints, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -225,17 +222,6 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Joint::ShowJoints(const bool & /*s_kk*/)
-{
-  /*msgs::Visual msg;
-  msg.set_name(this->visual);
-  msg.set_visible(s);
-  this->vis_pub->Publish(msg);
-  this->showJoints = s;
-  */
-}
-
-//////////////////////////////////////////////////
 void Joint::Reset()
 {
   this->SetMaxForce(0, 0);
@@ -300,7 +286,7 @@ void Joint::FillJointMsg(msgs::Joint &_msg)
   else if (this->HasType(Base::UNIVERSAL_JOINT))
     _msg.set_type(msgs::Joint::UNIVERSAL);
 
-  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetLocalAxis(0));
+  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetGlobalAxis(0));
   _msg.mutable_axis1()->set_limit_lower(0);
   _msg.mutable_axis1()->set_limit_upper(0);
   _msg.mutable_axis1()->set_limit_effort(0);
