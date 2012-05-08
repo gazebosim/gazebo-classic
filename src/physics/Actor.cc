@@ -386,11 +386,14 @@ void Actor::Update()
 
   TrajectoryInfo tinfo;
 
+  unsigned int tid = 0;
+
   for (unsigned int i = 0; i < this->trajInfo.size(); i++)
     if (this->trajInfo[i].startTime <= scriptTime &&
           this->trajInfo[i].endTime >= scriptTime)
     {
       tinfo = this->trajInfo[i];
+      tid = i;
       break;
     }
 
@@ -446,10 +449,17 @@ void Actor::Update()
     else
     {
       modelPose.pos = transform.GetTranslation();
+      transform.SetTranslate(math::Vector3(0, 0, 0));
       math::Vector3 yzPos(0.0, modelPose.pos.y, modelPose.pos.z);
-      modelPose.pos.z = 0.0;
-      modelPose.pos.y = 0.0;
-      transform.SetTranslate(yzPos);
+
+      common::PoseKeyFrame posFrame(0.0);
+      this->trajectories[tid]->SetTime(scriptTime);
+      this->trajectories[tid]->GetInterpolatedKeyFrame(posFrame);
+
+      modelPose.pos = posFrame.GetTranslation() +
+                        posFrame.GetRotation().RotateVector(yzPos);
+      modelPose.rot = posFrame.GetRotation();
+
       this->mainLink->SetWorldPose(modelPose);
 
       math::Matrix4 modelTrans(modelPose.rot.GetAsMatrix4());
