@@ -115,6 +115,22 @@ namespace sdf
     public: gazebo::common::Color GetValueColor(const std::string &_key = "");
     public: gazebo::common::Time GetValueTime(const std::string &_key = "");
 
+    public: bool Set(const bool &_value);
+    public: bool Set(const int &_value);
+    public: bool Set(const unsigned int &_value);
+    public: bool Set(const float &_value);
+    public: bool Set(const double &_value);
+    public: bool Set(const char &_value);
+    public: bool Set(const std::string &_value);
+    public: bool Set(const char *_value);
+    public: bool Set(const gazebo::math::Vector3 &_value);
+    public: bool Set(const gazebo::math::Vector2i &_value);
+    public: bool Set(const gazebo::math::Vector2d &_value);
+    public: bool Set(const gazebo::math::Quaternion &_value);
+    public: bool Set(const gazebo::math::Pose &_value);
+    public: bool Set(const gazebo::common::Color &_value);
+    public: bool Set(const gazebo::common::Time &_value);
+
     public: bool HasElement(const std::string &_name) const;
 
     public: ElementPtr GetElement(const std::string &_name) const;

@@ -107,46 +107,6 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetLinearDamping(double _damping)
-{
-  this->sdf->GetOrCreateElement("damping")->GetAttribute("linear")->Set(
-      _damping);
-}
-
-//////////////////////////////////////////////////
-void Inertial::SetAngularDamping(double _damping)
-{
-  this->sdf->GetOrCreateElement("damping")->GetAttribute("angular")->Set(
-      _damping);
-}
-
-//////////////////////////////////////////////////
-double Inertial::GetLinearDamping()
-{
-  double value = 0.0;
-  if (this->sdf->HasElement("damping"))
-  {
-    sdf::ElementPtr dampingElem = this->sdf->GetElement("damping");
-    value = dampingElem->GetValueDouble("linear");
-  }
-
-  return value;
-}
-
-//////////////////////////////////////////////////
-double Inertial::GetAngularDamping()
-{
-  double value = 0.0;
-  if (this->sdf->HasElement("damping"))
-  {
-    sdf::ElementPtr dampingElem = this->sdf->GetElement("damping");
-    value = dampingElem->GetValueDouble("angular");
-  }
-
-  return value;
-}
-
-//////////////////////////////////////////////////
 void Inertial::Reset()
 {
   this->mass = 0;
@@ -319,10 +279,6 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
     this->SetCoG(_msg.pose().position().x(),
                  _msg.pose().position().y(),
                  _msg.pose().position().z());
-  if (_msg.has_linear_damping())
-    this->SetLinearDamping(_msg.linear_damping());
-  if (_msg.has_angular_damping())
-    this->SetAngularDamping(_msg.angular_damping());
   if (_msg.has_ixx())
     this->SetIXX(_msg.ixx());
   if (_msg.has_ixy())
@@ -338,30 +294,36 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
 }
 
 /////////////////////////////////////////////////
-void Inertial::SetBox(const math::Vector3 &_size, double _density)
+void Inertial::SetBoxDensity(double _density, const math::Vector3 &_size)
 {
-  this->mass = _size.x * _size.y * _size.z * _density;
-  this->SetBox(_density);
+  this->SetBoxMass(_size.x * _size.y * _size.z * _density, _size);
 }
 
 /////////////////////////////////////////////////
-void Inertial::SetBox(const math::Vector3 &_size)
+void Inertial::SetBoxMass(double _mass, const math::Vector3 &_size)
 {
-  this->principals.x = this->mass/12.0 * (size.y*size.y + size.z*size.z);
-  this->principals.y = this->mass/12.0 * (size.x*size.x + size.z*size.z);
-  this->principals.z = this->mass/12.0 * (size.x*size.x + size.y*size.y);
+  this->mass = _mass;
+  this->principals.x = this->mass / 12.0 *
+    (_size.y * _size.y + _size.z * _size.z);
+  this->principals.y = this->mass / 12.0 *
+    (_size.x * _size.x + _size.z * _size.z);
+  this->principals.z = this->mass / 12.0 *
+    (_size.x * _size.x + _size.y * _size.y);
 }
 
 /////////////////////////////////////////////////
-void Inertial::SetCylinder(double _radius, double _length, double _density)
+void Inertial::SetCylinderDensity(double _density, double _radius,
+                                  double _length)
 {
-  this->mass = M_PI * _radius * _radius * _length * _density;
-  this->SetCylinder(_radius, _length);
+  this->SetCylinderMass(M_PI * _radius * _radius * _length * _density,
+                        _radius, _length);
 }
 
 /////////////////////////////////////////////////
-void Inertial::SetCylinder(double _radius, double _length)
+void Inertial::SetCylinderMass(double _mass, double _radius, double _length)
 {
+  this->mass = _mass;
+
   double r2 = _radius * _radius;
   double i = this->mass * (0.25 * r2 + (1.0/12.0) * _length * _length);
   this->principals.x = i;
@@ -370,3 +332,34 @@ void Inertial::SetCylinder(double _radius, double _length)
   // cylinders are oriented along the z axis
   this->products.z = this->mass * 0.5 * r2;
 }
+
+/////////////////////////////////////////////////
+void Inertial::SetSphereDensity(double _density, double _radius)
+{
+  this->SetSphereMass((4.0/3.0) * M_PI * _radius * _radius * _radius * _density,
+                      _radius);
+}
+
+/////////////////////////////////////////////////
+void Inertial::SetSphereMass(double _mass, double _radius)
+{
+  this->mass = _mass;
+  double ii = 0.4 * this->mass * _radius * _radius;
+  this->principals.x = ii;
+  this->principals.y = ii;
+  this->principals.z = ii;
+}
+
+/////////////////////////////////////////////////
+void Inertial::SetMeshDensity(double /*_density*/,
+                              const std::string &/*_meshName*/)
+{
+  gzerr << "Set Mesh Density not implemented\n";
+}
+
+/////////////////////////////////////////////////
+void Inertial::SetMeshMass(double /*_mass*/, const std::string &/*_meshName*/)
+{
+  gzerr << "Set Mesh Mass not implemented\n";
+}
+

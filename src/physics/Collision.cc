@@ -87,6 +87,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
 
   this->surface->Load(this->sdf->GetOrCreateElement("surface"));
 
+
   if (this->shape)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
@@ -97,6 +98,45 @@ void Collision::Load(sdf::ElementPtr _sdf)
   {
     this->visPub->Publish(this->CreateCollisionVisual());
   }
+
+  this->inertial->SetCoG(this->GetRelativePose().pos);
+
+  // Get the mass of the shape
+  double mass = 0.0;
+  if (this->sdf->HasElement("mass"))
+    mass = this->sdf->GetValueDouble("mass");
+  else if (this->sdf->HasElement("density"))
+    mass = this->shape->GetMass(this->sdf->HasElement("density"));
+
+  this->shape->SetInertial(this->inertial, mass);
+
+  // Calculate the inertial properties for the shape
+  /*if (this->shape->GetType() == Base::BOX_SHAPE)
+  {
+    this->inertial->SetBoxMass(mass,
+        boost::shared_static_cast<BoxShape>(this->shape)->GetSize());
+  }
+  else if (this->shape->GetType() == Base::SPHERE_SHAPE)
+  {
+    this->inertial->SetSphereMass(mass,
+        boost::shared_static_cast<SphereShape>(this->shape)->GetRadius());
+  }
+  else if (this->shape->GetType() == Base::CYLINDER_SHAPE)
+  {
+    CylinderShapePtr cylShape =
+      boost::shared_static_cast<CylinderShape>(this->shape);
+    this->inertial->SetCylinderMass(mass, cylShape->GetRadius(),
+        cylShape->GetLength() );
+  }
+  else if (this->shape->GetType() == Base::TRIMESH_SHAPE)
+  {
+    this->inertial->SetMeshMass(mass, "filename");
+  }
+  else
+    gzerr << "Unable to set inertial for shape["
+      << this->shape->GetType() << "]\n";
+      */
+  std::cout << "Collision Mass[" << mass << "] In[" << this->inertial << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -136,7 +176,7 @@ bool Collision::IsPlaceable() const
 //////////////////////////////////////////////////
 void Collision::SetLaserRetro(float _retro)
 {
-  this->sdf->GetAttribute("laser_retro")->Set(_retro);
+  this->sdf->GetElement("laser_retro")->Set(_retro);
 }
 
 //////////////////////////////////////////////////
@@ -402,4 +442,16 @@ CollisionState Collision::GetState()
 void Collision::SetState(const CollisionState &_state)
 {
   this->SetWorldPose(_state.GetPose());
+}
+
+/////////////////////////////////////////////////
+const InertialPtr Collision::GetInertial() const
+{
+  return this->inertial;
+}
+
+/////////////////////////////////////////////////
+void Collision::SetInertial(InertialPtr _inertial)
+{
+  this->inertial = _inertial;
 }

@@ -66,4 +66,9 @@ void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
   this->SetRadius(_msg.sphere().radius());
 }
 
-
+//////////////////////////////////////////////////
+double void SphereShape::GetMass(double _density) const
+{
+  double r = this->GetRadius();
+  return (4.0/3.0) * M_PI * r * r * r * _density;
+}

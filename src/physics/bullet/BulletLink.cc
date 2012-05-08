@@ -95,8 +95,8 @@ void BulletLink::Init()
   btRigidBody::btRigidBodyConstructionInfo
     rigidLinkCI(btMass, this->motionState, this->compoundShape, fallInertia);
 
-  rigidLinkCI.m_linearDamping = this->inertial->GetLinearDamping();
-  rigidLinkCI.m_angularDamping = this->inertial->GetAngularDamping();
+  rigidLinkCI.m_linearDamping = this->GetLinearDamping();
+  rigidLinkCI.m_angularDamping = this->GetAngularDamping();
 
   // Create the new rigid body
   this->rigidLink = new btRigidBody(rigidLinkCI);
@@ -342,21 +342,17 @@ btRigidBody *BulletLink::GetBulletLink() const
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetLinearDamping(double /*_damping*/)
+void BulletLink::SetLinearDamping(double _damping)
 {
-  /*
   this->rigidLink->setDamping((btScalar)_damping,
       (btScalar)this->rigidLink->getAngularDamping());
-      */
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetAngularDamping(double /*_damping*/)
+void BulletLink::SetAngularDamping(double _damping)
 {
-  /*
   this->rigidLink->setDamping(
       (btScalar)this->rigidLink->getLinearDamping(), (btScalar)_damping);
-      */
 }
 
 //////////////////////////////////////////////////

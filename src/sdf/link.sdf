@@ -9,7 +9,12 @@
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
   </element> <!-- End Origin -->
 
-  <include filename="inertial.sdf" required="1"/>
+  <element name="damping" required="1">
+    <element name="linear" type="double" default="0.01" required="1"/>
+    <element name="angular" type="double" default="0.01" required="1"/>
+  </element> <!-- End damping -->
+
+  <include filename="inertial.sdf" required="0"/>
   <include filename="collision.sdf" required="*"/>
   <include filename="visual.sdf" required="*"/>
   <include filename="sensor.sdf" required="*"/>

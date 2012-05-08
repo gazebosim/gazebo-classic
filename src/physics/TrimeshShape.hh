@@ -62,6 +62,8 @@ namespace gazebo
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
+      public: virtual double void GetMass(double _density) const;
+
       protected: const common::Mesh *mesh;
     };
     /// \}

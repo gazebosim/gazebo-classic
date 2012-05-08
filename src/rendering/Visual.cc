@@ -314,10 +314,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   }
 
   if (_msg->has_cast_shadows())
-    this->sdf->GetAttribute("cast_shadows")->Set(_msg->cast_shadows());
+    this->sdf->GetOrCreateElement("cast_shadows")->Set(_msg->cast_shadows());
 
   if (_msg->has_laser_retro())
-    this->sdf->GetAttribute("laser_retro")->Set(_msg->laser_retro());
+    this->sdf->GetOrCreateElement("laser_retro")->Set(_msg->laser_retro());
 
   this->Load();
   this->UpdateFromMsg(_msg);
@@ -368,8 +368,10 @@ void Visual::Load()
       this->skeleton = ent->getSkeleton();
 
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
+    {
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
           this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
+    }
   }
 
   // Set the pose of the scene node

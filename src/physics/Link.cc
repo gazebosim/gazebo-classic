@@ -91,14 +91,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  if (!this->IsStatic())
-  {
-    if (this->sdf->HasElement("inertial"))
-      this->inertial->Load(this->sdf->GetElement("inertial"));
-    else
-      gzerr << "Non-static body has no interial sdf element.\n";
-  }
-
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
@@ -155,6 +147,17 @@ void Link::Load(sdf::ElementPtr _sdf)
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
+
+  if (!this->IsStatic())
+  {
+    if (this->sdf->HasElement("inertial"))
+      this->inertial->Load(this->sdf->GetElement("inertial"));
+    else
+    {
+      this->SetInertialFromCollisions();
+      gzerr << "Non-static body has no interial sdf element.\n";
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -173,12 +176,8 @@ void Link::Init()
   if (this->children.size()== 0 || !this->sdf->GetValueBool("gravity"))
     this->SetGravityMode(false);
 
-  // global-inertial damping is implemented in ode svn trunk
-  if (this->inertial)
-  {
-    this->SetLinearDamping(this->inertial->GetLinearDamping());
-    this->SetAngularDamping(this->inertial->GetAngularDamping());
-  }
+  this->SetLinearDamping(this->GetLinearDamping());
+  this->SetAngularDamping(this->GetAngularDamping());
 
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
@@ -594,10 +593,6 @@ void Link::FillLinkMsg(msgs::Link &_msg)
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
-  _msg.mutable_inertial()->set_linear_damping(
-      this->inertial->GetLinearDamping());
-  _msg.mutable_inertial()->set_angular_damping(
-      this->inertial->GetAngularDamping());
   _msg.mutable_inertial()->set_ixx(this->inertial->GetIXX());
   _msg.mutable_inertial()->set_ixy(this->inertial->GetIXY());
   _msg.mutable_inertial()->set_ixz(this->inertial->GetIXZ());
@@ -769,4 +764,40 @@ void Link::SetState(const LinkState &_state)
     else
       gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void Link::SetInertialFromCollisions()
+{
+  Base_V::iterator iter;
+
+  std::cout << "Link UpdateInertial\n";
+  CollisionPtr coll;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+    {
+      coll = boost::shared_static_cast<Collision>(*iter);
+      (*this->inertial) += *(coll->GetInertial());
+      // std::cout << "  Intertial[" << coll->GetInertial() << "]\n";
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+double Link::GetLinearDamping() const
+{
+  if (this->sdf->HasElement("damping"))
+    return this->sdf->GetElement("damping")->GetValueDouble("linear");
+  else
+    return 0.0;
+}
+
+/////////////////////////////////////////////////
+double Link::GetAngularDamping() const
+{
+  if (this->sdf->HasElement("damping"))
+    return this->sdf->GetElement("damping")->GetValueDouble("angular");
+  else
+    return 0.0;
 }

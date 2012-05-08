@@ -91,4 +91,9 @@ void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
   this->SetFilename(_msg.mesh().filename());
 }
 
-
+//////////////////////////////////////////////////
+double void TrimeshShape::GetMass(double _density) const
+{
+  gzerr << "Not implemented\n";
+  return _density;
+}

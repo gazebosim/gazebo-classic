@@ -48,12 +48,6 @@ namespace gazebo
       /// \brief update the parameters using new sdf values
       public: void UpdateParameters(sdf::ElementPtr _sdf);
 
-      public: double GetLinearDamping();
-      public: double GetAngularDamping();
-
-      public: void SetLinearDamping(double _damping);
-      public: void SetAngularDamping(double _damping);
-
       /// \brief Reset all the mass properties
       public: void Reset();
 
@@ -98,6 +92,33 @@ namespace gazebo
       public: void SetIXZ(double _v);
       public: void SetIYZ(double _v);
 
+      /// \brief Set the inertia matrix for a box based on a density
+      public: void SetBoxDensity(double _density, const math::Vector3 &_size);
+
+      /// \brief Set the inertia matrix for a box based on a total mass
+      public: void SetBoxMass(double _mass, const math::Vector3 &_size);
+
+      /// \brief Set the inertia matrix for a cylinder based on a density
+      public: void SetCylinderDensity(double _density, double _radius,
+                                      double _length);
+
+      /// \brief Set the inertia matrix for a cylinder based on a total mass
+      public: void SetCylinderMass(double _mass, double _radius,
+                                   double _length);
+
+      /// \brief Set the inertia matrix for a sphere based on a density
+      public: void SetSphereDensity(double _density, double _radius);
+
+      /// \brief Set the inertia matrix for a sphere based on a total mass
+      public: void SetSphereMass(double _mass, double _radius);
+
+      /// \brief Set the inertia matrix for a mesh based on a density
+      public: void SetMeshDensity(double _density,
+                                  const std::string &_meshName);
+
+      /// \brief Set the inertia matrix for a mesh based on a total mass
+      public: void SetMeshMass(double _mass, const std::string &_meshName);
+
       /// \brief Rotate this mass
       public: void Rotate(const math::Quaternion &rot);
 
@@ -131,5 +152,3 @@ namespace gazebo
 }
 
 #endif
-
-

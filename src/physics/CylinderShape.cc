@@ -85,4 +85,10 @@ void CylinderShape::ProcessMsg(const msgs::Geometry &_msg)
   this->SetSize(_msg.cylinder().radius(), _msg.cylinder().length());
 }
 
-
+//////////////////////////////////////////////////
+double void CylinderShape::GetMass(double _density) const
+{
+  double r = this->GetRadius();
+  double l = this->GetLength();
+  return M_PI * r * r * l * _density;
+}

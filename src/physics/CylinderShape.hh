@@ -60,10 +60,10 @@ namespace gazebo
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      public: virtual double void GetMass(double _density) const;
     };
     /// \}
   }
 }
 #endif
-
-

@@ -43,6 +43,10 @@ namespace gazebo
       /// \brief Initialize the shape
       public: virtual void Init() = 0;
 
+      /// \brief Get the mass of a shape
+      public: virtual double void GetMass(double _density) const
+              {return 0;}
+
       public: virtual void FillShapeMsg(msgs::Geometry &_msg) = 0;
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg) = 0;
