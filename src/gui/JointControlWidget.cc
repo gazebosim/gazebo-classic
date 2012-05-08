@@ -29,8 +29,8 @@ MySlider::MySlider(const std::string &_name, QWidget *_parent)
 
   this->multiplier = new QDoubleSpinBox;
   this->multiplier->setRange(-100.0, 100.0);
-  this->multiplier->setSingleStep(0.01);
-  this->multiplier->setValue(0.00);
+  this->multiplier->setSingleStep(0.001);
+  this->multiplier->setValue(0.000);
 
   mainLayout->addWidget(new QLabel(tr(_name.c_str())), 0);
   mainLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,

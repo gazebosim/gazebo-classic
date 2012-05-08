@@ -47,6 +47,8 @@ namespace gazebo
     private: physics::ModelPtr model;
     private: physics::LinkPtr chassis;
     private: std::vector<physics::JointPtr> joints;
+    private: physics::JointPtr gasJoint;
+    private: physics::JointPtr steeringJoint;
 
     private: math::Vector3 velocity;
 

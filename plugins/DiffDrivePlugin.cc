@@ -82,12 +82,8 @@ void DiffDrivePlugin::Init()
       this->leftJoint->GetChild());
 
   math::Box bb = parent->GetBoundingBox();
-  math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
-
-  this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.25;
-
-  this->wheelSpeed[LEFT] = 0.2;
-  this->wheelSpeed[RIGHT] = 0.2;
+  // This assumes that the largest dimension of the wheel is the diameter
+  this->wheelRadius = bb.GetSize().GetMax() * 0.5; 
 }
 
 /////////////////////////////////////////////////
@@ -122,6 +118,9 @@ void DiffDrivePlugin::OnUpdate()
 
   double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
   double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
+
+  leftVelDesired = 0.2;
+  rightVelDesired = 0.2;
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);

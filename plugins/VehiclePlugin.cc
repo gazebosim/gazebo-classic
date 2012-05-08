@@ -34,16 +34,29 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->model = _model;
   // this->physics = this->model->GetWorld()->GetPhysicsEngine();
 
-  this->chassis = this->model->GetLink(
-      _sdf->GetElement("chassis")->GetValueString());
-  this->joints[0] = this->model->GetJoint(
-      _sdf->GetElement("front_left")->GetValueString());
-  this->joints[1] = this->model->GetJoint(
-      _sdf->GetElement("front_right")->GetValueString());
-  this->joints[2] = this->model->GetJoint(
-      _sdf->GetElement("back_left")->GetValueString());
-  this->joints[3] = this->model->GetJoint(
-      _sdf->GetElement("back_right")->GetValueString());
+  this->chassis = this->model->GetLink(_sdf->GetValueString("chassis"));
+  this->joints[0] = this->model->GetJoint(_sdf->GetValueString("front_left"));
+  this->joints[1] = this->model->GetJoint(_sdf->GetValueString("front_right"));
+  this->joints[2] = this->model->GetJoint( _sdf->GetValueString("back_left"));
+  this->joints[3] = this->model->GetJoint(_sdf->GetValueString("back_right"));
+
+  this->gasJoint = this->model->GetJoint(_sdf->GetValueString("gas"));
+  this->steeringJoint = this->model->GetJoint(_sdf->GetValueString("steering"));
+
+  if (!this->gasJoint)
+  {
+    gzerr << "Unable to find gas joint[" 
+          << _sdf->GetValueString("gas") << "]\n";
+    return;
+  }
+
+  if (!this->steeringJoint)
+  {
+    gzerr << "Unable to find steering joint[" 
+          << _sdf->GetValueString("steering") << "]\n";
+    return;
+  }
+
 
   if (!this->chassis)
   {
@@ -96,22 +109,54 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void VehiclePlugin::Init()
 {
+  //this->steeringJoint->SetDamping(0, 1.0);
 }
 
 /////////////////////////////////////////////////
 void VehiclePlugin::OnUpdate()
 {
-  this->joints[0]->SetVelocity(0, 1.0);
-  this->joints[0]->SetMaxForce(0, 10);
+  double maxGas = this->gasJoint->GetHighStop(0).GetAsRadian();
+  double gas = this->gasJoint->GetAngle(0).GetAsRadian() / maxGas;
 
-  this->joints[1]->SetVelocity(0, 1.0);
-  this->joints[1]->SetMaxForce(0, 10);
+  double frontPower = 20;
+  double rearPower = 20;
 
-  this->joints[2]->SetVelocity(0, 1.0);
-  this->joints[2]->SetMaxForce(0, 10);
+  double maxSpeed = 10;
+  double idleSpeed = 0.5;
 
-  this->joints[3]->SetVelocity(0, 1.0);
-  this->joints[3]->SetMaxForce(0, 10);
+  double wheelRadius = 0.3;
+  double jointVel = (gas * maxSpeed) / wheelRadius;
+
+
+  this->joints[0]->SetVelocity(1, jointVel);
+  this->joints[0]->SetMaxForce(1, gas * frontPower);
+
+  this->joints[1]->SetVelocity(1, jointVel);
+  this->joints[1]->SetMaxForce(1, gas * frontPower);
+
+  this->joints[2]->SetVelocity(0, jointVel);
+  this->joints[2]->SetMaxForce(0, gas * rearPower);
+
+  this->joints[3]->SetVelocity(0, jointVel);
+  this->joints[3]->SetMaxForce(0, gas * rearPower);
+
+  double tireRotate = GZ_DTOR(40);
+  double steeringRange = this->steeringJoint->GetHighStop(0).GetAsRadian() -
+                         this->steeringJoint->GetLowStop(0).GetAsRadian();
+  double turnRatio = steeringRange / tireRotate;
+  double steeringAngle = this->steeringJoint->GetAngle(0).GetAsRadian();
+  double wheelAngle = steeringAngle / turnRatio;
+
+  this->joints[0]->SetLowStop(0, wheelAngle);
+  this->joints[0]->SetHighStop(0, wheelAngle);
+  this->joints[0]->SetLowStop(0, wheelAngle);
+  this->joints[0]->SetHighStop(0, wheelAngle);
+
+
+  this->joints[1]->SetHighStop(0, wheelAngle);
+  this->joints[1]->SetLowStop(0, wheelAngle);
+  this->joints[1]->SetHighStop(0, wheelAngle);
+  this->joints[1]->SetLowStop(0, wheelAngle);
 
   this->velocity = this->chassis->GetWorldLinearVel();
   // std::cout << "Velocity[" << this->velocity << "]\n";

@@ -57,6 +57,7 @@ TEST_F(Pioneer2dx, StraightLine)
   endPose = this->poses["pioneer2dx"];
 
   double dist = (currTime - startTime).Double() * 0.2;
+  std::cout << "Dist[" << dist << "] End[" << endPose.pos << "]\n";
   EXPECT_LT(fabs(endPose.pos.x - dist), 0.1);
   EXPECT_LT(fabs(endPose.pos.y), 0.5);
   EXPECT_LT(fabs(endPose.pos.z), 0.01);
