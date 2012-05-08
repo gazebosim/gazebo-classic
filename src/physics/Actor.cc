@@ -33,6 +33,7 @@
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
 #include "common/Skeleton.hh"
+#include "common/SkeletonAnimation.hh"
 #include "common/BVHLoader.hh"
 
 #include "physics/World.hh"
@@ -74,6 +75,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
   this->skinScale = skinSdf->GetValueDouble("scale");
 
   MeshManager::Instance()->Load(this->skinFile);
+  std::string actorName = _sdf->GetValueString("name");
 
   if (MeshManager::Instance()->HasMesh(this->skinFile))
   {
@@ -87,16 +89,15 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
     sdf::ElementPtr linkSdf;
     linkSdf = _sdf->GetOrCreateElement("link");
-    linkSdf->GetAttribute("name")->Set(this->GetName() + "_origin");
+    linkSdf->GetAttribute("name")->Set(actorName + "_origin");
     linkSdf->GetAttribute("gravity")->Set(false);
     sdf::ElementPtr linkPose = linkSdf->GetOrCreateElement("origin");
 
     this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
-    this->AddSphereCollision(linkSdf, this->GetName() + "_origin_col",
+    this->AddSphereCollision(linkSdf, actorName + "_origin_col",
                                              math::Pose(), 0.02);
-    this->AddSphereVisual(linkSdf, this->GetName() + "_origin_vis",
+    this->AddSphereVisual(linkSdf, actorName + "_origin_vis",
                     math::Pose(), 0.05, "Gazebo/White", Color::White);
-
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
@@ -182,33 +183,65 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
   this->startDelay = _sdf->GetValueDouble("delay_start");
   this->autoStart = _sdf->GetValueBool("auto_start");
   this->active = this->autoStart;
-  double scriptTime = 0;
 
-  sdf::ElementPtr actionSdf = _sdf->GetOrCreateElement("action");
-  while (actionSdf)
+  sdf::ElementPtr trajSdf = _sdf->GetOrCreateElement("trajectory");
+  while (trajSdf)
   {
-    std::string actionName = actionSdf->GetValueString("name");
-    ScriptAction action;
-    if (actionName == "__default__")
+    TrajectoryInfo tinfo;
+    tinfo.id = trajSdf->GetValueInt("id");
+    tinfo.type = trajSdf->GetValueString("type");
+    std::vector<TrajectoryInfo>::iterator iter = this->trajInfo.begin();
+    while (iter != this->trajInfo.end())
     {
-      action.name = this->skelAnimation.begin()->first;
-      action.type = this->skelAnimation.begin()->first;
-      action.duration = 0.0;
-      action.targetPose = math::Pose();
-    }
-    else
-    {
-      action.name = actionName;
-      action.type = actionSdf->GetValueString("type");
-      action.duration = actionSdf->GetValueDouble("duration");
-      action.targetPose = actionSdf->GetValuePose("target_pose");
-      action.startTime = scriptTime;
-      action.endTime = scriptTime + action.duration;
-      scriptTime = action.endTime;
+      if (iter->id > tinfo.id)
+        break;
+      ++iter;
     }
 
-    this->actions.push_back(action);
-    actionSdf = actionSdf->GetNextElement("action");
+    unsigned int idx = iter - this->trajInfo.begin();
+    this->trajInfo.insert(iter, tinfo);
+
+    std::map<double, math::Pose> points;
+
+    sdf::ElementPtr wayptSdf = trajSdf->GetOrCreateElement("waypoint");
+    while (wayptSdf)
+    {
+      points[wayptSdf->GetValueDouble("time")] = wayptSdf->GetValuePose("pose");
+      wayptSdf = wayptSdf->GetNextElement("waypoint");
+    }
+
+    std::map<double, math::Pose>::reverse_iterator last = points.rbegin();
+    std::stringstream animName;
+    animName << tinfo.type << "_" << tinfo.id;
+    common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
+                                                          last->first, false);
+    this->trajInfo[idx].duration = last->first;
+
+    for (std::map<double, math::Pose>::iterator pIter = points.begin();
+          pIter != points.end(); pIter++)
+    {
+      common::PoseKeyFrame *key;
+      if (pIter == points.begin() && !math::equal(pIter->first, 0.0))
+      {
+        key = anim->CreateKeyFrame(0.0);
+        key->SetTranslation(pIter->second.pos);
+        key->SetRotation(pIter->second.rot);
+      }
+      key = anim->CreateKeyFrame(pIter->first);
+      key->SetTranslation(pIter->second.pos);
+      key->SetRotation(pIter->second.rot);
+    }
+
+    this->trajectories.insert(this->trajectories.begin() + idx, anim);
+
+    trajSdf = trajSdf->GetNextElement("trajectory");
+  }
+  double scriptTime = 0.0;
+  for (unsigned int i = 0; i < this->trajInfo.size(); i++)
+  {
+    this->trajInfo[i].startTime = scriptTime;
+    scriptTime += this->trajInfo[i].duration;
+    this->trajInfo[i].endTime = scriptTime;
   }
   this->scriptLength = scriptTime;
 }
@@ -221,7 +254,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   if (animName == "__default__")
   {
     this->skelAnimation[this->skinFile] =
-        this->skeleton->GetAnimationList().begin()->second;
+        this->skeleton->GetAnimation(0);
     std::map<std::string, std::string> skelMap;
     for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
       skelMap[this->skeleton->GetNodeByHandle(i)->GetName()] =
@@ -283,7 +316,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       else
       {
         this->skelAnimation[animName] =
-            skel->GetAnimationList().begin()->second;
+            skel->GetAnimation(0);
         this->skelNodesMap[animName] = skelMap;
       }
     }
@@ -296,6 +329,7 @@ void Actor::Init()
   this->prevFrameTime = this->world->GetSimTime();
   if (this->autoStart)
     this->Play();
+  this->mainLink = this->GetChildLink(this->GetName() + "_origin");
 }
 
 //////////////////////////////////////////////////
@@ -350,74 +384,39 @@ void Actor::Update()
   /// at this point we are certain that a new frame will be animated
   this->prevFrameTime = currentTime;
 
-  ScriptAction action;
+  TrajectoryInfo tinfo;
 
-  for (unsigned int i = 0; i < this->actions.size(); i++)
-    if (this->actions[i].startTime <= scriptTime &&
-          this->actions[i].endTime >= scriptTime)
+  unsigned int tid = 0;
+
+  for (unsigned int i = 0; i < this->trajInfo.size(); i++)
+    if (this->trajInfo[i].startTime <= scriptTime &&
+          this->trajInfo[i].endTime >= scriptTime)
     {
-      action = this->actions[i];
+      tinfo = this->trajInfo[i];
+      tid = i;
       break;
     }
 
-  scriptTime = scriptTime - action.startTime;
+  scriptTime = scriptTime - tinfo.startTime;
 
-  SkeletonAnimation *skelAnim = &this->skelAnimation[action.type];
-  std::map<std::string, std::string> skelMap = this->skelNodesMap[action.type];
+  SkeletonAnimation *skelAnim = this->skelAnimation[tinfo.type];
+  std::map<std::string, std::string> skelMap = this->skelNodesMap[tinfo.type];
 
   msgs::PoseAnimation msg;
 
+  std::map<std::string, math::Matrix4> frame = skelAnim->GetPoseAt(scriptTime);
+
   msg.set_model_name(this->visualName);
+
+  math::Pose modelPose;
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
   {
     SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
     SkeletonNode *parentBone = bone->GetParent();
     math::Matrix4 transform(math::Matrix4::IDENTITY);
-    if (skelAnim->find(skelMap[bone->GetName()]) != skelAnim->end())
-    {
-      NodeAnimation *anim = &(*skelAnim)[skelMap[bone->GetName()]];
-
-      NodeAnimation::iterator next = anim->begin();
-      NodeAnimation::iterator prev = anim->end();
-      --prev;
-      while ((next->first) < scriptTime)
-      {
-        prev = next;
-        ++next;
-        if (next == anim->end())
-        {
-          next = anim->begin();
-          scriptTime = scriptTime - prev->first;
-        }
-      }
-      double prevTime = prev->first;
-      if (next == anim->begin())
-        prevTime = 0.0;
-      math::Matrix4 prevTransform = prev->second;
-      if (next != anim->end())
-      {
-        double nextTime = next->first;
-        math::Matrix4 nextTransform = next->second;
-        double t = (scriptTime - prevTime) / (nextTime - prevTime);
-        math::Vector3 prevPos = prevTransform.GetTranslation();
-        math::Vector3 nextPos = nextTransform.GetTranslation();
-        math::Quaternion prevQ = prevTransform.GetRotation();
-        math::Quaternion nextQ = nextTransform.GetRotation();
-        math::Quaternion curQ;
-
-        math::Vector3 curPos =
-              math::Vector3(prevPos.x + (nextPos.x - prevPos.x) * t,
-                           prevPos.y + (nextPos.y - prevPos.y) * t,
-                           prevPos.z + (nextPos.z - prevPos.z) * t);
-        curQ = math::Quaternion::Slerp(t, prevQ, nextQ, true);
-
-        transform = curQ.GetAsMatrix4();
-        transform.SetTranslate(curPos);
-      }
-      else
-        transform = prevTransform;
-    }
+    if (frame.find(skelMap[bone->GetName()]) != frame.end())
+      transform = frame[skelMap[bone->GetName()]];
     else
       transform = bone->GetTransform();
 
@@ -447,8 +446,29 @@ void Actor::Update()
       parentTrans.SetTranslate(parentPose.pos);
       transform = parentTrans * transform;
     }
+    else
+    {
+      modelPose.pos = transform.GetTranslation();
+      transform.SetTranslate(math::Vector3(0, 0, 0));
+      math::Vector3 yzPos(0.0, modelPose.pos.y, modelPose.pos.z);
+
+      common::PoseKeyFrame posFrame(0.0);
+      this->trajectories[tid]->SetTime(scriptTime);
+      this->trajectories[tid]->GetInterpolatedKeyFrame(posFrame);
+
+      modelPose.pos = posFrame.GetTranslation() +
+                        posFrame.GetRotation().RotateVector(yzPos);
+      modelPose.rot = posFrame.GetRotation();
+
+      this->mainLink->SetWorldPose(modelPose);
+
+      math::Matrix4 modelTrans(modelPose.rot.GetAsMatrix4());
+      modelTrans.SetTranslate(modelPose.pos);
+      transform = modelTrans * transform;
+    }
     currentLink->SetWorldPose(transform.GetAsPose());
   }
+
   msgs::Time *stamp = msg.add_time();
   stamp->CopyFrom(msgs::Convert(currentTime));
 
