@@ -28,6 +28,7 @@
 #include "physics/Model.hh"
 #include "common/Time.hh"
 #include "common/Skeleton.hh"
+#include "common/Animation.hh"
 
 namespace gazebo
 {
@@ -38,12 +39,11 @@ namespace gazebo
   }
   namespace physics
   {
-    struct ScriptAction
+    struct TrajectoryInfo
     {
-      std::string name;
+      unsigned int id;
       std::string type;
       double duration;
-      math::Pose targetPose;
       double startTime;
       double endTime;
     };
@@ -130,14 +130,18 @@ namespace gazebo
 
       protected: bool autoStart;
 
+      protected: LinkPtr mainLink;
+
       protected: common::Time prevFrameTime;
 
       protected: common::Time playStartTime;
 
+      protected: std::vector<common::PoseAnimation*> trajectories;
+
+      protected: std::vector<TrajectoryInfo> trajInfo;
+
       protected: std::map<std::string, common::SkeletonAnimation*>
                                                             skelAnimation;
-
-      protected: std::vector<ScriptAction> actions;
 
       protected: std::map<std::string, double> originalActorVel;
 
