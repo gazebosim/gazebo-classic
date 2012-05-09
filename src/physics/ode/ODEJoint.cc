@@ -58,17 +58,17 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
     if (elem->HasElement("limit"))
     {
       this->SetParam(dParamStopERP,
-          elem->GetElement("limit")->GetValueDouble("cfm"));
-      this->SetParam(dParamStopCFM,
           elem->GetElement("limit")->GetValueDouble("erp"));
+      this->SetParam(dParamStopCFM,
+          elem->GetElement("limit")->GetValueDouble("cfm"));
     }
 
     if (elem->HasElement("suspension"))
     {
       this->SetParam(dParamSuspensionERP,
-          elem->GetElement("suspension")->GetValueDouble("cfm"));
-      this->SetParam(dParamSuspensionCFM,
           elem->GetElement("suspension")->GetValueDouble("erp"));
+      this->SetParam(dParamSuspensionCFM,
+          elem->GetElement("suspension")->GetValueDouble("cfm"));
     }
 
     if (elem->HasElement("fudge_factor"))
@@ -76,8 +76,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
           elem->GetElement("fudge_factor")->GetValueDouble());
 
     if (elem->HasElement("cfm"))
-        this->SetParam(dParamCFM,
-          elem->GetElement("cfm")->GetValueDouble());
+        this->SetParam(dParamCFM, elem->GetElement("cfm")->GetValueDouble());
 
     if (elem->HasElement("bounce"))
         this->SetParam(dParamBounce,
@@ -161,7 +160,10 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
   }
   else if (odechild && odeparent)
   {
-    dJointAttach(this->jointId, odechild->GetODEId(), odeparent->GetODEId());
+    if (this->HasType(Base::HINGE2_JOINT))
+      dJointAttach(this->jointId, odeparent->GetODEId(), odechild->GetODEId());
+    else
+      dJointAttach(this->jointId, odechild->GetODEId(), odeparent->GetODEId());
   }
 }
 

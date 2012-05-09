@@ -30,14 +30,13 @@ namespace gazebo
   {
     class SkeletonNode;
     class NodeTransform;
+    class SkeletonAnimation;
 
     typedef std::map<unsigned int, SkeletonNode*> NodeMap;
     typedef std::map<unsigned int, SkeletonNode*>::iterator NodeMapIter;
 
-    typedef std::map<double, std::vector<NodeTransform> > RawNodeAnimation;
-    typedef std::map<std::string, RawNodeAnimation> RawSkeletonAnimation;
-    typedef std::map<double, math::Matrix4> NodeAnimation;
-    typedef std::map<std::string, NodeAnimation> SkeletonAnimation;
+    typedef std::map<double, std::vector<NodeTransform> > RawNodeAnim;
+    typedef std::map<std::string, RawNodeAnim> RawSkeletonAnim;
 
     typedef std::vector<std::vector<std::pair<std::string, double> > >
                                                               RawNodeWeights;
@@ -91,9 +90,9 @@ namespace gazebo
 
       public: unsigned int GetNumAnimations();
 
-      public: std::map<std::string, SkeletonAnimation> GetAnimationList();
+      public: SkeletonAnimation* GetAnimation(const unsigned int i);
 
-      public: void AddAnimation(std::string _name, SkeletonAnimation _anim);
+      public: void AddAnimation(SkeletonAnimation *_anim);
 
       protected: void BuildNodeMap();
 
@@ -105,7 +104,7 @@ namespace gazebo
 
       protected: RawNodeWeights rawNW;
 
-      protected: std::map<std::string, SkeletonAnimation> animations;
+      protected: std::vector<SkeletonAnimation*> anims;
     };
 
     /// \brief A node

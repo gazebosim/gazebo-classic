@@ -3,7 +3,7 @@
     <link name="chassis">
       <origin pose="0 0 0.3 0 0 0"/>
       <collision name="collision">
-        <mass>1.0</mass>
+        <mass>10.0</mass>
         <geometry>
           <box size="2.0 1.0 0.2"/>
         </geometry>
@@ -150,6 +150,11 @@
         <limit lower="0" upper="0"/>
       </axis>
       <axis2 xyz="0 1 0"/>
+      <physics>
+        <ode>
+          <limit cfm="0.0" erp="0.9"/>
+        </ode>
+      </physics>
     </joint>
 
     <joint type="revolute2" name="front_right_joint">
@@ -159,6 +164,11 @@
         <limit lower="0" upper="0"/>
       </axis>
       <axis2 xyz="0 1 0"/>
+      <physics>
+        <ode>
+          <limit cfm="0.0" erp="0.9"/>
+        </ode>
+      </physics>
     </joint>
 
     <joint type="revolute" name="back_right_joint">

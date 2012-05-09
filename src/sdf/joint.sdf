@@ -51,12 +51,12 @@
       <element name="velocity" type="double" default="0" required="0"/>
 
       <element name="limit" required="0">
-        <attribute name="cfm" type="double" default="0" required="1"/>
-        <attribute name="erp" type="double" default="0" required="1"/>
+        <attribute name="cfm" type="double" default="0.0" required="1"/>
+        <attribute name="erp" type="double" default="0.2" required="1"/>
       </element>
       <element name="suspension" required="0">
-        <attribute name="cfm" type="double" default="0" required="1"/>
-        <attribute name="erp" type="double" default="0" required="1"/>
+        <attribute name="cfm" type="double" default="0.0" required="1"/>
+        <attribute name="erp" type="double" default="0.2" required="1"/>
       </element>
     </element>
   </element> <!-- End Physics -->

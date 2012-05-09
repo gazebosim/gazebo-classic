@@ -118,20 +118,19 @@ void VehiclePlugin::OnUpdate()
   double maxGas = this->gasJoint->GetHighStop(0).GetAsRadian();
   double gas = this->gasJoint->GetAngle(0).GetAsRadian() / maxGas;
 
-  double frontPower = 20;
-  double rearPower = 20;
+  double frontPower = 50;
+  double rearPower = 50;
 
-  double maxSpeed = 10;
+  double maxSpeed = 50;
   double idleSpeed = 0.5;
 
   double wheelRadius = 0.3;
   double jointVel = (gas * maxSpeed) / wheelRadius;
 
-
-  this->joints[0]->SetVelocity(1, jointVel);
+  this->joints[0]->SetVelocity(1, -jointVel);
   this->joints[0]->SetMaxForce(1, gas * frontPower);
 
-  this->joints[1]->SetVelocity(1, jointVel);
+  this->joints[1]->SetVelocity(1, -jointVel);
   this->joints[1]->SetMaxForce(1, gas * frontPower);
 
   this->joints[2]->SetVelocity(0, jointVel);

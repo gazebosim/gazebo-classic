@@ -17,6 +17,7 @@ set (sources
   MeshLoader.cc
   MeshManager.cc
   PID.cc
+  SkeletonAnimation.cc
   Skeleton.cc
   STLLoader.cc
   SystemPaths.cc
@@ -44,6 +45,7 @@ set (headers
   MouseEvent.hh
   PID.hh
   Plugin.hh
+  SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
   STLLoader.hh

@@ -11,6 +11,7 @@ set (files
   drop_test.world
   collision_test.world
   simple_pendulums.world
+  set_world_pose_test.world
   double_pendulums.world
   plugin.world
   pr2.world
