@@ -37,7 +37,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->chassis = this->model->GetLink(_sdf->GetValueString("chassis"));
   this->joints[0] = this->model->GetJoint(_sdf->GetValueString("front_left"));
   this->joints[1] = this->model->GetJoint(_sdf->GetValueString("front_right"));
-  this->joints[2] = this->model->GetJoint( _sdf->GetValueString("back_left"));
+  this->joints[2] = this->model->GetJoint(_sdf->GetValueString("back_left"));
   this->joints[3] = this->model->GetJoint(_sdf->GetValueString("back_right"));
 
   this->gasJoint = this->model->GetJoint(_sdf->GetValueString("gas"));
@@ -45,14 +45,14 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (!this->gasJoint)
   {
-    gzerr << "Unable to find gas joint[" 
+    gzerr << "Unable to find gas joint["
           << _sdf->GetValueString("gas") << "]\n";
     return;
   }
 
   if (!this->steeringJoint)
   {
-    gzerr << "Unable to find steering joint[" 
+    gzerr << "Unable to find steering joint["
           << _sdf->GetValueString("steering") << "]\n";
     return;
   }
@@ -109,7 +109,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void VehiclePlugin::Init()
 {
-  //this->steeringJoint->SetDamping(0, 1.0);
+  // this->steeringJoint->SetDamping(0, 1.0);
 }
 
 /////////////////////////////////////////////////
@@ -122,7 +122,7 @@ void VehiclePlugin::OnUpdate()
   double rearPower = 50;
 
   double maxSpeed = 50;
-  double idleSpeed = 0.5;
+  // double idleSpeed = 0.5;
 
   double wheelRadius = 0.3;
   double jointVel = (gas * maxSpeed) / wheelRadius;
@@ -161,8 +161,6 @@ void VehiclePlugin::OnUpdate()
   // std::cout << "Velocity[" << this->velocity << "]\n";
   // double AERO_LOAD = -0.1;
   // double SWAY_FORCE = 10;
-
-  // std::cout << "Aero[" << AERO_LOAD * this->velocity.GetSquaredLength() << "]\n";
 
   //  aerodynamics
   /*this->chassis->AddForce(math::Vector3(0, 0,

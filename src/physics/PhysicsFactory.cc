@@ -29,7 +29,7 @@
 void RegisterODEPhysics();
 
 #ifdef HAVE_BULLET
- void RegisterBulletPhysics();
+  void RegisterBulletPhysics();
 #endif
 
 using namespace gazebo;
@@ -44,8 +44,8 @@ void PhysicsFactory::RegisterAll()
   RegisterODEPhysics();
 
 #ifdef HAVE_BULLET
-   RegisterBulletPhysics();
- #endif
+  RegisterBulletPhysics();
+#endif
 }
 
 //////////////////////////////////////////////////

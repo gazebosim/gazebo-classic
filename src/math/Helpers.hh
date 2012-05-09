@@ -17,6 +17,7 @@
 #ifndef GAZEBO_MATH_FUNCTIONS_HH
 #define GAZEBO_MATH_FUNCTIONS_HH
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>

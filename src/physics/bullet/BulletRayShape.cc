@@ -32,7 +32,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
   : RayShape(_physicsEngine),
-    rayCallback(btVector3(0, 0, 0), btVector3(0, 0, 0)) 
+    rayCallback(btVector3(0, 0, 0), btVector3(0, 0, 0))
 {
   this->SetName("ODE Ray Shape");
 
@@ -43,7 +43,7 @@ BulletRayShape::BulletRayShape(PhysicsEnginePtr _physicsEngine)
 //////////////////////////////////////////////////
 BulletRayShape::BulletRayShape(CollisionPtr _parent)
     : RayShape(_parent),
-    rayCallback(btVector3(0, 0, 0), btVector3(0, 0, 0)) 
+    rayCallback(btVector3(0, 0, 0), btVector3(0, 0, 0))
 {
   this->SetName("Bullet Ray Shape");
   this->physicsEngine = boost::shared_static_cast<BulletPhysics>(
@@ -59,13 +59,13 @@ BulletRayShape::~BulletRayShape()
 void BulletRayShape::Update()
 {
   this->physicsEngine->GetDynamicsWorld()->rayTest(
-      this->rayCallback.m_rayFromWorld, 
+      this->rayCallback.m_rayFromWorld,
       this->rayCallback.m_rayToWorld,
       this->rayCallback);
 
     if (this->rayCallback.hasHit())
     {
-      math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(), 
+      math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(),
                            this->rayCallback.m_hitPointWorld.getY(),
                            this->rayCallback.m_hitPointWorld.getZ());
       this->SetLength(this->globalStartPos.Distance(result));
@@ -81,13 +81,13 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
   if (this->physicsEngine && this->collisionParent)
   {
     this->physicsEngine->GetDynamicsWorld()->rayTest(
-        this->rayCallback.m_rayFromWorld, 
+        this->rayCallback.m_rayFromWorld,
         this->rayCallback.m_rayToWorld,
         this->rayCallback);
 
     if (this->rayCallback.hasHit())
     {
-      math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(), 
+      math::Vector3 result(this->rayCallback.m_hitPointWorld.getX(),
                            this->rayCallback.m_hitPointWorld.getY(),
                            this->rayCallback.m_hitPointWorld.getZ());
       _dist = this->globalStartPos.Distance(result);

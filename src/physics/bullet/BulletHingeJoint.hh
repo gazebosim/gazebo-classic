@@ -28,7 +28,7 @@
 #include "physics/bullet/BulletJoint.hh"
 #include "physics/bullet/BulletPhysics.hh"
 
-class btHingeConstraint; 
+class btHingeConstraint;
 
 namespace gazebo
 {

@@ -33,7 +33,6 @@ namespace gazebo
   namespace physics
   {
     class BulletMotionState;
-    //class BulletCollision;
 
     /// \addtogroup gazebo_physics
     /// \brief The body class

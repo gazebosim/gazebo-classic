@@ -58,9 +58,9 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         collision = tmplinks[i]->GetCollision(j);
         collIter = this->collisions.find(collision->GetScopedName());
-        if (collIter != this->collisions.end()) 
+        if (collIter != this->collisions.end())
           continue;
-        
+
         collision->SetContactsEnabled(true);
         this->connections.push_back(collision->ConnectContact(
               boost::bind(&GripperPlugin::OnContact, this, _1, _2)));
@@ -160,7 +160,7 @@ void GripperPlugin::HandleAttach()
           this->attached = true;
 
           this->fixedJoint->Load(this->model->GetLink("palm"),
-              cc[iter->first]->GetLink(), math::Pose(0,0,0,0,0,0));
+              cc[iter->first]->GetLink(), math::Pose(0, 0, 0, 0, 0, 0));
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);
@@ -188,11 +188,11 @@ void GripperPlugin::OnContact(const std::string &/*_collisionName*/,
   if (_contact.collision1->IsStatic() || _contact.collision2->IsStatic())
     return;
 
-  //std::cout << "OnContact[" << _collisionName << "]\n";
-  //std::cout << "   C1[" << _contact.collision1->GetScopedName() << "]";
-  //std::cout << " C2[" << _contact.collision2->GetScopedName() << "]\n";
-  //std::cout << "   N[" << _contact.normals[0] << "]\n";
-  //std::cout << "  Static[" << _contact.collision2->IsStatic() << "]\n";
+  // std::cout << "OnContact[" << _collisionName << "]\n";
+  // std::cout << "   C1[" << _contact.collision1->GetScopedName() << "]";
+  // std::cout << " C2[" << _contact.collision2->GetScopedName() << "]\n";
+  // std::cout << "   N[" << _contact.normals[0] << "]\n";
+  // std::cout << "  Static[" << _contact.collision2->IsStatic() << "]\n";
   this->contacts.push_back(_contact);
 }
 

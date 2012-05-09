@@ -17,6 +17,8 @@
 #ifndef INERTIAL_HH
 #define INERTIAL_HH
 
+#include <string>
+
 #include "msgs/msgs.h"
 #include "sdf/sdf.h"
 #include "math/Quaternion.hh"

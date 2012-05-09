@@ -88,7 +88,6 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   this->constraint = this->btHinge;
 
   double angle = this->btHinge->getHingeAngle();
-  std::cout << "Hinge Angle[" << this->btHinge->getHingeAngle() << "]\n";
   this->btHinge->setLimit(angle - .4, angle + .4);
   // Add the joint to the world
   this->world->addConstraint(this->btHinge, true);
@@ -142,7 +141,8 @@ math::Angle BulletHingeJoint::GetAngle(int /*_index*/) const
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
-  // this->btHinge->enableAngularMotor(true, -_angle, this->GetMaxForce(_index));
+  // this->btHinge->enableAngularMotor(true, -_angle,
+  // this->GetMaxForce(_index));
 }
 
 //////////////////////////////////////////////////
@@ -170,8 +170,13 @@ void BulletHingeJoint::SetForce(int /*_index*/, double _torque)
   // math::Vector3 axis = this->GetLocalAxis(_index);
   // this->btHinge->enableAngularMotor(true);
 
-  btVector3 hingeAxisLocal = this->btHinge->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
-  btVector3 hingeAxisWorld = this->btHinge->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
+  // z-axis of constraint frame
+  btVector3 hingeAxisLocal =
+    this->btHinge->getAFrame().getBasis().getColumn(2);
+
+  btVector3 hingeAxisWorld =
+    this->btHinge->getRigidBodyA().getWorldTransform().getBasis() *
+    hingeAxisLocal;
 
   btVector3 hingeTorque = _torque * hingeAxisWorld;
 
@@ -195,8 +200,8 @@ void BulletHingeJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    //this->btHinge->setLimit(this->btHinge->getLowerLimit(),
-    //                        _angle.GetAsRadian());
+    // this->btHinge->setLimit(this->btHinge->getLowerLimit(),
+    //                         _angle.GetAsRadian());
   }
   else
   {
@@ -212,8 +217,8 @@ void BulletHingeJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    //this->btHinge->setLimit(-_angle.GetAsRadian(),
-    //                        this->btHinge->getUpperLimit());
+    // this->btHinge->setLimit(-_angle.GetAsRadian(),
+    //                         this->btHinge->getUpperLimit());
   }
   else
     gzthrow("Joint must be created first");

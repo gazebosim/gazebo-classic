@@ -74,9 +74,6 @@ bool ContactCallback(btManifoldPoint &/*_cp*/,
 bool ContactProcessed(btManifoldPoint &/*_cp*/, void * /*_body0*/,
                       void * /*_body1*/)
 {
-  // if (_cp.getAppliedImpulse() > 0.03)
-  //  std::cout << "Impulse[" << _cp.getAppliedImpulse() << "] Dist[" << _cp.m_distance1 << "]\n";
-  // if (_cp.getAppliedImpulse() > 1.0)
   return true;
 }
 
@@ -210,7 +207,7 @@ LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
-CollisionPtr BulletPhysics::CreateCollision(const std::string &_type, 
+CollisionPtr BulletPhysics::CreateCollision(const std::string &_type,
                                             LinkPtr _parent)
 {
   BulletCollisionPtr collision(new BulletCollision(_parent));
@@ -247,7 +244,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
       shape.reset(new BulletRayShape(_collision));
     else
       shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
-  else 
+  else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
   /*
@@ -281,20 +278,16 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::ConvertMass(InertialPtr /*_inertial*/, void * /*_engineMass*/)
+void BulletPhysics::ConvertMass(InertialPtr /*_inertial*/,
+                                void * /*_engineMass*/)
 {
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::ConvertMass(void * /*_engineMass*/, const InertialPtr /*_inertial*/)
+void BulletPhysics::ConvertMass(void * /*_engineMass*/,
+                                const InertialPtr /*_inertial*/)
 {
 }
-
-//////////////////////////////////////////////////
-/*PhysicsRaySensor *BulletPhysics::CreateRaySensor(Link *body)
-{
-  return NULL;
-}*/
 
 //////////////////////////////////////////////////
 math::Pose BulletPhysics::ConvertPose(const btTransform &_bt)

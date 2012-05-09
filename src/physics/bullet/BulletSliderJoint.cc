@@ -88,8 +88,8 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
       *bulletParentLink->GetBulletLink(),
       frame2, frame1, true);
 
-  //this->btSlider->setLowerAngLimit(0.0);
-  //this->btSlider->setUpperAngLimit(0.0);
+  // this->btSlider->setLowerAngLimit(0.0);
+  // this->btSlider->setUpperAngLimit(0.0);
 
   double pos = this->btSlider->getLinearPos();
   this->btSlider->setLowerLinLimit(pos);

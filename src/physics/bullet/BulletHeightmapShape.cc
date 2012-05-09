@@ -78,7 +78,7 @@ void BulletHeightmapShape::Init()
 
       // Find the height at a vertex
       this->heights[(imgHeight-y-1) * imgWidth + (x)] = h;
-        
+
       if (h > maxHeight)
         maxHeight = h;
       if (h < minHeight)
@@ -95,15 +95,15 @@ void BulletHeightmapShape::Init()
   maxHeight = 10;
 
   this->heightFieldShape  = new btHeightfieldTerrainShape(
-      imgWidth, // # of heights along width
-      imgHeight,  // # of height along height
-      &this->heights[0], // The heights
-      1,  // Height scaling
-      minHeight, // Min height
-      maxHeight, // Max height
-      upIndex, // Up axis 
+      imgWidth,           // # of heights along width
+      imgHeight,          // # of height along height
+      &this->heights[0],  // The heights
+      1,                  // Height scaling
+      minHeight,          // Min height
+      maxHeight,          // Max height
+      upIndex,            // Up axis
       PHY_FLOAT,
-      false); // Flip quad edges
+      false);             // Flip quad edges
 
   this->heightFieldShape->setUseDiamondSubdivision(true);
   this->heightFieldShape->setLocalScaling(localScaling);

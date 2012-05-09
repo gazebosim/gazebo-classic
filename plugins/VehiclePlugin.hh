@@ -22,6 +22,7 @@
 #define __GAZEBO_VEHICLE_PLUGIN_HH__
 
 #include <string>
+#include <vector>
 
 #include "common/common.h"
 #include "physics/physics.h"

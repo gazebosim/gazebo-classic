@@ -37,7 +37,7 @@ JointForceControl::JointForceControl(const std::string &_name, QWidget *_parent)
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum));
   mainLayout->addWidget(forceSpin, 0);
-  mainLayout->addWidget(new QLabel("N-m", this),0);
+  mainLayout->addWidget(new QLabel("N-m", this), 0);
   this->setLayout(mainLayout);
 
   connect(forceSpin, SIGNAL(valueChanged(double)),
@@ -155,11 +155,11 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   // std::string title = "Model: ";
   // title += _modelName;
   // mainLayout->addWidget(new QLabel(tr(title.c_str())));
-  //mainLayout->addWidget(scrollArea);
+  // mainLayout->addWidget(scrollArea);
 
   // Add the the force and pid scroll areas to the tab
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(tabWidget);  
+  mainLayout->addWidget(tabWidget);
   mainLayout->setContentsMargins(4, 4, 4, 4);
 
   this->setLayout(mainLayout);

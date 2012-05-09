@@ -27,7 +27,7 @@
 #include "physics/SliderJoint.hh"
 #include "physics/bullet/BulletPhysics.hh"
 
-class btSliderConstraint; 
+class btSliderConstraint;
 
 namespace gazebo
 {

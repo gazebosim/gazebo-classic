@@ -66,7 +66,7 @@ namespace gazebo
     typedef boost::shared_ptr<CylinderShape> CylinderShapePtr;
     typedef boost::shared_ptr<SphereShape> SphereShapePtr;
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
- 
+
     typedef std::vector<BasePtr> Base_V;
     typedef std::vector<ModelPtr> Model_V;
     typedef std::vector<ActorPtr> Actor_V;

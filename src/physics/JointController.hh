@@ -19,6 +19,8 @@
 
 #include <map>
 #include <string>
+#include <vector>
+
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "msgs/msgs.h"

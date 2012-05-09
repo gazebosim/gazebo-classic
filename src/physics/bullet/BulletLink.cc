@@ -139,7 +139,7 @@ void BulletLink::SetGravityMode(bool _mode)
 
   if (_mode == false)
     this->rigidLink->setGravity(btVector3(0, 0, 0));
-    //this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
+    // this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
   else
   {
     math::Vector3 g = this->bulletPhysics->GetGravity();

@@ -96,10 +96,10 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 {
   this->collisionShape = _shape;
 
-  //btmath::Vector3 vec;
-  //this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
+  // btmath::Vector3 vec;
+  // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
-  //this->mass.SetCoG(this->GetRelativePose().pos);
+  // this->mass.SetCoG(this->GetRelativePose().pos);
 }
 
 //////////////////////////////////////////////////

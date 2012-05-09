@@ -86,7 +86,8 @@ namespace gazebo
                return math::Vector3();}
 
       /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, int /*_index*/, double /*_value*/)
+      public: virtual void SetAttribute(Attribute, int /*_index*/,
+                                        double /*_value*/)
               {gzerr << "Not implement in Bullet\n";}
 
       protected: btTypedConstraint *constraint;

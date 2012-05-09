@@ -68,9 +68,6 @@ namespace gazebo
       /// \param bits The bits
       public: virtual void SetCollideBits(unsigned int bits);
 
-      /// \brief Get the mass of the collision
-      //public: Mass GetLinkMassMatrix();
-
       /// \brief Get the bounding box, defined by the physics engine
       public: virtual math::Box GetBoundingBox() const;
 
@@ -83,10 +80,7 @@ namespace gazebo
       /// \brief Set the index of the compound shape
       public: void SetCompoundShapeIndex(int index);
 
-      //protected: BulletPhysics *bulletPhysics;
       protected: btCollisionShape *collisionShape;
-
-      //protected: int compoundShapeIndex;
     };
     /// \}
   }

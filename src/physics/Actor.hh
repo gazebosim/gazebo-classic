@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include "physics/Model.hh"
 #include "common/Time.hh"

@@ -83,7 +83,7 @@ void DiffDrivePlugin::Init()
 
   math::Box bb = parent->GetBoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
-  this->wheelRadius = bb.GetSize().GetMax() * 0.5; 
+  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
 }
 
 /////////////////////////////////////////////////
@@ -124,7 +124,7 @@ void DiffDrivePlugin::OnUpdate()
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
-  
+
   this->leftJoint->SetMaxForce(0, this->torque);
   this->rightJoint->SetMaxForce(0, this->torque);
 }

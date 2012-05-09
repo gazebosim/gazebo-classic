@@ -48,7 +48,6 @@ namespace gazebo
       protected: virtual void Init()
                  {
                    T::Init();
-
                  }
       };
   }

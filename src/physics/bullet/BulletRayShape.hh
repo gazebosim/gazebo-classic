@@ -41,7 +41,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param body Link the ray is attached to
       public: BulletRayShape(CollisionPtr _collision);
-  
+
       /// \brief Destructor
       public: virtual ~BulletRayShape();
 

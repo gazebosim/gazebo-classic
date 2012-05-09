@@ -734,7 +734,7 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 
 //////////////////////////////////////////////////
 void World::OnControl(ConstWorldControlPtr &_data)
-{ 
+{
   if (_data->has_pause())
     this->SetPaused(_data->pause());
 

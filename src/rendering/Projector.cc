@@ -475,7 +475,7 @@ void Projector::ProjectorFrameListener::AddPassToMaterial(
     // vsParams->setNamedAutoConstant(
     //   "worldMatrix",GpuProgramParameters::ACT_WORLD_MATRIX);
     // vsParams->setNamedConstant("texViewProjMatrix", viewProj);
-    
+
     vsParams->setNamedAutoConstant(
       "worldMatrix", Ogre::GpuProgramParameters::ACT_WORLD_MATRIX);
 
@@ -520,7 +520,8 @@ void Projector::ProjectorFrameListener::RemovePassFromMaterials()
 }
 
 /////////////////////////////////////////////////
-void Projector::ProjectorFrameListener::RemovePassFromMaterial(const std::string &_matName)
+void Projector::ProjectorFrameListener::RemovePassFromMaterial(
+    const std::string &_matName)
 {
   this->projectorTargets[_matName]->getParent()->removePass(
     this->projectorTargets[_matName]->getIndex());
