@@ -1,7 +1,7 @@
 <gazebo version='1.0'>
   <model name='pr2_gripper' static='0'>
-    <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-    <link name='r_wrist_roll_link' gravity='0' self_collide='0' kinematic='0'>
+    <origin pose='-0.771000 0.188000 -0.790675 0.000000 -1.57079633 0.000000'/>
+    <link name='r_wrist_roll_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.771000 -0.188000 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.681070'>
         <origin pose='0.056408 0.000451 -0.001014 0.000000 -0.000000 0.000000'/>
@@ -29,42 +29,6 @@
         </geometry>
         <material script='PR2/RollLinks'/>
       </visual>
-      <collision name='r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.001000 0.001000 0.001000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='r_wrist_roll_link_geom_r_gripper_palm_link' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/gripper_palm.stl' scale='1.000000 1.000000 1.000000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
       <visual name='r_wrist_roll_link_geom_r_gripper_palm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
@@ -72,7 +36,7 @@
         </geometry>
       </visual>
     </link>
-    <link name='r_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_l_finger_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.847910 -0.178000 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.171260'>
         <origin pose='0.035980 0.017300 -0.001640 0.000000 -0.000000 0.000000'/>
@@ -100,7 +64,7 @@
         </geometry>
       </visual>
     </link>
-    <link name='r_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_l_finger_tip_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.939280 -0.173050 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.044190'>
         <origin pose='0.004230 0.002840 0.000000 0.000000 -0.000000 0.000000'/>
@@ -140,21 +104,21 @@
         </plugin>
       </sensor>
     </link>
-    <link name='r_gripper_motor_slider_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_motor_slider_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.939280 -0.188000 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.010000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <inertia ixx='0.001000' ixy='0.000000' ixz='0.000000' iyy='0.001000' iyz='0.000000' izz='0.001000'/>
       </inertial>
     </link>
-    <link name='r_gripper_motor_screw_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_motor_screw_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.939280 -0.188000 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.010000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <inertia ixx='0.000100' ixy='0.000000' ixz='0.000000' iyy='0.000100' iyz='0.000000' izz='0.000100'/>
       </inertial>
     </link>
-    <link name='r_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_r_finger_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.847910 -0.198000 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.173890'>
         <origin pose='0.035760 -0.017360 -0.000950 0.000000 -0.000000 0.000000'/>
@@ -182,7 +146,7 @@
         </geometry>
       </visual>
     </link>
-    <link name='r_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_r_finger_tip_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.939280 -0.202950 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.044190'>
         <origin pose='0.004230 -0.002840 0.000000 0.000000 -0.000000 0.000000'/>
@@ -229,14 +193,14 @@
         <inertia ixx='0.001000' ixy='0.000000' ixz='0.000000' iyy='0.001000' iyz='0.000000' izz='0.001000'/>
       </inertial>
     </link>
-    <link name='r_gripper_l_parallel_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_l_parallel_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.829910 -0.157000 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.171260'>
         <origin pose='0.035980 0.017300 -0.001640 0.000000 -0.000000 0.000000'/>
         <inertia ixx='0.000078' ixy='0.000001' ixz='-0.000010' iyy='0.000197' iyz='-0.000003' izz='0.000181'/>
       </inertial>
     </link>
-    <link name='r_gripper_r_parallel_link' gravity='0' self_collide='0' kinematic='0'>
+    <link name='r_gripper_r_parallel_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.829910 -0.219000 0.790675 0.000000 -0.000000 0.000000'/>
       <inertial mass='0.173890'>
         <origin pose='0.035760 -0.017360 -0.000950 0.000000 -0.000000 0.000000'/>
