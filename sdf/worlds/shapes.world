@@ -4,26 +4,6 @@
     <include filename="ground_plane.model"/>
     <include filename="sun.light"/>
 
-    <model name="box_high" static="true">
-      <origin pose="0 0 4.5 0 0 0"/>
-      <link name="link">
-        <collision name="collision">
-          <mass>1</mass>
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-
-
     <model name="box">
       <origin pose="0 0 .5 0 0 0"/>
       <link name="link">

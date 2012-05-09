@@ -150,7 +150,7 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
 
   QTabWidget *tabWidget = new QTabWidget;
   tabWidget->addTab(scrollArea, tr("Force"));
-  tabWidget->addTab(pidScrollArea, tr("PID"));
+  // tabWidget->addTab(pidScrollArea, tr("PID"));
 
   // std::string title = "Model: ";
   // title += _modelName;

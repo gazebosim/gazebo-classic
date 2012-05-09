@@ -105,7 +105,7 @@ TEST_F(FactoryTest, BlackCamera)
   ASSERT_EQ(height, 240);
 
   unsigned char *trueImage = new unsigned char[width * height * 3];
-  memset(trueImage, 255, width*height*3);
+  memset(trueImage, 178, width*height*3);
 
   unsigned int diffMax = 0;
   unsigned int diffSum = 0;

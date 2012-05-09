@@ -371,28 +371,40 @@ math::Vector3 ODELink::GetWorldAngularVel() const
 void ODELink::SetForce(const math::Vector3 &_force)
 {
   if (this->linkId)
+  {
+    this->SetEnabled(true);
     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
+  }
 }
 
 //////////////////////////////////////////////////
 void ODELink::SetTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
+  {
+    this->SetEnabled(true);
     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+  }
 }
 
 //////////////////////////////////////////////////
 void ODELink::AddForce(const math::Vector3 &_force)
 {
   if (this->linkId)
+  {
+    this->SetEnabled(true);
     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
+  }
 }
 
 /////////////////////////////////////////////////
 void ODELink::AddRelativeForce(const math::Vector3 &_force)
 {
   if (this->linkId)
+  {
+    this->SetEnabled(true);
     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -400,22 +412,31 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
                                const math::Vector3 &_relpos)
 {
   if (this->linkId)
+  {
+    this->SetEnabled(true);
     dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
                           _relpos.x, _relpos.y, _relpos.z);
+  }
 }
 
 /////////////////////////////////////////////////
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
+  {
+    this->SetEnabled(true);
     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+  }
 }
 
 /////////////////////////////////////////////////
 void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
+  {
+    this->SetEnabled(true);
     dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+  }
 }
 
 /////////////////////////////////////////////////

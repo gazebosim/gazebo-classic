@@ -52,7 +52,6 @@ void JointController::Update()
     std::map<std::string, double>::iterator iter;
     for (iter = this->forces.begin(); iter != this->forces.end(); ++iter)
       this->joints[iter->first]->SetForce(0, iter->second);
-    this->forces.clear();
   }
 
   if (this->positions.size() > 0)

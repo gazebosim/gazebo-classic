@@ -199,7 +199,6 @@ void GripperPlugin::OnContact(const std::string &/*_collisionName*/,
 /////////////////////////////////////////////////
 void GripperPlugin::ResetDiffs()
 {
-  printf("Reset Diffs\n");
   for (unsigned int i = 0; i < 10; ++i)
     this->diffs[i] = FLT_MAX;
 }
