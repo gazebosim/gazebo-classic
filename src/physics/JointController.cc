@@ -59,9 +59,7 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
   std::map<std::string, JointPtr>::iterator iter;
   iter = this->joints.find(_msg->name());
   if (iter != this->joints.end())
-  {
     this->forces[_msg->name()] = _msg->force();
-  }
   else
     gzerr << "Unable to find joint[" << _msg->name() << "]\n";
 }
