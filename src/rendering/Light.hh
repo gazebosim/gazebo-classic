@@ -71,6 +71,9 @@ namespace gazebo
       /// \brief Get the name of the visual
       public: std::string GetName() const;
 
+      /// \brief Get the type of the light
+      public: std::string GetType() const;
+
       /// \brief Set the position of the light
       public: void SetPosition(const math::Vector3 &p);
 
@@ -90,11 +93,17 @@ namespace gazebo
       /// \brief Set the diffuse
       public: void SetDiffuseColor(const common::Color &color);
 
+      /// \brief Get the diffuse color
+      public: common::Color GetDiffuseColor() const;
+
       /// \brief Set the specular color
       public: void SetSpecularColor(const common::Color &color);
 
       /// \brief Set the direction
       public: void SetDirection(const math::Vector3 &dir);
+
+      /// \brief Get the direction
+      public: math::Vector3 GetDirection() const;
 
       /// \brief Set the attenuation
       public: void SetAttenuation(double constant, double linear,

@@ -178,7 +178,7 @@ void JointTestPlugin::OnUpdate()
       eff = this->jointPIDs[i].Update(pos_err, stepTime);
       eff = eff > max_cmd ? max_cmd :
         (eff < -max_cmd ? -max_cmd : eff);
-      //gzdbg << "wheel pos [" << pos_curr << "] tar [" << pos_target << "]\n";
+      // gzdbg << "wheel pos [" << pos_curr << "] tar [" << pos_target << "]\n";
     }
 
     gzdbg << " wheel pos ["

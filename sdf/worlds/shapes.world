@@ -4,14 +4,11 @@
     <include filename="ground_plane.model"/>
     <include filename="sun.light"/>
 
-    <model name="box" static="true">
+    <model name="box">
       <origin pose="0 0 .5 0 0 0"/>
       <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
         <collision name="collision">
+          <mass>1</mass>
           <geometry>
             <box size="1 1 1"/>
           </geometry>
@@ -29,11 +26,8 @@
     <model name="sphere">
       <origin pose="0 1.5 0.5 0 0 0"/>
       <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
         <collision name="collision">
+          <mass>1</mass>
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
@@ -51,11 +45,9 @@
     <model name="cylinder">
       <origin pose="0 -1.5 0.5 0 0 0"/>
       <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
 
         <collision name="collision">
+          <mass>1</mass>
           <geometry>
             <cylinder radius="0.5" length="1.0"/>
           </geometry>

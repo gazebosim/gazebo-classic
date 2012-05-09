@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-#include <common/SkeletonAnimation.hh>
-#include <common/Console.hh>
+#include "common/SkeletonAnimation.hh"
+#include "common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
 
-
 //////////////////////////////////////////////////
-NodeAnimation::NodeAnimation(const std::string _name)
+NodeAnimation::NodeAnimation(const std::string &_name)
 {
   this->name = _name;
 }
@@ -34,7 +33,7 @@ NodeAnimation::~NodeAnimation()
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::SetName(const std::string _name)
+void NodeAnimation::SetName(const std::string &_name)
 {
   this->name = _name;
 }
@@ -179,7 +178,7 @@ void NodeAnimation::Scale(const double _scale)
 }
 
 //////////////////////////////////////////////////
-SkeletonAnimation::SkeletonAnimation(const std::string _name)
+SkeletonAnimation::SkeletonAnimation(const std::string &_name)
 {
   this->name = _name;
 }
@@ -191,7 +190,7 @@ SkeletonAnimation::~SkeletonAnimation()
 }
 
 //////////////////////////////////////////////////
-void SkeletonAnimation::SetName(const std::string _name)
+void SkeletonAnimation::SetName(const std::string &_name)
 {
   this->name = _name;
 }
@@ -209,14 +208,14 @@ unsigned int SkeletonAnimation::GetNodeCount() const
 }
 
 //////////////////////////////////////////////////
-bool SkeletonAnimation::HasNode(const std::string _node) const
+bool SkeletonAnimation::HasNode(const std::string &_node) const
 {
   return (this->animations.find(_node) != this->animations.end());
 }
 
 //////////////////////////////////////////////////
-void SkeletonAnimation::AddKeyFrame(const std::string _node, const double _time,
-                      const math::Matrix4 _mat)
+void SkeletonAnimation::AddKeyFrame(const std::string &_node,
+    const double _time, const math::Matrix4 _mat)
 {
   if (this->animations.find(_node) == this->animations.end())
     this->animations[_node] = new NodeAnimation(_node);
@@ -228,8 +227,8 @@ void SkeletonAnimation::AddKeyFrame(const std::string _node, const double _time,
 }
 
 //////////////////////////////////////////////////
-void SkeletonAnimation::AddKeyFrame(const std::string _node, const double _time,
-                      const math::Pose _pose)
+void SkeletonAnimation::AddKeyFrame(const std::string &_node,
+    const double _time, const math::Pose _pose)
 {
   if (this->animations.find(_node) == this->animations.end())
     this->animations[_node] = new NodeAnimation(_node);
@@ -241,7 +240,7 @@ void SkeletonAnimation::AddKeyFrame(const std::string _node, const double _time,
 }
 
 //////////////////////////////////////////////////
-math::Matrix4 SkeletonAnimation::GetNodePoseAt(const std::string _node,
+math::Matrix4 SkeletonAnimation::GetNodePoseAt(const std::string &_node,
                       const double _time, const bool _loop)
 {
   math::Matrix4 mat;

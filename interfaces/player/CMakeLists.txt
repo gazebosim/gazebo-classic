@@ -5,6 +5,7 @@ set (sources GazeboDriver.cc
              Position2dInterface.cc
              LaserInterface.cc
              CameraInterface.cc
+             ../../src/gazebo.cc
 )
              #Position3dInterface.cc
              #FiducialInterface.cc
@@ -27,13 +28,14 @@ include_directories(
 )
 
 link_directories(${PLAYER_LINK_DIRS} ${boost_library_dirs})
-add_library(gazebo_player SHARED ${sources})
 
+gz_add_library(gazebo_player ${sources})
 target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
-  gazebo_common
-  gazebo_transport
-  gazebo_msgs
-  gazebo_math
+gazebo_player
+gazebo_common
+gazebo_transport
+gazebo_msgs
+gazebo_math
 )
 
 INSTALL_LIBRARY(gazebo_player)

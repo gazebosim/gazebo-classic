@@ -185,6 +185,17 @@ void Vector3::SetToMin(const Vector3 & _v)
   if (_v.z < this->z) this->z = _v.z;
 }
 
+//////////////////////////////////////////////////
+double Vector3::GetMax() const
+{
+  return std::max(std::max(this->x, this->y), this->z);
+}
+
+//////////////////////////////////////////////////
+double Vector3::GetMin() const
+{
+  return std::min(std::min(this->x, this->y), this->z);
+}
 
 //////////////////////////////////////////////////
 Vector3 &Vector3::operator =(const Vector3 &_pt)
@@ -265,7 +276,7 @@ const Vector3 &Vector3::operator/=(double v)
 }
 
 //////////////////////////////////////////////////
-const Vector3 Vector3::operator*(const Vector3 &pt) const
+Vector3 Vector3::operator*(const Vector3 &pt) const
 {
   return Vector3(this->x * pt.x, this->y * pt.y, this->z * pt.z);
 }
@@ -281,7 +292,7 @@ const Vector3 &Vector3::operator*=(const Vector3 &pt)
 }
 
 //////////////////////////////////////////////////
-const Vector3 Vector3::operator*(double v) const
+Vector3 Vector3::operator*(double v) const
 {
   return Vector3(this->x * v, this->y * v, this->z * v);
 }

@@ -218,7 +218,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     this->trajInfo[idx].duration = last->first;
 
     for (std::map<double, math::Pose>::iterator pIter = points.begin();
-          pIter != points.end(); pIter++)
+          pIter != points.end(); ++pIter)
     {
       common::PoseKeyFrame *key;
       if (pIter == points.begin() && !math::equal(pIter->first, 0.0))
@@ -267,7 +267,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
     double scale = _sdf->GetValueDouble("scale");
-    Skeleton *skel;
+    Skeleton *skel = NULL;
 
     if (extension == "bvh")
     {
@@ -283,7 +283,9 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
           animMesh = MeshManager::Instance()->GetMesh(animFile);
         if (animMesh && animMesh->HasSkeleton())
           skel = animMesh->GetSkeleton();
-        skel->Scale(scale);
+
+        if (skel)
+          skel->Scale(scale);
       }
 
     if (!skel || skel->GetNumAnimations() == 0)

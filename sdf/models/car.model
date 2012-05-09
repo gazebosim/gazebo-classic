@@ -1,0 +1,196 @@
+<gazebo version='1.0'>
+  <model name="car" static="false">
+    <link name="chassis">
+      <origin pose="0 0 0.3 0 0 0"/>
+      <collision name="collision">
+        <mass>10.0</mass>
+        <geometry>
+          <box size="2.0 1.0 0.2"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <box size="2.0 1.0 0.2"/>
+        </geometry>
+        <material script="Gazebo/Green"/>
+      </visual>
+    </link>
+
+    <link name="front_left_wheel">
+      <origin pose="0.8 0.6 0.3 0 1.5707 1.5707"/>
+
+      <collision name="collision">
+        <mass>0.4</mass>
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+        <material script="Gazebo/Black"/>
+      </visual>
+    </link>
+
+    <link name="front_right_wheel">
+      <origin pose="0.8 -0.6 0.3 0  1.5707 1.5707"/>
+
+      <collision name="collision">
+        <mass>0.4</mass>
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+        <material script="Gazebo/Black"/>
+      </visual>
+    </link>
+
+    <link name="back_right_wheel">
+      <origin pose="-0.8 -0.6 0.3 0 1.5707 1.5707"/>
+
+      <collision name="collision">
+        <mass>0.4</mass>
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+        <material script="Gazebo/Black"/>
+      </visual>
+    </link>
+
+    <link name="back_left_wheel">
+      <origin pose="-0.8 0.6 0.3 0 1.5707 1.5707"/>
+
+      <collision name="collision">
+        <mass>0.4</mass>
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <cylinder radius="0.3" length="0.1"/>
+        </geometry>
+        <material script="Gazebo/Black"/>
+      </visual>
+    </link>
+
+    <link name="gas_pedal">
+      <origin pose="0.3 0.1 0.5 0 0 0"/>
+
+      <collision name="collision">
+        <mass>0.01</mass>
+        <geometry>
+          <box size="0.1 0.1 0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <box size="0.1 0.1 0.1"/>
+        </geometry>
+        <material script="Gazebo/Red"/>
+      </visual>
+    </link>
+
+    <link name="steering_wheel">
+      <origin pose="0.3 0.2 1.0 0 1.5707 0"/>
+
+      <collision name="collision">
+        <mass>0.01</mass>
+        <geometry>
+          <cylinder radius="0.1" length="0.01"/>
+        </geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <cylinder radius="0.1" length="0.01"/>
+        </geometry>
+        <material script="Gazebo/Blue"/>
+      </visual>
+    </link>
+
+
+    <joint type="prismatic" name="gas_joint">
+      <parent link="chassis"/>
+      <child link="gas_pedal"/>
+      <axis xyz="1 0 0">
+        <limit lower="0" upper="0.2"/>
+      </axis>
+    </joint>
+
+    <joint type="revolute" name="steering_joint">
+      <parent link="chassis"/>
+      <child link="steering_wheel"/>
+      <axis xyz="1 0 0">
+        <limit lower="-7.853" upper="7.853"/>
+      </axis>
+    </joint>
+
+
+    <joint type="revolute2" name="front_left_joint">
+      <parent link="chassis"/>
+      <child link="front_left_wheel"/>
+      <axis xyz="0 0 1">
+        <limit lower="0" upper="0"/>
+      </axis>
+      <axis2 xyz="0 1 0"/>
+      <physics>
+        <ode>
+          <limit cfm="0.0" erp="0.9"/>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint type="revolute2" name="front_right_joint">
+      <parent link="chassis"/>
+      <child link="front_right_wheel"/>
+      <axis xyz="0 0 1">
+        <limit lower="0" upper="0"/>
+      </axis>
+      <axis2 xyz="0 1 0"/>
+      <physics>
+        <ode>
+          <limit cfm="0.0" erp="0.9"/>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint type="revolute" name="back_right_joint">
+      <parent link="chassis"/>
+      <child link="back_right_wheel"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <joint type="revolute" name="back_left_joint">
+      <parent link="chassis"/>
+      <child link="back_left_wheel"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <plugin filename="libVehiclePlugin.so" name="vehicle">
+      <chassis>chassis</chassis>
+      <front_left>front_left_joint</front_left>
+      <front_right>front_right_joint</front_right>
+      <back_left>back_left_joint</back_left>
+      <back_right>back_right_joint</back_right>
+      <gas>gas_joint</gas>
+      <steering>steering_joint</steering>
+    </plugin>
+  </model> 
+</gazebo>

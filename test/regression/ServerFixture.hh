@@ -363,7 +363,7 @@ class ServerFixture : public testing::Test
                  << "      <cylinder radius ='.5' length ='1.0'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <cylinder radius ='.5' length ='1.0'/>"
                  << "    </geometry>"
@@ -404,7 +404,7 @@ class ServerFixture : public testing::Test
                  << "      <sphere radius ='.5'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <sphere radius ='.5'/>"
                  << "    </geometry>"
@@ -446,7 +446,7 @@ class ServerFixture : public testing::Test
                  << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
@@ -491,7 +491,7 @@ class ServerFixture : public testing::Test
   private: unsigned char **imgData;
   private: int gotImage;
 
-  private: common::Time simTime, realTime, pauseTime;
+  protected: common::Time simTime, realTime, pauseTime;
   private: double percentRealTime;
   private: bool paused;
   private: bool serverRunning;

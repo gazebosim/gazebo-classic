@@ -27,7 +27,8 @@ namespace gazebo
 {
   namespace gui
   {
-    class MySlider;
+    class JointForceControl;
+    class JointPIDControl;
     class JointControlWidget : public QWidget
     {
       Q_OBJECT
@@ -36,25 +37,34 @@ namespace gazebo
       public: virtual ~JointControlWidget();
 
       public: void Load(const std::string &_modelName);
-      private slots: void OnChanged(double _value, const std::string &_name);
+      private slots: void OnForceChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnPIDChanged(double _value, const std::string &_name);
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr jointPub;
 
       private: msgs::Request *requestMsg;
-      private: std::map<std::string, MySlider*> sliders;
+      private: std::map<std::string, JointForceControl*> sliders;
+      private: std::map<std::string, JointPIDControl*> pidSliders;
     };
 
-    class MySlider : public QWidget
+    class JointForceControl : public QWidget
     {
       Q_OBJECT
-      public: MySlider(const std::string &_name, QWidget *_parent);
-      public slots: void OnChanged(int _value);
+      public: JointForceControl(const std::string &_name, QWidget *_parent);
+      public slots: void OnChanged(double _value);
       Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
       private: std::string name;
-      private: QSlider *slider;
-      private: QLabel *label;
-      private: QDoubleSpinBox *multiplier;
+    };
+
+    class JointPIDControl : public QWidget
+    {
+      Q_OBJECT
+      public: JointPIDControl(const std::string &_name, QWidget *_parent);
+      public slots: void OnChanged(double _value);
+      Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
+      private: std::string name;
     };
   }
 }

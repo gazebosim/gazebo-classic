@@ -22,7 +22,6 @@
 #define ODELINK_HH
 
 #include "physics/ode/ode_inc.h"
-
 #include "physics/ode/ODETypes.hh"
 #include "physics/Link.hh"
 
@@ -30,8 +29,6 @@ namespace gazebo
 {
   namespace physics
   {
-    class ODEPhysics;
-
     /// \addtogroup gazebo_physics
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
@@ -41,7 +38,7 @@ namespace gazebo
     class ODELink : public Link
     {
       /// \brief Constructor
-      public: ODELink(EntityPtr parent);
+      public: ODELink(EntityPtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODELink();

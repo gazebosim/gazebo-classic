@@ -125,7 +125,6 @@ void World::Load(sdf::ElementPtr _sdf)
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0, 200000000);
 
-
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
@@ -221,6 +220,12 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
+  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+
   // Initialize all the entities
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
@@ -274,6 +279,7 @@ void World::RunLoop()
 void World::Step()
 {
   this->worldUpdateMutex->lock();
+
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
@@ -337,7 +343,8 @@ void World::StepWorld(int _steps)
   {
     common::Time::MSleep(1);
     this->worldUpdateMutex->lock();
-    if (this->stepInc == 0 || this->stop) wait = false;
+    if (this->stepInc == 0 || this->stop)
+      wait = false;
     this->worldUpdateMutex->unlock();
   }
 }
@@ -374,6 +381,7 @@ void World::Update()
     {
       (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
+
     this->dirtyPoses.clear();
   }
 
@@ -705,18 +713,17 @@ void World::SetPaused(bool _p)
   if (this->pause == _p)
     return;
 
+  this->worldUpdateMutex->lock();
+  this->pause = _p;
+  this->worldUpdateMutex->unlock();
+
   if (_p)
     this->pauseStartTime = common::Time::GetWallTime();
   else
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
   event::Events::pause(_p);
-
-  this->worldUpdateMutex->lock();
-  this->pause = _p;
-  this->worldUpdateMutex->unlock();
 }
-
 
 //////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
@@ -727,7 +734,8 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 
 //////////////////////////////////////////////////
 void World::OnControl(ConstWorldControlPtr &_data)
-{ if (_data->has_pause())
+{
+  if (_data->has_pause())
     this->SetPaused(_data->pause());
 
   if (_data->has_step())

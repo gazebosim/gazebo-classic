@@ -18,9 +18,11 @@
 #define SKELETONANIMATION_HH
 
 #include <map>
+#include <string>
+#include <utility>
 
-#include <math/Matrix4.hh>
-#include <math/Pose.hh>
+#include "math/Matrix4.hh"
+#include "math/Pose.hh"
 
 namespace gazebo
 {
@@ -28,11 +30,11 @@ namespace gazebo
   {
     class NodeAnimation
     {
-      public: NodeAnimation(const std::string _name);
+      public: NodeAnimation(const std::string &_name);
 
       public: ~NodeAnimation();
 
-      public: void SetName(const std::string _name);
+      public: void SetName(const std::string &_name);
 
       public: std::string GetName() const;
 
@@ -63,25 +65,25 @@ namespace gazebo
 
     class SkeletonAnimation
     {
-      public: SkeletonAnimation(const std::string _name);
+      public: SkeletonAnimation(const std::string &_name);
 
       public: ~SkeletonAnimation();
 
-      public: void SetName(const std::string _name);
+      public: void SetName(const std::string &_name);
 
       public: std::string GetName() const;
 
       public: unsigned int GetNodeCount() const;
 
-      public: bool HasNode(const std::string _node) const;
+      public: bool HasNode(const std::string &_node) const;
 
-      public: void AddKeyFrame(const std::string _node, const double _time,
+      public: void AddKeyFrame(const std::string &_node, const double _time,
                       const math::Matrix4 _mat);
 
-      public: void AddKeyFrame(const std::string _node, const double _time,
+      public: void AddKeyFrame(const std::string &_node, const double _time,
                       const math::Pose _pose);
 
-      public: math::Matrix4 GetNodePoseAt(const std::string _node,
+      public: math::Matrix4 GetNodePoseAt(const std::string &_node,
                       const double _time, const bool _loop = true);
 
       public: std::map<std::string, math::Matrix4> GetPoseAt(const double _time,

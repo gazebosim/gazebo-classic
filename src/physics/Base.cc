@@ -120,7 +120,10 @@ void Base::SetName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Base::GetName() const
 {
-  return this->sdf->GetValueString("name");
+  if (this->sdf->HasAttribute("name"))
+    return this->sdf->GetValueString("name");
+  else
+    return std::string();
 }
 
 //////////////////////////////////////////////////

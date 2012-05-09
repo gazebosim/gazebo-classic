@@ -22,6 +22,6 @@
 #pragma GCC system_header
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
-
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
 #endif

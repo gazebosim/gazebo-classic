@@ -275,5 +275,3 @@ namespace sdf
   };
 }
 #endif
-
-

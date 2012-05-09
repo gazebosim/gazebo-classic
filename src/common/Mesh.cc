@@ -661,10 +661,15 @@ void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
 void SubMesh::RecalculateNormals()
 {
   unsigned int i;
+  if (normals.size() < 3)
+    return;
 
   // Reset all the normals
   for (i = 0; i < this->normals.size(); i++)
     this->normals[i].Set(0, 0, 0);
+
+  if (this->normals.size() != this->vertices.size())
+    this->normals.resize(this->vertices.size());
 
   // For each face, which is defined by three indices, calculate the normals
   for (i = 0; i < this->indices.size(); i+= 3)

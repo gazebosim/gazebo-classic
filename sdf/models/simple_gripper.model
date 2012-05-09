@@ -2,19 +2,25 @@
   <model name="simple_gripper" static="false">
     <link name="riser">
       <origin pose="-0.15 0.0 0.5 0 0 0"/>
-      <inertial mass="10.0">
-        <origin pose="0 0 -0.5 0 0 0"/>
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
+      <inertial mass="20.0"/>
+        <!--<origin pose="0 0 -0.5 0 0 0"/>
       </inertial> 
+      -->
 
       <collision name="collision">
         <geometry>
           <box size="0.2 0.2 1.0"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu="9000000.0" mu2="9000000.0"/>
+          </friction>
+        </surface>
+
       </collision>
       <visual name="visual">
         <geometry>
-          <box size="0.2 0.2 1.1"/>
+          <box size="0.2 0.2 1.0"/>
         </geometry>
         <material script="Gazebo/Purple"/>
       </visual>
@@ -22,14 +28,18 @@
 
     <link name="palm">
       <origin pose="0.0 0.0 0.05 0 0 0"/>
-      <inertial mass="0.5">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial>
+      <inertial mass="0.5"/>
 
       <collision name="collision">
         <geometry>
           <box size="0.1 0.2 0.1"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu="9000000.0" mu2="9000000.0"/>
+          </friction>
+        </surface>
+
       </collision>
       <visual name="visual">
         <geometry>
@@ -41,15 +51,17 @@
 
     <link name="left_finger">
       <origin pose="0.1 0.2 0.05 0 0 -0.78539"/>
-      <inertial mass="0.1">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial>
-
+      <inertial mass="0.1"/>
 
       <collision name="collision">
         <geometry>
           <box size="0.1 0.3 0.1"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu="9000000.0" mu2="9000000.0"/>
+          </friction>
+        </surface>
       </collision>
       <visual name="visual">
         <geometry>
@@ -61,15 +73,18 @@
 
     <link name="left_finger_tip">
       <origin pose="0.336 0.3 0.05 0 0 1.5707"/>
-      <inertial mass="0.1">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial>
-
+      <inertial mass="0.1"/>
 
       <collision name="collision">
         <geometry>
           <box size="0.1 0.2 0.1"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu="9000000.0" mu2="9000000.0"/>
+          </friction>
+        </surface>
+
       </collision>
       <visual name="visual">
         <geometry>
@@ -81,15 +96,18 @@
 
     <link name="right_finger">
       <origin pose="0.1 -0.2 0.05 0 0 .78539"/>
-      <inertial mass="0.1">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial>
-
+      <inertial mass="0.1"/>
 
       <collision name="collision">
         <geometry>
           <box size="0.1 0.3 0.1"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu="9000000.0" mu2="9000000.0"/>
+          </friction>
+        </surface>
+
       </collision>
       <visual name="visual">
         <geometry>
@@ -101,15 +119,18 @@
 
     <link name="right_finger_tip">
       <origin pose="0.336 -0.3 0.05 0 0 1.5707"/>
-      <inertial mass="0.1">
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial>
-
+      <inertial mass="0.1"/>
 
       <collision name="collision">
         <geometry>
           <box size="0.1 0.2 0.1"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu="9000000.0" mu2="9000000.0"/>
+          </friction>
+        </surface>
+
       </collision>
       <visual name="visual">
         <geometry>
@@ -124,7 +145,7 @@
       <child link="left_finger"/>
       <parent link="palm"/>
       <axis xyz="0 0 1">
-        <limit lower="-0.4" upper="0.4"/> 
+        <limit lower="-0.8" upper="0.8"/>
       </axis>
     </joint>
 
@@ -133,7 +154,7 @@
       <child link="left_finger_tip"/>
       <parent link="left_finger"/>
       <axis xyz="0 0 1">
-        <limit lower="-0.4" upper="0.4"/> 
+        <limit lower="-0.8" upper="0.8"/>
       </axis>
     </joint>
 
@@ -142,7 +163,7 @@
       <child link="right_finger"/>
       <parent link="palm"/>
       <axis xyz="0 0 1">
-        <limit lower="-0.4" upper="0.4"/> 
+        <limit lower="-0.8" upper="0.8"/>
       </axis>
     </joint>
 
@@ -151,7 +172,7 @@
       <child link="right_finger_tip"/>
       <parent link="right_finger"/>
       <axis xyz="0 0 1">
-        <limit lower="-0.4" upper="0.4"/> 
+        <limit lower="-0.8" upper="0.8"/>
       </axis>
     </joint>
 
@@ -162,6 +183,22 @@
         <limit lower="0" upper="0.9"/> 
       </axis>
     </joint>
+
+    <joint name="fixed_riser" type="revolute">
+      <child link="riser"/>
+      <parent link="world"/>
+      <axis xyz="0 0 1">
+        <limit lower="0" upper="0"/> 
+      </axis>
+    </joint>
+
+
+    <plugin filename="libGripperPlugin.so" name="gripper">
+      <joint>palm_right_finger</joint>
+      <joint>right_finger_tip</joint>
+      <joint>palm_left_finger</joint>
+      <joint>left_finger_tip</joint>
+    </plugin>
 
   </model>
 </gazebo>

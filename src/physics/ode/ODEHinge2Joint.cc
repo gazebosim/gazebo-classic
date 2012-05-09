@@ -178,8 +178,3 @@ void ODEHinge2Joint::SetParam(int _parameter, double _value)
   ODEJoint::SetParam(_parameter, _value);
   dJointSetHinge2Param(this->jointId, _parameter, _value);
 }
-
-
-
-
-

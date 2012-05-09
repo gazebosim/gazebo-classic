@@ -43,9 +43,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param body Link the ray is attached to
-      /// \param displayRays Indicates if the rays should be
-      ///        displayed when rendering images
-      public: ODERayShape(CollisionPtr collision, bool displayRays);
+      public: ODERayShape(CollisionPtr collision);
 
       /// \brief Destructor
       public: virtual ~ODERayShape();

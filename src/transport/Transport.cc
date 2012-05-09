@@ -157,7 +157,7 @@ void on_response(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
-msgs::Response transport::request(const std::string _worldName,
+msgs::Response transport::request(const std::string &_worldName,
                                   const msgs::Request &_request)
 {
   boost::unique_lock<boost::mutex> lock(requestMutex);
@@ -178,5 +178,8 @@ msgs::Response transport::request(const std::string _worldName,
   responseSub.reset();
   node.reset();
 
-  return *g_response;
+  if (g_response != NULL)
+    return *g_response;
+  else
+    return msgs::Response();
 }

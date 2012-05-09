@@ -122,8 +122,8 @@ TEST_F(PhysicsTest, CollisionTest)
 
           if (i == 0)
             box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
-          EXPECT_TRUE(fabs(pose.pos.x - x) < 0.00001);
-          EXPECT_TRUE(fabs(vel.x - v) < 0.00001);
+          EXPECT_LT(fabs(pose.pos.x - x), 0.00001);
+          EXPECT_LT(fabs(vel.x - v), 0.00001);
         }
 
         physics::ModelPtr sphere_model = world->GetModel("sphere");
@@ -144,8 +144,8 @@ TEST_F(PhysicsTest, CollisionTest)
           }
           else
           {
-            EXPECT_TRUE(fabs(pose.pos.x - x - 1.0) < 0.00001);
-            EXPECT_TRUE(fabs(vel.x - v) < 0.00001);
+            EXPECT_LT(fabs(pose.pos.x - x - 1.0), 0.00001);
+            EXPECT_LT(fabs(vel.x - v), 0.00001);
           }
         }
       }
@@ -202,13 +202,13 @@ TEST_F(PhysicsTest, DropStuff)
                 << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
-            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
-            EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+            EXPECT_LT(fabs(vel.z - v) , 0.0001);
+            EXPECT_LT(fabs(pose.pos.z - z) , 0.0001);
           }
           else
           {
-            EXPECT_TRUE(fabs(vel.z) < 0.0101);  // sometimes -0.01, why?
-            EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+            EXPECT_LT(fabs(vel.z), 0.0101);  // sometimes -0.01, why?
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
           }
         }
 
@@ -224,13 +224,13 @@ TEST_F(PhysicsTest, DropStuff)
                 << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
-            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
-            EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+            EXPECT_LT(fabs(vel.z - v), 0.0001);
+            EXPECT_LT(fabs(pose.pos.z - z), 0.0001);
           }
           else
           {
-            EXPECT_TRUE(fabs(vel.z) < 3e-5);
-            EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+            EXPECT_LT(fabs(vel.z), 3e-5);
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
           }
         }
 
@@ -246,13 +246,13 @@ TEST_F(PhysicsTest, DropStuff)
                 << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
-            EXPECT_TRUE(fabs(vel.z - v) < 0.0001);
-            EXPECT_TRUE(fabs(pose.pos.z - z) < 0.0001);
+            EXPECT_LT(fabs(vel.z - v), 0.0001);
+            EXPECT_LT(fabs(pose.pos.z - z), 0.0001);
           }
           else
           {
-            EXPECT_TRUE(fabs(vel.z) < 0.011);
-            EXPECT_TRUE(fabs(pose.pos.z - 0.5) < 0.00001);
+            EXPECT_LT(fabs(vel.z), 0.011);
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
           }
         }
       }
@@ -325,7 +325,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
               << "] tol[" << e_tol
               << "]\n";
 
-        EXPECT_TRUE(fabs(e - e_start) < e_tol);
+        EXPECT_LT(fabs(e - e_start), e_tol);
       }
 
       physics::JointPtr joint = model->GetJoint("joint_0");
@@ -340,7 +340,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
               << "] actual [" << actual_theta
               << "] pose [" << model->GetWorldPose()
               << "]\n";
-         EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
+         EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
     }
   }
@@ -376,7 +376,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
               << "] tol[" << e_tol
               << "]\n";
 
-        EXPECT_TRUE(fabs(e - e_start) < e_tol);
+        EXPECT_LT(fabs(e - e_start), e_tol);
       }
 
       physics::JointPtr joint = model->GetJoint("joint_0");
@@ -391,7 +391,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
               << "] actual [" << actual_theta
               << "] pose [" << model->GetWorldPose()
               << "]\n";
-         EXPECT_TRUE(fabs(integ_theta - actual_theta) < 0.01);
+         EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
     }
   }

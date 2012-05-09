@@ -367,6 +367,7 @@ msgs::Light LightFromSDF(sdf::ElementPtr _sdf)
   return result;
 }
 
+/////////////////////////////////////////////////
 msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Visual result;
@@ -493,8 +494,6 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
 
   return result;
 }
-
-
 
 msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
 {

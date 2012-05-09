@@ -32,6 +32,7 @@ set (msgs axis.proto
           planegeom.proto
           vector3d.proto
           pose.proto
+          projector.proto
           publishers.proto
           publish.proto
           quaternion.proto
