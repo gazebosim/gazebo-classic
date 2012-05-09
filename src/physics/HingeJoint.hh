@@ -60,6 +60,17 @@ namespace gazebo
                        this->SetLowStop(0, limitElem->GetValueDouble("lower"));
                        this->SetHighStop(0, limitElem->GetValueDouble("upper"));
                      }
+                     if (axisElem->HasElement("dynamics"))
+                     {
+                       sdf::ElementPtr dynElem =
+                         _sdf->GetElement("axis")->GetElement("dynamics");
+
+                       // Perform this three step ordering to ensure the
+                       // parameters are set properly.
+                       // This is taken from the ODE wiki.
+                       this->SetDamping(0, dynElem->GetValueDouble("damping"));
+                       //this->SetFriction(0, dynElem->GetValueDouble("friction"));
+                     }
                    }
                  }
       };
