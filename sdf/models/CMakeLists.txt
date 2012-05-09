@@ -2,6 +2,7 @@ set (models
   pioneer2dx.model
   pr2.model
   pr2_visual_only.model
+  pr2_gripper.model
   box.model
   willowgarage.model
   willowgarage_visual.model
