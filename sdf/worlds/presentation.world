@@ -33,7 +33,8 @@
           </geometry>
         </collision>
 
-        <visual name="visual_1" cast_shadows="false">
+        <visual name="visual_1">
+          <cast_shadows>false</cast_shadows>
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>

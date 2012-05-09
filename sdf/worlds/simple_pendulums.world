@@ -33,7 +33,7 @@
                    izz="0.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_cylinder" laser_retro="100.0">
+        <visual name="visual_cylinder" laser_retro="100.0">
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
           <geometry>
             <cylinder radius="0.05" length="10.0"/>
@@ -70,7 +70,7 @@
                    izz="0.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_sphere" laser_retro="100.0">
+        <visual name="visual_sphere" laser_retro="100.0">
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <geometry>
             <sphere radius="0.1"/>
@@ -116,7 +116,7 @@
                    izz="0.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_cylinder" laser_retro="100.0">
+        <visual name="visual_cylinder" laser_retro="100.0">
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
           <geometry>
             <cylinder radius="0.1" length="10.0"/>
@@ -159,7 +159,7 @@
                    izz="0.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_cylinder" laser_retro="100.0">
+        <visual name="visual_cylinder" laser_retro="100.0">
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
           <geometry>
             <cylinder radius="0.1" length="10.0"/>

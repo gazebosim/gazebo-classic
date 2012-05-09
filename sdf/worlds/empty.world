@@ -1,13 +1,6 @@
 <?xml version="1.0"?> 
 <gazebo version="1.0">
   <world name="default">
-    <physics type="bullet">
-      <gravity xyz="0 0 -9.8"/>
-      <bullet>
-        <dt>0.01</dt>
-      </bullet>
-    </physics>
-
     <!-- A ground plane -->
     <include filename="ground_plane.model"/>
 
