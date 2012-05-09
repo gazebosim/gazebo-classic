@@ -18,6 +18,6 @@
   <include filename="collision.sdf" required="*"/>
   <include filename="visual.sdf" required="*"/>
   <include filename="sensor.sdf" required="*"/>
+  <include filename="projector.sdf" required="*"/>
 
 </element> <!-- End Link -->
-

@@ -55,6 +55,7 @@ namespace gazebo
 {
   namespace rendering
   {
+    class Projector;
     class Light;
     class Visual;
     class Grid;
@@ -378,6 +379,8 @@ namespace gazebo
       private: bool clearAll;
 
       private: Heightmap *heightmap;
+
+      private: std::vector<Projector *> projectors;
     };
     /// \}
   }

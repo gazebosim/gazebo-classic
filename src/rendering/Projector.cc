@@ -20,9 +20,14 @@
  */
 /*
  * Desc: Projector
- * Author: Jared Duke, (some maintainence by John Hsu)
+ * Author: Jared Duke, John Hsu, Nate Koenig
  */
 
+#include "rendering/RTShaderSystem.hh"
+
+#include "rendering/Conversions.hh"
+#include "rendering/Visual.hh"
+#include "rendering/Scene.hh"
 #include "rendering/Projector.hh"
 
 using namespace gazebo;
@@ -34,12 +39,7 @@ typedef OgrePassMap::iterator OgrePassMapIterator;
 /////////////////////////////////////////////////
 Projector::Projector(rendering::VisualPtr _parent)
 {
-  this->fov = M_PI * 0.25;
-  this->nearClip = 0.25;
-  this->farClip = 15.0;
-
-  this->parentVisual = _parent;
-  this->scene = _parent->GetScene();
+  this->visual = _parent;
 }
 
 /////////////////////////////////////////////////
@@ -50,66 +50,13 @@ Projector::~Projector()
 }
 
 /////////////////////////////////////////////////
-void Projector::Load(sdf::ElementPtr _sdf)
+void Projector::Load(const math::Pose &_pose,
+                     const std::string &_textureName,
+                     double _nearClip,
+                     double _farClip,
+                     double _fov)
 {
-  /*
-  if (!_sdf->HasElement("xyz"))
-  {
-    gzmsg << "projector plugin missing <xyz>, defaults to 0s\n";
-    this->xyz = math::Vector3(0, 0, 0);
-  }
-  else
-    this->xyz = _sdf->GetElement("xyz")->GetValueVector3();
-
-  if (!_sdf->HasElement("rpy"))
-  {
-    gzmsg << "projector plugin missing <rpy>, defaults to 0s\n";
-    this->rpy = math::Vector3(0, 0, 0);
-  }
-  else
-    this->rpy = _sdf->GetElement("rpy")->GetValueVector3();
-
-  this->textureName = "";
-  if (_sdf->HasElement("textureName"))
-    this->textureName = _sdf->GetElement("textureName")->GetValueString();
-
-  this->filterTextureName = "";
-  if (_sdf->HasElement("filterTextureName"))
-    this->filterTextureName =
-      _sdf->GetElement("filterTextureName")->GetValueString();
-
-  this->fov = Ogre::Math::PI*0.25;
-  if (_sdf->HasElement("fov"))
-    this->fov = _sdf->GetElement("fov")->GetValueDouble();
-
-  this->nearClip = 0.1;
-  if (_sdf->HasElement("nearClip"))
-    this->nearClip = _sdf->GetElement("nearClip")->GetValueDouble();
-
-  this->farClip = 15.0;
-  if (_sdf->HasElement("farClip"))
-    this->farClip = _sdf->GetElement("farClip")->GetValueDouble();
-
-  // UpdateShaders when a new model is added to the world (e.g. via gui)
-  this->add_model_event_ = gazebo::event::Events::ConnectAddEntity(
-    boost::bind(&Projector::UpdateShaders, this));
-
-  // Start projector
-  this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
-    boost::bind(&Projector::ToggleProjector, this, true));
-    */
-}
-
-/////////////////////////////////////////////////
-void Projector::LoadImage(const std::string &_textureName)
-{
-  this->projector.setTextureName(_textureName);
-}
-
-/////////////////////////////////////////////////
-void Projector::ToggleProjector(bool _projectorOn)
-{
-  if (!this->parentVisual)
+  if (!this->visual)
   {
     gzerr << "Projector does not have a valid parent visual\n";
     return;
@@ -118,250 +65,287 @@ void Projector::ToggleProjector(bool _projectorOn)
   int retryCount = 0;
 
   // Initialize the projector
-  while (!this->projector.isInit && retryCount < 10)
+  while (!this->projector.initialized && retryCount < 10)
   {
     // init
-    this->projector.Init(
-        this->parentVisual->GetSceneNode(),
-        this->scene->GetManager(),
-        this->textureName, this->filterTextureName,
-        this->nearClip, this->farClip, this->fov,
-        this->parentVisual->GetName() + "_Projector"
-        this->parentVisual->GetName() + "_ProjectorFilter");
+    this->projector.Init(this->visual, _textureName, _nearClip, _farClip, _fov);
 
     // set the projector pose relative to body
-    this->projector.SetPose(this->xyz, this->rpy);
+    this->projector.SetPose(_pose);
 
     // Add the projector as an Ogre frame listener
-    Ogre::Root::getSingletonPtr()->addFrameListener(&this->this->projector);
+    Ogre::Root::getSingletonPtr()->addFrameListener(&this->projector);
 
-    if (!this->projector.isInit)
+    if (!this->projector.initialized)
     {
       gzwarn << "starting projector failed, retrying in 1 sec.\n";
-      sleep(1);
-      retryCount++;
+      common::Time::MSleep(1000);
+      ++retryCount;
     }
   }
+/*
+  // Start projector
+  this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
+    boost::bind(&Projector::ToggleProjector, this, true));
+    */
+}
 
+/////////////////////////////////////////////////
+void Projector::Load(sdf::ElementPtr _sdf)
+{
+  math::Pose pose;
+  std::string textureName;
+  double nearClip = 0.1;
+  double farClip = 10.0;
+  double fov = M_PI * 0.25;
+
+  if (_sdf->HasElement("pose"))
+    pose = _sdf->GetValuePose("pose");
+
+  if (_sdf->HasElement("texture_name"))
+    textureName = _sdf->GetValueString("texture_name");
+
+  if (_sdf->HasElement("near_clip"))
+    nearClip = _sdf->GetValueDouble("near_clip");
+
+  if (_sdf->HasElement("far_clip"))
+    farClip = _sdf->GetValueDouble("far_clip");
+
+  if (_sdf->HasElement("fov"))
+    fov = _sdf->GetValueDouble("fov");
+
+  this->Load(pose, textureName, nearClip, farClip, fov);
+}
+
+/////////////////////////////////////////////////
+void Projector::Load(const msgs::Projector &_msg)
+{
+  math::Pose pose;
+  std::string textureName;
+  double nearClip = 0.1;
+  double farClip = 10.0;
+  double fov = M_PI * 0.25;
+
+  if (_msg.has_pose())
+    pose = msgs::Convert(_msg.pose());
+
+  if (_msg.has_texture())
+    textureName = _msg.texture();
+
+  if (_msg.has_near_clip())
+    nearClip = _msg.near_clip();
+
+  if (_msg.has_far_clip())
+    farClip = _msg.far_clip();
+
+  if (_msg.has_fov())
+    fov = _msg.fov();
+
+  this->Load(pose, textureName, nearClip, farClip, fov);
+}
+
+/////////////////////////////////////////////////
+void Projector::SetTexture(const std::string &_textureName)
+{
+  this->projector.SetTexture(_textureName);
+}
+
+/////////////////////////////////////////////////
+void Projector::Toggle()
+{
   // if not headless
-  if (this->projector.isInit)
+  if (this->projector.initialized)
   {
-    // gzmsg << "projector initialized, toggling state to ["
-    //       << _projectorOn << "]\n";
-    this->lock.lock();
-    this->this->projector.setEnabled(_projectorOn);
-    this->lock.unlock();
-    this->UpdateShaders();
+    this->projector.SetEnabled(!this->projector.enabled);
+    rendering::RTShaderSystem::Instance()->UpdateShaders();
   }
   else
     gzwarn << "could not start projector, toggle failed\n";
 }
 
 /////////////////////////////////////////////////
-void Projector::UpdateShaders()
+Projector::ProjectorFrameListener::ProjectorFrameListener()
 {
-  rendering::RTShaderSystem::Instance()->UpdateShaders();
-}
+  this->enabled = false;
+  this->initialized = false;
+  this->usingShaders = false;
 
-
-/////////////////////////////////////////////////
-Projector::Projector::Projector()
-{
-  this->isEnabled = false;
-  this->isInit = false;
-  this->isUsingShaders = false;
-
-  this->projectorNode = NULL;
-  this->projectorFilterNode = NULL;
+  this->node = NULL;
+  this->filterNode = NULL;
   this->projectorQuery = NULL;
-  this->projectorFrustum = NULL;
-  this->projectorFilterFrustum = NULL;
+  this->frustum = NULL;
+  this->filterFrustum = NULL;
 
-  this->projectorNodeName = "Projector";
-  this->projectorFilterNodeName = "projectorFilter";
+  this->nodeName = "Projector";
+  this->filterNodeName = "ProjectorFilter";
 }
 
 /////////////////////////////////////////////////
-Projector::Projector::~Projector()
+Projector::ProjectorFrameListener::~ProjectorFrameListener()
 {
-  removeProjectorPassFromMaterials();
+  this->RemovePassFromMaterials();
 
-  if (this->projectorNode)
+  if (this->node)
   {
-    this->projectorNode->detachObject(this->projectorFrustum);
-    this->parentSceneNode->removeAndDestroyChild(this->projectorNodeName);
-    this->projectorNode = NULL;
-  }
-  if (this->projectorFilterNode)
-  {
-    this->projectorFilterNode->detachObject(this->projectorFilterFrustum);
-    this->parentSceneNode->removeAndDestroyChild(this->projectorFilterNodeName);
-    this->projectorFilterNode = NULL;
+    this->node->detachObject(this->frustum);
+    this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
+    this->node = NULL;
   }
 
-  delete this->projectorFrustum;
-  delete this->projectorFilterFrustum;
+  if (this->filterNode)
+  {
+    this->filterNode->detachObject(this->filterFrustum);
+    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
+    this->filterNode = NULL;
+  }
+
+  delete this->frustum;
+  delete this->filterFrustum;
 
   if (this->projectorQuery)
     this->sceneMgr->destroyQuery(this->projectorQuery);
+
+  this->visual.reset();
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::init(Ogre::SceneNode *sceneNodePtr,
-                                      Ogre::SceneManager *sceneMgrPtr,
-                                      Ogre::String textureName,
-                                      Ogre::String filterTextureName,
-                                      double nearDist,
-                                      double farDist,
-                                      double fov,
-                                      std::string projectorNodeName,
-                                      std::string projectorFilterNodeName)
+void Projector::ProjectorFrameListener::Init(VisualPtr _visual,
+                                             const std::string &_textureName,
+                                             double _near,
+                                             double _far,
+                                             double _fov)
 {
-  if (this->isInit)
+  if (this->initialized)
     return;
 
-  this->projectorNodeName = projectorNodeName;
-  this->projectorFilterNodeName = projectorFilterNodeName;
+  if (_textureName.empty())
+  {
+    gzerr << "Projector is missing a texture\n";
+    return;
+  }
 
-  this->projectorFrustum = new Ogre::Frustum();
-  this->projectorFilterFrustum = new Ogre::Frustum();
-  this->projectorFilterFrustum->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+  this->visual = _visual;
 
-  this->sceneMgr = sceneMgrPtr;
+  this->nodeName = this->visual->GetName() + "_Projector";
+  this->filterNodeName = this->visual->GetName() + "_ProjectorFilter";
+
+  this->frustum = new Ogre::Frustum();
+  this->filterFrustum = new Ogre::Frustum();
+  this->filterFrustum->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+
+  this->sceneMgr = this->visual->GetScene()->GetManager();
   this->projectorQuery = this->sceneMgr->createPlaneBoundedVolumeQuery(
       Ogre::PlaneBoundedVolumeList());
 
-  this->parentSceneNode = sceneNodePtr;
-  this->setSceneNode();
-  this->setTextureName(textureName);
-  this->setFilterTextureName(filterTextureName);
-  this->setFrustumClipDistance(nearDist, farDist);
-  this->setFrustumFOV(fov);
+  this->SetSceneNode();
+  this->SetTexture(_textureName);
+  this->SetFrustumClipDistance(_near, _far);
+  this->SetFrustumFOV(_fov);
 
-  this->isInit = true;
+  this->initialized = true;
 }
 
 /////////////////////////////////////////////////
-bool Projector::Projector::frameStarted(const Ogre::FrameEvent &evt)
+bool Projector::ProjectorFrameListener::frameStarted(
+    const Ogre::FrameEvent &/*_evt*/)
 {
-  if (!isInit)
-    init(this->projectorNode);
+  if (!this->initialized || !this->enabled || this->textureName.empty())
+    return true;
 
-  if (isEnabled && !projectedTextureName.empty())
-  {
-    addProjectorPassToVisibleMaterials();
-    // addProjectorPassToAllMaterials();
-  }
-  else
-  {
-    removeProjectorPassFromMaterials();
-  }
+  this->AddPassToVisibleMaterials();
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool Projector::Projector::frameEnded(const Ogre::FrameEvent &evt)
+void Projector::ProjectorFrameListener::SetEnabled(bool _enabled)
 {
-  return true;
+  this->enabled = _enabled;
+  if (!this->enabled)
+    this->RemovePassFromMaterials();
 }
 
 /////////////////////////////////////////////////
-bool Projector::Projector::frameRenderingQueued(
-  const Ogre::FrameEvent &evt)
+void Projector::ProjectorFrameListener::SetUsingShaders(bool _usingShaders)
 {
-  return true;
+  this->usingShaders = _usingShaders;
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::setEnabled(bool enabled)
+void Projector::ProjectorFrameListener::SetSceneNode()
 {
-  this->isEnabled = enabled;
-}
-
-/////////////////////////////////////////////////
-void Projector::Projector::setUsingShaders(bool usingShaders)
-{
-  this->isUsingShaders = usingShaders;
-}
-
-/////////////////////////////////////////////////
-void Projector::Projector::setSceneNode()
-{
-  if (this->projectorNode)
+  if (this->node)
   {
-    this->projectorNode->detachObject(this->projectorFrustum);
-    this->parentSceneNode->removeAndDestroyChild(this->projectorNodeName);
-    this->projectorNode = NULL;
-  }
-  if (this->projectorFilterNode)
-  {
-    this->projectorFilterNode->detachObject(this->projectorFilterFrustum);
-    this->parentSceneNode->removeAndDestroyChild(this->projectorFilterNodeName);
-    this->projectorFilterNode = NULL;
+    this->node->detachObject(this->frustum);
+    this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
+    this->node = NULL;
   }
 
-  this->projectorNode       = this->parentSceneNode->createChildSceneNode(
-                              this->projectorNodeName);
-  this->projectorFilterNode = this->parentSceneNode->createChildSceneNode(
-                              this->projectorFilterNodeName);
-
-  if (this->projectorNode)
+  if (this->filterNode)
   {
-    this->projectorNode->attachObject(this->projectorFrustum);
+    this->filterNode->detachObject(this->filterFrustum);
+    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
+    this->filterNode = NULL;
   }
-  if (this->projectorFilterNode)
+
+  this->node = this->visual->GetSceneNode()->createChildSceneNode(
+      this->nodeName);
+
+  this->filterNode = this->visual->GetSceneNode()->createChildSceneNode(
+      this->filterNodeName);
+
+  if (this->node)
+    this->node->attachObject(this->frustum);
+
+  if (this->filterNode)
   {
-    this->projectorFilterNode->attachObject(this->projectorFilterFrustum);
-    this->projectorFilterNode->setOrientation(
+    this->filterNode->attachObject(this->filterFrustum);
+    this->filterNode->setOrientation(
       Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y));
   }
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::SetPose(const math::Pose &_pose)
+void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
 {
   Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.rot);
+  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);
   Ogre::Quaternion offsetQuaternion;
 
-  this->projectorNode->setPosition(Conversions::Convert(_pose.pos));
-  this->projectorNode->setOrientation(ogreQuaternion);
-  this->projectorFilterNode->setPosition(Conversions::Convert(_pos.rot));
+  this->node->setPosition(ogreVec);
+  this->node->setOrientation(ogreQuaternion);
+  this->filterNode->setPosition(ogreVec);
 
   offsetQuaternion = Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y);
-  this->projectorFilterNode->setOrientation(offsetQuaternion + ogreQuaternion);
+  this->filterNode->setOrientation(offsetQuaternion + ogreQuaternion);
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::SetTextureName(const std::string &_textureName)
+void Projector::ProjectorFrameListener::SetTexture(
+    const std::string &_textureName)
 {
-  this->projectedTextureName = _textureName;
+  this->textureName = _textureName;
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::SetFilterTextureName(const std::string &_textureName)
+void Projector::ProjectorFrameListener::SetFrustumClipDistance(double _near,
+                                                               double _far)
 {
-  this->projectedFilterTextureName = _textureName;
+  this->frustum->setNearClipDistance(_near);
+  this->filterFrustum->setNearClipDistance(_near);
+  this->frustum->setFarClipDistance(_far);
+  this->filterFrustum->setFarClipDistance(_far);
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::SetFrustumClipDistance(double _near, double _far)
+void Projector::ProjectorFrameListener::SetFrustumFOV(double _fov)
 {
-  this->projectorFrustum->setNearClipDistance(_near);
-  this->projectorFilterFrustum->setNearClipDistance(_near);
-  this->projectorFrustum->setFarClipDistance(_far);
-  this->projectorFilterFrustum->setFarClipDistance(_far);
+  this->frustum->setFOVy(Ogre::Radian(_fov));
+  this->filterFrustum->setFOVy(Ogre::Radian(_fov));
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::SetFrustumFOV(double _fov)
-{
-  this->projectorFrustum->setFOVy(Ogre::Radian(_fov));
-  this->projectorFilterFrustum->setFOVy(Ogre::Radian(_fov));
-}
-
-/////////////////////////////////////////////////
-void Projector::Projector::AddPassToAllMaterials()
+void Projector::ProjectorFrameListener::AddPassToAllMaterials()
 {
   std::list<std::string> allMaterials;
 
@@ -379,19 +363,19 @@ void Projector::Projector::AddPassToAllMaterials()
     }
   }
 
-  addProjectorPassToMaterials(allMaterials);
+  this->AddPassToMaterials(allMaterials);
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::AddPassToVisibleMaterials()
+void Projector::ProjectorFrameListener::AddPassToVisibleMaterials()
 {
+  std::list<std::string> newVisibleMaterials;
   Ogre::PlaneBoundedVolumeList volumeList;
-  volumeList.push_back(projectorFrustum->getPlaneBoundedVolume());
+
+  volumeList.push_back(this->frustum->getPlaneBoundedVolume());
 
   this->projectorQuery->setVolumes(volumeList);
-  SceneQueryResult result = this->projectorQuery->execute();
-
-  std::list<std::string> newVisibleMaterials;
+  Ogre::SceneQueryResult result = this->projectorQuery->execute();
 
   // Find all visible materials
   Ogre::SceneQueryResultMovableList::iterator it;
@@ -402,22 +386,24 @@ void Projector::Projector::AddPassToVisibleMaterials()
     {
       for (unsigned int i = 0; i < entity->getNumSubEntities(); i++)
       {
-        // addProjectorPassToMaterial(
-        //   entity->getSubEntity(i)->getMaterialName());
         newVisibleMaterials.push_back(
           entity->getSubEntity(i)->getMaterialName());
       }
     }
   }
 
-  addProjectorPassToMaterials(newVisibleMaterials);
+  this->AddPassToMaterials(newVisibleMaterials);
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::AddPassToMaterials(std::list<std::string> &_matList)
+void Projector::ProjectorFrameListener::AddPassToMaterials(
+    std::list<std::string> &_matList)
 {
   _matList.remove("");
   _matList.unique();
+
+  std::string invisibleMaterial;
+  std::list<std::string>::iterator visibleMaterial;
 
   // Loop through all existing passes, removing those for materials
   //   not in the newlist and skipping pass creation for those in the
@@ -425,15 +411,14 @@ void Projector::Projector::AddPassToMaterials(std::list<std::string> &_matList)
   OgrePassMapIterator used = projectorTargets.begin();
   while (used != projectorTargets.end())
   {
-    std::list<std::string>::iterator visibleMaterial =
-      std::find(_matList.begin(), _matList.end(), used->first);
+    visibleMaterial = std::find(_matList.begin(), _matList.end(), used->first);
 
     // Remove the pass if it applies to a material not in the new list
     if (visibleMaterial == _matList.end())
     {
-      std::string invisibleMaterial = used->first;
+      invisibleMaterial = used->first;
       ++used;
-      removeProjectorPassFromMaterial(invisibleMaterial);
+      this->RemovePassFromMaterial(invisibleMaterial);
     }
     // Otherwise remove it from the list of passes to be added
     else
@@ -443,74 +428,88 @@ void Projector::Projector::AddPassToMaterials(std::list<std::string> &_matList)
     }
   }
 
-  // Add pass for new materials
-  while (!_matList.empty())
+  if (!_matList.empty())
   {
-    addProjectorPassToMaterial(_matList.front());
-    _matList.erase(_matList.begin());
+    // Add pass for new materials
+    while (!_matList.empty())
+    {
+      this->AddPassToMaterial(_matList.front());
+      _matList.erase(_matList.begin());
+    }
+
+    RTShaderSystem::Instance()->UpdateShaders();
   }
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::AddPassToMaterial(const std::string &_matName)
+void Projector::ProjectorFrameListener::AddPassToMaterial(
+    const std::string &_matName)
 {
-  if (projectorTargets.find(_matName) != projectorTargets.end())
+  if (this->projectorTargets.find(_matName) != this->projectorTargets.end())
   {
     gzerr << "Adding a Material [" << _matName << "] that already exists.";
     return;
   }
 
-  Ogre::MaterialPtr mat =
-    (Ogre::MaterialPtr)MaterialManager::getSingleton().getByName(matName);
+  Ogre::MaterialPtr mat = static_cast<Ogre::MaterialPtr>(
+    Ogre::MaterialManager::getSingleton().getByName(_matName));
   Ogre::Pass *pass = mat->getTechnique(0)->createPass();
 
-  if (isUsingShaders)
+  if (this->usingShaders)
   {
-    Ogre::Matrix4 viewProj = projectorFrustum->getProjectionMatrix()
-      * projectorFrustum->getViewMatrix();
-    pass->setVertexProgram("GazeboWorlds/TexProjectionVP");
+    Ogre::Matrix4 viewProj = this->frustum->getProjectionMatrix() *
+                             this->frustum->getViewMatrix();
+
+    pass->setVertexProgram("Gazebo/TextureProjectionVP");
 
     // pass->setFragmentProgram("GazeboWorlds/TexProjectionFP");
     Ogre::GpuProgramParametersSharedPtr vsParams =
       pass->getVertexProgramParameters();
+
     Ogre::GpuProgramParametersSharedPtr psParams =
       pass->getFragmentProgramParameters();
+
     // vsParams->setNamedAutoConstant(
     //   "worldViewProjMatrix",
     //   GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
     // vsParams->setNamedAutoConstant(
     //   "worldMatrix",GpuProgramParameters::ACT_WORLD_MATRIX);
     // vsParams->setNamedConstant("texViewProjMatrix", viewProj);
+    
     vsParams->setNamedAutoConstant(
-      "worldMatrix", GpuProgramParameters::ACT_WORLD_MATRIX);
+      "worldMatrix", Ogre::GpuProgramParameters::ACT_WORLD_MATRIX);
+
     vsParams->setNamedConstant("texProjMatrix", viewProj);
+
     // psParams->setNamedConstant("projMap", viewProj);
+
     pass->setVertexProgramParameters(vsParams);
+
     // pass->setFragmentProgramParameters(psParams);
   }
-
-  Ogre::TextureUnitState *texState =
-    pass->createTextureUnitState(projectedTextureName);
-  texState->setProjectiveTexturing(true, projectorFrustum);
-  texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_BORDER);
-  texState->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
-  texState->setTextureBorderColour(Ogre::ColourValue(0.0, 0.0, 0.0, 0.0));
-  texState->setColourOperation(Ogre::LBO_ALPHA_BLEND);
-
-  texState = pass->createTextureUnitState(projectedFilterTextureName);
-  texState->setProjectiveTexturing(true, projectorFilterFrustum);
-  texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
-  texState->setTextureFiltering(Ogre::TFO_NONE);
 
   pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   pass->setDepthBias(1);
   pass->setLightingEnabled(false);
 
-  this->projectorTargets[ matName ] = pass;
+  Ogre::TextureUnitState *texState =
+    pass->createTextureUnitState(this->textureName);
+  texState->setProjectiveTexturing(true, this->frustum);
+  texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_BORDER);
+  texState->setTextureFiltering(Ogre::TFO_ANISOTROPIC);
+  texState->setTextureBorderColour(Ogre::ColourValue(0.0, 0.0, 0.0, 0.0));
+  texState->setColourOperation(Ogre::LBO_ALPHA_BLEND);
+
+  texState = pass->createTextureUnitState("projection_filter.png");
+  texState->setProjectiveTexturing(true, this->filterFrustum);
+  texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+  texState->setTextureFiltering(Ogre::TFO_NONE);
+
+  this->projectorTargets[_matName] = pass;
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::RemovePassFromMaterials()
+void Projector::ProjectorFrameListener::RemovePassFromMaterials()
 {
   for (OgrePassMap::const_iterator it = this->projectorTargets.begin();
       it != this->projectorTargets.end(); ++it)
@@ -521,7 +520,7 @@ void Projector::Projector::RemovePassFromMaterials()
 }
 
 /////////////////////////////////////////////////
-void Projector::Projector::RemovePassFromMaterial(const std::string &_matName)
+void Projector::ProjectorFrameListener::RemovePassFromMaterial(const std::string &_matName)
 {
   this->projectorTargets[_matName]->getParent()->removePass(
     this->projectorTargets[_matName]->getIndex());

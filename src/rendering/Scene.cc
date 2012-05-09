@@ -23,6 +23,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
+#include "rendering/Projector.hh"
 #include "rendering/Heightmap.hh"
 #include "rendering/RenderEvents.hh"
 #include "rendering/LaserVisual.hh"
@@ -256,8 +257,14 @@ void Scene::Init()
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 
-  /* TODO: Add GUI option to view all contacts
-  ContactVisualPtr contactVis(new ContactVisual(
+  /*this->projector = new Projector(this->worldVisual);
+  this->projector->Load(math::Pose(0, 0 , 2, 0, 0, 0),
+      "stereo_projection_pattern_high_res.png");
+  this->projector->Toggle();
+  */
+
+  // TODO: Add GUI option to view all contacts
+  /*ContactVisualPtr contactVis(new ContactVisual(
         "_GUIONLY_world_contact_vis",
         this->worldVisual, "~/physics/contacts"));
   this->visuals[contactVis->GetName()] = contactVis;
@@ -1384,7 +1391,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     RFIDTagVisualPtr rfidVis(new RFIDTagVisual(
           _msg->name() + "_GUIONLY_rfidtag_vis", parentVis, _msg->topic()));
 
-    std::cout << "rfid vis message recieved" << std::endl;
     this->visuals[rfidVis->GetName()] = rfidVis;
   }
   else if (_msg->type() == "rfid" && _msg->visualize() &&
@@ -1414,6 +1420,14 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
   comVis->Load(_msg);
   comVis->SetVisible(false);
   this->visuals[comVis->GetName()] = comVis;
+
+  for (int i = 0; i < _msg->projector_size(); ++i)
+  {
+    Projector *projector = new Projector(linkVis);
+    projector->Load(_msg->projector(i));
+    projector->Toggle();
+    this->projectors.push_back(projector);
+  }
 
   return true;
 }

@@ -42,6 +42,8 @@
 #include <OGRE/OgreCamera.h>
 #include <OGRE/OgreNode.h>
 #include <OGRE/OgreSimpleRenderable.h>
+#include <OGRE/OgreFrameListener.h>
+#include <OGRE/OgreTexture.h>
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <RTShaderSystem/OgreRTShaderSystem.h>

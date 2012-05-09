@@ -629,6 +629,19 @@ void Link::FillLinkMsg(msgs::Link &_msg)
       visualElem = visualElem->GetNextElement("visual");
     }
   }
+
+  if (this->sdf->HasElement("projector"))
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("projector");
+
+    msgs::Projector *proj = _msg.add_projector();
+    proj->set_name(this->GetScopedName() + "::" + elem->GetValueString("name"));
+    proj->set_texture(elem->GetValueString("texture"));
+    proj->set_fov(elem->GetValueDouble("fov"));
+    proj->set_near_clip(elem->GetValueDouble("near_clip"));
+    proj->set_far_clip(elem->GetValueDouble("far_clip"));
+    msgs::Set(proj->mutable_pose(), elem->GetValuePose("pose"));
+  }
 }
 
 //////////////////////////////////////////////////

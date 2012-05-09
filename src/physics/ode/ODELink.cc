@@ -74,8 +74,8 @@ void ODELink::Init()
     // Only use auto disable if no joints are present
     if (this->GetModel()->GetJointCount() == 0)
     {
-      // dBodySetAutoDisableDefaults(this->linkId);
-      // dBodySetAutoDisableFlag(this->linkId, 0);
+      dBodySetAutoDisableDefaults(this->linkId);
+      dBodySetAutoDisableFlag(this->linkId, 0);
     }
   }
 

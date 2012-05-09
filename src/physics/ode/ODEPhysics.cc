@@ -184,7 +184,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableTime(this->worldId, 2);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableSteps(this->worldId, 50);
+  dWorldSetAutoDisableSteps(this->worldId, 20);
 
   math::Vector3 g = this->sdf->GetOrCreateElement(
       "gravity")->GetValueVector3("xyz");

@@ -26,6 +26,13 @@
 #ifndef __PROJECTOR_HH__
 #define __PROJECTOR_HH__
 
+#include <string>
+
+#include "sdf/sdf.h"
+#include "rendering/ogre.h"
+
+#include "rendering/RenderTypes.hh"
+
 namespace gazebo
 {
   namespace rendering
@@ -34,27 +41,87 @@ namespace gazebo
     class Projector
     {
       /// \brief Constructor
-      public: Projector();
+      public: Projector(VisualPtr _parent);
 
       /// \brief Destructor
       public: ~Projector();
 
-      /// \brief Load the plugin
-      /// \param take in SDF root element
+      /// \brief Load from an sdf pointer
       public: void Load(sdf::ElementPtr _sdf);
+             
+      /// \brief Load from a message 
+      public: void Load(const msgs::Projector &_msg);
+
+      public: void Load(const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
+                     const std::string &_textureName = "",
+                     double _nearClip = 0.25,
+                     double _farClip = 15.0,
+                     double _fov = M_PI * 0.25);
 
       /// \brief Load a texture into the projector
-      public: void LoadImage(const std::string &_textureName);
+      public: void SetTexture(const std::string &_textureName);
 
       /// \brief Toggle the activation of the projector
-      public: void ToggleProjector(bool _projectorOn);
+      public: void Toggle();
 
-      private: double fov;
-      private: double nearClip, farClip;
+      private: VisualPtr visual;
 
-      private: class Projector : public Ogre::FrameListener
+      private: class ProjectorFrameListener : public Ogre::FrameListener
                {
+                 public: ProjectorFrameListener();
+                 public: virtual ~ProjectorFrameListener();
+                 public: void Init(VisualPtr _visual,
+                                   const std::string &_textureName,
+                                   double _near = 0.5,
+                                   double _far = 10,
+                                   double _fov = 0.785398163);
+
+                 public: bool frameStarted(const Ogre::FrameEvent &_evt);
+
+                 public: void SetTexture(const std::string &_textureName);
+
+                 public: void SetEnabled(bool _enabled);
+                 public: void SetUsingShaders(bool _usingShaders);
+
+                 public: void SetPose(const math::Pose &_pose);
+
+                 private: void SetSceneNode();
+
+                 private: void SetFrustumClipDistance(double _near,
+                                                      double _far);
+                 private: void SetFrustumFOV(double _fov);
+                 private: void AddPassToAllMaterials();
+                 private: void AddPassToVisibleMaterials();
+                 private: void AddPassToMaterials(
+                              std::list<std::string> &_matList);
+                 private: void AddPassToMaterial(const std::string &_matName);
+                 private: void RemovePassFromMaterials();
+                 private: void RemovePassFromMaterial(
+                              const std::string &_matName);
+
+                 public: bool enabled;
+                 public:  bool initialized;
+                 private: bool usingShaders;
+
+                 private: std::string nodeName;
+                 private: std::string filterNodeName;
+
+                 private: std::string textureName;
+
+                 private: Ogre::Frustum *frustum;
+                 private: Ogre::Frustum *filterFrustum;
+                 private: Ogre::PlaneBoundedVolumeListSceneQuery *projectorQuery;
+
+                 private: VisualPtr visual;
+
+                 private: Ogre::SceneNode *node;
+                 private: Ogre::SceneNode *filterNode;
+                 private: Ogre::SceneManager *sceneMgr;
+                 private: std::map<std::string, Ogre::Pass*> projectorTargets;
+
                };
+
+      private: ProjectorFrameListener projector;
     };
   }
 }
