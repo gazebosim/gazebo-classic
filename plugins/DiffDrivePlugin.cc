@@ -119,9 +119,6 @@ void DiffDrivePlugin::OnUpdate()
   double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
   double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
-  leftVelDesired = 0.2;
-  rightVelDesired = 0.2;
-
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
 
