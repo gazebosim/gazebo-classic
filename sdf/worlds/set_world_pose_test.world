@@ -17,6 +17,7 @@
 
     <include filename="ground_plane.model"/>
 
+    <!-- 25.3kg total mass -->
     <model name="test_model">
       <origin pose="0 0 0.7 0 0 0"/>
       <link name="link">
@@ -272,7 +273,9 @@
         <parent link="link"/>
         <child link="wheel_3"/>
         <origin pose="0 0 0 0 0 0"/>
-        <axis xyz="0 1 0"/>
+        <axis xyz="0 1 0">
+          <dynamics damping="0.01" friction="0.0"/>
+        </axis>
       </joint>
 
       <link name="wheel_4">
@@ -305,7 +308,9 @@
         <parent link="link"/>
         <child link="wheel_4"/>
         <origin pose="0 0 0 0 0 0"/>
-        <axis xyz="0 1 0"/>
+        <axis xyz="0 1 0">
+          <dynamics damping="0.01" friction="0.0"/>
+        </axis>
       </joint>
 
       <link name="sphere_link">
@@ -377,18 +382,18 @@
         <steer>bar_2_joint</steer>
         <steer_pid>10 0.1 0.5</steer_pid>
         <steer_ilim>-10 10</steer_ilim>
-        <steer_pos>0</steer_pos> <!-- steer -->
+        <steer_pos>0.5</steer_pos> <!-- steer -->
         <steer_vel>0</steer_vel> <!-- not used -->
         <steer_eff>100.0</steer_eff> <!-- max pos pid effort -->
         <right>wheel_3_joint</right>
-        <right_pid>0.3 0.0 0.01</right_pid>
-        <right_ilim>-0 0</right_ilim>
+        <right_pid>0.1 0.0 0.001</right_pid>
+        <right_ilim>-.1 .1</right_ilim>
         <right_pos>0</right_pos> <!-- final position pid -->
         <right_vel>0</right_vel> <!-- final velocity pid -->
         <right_eff>0.1</right_eff> <!-- drive torque -->
         <left>wheel_4_joint</left>
-        <left_pid>0.3 0.0 0.01</left_pid>
-        <left_ilim>-0 0</left_ilim>
+        <left_pid>0.1 0.0 0.001</left_pid>
+        <left_ilim>-.1 .1</left_ilim>
         <left_pos>0</left_pos> <!-- final position pid -->
         <left_vel>0</left_vel> <!-- final velocity pid -->
         <left_eff>0.1</left_eff> <!-- drive torque -->

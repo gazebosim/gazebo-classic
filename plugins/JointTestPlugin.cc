@@ -140,7 +140,7 @@ void JointTestPlugin::OnUpdate()
     effort_cmd = effort_cmd > max_cmd ? max_cmd :
       (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
     this->joints[i]->SetForce(0, effort_cmd);
-    gzdbg << "steer [" << pos_curr << "] [" << pos_target << "]\n";
+    gzdbg << "steer [" << pos_curr << "] [" << pos_target << "]";
   }
 
   for (int i = 1; i < NUM_JOINTS; i++)
@@ -178,14 +178,15 @@ void JointTestPlugin::OnUpdate()
       eff = this->jointPIDs[i].Update(pos_err, stepTime);
       eff = eff > max_cmd ? max_cmd :
         (eff < -max_cmd ? -max_cmd : eff);
-      gzdbg << "wheel pos [" << pos_curr << "] tar [" << pos_target << "]\n";
+      //gzdbg << "wheel pos [" << pos_curr << "] tar [" << pos_target << "]\n";
     }
 
-    gzdbg << "wheel pos ["
+    gzdbg << " wheel pos ["
           << this->joints[i]->GetAngle(0).GetAsRadian()
           << "] vel ["
           << this->joints[i]->GetVelocity(0)
-          << "] effort [" << eff << "]\n";
+          << "] effort [" << eff << "]";
     this->joints[i]->SetForce(0, eff);
   }
+  gzdbg << "\n";
 }
