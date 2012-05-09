@@ -62,7 +62,6 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           continue;
         
         collision->SetContactsEnabled(true);
-        std::cout << "Collision[" << collision->GetScopedName() << "]\n";
         this->connections.push_back(collision->ConnectContact(
               boost::bind(&GripperPlugin::OnContact, this, _1, _2)));
         this->collisions[collision->GetScopedName()] = collision;

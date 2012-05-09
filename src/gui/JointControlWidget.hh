@@ -37,13 +37,16 @@ namespace gazebo
       public: virtual ~JointControlWidget();
 
       public: void Load(const std::string &_modelName);
-      private slots: void OnChanged(double _value, const std::string &_name);
+      private slots: void OnForceChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnPIDChanged(double _value, const std::string &_name);
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr jointPub;
 
       private: msgs::Request *requestMsg;
       private: std::map<std::string, JointForceControl*> sliders;
+      private: std::map<std::string, JointPIDControl*> pidSliders;
     };
 
     class JointForceControl : public QWidget

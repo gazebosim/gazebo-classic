@@ -30,10 +30,11 @@ JointForceControl::JointForceControl(const std::string &_name, QWidget *_parent)
   QDoubleSpinBox *forceSpin = new QDoubleSpinBox;
   forceSpin->setRange(-100.0, 100.0);
   forceSpin->setSingleStep(0.001);
+  forceSpin->setDecimals(3);
   forceSpin->setValue(0.000);
 
   mainLayout->addWidget(new QLabel(tr(_name.c_str())), 0);
-  mainLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,
+  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum));
   mainLayout->addWidget(forceSpin, 0);
   mainLayout->addWidget(new QLabel("N-m", this),0);
@@ -58,10 +59,11 @@ JointPIDControl::JointPIDControl(const std::string &_name, QWidget *_parent)
   QDoubleSpinBox *posSpin = new QDoubleSpinBox;
   posSpin->setRange(-3.1415, 3.1415);
   posSpin->setSingleStep(0.001);
+  posSpin->setDecimals(3);
   posSpin->setValue(0.000);
 
   mainLayout->addWidget(new QLabel(tr(_name.c_str())), 0);
-  mainLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,
+  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum));
   mainLayout->addWidget(posSpin, 0);
   mainLayout->addWidget(new QLabel("radians", this), 0);
@@ -97,9 +99,8 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   modelMsg.ParseFromString(response.serialized_data());
 
 
+  // Create the Force control scroll area
   QScrollArea *scrollArea = new QScrollArea;
-  QScrollArea *pidScrollArea = new QScrollArea;
-
   QFrame *frame = new QFrame;
   frame->setLineWidth(0);
   frame->setFrameShadow(QFrame::Sunken);
@@ -113,7 +114,7 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
     this->sliders[jointName] = slider;
     vLayout->addWidget(slider);
     connect(slider, SIGNAL(changed(double, const std::string &)),
-            this, SLOT(OnChanged(double, const std::string &)));
+            this, SLOT(OnForceChanged(double, const std::string &)));
   }
 
   frame->setLayout(vLayout);
@@ -122,6 +123,30 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   scrollArea->setWidget(frame);
   scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+
+  // Create a PID scroll area
+  QScrollArea *pidScrollArea = new QScrollArea;
+  QFrame *pidFrame = new QFrame;
+  pidFrame->setLineWidth(0);
+  pidFrame->setFrameShadow(QFrame::Sunken);
+  pidFrame->setFrameShape(QFrame::Box);
+  QVBoxLayout *vPIDLayout = new QVBoxLayout;
+  for (int i = 0; i < modelMsg.joint_size(); ++i)
+  {
+    std::string jointName = modelMsg.joint(i).name();
+    JointPIDControl *slider = new JointPIDControl(jointName, this);
+    this->pidSliders[jointName] = slider;
+    vPIDLayout->addWidget(slider);
+    connect(slider, SIGNAL(changed(double, const std::string &)),
+            this, SLOT(OnPIDChanged(double, const std::string &)));
+  }
+  pidFrame->setLayout(vPIDLayout);
+  pidFrame->layout()->setContentsMargins(4, 0, 0, 0);
+  pidFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  pidScrollArea->setWidget(pidFrame);
+  pidScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  pidScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   QTabWidget *tabWidget = new QTabWidget;
   tabWidget->addTab(scrollArea, tr("Force"));
@@ -132,6 +157,7 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   // mainLayout->addWidget(new QLabel(tr(title.c_str())));
   //mainLayout->addWidget(scrollArea);
 
+  // Add the the force and pid scroll areas to the tab
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(tabWidget);  
   mainLayout->setContentsMargins(4, 4, 4, 4);
@@ -146,7 +172,7 @@ JointControlWidget::~JointControlWidget()
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::OnChanged(double _value, const std::string &_name)
+void JointControlWidget::OnForceChanged(double _value, const std::string &_name)
 {
   std::map<std::string, JointForceControl*>::iterator iter;
   iter = this->sliders.find(_name);
@@ -155,6 +181,20 @@ void JointControlWidget::OnChanged(double _value, const std::string &_name)
     msgs::JointCmd msg;
     msg.set_name(_name);
     msg.set_force(_value);
+    this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnPIDChanged(double _value, const std::string &_name)
+{
+  std::map<std::string, JointForceControl*>::iterator iter;
+  iter = this->sliders.find(_name);
+  if (iter != this->sliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.set_position(_value);
     this->jointPub->Publish(msg);
   }
 }

@@ -110,34 +110,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
     mass = this->shape->GetMass(this->sdf->HasElement("density"));
 
   this->shape->GetInertial(mass, this->inertial);
-
-  // Calculate the inertial properties for the shape
-  /*if (this->shape->GetType() == Base::BOX_SHAPE)
-  {
-    this->inertial->SetBoxMass(mass,
-        boost::shared_static_cast<BoxShape>(this->shape)->GetSize());
-  }
-  else if (this->shape->GetType() == Base::SPHERE_SHAPE)
-  {
-    this->inertial->SetSphereMass(mass,
-        boost::shared_static_cast<SphereShape>(this->shape)->GetRadius());
-  }
-  else if (this->shape->GetType() == Base::CYLINDER_SHAPE)
-  {
-    CylinderShapePtr cylShape =
-      boost::shared_static_cast<CylinderShape>(this->shape);
-    this->inertial->SetCylinderMass(mass, cylShape->GetRadius(),
-        cylShape->GetLength() );
-  }
-  else if (this->shape->GetType() == Base::TRIMESH_SHAPE)
-  {
-    this->inertial->SetMeshMass(mass, "filename");
-  }
-  else
-    gzerr << "Unable to set inertial for shape["
-      << this->shape->GetType() << "]\n";
-      */
-  std::cout << "Collision Mass[" << mass << "] In[" << *this->inertial << "]\n";
 }
 
 //////////////////////////////////////////////////
