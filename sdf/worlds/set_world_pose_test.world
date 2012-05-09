@@ -274,7 +274,7 @@
         <child link="wheel_3"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 1 0">
-          <dynamics damping="0.01" friction="0.0"/>
+          <dynamics damping="0.0" friction="0.0"/>
         </axis>
       </joint>
 
@@ -309,7 +309,7 @@
         <child link="wheel_4"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 1 0">
-          <dynamics damping="0.01" friction="0.0"/>
+          <dynamics damping="0.0" friction="0.0"/>
         </axis>
       </joint>
 
@@ -382,7 +382,7 @@
         <steer>bar_2_joint</steer>
         <steer_pid>10 0.1 0.5</steer_pid>
         <steer_ilim>-10 10</steer_ilim>
-        <steer_pos>0.5</steer_pos> <!-- steer -->
+        <steer_pos>0.0</steer_pos> <!-- steer -->
         <steer_vel>0</steer_vel> <!-- not used -->
         <steer_eff>100.0</steer_eff> <!-- max pos pid effort -->
         <right>wheel_3_joint</right>
