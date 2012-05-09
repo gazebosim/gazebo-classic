@@ -11,6 +11,7 @@ set (models
   saucepan.model
   female_standing.model
   cylinder.model
+  cube_20k.model
   ground_plane.model
   youbot.model
   youbot_static.model
