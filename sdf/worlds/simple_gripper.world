@@ -16,9 +16,10 @@
     <!-- A global light source -->
     <include filename="sun.light"/>
 
-    <include filename="simple_gripper.model"/>
+    <!--<include filename="simple_gripper.model"/>-->
+    <include filename="simple_arm.model"/>
 
-    <model name="cylinder">
+    <!--<model name="cylinder">
       <origin pose="0.25 0 0.2 0 0 0"/>
       <link name="link" gravity="true">
         <inertial mass="0.1"/>
@@ -43,5 +44,6 @@
         </visual>
       </link>
     </model>
+    -->
   </world>
 </gazebo>
