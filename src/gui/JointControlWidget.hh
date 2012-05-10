@@ -28,7 +28,8 @@ namespace gazebo
   namespace gui
   {
     class JointForceControl;
-    class JointPIDControl;
+    class JointPIDPosControl;
+    class JointPIDVelControl;
     class JointControlWidget : public QWidget
     {
       Q_OBJECT
@@ -39,22 +40,34 @@ namespace gazebo
       public: void Load(const std::string &_modelName);
       private slots: void OnForceChanged(double _value,
                                          const std::string &_name);
-      private slots: void OnPIDChanged(double _value, const std::string &_name);
+      private slots: void OnPIDPosChanged(double _value,
+          const std::string &_name);
 
-      private slots: void OnPGainChanged(double _value,
+      private slots: void OnPPosGainChanged(double _value,
                                          const std::string &_name);
-      private slots: void OnDGainChanged(double _value,
+      private slots: void OnDPosGainChanged(double _value,
                                          const std::string &_name);
-      private slots: void OnIGainChanged(double _value,
+      private slots: void OnIPosGainChanged(double _value,
                                          const std::string &_name);
 
-      private slots: void OnPIDUnitsChanged(int _index);
+      private slots: void OnPIDVelChanged(double _value,
+          const std::string &_name);
+
+      private slots: void OnPVelGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnDVelGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnIVelGainChanged(double _value,
+                                         const std::string &_name);
+
+      private slots: void OnPIDPosUnitsChanged(int _index);
       private: transport::NodePtr node;
       private: transport::PublisherPtr jointPub;
 
       private: msgs::Request *requestMsg;
       private: std::map<std::string, JointForceControl*> sliders;
-      private: std::map<std::string, JointPIDControl*> pidSliders;
+      private: std::map<std::string, JointPIDPosControl*> pidPosSliders;
+      private: std::map<std::string, JointPIDVelControl*> pidVelSliders;
     };
 
     class JointForceControl : public QWidget
@@ -67,10 +80,10 @@ namespace gazebo
       private: std::string name;
     };
 
-    class JointPIDControl : public QWidget
+    class JointPIDPosControl : public QWidget
     {
       Q_OBJECT
-      public: JointPIDControl(const std::string &_name,
+      public: JointPIDPosControl(const std::string &_name,
                   QGridLayout *_layout, QWidget *_parent);
 
       public: void SetToRadians();
@@ -89,6 +102,25 @@ namespace gazebo
       private: QDoubleSpinBox *posSpin;
       private: std::string name;
       private: bool radians;
+    };
+
+    class JointPIDVelControl : public QWidget
+    {
+      Q_OBJECT
+      public: JointPIDVelControl(const std::string &_name,
+                  QGridLayout *_layout, QWidget *_parent);
+
+      public slots: void OnChanged(double _value);
+      public slots: void OnPChanged(double _value);
+      public slots: void OnIChanged(double _value);
+      public slots: void OnDChanged(double _value);
+
+      Q_SIGNALS: void changed(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void pChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void dChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void iChanged(double /*_value*/, const std::string &/*_name*/);
+
+      private: std::string name;
     };
   }
 }

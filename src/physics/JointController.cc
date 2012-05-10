@@ -42,12 +42,25 @@ JointController::JointController(ModelPtr _model)
 void JointController::AddJoint(JointPtr _joint)
 {
   this->joints[_joint->GetName()] = _joint;
-  this->pids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
+  this->posPids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
+  this->velPids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
+}
+
+/////////////////////////////////////////////////
+void JointController::Reset()
+{
+  this->positions.clear();
+  this->velocities.clear();
+  this->forces.clear();
 }
 
 /////////////////////////////////////////////////
 void JointController::Update()
 {
+  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time stepTime = currTime - this->prevUpdateTime;
+  this->prevUpdateTime = currTime;
+
   if (this->forces.size() > 0)
   {
     std::map<std::string, double>::iterator iter;
@@ -58,15 +71,27 @@ void JointController::Update()
   if (this->positions.size() > 0)
   {
     double cmd;
-    common::Time currTime = this->model->GetWorld()->GetSimTime();
-    common::Time stepTime = currTime - this->prevUpdateTime;
-    this->prevUpdateTime = currTime;
     std::map<std::string, double>::iterator iter;
 
     for (iter = this->positions.begin(); iter != this->positions.end(); ++iter)
     {
-      cmd = this->pids[iter->first].Update(
+      cmd = this->posPids[iter->first].Update(
           this->joints[iter->first]->GetAngle(0).GetAsRadian() - iter->second,
+          stepTime);
+      this->joints[iter->first]->SetForce(0, cmd);
+    }
+  }
+
+  if (this->velocities.size() > 0)
+  {
+    double cmd;
+    std::map<std::string, double>::iterator iter;
+
+    for (iter = this->velocities.begin();
+         iter != this->velocities.end(); ++iter)
+    {
+      cmd = this->velPids[iter->first].Update(
+          this->joints[iter->first]->GetVelocity(0) - iter->second,
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
@@ -97,22 +122,39 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
     if (_msg->has_force())
       this->forces[_msg->name()] = _msg->force();
 
-    if (_msg->has_position())
-      this->positions[_msg->name()] = _msg->position();
 
-    if (_msg->has_pid())
+    if (_msg->has_position())
     {
-      if (_msg->pid().has_p_gain())
-        this->pids[_msg->name()].SetPGain(_msg->pid().p_gain());
-      if (_msg->pid().has_i_gain())
-        this->pids[_msg->name()].SetIGain(_msg->pid().i_gain());
-      if (_msg->pid().has_d_gain())
-        this->pids[_msg->name()].SetDGain(_msg->pid().d_gain());
-      if (_msg->pid().has_i_max())
-        this->pids[_msg->name()].SetIMax(_msg->pid().i_max());
-      if (_msg->pid().has_i_min())
-        this->pids[_msg->name()].SetIMax(_msg->pid().i_min());
+      if (_msg->position().has_target())
+        this->positions[_msg->name()] = _msg->position().target();
+      if (_msg->position().has_p_gain())
+        this->posPids[_msg->name()].SetPGain(_msg->position().p_gain());
+      if (_msg->position().has_i_gain())
+        this->posPids[_msg->name()].SetIGain(_msg->position().i_gain());
+      if (_msg->position().has_d_gain())
+        this->posPids[_msg->name()].SetDGain(_msg->position().d_gain());
+      if (_msg->position().has_i_max())
+        this->posPids[_msg->name()].SetIMax(_msg->position().i_max());
+      if (_msg->position().has_i_min())
+        this->posPids[_msg->name()].SetIMax(_msg->position().i_min());
     }
+
+    if (_msg->has_velocity())
+    {
+      if (_msg->velocity().has_target())
+        this->velocities[_msg->name()] = _msg->velocity().target();
+      if (_msg->velocity().has_p_gain())
+        this->velPids[_msg->name()].SetPGain(_msg->velocity().p_gain());
+      if (_msg->velocity().has_i_gain())
+        this->velPids[_msg->name()].SetIGain(_msg->velocity().i_gain());
+      if (_msg->velocity().has_d_gain())
+        this->velPids[_msg->name()].SetDGain(_msg->velocity().d_gain());
+      if (_msg->velocity().has_i_max())
+        this->velPids[_msg->name()].SetIMax(_msg->velocity().i_max());
+      if (_msg->velocity().has_i_min())
+        this->velPids[_msg->name()].SetIMax(_msg->velocity().i_min());
+    }
+
   }
   else
     gzerr << "Unable to find joint[" << _msg->name() << "]\n";

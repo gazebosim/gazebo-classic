@@ -37,6 +37,9 @@ namespace gazebo
       public: void AddJoint(JointPtr _joint);
       public: void Update();
 
+      /// \brief Reset all commands
+      public: void Reset();
+
       /// \brief Set the position of a joint
       public: void SetJointPosition(const std::string &_name, double _position);
 
@@ -72,10 +75,12 @@ namespace gazebo
 
       private: ModelPtr model;
       private: std::map<std::string, JointPtr> joints;
-      private: std::map<std::string, common::PID> pids;
+      private: std::map<std::string, common::PID> posPids;
+      private: std::map<std::string, common::PID> velPids;
 
       private: std::map<std::string, double> forces;
       private: std::map<std::string, double> positions;
+      private: std::map<std::string, double> velocities;
 
       private: transport::NodePtr node;
       private: transport::SubscriberPtr jointCmdSub;
