@@ -41,6 +41,10 @@ namespace gazebo
     class MultiRayShape;
     class Inertial;
     class SurfaceParams;
+    class BoxShape;
+    class CylinderShape;
+    class SphereShape;
+    class MeshShape;
 
     typedef boost::shared_ptr<Base> BasePtr;
     typedef boost::shared_ptr<Contact> ContactPtr;
@@ -57,6 +61,11 @@ namespace gazebo
     typedef boost::shared_ptr<MultiRayShape> MultiRayShapePtr;
     typedef boost::shared_ptr<Inertial> InertialPtr;
     typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;
+
+    typedef boost::shared_ptr<BoxShape> BoxShapePtr;
+    typedef boost::shared_ptr<CylinderShape> CylinderShapePtr;
+    typedef boost::shared_ptr<SphereShape> SphereShapePtr;
+    typedef boost::shared_ptr<MeshShape> MeshShapePtr;
 
     typedef std::vector<BasePtr> Base_V;
     typedef std::vector<ModelPtr> Model_V;

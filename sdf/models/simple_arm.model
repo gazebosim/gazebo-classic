@@ -22,7 +22,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_base_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_base_geom_visual'>
         <origin pose='0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='1.000000 1.000000 0.100000'/>
@@ -44,7 +44,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_base_geom_arm_trunk_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_base_geom_arm_trunk_visual'>
         <origin pose='0.000000 0.000000 0.600000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.050000' length='1.000000'/>
@@ -73,7 +73,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_shoulder_pan_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_shoulder_pan_geom_visual'>
         <origin pose='0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.050000' length='0.100000'/>
@@ -95,7 +95,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_shoulder_pan_geom_arm_shoulder_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_shoulder_pan_geom_arm_shoulder_visual'>
         <origin pose='0.550000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='1.000000 0.050000 0.100000'/>
@@ -124,7 +124,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_elbow_pan_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_elbow_pan_geom_visual'>
         <origin pose='0.000000 0.000000 0.100000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.050000' length='0.200000'/>
@@ -146,7 +146,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_elbow_pan_geom_arm_elbow_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_elbow_pan_geom_arm_elbow_visual'>
         <origin pose='0.300000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.500000 0.030000 0.100000'/>
@@ -168,7 +168,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_elbow_pan_geom_arm_wrist_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_elbow_pan_geom_arm_wrist_visual'>
         <origin pose='0.550000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.050000' length='0.300000'/>
@@ -197,7 +197,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_wrist_lift_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_wrist_lift_geom_visual'>
         <origin pose='0.000000 0.000000 0.500000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.030000' length='1.000000'/>
@@ -226,7 +226,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_wrist_roll_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_wrist_roll_geom_visual'>
         <origin pose='0.000000 0.000000 0.025000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <cylinder radius='0.050000' length='0.050000'/>

@@ -1,6 +1,7 @@
 <!-- Visual -->
 <element name="visual" required="*">
   <attribute name="name" type="string" default="__default__" required="1"/>
+
   <attribute name="cast_shadows" type="bool" default="true" required="0"/>
   <attribute name="laser_retro" type="double" default="0.0" required="0"/>
   <attribute name="transparency" type="double" default="0.0" required="0"/>

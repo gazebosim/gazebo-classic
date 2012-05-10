@@ -16,7 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include "physics/physics.h"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 #include "common/CommonTypes.hh"
 #include "common/Animation.hh"

@@ -20,7 +20,7 @@
 #include "common/common.h"
 #include "physics/physics.h"
 #include "transport/TransportTypes.hh"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 #define NUM_JOINTS 5
 namespace gazebo

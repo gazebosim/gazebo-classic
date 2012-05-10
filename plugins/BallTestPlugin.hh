@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
-#ifndef GAZEBO_HH
-#define GAZEBO_HH
+*/
+#ifndef __GAZEBO_BALL_TEST_PLUGIN_HH__
+#define __GAZEBO_BALL_TEST_PLUGIN_HH__
 
-#include <string>
+#include "common/common.h"
+#include "physics/physics.h"
+#include "gazebo.hh"
 
 namespace gazebo
 {
-  void print_version();
-  void add_plugin(const std::string &_filename);
+  class BallTestPlugin : public WorldPlugin
+  {
+    public: BallTestPlugin();
+    public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+    public: virtual void Init();
 
-  bool load();
-  bool init();
-  void run();
-  void stop();
-  void fini();
+    private: void OnUpdate();
+    private: event::ConnectionPtr updateConnection;
+
+    private: int index;
+    private: physics::WorldPtr world;
+  };
 }
-
 #endif

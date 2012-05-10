@@ -11,7 +11,7 @@ message HeightmapGeom
 {
   required string filename  = 1;
   optional Vector3d size    = 2;
-  optional Vector3d offset  = 3;
+  optional Vector3d origin  = 3;
 }
 
 /// \endverbatim

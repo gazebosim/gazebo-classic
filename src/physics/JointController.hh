@@ -14,11 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef JOINTCONTROLLER_HH
-#define JOINTCONTROLLER_HH
+#ifndef __JOINTCONTROLLER_HH__
+#define __JOINTCONTROLLER_HH__
 
 #include <map>
 #include <string>
+#include <vector>
+
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "msgs/msgs.h"
@@ -33,11 +35,43 @@ namespace gazebo
       public: void AddJoint(JointPtr _joint);
       public: void Update();
 
+      /// \brief Set the position of a joint
+      public: void SetJointPosition(const std::string &_name, double _position);
+
+      /// \brief Set the positions of a set of joints
+      public: void SetJointPositions(
+                  const std::map<std::string, double> &_jointPositions);
+
       private: void OnJointCmd(ConstJointCmdPtr &_msg);
+
+      private: void SetJointPosition(JointPtr _joint, double _position);
+
+      /// \brief Helper for SetJointPositions
+      private: void RotateBodyAndChildren(LinkPtr _link1,
+                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
+                   double _dangle, bool _updateChildren);
+
+      /// \brief Helper for SetJointPositions
+      private: void SlideBodyAndChildren(LinkPtr _link1,
+                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
+                   double _dposition, bool _updateChildren);
+
+      /// \brief Helper for SetJointPositions
+      private: void GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
+                                         const LinkPtr &_body);
+
+      /// \brief Helper for SetJointPositions
+      private: void GetAllParentBodies(std::vector<LinkPtr> &_bodies,
+                   const LinkPtr &_body, const LinkPtr &_origParentBody);
+
+      /// \brief Helper for SetJointPositions
+      private: bool InBodies(const LinkPtr &_body,
+                             const std::vector<LinkPtr> &_bodies);
 
       private: ModelPtr model;
       private: std::map<std::string, JointPtr> joints;
       private: std::map<std::string, double> forces;
+      private: std::map<std::string, double> positions;
       private: transport::NodePtr node;
       private: transport::SubscriberPtr jointCmdSub;
     };

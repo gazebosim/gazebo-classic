@@ -17,6 +17,8 @@
 #ifndef INERTIAL_HH
 #define INERTIAL_HH
 
+#include <string>
+
 #include "msgs/msgs.h"
 #include "sdf/sdf.h"
 #include "math/Quaternion.hh"
@@ -48,12 +50,6 @@ namespace gazebo
       /// \brief update the parameters using new sdf values
       public: void UpdateParameters(sdf::ElementPtr _sdf);
 
-      public: double GetLinearDamping();
-      public: double GetAngularDamping();
-
-      public: void SetLinearDamping(double _damping);
-      public: void SetAngularDamping(double _damping);
-
       /// \brief Reset all the mass properties
       public: void Reset();
 
@@ -76,8 +72,10 @@ namespace gazebo
       /// \brief Get the center of gravity
       public: inline const math::Vector3 &GetCoG() const
               { return this->cog; }
+
       public: inline const math::Pose GetPose() const
               { return math::Pose(this->cog, math::Quaternion());}
+
       /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
       public: math::Vector3 GetPrincipalMoments() const;
 
@@ -98,6 +96,33 @@ namespace gazebo
       public: void SetIXZ(double _v);
       public: void SetIYZ(double _v);
 
+      /// \brief Set the inertia matrix for a box based on a density
+      public: void SetBoxDensity(double _density, const math::Vector3 &_size);
+
+      /// \brief Set the inertia matrix for a box based on a total mass
+      public: void SetBoxMass(double _mass, const math::Vector3 &_size);
+
+      /// \brief Set the inertia matrix for a cylinder based on a density
+      public: void SetCylinderDensity(double _density, double _radius,
+                                      double _length);
+
+      /// \brief Set the inertia matrix for a cylinder based on a total mass
+      public: void SetCylinderMass(double _mass, double _radius,
+                                   double _length);
+
+      /// \brief Set the inertia matrix for a sphere based on a density
+      public: void SetSphereDensity(double _density, double _radius);
+
+      /// \brief Set the inertia matrix for a sphere based on a total mass
+      public: void SetSphereMass(double _mass, double _radius);
+
+      /// \brief Set the inertia matrix for a mesh based on a density
+      public: void SetMeshDensity(double _density,
+                                  const std::string &_meshName);
+
+      /// \brief Set the inertia matrix for a mesh based on a total mass
+      public: void SetMeshMass(double _mass, const std::string &_meshName);
+
       /// \brief Rotate this mass
       public: void Rotate(const math::Quaternion &rot);
 
@@ -115,7 +140,13 @@ namespace gazebo
                   const gazebo::physics::Inertial &_inertial)
               {
                 _out << "Mass[" << _inertial.mass << "] CoG["
-                    << _inertial.cog << "]";
+                    << _inertial.cog << "]\n";
+                _out << "IXX[" << _inertial.principals.x << "] "
+                     << "IYY[" << _inertial.principals.y << "] "
+                     << "IZZ[" << _inertial.principals.z << "]\n";
+                _out << "IXY[" << _inertial.products.x << "] "
+                     << "IXZ[" << _inertial.products.y << "] "
+                     << "IYZ[" << _inertial.products.z << "]\n";
                 return _out;
               }
 
@@ -131,5 +162,3 @@ namespace gazebo
 }
 
 #endif
-
-

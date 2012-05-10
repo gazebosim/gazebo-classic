@@ -36,9 +36,3 @@ namespace gazebo
     typedef boost::shared_ptr<ODERayShape> ODERayShapePtr;
   }
 }
-
-
-
-
-
-

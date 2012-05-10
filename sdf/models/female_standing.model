@@ -15,7 +15,7 @@
     <visual name="visual1">
       <origin pose="0.0 0 0 0 0 1.5707"/>
       <geometry>
-        <mesh filename="people/female_standing/female_standing.dae" scale="0.01 0.01 0.01"/>
+        <mesh filename="people/female_standing/female_standing.dae" scale="0.005 0.005 0.005"/>
       </geometry>
     </visual>
   </link>

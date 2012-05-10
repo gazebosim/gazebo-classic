@@ -19,8 +19,8 @@
  * Date: 16 Oct 2009
  */
 
-#ifndef ODETRIMESHSHAPE_HH
-#define ODETRIMESHSHAPE_HH
+#ifndef __ODETRIMESHSHAPE_HH__
+#define __ODETRIMESHSHAPE_HH__
 
 #include "physics/TrimeshShape.hh"
 
@@ -36,7 +36,7 @@ namespace gazebo
     class ODETrimeshShape : public TrimeshShape
     {
       /// \brief Constructor
-      public: ODETrimeshShape(CollisionPtr parent);
+      public: ODETrimeshShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODETrimeshShape();

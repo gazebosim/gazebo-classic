@@ -26,10 +26,18 @@
 
 #include "rendering/Visual.hh"
 
+namespace Ogre
+{
+  class Entity;
+  class SceneNode;
+}
+
 namespace gazebo
 {
   namespace rendering
   {
+    class DynamicLines;
+
     class ContactVisual : public Visual
     {
       public: ContactVisual(const std::string &_name, VisualPtr _vis,
@@ -41,7 +49,7 @@ namespace gazebo
       private: void OnContact(
                    ConstContactsPtr &_msg);
 
-      private: void SetupInstancedMaterialToEntity(Ogre::Entity *ent);
+      private: void SetupInstancedMaterialToEntity(Ogre::Entity *_ent);
 
       private: transport::NodePtr node;
       private: transport::SubscriberPtr contactsSub;

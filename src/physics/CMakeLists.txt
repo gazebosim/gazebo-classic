@@ -1,9 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_subdirectory(ode)
 
-#if (HAVE_BULLET)
-#  add_subdirectory(bullet)
-#endif()
+if (HAVE_BULLET)
+  add_subdirectory(bullet)
+endif()
 
 set (sources
   Actor.cc
@@ -85,18 +85,22 @@ set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(physics_headers "Physics Headers" "#include \"physics/${hdr}\"\n")
 endforeach()
-configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/physics.h.in ${CMAKE_CURRENT_BINARY_DIR}/physics.h )
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.h.in ${CMAKE_CURRENT_BINARY_DIR}/physics.h)
 
 gz_add_library(gazebo_physics ${sources})
 
-target_link_libraries(gazebo_physics gazebo_common 
-                                     gazebo_sdf_interface
-                                     gazebo_physics_ode
-                                     ${TBB_LIBRARIES} 
-                                     ${libtool_library} 
-                                     ${boost_libraries}
-                                     ${tinyxml_libraries}
-                                     )
+target_link_libraries(gazebo_physics
+  gazebo_common 
+  gazebo_sdf_interface
+  gazebo_physics_ode
+  ${TBB_LIBRARIES} 
+  ${libtool_library} 
+  ${boost_libraries}
+  ${tinyxml_libraries})
+
+if (HAVE_BULLET)
+  target_link_libraries(gazebo_physics gazebo_physics_bullet)
+endif()
 
 gz_add_executable(gzphysics server.cc)
 target_link_libraries(gzphysics gazebo_common

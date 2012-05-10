@@ -24,6 +24,7 @@ set (sdfs gazebo.sdf
           state.sdf
           rfidtag.sdf
           rfid.sdf
+          projector.sdf
 )
 
 INSTALL_INCLUDES("sdf" ${headers})

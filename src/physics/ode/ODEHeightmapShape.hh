@@ -40,7 +40,7 @@ namespace gazebo
     class ODEHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
-      public: ODEHeightmapShape(CollisionPtr parent);
+      public: ODEHeightmapShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEHeightmapShape();
@@ -58,12 +58,9 @@ namespace gazebo
 
       private: unsigned int odeVertSize;
       private: math::Vector3 odeScale;
+      private: int subSampling;
 
       private: std::vector<double> heights;
-
-      /// Warning: This is here for performance improvement, bu as a side 
-      /// effect it will only allow one heightmap per world.
-      private: static ODEHeightmapShape *self;
     };
 
     /// \}

@@ -410,15 +410,18 @@ void Element::ToString(const std::string &_prefix,
 /////////////////////////////////////////////////
 bool Element::HasAttribute(const std::string &_key)
 {
-  Param_V::const_iterator iter;
-  for (iter = this->attributes.begin();
-      iter != this->attributes.end(); ++iter)
-  {
-    if ((*iter)->GetKey() == _key)
-      return true;
-  }
+  return this->GetAttribute(_key) != NULL;
+}
 
-  return false;
+/////////////////////////////////////////////////
+bool Element::GetAttributeSet(const std::string &_key)
+{
+  bool result = false;
+  ParamPtr p = this->GetAttribute(_key);
+  if (p)
+    result = p->GetSet();
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -463,6 +466,22 @@ ElementPtr Element::GetElementDescription(unsigned int _index) const
   if (_index < this->elementDescriptions.size())
     result = this->elementDescriptions[_index];
   return result;
+}
+
+/////////////////////////////////////////////////
+ElementPtr Element::GetElementDescription(const std::string &_key) const
+{
+  ElementPtr_V::const_iterator iter;
+  for (iter = this->elementDescriptions.begin();
+       iter != this->elementDescriptions.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _key)
+      return (*iter);
+  }
+
+  gzdbg << "Unable to find element description with name["
+         << _key << "] return empty\n";
+  return ElementPtr();
 }
 
 /////////////////////////////////////////////////
@@ -603,6 +622,10 @@ bool Element::GetValueBool(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueBool();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueBool();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -620,6 +643,10 @@ int Element::GetValueInt(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueInt();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueInt();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -637,6 +664,10 @@ float Element::GetValueFloat(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueFloat();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueFloat();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -659,6 +690,10 @@ double Element::GetValueDouble(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueDouble();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueDouble();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -681,6 +716,10 @@ unsigned int Element::GetValueUInt(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueUInt();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueUInt();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -703,6 +742,10 @@ char Element::GetValueChar(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueChar();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueChar();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -720,6 +763,12 @@ std::string Element::GetValueString(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueString();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueString();
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
   }
   return result;
 }
@@ -735,6 +784,10 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueVector3();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueVector3();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -752,6 +805,10 @@ gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueVector2d();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueVector2d();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -769,6 +826,10 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueQuaternion();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueQuaternion();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -786,6 +847,10 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValuePose();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValuePose();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -803,6 +868,10 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElement(_key)->GetValueColor();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueColor();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -871,6 +940,171 @@ void Element::SetInclude(const std::string &_filename)
 std::string Element::GetInclude() const
 {
   return this->includeFilename;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const bool &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const int &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const unsigned int &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const float &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const double &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const char &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const std::string &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const char *_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const gazebo::math::Vector3 &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const gazebo::math::Vector2i &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const gazebo::math::Vector2d &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const gazebo::math::Quaternion &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const gazebo::math::Pose &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const gazebo::common::Color &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Element::Set(const gazebo::common::Time &_value)
+{
+  if (this->value)
+  {
+    this->value->Set(_value);
+    return true;
+  }
+  return false;
 }
 
 

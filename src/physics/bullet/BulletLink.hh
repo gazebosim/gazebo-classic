@@ -19,21 +19,20 @@
  * Date: 15 May 2009
  */
 
-#ifndef BulletBODY_HH
-#define BulletBODY_HH
+#ifndef __BULLETLINK_HH__
+#define __BULLETLINK_HH__
 
-/*
-#include "BulletPhysics.hh"
-#include "Link.hh"
-*/
+#include "physics/bullet/bullet_inc.h"
+#include "physics/bullet/BulletTypes.hh"
+#include "physics/Link.hh"
+
+class btRigidBody;
 
 namespace gazebo
 {
   namespace physics
   {
-    class XMLConfigNode;
     class BulletMotionState;
-    class BulletCollision;
 
     /// \addtogroup gazebo_physics
     /// \brief The body class
@@ -42,14 +41,13 @@ namespace gazebo
     class BulletLink : public Link
     {
       /// \brief Constructor
-      public: BulletLink(Entity *parent);
+      public: BulletLink(EntityPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletLink();
 
       /// \brief Load the body based on an common::XMLConfig node
-      /// \param node common::XMLConfigNode pointer
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load(sdf::ElementPtr _ptr);
 
       /// \brief Initialize the body
       public: virtual void Init();
@@ -60,10 +58,6 @@ namespace gazebo
       /// \brief Update the body
       public: virtual void Update();
 
-      /// \brief Attach a collision to this body
-      /// \param collision Collisionetery to attach to this body
-      public: virtual void AttachCollision(Collision *collision);
-
       /// \brief Called when the pose of the entity (or one of its parents) has
       /// changed
       public: virtual void OnPoseChange();
@@ -73,6 +67,7 @@ namespace gazebo
 
       /// \brief Get whether this body is enabled in the physics engine
       public: virtual bool GetEnabled() const {return true;}
+
       /// \brief Update the center of mass
       public: virtual void UpdateCoM();
 
@@ -110,7 +105,7 @@ namespace gazebo
       public: void SetSelfCollide(bool collide);
 
       /// \brief Get the bullet rigid body
-      public: btRigidLink *GetBulletLink() const;
+      public: btRigidBody *GetBulletLink() const;
 
       /// \brief Set the linear damping factor
       public: virtual void SetLinearDamping(double damping);
@@ -119,21 +114,37 @@ namespace gazebo
       public: virtual void SetAngularDamping(double damping);
 
       /// \brief Set the relative pose of a child collision.
-      public: void SetCollisionRelativePose(BulletCollision *collision,
+      /*public: void SetCollisionRelativePose(BulletCollision *collision,
                                             const math::Pose &newPose);
+                                            */
+
+      /// \brief Add a force to the body
+      public: virtual void AddForce(const math::Vector3 &_force);
+
+      /// \brief Add a force to the body, components are relative to the
+      ///        body's own frame of reference.
+      public: virtual void AddRelativeForce(const math::Vector3 &_force);
+
+      /// \brief Add a force to the body at position expressed to the body's
+      ///        own frame of reference.
+      public: virtual void AddForceAtRelativePosition(
+                  const math::Vector3 &_force,
+                  const math::Vector3 &_relpos);
+
+      /// \brief Add a torque to the body
+      public: virtual void AddTorque(const math::Vector3 &_torque);
+
+      /// \brief Add a torque to the body, components are relative to the
+      ///        body's own frame of reference.
+      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
       private: btCompoundShape *compoundShape;
       private: BulletMotionState *motionState;
-      private: btRigidLink *rigidLink;
-      private: BulletPhysics *bulletPhysics;
-
+      private: btRigidBody *rigidLink;
+      private: BulletPhysicsPtr bulletPhysics;
       protected: math::Pose pose;
     };
-
     /// \}
   }
 }
 #endif
-
-
-

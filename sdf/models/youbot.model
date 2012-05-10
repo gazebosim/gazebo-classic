@@ -22,7 +22,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='base_footprint_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='base_footprint_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.001000 0.001000 0.001000'/>
@@ -50,7 +50,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='base_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='base_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/base/base.dae' scale='1.000000 1.000000 1.000000'/>
@@ -78,7 +78,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_link_0_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_link_0_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/arm/arm0.dae' scale='1.000000 1.000000 1.000000'/>
@@ -107,7 +107,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_link_1_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_link_1_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/arm/arm1.dae' scale='1.000000 1.000000 1.000000'/>
@@ -135,7 +135,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_link_2_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_link_2_geom_visual'>
         <origin pose='0.000000 -0.032000 0.078000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/arm/arm2.dae' scale='1.000000 1.000000 1.000000'/>
@@ -163,7 +163,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_link_3_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_link_3_geom_visual'>
         <origin pose='0.000000 0.028000 0.079000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/arm/arm3.dae' scale='1.000000 1.000000 1.000000'/>
@@ -191,7 +191,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_link_4_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_link_4_geom_visual'>
         <origin pose='0.000000 -0.010000 0.029000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/arm/arm4.dae' scale='1.000000 1.000000 1.000000'/>
@@ -219,7 +219,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='arm_link_5_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='arm_link_5_geom_visual'>
         <origin pose='0.003000 0.000000 -0.034000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/arm/arm5.dae' scale='1.000000 1.000000 1.000000'/>
@@ -247,7 +247,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='gripper_palm_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='gripper_palm_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/gripper/palm.stl' scale='1.000000 1.000000 1.000000'/>
@@ -276,7 +276,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='gripper_finger_link_l_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='gripper_finger_link_l_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/gripper/finger.stl' scale='1.000000 1.000000 1.000000'/>
@@ -304,7 +304,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='gripper_finger_link_r_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='gripper_finger_link_r_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/gripper/finger.stl' scale='1.000000 1.000000 1.000000'/>
@@ -332,7 +332,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='base_laser_front_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='base_laser_front_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='hokuyo/hokuyo.dae' scale='1.000000 1.000000 1.000000'/>
@@ -376,7 +376,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='wheel_link_bl_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='wheel_link_bl_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename="youbot/base/back-left_wheel.dae"/>
@@ -412,7 +412,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='wheel_link_br_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='wheel_link_br_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename="youbot/base/back-right_wheel.dae"/>
@@ -448,7 +448,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='wheel_link_fl_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='wheel_link_fl_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename="youbot/base/front-left_wheel.dae"/>
@@ -484,7 +484,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='wheel_link_fr_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='wheel_link_fr_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename="youbot/base/front-right_wheel.dae"/>
@@ -513,7 +513,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='plate_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='plate_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='youbot/plate/plate.dae' scale='1.000000 1.000000 1.000000'/>

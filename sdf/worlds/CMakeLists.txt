@@ -11,11 +11,12 @@ set (files
   drop_test.world
   collision_test.world
   simple_pendulums.world
+  set_world_pose_test.world
   double_pendulums.world
   plugin.world
   pr2.world
   presentation.world
-  projector_test.world
+  projector.world
   shapes.world
   weshare2012.world
   willowgarage.world)

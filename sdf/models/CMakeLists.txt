@@ -25,6 +25,7 @@ set (models
   simple_arm.model
   14_4v_cordless_drill.model
   coke_can.model
+  car.model
   )
 
 set (lights

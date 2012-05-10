@@ -85,13 +85,19 @@ namespace sdf
     /// \brief Get the number of element descriptions
     public: unsigned int GetElementDescriptionCount() const;
 
-    /// \brief Get an attribute using an index
+    /// \brief Get an element description using an index
     public: ElementPtr GetElementDescription(unsigned int _index) const;
+
+    /// \brief Get an element descriptio using a key
+    public: ElementPtr GetElementDescription(const std::string &_key) const;
 
     /// \brief Return true if an element description exists
     public: bool HasElementDescription(const std::string &_name);
 
     public: bool HasAttribute(const std::string &_key);
+
+    /// \brief Return true if the attribute was set (i.e. not default value)
+    public: bool GetAttributeSet(const std::string &_key);
 
     /// \brief Get the param of the elements value
     public: ParamPtr GetValue();
@@ -111,6 +117,22 @@ namespace sdf
     public: gazebo::math::Pose GetValuePose(const std::string &_key = "");
     public: gazebo::common::Color GetValueColor(const std::string &_key = "");
     public: gazebo::common::Time GetValueTime(const std::string &_key = "");
+
+    public: bool Set(const bool &_value);
+    public: bool Set(const int &_value);
+    public: bool Set(const unsigned int &_value);
+    public: bool Set(const float &_value);
+    public: bool Set(const double &_value);
+    public: bool Set(const char &_value);
+    public: bool Set(const std::string &_value);
+    public: bool Set(const char *_value);
+    public: bool Set(const gazebo::math::Vector3 &_value);
+    public: bool Set(const gazebo::math::Vector2i &_value);
+    public: bool Set(const gazebo::math::Vector2d &_value);
+    public: bool Set(const gazebo::math::Quaternion &_value);
+    public: bool Set(const gazebo::math::Pose &_value);
+    public: bool Set(const gazebo::common::Color &_value);
+    public: bool Set(const gazebo::common::Time &_value);
 
     public: bool HasElement(const std::string &_name) const;
 

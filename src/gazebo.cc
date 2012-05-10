@@ -14,13 +14,12 @@
  * limitations under the License.
  *
  */
-#include <string>
 #include <vector>
 #include "transport/transport.h"
 #include "common/common.h"
 #include "math/gzmath.h"
 #include "gazebo_config.h"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 std::vector<gazebo::SystemPluginPtr> g_plugins;
 
