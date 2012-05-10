@@ -82,9 +82,9 @@ TEST_F(SpeedTest, ShapesWorld)
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
-  EXPECT_GT(speedRatio, 0.02);
+  EXPECT_GT(speedRatio, 0.08);
 #else
-  EXPECT_GT(speedRatio, 0.01);
+  EXPECT_GT(speedRatio, 0.07);
 #endif
 }
 
@@ -108,9 +108,9 @@ TEST_F(SpeedTest, PR2World)
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
-  EXPECT_GT(speedRatio, 0.02);
+  EXPECT_GT(speedRatio, 0.5);
 #else
-  EXPECT_GT(speedRatio, 0.01);
+  EXPECT_GT(speedRatio, 0.3);
 #endif
 }
 

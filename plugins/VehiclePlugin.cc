@@ -47,7 +47,21 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->joints[2] = this->model->GetJoint(_sdf->GetValueString("back_left"));
   this->joints[3] = this->model->GetJoint(_sdf->GetValueString("back_right"));
 
+
+  this->joints[0]->SetAttribute(physics::Joint::SUSPENSION_ERP, 0, 0.15);
+  this->joints[0]->SetAttribute(physics::Joint::SUSPENSION_CFM, 0, 0.04);
+
+  this->joints[1]->SetAttribute(physics::Joint::SUSPENSION_ERP, 0, 0.15);
+  this->joints[1]->SetAttribute(physics::Joint::SUSPENSION_CFM, 0, 0.04);
+
+  this->joints[2]->SetAttribute(physics::Joint::SUSPENSION_ERP, 0, 0.15);
+  this->joints[2]->SetAttribute(physics::Joint::SUSPENSION_CFM, 0, 0.04);
+
+  this->joints[3]->SetAttribute(physics::Joint::SUSPENSION_ERP, 0, 0.15);
+  this->joints[3]->SetAttribute(physics::Joint::SUSPENSION_CFM, 0, 0.04);
+
   this->gasJoint = this->model->GetJoint(_sdf->GetValueString("gas"));
+  this->brakeJoint = this->model->GetJoint(_sdf->GetValueString("brake"));
   this->steeringJoint = this->model->GetJoint(_sdf->GetValueString("steering"));
 
   if (!this->gasJoint)
@@ -61,12 +75,6 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
     gzerr << "Unable to find steering joint["
           << _sdf->GetValueString("steering") << "]\n";
-    return;
-  }
-
-  if (!this->chassis)
-  {
-    gzerr << "Unable to find chassis[" << _sdf->GetElement("chassis") << "]\n";
     return;
   }
 
@@ -99,14 +107,10 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   this->maxSpeed = _sdf->GetValueDouble("max_speed");
-  this->areoLoad = _sdf->GetValueDouble("areo_load");
+  this->aeroLoad = _sdf->GetValueDouble("aero_load");
   this->tireAngleRange = _sdf->GetValueDouble("tire_angle_range");
   this->frontPower = _sdf->GetValueDouble("front_power");
   this->rearPower = _sdf->GetValueDouble("rear_power");
-
-  std::cout << "Chassis[" << this->chassis->GetScopedName() << "]\n";
-  for (int i = 0; i < 4; ++i)
-    std::cout << "Joint[" << this->joints[i]->GetScopedName() << "]\n";
 
   this->connections.push_back(event::Events::ConnectWorldUpdateStart(
           boost::bind(&VehiclePlugin::OnUpdate, this)));
@@ -139,16 +143,22 @@ void VehiclePlugin::Init()
   // Maximum gas is the upper limit of the gas joint
   this->maxGas = this->gasJoint->GetHighStop(0).GetAsRadian();
 
-  printf("SteeringRation[%f] MaxGa[%f]\n", this->steeringRatio, this->maxGas);
+  // Maximum brake is the upper limit of the gas joint
+  this->maxBrake = this->gasJoint->GetHighStop(0).GetAsRadian();
 
-  // this->steeringJoint->SetDamping(0, 1.0);
+  printf("SteeringRation[%f] MaxGa[%f]\n", this->steeringRatio, this->maxGas);
 }
 
 /////////////////////////////////////////////////
 void VehiclePlugin::OnUpdate()
 {
-  // Get the normalized gas amount
+  // Get the normalized gas and brake amount
   double gas = this->gasJoint->GetAngle(0).GetAsRadian() / this->maxGas;
+  double brake = this->brakeJoint->GetAngle(0).GetAsRadian() / this->maxBrake;
+
+  // A little force to push back on the pedals
+  this->gasJoint->SetForce(0, -0.1);
+  this->brakeJoint->SetForce(0, -0.1);
 
   // Get the steering angle
   double steeringAngle = this->steeringJoint->GetAngle(0).GetAsRadian();
@@ -159,20 +169,21 @@ void VehiclePlugin::OnUpdate()
   // double idleSpeed = 0.5;
 
   // Compute the rotational velocity of the wheels
-  double jointVel = (gas * this->maxSpeed) / this->wheelRadius;
+  double jointVel = (std::max(0.0, gas-brake) * this->maxSpeed) /
+                    this->wheelRadius;
 
   // Set velocity and max force for each wheel
   this->joints[0]->SetVelocity(1, -jointVel);
-  this->joints[0]->SetMaxForce(1, gas * this->frontPower);
+  this->joints[0]->SetMaxForce(1, (gas + brake) * this->frontPower);
 
   this->joints[1]->SetVelocity(1, -jointVel);
-  this->joints[1]->SetMaxForce(1, gas * this->frontPower);
+  this->joints[1]->SetMaxForce(1, (gas + brake) * this->frontPower);
 
-  this->joints[2]->SetVelocity(0, jointVel);
-  this->joints[2]->SetMaxForce(0, gas * this->rearPower);
+  this->joints[2]->SetVelocity(1, -jointVel);
+  this->joints[2]->SetMaxForce(1, (gas + brake) * this->rearPower);
 
-  this->joints[3]->SetVelocity(0, jointVel);
-  this->joints[3]->SetMaxForce(0, gas * this->rearPower);
+  this->joints[3]->SetVelocity(1, -jointVel);
+  this->joints[3]->SetMaxForce(1, (gas + brake) * this->rearPower);
 
   // Set the front-left wheel angle
   this->joints[0]->SetLowStop(0, wheelAngle);
@@ -192,7 +203,7 @@ void VehiclePlugin::OnUpdate()
   //  aerodynamics
   this->chassis->AddForce(
       math::Vector3(0, 0, this->aeroLoad * this->velocity.GetSquaredLength()));
-/*
+
   // Sway bars
   math::Vector3 bodyPoint;
   math::Vector3 hingePoint;
@@ -200,48 +211,36 @@ void VehiclePlugin::OnUpdate()
 
   double displacement;
 
-  printf("Sway bars\n");
   for (int ix = 0; ix < 4; ++ix)
   {
     hingePoint = this->joints[ix]->GetAnchor(0);
-    // dJointGetHinge2Anchor(hinges_[ix], &hingePoint.x);
-
     bodyPoint = this->joints[ix]->GetAnchor(1);
-    // dJointGetHinge2Anchor2(hinges_[ix], &bodyPoint.x);
 
-    axis = this->joints[ix]->GetGlobalAxis(0);
-    //dJointGetHinge2Axis1(hinges_[ix], &axis.x);
-
+    axis = this->joints[ix]->GetGlobalAxis(0).Round();
     displacement = (bodyPoint - hingePoint).GetDotProd(axis);
 
-    std::cout << "Displacement[" << displacement << "]\n";
+    //std::cout << "Hinge[" << hingePoint << "] Body["
+    //          << bodyPoint << "] Axis[" << axis << "]\n";
+    //std::cout << "Displacement[" << displacement << "]\n";
 
-    float amt = displacement * SWAY_FORCE;
-    if( displacement > 0 )
+    float amt = displacement * this->swayForce;
+    if (displacement > 0)
     {
-      if( amt > 15 )
+      if (amt > 15)
         amt = 15;
 
-      this->joints[ix]->GetChild()->AddForce(axis * (amt * -1));
+      //std::cout << "Axis[" << ix << "]  Force[" << axis * -amt << "]\n";
+      //std::cout << "Axis[" << (ix^1) << "]  Force[" << axis * amt << "]\n";
+
+      math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();      
+      this->joints[ix]->GetChild()->AddForce(axis * -amt);
+      this->chassis->AddForceAtWorldPosition(axis * amt, p.pos);
+
+      p = this->joints[ix^1]->GetChild()->GetWorldPose();      
       this->joints[ix^1]->GetChild()->AddForce(axis * amt);
-
-      //dBodyAddForce( wheelBody_[ix], -axis.x * amt, -axis.y * amt, -axis.z * amt );
-
-      //math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();      
-      // dReal const * wp = dBodyGetPosition( wheelBody_[ix] );
-      
-      //this->chassis->AddForceAtRelativePosition(amt*axis, p.pos);
-      //dBodyAddForceAtPos( chassisBody_, axis.x*amt, axis.y*amt, axis.z*amt, wp[0], wp[1], wp[2] );
-      
-      //dBodyAddForce( wheelBody_[ix^1], axis.x * amt, axis.y * amt, axis.z * amt );
-      
-      //wp = dBodyGetPosition( wheelBody_[ix] );
-
-      //this->chassis->AddForceAtRelativePosition(-amt*axis, p.pos);
-      //dBodyAddForceAtPos( chassisBody_, -axis.x*amt, -axis.y*amt, -axis.z*amt, wp[0], wp[1], wp[2] );
+      this->chassis->AddForceAtWorldPosition(axis * -amt, p.pos);
     }
   }
-  */
 }
 
 /////////////////////////////////////////////////
