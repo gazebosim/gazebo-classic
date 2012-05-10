@@ -54,6 +54,7 @@ void JointController::Update()
       this->joints[iter->first]->SetForce(0, iter->second);
   }
 
+  /* Disabled for now. Collisions don't update properly
   if (this->positions.size() > 0)
   {
     std::map<std::string, JointPtr>::iterator iter;
@@ -65,6 +66,7 @@ void JointController::Update()
     this->SetJointPositions(this->positions);
     this->positions.clear();
   }
+  */
 }
 
 /////////////////////////////////////////////////

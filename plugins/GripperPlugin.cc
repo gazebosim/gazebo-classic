@@ -156,7 +156,6 @@ void GripperPlugin::HandleAttach()
 
         if (var < 1e-5 && max < 1e-5)
         {
-          std::cout << "Connected\n";
           this->attached = true;
 
           this->fixedJoint->Load(this->model->GetLink("palm"),
@@ -176,7 +175,6 @@ void GripperPlugin::HandleAttach()
 /////////////////////////////////////////////////
 void GripperPlugin::HandleDetach()
 {
-  std::cout << "Disconnected\n";
   this->attached = false;
   this->fixedJoint->Detach();
 }
@@ -188,11 +186,6 @@ void GripperPlugin::OnContact(const std::string &/*_collisionName*/,
   if (_contact.collision1->IsStatic() || _contact.collision2->IsStatic())
     return;
 
-  // std::cout << "OnContact[" << _collisionName << "]\n";
-  // std::cout << "   C1[" << _contact.collision1->GetScopedName() << "]";
-  // std::cout << " C2[" << _contact.collision2->GetScopedName() << "]\n";
-  // std::cout << "   N[" << _contact.normals[0] << "]\n";
-  // std::cout << "  Static[" << _contact.collision2->IsStatic() << "]\n";
   this->contacts.push_back(_contact);
 }
 

@@ -2,21 +2,17 @@
   <model name="simple_gripper" static="false">
     <link name="riser">
       <origin pose="-0.15 0.0 0.5 0 0 0"/>
-      <inertial mass="20.0"/>
-        <!--<origin pose="0 0 -0.5 0 0 0"/>
-      </inertial> 
-      -->
 
       <collision name="collision">
+        <mass>10.0</mass>
         <geometry>
           <box size="0.2 0.2 1.0"/>
         </geometry>
         <surface>
-          <friction>
-            <ode mu="9000000.0" mu2="9000000.0"/>
-          </friction>
+          <contact>
+            <ode max_vel="0.0"/>
+          </contact>
         </surface>
-
       </collision>
       <visual name="visual">
         <geometry>
@@ -28,18 +24,17 @@
 
     <link name="palm">
       <origin pose="0.0 0.0 0.05 0 0 0"/>
-      <inertial mass="0.5"/>
 
       <collision name="collision">
+        <mass>0.5</mass>
         <geometry>
           <box size="0.1 0.2 0.1"/>
         </geometry>
         <surface>
-          <friction>
-            <ode mu="9000000.0" mu2="9000000.0"/>
-          </friction>
+          <contact>
+            <ode max_vel="0.0"/>
+          </contact>
         </surface>
-
       </collision>
       <visual name="visual">
         <geometry>
@@ -51,16 +46,19 @@
 
     <link name="left_finger">
       <origin pose="0.1 0.2 0.05 0 0 -0.78539"/>
-      <inertial mass="0.1"/>
 
       <collision name="collision">
+        <mass>0.1</mass>
         <geometry>
           <box size="0.1 0.3 0.1"/>
         </geometry>
         <surface>
           <friction>
-            <ode mu="9000000.0" mu2="9000000.0"/>
+            <ode mu="0.1" mu2="0"/>
           </friction>
+          <contact>
+            <ode max_vel="0.0"/>
+          </contact>
         </surface>
       </collision>
       <visual name="visual">
@@ -73,18 +71,20 @@
 
     <link name="left_finger_tip">
       <origin pose="0.336 0.3 0.05 0 0 1.5707"/>
-      <inertial mass="0.1"/>
 
       <collision name="collision">
+        <mass>0.5</mass>
         <geometry>
           <box size="0.1 0.2 0.1"/>
         </geometry>
         <surface>
           <friction>
-            <ode mu="9000000.0" mu2="9000000.0"/>
+            <ode mu=".1" mu2="0"/>
           </friction>
+          <contact>
+            <ode max_vel="0.0"/>
+          </contact>
         </surface>
-
       </collision>
       <visual name="visual">
         <geometry>
@@ -96,16 +96,19 @@
 
     <link name="right_finger">
       <origin pose="0.1 -0.2 0.05 0 0 .78539"/>
-      <inertial mass="0.1"/>
 
       <collision name="collision">
+        <mass>0.1</mass>
         <geometry>
           <box size="0.1 0.3 0.1"/>
         </geometry>
         <surface>
           <friction>
-            <ode mu="9000000.0" mu2="9000000.0"/>
+            <ode mu="0.1" mu2="0"/>
           </friction>
+          <contact>
+            <ode max_vel="0.0"/>
+          </contact>
         </surface>
 
       </collision>
@@ -119,18 +122,20 @@
 
     <link name="right_finger_tip">
       <origin pose="0.336 -0.3 0.05 0 0 1.5707"/>
-      <inertial mass="0.1"/>
 
       <collision name="collision">
+        <mass>0.1</mass>
         <geometry>
           <box size="0.1 0.2 0.1"/>
         </geometry>
         <surface>
           <friction>
-            <ode mu="9000000.0" mu2="9000000.0"/>
+            <ode mu="0.1" mu2="0"/>
           </friction>
+          <contact>
+            <ode max_vel="0.0"/>
+          </contact>
         </surface>
-
       </collision>
       <visual name="visual">
         <geometry>
