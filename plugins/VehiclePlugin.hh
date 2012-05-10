@@ -55,6 +55,17 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
+
+    private: double frontPower, rearPower;
+    private: double maxSpeed;
+    private: double wheelRadius;
+
+    private: double steeringRatio;
+    private: double tireAngleRange;
+    private: double maxGas;
+
+    private: double aeroLoad;
+    private: double swayForce;
   };
 }
 #endif

@@ -26,6 +26,14 @@ GZ_REGISTER_MODEL_PLUGIN(VehiclePlugin)
 VehiclePlugin::VehiclePlugin()
 {
   this->joints.resize(4);
+
+  this->aeroLoad = 0.1;
+  this->swayForce = 10;
+
+  this->maxSpeed = 10;
+  this->frontPower = 50;
+  this->rearPower = 50;
+  this->wheelRadius = 0.3;
 }
 
 /////////////////////////////////////////////////
@@ -34,7 +42,6 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->model = _model;
   // this->physics = this->model->GetWorld()->GetPhysicsEngine();
 
-  this->chassis = this->model->GetLink(_sdf->GetValueString("chassis"));
   this->joints[0] = this->model->GetJoint(_sdf->GetValueString("front_left"));
   this->joints[1] = this->model->GetJoint(_sdf->GetValueString("front_right"));
   this->joints[2] = this->model->GetJoint(_sdf->GetValueString("back_left"));
@@ -56,7 +63,6 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           << _sdf->GetValueString("steering") << "]\n";
     return;
   }
-
 
   if (!this->chassis)
   {
@@ -92,6 +98,12 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
+  this->maxSpeed = _sdf->GetValueDouble("max_speed");
+  this->areoLoad = _sdf->GetValueDouble("areo_load");
+  this->tireAngleRange = _sdf->GetValueDouble("tire_angle_range");
+  this->frontPower = _sdf->GetValueDouble("front_power");
+  this->rearPower = _sdf->GetValueDouble("rear_power");
+
   std::cout << "Chassis[" << this->chassis->GetScopedName() << "]\n";
   for (int i = 0; i < 4; ++i)
     std::cout << "Joint[" << this->joints[i]->GetScopedName() << "]\n";
@@ -109,63 +121,78 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void VehiclePlugin::Init()
 {
+  this->chassis = this->joints[0]->GetParent();
+
+  // This assumes that the largest dimension of the wheel is the diameter
+  physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
+      this->joints[0]->GetChild());
+  math::Box bb = parent->GetBoundingBox();
+  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+
+  // The total range the steering wheel can rotate
+  double steeringRange = this->steeringJoint->GetHighStop(0).GetAsRadian() -
+                         this->steeringJoint->GetLowStop(0).GetAsRadian();
+
+  // Compute the angle ratio between the steering wheel and the tires
+  this->steeringRatio = steeringRange / this->tireAngleRange;
+
+  // Maximum gas is the upper limit of the gas joint
+  this->maxGas = this->gasJoint->GetHighStop(0).GetAsRadian();
+
+  printf("SteeringRation[%f] MaxGa[%f]\n", this->steeringRatio, this->maxGas);
+
   // this->steeringJoint->SetDamping(0, 1.0);
 }
 
 /////////////////////////////////////////////////
 void VehiclePlugin::OnUpdate()
 {
-  double maxGas = this->gasJoint->GetHighStop(0).GetAsRadian();
-  double gas = this->gasJoint->GetAngle(0).GetAsRadian() / maxGas;
+  // Get the normalized gas amount
+  double gas = this->gasJoint->GetAngle(0).GetAsRadian() / this->maxGas;
 
-  double frontPower = 50;
-  double rearPower = 50;
+  // Get the steering angle
+  double steeringAngle = this->steeringJoint->GetAngle(0).GetAsRadian();
 
-  double maxSpeed = 50;
+  // Compute the angle of the front wheels.
+  double wheelAngle = steeringAngle / this->steeringRatio;
+
   // double idleSpeed = 0.5;
 
-  double wheelRadius = 0.3;
-  double jointVel = (gas * maxSpeed) / wheelRadius;
+  // Compute the rotational velocity of the wheels
+  double jointVel = (gas * this->maxSpeed) / this->wheelRadius;
 
+  // Set velocity and max force for each wheel
   this->joints[0]->SetVelocity(1, -jointVel);
-  this->joints[0]->SetMaxForce(1, gas * frontPower);
+  this->joints[0]->SetMaxForce(1, gas * this->frontPower);
 
   this->joints[1]->SetVelocity(1, -jointVel);
-  this->joints[1]->SetMaxForce(1, gas * frontPower);
+  this->joints[1]->SetMaxForce(1, gas * this->frontPower);
 
   this->joints[2]->SetVelocity(0, jointVel);
-  this->joints[2]->SetMaxForce(0, gas * rearPower);
+  this->joints[2]->SetMaxForce(0, gas * this->rearPower);
 
   this->joints[3]->SetVelocity(0, jointVel);
-  this->joints[3]->SetMaxForce(0, gas * rearPower);
+  this->joints[3]->SetMaxForce(0, gas * this->rearPower);
 
-  double tireRotate = GZ_DTOR(40);
-  double steeringRange = this->steeringJoint->GetHighStop(0).GetAsRadian() -
-                         this->steeringJoint->GetLowStop(0).GetAsRadian();
-  double turnRatio = steeringRange / tireRotate;
-  double steeringAngle = this->steeringJoint->GetAngle(0).GetAsRadian();
-  double wheelAngle = steeringAngle / turnRatio;
-
+  // Set the front-left wheel angle
   this->joints[0]->SetLowStop(0, wheelAngle);
   this->joints[0]->SetHighStop(0, wheelAngle);
   this->joints[0]->SetLowStop(0, wheelAngle);
   this->joints[0]->SetHighStop(0, wheelAngle);
 
-
+  // Set the front-right wheel angle
   this->joints[1]->SetHighStop(0, wheelAngle);
   this->joints[1]->SetLowStop(0, wheelAngle);
   this->joints[1]->SetHighStop(0, wheelAngle);
   this->joints[1]->SetLowStop(0, wheelAngle);
 
+  // Get the current velocity of the car
   this->velocity = this->chassis->GetWorldLinearVel();
-  // std::cout << "Velocity[" << this->velocity << "]\n";
-  // double AERO_LOAD = -0.1;
-  // double SWAY_FORCE = 10;
 
   //  aerodynamics
-  /*this->chassis->AddForce(math::Vector3(0, 0,
-        AERO_LOAD * this->velocity.GetSquaredLength()));
-
+  this->chassis->AddForce(
+      math::Vector3(0, 0, this->aeroLoad * this->velocity.GetSquaredLength()));
+/*
   // Sway bars
   math::Vector3 bodyPoint;
   math::Vector3 hingePoint;
