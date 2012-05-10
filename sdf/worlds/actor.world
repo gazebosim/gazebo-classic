@@ -15,19 +15,19 @@
     <actor name="actor1" static="true">
       <origin pose="0 0 0 0 0 0"/>
       <skin filename="stand.dae" scale="1.0"/>
-      <animation name="standing" filename="stand.dae" scale="1.0"/>
-      <animation name="walking" filename="walk.dae" scale="1.0" linear_vel="0.24"/>
+      <animation name="standing" filename="stand.dae" scale="1.0" interpolate_x="false"/>
+      <animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true"/>
       
       <script loop="true" delay_start="0.0" auto_start="true">
         
         <trajectory id="0" type="standing">
           <waypoint time="0.0" pose="0 0 0 0 0 0"/>
-          <waypoint time="20.0" pose="0 0 0 0 0 0"/>
+          <waypoint time="1.0" pose="0 0 0 0 0 0"/>
         </trajectory>
         
         <trajectory id="1" type="walking">
           <waypoint time="0.0" pose="0 0 0 0 0 0"/> 
-          <waypoint time="10.0" pose="2.33 0 0 0 0 0"/>
+          <waypoint time="5.0" pose="2.33 0 0 0 0 0"/>
         </trajectory>
 
         <trajectory id="2" type="walking">
