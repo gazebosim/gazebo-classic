@@ -42,6 +42,7 @@ JointController::JointController(ModelPtr _model)
 void JointController::AddJoint(JointPtr _joint)
 {
   this->joints[_joint->GetName()] = _joint;
+  this->pids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
 }
 
 /////////////////////////////////////////////////
@@ -52,6 +53,23 @@ void JointController::Update()
     std::map<std::string, double>::iterator iter;
     for (iter = this->forces.begin(); iter != this->forces.end(); ++iter)
       this->joints[iter->first]->SetForce(0, iter->second);
+  }
+
+  if (this->positions.size() > 0)
+  {
+    double cmd;
+    common::Time currTime = this->model->GetWorld()->GetSimTime();
+    common::Time stepTime = currTime - this->prevUpdateTime;
+    this->prevUpdateTime = currTime;
+    std::map<std::string, double>::iterator iter;
+
+    for (iter = this->positions.begin(); iter != this->positions.end(); ++iter)
+    {
+      cmd = this->pids[iter->first].Update(
+          this->joints[iter->first]->GetAngle(0).GetAsRadian() - iter->second,
+          stepTime);
+      this->joints[iter->first]->SetForce(0, cmd);
+    }
   }
 
   /* Disabled for now. Collisions don't update properly
@@ -81,6 +99,20 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 
     if (_msg->has_position())
       this->positions[_msg->name()] = _msg->position();
+
+    if (_msg->has_pid())
+    {
+      if (_msg->pid().has_p_gain())
+        this->pids[_msg->name()].SetPGain(_msg->pid().p_gain());
+      if (_msg->pid().has_i_gain())
+        this->pids[_msg->name()].SetIGain(_msg->pid().i_gain());
+      if (_msg->pid().has_d_gain())
+        this->pids[_msg->name()].SetDGain(_msg->pid().d_gain());
+      if (_msg->pid().has_i_max())
+        this->pids[_msg->name()].SetIMax(_msg->pid().i_max());
+      if (_msg->pid().has_i_min())
+        this->pids[_msg->name()].SetIMax(_msg->pid().i_min());
+    }
   }
   else
     gzerr << "Unable to find joint[" << _msg->name() << "]\n";

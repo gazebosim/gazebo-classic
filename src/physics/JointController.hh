@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "common/PID.hh"
+#include "common/Time.hh"
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "msgs/msgs.h"
@@ -70,10 +72,15 @@ namespace gazebo
 
       private: ModelPtr model;
       private: std::map<std::string, JointPtr> joints;
+      private: std::map<std::string, common::PID> pids;
+
       private: std::map<std::string, double> forces;
       private: std::map<std::string, double> positions;
+
       private: transport::NodePtr node;
       private: transport::SubscriberPtr jointCmdSub;
+
+      private: common::Time prevUpdateTime;
     };
   }
 }

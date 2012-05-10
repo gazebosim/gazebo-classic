@@ -204,6 +204,7 @@
       </axis>
     </joint>
 
+    <!--
     <plugin name="simple_arm_plugin" filename="libSimpleArmPlugin.so">
       <joint1>arm_base_joint</joint1>
       <joint2>arm_shoulder_pan_joint</joint2>
@@ -221,5 +222,6 @@
       <joint4_ilim>-10 10</joint4_ilim>
       <joint5_ilim>-1 1</joint5_ilim>
     </plugin>
+    -->
   </model>
 </gazebo>

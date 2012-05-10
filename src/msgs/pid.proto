@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PID 
+/// \brief Message for PID
+/// \verbatim
+
+message PID
+{
+  optional double p_gain = 1[default=0.0];
+  optional double i_gain = 2[default=0.0];
+  optional double d_gain = 3[default=0.0];
+  optional double i_max  = 4[default=0.0];
+  optional double i_min  = 5[default=0.0];
+  optional double limit  = 6[default=0.0];
+}
+/// \endverbatim

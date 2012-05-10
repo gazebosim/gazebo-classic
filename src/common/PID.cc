@@ -17,14 +17,18 @@
 
 #include <math.h>
 #include <stdio.h>
+
+#include "math/Helpers.hh"
 #include "PID.hh"
 
 using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
-PID::PID(double _p, double _i, double _d, double _imax, double _imin)
-  : pGain(_p), iGain(_i), dGain(_d), iMax(_imax), iMin(_imin)
+PID::PID(double _p, double _i, double _d, double _imax, double _imin,
+         double _cmdMax, double _cmdMin)
+  : pGain(_p), iGain(_i), dGain(_d), iMax(_imax), iMin(_imin),
+    cmdMax(_cmdMax), cmdMin(_cmdMin)
 {
   this->Reset();
 }
@@ -35,15 +39,60 @@ PID::~PID()
 }
 
 /////////////////////////////////////////////////
-void PID::Init(double _p, double _i, double _d, double _imax, double _imin)
+void PID::Init(double _p, double _i, double _d, double _imax, double _imin,
+         double _cmdMax, double _cmdMin)
 {
   this->pGain = _p;
   this->iGain = _i;
   this->dGain = _d;
   this->iMax = _imax;
   this->iMin = _imin;
+  this->cmdMax = _cmdMax;
+  this->cmdMin = _cmdMin;
 
   this->Reset();
+}
+
+/////////////////////////////////////////////////
+void PID::SetPGain(double _p)
+{
+  this->pGain = _p;
+}
+
+/////////////////////////////////////////////////
+void PID::SetIGain(double _i)
+{
+  this->iGain = _i;
+}
+
+/////////////////////////////////////////////////
+void PID::SetDGain(double _d)
+{
+  this->dGain = _d;
+}
+
+/////////////////////////////////////////////////
+void PID::SetIMax(double _i)
+{
+  this->iMax = _i;
+}
+
+/////////////////////////////////////////////////
+void PID::SetIMin(double _i)
+{
+  this->iMin = _i;
+}
+
+/////////////////////////////////////////////////
+void PID::SetCmdMax(double _c)
+{
+  this->cmdMax = _c;
+}
+
+/////////////////////////////////////////////////
+void PID::SetCmdMin(double _c)
+{
+  this->cmdMin = _c;
 }
 
 /////////////////////////////////////////////////
@@ -54,6 +103,8 @@ void PID::Reset()
   this->iErr = 0.0;
   this->dErr = 0.0;
   this->cmd = 0.0;
+  this->cmdMax = 0.0;
+  this->cmdMin = 0.0;
 }
 
 /////////////////////////////////////////////////
@@ -96,6 +147,12 @@ double PID::Update(double _error, common::Time _dt)
   // Calculate derivative contribution to command
   dTerm = this->dGain * this->dErr;
   this->cmd = -pTerm - iTerm - dTerm;
+
+  // Check the command limits
+  if (!math::equal(this->cmdMax, 0.0) && this->cmd > this->cmdMax)
+    this->cmd = this->cmdMax;
+  if (!math::equal(this->cmdMin, 0.0) && this->cmd < this->cmdMin)
+    this->cmd = this->cmdMin;
 
   return this->cmd;
 }

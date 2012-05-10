@@ -41,6 +41,14 @@ namespace gazebo
                                          const std::string &_name);
       private slots: void OnPIDChanged(double _value, const std::string &_name);
 
+      private slots: void OnPGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnDGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnIGainChanged(double _value,
+                                         const std::string &_name);
+
+      private slots: void OnPIDUnitsChanged(int _index);
       private: transport::NodePtr node;
       private: transport::PublisherPtr jointPub;
 
@@ -52,7 +60,8 @@ namespace gazebo
     class JointForceControl : public QWidget
     {
       Q_OBJECT
-      public: JointForceControl(const std::string &_name, QWidget *_parent);
+      public: JointForceControl(const std::string &_name,
+                  QGridLayout *_layout, QWidget *_parent);
       public slots: void OnChanged(double _value);
       Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
       private: std::string name;
@@ -61,10 +70,25 @@ namespace gazebo
     class JointPIDControl : public QWidget
     {
       Q_OBJECT
-      public: JointPIDControl(const std::string &_name, QWidget *_parent);
+      public: JointPIDControl(const std::string &_name,
+                  QGridLayout *_layout, QWidget *_parent);
+
+      public: void SetToRadians();
+      public: void SetToDegrees();
+
       public slots: void OnChanged(double _value);
-      Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
+      public slots: void OnPChanged(double _value);
+      public slots: void OnIChanged(double _value);
+      public slots: void OnDChanged(double _value);
+
+      Q_SIGNALS: void changed(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void pChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void dChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void iChanged(double /*_value*/, const std::string &/*_name*/);
+
+      private: QDoubleSpinBox *posSpin;
       private: std::string name;
+      private: bool radians;
     };
   }
 }
