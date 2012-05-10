@@ -13,7 +13,6 @@ set (plugins
   RayPlugin
   DiffDrivePlugin
   GripperPlugin
-  BallTestPlugin
   VehiclePlugin
   JointTestPlugin)
 

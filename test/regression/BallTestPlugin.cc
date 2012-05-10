@@ -14,26 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_BALL_TEST_PLUGIN_HH__
-#define __GAZEBO_BALL_TEST_PLUGIN_HH__
 
-#include "common/common.h"
-#include "physics/physics.h"
-#include "gazebo.hh"
 
-namespace gazebo
-{
-  class BallTestPlugin : public WorldPlugin
-  {
-    public: BallTestPlugin();
-    public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
-    public: virtual void Init();
+void BallTestPlugin::Init()
 
-    private: void OnUpdate();
-    private: event::ConnectionPtr updateConnection;
 
-    private: int index;
-    private: physics::WorldPtr world;
-  };
-}
-#endif
+
