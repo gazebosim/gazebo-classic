@@ -106,6 +106,12 @@ namespace gazebo
       ///        passed in vector
       public: void SetToMin(const Vector3 &_v);
 
+      /// \brief Get the maximum value in the vector
+      public: double GetMax() const;
+
+      /// \brief Get the minimum value in the vector
+      public: double GetMin() const;
+
       /// \brief Equal operator
       public: Vector3 &operator =(const Vector3 &_pt);
 
@@ -142,13 +148,13 @@ namespace gazebo
       public: const Vector3 &operator/=(double _v);
 
       /// \brief Multiplication operators
-      public: const Vector3 operator*(const Vector3 &_pt) const;
+      public: Vector3 operator*(const Vector3 &_pt) const;
 
       /// \brief Multiplication operators
       public: const Vector3 &operator*=(const Vector3 &_pt);
 
       /// \brief Multiplication operators
-      public: const Vector3 operator*(double _v) const;
+      public: Vector3 operator*(double _v) const;
 
       /// \brief Multiplication operators
       public: const Vector3 &operator*=(double _v);

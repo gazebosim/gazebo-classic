@@ -20,7 +20,7 @@
 #include "common/common.h"
 #include "physics/physics.h"
 #include "transport/TransportTypes.hh"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 namespace gazebo
 {
@@ -48,7 +48,6 @@ namespace gazebo
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
 
-    private: common::PID leftPID, rightPID;
     private: double sum;
   };
 }

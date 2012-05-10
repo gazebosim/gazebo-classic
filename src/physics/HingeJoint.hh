@@ -43,24 +43,11 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
+                 }
 
-                   if (_sdf->HasElement("axis"))
-                   {
-                     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-                     this->SetAxis(0, axisElem->GetValueVector3("xyz"));
-                     if (axisElem->HasElement("limit"))
-                     {
-                       sdf::ElementPtr limitElem =
-                         _sdf->GetElement("axis")->GetElement("limit");
-
-                       // Perform this three step ordering to ensure the
-                       // parameters are set properly.
-                       // This is taken from the ODE wiki.
-                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-                       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
-                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-                     }
-                   }
+      protected: virtual void Init()
+                 {
+                   T::Init();
                  }
       };
   }

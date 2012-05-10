@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef ODEPLANESHAPE_HH
-#define ODEPLANESHAPE_HH
+#ifndef __ODEPLANESHAPE_HH__
+#define __ODEPLANESHAPE_HH__
 
 #include "physics/PlaneShape.hh"
 #include "physics/ode/ODEPhysics.hh"
@@ -31,8 +31,12 @@ namespace gazebo
     /// \brief An ODE Plane shape
     class ODEPlaneShape : public PlaneShape
     {
+      /// \brief Constructor
       public: ODEPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
+
+      /// \brief Destructor
       public: virtual ~ODEPlaneShape() {}
+
       /// \brief Create the plane
       public: void CreatePlane()
       {

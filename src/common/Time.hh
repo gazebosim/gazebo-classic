@@ -77,6 +77,10 @@ namespace gazebo
       /// \return Time as a double
       public: double Double() const;
 
+      /// \brief Get the time as a float
+      /// \return Time as a float
+      public: float Float() const;
+
       /// \brief Millisecond sleep
       public: static Time MSleep(unsigned int _ms);
 
@@ -170,6 +174,18 @@ namespace gazebo
       public: bool operator>=(const Time &time) const;
       /// \brief Equality operators
       public: bool operator>=(double time) const;
+
+      /// \brief Convert seconds to nanoseconds
+      public: static inline double SecToNano(double _sec)
+              { return _sec * 1e-9;}
+
+      /// \brief Convert milliseconds to nanoseconds
+      public: static inline double MilToNano(double _ms)
+              { return _ms * 1e-6;}
+
+      /// \brief Convert microseconds to nanoseconds
+      public: static inline double MicToNano(double _ms)
+              { return _ms * 1e-3;}
 
       /// Stream operators
       public: friend std::ostream &operator<<(std::ostream &_out,

@@ -15,7 +15,7 @@
  *
 */
 #include <map>
-#include "gazebo.h"
+#include "gazebo.hh"
 #include "common/common.h"
 #include "physics/physics.h"
 

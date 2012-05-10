@@ -22,7 +22,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='base_footprint_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='base_footprint_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.010000 0.010000 0.010000'/>
@@ -43,7 +43,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='base_footprint_geom_base_bellow_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='base_footprint_geom_base_bellow_link_visual'>
         <origin pose='-0.290000 0.000000 0.851000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.050000 0.370000 0.300000'/>
@@ -64,7 +64,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='base_footprint_geom_base_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='base_footprint_geom_base_link_visual'>
         <origin pose='0.000000 0.000000 0.051000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/base.dae' scale='1.000000 1.000000 1.000000'/>
@@ -109,7 +109,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='bl_caster_rotation_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='bl_caster_rotation_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1.000000 1.000000 1.000000'/>
@@ -137,7 +137,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='bl_caster_l_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='bl_caster_l_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -165,7 +165,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='bl_caster_r_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='bl_caster_r_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -193,7 +193,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='br_caster_rotation_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='br_caster_rotation_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1.000000 1.000000 1.000000'/>
@@ -221,7 +221,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='br_caster_l_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='br_caster_l_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -249,7 +249,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='br_caster_r_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='br_caster_r_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -277,7 +277,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='fl_caster_rotation_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='fl_caster_rotation_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1.000000 1.000000 1.000000'/>
@@ -305,7 +305,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='fl_caster_l_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='fl_caster_l_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -333,7 +333,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='fl_caster_r_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='fl_caster_r_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -361,7 +361,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='fr_caster_rotation_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='fr_caster_rotation_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1.000000 1.000000 1.000000'/>
@@ -389,7 +389,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='fr_caster_l_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='fr_caster_l_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -417,7 +417,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='fr_caster_r_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='fr_caster_r_wheel_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1.000000 1.000000 1.000000'/>
@@ -445,7 +445,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='torso_lift_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='torso_lift_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1.000000 1.000000 1.000000'/>
@@ -479,7 +479,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='head_pan_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='head_pan_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/head_v0/head_pan.dae' scale='1.000000 1.000000 1.000000'/>
@@ -507,7 +507,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='head_tilt_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='head_tilt_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/head_v0/head_tilt.dae' scale='1.000000 1.000000 1.000000'/>
@@ -528,7 +528,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='head_tilt_link_geom_head_mount_kinect_ir_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='head_tilt_link_geom_head_mount_kinect_ir_link_visual'>
         <origin pose='-0.147067 0.012500 0.291953 0.000000 -0.000000 0.000000'/>
         <geometry>
           <sphere radius='0.000250'/>
@@ -550,7 +550,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='head_tilt_link_geom_head_mount_kinect_rgb_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='head_tilt_link_geom_head_mount_kinect_rgb_link_visual'>
         <origin pose='-0.147067 -0.017500 0.291953 0.000000 -0.000000 0.000000'/>
         <geometry>
           <sphere radius='0.000250'/>
@@ -572,7 +572,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='head_tilt_link_geom_head_mount_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='head_tilt_link_geom_head_mount_link_visual'>
         <origin pose='-0.114800 0.000000 0.155500 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/sensors/kinect_prosilica_v0/115x100_swept_back--coarse.STL' scale='0.001000 0.001000 0.001000'/>
@@ -593,7 +593,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='head_tilt_link_geom_head_mount_prosilica_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='head_tilt_link_geom_head_mount_prosilica_link_visual'>
         <origin pose='-0.161257 0.012500 0.244421 0.000000 -0.000000 0.000000'/>
         <geometry>
           <sphere radius='0.000250'/>
@@ -615,7 +615,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='head_tilt_link_geom_head_plate_frame_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='head_tilt_link_geom_head_plate_frame_visual'>
         <origin pose='0.023200 0.000000 0.064500 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.010000 0.010000 0.010000'/>
@@ -716,7 +716,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_shoulder_pan_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_shoulder_pan_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1.000000 1.000000 1.000000'/>
@@ -744,7 +744,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_shoulder_lift_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_shoulder_lift_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1.000000 1.000000 1.000000'/>
@@ -772,7 +772,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_upper_arm_roll_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_upper_arm_roll_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.stl' scale='1.000000 1.000000 1.000000'/>
@@ -793,7 +793,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_upper_arm_roll_link_geom_l_upper_arm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_upper_arm_roll_link_geom_l_upper_arm_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1.000000 1.000000 1.000000'/>
@@ -821,7 +821,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_elbow_flex_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_elbow_flex_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1.000000 1.000000 1.000000'/>
@@ -849,7 +849,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_forearm_roll_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_forearm_roll_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1.000000 1.000000 1.000000'/>
@@ -870,7 +870,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_forearm_roll_link_geom_l_forearm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_forearm_roll_link_geom_l_forearm_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1.000000 1.000000 1.000000'/>
@@ -906,7 +906,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_wrist_flex_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_wrist_flex_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1.000000 1.000000 1.000000'/>
@@ -934,7 +934,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_wrist_roll_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_wrist_roll_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1.000000 1.000000 1.000000'/>
@@ -955,7 +955,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_wrist_roll_link_geom_l_gripper_motor_accelerometer_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_wrist_roll_link_geom_l_gripper_motor_accelerometer_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.001000 0.001000 0.001000'/>
@@ -976,7 +976,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_wrist_roll_link_geom_l_gripper_palm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_wrist_roll_link_geom_l_gripper_palm_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1004,7 +1004,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_gripper_l_finger_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_gripper_l_finger_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1032,7 +1032,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_gripper_l_finger_tip_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_gripper_l_finger_tip_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1080,7 +1080,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_gripper_r_finger_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_gripper_r_finger_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1108,7 +1108,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='l_gripper_r_finger_tip_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='l_gripper_r_finger_tip_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1142,7 +1142,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='laser_tilt_mount_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='laser_tilt_mount_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1179,7 +1179,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_shoulder_pan_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_shoulder_pan_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1207,7 +1207,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_shoulder_lift_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_shoulder_lift_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1235,7 +1235,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_upper_arm_roll_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_upper_arm_roll_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.stl' scale='1.000000 1.000000 1.000000'/>
@@ -1256,7 +1256,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_upper_arm_roll_link_geom_r_upper_arm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_upper_arm_roll_link_geom_r_upper_arm_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1284,7 +1284,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_elbow_flex_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_elbow_flex_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1312,7 +1312,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_forearm_roll_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_forearm_roll_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1.000000 1.000000 1.000000'/>
@@ -1333,7 +1333,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_forearm_roll_link_geom_r_forearm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_forearm_roll_link_geom_r_forearm_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1369,7 +1369,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_wrist_flex_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_wrist_flex_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1397,7 +1397,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_wrist_roll_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_wrist_roll_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1.000000 1.000000 1.000000'/>
@@ -1418,7 +1418,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <box size='0.001000 0.001000 0.001000'/>
@@ -1439,7 +1439,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_wrist_roll_link_geom_r_gripper_palm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_wrist_roll_link_geom_r_gripper_palm_link_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1467,7 +1467,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_gripper_l_finger_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_gripper_l_finger_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1495,7 +1495,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_gripper_l_finger_tip_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_gripper_l_finger_tip_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1543,7 +1543,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_gripper_r_finger_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_gripper_r_finger_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
@@ -1571,7 +1571,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='r_gripper_r_finger_tip_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+      <visual name='r_gripper_r_finger_tip_link_geom_visual'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>

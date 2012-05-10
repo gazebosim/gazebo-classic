@@ -11,13 +11,11 @@ message Inertial
 {
   optional double mass             = 1;
   optional Pose pose               = 2;
-  optional double linear_damping   = 3;
-  optional double angular_damping  = 4;
-  optional double ixx              = 5;
-  optional double ixy              = 6;
-  optional double ixz              = 7;
-  optional double iyy              = 8;
-  optional double iyz              = 9;
-  optional double izz              = 10;
+  optional double ixx              = 3;
+  optional double ixy              = 4;
+  optional double ixz              = 5;
+  optional double iyy              = 6;
+  optional double iyz              = 7;
+  optional double izz              = 8;
 }
 /// \endverbatim

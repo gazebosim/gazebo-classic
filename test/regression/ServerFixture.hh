@@ -26,6 +26,8 @@
 #include <string>
 
 #include "transport/transport.h"
+#include "physics/World.hh"
+#include "physics/PhysicsTypes.hh"
 #include "physics/Physics.hh"
 #include "sensors/sensors.h"
 #include "rendering/rendering.h"
@@ -80,6 +82,7 @@ class ServerFixture : public testing::Test
              {
                this->Load(_worldFilename, false);
              }
+
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
                delete this->server;
@@ -363,7 +366,7 @@ class ServerFixture : public testing::Test
                  << "      <cylinder radius ='.5' length ='1.0'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <cylinder radius ='.5' length ='1.0'/>"
                  << "    </geometry>"
@@ -379,6 +382,7 @@ class ServerFixture : public testing::Test
                while (!this->HasEntity(_name))
                  common::Time::MSleep(10);
              }
+
 
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
@@ -404,7 +408,7 @@ class ServerFixture : public testing::Test
                  << "      <sphere radius ='.5'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <sphere radius ='.5'/>"
                  << "    </geometry>"
@@ -446,7 +450,7 @@ class ServerFixture : public testing::Test
                  << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
                  << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
@@ -477,6 +481,21 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
              }
 
+  protected: void LoadPlugin(const std::string &_filename,
+                             const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->LoadPlugin(_filename, _name, sdf::ElementPtr());
+             }
+
+  protected: void RemovePlugin(const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->RemovePlugin(_name);
+             }
+
   protected: Server *server;
   protected: boost::thread *serverThread;
 
@@ -491,7 +510,7 @@ class ServerFixture : public testing::Test
   private: unsigned char **imgData;
   private: int gotImage;
 
-  private: common::Time simTime, realTime, pauseTime;
+  protected: common::Time simTime, realTime, pauseTime;
   private: double percentRealTime;
   private: bool paused;
   private: bool serverRunning;

@@ -19,63 +19,24 @@
  * Date: 21 May 2003
  */
 
-#ifndef BULLETHINGEJOINT_HH
-#define BULLETHINGEJOINT_HH
+#ifndef __BULLETHINGEJOINT_HH__
+#define __BULLETHINGEJOINT_HH__
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "BulletJoint.hh"
-#include "HingeJoint.hh"
-#include "BulletPhysics.hh"
+#include "physics/HingeJoint.hh"
+#include "physics/bullet/BulletJoint.hh"
+#include "physics/bullet/BulletPhysics.hh"
+
+class btHingeConstraint;
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics_joints
+    /// \addtogroup gazebo_physics
     /// \{
-    /** \defgroup gazebo_hinge_joint Hinge Joint
-
-      \brief A two-axis hinge joint.
-
-      \par Attributes
-      - body1 (string)
-        - Name of the first body to attach to the joint
-      - body2 (string)
-        - Name of the second body to attach to the joint
-      - anchor (string)
-        - Name of the body which will act as the anchor to the joint
-      - axis (float, tuple)
-        - Defines the axis of rotation for the first degree of freedom
-        - Default: 0 0 1
-      - lowStop (float, degrees)
-        - The low stop angle for the first degree of freedom
-        - Default: infinity
-      - highStop (float, degrees)
-        - The high stop angle for the first degree of freedom
-        - Default: infinity
-      - erp (double)
-        - Error reduction parameter.
-        - Default = 0.4
-      - cfm (double)
-        - Constraint force mixing.
-        - Default = 0.8
-
-      \par Example
-      \verbatim
-      <joint:hinge name ="hinge_joint>
-        <body1>body1_name</body1>
-        <body2>body2_name</body2>
-        <anchor>anchor_body</anchor>
-        <axis>0 0 1</axis>
-        <lowStop>0</lowStop>
-        <highStop>30</highStop>
-      </joint:hinge>
-      \endverbatim
-    */
-    /// \}
-
-    /// \addtogroup gazebo_hinge_joint
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
     /// \brief A single axis hinge joint
     class BulletHingeJoint : public HingeJoint<BulletJoint>
@@ -87,59 +48,65 @@ namespace gazebo
       public: virtual ~BulletHingeJoint();
 
       /// \brief Load joint
-      protected: virtual void Load(common::XMLConfigNode *node);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(Link *one, Link *two);
+      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
 
       /// \brief Get the anchor point
-      public: virtual math::Vector3 GetAnchor(int index) const;
+      public: virtual math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Set the anchor point
-      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
-
-      /// \brief Get the axis of rotation
-      public: math::Vector3 GetAxis(int index) const;
+      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Set the axis of rotation
-      public: void SetAxis(int index, const math::Vector3 &axis);
+      public: void SetAxis(int _index, const math::Vector3 &_axis);
 
       /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngle(int index) const;
+      public: virtual math::Angle GetAngle(int _index) const;
 
        /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle);
+      public: virtual void SetVelocity(int _index, double _angle);
 
       /// \brief Get the rotation rate
-      public: virtual double GetVelocity(int index) const;
+      public: virtual double GetVelocity(int _index) const;
 
       /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t);
+      public: virtual void SetMaxForce(int _index, double _t);
 
       /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index);
+      public: virtual double GetMaxForce(int _index);
 
       /// \brief Set the torque of a joint.
-      public: void SetForce(int index, double torque);
+      public: void SetForce(int _index, double _torque);
 
       /// \brief Get the torque of a joint.
-      public: virtual double GetForce(int index);
+      public: virtual double GetForce(int _index);
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, math::Angle angle);
+      public: virtual void SetHighStop(int _index, math::Angle _angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, math::Angle angle);
+      public: virtual void SetLowStop(int _index, math::Angle _angle);
 
       /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(int index);
+      public: virtual math::Angle GetHighStop(int _index);
 
       /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(int index);
+      public: virtual math::Angle GetLowStop(int _index);
+
+      /// \brief Get the axis of rotation
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+
+      /// \brief Get the angle of rotation
+      public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      private: btHingeConstraint *btHinge;
     };
+    /// \}
     /// \}
   }
 }

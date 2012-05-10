@@ -103,8 +103,10 @@ void ODESliderJoint::ApplyDamping()
 //////////////////////////////////////////////////
 void ODESliderJoint::SetForce(int /*index*/, double _force)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
 
   dJointAddSliderForce(this->jointId, _force);
 }

@@ -37,3 +37,9 @@ Shape::~Shape()
   if (this->collisionParent)
     this->collisionParent->SetShape(ShapePtr());
 }
+
+//////////////////////////////////////////////////
+void Shape::GetInertial(double /*_mass*/, InertialPtr /*_inertial*/) const
+{
+  return;
+}

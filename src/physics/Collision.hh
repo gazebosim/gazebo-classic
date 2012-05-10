@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef COLLISION_HH
-#define COLLISION_HH
+#ifndef __COLLISION_HH__
+#define __COLLISION_HH__
 
 #include <string>
 #include <vector>
@@ -42,7 +42,7 @@ namespace gazebo
     class Collision : public Entity
     {
       /// \brief Constructor
-      public: Collision(LinkPtr link);
+      public: Collision(LinkPtr _link);
 
       /// \brief Destructor
       public: virtual ~Collision();
@@ -53,30 +53,28 @@ namespace gazebo
       /// \brief Load the collision
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Initialize the collision
       public: virtual void Init();
 
       /// \brief Update the parameters using new sdf values
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Save the collision
-      public: void Save(std::string &prefix, std::ostream &stream);
-
       /// \brief Set the encapsulated collsion object
-      public: void SetCollision(bool placeable);
+      public: void SetCollision(bool _placeable);
 
       /// \brief Return whether this collision is placeable
       public: bool IsPlaceable() const;
 
       /// \brief Set the category bits, used during collision detection
       /// \param bits The bits
-      public: virtual void SetCategoryBits(unsigned int bits) = 0;
+      public: virtual void SetCategoryBits(unsigned int _bits) = 0;
 
       /// \brief Set the collide bits, used during collision detection
       /// \param bits The bits
-      public: virtual void SetCollideBits(unsigned int bits) = 0;
+      public: virtual void SetCollideBits(unsigned int _bits) = 0;
 
       /// \brief Set the laser retro reflectiveness
-      public: void SetLaserRetro(float retro);
+      public: void SetLaserRetro(float _retro);
 
       /// \brief Get the laser retro reflectiveness
       public: float GetLaserRetro() const;
@@ -94,7 +92,7 @@ namespace gazebo
       public: unsigned int GetShapeType();
 
       /// \brief Set the shape for this collision
-      public: void SetShape(ShapePtr shape);
+      public: void SetShape(ShapePtr _shape);
 
       /// \brief Get the attached shape
       public: ShapePtr GetShape() const;
@@ -106,7 +104,7 @@ namespace gazebo
       public: bool GetContactsEnabled() const;
 
       /// \brief Add an occurance of a contact to this collision
-      public: void AddContact(const Contact &contact);
+      public: void AddContact(const Contact &_contact);
 
       /// \brief Get the linear velocity of the collision
       public: virtual math::Vector3 GetRelativeLinearVel() const;
@@ -139,16 +137,30 @@ namespace gazebo
       /// \brief Set the current collision state
       public: void SetState(const CollisionState &_state);
 
-      public: template< typename T>
-              event::ConnectionPtr ConnectContact(T subscriber)
-              { return contact.Connect(subscriber); }
-      public: void DisconnectContact(event::ConnectionPtr &c)
-              { contact.Disconnect(c); }
+      public: template<typename T>
+              event::ConnectionPtr ConnectContact(T _subscriber)
+              {return contact.Connect(_subscriber);}
+
+      public: void DisconnectContact(event::ConnectionPtr &_c)
+              {contact.Disconnect(_c);}
+
       /// \brief Fill a collision message
       public: void FillCollisionMsg(msgs::Collision &_msg);
 
       /// \brief Update parameters from a message
       public: void ProcessMsg(const msgs::Collision &_msg);
+
+      /// \brief Get the surface parameters
+      public: inline SurfaceParamsPtr GetSurface() const
+              {return this->surface;}
+
+      /// \brief Get the inertial properties
+      /// \return A pointer to the inertial properties
+      public: const InertialPtr GetInertial() const;
+
+      /// \brief Set the inertial properties
+      /// \param _inertial The new inertial properties
+      public: void SetInertial(InertialPtr _inertial);
 
       private: msgs::Visual CreateCollisionVisual();
 
@@ -164,16 +176,17 @@ namespace gazebo
 
       protected: ShapePtr shape;
 
+      private: InertialPtr inertial;
+
       private: bool contactsEnabled;
 
       public: event::EventT<void (const std::string &,
                                   const Contact &)> contact;
 
-      public: SurfaceParamsPtr surface;
+      private: SurfaceParamsPtr surface;
       private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}
   }
 }
 #endif
-

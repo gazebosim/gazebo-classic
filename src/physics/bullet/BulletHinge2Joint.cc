@@ -21,16 +21,14 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletPhysics.hh"
-#include "BulletHinge2Joint.hh"
+
+#include "physics/bullet/BulletTypes.hh"
+#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletPhysics.hh"
+#include "physics/bullet/BulletHinge2Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
-
-using namespace physics;
-
-using namespace physics;
-
 
 //////////////////////////////////////////////////
 BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world)
@@ -39,51 +37,49 @@ BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world)
   this->world = _world;
 }
 
-
 //////////////////////////////////////////////////
 BulletHinge2Joint::~BulletHinge2Joint()
 {
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::Load(common::XMLConfigNode *_node)
+void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
-  Hinge2Joint<BulletJoint>::Load(_node);
+  Hinge2Joint<BulletJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SaveJoint(std::string &_prefix, std::ostream &_stream)
-{
-  Hinge2Joint<BulletJoint>::SaveJoint(_prefix, _stream);
-}
-
-//////////////////////////////////////////////////
-void BulletHinge2Joint::Attach(Link *_one, Link *_two)
+void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
 {
   Hinge2Joint<BulletJoint>::Attach(_one, _two);
-  BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
-  BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
-  if (!bulletLink1 || !bulletLink2)
+  BulletLinkPtr bulletChildLink =
+    boost::shared_static_cast<BulletLink>(this->childLink);
+  BulletLinkPtr bulletParentLink =
+    boost::shared_static_cast<BulletLink>(this->parentLink);
+
+  if (!bulletChildLink || !bulletParentLink)
     gzthrow("Requires bullet bodies");
 
-  btRigidLink *rigidLink1 = bulletLink1->GetBulletLink();
-  btRigidLink *rigidLink2 = bulletLink2->GetBulletLink();
+  sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
+  math::Vector3 axis1 = axis1Elem->GetValueVector3("xyz");
 
-  btmath::Vector3 anchor, axis1, axis2;
+  sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
+  math::Vector3 axis2 = axis2Elem->GetValueVector3("xyz");
 
-  anchor = btmath::Vector3(this->anchorPos.x, this->anchorPos.y,
-                           this->anchorPos.z);
-  axis1 = btmath::Vector3((**this->axis1P).x, (**this->axis1P).y,
-                          (**this->axis1P).z);
-  axis2 = btmath::Vector3((**this->axis2P).x, (**this->axis2P).y,
-                          (**this->axis2P).z);
+  btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
+  btVector3 baxis1(axis1.x, axis1.y, axis1.z);
+  btVector3 baxis2(axis2.x, axis2.y, axis2.z);
 
-  this->constraint = new btHinge2Constraint(*rigidLink1, *rigidLink2,
-      anchor, axis1, axis2);
+  this->btHinge2 = new btHinge2Constraint(
+      *bulletParentLink->GetBulletLink(),
+      *bulletChildLink->GetBulletLink(),
+      banchor, baxis1, baxis2);
+
+  this->constraint = this->btHinge2;
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
+  this->world->addConstraint(this->constraint, true);
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
@@ -98,87 +94,88 @@ math::Vector3 BulletHinge2Joint::GetAnchor(int /*index*/) const
 //////////////////////////////////////////////////
 math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
 {
-  btmath::Vector3 vec = ((btHinge2Constraint*)this->constraint)->getAxis1();
+  btVector3 vec = this->btHinge2->getAxis1();
   return math::Vector3(vec.getX(), vec.getY(), vec.getZ());
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetAngle(int _index) const
+math::Angle BulletHinge2Joint::GetAngle(int /*_index*/) const
 {
-  return ((btHinge2Constraint*)this->constraint)->getmath::Angle1();
+  return this->btHinge2->getAngle1();
 }
 
 //////////////////////////////////////////////////
-double BulletHinge2Joint::GetVelocity(int _index) const
+double BulletHinge2Joint::GetVelocity(int /*_index*/) const
 {
   gzerr << "Not implemented";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetVelocity(int _index, double _angle)
+void BulletHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAnchor(int _index, const math::Vector3 &_anchor)
+void BulletHinge2Joint::SetAnchor(int /*_index*/,
+                                  const math::Vector3 &/*_anchor*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
+void BulletHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented";
+  // Bullet seems to handle setAxis improperly. It readjust all the pivot
+  // points
+  /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
+  ((btHingeConstraint*)this->btHinge)->setAxis(vec);
+  */
 }
 
-
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetDamping(int /*index*/, const double _damping)
+void BulletHinge2Joint::SetDamping(int /*index*/, double /*_damping*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetForce(int _index, double _torque)
+void BulletHinge2Joint::SetForce(int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetMaxForce(int _index, double _t)
+void BulletHinge2Joint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-double BulletHinge2Joint::GetMaxForce(int _index)
+double BulletHinge2Joint::GetMaxForce(int /*_index*/)
 {
   gzerr << "Not implemented";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetHighStop(int _index, math::Angle _angle)
+void BulletHinge2Joint::SetHighStop(int /*_index*/, math::Angle _angle)
 {
-  static_cast<btHinge2Constraint*>(this->constraint)->setUpperLimit(
-      _angle.GetAsRadian());
+  this->btHinge2->setUpperLimit(_angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetLowStop(int _index, math::Angle _angle)
+void BulletHinge2Joint::SetLowStop(int /*_index*/, math::Angle _angle)
 {
-  static_cast<btHinge2Constraint*>(this->constraint)->setLowerLimit(
-      _angle.GetAsRadian());
+  this->btHinge2->setLowerLimit(_angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetHighStop(int _index)
 {
   btRotationalLimitMotor *motor =
-    static_cast<btHinge2Constraint*>(this->constraint)->getRotationalLimitMotor(
-        _index);
+    this->btHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_hiLimit;
 
@@ -190,8 +187,7 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 math::Angle BulletHinge2Joint::GetLowStop(int _index)
 {
   btRotationalLimitMotor *motor =
-    static_cast<btHinge2Constraint*>(this->constraint)->getRotationalLimitMotor(
-        _index);
+    this->btHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_loLimit;
 
@@ -199,4 +195,16 @@ math::Angle BulletHinge2Joint::GetLowStop(int _index)
   return 0;
 }
 
+//////////////////////////////////////////////////
+math::Vector3 BulletHinge2Joint::GetGlobalAxis(int /*_index*/) const
+{
+  gzerr << "BulletHinge2Joint::GetGlobalAxis not implemented\n";
+  return math::Vector3();
+}
 
+//////////////////////////////////////////////////
+math::Angle BulletHinge2Joint::GetAngleImpl(int /*_index*/) const
+{
+  gzerr << "BulletHinge2Joint::GetAngleImpl not implemented\n";
+  return math::Angle();
+}

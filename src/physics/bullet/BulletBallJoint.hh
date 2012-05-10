@@ -19,52 +19,73 @@
  * Date: 21 May 2003
  */
 
-#ifndef BULLETBALLJOINT_HH
-#define BULLETBALLJOINT_HH
-/*
-#include "BallJoint.hh"
-#include "BulletJoint.hh"
-#include "BulletPhysics.hh"
-*/
+#ifndef __BULLETBALLJOINT_HH__
+#define __BULLETBALLJOINT_HH__
+
+#include "physics/BallJoint.hh"
+#include "physics/bullet/BulletJoint.hh"
+#include "physics/bullet/BulletPhysics.hh"
+
+class btPoint2PointConstraint;
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
     /// \brief A ball joint
     class BulletBallJoint : public BallJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletBallJoint(btDynamicsWorld *world);
+      public: BulletBallJoint(btDynamicsWorld *_world);
 
       /// \brief Destructor
       public: virtual ~BulletBallJoint();
 
       /// \brief Get joint's anchor point
-      public: math::Vector3 GetAnchor(int index) const;
+      public: math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Set joint's anchor point
-      public: void SetAnchor(int index, const math::Vector3 &anchor);
+      public: void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Attach the two bodies with this joint
-      public: void Attach(Link *one, Link *two);
+      public: void Attach(LinkPtr _one, LinkPtr _two);
 
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetAxis(int index) const {}
+      public: virtual math::Vector3 GetAxis(int /*_index*/) const
+              {return math::Vector3();}
+
       /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle) {}
+      public: virtual void SetVelocity(int _index, double _angle);
+
       /// \brief Get the rotation rate of an axis(index)
-      public: virtual double GetVelocity(int index) const {}
+      public: virtual double GetVelocity(int _index) const;
+
       /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index) {}
+      public: virtual double GetMaxForce(int _index);
+
       /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t) {}
+      public: virtual void SetMaxForce(int _index, double _t);
+
       /// \brief Get the angle of rotation of an axis(index)
-      public: virtual math::Angle GetAngle(int index) const {}
+      public: virtual math::Angle GetAngle(int _index) const;
+
+      /// \brief Get the axis of rotation
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+
+      /// \brief Get the angle of rotation
+      public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      private: btPoint2PointConstraint *btBall;
     };
+    /// \}
+    /// \}
   }
 }
 #endif

@@ -17,8 +17,8 @@
 
     <include filename="ground_plane.model"/>
 
-    <model name="box_1">
-      <origin pose="0 0 0.5 0 0 0"/>
+    <model name="box">
+      <origin pose="0 0 10.5 0 0 0"/>
       <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -26,30 +26,29 @@
 
         <collision name="collision">
           <geometry>
-            <mesh filename="cube_20k.stl" scale="0.5 0.5 0.5"/>
+            <box size="1 1 1"/>
           </geometry>
           <surface>
             <friction>
               <ode mu="1" mu2="1"/>
             </friction>
             <contact>
-              <ode max_vel="0"/>
+              <ode max_vel="0" min_depth="0"/>
             </contact>
           </surface>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <mesh filename="cube_20k.stl" scale="0.5 0.5 0.5"/>
+            <box size="1 1 1"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
     </model>
 
-
-    <model name="box_2">
-      <origin pose="0 0 2.0 0 0 0"/>
+    <model name="sphere">
+      <origin pose="0 1.5 10.5 0 0 0"/>
       <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -57,27 +56,56 @@
 
         <collision name="collision">
           <geometry>
-            <mesh filename="cube_20k.stl" scale="0.5 0.5 0.5"/>
+            <sphere radius="0.5"/>
           </geometry>
           <surface>
             <friction>
               <ode mu="1" mu2="1"/>
             </friction>
             <contact>
-              <ode max_vel="0"/>
+              <ode max_vel="0" min_depth="0"/>
             </contact>
           </surface>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <mesh filename="cube_20k.stl" scale="0.5 0.5 0.5"/>
+            <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
     </model>
 
+    <model name="cylinder">
+      <origin pose="0 -1.5 10.5 0 0 0"/>
+      <link name="link">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <cylinder radius="0.5" length="1.0"/>
+          </geometry>
+          <surface>
+            <friction>
+              <ode mu="1" mu2="1"/>
+            </friction>
+            <contact>
+              <ode max_vel="0" min_depth="0"/>
+            </contact>
+          </surface>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder radius="0.5" length="1.0"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
 
     <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>

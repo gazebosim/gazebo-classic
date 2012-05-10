@@ -27,7 +27,7 @@
 #include "player.h"
 #include "transport/transport.h"
 
-#include "gazebo.h"
+#include "gazebo.hh"
 #include "GazeboTime.hh"
 #include "GazeboDriver.hh"
 #include "SimulationInterface.hh"

@@ -18,93 +18,77 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
-/*
-#include <sstream>
 
-#include "PhysicsEngine.hh"
-#include "BulletPhysics.hh"
-#include "rendering/Visual.hh"
-#include "common/Console.hh"
-#include "World.hh"
-*/
+#include "physics/bullet/bullet_inc.h"
+#include "physics/bullet/BulletCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
-BulletCollision::BulletCollision(Link *_body)
-    : Collision(_body)
+BulletCollision::BulletCollision(LinkPtr _parent)
+    : Collision(_parent)
 {
-  this->SetName("Bullet Collision");
-  this->bulletPhysics = dynamic_cast<BulletPhysics*>(this->physicsEngine);
+  this->SetName("Bullet_Collision");
   this->collisionShape = NULL;
 }
 
 //////////////////////////////////////////////////
 BulletCollision::~BulletCollision()
 {
+  /*
   delete this->collisionShape;
   this->collisionShape = NULL;
+  */
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::Load(common::XMLConfigNode *_node)
+void BulletCollision::Load(sdf::ElementPtr _sdf)
 {
-  Collision::Load(_node);
-//  this->visualNode->SetPose(this->GetRelativePose());
-}
-
-//////////////////////////////////////////////////
-void BulletCollision::Save(std::string &_prefix, std::ostream &_stream)
-{
-  Collision::Save(_prefix, _stream);
-}
-
-//////////////////////////////////////////////////
-void BulletCollision::Update()
-{
-  Collision::Update();
+  Collision::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
+  /*
   math::Pose pose = this->GetRelativePose();
   BulletLink *bbody = static_cast<BulletLink*>(this->body);
 
   bbody->SetCollisionRelativePose(this, pose);
+  */
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCategoryBits(unsigned int _bits)
+void BulletCollision::SetCategoryBits(unsigned int /*_bits*/)
 {
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollideBits(unsigned int _bits)
+void BulletCollision::SetCollideBits(unsigned int /*_bits*/)
 {
 }
 
 //////////////////////////////////////////////////
-Mass BulletCollision::GetLinkMassMatrix()
+/*Mass BulletCollision::GetLinkMassMatrix()
 {
   Mass result;
   return result;
-}
+}*/
 
 //////////////////////////////////////////////////
-void BulletCollision::GetBoundingBox(math::Vector3 &_min,
-                                     math::Vector3 &_max) const
+math::Box BulletCollision::GetBoundingBox() const
 {
+  math::Box result;
   if (this->collisionShape)
   {
-    btmath::Vector3 btMin, btMax;
+    btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    _min.Set(btMin.x(), btMin.y(), btMin.z());
-    _max.Set(btMax.x(), btMax.y(), btMax.z());
+    result.min.Set(btMin.x(), btMin.y(), btMin.z());
+    result.max.Set(btMax.x(), btMax.y(), btMax.z());
   }
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -112,11 +96,10 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 {
   this->collisionShape = _shape;
 
-  /*btmath::Vector3 vec;
-  this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
-  */
+  // btmath::Vector3 vec;
+  // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
-  this->mass.SetCoG(this->GetRelativePose().pos);
+  // this->mass.SetCoG(this->GetRelativePose().pos);
 }
 
 //////////////////////////////////////////////////
@@ -126,9 +109,7 @@ btCollisionShape *BulletCollision::GetCollisionShape() const
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCompoundShapeIndex(int _index)
+void BulletCollision::SetCompoundShapeIndex(int /*_index*/)
 {
-  this->compoundShapeIndex = 0;
+  // this->compoundShapeIndex = 0;
 }
-
-

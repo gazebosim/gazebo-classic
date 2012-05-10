@@ -64,7 +64,7 @@
     </link>
     <link name='br_caster_l_wheel_link' self_collide='0'>
       <origin pose='-0.2246 -0.1756 0.0792 0 -0 0'/>
-      <visual name='visual8' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual8'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -79,7 +79,7 @@
     </link>
     <link name='br_caster_r_wheel_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='-0.2246 -0.2736 0.0792 0 -0 0'/>
-      <visual name='visual9' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual9'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -94,7 +94,7 @@
     </link>
     <link name='fl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 0.2246 0.0792 0 -0 0'/>
-      <visual name='visual10' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual10'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
@@ -103,7 +103,7 @@
     </link>
     <link name='fl_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 0.2736 0.0792 0 -0 0'/>
-      <visual name='visual11' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual11'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -118,7 +118,7 @@
     </link>
     <link name='fl_caster_r_wheel_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 0.1756 0.0792 0 -0 0'/>
-      <visual name='visual12' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual12'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -133,7 +133,7 @@
     </link>
     <link name='fr_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 -0.2246 0.0792 0 -0 0'/>
-      <visual name='visual13' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual13'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
@@ -142,7 +142,7 @@
     </link>
     <link name='fr_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 -0.1756 0.0792 0 -0 0'/>
-      <visual name='visual14' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual14'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -157,7 +157,7 @@
     </link>
     <link name='fr_caster_r_wheel_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 -0.2736 0.0792 0 -0 0'/>
-      <visual name='visual15' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual15'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -172,7 +172,7 @@
     </link>
     <link name='torso_lift_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='-0.05 0 0.790675 0 -0 0'/>
-      <visual name='visual16' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual16'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1 1 1'/>
@@ -186,7 +186,7 @@
     </link>
     <link name='head_pan_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='-0.06707 0 1.17213 0 -0 0'/>
-      <visual name='visual17' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual17'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/head_v0/head_pan.dae' scale='1 1 1'/>
@@ -201,7 +201,7 @@
     </link>
     <link name='head_tilt_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.00093 0 1.17213 0 -0 0'/>
-      <visual name="visual1" cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name="visual1">
         <geometry>
           <mesh filename='pr2/head_v0/head_tilt.dae' scale='1 1 1'/>
         </geometry>
@@ -211,7 +211,7 @@
           </shader>
         </material>
       </visual>
-      <visual name='visual18' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual18'>
         <origin pose='0.0232 0 0.0645 0 -0 0'/>
         <geometry>
           <box size='0.01 0.01 0.01'/>
@@ -222,7 +222,7 @@
 
     <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='-0.05 0.188 0.790675 0 -0 0'/>
-      <visual name='visual20' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual20'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
@@ -236,7 +236,7 @@
     </link>
     <link name='l_shoulder_lift_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.05 0.188 0.790675 0 -0 0'/>
-      <visual name='visual21' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual21'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
@@ -250,7 +250,7 @@
     </link>
     <link name='l_upper_arm_roll_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.05 0.188 0.790675 0 -0 0'/>
-      <visual name='visual22' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual22'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
@@ -262,7 +262,7 @@
         </material>
 
       </visual>
-      <visual name='visual23' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual23'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
@@ -278,7 +278,7 @@
     </link>
     <link name='l_elbow_flex_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.45 0.188 0.790675 0 -0 0'/>
-      <visual name='visual24' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual24'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
@@ -293,13 +293,13 @@
     </link>
     <link name='l_forearm_roll_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.45 0.188 0.790675 0 -0 0'/>
-      <visual name='visual25' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual25'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
         </geometry>
       </visual>
-      <visual name='visual16' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual16'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
@@ -313,7 +313,7 @@
     </link>
     <link name='l_wrist_flex_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.771 0.188 0.790675 0 -0 0'/>
-      <visual name='visual27' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual27'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
@@ -328,19 +328,19 @@
     </link>
     <link name='l_wrist_roll_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.771 0.188 0.790675 0 -0 0'/>
-      <visual name='visual28' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual28'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
         </geometry>
       </visual>
-      <visual name='visual29' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual29'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <box size='0.001 0.001 0.001'/>
         </geometry>
       </visual>
-      <visual name='visual30' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual30'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
@@ -355,7 +355,7 @@
     </link>
     <link name='l_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.84791 0.198 0.790675 0 -0 0'/>
-      <visual name='visual31' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual31'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -370,7 +370,7 @@
     </link>
     <link name='l_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.93928 0.20295 0.790675 0 -0 0'/>
-      <visual name='visual32' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual32'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
@@ -385,7 +385,7 @@
     </link>
     <link name='l_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.84791 0.178 0.790675 0 -0 0'/>
-      <visual name='visual33' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual33'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -400,7 +400,7 @@
     </link>
     <link name='l_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.93928 0.17305 0.790675 0 -0 0'/>
-      <visual name='visual34' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual34'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
@@ -415,7 +415,7 @@
     </link>
     <link name='laser_tilt_mount_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.04893 0 1.01768 0 -0 0'/>
-      <visual name='visual26' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual26'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1'/>
@@ -430,7 +430,7 @@
     </link>
     <link name='r_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='-0.05 -0.188 0.790675 0 -0 0'/>
-      <visual name='visual27' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual27'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
@@ -444,7 +444,7 @@
     </link>
     <link name='r_shoulder_lift_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.05 -0.188 0.790675 0 -0 0'/>
-      <visual name='visual28' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual28'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
@@ -458,7 +458,7 @@
     </link>
     <link name='r_upper_arm_roll_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.05 -0.188 0.790675 0 -0 0'/>
-      <visual name='visual29' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual29'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
@@ -469,7 +469,7 @@
           </shader>
         </material>
       </visual>
-      <visual name='visual30' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual30'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
@@ -483,7 +483,7 @@
     </link>
     <link name='r_elbow_flex_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.45 -0.188 0.790675 0 -0 0'/>
-      <visual name='visual31' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual31'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
@@ -497,13 +497,13 @@
     </link>
     <link name='r_forearm_roll_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.45 -0.188 0.790675 0 -0 0'/>
-      <visual name='visual32' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual32'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
         </geometry>
       </visual>
-      <visual name='visual33' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual33'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
@@ -517,7 +517,7 @@
     </link>
     <link name='r_wrist_flex_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.771 -0.188 0.790675 0 -0 0'/>
-      <visual name='visual34' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual34'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
@@ -532,19 +532,19 @@
     </link>
     <link name='r_wrist_roll_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.771 -0.188 0.790675 0 -0 0'/>
-      <visual name='visual35' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual35'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
         </geometry>
       </visual>
-      <visual name='visual36' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual36'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <box size='0.001 0.001 0.001'/>
         </geometry>
       </visual>
-      <visual name='visual37' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual37'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
@@ -559,7 +559,7 @@
     </link>
     <link name='r_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.84791 -0.178 0.790675 0 -0 0'/>
-      <visual name='visual38' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual38'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -574,7 +574,7 @@
     </link>
     <link name='r_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.93928 -0.17305 0.790675 0 -0 0'/>
-      <visual name='visual40' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual40'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
@@ -589,7 +589,7 @@
     </link>
     <link name='r_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.84791 -0.198 0.790675 0 -0 0'/>
-      <visual name='visual41' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual41'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -604,7 +604,7 @@
     </link>
     <link name='r_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.93928 -0.20295 0.790675 0 -0 0'/>
-      <visual name='visual42' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual42'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>

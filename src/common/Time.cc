@@ -107,6 +107,12 @@ double Time::Double() const
 }
 
 /////////////////////////////////////////////////
+float Time::Float() const
+{
+  return (this->sec + this->nsec * 1e-9f);
+}
+
+/////////////////////////////////////////////////
 Time Time::MSleep(unsigned int _ms)
 {
   Time result;

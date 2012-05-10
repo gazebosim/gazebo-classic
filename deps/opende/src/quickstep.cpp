@@ -1906,8 +1906,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
          caccel_curr+=6, caccel_erp_curr+=6, bodycurr++, debug_count++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
-        dReal v0 = b_ptr->lvel[j];
-        dReal a0 = b_ptr->avel[j];
+        // dReal v0 = b_ptr->lvel[j];
+        // dReal a0 = b_ptr->avel[j];
         dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
         dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
 

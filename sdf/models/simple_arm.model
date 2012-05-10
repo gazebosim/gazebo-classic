@@ -1,284 +1,210 @@
 <gazebo version='1.0'>
-  <model name='simple_arm' static='0'>
-    <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-    <link name='arm_base' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='101.000000'>
-        <origin pose='0.000000 0.000000 0.000990 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='1.110000' ixy='0.000000' ixz='0.000000' iyy='100.110000' iyz='0.000000' izz='1.010000'/>
+  <model name='simple_arm'>
+    <link name='arm_base'>
+      <inertial mass='101.0'>
+        <origin pose='0 0 0.00099 0 0 0'/>
+        <inertia ixx='1.11' ixy='0' ixz='0' iyy='100.11' iyz='0' izz='1.01'/>
       </inertial>
-      <collision name='arm_base_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_base_geom'>
+        <origin pose='0 0 0.05 0 0 0'/>
         <geometry>
-          <box size='1.000000 1.000000 0.100000'/>
+          <box size='1.0 1.0 0.1'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_base_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_base_geom_visual'>
+        <origin pose='0 0 0.05 0 0 0'/>
         <geometry>
-          <box size='1.000000 1.000000 0.100000'/>
+          <box size='1.0 1.0 0.1'/>
         </geometry>
         <material script='Gazebo/Blue'/>
       </visual>
-      <collision name='arm_base_geom_arm_trunk' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.600000 0.000000 -0.000000 0.000000'/>
+
+      <collision name='arm_base_geom_arm_trunk'>
+        <origin pose='0 0 0.6 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='1.000000'/>
+          <cylinder radius='0.05' length='1.0'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_base_geom_arm_trunk_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.600000 0.000000 -0.000000 0.000000'/>
+      <visual name='arm_base_geom_arm_trunk_visual'>
+        <origin pose='0 0 0.6 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='1.000000'/>
+          <cylinder radius='0.05' length='1.0'/>
         </geometry>
         <material script='Gazebo/Red'/>
       </visual>
     </link>
-    <link name='arm_shoulder_pan' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='0.000000 0.000000 1.100000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='1.100000'>
-        <origin pose='0.045455 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.011000' ixy='0.000000' ixz='0.000000' iyy='0.022500' iyz='0.000000' izz='0.013500'/>
+
+    <link name='arm_shoulder_pan'>
+      <origin pose='0 0 1.1 0 0 0'/>
+      <inertial mass='1.1'>
+        <origin pose='0.045455 0 0 0 0 0'/>
+        <inertia ixx='0.011' ixy='0' ixz='0' iyy='0.0225' iyz='0' izz='0.0135'/>
       </inertial>
-      <collision name='arm_shoulder_pan_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_shoulder_pan_geom' >
+        <origin pose='0 0 0.05 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.100000'/>
+          <cylinder radius='0.05' length='0.1'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_shoulder_pan_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_shoulder_pan_geom_visual'>
+        <origin pose='0 0 0.05 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.100000'/>
+          <cylinder radius='0.05' length='0.1'/>
         </geometry>
         <material script='Gazebo/Yellow'/>
       </visual>
-      <collision name='arm_shoulder_pan_geom_arm_shoulder' laser_retro='0.000000'>
-        <origin pose='0.550000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+
+      <collision name='arm_shoulder_pan_geom_arm_shoulder' >
+        <origin pose='0.55 0 0.05 0 0 0'/>
         <geometry>
-          <box size='1.000000 0.050000 0.100000'/>
+          <box size='1.0 0.05 0.1'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_shoulder_pan_geom_arm_shoulder_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.550000 0.000000 0.050000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_shoulder_pan_geom_arm_shoulder_visual'>
+        <origin pose='0.55 0 0.05 0 0 0'/>
         <geometry>
-          <box size='1.000000 0.050000 0.100000'/>
+          <box size='1.0 0.05 0.1'/>
         </geometry>
         <material script='Gazebo/Yellow'/>
       </visual>
     </link>
-    <link name='arm_elbow_pan' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='1.050000 0.000000 1.100000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='1.200000'>
-        <origin pose='0.087500 0.000000 0.083333 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.031000' ixy='0.000000' ixz='-0.005000' iyy='0.072750' iyz='0.000000' izz='0.044750'/>
+
+    <link name='arm_elbow_pan'>
+      <origin pose='1.05 0 1.1 0 0 0'/>
+      <inertial mass='1.2'>
+        <origin pose='0.0875 0 0.083333 0 0 0'/>
+        <inertia ixx='0.031' ixy='0' ixz='0.005' iyy='0.07275' iyz='0' izz='0.04475'/>
       </inertial>
-      <collision name='arm_elbow_pan_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.100000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_elbow_pan_geom' >
+        <origin pose='0 0 0.1 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.200000'/>
+          <cylinder radius='0.05' length='0.2'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_elbow_pan_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.100000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_elbow_pan_geom_visual'>
+        <origin pose='0 0 0.1 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.200000'/>
+          <cylinder radius='0.05' length='0.2'/>
         </geometry>
         <material script='Gazebo/Red'/>
       </visual>
-      <collision name='arm_elbow_pan_geom_arm_elbow' laser_retro='0.000000'>
-        <origin pose='0.300000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
+
+      <collision name='arm_elbow_pan_geom_arm_elbow'>
+        <origin pose='0.3 0 0.15 0 0 0'/>
         <geometry>
-          <box size='0.500000 0.030000 0.100000'/>
+          <box size='0.5 0.03 0.1'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_elbow_pan_geom_arm_elbow_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.300000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_elbow_pan_geom_arm_elbow_visual'>
+        <origin pose='0.3 0 0.15 0 0 0'/>
         <geometry>
-          <box size='0.500000 0.030000 0.100000'/>
+          <box size='0.5 0.03 0.1'/>
         </geometry>
         <material script='Gazebo/Yellow'/>
       </visual>
-      <collision name='arm_elbow_pan_geom_arm_wrist' laser_retro='0.000000'>
-        <origin pose='0.550000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
+
+      <collision name='arm_elbow_pan_geom_arm_wrist'>
+        <origin pose='0.55 0 0.15 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.300000'/>
+          <cylinder radius='0.05' length='0.3'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_elbow_pan_geom_arm_wrist_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.550000 0.000000 0.150000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_elbow_pan_geom_arm_wrist_visual'>
+        <origin pose='0.55 0 0.15 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.300000'/>
+          <cylinder radius='0.05' length='0.3'/>
         </geometry>
         <material script='Gazebo/Red'/>
       </visual>
     </link>
-    <link name='arm_wrist_lift' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='1.600000 0.000000 1.050000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='0.100000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.001000'/>
+
+    <link name='arm_wrist_lift'>
+      <origin pose='1.6 0 1.05 0 0 0'/>
+      <inertial mass='0.1'>
+        <origin pose='0 0 0 0 0 0'/>
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.001'/>
       </inertial>
-      <collision name='arm_wrist_lift_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.500000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_wrist_lift_geom'>
+        <origin pose='0 0 0.5 0 0 0'/>
         <geometry>
-          <cylinder radius='0.030000' length='1.000000'/>
+          <cylinder radius='0.03' length='1.0'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_wrist_lift_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.500000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_wrist_lift_geom_visual'>
+        <origin pose='0 0 0.5 0 0 0'/>
         <geometry>
-          <cylinder radius='0.030000' length='1.000000'/>
+          <cylinder radius='0.03' length='1.0'/>
         </geometry>
         <material script='Gazebo/Yellow'/>
       </visual>
     </link>
-    <link name='arm_wrist_roll' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='1.600000 0.000000 1.000000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='0.100000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.001000'/>
+
+    <link name='arm_wrist_roll'>
+      <origin pose='1.6 0 1.0 0 0 0'/>
+      <inertial mass='0.1'>
+        <origin pose='0 0 0 0 0 0'/>
+        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.001'/>
       </inertial>
-      <collision name='arm_wrist_roll_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.025000 0.000000 -0.000000 0.000000'/>
+      <collision name='arm_wrist_roll_geom'>
+        <origin pose='0 0 0.025 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.050000'/>
+          <cylinder radius='0.05' length='0.05'/>
         </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.000000'/>
-          </contact>
-        </surface>
       </collision>
-      <visual name='arm_wrist_roll_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.025000 0.000000 -0.000000 0.000000'/>
+
+      <visual name='arm_wrist_roll_geom_visual'>
+        <origin pose='0 0 0.025 0 0 0'/>
         <geometry>
-          <cylinder radius='0.050000' length='0.050000'/>
+          <cylinder radius='0.05' length='0.05'/>
         </geometry>
         <material script='Gazebo/Red'/>
       </visual>
     </link>
+
     <joint name='arm_base_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='world'/>
       <child link='arm_base'/>
-      <axis xyz='0.000000 0.000000 1.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='0.000000' upper='0.000000' effort='0.000000' velocity='0.000000'/>
+      <axis xyz='0 0 1'>
+        <limit lower='0' upper='0'/>
       </axis>
     </joint>
+
     <joint name='arm_shoulder_pan_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='world'/>
       <child link='arm_shoulder_pan'/>
-      <axis xyz='0.000000 0.000000 1.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
-      </axis>
+      <axis xyz='0 0 1'/>
     </joint>
+
     <joint name='arm_elbow_pan_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='arm_shoulder_pan'/>
       <child link='arm_elbow_pan'/>
-      <axis xyz='0.000000 0.000000 1.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
-      </axis>
+      <axis xyz='0 0 1'/>
     </joint>
+
     <joint name='arm_wrist_lift_joint' type='prismatic'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='arm_elbow_pan'/>
       <child link='arm_wrist_lift'/>
-      <axis xyz='0.000000 0.000000 1.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-0.800000' upper='0.100000' effort='0.000000' velocity='0.000000'/>
+      <axis xyz='0 0 1'>
+        <limit lower='-0.8' upper='0.1'/>
       </axis>
     </joint>
+
     <joint name='arm_wrist_roll_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
       <parent link='arm_wrist_lift'/>
       <child link='arm_wrist_roll'/>
-      <axis xyz='0.000000 0.000000 1.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-2.999994' upper='2.999994' effort='0.000000' velocity='0.000000'/>
+      <axis xyz='0 0 1'>
+        <limit lower='-2.999994' upper='2.999994'/>
       </axis>
     </joint>
+
+    <!--
     <plugin name="simple_arm_plugin" filename="libSimpleArmPlugin.so">
       <joint1>arm_base_joint</joint1>
       <joint2>arm_shoulder_pan_joint</joint2>
@@ -296,5 +222,6 @@
       <joint4_ilim>-10 10</joint4_ilim>
       <joint5_ilim>-1 1</joint5_ilim>
     </plugin>
+    -->
   </model>
 </gazebo>

@@ -16,7 +16,7 @@
     <attribute name="name" type="string" default="__default__" required="1"/>
     <attribute name="filename" type="string" default="__default__" required="1"/>
     <attribute name="scale" type="double" default="1.0" required="0"/>
-    <attribute name="linear_vel" type="double" default="0.0" required="0"/>
+    <attribute name="interpolate_x" type="bool" default="false" required="0"/>
   </element> <!-- End Animation -->
 
   <element name="script" required="1">

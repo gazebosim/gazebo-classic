@@ -27,7 +27,9 @@ namespace gazebo
 {
   namespace gui
   {
-    class MySlider;
+    class JointForceControl;
+    class JointPIDPosControl;
+    class JointPIDVelControl;
     class JointControlWidget : public QWidget
     {
       Q_OBJECT
@@ -36,25 +38,89 @@ namespace gazebo
       public: virtual ~JointControlWidget();
 
       public: void Load(const std::string &_modelName);
-      private slots: void OnChanged(double _value, const std::string &_name);
+      private slots: void OnForceChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnPIDPosChanged(double _value,
+          const std::string &_name);
 
+      private slots: void OnPPosGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnDPosGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnIPosGainChanged(double _value,
+                                         const std::string &_name);
+
+      private slots: void OnPIDVelChanged(double _value,
+          const std::string &_name);
+
+      private slots: void OnPVelGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnDVelGainChanged(double _value,
+                                         const std::string &_name);
+      private slots: void OnIVelGainChanged(double _value,
+                                         const std::string &_name);
+
+      private slots: void OnPIDPosUnitsChanged(int _index);
       private: transport::NodePtr node;
       private: transport::PublisherPtr jointPub;
 
       private: msgs::Request *requestMsg;
-      private: std::map<std::string, MySlider*> sliders;
+      private: std::map<std::string, JointForceControl*> sliders;
+      private: std::map<std::string, JointPIDPosControl*> pidPosSliders;
+      private: std::map<std::string, JointPIDVelControl*> pidVelSliders;
     };
 
-    class MySlider : public QWidget
+    class JointForceControl : public QWidget
     {
       Q_OBJECT
-      public: MySlider(const std::string &_name, QWidget *_parent);
-      public slots: void OnChanged(int _value);
+      public: JointForceControl(const std::string &_name,
+                  QGridLayout *_layout, QWidget *_parent);
+      public slots: void OnChanged(double _value);
       Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
       private: std::string name;
-      private: QSlider *slider;
-      private: QLabel *label;
-      private: QDoubleSpinBox *multiplier;
+    };
+
+    class JointPIDPosControl : public QWidget
+    {
+      Q_OBJECT
+      public: JointPIDPosControl(const std::string &_name,
+                  QGridLayout *_layout, QWidget *_parent);
+
+      public: void SetToRadians();
+      public: void SetToDegrees();
+
+      public slots: void OnChanged(double _value);
+      public slots: void OnPChanged(double _value);
+      public slots: void OnIChanged(double _value);
+      public slots: void OnDChanged(double _value);
+
+      Q_SIGNALS: void changed(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void pChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void dChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void iChanged(double /*_value*/, const std::string &/*_name*/);
+
+      private: QDoubleSpinBox *posSpin;
+      private: std::string name;
+      private: bool radians;
+    };
+
+    class JointPIDVelControl : public QWidget
+    {
+      Q_OBJECT
+      public: JointPIDVelControl(const std::string &_name,
+                  QGridLayout *_layout, QWidget *_parent);
+
+      public slots: void OnChanged(double _value);
+      public slots: void OnPChanged(double _value);
+      public slots: void OnIChanged(double _value);
+      public slots: void OnDChanged(double _value);
+
+      Q_SIGNALS: void changed(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void pChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void dChanged(double /*_value*/, const std::string &/*_name*/);
+      Q_SIGNALS: void iChanged(double /*_value*/, const std::string &/*_name*/);
+
+      private: std::string name;
     };
   }
 }

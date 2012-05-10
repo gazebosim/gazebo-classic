@@ -121,9 +121,9 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
                         && words[1] == "Site")
                 {
                   /// ignore End Sites
-                  getline(file, line); /// read {
-                  getline(file, line); /// read OFFSET
-                  getline(file, line); /// read }
+                  getline(file, line);  /// read {
+                  getline(file, line);  /// read OFFSET
+                  getline(file, line);  /// read }
                 }
                 else
                 {

@@ -44,7 +44,7 @@ namespace gazebo
       /// \param body Link the ray is attached to
       /// \param displayRays Indicates if the rays should be displayed when
       ///        rendering images
-      public: RayShape(CollisionPtr parent, bool displayRays);
+      public: RayShape(CollisionPtr parent);
 
       /// \brief Destructor
       public: virtual ~RayShape();

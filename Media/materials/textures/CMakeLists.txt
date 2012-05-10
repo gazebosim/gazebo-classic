@@ -50,9 +50,10 @@ SET (files
             growth_weirdfungus-03_diffusespecular.dds
             growth_weirdfungus-03_normalheight.dds
             heightmap_bowl.png
+            projection_filter.png
+            stereo_projection_pattern_high_res.png
+            stereo_projection_pattern_high_res_red.png
 )
 
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/textures/)
-
-

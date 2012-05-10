@@ -55,13 +55,13 @@ namespace gazebo
 
       public: std::string GetFilename() const;
       public: math::Vector3 GetSize() const;
-      public: math::Vector3 GetOffset() const;
+      public: math::Vector3 GetOrigin() const;
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      protected: std::vector<double> heights;
+      protected: std::vector<float> heights;
 
       protected: common::Image img;
     };

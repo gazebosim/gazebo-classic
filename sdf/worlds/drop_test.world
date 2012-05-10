@@ -33,7 +33,7 @@
               <ode mu="1" mu2="1"/>
             </friction>
             <contact>
-              <ode soft_erp="1" max_vel="0"/>
+              <ode max_vel="0" min_depth="0"/>
             </contact>
           </surface>
         </collision>
@@ -63,7 +63,7 @@
               <ode mu="1" mu2="1"/>
             </friction>
             <contact>
-              <ode soft_erp="1" max_vel="0"/>
+              <ode max_vel="0" min_depth="0"/>
             </contact>
           </surface>
         </collision>
@@ -93,7 +93,7 @@
               <ode mu="1" mu2="1"/>
             </friction>
             <contact>
-              <ode soft_erp="1" max_vel="0"/>
+              <ode max_vel="0" min_depth="0"/>
             </contact>
           </surface>
         </collision>

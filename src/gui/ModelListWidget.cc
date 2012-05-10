@@ -555,9 +555,9 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     pz = this->variantManager->value(
          this->GetChildItem(offsetProp, "z")).toDouble();
 
-    heightmapMessage->mutable_offset()->set_x(px);
-    heightmapMessage->mutable_offset()->set_y(py);
-    heightmapMessage->mutable_offset()->set_z(pz);
+    heightmapMessage->mutable_origin()->set_x(px);
+    heightmapMessage->mutable_origin()->set_y(py);
+    heightmapMessage->mutable_origin()->set_z(pz);
   }
   else if (type == "mesh")
   {
@@ -978,10 +978,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::LinearDamping
-  item = this->variantManager->addProperty(QVariant::Double,
+/*  item = this->variantManager->addProperty(QVariant::Double,
                                            tr("linear_damping"));
-  if (_msg.inertial().has_linear_damping())
-    item->setValue(_msg.inertial().linear_damping());
+  if (_msg.has_linear_damping())
+    item->setValue(_msg.linear_damping());
   else
     item->setValue(0.0);
   inertialItem->addSubProperty(item);
@@ -989,12 +989,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   // Inertial::AngularDamping
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("angular_damping"));
-  if (_msg.inertial().has_angular_damping())
-    item->setValue(_msg.inertial().angular_damping());
+  if (_msg.has_angular_damping())
+    item->setValue(_msg.angular_damping());
   else
     item->setValue(0.0);
   inertialItem->addSubProperty(item);
-
+*/
   // Inertial::ixx
   item = this->variantManager->addProperty(QVariant::Double, tr("ixx"));
   if (_msg.inertial().has_ixx())
@@ -1343,7 +1343,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
         QtVariantPropertyManager::groupTypeId(),
         tr("offset"));
     _parent->addSubProperty(sizeItem);
-    this->FillVector3dProperty(_msg.heightmap().offset(), sizeItem);
+    this->FillVector3dProperty(_msg.heightmap().origin(), sizeItem);
   }
 }
 

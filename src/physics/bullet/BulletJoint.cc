@@ -18,95 +18,85 @@
  * Author: Nate Keonig, Andrew Howard
  * Date: 15 May 2009
  */
-/*
+
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletJoint.hh"
-*/
+
+#include "physics/bullet/bullet_inc.h"
+#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////
 BulletJoint::BulletJoint()
   : Joint()
 {
   this->constraint = NULL;
+  this->world = NULL;
 }
 
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
+  this->world = NULL;
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::Load(common::XMLConfigNode *_node)
+void BulletJoint::Load(sdf::ElementPtr _sdf)
 {
-  Joint::Load(_node);
+  Joint::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-Link *BulletJoint::GetJointLink(int index) const
+void BulletJoint::Reset()
 {
-  Link *result = NULL;
+  Joint::Reset();
+}
+
+//////////////////////////////////////////////////
+LinkPtr BulletJoint::GetJointLink(int _index) const
+{
+  LinkPtr result;
 
   if (this->constraint == NULL)
     gzthrow("Attach bodies to the joint first");
 
-  if (index == 0 || index == 1)
+  if (_index == 0 || _index == 1)
   {
-    BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
-    BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
-    btRigidLink rigidLink = this->constraint->getRigidLinkA();
+    BulletLinkPtr bulletLink1 =
+      boost::shared_static_cast<BulletLink>(this->childLink);
 
-    if (bulletLink1 && rigidLink.getUserPointer() == bulletLink1)
-      result = this->body1;
+    BulletLinkPtr bulletLink2 =
+      boost::shared_static_cast<BulletLink>(this->parentLink);
+
+    btRigidBody rigidLink = this->constraint->getRigidBodyA();
+
+    if (bulletLink1 && rigidLink.getUserPointer() == bulletLink1.get())
+      result = this->childLink;
     else if (bulletLink2)
-      result = this->body2;
+      result = this->parentLink;
   }
 
   return result;
 }
 
-
 //////////////////////////////////////////////////
-bool BulletJoint::AreConnected(Link *_one, Link *_two) const
+bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  return this->constraint && ((this->body1 == _one && this->body2 == _two) ||
-         (this->body1 == _two && this->body2 == _one));
+  return this->constraint && ((this->childLink.get() == _one.get() &&
+                               this->parentLink.get() == _two.get()) ||
+                              (this->childLink.get() == _two.get() &&
+                               this->parentLink.get() == _one.get()));
 }
 
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
-  this->body1 = NULL;
-  this->body2 = NULL;
+  this->childLink.reset();
+  this->parentLink.reset();
 
   delete this->constraint;
 }
-
-//////////////////////////////////////////////////
-void BulletJoint::SetERP(double _newERP)
-{
-}
-
-//////////////////////////////////////////////////
-double BulletJoint::GetERP()
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void BulletJoint::SetCFM(double _newCFM)
-{
-}
-
-//////////////////////////////////////////////////
-double BulletJoint::GetCFM()
-{
-  return 0;
-}
-
-

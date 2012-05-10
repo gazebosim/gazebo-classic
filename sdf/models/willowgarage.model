@@ -16,7 +16,7 @@
         </geometry>
       </collision>
 
-      <visual name='visual' cast_shadows='false'>
+      <visual name='visual' cast_shadows="false">
         <geometry>
           <mesh filename='willowgarage/willowgarage_visual.dae' scale='0.0254 0.0254 0.0254'/>
         </geometry>

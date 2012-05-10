@@ -143,16 +143,8 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 
         for (int i = 0; i < iter2->second.count; i++)
         {
-          msgs::Vector3d *posMsg = contactMsg->add_position();
-          msgs::Vector3d *normalMsg = contactMsg->add_normal();
-          posMsg->set_x(iter2->second.positions[i].x);
-          posMsg->set_y(iter2->second.positions[i].y);
-          posMsg->set_z(iter2->second.positions[i].z);
-
-          normalMsg->set_x(iter2->second.normals[i].x);
-          normalMsg->set_y(iter2->second.normals[i].y);
-          normalMsg->set_z(iter2->second.normals[i].z);
-
+          msgs::Set(contactMsg->add_position(), iter2->second.positions[i]);
+          msgs::Set(contactMsg->add_normal(), iter2->second.normals[i]);
           contactMsg->add_depth(iter2->second.depths[i]);
         }
       }
