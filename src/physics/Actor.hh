@@ -114,9 +114,6 @@ namespace gazebo
 
       protected: common::Skeleton *skeleton;
 
-      protected: std::map<std::string, std::map<std::string, std::string> >
-                                                            skelNodesMap;
-
       protected: std::string skinFile;
 
       protected: double skinScale;
@@ -124,6 +121,8 @@ namespace gazebo
       protected: double startDelay;
 
       protected: double scriptLength;
+
+      protected: double lastScriptTime;
 
       protected: bool loop;
 
@@ -144,7 +143,10 @@ namespace gazebo
       protected: std::map<std::string, common::SkeletonAnimation*>
                                                             skelAnimation;
 
-      protected: std::map<std::string, double> originalActorVel;
+      protected: std::map<std::string, std::map<std::string, std::string> >
+                                                            skelNodesMap;
+
+      protected: std::map<std::string, bool> interpolateX;
 
       protected: std::string visualName;
 
