@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Link 
-/// \brief Information about a link
+/// \interface Body 
+/// \brief Information about a body
 /// \verbatim
 
 import "header.proto";
@@ -13,7 +13,7 @@ import "sensor.proto";
 import "projector.proto";
 import "pose.proto";
 
-message Link
+message Body
 {
   required uint32 id            = 1;
   required string name          = 2;

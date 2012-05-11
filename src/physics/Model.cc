@@ -36,7 +36,7 @@
 
 #include "physics/Joint.hh"
 #include "physics/JointController.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Model.hh"
@@ -47,9 +47,9 @@
 using namespace gazebo;
 using namespace physics;
 
-class LinkUpdate_TBB
+class BodyUpdate_TBB
 {
-  public: LinkUpdate_TBB(Link_V *_bodies) : bodies(_bodies) {}
+  public: BodyUpdate_TBB(Body_V *_bodies) : bodies(_bodies) {}
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
     for (size_t i = _r.begin(); i != _r.end(); i++)
@@ -58,7 +58,7 @@ class LinkUpdate_TBB
     }
   }
 
-  private: Link_V *bodies;
+  private: Body_V *bodies;
 };
 
 
@@ -93,30 +93,30 @@ void Model::Load(sdf::ElementPtr _sdf)
   // BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
-  if (_sdf->HasElement("link"))
+  if (_sdf->HasElement("body"))
   {
-    sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    sdf::ElementPtr bodyElem = _sdf->GetElement("body");
     bool first = true;
-    while (linkElem)
+    while (bodyElem)
     {
-      // Create a new link
-      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
+      // Create a new body
+      BodyPtr body = this->GetWorld()->GetPhysicsEngine()->CreateBody(
           boost::shared_static_cast<Model>(shared_from_this()));
 
-      // FIXME: canonical link is hardcoded to the first link.
+      // FIXME: canonical body is hardcoded to the first body.
       //        warn users for now, need  to add parsing of
       //        the canonical tag in sdf
       if (first)
       {
-        link->SetCanonicalLink(true);
-        this->canonicalLink = link;
+        body->SetCanonicalBody(true);
+        this->canonicalBody = body;
         first = false;
       }
 
-      // Load the link using the config node. This also loads all of the
+      // Load the body using the config node. This also loads all of the
       // bodies collisionetries
-      link->Load(linkElem);
-      linkElem = linkElem->GetNextElement("link");
+      body->Load(bodyElem);
+      bodyElem = bodyElem->GetNextElement("body");
     }
   }
 
@@ -155,8 +155,8 @@ void Model::Init()
   for (Base_V::iterator iter = this->children.begin();
        iter!= this->children.end(); ++iter)
   {
-    if ((*iter)->HasType(Base::LINK))
-      boost::shared_static_cast<Link>(*iter)->Init();
+    if ((*iter)->HasType(Base::BODY))
+      boost::shared_static_cast<Body>(*iter)->Init();
     else if ((*iter)->HasType(Base::MODEL))
       boost::shared_static_cast<Model>(*iter)->Init();
   }
@@ -236,7 +236,7 @@ void Model::RemoveChild(EntityPtr _child)
 {
   Joint_V::iterator jiter;
 
-  if (_child->HasType(LINK))
+  if (_child->HasType(BODY))
   {
     bool done = false;
 
@@ -249,12 +249,12 @@ void Model::RemoveChild(EntityPtr _child)
         if (!(*jiter))
           continue;
 
-        LinkPtr jlink0 = (*jiter)->GetJointLink(0);
-        LinkPtr jlink1 = (*jiter)->GetJointLink(1);
+        BodyPtr jbody0 = (*jiter)->GetJointBody(0);
+        BodyPtr jbody1 = (*jiter)->GetJointBody(1);
 
-        if (!jlink0 || !jlink1 || jlink0->GetName() == _child->GetName() ||
-            jlink1->GetName() == _child->GetName() ||
-            jlink0->GetName() == jlink1->GetName())
+        if (!jbody0 || !jbody1 || jbody0->GetName() == _child->GetName() ||
+            jbody1->GetName() == _child->GetName() ||
+            jbody0->GetName() == jbody1->GetName())
         {
           this->joints.erase(jiter);
           done = false;
@@ -268,8 +268,8 @@ void Model::RemoveChild(EntityPtr _child)
 
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
+    if (*iter && (*iter)->HasType(BODY))
+      boost::static_pointer_cast<Body>(*iter)->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
@@ -280,7 +280,7 @@ void Model::Fini()
   this->attachedModels.clear();
   this->joints.clear();
   this->plugins.clear();
-  this->canonicalLink.reset();
+  this->canonicalBody.reset();
 }
 
 //////////////////////////////////////////////////
@@ -288,15 +288,15 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
 
-  if (_sdf->HasElement("link"))
+  if (_sdf->HasElement("body"))
   {
-    sdf::ElementPtr linkElem = _sdf->GetElement("link");
-    while (linkElem)
+    sdf::ElementPtr bodyElem = _sdf->GetElement("body");
+    while (bodyElem)
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(
-          this->GetChild(linkElem->GetValueString("name")));
-      link->UpdateParameters(linkElem);
-      linkElem = linkElem->GetNextElement("link");
+      BodyPtr body = boost::shared_dynamic_cast<Body>(
+          this->GetChild(bodyElem->GetValueString("name")));
+      body->UpdateParameters(bodyElem);
+      bodyElem = bodyElem->GetNextElement("body");
     }
   }
   /*
@@ -344,11 +344,11 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
   for (Base_V::iterator iter = this->children.begin();
       iter != this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearVel(_vel);
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
+      body->SetEnabled(true);
+      body->SetLinearVel(_vel);
     }
   }
 }
@@ -360,11 +360,11 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularVel(_vel);
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
+      body->SetEnabled(true);
+      body->SetAngularVel(_vel);
     }
   }
 }
@@ -376,11 +376,11 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearAccel(_accel);
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
+      body->SetEnabled(true);
+      body->SetLinearAccel(_accel);
     }
   }
 }
@@ -392,11 +392,11 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularAccel(_accel);
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
+      body->SetEnabled(true);
+      body->SetAngularAccel(_accel);
     }
   }
 }
@@ -404,8 +404,8 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearVel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeLinearVel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeLinearVel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -413,8 +413,8 @@ math::Vector3 Model::GetRelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearVel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldLinearVel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldLinearVel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -422,8 +422,8 @@ math::Vector3 Model::GetWorldLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularVel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeAngularVel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeAngularVel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -431,8 +431,8 @@ math::Vector3 Model::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularVel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldAngularVel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldAngularVel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -441,8 +441,8 @@ math::Vector3 Model::GetWorldAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearAccel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeLinearAccel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeLinearAccel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -450,8 +450,8 @@ math::Vector3 Model::GetRelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearAccel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldLinearAccel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldLinearAccel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -459,8 +459,8 @@ math::Vector3 Model::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularAccel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeAngularAccel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeAngularAccel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -468,8 +468,8 @@ math::Vector3 Model::GetRelativeAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularAccel() const
 {
-  if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldAngularAccel();
+  if (this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldAngularAccel();
   else
     return math::Vector3(0, 0, 0);
 }
@@ -485,12 +485,12 @@ math::Box Model::GetBoundingBox() const
 
   for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-      math::Box linkBox;
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      linkBox = link->GetBoundingBox();
-      box += linkBox;
+      math::Box bodyBox;
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
+      bodyBox = body->GetBoundingBox();
+      box += bodyBox;
     }
   }
 
@@ -531,20 +531,20 @@ JointPtr Model::GetJoint(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-LinkPtr Model::GetLinkById(unsigned int _id) const
+BodyPtr Model::GetBodyById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Link>(this->GetById(_id));
+  return boost::shared_dynamic_cast<Body>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
-LinkPtr Model::GetLink(const std::string &_name) const
+BodyPtr Model::GetBody(const std::string &_name) const
 {
   Base_V::const_iterator biter;
-  LinkPtr result;
+  BodyPtr result;
 
   if (_name == "canonical")
   {
-    result = this->canonicalLink;
+    result = this->canonicalBody;
   }
   else
   {
@@ -552,7 +552,7 @@ LinkPtr Model::GetLink(const std::string &_name) const
     {
       if ((*biter)->GetName() == _name)
       {
-        result = boost::shared_dynamic_cast<Link>(*biter);
+        result = boost::shared_dynamic_cast<Body>(*biter);
         break;
       }
     }
@@ -562,15 +562,15 @@ LinkPtr Model::GetLink(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-LinkPtr Model::GetLink(unsigned int _index) const
+BodyPtr Model::GetBody(unsigned int _index) const
 {
-  LinkPtr link;
+  BodyPtr body;
   if (_index <= this->GetChildCount())
-    link = boost::shared_static_cast<Link>(this->GetChild(_index));
+    body = boost::shared_static_cast<Body>(this->GetChild(_index));
   else
     gzerr << "Index is out of range\n";
 
-  return link;
+  return body;
 }
 
 //////////////////////////////////////////////////
@@ -625,9 +625,9 @@ void Model::SetGravityMode(const bool &_v)
 
   for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-      boost::shared_static_cast<Link>(*iter)->SetGravityMode(_v);
+      boost::shared_static_cast<Body>(*iter)->SetGravityMode(_v);
     }
   }
 }
@@ -640,9 +640,9 @@ void Model::SetCollideMode(const std::string &_m)
 
   for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-      boost::shared_static_cast<Link>(*iter)->SetCollideMode(_m);
+      boost::shared_static_cast<Body>(*iter)->SetCollideMode(_m);
     }
   }
 }
@@ -655,9 +655,9 @@ void Model::SetLaserRetro(const float &_retro)
 
   for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter && (*iter)->HasType(BODY))
     {
-       boost::shared_static_cast<Link>(*iter)->SetLaserRetro(_retro);
+       boost::shared_static_cast<Body>(*iter)->SetLaserRetro(_retro);
     }
   }
 }
@@ -675,10 +675,10 @@ void Model::FillModelMsg(msgs::Model &_msg)
 
   for (unsigned int j = 0; j < this->GetChildCount(); ++j)
   {
-    if (this->GetChild(j)->HasType(Base::LINK))
+    if (this->GetChild(j)->HasType(Base::BODY))
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
-      link->FillLinkMsg(*_msg.add_link());
+      BodyPtr body = boost::shared_dynamic_cast<Body>(this->GetChild(j));
+      body->FillBodyMsg(*_msg.add_body());
     }
   }
 
@@ -705,11 +705,11 @@ void Model::ProcessMsg(const msgs::Model &_msg)
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
     this->SetWorldPose(msgs::Convert(_msg.pose()));
-  for (int i = 0; i < _msg.link_size(); i++)
+  for (int i = 0; i < _msg.body_size(); i++)
   {
-    LinkPtr link = this->GetLinkById(_msg.link(i).id());
-    if (link)
-      link->ProcessMsg(_msg.link(i));
+    BodyPtr body = this->GetBodyById(_msg.body(i).id());
+    if (body)
+      body->ProcessMsg(_msg.body(i));
   }
 
   if (_msg.has_is_static())
@@ -792,14 +792,14 @@ void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
-  for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  for (unsigned int i = 0; i < _state.GetBodyStateCount(); ++i)
   {
-    LinkState linkState = _state.GetLinkState(i);
-    LinkPtr link = this->GetLink(linkState.GetName());
-    if (link)
-      link->SetState(linkState);
+    BodyState bodyState = _state.GetBodyState(i);
+    BodyPtr body = this->GetBody(bodyState.GetName());
+    if (body)
+      body->SetState(bodyState);
     else
-      gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
+      gzerr << "Unable to find body[" << bodyState.GetName() << "]\n";
   }
 
   for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
@@ -818,6 +818,6 @@ void Model::SetEnabled(bool _enabled)
 {
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
+    if (*iter && (*iter)->HasType(BODY))
+      boost::static_pointer_cast<Body>(*iter)->SetEnabled(_enabled);
 }

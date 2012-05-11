@@ -23,7 +23,7 @@
 #include "common/Console.hh"
 
 #include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletJoint.hh"
 
 using namespace gazebo;
@@ -57,46 +57,46 @@ void BulletJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-LinkPtr BulletJoint::GetJointLink(int _index) const
+BodyPtr BulletJoint::GetJointBody(int _index) const
 {
-  LinkPtr result;
+  BodyPtr result;
 
   if (this->constraint == NULL)
     gzthrow("Attach bodies to the joint first");
 
   if (_index == 0 || _index == 1)
   {
-    BulletLinkPtr bulletLink1 =
-      boost::shared_static_cast<BulletLink>(this->childLink);
+    BulletBodyPtr bulletBody1 =
+      boost::shared_static_cast<BulletBody>(this->childBody);
 
-    BulletLinkPtr bulletLink2 =
-      boost::shared_static_cast<BulletLink>(this->parentLink);
+    BulletBodyPtr bulletBody2 =
+      boost::shared_static_cast<BulletBody>(this->parentBody);
 
-    btRigidBody rigidLink = this->constraint->getRigidBodyA();
+    btRigidBody rigidBody = this->constraint->getRigidBodyA();
 
-    if (bulletLink1 && rigidLink.getUserPointer() == bulletLink1.get())
-      result = this->childLink;
-    else if (bulletLink2)
-      result = this->parentLink;
+    if (bulletBody1 && rigidBody.getUserPointer() == bulletBody1.get())
+      result = this->childBody;
+    else if (bulletBody2)
+      result = this->parentBody;
   }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
+bool BulletJoint::AreConnected(BodyPtr _one, BodyPtr _two) const
 {
-  return this->constraint && ((this->childLink.get() == _one.get() &&
-                               this->parentLink.get() == _two.get()) ||
-                              (this->childLink.get() == _two.get() &&
-                               this->parentLink.get() == _one.get()));
+  return this->constraint && ((this->childBody.get() == _one.get() &&
+                               this->parentBody.get() == _two.get()) ||
+                              (this->childBody.get() == _two.get() &&
+                               this->parentBody.get() == _one.get()));
 }
 
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
-  this->childLink.reset();
-  this->parentLink.reset();
+  this->childBody.reset();
+  this->parentBody.reset();
 
   delete this->constraint;
 }

@@ -188,10 +188,10 @@ namespace gazebo
       /// \brief Remove a running plugin
       public: void RemovePlugin(const std::string &_name);
 
-      /// \brief Enable all links in all the models
+      /// \brief Enable all bodys in all the models
       public: void EnableAllModels();
 
-      /// \brief Disable all links in all the models
+      /// \brief Disable all bodys in all the models
       public: void DisableAllModels();
 
       /// \brief Step callback

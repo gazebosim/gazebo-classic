@@ -52,26 +52,26 @@ namespace gazebo
       private: void SetJointPosition(JointPtr _joint, double _position);
 
       /// \brief Helper for SetJointPositions
-      private: void RotateBodyAndChildren(LinkPtr _link1,
+      private: void RotateBodyAndChildren(BodyPtr _body1,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
                    double _dangle, bool _updateChildren);
 
       /// \brief Helper for SetJointPositions
-      private: void SlideBodyAndChildren(LinkPtr _link1,
+      private: void SlideBodyAndChildren(BodyPtr _body1,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
                    double _dposition, bool _updateChildren);
 
       /// \brief Helper for SetJointPositions
-      private: void GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
-                                         const LinkPtr &_body);
+      private: void GetAllChildrenBodies(std::vector<BodyPtr> &_bodies,
+                                         const BodyPtr &_body);
 
       /// \brief Helper for SetJointPositions
-      private: void GetAllParentBodies(std::vector<LinkPtr> &_bodies,
-                   const LinkPtr &_body, const LinkPtr &_origParentBody);
+      private: void GetAllParentBodies(std::vector<BodyPtr> &_bodies,
+                   const BodyPtr &_body, const BodyPtr &_origParentBody);
 
       /// \brief Helper for SetJointPositions
-      private: bool InBodies(const LinkPtr &_body,
-                             const std::vector<LinkPtr> &_bodies);
+      private: bool InBodies(const BodyPtr &_body,
+                             const std::vector<BodyPtr> &_bodies);
 
       private: ModelPtr model;
       private: std::map<std::string, JointPtr> joints;

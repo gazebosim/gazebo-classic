@@ -280,7 +280,7 @@ namespace gazebo
 
       private: bool ProcessSensorMsg(ConstSensorPtr &_msg);
       private: bool ProcessJointMsg(ConstJointPtr &_msg);
-      private: bool ProcessLinkMsg(ConstLinkPtr &_msg);
+      private: bool ProcessBodyMsg(ConstBodyPtr &_msg);
 
       private: void ProcessSceneMsg(ConstScenePtr &_msg);
 
@@ -333,8 +333,8 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Joint const> > JointMsgs_L;
       private: JointMsgs_L jointMsgs;
 
-      typedef std::list<boost::shared_ptr<msgs::Link const> > LinkMsgs_L;
-      private: LinkMsgs_L linkMsgs;
+      typedef std::list<boost::shared_ptr<msgs::Body const> > BodyMsgs_L;
+      private: BodyMsgs_L bodyMsgs;
 
       typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
       private: SensorMsgs_L sensorMsgs;

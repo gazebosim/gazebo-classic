@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Link class
+/* Desc: ODE Body class
  * Author: Nate Koenig
  */
 
-#ifndef ODELINK_HH
-#define ODELINK_HH
+#ifndef ODEBODY_HH
+#define ODEBODY_HH
 
 #include "physics/ode/ode_inc.h"
 #include "physics/ode/ODETypes.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 
 namespace gazebo
 {
@@ -34,40 +34,40 @@ namespace gazebo
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \brief ODE Physics wrapper
     /// \{
-    /// \brief ODE Link class
-    class ODELink : public Link
+    /// \brief ODE Body class
+    class ODEBody : public Body
     {
       /// \brief Constructor
-      public: ODELink(EntityPtr _parent);
+      public: ODEBody(EntityPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~ODELink();
+      public: virtual ~ODEBody();
 
-      /// \brief Load the link based on SDF parameters
+      /// \brief Load the body based on SDF parameters
       /// \param _sdf the sdf parameters
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the link
+      /// \brief Initialize the body
       public: virtual void Init();
 
-      /// \brief Finalize the link
+      /// \brief Finalize the body
       public: virtual void Fini();
 
-      /// \brief Update the link
+      /// \brief Update the body
       public: virtual void Update();
 
       /// \brief Called when the pose of the entity (or one of its parents) has
       /// changed
       public: virtual void OnPoseChange();
 
-      /// \brief Return the ID of this link
-      /// \return ODE link id
+      /// \brief Return the ID of this body
+      /// \return ODE body id
       public: dBodyID GetODEId() const;
 
-      /// \brief Set whether this link is enabled
+      /// \brief Set whether this body is enabled
       public: virtual void SetEnabled(bool enable) const;
 
-      /// \brief Get whether this link is enabled in the physics engine
+      /// \brief Get whether this body is enabled in the physics engine
       public: virtual bool GetEnabled() const;
 
       /// \brief Update the mass matrix
@@ -76,16 +76,16 @@ namespace gazebo
       /// \brief Update other parameters for ODE
       public: virtual void UpdateSurface();
 
-      /// \brief Set the linear velocity of the link
+      /// \brief Set the linear velocity of the body
       public: virtual void SetLinearVel(const math::Vector3 &vel);
 
-      /// \brief Set the angular velocity of the link
+      /// \brief Set the angular velocity of the body
       public: virtual void SetAngularVel(const math::Vector3 &vel);
 
-      /// \brief Set the force applied to the link
+      /// \brief Set the force applied to the body
       public: virtual void SetForce(const math::Vector3 &_force);
 
-      /// \brief Set the torque applied to the link
+      /// \brief Set the torque applied to the body
       public: virtual void SetTorque(const math::Vector3 &_torque);
 
       /// \brief Add a force to the body
@@ -108,31 +108,31 @@ namespace gazebo
       /// \brief Add a torque to the body relative frame
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
-      /// \brief Get the linear velocity of the link in the world frame
+      /// \brief Get the linear velocity of the body in the world frame
       public: virtual math::Vector3 GetWorldLinearVel() const;
 
-      /// \brief Get the angular velocity of the link in the world frame
+      /// \brief Get the angular velocity of the body in the world frame
       public: virtual math::Vector3 GetWorldAngularVel() const;
 
-      /// \brief Get the force applied to the link in the world frame
+      /// \brief Get the force applied to the body in the world frame
       public: virtual math::Vector3 GetWorldForce() const;
 
-      /// \brief Get the torque applied to the link in the world frame
+      /// \brief Get the torque applied to the body in the world frame
       public: virtual math::Vector3 GetWorldTorque() const;
 
-      /// \brief Set whether gravity affects this link
+      /// \brief Set whether gravity affects this body
       public: virtual void SetGravityMode(bool mode);
 
       /// \brief Get the gravity mode
       public: virtual bool GetGravityMode();
 
-      /// \brief Set whether this link will collide with others in the model
+      /// \brief Set whether this body will collide with others in the model
       public: void SetSelfCollide(bool collide);
 
-      /// \brief Get the link's space ID
+      /// \brief Get the body's space ID
       public: dSpaceID GetSpaceId() const;
 
-      /// \brief Set the link's space ID
+      /// \brief Set the body's space ID
       public: void SetSpaceId(dSpaceID spaceid);
 
       /// \brief Set the linear damping factor
@@ -144,16 +144,16 @@ namespace gazebo
       public: static void DisabledCallback(dBodyID _id);
       public: static void MoveCallback(dBodyID id);
 
-      /// \brief Set whether this link is in the kinematic state
+      /// \brief Set whether this body is in the kinematic state
       public: virtual void SetKinematic(const bool &state);
 
-      /// \brief Get whether this link is in the kinematic state
+      /// \brief Get whether this body is in the kinematic state
       public: virtual bool GetKinematic() const;
 
       protected: math::Pose pose;
 
-      /// ODE link handle
-      private: dBodyID linkId;
+      /// ODE body handle
+      private: dBodyID bodyId;
 
       private: ODEPhysicsPtr odePhysics;
 

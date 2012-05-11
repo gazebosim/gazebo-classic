@@ -21,7 +21,7 @@
 
       <origin pose="0.0 0.0 2.1 30.0 0.0 0.0"/>
 
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
+      <body name="body_1" self_collide="true" gravity="true" kinematic="false">
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
@@ -58,9 +58,9 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
-      <link name="link_2">
+      <body name="body_2">
 
         <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0"/>
 
@@ -97,11 +97,11 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
       <joint name="joint_0" type="revolute">
-        <parent link="world"/>
-        <child link="link_1"/>
+        <parent body="world"/>
+        <child body="body_1"/>
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
         <axis xyz="1.0 0.0 0.0">
           <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
@@ -121,8 +121,8 @@
       </joint>
 
       <joint name="joint_1" type="revolute">
-        <parent link="link_1"/>
-        <child link="link_2"/>
+        <parent body="body_1"/>
+        <child body="body_2"/>
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
         <axis xyz="1.0 0.0 0.0">
           <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
@@ -149,7 +149,7 @@
 
       <origin pose="1.0 0.0 2.1 30.0 0.0 0.0"/>
 
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
+      <body name="body_1" self_collide="true" gravity="true" kinematic="false">
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
@@ -186,9 +186,9 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
-      <link name="link_2">
+      <body name="body_2">
 
         <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0"/>
 
@@ -225,11 +225,11 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
       <joint name="joint_0" type="revolute">
-        <parent link="world"/>
-        <child link="link_1"/>
+        <parent body="world"/>
+        <child body="body_1"/>
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
         <axis xyz="1.0 0.0 0.0">
           <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
@@ -249,8 +249,8 @@
       </joint>
 
       <joint name="joint_1" type="revolute">
-        <parent link="link_1"/>
-        <child link="link_2"/>
+        <parent body="body_1"/>
+        <child body="body_2"/>
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
         <axis xyz="1.0 0.0 0.0">
           <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
@@ -275,7 +275,7 @@
 
       <origin pose="0.0 -2.5 2.1 0.0 30.0 0.0"/>
 
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
+      <body name="body_1" self_collide="true" gravity="true" kinematic="false">
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
@@ -312,9 +312,9 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
-      <link name="link_2">
+      <body name="body_2">
 
         <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0"/>
 
@@ -351,11 +351,11 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
       <joint name="joint_0" type="revolute">
-        <parent link="world"/>
-        <child link="link_1"/>
+        <parent body="world"/>
+        <child body="body_1"/>
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
         <axis xyz="0.0 1.0 0.0">
           <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
@@ -375,8 +375,8 @@
       </joint>
 
       <joint name="joint_1" type="revolute">
-        <parent link="link_1"/>
-        <child link="link_2"/>
+        <parent body="body_1"/>
+        <child body="body_2"/>
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
         <axis xyz="0.0 1.0 0.0">
           <limit lower="-100" upper="100" effort="1000" velocity="1000"/>

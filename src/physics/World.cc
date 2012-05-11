@@ -38,7 +38,7 @@
 #include "common/Plugin.hh"
 
 #include "physics/RayShape.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Model.hh"
@@ -951,15 +951,15 @@ void World::ProcessRequestMsgs()
           modelMsg.SerializeToString(serializedData);
           response.set_type(modelMsg.GetTypeName());
         }
-        else if (entity->HasType(Base::LINK))
+        else if (entity->HasType(Base::BODY))
         {
-          msgs::Link linkMsg;
-          LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
-          link->FillLinkMsg(linkMsg);
+          msgs::Body bodyMsg;
+          BodyPtr body = boost::shared_dynamic_cast<Body>(entity);
+          body->FillBodyMsg(bodyMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
-          linkMsg.SerializeToString(serializedData);
-          response.set_type(linkMsg.GetTypeName());
+          bodyMsg.SerializeToString(serializedData);
+          response.set_type(bodyMsg.GetTypeName());
         }
         else if (entity->HasType(Base::COLLISION))
         {

@@ -15,39 +15,39 @@
  *
  */
 
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/Collision.hh"
 #include "physics/World.hh"
-#include "physics/LinkState.hh"
+#include "physics/BodyState.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
-LinkState::LinkState()
+BodyState::BodyState()
 : State()
 {
 }
 
 /////////////////////////////////////////////////
-LinkState::LinkState(const LinkPtr _link)
-  : State(_link->GetName(), _link->GetWorld()->GetRealTime(),
-          _link->GetWorld()->GetSimTime())
+BodyState::BodyState(const BodyPtr _body)
+  : State(_body->GetName(), _body->GetWorld()->GetRealTime(),
+          _body->GetWorld()->GetSimTime())
 {
-  for (unsigned int i = 0; i < _link->GetChildCount(); ++i)
+  for (unsigned int i = 0; i < _body->GetChildCount(); ++i)
   {
-    this->collisionStates.push_back(_link->GetCollision(i)->GetState());
+    this->collisionStates.push_back(_body->GetCollision(i)->GetState());
   }
-  this->pose = _link->GetRelativePose();
+  this->pose = _body->GetRelativePose();
 }
 
 /////////////////////////////////////////////////
-LinkState::~LinkState()
+BodyState::~BodyState()
 {
 }
 
 /////////////////////////////////////////////////
-void LinkState::Load(sdf::ElementPtr _elem)
+void BodyState::Load(sdf::ElementPtr _elem)
 {
   this->name = _elem->GetValueString("name");
 
@@ -56,19 +56,19 @@ void LinkState::Load(sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-math::Pose LinkState::GetPose() const
+math::Pose BodyState::GetPose() const
 {
   return this->pose;
 }
 
 /////////////////////////////////////////////////
-unsigned int LinkState::GetCollisionStateCount() const
+unsigned int BodyState::GetCollisionStateCount() const
 {
   return this->collisionStates.size();
 }
 
 /////////////////////////////////////////////////
-CollisionState LinkState::GetCollisionState(unsigned int _index) const
+CollisionState BodyState::GetCollisionState(unsigned int _index) const
 {
   if (_index < this->collisionStates.size())
     return this->collisionStates[_index];
@@ -79,7 +79,7 @@ CollisionState LinkState::GetCollisionState(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-CollisionState LinkState::GetCollisionState(
+CollisionState BodyState::GetCollisionState(
     const std::string &_collisionName) const
 {
   std::vector<CollisionState>::const_iterator iter;
@@ -94,7 +94,7 @@ CollisionState LinkState::GetCollisionState(
 }
 
 /////////////////////////////////////////////////
-void LinkState::FillStateSDF(sdf::ElementPtr _elem)
+void BodyState::FillStateSDF(sdf::ElementPtr _elem)
 {
   _elem->GetAttribute("name")->Set(this->GetName());
   _elem->GetOrCreateElement("pose")->GetValue()->Set(this->pose);
@@ -108,7 +108,7 @@ void LinkState::FillStateSDF(sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-void LinkState::UpdateLinkSDF(sdf::ElementPtr _elem)
+void BodyState::UpdateBodySDF(sdf::ElementPtr _elem)
 {
   _elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->pose);
 }

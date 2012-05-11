@@ -156,7 +156,7 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     std::ostringstream stream;
 
     // Create the box geometry
-    CollisionPtr collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision("box", this->collisionParent->GetLink());
+    CollisionPtr collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision("box", this->collisionParent->GetBody());
     collision->SetSaveable(false);
 
     stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";

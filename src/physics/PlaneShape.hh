@@ -38,7 +38,7 @@ namespace gazebo
     class PlaneShape : public Shape
     {
       /// \brief Constructor
-      /// \param body Link to which we are attached.
+      /// \param body Body to which we are attached.
       public: PlaneShape(CollisionPtr parent);
 
       /// \brief Destructor

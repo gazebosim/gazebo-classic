@@ -19,7 +19,7 @@
 
     <model name="box_1" static="false">
       <origin pose="0 0 .5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -36,11 +36,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="box_2" static="false">
       <origin pose="0 0 1.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -57,11 +57,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="box_3" static="false">
       <origin pose="0 0 2.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -78,11 +78,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="box_4" static="false">
       <origin pose="0 0 3.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -99,11 +99,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="box_5" static="false">
       <origin pose="0 0 4.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -120,12 +120,12 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="sphere_1">
       <origin pose="0 1.5 0.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -142,11 +142,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="sphere_2">
       <origin pose="0 1.5 1.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -163,11 +163,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="sphere_3">
       <origin pose="0 1.5 2.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -184,11 +184,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="sphere_4">
       <origin pose="0 1.5 3.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -205,11 +205,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="sphere_5">
       <origin pose="0 1.5 4.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="10000.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -226,12 +226,12 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="cylinder_1">
       <origin pose="0 -1.5 0.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -248,11 +248,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="cylinder_2">
       <origin pose="0 -1.5 1.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -269,11 +269,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="cylinder_3">
       <origin pose="0 -1.5 2.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -290,11 +290,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="cylinder_4">
       <origin pose="0 -1.5 3.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -311,11 +311,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="cylinder_5">
       <origin pose="0 -1.5 4.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -332,7 +332,7 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <light type="directional" name="sun" cast_shadows="true">

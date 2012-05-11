@@ -19,7 +19,7 @@
 
     <model name="box">
       <origin pose="0 0 10.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -44,12 +44,12 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="sphere">
       <origin pose="0 1.5 10.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -74,12 +74,12 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="cylinder">
       <origin pose="0 -1.5 10.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -104,7 +104,7 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <light type="directional" name="sun" cast_shadows="true">

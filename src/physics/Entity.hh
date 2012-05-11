@@ -139,13 +139,13 @@ namespace gazebo
       /// \return A math::Vector3 for the acceleration
       public: virtual math::Vector3 GetWorldAngularAccel() const
               {return math::Vector3();}
-      /// \brief Set to true if this entity is a canonical link for a model.
-      /// \param _value True if the link is canonical.
-      public: void SetCanonicalLink(bool _value);
+      /// \brief Set to true if this entity is a canonical body for a model.
+      /// \param _value True if the body is canonical.
+      public: void SetCanonicalBody(bool _value);
 
       /// \brief A helper function that checks if this is a canonical body
-      public: inline bool IsCanonicalLink() const
-              { return this->isCanonicalLink; }
+      public: inline bool IsCanonicalBody() const
+              { return this->isCanonicalBody; }
       /// \brief Set an animation for this entity
       public: void SetAnimation(const common::PoseAnimationPtr &_anim,
                                 boost::function<void()> _onComplete);
@@ -163,8 +163,8 @@ namespace gazebo
       /// \brief Get a child collision entity, if one exists
       public: CollisionPtr GetChildCollision(const std::string &_name);
 
-      /// \brief Get a child linke entity, if one exists
-      public: LinkPtr GetChildLink(const std::string &_name);
+      /// \brief Get a child bodye entity, if one exists
+      public: BodyPtr GetChildBody(const std::string &_name);
 
       /// \brief Get the distance to the nearest entity below
       ///        (along the Z-axis) this entity.
@@ -190,7 +190,7 @@ namespace gazebo
 
       private: void SetWorldPoseModel(const math::Pose &_pose, bool _notify);
 
-      private: void SetWorldPoseCanonicalLink(const math::Pose &_pose,
+      private: void SetWorldPoseCanonicalBody(const math::Pose &_pose,
                                               bool _notify);
 
       private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify);
@@ -213,8 +213,8 @@ namespace gazebo
 
       private: bool isStatic;
 
-      /// \brief Only used by Links. Included here for performance.
-      private: bool isCanonicalLink;
+      /// \brief Only used by Bodys. Included here for performance.
+      private: bool isCanonicalBody;
 
       /// The initial pose of the entity
       private: math::Pose initialRelativePose;

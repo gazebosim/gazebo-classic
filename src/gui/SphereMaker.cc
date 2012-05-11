@@ -162,7 +162,7 @@ void SphereMaker::CreateTheEntity()
                      << this->visualMsg->pose().position().y() << " "
                      << this->visualMsg->geometry().sphere().radius()
                      << " 0 0 0'/>\
-    <link name ='body'>\
+    <body name ='body'>\
       <inertial mass ='1.0'>\
           <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
       </inertial>\
@@ -179,7 +179,7 @@ void SphereMaker::CreateTheEntity()
         </geometry>\
         <material script ='Gazebo/Grey'/>\
       </visual>\
-    </link>\
+    </body>\
   </model>\
   </gazebo>";
 

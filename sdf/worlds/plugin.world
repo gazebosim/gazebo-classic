@@ -9,7 +9,7 @@
 
     <model name="box_model">
       <origin pose="0 0 0.5 0 0 0"/>
-      <link name="body">
+      <body name="body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -32,7 +32,7 @@
           <material script="Gazebo/WoodPallet"/>
         </visual>
 
-      </link>
+      </body>
 
       <plugin name="my_plugin" filename="libmodel_push.so"/>
     </model>

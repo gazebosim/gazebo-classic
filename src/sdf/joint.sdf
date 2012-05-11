@@ -3,10 +3,10 @@
   <attribute name="name" type="string" default="__default__" required="1"/>
   <attribute name="type" type="string" default="__default__" required="1"/>
   <element name="parent" required="1">
-    <attribute name="link" type="string" default="__default__" required="1"/>
+    <attribute name="body" type="string" default="__default__" required="1"/>
   </element> <!-- End Parent -->
   <element name="child" required="1">
-    <attribute name="link" type="string" default="__default__" required="1"/>
+    <attribute name="body" type="string" default="__default__" required="1"/>
   </element> <!-- End Child -->
   <element name="origin" required="0">
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>

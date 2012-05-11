@@ -69,7 +69,7 @@ namespace gazebo
       /// and Init the sensor.
       /// \param _elem The SDF element that describes the sensor
       /// \param _worldName Name of the world in which to create the sensor
-      /// \param _parentName The name of the parent link which the sensor is
+      /// \param _parentName The name of the parent body which the sensor is
       /// attached to.
       /// \return The name of the sensor
       public: std::string CreateSensor(sdf::ElementPtr _elem,

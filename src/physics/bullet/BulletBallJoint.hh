@@ -55,7 +55,7 @@ namespace gazebo
       public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
+      public: void Attach(BodyPtr _one, BodyPtr _two);
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetAxis(int /*_index*/) const

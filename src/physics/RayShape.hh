@@ -41,7 +41,7 @@ namespace gazebo
       public: RayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Constructor
-      /// \param body Link the ray is attached to
+      /// \param body Body the ray is attached to
       /// \param displayRays Indicates if the rays should be displayed when
       ///        rendering images
       public: RayShape(CollisionPtr parent);

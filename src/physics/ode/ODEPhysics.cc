@@ -41,7 +41,7 @@
 #include "physics/MapShape.hh"
 
 #include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODELink.hh"
+#include "physics/ode/ODEBody.hh"
 #include "physics/ode/ODEScrewJoint.hh"
 #include "physics/ode/ODEHingeJoint.hh"
 #include "physics/ode/ODEHinge2Joint.hh"
@@ -389,10 +389,10 @@ double ODEPhysics::GetStepTime()
 }
 
 //////////////////////////////////////////////////
-LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
+BodyPtr ODEPhysics::CreateBody(ModelPtr _parent)
 {
   if (_parent == NULL)
-    gzthrow("Link must have a parent\n");
+    gzthrow("Body must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
   iter = this->spaces.find(_parent->GetName());
@@ -400,17 +400,17 @@ LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
   if (iter == this->spaces.end())
     this->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
 
-  ODELinkPtr link(new ODELink(_parent));
+  ODEBodyPtr body(new ODEBody(_parent));
 
-  link->SetSpaceId(this->spaces[_parent->GetName()]);
-  link->SetWorld(_parent->GetWorld());
+  body->SetSpaceId(this->spaces[_parent->GetName()]);
+  body->SetWorld(_parent->GetWorld());
 
-  return link;
+  return body;
 }
 
 //////////////////////////////////////////////////
 CollisionPtr ODEPhysics::CreateCollision(const std::string &_type,
-                                         LinkPtr _body)
+                                         BodyPtr _body)
 {
   ODECollisionPtr collision(new ODECollision(_body));
   ShapePtr shape = this->CreateShape(_type, collision);
@@ -966,14 +966,14 @@ void ODEPhysics::DebugPrint() const
   for (int i = 0; i < dWorldGetBodyCount(this->worldId); ++i)
   {
     b = dWorldGetBody(this->worldId, i);
-    ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-    math::Pose pose = link->GetWorldPose();
+    ODEBody *body = static_cast<ODEBody*>(dBodyGetData(b));
+    math::Pose pose = body->GetWorldPose();
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
     math::Vector3 dpos(pos[0], pos[1], pos[2]);
     math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
 
-    std::cout << "Body[" << link->GetScopedName() << "]\n";
+    std::cout << "Body[" << body->GetScopedName() << "]\n";
     std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
     if (pose.pos != dpos)
       std::cout << "    Incorrect world pos[" << pose.pos << "]\n";

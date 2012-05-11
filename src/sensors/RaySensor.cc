@@ -24,7 +24,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Physics.hh"
 #include "physics/Model.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/Collision.hh"
 #include "common/Exception.hh"
 

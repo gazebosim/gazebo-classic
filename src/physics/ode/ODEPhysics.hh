@@ -91,11 +91,11 @@ namespace gazebo
       public: virtual double GetStepTime();
 
       /// \brief Create a new body
-      public: virtual LinkPtr CreateLink(ModelPtr _parent);
+      public: virtual BodyPtr CreateBody(ModelPtr _parent);
 
       /// \brief Create a collision
       public: virtual CollisionPtr CreateCollision(
-                  const std::string &_shapeType, LinkPtr _parent);
+                  const std::string &_shapeType, BodyPtr _parent);
 
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);

@@ -49,7 +49,7 @@ namespace gazebo
     class BulletCollision : public Collision
     {
       /// \brief Constructor
-      public: BulletCollision(LinkPtr _parent);
+      public: BulletCollision(BodyPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletCollision();

@@ -20,7 +20,7 @@
  */
 
 #include "physics/World.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODECollision.hh"
@@ -80,11 +80,11 @@ void ODERayShape::Update()
       boost::shared_static_cast<ODECollision>(this->collisionParent);
 
     this->globalStartPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+      this->collisionParent->GetBody()->GetWorldPose().CoordPositionAdd(
           this->relativeStartPos);
 
     this->globalEndPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+      this->collisionParent->GetBody()->GetWorldPose().CoordPositionAdd(
           this->relativeEndPos);
   }
 

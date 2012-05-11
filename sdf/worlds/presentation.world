@@ -26,7 +26,7 @@
 
     <!-- Ground Plane -->
     <model name="plane1_model" static="true">
-      <link name="body">
+      <body name="body">
         <collision name="geom_1">
           <geometry>
             <plane normal="0 0 1"/>
@@ -39,12 +39,12 @@
           </geometry>
           <material script="Gazebo/Grey"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide1" static="true">
       <origin pose="0 0 0 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.1 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -62,12 +62,12 @@
           </geometry>
           <material script="nate/slide1"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide2" static="true">
       <origin pose="1 0 0.201 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -85,12 +85,12 @@
           </geometry>
           <material script="nate/slide2"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide3" static="true">
       <origin pose="0.95 -0.05 0.201 0 0 -1.5707"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -108,12 +108,12 @@
           </geometry>
           <material script="nate/slide3"/>
         </visual>
-      </link>
+      </body>
     </model>
 
      <model name="slide4" static="true">
       <origin pose="0.95 -0.07 0.201 0 0 -1.5707"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -131,12 +131,12 @@
           </geometry>
           <material script="nate/slide4"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide5" static="true">
       <origin pose="0.95 -0.09 0.201 0 0 -1.5707"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -154,12 +154,12 @@
           </geometry>
           <material script="nate/slide5"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide6" static="true">
       <origin pose="0.95 -0.11 0.201 0 0 -1.5707"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -177,12 +177,12 @@
           </geometry>
           <material script="nate/slide6"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide7" static="true">
       <origin pose="0.91 -0.11 0.2011 0 0 -1.5707"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -200,12 +200,12 @@
           </geometry>
           <material script="nate/slide7"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide8" static="true">
       <origin pose="10 10 0 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -223,12 +223,12 @@
           </geometry>
           <material script="nate/slide8"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide9" static="true">
       <origin pose="10.2 9.78 0.005 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -246,11 +246,11 @@
           </geometry>
           <material script="nate/slide9"/>
         </visual>
-      </link>
+      </body>
     </model>
     <model name="slide10" static="true">
       <origin pose="10.20 9.74 0.005 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -268,12 +268,12 @@
           </geometry>
           <material script="nate/slide10"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide11" static="true">
       <origin pose="9.93 9.07 0.005 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -291,13 +291,13 @@
           </geometry>
           <material script="nate/slide11"/>
         </visual>
-      </link>
+      </body>
     </model>
 
 
     <model name="slide12" static="true">
       <origin pose="9.69 8.21 0.005 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -315,13 +315,13 @@
           </geometry>
           <material script="nate/slide12"/>
         </visual>
-      </link>
+      </body>
     </model>
 
 
     <model name="slide13" static="true">
       <origin pose="9.43 8.93 0.005 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -339,12 +339,12 @@
           </geometry>
           <material script="nate/slide13"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide14" static="true">
       <origin pose="7 14 0.005 0 0 1.5707"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -362,12 +362,12 @@
           </geometry>
           <material script="nate/slide14"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="slide15" static="true">
       <origin pose="3 10 0.005 0 0 3.1415"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0.0005 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -385,7 +385,7 @@
           </geometry>
           <material script="nate/slide15"/>
         </visual>
-      </link>
+      </body>
     </model>
 
 

@@ -29,7 +29,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Physics.hh"
 #include "physics/Model.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/Collision.hh"
 
 #include "msgs/msgs.h"
@@ -56,7 +56,7 @@ RFIDSensor::RFIDSensor()
 /////////////////////////////////////////////////
 RFIDSensor::~RFIDSensor()
 {
-  // this->link.reset();
+  // this->body.reset();
 }
 
 /////////////////////////////////////////////////
@@ -152,10 +152,10 @@ void RFIDSensor::EvaluateTags()
   // iterate through the tags contained given rfid tag manager
   for (ci = tags.begin(); ci != tags.end(); ++ci)
   {
-    // physics::LinkPtr tagLinkPtr = (*ci)->getLinkPtr();
+    // physics::BodyPtr tagBodyPtr = (*ci)->getBodyPtr();
     math::Pose pos = (*ci)->GetTagPose();
-    // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
-    // std::cout << "link pos: x" << pos.pos.x
+    // std::cout << "body: " << tagModelPtr->GetName() << std::endl;
+    // std::cout << "body pos: x" << pos.pos.x
     //     << " y:" << pos.pos.y
     //     << " z:" << pos.pos.z << std::endl;
     this->CheckTagRange(pos);
@@ -177,7 +177,7 @@ bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
     return true;
   }
 
-  // this->CheckRayIntersection(link);
+  // this->CheckRayIntersection(body);
   return false;
 }
 

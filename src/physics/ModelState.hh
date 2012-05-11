@@ -25,7 +25,7 @@
 #include <string>
 
 #include "physics/State.hh"
-#include "physics/LinkState.hh"
+#include "physics/BodyState.hh"
 #include "physics/JointState.hh"
 #include "math/Pose.hh"
 
@@ -50,14 +50,14 @@ namespace gazebo
       /// \brief Get the model pose
       public: math::Pose GetPose() const;
 
-      /// \brief Get the number of link states
-      public: unsigned int GetLinkStateCount() const;
+      /// \brief Get the number of body states
+      public: unsigned int GetBodyStateCount() const;
 
-      /// \brief Get a link state
-      public: LinkState GetLinkState(unsigned int _index) const;
+      /// \brief Get a body state
+      public: BodyState GetBodyState(unsigned int _index) const;
 
-      /// \brief Get a link state by model name
-      public: LinkState GetLinkState(const std::string &_modelName) const;
+      /// \brief Get a body state by model name
+      public: BodyState GetBodyState(const std::string &_modelName) const;
 
       /// \brief Get the number of joint states
       public: unsigned int GetJointStateCount() const;
@@ -75,7 +75,7 @@ namespace gazebo
       public: void UpdateModelSDF(sdf::ElementPtr _elem);
 
       private: math::Pose pose;
-      private: std::vector<LinkState> linkStates;
+      private: std::vector<BodyState> bodyStates;
       private: std::vector<JointState> jointStates;
     };
   }

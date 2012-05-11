@@ -24,7 +24,7 @@
 #include "gazebo_config.h"
 #include "common/Console.hh"
 
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/ode/ODEHingeJoint.hh"
 
 using namespace gazebo;
@@ -64,10 +64,10 @@ math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 //////////////////////////////////////////////////
 void ODEHingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (this->childBody)
+    this->childBody->SetEnabled(true);
+  if (this->parentBody)
+    this->parentBody->SetEnabled(true);
 
   dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
 }
@@ -84,10 +84,10 @@ math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 //////////////////////////////////////////////////
 void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (this->childBody)
+    this->childBody->SetEnabled(true);
+  if (this->parentBody)
+    this->parentBody->SetEnabled(true);
 
   dJointSetHingeAxis(this->jointId, _axis.x, _axis.y, _axis.z);
 }
@@ -143,10 +143,10 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 //////////////////////////////////////////////////
 void ODEHingeJoint::SetForce(int /*index*/, double _torque)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (this->childBody)
+    this->childBody->SetEnabled(true);
+  if (this->parentBody)
+    this->parentBody->SetEnabled(true);
   dJointAddHingeTorque(this->jointId, _torque);
 }
 

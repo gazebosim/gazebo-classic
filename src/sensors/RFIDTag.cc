@@ -23,7 +23,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Physics.hh"
 #include "physics/Model.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/Collision.hh"
 #include "common/Exception.hh"
 
@@ -99,11 +99,11 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
     msgs::Pose msg;
     msgs::Set(&msg, entity->GetWorldPose());
 
-    // msg.set_position(link->GetWorldPose().pos);
-    // msg.set_orientation(link->GetWorldPose().rot);
+    // msg.set_position(body->GetWorldPose().pos);
+    // msg.set_orientation(body->GetWorldPose().rot);
     // msgs::LaserScan msg;
 
-    // msg.set_frame(this->link->GetScopedName());
+    // msg.set_frame(this->body->GetScopedName());
     // msgs::Set(msg.mutable_offset(), this->GetPose());
     // msg.set_angle_min( this->GetAngleMin().GetAsRadian() );
     // msg.set_angle_max( this->GetAngleMax().GetAsRadian() );

@@ -6,7 +6,7 @@
 
     <model name="projector_model" static="true">
       <origin pose="0 0 1 0.0 0.0 0"/>
-      <link name="projector_link">
+      <body name="projector_body">
 
         <collision name="collision">
           <geometry>
@@ -28,12 +28,12 @@
           <near_clip>0.1</near_clip>
           <far_clip>10</far_clip>
         </projector>
-      </link>
+      </body>
     </model>
 
     <model name="texture_test_model" static="true">
       <origin pose="3 0 1 0.0 0.0 0"/>
-      <link name="texture_test_link">
+      <body name="texture_test_body">
         <collision name="collision">
           <geometry>
             <sphere radius="0.5"/>
@@ -46,7 +46,7 @@
           </geometry>
           <material script="Gazebo/Grey"/>
         </visual>
-      </link>
+      </body>
     </model>
 
   </world>

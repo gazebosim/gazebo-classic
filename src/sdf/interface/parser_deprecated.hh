@@ -56,7 +56,7 @@ namespace deprecated_sdf
   bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf);
-  bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initBody(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf);

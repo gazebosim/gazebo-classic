@@ -30,13 +30,13 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-BulletRaySensor::BulletRaySensor(Link *_body)
+BulletRaySensor::BulletRaySensor(Body *_body)
   : PhysicsRaySensor(_body)
 {
-  this->body = dynamic_cast<BulletLink*>(_body);
+  this->body = dynamic_cast<BulletBody*>(_body);
 
   if (this->body == NULL)
-    gzthrow("BulletRaySensor requires an BulletLink");
+    gzthrow("BulletRaySensor requires an BulletBody");
 }
 
 //////////////////////////////////////////////////

@@ -190,7 +190,7 @@ void CylinderMaker::CreateTheEntity()
                        << this->visualMsg->pose().position().y() << " "
                        << this->visualMsg->pose().position().z()
                        << " 0 0 0'/>\
-      <link name ='body'>\
+      <body name ='body'>\
         <inertial mass ='1.0'>\
             <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
         </inertial>\
@@ -211,7 +211,7 @@ void CylinderMaker::CreateTheEntity()
           </geometry>\
           <material script ='Gazebo/Grey'/>\
         </visual>\
-      </link>\
+      </body>\
     </model>\
     </gazebo>";
 

@@ -92,7 +92,7 @@ void ModelMaker::InitFromFile(const std::string &_filename)
 
   // Load the world file
   std::string modelName;
-  math::Pose modelPose, linkPose, visualPose;
+  math::Pose modelPose, bodyPose, visualPose;
 
   sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
   if (modelElem->HasElement("origin"))
@@ -111,27 +111,27 @@ void ModelMaker::InitFromFile(const std::string &_filename)
 
   scene->AddVisual(this->modelVisual);
 
-  sdf::ElementPtr linkElem = modelElem->GetElement("link");
+  sdf::ElementPtr bodyElem = modelElem->GetElement("body");
 
   try
   {
-    while (linkElem)
+    while (bodyElem)
     {
-      std::string linkName = linkElem->GetValueString("name");
-      if (linkElem->HasElement("origin"))
-        linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
+      std::string bodyName = bodyElem->GetValueString("name");
+      if (bodyElem->HasElement("origin"))
+        bodyPose = bodyElem->GetElement("origin")->GetValuePose("pose");
 
-      rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
-            linkName, this->modelVisual));
-      linkVisual->Load();
-      linkVisual->SetPose(linkPose);
-      this->visuals.push_back(linkVisual);
+      rendering::VisualPtr bodyVisual(new rendering::Visual(modelName + "::" +
+            bodyName, this->modelVisual));
+      bodyVisual->Load();
+      bodyVisual->SetPose(bodyPose);
+      this->visuals.push_back(bodyVisual);
 
       int visualIndex = 0;
       sdf::ElementPtr visualElem;
 
-      if (linkElem->HasElement("visual"))
-        visualElem = linkElem->GetElement("visual");
+      if (bodyElem->HasElement("visual"))
+        visualElem = bodyElem->GetElement("visual");
 
       while (visualElem)
       {
@@ -139,10 +139,10 @@ void ModelMaker::InitFromFile(const std::string &_filename)
           visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
 
         std::ostringstream visualName;
-        visualName << modelName << "::" << linkName << "::Visual_"
+        visualName << modelName << "::" << bodyName << "::Visual_"
           << visualIndex++;
         rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-              linkVisual));
+              bodyVisual));
 
         visVisual->Load(visualElem);
         this->visuals.push_back(visVisual);
@@ -150,7 +150,7 @@ void ModelMaker::InitFromFile(const std::string &_filename)
         visualElem = visualElem->GetNextElement("visual");
       }
 
-      linkElem = linkElem->GetNextElement("link");
+      bodyElem = bodyElem->GetNextElement("body");
     }
   }
   catch(common::Exception &_e)

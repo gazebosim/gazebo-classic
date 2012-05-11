@@ -115,7 +115,7 @@ void Scene::Clear()
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
-  this->linkMsgs.clear();
+  this->bodyMsgs.clear();
   this->cameras.clear();
   this->userCameras.clear();
   this->lights.clear();
@@ -156,7 +156,7 @@ Scene::~Scene()
   Visual_M::iterator iter;
   this->visuals.clear();
   this->jointMsgs.clear();
-  this->linkMsgs.clear();
+  this->bodyMsgs.clear();
   this->sceneMsgs.clear();
   this->poseMsgs.clear();
   this->lightMsgs.clear();
@@ -1050,7 +1050,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
-  std::string modelName, linkName;
+  std::string modelName, bodyName;
   for (int i = 0; i < _msg->model_size(); i++)
   {
     modelName = _msg->model(i).name() + "::";
@@ -1072,43 +1072,43 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       this->jointMsgs.push_back(jm);
     }
 
-    for (int j = 0; j < _msg->model(i).link_size(); j++)
+    for (int j = 0; j < _msg->model(i).body_size(); j++)
     {
-      linkName = modelName +_msg->model(i).link(j).name();
+      bodyName = modelName +_msg->model(i).body(j).name();
       boost::shared_ptr<msgs::Pose> pm2(
-          new msgs::Pose(_msg->model(i).link(j).pose()));
-      pm2->set_name(linkName);
+          new msgs::Pose(_msg->model(i).body(j).pose()));
+      pm2->set_name(bodyName);
       this->poseMsgs.push_front(pm2);
 
-      if (_msg->model(i).link(j).has_inertial())
+      if (_msg->model(i).body(j).has_inertial())
       {
-        boost::shared_ptr<msgs::Link> lm(
-            new msgs::Link(_msg->model(i).link(j)));
-        this->linkMsgs.push_back(lm);
+        boost::shared_ptr<msgs::Body> lm(
+            new msgs::Body(_msg->model(i).body(j)));
+        this->bodyMsgs.push_back(lm);
       }
 
-      for (int k = 0; k < _msg->model(i).link(j).visual_size(); k++)
+      for (int k = 0; k < _msg->model(i).body(j).visual_size(); k++)
       {
         boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
-              _msg->model(i).link(j).visual(k)));
+              _msg->model(i).body(j).visual(k)));
         this->visualMsgs.push_back(vm);
       }
 
-      for (int k = 0; k < _msg->model(i).link(j).collision_size(); k++)
+      for (int k = 0; k < _msg->model(i).body(j).collision_size(); k++)
       {
         for (int l = 0;
-             l < _msg->model(i).link(j).collision(k).visual_size(); l++)
+             l < _msg->model(i).body(j).collision(k).visual_size(); l++)
         {
           boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
-                _msg->model(i).link(j).collision(k).visual(l)));
+                _msg->model(i).body(j).collision(k).visual(l)));
           this->visualMsgs.push_back(vm);
         }
       }
 
-      for (int k = 0; k < _msg->model(i).link(j).sensor_size(); k++)
+      for (int k = 0; k < _msg->model(i).body(j).sensor_size(); k++)
       {
         boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
-              _msg->model(i).link(j).sensor(k)));
+              _msg->model(i).body(j).sensor(k)));
         this->sensorMsgs.push_back(sm);
       }
     }
@@ -1214,7 +1214,7 @@ void Scene::PreRender()
   static SkeletonPoseMsgs_L::iterator spIter;
   static JointMsgs_L::iterator jIter;
   static SensorMsgs_L::iterator sensorIter;
-  static LinkMsgs_L::iterator linkIter;
+  static BodyMsgs_L::iterator bodyIter;
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
@@ -1312,14 +1312,14 @@ void Scene::PreRender()
       ++jIter;
   }
 
-  // Process the link messages
-  linkIter = this->linkMsgs.begin();
-  while (linkIter != this->linkMsgs.end())
+  // Process the body messages
+  bodyIter = this->bodyMsgs.begin();
+  while (bodyIter != this->bodyMsgs.end())
   {
-    if (this->ProcessLinkMsg(*linkIter))
-      this->linkMsgs.erase(linkIter++);
+    if (this->ProcessBodyMsg(*bodyIter))
+      this->bodyMsgs.erase(bodyIter++);
     else
-      ++linkIter;
+      ++bodyIter;
   }
 
   if (this->selectionMsg)
@@ -1409,21 +1409,21 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
+bool Scene::ProcessBodyMsg(ConstBodyPtr &_msg)
 {
-  VisualPtr linkVis = this->GetVisual(_msg->name());
+  VisualPtr bodyVis = this->GetVisual(_msg->name());
 
-  if (!linkVis)
+  if (!bodyVis)
     return false;
 
-  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
+  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", bodyVis));
   comVis->Load(_msg);
   comVis->SetVisible(false);
   this->visuals[comVis->GetName()] = comVis;
 
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
-    Projector *projector = new Projector(linkVis);
+    Projector *projector = new Projector(bodyVis);
     projector->Load(_msg->projector(i));
     projector->Toggle();
     this->projectors.push_back(projector);

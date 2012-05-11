@@ -21,7 +21,7 @@
 
     <model name="camera_model" static="true">
       <origin pose="0 0 .5 0.0 0.0 0"/>
-      <link name="my_link">
+      <body name="my_body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" 
                    iyy="1" iyz="0" 
@@ -53,7 +53,7 @@
 
           <plugin filename="libCameraPlugin.so" name="camera_plugin"/>
         </sensor>
-      </link>
+      </body>
     </model>
 
     <light type="directional" name="my_light" cast_shadows="false">

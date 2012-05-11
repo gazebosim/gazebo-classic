@@ -36,7 +36,7 @@
 
 #include "physics/World.hh"
 #include "physics/Joint.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/Model.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Actor.hh"
@@ -82,58 +82,58 @@ void Actor::Load(sdf::ElementPtr _sdf)
       gzthrow("Collada file does not contain skeletal animation.");
     this->skeleton = mesh->GetSkeleton();
     this->skeleton->Scale(this->skinScale);
-    /// create the link sdfs for the model
+    /// create the body sdfs for the model
     NodeMap nodes = this->skeleton->GetNodes();
 
-    sdf::ElementPtr linkSdf;
-    linkSdf = _sdf->GetOrCreateElement("link");
-    linkSdf->GetAttribute("name")->Set(actorName + "_origin");
-    linkSdf->GetAttribute("gravity")->Set(false);
-    sdf::ElementPtr linkPose = linkSdf->GetOrCreateElement("origin");
+    sdf::ElementPtr bodySdf;
+    bodySdf = _sdf->GetOrCreateElement("body");
+    bodySdf->GetAttribute("name")->Set(actorName + "_origin");
+    bodySdf->GetAttribute("gravity")->Set(false);
+    sdf::ElementPtr bodyPose = bodySdf->GetOrCreateElement("origin");
 
-    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
-    this->AddSphereCollision(linkSdf, actorName + "_origin_col",
+    this->AddSphereInertia(bodySdf, math::Pose(), 1.0, 0.01);
+    this->AddSphereCollision(bodySdf, actorName + "_origin_col",
                                              math::Pose(), 0.02);
-    this->AddSphereVisual(linkSdf, actorName + "_origin_vis",
+    this->AddSphereVisual(bodySdf, actorName + "_origin_vis",
                     math::Pose(), 0.05, "Gazebo/White", Color::White);
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
       SkeletonNode* bone = iter->second;
 
-      linkSdf = _sdf->AddElement("link");
+      bodySdf = _sdf->AddElement("body");
 
-      linkSdf->GetAttribute("name")->Set(bone->GetName());
-      linkSdf->GetAttribute("gravity")->Set(false);
-      linkPose = linkSdf->GetOrCreateElement("origin");
+      bodySdf->GetAttribute("name")->Set(bone->GetName());
+      bodySdf->GetAttribute("gravity")->Set(false);
+      bodyPose = bodySdf->GetOrCreateElement("origin");
       math::Pose pose(bone->GetModelTransform().GetTranslation(),
                       bone->GetModelTransform().GetRotation());
-      linkPose->GetAttribute("pose")->Set(pose);
+      bodyPose->GetAttribute("pose")->Set(pose);
 
       /// FIXME hardcoded inertia of a sphere with mass 1.0 and radius 0.01
-      this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
+      this->AddSphereInertia(bodySdf, math::Pose(), 1.0, 0.01);
 
       /// FIXME hardcoded collision to sphere with radius 0.02
-      this->AddSphereCollision(linkSdf, bone->GetName() + "_collision",
+      this->AddSphereCollision(bodySdf, bone->GetName() + "_collision",
                        math::Pose(), 0.02);
 
       /// FIXME hardcoded visual to red sphere with radius 0.02
       if (bone->IsRootNode())
       {
-        this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+        this->AddSphereVisual(bodySdf, bone->GetName() + "_visual",
                             math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
-        this->AddActorVisual(linkSdf, name + "_visual", pose.GetInverse());
+        this->AddActorVisual(bodySdf, name + "_visual", pose.GetInverse());
         this->visualName = name + "::" + bone->GetName()
                              + "::" + name + "_visual";
       }
       else
         if (bone->GetChildCount() == 0)
         {
-            this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+            this->AddSphereVisual(bodySdf, bone->GetName() + "_visual",
                             math::Pose(), 0.02, "Gazebo/Yellow", Color::Yellow);
         }
         else
-          this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+          this->AddSphereVisual(bodySdf, bone->GetName() + "_visual",
                             math::Pose(), 0.02, "Gazebo/Red", Color::Red);
 
       for (unsigned int i = 0; i < bone->GetChildCount(); i++)
@@ -141,18 +141,18 @@ void Actor::Load(sdf::ElementPtr _sdf)
         SkeletonNode *curChild = bone->GetChild(i);
 
         math::Vector3 r = curChild->GetTransform().GetTranslation();
-        math::Vector3 linkPos = math::Vector3(r.x / 2.0, r.y / 2.0, r.z / 2.0);
+        math::Vector3 bodyPos = math::Vector3(r.x / 2.0, r.y / 2.0, r.z / 2.0);
         math::Vector3 dir = curChild->GetModelTransform().GetTranslation() -
             bone->GetModelTransform().GetTranslation();
         double length = dir.GetLength();
         double theta = atan2(dir.y, dir.x);
         double phi = acos(dir.z / length);
 
-        math::Pose bonePose(linkPos, math::Quaternion(0.0, phi, theta));
+        math::Pose bonePose(bodyPos, math::Quaternion(0.0, phi, theta));
         bonePose.rot = pose.rot.GetInverse() * bonePose.rot;
 
-        this->AddBoxVisual(linkSdf, bone->GetName() + "_" + curChild->GetName()
-          + "_link", bonePose, math::Vector3(0.02, 0.02, length),
+        this->AddBoxVisual(bodySdf, bone->GetName() + "_" + curChild->GetName()
+          + "_body", bonePose, math::Vector3(0.02, 0.02, length),
           "Gazebo/Green", Color::Green);
       }
     }
@@ -167,7 +167,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
     this->LoadScript(_sdf->GetOrCreateElement("script"));
 
-    /// we are ready to load the links
+    /// we are ready to load the bodys
     Model::Load(_sdf);
     this->bonePosePub = this->node->Advertise<msgs::PoseAnimation>(
                                        "~/skeleton_pose/info", 10);
@@ -331,7 +331,7 @@ void Actor::Init()
   this->prevFrameTime = this->world->GetSimTime();
   if (this->autoStart)
     this->Play();
-  this->mainLink = this->GetChildLink(this->GetName() + "_origin");
+  this->mainBody = this->GetChildBody(this->GetName() + "_origin");
 }
 
 //////////////////////////////////////////////////
@@ -435,7 +435,7 @@ void Actor::Update()
     else
       transform = bone->GetTransform();
 
-    LinkPtr currentLink = this->GetChildLink(bone->GetName());
+    BodyPtr currentBody = this->GetChildBody(bone->GetName());
     if (parentBone)
     {
       math::Pose bonePose;
@@ -453,9 +453,9 @@ void Actor::Update()
       msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
       msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
 
-      LinkPtr parentLink = this->GetChildLink(
+      BodyPtr parentBody = this->GetChildBody(
                               skelMap[parentBone->GetName()]);
-      math::Pose parentPose = parentLink->GetWorldPose();
+      math::Pose parentPose = parentBody->GetWorldPose();
       math::Matrix4 parentTrans(math::Matrix4::IDENTITY);
       parentTrans = parentPose.rot.GetAsMatrix4();
       parentTrans.SetTranslate(parentPose.pos);
@@ -473,7 +473,7 @@ void Actor::Update()
                         posFrame.GetRotation().RotateVector(yPos);
       modelPose.rot = posFrame.GetRotation();
 
-      this->mainLink->SetWorldPose(modelPose);
+      this->mainBody->SetWorldPose(modelPose);
 
       math::Matrix4 modelTrans(modelPose.rot.GetAsMatrix4());
       modelTrans.SetTranslate(modelPose.pos + zPos);
@@ -482,7 +482,7 @@ void Actor::Update()
 
       this->lastScriptTime = scriptTime;
     }
-    currentLink->SetWorldPose(transform.GetAsPose());
+    currentBody->SetWorldPose(transform.GetAsPose());
   }
 
   msgs::Time *stamp = msg.add_time();
@@ -511,11 +511,11 @@ const sdf::ElementPtr Actor::GetSDF()
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
+void Actor::AddSphereInertia(sdf::ElementPtr bodySdf, math::Pose pose,
             double mass, double radius)
 {
   double ixx = 2.0 * mass * radius * radius / 5.0;
-  sdf::ElementPtr inertialSdf = linkSdf->GetOrCreateElement("inertial");
+  sdf::ElementPtr inertialSdf = bodySdf->GetOrCreateElement("inertial");
   sdf::ElementPtr inertialPoseSdf = inertialSdf->GetOrCreateElement("origin");
   inertialPoseSdf->GetAttribute("pose")->Set(pose);
   inertialSdf->GetAttribute("mass")->Set(mass);
@@ -529,10 +529,10 @@ void Actor::AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereCollision(sdf::ElementPtr linkSdf, std::string name,
+void Actor::AddSphereCollision(sdf::ElementPtr bodySdf, std::string name,
             math::Pose pose, double radius)
 {
-  sdf::ElementPtr collisionSdf = linkSdf->GetOrCreateElement("collision");
+  sdf::ElementPtr collisionSdf = bodySdf->GetOrCreateElement("collision");
   collisionSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr collPoseSdf = collisionSdf->GetOrCreateElement("origin");
   collPoseSdf->GetAttribute("pose")->Set(pose);
@@ -542,10 +542,10 @@ void Actor::AddSphereCollision(sdf::ElementPtr linkSdf, std::string name,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
+void Actor::AddSphereVisual(sdf::ElementPtr bodySdf, std::string name,
             math::Pose pose, double radius, std::string material, Color ambient)
 {
-  sdf::ElementPtr visualSdf = linkSdf->GetOrCreateElement("visual");
+  sdf::ElementPtr visualSdf = bodySdf->GetOrCreateElement("visual");
   visualSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
   visualPoseSdf->GetAttribute("pose")->Set(pose);
@@ -559,10 +559,10 @@ void Actor::AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
+void Actor::AddBoxVisual(sdf::ElementPtr bodySdf, std::string name,
     math::Pose pose, math::Vector3 size, std::string material, Color ambient)
 {
-  sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
+  sdf::ElementPtr visualSdf = bodySdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
   visualPoseSdf->GetAttribute("pose")->Set(pose);
@@ -576,10 +576,10 @@ void Actor::AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
+void Actor::AddActorVisual(sdf::ElementPtr bodySdf, std::string name,
     math::Pose pose)
 {
-  sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
+  sdf::ElementPtr visualSdf = bodySdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
   visualPoseSdf->GetAttribute("pose")->Set(pose);

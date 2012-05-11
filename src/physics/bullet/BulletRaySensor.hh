@@ -29,13 +29,13 @@ namespace gazebo
   namespace physics
   {
     class BulletRayCollision;
-    class BulletLink;
+    class BulletBody;
 
     /// \brief An Bullet Ray sensor
     class BulletRaySensor : public PhysicsRaySensor
     {
       /// \brief Constructor
-      public: BulletRaySensor(Link *body);
+      public: BulletRaySensor(Body *body);
 
       /// \brief Destructor
       public: virtual ~BulletRaySensor();
@@ -66,7 +66,7 @@ namespace gazebo
       /// All the rays
       private: std::vector<BulletRayCollision*> rays;
 
-      private: BulletLink *body;
+      private: BulletBody *body;
     };
   }
 }

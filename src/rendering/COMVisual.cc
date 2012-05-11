@@ -43,7 +43,7 @@ COMVisual::~COMVisual()
 }
 
 /////////////////////////////////////////////////
-void COMVisual::Load(ConstLinkPtr &_msg)
+void COMVisual::Load(ConstBodyPtr &_msg)
 {
   Visual::Load();
 

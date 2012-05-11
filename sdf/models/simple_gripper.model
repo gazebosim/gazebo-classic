@@ -1,6 +1,6 @@
 <gazebo version='1.0'>
   <model name="simple_gripper" static="false">
-    <link name="riser">
+    <body name="riser">
       <origin pose="-0.15 0.0 0.5 0 0 0"/>
 
       <collision name="collision">
@@ -20,9 +20,9 @@
         </geometry>
         <material script="Gazebo/Purple"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="palm">
+    <body name="palm">
       <origin pose="0.0 0.0 0.05 0 0 0"/>
 
       <collision name="collision">
@@ -42,9 +42,9 @@
         </geometry>
         <material script="Gazebo/Red"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="left_finger">
+    <body name="left_finger">
       <origin pose="0.1 0.2 0.05 0 0 -0.78539"/>
 
       <collision name="collision">
@@ -67,9 +67,9 @@
         </geometry>
         <material script="Gazebo/Blue"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="left_finger_tip">
+    <body name="left_finger_tip">
       <origin pose="0.336 0.3 0.05 0 0 1.5707"/>
 
       <collision name="collision">
@@ -92,9 +92,9 @@
         </geometry>
         <material script="Gazebo/Blue"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="right_finger">
+    <body name="right_finger">
       <origin pose="0.1 -0.2 0.05 0 0 .78539"/>
 
       <collision name="collision">
@@ -118,9 +118,9 @@
         </geometry>
         <material script="Gazebo/Green"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="right_finger_tip">
+    <body name="right_finger_tip">
       <origin pose="0.336 -0.3 0.05 0 0 1.5707"/>
 
       <collision name="collision">
@@ -143,12 +143,12 @@
         </geometry>
         <material script="Gazebo/Green"/>
       </visual>
-    </link>
+    </body>
 
     <joint name="palm_left_finger" type="revolute">
       <origin pose="0 -0.15 0 0 0 0"/>
-      <child link="left_finger"/>
-      <parent link="palm"/>
+      <child body="left_finger"/>
+      <parent body="palm"/>
       <axis xyz="0 0 1">
         <limit lower="-0.8" upper="0.8"/>
       </axis>
@@ -156,8 +156,8 @@
 
     <joint name="left_finger_tip" type="revolute">
       <origin pose="0 0.1 0 0 0 0"/>
-      <child link="left_finger_tip"/>
-      <parent link="left_finger"/>
+      <child body="left_finger_tip"/>
+      <parent body="left_finger"/>
       <axis xyz="0 0 1">
         <limit lower="-0.8" upper="0.8"/>
       </axis>
@@ -165,8 +165,8 @@
 
     <joint name="palm_right_finger" type="revolute">
       <origin pose="0 0.15 0 0 0 0"/>
-      <child link="right_finger"/>
-      <parent link="palm"/>
+      <child body="right_finger"/>
+      <parent body="palm"/>
       <axis xyz="0 0 1">
         <limit lower="-0.8" upper="0.8"/>
       </axis>
@@ -174,24 +174,24 @@
 
     <joint name="right_finger_tip" type="revolute">
       <origin pose="0 0.1 0 0 0 0"/>
-      <child link="right_finger_tip"/>
-      <parent link="right_finger"/>
+      <child body="right_finger_tip"/>
+      <parent body="right_finger"/>
       <axis xyz="0 0 1">
         <limit lower="-0.8" upper="0.8"/>
       </axis>
     </joint>
 
     <joint name="palm_riser" type="prismatic">
-      <child link="palm"/>
-      <parent link="riser"/>
+      <child body="palm"/>
+      <parent body="riser"/>
       <axis xyz="0 0 1">
         <limit lower="0" upper="0.9"/> 
       </axis>
     </joint>
 
     <joint name="fixed_riser" type="revolute">
-      <child link="riser"/>
-      <parent link="world"/>
+      <child body="riser"/>
+      <parent body="world"/>
       <axis xyz="0 0 1">
         <limit lower="0" upper="0"/> 
       </axis>

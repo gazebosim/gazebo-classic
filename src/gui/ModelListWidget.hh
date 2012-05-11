@@ -77,7 +77,7 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parentItem);
 
-      private: void FillPropertyTree(const msgs::Link &_msg,
+      private: void FillPropertyTree(const msgs::Body &_msg,
                                      QtProperty *_parentItem);
 
       private: void FillPropertyTree(const msgs::Collision &_msg,

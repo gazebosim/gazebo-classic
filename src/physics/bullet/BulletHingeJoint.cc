@@ -21,7 +21,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletHingeJoint.hh"
 
@@ -47,16 +47,16 @@ void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletHingeJoint::Attach(BodyPtr _one, BodyPtr _two)
 {
   HingeJoint<BulletJoint>::Attach(_one, _two);
 
-  BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
-  BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+  BulletBodyPtr bulletChildBody =
+    boost::shared_static_cast<BulletBody>(this->childBody);
+  BulletBodyPtr bulletParentBody =
+    boost::shared_static_cast<BulletBody>(this->parentBody);
 
-  if (!bulletChildLink || !bulletParentLink)
+  if (!bulletChildBody || !bulletParentBody)
     gzthrow("Requires bullet bodies");
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
@@ -65,21 +65,21 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 pivotA, pivotB, axisA, axisB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
+  pivotA = this->anchorPos - this->parentBody->GetWorldPose().pos;
+  pivotB = this->anchorPos - this->childBody->GetWorldPose().pos;
 
-  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
-  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
+  pivotA = this->parentBody->GetWorldPose().rot.RotateVectorReverse(pivotA);
+  pivotB = this->childBody->GetWorldPose().rot.RotateVectorReverse(pivotB);
 
-  axisA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(axis);
+  axisA = this->parentBody->GetWorldPose().rot.RotateVectorReverse(axis);
   axisA = axisA.Round();
 
-  axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
+  axisB = this->childBody->GetWorldPose().rot.RotateVectorReverse(axis);
   axisB = axisB.Round();
 
   this->btHinge = new btHingeConstraint(
-      *bulletParentLink->GetBulletLink(),
-      *bulletChildLink->GetBulletLink(),
+      *bulletParentBody->GetBulletBody(),
+      *bulletChildBody->GetBulletBody(),
       btVector3(pivotA.x, pivotA.y, pivotA.z),
       btVector3(pivotB.x, pivotB.y, pivotB.z),
       btVector3(axisA.x, axisA.y, axisA.z),

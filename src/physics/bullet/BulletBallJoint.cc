@@ -23,7 +23,7 @@
 #include "common/Console.hh"
 
 #include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletBallJoint.hh"
 
 using namespace gazebo;
@@ -61,27 +61,27 @@ void BulletBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletBallJoint::Attach(BodyPtr _one, BodyPtr _two)
 {
   BallJoint<BulletJoint>::Attach(_one, _two);
 
-  BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
-  BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+  BulletBodyPtr bulletChildBody =
+    boost::shared_static_cast<BulletBody>(this->childBody);
+  BulletBodyPtr bulletParentBody =
+    boost::shared_static_cast<BulletBody>(this->parentBody);
 
-  if (!bulletChildLink || !bulletParentLink)
+  if (!bulletChildBody || !bulletParentBody)
     gzthrow("Requires bullet bodies");
 
   math::Vector3 pivotA, pivotB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
+  pivotA = this->anchorPos - this->parentBody->GetWorldPose().pos;
+  pivotB = this->anchorPos - this->childBody->GetWorldPose().pos;
 
   this->btBall = new btPoint2PointConstraint(
-      *bulletParentLink->GetBulletLink(),
-      *bulletChildLink->GetBulletLink(),
+      *bulletParentBody->GetBulletBody(),
+      *bulletChildBody->GetBulletBody(),
       btVector3(pivotA.x, pivotA.y, pivotA.z),
       btVector3(pivotB.x, pivotB.y, pivotB.z));
 

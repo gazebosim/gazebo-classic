@@ -23,9 +23,9 @@
 #include "common/Console.hh"
 
 #include "physics/World.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/PhysicsEngine.hh"
-#include "physics/ode/ODELink.hh"
+#include "physics/ode/ODEBody.hh"
 #include "physics/ode/ODEJoint.hh"
 
 using namespace gazebo;
@@ -101,34 +101,34 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-LinkPtr ODEJoint::GetJointLink(int _index) const
+BodyPtr ODEJoint::GetJointBody(int _index) const
 {
-  LinkPtr result;
+  BodyPtr result;
 
   if (_index == 0 || _index == 1)
   {
-    ODELinkPtr odeLink1 = boost::shared_static_cast<ODELink>(this->childLink);
-    ODELinkPtr odeLink2 = boost::shared_static_cast<ODELink>(this->parentLink);
-    if (odeLink1 != NULL &&
-        dJointGetBody(this->jointId, _index) == odeLink1->GetODEId())
-      result = this->childLink;
-    else if (odeLink2)
-      result = this->parentLink;
+    ODEBodyPtr odeBody1 = boost::shared_static_cast<ODEBody>(this->childBody);
+    ODEBodyPtr odeBody2 = boost::shared_static_cast<ODEBody>(this->parentBody);
+    if (odeBody1 != NULL &&
+        dJointGetBody(this->jointId, _index) == odeBody1->GetODEId())
+      result = this->childBody;
+    else if (odeBody2)
+      result = this->parentBody;
   }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
+bool ODEJoint::AreConnected(BodyPtr _one, BodyPtr _two) const
 {
-  ODELinkPtr odeLink1 = boost::shared_dynamic_cast<ODELink>(_one);
-  ODELinkPtr odeLink2 = boost::shared_dynamic_cast<ODELink>(_two);
+  ODEBodyPtr odeBody1 = boost::shared_dynamic_cast<ODEBody>(_one);
+  ODEBodyPtr odeBody2 = boost::shared_dynamic_cast<ODEBody>(_two);
 
-  if (odeLink1 == NULL || odeLink2 == NULL)
+  if (odeBody1 == NULL || odeBody2 == NULL)
     gzthrow("ODEJoint requires ODE bodies\n");
 
-  return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
+  return dAreConnected(odeBody1->GetODEId(), odeBody2->GetODEId());
 }
 
 //////////////////////////////////////////////////
@@ -139,15 +139,15 @@ double ODEJoint::GetParam(int /*parameter*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
+void ODEJoint::Attach(BodyPtr _parent, BodyPtr _child)
 {
   Joint::Attach(_parent, _child);
 
-  ODELinkPtr odechild = boost::shared_dynamic_cast<ODELink>(this->childLink);
-  ODELinkPtr odeparent = boost::shared_dynamic_cast<ODELink>(this->parentLink);
+  ODEBodyPtr odechild = boost::shared_dynamic_cast<ODEBody>(this->childBody);
+  ODEBodyPtr odeparent = boost::shared_dynamic_cast<ODEBody>(this->parentBody);
 
   if (odechild == NULL && odeparent == NULL)
-    gzthrow("ODEJoint requires at least one ODE link\n");
+    gzthrow("ODEJoint requires at least one ODE body\n");
 
 
   if (!odechild && odeparent)
@@ -170,8 +170,8 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
-  this->childLink.reset();
-  this->parentLink.reset();
+  this->childBody.reset();
+  this->parentBody.reset();
   dJointAttach(this->jointId, 0, 0);
 }
 
@@ -179,10 +179,10 @@ void ODEJoint::Detach()
 // where appropriate
 void ODEJoint::SetParam(int /*parameter*/, double /*value*/)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (this->childBody)
+    this->childBody->SetEnabled(true);
+  if (this->parentBody)
+    this->parentBody->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
@@ -291,7 +291,7 @@ math::Angle ODEJoint::GetLowStop(int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
+math::Vector3 ODEJoint::GetBodyForce(unsigned int _index) const
 {
   math::Vector3 result;
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
@@ -307,7 +307,7 @@ math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
+math::Vector3 ODEJoint::GetBodyTorque(unsigned int _index) const
 {
   math::Vector3 result;
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);

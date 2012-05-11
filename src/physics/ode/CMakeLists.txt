@@ -4,7 +4,7 @@ include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
 set (sources ODEPhysics.cc
              ODECollision.cc
-             ODELink.cc
+             ODEBody.cc
              ODEJoint.cc
              ODESliderJoint.cc
              ODEHingeJoint.cc
@@ -20,7 +20,7 @@ set (sources ODEPhysics.cc
 
 SET (headers ODEPhysics.hh
              ODECollision.hh
-             ODELink.hh
+             ODEBody.hh
              ODEJoint.hh
              ODESliderJoint.hh
              ODEHingeJoint.hh

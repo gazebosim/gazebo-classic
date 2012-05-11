@@ -23,7 +23,7 @@
 #include "common/Console.hh"
 
 #include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletHinge2Joint.hh"
 
@@ -49,16 +49,16 @@ void BulletHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletHinge2Joint::Attach(BodyPtr _one, BodyPtr _two)
 {
   Hinge2Joint<BulletJoint>::Attach(_one, _two);
 
-  BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
-  BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+  BulletBodyPtr bulletChildBody =
+    boost::shared_static_cast<BulletBody>(this->childBody);
+  BulletBodyPtr bulletParentBody =
+    boost::shared_static_cast<BulletBody>(this->parentBody);
 
-  if (!bulletChildLink || !bulletParentLink)
+  if (!bulletChildBody || !bulletParentBody)
     gzthrow("Requires bullet bodies");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
@@ -72,8 +72,8 @@ void BulletHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
   btVector3 baxis2(axis2.x, axis2.y, axis2.z);
 
   this->btHinge2 = new btHinge2Constraint(
-      *bulletParentLink->GetBulletLink(),
-      *bulletChildLink->GetBulletLink(),
+      *bulletParentBody->GetBulletBody(),
+      *bulletChildBody->GetBulletBody(),
       banchor, baxis1, baxis2);
 
   this->constraint = this->btHinge2;

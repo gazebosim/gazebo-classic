@@ -16,7 +16,7 @@
  */
 #include "physics/World.hh"
 #include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletCollision.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletRayShape.hh"

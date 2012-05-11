@@ -21,7 +21,7 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletTypes.hh"
 #include "physics/bullet/BulletUniversalJoint.hh"
 
@@ -41,16 +41,16 @@ BulletUniversalJoint::~BulletUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletUniversalJoint::Attach(BodyPtr _one, BodyPtr _two)
 {
   UniversalJoint<BulletJoint>::Attach(_one, _two);
 
-  BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
-  BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+  BulletBodyPtr bulletChildBody =
+    boost::shared_static_cast<BulletBody>(this->childBody);
+  BulletBodyPtr bulletParentBody =
+    boost::shared_static_cast<BulletBody>(this->parentBody);
 
-  if (!bulletChildLink || !bulletParentLink)
+  if (!bulletChildBody || !bulletParentBody)
     gzthrow("Requires bullet bodies");
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
@@ -58,8 +58,8 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 axis2 = axisElem->GetValueVector3("xyz");
 
   this->btUniversal = new btUniversalConstraint(
-      *bulletParentLink->GetBulletLink(),
-      *bulletChildLink->GetBulletLink(),
+      *bulletParentBody->GetBulletBody(),
+      *bulletChildBody->GetBulletBody(),
       btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
       btVector3(axis1.x, axis1.y, axis1.z),
       btVector3(axis2.x, axis2.y, axis2.z));

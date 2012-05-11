@@ -23,7 +23,7 @@
 #include "common/Exception.hh"
 
 #include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletSliderJoint.hh"
 
@@ -49,16 +49,16 @@ void BulletSliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
+void BulletSliderJoint::Attach(BodyPtr _one, BodyPtr _two)
 {
   SliderJoint<BulletJoint>::Attach(_one, _two);
 
-  BulletLinkPtr bulletChildLink =
-    boost::shared_static_cast<BulletLink>(this->childLink);
-  BulletLinkPtr bulletParentLink =
-    boost::shared_static_cast<BulletLink>(this->parentLink);
+  BulletBodyPtr bulletChildBody =
+    boost::shared_static_cast<BulletBody>(this->childBody);
+  BulletBodyPtr bulletParentBody =
+    boost::shared_static_cast<BulletBody>(this->parentBody);
 
-  if (!bulletChildLink || !bulletParentLink)
+  if (!bulletChildBody || !bulletParentBody)
     gzthrow("Requires bullet bodies");
 
   btVector3 anchor, axis1, axis2;
@@ -68,11 +68,11 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
 
   math::Vector3 pivotA, pivotB;
 
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
+  pivotA = this->anchorPos - this->parentBody->GetWorldPose().pos;
+  pivotB = this->anchorPos - this->childBody->GetWorldPose().pos;
 
-  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
-  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
+  pivotA = this->parentBody->GetWorldPose().rot.RotateVectorReverse(pivotA);
+  pivotB = this->childBody->GetWorldPose().rot.RotateVectorReverse(pivotB);
 
   std::cout << "AnchorPos[" << this->anchorPos << "]\n";
   std::cout << "Slider PivotA[" << pivotA << "] PivotB[" << pivotB << "]\n";
@@ -84,8 +84,8 @@ void BulletSliderJoint::Attach(LinkPtr _one, LinkPtr _two)
   frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
 
   this->btSlider = new btSliderConstraint(
-      *bulletChildLink->GetBulletLink(),
-      *bulletParentLink->GetBulletLink(),
+      *bulletChildBody->GetBulletBody(),
+      *bulletParentBody->GetBulletBody(),
       frame2, frame1, true);
 
   // this->btSlider->setLowerAngLimit(0.0);

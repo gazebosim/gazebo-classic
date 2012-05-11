@@ -19,7 +19,7 @@
  * Date: 25 May 2009
  */
 
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletMotionState.hh"
 
@@ -27,10 +27,10 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletMotionState::BulletMotionState(Link *_link)
+BulletMotionState::BulletMotionState(Body *_body)
   : btMotionState()
 {
-  this->link = _link;
+  this->body = _body;
 }
 
 //////////////////////////////////////////////////
@@ -85,5 +85,5 @@ void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
   math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
   this->worldPose.pos -= cg;
 
-  this->link->SetWorldPose(this->worldPose, false);
+  this->body->SetWorldPose(this->worldPose, false);
 }

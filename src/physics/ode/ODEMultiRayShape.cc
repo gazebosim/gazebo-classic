@@ -16,7 +16,7 @@
  */
 #include "physics/World.hh"
 #include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODELink.hh"
+#include "physics/ode/ODEBody.hh"
 #include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODERayShape.hh"
@@ -43,9 +43,9 @@ using namespace physics;
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
   // These three lines may be unessecary
-  ODELinkPtr pLink =
-    boost::shared_static_cast<ODELink>(this->collisionParent->GetLink());
-  pLink->SetSpaceId(this->raySpaceId);
+  ODEBodyPtr pBody =
+    boost::shared_static_cast<ODEBody>(this->collisionParent->GetBody());
+  pBody->SetSpaceId(this->raySpaceId);
   boost::shared_static_cast<ODECollision>(_parent)->SetSpaceId(
       this->raySpaceId);
 }
@@ -181,7 +181,7 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
   MultiRayShape::AddRay(_start, _end);
 
   ODECollisionPtr odeCollision(new ODECollision(
-        this->collisionParent->GetLink()));
+        this->collisionParent->GetBody()));
   odeCollision->SetName("ode_ray_collision");
   odeCollision->SetSpaceId(this->raySpaceId);
 

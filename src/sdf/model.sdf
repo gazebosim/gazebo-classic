@@ -7,7 +7,7 @@
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
   </element> <!-- End Origin -->
 
-  <include filename="link.sdf" required="+"/>
+  <include filename="body.sdf" required="+"/>
   <include filename="joint.sdf" required="*"/>
   <include filename="plugin.sdf" required="*"/>
 

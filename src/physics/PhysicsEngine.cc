@@ -26,7 +26,7 @@
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 
@@ -95,16 +95,16 @@ math::Vector3 PhysicsEngine::GetGravity() const
 
 //////////////////////////////////////////////////
 CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
-                                            const std::string &_linkName)
+                                            const std::string &_bodyName)
 {
   CollisionPtr result;
-  LinkPtr link =
-    boost::shared_dynamic_cast<Link>(this->world->GetEntity(_linkName));
+  BodyPtr body =
+    boost::shared_dynamic_cast<Body>(this->world->GetEntity(_bodyName));
 
-  if (!link)
-    gzerr << "Unable to find link[" << _linkName << "]\n";
+  if (!body)
+    gzerr << "Unable to find body[" << _bodyName << "]\n";
   else
-    result = this->CreateCollision(_shapeType, link);
+    result = this->CreateCollision(_shapeType, body);
 
   return result;
 }

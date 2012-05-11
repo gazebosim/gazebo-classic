@@ -42,7 +42,7 @@ namespace gazebo
     class Collision : public Entity
     {
       /// \brief Constructor
-      public: Collision(LinkPtr _link);
+      public: Collision(BodyPtr _body);
 
       /// \brief Destructor
       public: virtual ~Collision();
@@ -79,8 +79,8 @@ namespace gazebo
       /// \brief Get the laser retro reflectiveness
       public: float GetLaserRetro() const;
 
-      /// \brief Get the link this collision belongs to
-      public: LinkPtr GetLink() const;
+      /// \brief Get the body this collision belongs to
+      public: BodyPtr GetBody() const;
 
       /// \brief Get the model this collision belongs to
       public: ModelPtr GetModel() const;
@@ -164,8 +164,8 @@ namespace gazebo
 
       private: msgs::Visual CreateCollisionVisual();
 
-      /// The link this collision belongs to
-      protected: LinkPtr link;
+      /// The body this collision belongs to
+      protected: BodyPtr body;
 
       protected: bool placeable;
 

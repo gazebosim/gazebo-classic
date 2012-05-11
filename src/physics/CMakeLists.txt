@@ -8,8 +8,8 @@ endif()
 set (sources
   Actor.cc
   Base.cc
-  Link.cc
-  LinkState.cc
+  Body.cc
+  BodyState.cc
   BoxShape.cc
   Contact.cc
   CylinderShape.cc
@@ -43,8 +43,8 @@ set (headers
   Actor.hh
   BallJoint.hh
   Base.hh
-  Link.hh
-  LinkState.hh
+  Body.hh
+  BodyState.hh
   BoxShape.hh
   Contact.hh
   CylinderShape.hh

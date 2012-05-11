@@ -20,7 +20,7 @@
     <!-- 25.3kg total mass -->
     <model name="test_model">
       <origin pose="0 0 0.7 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <origin pose="0 0 0 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -69,9 +69,9 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
 
-      <link name="bar_1">
+      <body name="bar_1">
         <origin pose="0.45 0 -0.5 0 0 0"/>
         <inertial mass="0.1">
           <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
@@ -95,21 +95,21 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="bar_12_joint" type="revolute">
-        <parent link="bar_2"/>
-        <child link="bar_1"/>
+        <parent body="bar_2"/>
+        <child body="bar_1"/>
         <origin pose="0 0.5 0 0 0 0"/>
         <axis xyz="0 0 1"/>
       </joint>
       <joint name="bar_13_joint" type="revolute">
-        <parent link="bar_3"/>
-        <child link="bar_1"/>
+        <parent body="bar_3"/>
+        <child body="bar_1"/>
         <origin pose="0 -0.5 0 0 0 0"/>
         <axis xyz="0 0 1"/>
       </joint>
 
-      <link name="bar_2">
+      <body name="bar_2">
         <origin pose="0.5 0.5 -0.5 0 0 0"/>
         <inertial mass="0.1">
           <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
@@ -135,14 +135,14 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="bar_2_joint" type="revolute">
-        <parent link="link"/>
-        <child link="bar_2"/>
+        <parent body="body"/>
+        <child body="bar_2"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 0 1"/>
       </joint>
-      <link name="bar_3">
+      <body name="bar_3">
         <origin pose="0.5 -0.5 -0.5 0 0 0"/>
         <inertial mass="0.1">
           <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
@@ -168,16 +168,16 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="bar_3_joint" type="revolute">
-        <parent link="link"/>
-        <child link="bar_3"/>
+        <parent body="body"/>
+        <child body="bar_3"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 0 1"/>
       </joint>
 
 
-      <link name="wheel_1">
+      <body name="wheel_1">
         <origin pose="0.5 0.55 -0.5 1.57079633 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
@@ -202,15 +202,15 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="wheel_1_joint" type="revolute">
-        <parent link="bar_2"/>
-        <child link="wheel_1"/>
+        <parent body="bar_2"/>
+        <child body="wheel_1"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 1 0"/>
       </joint>
 
-      <link name="wheel_2">
+      <body name="wheel_2">
         <origin pose="0.5 -0.55 -0.5 1.57079633 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
@@ -235,15 +235,15 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="wheel_2_joint" type="revolute">
-        <parent link="bar_3"/>
-        <child link="wheel_2"/>
+        <parent body="bar_3"/>
+        <child body="wheel_2"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 1 0"/>
       </joint>
 
-      <link name="wheel_3">
+      <body name="wheel_3">
         <origin pose="-0.5 0.55 -0.5 1.57079633 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
@@ -268,17 +268,17 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="wheel_3_joint" type="revolute">
-        <parent link="link"/>
-        <child link="wheel_3"/>
+        <parent body="body"/>
+        <child body="wheel_3"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 1 0">
           <dynamics damping="0.0" friction="0.0"/>
         </axis>
       </joint>
 
-      <link name="wheel_4">
+      <body name="wheel_4">
         <origin pose="-0.5 -0.55 -0.5 1.57079633 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
@@ -303,17 +303,17 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="wheel_4_joint" type="revolute">
-        <parent link="link"/>
-        <child link="wheel_4"/>
+        <parent body="body"/>
+        <child body="wheel_4"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 1 0">
           <dynamics damping="0.0" friction="0.0"/>
         </axis>
       </joint>
 
-      <link name="sphere_link">
+      <body name="sphere_body">
         <origin pose="0 0 0.5 0 0 0"/>
         <inertial mass="10.0">
           <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
@@ -337,15 +337,15 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="joint_sphere" type="revolute">
-        <parent link="link"/>
-        <child link="sphere_link"/>
+        <parent body="body"/>
+        <child body="sphere_body"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 0 1"/>
       </joint>
 
-      <link name="cylinder_link">
+      <body name="cylinder_body">
         <origin pose="0 0 0.25 0 0 0"/>
         <inertial mass="10.0">
           <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
@@ -371,10 +371,10 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
       <joint name="joint_cylinder" type="revolute">
-        <parent link="sphere_link"/>
-        <child link="cylinder_link"/>
+        <parent body="sphere_body"/>
+        <child body="cylinder_body"/>
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 0 1"/>
       </joint>

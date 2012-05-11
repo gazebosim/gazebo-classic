@@ -20,7 +20,7 @@
 #include "physics/Model.hh"
 #include "physics/World.hh"
 #include "physics/Joint.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/JointController.hh"
 
 using namespace gazebo;
@@ -201,16 +201,16 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
   // request joint_names list
   if (_joint->HasType(Base::HINGE_JOINT) || _joint->HasType(Base::SLIDER_JOINT))
   {
-    LinkPtr parentLink = _joint->GetParent();
-    LinkPtr childLink = _joint->GetChild();
+    BodyPtr parentBody = _joint->GetParent();
+    BodyPtr childBody = _joint->GetChild();
 
-    if (parentLink && childLink &&
-        parentLink->GetName() != childLink->GetName())
+    if (parentBody && childBody &&
+        parentBody->GetName() != childBody->GetName())
     {
       // transform about the current anchor, about the axis
       if (_joint->HasType(Base::HINGE_JOINT))
       {
-        // rotate child (childLink) about anchor point, by delta-angle
+        // rotate child (childBody) about anchor point, by delta-angle
         // along axis
         double dangle = _position - _joint->GetAngle(0).GetAsRadian();
 
@@ -219,9 +219,9 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
         if (this->model->IsStatic())
         {
-          math::Pose linkWorldPose = childLink->GetWorldPose();
-          axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
-          anchor = linkWorldPose.pos;
+          math::Pose bodyWorldPose = childBody->GetWorldPose();
+          axis = bodyWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
+          anchor = bodyWorldPose.pos;
         }
         else
         {
@@ -229,7 +229,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
           axis = _joint->GetGlobalAxis(0);
         }
 
-        this->RotateBodyAndChildren(childLink, anchor, axis, dangle, true);
+        this->RotateBodyAndChildren(childBody, anchor, axis, dangle, true);
       }
       else if (_joint->HasType(Base::SLIDER_JOINT))
       {
@@ -240,9 +240,9 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
         if (this->model->IsStatic())
         {
-          math::Pose linkWorldPose = childLink->GetWorldPose();
-          axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
-          anchor = linkWorldPose.pos;
+          math::Pose bodyWorldPose = childBody->GetWorldPose();
+          axis = bodyWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
+          anchor = bodyWorldPose.pos;
         }
         else
         {
@@ -250,7 +250,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
           axis = _joint->GetGlobalAxis(0);
         }
 
-        this->SlideBodyAndChildren(childLink, anchor,
+        this->SlideBodyAndChildren(childBody, anchor,
             axis, dposition, true);
       }
       else
@@ -267,14 +267,14 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
 
 //////////////////////////////////////////////////
-void JointController::RotateBodyAndChildren(LinkPtr _link1,
+void JointController::RotateBodyAndChildren(BodyPtr _body1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dangle, bool _updateChildren)
 {
-  math::Pose linkWorldPose = _link1->GetWorldPose();
+  math::Pose bodyWorldPose = _body1->GetWorldPose();
 
   // relative to anchor point
-  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+  math::Pose relativePose(bodyWorldPose.pos - _anchor, bodyWorldPose.rot);
 
   // take axis rotation and turn it int a quaternion
   math::Quaternion rotation(_axis, _dangle);
@@ -288,15 +288,15 @@ void JointController::RotateBodyAndChildren(LinkPtr _link1,
   math::Pose newWorldPose(newRelativePose.pos + _anchor,
                           newRelativePose.rot);
 
-  _link1->SetWorldPose(newWorldPose);
+  _body1->SetWorldPose(newWorldPose);
 
   // recurse through children bodies
   if (_updateChildren)
   {
-    std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _link1);
+    std::vector<BodyPtr> bodies;
+    this->GetAllChildrenBodies(bodies, _body1);
 
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
+    for (std::vector<BodyPtr>::iterator biter = bodies.begin();
         biter != bodies.end(); ++biter)
     {
       this->RotateBodyAndChildren((*biter), _anchor, _axis, _dangle, false);
@@ -305,14 +305,14 @@ void JointController::RotateBodyAndChildren(LinkPtr _link1,
 }
 
 //////////////////////////////////////////////////
-void JointController::SlideBodyAndChildren(LinkPtr _link1,
+void JointController::SlideBodyAndChildren(BodyPtr _body1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
-  math::Pose linkWorldPose = _link1->GetWorldPose();
+  math::Pose bodyWorldPose = _body1->GetWorldPose();
 
   // relative to anchor point
-  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+  math::Pose relativePose(bodyWorldPose.pos - _anchor, bodyWorldPose.rot);
 
   // slide relative pose by dposition along axis
   math::Pose newRelativePose;
@@ -320,15 +320,15 @@ void JointController::SlideBodyAndChildren(LinkPtr _link1,
   newRelativePose.rot = relativePose.rot;
 
   math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
-  _link1->SetWorldPose(newWorldPose);
+  _body1->SetWorldPose(newWorldPose);
 
   // recurse through children bodies
   if (_updateChildren)
   {
-    std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _link1);
+    std::vector<BodyPtr> bodies;
+    this->GetAllChildrenBodies(bodies, _body1);
 
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
+    for (std::vector<BodyPtr>::iterator biter = bodies.begin();
         biter != bodies.end(); ++biter)
     {
       this->SlideBodyAndChildren((*biter), _anchor, _axis, _dposition, false);
@@ -337,8 +337,8 @@ void JointController::SlideBodyAndChildren(LinkPtr _link1,
 }
 
 //////////////////////////////////////////////////
-void JointController::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
-                                           const LinkPtr &_body)
+void JointController::GetAllChildrenBodies(std::vector<BodyPtr> &_bodies,
+                                           const BodyPtr &_body)
 {
   // strategy, for each child, recursively look for children
   //           for each child, also look for parents to catch multiple roots
@@ -348,23 +348,23 @@ void JointController::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
     JointPtr joint = iter->second;
 
     // recurse through children connected by joints
-    LinkPtr parentLink = joint->GetParent();
-    LinkPtr childLink = joint->GetChild();
-    if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && parentLink->GetName() == _body->GetName()
-        && !this->InBodies(childLink, _bodies))
+    BodyPtr parentBody = joint->GetParent();
+    BodyPtr childBody = joint->GetChild();
+    if (parentBody && childBody
+        && parentBody->GetName() != childBody->GetName()
+        && parentBody->GetName() == _body->GetName()
+        && !this->InBodies(childBody, _bodies))
     {
-      _bodies.push_back(childLink);
-      this->GetAllChildrenBodies(_bodies, childLink);
-      this->GetAllParentBodies(_bodies, childLink, _body);
+      _bodies.push_back(childBody);
+      this->GetAllChildrenBodies(_bodies, childBody);
+      this->GetAllParentBodies(_bodies, childBody, _body);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void JointController::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
-    const LinkPtr &_body, const LinkPtr &_origParentBody)
+void JointController::GetAllParentBodies(std::vector<BodyPtr> &_bodies,
+    const BodyPtr &_body, const BodyPtr &_origParentBody)
 {
   std::map<std::string, JointPtr>::iterator iter;
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
@@ -372,26 +372,26 @@ void JointController::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
     JointPtr joint = iter->second;
 
     // recurse through children connected by joints
-    LinkPtr parentLink = joint->GetParent();
-    LinkPtr childLink = joint->GetChild();
+    BodyPtr parentBody = joint->GetParent();
+    BodyPtr childBody = joint->GetChild();
 
-    if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && childLink->GetName() == _body->GetName()
-        && parentLink->GetName() != _origParentBody->GetName()
-        && !this->InBodies(parentLink, _bodies))
+    if (parentBody && childBody
+        && parentBody->GetName() != childBody->GetName()
+        && childBody->GetName() == _body->GetName()
+        && parentBody->GetName() != _origParentBody->GetName()
+        && !this->InBodies(parentBody, _bodies))
     {
-      _bodies.push_back(parentLink);
-      this->GetAllParentBodies(_bodies, childLink, _origParentBody);
+      _bodies.push_back(parentBody);
+      this->GetAllParentBodies(_bodies, childBody, _origParentBody);
     }
   }
 }
 
 //////////////////////////////////////////////////
-bool JointController::InBodies(const LinkPtr &_body,
-                               const std::vector<LinkPtr> &_bodies)
+bool JointController::InBodies(const BodyPtr &_body,
+                               const std::vector<BodyPtr> &_bodies)
 {
-  for (std::vector<LinkPtr>::const_iterator bit = _bodies.begin();
+  for (std::vector<BodyPtr>::const_iterator bit = _bodies.begin();
        bit != _bodies.end(); ++bit)
   {
     if ((*bit)->GetName() == _body->GetName())

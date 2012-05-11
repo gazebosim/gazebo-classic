@@ -25,7 +25,7 @@
 
       <origin pose="0.5 -0.5 0.5 0.0 0.0 0.0"/>
 
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
+      <body name="body_1" self_collide="true" gravity="true" kinematic="false">
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
@@ -61,7 +61,7 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
     </model>
 
@@ -72,7 +72,7 @@
 
       <origin pose="0.5 1.5 0.5 0 0.0 0.0"/>
 
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
+      <body name="body_1" self_collide="true" gravity="true" kinematic="false">
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
@@ -105,7 +105,7 @@
           </surface>
         </collision>
 
-      </link>
+      </body>
 
     </model>
     -->

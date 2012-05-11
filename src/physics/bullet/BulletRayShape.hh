@@ -39,7 +39,7 @@ namespace gazebo
       public: BulletRayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Constructor
-      /// \param body Link the ray is attached to
+      /// \param body Body the ray is attached to
       public: BulletRayShape(CollisionPtr _collision);
 
       /// \brief Destructor

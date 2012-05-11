@@ -106,7 +106,7 @@ ModelBuilderWidget::ModelBuilderWidget(QWidget *_parent)
   newModelStr << "<model name ='my_new_model'>\
     <static>true</static>\
     <origin xyz ='0 0 0'/>\
-    <link name ='body'>\
+    <body name ='body'>\
       <collision name ='geom'>\
         <geometry>\
           <box size ='1 1 1'/>\
@@ -121,7 +121,7 @@ ModelBuilderWidget::ModelBuilderWidget(QWidget *_parent)
         <cast_shadows>true</cast_shadows>\
         <shader>pixel</shader>\
       </visual>\
-    </link>\
+    </body>\
   </model>";
 
   msg.set_sdf(newModelStr.str());

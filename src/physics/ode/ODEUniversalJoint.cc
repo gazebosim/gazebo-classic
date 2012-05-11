@@ -22,7 +22,7 @@
 #include "gazebo_config.h"
 #include "common/Console.hh"
 
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/ode/ODEUniversalJoint.hh"
 
 using namespace gazebo;
@@ -53,8 +53,8 @@ math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   dJointSetUniversalAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
 }
@@ -75,8 +75,8 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   if (_index == 0)
     dJointSetUniversalAxis1(this->jointId, _axis.x, _axis.y, _axis.z);
@@ -128,8 +128,8 @@ void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetForce(int _index, double _torque)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
   if (_index == 0)
     dJointAddUniversalTorques(this->jointId, _torque, 0);
   else

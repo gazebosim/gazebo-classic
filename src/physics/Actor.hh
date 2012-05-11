@@ -89,21 +89,21 @@ namespace gazebo
       /// \brief Get the SDF values for the actor
       public: virtual const sdf::ElementPtr GetSDF();
 
-      private: void AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
+      private: void AddSphereInertia(sdf::ElementPtr bodySdf, math::Pose pose,
                         double mass, double radius);
 
-      private: void AddSphereCollision(sdf::ElementPtr linkSdf,
+      private: void AddSphereCollision(sdf::ElementPtr bodySdf,
                         std::string name, math::Pose pose, double radius);
 
-      private: void AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
+      private: void AddSphereVisual(sdf::ElementPtr bodySdf, std::string name,
                         math::Pose pose, double radius, std::string material,
                         common::Color ambient);
 
-      private: void AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
+      private: void AddBoxVisual(sdf::ElementPtr bodySdf, std::string name,
                       math::Pose pose, math::Vector3 size, std::string material,
                       common::Color ambient);
 
-      private: void AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
+      private: void AddActorVisual(sdf::ElementPtr bodySdf, std::string name,
                       math::Pose pose);
 
       private: void LoadAnimation(sdf::ElementPtr _sdf);
@@ -130,7 +130,7 @@ namespace gazebo
 
       protected: bool autoStart;
 
-      protected: LinkPtr mainLink;
+      protected: BodyPtr mainBody;
 
       protected: common::Time prevFrameTime;
 

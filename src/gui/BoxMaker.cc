@@ -184,7 +184,7 @@ void BoxMaker::CreateTheEntity()
   newModelStr << "<gazebo version ='1.0'>\
     <model name='custom_user_box" << counter << "_model'>\
     <origin pose='" << p.x << " " << p.y << " " << size.z * 0.5 << " 0 0 0'/>\
-    <link name ='link'>\
+    <body name ='body'>\
       <inertial mass ='1.0'>\
           <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
       </inertial>\
@@ -199,7 +199,7 @@ void BoxMaker::CreateTheEntity()
         </geometry>\
         <material script ='Gazebo/Grey'/>\
       </visual>\
-    </link>\
+    </body>\
   </model>\
   </gazebo>";
 

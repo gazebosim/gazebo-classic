@@ -43,7 +43,7 @@ void GripperPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   sdf::ElementPtr jointElem = _sdf->GetElement("joint");
 
   physics::JointPtr joint;
-  physics::LinkPtr tmplinks[2];
+  physics::BodyPtr tmplinks[2];
   physics::CollisionPtr collision;
   std::map<std::string, physics::CollisionPtr>::iterator collIter;
   while (jointElem)
@@ -143,8 +143,8 @@ void GripperPlugin::HandleAttach()
     {
       if (!this->attached)
       {
-        math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
-          this->model->GetLink("palm")->GetWorldPose();
+        math::Pose diff = cc[iter->first]->GetBody()->GetWorldPose() -
+          this->model->GetBody("palm")->GetWorldPose();
 
         double dd = (diff - prevDiff).pos.GetSquaredLength();
 
@@ -158,8 +158,8 @@ void GripperPlugin::HandleAttach()
         {
           this->attached = true;
 
-          this->fixedJoint->Load(this->model->GetLink("palm"),
-              cc[iter->first]->GetLink(), math::Pose(0, 0, 0, 0, 0, 0));
+          this->fixedJoint->Load(this->model->GetBody("palm"),
+              cc[iter->first]->GetBody(), math::Pose(0, 0, 0, 0, 0, 0));
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);

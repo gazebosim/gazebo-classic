@@ -77,11 +77,11 @@ namespace gazebo
       public: virtual double GetStepTime();
 
       /// \brief Create a new body
-      public: virtual LinkPtr CreateLink(ModelPtr _parent);
+      public: virtual BodyPtr CreateBody(ModelPtr _parent);
 
       /// \brief Create a new collision
       public: virtual CollisionPtr CreateCollision(const std::string &_type,
-                                                   LinkPtr _body);
+                                                   BodyPtr _body);
 
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string &_type);
@@ -90,7 +90,7 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       /// \brief Create a physics based ray sensor
-      // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
+      // public: virtual PhysicsRaySensor *CreateRaySensor(Body *body);
 
       /// \brief Convert an bullet mass to a gazebo Mass
       public: virtual void ConvertMass(InertialPtr _inertial,

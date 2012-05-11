@@ -26,13 +26,13 @@ namespace gazebo
   namespace physics
   {
     class BulletCollision;
-    class BulletLink;
+    class BulletBody;
     class BulletPhysics;
     class BulletRayShape;
 
     typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
     typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
-    typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
+    typedef boost::shared_ptr<BulletBody> BulletBodyPtr;
     typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
   }
 }

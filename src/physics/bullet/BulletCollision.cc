@@ -26,7 +26,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletCollision::BulletCollision(LinkPtr _parent)
+BulletCollision::BulletCollision(BodyPtr _parent)
     : Collision(_parent)
 {
   this->SetName("Bullet_Collision");
@@ -53,7 +53,7 @@ void BulletCollision::OnPoseChange()
 {
   /*
   math::Pose pose = this->GetRelativePose();
-  BulletLink *bbody = static_cast<BulletLink*>(this->body);
+  BulletBody *bbody = static_cast<BulletBody*>(this->body);
 
   bbody->SetCollisionRelativePose(this, pose);
   */
@@ -70,7 +70,7 @@ void BulletCollision::SetCollideBits(unsigned int /*_bits*/)
 }
 
 //////////////////////////////////////////////////
-/*Mass BulletCollision::GetLinkMassMatrix()
+/*Mass BulletCollision::GetBodyMassMatrix()
 {
   Mass result;
   return result;

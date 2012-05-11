@@ -1,6 +1,6 @@
  <gazebo version='1.0'>
   <model name="camera">
-    <link name="link">
+    <body name="body">
       <origin pose="0.05 0.05 0.05 0 0 0"/>
 
       <inertial mass="0.1">
@@ -20,7 +20,7 @@
           <clip near='0.1' far='100'/>
         </camera>
       </sensor>
-    </link>
+    </body>
   </model>
 </gazebo>
     

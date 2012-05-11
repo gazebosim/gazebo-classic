@@ -16,7 +16,7 @@
  */
 
 #include "physics/Model.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/World.hh"
 #include "physics/ModelState.hh"
 
@@ -36,7 +36,7 @@ ModelState::ModelState(ModelPtr _model)
 {
   for (unsigned int i = 0; i < _model->GetChildCount(); ++i)
   {
-    this->linkStates.push_back(_model->GetLink(i)->GetState());
+    this->bodyStates.push_back(_model->GetBody(i)->GetState());
   }
 
   /*for (unsigned int i = 0; i < _model->GetJointCount(); ++i)
@@ -59,16 +59,16 @@ void ModelState::Load(sdf::ElementPtr _elem)
   if (_elem->HasElement("pose"))
     this->pose = _elem->GetElement("pose")->GetValuePose("");
 
-  if (_elem->HasElement("link"))
+  if (_elem->HasElement("body"))
   {
-    sdf::ElementPtr childElem = _elem->GetElement("link");
+    sdf::ElementPtr childElem = _elem->GetElement("body");
 
     while (childElem)
     {
-      LinkState state;
+      BodyState state;
       state.Load(childElem);
-      this->linkStates.push_back(state);
-      childElem = childElem->GetNextElement("link");
+      this->bodyStates.push_back(state);
+      childElem = childElem->GetNextElement("body");
     }
   }
 }
@@ -79,10 +79,10 @@ void ModelState::FillStateSDF(sdf::ElementPtr _elem)
   _elem->GetAttribute("name")->Set(this->GetName());
   _elem->GetOrCreateElement("pose")->GetValue()->Set(this->pose);
 
-  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
-       iter != this->linkStates.end(); ++iter)
+  for (std::vector<BodyState>::iterator iter = this->bodyStates.begin();
+       iter != this->bodyStates.end(); ++iter)
   {
-    sdf::ElementPtr elem = _elem->AddElement("link");
+    sdf::ElementPtr elem = _elem->AddElement("body");
     (*iter).FillStateSDF(elem);
   }
 }
@@ -92,24 +92,24 @@ void ModelState::UpdateModelSDF(sdf::ElementPtr _elem)
 {
   _elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->pose);
 
-  if (_elem->HasElement("link"))
+  if (_elem->HasElement("body"))
   {
-    sdf::ElementPtr childElem = _elem->GetElement("link");
+    sdf::ElementPtr childElem = _elem->GetElement("body");
 
-    // Update all links
+    // Update all bodys
     while (childElem)
     {
-      // Find matching link state
-      for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
-          iter != this->linkStates.end(); ++iter)
+      // Find matching body state
+      for (std::vector<BodyState>::iterator iter = this->bodyStates.begin();
+          iter != this->bodyStates.end(); ++iter)
       {
         if ((*iter).GetName() == childElem->GetValueString("name"))
         {
-          (*iter).UpdateLinkSDF(childElem);
+          (*iter).UpdateBodySDF(childElem);
         }
       }
 
-      childElem = childElem->GetNextElement("link");
+      childElem = childElem->GetNextElement("body");
     }
   }
 }
@@ -121,33 +121,33 @@ math::Pose ModelState::GetPose() const
 }
 
 /////////////////////////////////////////////////
-unsigned int ModelState::GetLinkStateCount() const
+unsigned int ModelState::GetBodyStateCount() const
 {
-  return this->linkStates.size();
+  return this->bodyStates.size();
 }
 
 /////////////////////////////////////////////////
-LinkState ModelState::GetLinkState(unsigned int _index) const
+BodyState ModelState::GetBodyState(unsigned int _index) const
 {
-  if (_index < this->linkStates.size())
-    return this->linkStates[_index];
+  if (_index < this->bodyStates.size())
+    return this->bodyStates[_index];
   else
     gzerr << "Index is out of range\n";
 
-  return LinkState();
+  return BodyState();
 }
 
 /////////////////////////////////////////////////
-LinkState ModelState::GetLinkState(const std::string &_linkName) const
+BodyState ModelState::GetBodyState(const std::string &_bodyName) const
 {
-  std::vector<LinkState>::const_iterator iter;
-  for (iter = this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  std::vector<BodyState>::const_iterator iter;
+  for (iter = this->bodyStates.begin(); iter != this->bodyStates.end(); ++iter)
   {
-    if ((*iter).GetName() == _linkName)
+    if ((*iter).GetName() == _bodyName)
       return *iter;
   }
 
-  return LinkState();
+  return BodyState();
 }
 
 /////////////////////////////////////////////////

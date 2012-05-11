@@ -34,12 +34,12 @@ TEST_F(PhysicsTest, State)
 
   physics::WorldState worldState = world->GetState();
   physics::ModelState modelState = worldState.GetModelState(0);
-  physics::LinkState linkState = modelState.GetLinkState(0);
+  physics::BodyState linkState = modelState.GetBodyState(0);
   physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
   math::Pose pose;
   EXPECT_EQ(1, worldState.GetModelStateCount());
-  EXPECT_EQ(1, modelState.GetLinkStateCount());
+  EXPECT_EQ(1, modelState.GetBodyStateCount());
   EXPECT_EQ(1, linkState.GetCollisionStateCount());
   EXPECT_EQ(pose, modelState.GetPose());
   EXPECT_EQ(pose, linkState.GetPose());
@@ -121,7 +121,7 @@ TEST_F(PhysicsTest, CollisionTest)
                 << "]\n";
 
           if (i == 0)
-            box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
+            box_model->GetBody("link")->SetForce(math::Vector3(1000, 0, 0));
           EXPECT_LT(fabs(pose.pos.x - x), 0.00001);
           EXPECT_LT(fabs(vel.x - v), 0.00001);
         }
@@ -272,7 +272,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
   EXPECT_TRUE(physicsEngine);
   physics::ModelPtr model = world->GetModel("model_1");
   EXPECT_TRUE(model);
-  physics::LinkPtr link = model->GetLink("link_2");  // sphere link at end
+  physics::BodyPtr link = model->GetBody("link_2");  // sphere link at end
   EXPECT_TRUE(link);
 
   double g = 9.81;

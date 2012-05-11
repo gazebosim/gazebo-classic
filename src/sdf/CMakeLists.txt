@@ -7,7 +7,7 @@ set (sdfs gazebo.sdf
           inertial.sdf 
           joint.sdf 
           light.sdf 
-          link.sdf 
+          body.sdf 
           model.sdf 
           actor.sdf 
           physics.sdf 

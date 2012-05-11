@@ -16,7 +16,7 @@
  */
 
 #include "physics/Joint.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/World.hh"
 #include "physics/JointState.hh"
 

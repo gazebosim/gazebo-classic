@@ -38,19 +38,19 @@
 #include "physics/HeightmapShape.hh"
 #include "physics/SurfaceParams.hh"
 #include "physics/Model.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Collision::Collision(LinkPtr _link)
-    : Entity(_link)
+Collision::Collision(BodyPtr _body)
+    : Entity(_body)
 {
   this->AddType(Base::COLLISION);
 
-  this->link = _link;
+  this->body = _body;
 
   this->transparency = 0;
   this->contactsEnabled = false;
@@ -72,7 +72,7 @@ void Collision::Fini()
   this->requestPub->Publish(*msg, true);
 
   Entity::Fini();
-  this->link.reset();
+  this->body.reset();
   this->shape.reset();
   this->surface.reset();
   this->connections.clear();
@@ -159,15 +159,15 @@ float Collision::GetLaserRetro() const
 }
 
 //////////////////////////////////////////////////
-LinkPtr Collision::GetLink() const
+BodyPtr Collision::GetBody() const
 {
-  return this->link;
+  return this->body;
 }
 
 //////////////////////////////////////////////////
 ModelPtr Collision::GetModel() const
 {
-  return this->link->GetModel();
+  return this->body->GetModel();
 }
 
 //////////////////////////////////////////////////
@@ -214,8 +214,8 @@ void Collision::AddContact(const Contact &_contact)
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearVel() const
 {
-  if (this->link)
-    return this->link->GetRelativeLinearVel();
+  if (this->body)
+    return this->body->GetRelativeLinearVel();
   else
     return math::Vector3();
 }
@@ -223,8 +223,8 @@ math::Vector3 Collision::GetRelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldLinearVel() const
 {
-  if (this->link)
-    return this->link->GetWorldLinearVel();
+  if (this->body)
+    return this->body->GetWorldLinearVel();
   else
     return math::Vector3();
 }
@@ -232,8 +232,8 @@ math::Vector3 Collision::GetWorldLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeAngularVel() const
 {
-  if (this->link)
-    return this->link->GetRelativeAngularVel();
+  if (this->body)
+    return this->body->GetRelativeAngularVel();
   else
     return math::Vector3();
 }
@@ -241,8 +241,8 @@ math::Vector3 Collision::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldAngularVel() const
 {
-  if (this->link)
-    return this->link->GetWorldAngularVel();
+  if (this->body)
+    return this->body->GetWorldAngularVel();
   else
     return math::Vector3();
 }
@@ -250,8 +250,8 @@ math::Vector3 Collision::GetWorldAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearAccel() const
 {
-  if (this->link)
-    return this->link->GetRelativeLinearAccel();
+  if (this->body)
+    return this->body->GetRelativeLinearAccel();
   else
     return math::Vector3();
 }
@@ -259,8 +259,8 @@ math::Vector3 Collision::GetRelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldLinearAccel() const
 {
-  if (this->link)
-    return this->link->GetWorldLinearAccel();
+  if (this->body)
+    return this->body->GetWorldLinearAccel();
   else
     return math::Vector3();
 }
@@ -268,8 +268,8 @@ math::Vector3 Collision::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeAngularAccel() const
 {
-  if (this->link)
-    return this->link->GetRelativeAngularAccel();
+  if (this->body)
+    return this->body->GetRelativeAngularAccel();
   else
     return math::Vector3();
 }
@@ -277,8 +277,8 @@ math::Vector3 Collision::GetRelativeAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldAngularAccel() const
 {
-  if (this->link)
-    return this->link->GetWorldAngularAccel();
+  if (this->body)
+    return this->body->GetWorldAngularAccel();
   else
     return math::Vector3();
 }
@@ -319,19 +319,19 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
 
   if (_msg.has_pose())
   {
-    this->link->SetEnabled(true);
+    this->body->SetEnabled(true);
     this->SetRelativePose(msgs::Convert(_msg.pose()));
   }
 
   if (_msg.has_geometry())
   {
-    this->link->SetEnabled(true);
+    this->body->SetEnabled(true);
     this->shape->ProcessMsg(_msg.geometry());
   }
 
   if (_msg.has_surface())
   {
-    this->link->SetEnabled(true);
+    this->body->SetEnabled(true);
     this->surface->ProcessMsg(_msg.surface());
   }
 }

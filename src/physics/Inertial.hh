@@ -30,7 +30,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief A class for inertial information about a link
+    /// \brief A class for inertial information about a body
     class Inertial
     {
       /// \brief Default Constructor

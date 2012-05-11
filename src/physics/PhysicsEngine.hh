@@ -80,15 +80,15 @@ namespace gazebo
       /// \brief Update the physics engine
       public: virtual void UpdatePhysics() {}
       /// \brief Create a new body
-      public: virtual LinkPtr CreateLink(ModelPtr _parent) = 0;
+      public: virtual BodyPtr CreateBody(ModelPtr _parent) = 0;
 
       /// \brief Create a collision
       public: virtual CollisionPtr CreateCollision(
-                  const std::string &_shapeType, LinkPtr _link) = 0;
+                  const std::string &_shapeType, BodyPtr _body) = 0;
 
       /// \brief Create a collision
       public: CollisionPtr CreateCollision(const std::string &_shapeType,
-                                           const std::string &_linkName);
+                                           const std::string &_bodyName);
 
       public: virtual ShapePtr CreateShape(
                   const std::string &_shapeType,

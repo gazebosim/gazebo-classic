@@ -375,7 +375,7 @@ bool initContact(xmlNodePtr _config, sdf::ElementPtr _sdf)
 bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Origin (old gazebo xml supports only cx, cy, cz translations, no rotation
-  // xyz and rpy under body:... is for the link frame
+  // xyz and rpy under body:... is for the body frame
   xmlNodePtr cx_xml = firstChildElement(_config, "cx");
   xmlNodePtr cy_xml = firstChildElement(_config, "cy");
   xmlNodePtr cz_xml = firstChildElement(_config, "cz");
@@ -614,8 +614,8 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
 }
 
 // _config = <body>
-// _sdf = <link>
-bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
+// _sdf = <body>
+bool initBody(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
   initOrigin(_config, _sdf);
@@ -644,7 +644,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
       sdf::ElementPtr sdfInertial = _sdf->AddElement("inertial");
       if (!initInertial(_config, sdfInertial))
       {
-        gzerr << "Could not parse inertial element for Link '"
+        gzerr << "Could not parse inertial element for Body '"
           << _sdf->GetAttribute("name")->GetAsString() << "'\n";
         return false;
       }
@@ -831,35 +831,35 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
   origin->GetAttribute("pose")->SetFromString(poseStr);
 
 
-  // setup parent / child links
+  // setup parent / child bodies
   sdf::ElementPtr sdfParent = _sdf->AddElement("parent");
   sdf::ElementPtr sdfChild = _sdf->AddElement("child");
 
-  // Get Parent Link
+  // Get Parent Body
   // parent is specified by <anchor> element in old xml
   // once anchor is found, <body1> or <body2> are parsed
   // as child and parent
   if (!firstChildElement(_config, "anchor"))
   {
-    gzerr << "No parent link specified for joint["
+    gzerr << "No parent body specified for joint["
           << _sdf->GetAttribute("name")->GetAsString() << "]\n";
     return false;
   }
-  initAttr(_config, "anchor", sdfChild->GetAttribute("link"));
+  initAttr(_config, "anchor", sdfChild->GetAttribute("body"));
 
-  // Get Child Link
+  // Get Child Body
   xmlNodePtr body1Xml = firstChildElement(_config, "body1");
   xmlNodePtr body2Xml = firstChildElement(_config, "body2");
   if (body1Xml && body2Xml)
   {
-    if (sdfChild->GetAttribute("link")->GetAsString() == getValue(body1Xml))
+    if (sdfChild->GetAttribute("body")->GetAsString() == getValue(body1Xml))
     {
-      initAttr(_config, "body2", sdfParent->GetAttribute("link"));
+      initAttr(_config, "body2", sdfParent->GetAttribute("body"));
     }
-    else if (sdfChild->GetAttribute("link")->GetAsString() ==
+    else if (sdfChild->GetAttribute("body")->GetAsString() ==
              getValue(body2Xml))
     {
-      initAttr(_config, "body1", sdfParent->GetAttribute("link"));
+      initAttr(_config, "body1", sdfParent->GetAttribute("body"));
     }
     else
     {
@@ -870,7 +870,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
   else
   {
-    gzerr << "No child link specified for joint["
+    gzerr << "No child body specified for joint["
           << _sdf->GetAttribute("name")->GetAsString() << "]\n";
     return false;
   }
@@ -899,7 +899,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
     // _sdf->GetOrCreateElement("thread_pitch")->value->SetFromString(
     // getValue(threadPitchXml));
 
-  initAttr(_config, "anchor", sdfChild->GetAttribute("link"));
+  initAttr(_config, "anchor", sdfChild->GetAttribute("body"));
   if (firstChildElement(_config, "axis"))
   {
     sdf::ElementPtr sdfAxis = _sdf->AddElement("axis");
@@ -981,14 +981,14 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
   initAttr(_config, "static", _sdf->GetAttribute("static"));
   initOrigin(_config, _sdf);
 
-  // Get all Link elements
-  for (xmlNodePtr  linkXml = getChildByNSPrefix(_config, "body");
-      linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
+  // Get all Body elements
+  for (xmlNodePtr  bodyXml = getChildByNSPrefix(_config, "body");
+       bodyXml; bodyXml = getNextByNSPrefix(bodyXml, "body"))
   {
-    sdf::ElementPtr sdfLink = _sdf->AddElement("link");
-    if (!initLink(linkXml, sdfLink))
+    sdf::ElementPtr sdfBody = _sdf->AddElement("body");
+    if (!initBody(bodyXml, sdfBody))
     {
-      gzerr << "link xml is not initialized correctly\n";
+      gzerr << "body xml is not initialized correctly\n";
       return false;
     }
   }

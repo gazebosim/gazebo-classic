@@ -62,7 +62,7 @@ namespace gazebo
       public: virtual ~Joint();
 
       /// \brief Load a joint
-      public: void Load(LinkPtr _parent, LinkPtr _child,
+      public: void Load(BodyPtr _parent, BodyPtr _child,
                         const math::Pose &_origin);
 
       /// \brief Load a joint
@@ -89,15 +89,15 @@ namespace gazebo
       /// \brief Set the model this joint belongs too
       public: void SetModel(ModelPtr model);
 
-      /// \brief Get the link to which the joint is attached according
+      /// \brief Get the body to which the joint is attached according
       ///        the _index
-      public: virtual LinkPtr GetJointLink(int index) const = 0;
+      public: virtual BodyPtr GetJointBody(int index) const = 0;
 
       /// \brief Determines of the two bodies are connected by a joint
-      public: virtual bool AreConnected(LinkPtr one, LinkPtr two) const = 0;
+      public: virtual bool AreConnected(BodyPtr one, BodyPtr two) const = 0;
 
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(LinkPtr parent, LinkPtr child);
+      public: virtual void Attach(BodyPtr parent, BodyPtr child);
 
       /// \brief Detach this joint from all bodies
       public: virtual void Detach() = 0;
@@ -167,22 +167,22 @@ namespace gazebo
       ///        animation of static models.
       public: void SetAngle(int _index, math::Angle _angle);
 
-      /// \brief Get the force the joint applies to the first link
-      /// \param index The index of the link(0 or 1)
-      public: virtual math::Vector3 GetLinkForce(unsigned int index) const = 0;
+      /// \brief Get the force the joint applies to the first body
+      /// \param index The index of the body(0 or 1)
+      public: virtual math::Vector3 GetBodyForce(unsigned int index) const = 0;
 
-      /// \brief Get the torque the joint applies to the first link
-      /// \param index The index of the link(0 or 1)
-      public: virtual math::Vector3 GetLinkTorque(unsigned int index) const = 0;
+      /// \brief Get the torque the joint applies to the first body
+      /// \param index The index of the body(0 or 1)
+      public: virtual math::Vector3 GetBodyTorque(unsigned int index) const = 0;
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, int index, double value) = 0;
 
-      /// \brief Get the child link
-      public: LinkPtr GetChild() const;
+      /// \brief Get the child body
+      public: BodyPtr GetChild() const;
 
-      /// \brief Get the child link
-      public: LinkPtr GetParent() const;
+      /// \brief Get the child body
+      public: BodyPtr GetParent() const;
 
       /// Fill a joint message
       public: void FillJointMsg(msgs::Joint &_msg);
@@ -191,11 +191,11 @@ namespace gazebo
 
       private: void LoadImpl(const math::Pose &_origin);
 
-      /// The first link this joint connects to
-      protected: LinkPtr childLink;
+      /// The first body this joint connects to
+      protected: BodyPtr childBody;
 
-      /// The second link this joint connects to
-      protected: LinkPtr parentLink;
+      /// The second body this joint connects to
+      protected: BodyPtr parentBody;
 
       protected: std::string visual;
       protected: std::string line1;
@@ -205,7 +205,7 @@ namespace gazebo
       protected: ModelPtr model;
 
       protected: math::Vector3 anchorPos;
-      protected: LinkPtr anchorLink;
+      protected: BodyPtr anchorBody;
 
       private: event::EventT<void ()> jointUpdate;
       private: event::ConnectionPtr showJointsConnection;

@@ -1,6 +1,6 @@
 <gazebo version='1.0'>
   <model name="car" static="false">
-    <link name="chassis">
+    <body name="chassis">
       <origin pose="0 0 0.3 0 0 0"/>
       <collision name="collision">
         <mass>10.0</mass>
@@ -15,9 +15,9 @@
         </geometry>
         <material script="Gazebo/Green"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="front_left_wheel">
+    <body name="front_left_wheel">
       <origin pose="0.8 0.6 0.3 0 1.5707 1.5707"/>
 
       <collision name="collision">
@@ -33,9 +33,9 @@
         </geometry>
         <material script="Gazebo/Black"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="front_right_wheel">
+    <body name="front_right_wheel">
       <origin pose="0.8 -0.6 0.3 0  1.5707 1.5707"/>
 
       <collision name="collision">
@@ -51,9 +51,9 @@
         </geometry>
         <material script="Gazebo/Black"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="back_right_wheel">
+    <body name="back_right_wheel">
       <origin pose="-0.8 -0.6 0.3 0 1.5707 1.5707"/>
 
       <collision name="collision">
@@ -69,9 +69,9 @@
         </geometry>
         <material script="Gazebo/Black"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="back_left_wheel">
+    <body name="back_left_wheel">
       <origin pose="-0.8 0.6 0.3 0 1.5707 1.5707"/>
 
       <collision name="collision">
@@ -87,9 +87,9 @@
         </geometry>
         <material script="Gazebo/Black"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="gas_pedal">
+    <body name="gas_pedal">
       <origin pose="0.3 0.1 0.5 0 0 0"/>
 
       <collision name="collision">
@@ -105,9 +105,9 @@
         </geometry>
         <material script="Gazebo/Red"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="brake_pedal">
+    <body name="brake_pedal">
       <origin pose="0.3 0.25 0.5 0 0 0"/>
 
       <collision name="collision">
@@ -123,9 +123,9 @@
         </geometry>
         <material script="Gazebo/Blue"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="steering_wheel">
+    <body name="steering_wheel">
       <origin pose="0.3 0.2 1.0 0 1.5707 0"/>
 
       <collision name="collision">
@@ -141,28 +141,28 @@
         </geometry>
         <material script="Gazebo/Blue"/>
       </visual>
-    </link>
+    </body>
 
 
     <joint type="prismatic" name="gas_joint">
-      <parent link="chassis"/>
-      <child link="gas_pedal"/>
+      <parent body="chassis"/>
+      <child body="gas_pedal"/>
       <axis xyz="1 0 0">
         <limit lower="0" upper="0.2"/>
       </axis>
     </joint>
 
     <joint type="prismatic" name="brake_joint">
-      <parent link="chassis"/>
-      <child link="brake_pedal"/>
+      <parent body="chassis"/>
+      <child body="brake_pedal"/>
       <axis xyz="1 0 0">
         <limit lower="0" upper="0.2"/>
       </axis>
     </joint>
 
     <joint type="revolute" name="steering_joint">
-      <parent link="chassis"/>
-      <child link="steering_wheel"/>
+      <parent body="chassis"/>
+      <child body="steering_wheel"/>
       <axis xyz="1 0 0">
         <limit lower="-7.853" upper="7.853"/>
       </axis>
@@ -170,8 +170,8 @@
 
 
     <joint type="revolute2" name="front_left_joint">
-      <parent link="chassis"/>
-      <child link="front_left_wheel"/>
+      <parent body="chassis"/>
+      <child body="front_left_wheel"/>
       <axis xyz="0 0 1">
         <limit lower="0" upper="0"/>
       </axis>
@@ -185,8 +185,8 @@
     </joint>
 
     <joint type="revolute2" name="front_right_joint">
-      <parent link="chassis"/>
-      <child link="front_right_wheel"/>
+      <parent body="chassis"/>
+      <child body="front_right_wheel"/>
       <axis xyz="0 0 1">
         <limit lower="0" upper="0"/>
       </axis>
@@ -200,8 +200,8 @@
     </joint>
 
     <joint type="revolute2" name="back_right_joint">
-      <parent link="chassis"/>
-      <child link="back_right_wheel"/>
+      <parent body="chassis"/>
+      <child body="back_right_wheel"/>
       <axis xyz="0 0 1">
         <limit lower="0" upper="0"/>
       </axis>
@@ -215,8 +215,8 @@
     </joint>
 
     <joint type="revolute2" name="back_left_joint">
-      <parent link="chassis"/>
-      <child link="back_left_wheel"/>
+      <parent body="chassis"/>
+      <child body="back_left_wheel"/>
       <axis xyz="0 0 1">
         <limit lower="0" upper="0"/>
       </axis>

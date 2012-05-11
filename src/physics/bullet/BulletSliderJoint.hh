@@ -50,7 +50,7 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint
-      public: void Attach(LinkPtr _one, LinkPtr _two);
+      public: void Attach(BodyPtr _one, BodyPtr _two);
 
       /// \brief Set the axis of motion
       public: void SetAxis(int _index, const math::Vector3 &_axis);

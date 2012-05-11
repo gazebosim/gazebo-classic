@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: A link state
+/* Desc: A body state
  * Author: Nate Koenig
  */
 
-#ifndef LINK_STATE_HH
-#define LINK_STATE_HH
+#ifndef BODY_STATE_HH
+#define BODY_STATE_HH
 
 #include <vector>
 #include <string>
@@ -33,49 +33,49 @@ namespace gazebo
 {
   namespace physics
   {
-    class LinkState : public State
+    class BodyState : public State
     {
       /// \brief Default constructor
-      public: LinkState();
+      public: BodyState();
 
       /// \brief Constructor
-      public: LinkState(const LinkPtr _link);
+      public: BodyState(const BodyPtr _body);
 
       /// \brief Destructor
-      public: virtual ~LinkState();
+      public: virtual ~BodyState();
 
       /// \brief Load state from SDF element
       public: virtual void Load(sdf::ElementPtr _elem);
 
-      /// \brief Get the link pose
+      /// \brief Get the body pose
       public: math::Pose GetPose() const;
 
-      /// \brief Get the number of link states
+      /// \brief Get the number of body states
       public: unsigned int GetCollisionStateCount() const;
 
-      /// \brief Get a link state
+      /// \brief Get a body state
       public: CollisionState GetCollisionState(unsigned int _index) const;
 
-      /// \brief Get a link state by link name
+      /// \brief Get a body state by body name
       public: CollisionState GetCollisionState(
                   const std::string &_collisionName) const;
 
       /// \brief Fill a State SDF element with state info
       public: void FillStateSDF(sdf::ElementPtr _elem);
 
-      /// \brief Update a Link SDF element with this state info
-      public: void UpdateLinkSDF(sdf::ElementPtr _elem);
+      /// \brief Update a Body SDF element with this state info
+      public: void UpdateBodySDF(sdf::ElementPtr _elem);
 
-      /// 3D pose of the link relative to the model
+      /// 3D pose of the body relative to the model
       private: math::Pose pose;
 
-      /// Velocity of the link (linear and angular)
+      /// Velocity of the body (linear and angular)
       private: math::Pose velocity;
 
-      /// Acceleration of the link (linear and angular)
+      /// Acceleration of the body (linear and angular)
       private: math::Pose acceleration;
 
-      // Forces on the link(linear and angular)
+      // Forces on the body(linear and angular)
       private: std::vector<math::Pose> forces;
 
       private: std::vector<CollisionState> collisionStates;

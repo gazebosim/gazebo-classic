@@ -20,7 +20,7 @@
  */
 
 #include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletCollision.hh"
 
 #include "physics/bullet/BulletPlaneShape.hh"
@@ -195,20 +195,20 @@ double BulletPhysics::GetStepTime()
 }
 
 //////////////////////////////////////////////////
-LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
+BodyPtr BulletPhysics::CreateBody(ModelPtr _parent)
 {
   if (_parent == NULL)
-    gzthrow("Link must have a parent\n");
+    gzthrow("Body must have a parent\n");
 
-  BulletLinkPtr link(new BulletLink(_parent));
-  link->SetWorld(_parent->GetWorld());
+  BulletBodyPtr body(new BulletBody(_parent));
+  body->SetWorld(_parent->GetWorld());
 
-  return link;
+  return body;
 }
 
 //////////////////////////////////////////////////
 CollisionPtr BulletPhysics::CreateCollision(const std::string &_type,
-                                            LinkPtr _parent)
+                                            BodyPtr _parent)
 {
   BulletCollisionPtr collision(new BulletCollision(_parent));
   ShapePtr shape = this->CreateShape(_type, collision);

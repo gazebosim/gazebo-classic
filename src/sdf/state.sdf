@@ -11,8 +11,8 @@
     <attribute name="name" type="string" default="__default__" required="1"/>
     <element name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
 
-    <!-- State information for a link -->
-    <element name="link" required="*">
+    <!-- State information for a body -->
+    <element name="body" required="*">
       <attribute name="name" type="string" default="__default__" required="1"/>
       <element name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
       <element name="velocity" type="pose" default="0 0 0 0 0 0" required="0"/>
@@ -23,6 +23,6 @@
         <element name="mag" type="pose" default="0 0 0 0 0 0" required="1"/>
       </element>
 
-    </element> <!-- End Link -->
+    </element> <!-- End Body -->
   </element> <!-- End Model -->
 </element> <!-- End State -->

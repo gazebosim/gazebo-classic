@@ -27,7 +27,7 @@
 #include "common/Console.hh"
 
 #include "physics/PhysicsEngine.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/Model.hh"
 #include "physics/World.hh"
 #include "physics/Joint.hh"
@@ -50,13 +50,13 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_origin)
+void Joint::Load(BodyPtr _parent, BodyPtr _child, const math::Pose &_origin)
 {
   this->world = _parent->GetWorld();
   this->model = _parent->GetModel();
 
-  this->parentLink = _parent;
-  this->childLink = _child;
+  this->parentBody = _parent;
+  this->childBody = _child;
   this->LoadImpl(_origin);
 }
 
@@ -65,8 +65,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetElement("parent")->GetValueString("link");
-  std::string childName = _sdf->GetElement("child")->GetValueString("link");
+  std::string parentName = _sdf->GetElement("parent")->GetValueString("body");
+  std::string childName = _sdf->GetElement("child")->GetValueString("body");
 
   math::Pose origin;
   if (_sdf->HasElement("origin"))
@@ -74,23 +74,23 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
   if (this->model)
   {
-    this->childLink = this->model->GetLink(childName);
-    this->parentLink = this->model->GetLink(parentName);
+    this->childBody = this->model->GetBody(childName);
+    this->parentBody = this->model->GetBody(parentName);
   }
   else
   {
-    this->childLink = boost::shared_dynamic_cast<Link>(
+    this->childBody = boost::shared_dynamic_cast<Body>(
         this->GetWorld()->GetByName(childName));
 
-    this->parentLink = boost::shared_dynamic_cast<Link>(
+    this->parentBody = boost::shared_dynamic_cast<Body>(
         this->GetWorld()->GetByName(parentName));
   }
 
-  if (!this->parentLink && parentName != std::string("world"))
-    gzthrow("Couldn't Find Parent Link[" + parentName);
+  if (!this->parentBody && parentName != std::string("world"))
+    gzthrow("Couldn't Find Parent Body[" + parentName);
 
-  if (!this->childLink && childName != std::string("world"))
-    gzthrow("Couldn't Find Child Link[" + childName);
+  if (!this->childBody && childName != std::string("world"))
+    gzthrow("Couldn't Find Child Body[" + childName);
 
   this->LoadImpl(origin);
 }
@@ -100,13 +100,13 @@ void Joint::LoadImpl(const math::Pose &_origin)
 {
   BasePtr myBase = shared_from_this();
 
-  if (this->parentLink)
-    this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
-  this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+  if (this->parentBody)
+    this->parentBody->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
+  this->childBody->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
 
-  // setting anchor relative to gazebo link frame origin
-  if (this->childLink)
-    this->anchorPos = (_origin + this->childLink->GetWorldPose()).pos;
+  // setting anchor relative to gazebo body frame origin
+  if (this->childBody)
+    this->anchorPos = (_origin + this->childBody->GetWorldPose()).pos;
   else
     this->anchorPos = math::Vector3(0, 0, 0);
 }
@@ -114,7 +114,7 @@ void Joint::LoadImpl(const math::Pose &_origin)
 //////////////////////////////////////////////////
 void Joint::Init()
 {
-  this->Attach(this->parentLink, this->childLink);
+  this->Attach(this->parentBody, this->childBody);
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
@@ -154,9 +154,9 @@ void Joint::Init()
     }
   }
 
-  if (this->parentLink)
+  if (this->parentBody)
   {
-    math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
+    math::Pose modelPose = this->parentBody->GetModel()->GetWorldPose();
 
     // Set joint axis
     if (this->sdf->HasElement("axis"))
@@ -176,11 +176,11 @@ void Joint::Init()
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetElement("parent")->GetValueString("link") != "world")
+      if (this->sdf->GetElement("parent")->GetValueString("body") != "world")
       {
         gzwarn << "joint [" << this->GetName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link")
+          << "] has a non-real parentBody ["
+          << this->sdf->GetElement("parent")->GetValueString("body")
           << "], loading axis from SDF ["
           << this->sdf->GetElement("axis")->GetValueVector3("xyz")
           << "]\n";
@@ -190,11 +190,11 @@ void Joint::Init()
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
 
-      if (this->sdf->GetElement("parent")->GetValueString("link") != "world")
+      if (this->sdf->GetElement("parent")->GetValueString("body") != "world")
       {
         gzwarn << "joint [" << this->GetName()
-          << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link")
+          << "] has a non-real parentBody ["
+          << this->sdf->GetElement("parent")->GetValueString("body")
           << "], loading axis2 from SDF ["
           << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
           << "]\n";
@@ -213,7 +213,7 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   else if (this->sdf->HasElement("axis2"))
     vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
 
-  vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
+  vec = this->childBody->GetWorldPose().rot.RotateVectorReverse(vec);
   vec.Round();
   return vec;
 }
@@ -240,10 +240,10 @@ void Joint::Reset()
 }
 
 //////////////////////////////////////////////////
-void Joint::Attach(LinkPtr _parent, LinkPtr _child)
+void Joint::Attach(BodyPtr _parent, BodyPtr _child)
 {
-  this->parentLink = _parent;
-  this->childLink = _child;
+  this->parentBody = _parent;
+  this->childBody = _child;
 }
 
 
@@ -255,15 +255,15 @@ void Joint::SetModel(ModelPtr _model)
 }
 
 //////////////////////////////////////////////////
-LinkPtr Joint::GetChild() const
+BodyPtr Joint::GetChild() const
 {
-  return this->childLink;
+  return this->childBody;
 }
 
 //////////////////////////////////////////////////
-LinkPtr Joint::GetParent() const
+BodyPtr Joint::GetParent() const
 {
-  return this->parentLink;
+  return this->parentBody;
 }
 
 //////////////////////////////////////////////////

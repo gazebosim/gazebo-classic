@@ -6,7 +6,7 @@ package gazebo.msgs;
 /// \verbatim
 
 import "joint.proto";
-import "link.proto";
+import "body.proto";
 import "pose.proto";
 import "visual.proto";
 
@@ -17,7 +17,7 @@ message Model
   optional bool is_static      = 3;
   optional Pose pose           = 4;
   repeated Joint joint         = 5;
-  repeated Link link           = 6;
+  repeated Body body           = 6;
   optional bool deleted        = 7;
   repeated Visual visual       = 8;
 }

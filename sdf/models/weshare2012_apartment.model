@@ -2,7 +2,7 @@
 <model name="apartment" static="true">
   <!--<origin pose="0 0 0 0 0 0"/>-->
 
-  <link name="wooden-floor">
+  <body name="wooden-floor">
     <visual name="visual2">
       <origin pose="0 0 0 0 0 0"/>
       <geometry>
@@ -10,10 +10,10 @@
       </geometry>
     <material script="Kitchen/WoodFloor"/>
     </visual>
-  </link>
+  </body>
 
 
-  <link name="wall1east">
+  <body name="wall1east">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -32,10 +32,10 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
 
-  <link name="wall2west">
+  <body name="wall2west">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -54,9 +54,9 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
-  <link name="wall3north-right">
+  <body name="wall3north-right">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -75,9 +75,9 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
-  <link name="wall3north-left">
+  <body name="wall3north-left">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -96,10 +96,10 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
 
-  <link name="wall4southleft">
+  <body name="wall4southleft">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -119,9 +119,9 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
-  <link name="wall4southwindowwallleft">
+  <body name="wall4southwindowwallleft">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -142,9 +142,9 @@
     <material script="Gazebo/White"/>
     </visual>
 
-  </link>
+  </body>
 
-  <link name="wall4southwindowwindowleft">
+  <body name="wall4southwindowwindowleft">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -164,9 +164,9 @@
       </geometry>
     <material script="Gazebo/BlueTransparent"/>
     </visual>
-  </link>
+  </body>
 
- <link name="wall4southright">
+ <body name="wall4southright">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -186,10 +186,10 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
 
- <link name="wall4southrightwindowwall">
+ <body name="wall4southrightwindowwall">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -209,9 +209,9 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
- <link name="wall4southrightwindowwindow">
+ <body name="wall4southrightwindowwindow">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -233,10 +233,10 @@
     </visual>
 
 
-  </link>
+  </body>
 
 
- <link name="wall4southrightright">
+ <body name="wall4southrightright">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -256,11 +256,11 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
   <!--BATHROOM-->
   <!-- WALLS -->
-  <link name="bathroom-south">
+  <body name="bathroom-south">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -279,10 +279,10 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
 
-  <link name="bathroom-west">
+  <body name="bathroom-west">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -301,14 +301,14 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
   <!-- //BATHROOM -->
 
   <!-- BEDROOM -->
   <!-- WALLS -->
 
-  <link name="bedroom-north">
+  <body name="bedroom-north">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -327,9 +327,9 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
-  <link name="bedroom-west">
+  <body name="bedroom-west">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -348,14 +348,14 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
   <!-- //BEDROOM -->
 
   <!-- KITCHEN -->
 
   <!-- KITCHEN/HALLWAY STORAGE -->
-  <link name="kitchen-hallway-storage">
+  <body name="kitchen-hallway-storage">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -374,9 +374,9 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
   <!-- HALLWAY COAT CLOSET -->
-  <link name="hallway-coat-closet">
+  <body name="hallway-coat-closet">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -395,10 +395,10 @@
       </geometry>
     <material script="Gazebo/White"/>
     </visual>
-  </link>
+  </body>
 
   <!-- KITCHEN BANKS -->
-  <link name="kitchen bank1">
+  <body name="kitchen bank1">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -419,9 +419,9 @@
     </visual>
 
 
-  </link>
+  </body>
 
-  <link name="kitchen bank1top">
+  <body name="kitchen bank1top">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -440,9 +440,9 @@
       </geometry>
     <material script="Kitchen/CounterTop"/>
     </visual>
-  </link>
+  </body>
 
-  <link name="kitchen bank2">
+  <body name="kitchen bank2">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -464,9 +464,9 @@
 
 
 
-  </link>
+  </body>
 
-  <link name="kitchen bank2top">
+  <body name="kitchen bank2top">
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
@@ -485,10 +485,10 @@
       </geometry>
     <material script="Kitchen/CounterTop_H"/>
     </visual>
-  </link>
+  </body>
 
   <!-- FRIDGE -->
-  <link name="fridge">
+  <body name="fridge">
     <origin pose="6.5 1.5 2.0 0 0 0"/>
 
     <inertial mass="1.0">
@@ -513,5 +513,5 @@
     <sensor name='bank_sensor' type='rfid' always_on='1' update_rate='100' visualize='true'>
       <topic>~/rfid</topic>
     </sensor>
-  </link>
+  </body>
 </model>

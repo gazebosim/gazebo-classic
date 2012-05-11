@@ -46,7 +46,7 @@ namespace gazebo
     private: std::vector<event::ConnectionPtr> connections;
 
     private: physics::ModelPtr model;
-    private: physics::LinkPtr chassis;
+    private: physics::BodyPtr chassis;
     private: std::vector<physics::JointPtr> joints;
     private: physics::JointPtr gasJoint, brakeJoint;
     private: physics::JointPtr steeringJoint;

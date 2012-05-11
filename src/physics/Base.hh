@@ -41,7 +41,7 @@ namespace gazebo
       "common",
       "entity",
       "model",
-      "link",
+      "body",
       "collision",
       "light",
       "visual",
@@ -71,7 +71,7 @@ namespace gazebo
                 ENTITY          = 0x00000001,
                 MODEL           = 0x00000002,
                 ACTOR           = 0x00000003,
-                LINK            = 0x00000004,
+                BODY            = 0x00000004,
                 COLLISION       = 0x00000008,
                 LIGHT           = 0x00000010,
                 VISUAL          = 0x00000020,
@@ -118,7 +118,7 @@ namespace gazebo
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the name of the entity
-      /// \param name Link name
+      /// \param name Body name
       public: virtual void SetName(const std::string &name);
 
       /// \brief Return the name of the entity

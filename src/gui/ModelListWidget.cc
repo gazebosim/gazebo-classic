@@ -210,20 +210,20 @@ void ModelListWidget::ProcessModelMsgs()
         topItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
         this->modelTreeWidget->addTopLevelItem(topItem);
 
-        for (int i = 0; i < (*iter).link_size(); i++)
+        for (int i = 0; i < (*iter).body_size(); i++)
         {
-          std::string linkName = (*iter).link(i).name();
-          int index = linkName.rfind("::") + 2;
-          std::string linkNameShort = linkName.substr(
-              index, linkName.size() - index);
+          std::string bodyName = (*iter).body(i).name();
+          int index = bodyName.rfind("::") + 2;
+          std::string bodyNameShort = bodyName.substr(
+              index, bodyName.size() - index);
 
-          QTreeWidgetItem *linkItem = new QTreeWidgetItem(topItem,
+          QTreeWidgetItem *bodyItem = new QTreeWidgetItem(topItem,
               QStringList(QString("%1").arg(
-                  QString::fromStdString(linkNameShort))));
+                  QString::fromStdString(bodyNameShort))));
 
-          linkItem->setData(0, Qt::UserRole, QVariant((*iter).link(i).id()));
-          linkItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
-          this->modelTreeWidget->addTopLevelItem(linkItem);
+          bodyItem->setData(0, Qt::UserRole, QVariant((*iter).body(i).id()));
+          bodyItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+          this->modelTreeWidget->addTopLevelItem(bodyItem);
         }
       }
     }
@@ -653,11 +653,11 @@ void ModelListWidget::FillMsg(QtProperty *_item,
   if (!_item)
     return;
 
-  if (_item->propertyName().toStdString() == "link")
+  if (_item->propertyName().toStdString() == "body")
   {
     QtProperty *nameItem = this->GetChildItem(_item, "name");
-    ((msgs::Link*)(_message))->set_name(nameItem->valueText().toStdString());
-    ((msgs::Link*)(_message))->set_id(
+    ((msgs::Body*)(_message))->set_name(nameItem->valueText().toStdString());
+    ((msgs::Body*)(_message))->set_id(
       gui::get_entity_id(nameItem->valueText().toStdString()));
   }
   else if (_item->propertyName().toStdString() == "collision")
@@ -921,7 +921,7 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
+void ModelListWidget::FillPropertyTree(const msgs::Body &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -1432,17 +1432,17 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
   this->propTreeBrowser->setExpanded(bItem, false);
   this->FillPoseProperty(_msg.pose(), topItem);
 
-  for (int i = 0; i < _msg.link_size(); i++)
+  for (int i = 0; i < _msg.body_size(); i++)
   {
     QtVariantProperty *prop;
     prop = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("link"));
-    prop->setToolTip(tr(_msg.link(i).name().c_str()));
+        QtVariantPropertyManager::groupTypeId(), tr("body"));
+    prop->setToolTip(tr(_msg.body(i).name().c_str()));
 
     bItem = this->propTreeBrowser->addProperty(prop);
     this->propTreeBrowser->setExpanded(bItem, false);
 
-    this->FillPropertyTree(_msg.link(i), prop);
+    this->FillPropertyTree(_msg.body(i), prop);
   }
 }
 

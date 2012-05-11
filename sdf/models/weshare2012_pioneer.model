@@ -2,7 +2,7 @@
   <model name="default_pioneer_model">
   <origin pose="0 0 0 0 0 0"/>
 
-    <link name="chassis">
+    <body name="chassis">
       <origin pose="0.0 0.0 0.16 0 0 0"/>
    
       <inertial mass="1.0">
@@ -38,9 +38,9 @@
         <!--<plugin name='laser' filename='libRayPlugin.so'/>-->
       </sensor>
 
-    </link>
+    </body>
     
-    <link name="right_wheel">
+    <body name="right_wheel">
       <origin pose="0.1 -.17 0.11 0 1.5707 1.5707"/>
   
       <inertial mass="0.1">
@@ -59,9 +59,9 @@
         </geometry>
         <material script="Gazebo/FlatBlack"/>
       </visual>
-    </link>
+    </body>
 
-    <link name="left_wheel">
+    <body name="left_wheel">
       <origin pose="0.1 .17 0.11 0 1.5707 1.5707"/>
   
       <inertial mass="0.1">
@@ -83,9 +83,9 @@
 
 
 
-    </link>
+    </body>
   
-    <link name="castor">
+    <body name="castor">
       <origin pose="-0.200 0 0.04 0 0 0"/>
   
       <inertial mass="0.1">
@@ -117,28 +117,28 @@
       <sensor name="rfidtag" type="rfidtag" always_on='1' visualize='true'>
         <topic>~/rfidtag</topic>
       </sensor>
-    </link>
+    </body>
   
 
 
 
     <joint type="revolute" name="left_wheel_hinge">
       <origin pose="0 0 0.04 0 0 0"/>
-      <child link="left_wheel"/>
-      <parent link="chassis"/>
+      <child body="left_wheel"/>
+      <parent body="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
     
     <joint type="revolute" name="right_wheel_hinge">
       <origin pose="0 0 -0.04 0 0 0"/>
-      <child link="right_wheel"/>
-      <parent link="chassis"/>
+      <child body="right_wheel"/>
+      <parent body="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
     
     <joint type="ball" name="ball_joint">
-      <child link="castor"/>
-      <parent link="chassis"/>
+      <child body="castor"/>
+      <parent body="chassis"/>
     </joint>
     <!--<plugin filename="libHlaModelPlugin.so" name="plugin"/>
     <plugin filename="libHlaRFIDTagPlugin.so" name="rfid1"/>-->

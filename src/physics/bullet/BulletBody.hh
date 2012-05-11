@@ -14,17 +14,17 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet Link class
+/* Desc: Bullet Body class
  * Author: Nate Koenig
  * Date: 15 May 2009
  */
 
-#ifndef __BULLETLINK_HH__
-#define __BULLETLINK_HH__
+#ifndef __BULLETBODY_HH__
+#define __BULLETBODY_HH__
 
 #include "physics/bullet/bullet_inc.h"
 #include "physics/bullet/BulletTypes.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 
 class btRigidBody;
 
@@ -37,14 +37,14 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \brief The body class
     /// \{
-    /// Link class
-    class BulletLink : public Link
+    /// Body class
+    class BulletBody : public Body
     {
       /// \brief Constructor
-      public: BulletLink(EntityPtr _parent);
+      public: BulletBody(EntityPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~BulletLink();
+      public: virtual ~BulletBody();
 
       /// \brief Load the body based on an common::XMLConfig node
       public: virtual void Load(sdf::ElementPtr _ptr);
@@ -105,7 +105,7 @@ namespace gazebo
       public: void SetSelfCollide(bool collide);
 
       /// \brief Get the bullet rigid body
-      public: btRigidBody *GetBulletLink() const;
+      public: btRigidBody *GetBulletBody() const;
 
       /// \brief Set the linear damping factor
       public: virtual void SetLinearDamping(double damping);
@@ -144,7 +144,7 @@ namespace gazebo
 
       private: btCompoundShape *compoundShape;
       private: BulletMotionState *motionState;
-      private: btRigidBody *rigidLink;
+      private: btRigidBody *rigidBody;
       private: BulletPhysicsPtr bulletPhysics;
       protected: math::Pose pose;
     };

@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
+/* Desc: Body class
  * Author: Nate Koenig
  */
 
-#ifndef __LINK_HH__
-#define __LINK_HH__
+#ifndef __BODY_HH__
+#define __BODY_HH__
 
 #include <map>
 #include <vector>
@@ -28,7 +28,7 @@
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
-#include "physics/LinkState.hh"
+#include "physics/BodyState.hh"
 #include "physics/Entity.hh"
 #include "physics/Inertial.hh"
 #include "physics/Joint.hh"
@@ -42,14 +42,14 @@ namespace gazebo
 
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief Link class
-    class Link : public Entity
+    /// \brief Body class
+    class Body : public Entity
     {
       /// \brief Constructor
-      public: Link(EntityPtr parent);
+      public: Body(EntityPtr parent);
 
       /// \brief Destructor
-      public: virtual ~Link();
+      public: virtual ~Body();
 
       /// \brief Load the body based on an SDF element
       /// \param _sdf SDF parameters
@@ -61,7 +61,7 @@ namespace gazebo
       /// \brief Finalize the body
       public: void Fini();
 
-      /// \brief Reset the link
+      /// \brief Reset the body
       public: void Reset();
 
       /// \brief Update the parameters using new sdf values
@@ -227,37 +227,37 @@ namespace gazebo
       public: void DisconnectEnabled(event::ConnectionPtr &c)
               { enabledSignal.Disconnect(c); }
 
-      /// \brief Fill a link message
+      /// \brief Fill a body message
       /// \param _msg Message to fill
-      public: void FillLinkMsg(msgs::Link &_msg);
+      public: void FillBodyMsg(msgs::Body &_msg);
 
       /// \brief Update parameters from a message
       /// \param _msg Message to read
-      public: void ProcessMsg(const msgs::Link &_msg);
+      public: void ProcessMsg(const msgs::Body &_msg);
 
-      /// \brief Joints that have this Link as a parent Link
+      /// \brief Joints that have this Body as a parent Body
       public: void AddChildJoint(JointPtr joint);
 
-      /// \brief Joints that have this Link as a child Link
+      /// \brief Joints that have this Body as a child Body
       public: void AddParentJoint(JointPtr joint);
 
-      /// \brief Attach a static model to this link
+      /// \brief Attach a static model to this body
       public: void AttachStaticModel(ModelPtr &_model,
                                      const math::Pose &_offset);
 
-      /// \brief Detach a static model from this link
+      /// \brief Detach a static model from this body
       public: void DetachStaticModel(const std::string &_modelName);
 
-      /// \brief Detach all static models from this link
+      /// \brief Detach all static models from this body
       public: void DetachAllStaticModels();
 
       public: virtual void OnPoseChange();
 
-      /// \brief Get the link state
-      public: LinkState GetState();
+      /// \brief Get the body state
+      public: BodyState GetState();
 
-      /// \brief Set the current link state
-      public: void SetState(const LinkState &_state);
+      /// \brief Set the current body state
+      public: void SetState(const BodyState &_state);
 
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision

@@ -6,7 +6,7 @@
 
     <model name="box">
       <origin pose="0 0 .5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <collision name="collision">
           <mass>1</mass>
           <geometry>
@@ -20,12 +20,12 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="sphere">
       <origin pose="0 1.5 0.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
         <collision name="collision">
           <mass>1</mass>
           <geometry>
@@ -39,12 +39,12 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
     <model name="cylinder">
       <origin pose="0 -1.5 0.5 0 0 0"/>
-      <link name="link">
+      <body name="body">
 
         <collision name="collision">
           <mass>1</mass>
@@ -59,7 +59,7 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-      </link>
+      </body>
     </model>
 
   </world>

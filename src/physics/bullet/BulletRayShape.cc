@@ -20,7 +20,7 @@
  */
 
 #include "physics/World.hh"
-#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletBody.hh"
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/bullet/BulletTypes.hh"
 #include "physics/bullet/BulletCollision.hh"
@@ -91,7 +91,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
                            this->rayCallback.m_hitPointWorld.getY(),
                            this->rayCallback.m_hitPointWorld.getZ());
       _dist = this->globalStartPos.Distance(result);
-      _entity = static_cast<BulletLink*>(
+      _entity = static_cast<BulletBody*>(
           this->rayCallback.m_collisionObject->getUserPointer())->GetName();
     }
   }

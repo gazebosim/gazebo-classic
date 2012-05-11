@@ -35,7 +35,7 @@
 #include "physics/RayShape.hh"
 #include "physics/Collision.hh"
 #include "physics/Model.hh"
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Entity.hh"
@@ -47,7 +47,7 @@ using namespace physics;
 Entity::Entity(BasePtr _parent)
   : Base(_parent)
 {
-  this->isCanonicalLink = false;
+  this->isCanonicalBody = false;
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
 
@@ -120,8 +120,8 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;
-  else if (this->IsCanonicalLink())
-    this->setWorldPoseFunc = &Entity::SetWorldPoseCanonicalLink;
+  else if (this->IsCanonicalBody())
+    this->setWorldPoseFunc = &Entity::SetWorldPoseCanonicalBody;
   else
     this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 }
@@ -169,9 +169,9 @@ math::Box Entity::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-void Entity::SetCanonicalLink(bool _value)
+void Entity::SetCanonicalBody(bool _value)
 {
-  this->isCanonicalLink = _value;
+  this->isCanonicalBody = _value;
 }
 
 //////////////////////////////////////////////////
@@ -228,7 +228,7 @@ void Entity::PublishPose()
 //////////////////////////////////////////////////
 math::Pose Entity::GetRelativePose() const
 {
-  if (this->IsCanonicalLink())
+  if (this->IsCanonicalBody())
   {
     return this->initialRelativePose;
   }
@@ -255,13 +255,13 @@ void Entity::SetRelativePose(const math::Pose &_pose, bool _notify)
 void Entity::SetWorldTwist(const math::Vector3 &_linear,
     const math::Vector3 &_angular, bool _updateChildren)
 {
-  if (this->HasType(LINK) || this->HasType(MODEL))
+  if (this->HasType(BODY) || this->HasType(MODEL))
   {
-    if (this->HasType(LINK))
+    if (this->HasType(BODY))
     {
-      Link* link = dynamic_cast<Link*>(this);
-      link->SetLinearVel(_linear);
-      link->SetAngularVel(_angular);
+      Body* body = dynamic_cast<Body*>(this);
+      body->SetLinearVel(_linear);
+      body->SetAngularVel(_angular);
     }
     if (_updateChildren)
     {
@@ -305,7 +305,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
     {
       EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
 
-      if (entity->IsCanonicalLink())
+      if (entity->IsCanonicalBody())
       {
         entity->worldPose = (entity->initialRelativePose + _pose);
       }
@@ -322,7 +322,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
+void Entity::SetWorldPoseCanonicalBody(const math::Pose &_pose, bool _notify)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -413,8 +413,8 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
     for (Base_V::iterator iter = this->children.begin();
          iter != this->childrenEnd; ++iter)
     {
-      if ((*iter)->HasType(LINK))
-        boost::shared_static_cast<Link>(*iter)->OnPoseChange();
+      if ((*iter)->HasType(BODY))
+        boost::shared_static_cast<Body>(*iter)->OnPoseChange();
       else if ((*iter)->HasType(COLLISION))
       {
         CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
@@ -461,13 +461,13 @@ CollisionPtr Entity::GetChildCollision(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-LinkPtr Entity::GetChildLink(const std::string &_name)
+BodyPtr Entity::GetChildBody(const std::string &_name)
 {
   BasePtr base = this->GetByName(_name);
   if (base)
-    return boost::shared_dynamic_cast<Link>(base);
+    return boost::shared_dynamic_cast<Body>(base);
 
-  return LinkPtr();
+  return BodyPtr();
 }
 
 //////////////////////////////////////////////////

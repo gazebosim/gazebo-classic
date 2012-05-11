@@ -1,7 +1,7 @@
 <gazebo version='1.0'>
   <model name='willowgarage' static='true'>
     <origin pose='-20 -20 0 0 0 0'/>
-    <link name='walls' gravity='1' self_collide='0' kinematic='0'>
+    <body name='walls' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0 0 0 0 -0 0'/>
       <inertial mass='0'>
         <origin pose='0 0 0 0 0 0'/>
@@ -21,6 +21,6 @@
           <mesh filename='willowgarage/willowgarage_visual.dae' scale='0.0254 0.0254 0.0254'/>
         </geometry>
       </visual>
-    </link>
+    </body>
   </model>
 </gazebo>

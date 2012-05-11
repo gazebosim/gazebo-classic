@@ -147,17 +147,17 @@ namespace gazebo
       /// \return Pointer to the joint
       public: JointPtr GetJoint(const std::string &name);
 
-      /// \brief Get a link by id
-      /// \return Pointer to the link
-      public: LinkPtr GetLinkById(unsigned int _id) const;
+      /// \brief Get a body by id
+      /// \return Pointer to the body
+      public: BodyPtr GetBodyById(unsigned int _id) const;
 
-      /// \brief Get a link by name
-      /// \return Pointer to the link
-      public: LinkPtr GetLink(const std::string &name ="canonical") const;
+      /// \brief Get a body by name
+      /// \return Pointer to the body
+      public: BodyPtr GetBody(const std::string &name ="canonical") const;
 
-      /// \brief Get a child link by index
-      /// \return Point to the link
-      public: LinkPtr GetLink(unsigned int _index) const;
+      /// \brief Get a child body by index
+      /// \return Point to the body
+      public: BodyPtr GetBody(unsigned int _index) const;
 
       /// \brief Set the gravity mode of the model
       public: void SetGravityMode(const bool &v);
@@ -199,7 +199,7 @@ namespace gazebo
       /// \brief Set the current model state
       public: void SetState(const ModelState &_state);
 
-      /// \brief Enable all the links in all the models
+      /// \brief Enable all the bodys in all the models
       public: void SetEnabled(bool _enabled);
 
       protected: virtual void OnPoseChange();
@@ -212,7 +212,7 @@ namespace gazebo
       /// \param _sdf SDF parameter
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
-      private: LinkPtr canonicalLink;
+      private: BodyPtr canonicalBody;
 
       private: Joint_V joints;
 

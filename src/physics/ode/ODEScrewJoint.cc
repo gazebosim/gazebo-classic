@@ -28,7 +28,7 @@
 #include "gazebo_config.h"
 #include "common/Console.hh"
 
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/ode/ODEScrewJoint.hh"
 
 using namespace gazebo;
@@ -87,8 +87,8 @@ void ODEScrewJoint::SetVelocity(int /*index*/, double _angle)
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   dJointSetScrewAxis(this->jointId, _axis.x, _axis.y, _axis.z);
 }
@@ -116,8 +116,8 @@ void ODEScrewJoint::ApplyDamping()
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetForce(int /*index*/, double _force)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
   // dJointAddScrewForce(this->jointId, _force);
   dJointAddScrewTorque(this->jointId, _force);
 }

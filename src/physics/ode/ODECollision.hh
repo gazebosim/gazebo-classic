@@ -41,7 +41,7 @@ namespace gazebo
     class ODECollision : public Collision
     {
       /// \brief Constructor
-      public: ODECollision(LinkPtr link);
+      public: ODECollision(BodyPtr body);
 
       /// \brief Destructor
       public: virtual ~ODECollision();

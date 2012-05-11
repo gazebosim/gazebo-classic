@@ -22,7 +22,7 @@
 #include "gazebo_config.h"
 #include "common/Console.hh"
 
-#include "physics/Link.hh"
+#include "physics/Body.hh"
 #include "physics/ode/ODEHinge2Joint.hh"
 
 using namespace gazebo;
@@ -63,16 +63,16 @@ math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
   dJointSetHinge2Anchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
 }
 
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   if (_index == 0)
     dJointSetHinge2Axis1(this->jointId, _axis.x, _axis.y, _axis.z);
@@ -155,8 +155,8 @@ void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetForce(int _index, double _torque)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   if (_index == 0)
     dJointAddHinge2Torques(this->jointId, _torque, 0);

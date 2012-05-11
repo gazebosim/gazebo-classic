@@ -22,7 +22,7 @@ set (msgs axis.proto
           joint.proto
           laserscan.proto
           light.proto
-          link.proto
+          body.proto
           material.proto
           meshgeom.proto
           model.proto

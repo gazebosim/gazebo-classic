@@ -42,7 +42,7 @@ namespace gazebo
       public: ODERayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Constructor
-      /// \param body Link the ray is attached to
+      /// \param body Body the ray is attached to
       public: ODERayShape(CollisionPtr collision);
 
       /// \brief Destructor

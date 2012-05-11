@@ -8,7 +8,7 @@ add_definitions(${BULLET_CFLAGS})
 
 set (sources
   BulletPhysics.cc
-  BulletLink.cc
+  BulletBody.cc
   BulletCollision.cc
   BulletMotionState.cc
   BulletTrimeshShape.cc

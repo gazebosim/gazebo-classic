@@ -26,13 +26,13 @@ namespace gazebo
   namespace physics
   {
     class ODECollision;
-    class ODELink;
+    class ODEBody;
     class ODEPhysics;
     class ODERayShape;
 
     typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
     typedef boost::shared_ptr<ODECollision> ODECollisionPtr;
-    typedef boost::shared_ptr<ODELink> ODELinkPtr;
+    typedef boost::shared_ptr<ODEBody> ODEBodyPtr;
     typedef boost::shared_ptr<ODERayShape> ODERayShapePtr;
   }
 }

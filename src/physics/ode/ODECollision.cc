@@ -26,15 +26,15 @@
 
 #include "physics/SurfaceParams.hh"
 #include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODELink.hh"
+#include "physics/ode/ODEBody.hh"
 #include "physics/ode/ODECollision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODECollision::ODECollision(LinkPtr _link)
-: Collision(_link)
+ODECollision::ODECollision(BodyPtr _body)
+: Collision(_body)
 {
   this->SetName("ODE_Collision");
   this->collisionId = NULL;
@@ -55,7 +55,7 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
   Collision::Load(_sdf);
 
   this->SetSpaceId(
-      boost::shared_static_cast<ODELink>(this->link)->GetSpaceId());
+      boost::shared_static_cast<ODEBody>(this->body)->GetSpaceId());
 
   if (this->IsStatic())
   {
@@ -192,11 +192,11 @@ void ODECollision::OnPoseChangeGlobal()
 {
   dQuaternion q;
 
-  // Transform into global pose since a static collision does not have a link
+  // Transform into global pose since a static collision does not have a body
   math::Pose localPose = this->GetWorldPose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
+  math::Vector3 cog_vec = this->body->GetInertial()->GetCoG();
   localPose.pos = localPose.pos - cog_vec;
 
   q[0] = localPose.rot.w;
@@ -217,7 +217,7 @@ void ODECollision::OnPoseChangeRelative()
   math::Pose localPose = this->GetRelativePose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
+  math::Vector3 cog_vec = this->body->GetInertial()->GetCoG();
   localPose.pos = localPose.pos - cog_vec;
 
   q[0] = localPose.rot.w;

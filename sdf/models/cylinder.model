@@ -1,6 +1,6 @@
 <gazebo version="1.0">
 <model name="cylinder">
-  <link name="link">
+  <body name="body">
     <origin pose="0 0 0.5 0 0 0"/>
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -18,6 +18,6 @@
       </geometry>
       <material script="Gazebo/Grey"/>
     </visual>
-  </link>
+  </body>
 </model>
 </gazebo>
