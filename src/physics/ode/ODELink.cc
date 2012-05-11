@@ -420,6 +420,18 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
+void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
+                                      const math::Vector3 &_pos)
+{
+  if (this->linkId)
+  {
+    this->SetEnabled(true);
+    dBodyAddForceAtPos(this->linkId, _force.x, _force.y, _force.z,
+                          _pos.x, _pos.y, _pos.z);
+  }
+}
+
+/////////////////////////////////////////////////
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)

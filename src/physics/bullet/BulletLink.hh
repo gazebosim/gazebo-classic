@@ -125,6 +125,10 @@ namespace gazebo
       ///        body's own frame of reference.
       public: virtual void AddRelativeForce(const math::Vector3 &_force);
 
+      /// \brief Add a force to the body using a global position
+      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
+                                                   const math::Vector3 &_pos);
+
       /// \brief Add a force to the body at position expressed to the body's
       ///        own frame of reference.
       public: virtual void AddForceAtRelativePosition(

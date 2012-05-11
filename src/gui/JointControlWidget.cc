@@ -22,26 +22,28 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-JointForceControl::JointForceControl(const std::string &_name, QWidget *_parent)
+JointForceControl::JointForceControl(const std::string &_name,
+    QGridLayout *_layout, QWidget *_parent)
   : QWidget(_parent), name(_name)
 {
-  QHBoxLayout *mainLayout = new QHBoxLayout;
 
-  QDoubleSpinBox *forceSpin = new QDoubleSpinBox;
-  forceSpin->setRange(-100.0, 100.0);
-  forceSpin->setSingleStep(0.001);
-  forceSpin->setDecimals(3);
-  forceSpin->setValue(0.000);
+  this->forceSpin = new QDoubleSpinBox;
+  this->forceSpin->setRange(-100.0, 100.0);
+  this->forceSpin->setSingleStep(0.001);
+  this->forceSpin->setDecimals(3);
+  this->forceSpin->setValue(0.000);
 
-  mainLayout->addWidget(new QLabel(tr(_name.c_str())), 0);
-  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum));
-  mainLayout->addWidget(forceSpin, 0);
-  mainLayout->addWidget(new QLabel("N-m", this), 0);
-  this->setLayout(mainLayout);
+  int r = _layout->rowCount()-1;
+  _layout->addWidget(forceSpin, r, 2);
 
-  connect(forceSpin, SIGNAL(valueChanged(double)),
-        this, SLOT(OnChanged(double)));
+  connect(this->forceSpin, SIGNAL(valueChanged(double)),
+          this, SLOT(OnChanged(double)));
+}
+
+/////////////////////////////////////////////////
+void JointForceControl::Reset()
+{
+  this->forceSpin->setValue(0.0);
 }
 
 /////////////////////////////////////////////////
@@ -51,32 +53,184 @@ void JointForceControl::OnChanged(double _value)
 }
 
 /////////////////////////////////////////////////
-JointPIDControl::JointPIDControl(const std::string &_name, QWidget *_parent)
+JointPIDPosControl::JointPIDPosControl(const std::string &_name,
+    QGridLayout *_layout, QWidget *_parent)
   : QWidget(_parent), name(_name)
 {
-  QHBoxLayout *mainLayout = new QHBoxLayout;
+  this->posSpin = new QDoubleSpinBox;
+  this->posSpin->setRange(-360, 360);
+  this->posSpin->setSingleStep(0.001);
+  this->posSpin->setDecimals(3);
+  this->posSpin->setValue(0.000);
 
-  QDoubleSpinBox *posSpin = new QDoubleSpinBox;
-  posSpin->setRange(-3.1415, 3.1415);
+  this->pGainSpin = new QDoubleSpinBox;
+  this->pGainSpin->setMinimum(0.0);
+  this->pGainSpin->setSingleStep(0.01);
+  this->pGainSpin->setDecimals(3);
+  this->pGainSpin->setValue(1.000);
+
+  this->iGainSpin = new QDoubleSpinBox;
+  this->iGainSpin->setMinimum(0.0);
+  this->iGainSpin->setSingleStep(0.01);
+  this->iGainSpin->setDecimals(3);
+  this->iGainSpin->setValue(0.100);
+
+  this->dGainSpin = new QDoubleSpinBox;
+  this->dGainSpin->setMinimum(0.0);
+  this->dGainSpin->setSingleStep(0.01);
+  this->dGainSpin->setDecimals(3);
+  this->dGainSpin->setValue(0.010);
+
+  int r = _layout->rowCount()-1;
+  _layout->addWidget(this->posSpin, r, 2);
+  _layout->addWidget(pGainSpin, r, 3);
+  _layout->addWidget(iGainSpin, r, 4);
+  _layout->addWidget(dGainSpin, r, 5);
+
+  connect(this->posSpin, SIGNAL(valueChanged(double)),
+        this, SLOT(OnChanged(double)));
+  connect(pGainSpin, SIGNAL(valueChanged(double)),
+        this, SLOT(OnPChanged(double)));
+  connect(iGainSpin, SIGNAL(valueChanged(double)),
+        this, SLOT(OnIChanged(double)));
+  connect(dGainSpin, SIGNAL(valueChanged(double)),
+        this, SLOT(OnDChanged(double)));
+
+  this->radians = true;
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::Reset()
+{
+  this->posSpin->setValue(0.0);
+  this->pGainSpin->setValue(1.000);
+  this->iGainSpin->setValue(0.100);
+  this->dGainSpin->setValue(0.010);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetToDegrees()
+{
+  if (this->radians)
+  {
+    this->radians = false;
+    this->posSpin->setValue(GZ_RTOD(this->posSpin->value()));
+  }
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetToRadians()
+{
+  if (!this->radians)
+  {
+    this->radians = true;
+    this->posSpin->setValue(GZ_DTOR(this->posSpin->value()));
+  }
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::OnChanged(double _value)
+{
+  if (this->radians)
+    emit changed(_value, this->name);
+  else
+    emit changed(GZ_DTOR(_value), this->name);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::OnPChanged(double _value)
+{
+  emit pChanged(_value, this->name);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::OnIChanged(double _value)
+{
+  emit iChanged(_value, this->name);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::OnDChanged(double _value)
+{
+  emit dChanged(_value, this->name);
+}
+
+/////////////////////////////////////////////////
+JointPIDVelControl::JointPIDVelControl(const std::string &_name,
+    QGridLayout *_layout, QWidget *_parent)
+  : QWidget(_parent), name(_name)
+{
+  this->posSpin = new QDoubleSpinBox;
+  posSpin->setRange(-360, 360);
   posSpin->setSingleStep(0.001);
   posSpin->setDecimals(3);
   posSpin->setValue(0.000);
 
-  mainLayout->addWidget(new QLabel(tr(_name.c_str())), 0);
-  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum));
-  mainLayout->addWidget(posSpin, 0);
-  mainLayout->addWidget(new QLabel("radians", this), 0);
-  this->setLayout(mainLayout);
+  this->pGainSpin = new QDoubleSpinBox;
+  pGainSpin->setMinimum(0.0);
+  pGainSpin->setSingleStep(0.01);
+  pGainSpin->setDecimals(3);
+  pGainSpin->setValue(1.000);
+
+  this->iGainSpin = new QDoubleSpinBox;
+  iGainSpin->setMinimum(0.0);
+  iGainSpin->setSingleStep(0.01);
+  iGainSpin->setDecimals(3);
+  iGainSpin->setValue(0.100);
+
+  this->dGainSpin = new QDoubleSpinBox;
+  dGainSpin->setMinimum(0.0);
+  dGainSpin->setSingleStep(0.01);
+  dGainSpin->setDecimals(3);
+  dGainSpin->setValue(0.010);
+
+  int r = _layout->rowCount()-1;
+  _layout->addWidget(posSpin, r, 2);
+  _layout->addWidget(pGainSpin, r, 3);
+  _layout->addWidget(iGainSpin, r, 4);
+  _layout->addWidget(dGainSpin, r, 5);
 
   connect(posSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnChanged(double)));
+  connect(pGainSpin, SIGNAL(valueChanged(double)),
+        this, SLOT(OnPChanged(double)));
+  connect(iGainSpin, SIGNAL(valueChanged(double)),
+        this, SLOT(OnIChanged(double)));
+  connect(dGainSpin, SIGNAL(valueChanged(double)),
+        this, SLOT(OnDChanged(double)));
 }
 
 /////////////////////////////////////////////////
-void JointPIDControl::OnChanged(double _value)
+void JointPIDVelControl::Reset()
+{
+  this->posSpin->setValue(0.0);
+  this->pGainSpin->setValue(1.000);
+  this->iGainSpin->setValue(0.100);
+  this->dGainSpin->setValue(0.010);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::OnChanged(double _value)
 {
   emit changed(_value, this->name);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::OnPChanged(double _value)
+{
+  emit pChanged(_value, this->name);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::OnIChanged(double _value)
+{
+  emit iChanged(_value, this->name);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::OnDChanged(double _value)
+{
+  emit dChanged(_value, this->name);
 }
 
 /////////////////////////////////////////////////
@@ -101,64 +255,153 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
 
   // Create the Force control scroll area
   QScrollArea *scrollArea = new QScrollArea;
-  QFrame *frame = new QFrame;
-  frame->setLineWidth(0);
-  frame->setFrameShadow(QFrame::Sunken);
-  frame->setFrameShape(QFrame::Box);
+  scrollArea->setLineWidth(0);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setFrameShadow(QFrame::Plain);
 
-  QVBoxLayout *vLayout = new QVBoxLayout;
+  QGridLayout *gridLayout = new QGridLayout;
+  gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                      QSizePolicy::Minimum), 0, 0, 2);
+  gridLayout->addWidget(new QLabel("Newton-meter", this), 0, 2);
   for (int i = 0; i < modelMsg.joint_size(); ++i)
   {
     std::string jointName =modelMsg.joint(i).name();
-    JointForceControl *slider = new JointForceControl(jointName, this);
+    gridLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+    gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                   QSizePolicy::Minimum), i+1, 1);
+
+    JointForceControl *slider = new JointForceControl(jointName, gridLayout,
+                                                      this);
     this->sliders[jointName] = slider;
-    vLayout->addWidget(slider);
     connect(slider, SIGNAL(changed(double, const std::string &)),
             this, SLOT(OnForceChanged(double, const std::string &)));
   }
 
-  frame->setLayout(vLayout);
-  frame->layout()->setContentsMargins(4, 0, 0, 0);
-  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  scrollArea->setWidget(frame);
-  scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  scrollArea->setLayout(gridLayout);
+  //scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
-  // Create a PID scroll area
-  QScrollArea *pidScrollArea = new QScrollArea;
-  QFrame *pidFrame = new QFrame;
-  pidFrame->setLineWidth(0);
-  pidFrame->setFrameShadow(QFrame::Sunken);
-  pidFrame->setFrameShape(QFrame::Box);
-  QVBoxLayout *vPIDLayout = new QVBoxLayout;
+
+  // Create a PID Pos scroll area
+  QScrollArea *pidPosScrollArea = new QScrollArea;
+  pidPosScrollArea->setLineWidth(0);
+  pidPosScrollArea->setFrameShape(QFrame::NoFrame);
+  pidPosScrollArea->setFrameShadow(QFrame::Plain);
+
+  gridLayout = new QGridLayout;
+  gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                      QSizePolicy::Minimum), 0, 0, 2);
+  QComboBox *unitsCombo = new QComboBox;
+  unitsCombo->addItem("Radians");
+  unitsCombo->addItem("Degrees");
+  connect(unitsCombo, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnPIDPosUnitsChanged(int)));
+
+  gridLayout->addWidget(unitsCombo, 0, 2);
+  gridLayout->addWidget(new QLabel("P Gain", this), 0, 3);
+  gridLayout->addWidget(new QLabel("I Gain", this), 0, 4);
+  gridLayout->addWidget(new QLabel("D Gain", this), 0, 5);
+
   for (int i = 0; i < modelMsg.joint_size(); ++i)
   {
     std::string jointName = modelMsg.joint(i).name();
-    JointPIDControl *slider = new JointPIDControl(jointName, this);
-    this->pidSliders[jointName] = slider;
-    vPIDLayout->addWidget(slider);
+    gridLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+    gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                   QSizePolicy::Minimum), i+1, 1);
+
+    JointPIDPosControl *slider = new JointPIDPosControl(jointName,
+        gridLayout, this);
+
+    this->pidPosSliders[jointName] = slider;
     connect(slider, SIGNAL(changed(double, const std::string &)),
-            this, SLOT(OnPIDChanged(double, const std::string &)));
+            this, SLOT(OnPIDPosChanged(double, const std::string &)));
+    connect(slider, SIGNAL(pChanged(double, const std::string &)),
+            this, SLOT(OnPPosGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(iChanged(double, const std::string &)),
+            this, SLOT(OnIPosGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(dChanged(double, const std::string &)),
+            this, SLOT(OnDPosGainChanged(double, const std::string &)));
   }
-  pidFrame->setLayout(vPIDLayout);
-  pidFrame->layout()->setContentsMargins(4, 0, 0, 0);
-  pidFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  pidScrollArea->setWidget(pidFrame);
-  pidScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  pidScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+  pidPosScrollArea->setLayout(gridLayout);
+  //pidPosScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  pidPosScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+ 
+
+
+  // Create a PID Vel scroll area
+  QScrollArea *pidVelScrollArea = new QScrollArea;
+  pidVelScrollArea->setLineWidth(0);
+  pidVelScrollArea->setFrameShape(QFrame::NoFrame);
+  pidVelScrollArea->setFrameShadow(QFrame::Plain);
+
+  QFrame *pidVelFrame = new QFrame;
+  pidVelFrame->setLineWidth(0);
+  gridLayout = new QGridLayout;
+
+  gridLayout->addItem(new QSpacerItem(10, 27, QSizePolicy::Expanding,
+                                      QSizePolicy::Minimum), 0, 0, 2);
+
+  // Set fixed height for the label to make the tabs stay a consistent size.
+  QLabel *label;
+  label = new QLabel("m/s",this);
+  label->setFixedHeight(27);
+
+  gridLayout->addWidget(label, 0, 2);
+  gridLayout->addWidget(new QLabel("P Gain", this), 0, 3);
+  gridLayout->addWidget(new QLabel("I Gain", this), 0, 4);
+  gridLayout->addWidget(new QLabel("D Gain", this), 0, 5);
+
+  for (int i = 0; i < modelMsg.joint_size(); ++i)
+  {
+    std::string jointName = modelMsg.joint(i).name();
+    gridLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+    gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                   QSizePolicy::Minimum), i+1, 1);
+
+    JointPIDVelControl *slider =
+      new JointPIDVelControl(jointName, gridLayout, this);
+
+    this->pidVelSliders[jointName] = slider;
+    connect(slider, SIGNAL(changed(double, const std::string &)),
+            this, SLOT(OnPIDVelChanged(double, const std::string &)));
+    connect(slider, SIGNAL(pChanged(double, const std::string &)),
+            this, SLOT(OnPVelGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(iChanged(double, const std::string &)),
+            this, SLOT(OnIVelGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(dChanged(double, const std::string &)),
+            this, SLOT(OnDVelGainChanged(double, const std::string &)));
+  }
+
+  pidVelFrame->setLayout(gridLayout);
+  pidVelFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  pidVelScrollArea->setWidget(pidVelFrame);
+  pidVelScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  pidVelScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   QTabWidget *tabWidget = new QTabWidget;
   tabWidget->addTab(scrollArea, tr("Force"));
-  // tabWidget->addTab(pidScrollArea, tr("PID"));
+  tabWidget->addTab(pidPosScrollArea, tr("Position"));
+  tabWidget->addTab(pidVelScrollArea, tr("Velocity"));
 
-  // std::string title = "Model: ";
-  // title += _modelName;
-  // mainLayout->addWidget(new QLabel(tr(title.c_str())));
   // mainLayout->addWidget(scrollArea);
 
   // Add the the force and pid scroll areas to the tab
   QVBoxLayout *mainLayout = new QVBoxLayout;
+
+  QHBoxLayout *hboxLayout = new QHBoxLayout;
+  std::string title = std::string("Model: ") + _modelName;
+  hboxLayout->addWidget(new QLabel(tr(title.c_str())));
+
+  hboxLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                      QSizePolicy::Minimum));
+  QPushButton *resetButton = new QPushButton(tr("Reset"));
+  connect(resetButton, SIGNAL(clicked()), this, SLOT(OnReset()));
+
+  hboxLayout->addWidget(resetButton);
+
+  mainLayout->addLayout(hboxLayout);
   mainLayout->addWidget(tabWidget);
   mainLayout->setContentsMargins(4, 4, 4, 4);
 
@@ -169,6 +412,32 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
 /////////////////////////////////////////////////
 JointControlWidget::~JointControlWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnReset()
+{
+  for (std::map<std::string, JointForceControl*>::iterator iter =
+       this->sliders.begin(); iter != this->sliders.end(); ++iter)
+  {
+    msgs::JointCmd msg;
+    msg.set_name(iter->first);
+    msg.set_reset(true);
+    this->jointPub->Publish(msg);
+    iter->second->Reset();
+  }
+
+  for (std::map<std::string, JointPIDPosControl*>::iterator iter =
+       this->pidPosSliders.begin(); iter != this->pidPosSliders.end(); ++iter)
+  {
+    iter->second->Reset();
+  }
+
+  for (std::map<std::string, JointPIDVelControl*>::iterator iter =
+       this->pidVelSliders.begin(); iter != this->pidVelSliders.end(); ++iter)
+  {
+    iter->second->Reset();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -186,15 +455,61 @@ void JointControlWidget::OnForceChanged(double _value, const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::OnPIDChanged(double _value, const std::string &_name)
+void JointControlWidget::OnPIDPosChanged(double _value,
+    const std::string &_name)
 {
-  std::map<std::string, JointForceControl*>::iterator iter;
-  iter = this->sliders.find(_name);
-  if (iter != this->sliders.end())
+  std::map<std::string, JointPIDPosControl*>::iterator iter;
+  iter = this->pidPosSliders.find(_name);
+  if (iter != this->pidPosSliders.end())
   {
     msgs::JointCmd msg;
     msg.set_name(_name);
-    msg.set_position(_value);
+    msg.mutable_position()->set_target(_value);
+    this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnPPosGainChanged(double _value,
+    const std::string &_name)
+{
+  std::map<std::string, JointPIDPosControl*>::iterator iter;
+  iter = this->pidPosSliders.find(_name);
+  if (iter != this->pidPosSliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.mutable_position()->set_p_gain(_value);
+    this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnDPosGainChanged(double _value,
+    const std::string &_name)
+{
+  std::map<std::string, JointPIDPosControl*>::iterator iter;
+  iter = this->pidPosSliders.find(_name);
+  if (iter != this->pidPosSliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.mutable_position()->set_d_gain(_value);
+    this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnIPosGainChanged(double _value,
+    const std::string &_name)
+{
+  std::map<std::string, JointPIDPosControl*>::iterator iter;
+  iter = this->pidPosSliders.find(_name);
+  if (iter != this->pidPosSliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.mutable_position()->set_i_gain(_value);
     this->jointPub->Publish(msg);
   }
 }
@@ -202,4 +517,77 @@ void JointControlWidget::OnPIDChanged(double _value, const std::string &_name)
 /////////////////////////////////////////////////
 void JointControlWidget::Load(const std::string &/*_modelName*/)
 {
+}
+ 
+/////////////////////////////////////////////////
+void JointControlWidget::OnPIDPosUnitsChanged(int _index)
+{
+  std::map<std::string, JointPIDPosControl*>::iterator iter;
+  for (iter = this->pidPosSliders.begin(); iter != this->pidPosSliders.end(); ++iter)
+  {
+    if (_index == 0)
+      iter->second->SetToRadians();
+    else
+      iter->second->SetToDegrees();
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnPIDVelChanged(double _value,
+    const std::string &_name)
+{
+  std::map<std::string, JointPIDVelControl*>::iterator iter;
+  iter = this->pidVelSliders.find(_name);
+  if (iter != this->pidVelSliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.mutable_velocity()->set_target(_value);
+    this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnPVelGainChanged(double _value,
+    const std::string &_name)
+{
+  std::map<std::string, JointPIDVelControl*>::iterator iter;
+  iter = this->pidVelSliders.find(_name);
+  if (iter != this->pidVelSliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.mutable_velocity()->set_p_gain(_value);
+    this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnDVelGainChanged(double _value,
+    const std::string &_name)
+{
+  std::map<std::string, JointPIDVelControl*>::iterator iter;
+  iter = this->pidVelSliders.find(_name);
+  if (iter != this->pidVelSliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.mutable_velocity()->set_d_gain(_value);
+    this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnIVelGainChanged(double _value,
+    const std::string &_name)
+{
+  std::map<std::string, JointPIDVelControl*>::iterator iter;
+  iter = this->pidVelSliders.find(_name);
+  if (iter != this->pidVelSliders.end())
+  {
+    msgs::JointCmd msg;
+    msg.set_name(_name);
+    msg.mutable_velocity()->set_i_gain(_value);
+    this->jointPub->Publish(msg);
+  }
 }

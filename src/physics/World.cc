@@ -73,6 +73,7 @@ World::World(const std::string &_name)
 
   this->receiveMutex = new boost::mutex();
 
+  this->initialized = false;
   this->needsReset = false;
   this->stepInc = 0;
   this->pause = false;
@@ -235,6 +236,8 @@ void World::Init()
 
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -824,19 +827,43 @@ void World::ModelUpdateSingleLoop()
 }
 
 
+//////////////////////////////////////////////////
+void World::LoadPlugin(const std::string &_filename,
+                       const std::string &_name,
+                       sdf::ElementPtr _sdf)
+{
+  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
+                                                              _name);
+  if (plugin)
+  {
+    plugin->Load(shared_from_this(), _sdf);
+    this->plugins.push_back(plugin);
+
+    if (this->initialized)
+      plugin->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::RemovePlugin(const std::string &_name)
+{
+  std::vector<WorldPluginPtr>::iterator iter;
+  for (iter = this->plugins.begin(); iter != this->plugins.end(); ++iter)
+  {
+    if ((*iter)->GetHandle() == _name)
+    {
+      this->plugins.erase(iter);
+      break;
+    }
+  }
+}
 
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename,
-                                                              pluginName);
-  if (plugin)
-  {
-    plugin->Load(shared_from_this(), _sdf);
-    this->plugins.push_back(plugin);
-  }
+  this->LoadPlugin(filename, pluginName, _sdf);
 }
 
 //////////////////////////////////////////////////

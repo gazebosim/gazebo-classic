@@ -48,13 +48,24 @@ namespace gazebo
     private: physics::ModelPtr model;
     private: physics::LinkPtr chassis;
     private: std::vector<physics::JointPtr> joints;
-    private: physics::JointPtr gasJoint;
+    private: physics::JointPtr gasJoint, brakeJoint;
     private: physics::JointPtr steeringJoint;
 
     private: math::Vector3 velocity;
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
+
+    private: double frontPower, rearPower;
+    private: double maxSpeed;
+    private: double wheelRadius;
+
+    private: double steeringRatio;
+    private: double tireAngleRange;
+    private: double maxGas, maxBrake;
+
+    private: double aeroLoad;
+    private: double swayForce;
   };
 }
 #endif

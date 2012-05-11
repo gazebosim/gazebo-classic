@@ -14,14 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 #include <msgs/msgs.h>
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
+#include <limits>
+#include <algorithm>
 
 #include "common/KeyFrame.hh"
 #include "common/Animation.hh"
@@ -260,6 +258,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       skelMap[this->skeleton->GetNodeByHandle(i)->GetName()] =
         this->skeleton->GetNodeByHandle(i)->GetName();
     this->skelNodesMap[this->skinFile] = skelMap;
+    this->interpolateX[this->skinFile] = false;
   }
   else
   {
@@ -282,10 +281,10 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
         if (MeshManager::Instance()->HasMesh(animFile))
           animMesh = MeshManager::Instance()->GetMesh(animFile);
         if (animMesh && animMesh->HasSkeleton())
+        {
           skel = animMesh->GetSkeleton();
-
-        if (skel)
           skel->Scale(scale);
+        }
       }
 
     if (!skel || skel->GetNumAnimations() == 0)
@@ -319,6 +318,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       {
         this->skelAnimation[animName] =
             skel->GetAnimation(0);
+        this->interpolateX[animName] = _sdf->GetValueBool("interpolate_x");
         this->skelNodesMap[animName] = skelMap;
       }
     }
@@ -339,6 +339,7 @@ void Actor::Play()
 {
   this->active = true;
   this->playStartTime = this->world->GetSimTime();
+  this->lastScriptTime = std::numeric_limits<double>::max();
 }
 
 //////////////////////////////////////////////////
@@ -404,13 +405,25 @@ void Actor::Update()
   SkeletonAnimation *skelAnim = this->skelAnimation[tinfo.type];
   std::map<std::string, std::string> skelMap = this->skelNodesMap[tinfo.type];
 
+  common::PoseKeyFrame posFrame(0.0);
+  this->trajectories[tid]->SetTime(scriptTime);
+  this->trajectories[tid]->GetInterpolatedKeyFrame(posFrame);
+
   msgs::PoseAnimation msg;
-
-  std::map<std::string, math::Matrix4> frame = skelAnim->GetPoseAt(scriptTime);
-
   msg.set_model_name(this->visualName);
 
-  math::Pose modelPose;
+  std::map<std::string, math::Matrix4> frame;
+  if (!this->interpolateX[tinfo.type])
+    frame = skelAnim->GetPoseAt(scriptTime);
+  else
+  {
+    common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
+        (this->trajectories[tid]->GetKeyFrame(0));
+    math::Vector3 framePos = posFrame.GetTranslation() -
+        frame0->GetTranslation();
+    frame = skelAnim->GetPoseAtX(framePos.GetLength(),
+              skelMap[this->skeleton->GetRootNode()->GetName()]);
+  }
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
   {
@@ -450,23 +463,24 @@ void Actor::Update()
     }
     else
     {
-      modelPose.pos = transform.GetTranslation();
-      transform.SetTranslate(math::Vector3(0, 0, 0));
-      math::Vector3 yzPos(0.0, modelPose.pos.y, modelPose.pos.z);
+      math::Pose modelPose;
 
-      common::PoseKeyFrame posFrame(0.0);
-      this->trajectories[tid]->SetTime(scriptTime);
-      this->trajectories[tid]->GetInterpolatedKeyFrame(posFrame);
+      modelPose.pos = transform.GetTranslation();
+      math::Vector3 yPos(0.0, modelPose.pos.y, 0.0);
+      math::Vector3 zPos(0.0, 0.0, modelPose.pos.z);
 
       modelPose.pos = posFrame.GetTranslation() +
-                        posFrame.GetRotation().RotateVector(yzPos);
+                        posFrame.GetRotation().RotateVector(yPos);
       modelPose.rot = posFrame.GetRotation();
 
       this->mainLink->SetWorldPose(modelPose);
 
       math::Matrix4 modelTrans(modelPose.rot.GetAsMatrix4());
-      modelTrans.SetTranslate(modelPose.pos);
+      modelTrans.SetTranslate(modelPose.pos + zPos);
+      transform.SetTranslate(math::Vector3(0, 0, 0));
       transform = modelTrans * transform;
+
+      this->lastScriptTime = scriptTime;
     }
     currentLink->SetWorldPose(transform.GetAsPose());
   }

@@ -26,6 +26,8 @@
 #include <string>
 
 #include "transport/transport.h"
+#include "physics/World.hh"
+#include "physics/PhysicsTypes.hh"
 #include "physics/Physics.hh"
 #include "sensors/sensors.h"
 #include "rendering/rendering.h"
@@ -80,6 +82,7 @@ class ServerFixture : public testing::Test
              {
                this->Load(_worldFilename, false);
              }
+
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
                delete this->server;
@@ -380,6 +383,7 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
              }
 
+
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
@@ -475,6 +479,21 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);
+             }
+
+  protected: void LoadPlugin(const std::string &_filename,
+                             const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->LoadPlugin(_filename, _name, sdf::ElementPtr());
+             }
+
+  protected: void RemovePlugin(const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->RemovePlugin(_name);
              }
 
   protected: Server *server;
