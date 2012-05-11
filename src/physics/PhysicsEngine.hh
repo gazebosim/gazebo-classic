@@ -165,6 +165,31 @@ namespace gazebo
       /// Store the value of the updateRate parameter in double form.
       /// To improve efficiency.
       private: double updateRateDouble;
+
+
+      /* FIXME: add back temporarily for grasp hack, remove soon */
+      public: std::map<LinkPtr, LinkPtr> contactPairs;
+      public: void AddLinkPair(LinkPtr link1, LinkPtr link2)
+      {
+        // keep a map of both directions, easier to search later
+        if (this->contactPairs.find(link1) == this->contactPairs.end())
+          this->contactPairs.insert(std::make_pair(link1, link2));
+        if (this->contactPairs.find(link2) == this->contactPairs.end())
+          this->contactPairs.insert(std::make_pair(link2, link1));
+      };
+      public: bool AreTouching(LinkPtr link1, LinkPtr link2)
+      {
+        if ((this->contactPairs.find(link1) == this->contactPairs.end() ||
+             this->contactPairs.find(link1)->second != link2) &&
+            (this->contactPairs.find(link2) == this->contactPairs.end() ||
+             this->contactPairs.find(link2)->second != link1))
+          return false;
+        else
+          return true;
+      };
+
+
+
     };
 
     /// \}
