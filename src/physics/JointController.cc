@@ -164,7 +164,6 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
       if (_msg->velocity().has_i_min())
         this->velPids[_msg->name()].SetIMax(_msg->velocity().i_min());
     }
-
   }
   else
     gzerr << "Unable to find joint[" << _msg->name() << "]\n";

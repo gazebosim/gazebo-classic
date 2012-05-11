@@ -44,8 +44,8 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~Gripper();
-     
-      /// \brief Load 
+
+      /// \brief Load
       /// \param _sdf Shared point to an sdf element that contains the list
       /// of links in the gripper.
       public: virtual void Load(sdf::ElementPtr _sdf);
