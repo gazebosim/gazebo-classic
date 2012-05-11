@@ -51,7 +51,7 @@ RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
 }
 
 //////////////////////////////////////////////////
-RayShape::RayShape(CollisionPtr _parent, bool /*_displayRays*/)
+RayShape::RayShape(CollisionPtr _parent)
   : Shape(_parent)
 {
   this->AddType(RAY_SHAPE);

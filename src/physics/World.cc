@@ -73,6 +73,7 @@ World::World(const std::string &_name)
 
   this->receiveMutex = new boost::mutex();
 
+  this->initialized = false;
   this->needsReset = false;
   this->stepInc = 0;
   this->pause = false;
@@ -124,7 +125,6 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0, 200000000);
-
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
@@ -221,6 +221,12 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
+  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+
   // Initialize all the entities
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
@@ -230,6 +236,8 @@ void World::Init()
 
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -274,6 +282,7 @@ void World::RunLoop()
 void World::Step()
 {
   this->worldUpdateMutex->lock();
+
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
@@ -337,7 +346,8 @@ void World::StepWorld(int _steps)
   {
     common::Time::MSleep(1);
     this->worldUpdateMutex->lock();
-    if (this->stepInc == 0 || this->stop) wait = false;
+    if (this->stepInc == 0 || this->stop)
+      wait = false;
     this->worldUpdateMutex->unlock();
   }
 }
@@ -374,8 +384,8 @@ void World::Update()
     {
       (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
-    this->dirtyPoses.clear();
 
+    this->dirtyPoses.clear();
   }
 
   event::Events::worldUpdateEnd();
@@ -706,18 +716,17 @@ void World::SetPaused(bool _p)
   if (this->pause == _p)
     return;
 
+  this->worldUpdateMutex->lock();
+  this->pause = _p;
+  this->worldUpdateMutex->unlock();
+
   if (_p)
     this->pauseStartTime = common::Time::GetWallTime();
   else
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
   event::Events::pause(_p);
-
-  this->worldUpdateMutex->lock();
-  this->pause = _p;
-  this->worldUpdateMutex->unlock();
 }
-
 
 //////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
@@ -728,7 +737,8 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 
 //////////////////////////////////////////////////
 void World::OnControl(ConstWorldControlPtr &_data)
-{ if (_data->has_pause())
+{
+  if (_data->has_pause())
     this->SetPaused(_data->pause());
 
   if (_data->has_step())
@@ -817,19 +827,43 @@ void World::ModelUpdateSingleLoop()
 }
 
 
+//////////////////////////////////////////////////
+void World::LoadPlugin(const std::string &_filename,
+                       const std::string &_name,
+                       sdf::ElementPtr _sdf)
+{
+  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
+                                                              _name);
+  if (plugin)
+  {
+    plugin->Load(shared_from_this(), _sdf);
+    this->plugins.push_back(plugin);
+
+    if (this->initialized)
+      plugin->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::RemovePlugin(const std::string &_name)
+{
+  std::vector<WorldPluginPtr>::iterator iter;
+  for (iter = this->plugins.begin(); iter != this->plugins.end(); ++iter)
+  {
+    if ((*iter)->GetHandle() == _name)
+    {
+      this->plugins.erase(iter);
+      break;
+    }
+  }
+}
 
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename,
-                                                              pluginName);
-  if (plugin)
-  {
-    plugin->Load(shared_from_this(), _sdf);
-    this->plugins.push_back(plugin);
-  }
+  this->LoadPlugin(filename, pluginName, _sdf);
 }
 
 //////////////////////////////////////////////////

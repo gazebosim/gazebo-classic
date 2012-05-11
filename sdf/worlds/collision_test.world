@@ -1,12 +1,6 @@
 <?xml version="1.0"?> 
 <gazebo version="1.0">
   <world name="default">
-    <scene>
-      <ambient rgba="1.0 1.0 1.0 1"/>
-      <background rgba="0 0 0 1.0"/>
-      <shadows enabled="true"/>
-    </scene>
-
     <physics type="ode">
       <gravity xyz="0 0 0"/>
       <ode>

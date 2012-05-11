@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef BulletGEOM_HH
-#define BulletGEOM_HH
+#ifndef __BULLET_COLLISION_HH__
+#define __BULLET_COLLISION_HH__
 
 #include <string>
 
@@ -33,16 +33,15 @@
 #include "physics/Collision.hh"
 */
 
+#include "physics/PhysicsTypes.hh"
+#include "physics/Collision.hh"
+
 class btCollisionShape;
 
 namespace gazebo
 {
   namespace physics
   {
-    class Link;
-    class XMLConfigNode;
-    class BulletPhysics;
-
     /// \addtogroup gazebo_physics_ode
     /// \brief Base class for all Bullet collisions
     /// \{
@@ -50,20 +49,13 @@ namespace gazebo
     class BulletCollision : public Collision
     {
       /// \brief Constructor
-      // public: Collision(Link *body, const std::string &name);
-      public: BulletCollision(Link *body);
+      public: BulletCollision(LinkPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletCollision();
 
       /// \brief Load the collision
-      public: virtual void Load(common::XMLConfigNode *node);
-
-      /// \brief Load the collision
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
-
-      /// \brief Update function for collisions
-      public: virtual void Update();
+      public: virtual void Load(sdf::ElementPtr _ptr);
 
       /// \brief On pose change
       public: virtual void OnPoseChange();
@@ -76,12 +68,8 @@ namespace gazebo
       /// \param bits The bits
       public: virtual void SetCollideBits(unsigned int bits);
 
-      /// \brief Get the mass of the collision
-      public: Mass GetLinkMassMatrix();
-
       /// \brief Get the bounding box, defined by the physics engine
-      public: virtual void GetBoundingBox(math::Vector3 &min,
-                                          math::Vector3 &max) const;
+      public: virtual math::Box GetBoundingBox() const;
 
       /// \brief Set the collision shape
       public: void SetCollisionShape(btCollisionShape *shape);
@@ -92,10 +80,7 @@ namespace gazebo
       /// \brief Set the index of the compound shape
       public: void SetCompoundShapeIndex(int index);
 
-      protected: BulletPhysics *bulletPhysics;
       protected: btCollisionShape *collisionShape;
-
-      protected: int compoundShapeIndex;
     };
     /// \}
   }

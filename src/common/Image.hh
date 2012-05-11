@@ -40,7 +40,7 @@ namespace gazebo
     class Image
     {
       /// \brief Constructor
-      public: Image();
+      public: Image(const std::string &_filename="");
 
       /// \brief Destructor
       public: virtual ~Image();
@@ -70,6 +70,9 @@ namespace gazebo
 
       /// \brief Get the size of one pixel in bits
       public: unsigned int GetBPP() const;
+
+      // \brief Get the size of a row of pixel
+      public: int GetPitch() const;
 
       /// \brief Get a pixel color value
       public: Color GetPixel(unsigned int _x, unsigned int _y);
@@ -103,4 +106,3 @@ namespace gazebo
   }
 }
 #endif
-

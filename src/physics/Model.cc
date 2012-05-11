@@ -182,9 +182,7 @@ void Model::Update()
   this->updateMutex->lock();
 
   if (this->jointController)
-  {
     this->jointController->Update();
-  }
 
   if (this->jointAnimations.size() > 0)
   {
@@ -212,7 +210,7 @@ void Model::Update()
     }
     if (!jointPositions.empty())
     {
-      this->SetJointPositions(jointPositions);
+      this->jointController->SetJointPositions(jointPositions);
     }
     else
     {
@@ -223,6 +221,14 @@ void Model::Update()
   }
 
   this->updateMutex->unlock();
+}
+
+//////////////////////////////////////////////////
+void Model::SetJointPositions(
+    const std::map<std::string, double> &_jointPositions)
+{
+  if (this->jointController)
+    this->jointController->SetJointPositions(_jointPositions);
 }
 
 //////////////////////////////////////////////////
@@ -708,227 +714,6 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   if (_msg.has_is_static())
     this->SetStatic(_msg.is_static());
-}
-
-//////////////////////////////////////////////////
-void Model::SetJointPositions(
-    const std::map<std::string, double> &_jointPositions)
-{
-  // go through all joints in this model and update each one
-  //   for each joint update, recursively update all children
-  Joint_V::iterator iter;
-  std::map<std::string, double>::const_iterator jiter = _jointPositions.begin();
-  for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
-  {
-    JointPtr joint = *iter;
-
-    jiter = _jointPositions.find(joint->GetName());
-
-    // only deal with hinge and revolute joints in the user
-    // request joint_names list
-    if ((joint->HasType(Base::HINGE_JOINT) ||
-         joint->HasType(Base::SLIDER_JOINT)) && jiter != _jointPositions.end())
-    {
-      LinkPtr parentLink = joint->GetParent();
-      LinkPtr childLink = joint->GetChild();
-
-      if (parentLink && childLink &&
-          parentLink->GetName() != childLink->GetName())
-      {
-        // transform about the current anchor, about the axis
-        if (joint->HasType(Base::HINGE_JOINT))
-        {
-          // rotate child (childLink) about anchor point, by delta-angle
-          // along axis
-          double dangle = jiter->second - joint->GetAngle(0).GetAsRadian();
-
-          math::Vector3 anchor;
-          math::Vector3 axis;
-
-          if (this->IsStatic())
-          {
-            math::Pose linkWorldPose = childLink->GetWorldPose();
-            axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
-            anchor = linkWorldPose.pos;
-          }
-          else
-          {
-            anchor = joint->GetAnchor(0);
-            axis = joint->GetGlobalAxis(0);
-          }
-
-          this->RotateBodyAndChildren(childLink, anchor,
-              axis, dangle, true);
-        }
-        else if (joint->HasType(Base::SLIDER_JOINT))
-        {
-          double dposition = jiter->second -
-            joint->GetAngle(0).GetAsRadian();
-
-          math::Vector3 anchor;
-          math::Vector3 axis;
-
-          if (this->IsStatic())
-          {
-            math::Pose linkWorldPose = childLink->GetWorldPose();
-            axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
-            anchor = linkWorldPose.pos;
-          }
-          else
-          {
-            anchor = joint->GetAnchor(0);
-            axis = joint->GetGlobalAxis(0);
-          }
-
-          this->SlideBodyAndChildren(childLink, anchor,
-              axis, dposition, true);
-        }
-        else
-        {
-          gzwarn << "Setting non HINGE/SLIDER joint types not"
-            << "implemented [" << joint->GetName() << "]\n";
-        }
-      }
-    }
-  }
-
-  for (jiter = _jointPositions.begin(); jiter != _jointPositions.end(); ++jiter)
-  {
-    JointPtr joint = this->GetJoint(jiter->first);
-    if (joint)
-      joint->SetAngle(0, jiter->second);
-  }
-}
-
-//////////////////////////////////////////////////
-void Model::RotateBodyAndChildren(LinkPtr _link1, const math::Vector3 &_anchor,
-    const math::Vector3 &_axis, double _dangle, bool _updateChildren)
-{
-  math::Pose linkWorldPose = _link1->GetWorldPose();
-
-  // relative to anchor point
-  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
-
-  // take axis rotation and turn it int a quaternion
-  math::Quaternion rotation(_axis, _dangle);
-
-  // rotate relative pose by rotation
-  math::Pose newRelativePose;
-
-  newRelativePose.pos = rotation.RotateVector(relativePose.pos);
-  newRelativePose.rot = rotation * relativePose.rot;
-
-  math::Pose newWorldPose(newRelativePose.pos + _anchor,
-                          newRelativePose.rot);
-
-  _link1->SetWorldPose(newWorldPose);
-
-  // recurse through children bodies
-  if (_updateChildren)
-  {
-    std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _link1);
-
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
-        biter != bodies.end(); ++biter)
-    {
-      this->RotateBodyAndChildren((*biter), _anchor, _axis, _dangle, false);
-    }
-  }
-}
-
-
-//////////////////////////////////////////////////
-void Model::SlideBodyAndChildren(LinkPtr _link1, const math::Vector3 &_anchor,
-    const math::Vector3 &_axis, double _dposition, bool _updateChildren)
-{
-  math::Pose linkWorldPose = _link1->GetWorldPose();
-
-  // relative to anchor point
-  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
-
-  // slide relative pose by dposition along axis
-  math::Pose newRelativePose;
-  newRelativePose.pos = relativePose.pos + _axis * _dposition;
-  newRelativePose.rot = relativePose.rot;
-
-  math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
-  _link1->SetWorldPose(newWorldPose);
-
-  // recurse through children bodies
-  if (_updateChildren)
-  {
-    std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _link1);
-
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
-        biter != bodies.end(); ++biter)
-    {
-      this->SlideBodyAndChildren((*biter), _anchor, _axis, _dposition, false);
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-void Model::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
-                                 const LinkPtr &_body)
-{
-  // strategy, for each child, recursively look for children
-  //           for each child, also look for parents to catch multiple roots
-  for (unsigned int i = 0; i < this->GetJointCount(); i++)
-  {
-    gazebo::physics::JointPtr joint = this->GetJoint(i);
-
-    // recurse through children connected by joints
-    LinkPtr parentLink = joint->GetParent();
-    LinkPtr childLink = joint->GetChild();
-    if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && parentLink->GetName() == _body->GetName()
-        && !this->InBodies(childLink, _bodies))
-    {
-      _bodies.push_back(childLink);
-      this->GetAllChildrenBodies(_bodies, childLink);
-      this->GetAllParentBodies(_bodies, childLink, _body);
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-void Model::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
-    const LinkPtr &_body, const LinkPtr &_origParentBody)
-{
-  for (unsigned int i = 0; i < this->GetJointCount(); i++)
-  {
-    JointPtr joint = this->GetJoint(i);
-
-    // recurse through children connected by joints
-    LinkPtr parentLink = joint->GetParent();
-    LinkPtr childLink = joint->GetChild();
-
-    if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && childLink->GetName() == _body->GetName()
-        && parentLink->GetName() != _origParentBody->GetName()
-        && !this->InBodies(parentLink, _bodies))
-    {
-      _bodies.push_back(parentLink);
-      this->GetAllParentBodies(_bodies, childLink, _origParentBody);
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-bool Model::InBodies(const LinkPtr &_body, const std::vector<LinkPtr> &_bodies)
-{
-  for (std::vector<LinkPtr>::const_iterator bit = _bodies.begin();
-       bit != _bodies.end(); ++bit)
-  {
-    if ((*bit)->GetName() == _body->GetName())
-      return true;
-  }
-
-  return false;
 }
 
 //////////////////////////////////////////////////

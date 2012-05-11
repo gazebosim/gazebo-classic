@@ -36,6 +36,7 @@
 #include "common/Time.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2i.hh"
+#include "math/Vector2d.hh"
 #include "math/Pose.hh"
 #include "math/Quaternion.hh"
 
@@ -86,6 +87,7 @@ namespace sdf
     public: bool IsStr() const;
     public: bool IsVector3() const;
     public: bool IsVector2i() const;
+    public: bool IsVector2d() const;
     public: bool IsQuaternion() const;
     public: bool IsPose() const;
     public: bool IsColor() const;
@@ -101,6 +103,7 @@ namespace sdf
     public: bool Set(const char *_value);
     public: bool Set(const gazebo::math::Vector3 &_value);
     public: bool Set(const gazebo::math::Vector2i &_value);
+    public: bool Set(const gazebo::math::Vector2d &_value);
     public: bool Set(const gazebo::math::Quaternion &_value);
     public: bool Set(const gazebo::math::Pose &_value);
     public: bool Set(const gazebo::common::Color &_value);
@@ -115,6 +118,7 @@ namespace sdf
     public: bool Get(std::string &_value);
     public: bool Get(gazebo::math::Vector3 &_value);
     public: bool Get(gazebo::math::Vector2i &_value);
+    public: bool Get(gazebo::math::Vector2d &_value);
     public: bool Get(gazebo::math::Quaternion &_value);
     public: bool Get(gazebo::math::Pose &_value);
     public: bool Get(gazebo::common::Color &_value);
@@ -271,5 +275,3 @@ namespace sdf
   };
 }
 #endif
-
-

@@ -23,6 +23,7 @@
 #include "common/BVHLoader.hh"
 #include "common/SystemPaths.hh"
 #include "common/Skeleton.hh"
+#include "common/SkeletonAnimation.hh"
 #include "common/Console.hh"
 #include "math/Matrix3.hh"
 #include "math/Angle.hh"
@@ -67,8 +68,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
       std::vector<std::string> words;
       boost::trim(line);
       boost::split(words, line, boost::is_any_of("   "));
-      if (words[0] == "ROOT" || words[0] == "JOINT" ||
-         (words.size() == 2 && words[0] == "End" && words[1] == "Site"))
+      if (words[0] == "ROOT" || words[0] == "JOINT")
       {
         if (words.size() < 2)
         {
@@ -77,11 +77,6 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
         }
         SkeletonNode::SkeletonNodeType type = SkeletonNode::JOINT;
         std::string name = words[1];
-        if (words[0] == "End")
-        {
-          name = parent->GetName() + "_END_SITE";
-          type = SkeletonNode::NODE;
-        }
         node = new SkeletonNode(parent, name, name, type);
         std::string parentName = "NULL";
         if (words[0] != "End")
@@ -122,15 +117,24 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
               if (words[0] == "}")
                 parent = parent->GetParent();
               else
-              {
-                if (nodes.empty())
+                if (words.size() == 2 && words[0] == "End"
+                        && words[1] == "Site")
                 {
-                  file.close();
-                  return NULL;
+                  /// ignore End Sites
+                  getline(file, line);  /// read {
+                  getline(file, line);  /// read OFFSET
+                  getline(file, line);  /// read }
                 }
-                skeleton = new Skeleton(nodes[0]);
-                break;
-              }
+                else
+                {
+                  if (nodes.empty())
+                  {
+                    file.close();
+                    return NULL;
+                  }
+                  skeleton = new Skeleton(nodes[0]);
+                  break;
+                }
     }
   }
   getline(file, line);
@@ -163,7 +167,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
   double time = 0.0;
   unsigned int frameNo = 0;
 
-  SkeletonAnimation animation;
+  SkeletonAnimation *animation = new SkeletonAnimation(filename);
 
   while (!file.eof())
   {
@@ -238,7 +242,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
       math::Matrix4 pos(math::Matrix4::IDENTITY);
       pos.SetTranslate(translation);
       transform = pos * transform;
-      animation[node->GetName()][time] = transform;
+      animation->AddKeyFrame(node->GetName(), time, transform);
     }
 
     frameNo++;
@@ -249,7 +253,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
   if (frameNo < frameCount - 1)
     gzwarn << "BVH file ended unexpectedly.\n";
 
-  skeleton->AddAnimation("animation1", animation);
+  skeleton->AddAnimation(animation);
 
   file.close();
   return skeleton;

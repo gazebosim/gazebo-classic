@@ -3,14 +3,50 @@
   <world name="default">
 
     <include filename="ground_plane.model"/>
-    <include filename="sun.light"/>
+    
+    <light type="directional" name="sun" cast_shadows="true">
+      <origin pose="0 0 100 0 0 0"/>
+      <diffuse rgba="0.5 0.5 0.5 1"/>
+      <specular rgba="0.2 0.2 0.2 1"/>
+      <attenuation range="100" constant="0.8" linear="0.01" quadratic="0.0"/>
+      <direction xyz="0.0 0.2 -8.0"/>
+    </light>
 
     <actor name="actor1" static="true">
       <origin pose="0 0 0 0 0 0"/>
-      <skin filename="cmu_16_15-new.dae" scale="1.0"/>
-      <animation loop="true" delay_start="0.0" time_scale="1">
-        <!--external filename="poses000.s1.dae" scale="1"/-->
-      </animation>
+      <skin filename="stand.dae" scale="1.0"/>
+      <animation name="standing" filename="stand.dae" scale="1.0" interpolate_x="false"/>
+      <animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true"/>
+      
+      <script loop="true" delay_start="0.0" auto_start="true">
+        
+        <trajectory id="0" type="standing">
+          <waypoint time="0.0" pose="0 0 0 0 0 0"/>
+          <waypoint time="1.0" pose="0 0 0 0 0 0"/>
+        </trajectory>
+        
+        <trajectory id="1" type="walking">
+          <waypoint time="0.0" pose="0 0 0 0 0 0"/> 
+          <waypoint time="5.0" pose="2.33 0 0 0 0 0"/>
+        </trajectory>
+
+        <trajectory id="2" type="walking">
+          <waypoint time="0.0" pose="2.33 0 0 0 0 1.5707"/> 
+          <waypoint time="10.0" pose="2.33 2.33 0 0 0 1.5707"/>
+        </trajectory>
+      
+        <trajectory id="3" type="walking">
+          <waypoint time="0.0" pose="2.33 2.33 0 0 0 3.1415"/> 
+          <waypoint time="10.0" pose="0 2.33 0 0 0 3.1415"/>
+        </trajectory>
+      
+        <trajectory id="4" type="walking">
+          <waypoint time="0.0" pose="0 2.33 0 0 0 -1.5707"/> 
+          <waypoint time="10.0" pose="0 0 0 0 0 -1.5707"/>
+        </trajectory>
+      
+      </script>
+    
     </actor>
 
   </world>

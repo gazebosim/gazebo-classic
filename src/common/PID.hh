@@ -34,7 +34,8 @@ namespace gazebo
       ///  \param _imax The integral upper limit.
       ///  \param _imin The integral lower limit.
       public: PID(double _p = 0.0, double _i = 0.0, double _d = 0.0,
-                  double _imax = 0.0, double _imin = 0.0);
+                  double _imax = 0.0, double _imin = 0.0,
+                  double _cmdMax = 0.0, double _cmdMin = 0.0);
 
       /// \brief Destructor
       public: virtual ~PID();
@@ -47,7 +48,36 @@ namespace gazebo
       ///  \param _imax The integral upper limit.
       ///  \param _imin The integral lower limit.
       public: void Init(double _p = 0.0, double _i = 0.0, double _d = 0.0,
-                        double _imax = 0.0, double _imin = 0.0);
+                        double _imax = 0.0, double _imin = 0.0,
+                        double _cmdMax = 0.0, double _cmdMin = 0.0);
+
+      /// \brief Set the proportional Gain
+      /// \param _p proportional gain value
+      public: void SetPGain(double _p);
+
+      /// \brief Set the integral Gain
+      /// \param _p integral gain value
+      public: void SetIGain(double _i);
+
+      /// \brief Set the derivtive Gain
+      /// \param _p dertivative gain value
+      public: void SetDGain(double _d);
+
+      /// \brief Set the integral upper limit
+      /// \param _p integral upper limit value
+      public: void SetIMax(double _i);
+
+      /// \brief Set the integral lower limit
+      /// \param _p integral lower limit value
+      public: void SetIMin(double _i);
+
+      /// \brief Set the maximum value for the command
+      /// \param _c The maximum value
+      public: void SetCmdMax(double _c);
+
+      /// \brief Set the maximum value for the command
+      /// \param _c The maximum value
+      public: void SetCmdMin(double _c);
 
       /// \brief Update the Pid loop with nonuniform time step size.
       /// \param _error  Error since last call (p_state-p_target)
@@ -77,6 +107,7 @@ namespace gazebo
                 this->dGain = _p.dGain;
                 this->iMax = _p.iMax;
                 this->iMin = _p.iMin;
+                this->cmdMax = _p.cmdMax;
 
                 this->Reset();
                 return *this;
@@ -95,6 +126,8 @@ namespace gazebo
       private: double iMax;
       private: double iMin;
       private: double cmd;
+      private: double cmdMax;
+      private: double cmdMin;
     };
   }
 }

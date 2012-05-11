@@ -25,11 +25,14 @@
 #include <Terrain/OgreTerrain.h>
 #include <Terrain/OgreTerrainGroup.h>
 
+#include "math/Helpers.hh"
 #include "rendering/ogre.h"
 #include "common/Image.hh"
 #include "common/Exception.hh"
 
 #include "rendering/Scene.hh"
+#include "rendering/Light.hh"
+#include "rendering/Conversions.hh"
 #include "rendering/Heightmap.hh"
 
 using namespace gazebo;
@@ -52,6 +55,7 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
   this->heightImage = _msg->geometry().heightmap().filename();
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
+  this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
   this->Load();
 }
@@ -60,13 +64,33 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 void Heightmap::Load()
 {
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
-  /*Nate: this->terrainGroup = new Ogre::TerrainGroup(this->scene->GetManager(),
-      Ogre::Terrain::ALIGN_X_Y, 513, 513.0f);*/
-  this->terrainGroup = new Ogre::TerrainGroup(this->scene->GetManager(),
-      Ogre::Terrain::ALIGN_X_Y, this->terrainSize.x, this->terrainSize.y);
+  common::Image img(this->heightImage);
+
+  if (img.GetWidth() != img.GetHeight() ||
+      !math::isPowerOfTwo(img.GetWidth() - 1))
+  {
+    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
+  }
+
+  this->imageSize = img.GetWidth();
+  this->maxPixel = img.GetMaxColor().R();
+  if (math::equal(this->maxPixel, 0))
+    this->maxPixel = 1.0;
+
+  // Create terrain group, which holds all the individual terrain instances.
+  // Param 1: Pointer to the scene manager
+  // Param 2: Alignment plane
+  // Param 3: Number of vertices along one edge of the terrain (2^n+1).
+  //          Terrains must be square, with each side a power of 2 in size
+  // Param 4: World size of each terrain instance, in meters.
+  this->terrainGroup = new Ogre::TerrainGroup(
+      this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
+      this->imageSize, this->terrainSize.x);
+
   this->terrainGroup->setFilenameConvention(
-      Ogre::String("BasicTutorial3Terrain"), Ogre::String("dat"));
-  this->terrainGroup->setOrigin(Ogre::Vector3::ZERO);
+      Ogre::String("gazebo_terrain"), Ogre::String("dat"));
+
+  this->terrainGroup->setOrigin(Conversions::Convert(this->terrainOrigin));
 
   this->ConfigureTerrainDefaults();
 
@@ -100,18 +124,42 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(8);
+  this->terrainGlobals->setMaxPixelError(0);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
-  this->terrainGlobals->setCompositeMapDistance(3000);
+  this->terrainGlobals->setCompositeMapDistance(1000);
+
+  // Get the first directional light
+  LightPtr directionalLight;
+  for (unsigned int i = 0; i < this->scene->GetLightCount(); ++i)
+  {
+    LightPtr light = this->scene->GetLight(i);
+    if (light->GetType() == "directional")
+    {
+      directionalLight = light;
+      break;
+    }
+  }
+
+  this->terrainGlobals->setCompositeMapAmbient(
+      this->scene->GetManager()->getAmbientLight());
 
   // Important to set these so that the terrain knows what to use for
   // derived (non-realtime) data
-  this->terrainGlobals->setLightMapDirection(Ogre::Vector3(0, 0, -1));
-  this->terrainGlobals->setCompositeMapAmbient(
-      this->scene->GetManager()->getAmbientLight());
-  this->terrainGlobals->setCompositeMapDiffuse(Ogre::ColourValue(1, 1, 1, 1));
+  if (directionalLight)
+  {
+    this->terrainGlobals->setLightMapDirection(
+        Conversions::Convert(directionalLight->GetDirection()));
+    this->terrainGlobals->setCompositeMapDiffuse(
+        Conversions::Convert(directionalLight->GetDiffuseColor()));
+  }
+  else
+  {
+    this->terrainGlobals->setLightMapDirection(Ogre::Vector3(0, 0, -1));
+    this->terrainGlobals->setCompositeMapDiffuse(
+        Ogre::ColourValue(.6, .6, .6, 1));
+  }
 
   // Configure default import settings for if we use imported image
   Ogre::Terrain::ImportData &defaultimp =
@@ -120,10 +168,11 @@ void Heightmap::ConfigureTerrainDefaults()
   /* Nate: defaultimp.terrainSize = 513;
   defaultimp.worldSize = 513.0f;
   */
-  defaultimp.terrainSize = this->terrainSize.x;
+  defaultimp.terrainSize = this->imageSize;
   defaultimp.worldSize = this->terrainSize.x;
 
-  defaultimp.inputScale = 100;
+  defaultimp.inputScale = this->terrainSize.z / this->maxPixel;
+
   defaultimp.minBatchSize = 33;
   defaultimp.maxBatchSize = 65;
 
@@ -187,10 +236,16 @@ void Heightmap::DefineTerrain(int x, int y)
 }
 
 /////////////////////////////////////////////////
-void Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
+bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 {
-  Ogre::TerrainLayerBlendMap* blendMap0 = _terrain->getLayerBlendMap(1);
-  Ogre::TerrainLayerBlendMap* blendMap1 = _terrain->getLayerBlendMap(2);
+  if (!_terrain)
+  {
+    std::cerr << "Invalid  terrain\n";
+    return false;
+  }
+
+  Ogre::TerrainLayerBlendMap *blendMap0 = _terrain->getLayerBlendMap(1);
+  Ogre::TerrainLayerBlendMap *blendMap1 = _terrain->getLayerBlendMap(2);
   Ogre::Real minHeight0 = 30;
   Ogre::Real fadeDist0 = 20;
   Ogre::Real minHeight1 = 31;
@@ -218,6 +273,8 @@ void Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
   blendMap1->dirty();
   blendMap0->update();
   blendMap1->update();
+
+  return true;
 }
 
 /////////////////////////////////////////////////

@@ -107,46 +107,6 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetLinearDamping(double _damping)
-{
-  this->sdf->GetOrCreateElement("damping")->GetAttribute("linear")->Set(
-      _damping);
-}
-
-//////////////////////////////////////////////////
-void Inertial::SetAngularDamping(double _damping)
-{
-  this->sdf->GetOrCreateElement("damping")->GetAttribute("angular")->Set(
-      _damping);
-}
-
-//////////////////////////////////////////////////
-double Inertial::GetLinearDamping()
-{
-  double value = 0;
-  if (this->sdf->HasElement("damping"))
-  {
-    sdf::ElementPtr dampingElem = this->sdf->GetElement("damping");
-    value = dampingElem->GetValueDouble("linear");
-  }
-
-  return value;
-}
-
-//////////////////////////////////////////////////
-double Inertial::GetAngularDamping()
-{
-  double value = 0;
-  if (this->sdf->HasElement("damping"))
-  {
-    sdf::ElementPtr dampingElem = this->sdf->GetElement("damping");
-    value = dampingElem->GetValueDouble("angular");
-  }
-
-  return value;
-}
-
-//////////////////////////////////////////////////
 void Inertial::Reset()
 {
   this->mass = 0;
@@ -319,10 +279,6 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
     this->SetCoG(_msg.pose().position().x(),
                  _msg.pose().position().y(),
                  _msg.pose().position().z());
-  if (_msg.has_linear_damping())
-    this->SetLinearDamping(_msg.linear_damping());
-  if (_msg.has_angular_damping())
-    this->SetAngularDamping(_msg.angular_damping());
   if (_msg.has_ixx())
     this->SetIXX(_msg.ixx());
   if (_msg.has_ixy())

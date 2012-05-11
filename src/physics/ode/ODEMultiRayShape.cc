@@ -185,7 +185,7 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
   odeCollision->SetName("ode_ray_collision");
   odeCollision->SetSpaceId(this->raySpaceId);
 
-  ODERayShapePtr ray(new ODERayShape(odeCollision, true));
+  ODERayShapePtr ray(new ODERayShape(odeCollision));
   odeCollision->SetShape(ray);
 
   ray->SetPoints(_start, _end);

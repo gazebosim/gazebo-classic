@@ -21,11 +21,12 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletUniversalJoint.hh"
+#include "physics/bullet/BulletLink.hh"
+#include "physics/bullet/BulletTypes.hh"
+#include "physics/bullet/BulletUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////
 BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world)
@@ -40,36 +41,36 @@ BulletUniversalJoint::~BulletUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::Attach(Link *_one, Link *_two)
+void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
 {
   UniversalJoint<BulletJoint>::Attach(_one, _two);
 
-  BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
-  BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
+  BulletLinkPtr bulletChildLink =
+    boost::shared_static_cast<BulletLink>(this->childLink);
+  BulletLinkPtr bulletParentLink =
+    boost::shared_static_cast<BulletLink>(this->parentLink);
 
-  if (!bulletLink1 || !bulletLink2)
+  if (!bulletChildLink || !bulletParentLink)
     gzthrow("Requires bullet bodies");
 
-  btRigidLink *rigidLink1 = bulletLink1->GetBulletLink();
-  btRigidLink *rigidLink2 = bulletLink2->GetBulletLink();
+  sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+  math::Vector3 axis1 = axisElem->GetValueVector3("xyz");
+  math::Vector3 axis2 = axisElem->GetValueVector3("xyz");
 
-  btmath::Vector3 anchor, axis1, axis2;
+  this->btUniversal = new btUniversalConstraint(
+      *bulletParentLink->GetBulletLink(),
+      *bulletChildLink->GetBulletLink(),
+      btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
+      btVector3(axis1.x, axis1.y, axis1.z),
+      btVector3(axis2.x, axis2.y, axis2.z));
 
-  anchor = btmath::Vector3(this->anchorPos.x, this->anchorPos.y,
-                           this->anchorPos.z);
-  axis1 = btmath::Vector3((**this->axis1P).x, (**this->axis1P).y,
-                          (**this->axis1P).z);
-  axis2 = btmath::Vector3((**this->axis2P).x, (**this->axis2P).y,
-                          (**this->axis2P).z);
-
-  this->constraint = new btUniversalConstraint(*rigidLink1, *rigidLink2,
-      anchor, axis1, axis2);
+  this->constraint = this->btUniversal;
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
+  this->world->addConstraint(this->btUniversal, true);
 
   // Allows access to impulse
-  this->constraint->enableFeedback(true);
+  this->btUniversal->enableFeedback(true);
 }
 
 //////////////////////////////////////////////////
@@ -79,7 +80,8 @@ math::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
+void BulletUniversalJoint::SetAnchor(int /*_index*/,
+                                     const math::Vector3 &/*_anchor*/)
 {
   gzerr << "Not implemented\n";
 }
@@ -87,19 +89,19 @@ void BulletUniversalJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 //////////////////////////////////////////////////
 math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 {
-  btmath::Vector3 axis =
-    static_cast<btUniversalConstraint*>(this->constraint)->getAxis(_index);
+  btVector3 axis = this->btUniversal->getAxis(_index);
   return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetDamping(int /*index*/, const double _damping)
+void BulletUniversalJoint::SetDamping(int /*index*/, double /*_damping*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void BulletUniversalJoint::SetAxis(int /*_index*/,
+                                   const math::Vector3 &/*_axis*/)
 {
   gzerr << "Not implemented\n";
 }
@@ -108,38 +110,38 @@ void BulletUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 math::Angle BulletUniversalJoint::GetAngle(int _index) const
 {
   if (_index == 0)
-    return ((btUniversalConstraint*)this->constraint)->getmath::Angle1();
+    return this->btUniversal->getAngle1();
   else
-    return ((btUniversalConstraint*)this->constraint)->getmath::Angle2();
+    return this->btUniversal->getAngle2();
 }
 
 //////////////////////////////////////////////////
-double BulletUniversalJoint::GetVelocity(int _index) const
+double BulletUniversalJoint::GetVelocity(int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetVelocity(int _index, double _angle)
+void BulletUniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetForce(int _index, double _torque)
+void BulletUniversalJoint::SetForce(int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetMaxForce(int _index, double _t)
+void BulletUniversalJoint::SetMaxForce(int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-double BulletUniversalJoint::GetMaxForce(int _index)
+double BulletUniversalJoint::GetMaxForce(int /*_index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
@@ -148,13 +150,15 @@ double BulletUniversalJoint::GetMaxForce(int _index)
 //////////////////////////////////////////////////
 void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
 {
-  if (this->constraint)
+  if (this->btUniversal)
+  {
     if (_index == 0)
-      static_cast<btUniversalConstraint*>(this->constraint)->setUpperLimit(
+      this->btUniversal->setUpperLimit(
         _angle.GetAsRadian(), this->GetHighStop(1).GetAsRadian());
     else
-      static_cast<btUniversalConstraint*>(this->constraint)->setUpperLimit(
+      this->btUniversal->setUpperLimit(
         this->GetHighStop(0).GetAsRadian(), _angle.GetAsRadian());
+  }
   else
     gzthrow("Joint must be created first");
 }
@@ -162,13 +166,15 @@ void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
 //////////////////////////////////////////////////
 void BulletUniversalJoint::SetLowStop(int _index, math::Angle _angle)
 {
-  if (this->constraint)
+  if (this->btUniversal)
+  {
     if (_index == 0)
-      static_cast<btUniversalConstraint*>(this->constraint)->setLowerLimit(
+      this->btUniversal->setLowerLimit(
         _angle.GetAsRadian(), this->GetLowStop(1).GetAsRadian());
     else
-      static_cast<btUniversalConstraint*>(this->constraint)->setUpperLimit(
+      this->btUniversal->setUpperLimit(
         this->GetLowStop(0).GetAsRadian(), _angle.GetAsRadian());
+  }
   else
     gzthrow("Joint must be created first");
 }
@@ -178,14 +184,11 @@ math::Angle BulletUniversalJoint::GetHighStop(int _index)
 {
   math::Angle result;
 
-  if (this->constraint)
+  if (this->btUniversal)
   {
     btRotationalLimitMotor *motor;
-    motor = static_cast<btUniversalConstraint*>(
-        this->constraint)->getRotationalLimitMotor(
-        _index);
-
-    return motor->m_hiLimit;
+    motor = this->btUniversal->getRotationalLimitMotor(_index);
+    result = motor->m_hiLimit;
   }
   else
     gzthrow("Joint must be created first");
@@ -198,13 +201,11 @@ math::Angle BulletUniversalJoint::GetLowStop(int _index)
 {
   math::Angle result;
 
-  if (this->constraint)
+  if (this->btUniversal)
   {
     btRotationalLimitMotor *motor;
-    motor = static_cast<btUniversalConstraint*>(
-        this->constraint)->getRotationalLimitMotor(_index);
-
-    return motor->m_loLimit;
+    motor = this->btUniversal->getRotationalLimitMotor(_index);
+    result = motor->m_loLimit;
   }
   else
     gzthrow("Joint must be created first");
@@ -212,4 +213,16 @@ math::Angle BulletUniversalJoint::GetLowStop(int _index)
   return result;
 }
 
+//////////////////////////////////////////////////
+math::Vector3 BulletUniversalJoint::GetGlobalAxis(int /*_index*/) const
+{
+  gzerr << "BulletUniversalJoint::GetGlobalAxis not implemented\n";
+  return math::Vector3();
+}
 
+//////////////////////////////////////////////////
+math::Angle BulletUniversalJoint::GetAngleImpl(int /*_index*/) const
+{
+  gzerr << "BulletUniversalJoint::GetAngleImpl not implemented\n";
+  return math::Angle();
+}

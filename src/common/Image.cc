@@ -39,7 +39,7 @@ using namespace common;
 int Image::count = 0;
 
 //////////////////////////////////////////////////
-Image::Image()
+Image::Image(const std::string &_filename)
 {
   if (count == 0)
     FreeImage_Initialise();
@@ -47,6 +47,8 @@ Image::Image()
   count++;
 
   this->bitmap = NULL;
+  if (!_filename.empty())
+    this->Load(_filename);
 }
 
 //////////////////////////////////////////////////
@@ -152,6 +154,12 @@ void Image::SetFromData(const unsigned char *data, unsigned int width,
 
   this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(data),
       width, height, scanline_bytes, bpp, redmask, greenmask, bluemask);
+}
+
+//////////////////////////////////////////////////
+int Image::GetPitch() const
+{
+  return FreeImage_GetPitch(this->bitmap);
 }
 
 //////////////////////////////////////////////////

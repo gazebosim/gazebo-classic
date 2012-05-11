@@ -19,36 +19,44 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef BULLETBOXSHAPE_HH
-#define BULLETBOXSHAPE_HH
+#ifndef __BULLETBOXSHAPE_HH__
+#define __BULLETBOXSHAPE_HH__
 
-#include "common/Exception.hh"
-#include "BulletPhysics.hh"
-#include "BoxShape.hh"
+#include "physics/bullet/BulletPhysics.hh"
+#include "physics/BoxShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief Box collision
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet ODE Physics
+    /// \{
+    /// \brief Bullet box collision
     class BulletBoxShape : public BoxShape
     {
       /// \brief Constructor
-      public: BulletBoxShape(Collision *parent) : BoxShape(parent) {}
+      public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
+
       /// \brief Destructor
       public: virtual ~BulletBoxShape() {}
+
       /// \brief Set the size of the box
-      public: void SetSize(const math::Vector3 &size)
+      public: void SetSize(const math::Vector3 &_size)
               {
-                BoxShape::SetSize(size);
-                BulletCollision *bParent =
-                  static_cast<BulletCollision*>(this->parent);
+                BoxShape::SetSize(_size);
+                BulletCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                    this->collisionParent);
 
                 /// Bullet requires the half-extents of the box
                 bParent->SetCollisionShape(new btBoxShape(
-                    btmath::Vector3(size.x*0.5, size.y*0.5, size.z*0.5)));
+                    btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));
               }
     };
+    /// \}
+    /// \}
   }
 }
 #endif

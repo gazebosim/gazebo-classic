@@ -204,23 +204,6 @@ namespace gazebo
 
       protected: virtual void OnPoseChange();
 
-      private: void RotateBodyAndChildren(LinkPtr _body1,
-                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
-                   double _dangle, bool _updateChildren);
-
-      private: void SlideBodyAndChildren(LinkPtr _body1,
-                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
-                   double _dposition, bool _updateChildren);
-
-      private: void GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
-                   const LinkPtr &_body);
-
-      private: void GetAllParentBodies(std::vector<LinkPtr> &_bodies,
-                   const LinkPtr &_body, const LinkPtr &_origParentBody);
-
-      private: bool InBodies(const LinkPtr &_body,
-                             const std::vector<LinkPtr> &_bodies);
-
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint(sdf::ElementPtr _sdf);

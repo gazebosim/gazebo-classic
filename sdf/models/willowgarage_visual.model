@@ -2,7 +2,7 @@
   <model name='willowgarage' static='true'>
     <origin pose='-20 -20 0 0 0 0'/>
     <link name='walls'>
-      <visual name='visual' cast_shadows='false'>
+      <visual name='visual' cast_shadows="false">
         <geometry>
           <mesh filename='willowgarage/willowgarage_visual.dae' scale='0.0254 0.0254 0.0254'/>
         </geometry>

@@ -84,13 +84,6 @@ namespace gazebo
       /// \brief Finilize the ODE engine
       public: virtual void Fini();
 
-      /// \brief Set the simulation update rate
-      public: void SetUpdateRate(double _value);
-
-      /// \brief Get the simulation simulation update rate
-      public: virtual double GetUpdateRate();
-      public: virtual double GetUpdatePeriod();
-
       /// \brief Set the step time
       public: void SetStepTime(double _value);
 
@@ -117,11 +110,10 @@ namespace gazebo
       public: dWorldID GetWorldId();
 
       /// \brief Convert an odeMass to Mass
-      public: static void ConvertMass(InertialPtr &_interial, void *odeMass);
+      public: static void ConvertMass(InertialPtr _interial, void *odeMass);
 
       /// \brief Convert an odeMass to Mass
-      public: static void ConvertMass(void *odeMass,
-                                      const InertialPtr &_inertial);
+      public: static void ConvertMass(void *odeMass, InertialPtr _inertial);
 
       /// \brief Get the step type
       public: virtual std::string GetStepType() const;
@@ -180,7 +172,8 @@ namespace gazebo
       public: void Collide(ODECollision *collision1, ODECollision *collision2,
                            dContactGeom *contactCollisions);
 
-      public: void ProcessContactFeedback(ContactFeedback* feedback);
+      public: void ProcessContactFeedback(ContactFeedback* feedback,
+                                          msgs::Contact *_msg);
 
       public: virtual void DebugPrint() const;
 
@@ -206,16 +199,13 @@ namespace gazebo
       /// \brief Collision attributes
       private: dJointGroupID contactGroup;
 
-      /// Store the value of the updateRate parameter in doubl form. To improve
-      /// efficiency
-      private: double updateRateDouble;
-
       /// Store the value of the stepTime parameter in doubl form. To improve
       /// efficiency
       private: double stepTimeDouble;
       private: std::string stepType;
 
       private: std::vector<ContactFeedback*> contactFeedbacks;
+      private: unsigned int contactFeedbackIndex;
 
       private: std::map<std::string, dSpaceID> spaces;
 

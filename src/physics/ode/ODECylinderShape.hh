@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef ODECYLINDERSHAPE_HH
-#define ODECYLINDERSHAPE_HH
+#ifndef __ODECYLINDERSHAPE_HH__
+#define __ODECYLINDERSHAPE_HH__
 
 #include "physics/CylinderShape.hh"
 #include "physics/ode/ODEPhysics.hh"
@@ -33,17 +33,17 @@ namespace gazebo
     {
       public: ODECylinderShape(CollisionPtr _parent) : CylinderShape(_parent) {}
       public: virtual ~ODECylinderShape() {}
-      public: void SetSize(const double &radius, const double &length)
+      public: void SetSize(const double &_radius, const double &_length)
       {
-        CylinderShape::SetSize(radius, length);
+        CylinderShape::SetSize(_radius, _length);
         ODECollisionPtr oParent;
         oParent =
           boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
 
         if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateCylinder(0, radius, length), true);
+          oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
         else
-          dGeomCylinderSetParams(oParent->GetCollisionId(), radius, length);
+          dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
       }
     };
 
