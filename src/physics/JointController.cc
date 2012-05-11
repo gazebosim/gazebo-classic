@@ -119,6 +119,16 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
   iter = this->joints.find(_msg->name());
   if (iter != this->joints.end())
   {
+    if (_msg->has_reset() && _msg->reset())
+    {
+      if (this->forces.find(_msg->name()) != this->forces.end())
+        this->forces.erase(this->forces.find(_msg->name()));
+      if (this->positions.find(_msg->name()) != this->positions.end())
+        this->positions.erase(this->positions.find(_msg->name()));
+      if (this->velocities.find(_msg->name()) != this->velocities.end())
+        this->velocities.erase(this->velocities.find(_msg->name()));
+    }
+
     if (_msg->has_force())
       this->forces[_msg->name()] = _msg->force();
 

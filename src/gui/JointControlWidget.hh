@@ -38,6 +38,8 @@ namespace gazebo
       public: virtual ~JointControlWidget();
 
       public: void Load(const std::string &_modelName);
+
+      private slots: void OnReset();
       private slots: void OnForceChanged(double _value,
                                          const std::string &_name);
       private slots: void OnPIDPosChanged(double _value,

@@ -232,7 +232,8 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   // Create the Force control scroll area
   QScrollArea *scrollArea = new QScrollArea;
   QFrame *frame = new QFrame;
-  frame->setLineWidth(0);
+  frame->setLineWidth(1);
+  frame->setFrameShape(QFrame::NoFrame);
 
   QGridLayout *gridLayout = new QGridLayout;
   gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
@@ -355,13 +356,21 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   tabWidget->addTab(pidPosScrollArea, tr("Position"));
   tabWidget->addTab(pidVelScrollArea, tr("Velocity"));
 
-  // std::string title = "Model: ";
-  // title += _modelName;
-  // mainLayout->addWidget(new QLabel(tr(title.c_str())));
   // mainLayout->addWidget(scrollArea);
 
   // Add the the force and pid scroll areas to the tab
   QVBoxLayout *mainLayout = new QVBoxLayout;
+
+  QHBoxLayout *hboxLayout = new QHBoxLayout;
+  std::string title = std::string("Model: ") + _modelName;
+  hboxLayout->addWidget(new QLabel(tr(title.c_str())));
+
+  QPushButton *resetButton = new QPushButton(tr("Reset"));
+  connect(resetButton, SIGNAL(clicked()), this, SLOT(OnReset()));
+
+  hboxLayout->addWidget(resetButton);
+
+  mainLayout->addLayout(hboxLayout);
   mainLayout->addWidget(tabWidget);
   mainLayout->setContentsMargins(4, 4, 4, 4);
 
@@ -372,6 +381,20 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
 /////////////////////////////////////////////////
 JointControlWidget::~JointControlWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::OnReset()
+{
+  std::map<std::string, JointForceControl*>::iterator iter;
+
+  for (iter = this->sliders.begin(); iter != this->sliders.end(); ++iter)
+  {
+    msgs::JointCmd msg;
+    msg.set_name(iter->first);
+    msg.set_reset(true);
+    this->jointPub->Publish(msg);
+  }
 }
 
 /////////////////////////////////////////////////
