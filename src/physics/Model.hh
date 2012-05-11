@@ -42,6 +42,7 @@ namespace gazebo
   namespace physics
   {
     class JointController;
+    class Gripper;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -212,9 +213,14 @@ namespace gazebo
       /// \param _sdf SDF parameter
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
+      /// \brief Load a gripper helper function
+      /// \param _sdf SDF parameter
+      private: void LoadGripper(sdf::ElementPtr _sdf);
+
       private: LinkPtr canonicalLink;
 
       private: Joint_V joints;
+      private: std::vector<Gripper*> grippers;
 
       private: std::vector<ModelPluginPtr> plugins;
 
