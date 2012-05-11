@@ -27,17 +27,23 @@ JointForceControl::JointForceControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
 
-  QDoubleSpinBox *forceSpin = new QDoubleSpinBox;
-  forceSpin->setRange(-100.0, 100.0);
-  forceSpin->setSingleStep(0.001);
-  forceSpin->setDecimals(3);
-  forceSpin->setValue(0.000);
+  this->forceSpin = new QDoubleSpinBox;
+  this->forceSpin->setRange(-100.0, 100.0);
+  this->forceSpin->setSingleStep(0.001);
+  this->forceSpin->setDecimals(3);
+  this->forceSpin->setValue(0.000);
 
   int r = _layout->rowCount()-1;
   _layout->addWidget(forceSpin, r, 2);
 
-  connect(forceSpin, SIGNAL(valueChanged(double)),
-        this, SLOT(OnChanged(double)));
+  connect(this->forceSpin, SIGNAL(valueChanged(double)),
+          this, SLOT(OnChanged(double)));
+}
+
+/////////////////////////////////////////////////
+void JointForceControl::Reset()
+{
+  this->forceSpin->setValue(0.0);
 }
 
 /////////////////////////////////////////////////
@@ -57,23 +63,23 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   this->posSpin->setDecimals(3);
   this->posSpin->setValue(0.000);
 
-  QDoubleSpinBox *pGainSpin = new QDoubleSpinBox;
-  pGainSpin->setMinimum(0.0);
-  pGainSpin->setSingleStep(0.01);
-  pGainSpin->setDecimals(3);
-  pGainSpin->setValue(1.000);
+  this->pGainSpin = new QDoubleSpinBox;
+  this->pGainSpin->setMinimum(0.0);
+  this->pGainSpin->setSingleStep(0.01);
+  this->pGainSpin->setDecimals(3);
+  this->pGainSpin->setValue(1.000);
 
-  QDoubleSpinBox *iGainSpin = new QDoubleSpinBox;
-  iGainSpin->setMinimum(0.0);
-  iGainSpin->setSingleStep(0.01);
-  iGainSpin->setDecimals(3);
-  iGainSpin->setValue(0.100);
+  this->iGainSpin = new QDoubleSpinBox;
+  this->iGainSpin->setMinimum(0.0);
+  this->iGainSpin->setSingleStep(0.01);
+  this->iGainSpin->setDecimals(3);
+  this->iGainSpin->setValue(0.100);
 
-  QDoubleSpinBox *dGainSpin = new QDoubleSpinBox;
-  dGainSpin->setMinimum(0.0);
-  dGainSpin->setSingleStep(0.01);
-  dGainSpin->setDecimals(3);
-  dGainSpin->setValue(0.010);
+  this->dGainSpin = new QDoubleSpinBox;
+  this->dGainSpin->setMinimum(0.0);
+  this->dGainSpin->setSingleStep(0.01);
+  this->dGainSpin->setDecimals(3);
+  this->dGainSpin->setValue(0.010);
 
   int r = _layout->rowCount()-1;
   _layout->addWidget(this->posSpin, r, 2);
@@ -91,6 +97,15 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
         this, SLOT(OnDChanged(double)));
 
   this->radians = true;
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::Reset()
+{
+  this->posSpin->setValue(0.0);
+  this->pGainSpin->setValue(1.000);
+  this->iGainSpin->setValue(0.100);
+  this->dGainSpin->setValue(0.010);
 }
 
 /////////////////////////////////////////////////
@@ -145,25 +160,25 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
     QGridLayout *_layout, QWidget *_parent)
   : QWidget(_parent), name(_name)
 {
-  QDoubleSpinBox *posSpin = new QDoubleSpinBox;
+  this->posSpin = new QDoubleSpinBox;
   posSpin->setRange(-360, 360);
   posSpin->setSingleStep(0.001);
   posSpin->setDecimals(3);
   posSpin->setValue(0.000);
 
-  QDoubleSpinBox *pGainSpin = new QDoubleSpinBox;
+  this->pGainSpin = new QDoubleSpinBox;
   pGainSpin->setMinimum(0.0);
   pGainSpin->setSingleStep(0.01);
   pGainSpin->setDecimals(3);
   pGainSpin->setValue(1.000);
 
-  QDoubleSpinBox *iGainSpin = new QDoubleSpinBox;
+  this->iGainSpin = new QDoubleSpinBox;
   iGainSpin->setMinimum(0.0);
   iGainSpin->setSingleStep(0.01);
   iGainSpin->setDecimals(3);
   iGainSpin->setValue(0.100);
 
-  QDoubleSpinBox *dGainSpin = new QDoubleSpinBox;
+  this->dGainSpin = new QDoubleSpinBox;
   dGainSpin->setMinimum(0.0);
   dGainSpin->setSingleStep(0.01);
   dGainSpin->setDecimals(3);
@@ -183,6 +198,15 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
         this, SLOT(OnIChanged(double)));
   connect(dGainSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnDChanged(double)));
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::Reset()
+{
+  this->posSpin->setValue(0.0);
+  this->pGainSpin->setValue(1.000);
+  this->iGainSpin->setValue(0.100);
+  this->dGainSpin->setValue(0.010);
 }
 
 /////////////////////////////////////////////////
@@ -231,9 +255,9 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
 
   // Create the Force control scroll area
   QScrollArea *scrollArea = new QScrollArea;
-  QFrame *frame = new QFrame;
-  frame->setLineWidth(1);
-  frame->setFrameShape(QFrame::NoFrame);
+  scrollArea->setLineWidth(0);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setFrameShadow(QFrame::Plain);
 
   QGridLayout *gridLayout = new QGridLayout;
   gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
@@ -253,20 +277,19 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
             this, SLOT(OnForceChanged(double, const std::string &)));
   }
 
-  frame->setLayout(gridLayout);
-  frame->layout()->setContentsMargins(4, 0, 0, 0);
-  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  scrollArea->setWidget(frame);
-  scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  scrollArea->setLayout(gridLayout);
+  //scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 
 
   // Create a PID Pos scroll area
   QScrollArea *pidPosScrollArea = new QScrollArea;
-  QFrame *pidPosFrame = new QFrame;
-  pidPosFrame->setLineWidth(0);
-  gridLayout = new QGridLayout;
+  pidPosScrollArea->setLineWidth(0);
+  pidPosScrollArea->setFrameShape(QFrame::NoFrame);
+  pidPosScrollArea->setFrameShadow(QFrame::Plain);
 
+  gridLayout = new QGridLayout;
   gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum), 0, 0, 2);
   QComboBox *unitsCombo = new QComboBox;
@@ -301,24 +324,31 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
             this, SLOT(OnDPosGainChanged(double, const std::string &)));
   }
 
-  pidPosFrame->setLayout(gridLayout);
-  pidPosFrame->layout()->setContentsMargins(4, 0, 0, 0);
-  pidPosFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  pidPosScrollArea->setWidget(pidPosFrame);
-  pidPosScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  pidPosScrollArea->setLayout(gridLayout);
+  //pidPosScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   pidPosScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
  
 
 
   // Create a PID Vel scroll area
   QScrollArea *pidVelScrollArea = new QScrollArea;
+  pidVelScrollArea->setLineWidth(0);
+  pidVelScrollArea->setFrameShape(QFrame::NoFrame);
+  pidVelScrollArea->setFrameShadow(QFrame::Plain);
+
   QFrame *pidVelFrame = new QFrame;
   pidVelFrame->setLineWidth(0);
   gridLayout = new QGridLayout;
 
-  gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+  gridLayout->addItem(new QSpacerItem(10, 27, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum), 0, 0, 2);
-  gridLayout->addWidget(new QLabel("m/s", this), 0, 2);
+
+  // Set fixed height for the label to make the tabs stay a consistent size.
+  QLabel *label;
+  label = new QLabel("m/s",this);
+  label->setFixedHeight(27);
+
+  gridLayout->addWidget(label, 0, 2);
   gridLayout->addWidget(new QLabel("P Gain", this), 0, 3);
   gridLayout->addWidget(new QLabel("I Gain", this), 0, 4);
   gridLayout->addWidget(new QLabel("D Gain", this), 0, 5);
@@ -345,7 +375,6 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   }
 
   pidVelFrame->setLayout(gridLayout);
-  pidVelFrame->layout()->setContentsMargins(4, 0, 0, 0);
   pidVelFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   pidVelScrollArea->setWidget(pidVelFrame);
   pidVelScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -365,6 +394,8 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   std::string title = std::string("Model: ") + _modelName;
   hboxLayout->addWidget(new QLabel(tr(title.c_str())));
 
+  hboxLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                      QSizePolicy::Minimum));
   QPushButton *resetButton = new QPushButton(tr("Reset"));
   connect(resetButton, SIGNAL(clicked()), this, SLOT(OnReset()));
 
@@ -386,14 +417,26 @@ JointControlWidget::~JointControlWidget()
 /////////////////////////////////////////////////
 void JointControlWidget::OnReset()
 {
-  std::map<std::string, JointForceControl*>::iterator iter;
-
-  for (iter = this->sliders.begin(); iter != this->sliders.end(); ++iter)
+  for (std::map<std::string, JointForceControl*>::iterator iter =
+       this->sliders.begin(); iter != this->sliders.end(); ++iter)
   {
     msgs::JointCmd msg;
     msg.set_name(iter->first);
     msg.set_reset(true);
     this->jointPub->Publish(msg);
+    iter->second->Reset();
+  }
+
+  for (std::map<std::string, JointPIDPosControl*>::iterator iter =
+       this->pidPosSliders.begin(); iter != this->pidPosSliders.end(); ++iter)
+  {
+    iter->second->Reset();
+  }
+
+  for (std::map<std::string, JointPIDVelControl*>::iterator iter =
+       this->pidVelSliders.begin(); iter != this->pidVelSliders.end(); ++iter)
+  {
+    iter->second->Reset();
   }
 }
 

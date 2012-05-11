@@ -30,6 +30,7 @@ namespace gazebo
     class JointForceControl;
     class JointPIDPosControl;
     class JointPIDVelControl;
+
     class JointControlWidget : public QWidget
     {
       Q_OBJECT
@@ -77,9 +78,11 @@ namespace gazebo
       Q_OBJECT
       public: JointForceControl(const std::string &_name,
                   QGridLayout *_layout, QWidget *_parent);
+      public: void Reset();
       public slots: void OnChanged(double _value);
       Q_SIGNALS: void changed(double /*_value*/, const std::string & /*_name*/);
       private: std::string name;
+      private: QDoubleSpinBox *forceSpin;
     };
 
     class JointPIDPosControl : public QWidget
@@ -88,6 +91,7 @@ namespace gazebo
       public: JointPIDPosControl(const std::string &_name,
                   QGridLayout *_layout, QWidget *_parent);
 
+      public: void Reset();
       public: void SetToRadians();
       public: void SetToDegrees();
 
@@ -101,7 +105,7 @@ namespace gazebo
       Q_SIGNALS: void dChanged(double /*_value*/, const std::string &/*_name*/);
       Q_SIGNALS: void iChanged(double /*_value*/, const std::string &/*_name*/);
 
-      private: QDoubleSpinBox *posSpin;
+      private: QDoubleSpinBox *posSpin, *pGainSpin, *iGainSpin, *dGainSpin;
       private: std::string name;
       private: bool radians;
     };
@@ -112,6 +116,7 @@ namespace gazebo
       public: JointPIDVelControl(const std::string &_name,
                   QGridLayout *_layout, QWidget *_parent);
 
+      public: void Reset();
       public slots: void OnChanged(double _value);
       public slots: void OnPChanged(double _value);
       public slots: void OnIChanged(double _value);
@@ -122,6 +127,7 @@ namespace gazebo
       Q_SIGNALS: void dChanged(double /*_value*/, const std::string &/*_name*/);
       Q_SIGNALS: void iChanged(double /*_value*/, const std::string &/*_name*/);
 
+      private: QDoubleSpinBox *posSpin, *pGainSpin, *iGainSpin, *dGainSpin;
       private: std::string name;
     };
   }
