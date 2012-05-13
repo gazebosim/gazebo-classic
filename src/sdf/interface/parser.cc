@@ -617,16 +617,63 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
   std::string modelName = modelPtr->GetValueString("name");
   while (elem)
   {
-    std::string elemName = elem->GetValueString("name");
-    std::string newName =  modelName + "__" + elemName;
-    replace[elemName] = newName;
-    if (elem->HasElementDescription("origin"))
+    if (elem->GetName() == "link")
     {
-      ElementPtr originElem = elem->GetOrCreateElement("origin");
-      gazebo::math::Pose newPose = modelPose + originElem->GetValuePose("pose");
-      originElem->GetAttribute("pose")->Set(newPose);
+      std::string elemName = elem->GetValueString("name");
+      std::string newName =  modelName + "__" + elemName;
+      replace[elemName] = newName;
+      if (elem->HasElementDescription("origin"))
+      {
+        ElementPtr originElem = elem->GetOrCreateElement("origin");
+        gazebo::math::Pose newPose = gazebo::math::Pose(
+          modelPose.pos +
+            modelPose.rot.RotateVector(originElem->GetValuePose("pose").pos),
+            modelPose.rot * originElem->GetValuePose("pose").rot);
+          //modelPose + originElem->GetValuePose("pose");
+        gzerr << "name [" << elemName << "] ";
+        gzerr << "modeo_pose [" << modelPose << "] ";
+        gzerr << "oldPose [" << originElem->GetValuePose("pose")
+              << "] newPose [" << newPose << "]\n";
+        originElem->GetAttribute("pose")->Set(newPose);
+      }
+      // FIXME:  need to also rotate inertial/collision/visual origins
+/*
+      if (elem->HasElement("visual"))
+      {
+        ElementPtr visualElem = elem->GetElement("visual");
+        ElementPtr originElem = visualElem->GetOrCreateElement("origin");
+        gazebo::math::Pose newPose = gazebo::math::Pose(
+          modelPose.rot.RotateVector(originElem->GetValuePose("pose").pos),
+          originElem->GetValuePose("pose").rot );
+          //modelPose.rot * originElem->GetValuePose("pose").rot );
+        gzerr << "name [" << visualElem->GetValueString("name") << "] ";
+        gzerr << "modeo_pose [" << modelPose << "] ";
+        gzerr << "oldPose [" << originElem->GetValuePose("pose")
+              << "] newPose [" << newPose << "]\n";
+        originElem->GetAttribute("pose")->Set(newPose);
+      }
+*/
     }
-
+    else if (elem->GetName() == "joint")
+    {
+      // for joints, we need to
+      //   prefix name like we did with links, and
+      std::string elemName = elem->GetValueString("name");
+      std::string newName =  modelName + "__" + elemName;
+      replace[elemName] = newName;
+      //   rotate the joint axis because they are model-global
+      if (elem->HasElement("axis"))
+      {
+        ElementPtr axisElem = elem->GetElement("axis");
+        gzerr << "name [" << elemName << "] ";
+        gzerr << "modeo_pose [" << modelPose << "] ";
+        gazebo::math::Vector3 newAxis =  modelPose.rot.RotateVector(
+          axisElem->GetValueVector3("xyz"));
+        gzerr << "oldAxis [" << axisElem->GetValueVector3("xyz")
+              << "] newAxis [" << newAxis << "]\n";
+        axisElem->GetAttribute("xyz")->Set(newAxis);
+      }
+    }
     elem = elem->GetNextElement();
   }
 
