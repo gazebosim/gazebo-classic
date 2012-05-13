@@ -223,7 +223,7 @@
       <joint5_ilim>-1 1</joint5_ilim>
     </plugin>
     -->
-    <include filename="pr2_gripper.model" model_pose="0.829 0.188 0.209325 0 0 0"/>
+    <include filename="pr2_gripper.model" model_pose="0.829 0.188 0.209325 0 1.57079633 0"/>
     <!--
     <origin pose='-0.771000 0.188000 -0.790675 0.000000 -1.57079633 0.000000'/>
     -->
