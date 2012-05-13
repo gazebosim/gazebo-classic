@@ -15,15 +15,24 @@
  *
 */
 
+
+/*
+ *  this plugin drives a four wheeled cart model forward and back
+ *  by applying a small wheel torque.  Steering is controlled via
+ *  a position pid.
+ *  this is a test for general rolling contact stability.
+ *  should refine the test to be more specific in the future.
+*/
+
 #include "physics/physics.h"
 #include "transport/transport.h"
-#include "plugins/JointTestPlugin.hh"
+#include "plugins/CartTestPlugin.hh"
 
 using namespace gazebo;
-GZ_REGISTER_MODEL_PLUGIN(JointTestPlugin)
+GZ_REGISTER_MODEL_PLUGIN(CartTestPlugin)
 
 /////////////////////////////////////////////////
-JointTestPlugin::JointTestPlugin()
+CartTestPlugin::CartTestPlugin()
 {
   for (int i = 0; i < NUM_JOINTS; i++)
   {
@@ -35,7 +44,7 @@ JointTestPlugin::JointTestPlugin()
 }
 
 /////////////////////////////////////////////////
-void JointTestPlugin::Load(physics::ModelPtr _model,
+void CartTestPlugin::Load(physics::ModelPtr _model,
                            sdf::ElementPtr _sdf)
 {
   this->model = _model;
@@ -43,12 +52,8 @@ void JointTestPlugin::Load(physics::ModelPtr _model,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->GetName());
 
-  this->velSub = this->node->Subscribe(std::string("~/") +
-      this->model->GetName() + "/joint_test_cmd",
-      &JointTestPlugin::OnJointCmdMsg, this);
-
   if (!_sdf->HasElement("steer"))
-    gzerr << "JointTest plugin missing <steer> element\n";
+    gzerr << "CartTest plugin missing <steer> element\n";
 
   // get all joints
   this->joints[0] = _model->GetJoint(
@@ -97,30 +102,18 @@ void JointTestPlugin::Load(physics::ModelPtr _model,
     _sdf->GetElement("left_eff")->GetValueDouble();
 
   this->updateConnection = event::Events::ConnectWorldUpdateStart(
-          boost::bind(&JointTestPlugin::OnUpdate, this));
+          boost::bind(&CartTestPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
-void JointTestPlugin::Init()
+void CartTestPlugin::Init()
 {
   // physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
   //   this->joints[0]->GetChild());
 }
 
 /////////////////////////////////////////////////
-void JointTestPlugin::OnJointCmdMsg(ConstJointCmdPtr &_msg)
-{
-  // update joint velocities
-  for (int i = 0; i < NUM_JOINTS; i++)
-  {
-    // ignore everything else, get position and force only
-    this->jointPositions[i] = _msg->position();
-    this->jointMaxEfforts[i] = _msg->force();
-  }
-}
-
-/////////////////////////////////////////////////
-void JointTestPlugin::OnUpdate()
+void CartTestPlugin::OnUpdate()
 {
   common::Time currTime = this->model->GetWorld()->GetSimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;

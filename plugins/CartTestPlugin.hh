@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_JOINT_TEST_PLUGIN_HH__
-#define __GAZEBO_JOINT_TEST_PLUGIN_HH__
+#ifndef __GAZEBO_CART_TEST_PLUGIN_HH__
+#define __GAZEBO_CART_TEST_PLUGIN_HH__
 
 #include "common/common.h"
 #include "physics/physics.h"
@@ -25,18 +25,15 @@
 #define NUM_JOINTS 3
 namespace gazebo
 {
-  class JointTestPlugin : public ModelPlugin
+  class CartTestPlugin : public ModelPlugin
   {
-    public: JointTestPlugin();
+    public: CartTestPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
 
     private: void OnUpdate();
 
-    private: void OnJointCmdMsg(ConstJointCmdPtr &_msg);
-
     private: transport::NodePtr node;
-    private: transport::SubscriberPtr velSub;
 
     private: event::ConnectionPtr updateConnection;
 
