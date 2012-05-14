@@ -9,9 +9,15 @@ import "vector3d.proto";
 
 message HeightmapGeom
 {
-  required string filename  = 1;
-  optional Vector3d size    = 2;
-  optional Vector3d origin  = 3;
+  required string filename   = 1;
+  optional Vector3d size     = 2;
+  optional Vector3d origin   = 3;
+
+  repeated string diffuse    = 4;
+  repeated string normal     = 5;
+  repeated double world_size = 6;
+  repeated double min_height = 7;
+  repeated double fade_dist  = 8;
 }
 
 /// \endverbatim

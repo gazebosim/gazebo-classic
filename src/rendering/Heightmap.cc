@@ -57,6 +57,14 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
+  std::cout << "Materials[" <<_msg->geometry().heightmap().diffuse_size() << "\n";
+  for (int i = 0; i < _msg->geometry().heightmap().diffuse_size(); ++i)
+  {
+    this->diffuseTextures.push_back(_msg->geometry().heightmap().diffuse(i));
+    this->normalTextures.push_back(_msg->geometry().heightmap().normal(i));
+    this->worldSizes.push_back(_msg->geometry().heightmap().world_size(i));
+  }
+
   this->Load();
 }
 
@@ -182,15 +190,24 @@ void Heightmap::ConfigureTerrainDefaults()
   //    2. normal_height - normal map with a height map in the alpha channel
   {
     // number of texture layers
-    defaultimp.layerList.resize(3);
+    //defaultimp.layerList.resize(3);
+    defaultimp.layerList.resize(this->diffuseTextures.size());
 
     // The worldSize decides how big each splat of textures will be.
     // A smaller value will increase the resolution
+    for (unsigned int i = 0; i < this->diffuseTextures.size(); ++i)
+    {
+      defaultimp.layerList[i].worldSize = this->worldSizes[i];
+      defaultimp.layerList[i].textureNames.push_back(this->diffuseTextures[i]);
+      defaultimp.layerList[i].textureNames.push_back(this->normalTextures[i]);
+    }
+
+    /*
     defaultimp.layerList[0].worldSize = 10;
     defaultimp.layerList[0].textureNames.push_back(
-        "dirt_grayrocky_diffusespecular.dds");
+        "dirt_grayrocky_diffusespecular.png");
     defaultimp.layerList[0].textureNames.push_back(
-        "dirt_grayrocky_normalheight.dds");
+        "dirt_grayrocky_normalheight.png");
 
     defaultimp.layerList[1].worldSize = 3;
     defaultimp.layerList[1].textureNames.push_back(
@@ -203,6 +220,7 @@ void Heightmap::ConfigureTerrainDefaults()
         "growth_weirdfungus-03_diffusespecular.dds");
     defaultimp.layerList[2].textureNames.push_back(
         "growth_weirdfungus-03_normalheight.dds");
+        */
   }
 }
 

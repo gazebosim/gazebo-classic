@@ -93,6 +93,19 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
   _msg.mutable_heightmap()->set_filename(this->GetFilename());
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetOrigin());
+
+  _msg.mutable_heightmap()->add_diffuse("dirt_grayrocky_diffusespecular.png");
+  _msg.mutable_heightmap()->add_normal("dirt_grayrocky_normalheight.png");
+  _msg.mutable_heightmap()->add_world_size(10);
+
+  _msg.mutable_heightmap()->add_diffuse("grass_green-01_diffusespecular.dds");
+  _msg.mutable_heightmap()->add_normal("grass_green-01_normalheight.dds");
+  _msg.mutable_heightmap()->add_world_size(3);
+
+  _msg.mutable_heightmap()->add_diffuse("growth_weirdfungus-03_diffusespecular.dds");
+  _msg.mutable_heightmap()->add_normal("growth_weirdfungus-03_normalheight.dds");
+  _msg.mutable_heightmap()->add_world_size(20);
+
 }
 
 //////////////////////////////////////////////////

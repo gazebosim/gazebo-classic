@@ -16,6 +16,39 @@
           <geometry>
             <heightmap filename="heightmap_bowl.png" size="129 129 10" origin="0 0 0"/>
           </geometry>
+
+          <!--
+          <materials>
+            <material>
+              <world_size>20</world_size>
+              <diffuse>dirt_grayrocky_diffusespecular.png</diffuse>
+              <normal>dirt_grayrocky_normalheight.png</normal>
+            </material>
+
+            <blend>
+              <min_height>2</min_height>
+              <fade_dist>3</fade_dist>
+            </blend>
+
+            <material>
+              <world_size>3</world_size>
+              <diffuse>grass_green-01_diffusespecular.png</diffuse>
+              <normal>grass_green-01_normalheight.png</normal>
+            </material>
+
+            <blend>
+              <min_height>4</min_height>
+              <fade_dist>5</fade_dist>
+            </blend>
+
+            <material>
+              <world_size>20</world_size>
+              <diffuse>growth_weirdfungus-03_diffusespecular.png</diffuse>
+              <normal>growth_weirdfungus-03_normalheight.png</normal>
+            </material>
+          </materials>
+          -->
+
         </visual>
       </link>
     </model>

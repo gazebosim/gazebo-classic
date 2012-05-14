@@ -71,10 +71,12 @@ namespace gazebo
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
       private: Ogre::TerrainGroup *terrainGroup;
       private: bool terrainsImported;
+
+      private: std::vector<std::string> diffuseTextures;
+      private: std::vector<std::string> normalTextures;
+      private: std::vector<double> worldSizes;
     };
     /// \}
   }
 }
 #endif
-
-
