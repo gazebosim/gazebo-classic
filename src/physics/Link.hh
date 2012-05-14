@@ -180,9 +180,6 @@ namespace gazebo
       /// \brief Set the mass of the body
       public: void SetInertial(const InertialPtr &_inertial);
 
-      public: virtual void UpdateMass() {}
-      public: virtual void UpdateSurface() {}
-
       /// \brief Get a collision by id
       /// \return Pointer to the collision
       public: CollisionPtr GetCollisionById(unsigned int _id) const;
@@ -258,6 +255,12 @@ namespace gazebo
 
       /// \brief Set the current link state
       public: void SetState(const LinkState &_state);
+
+      /// \brief Update the mass matrix
+      public: virtual void UpdateMass() {}
+
+      /// \brief Update surface parameters
+      public: virtual void UpdateSurface() {}
 
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision

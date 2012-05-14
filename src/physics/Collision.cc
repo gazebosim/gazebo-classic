@@ -100,6 +100,13 @@ void Collision::Load(sdf::ElementPtr _sdf)
     this->visPub->Publish(this->CreateCollisionVisual());
   }
 
+  // Force max correcting velocity to zero for certain collision entities
+  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
+      this->shape->HasType(Base::MAP_SHAPE))
+  {
+    this->surface->maxVel = 0.0;
+  }
+
   this->inertial->SetCoG(this->GetRelativePose().pos);
 
   // Get the mass of the shape

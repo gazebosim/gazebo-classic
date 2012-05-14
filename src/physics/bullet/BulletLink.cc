@@ -390,8 +390,8 @@ void BulletLink::AddRelativeForce(const math::Vector3 &/*_force*/)
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForceAtWorldPosition(const math::Vector3 &_force,
-                                         const math::Vector3 &_pos)
+void BulletLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
+                                         const math::Vector3 &/*_pos*/)
 {
 }
 
