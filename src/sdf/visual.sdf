@@ -31,19 +31,5 @@
     </element>
   </element> <!-- End Material -->
 
-  <!--
-  <element name="materials" required="0">
-    <element name="material" required="+"/>
-      <element name="world_size" type="double" default="10" required="1"/>
-      <element name="diffuse" type="string" default="__default__" required="1"/>
-      <element name="normal" type="string" default="__default__" required="1"/>
-    </element>
-    <element name="blend" required="+">
-      <element name="min_height" type="double" default="0" required="1"/>
-      <element name="fade_dist" type="double" default="0" required="1"/>
-    </element>
-  </element>
-  -->
-
   <include filename="geometry.sdf" required="1"/>
 </element> <!-- End Visual -->

@@ -65,6 +65,11 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
+    /// \brief Convert a common::Image to a msgs::Image
+    /// \param _i The Image to convert
+    /// \return A msgs::Image object
+    msgs::Image      Convert(const common::Image &_i);
+
     /// \brief Convert a math::Vector3 to a msgs::Vector3d
     /// \param _v The vector to convert
     /// \return A msgs::Vector3d object

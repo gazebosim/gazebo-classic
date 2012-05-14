@@ -75,6 +75,10 @@ namespace gazebo
       private: std::vector<std::string> diffuseTextures;
       private: std::vector<std::string> normalTextures;
       private: std::vector<double> worldSizes;
+
+      private: std::vector<double> blendHeight;
+      private: std::vector<double> blendFade;
+
     };
     /// \}
   }

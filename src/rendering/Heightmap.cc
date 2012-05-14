@@ -15,7 +15,7 @@
  *
 */
 /* Desc: Heightmap geometry
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 12 May 2009
  */
 
@@ -57,20 +57,24 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
-  for (int i = 0; i < _msg->geometry().heightmap().diffuse_size(); ++i)
+  for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
-    this->diffuseTextures.push_back(_msg->geometry().heightmap().diffuse(i));
-    this->normalTextures.push_back(_msg->geometry().heightmap().normal(i));
-    this->worldSizes.push_back(_msg->geometry().heightmap().world_size(i));
+    this->diffuseTextures.push_back(
+        _msg->geometry().heightmap().texture(i).diffuse());
+    this->normalTextures.push_back(
+        _msg->geometry().heightmap().texture(i).normal());
+    this->worldSizes.push_back(
+        _msg->geometry().heightmap().texture(i).size());
 
-    if (i < _msg->geometry().heightmap().diffuse_size() - 1)
-    {
-      this->blendHeight.push_back(_msg->geometry().heightmap().min_height(i));
-      this->blendFade.push_back(_msg->geometry().heightmap().fade_dist(i));
-    }
   }
 
-  this->blendDist.p
+  for (int i = 0; i < _msg->geometry().heightmap().blend_size(); ++i)
+  {
+    this->blendHeight.push_back(
+        _msg->geometry().heightmap().blend(i).min_height());
+    this->blendFade.push_back(
+        _msg->geometry().heightmap().blend(i).fade_dist());
+  }
 
   this->Load();
 }
@@ -180,9 +184,6 @@ void Heightmap::ConfigureTerrainDefaults()
   Ogre::Terrain::ImportData &defaultimp =
     this->terrainGroup->getDefaultImportSettings();
 
-  /* Nate: defaultimp.terrainSize = 513;
-  defaultimp.worldSize = 513.0f;
-  */
   defaultimp.terrainSize = this->imageSize;
   defaultimp.worldSize = this->terrainSize.x;
 
@@ -197,7 +198,6 @@ void Heightmap::ConfigureTerrainDefaults()
   //    2. normal_height - normal map with a height map in the alpha channel
   {
     // number of texture layers
-    //defaultimp.layerList.resize(3);
     defaultimp.layerList.resize(this->diffuseTextures.size());
 
     // The worldSize decides how big each splat of textures will be.
@@ -208,26 +208,6 @@ void Heightmap::ConfigureTerrainDefaults()
       defaultimp.layerList[i].textureNames.push_back(this->diffuseTextures[i]);
       defaultimp.layerList[i].textureNames.push_back(this->normalTextures[i]);
     }
-
-    /*
-    defaultimp.layerList[0].worldSize = 10;
-    defaultimp.layerList[0].textureNames.push_back(
-        "dirt_grayrocky_diffusespecular.png");
-    defaultimp.layerList[0].textureNames.push_back(
-        "dirt_grayrocky_normalheight.png");
-
-    defaultimp.layerList[1].worldSize = 3;
-    defaultimp.layerList[1].textureNames.push_back(
-        "grass_green-01_diffusespecular.dds");
-    defaultimp.layerList[1].textureNames.push_back(
-        "grass_green-01_normalheight.dds");
-
-    defaultimp.layerList[2].worldSize = 20;
-    defaultimp.layerList[2].textureNames.push_back(
-        "growth_weirdfungus-03_diffusespecular.dds");
-    defaultimp.layerList[2].textureNames.push_back(
-        "growth_weirdfungus-03_normalheight.dds");
-        */
   }
 }
 
@@ -269,52 +249,44 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
     return false;
   }
 
+  Ogre::Real val, height;
+  unsigned int i = 0;
+
   std::vector<Ogre::TerrainLayerBlendMap *> blendMaps;
   std::vector<float*> pBlend;
-  for (int i = 0; i < this->blendHeight.size(); ++i)
+
+  // Create the blend maps
+  for (i = 0; i < this->blendHeight.size(); ++i)
   {
-    blendMaps[i] = _terrain->getLayerBlendMap(i+1);
-    pBlend[i] = blendMaps[i]->getBlendPointer();
+    blendMaps.push_back(_terrain->getLayerBlendMap(i+1));
+    pBlend.push_back(blendMaps[i]->getBlendPointer());
   }
 
-  //Ogre::TerrainLayerBlendMap *blendMap0 = _terrain->getLayerBlendMap(1);
-  //Ogre::TerrainLayerBlendMap *blendMap1 = _terrain->getLayerBlendMap(2);
-  //Ogre::Real minHeight0 = 30;
-  //Ogre::Real fadeDist0 = 20;
-  //Ogre::Real minHeight1 = 31;
-  //Ogre::Real fadeDist1 = 10;
-  float* pBlend0 = blendMap0->getBlendPointer();
-  float* pBlend1 = blendMap1->getBlendPointer();
-
-  Ogre::Real val;
-
+  // Set the blend values based on the height of the terrain
   for (Ogre::uint16 y = 0; y < _terrain->getLayerBlendMapSize(); ++y)
   {
     for (Ogre::uint16 x = 0; x < _terrain->getLayerBlendMapSize(); ++x)
     {
       Ogre::Real tx, ty;
 
-      blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
-      Ogre::Real height = _terrain->getHeightAtTerrainPosition(tx, ty);
+      blendMaps[0]->convertImageToTerrainSpace(x, y, &tx, &ty);
+      height = _terrain->getHeightAtTerrainPosition(tx, ty);
 
-      for (int i = 0; i < this->blendHeight.size(); ++i)
+      for (i = 0; i < this->blendHeight.size(); ++i)
       {
         val = (height - this->blendHeight[i]) / this->blendFade[i];
         val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
         *pBlend[i]++ = val;
       }
-
-      /*
-      val = (height - minHeight1) / fadeDist1;
-      val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
-      *pBlend1++ = val;
-      */
     }
   }
-  blendMap0->dirty();
-  blendMap1->dirty();
-  blendMap0->update();
-  blendMap1->update();
+
+  // Make sure the blend maps are properly updated
+  for (i = 0; i < blendMaps.size(); ++i)
+  {
+    blendMaps[i]->dirty();
+    blendMaps[i]->update();
+  }
 
   return true;
 }

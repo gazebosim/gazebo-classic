@@ -14,64 +14,32 @@
         </collision>
         <visual name="visual">
           <geometry>
-            <heightmap filename="heightmap_bowl.png" size="129 129 10" origin="0 0 0"/>
+            <heightmap filename="heightmap_bowl.png" size="129 129 10" origin="0 0 0">
+              <texture>
+                <diffuse>dirt_diffusespecular.png</diffuse>
+                <normal>dirt_normal.png</normal>
+                <size>50</size>
+              </texture>
+              <texture>
+                <diffuse>grass_diffusespecular.png</diffuse>
+                <normal>grass_normal.png</normal>
+                <size>20</size>
+              </texture>
+              <texture>
+                <diffuse>fungus_diffusespecular.png</diffuse>
+                <normal>fungus_normal.png</normal>
+                <size>80</size>
+              </texture>
+              <blend>
+                <min_height>2</min_height>
+                <fade_dist>5</fade_dist>
+              </blend>
+              <blend>
+                <min_height>4</min_height>
+                <fade_dist>5</fade_dist>
+              </blend>
+            </heightmap>
           </geometry>
-
-          <!--
-          <materials>
-            <material>
-              <world_size>20</world_size>
-              <diffuse>dirt_grayrocky_diffusespecular.png</diffuse>
-              <normal>dirt_grayrocky_normalheight.png</normal>
-            </material>
-
-            <blend>
-              <min_height>2</min_height>
-              <fade_dist>3</fade_dist>
-            </blend>
-
-            <material>
-              <world_size>3</world_size>
-              <diffuse>grass_green-01_diffusespecular.png</diffuse>
-              <normal>grass_green-01_normalheight.png</normal>
-            </material>
-
-            <blend>
-              <min_height>4</min_height>
-              <fade_dist>5</fade_dist>
-            </blend>
-
-            <material>
-              <world_size>20</world_size>
-              <diffuse>growth_weirdfungus-03_diffusespecular.png</diffuse>
-              <normal>growth_weirdfungus-03_normalheight.png</normal>
-            </material>
-          </materials>
-          -->
-
-        </visual>
-      </link>
-    </model>
-
-    <!-- Sphere for testing the heightmap -->
-    <model name="sphere">
-      <origin pose="5.0 0 11.0 0 0 0"/>
-      <link name="link">
-        <inertial mass="2.1">
-          <inertia ixx=".01" ixy="0" ixz="0" iyy=".01" iyz="0" izz=".01"/>
-        </inertial>
-
-        <collision name="collision">
-          <geometry>
-            <sphere radius="0.5"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <sphere radius="0.5"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
     </model>

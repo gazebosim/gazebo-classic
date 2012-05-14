@@ -21,6 +21,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <boost/filesystem.hpp>
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
@@ -68,65 +69,70 @@ Image::~Image()
 int Image::Load(const std::string &_filename)
 {
   struct stat st;
+  DIR *dir = NULL;
+  this->fullName = boost::filesystem::current_path().string();
+  this->fullName += "/" + _filename;
 
-  // @todo: fix path search. for now repeat similar path search in simulator
-  std::list<std::string> gazeboPaths =
-    SystemPaths::Instance()->GetGazeboPaths();
-
-  for (std::list<std::string>::iterator iter = gazeboPaths.begin();
-      iter!= gazeboPaths.end(); ++iter)
+  if (stat(this->fullName.c_str(), &st) != 0)
   {
-    std::vector<std::string> pathNames;
-    pathNames.push_back((*iter)+"/Media");
-    pathNames.push_back((*iter)+"/Media/fonts");
-    pathNames.push_back((*iter)+"/Media/materials/programs");
-    pathNames.push_back((*iter)+"/Media/materials/scripts");
-    pathNames.push_back((*iter)+"/Media/materials/textures");
-    pathNames.push_back((*iter)+"/Media/models");
-    pathNames.push_back((*iter)+"/Media/sets");
-    pathNames.push_back((*iter)+"/Media/maps");
+    // @todo: fix path search. for now repeat similar path search in simulator
+    std::list<std::string> gazeboPaths =
+      SystemPaths::Instance()->GetGazeboPaths();
 
-    for (std::vector<std::string>::iterator piter = pathNames.begin();
-         piter!= pathNames.end(); ++piter)
+    for (std::list<std::string>::iterator iter = gazeboPaths.begin();
+        iter!= gazeboPaths.end(); ++iter)
     {
-      std::string path(*piter);
-      DIR *dir = opendir(path.c_str());
+      std::vector<std::string> pathNames;
+      pathNames.push_back((*iter)+"/Media");
+      pathNames.push_back((*iter)+"/Media/fonts");
+      pathNames.push_back((*iter)+"/Media/materials/programs");
+      pathNames.push_back((*iter)+"/Media/materials/scripts");
+      pathNames.push_back((*iter)+"/Media/materials/textures");
+      pathNames.push_back((*iter)+"/Media/models");
+      pathNames.push_back((*iter)+"/Media/sets");
+      pathNames.push_back((*iter)+"/Media/maps");
 
-      // if directory exist
-      if (dir != NULL)
+      for (std::vector<std::string>::iterator piter = pathNames.begin();
+          piter!= pathNames.end(); ++piter)
       {
-        closedir(dir);
-
-        this->fullName = (((*piter)+"/")+_filename);
-        // if file exist
-        if (stat(this->fullName.c_str(), &st) == 0)
+        // if directory exist
+        if ((dir = opendir((*piter).c_str())) != NULL)
         {
-          FREE_IMAGE_FORMAT fifmt =
-            FreeImage_GetFIFFromFilename(this->fullName.c_str());
+          closedir(dir);
 
-          if (this->bitmap)
-            FreeImage_Unload(this->bitmap);
-          this->bitmap = NULL;
+          this->fullName = (((*piter)+"/")+_filename);
 
-          if (fifmt == FIF_PNG)
-            this->bitmap =
-              FreeImage_Load(fifmt, this->fullName.c_str(), PNG_DEFAULT);
-          else if (fifmt == FIF_JPEG)
-            this->bitmap =
-              FreeImage_Load(fifmt, this->fullName.c_str(), JPEG_DEFAULT);
-          else if (fifmt == FIF_BMP)
-            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(),
-                BMP_DEFAULT);
-          else
-          {
-            gzerr << "Unknown image format[" << this->fullName << "]\n";
-            return -1;
-          }
-
-          return 0;
+          // if file exist
+          if (stat(this->fullName.c_str(), &st) == 0)
+            break;
         }
       }
     }
+  }
+
+  if (stat(this->fullName.c_str(), &st) == 0)
+  {
+    FREE_IMAGE_FORMAT fifmt =
+      FreeImage_GetFIFFromFilename(this->fullName.c_str());
+
+    if (this->bitmap)
+      FreeImage_Unload(this->bitmap);
+    this->bitmap = NULL;
+
+    if (fifmt == FIF_PNG)
+      this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), PNG_DEFAULT);
+    else if (fifmt == FIF_JPEG)
+      this->bitmap =
+        FreeImage_Load(fifmt, this->fullName.c_str(), JPEG_DEFAULT);
+    else if (fifmt == FIF_BMP)
+      this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), BMP_DEFAULT);
+    else
+    {
+      gzerr << "Unknown image format[" << this->fullName << "]\n";
+      return -1;
+    }
+
+    return 0;
   }
 
   gzerr << "Unable to open image file[" << _filename << "]\n";
@@ -154,6 +160,56 @@ void Image::SetFromData(const unsigned char *data, unsigned int width,
 
   this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(data),
       width, height, scanline_bytes, bpp, redmask, greenmask, bluemask);
+}
+
+//////////////////////////////////////////////////
+void Image::SetFromData(const unsigned char *_data, unsigned int _width,
+    unsigned int _height, PixelFormat _format)
+{
+  if (this->bitmap)
+    FreeImage_Unload(this->bitmap);
+  this->bitmap = NULL;
+
+  // int redmask = FI_RGBA_RED_MASK;
+  int redmask = 0xff0000;
+
+  // int greenmask = FI_RGBA_GREEN_MASK;
+  int greenmask = 0x00ff00;
+
+  // int bluemask = FI_RGBA_BLUE_MASK;
+  int bluemask = 0x0000ff;
+
+  unsigned int bpp;
+  int scanlineBytes;
+
+  if (_format == L_INT8)
+  {
+    bpp = 8;
+  }
+  else if (_format == RGB_INT8)
+  {
+    bpp = 32;
+    redmask = 0xff0000;
+    greenmask = 0x00ff00;
+    bluemask = 0x0000ff;
+  }
+  else if (_format == BGR_INT8)
+  {
+    bpp = 32;
+    redmask = 0x0000ff;
+    greenmask = 0x00ff00;
+    bluemask = 0xff0000;
+  }
+  else
+  {
+    gzerr << "Unable to handle format[" << _format << "]\n";
+    return;
+  }
+
+  scanlineBytes = bpp * _width;
+
+  this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
+      _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask);
 }
 
 //////////////////////////////////////////////////
@@ -345,55 +401,6 @@ void Image::Rescale(int _width, int _height)
 }
 
 //////////////////////////////////////////////////
-/*void Image::RenderOpengl(float destW, float destH)
-  {
-  if (!this->Valid())
-  {
-  printf("Invalid\n");
-  return;
-  }
-
-  FIBITMAP *resizedBitmap = FreeImage_Rescale(this->bitmap, destW, destH,
-  FILTER_LANCZOS3);
-
-  math::Vector3d pt;
-  Color clr;
-
-  unsigned int x, y;
-  unsigned int w = this->GetWidth();
-  unsigned int h = this->GetHeight();
-
-// float xRes = destW / w;
-// float yRes = destH / h;
-
-pt.z = 0;
-
-glBegin(GL_TRIANGLE_STRIP);
-for (y = h-1; y > 0; y--)
-{
-for (x = 0; x < w; x++)
-{
-pt.x = x;// * xRes;
-pt.y = (h-y);// * yRes;
-
-clr = this->GetPixel(x, y);
-glColor3ub(clr.r, clr.g, clr.b);
-glVertex3f(pt.x, pt.y, pt.z);
-
-pt.y = (h-y-1);// * yRes;
-clr = this->GetPixel(x, y-1);
-glColor3ub(clr.r, clr.g, clr.b);
-glVertex3f(pt.x, pt.y, pt.z);
-}
-glVertex3f(pt.x, pt.y, pt.z);
-glVertex3f(pt.x, pt.y, pt.z);
-}
-glEnd();
-
-FreeImage_Unload(resizedBitmap);
-}*/
-
-//////////////////////////////////////////////////
 bool Image::Valid() const
 {
   return this->bitmap != NULL;
@@ -403,4 +410,35 @@ bool Image::Valid() const
 std::string Image::GetFilename() const
 {
   return this->fullName;
+}
+
+//////////////////////////////////////////////////
+Image::PixelFormat Image::GetPixelFormat() const
+{
+  FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->bitmap);
+  if (type == FIT_BITMAP)
+  {
+    unsigned int bpp = this->GetBPP();
+    if (bpp == 8)
+      return L_INT8;
+    else if (bpp == 16)
+      return L_INT16;
+    else if (bpp == 32)
+    {
+      unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
+      if (redMask == 0xff0000)
+        return RGB_INT32;
+      else 
+        return BGR_INT32;
+    }
+  }
+  else if (type == FIT_RGB16)
+    return RGB_INT16;
+  else if (type == FIT_RGBF)
+    return RGB_FLOAT32;
+
+  else if (type == FIT_UINT16 || type == FIT_INT16)
+    return L_INT16;
+
+  return UNKNOWN;
 }

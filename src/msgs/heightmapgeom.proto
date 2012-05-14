@@ -9,15 +9,25 @@ import "vector3d.proto";
 
 message HeightmapGeom
 {
-  required string filename   = 1;
-  optional Vector3d size     = 2;
-  optional Vector3d origin   = 3;
+  required Image image       = 1; // The image data
+  optional Vector3d size     = 2; // Size in meters
+  optional Vector3d origin   = 3; // Origin in world coordinate frame
 
-  repeated string diffuse    = 4;
-  repeated string normal     = 5;
-  repeated double world_size = 6;
-  repeated double min_height = 7;
-  repeated double fade_dist  = 8;
+  message Texture
+  {
+    required string diffuse    = 1;
+    required string normal     = 2;
+    required double size       = 3;
+  }
+
+  message Blend
+  {
+    required double min_height = 1;
+    required double fade_dist  = 2;
+  }
+
+  repeated Texture texture = 4; // List of textures
+  repeated Blend blend     = 5; // How to blend the textures
 }
 
 /// \endverbatim

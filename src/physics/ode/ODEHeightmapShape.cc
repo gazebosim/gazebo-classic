@@ -131,10 +131,6 @@ void ODEHeightmapShape::Init()
   else
     this->odeScale.z = terrainSize.z / this->img.GetMaxColor().R();
 
-  std::cout << "Terrain Size[" << terrainSize << "]\n";
-  std::cout << "Max[" << this->img.GetMaxColor().R() << "]\n";
-  std::cout << "Z Scale[" << this->odeScale.z << "]\n";
-
   // Step 1: Construct the heightmap lookup table, using the ogre ray scene
   // query functionality
   this->FillHeightMap();

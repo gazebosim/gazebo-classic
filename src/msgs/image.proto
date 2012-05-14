@@ -9,12 +9,17 @@ import "time.proto";
 
 message Image
 {
+  required uint32 width         = 1; // Image width (number of columns)
+  required uint32 height        = 2; // Image height (number of rows)
+  required uint32 pixel_format  = 3;
+  required uint32 step          = 4; // Full row length in bytes
+  required bytes data           = 5; // Actual data, size if (step * rows)
+}
+
+message ImageStamped
+{
   required Time time          = 1; // Time when the data was captured
-  required uint32 width       = 2; // Image width (number of columns)
-  required uint32 height      = 3; // Image height (number of rows)
-  required string encoding    = 4;
-  required uint32 step        = 5; // Full row length in bytes
-  required bytes data         = 6; // Actual data, size if (step * rows)
+  required Image image        = 2;
 }
 
 /// \endverbatim

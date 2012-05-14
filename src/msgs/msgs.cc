@@ -24,6 +24,7 @@
 #include "math/Plane.hh"
 #include "math/Rand.hh"
 
+#include "common/Image.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "msgs/msgs.h"
@@ -162,6 +163,22 @@ void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
   _p->mutable_size()->set_x(_v.size.x);
   _p->mutable_size()->set_y(_v.size.y);
   _p->set_d(_v.d);
+}
+
+/////////////////////////////////////////////////
+msgs::Image Convert(const common::Image &_i)
+{
+  msgs::Image result;
+  result.set_width(_i.GetWidth());
+  result.set_height(_i.GetHeight());
+  result.set_encoding(_i.GetPixelFormat());
+  result.set_step(_i.GetPitch());
+  unsigned char *data;
+  unsigned int size;
+  _i.GetData(&data, size)
+  result.set_data(data, size);
+
+  return result;
 }
 
 msgs::Vector3d Convert(const math::Vector3 &_v)
@@ -431,22 +448,27 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
       geomMsg->mutable_heightmap()->set_filename(
           geomElem->GetValueString("filename"));
 
-      geomMsg->mutable_heightmap()->add_diffuse("dirt_grayrocky_diffusespecular.dds");
-      geomMsg->mutable_heightmap()->add_normal("dirt_grayrocky_normalheight.dds");
-      geomMsg->mutable_heightmap()->add_world_size(10);
+      sdf::ElementPtr textureElem = geomElem->GetElement("texture");
+      msgs::HeightmapGeom::Texture *tex;
+      while (textureElem)
+      {
+        tex = geomMsg->mutable_heightmap()->add_texture();
+        tex->set_diffuse(textureElem->GetValueString("diffuse"));
+        tex->set_normal(textureElem->GetValueString("normal"));
+        tex->set_size(textureElem->GetValueDouble("size"));
+        textureElem = textureElem->GetNextElement("texture");
+      }
 
-      geomMsg->mutable_heightmap()->add_diffuse("grass_green-01_diffusespecular.dds");
-      geomMsg->mutable_heightmap()->add_normal("grass_green-01_normalheight.dds");
-      geomMsg->mutable_heightmap()->add_world_size(3);
+      sdf::ElementPtr blendElem = geomElem->GetElement("blend");
+      msgs::HeightmapGeom::Blend *blend;
+      while (blendElem)
+      {
+        blend = geomMsg->mutable_heightmap()->add_blend();
 
-      geomMsg->mutable_heightmap()->add_diffuse("growth_weirdfungus-03_diffusespecular.dds");
-      geomMsg->mutable_heightmap()->add_normal("growth_weirdfungus-03_normalheight.dds");
-      geomMsg->mutable_heightmap()->add_world_size(20);
-
-      geomMsg->mutable_heightmap()->add_min_height(2);
-      geomMsg->mutable_heightmap()->add_fade_dis(3);
-      geomMsg->mutable_heightmap()->add_min_height(4);
-      geomMsg->mutable_heightmap()->add_fade_dis(2);
+        blend->set_min_height(blendElem->GetValueDouble("min_height"));
+        blend->set_fade_dist(blendElem->GetValueDouble("fade_dist"));
+        blendElem = blendElem->GetNextElement("blend");
+      }
     }
     else if (geomElem->GetName() == "mesh")
     {
