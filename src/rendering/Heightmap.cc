@@ -57,13 +57,20 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
-  std::cout << "Materials[" <<_msg->geometry().heightmap().diffuse_size() << "\n";
   for (int i = 0; i < _msg->geometry().heightmap().diffuse_size(); ++i)
   {
     this->diffuseTextures.push_back(_msg->geometry().heightmap().diffuse(i));
     this->normalTextures.push_back(_msg->geometry().heightmap().normal(i));
     this->worldSizes.push_back(_msg->geometry().heightmap().world_size(i));
+
+    if (i < _msg->geometry().heightmap().diffuse_size() - 1)
+    {
+      this->blendHeight.push_back(_msg->geometry().heightmap().min_height(i));
+      this->blendFade.push_back(_msg->geometry().heightmap().fade_dist(i));
+    }
   }
+
+  this->blendDist.p
 
   this->Load();
 }
@@ -262,14 +269,25 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
     return false;
   }
 
-  Ogre::TerrainLayerBlendMap *blendMap0 = _terrain->getLayerBlendMap(1);
-  Ogre::TerrainLayerBlendMap *blendMap1 = _terrain->getLayerBlendMap(2);
-  Ogre::Real minHeight0 = 30;
-  Ogre::Real fadeDist0 = 20;
-  Ogre::Real minHeight1 = 31;
-  Ogre::Real fadeDist1 = 10;
+  std::vector<Ogre::TerrainLayerBlendMap *> blendMaps;
+  std::vector<float*> pBlend;
+  for (int i = 0; i < this->blendHeight.size(); ++i)
+  {
+    blendMaps[i] = _terrain->getLayerBlendMap(i+1);
+    pBlend[i] = blendMaps[i]->getBlendPointer();
+  }
+
+  //Ogre::TerrainLayerBlendMap *blendMap0 = _terrain->getLayerBlendMap(1);
+  //Ogre::TerrainLayerBlendMap *blendMap1 = _terrain->getLayerBlendMap(2);
+  //Ogre::Real minHeight0 = 30;
+  //Ogre::Real fadeDist0 = 20;
+  //Ogre::Real minHeight1 = 31;
+  //Ogre::Real fadeDist1 = 10;
   float* pBlend0 = blendMap0->getBlendPointer();
   float* pBlend1 = blendMap1->getBlendPointer();
+
+  Ogre::Real val;
+
   for (Ogre::uint16 y = 0; y < _terrain->getLayerBlendMapSize(); ++y)
   {
     for (Ogre::uint16 x = 0; x < _terrain->getLayerBlendMapSize(); ++x)
@@ -278,13 +296,19 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 
       blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
       Ogre::Real height = _terrain->getHeightAtTerrainPosition(tx, ty);
-      Ogre::Real val = (height - minHeight0) / fadeDist0;
-      val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
-      *pBlend0++ = val;
 
+      for (int i = 0; i < this->blendHeight.size(); ++i)
+      {
+        val = (height - this->blendHeight[i]) / this->blendFade[i];
+        val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
+        *pBlend[i]++ = val;
+      }
+
+      /*
       val = (height - minHeight1) / fadeDist1;
       val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
       *pBlend1++ = val;
+      */
     }
   }
   blendMap0->dirty();

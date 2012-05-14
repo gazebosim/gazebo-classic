@@ -430,6 +430,23 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
                  geomElem->GetValueVector3("size"));
       geomMsg->mutable_heightmap()->set_filename(
           geomElem->GetValueString("filename"));
+
+      geomMsg->mutable_heightmap()->add_diffuse("dirt_grayrocky_diffusespecular.dds");
+      geomMsg->mutable_heightmap()->add_normal("dirt_grayrocky_normalheight.dds");
+      geomMsg->mutable_heightmap()->add_world_size(10);
+
+      geomMsg->mutable_heightmap()->add_diffuse("grass_green-01_diffusespecular.dds");
+      geomMsg->mutable_heightmap()->add_normal("grass_green-01_normalheight.dds");
+      geomMsg->mutable_heightmap()->add_world_size(3);
+
+      geomMsg->mutable_heightmap()->add_diffuse("growth_weirdfungus-03_diffusespecular.dds");
+      geomMsg->mutable_heightmap()->add_normal("growth_weirdfungus-03_normalheight.dds");
+      geomMsg->mutable_heightmap()->add_world_size(20);
+
+      geomMsg->mutable_heightmap()->add_min_height(2);
+      geomMsg->mutable_heightmap()->add_fade_dis(3);
+      geomMsg->mutable_heightmap()->add_min_height(4);
+      geomMsg->mutable_heightmap()->add_fade_dis(2);
     }
     else if (geomElem->GetName() == "mesh")
     {
