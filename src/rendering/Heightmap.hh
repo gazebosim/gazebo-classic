@@ -22,7 +22,9 @@
 #ifndef HEIGHTMAP_HH
 #define HEIGHTMAP_HH
 #include <string>
+#include <vector>
 
+#include "common/Image.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
 #include "rendering/Scene.hh"
@@ -63,7 +65,7 @@ namespace gazebo
       private: void DefineTerrain(int x, int y);
 
       private: ScenePtr scene;
-      private: std::string heightImage;
+      private: common::Image heightImage;
       private: math::Vector3 terrainSize;
       private: unsigned int imageSize;
       private: double maxPixel;
@@ -71,10 +73,15 @@ namespace gazebo
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
       private: Ogre::TerrainGroup *terrainGroup;
       private: bool terrainsImported;
+
+      private: std::vector<std::string> diffuseTextures;
+      private: std::vector<std::string> normalTextures;
+      private: std::vector<double> worldSizes;
+
+      private: std::vector<double> blendHeight;
+      private: std::vector<double> blendFade;
     };
     /// \}
   }
 }
 #endif
-
-

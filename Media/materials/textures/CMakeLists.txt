@@ -43,12 +43,12 @@ SET (files
             granite.jpg
             granite2.jpg
             grass.jpg
-            dirt_grayrocky_diffusespecular.dds
-            dirt_grayrocky_normalheight.dds
-            grass_green-01_diffusespecular.dds
-            grass_green-01_normalheight.dds
-            growth_weirdfungus-03_diffusespecular.dds
-            growth_weirdfungus-03_normalheight.dds
+            dirt_diffusespecular.png
+            dirt_normal.png
+            grass_diffusespecular.png
+            grass_normal.png
+            fungus_diffusespecular.png
+            fungus_normal.png
             heightmap_bowl.png
             projection_filter.png
             stereo_projection_pattern_high_res.png

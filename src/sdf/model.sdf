@@ -10,5 +10,6 @@
   <include filename="link.sdf" required="+"/>
   <include filename="joint.sdf" required="*"/>
   <include filename="plugin.sdf" required="*"/>
+  <include filename="gripper.sdf" required="*"/>
 
 </element> <!-- End Model -->

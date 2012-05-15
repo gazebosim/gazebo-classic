@@ -18,13 +18,6 @@
  * Date: 6th December 2011
  */
 
-#include "physics/World.hh"
-#include "physics/MultiRayShape.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Physics.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
 #include "common/Exception.hh"
 
 #include "transport/Node.hh"

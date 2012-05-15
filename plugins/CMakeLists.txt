@@ -12,7 +12,6 @@ set (plugins
   CartTestPlugin
   RayPlugin
   DiffDrivePlugin
-  GripperPlugin
   VehiclePlugin)
 
 foreach (src ${plugins})

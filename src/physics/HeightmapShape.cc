@@ -90,7 +90,8 @@ math::Vector3 HeightmapShape::GetOrigin() const
 void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
-  _msg.mutable_heightmap()->set_filename(this->GetFilename());
+  msgs::Set(_msg.mutable_heightmap()->mutable_image(),
+            common::Image(this->GetFilename()));
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetOrigin());
 }

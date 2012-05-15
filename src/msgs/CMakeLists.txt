@@ -17,6 +17,7 @@ set (msgs axis.proto
           heightmapgeom.proto
           imagegeom.proto
           image.proto
+          image_stamped.proto
           inertial.proto
           int.proto
           joint.proto

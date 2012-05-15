@@ -45,7 +45,7 @@ TEST_F(SpeedTest, BallTest)
 
   double speedRatio = loadedSpeed / emptySpeed;
 
-  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded[" 
+  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
@@ -78,7 +78,7 @@ TEST_F(SpeedTest, ShapesWorld)
   double loadedSpeed = GetPercentRealTime();
   double speedRatio = loadedSpeed / emptySpeed;
 
-  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded[" 
+  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
@@ -104,7 +104,7 @@ TEST_F(SpeedTest, PR2World)
 
   double speedRatio = loadedSpeed / emptySpeed;
 
-  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded[" 
+  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE

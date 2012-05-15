@@ -8,18 +8,20 @@ endif()
 set (sources
   Actor.cc
   Base.cc
-  Link.cc
-  LinkState.cc
   BoxShape.cc
+  Collision.cc
+  CollisionState.cc
   Contact.cc
   CylinderShape.cc
   Entity.cc
-  Collision.cc
-  CollisionState.cc
+  Gripper.cc
   HeightmapShape.cc
+  Inertial.cc
   Joint.cc
   JointController.cc
   JointState.cc
+  Link.cc
+  LinkState.cc
   MapShape.cc
   Model.cc
   ModelState.cc
@@ -31,33 +33,34 @@ set (sources
   RayShape.cc
   Shape.cc
   SphereShape.cc
+  State.cc
+  SurfaceParams.cc
   TrimeshShape.cc
   World.cc
   WorldState.cc
-  Inertial.cc
-  SurfaceParams.cc
-  State.cc
 ) 
 
 set (headers
   Actor.hh
   BallJoint.hh
   Base.hh
-  Link.hh
-  LinkState.hh
   BoxShape.hh
+  Collision.hh
+  CollisionState.hh
   Contact.hh
   CylinderShape.hh
   Entity.hh
-  Collision.hh
-  CollisionState.hh
   HeightmapShape.hh
   Hinge2Joint.hh
   HingeJoint.hh
+  Inertial.hh
+  Gripper.hh
   Joint.hh
   JointController.hh
   JointFeedback.hh
   JointState.hh
+  Link.hh
+  LinkState.hh
   MapShape.hh
   Model.hh
   ModelState.hh
@@ -69,17 +72,15 @@ set (headers
   PlaneShape.hh
   RayShape.hh
   Shape.hh
+  ScrewJoint.hh
   SliderJoint.hh
   SphereShape.hh
+  State.hh
+  SurfaceParams.hh
   TrimeshShape.hh
   UniversalJoint.hh
   World.hh
-  WorldState.hh
-  Inertial.hh
-  ScrewJoint.hh
-  SurfaceParams.hh
-  State.hh
-  )
+  WorldState.hh)
 
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})

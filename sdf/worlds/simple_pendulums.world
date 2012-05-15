@@ -32,6 +32,11 @@
                    izz="0.0"/>
         </inertial>
 
+        <damping>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </damping>
+
         <visual name="visual_cylinder">
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
           <geometry>
@@ -67,6 +72,11 @@
                    iyy="0.0" iyz="0.0"
                    izz="0.0"/>
         </inertial>
+
+        <damping>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </damping>
 
         <visual name="visual_sphere">
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
@@ -113,6 +123,11 @@
                    izz="0.0"/>
         </inertial>
 
+        <damping>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </damping>
+
         <visual name="visual_cylinder">
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
           <geometry>
@@ -154,6 +169,11 @@
                    iyy="0.0" iyz="0.0"
                    izz="0.0"/>
         </inertial>
+
+        <damping>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </damping>
 
         <visual name="visual_cylinder">
           <origin pose="0.0 0.0 -5.0 0.0 0.0 0.0"/>
