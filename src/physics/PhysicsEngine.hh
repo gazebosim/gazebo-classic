@@ -187,9 +187,6 @@ namespace gazebo
         else
           return true;
       };
-
-
-
     };
 
     /// \}
