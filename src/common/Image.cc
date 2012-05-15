@@ -427,9 +427,9 @@ Image::PixelFormat Image::GetPixelFormat() const
     {
       unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
       if (redMask == 0xff0000)
-        return RGB_INT32;
+        return RGB_INT8;
       else 
-        return BGR_INT32;
+        return BGR_INT8;
     }
   }
   else if (type == FIT_RGB16)

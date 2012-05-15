@@ -27,7 +27,6 @@
 
 #include "math/Helpers.hh"
 #include "rendering/ogre.h"
-#include "common/Image.hh"
 #include "common/Exception.hh"
 
 #include "rendering/Scene.hh"
@@ -53,7 +52,7 @@ Heightmap::~Heightmap()
 //////////////////////////////////////////////////
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
-  this->heightImage = msgs::Convert(_msg->geometry().heightmap().image());
+  msgs::Set(this->heightImage, _msg->geometry().heightmap().image());
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
@@ -225,8 +224,18 @@ void Heightmap::DefineTerrain(int x, int y)
     bool flipX = x % 2 != 0;
     bool flipY = y % 2 != 0;
 
-    img.load(this->heightImage,
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    unsigned char *data = NULL;
+    unsigned int count = 0;
+    this->heightImage.GetData(&data, count);
+
+    if (this->heightImage.GetPixelFormat() == common::Image::L_INT8)
+      img.loadDynamicImage(data, this->heightImage.GetWidth(),
+          this->heightImage.GetHeight(), Ogre::PF_L8);
+    else if (this->heightImage.GetPixelFormat() == common::Image::RGB_INT8)
+      img.loadDynamicImage(data, this->heightImage.GetWidth(),
+          this->heightImage.GetHeight(), Ogre::PF_BYTE_RGB);
+    else
+      gzerr << "Unable to handle image format\n";
 
     if (flipX)
       img.flipAroundY();
@@ -235,6 +244,8 @@ void Heightmap::DefineTerrain(int x, int y)
 
     this->terrainGroup->defineTerrain(x, y, &img);
     this->terrainsImported = true;
+
+    delete [] data;
   }
 }
 

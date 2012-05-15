@@ -23,6 +23,7 @@
 #define HEIGHTMAP_HH
 #include <string>
 
+#include "common/Image.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
 #include "rendering/Scene.hh"

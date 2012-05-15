@@ -116,9 +116,9 @@ namespace gazebo
     math::Pose       Convert(const msgs::Pose &_p);
 
     /// \brief Convert a msgs::Image to a common::Image
+    /// \param _img The common::Image container
     /// \param _msg The Image message to convert
-    /// \return A common::Imnage object
-    common::Image Convert(const msgs::Image &_msg);
+    void Set(common::Image &_img, const msgs::Image &_msg);
 
     /// \brief Convert a msgs::Color to a common::Color
     /// \param _c The color to convert

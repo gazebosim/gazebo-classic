@@ -166,16 +166,13 @@ void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
 }
 
 /////////////////////////////////////////////////
-common::Image Convert(const msgs::Image &_msg)
+void Set(common::Image &_img, const msgs::Image &_msg)
 {
-  common::Image result;
-  result.SetFromData(
+  _img.SetFromData(
       (const unsigned char*)_msg.data().c_str(), 
       _msg.width(), 
       _msg.height(), 
       (common::Image::PixelFormat)(_msg.pixel_format()));
-
-  return result;
 }
 
 /////////////////////////////////////////////////
@@ -186,7 +183,7 @@ msgs::Image Convert(const common::Image &_i)
   result.set_height(_i.GetHeight());
   result.set_pixel_format(_i.GetPixelFormat());
   result.set_step(_i.GetPitch());
-  unsigned char *data;
+  unsigned char *data = NULL;
   unsigned int size;
   _i.GetData(&data, size);
   result.set_data(data, size);
