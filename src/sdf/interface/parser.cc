@@ -629,30 +629,8 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
           modelPose.pos +
             modelPose.rot.RotateVector(originElem->GetValuePose("pose").pos),
             modelPose.rot * originElem->GetValuePose("pose").rot);
-          //modelPose + originElem->GetValuePose("pose");
-        gzerr << "name [" << elemName << "] ";
-        gzerr << "modeo_pose [" << modelPose << "] ";
-        gzerr << "oldPose [" << originElem->GetValuePose("pose")
-              << "] newPose [" << newPose << "]\n";
         originElem->GetAttribute("pose")->Set(newPose);
       }
-      // FIXME:  need to also rotate inertial/collision/visual origins
-/*
-      if (elem->HasElement("visual"))
-      {
-        ElementPtr visualElem = elem->GetElement("visual");
-        ElementPtr originElem = visualElem->GetOrCreateElement("origin");
-        gazebo::math::Pose newPose = gazebo::math::Pose(
-          modelPose.rot.RotateVector(originElem->GetValuePose("pose").pos),
-          originElem->GetValuePose("pose").rot );
-          //modelPose.rot * originElem->GetValuePose("pose").rot );
-        gzerr << "name [" << visualElem->GetValueString("name") << "] ";
-        gzerr << "modeo_pose [" << modelPose << "] ";
-        gzerr << "oldPose [" << originElem->GetValuePose("pose")
-              << "] newPose [" << newPose << "]\n";
-        originElem->GetAttribute("pose")->Set(newPose);
-      }
-*/
     }
     else if (elem->GetName() == "joint")
     {
@@ -665,12 +643,8 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
       if (elem->HasElement("axis"))
       {
         ElementPtr axisElem = elem->GetElement("axis");
-        gzerr << "name [" << elemName << "] ";
-        gzerr << "modeo_pose [" << modelPose << "] ";
         gazebo::math::Vector3 newAxis =  modelPose.rot.RotateVector(
           axisElem->GetValueVector3("xyz"));
-        gzerr << "oldAxis [" << axisElem->GetValueVector3("xyz")
-              << "] newAxis [" << newAxis << "]\n";
         axisElem->GetAttribute("xyz")->Set(newAxis);
       }
     }
