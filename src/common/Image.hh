@@ -45,6 +45,8 @@ namespace gazebo
                 L_INT8,
                 L_INT16,
                 RGB_INT8,
+                RGBA_INT8,
+                BGRA_INT8,
                 RGB_INT16,
                 RGB_INT32,
                 BGR_INT8,

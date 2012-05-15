@@ -180,7 +180,7 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
   int bluemask = 0x0000ff;
 
   unsigned int bpp;
-  int scanlineBytes;
+  int scanlineBits;
 
   if (_format == L_INT8)
   {
@@ -192,6 +192,13 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     redmask = 0xff0000;
     greenmask = 0x00ff00;
     bluemask = 0x0000ff;
+  }
+  else if (_format == RGBA_INT8)
+  {
+    bpp = 32;
+    redmask = 0xff000000;
+    greenmask = 0x00ff0000;
+    bluemask = 0x0000ff00;
   }
   else if (_format == BGR_INT8)
   {
@@ -206,10 +213,10 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     return;
   }
 
-  scanlineBytes = bpp * _width;
+  scanlineBits = bpp * _width;
 
   this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
-      _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask);
+      _width, _height, scanlineBits, bpp, redmask, greenmask, bluemask);
 }
 
 //////////////////////////////////////////////////
@@ -415,30 +422,29 @@ std::string Image::GetFilename() const
 //////////////////////////////////////////////////
 Image::PixelFormat Image::GetPixelFormat() const
 {
+  Image::PixelFormat fmt = UNKNOWN;
   FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->bitmap);
+
+  unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
+
   if (type == FIT_BITMAP)
   {
     unsigned int bpp = this->GetBPP();
     if (bpp == 8)
-      return L_INT8;
+      fmt = L_INT8;
     else if (bpp == 16)
-      return L_INT16;
+      fmt = L_INT16;
+    else if (bpp == 24)
+      redMask == 0xff0000 ? fmt = RGB_INT8 : fmt = BGR_INT8;
     else if (bpp == 32)
-    {
-      unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
-      if (redMask == 0xff0000)
-        return RGB_INT8;
-      else 
-        return BGR_INT8;
-    }
+      redMask == 0xff000000 ? fmt = RGBA_INT8 : fmt = BGRA_INT8;
   }
   else if (type == FIT_RGB16)
-    return RGB_INT16;
+    fmt = RGB_INT16;
   else if (type == FIT_RGBF)
-    return RGB_FLOAT32;
-
+    fmt = RGB_FLOAT32;
   else if (type == FIT_UINT16 || type == FIT_INT16)
-    return L_INT16;
+    fmt = L_INT16;
 
-  return UNKNOWN;
+  return fmt;
 }

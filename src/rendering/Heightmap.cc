@@ -52,6 +52,14 @@ Heightmap::~Heightmap()
 //////////////////////////////////////////////////
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
+
+  std::cout << "Image: Width["
+    << _msg->geometry().heightmap().image().width() << "] Height["
+    << _msg->geometry().heightmap().image().height() << "] Fmt[" 
+    << _msg->geometry().heightmap().image().pixel_format() << "] Step[" 
+    << _msg->geometry().heightmap().image().step() << "] Data[" 
+    << _msg->geometry().heightmap().image().data().size() << "]\n";
+
   msgs::Set(this->heightImage, _msg->geometry().heightmap().image());
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
@@ -229,13 +237,24 @@ void Heightmap::DefineTerrain(int x, int y)
     this->heightImage.GetData(&data, count);
 
     if (this->heightImage.GetPixelFormat() == common::Image::L_INT8)
+    {
       img.loadDynamicImage(data, this->heightImage.GetWidth(),
           this->heightImage.GetHeight(), Ogre::PF_L8);
-    else if (this->heightImage.GetPixelFormat() == common::Image::RGB_INT8)
+    }
+    else if (this->heightImage.GetPixelFormat() == common::Image::RGBA_INT8)
+    {
+      printf("RGBA Count[%d]\n", count);
       img.loadDynamicImage(data, this->heightImage.GetWidth(),
-          this->heightImage.GetHeight(), Ogre::PF_BYTE_RGB);
+          this->heightImage.GetHeight(), Ogre::PF_R8G8B8A8);
+    }
+    else if (this->heightImage.GetPixelFormat() == common::Image::RGB_INT8)
+    {
+      printf("RGB Count[%d]\n", count);
+      img.loadDynamicImage(data, this->heightImage.GetWidth(),
+          this->heightImage.GetHeight(), Ogre::PF_R8G8B8);
+    }
     else
-      gzerr << "Unable to handle image format\n";
+      gzerr << "Unable to handle image format[" << this->heightImage.GetPixelFormat() << "]\n";
 
     if (flipX)
       img.flipAroundY();
