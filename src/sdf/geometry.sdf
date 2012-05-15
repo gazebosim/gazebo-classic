@@ -28,6 +28,16 @@
   <element name="heightmap" required="0">
     <attribute name="filename" type="string" default="__default__" required="1"/>
     <attribute name="size" type="vector3" default="1 1 1" required="1"/>
-    <attribute name="offset" type="vector3" default="0 0 0" required="1"/>
+    <attribute name="origin" type="vector3" default="0 0 0" required="1"/>
+
+    <element name="texture" required="*">
+      <element name="size" type="double" default="10" required="1"/>
+      <element name="diffuse" type="string" default="__default__" required="1"/>
+      <element name="normal" type="string" default="__default__" required="1"/>
+    </element>
+    <element name="blend" required="*">
+      <element name="min_height" type="double" default="0" required="1"/>
+      <element name="fade_dist" type="double" default="0" required="1"/>
+    </element>
   </element> <!-- End Heightmap -->
 </element><!-- End Geometry -->

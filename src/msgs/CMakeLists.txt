@@ -17,6 +17,7 @@ set (msgs axis.proto
           heightmapgeom.proto
           imagegeom.proto
           image.proto
+          image_stamped.proto
           inertial.proto
           int.proto
           joint.proto
@@ -30,8 +31,9 @@ set (msgs axis.proto
           packet.proto
           physics.proto
           planegeom.proto
-          vector3d.proto
+          pid.proto
           pose.proto
+          projector.proto
           publishers.proto
           publish.proto
           quaternion.proto
@@ -51,6 +53,7 @@ set (msgs axis.proto
           time.proto
           topic_info.proto
           vector2d.proto
+          vector3d.proto
           visual.proto
           world_control.proto
           world_stats.proto 
@@ -62,6 +65,7 @@ set (msgs axis.proto
           test.proto
           pose_animation.proto
           joint_animation.proto
+          joint_cmd.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

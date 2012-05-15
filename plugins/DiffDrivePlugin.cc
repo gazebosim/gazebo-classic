@@ -26,10 +26,8 @@ enum {RIGHT, LEFT};
 
 /////////////////////////////////////////////////
 DiffDrivePlugin::DiffDrivePlugin()
-  : leftPID(0.01, 0.0, 0.001), rightPID(0.01, 0.0, 0.001)
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
-  this->sum = 0;
 }
 
 /////////////////////////////////////////////////
@@ -37,12 +35,9 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
                            sdf::ElementPtr _sdf)
 {
   this->model = _model;
-  this->link = this->model->GetLink();
-  this->leftWheelLink = this->model->GetLink("left_wheel");
-  this->rightWheelLink = this->model->GetLink("right_wheel");
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->GetName());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
@@ -87,12 +82,8 @@ void DiffDrivePlugin::Init()
       this->leftJoint->GetChild());
 
   math::Box bb = parent->GetBoundingBox();
-  math::Vector3 size = bb.GetSize() * this->leftJoint->GetLocalAxis(0);
-
-  this->wheelRadius = (bb.GetSize().GetSum() - size.GetSum()) * 0.5;
-
-  // this->wheelSpeed[LEFT] = 0.2;
-  // this->wheelSpeed[RIGHT] = 0.2;
+  // This assumes that the largest dimension of the wheel is the diameter
+  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
 }
 
 /////////////////////////////////////////////////
@@ -103,19 +94,16 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   vr = _msg->position().x();
   va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
 
-  this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2;
-  this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2;
+  this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2.0;
+  this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2.0;
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  double d1, d2;
+  /* double d1, d2;
   double dr, da;
-  common::Time stepTime;
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
 
-  stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime; 
 
   // Distance travelled by front wheels
@@ -124,29 +112,16 @@ void DiffDrivePlugin::OnUpdate()
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
-  double leftVel = this->leftJoint->GetVelocity(0);
-  double rightVel = this->rightJoint->GetVelocity(0);
+  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time stepTime = currTime - this->prevUpdateTime;
+  */
 
   double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
   double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
-  double leftErr = leftVel - leftVelDesired;
-  double rightErr = rightVel - rightVelDesired;
+  this->leftJoint->SetVelocity(0, leftVelDesired);
+  this->rightJoint->SetVelocity(0, rightVelDesired);
 
-  double leftForce = this->leftPID.Update(leftErr, stepTime);
-  double rightForce = this->rightPID.Update(leftErr, stepTime);
-
-  if (leftForce < -this->torque)
-    leftForce = -this->torque;
-  if (leftForce > this->torque)
-    leftForce = this->torque;
-
-  if (rightForce < -this->torque)
-    rightForce = -this->torque;
-  if (rightForce > this->torque)
-    rightForce = this->torque;
-
-  // printf("LV[%7.4f] LD[%7.4f] LF[%7.4f] RV[%7.4f] RD[%7.4f] RF[%7.4f]\n", leftVel, leftVelDesired, leftForce, rightVel, rightVelDesired, rightForce);
-  this->leftJoint->SetForce(0, leftForce);
-  this->rightJoint->SetForce(0, rightForce);
+  this->leftJoint->SetMaxForce(0, this->torque);
+  this->rightJoint->SetMaxForce(0, this->torque);
 }

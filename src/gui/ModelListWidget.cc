@@ -22,6 +22,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "sdf/sdf.h"
+#include "common/Image.hh"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
 #include "common/Events.hh"
@@ -170,6 +171,7 @@ void ModelListWidget::Update()
     this->receiveMutex->unlock();
   }
 
+  this->ProcessModelMsgs();
   this->ProcessPoseMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
@@ -177,53 +179,72 @@ void ModelListWidget::Update()
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 {
-  std::string name = _msg.name();
+  this->receiveMutex->lock();
+  msgs::Model msg;
+  msg.CopyFrom(_msg);
+  this->modelMsgs.push_back(msg);
+  this->receiveMutex->unlock();
+}
 
-  QTreeWidgetItem *listItem = this->GetModelListItem(_msg.id());
+/////////////////////////////////////////////////
+void ModelListWidget::ProcessModelMsgs()
+{
+  this->receiveMutex->lock();
 
-  if (!listItem)
+  for (ModelMsgs_L::iterator iter = this->modelMsgs.begin();
+       iter != this->modelMsgs.end(); ++iter)
   {
-    if (!_msg.has_deleted() || !_msg.deleted())
+    std::string name = (*iter).name();
+
+    QTreeWidgetItem *listItem = this->GetModelListItem((*iter).id());
+
+    if (!listItem)
     {
-      // Create a top-level tree item for the path
-      QTreeWidgetItem *topItem = new QTreeWidgetItem(
-          static_cast<QTreeWidgetItem*>(0),
-          QStringList(QString("%1").arg(QString::fromStdString(name))));
-
-      topItem->setData(0, Qt::UserRole, QVariant(_msg.id()));
-      topItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
-      this->modelTreeWidget->addTopLevelItem(topItem);
-
-      for (int i = 0; i < _msg.link_size(); i++)
+      if (!(*iter).has_deleted() || !(*iter).deleted())
       {
-        std::string linkName = _msg.link(i).name();
-        int index = linkName.rfind("::") + 2;
-        std::string linkNameShort = linkName.substr(
-            index, linkName.size() - index);
+        // Create a top-level tree item for the path
+        QTreeWidgetItem *topItem = new QTreeWidgetItem(
+            static_cast<QTreeWidgetItem*>(0),
+            QStringList(QString("%1").arg(QString::fromStdString(name))));
 
-        QTreeWidgetItem *linkItem = new QTreeWidgetItem(topItem,
-          QStringList(QString("%1").arg(
-              QString::fromStdString(linkNameShort))));
+        topItem->setData(0, Qt::UserRole, QVariant((*iter).id()));
+        topItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+        this->modelTreeWidget->addTopLevelItem(topItem);
 
-        linkItem->setData(0, Qt::UserRole, QVariant(_msg.link(i).id()));
-        linkItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
-        this->modelTreeWidget->addTopLevelItem(linkItem);
+        for (int i = 0; i < (*iter).link_size(); i++)
+        {
+          std::string linkName = (*iter).link(i).name();
+          int index = linkName.rfind("::") + 2;
+          std::string linkNameShort = linkName.substr(
+              index, linkName.size() - index);
+
+          QTreeWidgetItem *linkItem = new QTreeWidgetItem(topItem,
+              QStringList(QString("%1").arg(
+                  QString::fromStdString(linkNameShort))));
+
+          linkItem->setData(0, Qt::UserRole, QVariant((*iter).link(i).id()));
+          linkItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+          this->modelTreeWidget->addTopLevelItem(linkItem);
+        }
       }
-    }
-  }
-  else
-  {
-    if (_msg.has_deleted() && _msg.deleted())
-    {
-      int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
-      this->modelTreeWidget->takeTopLevelItem(i);
     }
     else
     {
-      listItem->setText(0, _msg.name().c_str());
-      listItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
+      if ((*iter).has_deleted() && (*iter).deleted())
+      {
+        int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
+        this->modelTreeWidget->takeTopLevelItem(i);
+      }
+      else
+      {
+        listItem->setText(0, (*iter).name().c_str());
+        listItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+      }
     }
   }
+  this->modelMsgs.clear();
+
+  this->receiveMutex->unlock();
 }
 
 /////////////////////////////////////////////////
@@ -514,8 +535,9 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     double px, py, pz;
     msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
 
-    heightmapMessage->set_filename(this->variantManager->value(
-          fileProp).toString().toStdString());
+    msgs::Set(heightmapMessage->mutable_image(),
+        common::Image(this->variantManager->value(
+            fileProp).toString().toStdString()));
 
     px = this->variantManager->value(
          this->GetChildItem(sizeProp, "x")).toDouble();
@@ -535,9 +557,9 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     pz = this->variantManager->value(
          this->GetChildItem(offsetProp, "z")).toDouble();
 
-    heightmapMessage->mutable_offset()->set_x(px);
-    heightmapMessage->mutable_offset()->set_y(py);
-    heightmapMessage->mutable_offset()->set_z(pz);
+    heightmapMessage->mutable_origin()->set_x(px);
+    heightmapMessage->mutable_origin()->set_y(py);
+    heightmapMessage->mutable_origin()->set_z(pz);
   }
   else if (type == "mesh")
   {
@@ -958,10 +980,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::LinearDamping
-  item = this->variantManager->addProperty(QVariant::Double,
+/*  item = this->variantManager->addProperty(QVariant::Double,
                                            tr("linear_damping"));
-  if (_msg.inertial().has_linear_damping())
-    item->setValue(_msg.inertial().linear_damping());
+  if (_msg.has_linear_damping())
+    item->setValue(_msg.linear_damping());
   else
     item->setValue(0.0);
   inertialItem->addSubProperty(item);
@@ -969,12 +991,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   // Inertial::AngularDamping
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("angular_damping"));
-  if (_msg.inertial().has_angular_damping())
-    item->setValue(_msg.inertial().angular_damping());
+  if (_msg.has_angular_damping())
+    item->setValue(_msg.angular_damping());
   else
     item->setValue(0.0);
   inertialItem->addSubProperty(item);
-
+*/
   // Inertial::ixx
   item = this->variantManager->addProperty(QVariant::Double, tr("ixx"));
   if (_msg.inertial().has_ixx())
@@ -1323,7 +1345,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
         QtVariantPropertyManager::groupTypeId(),
         tr("offset"));
     _parent->addSubProperty(sizeItem);
-    this->FillVector3dProperty(_msg.heightmap().offset(), sizeItem);
+    this->FillVector3dProperty(_msg.heightmap().origin(), sizeItem);
   }
 }
 

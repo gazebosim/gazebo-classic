@@ -36,14 +36,11 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
     : Shape(_parent)
 {
   this->AddType(Base::HEIGHTMAP_SHAPE);
-  // TODO this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
-
 
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
-  // TODO delete this->ogreHeightmap;
 }
 
 //////////////////////////////////////////////////
@@ -59,9 +56,11 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   // Use the image to get the size of the heightmap
   this->img.Load(this->sdf->GetValueString("filename"));
 
-  // Width and height must be the same
-  if (this->img.GetWidth() != this->img.GetHeight())
-    gzthrow("Heightmap image must be square\n");
+  if (this->img.GetWidth() != this->img.GetHeight() ||
+      !math::isPowerOfTwo(this->img.GetWidth()-1))
+  {
+    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -69,31 +68,36 @@ void HeightmapShape::Init()
 {
 }
 
+//////////////////////////////////////////////////
 std::string HeightmapShape::GetFilename() const
 {
   return this->sdf->GetValueString("filename");
 }
 
+//////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
-  return math::Vector3();
+  return this->sdf->GetValueVector3("size");
 }
 
-math::Vector3 HeightmapShape::GetOffset() const
+//////////////////////////////////////////////////
+math::Vector3 HeightmapShape::GetOrigin() const
 {
-  return math::Vector3();
+  return this->sdf->GetValueVector3("origin");
 }
 
+//////////////////////////////////////////////////
 void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
-  _msg.mutable_heightmap()->set_filename(this->GetFilename());
+  msgs::Set(_msg.mutable_heightmap()->mutable_image(),
+            common::Image(this->GetFilename()));
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
-  msgs::Set(_msg.mutable_heightmap()->mutable_offset(), this->GetOffset());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetOrigin());
 }
 
+//////////////////////////////////////////////////
 void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
-

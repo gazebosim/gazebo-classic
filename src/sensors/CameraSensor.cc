@@ -70,7 +70,7 @@ std::string CameraSensor::GetTopic() const
 {
   std::string topicName = "~/";
   topicName += this->parentName + "/" + this->GetName() + "/image";
-  boost::replace_all(topicName,"::","/");
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }
@@ -80,7 +80,7 @@ void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
   this->node->Init(_worldName);
-  this->imagePub = this->node->Advertise<msgs::Image>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
 }
 
 //////////////////////////////////////////////////
@@ -154,13 +154,14 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
 
     if (this->imagePub->HasConnections())
     {
-      msgs::Image msg;
+      msgs::ImageStamped msg;
       msgs::Set(msg.mutable_time(), this->world->GetSimTime());
-      msg.set_width(this->camera->GetImageWidth());
-      msg.set_height(this->camera->GetImageHeight());
-      msg.set_encoding(this->camera->GetImageFormat());
-      msg.set_step(this->camera->GetImageWidth() * 3);
-      msg.set_data(this->camera->GetImageData(), msg.width()*3*msg.height());
+      msg.mutable_image()->set_width(this->camera->GetImageWidth());
+      msg.mutable_image()->set_height(this->camera->GetImageHeight());
+      // msg.mutable_image()->set_pixel_format(this->camera->GetImageFormat());
+      msg.mutable_image()->set_step(this->camera->GetImageWidth() * 3);
+      msg.mutable_image()->set_data(this->camera->GetImageData(),
+          msg.image().width() * 3 * msg.image().height());
       this->imagePub->Publish(msg);
     }
   }

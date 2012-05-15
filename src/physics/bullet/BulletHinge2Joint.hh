@@ -19,77 +19,24 @@
  * Date: 21 May 2003
  */
 
-#ifndef BULLETHINGE2JOINT_HH
-#define BULLETHINGE2JOINT_HH
-#include <string>
-/*
+#ifndef __BULLETHINGE2JOINT_HH__
+#define __BULLETHINGE2JOINT_HH__
+
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "Hinge2Joint.hh"
-#include "BulletJoint.hh"
-#include "BulletPhysics.hh"
-*/
+#include "physics/Hinge2Joint.hh"
+#include "physics/bullet/BulletJoint.hh"
+#include "physics/bullet/BulletPhysics.hh"
+
+class btHinge2Constraint;
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics_joints
+    /// \addtogroup gazebo_physics
     /// \{
-    /** \defgroup gazebo_hinge2_joint Hinge 2 Joint
-
-      \brief A two-axis hinge joint.
-
-      \par Attributes
-      - body1 (string)
-        - Name of the first body to attach to the joint
-      - body2 (string)
-        - Name of the second body to attach to the joint
-      - anchor (string)
-        - Name of the body which will act as the anchor to the joint
-      - axis1 (float, tuple)
-        - Defines the axis of rotation for the first degree of freedom
-        - Default: 0 0 1
-      - axis2 (float, tuple)
-        - Defines the axis of rotation for the second degree of freedom
-        - Default: 0 0 1
-      - lowStop1 (float, degrees)
-        - The low stop angle for the first degree of freedom
-        - Default: infinity
-      - highStop1 (float, degrees)
-        - The high stop angle for the first degree of freedom
-        - Default: infinity
-      - lowStop2 (float, degrees)
-        - The low stop angle for the second degree of freedom
-        - Default: infinity
-      - highStop2 (float, degrees)
-        - The high stop angle for the second degree of freedom
-        - Default: infinity
-      - erp (double)
-        - Error reduction parameter.
-        - Default = 0.4
-      - cfm (double)
-        - Constraint force mixing.
-        - Default = 0.8
-
-
-      \par Example
-      \verbatim
-      <joint:hinge2 name ="hinge2_joint>
-        <body1>body1_name</body1>
-        <body2>body2_name</body2>
-        <anchor>anchor_body</anchor>
-        <axis1>0 0 1</axis1>
-        <axis2>0 1 0</axis2>
-        <lowStop1>0</lowStop1>
-        <highStop1>30</highStop1>
-        <lowStop2>0</lowStop2>
-        <highStop2>30</highStop2>
-      </joint:hinge2>
-      \endverbatim
-    */
-    /// \}
-    /// \addtogroup gazebo_hinge2_joint
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
     /// \brief A two axis hinge joint
     class BulletHinge2Joint : public Hinge2Joint<BulletJoint>
@@ -101,65 +48,67 @@ namespace gazebo
       public: virtual ~BulletHinge2Joint();
 
       /// \brief Load the joint
-      protected: virtual void Load(common::XMLConfigNode *node);
-
-      /// \brief Save a joint to a stream in XML format
-      protected: virtual void SaveJoint(std::string &prefix,
-                                        std::ostream &stream);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(Link *one, Link *two);
+      public: virtual void Attach(LinkPtr _one, LinkPtr _two);
 
       /// \brief Set the anchor point
-      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
+      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Get anchor point
-      public: virtual math::Vector3 GetAnchor(int index) const;
+      public: virtual math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Set the first axis of rotation
-      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
       /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Get first axis of rotation
-      public: virtual math::Vector3 GetAxis(int index) const;
+      public: virtual math::Vector3 GetAxis(int _index) const;
 
       /// \brief Get angle of rotation about first axis
-      public: math::Angle GetAngle(int index) const;
+      public: math::Angle GetAngle(int _index) const;
 
       /// \brief Get rate of rotation about first axis
-      public: double GetVelocity(int index) const;
+      public: double GetVelocity(int _index) const;
 
       /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle);
+      public: virtual void SetVelocity(int _index, double _angle);
 
       /// \brief Set the torque
-      public: void SetForce(int index, double torque);
+      public: void SetForce(int _index, double _torque);
 
       /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t);
+      public: virtual void SetMaxForce(int _index, double _t);
 
       /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index);
+      public: virtual double GetMaxForce(int _index);
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, math::Angle angle);
+      public: virtual void SetHighStop(int _index, math::Angle _angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, math::Angle angle);
+      public: virtual void SetLowStop(int _index, math::Angle _angle);
 
       /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(int index);
+      public: virtual math::Angle GetHighStop(int _index);
 
       /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(int index);
+      public: virtual math::Angle GetLowStop(int _index);
+
+      /// \brief Get the axis of rotation
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+
+      /// \brief Get the angle of rotation
+      public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      private: btHinge2Constraint *btHinge2;
     };
 
+  /// \}
   /// \}
   }
 }
 #endif
-
-
-

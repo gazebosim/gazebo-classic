@@ -46,7 +46,7 @@ target_link_libraries(gazebo_sensors gazebo_common
                                      ${ogre_ldflags}
                                      )
 
-add_executable(gzsensor server.cc)
+add_executable(gzsensor server.cc ../gazebo.cc)
 target_link_libraries( gzsensor gazebo_common
                                 gazebo_transport
                                 gazebo_sensors

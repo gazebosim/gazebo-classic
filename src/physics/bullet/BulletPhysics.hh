@@ -23,11 +23,10 @@
 #define BULLETPHYSICS_HH
 #include <string>
 
-#include "physics/bullet/bullet_inc.h"
-
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include "physics/bullet/bullet_inc.h"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Collision.hh"
 #include "physics/Shape.hh"
@@ -48,7 +47,7 @@ namespace gazebo
     class BulletPhysics : public PhysicsEngine
     {
       /// \brief Constructor
-      public: BulletPhysics(World *world);
+      public: BulletPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~BulletPhysics();
@@ -71,20 +70,21 @@ namespace gazebo
       /// \brief Finilize the Bullet engine
       public: virtual void Fini();
 
-      /// \brief Add an entity to the world
-      public: void AddEntity(Entity *entity);
+      /// \brief Set the simulation step time
+      public: virtual void SetStepTime(double _value);
 
-      /// \brief Remove an entity from the physics engine
-      public: virtual void RemoveEntity(Entity *entity);
+      /// \brief Get the simulation step time
+      public: virtual double GetStepTime();
 
       /// \brief Create a new body
-      public: virtual Link *CreateLink(Entity *parent);
+      public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       /// \brief Create a new collision
-      public: virtual Collision *CreateCollision(std::string type, Link *body);
+      public: virtual CollisionPtr CreateCollision(const std::string &_type,
+                                                   LinkPtr _body);
 
       /// \brief Create a new joint
-      public: virtual Joint *CreateJoint(std::string type);
+      public: virtual JointPtr CreateJoint(const std::string &_type);
 
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
@@ -93,24 +93,28 @@ namespace gazebo
       // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
 
       /// \brief Convert an bullet mass to a gazebo Mass
-      public: virtual void ConvertMass(Mass *mass, void *engineMass);
+      public: virtual void ConvertMass(InertialPtr _inertial,
+                                       void *_engineMass);
 
       /// \brief Convert an gazebo Mass to a bullet Mass
-      public: virtual void ConvertMass(void *engineMass, const Mass &mass);
+      public: virtual void ConvertMass(void *_engineMass,
+                                       InertialPtr _inertial);
 
       /// \brief Convert a bullet transform to a gazebo pose
-      public: static math::Pose ConvertPose(btTransform bt);
+      public: static math::Pose ConvertPose(const btTransform &_bt);
 
       /// \brief Convert a gazebo pose to a bullet transform
-      public: static btTransform ConvertPose(const math::Pose pose);
+      public: static btTransform ConvertPose(const math::Pose &_pose);
 
       /// \brief Register a joint with the dynamics world
       public: btDynamicsWorld *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
+
       /// \brief Set the gavity vector
       public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
 
-      // private: btAxisSweep3 *broadPhase;
+      public: virtual void DebugPrint() const;
+
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
       private: btCollisionDispatcher *dispatcher;
@@ -118,6 +122,8 @@ namespace gazebo
       private: btDiscreteDynamicsWorld *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
+
+      private: double stepTimeDouble;
     };
 
   /// \}

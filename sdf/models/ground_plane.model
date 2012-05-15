@@ -7,7 +7,7 @@
         </geometry>
         <surface>
           <friction>
-            <ode mu="100000.0" mu2="100000.0"/>
+            <ode mu="100" mu2="50"/>
           </friction>
         </surface>
       </collision>

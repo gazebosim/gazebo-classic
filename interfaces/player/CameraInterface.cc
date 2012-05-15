@@ -63,7 +63,7 @@ void CameraInterface::Update()
 }
 
 /////////////////////////////////////////////////
-void CameraInterface::OnImage(ConstImagePtr &_msg)
+void CameraInterface::OnImage(ConstImageStampedPtr &_msg)
 {
   // char filename[256];
 
@@ -72,15 +72,15 @@ void CameraInterface::OnImage(ConstImagePtr &_msg)
   this->datatime = gazebo::msgs::Convert(_msg->time()).Double();
 
   // Set the image properties
-  this->data.width = _msg->width();
-  this->data.height = _msg->height();
-  this->data.bpp = (_msg->step() / _msg->width()) * 8;
+  this->data.width = _msg->image().width();
+  this->data.height = _msg->image().height();
+  this->data.bpp = (_msg->image().step() / _msg->image().width()) * 8;
   this->data.fdiv = 1;
   this->data.format = PLAYER_CAMERA_FORMAT_RGB888;
   this->data.compression = PLAYER_CAMERA_COMPRESS_RAW;
 
   unsigned int oldCount = this->data.image_count;
-  this->data.image_count = _msg->data().size();
+  this->data.image_count = _msg->image().data().size();
 
   if (oldCount != this->data.image_count)
   {
@@ -89,14 +89,16 @@ void CameraInterface::OnImage(ConstImagePtr &_msg)
   }
 
   // Set the image pixels
-  memcpy(this->data.image, _msg->data().c_str(), _msg->data().size());
+  memcpy(this->data.image, _msg->image().data().c_str(),
+         _msg->image().data().size());
 
-  size = sizeof(this->data) - sizeof(this->data.image) + _msg->data().size();
+  size = sizeof(this->data) - sizeof(this->data.image) +
+         _msg->image().data().size();
 
   // Send data to server
   this->driver->Publish(this->device_addr, PLAYER_MSGTYPE_DATA,
                         PLAYER_CAMERA_DATA_STATE,
-                        (void*)&this->data, size, &this->datatime);
+                        static_cast<void*>(&this->data), size, &this->datatime);
 
   // Save frames
   /*if (this->save)
@@ -111,7 +113,7 @@ void CameraInterface::Subscribe()
 {
   std::string topic = "~/";
   topic += this->cameraName + "/image";
-  boost::replace_all(topic,"::","/");
+  boost::replace_all(topic, "::", "/");
 
   std::cout << "Topic[" << topic << "]\n";
   this->cameraSub = this->node->Subscribe(topic,
@@ -126,7 +128,7 @@ void CameraInterface::Unsubscribe()
 }
 
 /////////////////////////////////////////////////
-void CameraInterface::SaveFrame(const char *filename)
+void CameraInterface::SaveFrame(const char * /*filename*/) const
 {
   /*
   int width, height;

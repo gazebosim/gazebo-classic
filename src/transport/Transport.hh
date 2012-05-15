@@ -64,6 +64,10 @@ namespace gazebo
     ///        for later delivery
     void pause_incoming(bool _pause);
 
+    /// \brief Send a request, and receive a response.
+    msgs::Response request(const std::string &_worldName,
+                           const msgs::Request &_request);
+
     /// \}
   }
 }

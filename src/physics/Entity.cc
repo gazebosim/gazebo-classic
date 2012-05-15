@@ -233,9 +233,13 @@ math::Pose Entity::GetRelativePose() const
     return this->initialRelativePose;
   }
   else if (this->parent && this->parentEntity)
+  {
     return this->worldPose - this->parentEntity->GetWorldPose();
+  }
   else
+  {
     return this->worldPose;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -390,11 +394,11 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
 //
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
 {
-  this->GetWorld()->modelWorldPoseUpdateMutex->lock();
+  this->GetWorld()->setWorldPoseMutex->lock();
 
   (*this.*setWorldPoseFunc)(_pose, _notify);
 
-  this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
+  this->GetWorld()->setWorldPoseMutex->unlock();
 
   this->PublishPose();
 }
@@ -416,7 +420,9 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
         CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
 
         if (this->IsStatic())
-          coll->worldPose = this->worldPose + coll->initialRelativePose;
+        {
+          coll->worldPose = this->worldPose + coll->GetRelativePose();
+        }
         coll->OnPoseChange();
       }
       else
@@ -492,12 +498,14 @@ void Entity::Fini()
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
+  this->GetWorld()->setWorldPoseMutex->lock();
   Base::Reset();
 
   if (this->HasType(Base::MODEL))
     this->SetWorldPose(this->initialRelativePose);
   else
     this->SetRelativePose(this->initialRelativePose);
+  this->GetWorld()->setWorldPoseMutex->unlock();
 }
 
 //////////////////////////////////////////////////

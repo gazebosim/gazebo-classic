@@ -23,10 +23,13 @@
 #define ACTOR_HH
 
 #include <string>
+#include <map>
+#include <vector>
 
 #include "physics/Model.hh"
 #include "common/Time.hh"
 #include "common/Skeleton.hh"
+#include "common/Animation.hh"
 
 namespace gazebo
 {
@@ -37,6 +40,15 @@ namespace gazebo
   }
   namespace physics
   {
+    struct TrajectoryInfo
+    {
+      unsigned int id;
+      std::string type;
+      double duration;
+      double startTime;
+      double endTime;
+    };
+
     /// \addtogroup gazebo_physics
     /// \{
     /// \brief An actor
@@ -55,6 +67,15 @@ namespace gazebo
 
       /// \brief Initialize the actor
       public: virtual void Init();
+
+      /// \brief Start playing the script
+      public: virtual void Play();
+
+      /// \brief Stop playing the script
+      public: virtual void Stop();
+
+      /// \brief Returns true when actor is playing animation
+      public: virtual bool IsActive();
 
       /// \brief Update the actor
       public: void Update();
@@ -85,21 +106,53 @@ namespace gazebo
       private: void AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
                       math::Pose pose);
 
+      private: void LoadAnimation(sdf::ElementPtr _sdf);
+
+      private: void LoadScript(sdf::ElementPtr _sdf);
+
       protected: const common::Mesh *mesh;
 
       protected: common::Skeleton *skeleton;
 
-      protected: std::string fileName;
+      protected: std::string skinFile;
 
-      protected: double timeFactor;
+      protected: double skinScale;
 
-      protected: common::Time prevSkelAnim;
+      protected: double startDelay;
 
-      protected: common::SkeletonAnimation skelAnimation;
+      protected: double scriptLength;
+
+      protected: double lastScriptTime;
+
+      protected: bool loop;
+
+      protected: bool active;
+
+      protected: bool autoStart;
+
+      protected: LinkPtr mainLink;
+
+      protected: common::Time prevFrameTime;
+
+      protected: common::Time playStartTime;
+
+      protected: std::vector<common::PoseAnimation*> trajectories;
+
+      protected: std::vector<TrajectoryInfo> trajInfo;
+
+      protected: std::map<std::string, common::SkeletonAnimation*>
+                                                            skelAnimation;
+
+      protected: std::map<std::string, std::map<std::string, std::string> >
+                                                            skelNodesMap;
+
+      protected: std::map<std::string, bool> interpolateX;
 
       protected: std::string visualName;
 
       protected: transport::PublisherPtr bonePosePub;
+
+      protected: std::string oldAction;
     };
     /// \}
   }

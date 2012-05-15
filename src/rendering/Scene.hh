@@ -55,6 +55,7 @@ namespace gazebo
 {
   namespace rendering
   {
+    class Projector;
     class Light;
     class Visual;
     class Grid;
@@ -145,6 +146,12 @@ namespace gazebo
 
       /// \brief Get a light by name
       public: LightPtr GetLight(const std::string &_name) const;
+
+      /// \brief Get the count of the lights
+      public: unsigned int GetLightCount() const;
+
+      /// \brief Get a light based on an index
+      public: LightPtr GetLight(unsigned int _index) const;
 
       /// \brief Create a visual
       public: VisualPtr CreateVisual(const std::string &_name);
@@ -372,6 +379,8 @@ namespace gazebo
       private: bool clearAll;
 
       private: Heightmap *heightmap;
+
+      private: std::vector<Projector *> projectors;
     };
     /// \}
   }

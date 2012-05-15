@@ -121,13 +121,12 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->worldId = dWorldCreate();
 
-  // this->spaceId = dSimpleSpaceCreate(0);
   this->spaceId = dHashSpaceCreate(0);
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
 
-  // this->lastCollisionUpdateTime = common::Time(0.0);
+  this->colliders.resize(100);
 }
 
 //////////////////////////////////////////////////
@@ -157,15 +156,15 @@ ODEPhysics::~ODEPhysics()
 //////////////////////////////////////////////////
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf->Copy(_sdf);
+  PhysicsEngine::Load(_sdf);
+
   sdf::ElementPtr odeElem = this->sdf->GetOrCreateElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetOrCreateElement("solver");
 
   this->stepTimeDouble = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
 
-  if (this->sdf->HasAttribute("update_rate"))
-    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
+  dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,
@@ -174,7 +173,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId,
-      odeElem->GetOrCreateElement("constraints")->GetValueDouble(
+       odeElem->GetOrCreateElement("constraints")->GetValueDouble(
         "contact_surface_layer"));
 
   // If auto-disable is active, then user interaction with the joints
@@ -185,7 +184,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableTime(this->worldId, 2);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableSteps(this->worldId, 50);
+  dWorldSetAutoDisableSteps(this->worldId, 20);
 
   math::Vector3 g = this->sdf->GetOrCreateElement(
       "gravity")->GetValueVector3("xyz");
@@ -217,6 +216,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
     gzthrow(std::string("Invalid step type[") + this->stepType);
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 {
   msgs::Response response;
@@ -246,6 +246,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_dt())
@@ -307,75 +308,52 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
-  this->contactPairs.clear();
-
+  unsigned int i = 0;
   this->collidersCount = 0;
   this->trimeshCollidersCount = 0;
 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
 
-  for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
-    delete this->contactFeedbacks[i];
-  this->contactFeedbacks.clear();
+  this->contactFeedbackIndex = 0;
 
-  // Collide all the collisions
-  // if (this->colliders.size() < 50)
-  // if (this->collidersCount < 50)
-  // {
-      for (unsigned int i = 0; i < this->collidersCount; i++)
-      {
-        this->Collide(this->colliders[i].first,
-                      this->colliders[i].second, this->contactCollisions);
-      }
-  // }
-  // else
-  // {
-  // tbb::parallel_for(tbb::blocked_range<size_t>(0,
-  //       this->collidersCount, 10),
-  //       Colliders_TBB(&this->colliders, this, this->contactCollisions));
-  // }
+  for (i = 0; i < this->collidersCount; ++i)
+  {
+    this->Collide(this->colliders[i].first,
+        this->colliders[i].second, this->contactCollisions);
+  }
 
   // Trimesh collision must happen in this thread sequentially
-  for (unsigned int i = 0; i < this->trimeshCollidersCount; i++)
+  for (i = 0; i < this->trimeshCollidersCount; ++i)
   {
     ODECollision *collision1 = this->trimeshColliders[i].first;
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
-
-  // printf("ContactFeedbacks[%d]\n", this->contactFeedbacks.size());
-  // Process all the contact feedbacks
-  // tbb not has memeory issues
-  // if (this->contactFeedbacks.size() < 50)
-  // {
-  // }
-  // else
-  // {
-  //  // Process all the contacts, get the feedback info, and call the collision
-  //  // callbacks
-  //  tbb::parallel_for(tbb::blocked_range<size_t>(0,
-  //        this->contactFeedbacks.size(), MAX_CONTACT_JOINTS),
-  //      ContactUpdate_TBB(&this->contactFeedbacks));
-  // }
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::UpdatePhysics()
 {
+  // need to lock, otherwise might conflict with world resetting
   {
-    this->rayMutex->lock();
+    this->physicsUpdateMutex->lock();
+
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
-    this->rayMutex->unlock();
+
+    msgs::Contacts msg;
 
     // put contact forces into contact feedbacks
-    for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
-      this->ProcessContactFeedback(this->contactFeedbacks[i]);
-  }
+    for (unsigned int i = 0; i < this->contactFeedbackIndex; ++i)
+      this->ProcessContactFeedback(this->contactFeedbacks[i],
+                                   msg.add_contact());
 
-  // Very important to clear out the contact group
-  dJointGroupEmpty(this->contactGroup);
+    this->contactPub->Publish(msg);
+
+    dJointGroupEmpty(this->contactGroup);
+    this->physicsUpdateMutex->unlock();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -387,31 +365,13 @@ void ODEPhysics::Fini()
 //////////////////////////////////////////////////
 void ODEPhysics::Reset()
 {
+  this->physicsUpdateMutex->lock();
   // Very important to clear out the contact group
   dJointGroupEmpty(this->contactGroup);
+  this->physicsUpdateMutex->unlock();
 }
 
-//////////////////////////////////////////////////
-void ODEPhysics::SetUpdateRate(double _value)
-{
-  this->sdf->GetAttribute("update_rate")->Set(_value);
-  this->updateRateDouble = _value;
-}
 
-//////////////////////////////////////////////////
-double ODEPhysics::GetUpdateRate()
-{
-  return this->updateRateDouble;
-}
-
-//////////////////////////////////////////////////
-double ODEPhysics::GetUpdatePeriod()
-{
-  if (this->updateRateDouble > 0)
-    return 1.0/this->updateRateDouble;
-  else
-    return 0;
-}
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetStepTime(double _value)
@@ -427,7 +387,6 @@ double ODEPhysics::GetStepTime()
 {
   return this->stepTimeDouble;
 }
-
 
 //////////////////////////////////////////////////
 LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
@@ -486,7 +445,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
     shape.reset(new MapShape(collision));
   else if (_type == "ray")
     if (_collision)
-      shape.reset(new ODERayShape(collision, false));
+      shape.reset(new ODERayShape(collision));
     else
       shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
   else
@@ -502,7 +461,7 @@ dWorldID ODEPhysics::GetWorldId()
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *_engineMass)
+void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 
@@ -644,7 +603,7 @@ int ODEPhysics::GetMaxContacts()
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ConvertMass(void *_engineMass, const InertialPtr &_inertial)
+void ODEPhysics::ConvertMass(void *_engineMass, InertialPtr _inertial)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 
@@ -658,8 +617,13 @@ void ODEPhysics::ConvertMass(void *_engineMass, const InertialPtr &_inertial)
   odeMass->I[2*4+2] = _inertial->GetPrincipalMoments()[2];
 
   odeMass->I[0*4+1] = _inertial->GetProductsofInertia()[0];
+  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[0];
+
   odeMass->I[0*4+2] = _inertial->GetProductsofInertia()[1];
+  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[1];
+
   odeMass->I[1*4+2] = _inertial->GetProductsofInertia()[2];
+  odeMass->I[2*4+1] = _inertial->GetProductsofInertia()[2];
 }
 
 //////////////////////////////////////////////////
@@ -669,16 +633,18 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type)
 
   if (_type == "prismatic")
     joint.reset(new ODESliderJoint(this->worldId));
-  if (_type == "screw")
+  else if (_type == "screw")
     joint.reset(new ODEScrewJoint(this->worldId));
-  if (_type == "revolute")
+  else if (_type == "revolute")
     joint.reset(new ODEHingeJoint(this->worldId));
-  if (_type == "revolute2")
+  else if (_type == "revolute2")
     joint.reset(new ODEHinge2Joint(this->worldId));
-  if (_type == "ball")
+  else if (_type == "ball")
     joint.reset(new ODEBallJoint(this->worldId));
-  if (_type == "universal")
+  else if (_type == "universal")
     joint.reset(new ODEUniversalJoint(this->worldId));
+  else
+    gzthrow("Unable to create joint of type[" << _type << "]");
 
   return joint;
 }
@@ -767,7 +733,9 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
           collision2->HasType(Base::TRIMESH_SHAPE))
         self->AddTrimeshCollider(collision1, collision2);
       else
+      {
         self->AddCollider(collision1, collision2);
+      }
     }
   }
 }
@@ -812,13 +780,20 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
   {
-    contactFeedback = new ContactFeedback();
+    if (this->contactFeedbackIndex < this->contactFeedbacks.size())
+      contactFeedback = this->contactFeedbacks[this->contactFeedbackIndex++];
+    else
+    {
+      contactFeedback = new ContactFeedback();
+      this->contactFeedbacks.push_back(contactFeedback);
+      this->contactFeedbackIndex = this->contactFeedbacks.size();
+    }
+
     contactFeedback->contact.collision1 = _collision1;
     contactFeedback->contact.collision2 = _collision2;
     contactFeedback->feedbackCount = 0;
     contactFeedback->contact.count = 0;
     contactFeedback->contact.time = this->world->GetSimTime();
-    this->contactFeedbacks.push_back(contactFeedback);
   }
 
   double h = this->stepTimeDouble;
@@ -827,15 +802,15 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactMu2 |
                          dContactSoftERP |
                          dContactSoftCFM |
-                         dContactApprox1;
-  //                       dContactSlip1 |
-  //                       dContactSlip2 |
+                         dContactApprox1 |
+                         dContactSlip1 |
+                         dContactSlip2;
 
   // Compute the CFM and ERP by assuming the two bodies form a
   // spring-damper system.
   double kp = 1.0 /
-    (1.0 / _collision1->surface->kp + 1.0 / _collision2->surface->kp);
-  double kd = _collision1->surface->kd + _collision2->surface->kd;
+    (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
+  double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
 
   contact.surface.soft_erp = h * kp / (h * kp + kd);
   contact.surface.soft_cfm = 1.0 / (h * kp + kd);
@@ -847,29 +822,31 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   // assign fdir1 if not set as 0
   math::Vector3 fd =
-    (_collision1->surface->fdir1 +_collision2->surface->fdir1) * 0.5;
+    (_collision1->GetSurface()->fdir1 +_collision2->GetSurface()->fdir1) * 0.5;
   if (fd != math::Vector3(0, 0, 0))
   {
-    contact.surface.mode = dContactFDir1 | contact.surface.mode;
+    contact.surface.mode |= dContactFDir1;
     contact.fdir1[0] = fd.x;
     contact.fdir1[1] = fd.y;
     contact.fdir1[2] = fd.z;
   }
 
-  contact.surface.mu = std::min(_collision1->surface->mu1,
-                                _collision2->surface->mu1);
-  contact.surface.mu2 = std::min(_collision1->surface->mu2,
-                                 _collision2->surface->mu2);
+  contact.surface.mu = std::min(_collision1->GetSurface()->mu1,
+                                _collision2->GetSurface()->mu1);
+  contact.surface.mu2 = std::min(_collision1->GetSurface()->mu2,
+                                 _collision2->GetSurface()->mu2);
 
-  contact.surface.slip1 = std::min(_collision1->surface->slip1,
-                                   _collision2->surface->slip1);
-  contact.surface.slip2 = std::min(_collision1->surface->slip2,
-                                   _collision2->surface->slip2);
 
-  contact.surface.bounce = std::min(_collision1->surface->bounce,
-                                    _collision2->surface->bounce);
-  contact.surface.bounce_vel = std::min(_collision1->surface->bounceThreshold,
-                                        _collision2->surface->bounceThreshold);
+  contact.surface.slip1 = std::min(_collision1->GetSurface()->slip1,
+                                   _collision2->GetSurface()->slip1);
+  contact.surface.slip2 = std::min(_collision1->GetSurface()->slip2,
+                                   _collision2->GetSurface()->slip2);
+
+  contact.surface.bounce = std::min(_collision1->GetSurface()->bounce,
+                                    _collision2->GetSurface()->bounce);
+  contact.surface.bounce_vel =
+    std::min(_collision1->GetSurface()->bounceThreshold,
+             _collision2->GetSurface()->bounceThreshold);
 
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
@@ -886,6 +863,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     }
 
     contact.geom = _contactCollisions[this->indices[j]];
+
     dJointID contact_joint =
       dJointCreateContact(this->worldId, this->contactGroup, &contact);
 
@@ -907,16 +885,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     }
 
     dJointAttach(contact_joint, b1, b2);
-
-    // my joints map
-    LinkPtr link1 = _collision1->GetLink();
-    LinkPtr link2 = _collision2->GetLink();
-    this->AddLinkPair(link1, link2);
   }
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback)
+void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
+                                        msgs::Contact *_msg)
 {
   if (_feedback->contact.collision1 == NULL)
     gzerr << "collision update Collision1 is null\n";
@@ -924,9 +898,16 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback)
   if (_feedback->contact.collision2 == NULL)
     gzerr << "Collision update Collision2 is null\n";
 
+  _msg->set_collision1(_feedback->contact.collision1->GetScopedName());
+  _msg->set_collision2(_feedback->contact.collision2->GetScopedName());
+
   // Copy all the joint forces to the contact
   for (int i = 0; i < _feedback->feedbackCount; i++)
   {
+    msgs::Set(_msg->add_position(), _feedback->contact.positions[i]);
+    msgs::Set(_msg->add_normal(), _feedback->contact.normals[i]);
+    _msg->add_depth(_feedback->contact.depths[i]);
+
     _feedback->contact.forces[i].body1Force.Set(
         _feedback->feedbacks[i].f1[0],
         _feedback->feedbacks[i].f1[1],
@@ -967,7 +948,7 @@ void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddCollider(ODECollision *_collision1,
-                              ODECollision *_collision2)
+                             ODECollision *_collision2)
 {
   if (this->collidersCount >= this->colliders.size())
     this->colliders.resize(this->colliders.size() + 100);

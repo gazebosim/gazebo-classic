@@ -22,7 +22,9 @@
 #ifndef HEIGHTMAP_HH
 #define HEIGHTMAP_HH
 #include <string>
+#include <vector>
 
+#include "common/Image.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
 #include "rendering/Scene.hh"
@@ -50,23 +52,36 @@ namespace gazebo
       public: virtual ~Heightmap();
 
       /// \brief Load the heightmap
-      public: virtual void Load();
+      public: void Load();
+
+      /// \brief Load the heightmap from a visual message
+      public: void LoadFromMsg(ConstVisualPtr &_msg);
 
       /// \brief Get the height at a location
       public: double GetHeight(double x, double y);
 
-      private: void InitBlendMaps(Ogre::Terrain *_terrain);
+      private: bool InitBlendMaps(Ogre::Terrain *_terrain);
       private: void ConfigureTerrainDefaults();
       private: void DefineTerrain(int x, int y);
 
       private: ScenePtr scene;
+      private: common::Image heightImage;
+      private: math::Vector3 terrainSize;
+      private: unsigned int imageSize;
+      private: double maxPixel;
+      private: math::Vector3 terrainOrigin;
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
       private: Ogre::TerrainGroup *terrainGroup;
       private: bool terrainsImported;
+
+      private: std::vector<std::string> diffuseTextures;
+      private: std::vector<std::string> normalTextures;
+      private: std::vector<double> worldSizes;
+
+      private: std::vector<double> blendHeight;
+      private: std::vector<double> blendFade;
     };
     /// \}
   }
 }
 #endif
-
-

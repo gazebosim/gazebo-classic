@@ -41,6 +41,9 @@ namespace gazebo
 {
   namespace physics
   {
+    class JointController;
+    class Gripper;
+
     /// \addtogroup gazebo_physics
     /// \{
     /// \brief A model
@@ -202,23 +205,6 @@ namespace gazebo
 
       protected: virtual void OnPoseChange();
 
-      private: void RotateBodyAndChildren(LinkPtr _body1,
-                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
-                   double _dangle, bool _updateChildren);
-
-      private: void SlideBodyAndChildren(LinkPtr _body1,
-                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
-                   double _dposition, bool _updateChildren);
-
-      private: void GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
-                   const LinkPtr &_body);
-
-      private: void GetAllParentBodies(std::vector<LinkPtr> &_bodies,
-                   const LinkPtr &_body, const LinkPtr &_origParentBody);
-
-      private: bool InBodies(const LinkPtr &_body,
-                             const std::vector<LinkPtr> &_bodies);
-
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint(sdf::ElementPtr _sdf);
@@ -227,9 +213,14 @@ namespace gazebo
       /// \param _sdf SDF parameter
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
+      /// \brief Load a gripper helper function
+      /// \param _sdf SDF parameter
+      private: void LoadGripper(sdf::ElementPtr _sdf);
+
       private: LinkPtr canonicalLink;
 
       private: Joint_V joints;
+      private: std::vector<Gripper*> grippers;
 
       private: std::vector<ModelPluginPtr> plugins;
 
@@ -241,6 +232,7 @@ namespace gazebo
       private: common::Time prevAnimationTime;
 
       private: boost::recursive_mutex *updateMutex;
+      private: JointController *jointController;
 
       protected: std::vector<ModelPtr> attachedModels;
       protected: std::vector<math::Pose> attachedModelsOffset;

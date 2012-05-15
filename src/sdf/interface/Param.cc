@@ -103,6 +103,12 @@ bool Param::IsVector2i() const
 }
 
 //////////////////////////////////////////////////
+bool Param::IsVector2d() const
+{
+  return this->GetTypeName() == typeid(gazebo::math::Vector2d).name();
+}
+
+//////////////////////////////////////////////////
 bool Param::IsQuaternion() const
 {
   return this->GetTypeName() == typeid(gazebo::math::Quaternion).name();
@@ -182,6 +188,12 @@ bool Param::Set(const gazebo::math::Vector3 &_value)
 
 //////////////////////////////////////////////////
 bool Param::Set(const gazebo::math::Vector2i &_value)
+{
+  return this->SetFromString(boost::lexical_cast<std::string>(_value));
+}
+
+//////////////////////////////////////////////////
+bool Param::Set(const gazebo::math::Vector2d &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
@@ -385,6 +397,53 @@ bool Param::Get(gazebo::math::Vector2i &_value)
             gzerr << "value ["
                   << pieces[i]
                   << "] is not a valid double for Vector2i[" << i << "]\n";
+            return false;
+          }
+        }
+      }
+      _value.x = elements[0];
+      _value.y = elements[1];
+      return true;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+bool Param::Get(gazebo::math::Vector2d &_value)
+{
+  if (this->IsVector2d())
+  {
+    _value = ((ParamT<gazebo::math::Vector2d>*)this)->GetValue();
+    return true;
+  }
+  else
+  {
+    gzwarn << "Parameter [" << this->key << "] is not vector2d, try parsing\n";
+    std::string val_str = this->GetAsString();
+    std::vector<double> elements;
+    std::vector<std::string> pieces;
+    boost::split(pieces, val_str, boost::is_any_of(" "));
+    if (pieces.size() != 2)
+    {
+      gzerr <<
+        "string does not have 2 pieces to parse into Vector2d, using 0s\n";
+      return false;
+    }
+    else
+    {
+      for (unsigned int i = 0; i < pieces.size(); ++i)
+      {
+        if (pieces[i] != "")
+        {
+          try
+          {
+            elements.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
+          }
+          catch(boost::bad_lexical_cast &e)
+          {
+            gzerr << "value ["
+                  << pieces[i]
+                  << "] is not a valid double for Vector2d[" << i << "]\n";
             return false;
           }
         }

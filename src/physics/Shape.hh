@@ -22,6 +22,7 @@
 #include "msgs/msgs.h"
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
+#include "physics/Inertial.hh"
 
 #include "physics/Base.hh"
 
@@ -42,6 +43,14 @@ namespace gazebo
 
       /// \brief Initialize the shape
       public: virtual void Init() = 0;
+
+      /// \brief Get the mass of a shape
+      public: virtual double GetMass(double _density) const
+              {return _density;}
+
+      /// \brief Get inertial for a shape
+      public: virtual void GetInertial(double _mass,
+                                       InertialPtr _inertial) const;
 
       public: virtual void FillShapeMsg(msgs::Geometry &_msg) = 0;
 

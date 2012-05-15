@@ -368,8 +368,10 @@ void Visual::Load()
       this->skeleton = ent->getSkeleton();
 
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
+    {
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
           this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
+    }
   }
 
   // Set the pose of the scene node
@@ -1466,8 +1468,6 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       for (unsigned int i = 0; i < skel->GetNumNodes(); i++)
       {
         common::SkeletonNode *node = skel->GetNodeByHandle(i);
-        if (node->GetChildCount() == 0)
-          continue;
         Ogre::Bone *bone = ogreSkeleton->createBone(node->GetName());
 
         if (node->GetParent())
@@ -1635,8 +1635,8 @@ void Visual::InsertMesh(const common::Mesh *mesh)
 
     if (mesh->HasSkeleton())
     {
-      min = math::Vector3(-10, -10, -10);
-      max = math::Vector3(10, 10, 10);
+      min = math::Vector3(-1, -1, -1);
+      max = math::Vector3(1, 1, 1);
     }
 
     if (!max.IsFinite())
@@ -1982,6 +1982,8 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
     return;
   }
+
+//  const msgs::Time& stamp = _pose.time(0);
 
   for (int i = 0; i < _pose.pose_size(); i++)
   {

@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef LINK_HH
-#define LINK_HH
+#ifndef __LINK_HH__
+#define __LINK_HH__
 
 #include <map>
 #include <vector>
@@ -61,6 +61,7 @@ namespace gazebo
       /// \brief Finalize the body
       public: void Fini();
 
+      /// \brief Reset the link
       public: void Reset();
 
       /// \brief Update the parameters using new sdf values
@@ -84,7 +85,6 @@ namespace gazebo
 
       /// \brief Get the gravity mode
       public: virtual bool GetGravityMode() = 0;
-
 
       /// \brief Set whether this body will collide with others in the model
       public: virtual void SetSelfCollide(bool collide) = 0;
@@ -123,6 +123,10 @@ namespace gazebo
       /// \brief Add a force to the body, components are relative to the
       ///        body's own frame of reference.
       public: virtual void AddRelativeForce(const math::Vector3 &_force) = 0;
+
+      /// \brief Add a force to the body using a global position
+      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
+                  const math::Vector3 &_pos) = 0;
 
       /// \brief Add a force to the body at position expressed to the body's
       ///        own frame of reference.
@@ -172,15 +176,9 @@ namespace gazebo
 
       /// \brief Get the mass of the body
       public: InertialPtr GetInertial() const { return this->inertial; }
+
       /// \brief Set the mass of the body
       public: void SetInertial(const InertialPtr &_inertial);
-
-      public: virtual void UpdateMass() {}
-      public: virtual void UpdateSurface() {}
-
-      /// Load a new collision helper function
-      /// \param _sdf SDF element used to load the collision
-      private: void LoadCollision(sdf::ElementPtr _sdf);
 
       /// \brief Get a collision by id
       /// \return Pointer to the collision
@@ -196,15 +194,23 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const;
 
       /// \brief Set the linear damping factor
-      public: virtual void SetLinearDamping(double damping) = 0;
+      public: virtual void SetLinearDamping(double _damping) = 0;
 
       /// \brief Set the angular damping factor
-      public: virtual void SetAngularDamping(double damping) = 0;
+      public: virtual void SetAngularDamping(double _damping) = 0;
+
+      /// \brief Get the linear damping factor
+      public: double GetLinearDamping() const;
+
+      /// \brief Get the angular damping factor
+      public: double GetAngularDamping() const;
 
       /// \brief Set whether this body is in the kinematic state
       public: virtual void SetKinematic(const bool &) {}
+
       /// \brief Get whether this body is in the kinematic state
       public: virtual bool GetKinematic() const {return false;}
+
       /// \brief Get sensor count
       public: unsigned int GetSensorCount() const;
 
@@ -217,6 +223,7 @@ namespace gazebo
               { return enabledSignal.Connect(subscriber); }
       public: void DisconnectEnabled(event::ConnectionPtr &c)
               { enabledSignal.Disconnect(c); }
+
       /// \brief Fill a link message
       /// \param _msg Message to fill
       public: void FillLinkMsg(msgs::Link &_msg);
@@ -248,6 +255,19 @@ namespace gazebo
 
       /// \brief Set the current link state
       public: void SetState(const LinkState &_state);
+
+      /// \brief Update the mass matrix
+      public: virtual void UpdateMass() {}
+
+      /// \brief Update surface parameters
+      public: virtual void UpdateSurface() {}
+
+      /// Load a new collision helper function
+      /// \param _sdf SDF element used to load the collision
+      private: void LoadCollision(sdf::ElementPtr _sdf);
+
+      /// \brief Set the inertial properties based on the collision entities
+      private: void SetInertialFromCollisions();
 
       protected: bool isStatic;
 

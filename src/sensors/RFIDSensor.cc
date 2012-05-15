@@ -24,14 +24,6 @@
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
-#include "physics/World.hh"
-#include "physics/MultiRayShape.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Physics.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
-
 #include "msgs/msgs.h"
 
 #include "math/Vector3.hh"
@@ -43,11 +35,11 @@
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("rfid",RFIDSensor)
+GZ_REGISTER_STATIC_SENSOR("rfid", RFIDSensor)
 
 /////////////////////////////////////////////////
-  RFIDSensor::RFIDSensor()
-: Sensor()
+RFIDSensor::RFIDSensor()
+  : Sensor()
 {
   this->active = false;
   this->node = transport::NodePtr(new transport::Node());
@@ -63,7 +55,6 @@ RFIDSensor::~RFIDSensor()
 void RFIDSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf )
 {
   Sensor::Load(_worldName, _sdf);
-
 }
 
 /////////////////////////////////////////////////
@@ -102,7 +93,8 @@ void RFIDSensor::Load(const std::string &_worldName)
   this->laserShape->Init();
   */
 
-  /*** Tried to use rendering, but says rendering engine isnt initialized which is understandable */
+  /*** Tried to use rendering, but says rendering engine isnt initialized
+       which is understandable */
 
   /**
     rendering::ScenePtr scene = rendering::get_scene(this->world->GetName());
@@ -149,14 +141,13 @@ void RFIDSensor::EvaluateTags()
   std::vector<RFIDTag*> tags = this->rtm->GetTags();
   std::vector<RFIDTag*>::const_iterator ci;
 
-  // iterate through the tags contained given rfid tag manager 
-  for(ci = tags.begin(); ci != tags.end(); ++ci)
+  // iterate through the tags contained given rfid tag manager
+  for (ci = tags.begin(); ci != tags.end(); ++ci)
   {
-    // physics::LinkPtr tagLinkPtr = (*ci)->getLinkPtr();
     math::Pose pos = (*ci)->GetTagPose();
     // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
     // std::cout << "link pos: x" << pos.pos.x
-    //     << " y:" << pos.pos.y 
+    //     << " y:" << pos.pos.y
     //     << " z:" << pos.pos.z << std::endl;
     this->CheckTagRange(pos);
   }
@@ -165,7 +156,7 @@ void RFIDSensor::EvaluateTags()
 //////////////////////////////////////////////////
 bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
 {
-  //copy sensor vector pos into a temp var
+  // copy sensor vector pos into a temp var
   math::Vector3 v;
   v = _pose.pos - this->entity->GetWorldPose().pos;
 
@@ -182,7 +173,7 @@ bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
+bool RFIDSensor::CheckRayIntersection(const math::Pose &/*_pose*/)
 {
   /** rendering code below to check for intersections
 

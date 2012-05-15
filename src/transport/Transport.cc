@@ -19,6 +19,7 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
+#include "transport/Node.hh"
 #include "transport/Publisher.hh"
 #include "transport/Subscriber.hh"
 #include "transport/ConnectionManager.hh"
@@ -27,7 +28,12 @@
 using namespace gazebo;
 
 boost::thread *g_runThread = NULL;
+boost::condition_variable g_responseCondition;
+boost::mutex requestMutex;
 bool g_stopped = true;
+
+const msgs::Request *g_request = NULL;
+msgs::Response *g_response = NULL;
 
 /////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &master_host,
@@ -135,4 +141,45 @@ void transport::clear_buffers()
 void transport::pause_incoming(bool _pause)
 {
   transport::TopicManager::Instance()->PauseIncoming(_pause);
+}
+
+/////////////////////////////////////////////////
+void on_response(ConstResponsePtr &_msg)
+{
+  if (!g_request || _msg->id() != g_request->id())
+    return;
+
+  if (!g_response)
+    g_response = new msgs::Response;
+
+  g_response->CopyFrom(*_msg);
+  g_responseCondition.notify_one();
+}
+
+/////////////////////////////////////////////////
+msgs::Response transport::request(const std::string &_worldName,
+                                  const msgs::Request &_request)
+{
+  boost::unique_lock<boost::mutex> lock(requestMutex);
+  g_response = NULL;
+  g_request = &_request;
+
+  NodePtr node = NodePtr(new Node());
+  node->Init(_worldName);
+
+  PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
+  SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
+
+  requestPub->Publish(_request);
+
+  g_responseCondition.wait(lock);
+
+  requestPub.reset();
+  responseSub.reset();
+  node.reset();
+
+  if (g_response != NULL)
+    return *g_response;
+  else
+    return msgs::Response();
 }

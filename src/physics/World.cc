@@ -73,14 +73,16 @@ World::World(const std::string &_name)
 
   this->receiveMutex = new boost::mutex();
 
+  this->initialized = false;
   this->needsReset = false;
-  this->stepInc = false;
+  this->stepInc = 0;
   this->pause = false;
   this->thread = NULL;
 
   this->name = _name;
 
-  this->modelWorldPoseUpdateMutex = new boost::recursive_mutex();
+  this->setWorldPoseMutex = new boost::recursive_mutex();
+  this->worldUpdateMutex = new boost::recursive_mutex();
 
   this->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
@@ -92,8 +94,10 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
-  delete this->modelWorldPoseUpdateMutex;
-  this->modelWorldPoseUpdateMutex = NULL;
+  delete this->setWorldPoseMutex;
+  this->setWorldPoseMutex = NULL;
+  delete this->worldUpdateMutex;
+  this->worldUpdateMutex = NULL;
 
   this->connections.clear();
   this->Fini();
@@ -121,7 +125,6 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0, 200000000);
-
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
@@ -218,6 +221,12 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
+  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+
   // Initialize all the entities
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
@@ -227,6 +236,8 @@ void World::Init()
 
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -255,57 +266,89 @@ void World::RunLoop()
 {
   this->physicsEngine->InitForThread();
 
-  common::Time step = this->physicsEngine->GetStepTime();
-
   this->startTime = common::Time::GetWallTime();
 
   // This fixes a minor issue when the world is paused before it's started
   if (this->IsPaused())
     this->pauseStartTime = this->startTime;
 
-  common::Time prevUpdateTime = common::Time::GetWallTime();
+  this->prevStepWallTime = common::Time::GetWallTime();
+
   while (!this->stop)
+    this->Step();
+}
+
+//////////////////////////////////////////////////
+void World::Step()
+{
+  this->worldUpdateMutex->lock();
+
+  // Send statistics about the world simulation
+  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
-    // Send statistics about the world simulation
-    if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
-    {
-      msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
-      msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
-      msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
-      this->worldStatsMsg.set_paused(this->IsPaused());
+    msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
+    msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
+    msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
+    this->worldStatsMsg.set_paused(this->IsPaused());
 
-      this->statPub->Publish(this->worldStatsMsg);
-      this->prevStatTime = common::Time::GetWallTime();
+    this->statPub->Publish(this->worldStatsMsg);
+    this->prevStatTime = common::Time::GetWallTime();
+  }
+
+  if (this->IsPaused() && !this->stepInc > 0)
+    this->pauseTime += this->physicsEngine->GetStepTime();
+  else
+  {
+    // throttling update rate
+    if (common::Time::GetWallTime() - this->prevStepWallTime
+           >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+    {
+      this->prevStepWallTime = common::Time::GetWallTime();
+      // query timestep to allow dynamic time step size updates
+      this->simTime += this->physicsEngine->GetStepTime();
+      this->Update();
     }
+  }
 
-    if (this->IsPaused() && !this->stepInc)
-      this->pauseTime += step;
-    else
-    {
-      // throttling update rate
-      if (common::Time::GetWallTime() - prevUpdateTime
-             >= common::Time(this->physicsEngine->GetUpdatePeriod()))
-      {
-        prevUpdateTime = common::Time::GetWallTime();
-        this->simTime += step;
-        this->Update();
-      }
-    }
+  // TODO: Fix timeout:  this belongs in simulator.cc
+  /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
+  {
+    this->stop = true;
+    break;
+  }*/
 
-    // TODO: Fix timeout:  this belongs in simulator.cc
-    /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
-    {
-      this->stop = true;
-      break;
-    }*/
+  if (this->IsPaused() && this->stepInc > 0)
+    this->stepInc--;
 
-    if (this->IsPaused() && this->stepInc)
-      this->stepInc = false;
+  this->ProcessEntityMsgs();
+  this->ProcessRequestMsgs();
+  this->ProcessFactoryMsgs();
+  this->ProcessModelMsgs();
+  this->worldUpdateMutex->unlock();
+}
 
-    this->ProcessEntityMsgs();
-    this->ProcessRequestMsgs();
-    this->ProcessFactoryMsgs();
-    this->ProcessModelMsgs();
+//////////////////////////////////////////////////
+void World::StepWorld(int _steps)
+{
+  if (!this->IsPaused())
+  {
+    gzwarn << "Calling World::StepWorld(steps) while world is not paused\n";
+    this->SetPaused(true);
+  }
+
+  this->worldUpdateMutex->lock();
+  this->stepInc = _steps;
+  this->worldUpdateMutex->unlock();
+
+  // block on completion
+  bool wait = true;
+  while (wait)
+  {
+    common::Time::MSleep(1);
+    this->worldUpdateMutex->lock();
+    if (this->stepInc == 0 || this->stop)
+      wait = false;
+    this->worldUpdateMutex->unlock();
   }
 }
 
@@ -331,14 +374,18 @@ void World::Update()
   {
     this->physicsEngine->UpdateCollision();
 
+    this->physicsEngine->UpdatePhysics();
+
+    // do this after physics update as
+    //   ode --> MoveCallback sets the dirtyPoses
+    //           and we need to propagate it into Entity::worldPose
     for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
         iter != this->dirtyPoses.end(); ++iter)
     {
       (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
-    this->dirtyPoses.clear();
 
-    this->physicsEngine->UpdatePhysics();
+    this->dirtyPoses.clear();
   }
 
   event::Events::worldUpdateEnd();
@@ -570,7 +617,7 @@ void World::Reset(bool _resetTime)
 //////////////////////////////////////////////////
 void World::OnStep()
 {
-  this->stepInc = true;
+  this->stepInc = 1;
 }
 
 //////////////////////////////////////////////////
@@ -669,15 +716,17 @@ void World::SetPaused(bool _p)
   if (this->pause == _p)
     return;
 
+  this->worldUpdateMutex->lock();
+  this->pause = _p;
+  this->worldUpdateMutex->unlock();
+
   if (_p)
     this->pauseStartTime = common::Time::GetWallTime();
   else
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
   event::Events::pause(_p);
-  this->pause = _p;
 }
-
 
 //////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
@@ -688,7 +737,8 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 
 //////////////////////////////////////////////////
 void World::OnControl(ConstWorldControlPtr &_data)
-{ if (_data->has_pause())
+{
+  if (_data->has_pause())
     this->SetPaused(_data->pause());
 
   if (_data->has_step())
@@ -777,19 +827,43 @@ void World::ModelUpdateSingleLoop()
 }
 
 
+//////////////////////////////////////////////////
+void World::LoadPlugin(const std::string &_filename,
+                       const std::string &_name,
+                       sdf::ElementPtr _sdf)
+{
+  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
+                                                              _name);
+  if (plugin)
+  {
+    plugin->Load(shared_from_this(), _sdf);
+    this->plugins.push_back(plugin);
+
+    if (this->initialized)
+      plugin->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::RemovePlugin(const std::string &_name)
+{
+  std::vector<WorldPluginPtr>::iterator iter;
+  for (iter = this->plugins.begin(); iter != this->plugins.end(); ++iter)
+  {
+    if ((*iter)->GetHandle() == _name)
+    {
+      this->plugins.erase(iter);
+      break;
+    }
+  }
+}
 
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename,
-                                                              pluginName);
-  if (plugin)
-  {
-    plugin->Load(shared_from_this(), _sdf);
-    this->plugins.push_back(plugin);
-  }
+  this->LoadPlugin(filename, pluginName, _sdf);
 }
 
 //////////////////////////////////////////////////

@@ -19,27 +19,31 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef BULLETPLANESHAPE_HH
-#define BULLETPLANESHAPE_HH
+#ifndef __BULLETPLANESHAPE_HH__
+#define __BULLETPLANESHAPE_HH__
 
-#include "common/Exception.hh"
-#include "BulletPhysics.hh"
-#include "PlaneShape.hh"
+#include <iostream>
+
+#include "physics/bullet/BulletPhysics.hh"
+#include "physics/PlaneShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class Link;
-    class XMLConfig;
-
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
     /// \brief Bullet collision for an infinite plane.
     class BulletPlaneShape : public PlaneShape
     {
       /// \brief Constructor
-      public: BulletPlaneShape(Collision *parent) : PlaneShape(parent) {}
+      public: BulletPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
+
       /// \brief Destructor
       public: virtual ~BulletPlaneShape() {}
+
       /// \brief Set the altitude of the plane
       public: void SetAltitude(const math::Vector3 &pos)
               {
@@ -49,18 +53,18 @@ namespace gazebo
       /// \brief Create the plane
       public: void CreatePlane()
               {
-                BulletCollision *bParent =
-                  static_cast<BulletCollision*>(this->parent);
                 PlaneShape::CreatePlane();
+                BulletCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                    this->collisionParent);
 
-                btmath::Vector3 vec((**normalP).x,
-                    (**normalP).y, (**normalP).z);
+                math::Vector3 n = this->GetNormal();
+                btVector3 vec(n.x, n.y, n.z);
 
-                btCollisionShape *btshape = new btStaticPlaneShape(vec, 0.0);
-
-                bParent->SetCollisionShape(btshape);
+                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0));
               }
     };
+    /// \}
     /// \}
   }
 }

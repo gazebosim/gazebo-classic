@@ -45,12 +45,15 @@ namespace gazebo
       /// \brief Load a joint
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Reset the joint
+      public: virtual void Reset();
+
       /// \brief Get the link to which the joint is attached according
       ///        the _index
-      public: virtual LinkPtr GetJointLink(int index) const;
+      public: virtual LinkPtr GetJointLink(int _index) const;
 
       /// \brief Determines of the two bodies are connected by a joint
-      public: bool virtual AreConnected(LinkPtr one, LinkPtr two) const;
+      public: bool virtual AreConnected(LinkPtr _one, LinkPtr _two) const;
 
       /// \brief The default function does nothing. This should be
       ///        overriden in the child classes where appropriate
@@ -104,8 +107,6 @@ namespace gazebo
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, int index, double value);
 
-      public: virtual void Reset();
-
       /// This is our id
       protected: dJointID jointId;
 
@@ -117,9 +118,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-
-
-
-

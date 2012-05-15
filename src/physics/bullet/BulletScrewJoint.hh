@@ -23,121 +23,83 @@
  * Date: 24 May 2009
  */
 
-#ifndef BULLETSCREWJOINT_HH
-#define BULLETSCREWJOINT_HH
-/*
-#include <btBulletDynamicsCommon.h>
-#include "Param.hh"
-#include "ScrewJoint.hh"
-#include "BulletJoint.hh"
-*/
+#ifndef __BULLETSCREWJOINT_HH__
+#define __BULLETSCREWJOINT_HH__
+
+#include "physics/bullet/BulletJoint.hh"
+#include "physics/ScrewJoint.hh"
+
+class btSliderConstraint;
 
 namespace gazebo
 {
-/// \addtogroup gazebo_physics_joints
-/// \{
-/** \defgroup gazebo_screw_joint Screw Joint
-
-  \brief A screw joint
-
-  \par Attributes
-  - body1 (string)
-    - Name of the first body to attach to the joint
-  - body2 (string)
-    - Name of the second body to attach to the joint
-  - anchor (string)
-    - Name of the body which will act as the anchor to the joint
-  - axis (float, tuple)
-    - Defines the axis of movement
-    - Default: 0 0 1
-  - lowStop (float, meters)
-    - The low stop position
-    - Default: infinity
-  - highStop (float, meters)
-    - The high stop position
-    - Default: infinity
-  - erp (double)
-    - Error reduction parameter.
-    - Default = 0.4
-  - cfm (double)
-    - Constraint force mixing.
-    - Default = 0.8
-
-
-  \par Example
-  \verbatim
-  <joint:screw name ="screw_joint>
-    <body1>body1_name</body1>
-    <body2>body2_name</body2>
-    <anchor>anchor_body</anchor>
-    <axis>0 0 1</axis>
-    <lowStop>0</lowStop>
-    <highStop>30</highStop>
-  </joint:screw>
-  \endverbatim
-*/
-/// \}
-
-
-/// \addtogroup gazebo_screw_joint Screw Joint
-/// \{
-  /// \brief A screw joint
-  class BulletScrewJoint : public ScrewJoint<BulletJoint>
+  namespace physics
   {
-    /// \brief Constructor
-    public: BulletScrewJoint(btDynamicsWorld *world);
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
+    /// \brief A screw joint
+    class BulletScrewJoint : public ScrewJoint<BulletJoint>
+    {
+      /// \brief Constructor
+      public: BulletScrewJoint(btDynamicsWorld *world);
 
-    /// \brief Destructor
-    public: virtual ~BulletScrewJoint();
+      /// \brief Destructor
+      public: virtual ~BulletScrewJoint();
 
-    /// \brief Load the joint
-    protected: virtual void Load(XMLConfigNode *node);
+      /// \brief Load the joint
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
-    /// \brief Attach the two bodies with this joint
-    public: void Attach(Body *one, Body *two);
+      /// \brief Attach the two bodies with this joint
+      public: void Attach(LinkPtr _one, LinkPtr _two);
 
-    /// \brief Get the axis of rotation
-    public: virtual Vector3 GetAxis(int index) const;
+      /// \brief Set the axis of motion
+      public: void SetAxis(int _index, const math::Vector3 &_axis);
 
-    /// \brief Set the axis of motion
-    public: void SetAxis(int index, const Vector3 &axis);
+      /// \brief Set joint damping, not yet implemented
+      public: virtual void SetDamping(int _index, double _damping);
 
-    /// \brief Set joint damping, not yet implemented
-    public: virtual void SetDamping(int index, const double damping);
+      /// \brief Set the high stop of an axis(index).
+      public: virtual void SetHighStop(int _index, math::Angle _angle);
 
-    /// \brief Set the high stop of an axis(index).
-    public: virtual void SetHighStop(int index, Angle angle);
+      /// \brief Set the low stop of an axis(index).
+      public: virtual void SetLowStop(int _index, math::Angle _angle);
 
-    /// \brief Set the low stop of an axis(index).
-    public: virtual void SetLowStop(int index, Angle angle);
+      /// \brief Get the high stop of an axis(index).
+      public: virtual math::Angle GetHighStop(int _index);
 
-    /// \brief Get the high stop of an axis(index).
-    public: virtual Angle GetHighStop(int index);
+      /// \brief Get the low stop of an axis(index).
+      public: virtual math::Angle GetLowStop(int _index);
 
-    /// \brief Get the low stop of an axis(index).
-    public: virtual Angle GetLowStop(int index);
+      /// \brief Get the position of the joint
+      public: virtual math::Angle GetAngle(int _index) const;
 
-    /// \brief Get the position of the joint
-    public: virtual Angle GetAngle(int index) const;
+      /// \brief Get the rate of change
+      public: virtual double GetVelocity(int _index) const;
 
-    /// \brief Get the rate of change
-    public: virtual double GetVelocity(int index) const;
+       /// \brief Set the velocity of an axis(index).
+      public: virtual void SetVelocity(int _index, double _angle);
 
-     /// \brief Set the velocity of an axis(index).
-    public: virtual void SetVelocity(int index, double angle);
+      /// \brief Set the screw force
+      public: virtual void SetForce(int _index, double _force);
 
-    /// \brief Set the screw force
-    public: virtual void SetForce(int index, double force);
+      /// \brief Set the max allowed force of an axis(index).
+      public: virtual void SetMaxForce(int _index, double _t);
 
-    /// \brief Set the max allowed force of an axis(index).
-    public: virtual void SetMaxForce(int index, double t);
+      /// \brief Get the max allowed force of an axis(index).
+      public: virtual double GetMaxForce(int _index);
 
-    /// \brief Get the max allowed force of an axis(index).
-    public: virtual double GetMaxForce(int index);
-  };
+      /// \brief Get the axis of rotation
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-/// \}
+      /// \brief Get the angle of rotation
+      public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      private: btSliderConstraint *btScrew;
+    };
+    /// \}
+    /// \}
+  }
 }
 #endif
-
-

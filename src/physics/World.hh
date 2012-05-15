@@ -19,8 +19,8 @@
  * Date: 3 Apr 2007
  */
 
-#ifndef WORLD_HH
-#define WORLD_HH
+#ifndef __WORLD_HH__
+#define __WORLD_HH__
 
 #include <vector>
 #include <list>
@@ -180,11 +180,22 @@ namespace gazebo
       /// \brief Return a version of the name with "<world_name>::" removed
       public: std::string StripWorldName(const std::string &_name) const;
 
+      /// \brief Load a plugin
+      public: void LoadPlugin(const std::string &_filename,
+                              const std::string &_name,
+                              sdf::ElementPtr _sdf);
+
+      /// \brief Remove a running plugin
+      public: void RemovePlugin(const std::string &_name);
+
       /// \brief Enable all links in all the models
       public: void EnableAllModels();
 
       /// \brief Disable all links in all the models
       public: void DisableAllModels();
+
+      /// \brief Step callback
+      public: void StepWorld(int _steps);
 
       /// \brief Create all entities
       /// \param _sdf SDF element
@@ -199,6 +210,10 @@ namespace gazebo
 
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
+      private: void Step();
+
+      /// \brief For keeping track of time step throttling
+      private: common::Time prevStepWallTime;
 
       /// \brief Update the world
       private: void Update();
@@ -267,7 +282,7 @@ namespace gazebo
       /// Current simulation time
       private: common::Time simTime, pauseTime, startTime;
       private: bool pause;
-      private: bool stepInc;
+      private: int stepInc;
 
       private: event::Connection_V connections;
 
@@ -294,7 +309,8 @@ namespace gazebo
 
       /// TODO: Add an accessor for this, and make it private
       /// lock all pose updates when worldPose is being updated for a model
-      public: boost::recursive_mutex *modelWorldPoseUpdateMutex;
+      public: boost::recursive_mutex *setWorldPoseMutex;
+      private: boost::recursive_mutex *worldUpdateMutex;
 
       private: sdf::ElementPtr sdf;
 
@@ -308,6 +324,7 @@ namespace gazebo
       private: std::list<msgs::Model> modelMsgs;
 
       private: bool needsReset;
+      private: bool initialized;
 
       private: RayShapePtr testRay;
     };

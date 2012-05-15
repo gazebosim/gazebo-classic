@@ -51,10 +51,14 @@ namespace gazebo
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      public: virtual double GetMass(double _density) const;
+
+      /// \brief Get inertial for a shape
+      public: virtual void GetInertial(double _mass,
+                                       InertialPtr _inertial) const;
     };
     /// \}
   }
 }
 #endif
-
-

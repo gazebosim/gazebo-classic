@@ -22,7 +22,7 @@
 #include "common/Plugin.hh"
 #include "sensors/CameraSensor.hh"
 #include "rendering/Camera.hh"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 namespace gazebo
 {

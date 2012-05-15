@@ -15,7 +15,7 @@
  *
 */
 /* Desc: Heightmap geometry
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 12 May 2009
  */
 
@@ -25,11 +25,13 @@
 #include <Terrain/OgreTerrain.h>
 #include <Terrain/OgreTerrainGroup.h>
 
+#include "math/Helpers.hh"
 #include "rendering/ogre.h"
-#include "common/Image.hh"
 #include "common/Exception.hh"
 
 #include "rendering/Scene.hh"
+#include "rendering/Light.hh"
+#include "rendering/Conversions.hh"
 #include "rendering/Heightmap.hh"
 
 using namespace gazebo;
@@ -48,14 +50,63 @@ Heightmap::~Heightmap()
 }
 
 //////////////////////////////////////////////////
+void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
+{
+  msgs::Set(this->heightImage, _msg->geometry().heightmap().image());
+  this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
+  this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
+
+  for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
+  {
+    this->diffuseTextures.push_back(
+        _msg->geometry().heightmap().texture(i).diffuse());
+    this->normalTextures.push_back(
+        _msg->geometry().heightmap().texture(i).normal());
+    this->worldSizes.push_back(
+        _msg->geometry().heightmap().texture(i).size());
+  }
+
+  for (int i = 0; i < _msg->geometry().heightmap().blend_size(); ++i)
+  {
+    this->blendHeight.push_back(
+        _msg->geometry().heightmap().blend(i).min_height());
+    this->blendFade.push_back(
+        _msg->geometry().heightmap().blend(i).fade_dist());
+  }
+
+  this->Load();
+}
+
+//////////////////////////////////////////////////
 void Heightmap::Load()
 {
-  this->terrainGlobals = OGRE_NEW Ogre::TerrainGlobalOptions();
-  this->terrainGroup = OGRE_NEW Ogre::TerrainGroup(this->scene->GetManager(),
-      Ogre::Terrain::ALIGN_X_Y, 513, 513.0f);
+  this->terrainGlobals = new Ogre::TerrainGlobalOptions();
+
+  if (this->heightImage.GetWidth() != this->heightImage.GetHeight() ||
+      !math::isPowerOfTwo(this->heightImage.GetWidth() - 1))
+  {
+    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
+  }
+
+  this->imageSize = this->heightImage.GetWidth();
+  this->maxPixel = this->heightImage.GetMaxColor().R();
+  if (math::equal(this->maxPixel, 0))
+    this->maxPixel = 1.0;
+
+  // Create terrain group, which holds all the individual terrain instances.
+  // Param 1: Pointer to the scene manager
+  // Param 2: Alignment plane
+  // Param 3: Number of vertices along one edge of the terrain (2^n+1).
+  //          Terrains must be square, with each side a power of 2 in size
+  // Param 4: World size of each terrain instance, in meters.
+  this->terrainGroup = new Ogre::TerrainGroup(
+      this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
+      this->imageSize, this->terrainSize.x);
+
   this->terrainGroup->setFilenameConvention(
-      Ogre::String("BasicTutorial3Terrain"), Ogre::String("dat"));
-  this->terrainGroup->setOrigin(Ogre::Vector3::ZERO);
+      Ogre::String("gazebo_terrain"), Ogre::String("dat"));
+
+  this->terrainGroup->setOrigin(Conversions::Convert(this->terrainOrigin));
 
   this->ConfigureTerrainDefaults();
 
@@ -89,26 +140,52 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(8);
+  this->terrainGlobals->setMaxPixelError(0);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
-  this->terrainGlobals->setCompositeMapDistance(3000);
+  this->terrainGlobals->setCompositeMapDistance(1000);
+
+  // Get the first directional light
+  LightPtr directionalLight;
+  for (unsigned int i = 0; i < this->scene->GetLightCount(); ++i)
+  {
+    LightPtr light = this->scene->GetLight(i);
+    if (light->GetType() == "directional")
+    {
+      directionalLight = light;
+      break;
+    }
+  }
+
+  this->terrainGlobals->setCompositeMapAmbient(
+      this->scene->GetManager()->getAmbientLight());
 
   // Important to set these so that the terrain knows what to use for
   // derived (non-realtime) data
-  this->terrainGlobals->setLightMapDirection(Ogre::Vector3(0, 0, -1));
-  this->terrainGlobals->setCompositeMapAmbient(
-      this->scene->GetManager()->getAmbientLight());
-  this->terrainGlobals->setCompositeMapDiffuse(Ogre::ColourValue(1, 1, 1, 1));
+  if (directionalLight)
+  {
+    this->terrainGlobals->setLightMapDirection(
+        Conversions::Convert(directionalLight->GetDirection()));
+    this->terrainGlobals->setCompositeMapDiffuse(
+        Conversions::Convert(directionalLight->GetDiffuseColor()));
+  }
+  else
+  {
+    this->terrainGlobals->setLightMapDirection(Ogre::Vector3(0, 0, -1));
+    this->terrainGlobals->setCompositeMapDiffuse(
+        Ogre::ColourValue(.6, .6, .6, 1));
+  }
 
   // Configure default import settings for if we use imported image
   Ogre::Terrain::ImportData &defaultimp =
     this->terrainGroup->getDefaultImportSettings();
 
-  defaultimp.terrainSize = 513;
-  defaultimp.worldSize = 513.0f;
-  defaultimp.inputScale = 100;
+  defaultimp.terrainSize = this->imageSize;
+  defaultimp.worldSize = this->terrainSize.x;
+
+  defaultimp.inputScale = this->terrainSize.z / this->maxPixel;
+
   defaultimp.minBatchSize = 33;
   defaultimp.maxBatchSize = 65;
 
@@ -118,27 +195,16 @@ void Heightmap::ConfigureTerrainDefaults()
   //    2. normal_height - normal map with a height map in the alpha channel
   {
     // number of texture layers
-    defaultimp.layerList.resize(3);
+    defaultimp.layerList.resize(this->diffuseTextures.size());
 
     // The worldSize decides how big each splat of textures will be.
     // A smaller value will increase the resolution
-    defaultimp.layerList[0].worldSize = 10;
-    defaultimp.layerList[0].textureNames.push_back(
-        "dirt_grayrocky_diffusespecular.dds");
-    defaultimp.layerList[0].textureNames.push_back(
-        "dirt_grayrocky_normalheight.dds");
-
-    defaultimp.layerList[1].worldSize = 3;
-    defaultimp.layerList[1].textureNames.push_back(
-        "grass_green-01_diffusespecular.dds");
-    defaultimp.layerList[1].textureNames.push_back(
-        "grass_green-01_normalheight.dds");
-
-    defaultimp.layerList[2].worldSize = 20;
-    defaultimp.layerList[2].textureNames.push_back(
-        "growth_weirdfungus-03_diffusespecular.dds");
-    defaultimp.layerList[2].textureNames.push_back(
-        "growth_weirdfungus-03_normalheight.dds");
+    for (unsigned int i = 0; i < this->diffuseTextures.size(); ++i)
+    {
+      defaultimp.layerList[i].worldSize = this->worldSizes[i];
+      defaultimp.layerList[i].textureNames.push_back(this->diffuseTextures[i]);
+      defaultimp.layerList[i].textureNames.push_back(this->normalTextures[i]);
+    }
   }
 }
 
@@ -157,52 +223,92 @@ void Heightmap::DefineTerrain(int x, int y)
     bool flipX = x % 2 != 0;
     bool flipY = y % 2 != 0;
 
-    img.load("canyon.png",
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    unsigned char *data = NULL;
+    unsigned int count = 0;
+    this->heightImage.GetData(&data, count);
+
+    if (this->heightImage.GetPixelFormat() == common::Image::L_INT8)
+    {
+      img.loadDynamicImage(data, this->heightImage.GetWidth(),
+          this->heightImage.GetHeight(), Ogre::PF_L8);
+    }
+    else if (this->heightImage.GetPixelFormat() == common::Image::RGBA_INT8)
+    {
+      img.loadDynamicImage(data, this->heightImage.GetWidth(),
+          this->heightImage.GetHeight(), Ogre::PF_R8G8B8A8);
+    }
+    else if (this->heightImage.GetPixelFormat() == common::Image::RGB_INT8)
+    {
+      img.loadDynamicImage(data, this->heightImage.GetWidth(),
+          this->heightImage.GetHeight(), Ogre::PF_R8G8B8);
+    }
+    else
+    {
+      gzerr << "Unable to handle image format["
+            << this->heightImage.GetPixelFormat() << "]\n";
+    }
 
     if (flipX)
       img.flipAroundY();
     if (flipY)
       img.flipAroundX();
 
-    // this->GetTerrainImage(x % 2 != 0, y % 2 != 0, img);
     this->terrainGroup->defineTerrain(x, y, &img);
     this->terrainsImported = true;
+
+    // delete [] data;
   }
 }
 
 /////////////////////////////////////////////////
-void Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
+bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 {
-  Ogre::TerrainLayerBlendMap* blendMap0 = _terrain->getLayerBlendMap(1);
-  Ogre::TerrainLayerBlendMap* blendMap1 = _terrain->getLayerBlendMap(2);
-  Ogre::Real minHeight0 = 30;
-  Ogre::Real fadeDist0 = 20;
-  Ogre::Real minHeight1 = 31;
-  Ogre::Real fadeDist1 = 10;
-  float* pBlend0 = blendMap0->getBlendPointer();
-  float* pBlend1 = blendMap1->getBlendPointer();
+  if (!_terrain)
+  {
+    std::cerr << "Invalid  terrain\n";
+    return false;
+  }
+
+  Ogre::Real val, height;
+  unsigned int i = 0;
+
+  std::vector<Ogre::TerrainLayerBlendMap *> blendMaps;
+  std::vector<float*> pBlend;
+
+  // Create the blend maps
+  for (i = 0; i < this->blendHeight.size(); ++i)
+  {
+    blendMaps.push_back(_terrain->getLayerBlendMap(i+1));
+    pBlend.push_back(blendMaps[i]->getBlendPointer());
+  }
+
+  // Set the blend values based on the height of the terrain
   for (Ogre::uint16 y = 0; y < _terrain->getLayerBlendMapSize(); ++y)
   {
     for (Ogre::uint16 x = 0; x < _terrain->getLayerBlendMapSize(); ++x)
     {
       Ogre::Real tx, ty;
 
-      blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
-      Ogre::Real height = _terrain->getHeightAtTerrainPosition(tx, ty);
-      Ogre::Real val = (height - minHeight0) / fadeDist0;
-      val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
-      *pBlend0++ = val;
+      blendMaps[0]->convertImageToTerrainSpace(x, y, &tx, &ty);
+      height = _terrain->getHeightAtTerrainPosition(tx, ty);
 
-      val = (height - minHeight1) / fadeDist1;
-      val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
-      *pBlend1++ = val;
+      for (i = 0; i < this->blendHeight.size(); ++i)
+      {
+        val = (height - this->blendHeight[i]) / this->blendFade[i];
+        val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
+        *pBlend[i]++ = val;
+      }
     }
   }
-  blendMap0->dirty();
-  blendMap1->dirty();
-  blendMap0->update();
-  blendMap1->update();
+
+  // Make sure the blend maps are properly updated
+  for (i = 0; i < blendMaps.size(); ++i)
+  {
+    blendMaps[i]->dirty();
+    blendMaps[i]->update();
+  }
+
+  return true;
 }
 
 /////////////////////////////////////////////////

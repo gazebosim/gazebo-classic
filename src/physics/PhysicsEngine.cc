@@ -47,13 +47,28 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->physicsSub = this->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->responsePub =
+    this->node->Advertise<msgs::Response>("~/response");
+  this->contactPub =
+    this->node->Advertise<msgs::Contacts>("~/physics/contacts");
+
   this->requestSub = this->node->Subscribe("~/request",
                                            &PhysicsEngine::OnRequest, this);
 
-  this->rayMutex = new boost::recursive_mutex();
+  this->physicsUpdateMutex = new boost::recursive_mutex();
+
+  this->updateRateDouble = 0.0;
 }
 
+//////////////////////////////////////////////////
+void PhysicsEngine::Load(sdf::ElementPtr _sdf)
+{
+  this->sdf->Copy(_sdf);
+  if (this->sdf->HasAttribute("update_rate"))
+    this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
+}
+
+//////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
   this->world.reset();
@@ -65,8 +80,8 @@ PhysicsEngine::~PhysicsEngine()
 {
   this->sdf->Reset();
   this->sdf.reset();
-  delete this->rayMutex;
-  this->rayMutex = NULL;
+  delete this->physicsUpdateMutex;
+  this->physicsUpdateMutex = NULL;
   this->responsePub.reset();
   this->requestSub.reset();
   this->node.reset();
@@ -92,4 +107,26 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
     result = this->CreateCollision(_shapeType, link);
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetUpdateRate(double _value)
+{
+  this->sdf->GetAttribute("update_rate")->Set(_value);
+  this->updateRateDouble = _value;
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetUpdateRate()
+{
+  return this->updateRateDouble;
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetUpdatePeriod()
+{
+  if (this->updateRateDouble > 0)
+    return 1.0/this->updateRateDouble;
+  else
+    return 0;
 }

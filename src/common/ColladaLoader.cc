@@ -31,6 +31,7 @@
 #include "common/Material.hh"
 #include "common/Mesh.hh"
 #include "common/Skeleton.hh"
+#include "common/SkeletonAnimation.hh"
 #include "common/ColladaLoader.hh"
 #include "common/SystemPaths.hh"
 #include "common/Exception.hh"
@@ -453,7 +454,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
     else
       animName << "animation" << (_skel->GetNumAnimations() + 1);
 
-  RawSkeletonAnimation animation;
+  RawSkeletonAnim animation;
 
   TiXmlElement *animXml = _xml->FirstChildElement("animation");
   while (animXml)
@@ -573,11 +574,11 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
     animXml = animXml->NextSiblingElement("animation");
   }
 
-  SkeletonAnimation anim;
+  SkeletonAnimation *anim = new SkeletonAnimation(animName.str());
 
-  for (RawSkeletonAnimation::iterator iter = animation.begin();
+  for (RawSkeletonAnim::iterator iter = animation.begin();
         iter != animation.end(); ++iter)
-    for (RawNodeAnimation::iterator niter = iter->second.begin();
+    for (RawNodeAnim::iterator niter = iter->second.begin();
           niter != iter->second.end(); ++niter)
     {
       math::Matrix4 transform(math::Matrix4::IDENTITY);
@@ -586,10 +587,10 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
         niter->second[i].RecalculateMatrix();
         transform = transform * niter->second[i]();
       }
-      anim[iter->first][niter->first] = transform;
+      anim->AddKeyFrame(iter->first, niter->first, transform);
     }
 
-  _skel->AddAnimation(animName.str(), anim);
+  _skel->AddAnimation(anim);
 }
 
 /////////////////////////////////////////////////
@@ -982,7 +983,6 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
   TiXmlElement *cgXml = effectXml->FirstChildElement("profile_CG");
   if (cgXml)
     gzerr << "profile_CG unsupported\n";
-
   return mat;
 }
 
@@ -1042,7 +1042,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 {
   // This function parses polylist types in collada into
   // a set of triangle meshes.  The assumption is that
-  // each polylist polygon is convex, and we do decomposiont
+  // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
   SubMesh *subMesh = new SubMesh;
   bool combinedVertNorms = false;
@@ -1067,6 +1067,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   std::vector<math::Vector3> verts;
   std::vector<math::Vector3> norms;
   std::vector<math::Vector2d> texcoords;
+
+  math::Matrix4 bindShapeMat(math::Matrix4::IDENTITY);
+  if (_mesh->HasSkeleton())
+    bindShapeMat = _mesh->GetSkeleton()->GetBindShapeTransform();
 
   // read input elements
   std::map<std::string, int> inputs;
@@ -1163,10 +1167,24 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         {
           if (iter->first == "VERTEX")
           {
-            subMesh->AddVertex(verts[values[iter->second]]);
+            subMesh->AddVertex(bindShapeMat * verts[values[iter->second]]);
             subMesh->AddIndex(subMesh->GetVertexCount()-1);
             if (combinedVertNorms)
               subMesh->AddNormal(norms[values[iter->second]]);
+            if (_mesh->HasSkeleton())
+            {
+              Skeleton *skel = _mesh->GetSkeleton();
+              for (unsigned int i = 0;
+                  i < skel->GetNumVertNodeWeights(values[iter->second]); i++)
+              {
+                std::pair<std::string, double> node_weight =
+                              skel->GetVertNodeWeight(values[iter->second], i);
+                SkeletonNode *node =
+                  _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
+                subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
+                            node->GetHandle(), node_weight.second);
+              }
+            }
           }
           else if (iter->first == "NORMAL")
           {

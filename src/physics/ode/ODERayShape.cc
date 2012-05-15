@@ -33,6 +33,8 @@ using namespace physics;
 ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
   : RayShape(_physicsEngine)
 {
+  this->SetName("ODE Ray Shape");
+
   this->physicsEngine =
     boost::shared_static_cast<ODEPhysics>(_physicsEngine);
   this->geomId = dCreateRay(this->physicsEngine->GetSpaceId(), 2.0);
@@ -43,8 +45,8 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
 
 
 //////////////////////////////////////////////////
-ODERayShape::ODERayShape(CollisionPtr _parent, bool _displayRays)
-    : RayShape(_parent, _displayRays)
+ODERayShape::ODERayShape(CollisionPtr _parent)
+    : RayShape(_parent)
 {
   this->SetName("ODE Ray Shape");
 
@@ -108,13 +110,13 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
     Intersection intersection;
     intersection.depth = 1000;
 
-    this->physicsEngine->GetRayMutex()->lock();
+    this->physicsEngine->GetPhysicsUpdateMutex()->lock();
 
     // Do collision detection
     dSpaceCollide2(this->geomId,
         (dGeomID)(this->physicsEngine->GetSpaceId()),
         &intersection, &UpdateCallback);
-    this->physicsEngine->GetRayMutex()->unlock();
+    this->physicsEngine->GetPhysicsUpdateMutex()->unlock();
 
     _dist = intersection.depth;
     _entity = intersection.name;
