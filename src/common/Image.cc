@@ -21,12 +21,12 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <boost/filesystem.hpp>
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
 
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 #include "math/Vector3.hh"
 #include "common/Console.hh"
@@ -153,9 +153,7 @@ void Image::SetFromData(const unsigned char *data, unsigned int width,
   int bluemask = 0x0000ff;
 
   if (this->bitmap)
-  {
     FreeImage_Unload(this->bitmap);
-  }
   this->bitmap = NULL;
 
   this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(data),
@@ -180,18 +178,20 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
   int bluemask = 0x0000ff;
 
   unsigned int bpp;
-  int scanlineBits;
+  int scanlineBytes;
 
   if (_format == L_INT8)
   {
     bpp = 8;
+    scanlineBytes = _width;
   }
   else if (_format == RGB_INT8)
   {
-    bpp = 32;
+    bpp = 24;
     redmask = 0xff0000;
     greenmask = 0x00ff00;
     bluemask = 0x0000ff;
+    scanlineBytes = _width * 3;
   }
   else if (_format == RGBA_INT8)
   {
@@ -199,13 +199,15 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     redmask = 0xff000000;
     greenmask = 0x00ff0000;
     bluemask = 0x0000ff00;
+    scanlineBytes = _width * 4;
   }
   else if (_format == BGR_INT8)
   {
-    bpp = 32;
+    bpp = 24;
     redmask = 0x0000ff;
     greenmask = 0x00ff00;
     bluemask = 0xff0000;
+    scanlineBytes = _width * 3;
   }
   else
   {
@@ -213,10 +215,9 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     return;
   }
 
-  scanlineBits = bpp * _width;
 
   this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
-      _width, _height, scanlineBits, bpp, redmask, greenmask, bluemask);
+      _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask);
 }
 
 //////////////////////////////////////////////////
@@ -237,7 +238,7 @@ void Image::GetData(unsigned char **_data, unsigned int &_count) const
   int bluemask = FI_RGBA_BLUE_MASK;
   // int redmask = 0x000000ff;
 
-  int scan_width = FreeImage_GetPitch(this->bitmap);
+  int scan_width = FreeImage_GetLine(this->bitmap);
 
   if (*_data)
     delete [] *_data;
@@ -246,7 +247,8 @@ void Image::GetData(unsigned char **_data, unsigned int &_count) const
   *_data = new unsigned char[_count];
 
   FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(*_data), this->bitmap,
-      scan_width, this->GetBPP(), redmask, greenmask, bluemask, true);
+      FreeImage_GetLine(this->bitmap),
+      this->GetBPP(), redmask, greenmask, bluemask, true);
 
 #ifdef FREEIMAGE_COLORORDER
   if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
@@ -426,10 +428,10 @@ Image::PixelFormat Image::GetPixelFormat() const
   FREE_IMAGE_TYPE type = FreeImage_GetImageType(this->bitmap);
 
   unsigned int redMask = FreeImage_GetRedMask(this->bitmap);
+  unsigned int bpp = this->GetBPP();
 
   if (type == FIT_BITMAP)
   {
-    unsigned int bpp = this->GetBPP();
     if (bpp == 8)
       fmt = L_INT8;
     else if (bpp == 16)
@@ -437,7 +439,7 @@ Image::PixelFormat Image::GetPixelFormat() const
     else if (bpp == 24)
       redMask == 0xff0000 ? fmt = RGB_INT8 : fmt = BGR_INT8;
     else if (bpp == 32)
-      redMask == 0xff000000 ? fmt = RGBA_INT8 : fmt = BGRA_INT8;
+      redMask == 0xff0000 ? fmt = RGBA_INT8 : fmt = BGRA_INT8;
   }
   else if (type == FIT_RGB16)
     fmt = RGB_INT16;

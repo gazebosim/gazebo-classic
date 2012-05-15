@@ -55,7 +55,6 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 
   // Use the image to get the size of the heightmap
   this->img.Load(this->sdf->GetValueString("filename"));
-  std::cout << "BPP[" << this->img.GetBPP() << "] Pitch[" << this->img.GetPitch() << "] PXFormat[" << this->img.GetPixelFormat() << "]\n";
 
   if (this->img.GetWidth() != this->img.GetHeight() ||
       !math::isPowerOfTwo(this->img.GetWidth()-1))

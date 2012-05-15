@@ -88,7 +88,7 @@ namespace gazebo
       /// \param _format Pixel format of the provided data
       public: void SetFromData(const unsigned char *_data, unsigned int _width,
                   unsigned int _height, Image::PixelFormat _format);
-                  
+
       /// \brief Get the image as a data array
       /// \param _data Pointer to a NULL array of char.
       /// \param _count The resulting data array size

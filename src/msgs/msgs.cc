@@ -157,6 +157,7 @@ void Set(msgs::Time *_t, const common::Time &_v)
 }
 
 
+/////////////////////////////////////////////////
 void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
 {
   Set(_p->mutable_normal(), _v.normal);
@@ -169,32 +170,24 @@ void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
 void Set(common::Image &_img, const msgs::Image &_msg)
 {
   _img.SetFromData(
-      (const unsigned char*)_msg.data().c_str(), 
-      _msg.width(), 
-      _msg.height(), 
+      (const unsigned char*)_msg.data().data(),
+      _msg.width(),
+      _msg.height(),
       (common::Image::PixelFormat)(_msg.pixel_format()));
-}
-
-/////////////////////////////////////////////////
-msgs::Image Convert(const common::Image &_i)
-{
-  msgs::Image result;
-  result.set_width(_i.GetWidth());
-  result.set_height(_i.GetHeight());
-  result.set_pixel_format(_i.GetPixelFormat());
-  result.set_step(_i.GetPitch());
-  unsigned char *data = NULL;
-  unsigned int size;
-  _i.GetData(&data, size);
-  result.set_data(data, size);
-
-  return result;
 }
 
 /////////////////////////////////////////////////
 void Set(msgs::Image *_msg, const common::Image &_i)
 {
-  _msg->CopyFrom(Convert(_i));
+  _msg->set_width(_i.GetWidth());
+  _msg->set_height(_i.GetHeight());
+  _msg->set_pixel_format(_i.GetPixelFormat());
+  _msg->set_step(_i.GetPitch());
+
+  unsigned char *data = NULL;
+  unsigned int size;
+  _i.GetData(&data, size);
+  _msg->set_data(data, size);
 }
 
 /////////////////////////////////////////////////
@@ -322,6 +315,7 @@ msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
   return result;
 }
 
+/////////////////////////////////////////////////
 msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::TrackVisual result;
@@ -338,6 +332,7 @@ msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf)
 }
 
 
+/////////////////////////////////////////////////
 msgs::Light LightFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Light result;

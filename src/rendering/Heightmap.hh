@@ -22,6 +22,7 @@
 #ifndef HEIGHTMAP_HH
 #define HEIGHTMAP_HH
 #include <string>
+#include <vector>
 
 #include "common/Image.hh"
 #include "math/Vector3.hh"
@@ -79,7 +80,6 @@ namespace gazebo
 
       private: std::vector<double> blendHeight;
       private: std::vector<double> blendFade;
-
     };
     /// \}
   }

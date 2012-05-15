@@ -52,14 +52,6 @@ Heightmap::~Heightmap()
 //////////////////////////////////////////////////
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
-
-  std::cout << "Image: Width["
-    << _msg->geometry().heightmap().image().width() << "] Height["
-    << _msg->geometry().heightmap().image().height() << "] Fmt[" 
-    << _msg->geometry().heightmap().image().pixel_format() << "] Step[" 
-    << _msg->geometry().heightmap().image().step() << "] Data[" 
-    << _msg->geometry().heightmap().image().data().size() << "]\n";
-
   msgs::Set(this->heightImage, _msg->geometry().heightmap().image());
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
@@ -72,7 +64,6 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
         _msg->geometry().heightmap().texture(i).normal());
     this->worldSizes.push_back(
         _msg->geometry().heightmap().texture(i).size());
-
   }
 
   for (int i = 0; i < _msg->geometry().heightmap().blend_size(); ++i)
@@ -243,18 +234,19 @@ void Heightmap::DefineTerrain(int x, int y)
     }
     else if (this->heightImage.GetPixelFormat() == common::Image::RGBA_INT8)
     {
-      printf("RGBA Count[%d]\n", count);
       img.loadDynamicImage(data, this->heightImage.GetWidth(),
           this->heightImage.GetHeight(), Ogre::PF_R8G8B8A8);
     }
     else if (this->heightImage.GetPixelFormat() == common::Image::RGB_INT8)
     {
-      printf("RGB Count[%d]\n", count);
       img.loadDynamicImage(data, this->heightImage.GetWidth(),
           this->heightImage.GetHeight(), Ogre::PF_R8G8B8);
     }
     else
-      gzerr << "Unable to handle image format[" << this->heightImage.GetPixelFormat() << "]\n";
+    {
+      gzerr << "Unable to handle image format["
+            << this->heightImage.GetPixelFormat() << "]\n";
+    }
 
     if (flipX)
       img.flipAroundY();
@@ -264,7 +256,7 @@ void Heightmap::DefineTerrain(int x, int y)
     this->terrainGroup->defineTerrain(x, y, &img);
     this->terrainsImported = true;
 
-    delete [] data;
+    // delete [] data;
   }
 }
 
