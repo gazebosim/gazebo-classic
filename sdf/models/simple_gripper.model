@@ -197,13 +197,11 @@
       </axis>
     </joint>
 
-
-    <plugin filename="libGripperPlugin.so" name="gripper">
+    <gripper name="simple_gripper">
       <joint>palm_right_finger</joint>
       <joint>right_finger_tip</joint>
       <joint>palm_left_finger</joint>
       <joint>left_finger_tip</joint>
-    </plugin>
-
+    </gripper>
   </model>
 </gazebo>

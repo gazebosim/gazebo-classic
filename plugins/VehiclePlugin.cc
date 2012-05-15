@@ -219,24 +219,17 @@ void VehiclePlugin::OnUpdate()
     axis = this->joints[ix]->GetGlobalAxis(0).Round();
     displacement = (bodyPoint - hingePoint).GetDotProd(axis);
 
-    //std::cout << "Hinge[" << hingePoint << "] Body["
-    //          << bodyPoint << "] Axis[" << axis << "]\n";
-    //std::cout << "Displacement[" << displacement << "]\n";
-
     float amt = displacement * this->swayForce;
     if (displacement > 0)
     {
       if (amt > 15)
         amt = 15;
 
-      //std::cout << "Axis[" << ix << "]  Force[" << axis * -amt << "]\n";
-      //std::cout << "Axis[" << (ix^1) << "]  Force[" << axis * amt << "]\n";
-
-      math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();      
+      math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();
       this->joints[ix]->GetChild()->AddForce(axis * -amt);
       this->chassis->AddForceAtWorldPosition(axis * amt, p.pos);
 
-      p = this->joints[ix^1]->GetChild()->GetWorldPose();      
+      p = this->joints[ix^1]->GetChild()->GetWorldPose();
       this->joints[ix^1]->GetChild()->AddForce(axis * amt);
       this->chassis->AddForceAtWorldPosition(axis * -amt, p.pos);
     }

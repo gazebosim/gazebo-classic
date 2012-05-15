@@ -110,6 +110,11 @@ namespace gazebo
     /// \return A math::Pose object
     math::Pose       Convert(const msgs::Pose &_p);
 
+    /// \brief Convert a msgs::Image to a common::Image
+    /// \param _img The common::Image container
+    /// \param _msg The Image message to convert
+    void Set(common::Image &_img, const msgs::Image &_msg);
+
     /// \brief Convert a msgs::Color to a common::Color
     /// \param _c The color to convert
     /// \return A common::Color object
@@ -124,6 +129,11 @@ namespace gazebo
     /// \param _p The plane to convert
     /// \return A common::Plane object
     math::Plane      Convert(const msgs::PlaneGeom &_p);
+
+    /// \brief Set a msgs::Image from a common::Image
+    /// \param _msg A msgs::Image pointer
+    /// \param _i A common::Image reference
+    void Set(msgs::Image *_msg, const common::Image &_i);
 
     /// \brief Set a msgs::Vector3d from a math::Vector3
     /// \param _pt A msgs::Vector3d pointer

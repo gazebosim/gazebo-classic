@@ -24,6 +24,12 @@
 #include <iostream>
 #include <vector>
 
+#define GZ_DBL_MAX std::numeric_limits<double>::max()
+#define GZ_DBL_MIN std::numeric_limits<double>::min()
+
+#define GZ_FLT_MAX std::numeric_limits<float>::max()
+#define GZ_FLT_MIN std::numeric_limits<float>::min()
+
 namespace gazebo
 {
   namespace math

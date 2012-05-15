@@ -26,7 +26,6 @@ JointForceControl::JointForceControl(const std::string &_name,
     QGridLayout *_layout, QWidget *_parent)
   : QWidget(_parent), name(_name)
 {
-
   this->forceSpin = new QDoubleSpinBox;
   this->forceSpin->setRange(-100.0, 100.0);
   this->forceSpin->setSingleStep(0.001);
@@ -278,7 +277,6 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   }
 
   scrollArea->setLayout(gridLayout);
-  //scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
@@ -325,9 +323,7 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   }
 
   pidPosScrollArea->setLayout(gridLayout);
-  //pidPosScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   pidPosScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
- 
 
 
   // Create a PID Vel scroll area
@@ -345,7 +341,7 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
 
   // Set fixed height for the label to make the tabs stay a consistent size.
   QLabel *label;
-  label = new QLabel("m/s",this);
+  label = new QLabel("m/s", this);
   label->setFixedHeight(27);
 
   gridLayout->addWidget(label, 0, 2);
@@ -518,12 +514,13 @@ void JointControlWidget::OnIPosGainChanged(double _value,
 void JointControlWidget::Load(const std::string &/*_modelName*/)
 {
 }
- 
+
 /////////////////////////////////////////////////
 void JointControlWidget::OnPIDPosUnitsChanged(int _index)
 {
   std::map<std::string, JointPIDPosControl*>::iterator iter;
-  for (iter = this->pidPosSliders.begin(); iter != this->pidPosSliders.end(); ++iter)
+  for (iter = this->pidPosSliders.begin();
+       iter != this->pidPosSliders.end(); ++iter)
   {
     if (_index == 0)
       iter->second->SetToRadians();

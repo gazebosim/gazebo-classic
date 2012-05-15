@@ -34,6 +34,7 @@
 #include "common/Console.hh"
 #include "common/CommonTypes.hh"
 
+#include "physics/Gripper.hh"
 #include "physics/Joint.hh"
 #include "physics/JointController.hh"
 #include "physics/Link.hh"
@@ -141,6 +142,16 @@ void Model::Load(sdf::ElementPtr _sdf)
       pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
+
+  if (_sdf->HasElement("gripper"))
+  {
+    sdf::ElementPtr gripperElem = _sdf->GetElement("gripper");
+    while (gripperElem)
+    {
+      this->LoadGripper(gripperElem);
+      gripperElem = gripperElem->GetNextElement("gripper");
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -170,6 +181,12 @@ void Model::Init()
 
   for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+
+  for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
+       iter != this->grippers.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -602,6 +619,15 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     this->jointController = new JointController(
         boost::shared_dynamic_cast<Model>(shared_from_this()));
   this->jointController->AddJoint(joint);
+}
+
+//////////////////////////////////////////////////
+void Model::LoadGripper(sdf::ElementPtr _sdf)
+{
+  Gripper *gripper = new Gripper(
+      boost::shared_static_cast<Model>(shared_from_this()));
+  gripper->Load(_sdf);
+  this->grippers.push_back(gripper);
 }
 
 //////////////////////////////////////////////////

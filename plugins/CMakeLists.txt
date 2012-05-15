@@ -11,7 +11,6 @@ set (plugins
   ContactPlugin
   RayPlugin
   DiffDrivePlugin
-  GripperPlugin
   VehiclePlugin)
 
 foreach (src ${plugins})
