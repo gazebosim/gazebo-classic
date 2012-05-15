@@ -53,7 +53,7 @@ Heightmap::~Heightmap()
 //////////////////////////////////////////////////
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
-  this->heightImage = _msg->geometry().heightmap().filename();
+  this->heightImage = msgs::Convert(_msg->geometry().heightmap().image());
   this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
   this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
 
@@ -83,16 +83,15 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 void Heightmap::Load()
 {
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
-  common::Image img(this->heightImage);
 
-  if (img.GetWidth() != img.GetHeight() ||
-      !math::isPowerOfTwo(img.GetWidth() - 1))
+  if (this->heightImage.GetWidth() != this->heightImage.GetHeight() ||
+      !math::isPowerOfTwo(this->heightImage.GetWidth() - 1))
   {
     gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
   }
 
-  this->imageSize = img.GetWidth();
-  this->maxPixel = img.GetMaxColor().R();
+  this->imageSize = this->heightImage.GetWidth();
+  this->maxPixel = this->heightImage.GetMaxColor().R();
   if (math::equal(this->maxPixel, 0))
     this->maxPixel = 1.0;
 
@@ -234,7 +233,6 @@ void Heightmap::DefineTerrain(int x, int y)
     if (flipY)
       img.flipAroundX();
 
-    // this->GetTerrainImage(x % 2 != 0, y % 2 != 0, img);
     this->terrainGroup->defineTerrain(x, y, &img);
     this->terrainsImported = true;
   }

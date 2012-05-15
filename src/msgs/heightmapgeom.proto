@@ -5,13 +5,16 @@ package gazebo.msgs;
 /// \brief Message for a heightmap geometry
 /// \verbatim
 
+import "image.proto";
 import "vector3d.proto";
 
 message HeightmapGeom
 {
-  required Image image       = 1; // The image data
-  optional Vector3d size     = 2; // Size in meters
-  optional Vector3d origin   = 3; // Origin in world coordinate frame
+  repeated float heights     = 1; // The height data
+  required uint32 width      = 2; // Width of the height data (x-dimension)
+  required uint32 length     = 3; // Length of the height data (y-dimension)
+  required Vector3d size     = 4; // Size in meters
+  optional Vector3d origin   = 5; // Origin in world coordinate frame
 
   message Texture
   {
@@ -26,8 +29,8 @@ message HeightmapGeom
     required double fade_dist  = 2;
   }
 
-  repeated Texture texture = 4; // List of textures
-  repeated Blend blend     = 5; // How to blend the textures
+  repeated Texture texture = 6; // List of textures
+  repeated Blend blend     = 7; // How to blend the textures
 }
 
 /// \endverbatim

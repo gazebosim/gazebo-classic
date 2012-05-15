@@ -28,6 +28,7 @@
 #include <FreeImage.h>
 #include <string>
 
+#include "common/CommonTypes.hh"
 #include "common/Color.hh"
 
 namespace gazebo
@@ -89,7 +90,7 @@ namespace gazebo
       /// \brief Get the image as a data array
       /// \param _data Pointer to a NULL array of char.
       /// \param _count The resulting data array size
-      public: void GetData(unsigned char **_data, unsigned int &_count);
+      public: void GetData(unsigned char **_data, unsigned int &_count) const;
 
       /// \brief Get the width
       public: unsigned int GetWidth() const;

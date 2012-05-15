@@ -219,7 +219,7 @@ int Image::GetPitch() const
 }
 
 //////////////////////////////////////////////////
-void Image::GetData(unsigned char **_data, unsigned int &_count)
+void Image::GetData(unsigned char **_data, unsigned int &_count) const
 {
   int redmask = FI_RGBA_RED_MASK;
   // int bluemask = 0x00ff0000;

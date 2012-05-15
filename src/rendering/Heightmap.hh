@@ -63,7 +63,7 @@ namespace gazebo
       private: void DefineTerrain(int x, int y);
 
       private: ScenePtr scene;
-      private: std::string heightImage;
+      private: common::Image heightImage;
       private: math::Vector3 terrainSize;
       private: unsigned int imageSize;
       private: double maxPixel;

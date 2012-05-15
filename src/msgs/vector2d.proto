@@ -9,8 +9,8 @@ import "header.proto";
 
 message Vector2d
 {
-  required double x = 2;
-  required double y = 3;
+  required double x = 1;
+  required double y = 2;
 }
 
 /// \endverbatim

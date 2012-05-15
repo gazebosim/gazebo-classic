@@ -382,7 +382,8 @@ msgs::Visual Collision::CreateCollisionVisual()
     HeightmapShape *hgt = static_cast<HeightmapShape*>(this->shape.get());
     geom->set_type(msgs::Geometry::HEIGHTMAP);
 
-    geom->mutable_heightmap()->set_filename(hgt->GetFilename());
+    msgs::Set(geom->mutable_heightmap()->mutable_image(),
+              common::Image(hgt->GetFilename()));
     msgs::Set(geom->mutable_heightmap()->mutable_size(), hgt->GetSize());
     msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetOrigin());
   }

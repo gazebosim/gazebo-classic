@@ -166,21 +166,41 @@ void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
 }
 
 /////////////////////////////////////////////////
+common::Image Convert(const msgs::Image &_msg)
+{
+  common::Image result;
+  result.SetFromData(
+      (const unsigned char*)_msg.data().c_str(), 
+      _msg.width(), 
+      _msg.height(), 
+      (common::Image::PixelFormat)(_msg.pixel_format()));
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 msgs::Image Convert(const common::Image &_i)
 {
   msgs::Image result;
   result.set_width(_i.GetWidth());
   result.set_height(_i.GetHeight());
-  result.set_encoding(_i.GetPixelFormat());
+  result.set_pixel_format(_i.GetPixelFormat());
   result.set_step(_i.GetPitch());
   unsigned char *data;
   unsigned int size;
-  _i.GetData(&data, size)
+  _i.GetData(&data, size);
   result.set_data(data, size);
 
   return result;
 }
 
+/////////////////////////////////////////////////
+void Set(msgs::Image *_msg, const common::Image &_i)
+{
+  _msg->CopyFrom(Convert(_i));
+}
+
+/////////////////////////////////////////////////
 msgs::Vector3d Convert(const math::Vector3 &_v)
 {
   msgs::Vector3d result;
@@ -445,8 +465,8 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
       geomMsg->set_type(msgs::Geometry::HEIGHTMAP);
       msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
                  geomElem->GetValueVector3("size"));
-      geomMsg->mutable_heightmap()->set_filename(
-          geomElem->GetValueString("filename"));
+      common::Image img(geomElem->GetValueString("filename"));
+      msgs::Set(geomMsg->mutable_heightmap()->mutable_image(), img);
 
       sdf::ElementPtr textureElem = geomElem->GetElement("texture");
       msgs::HeightmapGeom::Texture *tex;
