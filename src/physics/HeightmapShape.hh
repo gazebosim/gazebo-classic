@@ -54,14 +54,24 @@ namespace gazebo
       public: virtual void Init();
 
       public: std::string GetFilename() const;
+
+      /// \brief Get the size in meters
       public: math::Vector3 GetSize() const;
+
+      /// \brief Get the origin in world coordinate frame
       public: math::Vector3 GetOrigin() const;
+
+      /// \brief Return the number of vertices, which equals the size of the
+      /// image used to load the heightmap
+      /// \return math::Vector2i, result.x = width, result.y = length/height
+      public: math::Vector2i GetVertexCount() const;
+
+      /// \brief Get a height at a vertex
+      public: virtual float GetHeight(int x, int y) = 0;
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
-
-      protected: std::vector<float> heights;
 
       protected: common::Image img;
     };
@@ -69,5 +79,3 @@ namespace gazebo
   }
 }
 #endif
-
-

@@ -101,3 +101,9 @@ void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
+
+//////////////////////////////////////////////////
+math::Vector2i HeightmapShape::GetVertexCount() const
+{
+  return math::Vector2i(this->img.GetWidth(), this->img.GetHeight());
+}

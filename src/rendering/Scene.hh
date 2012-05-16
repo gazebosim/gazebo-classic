@@ -362,6 +362,7 @@ namespace gazebo
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;
+      private: transport::SubscriberPtr jointSub;
       private: transport::SubscriberPtr selectionSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;

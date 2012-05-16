@@ -119,3 +119,9 @@ void BulletHeightmapShape::Init()
   pose.pos.z = (maxHeight - minHeight) * 0.5;
   bParent->SetRelativePose(pose, false);
 }
+
+/////////////////////////////////////////////////
+float BulletHeightmapShape::GetHeight(int x, int y)
+{
+  return 0.0;
+}

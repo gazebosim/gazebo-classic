@@ -106,10 +106,8 @@ void ODEHeightmapShape::FillHeightMap()
 //////////////////////////////////////////////////
 dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
 {
-  ODEHeightmapShape *collision = static_cast<ODEHeightmapShape*>(_data);
-
   // Return the height at a specific vertex
-  return collision->heights[_y * collision->odeVertSize + _x];
+  return static_cast<ODEHeightmapShape*>(_data)->GetHeight(_x, _y);
 }
 
 //////////////////////////////////////////////////
@@ -174,4 +172,10 @@ void ODEHeightmapShape::Init()
   q[3] = pose.rot.z;
 
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
+}
+
+/////////////////////////////////////////////////
+virtual float ODEHeightmapShape::GetHeight(int _x, int _y)
+{
+  return this->heights[_y * this->odeVertSize + _x];
 }
