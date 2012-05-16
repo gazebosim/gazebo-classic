@@ -43,60 +43,18 @@ BulletHeightmapShape::~BulletHeightmapShape()
 //////////////////////////////////////////////////
 void BulletHeightmapShape::Init()
 {
-  int x, y;
-  float maxHeight = -FLT_MAX;
-  float minHeight = FLT_MAX;
+  HeightmapShape::Init();
 
-  int imgHeight = this->img.GetHeight();
-  int imgWidth = this->img.GetWidth();
-  unsigned int pitch = this->img.GetPitch();
-  unsigned int bpp = pitch / imgWidth;
-
-  unsigned char *data = NULL;
-  unsigned int count;
-  this->heights.resize(imgWidth * imgHeight);
-
-  this->img.GetData(&data, count);
-
-  math::Vector3 terrainSize = this->sdf->GetValueVector3("size");
-
-  math::Vector3 scale;
-  scale.x = terrainSize.x / imgWidth;
-  scale.y = terrainSize.y / imgHeight;
-  if (math::equal(this->img.GetMaxColor().R(), 0))
-    scale.z = terrainSize.z;
-  else
-    scale.z = terrainSize.z / this->img.GetMaxColor().R();
-
-  // Iterate over all the verices
-  for (y = 0; y < imgHeight; ++y)
-  {
-    for (x = 0; x < imgWidth; ++x)
-    {
-      float h = static_cast<int>(data[y * pitch + x * bpp]) / 255.0;
-      h *= scale.z;
-
-      // Find the height at a vertex
-      this->heights[(imgHeight-y-1) * imgWidth + (x)] = h;
-
-      if (h > maxHeight)
-        maxHeight = h;
-      if (h < minHeight)
-        minHeight = h;
-    }
-  }
-
+  float maxHeight = this->GetMaxHeight();
+  float minHeight = this->GetMinHeight();
 
   // This will force the Z-axis to be up
   int upIndex = 2;
-  btVector3 localScaling(scale.x, scale.y, 1.0);
-
-  minHeight = 0;
-  maxHeight = 10;
+  btVector3 localScaling(this->scale.x, this->scale.y, 1.0);
 
   this->heightFieldShape  = new btHeightfieldTerrainShape(
-      imgWidth,           // # of heights along width
-      imgHeight,          // # of height along height
+      this->vertSize,     // # of heights along width
+      this->vertSize,     // # of height along height
       &this->heights[0],  // The heights
       1,                  // Height scaling
       minHeight,          // Min height

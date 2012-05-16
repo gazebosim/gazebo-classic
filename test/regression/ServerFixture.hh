@@ -214,7 +214,28 @@ class ServerFixture : public testing::Test
                    _name.c_str());
              }
 
-  protected: void ScanCompare(double *_scanA, double *_scanB,
+  protected: void FloatCompare(float *_scanA, float *_scanB,
+                 unsigned int _sampleCount, float &_diffMax,
+                 float &_diffSum, float &_diffAvg)
+             {
+               float diff;
+               _diffMax = 0;
+               _diffSum = 0;
+               _diffAvg = 0;
+               for (unsigned int i = 0; i < _sampleCount; ++i)
+               {
+                 diff = fabs(math::precision(_scanA[i], 10) -
+                             math::precision(_scanB[i], 10));
+                 _diffSum += diff;
+                 if (diff > _diffMax)
+                 {
+                   _diffMax = diff;
+                 }
+               }
+               _diffAvg = _diffSum / _sampleCount;
+             }
+
+  protected: void DoubleCompare(double *_scanA, double *_scanB,
                  unsigned int _sampleCount, double &_diffMax,
                  double &_diffSum, double &_diffAvg)
              {
@@ -488,6 +509,14 @@ class ServerFixture : public testing::Test
                physics::WorldPtr world = physics::get_world();
                world->LoadPlugin(_filename, _name, sdf::ElementPtr());
              }
+
+  protected: physics::ModelPtr GetModel(const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               return world->GetModel(_name);
+             }
+
 
   protected: void RemovePlugin(const std::string &_name)
              {
