@@ -49,9 +49,6 @@ namespace gazebo
       /// \brief Load the heightmap
       public: virtual void Init();
 
-      /// \brief Get a height at a vertex
-      public: virtual float GetHeight(int x, int y);
-
       private: btHeightfieldTerrainShape* heightFieldShape;
     };
     /// \}

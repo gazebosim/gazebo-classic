@@ -48,22 +48,10 @@ namespace gazebo
       /// \brief Load the heightmap
       public: virtual void Init();
 
-      /// \brief Get a height at a vertex
-      public: virtual float GetHeight(int x, int y);
-
-      /// Create a lookup table of the terrain's height
-      private: void FillHeightMap();
-
       /// \brief Called by ODE to get the height at a vertex
       private: static dReal GetHeightCallback(void *data, int x, int y);
 
       private: dHeightfieldDataID odeData;
-
-      private: unsigned int odeVertSize;
-      private: math::Vector3 odeScale;
-      private: int subSampling;
-
-      private: std::vector<double> heights;
     };
 
     /// \}

@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "common/Image.hh"
+#include "math/Vector3.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Shape.hh"
 
@@ -67,13 +68,27 @@ namespace gazebo
       public: math::Vector2i GetVertexCount() const;
 
       /// \brief Get a height at a vertex
-      public: virtual float GetHeight(int x, int y) = 0;
+      public: float GetHeight(int x, int y);
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
+      /// \brief Get the maximum height
+      public: float GetMaxHeight() const;
+
+      /// \brief Get the minimum height
+      public: float GetMinHeight() const;
+
+      /// Create a lookup table of the terrain's height
+      private: void FillHeightMap();
+
+      protected: std::vector<float> heights;
       protected: common::Image img;
+
+      protected: unsigned int vertSize;
+      protected: math::Vector3 scale;
+      protected: int subSampling;
     };
     /// \}
   }

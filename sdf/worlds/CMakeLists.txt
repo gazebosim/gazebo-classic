@@ -4,6 +4,7 @@ set (files
   depth_camera.world
   empty.world
   joints.world
+  heightmap.world
   kitchen.world
   lights.world
   model_nesting.world
