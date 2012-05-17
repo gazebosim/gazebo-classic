@@ -215,7 +215,6 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     return;
   }
 
-
   this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
       _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask);
 }
@@ -223,11 +222,25 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
 //////////////////////////////////////////////////
 int Image::GetPitch() const
 {
-  return FreeImage_GetPitch(this->bitmap);
+  return FreeImage_GetLine(this->bitmap);
+}
+
+//////////////////////////////////////////////////
+void Image::GetRGBData(unsigned char **_data, unsigned int &_count) const
+{
+  FIBITMAP *tmp = FreeImage_ConvertTo24Bits(this->bitmap);
+  this->GetDataImpl(_data, _count, tmp);
 }
 
 //////////////////////////////////////////////////
 void Image::GetData(unsigned char **_data, unsigned int &_count) const
+{
+  this->GetDataImpl(_data, _count, this->bitmap);
+}
+
+//////////////////////////////////////////////////
+void Image::GetDataImpl(unsigned char **_data, unsigned int &_count,
+                        FIBITMAP *_img) const
 {
   int redmask = FI_RGBA_RED_MASK;
   // int bluemask = 0x00ff0000;
@@ -238,17 +251,16 @@ void Image::GetData(unsigned char **_data, unsigned int &_count) const
   int bluemask = FI_RGBA_BLUE_MASK;
   // int redmask = 0x000000ff;
 
-  int scan_width = FreeImage_GetLine(this->bitmap);
+  int scanWidth = FreeImage_GetLine(_img);
 
   if (*_data)
     delete [] *_data;
 
-  _count = scan_width * this->GetHeight();
+  _count = scanWidth * FreeImage_GetHeight(_img);
   *_data = new unsigned char[_count];
 
-  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(*_data), this->bitmap,
-      FreeImage_GetLine(this->bitmap),
-      this->GetBPP(), redmask, greenmask, bluemask, true);
+  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(*_data), _img,
+      scanWidth, FreeImage_GetBPP(_img), redmask, greenmask, bluemask, true);
 
 #ifdef FREEIMAGE_COLORORDER
   if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)

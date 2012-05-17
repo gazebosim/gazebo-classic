@@ -88,6 +88,8 @@ class ServerFixture : public testing::Test
                delete this->server;
                this->server = NULL;
 
+               common::SystemPaths::Instance()->AddGazeboPaths("/home/nkoenig/work/gazebo/test/regression");
+
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,

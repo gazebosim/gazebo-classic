@@ -24,6 +24,7 @@ class HeightmapTest : public ServerFixture
 {
 };
 
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, Heights)
 {
   Load("worlds/heightmap.world");
@@ -76,6 +77,12 @@ TEST_F(HeightmapTest, Heights)
   }
   printf(" %f};\nstatic float *heights = __heights;\n", shape->GetHeight(x,y));
   */
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, White)
+{
+  Load("white_alpha_heightmap.world");
 }
 
 int main(int argc, char **argv)
