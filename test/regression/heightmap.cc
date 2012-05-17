@@ -82,7 +82,7 @@ TEST_F(HeightmapTest, Heights)
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, White)
 {
-  Load("white_alpha_heightmap.world");
+  Load("worlds/white_alpha_heightmap.world");
 }
 
 int main(int argc, char **argv)

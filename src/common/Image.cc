@@ -79,8 +79,9 @@ int Image::Load(const std::string &_filename)
     std::list<std::string> gazeboPaths =
       SystemPaths::Instance()->GetGazeboPaths();
 
+    bool found = false;
     for (std::list<std::string>::iterator iter = gazeboPaths.begin();
-        iter!= gazeboPaths.end(); ++iter)
+         iter != gazeboPaths.end() && !found; ++iter)
     {
       std::vector<std::string> pathNames;
       pathNames.push_back((*iter)+"/Media");
@@ -93,7 +94,7 @@ int Image::Load(const std::string &_filename)
       pathNames.push_back((*iter)+"/Media/maps");
 
       for (std::vector<std::string>::iterator piter = pathNames.begin();
-          piter!= pathNames.end(); ++piter)
+          piter!= pathNames.end() && !found; ++piter)
       {
         // if directory exist
         if ((dir = opendir((*piter).c_str())) != NULL)
@@ -104,7 +105,9 @@ int Image::Load(const std::string &_filename)
 
           // if file exist
           if (stat(this->fullName.c_str(), &st) == 0)
-            break;
+          {
+            found = true;
+          }
         }
       }
     }
