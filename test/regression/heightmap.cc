@@ -56,6 +56,7 @@ TEST_F(HeightmapTest, Heights)
   }
 
   FloatCompare(heights, &test[0], test.size(), diffMax, diffSum, diffAvg);
+  printf("Max[%f] Sim[%f] Avg[%f]\n", diffMax, diffSum, diffAvg);
 
   // This will print the heights
   /*printf("static float __heights[] = {");
@@ -80,9 +81,67 @@ TEST_F(HeightmapTest, Heights)
 }
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapTest, White)
+TEST_F(HeightmapTest, NotSquareImage)
+{
+  EXPECT_THROW(Load("worlds/not_square_heightmap.world"), common::Exception);
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, InvalidSizeImage)
+{
+  EXPECT_THROW(Load("worlds/invalid_size_heightmap.world"), common::Exception);
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, WhiteAlpha)
 {
   Load("worlds/white_alpha_heightmap.world");
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::shared_dynamic_cast<physics::HeightmapShape>(collision->GetShape());
+
+  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
+
+  int x, y;
+  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  {
+    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    {
+      EXPECT_EQ(shape->GetHeight(x, y), 10.0);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, WhiteNoAlpha)
+{
+  Load("worlds/white_no_alpha_heightmap.world");
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::shared_dynamic_cast<physics::HeightmapShape>(collision->GetShape());
+
+  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
+
+  int x, y;
+  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  {
+    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    {
+      EXPECT_EQ(shape->GetHeight(x, y), 10.0);
+    }
+  }
 }
 
 int main(int argc, char **argv)

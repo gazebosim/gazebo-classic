@@ -44,11 +44,6 @@ HeightmapShape::~HeightmapShape()
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::Update()
-{
-}
-
-//////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
@@ -59,7 +54,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   if (this->img.GetWidth() != this->img.GetHeight() ||
       !math::isPowerOfTwo(this->img.GetWidth()-1))
   {
-    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
+    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
   }
 }
 
