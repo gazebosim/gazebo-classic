@@ -19,8 +19,8 @@
  * Date: 14 July 2008
  */
 
-#ifndef IMAGE_HH
-#define IMAGE_HH
+#ifndef __IMAGE_HH__
+#define __IMAGE_HH__
 
 #ifdef BOOL
 #undef BOOL
@@ -94,6 +94,13 @@ namespace gazebo
       /// \param _count The resulting data array size
       public: void GetData(unsigned char **_data, unsigned int &_count) const;
 
+      /// \brief Get only the RGB data from the image. This will drop the
+      /// alpha channel if one is present.
+      /// \param _data Pointer to a NULL array of char.
+      /// \param _count The resulting data array size
+      public: void GetRGBData(unsigned char **_data,
+                              unsigned int &_count) const;
+
       /// \brief Get the width
       public: unsigned int GetWidth() const;
 
@@ -130,6 +137,9 @@ namespace gazebo
 
       /// \brief Returns whether this is a valid image
       public: bool Valid() const;
+
+      private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
+                        FIBITMAP *_img) const;
 
       /// Count the number of images created. Used for initialising free image
       private: static int count;

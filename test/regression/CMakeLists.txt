@@ -38,6 +38,8 @@ set (gtest_sources
 
 set (plugins )
 
+configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
+
 # Build plugins
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
