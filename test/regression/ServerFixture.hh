@@ -26,6 +26,8 @@
 #include <string>
 
 #include "transport/transport.h"
+
+#include "common/SystemPaths.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Physics.hh"
@@ -35,6 +37,8 @@
 
 #include "gazebo_config.h"
 #include "src/Server.hh"
+
+#include "test_config.h"
 
 using namespace gazebo;
 
@@ -88,6 +92,9 @@ class ServerFixture : public testing::Test
                delete this->server;
                this->server = NULL;
 
+               common::SystemPaths::Instance()->AddGazeboPaths(
+                   TEST_REGRESSION_PATH);
+
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
@@ -116,7 +123,6 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               printf("Load world[%s]\n", _worldFilename.c_str());
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);

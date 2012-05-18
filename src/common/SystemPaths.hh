@@ -70,17 +70,21 @@ namespace gazebo
       public: std::string FindFileWithGazeboPaths(const std::string &_filename);
 
       /// \brief Add colon delimited paths to Gazebo install
-      public: void AddGazeboPaths(std::string _path);
+      public: void AddGazeboPaths(const std::string &_path);
 
       /// \brief Add colon delimited paths to ogre install
-      public: void AddOgrePaths(std::string _path);
+      public: void AddOgrePaths(const std::string &_path);
 
       /// \brief Add colon delimited paths to plugins
-      public: void AddPluginPaths(std::string _path);
+      public: void AddPluginPaths(const std::string &_path);
 
       public: void ClearGazeboPaths();
       public: void ClearOgrePaths();
       public: void ClearPluginPaths();
+
+      private: void UpdateGazeboPaths();
+      private: void InsertUnique(const std::string &_path,
+                               std::list<std::string> &_list);
 
       /// Paths gazebo install
       private: std::list<std::string> gazeboPaths;
