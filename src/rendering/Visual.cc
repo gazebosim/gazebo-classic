@@ -1982,11 +1982,6 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
     return;
   }
-  std::cerr << this->sceneNode->getParent()->getName() << "\n";
-  this->sceneNode->getParent()->_update(true, true);
-
-  Ogre::Bone *foot = NULL;
-  Ogre::Vector3 toePos;
 
   for (int i = 0; i < _pose.pose_size(); i++)
   {
@@ -1994,9 +1989,6 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     if (!this->skeleton->hasBone(bonePose.name()))
     {
       gzerr << "Bone " << bonePose.name() << " not found.\n";
-      toePos.x = bonePose.position().x();
-      toePos.y = bonePose.position().y();
-      toePos.z = bonePose.position().z();
       continue;
     }
     Ogre::Bone *bone = this->skeleton->getBone(bonePose.name());
@@ -2011,29 +2003,5 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     bone->setManuallyControlled(true);
     bone->setPosition(p);
     bone->setOrientation(quat);
-    if (bone->getName() == "LeftToeBase")
-    {
-      foot = bone;
-    }
   }
-
-  Ogre::Entity *ent = NULL;
-
-  for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
-  {
-    ent = dynamic_cast<Ogre::Entity*>(this->sceneNode->getAttachedObject(i));
-    if (ent->hasSkeleton())
-      break;
-  }
-//  this->scene->GetManager()->_applySceneAnimations();
-  std::cerr << "root " << this->sceneNode->_getFullTransform().getTrans() << "\n";
-  std::cerr << "node " << foot->_getFullTransform().getTrans() << "\n";
-  Ogre::Vector3 ogretoePos = (this->sceneNode->_getFullTransform() *
-                                  foot->_getFullTransform()).getTrans();
-  std::cerr << ogretoePos<< "\n";
-  Ogre::Vector3 error = toePos - ogretoePos;
-  std::cerr << error << " ||| " << error.length() << "\n";
-  if (error.length() > 1e-3)
-    std::cerr <<"\n\nERROR\n\n";
-      std::cerr << "----------------------------------------------------\n";
 }

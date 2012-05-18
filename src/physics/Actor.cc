@@ -476,11 +476,9 @@ void Actor::Update()
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
-  std::cerr << scriptTime << "\n";
   this->SetPose(frame, skelMap, currentTime.Double());
 
   this->lastScriptTime = scriptTime;
-  std::cerr << " ======================================\n";
 //  physics::pause_worlds(true);
 }
 
@@ -517,13 +515,8 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
     msg_pose->set_name(bone->GetName());
     if (!parentBone)
     {
-      msg_pose->mutable_position()->CopyFrom(msgs::Convert(math::Vector3()));
-      msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(
-                                                        math::Quaternion()));
-//      msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
-//      msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
-      this->mainLink->SetWorldPose(bonePose);
-      std::cerr << "root pos: " << bonePose.pos << "\n";
+      msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
+      msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
 
       currentLink->SetWorldPose(bonePose);
     }
@@ -537,15 +530,6 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
       parentTrans.SetTranslate(parentPose.pos);
       transform = parentTrans * transform;
       currentLink->SetWorldPose(transform.GetAsPose());
-      if (bone->GetName() == "LeftToeBase")
-      {
-        std::cerr << "pos: " << transform.GetTranslation() << "\n";
-        msgs::Pose *msg_pos1 = msg.add_pose();
-        math::Pose toePose = transform.GetAsPose();
-        msg_pos1->set_name("toe");
-        msg_pos1->mutable_position()->CopyFrom(msgs::Convert(toePose.pos));
-        msg_pos1->mutable_orientation()->CopyFrom(msgs::Convert(toePose.rot));
-      }
     }
   }
 

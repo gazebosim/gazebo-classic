@@ -139,8 +139,6 @@ math::Matrix4 NodeAnimation::GetFrameAt(double _time, bool _loop) const
   math::Matrix4 prevTrans = it2->second;
 
   double t = (time - prevKey) / (nextKey - prevKey);
-  if (this->name == "LeftToeBase")
-    std::cerr << "t: " << t << "\n";
   assert(t > 0.0 && t < 1.0);
 
   math::Vector3 nextPos = nextTrans.GetTranslation();
