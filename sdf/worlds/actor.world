@@ -14,15 +14,15 @@
 
     <actor name="actor1" static="true">
       <origin pose="0 0 0 0 0 0"/>
-      <skin filename="stand.dae" scale="1.0"/>
-      <animation name="standing" filename="stand.dae" scale="1.0" interpolate_x="false"/>
-      <animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true"/>
+      <skin filename="stand20.dae" scale="1.0"/>
+      <!--animation name="standing" filename="stand20.dae" scale="1.0" interpolate_x="false"/-->
+      <!--animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true"/-->
       
       <script loop="true" delay_start="0.0" auto_start="true">
         
-        <trajectory id="0" type="standing">
+        <!--trajectory id="0" type="standing">
           <waypoint time="0.0" pose="0 0 0 0 0 0"/>
-          <waypoint time="1.0" pose="0 0 0 0 0 0"/>
+          <waypoint time="20.8" pose="0 0 0 0 0 0"/>
         </trajectory>
         
         <trajectory id="1" type="walking">
@@ -43,7 +43,7 @@
         <trajectory id="4" type="walking">
           <waypoint time="0.0" pose="0 2.33 0 0 0 -1.5707"/> 
           <waypoint time="10.0" pose="0 0 0 0 0 -1.5707"/>
-        </trajectory>
+        </trajectory-->
       
       </script>
     

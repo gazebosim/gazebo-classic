@@ -23,7 +23,7 @@
     <attribute name="loop" type="bool" default="false" required="0"/>
     <attribute name="delay_start" type="double" default="0.0" required="0"/>
     <attribute name="auto_start" type="bool" default="false" required="0"/>
-    <element name="trajectory" required="+">
+    <element name="trajectory" required="*">
       <attribute name="id" type="int" default="0" required="1"/>
       <attribute name="type" type="string" default="__default__" required="1"/>
       <element name="waypoint" required="+">

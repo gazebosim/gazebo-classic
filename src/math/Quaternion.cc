@@ -477,19 +477,19 @@ Vector3 Quaternion::GetZAxis() const
 //////////////////////////////////////////////////
 bool Quaternion::operator ==(const Quaternion &_qt) const
 {
-  return equal(this->x, _qt.x, 0.001) &&
-         equal(this->y, _qt.y, 0.001) &&
-         equal(this->z, _qt.z, 0.001) &&
-         equal(this->w, _qt.w, 0.001);
+  return equal(this->x, _qt.x, 1e-10) &&
+         equal(this->y, _qt.y, 1e-10) &&
+         equal(this->z, _qt.z, 1e-10) &&
+         equal(this->w, _qt.w, 1e-10);
 }
 
 //////////////////////////////////////////////////
 bool Quaternion::operator!=(const Quaternion &_qt) const
 {
-  return !equal(this->x, _qt.x, 0.001) ||
-         !equal(this->y, _qt.y, 0.001) ||
-         !equal(this->z, _qt.z, 0.001) ||
-         !equal(this->w, _qt.w, 0.001);
+  return !equal(this->x, _qt.x, 1e-10) ||
+         !equal(this->y, _qt.y, 1e-10) ||
+         !equal(this->z, _qt.z, 1e-10) ||
+         !equal(this->w, _qt.w, 1e-10);
 }
 
 //////////////////////////////////////////////////

@@ -310,9 +310,9 @@ const Vector3 &Vector3::operator*=(double v)
 //////////////////////////////////////////////////
 bool Vector3::operator ==(const Vector3 &_pt) const
 {
-  return equal(this->x, _pt.x, 0.001) &&
-         equal(this->y, _pt.y, 0.001) &&
-         equal(this->z, _pt.z, 0.001);
+  return equal(this->x, _pt.x, 1e-10) &&
+         equal(this->y, _pt.y, 1e-10) &&
+         equal(this->z, _pt.z, 1e-10);
 }
 
 //////////////////////////////////////////////////

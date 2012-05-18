@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for animated models
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
-
 #ifndef ACTOR_HH
 #define ACTOR_HH
 
@@ -109,6 +104,9 @@ namespace gazebo
       private: void LoadAnimation(sdf::ElementPtr _sdf);
 
       private: void LoadScript(sdf::ElementPtr _sdf);
+
+      private: void SetPose(std::map<std::string, math::Matrix4> _frame,
+                     std::map<std::string, std::string> _skelMap, double _time);
 
       protected: const common::Mesh *mesh;
 

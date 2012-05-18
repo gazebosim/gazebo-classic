@@ -1269,7 +1269,8 @@ void Scene::PreRender()
           std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
-
+        if ((*pIter)->name() == "actor1")
+          std::cerr << "________root: " << pose.pos << "\n";
         iter->second->SetPose(pose);
       }
       PoseMsgs_L::iterator prev = pIter++;
@@ -1607,11 +1608,17 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
+  if (_msg->name() == "actor1")
+  {
+    std::cerr << "received actor1 pose\n";
+  }
+
   // Find an old model message, and remove them
   for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
   {
     if ((*iter)->name() == _msg->name())
     {
+      std::cerr << "removing old pose for " << _msg->name() << "\n";
       this->poseMsgs.erase(iter);
       break;
     }
@@ -1632,6 +1639,7 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
   {
     if ((*iter)->model_name() == _msg->model_name())
     {
+      std::cerr << "removing old skeleton pose\n";
       this->skeletonPoseMsgs.erase(iter);
       break;
     }
