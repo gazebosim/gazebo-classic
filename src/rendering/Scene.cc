@@ -1520,6 +1520,13 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     if (vis)
       vis->SetTransparency(_msg->dbl_data());
   }
+  else if (_msg->request() == "show_skeleton")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    bool show = (math::equal(_msg->dbl_data(), 1.0)) ? true : false;
+      if (vis)
+        vis->ShowSkeleton(show);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1590,7 +1597,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       result = true;
       visual->LoadFromMsg(_msg);
       this->visuals[_msg->name()] = visual;
-      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
+          visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
         visual->SetVisible(false);
       }

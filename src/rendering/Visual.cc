@@ -1926,6 +1926,26 @@ void Visual::ShowCollision(bool _show)
 }
 
 //////////////////////////////////////////////////
+void Visual::ShowSkeleton(bool _show)
+{
+  double transp = 0.0;
+  if (_show)
+    transp = 0.5;
+
+  ///  make the rest of the model transparent
+  this->SetTransparency(transp);
+
+  if (this->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowSkeleton(_show);
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetVisibilityFlags(uint32_t _flags)
 {
   for (std::vector<VisualPtr>::iterator iter = this->children.begin();

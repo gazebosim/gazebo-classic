@@ -125,18 +125,20 @@ void Actor::Load(sdf::ElementPtr _sdf)
       /// FIXME hardcoded visual to red sphere with radius 0.02
       if (bone->IsRootNode())
       {
-        this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
+        this->AddSphereVisual(linkSdf, bone->GetName() + "__SKELETON_VISUAL__",
                             math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
       }
       else
         if (bone->GetChildCount() == 0)
         {
-            this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
-                            math::Pose(), 0.02, "Gazebo/Yellow", Color::Yellow);
+            this->AddSphereVisual(linkSdf, bone->GetName() +
+                            "__SKELETON_VISUAL__", math::Pose(), 0.02,
+                            "Gazebo/Yellow", Color::Yellow);
         }
         else
-          this->AddSphereVisual(linkSdf, bone->GetName() + "_visual",
-                            math::Pose(), 0.02, "Gazebo/Red", Color::Red);
+          this->AddSphereVisual(linkSdf, bone->GetName() +
+                            "__SKELETON_VISUAL__", math::Pose(), 0.02,
+                            "Gazebo/Red", Color::Red);
 
       for (unsigned int i = 0; i < bone->GetChildCount(); i++)
       {
@@ -158,8 +160,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
           bonePose.rot = pose.rot.GetInverse() * bonePose.rot;
 
           this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
-            curChild->GetName() + "_link", bonePose, math::Vector3(0.02, 0.02,
-            length), "Gazebo/Green", Color::Green);
+            curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
+            math::Vector3(0.02, 0.02, length), "Gazebo/Green", Color::Green);
         }
       }
     }

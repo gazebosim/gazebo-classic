@@ -1584,7 +1584,7 @@ void ModelListWidget::ProcessPoseMsgs()
 void ModelListWidget::OnPose(ConstPosePtr &/*_msg*/)
 {
   /*this->receiveMutex->lock();
-  if (!this->selectedModelName.empty() && 
+  if (!this->selectedModelName.empty() &&
       _msg->name().find(this->selectedModelName) != std::string::npos)
   {
     PoseMsgs_L::iterator iter;
