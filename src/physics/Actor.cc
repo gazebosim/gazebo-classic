@@ -220,37 +220,47 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
 
       std::map<double, math::Pose> points;
 
-      sdf::ElementPtr wayptSdf = trajSdf->GetOrCreateElement("waypoint");
-      while (wayptSdf)
+      if (trajSdf->HasElement("waypoint"))
       {
-        points[wayptSdf->GetValueDouble("time")] =
-                                          wayptSdf->GetValuePose("pose");
-        wayptSdf = wayptSdf->GetNextElement("waypoint");
-      }
-
-      std::map<double, math::Pose>::reverse_iterator last = points.rbegin();
-      std::stringstream animName;
-      animName << tinfo.type << "_" << tinfo.id;
-      common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
-                                                          last->first, false);
-      this->trajInfo[idx].duration = last->first;
-
-      for (std::map<double, math::Pose>::iterator pIter = points.begin();
-            pIter != points.end(); ++pIter)
-      {
-        common::PoseKeyFrame *key;
-        if (pIter == points.begin() && !math::equal(pIter->first, 0.0))
+        sdf::ElementPtr wayptSdf = trajSdf->GetOrCreateElement("waypoint");
+        while (wayptSdf)
         {
-          key = anim->CreateKeyFrame(0.0);
+          points[wayptSdf->GetValueDouble("time")] =
+                                          wayptSdf->GetValuePose("pose");
+          wayptSdf = wayptSdf->GetNextElement("waypoint");
+        }
+
+        std::map<double, math::Pose>::reverse_iterator last = points.rbegin();
+        std::stringstream animName;
+        animName << tinfo.type << "_" << tinfo.id;
+        common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
+                                                          last->first, false);
+        this->trajInfo[idx].duration = last->first;
+        this->trajInfo[idx].translated = true;
+
+        for (std::map<double, math::Pose>::iterator pIter = points.begin();
+              pIter != points.end(); ++pIter)
+        {
+          common::PoseKeyFrame *key;
+          if (pIter == points.begin() && !math::equal(pIter->first, 0.0))
+          {
+            key = anim->CreateKeyFrame(0.0);
+            key->SetTranslation(pIter->second.pos);
+            key->SetRotation(pIter->second.rot);
+          }
+          key = anim->CreateKeyFrame(pIter->first);
           key->SetTranslation(pIter->second.pos);
           key->SetRotation(pIter->second.rot);
         }
-        key = anim->CreateKeyFrame(pIter->first);
-        key->SetTranslation(pIter->second.pos);
-        key->SetRotation(pIter->second.rot);
-      }
 
-      this->trajectories.insert(this->trajectories.begin() + idx, anim);
+        this->trajectories[this->trajInfo[idx].id] = anim;
+      }
+      else
+      {
+        this->trajInfo[idx].duration =
+                this->skelAnimation[this->trajInfo[idx].type]->GetLength();
+        this->trajInfo[idx].translated = false;
+      }
 
       trajSdf = trajSdf->GetNextElement("trajectory");
     }
@@ -266,6 +276,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
       tinfo.startTime = 0.0;
       tinfo.duration = this->skelAnimation.begin()->second->GetLength();
       tinfo.endTime = tinfo.duration;
+      tinfo.translated = false;
       this->trajInfo.push_back(tinfo);
       this->interpolateX[this->skinFile] = false;
     }
@@ -424,14 +435,11 @@ void Actor::Update()
 
   TrajectoryInfo tinfo;
 
-  unsigned int tid = 0;
-
   for (unsigned int i = 0; i < this->trajInfo.size(); i++)
     if (this->trajInfo[i].startTime <= scriptTime &&
           this->trajInfo[i].endTime >= scriptTime)
     {
       tinfo = this->trajInfo[i];
-      tid = i;
       break;
     }
 
@@ -442,20 +450,19 @@ void Actor::Update()
 
   math::Pose modelPose;
   std::map<std::string, math::Matrix4> frame;
-  bool removeXpos = false;
-  if (this->trajectories.size() > 0)
+  if (this->trajectories.find(tinfo.id) != this->trajectories.end())
   {
-    removeXpos = true;
     common::PoseKeyFrame posFrame(0.0);
-    this->trajectories[tid]->SetTime(scriptTime);
-    this->trajectories[tid]->GetInterpolatedKeyFrame(posFrame);
+    this->trajectories[tinfo.id]->SetTime(scriptTime);
+    this->trajectories[tinfo.id]->GetInterpolatedKeyFrame(posFrame);
     modelPose.pos = posFrame.GetTranslation();
     modelPose.rot = posFrame.GetRotation();
   }
-  if (this->interpolateX[tinfo.type])
+  if (this->interpolateX[tinfo.type] &&
+        this->trajectories.find(tinfo.id) != this->trajectories.end())
   {
     common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
-      (this->trajectories[tid]->GetKeyFrame(0));
+      (this->trajectories[tinfo.id]->GetKeyFrame(0));
     math::Vector3 framePos = modelPose.pos - frame0->GetTranslation();
     frame = skelAnim->GetPoseAtX(framePos.GetLength(),
               skelMap[this->skeleton->GetRootNode()->GetName()]);
@@ -469,9 +476,11 @@ void Actor::Update()
   math::Vector3 rootPos = rootTrans.GetTranslation();
   math::Quaternion rootRot = rootTrans.GetRotation();
 
-  if (removeXpos)
+  if (tinfo.translated)
     rootPos.x = 0.0;
-  math::Pose actorPose = modelPose * math::Pose(rootPos, rootRot);
+  math::Pose actorPose;
+  actorPose.pos = modelPose.pos + modelPose.rot.RotateVector(rootPos);
+  actorPose.rot = modelPose.rot *rootRot;
 
   math::Matrix4 rootM(actorPose.rot.GetAsMatrix4());
   rootM.SetTranslate(actorPose.pos);
@@ -481,7 +490,6 @@ void Actor::Update()
   this->SetPose(frame, skelMap, currentTime.Double());
 
   this->lastScriptTime = scriptTime;
-//  physics::pause_worlds(true);
 }
 
 //////////////////////////////////////////////////

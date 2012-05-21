@@ -12,38 +12,63 @@
       <direction xyz="0.0 0.2 -8.0"/>
     </light>
 
+    <model name="cube">
+      <origin pose="-0.4 0 0.275 0 0 0"/>
+      <link name="link">
+        <collision name="collision">
+          <mass>1</mass>
+          <geometry>
+            <box size="0.45 0.5 0.45"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="0.45 0.5 0.45"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+
     <actor name="actor1" static="true">
       <origin pose="0 0 0 0 0 0"/>
-      <skin filename="stand20.dae" scale="1.0"/>
-      <!--animation name="standing" filename="stand20.dae" scale="1.0" interpolate_x="false"/-->
-      <!--animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true"/-->
+      <skin filename="walk.dae" scale="1.0"/>
+      <animation name="sit_down" filename="sit_down.dae" scale="1.0" interpolate_x="false"/>
+      <animation name="sitting" filename="sitting.dae" scale="1.0" interpolate_x="false"/>
+      <animation name="stand_up" filename="stand_up.dae" scale="1.0" interpolate_x="false"/>
+      <animation name="stand" filename="stand.dae" scale="1.0" interpolate_x="false"/>
+      <animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true"/>
+      <animation name="running" filename="run.dae" scale="1.0" interpolate_x="true"/>
+      <animation name="moonwalking" filename="moonwalk.dae" scale="1.0" interpolate_x="true"/>
       
       <script loop="true" delay_start="0.0" auto_start="true">
         
-        <!--trajectory id="0" type="standing">
-          <waypoint time="0.0" pose="0 0 0 0 0 0"/>
-          <waypoint time="20.8" pose="0 0 0 0 0 0"/>
+        <trajectory id="0" type="stand">
+          <waypoint time="0.0" pose="0 0 0 0 0 0"/> 
+          <waypoint time="10.0" pose="0 0 0 0 0 0"/>
         </trajectory>
         
-        <trajectory id="1" type="walking">
-          <waypoint time="0.0" pose="0 0 0 0 0 0"/> 
-          <waypoint time="5.0" pose="2.33 0 0 0 0 0"/>
-        </trajectory>
+        <trajectory id="1" type="sit_down"/>
+        
+        <trajectory id="2" type="sitting"/>
 
-        <trajectory id="2" type="walking">
-          <waypoint time="0.0" pose="2.33 0 0 0 0 1.5707"/> 
-          <waypoint time="10.0" pose="2.33 2.33 0 0 0 1.5707"/>
-        </trajectory>
-      
-        <trajectory id="3" type="walking">
-          <waypoint time="0.0" pose="2.33 2.33 0 0 0 3.1415"/> 
-          <waypoint time="10.0" pose="0 2.33 0 0 0 3.1415"/>
-        </trajectory>
+        <trajectory id="3" type="stand_up"/>
       
         <trajectory id="4" type="walking">
-          <waypoint time="0.0" pose="0 2.33 0 0 0 -1.5707"/> 
-          <waypoint time="10.0" pose="0 0 0 0 0 -1.5707"/>
-        </trajectory-->
+          <waypoint time="0.0" pose="0 0 0 0 0 0"/> 
+          <waypoint time="10.0" pose="5 0 0 0 0 0"/>
+        </trajectory>
+        
+        <trajectory id="5" type="running">
+          <waypoint time="0.0" pose="5 0 0 0 0 0"/> 
+          <waypoint time="5.0" pose="10 0 0 0 0 0"/>
+        </trajectory>
+
+        <trajectory id="6" type="moonwalking">
+          <waypoint time="0.0" pose="10 0 0 0 0 3.14159"/> 
+          <waypoint time="20.0" pose="0 0 0 0 0 3.14159"/>
+        </trajectory>
       
       </script>
     

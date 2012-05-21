@@ -42,6 +42,7 @@ namespace gazebo
       double duration;
       double startTime;
       double endTime;
+      bool translated;
     };
 
     /// \addtogroup gazebo_physics
@@ -134,7 +135,7 @@ namespace gazebo
 
       protected: common::Time playStartTime;
 
-      protected: std::vector<common::PoseAnimation*> trajectories;
+      protected: std::map<unsigned int, common::PoseAnimation*> trajectories;
 
       protected: std::vector<TrajectoryInfo> trajInfo;
 

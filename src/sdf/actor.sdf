@@ -26,7 +26,7 @@
     <element name="trajectory" required="*">
       <attribute name="id" type="int" default="0" required="1"/>
       <attribute name="type" type="string" default="__default__" required="1"/>
-      <element name="waypoint" required="+">
+      <element name="waypoint" required="*">
         <attribute name="time" type="double" default="0.0" required="1"/>
         <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
       </element> <!-- End Waypoint -->
