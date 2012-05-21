@@ -1270,7 +1270,7 @@ void Scene::PreRender()
       {
         math::Pose pose = msgs::Convert(*(*pIter));
         if ((*pIter)->name() == "actor1")
-          std::cerr << "________root: " << pose.pos << "\n";
+           printf("processing pose for actor1: %f %f %f\n", pose.pos.x, pose.pos.y, pose.pos.z);
         iter->second->SetPose(pose);
       }
       PoseMsgs_L::iterator prev = pIter++;
@@ -1287,6 +1287,7 @@ void Scene::PreRender()
     Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
     if (iter != this->visuals.end())
     {
+      printf("processing skeleton pose\n");
       iter->second->SetSkeletonPose(*(*spIter).get());
       SkeletonPoseMsgs_L::iterator prev = spIter++;
       this->skeletonPoseMsgs.erase(prev);
@@ -1608,9 +1609,12 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
-  if (_msg->name() == "actor1")
+  if (_msg->name() == "actor1" || _msg->name() == "actor1::LeftToeBase")
   {
-    std::cerr << "received actor1 pose\n";
+    printf("received %s pose: %f %f %f\n", _msg->name().c_str(),
+                                           _msg->position().x(),
+                                           _msg->position().y(),
+                                           _msg->position().z());
   }
 
   // Find an old model message, and remove them
@@ -1618,7 +1622,6 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
   {
     if ((*iter)->name() == _msg->name())
     {
-      std::cerr << "removing old pose for " << _msg->name() << "\n";
       this->poseMsgs.erase(iter);
       break;
     }
@@ -1632,6 +1635,7 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   SkeletonPoseMsgs_L::iterator iter;
+  printf("received skeleton pose\n");
 
   // Find an old model message, and remove them
   for (iter = this->skeletonPoseMsgs.begin();
@@ -1639,7 +1643,6 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
   {
     if ((*iter)->model_name() == _msg->model_name())
     {
-      std::cerr << "removing old skeleton pose\n";
       this->skeletonPoseMsgs.erase(iter);
       break;
     }

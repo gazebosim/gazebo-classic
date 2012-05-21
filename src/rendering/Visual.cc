@@ -1982,7 +1982,6 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
     return;
   }
-  std::cerr << this->sceneNode->getParent()->getName() << "\n";
   this->sceneNode->getParent()->_update(true, true);
 
   Ogre::Bone *foot = NULL;
@@ -2026,14 +2025,18 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
       break;
   }
 //  this->scene->GetManager()->_applySceneAnimations();
-  std::cerr << "root " << this->sceneNode->_getFullTransform().getTrans() << "\n";
-  std::cerr << "node " << foot->_getFullTransform().getTrans() << "\n";
+  Ogre::Vector3 rootpos = this->sceneNode->_getFullTransform().getTrans();
+  printf("root pos: %f %f %f\n", rootpos.x, rootpos.y, rootpos.z);
   Ogre::Vector3 ogretoePos = (this->sceneNode->_getFullTransform() *
                                   foot->_getFullTransform()).getTrans();
-  std::cerr << ogretoePos<< "\n";
+  printf("skeleton toe pos: %f %f %f\n", ogretoePos.x, ogretoePos.y, ogretoePos.z);
+  printf("physical toe pos: %f %f %f\n", toePos.x, toePos.y, toePos.z);
   Ogre::Vector3 error = toePos - ogretoePos;
-  std::cerr << error << " ||| " << error.length() << "\n";
+  printf("error: %f\n", error.length());
   if (error.length() > 1e-3)
-    std::cerr <<"\n\nERROR\n\n";
-      std::cerr << "----------------------------------------------------\n";
+  {
+    printf("\n\nERROR\n\n");
+    gzthrow("failed to sync");
+  }
+  printf("----------------------------------------------------\n");
 }

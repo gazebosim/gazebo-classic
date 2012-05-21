@@ -476,11 +476,11 @@ void Actor::Update()
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
-  std::cerr << scriptTime << "\n";
+  printf("script time: %f\n", scriptTime);
   this->SetPose(frame, skelMap, currentTime.Double());
 
   this->lastScriptTime = scriptTime;
-  std::cerr << " ======================================\n";
+  printf("======================================\n");
 //  physics::pause_worlds(true);
 }
 
@@ -492,6 +492,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
   msg.set_model_name(this->visualName);
 
   math::Matrix4 modelTrans(math::Matrix4::IDENTITY);
+  math::Pose mainLinkPose;
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
   {
@@ -520,12 +521,8 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
       msg_pose->mutable_position()->CopyFrom(msgs::Convert(math::Vector3()));
       msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(
                                                         math::Quaternion()));
-//      msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
-//      msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
-      this->mainLink->SetWorldPose(bonePose);
-      std::cerr << "root pos: " << bonePose.pos << "\n";
-
       currentLink->SetWorldPose(bonePose);
+      mainLinkPose = bonePose;
     }
     else
     {
@@ -539,7 +536,8 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
       currentLink->SetWorldPose(transform.GetAsPose());
       if (bone->GetName() == "LeftToeBase")
       {
-        std::cerr << "pos: " << transform.GetTranslation() << "\n";
+        math::Vector3 toepos = transform.GetTranslation();
+        printf("toe pos: %f %f %f\n", toepos.x, toepos.y, toepos.z);
         msgs::Pose *msg_pos1 = msg.add_pose();
         math::Pose toePose = transform.GetAsPose();
         msg_pos1->set_name("toe");
@@ -554,6 +552,8 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);
+  this->mainLink->SetWorldPose(mainLinkPose);
+  printf("root pos: %f %f %f\n", mainLinkPose.pos.x, mainLinkPose.pos.y, mainLinkPose.pos.z);
 }
 
 //////////////////////////////////////////////////
