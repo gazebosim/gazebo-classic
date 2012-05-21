@@ -55,6 +55,8 @@ Actor::Actor(BasePtr _parent)
   this->AddType(ACTOR);
   this->mesh = NULL;
   this->skeleton = NULL;
+  this->pathLength = 0.0;
+  this->lastTraj = 1e+5;
 }
 
 //////////////////////////////////////////////////
@@ -73,6 +75,20 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
   MeshManager::Instance()->Load(this->skinFile);
   std::string actorName = _sdf->GetValueString("name");
+
+/*  double radius = 1.0;
+  unsigned int pointNum = 32;
+  for (unsigned int i = 0; i < pointNum; i++)
+  {
+    double angle = (2 * i * M_PI) / pointNum;
+    double x = radius * sin(angle);
+    double y = radius * cos(angle);
+    if (math::equal(x, 0.0))
+      x = 0;
+    if (math::equal(y, 0.0))
+      y = 0;
+    std::cerr << x << " " << y << " 0 0 0 " << angle << "\n";
+  }   */
 
   if (MeshManager::Instance()->HasMesh(this->skinFile))
   {
@@ -457,18 +473,27 @@ void Actor::Update()
     this->trajectories[tinfo.id]->GetInterpolatedKeyFrame(posFrame);
     modelPose.pos = posFrame.GetTranslation();
     modelPose.rot = posFrame.GetRotation();
+
+    if (this->lastTraj == tinfo.id)
+      this->pathLength += fabs(this->lastPos.Distance(modelPose.pos));
+    else
+    {
+      common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
+        (this->trajectories[tinfo.id]->GetKeyFrame(0));
+      this->pathLength = fabs(modelPose.pos.Distance(frame0->GetTranslation()));
+    }
+    this->lastPos = modelPose.pos;
   }
   if (this->interpolateX[tinfo.type] &&
         this->trajectories.find(tinfo.id) != this->trajectories.end())
   {
-    common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
-      (this->trajectories[tinfo.id]->GetKeyFrame(0));
-    math::Vector3 framePos = modelPose.pos - frame0->GetTranslation();
-    frame = skelAnim->GetPoseAtX(framePos.GetLength(),
+    frame = skelAnim->GetPoseAtX(this->pathLength,
               skelMap[this->skeleton->GetRootNode()->GetName()]);
   }
   else
     frame = skelAnim->GetPoseAt(scriptTime);
+
+  this->lastTraj = tinfo.id;
 
   math::Matrix4 rootTrans =
                   frame[skelMap[this->skeleton->GetRootNode()->GetName()]];

@@ -147,6 +147,12 @@ namespace gazebo
 
       protected: std::map<std::string, bool> interpolateX;
 
+      protected: math::Vector3 lastPos;
+
+      protected: double pathLength;
+
+      protected: unsigned int lastTraj;
+
       protected: std::string visualName;
 
       protected: transport::PublisherPtr bonePosePub;
