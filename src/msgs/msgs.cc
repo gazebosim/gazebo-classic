@@ -27,7 +27,7 @@
 #include "common/Image.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 namespace gazebo { namespace msgs {
 /// Create a request message

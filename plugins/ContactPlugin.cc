@@ -23,7 +23,7 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
-#include "physics/physics.h"
+#include "physics/physics.hh"
 #include "ContactPlugin.hh"
 
 using namespace gazebo;

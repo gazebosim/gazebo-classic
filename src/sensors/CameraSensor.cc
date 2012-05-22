@@ -24,8 +24,8 @@
 #include "common/Events.hh"
 #include "common/Exception.hh"
 
-#include "transport/transport.h"
-#include "msgs/msgs.h"
+#include "transport/transport.hh"
+#include "msgs/msgs.hh"
 
 #include "physics/World.hh"
 

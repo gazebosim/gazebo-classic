@@ -21,7 +21,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "common/Events.hh"
 #include "common/Console.hh"

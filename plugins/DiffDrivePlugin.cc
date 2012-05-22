@@ -15,8 +15,8 @@
  *
 */
 
-#include "physics/physics.h"
-#include "transport/transport.h"
+#include "physics/physics.hh"
+#include "transport/transport.hh"
 #include "plugins/DiffDrivePlugin.hh"
 
 using namespace gazebo;

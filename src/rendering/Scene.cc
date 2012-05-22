@@ -17,8 +17,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include "rendering/ogre.h"
-#include "msgs/msgs.h"
-#include "sdf/sdf.h"
+#include "msgs/msgs.hh"
+#include "sdf/sdf.hh"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"

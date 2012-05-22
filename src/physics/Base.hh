@@ -27,7 +27,7 @@
 
 #include <string>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 

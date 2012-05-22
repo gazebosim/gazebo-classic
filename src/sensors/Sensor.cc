@@ -19,8 +19,8 @@
  * Date: 25 May 2007
  */
 
-#include "sdf/sdf.h"
-#include "transport/transport.h"
+#include "sdf/sdf.hh"
+#include "transport/transport.hh"
 
 #include "physics/Physics.hh"
 #include "physics/World.hh"

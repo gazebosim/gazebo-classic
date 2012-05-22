@@ -23,7 +23,7 @@
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "math/Vector3.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 namespace gazebo
 {

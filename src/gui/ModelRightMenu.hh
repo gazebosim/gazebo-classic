@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 #include "gui/qt.h"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "transport/TransportTypes.hh"
 
 namespace gazebo

@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "common/common.h"
+#include "common/common.hh"
 
 using namespace gazebo;
 class CommonTest : public ServerFixture

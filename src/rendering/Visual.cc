@@ -20,9 +20,9 @@
  */
 
 #include "rendering/ogre.h"
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/Events.hh"
 
 #include "rendering/Conversions.hh"

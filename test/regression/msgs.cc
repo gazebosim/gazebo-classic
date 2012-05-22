@@ -15,7 +15,7 @@
  *
 */
 #include <string.h>
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;

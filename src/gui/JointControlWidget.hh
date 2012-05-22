@@ -19,7 +19,7 @@
 
 #include <string>
 #include <map>
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "gui/qt.h"
 #include "transport/TransportTypes.hh"
 

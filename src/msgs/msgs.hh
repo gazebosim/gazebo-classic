@@ -20,7 +20,7 @@
 #include <string>
 
 #include "msgs/MessageTypes.hh"
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 #include "math/MathTypes.hh"
 #include "math/Vector3.hh"

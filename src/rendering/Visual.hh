@@ -35,8 +35,8 @@
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
 
-#include "sdf/sdf.h"
-#include "msgs/msgs.h"
+#include "sdf/sdf.hh"
+#include "msgs/msgs.hh"
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
 

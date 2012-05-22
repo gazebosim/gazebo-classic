@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "gui/qt.h"
-#include "sdf/sdf.h"
-#include "msgs/msgs.h"
+#include "sdf/sdf.hh"
+#include "msgs/msgs.hh"
 #include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 

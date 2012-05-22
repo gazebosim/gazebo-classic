@@ -17,9 +17,9 @@
 #include <math.h>
 
 #include "common/Exception.hh"
-#include "math/gzmath.h"
+#include "math/gzmath.hh"
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
 
 #include "rendering/RenderEvents.hh"
 #include "rendering/Rendering.hh"
