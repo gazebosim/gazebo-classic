@@ -1926,6 +1926,26 @@ void Visual::ShowCollision(bool _show)
 }
 
 //////////////////////////////////////////////////
+void Visual::ShowSkeleton(bool _show)
+{
+  double transp = 0.0;
+  if (_show)
+    transp = 0.5;
+
+  ///  make the rest of the model transparent
+  this->SetTransparency(transp);
+
+  if (this->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    (*iter)->ShowSkeleton(_show);
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetVisibilityFlags(uint32_t _flags)
 {
   for (std::vector<VisualPtr>::iterator iter = this->children.begin();
@@ -1983,23 +2003,22 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     return;
   }
 
-//  const msgs::Time& stamp = _pose.time(0);
-
   for (int i = 0; i < _pose.pose_size(); i++)
   {
     const msgs::Pose& bonePose = _pose.pose(i);
+    if (!this->skeleton->hasBone(bonePose.name()))
+      continue;
     Ogre::Bone *bone = this->skeleton->getBone(bonePose.name());
-    if (!bone)
-    {
-      gzerr << "Bone " << bonePose.name() << " not found.\n";
-      return;
-    }
-
-    const msgs::Vector3d& pos = bonePose.position();
-    const msgs::Quaternion& rot = bonePose.orientation();
+    Ogre::Vector3 p(bonePose.position().x(),
+                    bonePose.position().y(),
+                    bonePose.position().z());
+    Ogre::Quaternion quat(Ogre::Quaternion(bonePose.orientation().w(),
+                                           bonePose.orientation().x(),
+                                           bonePose.orientation().y(),
+                                           bonePose.orientation().z()));
 
     bone->setManuallyControlled(true);
-    bone->setPosition(Ogre::Vector3(pos.x(), pos.y(), pos.z()));
-    bone->setOrientation(Ogre::Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
+    bone->setPosition(p);
+    bone->setOrientation(quat);
   }
 }

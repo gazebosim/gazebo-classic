@@ -23,8 +23,15 @@ set (files hanoi_red_disk.dae
            hanoi_green_disk.dae
            hanoi_blue_disk.dae
            bowl.dae
-           test.dae
-           human.dae
+           moonwalk.dae
+           run.dae
+           sit_down.dae
+           stand_up.dae
+           sitting.dae
+           walk.dae
+           stand.dae
+           talk_a.dae
+           talk_b.dae
            coke_can.dae
            cube_20k.stl
            14_4v_cordless_drill.dae

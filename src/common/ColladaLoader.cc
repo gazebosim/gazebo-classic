@@ -279,7 +279,8 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
 
-  this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
+  if (rootXml->FirstChildElement("library_animations"))
+    this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
         skeleton);
 
   TiXmlElement *skinXml = _contrXml->FirstChildElement("skin");
