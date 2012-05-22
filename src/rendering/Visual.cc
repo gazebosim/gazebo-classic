@@ -1982,22 +1982,12 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
     return;
   }
-  this->sceneNode->getParent()->_update(true, true);
-
-  Ogre::Bone *foot = NULL;
-  Ogre::Vector3 toePos;
 
   for (int i = 0; i < _pose.pose_size(); i++)
   {
     const msgs::Pose& bonePose = _pose.pose(i);
     if (!this->skeleton->hasBone(bonePose.name()))
-    {
-      gzerr << "Bone " << bonePose.name() << " not found.\n";
-      toePos.x = bonePose.position().x();
-      toePos.y = bonePose.position().y();
-      toePos.z = bonePose.position().z();
       continue;
-    }
     Ogre::Bone *bone = this->skeleton->getBone(bonePose.name());
     Ogre::Vector3 p(bonePose.position().x(),
                     bonePose.position().y(),
@@ -2010,33 +2000,5 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     bone->setManuallyControlled(true);
     bone->setPosition(p);
     bone->setOrientation(quat);
-    if (bone->getName() == "LeftToeBase")
-    {
-      foot = bone;
-    }
   }
-
-  Ogre::Entity *ent = NULL;
-
-  for (int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
-  {
-    ent = dynamic_cast<Ogre::Entity*>(this->sceneNode->getAttachedObject(i));
-    if (ent->hasSkeleton())
-      break;
-  }
-//  this->scene->GetManager()->_applySceneAnimations();
-  Ogre::Vector3 rootpos = this->sceneNode->_getFullTransform().getTrans();
-  printf("root pos: %f %f %f\n", rootpos.x, rootpos.y, rootpos.z);
-  Ogre::Vector3 ogretoePos = (this->sceneNode->_getFullTransform() *
-                                  foot->_getFullTransform()).getTrans();
-  printf("skeleton toe pos: %f %f %f\n", ogretoePos.x, ogretoePos.y, ogretoePos.z);
-  printf("physical toe pos: %f %f %f\n", toePos.x, toePos.y, toePos.z);
-  Ogre::Vector3 error = toePos - ogretoePos;
-  printf("error: %f\n", error.length());
-  if (error.length() > 1e-3)
-  {
-    printf("\n\nERROR\n\n");
-    gzthrow("failed to sync");
-  }
-  printf("----------------------------------------------------\n");
 }

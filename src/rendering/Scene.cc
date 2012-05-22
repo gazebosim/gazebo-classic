@@ -1252,7 +1252,6 @@ void Scene::PreRender()
   }
   this->lightMsgs.clear();
 
-
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
   // over the wire before  we recieve the visual
@@ -1269,8 +1268,6 @@ void Scene::PreRender()
           std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
-        if ((*pIter)->name() == "actor1")
-           printf("processing pose for actor1: %f %f %f\n", pose.pos.x, pose.pos.y, pose.pos.z);
         iter->second->SetPose(pose);
       }
       PoseMsgs_L::iterator prev = pIter++;
@@ -1285,9 +1282,26 @@ void Scene::PreRender()
   while (spIter != this->skeletonPoseMsgs.end())
   {
     Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
+    for (int i = 0; i < (*spIter)->pose_size(); i++)
+    {
+      const msgs::Pose& pose_msg = (*spIter)->pose(i);
+      Visual_M::iterator iter2 = this->visuals.find(pose_msg.name());
+      if (iter2 != this->visuals.end())
+      {
+        // If an object is selected, don't let the physics engine move it.
+        if (this->selectionObj->GetVisualName().empty() ||
+           !this->selectionObj->IsActive() ||
+           iter->first.find(this->selectionObj->GetVisualName()) ==
+            std::string::npos)
+        {
+          math::Pose pose = msgs::Convert(pose_msg);
+          iter2->second->SetPose(pose);
+        }
+      }
+    }
+
     if (iter != this->visuals.end())
     {
-      printf("processing skeleton pose\n");
       iter->second->SetSkeletonPose(*(*spIter).get());
       SkeletonPoseMsgs_L::iterator prev = spIter++;
       this->skeletonPoseMsgs.erase(prev);
@@ -1609,14 +1623,6 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
-  if (_msg->name() == "actor1" || _msg->name() == "actor1::LeftToeBase")
-  {
-    printf("received %s pose: %f %f %f\n", _msg->name().c_str(),
-                                           _msg->position().x(),
-                                           _msg->position().y(),
-                                           _msg->position().z());
-  }
-
   // Find an old model message, and remove them
   for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
   {
@@ -1635,7 +1641,6 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   SkeletonPoseMsgs_L::iterator iter;
-  printf("received skeleton pose\n");
 
   // Find an old model message, and remove them
   for (iter = this->skeletonPoseMsgs.begin();

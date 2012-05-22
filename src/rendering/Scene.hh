@@ -366,6 +366,7 @@ namespace gazebo
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
       private: transport::SubscriberPtr skeletonPoseSub;
+      private: transport::SubscriberPtr triggerSub;
       private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;
