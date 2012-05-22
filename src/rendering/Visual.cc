@@ -2007,10 +2007,7 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
   {
     const msgs::Pose& bonePose = _pose.pose(i);
     if (!this->skeleton->hasBone(bonePose.name()))
-    {
-      gzerr << "Bone " << bonePose.name() << " not found.\n";
       continue;
-    }
     Ogre::Bone *bone = this->skeleton->getBone(bonePose.name());
     Ogre::Vector3 p(bonePose.position().x(),
                     bonePose.position().y(),

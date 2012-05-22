@@ -106,10 +106,10 @@ void Actor::Load(sdf::ElementPtr _sdf)
     linkSdf->GetAttribute("gravity")->Set(false);
     sdf::ElementPtr linkPose = linkSdf->GetOrCreateElement("origin");
 
-    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
+/*    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
     this->AddSphereCollision(linkSdf, actorName + "_origin_col",
                                              math::Pose(), 0.02);
-    this->AddBoxVisual(linkSdf, actorName + "_origin_vis",
+*/    this->AddBoxVisual(linkSdf, actorName + "_origin_vis",
                     math::Pose(), math::Vector3(0.05, 0.05, 0.05), "Gazebo/White", Color::White);
     this->AddActorVisual(linkSdf, actorName + "_visual", math::Pose());
 
@@ -525,6 +525,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
   msg.set_model_name(this->visualName);
 
   math::Matrix4 modelTrans(math::Matrix4::IDENTITY);
+  math::Pose mainLinkPose;
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
   {
@@ -546,33 +547,47 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
       bonePose.Correct();
     }
 
-    msgs::Pose *msg_pose = msg.add_pose();
-    msg_pose->set_name(bone->GetName());
+    msgs::Pose *bone_pose = msg.add_pose();
+    bone_pose->set_name(bone->GetName());
+
     if (!parentBone)
     {
-      msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
-      msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
-
-      currentLink->SetWorldPose(bonePose);
+      bone_pose->mutable_position()->CopyFrom(msgs::Convert(math::Vector3()));
+      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
+                                                    math::Quaternion()));
+      mainLinkPose = bonePose;
     }
     else
     {
-      msg_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
-      msg_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
+      bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
+      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
       math::Pose parentPose = parentLink->GetWorldPose();
       math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
       parentTrans.SetTranslate(parentPose.pos);
       transform = parentTrans * transform;
-      currentLink->SetWorldPose(transform.GetAsPose());
     }
+
+    msgs::Pose *link_pose = msg.add_pose();
+    link_pose->set_name(currentLink->GetScopedName());
+    math::Pose linkPose = transform.GetAsPose() - mainLinkPose;
+    link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
+    link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.rot));
+
+    currentLink->SetWorldPose(transform.GetAsPose(), true, false);
   }
 
   msgs::Time *stamp = msg.add_time();
   stamp->CopyFrom(msgs::Convert(_time));
 
+  msgs::Pose *model_pose = msg.add_pose();
+  model_pose->set_name(this->GetScopedName());
+  model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.pos));
+  model_pose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.rot));
+
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);
+  this->SetWorldPose(mainLinkPose, true, false);
 }
 
 //////////////////////////////////////////////////
