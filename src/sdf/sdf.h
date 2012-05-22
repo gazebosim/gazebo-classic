@@ -15,7 +15,7 @@
  *
 */
 // DEPRECATED
-#ifndef __PHYSICS_H__
-#define __PHYSICS_H__
-#include "physics/physics.hh"
+#ifndef __SDF_H__
+#define __SDF_H__
+#include "sdf/sdf.hh"
 #endif

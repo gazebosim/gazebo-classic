@@ -81,18 +81,6 @@ TEST_F(HeightmapTest, Heights)
 }
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapTest, NotSquareImage)
-{
-  EXPECT_THROW(Load("worlds/not_square_heightmap.world"), common::Exception);
-}
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, InvalidSizeImage)
-{
-  EXPECT_THROW(Load("worlds/invalid_size_heightmap.world"), common::Exception);
-}
-
-/////////////////////////////////////////////////
 TEST_F(HeightmapTest, WhiteAlpha)
 {
   Load("worlds/white_alpha_heightmap.world");
@@ -143,6 +131,35 @@ TEST_F(HeightmapTest, WhiteNoAlpha)
     }
   }
 }
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, NotSquareImage)
+{
+  common::SystemPaths::Instance()->AddGazeboPaths(
+      TEST_REGRESSION_PATH);
+
+  this->server = new Server();
+  EXPECT_THROW(this->server->Load("worlds/not_square_heightmap.world"),
+               common::Exception);
+
+  this->server->Fini();
+  delete this->server;
+}
+
+/////////////////////////////////////////////////
+/*TEST_F(HeightmapTest, InvalidSizeImage)
+{
+  common::SystemPaths::Instance()->AddGazeboPaths(
+      TEST_REGRESSION_PATH);
+
+  this->server = new Server();
+  EXPECT_THROW(this->server->Load("worlds/invalid_size_heightmap.world"),
+               common::Exception);
+
+  this->server->Fini();
+  delete this->server;
+}*/
+
 
 int main(int argc, char **argv)
 {

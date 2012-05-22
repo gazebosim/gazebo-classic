@@ -15,7 +15,7 @@
  *
 */
 // DEPRECATED
-#ifndef __PHYSICS_H__
-#define __PHYSICS_H__
-#include "physics/physics.hh"
+#ifndef __MSGS_H__
+#define __MSGS_H__
+#include "msgs/msgs.hh"
 #endif
