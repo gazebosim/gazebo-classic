@@ -1,6 +1,7 @@
 set (files 
   actor.world
   actor_demo.world
+  actor_circle.world
   two_actors.world
   camera.world
   depth_camera.world
