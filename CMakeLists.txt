@@ -208,7 +208,7 @@ else (build_errors)
 
   ########################################
   # Make the package config files
-  set (pkgconfig_files gazebo)
+  set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
 
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
