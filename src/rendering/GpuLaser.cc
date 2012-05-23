@@ -44,6 +44,7 @@
 using namespace gazebo;
 using namespace rendering;
 
+int GpuLaser::texCount = 0;
 
 //////////////////////////////////////////////////
 GpuLaser::GpuLaser(const std::string &_namePrefix, Scene *_scene,
@@ -160,9 +161,12 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
   Ogre::TextureUnitState *tex_unit;
   for (unsigned int i = 0; i < this->_textureCount; i++)
   {
+    unsigned int texIndex = texCount++;
     tex_unit =
       this->mat_2nd_pass->getTechnique(0)->getPass(0)->createTextureUnitState(
-        this->_1stPassTextures[i]->getName());
+        this->_1stPassTextures[i]->getName(), texIndex);
+
+    this->texIdx.push_back(texIndex);
 
     tex_unit->setTextureFiltering(Ogre::TFO_NONE);
     tex_unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
@@ -230,7 +234,7 @@ void GpuLaser::PostRender()
 }
 
 void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
-                        Ogre::Material *material, Ogre::Camera *cam)
+                   Ogre::Material *material, Ogre::Camera *cam, bool updateTex)
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
@@ -268,6 +272,20 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
 #else
   pass->_updateAutoParams(&autoParamDataSource, 1);
 #endif
+
+  if (updateTex)
+  {
+    pass->getFragmentProgramParameters()->setNamedConstant("tex1",
+      this->texIdx[0]);
+    if (this->texIdx.size() > 0)
+    {
+      pass->getFragmentProgramParameters()->setNamedConstant("tex2",
+        this->texIdx[1]);
+      if (this->texIdx.size() > 1)
+        pass->getFragmentProgramParameters()->setNamedConstant("tex3",
+          this->texIdx[1]);
+    }
+  }
 
   // NOTE: We MUST bind parameters AFTER updating the autos
   if (pass->hasVertexProgram())
@@ -385,7 +403,7 @@ void GpuLaser::RenderImpl()
   this->visual->SetVisible(true);
 
   this->UpdateRenderTarget(this->_2ndPassTarget,
-                this->mat_2nd_pass, this->orthoCam);
+                this->mat_2nd_pass, this->orthoCam, true);
   this->_2ndPassTarget->update(false);
 
   this->visual->SetVisible(false);
