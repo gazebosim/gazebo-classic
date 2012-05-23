@@ -43,7 +43,6 @@ Projector::Projector(rendering::VisualPtr _parent)
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->visual->GetScene()->GetName());
-
 }
 
 /////////////////////////////////////////////////
