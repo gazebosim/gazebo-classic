@@ -41,6 +41,7 @@ namespace gazebo
       "common",
       "entity",
       "model",
+      "actor",
       "link",
       "collision",
       "light",
@@ -70,9 +71,9 @@ namespace gazebo
                 BASE            = 0x00000000,
                 ENTITY          = 0x00000001,
                 MODEL           = 0x00000002,
-                ACTOR           = 0x00000003,
                 LINK            = 0x00000004,
                 COLLISION       = 0x00000008,
+                ACTOR           = 0x00000016,
                 LIGHT           = 0x00000010,
                 VISUAL          = 0x00000020,
 

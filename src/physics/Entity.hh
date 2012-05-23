@@ -99,12 +99,14 @@ namespace gazebo
       /// \brief Set the pose of the entity relative to its parent
       /// \param pose The new pose
       /// \param notify True = tell children of the pose change
-      public: void SetRelativePose(const math::Pose &pose, bool notify = true);
+      public: void SetRelativePose(const math::Pose &pose, bool notify = true,
+                                   bool publish = true);
 
       /// \brief Set the world pose of the entity
       /// \param pose The new world pose
       /// \param notify True = tell children of the pose change
-      public: void SetWorldPose(const math::Pose &pose, bool notify = true);
+      public: void SetWorldPose(const math::Pose &pose, bool notify = true,
+                                bool publish = true);
 
       /// \brief Get the linear velocity of the entity
       /// \return A math::Vector3 for the linear velocity
@@ -188,12 +190,14 @@ namespace gazebo
 
       private: math::Box GetCollisionBoundingBoxHelper(BasePtr _base) const;
 
-      private: void SetWorldPoseModel(const math::Pose &_pose, bool _notify);
+      private: void SetWorldPoseModel(const math::Pose &_pose, bool _notify,
+                                      bool _publish);
 
       private: void SetWorldPoseCanonicalLink(const math::Pose &_pose,
-                                              bool _notify);
+                                              bool _notify, bool _publish);
 
-      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify);
+      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
+                                        bool _publish);
 
       /// \brief Called when a new pose message arrives
       private: void OnPoseMsg(ConstPosePtr &_msg);
@@ -239,7 +243,7 @@ namespace gazebo
       protected: math::Pose dirtyPose;
       private: boost::function<void()> onAnimationComplete;
 
-      private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool);
+      private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool, bool);
     };
 
     /// \}

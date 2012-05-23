@@ -271,6 +271,8 @@ namespace gazebo
       public: void ShowBoundingBox();
       public: void ShowCollision(bool _show);
 
+      public: void ShowSkeleton(bool _show);
+
       public: void SetScene(ScenePtr _scene);
       public: ScenePtr GetScene() const;
       public: void ShowJoints(bool _show);
