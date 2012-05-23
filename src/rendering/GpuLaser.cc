@@ -174,10 +174,10 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void GpuLaser::PostRender()
 {
-  common::Timer postRenderT, blitT;
-  postRenderT.Start();
-  double blitDur = 0.0;
-  double postRenderDur = 0.0;
+//  common::Timer postRenderT, blitT;
+//  postRenderT.Start();
+//  double blitDur = 0.0;
+//  double postRenderDur = 0.0;
   for (unsigned int i = 0; i < this->_textureCount; i++)
     this->_1stPassTargets[i]->swapBuffers();
 
@@ -205,10 +205,9 @@ void GpuLaser::PostRender()
     Ogre::PixelBox dst_box(width, height,
         1, Ogre::PF_FLOAT32_RGB, this->laserBuffer);
 
-    sleep(0.3);
-    blitT.Start();
+//    blitT.Start();
     pixelBuffer->blitToMemory(dst_box);
-    blitDur = blitT.GetElapsed().Double();
+//    blitDur = blitT.GetElapsed().Double();
 
     if (!this->laserScan)
       this->laserScan =  new float[this->w2nd * this->h2nd * 3];
@@ -220,14 +219,14 @@ void GpuLaser::PostRender()
   }
 
   this->newData = false;
-  postRenderDur = postRenderT.GetElapsed().Double();
+//  postRenderDur = postRenderT.GetElapsed().Double();
 
-  std::cerr << " Render: " << this->lastRenderDuration * 1000
+/*  std::cerr << " Render: " << this->lastRenderDuration * 1000
             << " BLIT: " << blitDur * 1000
             << " postRender: " << postRenderDur * 1000
             << " TOTAL: " << (this->lastRenderDuration + postRenderDur) * 1000
             << " Total - BLIT: " << (this->lastRenderDuration + postRenderDur
-            - blitDur) * 1000 << "\n";
+            - blitDur) * 1000 << "\n";   */
 }
 
 void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
