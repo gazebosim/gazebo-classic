@@ -457,6 +457,9 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
       geomMsg->set_type(msgs::Geometry::HEIGHTMAP);
       msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
                  geomElem->GetValueVector3("size"));
+      msgs::Set(geomMsg->mutable_heightmap()->mutable_origin(),
+                 geomElem->GetValueVector3("origin"));
+
       common::Image img(geomElem->GetValueString("filename"));
       msgs::Set(geomMsg->mutable_heightmap()->mutable_image(), img);
 
