@@ -24,9 +24,10 @@
 #include "math/Plane.hh"
 #include "math/Rand.hh"
 
+#include "common/Image.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 namespace gazebo { namespace msgs {
 /// Create a request message
@@ -156,6 +157,7 @@ void Set(msgs::Time *_t, const common::Time &_v)
 }
 
 
+/////////////////////////////////////////////////
 void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
 {
   Set(_p->mutable_normal(), _v.normal);
@@ -164,6 +166,31 @@ void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
   _p->set_d(_v.d);
 }
 
+/////////////////////////////////////////////////
+void Set(common::Image &_img, const msgs::Image &_msg)
+{
+  _img.SetFromData(
+      (const unsigned char*)_msg.data().data(),
+      _msg.width(),
+      _msg.height(),
+      (common::Image::PixelFormat)(_msg.pixel_format()));
+}
+
+/////////////////////////////////////////////////
+void Set(msgs::Image *_msg, const common::Image &_i)
+{
+  _msg->set_width(_i.GetWidth());
+  _msg->set_height(_i.GetHeight());
+  _msg->set_pixel_format(_i.GetPixelFormat());
+  _msg->set_step(_i.GetPitch());
+
+  unsigned char *data = NULL;
+  unsigned int size;
+  _i.GetData(&data, size);
+  _msg->set_data(data, size);
+}
+
+/////////////////////////////////////////////////
 msgs::Vector3d Convert(const math::Vector3 &_v)
 {
   msgs::Vector3d result;
@@ -288,6 +315,7 @@ msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
   return result;
 }
 
+/////////////////////////////////////////////////
 msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::TrackVisual result;
@@ -304,6 +332,7 @@ msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf)
 }
 
 
+/////////////////////////////////////////////////
 msgs::Light LightFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Light result;
@@ -428,8 +457,33 @@ msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf)
       geomMsg->set_type(msgs::Geometry::HEIGHTMAP);
       msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
                  geomElem->GetValueVector3("size"));
-      geomMsg->mutable_heightmap()->set_filename(
-          geomElem->GetValueString("filename"));
+      msgs::Set(geomMsg->mutable_heightmap()->mutable_origin(),
+                 geomElem->GetValueVector3("origin"));
+
+      common::Image img(geomElem->GetValueString("filename"));
+      msgs::Set(geomMsg->mutable_heightmap()->mutable_image(), img);
+
+      sdf::ElementPtr textureElem = geomElem->GetElement("texture");
+      msgs::HeightmapGeom::Texture *tex;
+      while (textureElem)
+      {
+        tex = geomMsg->mutable_heightmap()->add_texture();
+        tex->set_diffuse(textureElem->GetValueString("diffuse"));
+        tex->set_normal(textureElem->GetValueString("normal"));
+        tex->set_size(textureElem->GetValueDouble("size"));
+        textureElem = textureElem->GetNextElement("texture");
+      }
+
+      sdf::ElementPtr blendElem = geomElem->GetElement("blend");
+      msgs::HeightmapGeom::Blend *blend;
+      while (blendElem)
+      {
+        blend = geomMsg->mutable_heightmap()->add_blend();
+
+        blend->set_min_height(blendElem->GetValueDouble("min_height"));
+        blend->set_fade_dist(blendElem->GetValueDouble("fade_dist"));
+        blendElem = blendElem->GetNextElement("blend");
+      }
     }
     else if (geomElem->GetName() == "mesh")
     {

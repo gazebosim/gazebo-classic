@@ -23,7 +23,7 @@
 #include <dirent.h>
 #include <sstream>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "rendering/ogre.h"
 #include "rendering/RTShaderSystem.hh"
 

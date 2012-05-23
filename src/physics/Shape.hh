@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Inertial.hh"

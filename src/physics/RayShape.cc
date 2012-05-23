@@ -31,7 +31,7 @@
 #include "common/Event.hh"
 
 #include "physics/PhysicsTypes.hh"
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 #include "physics/Collision.hh"
 #include "physics/RayShape.hh"

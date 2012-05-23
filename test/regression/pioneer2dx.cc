@@ -15,7 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.h"
+#include "physics/physics.hh"
 #include "common/Time.hh"
 
 using namespace gazebo;

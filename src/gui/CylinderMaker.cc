@@ -16,7 +16,7 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "gui/GuiEvents.hh"
 #include "common/MouseEvent.hh"
 #include "math/Quaternion.hh"

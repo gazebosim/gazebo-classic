@@ -350,10 +350,13 @@ void RenderEngine::LoadPlugins()
       }
       catch(Ogre::Exception &e)
       {
-        std::string description("Unable to load Ogre Plugin[");
-        description.append(*piter);
-        description.append("]...Skipping.");
-        gzerr << description << "\n";
+        if ((*piter).find("RenderSystem") != std::string::npos)
+        {
+          std::string description("Unable to load Ogre Plugin[");
+          description.append(*piter);
+          description.append("]...This won't end well.");
+          gzerr << description << "\n";
+        }
       }
     }
   }

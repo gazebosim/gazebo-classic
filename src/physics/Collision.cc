@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "msgs/MessageTypes.hh"
 
 #include "common/Events.hh"
@@ -98,6 +98,13 @@ void Collision::Load(sdf::ElementPtr _sdf)
       !this->shape->HasType(Base::RAY_SHAPE))
   {
     this->visPub->Publish(this->CreateCollisionVisual());
+  }
+
+  // Force max correcting velocity to zero for certain collision entities
+  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
+      this->shape->HasType(Base::MAP_SHAPE))
+  {
+    this->surface->maxVel = 0.0;
   }
 
   this->inertial->SetCoG(this->GetRelativePose().pos);
@@ -375,7 +382,8 @@ msgs::Visual Collision::CreateCollisionVisual()
     HeightmapShape *hgt = static_cast<HeightmapShape*>(this->shape.get());
     geom->set_type(msgs::Geometry::HEIGHTMAP);
 
-    geom->mutable_heightmap()->set_filename(hgt->GetFilename());
+    msgs::Set(geom->mutable_heightmap()->mutable_image(),
+              common::Image(hgt->GetFilename()));
     msgs::Set(geom->mutable_heightmap()->mutable_size(), hgt->GetSize());
     msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetOrigin());
   }

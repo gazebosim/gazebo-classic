@@ -24,15 +24,7 @@
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
-#include "physics/World.hh"
-#include "physics/MultiRayShape.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Physics.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/Collision.hh"
-
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "math/Vector3.hh"
 
@@ -152,7 +144,6 @@ void RFIDSensor::EvaluateTags()
   // iterate through the tags contained given rfid tag manager
   for (ci = tags.begin(); ci != tags.end(); ++ci)
   {
-    // physics::LinkPtr tagLinkPtr = (*ci)->getLinkPtr();
     math::Pose pos = (*ci)->GetTagPose();
     // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
     // std::cout << "link pos: x" << pos.pos.x

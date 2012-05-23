@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "physics/MultiRayShape.hh"
 
 using namespace gazebo;

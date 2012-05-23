@@ -22,7 +22,7 @@
 #include <float.h>
 #include <sstream>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "common/Events.hh"
 #include "math/Quaternion.hh"
@@ -410,9 +410,8 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
   std::string geomType =
     _sdf->GetElement("geometry")->GetFirstElement()->GetName();
 
-  /*if (type == "heightmap" || type == "map")
+  if (geomType == "heightmap" || geomType == "map")
     this->SetStatic(true);
-    */
 
   collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
       boost::shared_static_cast<Link>(shared_from_this()));

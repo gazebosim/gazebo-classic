@@ -30,14 +30,14 @@
 
 #include "transport/TransportTypes.hh"
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/WorldState.hh"
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 namespace boost
 {
@@ -180,6 +180,14 @@ namespace gazebo
       /// \brief Return a version of the name with "<world_name>::" removed
       public: std::string StripWorldName(const std::string &_name) const;
 
+      /// \brief Load a plugin
+      public: void LoadPlugin(const std::string &_filename,
+                              const std::string &_name,
+                              sdf::ElementPtr _sdf);
+
+      /// \brief Remove a running plugin
+      public: void RemovePlugin(const std::string &_name);
+
       /// \brief Enable all links in all the models
       public: void EnableAllModels();
 
@@ -316,6 +324,7 @@ namespace gazebo
       private: std::list<msgs::Model> modelMsgs;
 
       private: bool needsReset;
+      private: bool initialized;
 
       private: RayShapePtr testRay;
     };

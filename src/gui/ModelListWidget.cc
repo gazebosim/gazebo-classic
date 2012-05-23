@@ -21,7 +21,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
+#include "common/Image.hh"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
 #include "common/Events.hh"
@@ -534,8 +535,9 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     double px, py, pz;
     msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
 
-    heightmapMessage->set_filename(this->variantManager->value(
-          fileProp).toString().toStdString());
+    msgs::Set(heightmapMessage->mutable_image(),
+        common::Image(this->variantManager->value(
+            fileProp).toString().toStdString()));
 
     px = this->variantManager->value(
          this->GetChildItem(sizeProp, "x")).toDouble();

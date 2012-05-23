@@ -30,7 +30,7 @@
 #include <map>
 #include <list>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "rendering/ogre.h"
 
 #include "rendering/RenderTypes.hh"

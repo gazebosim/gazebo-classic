@@ -9,13 +9,9 @@ set (plugins
   DepthCameraPlugin
   GpuRayPlugin
   ContactPlugin
-  SimpleArmPlugin
   RayPlugin
   DiffDrivePlugin
-  GripperPlugin
-  BallTestPlugin
-  VehiclePlugin
-  JointTestPlugin)
+  VehiclePlugin)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)

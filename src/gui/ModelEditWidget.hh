@@ -19,7 +19,7 @@
 
 #include "gui/qt.h"
 #include "transport/TransportTypes.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 class QTreeWidget;
 

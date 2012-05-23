@@ -45,6 +45,7 @@ namespace gazebo
     class CylinderShape;
     class SphereShape;
     class MeshShape;
+    class HeightmapShape;
 
     typedef boost::shared_ptr<Base> BasePtr;
     typedef boost::shared_ptr<Contact> ContactPtr;
@@ -58,6 +59,7 @@ namespace gazebo
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
     typedef boost::shared_ptr<Shape> ShapePtr;
     typedef boost::shared_ptr<RayShape> RayShapePtr;
+    typedef boost::shared_ptr<HeightmapShape> HeightmapShapePtr;
     typedef boost::shared_ptr<MultiRayShape> MultiRayShapePtr;
     typedef boost::shared_ptr<Inertial> InertialPtr;
     typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;

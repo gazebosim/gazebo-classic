@@ -17,6 +17,7 @@ set (msgs axis.proto
           heightmapgeom.proto
           imagegeom.proto
           image.proto
+          image_stamped.proto
           inertial.proto
           int.proto
           joint.proto
@@ -30,7 +31,7 @@ set (msgs axis.proto
           packet.proto
           physics.proto
           planegeom.proto
-          vector3d.proto
+          pid.proto
           pose.proto
           projector.proto
           publishers.proto
@@ -52,6 +53,7 @@ set (msgs axis.proto
           time.proto
           topic_info.proto
           vector2d.proto
+          vector3d.proto
           visual.proto
           world_control.proto
           world_stats.proto 
@@ -72,7 +74,7 @@ gz_add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_g
 target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
 
 set (sources msgs.cc)
-set (headers msgs.h)
+set (headers msgs.hh)
 
 set(PROTO_SRCS)
 set(PROTO_HDRS)
@@ -107,6 +109,4 @@ endforeach()
 configure_file ( ${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
 
 INSTALL_LIBRARY(gazebo_msgs)
-INSTALL_INCLUDES("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh)
-
-
+INSTALL_INCLUDES("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh msgs.h)

@@ -479,8 +479,6 @@ ElementPtr Element::GetElementDescription(const std::string &_key) const
       return (*iter);
   }
 
-  gzdbg << "Unable to find element description with name["
-         << _key << "] return empty\n";
   return ElementPtr();
 }
 

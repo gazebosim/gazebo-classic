@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef SDF_H_
-#define SDF_H_
-
-#include "sdf/interface/SDF.hh"
-#include "sdf/interface/Param.hh"
-#include "sdf/interface/parser.hh"
-
+// DEPRECATED
+#ifndef __SDF_H__
+#define __SDF_H__
+#include "sdf/sdf.hh"
 #endif

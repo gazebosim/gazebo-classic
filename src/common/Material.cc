@@ -37,8 +37,8 @@ Material::Material()
   this->shadeMode = GOURAUD;
   this->transparency = 0;
   this->shininess = 0;
-  this->ambient.Set(1, 1, 1, 1);
-  this->diffuse.Set(1, 1, 1, 1);
+  this->ambient.Set(0.4, 0.4, 0.4, 1);
+  this->diffuse.Set(0.5, 0.5, 0.5, 1);
   this->specular.Set(0, 0, 0, 1);
   this->lighting = false;
   this->dstBlendFactor = this->srcBlendFactor = 1.0;

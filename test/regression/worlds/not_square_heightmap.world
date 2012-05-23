@@ -1,0 +1,14 @@
+<?xml version="1.0"?> 
+<gazebo version="1.0">
+  <world name="default">
+    <model name="heightmap" static="true">
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <heightmap filename="not_square.png" size="129 129 10"/>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+  </world>
+</gazebo>

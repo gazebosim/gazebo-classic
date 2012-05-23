@@ -212,7 +212,7 @@ namespace gazebo
 
       // joint damping_coefficient
       protected: double damping_coefficient;
-      protected: transport::PublisherPtr vis_pub;
+
       private: math::Angle staticAngle;
     };
     /// \}

@@ -25,14 +25,20 @@
 #include <map>
 #include <string>
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
+
+#include "common/SystemPaths.hh"
+#include "physics/World.hh"
+#include "physics/PhysicsTypes.hh"
 #include "physics/Physics.hh"
-#include "sensors/sensors.h"
-#include "rendering/rendering.h"
-#include "msgs/msgs.h"
+#include "sensors/sensors.hh"
+#include "rendering/rendering.hh"
+#include "msgs/msgs.hh"
 
 #include "gazebo_config.h"
 #include "src/Server.hh"
+
+#include "test_config.h"
 
 using namespace gazebo;
 
@@ -80,10 +86,14 @@ class ServerFixture : public testing::Test
              {
                this->Load(_worldFilename, false);
              }
+
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
                delete this->server;
                this->server = NULL;
+
+               common::SystemPaths::Instance()->AddGazeboPaths(
+                   TEST_REGRESSION_PATH);
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
@@ -113,7 +123,6 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               printf("Load world[%s]\n", _worldFilename.c_str());
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);
@@ -211,7 +220,28 @@ class ServerFixture : public testing::Test
                    _name.c_str());
              }
 
-  protected: void ScanCompare(double *_scanA, double *_scanB,
+  protected: void FloatCompare(float *_scanA, float *_scanB,
+                 unsigned int _sampleCount, float &_diffMax,
+                 float &_diffSum, float &_diffAvg)
+             {
+               float diff;
+               _diffMax = 0;
+               _diffSum = 0;
+               _diffAvg = 0;
+               for (unsigned int i = 0; i < _sampleCount; ++i)
+               {
+                 diff = fabs(math::precision(_scanA[i], 10) -
+                             math::precision(_scanB[i], 10));
+                 _diffSum += diff;
+                 if (diff > _diffMax)
+                 {
+                   _diffMax = diff;
+                 }
+               }
+               _diffAvg = _diffSum / _sampleCount;
+             }
+
+  protected: void DoubleCompare(double *_scanA, double *_scanB,
                  unsigned int _sampleCount, double &_diffMax,
                  double &_diffSum, double &_diffAvg)
              {
@@ -380,6 +410,7 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
              }
 
+
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
@@ -475,6 +506,29 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);
+             }
+
+  protected: void LoadPlugin(const std::string &_filename,
+                             const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->LoadPlugin(_filename, _name, sdf::ElementPtr());
+             }
+
+  protected: physics::ModelPtr GetModel(const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               return world->GetModel(_name);
+             }
+
+
+  protected: void RemovePlugin(const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->RemovePlugin(_name);
              }
 
   protected: Server *server;

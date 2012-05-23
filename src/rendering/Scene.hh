@@ -24,8 +24,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/sdf.h"
-#include "msgs/msgs.h"
+#include "sdf/sdf.hh"
+#include "msgs/msgs.hh"
 
 #include "rendering/RenderTypes.hh"
 
@@ -362,6 +362,7 @@ namespace gazebo
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;
+      private: transport::SubscriberPtr jointSub;
       private: transport::SubscriberPtr selectionSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;

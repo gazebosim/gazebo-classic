@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "common/common.h"
+#include "common/common.hh"
 
 using namespace gazebo;
 class CommonTest : public ServerFixture
@@ -135,7 +135,7 @@ TEST_F(CommonTest, Image)
   EXPECT_EQ(489552, size);
 
   img.SetFromData(data, img.GetWidth(), img.GetHeight(),
-                  3*img.GetWidth(), img.GetBPP());
+                  common::Image::RGB_INT8);
 }
 
 TEST_F(CommonTest, Paths)

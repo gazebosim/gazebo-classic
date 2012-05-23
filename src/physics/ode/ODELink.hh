@@ -94,6 +94,10 @@ namespace gazebo
       /// \brief Add a force to the body
       public: virtual void AddRelativeForce(const math::Vector3 &_force);
 
+      /// \brief Add a force to the body using a global position
+      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
+                                                   const math::Vector3 &_pos);
+
       /// \brief Set the force applied to the body (add by Stefano)
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force, const math::Vector3 &_relpos);

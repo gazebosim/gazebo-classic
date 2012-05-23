@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "physics/PhysicsTypes.hh"
 #include "common/Time.hh"
 

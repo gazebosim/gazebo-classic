@@ -2,6 +2,7 @@ set (models
   pioneer2dx.model
   pr2.model
   pr2_visual_only.model
+  pr2_gripper.model
   box.model
   willowgarage.model
   willowgarage_visual.model
@@ -11,6 +12,7 @@ set (models
   saucepan.model
   female_standing.model
   cylinder.model
+  cube_20k.model
   ground_plane.model
   youbot.model
   youbot_static.model

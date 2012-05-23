@@ -17,8 +17,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include "rendering/ogre.h"
-#include "msgs/msgs.h"
-#include "sdf/sdf.h"
+#include "msgs/msgs.hh"
+#include "sdf/sdf.hh"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -90,6 +90,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
           &Scene::OnSkeletonPoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection",
@@ -146,6 +147,7 @@ Scene::~Scene()
   this->visSub.reset();
   this->lightSub.reset();
   this->poseSub.reset();
+  this->jointSub.reset();
   this->skeletonPoseSub.reset();
   this->selectionSub.reset();
   this->responseSub.reset();

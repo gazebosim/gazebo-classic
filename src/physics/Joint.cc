@@ -35,7 +35,6 @@
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 Joint::Joint()
   : Base(BasePtr())
@@ -245,7 +244,6 @@ void Joint::Attach(LinkPtr _parent, LinkPtr _child)
   this->parentLink = _parent;
   this->childLink = _child;
 }
-
 
 //////////////////////////////////////////////////
 void Joint::SetModel(ModelPtr _model)

@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.h"
-#include "sensors/sensors.h"
-#include "common/common.h"
+#include "physics/physics.hh"
+#include "sensors/sensors.hh"
+#include "common/common.hh"
 #include "scans_cmp.h"
 
 using namespace gazebo;

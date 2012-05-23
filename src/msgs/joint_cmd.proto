@@ -8,11 +8,15 @@ package gazebo.msgs;
 import "vector3d.proto";
 import "axis.proto";
 import "pose.proto";
+import "pid.proto";
 
 message JointCmd
 {
   required string name     = 1;
   optional int32 axis      = 2 [default=0];
   optional double force    = 3;
-  optional double position = 4;
+
+  optional PID position    = 4;
+  optional PID velocity    = 5;
+  optional bool reset      = 6;
 }

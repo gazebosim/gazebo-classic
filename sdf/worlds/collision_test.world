@@ -16,6 +16,11 @@
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
 
+        <damping>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </damping>
+
         <collision name="collision">
           <geometry>
             <box size="1 1 1"/>
@@ -42,6 +47,10 @@
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
+        <damping>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </damping>
 
         <collision name="collision">
           <geometry>
