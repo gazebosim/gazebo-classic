@@ -23,6 +23,7 @@
 
 using namespace gazebo;
 
+/////////////////////////////////////////////////
 Master::Master()
   : connection(new transport::Connection())
 {
@@ -33,6 +34,7 @@ Master::Master()
   this->msgsMutex = new boost::recursive_mutex();
 }
 
+/////////////////////////////////////////////////
 Master::~Master()
 {
   this->Fini();
@@ -55,6 +57,7 @@ Master::~Master()
   this->connection = NULL;
 }
 
+/////////////////////////////////////////////////
 void Master::Init(uint16_t _port)
 {
   try
@@ -359,6 +362,7 @@ void Master::RunOnce()
   this->connectionMutex->unlock();
 }
 
+/////////////////////////////////////////////////
 void Master::RemoveConnection(unsigned int _index)
 {
   std::list< std::pair<unsigned int, std::string> >::iterator msgIter;
@@ -424,6 +428,7 @@ void Master::RemoveConnection(unsigned int _index)
   this->connections.erase(connIter);
 }
 
+/////////////////////////////////////////////////
 void Master::RemovePublisher(const msgs::Publish _pub)
 {
   this->connectionMutex->lock();
@@ -460,6 +465,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
   }
 }
 
+/////////////////////////////////////////////////
 void Master::RemoveSubscriber(const msgs::Subscribe _sub)
 {
   // Find all publishers of the topic, and remove the subscriptions
