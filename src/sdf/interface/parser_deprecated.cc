@@ -49,7 +49,7 @@
 
 namespace deprecated_sdf
 {
-void copyChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
+void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Iterate over all the child elements
   for (xmlNodePtr elemXml = xmlFirstElementChild(_config);
@@ -85,16 +85,17 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
     }
     else
     {
-      gzdbg << "skipping prefixed element [" << prefix << ":"
-             << (const char*)elemXml->name << "] when copying plugins\n";
+      //gzwarn << "skipped: check to make sure the deprecated prefixed element ["
+      //       << prefix << ":"
+      //       << (const char*)elemXml->name << "] is not used.\n";
       // element->SetName(prefix + ":" + (const char*)elemXml->name);
     }
   }
 }
 
-bool getPlugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool controller2Plugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
-  // Get all plugins
+  // Get all controllers and convert to plugins
   for (xmlNodePtr pluginXml = _config->xmlChildrenNode;
        pluginXml != NULL; pluginXml = pluginXml->next)
   {
@@ -111,27 +112,30 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
         // (const char*)pluginXml->name);
         initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
 
-      deprecated_sdf::copyChildren(pluginXml, sdfPlugin);
+      deprecated_sdf::copyBlockChildren(pluginXml, sdfPlugin);
     }
-    else if (std::string((const char*)pluginXml->name) == "plugin")
+  }
+
+  return true;
+}
+
+bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf)
+{
+  gzerr << "checking for projector\n";
+  // Get all projectors
+  for (xmlNodePtr projectorXml = _config->xmlChildrenNode;
+       projectorXml != NULL; projectorXml = projectorXml->next)
+  {
+    if (projectorXml->name &&
+        std::string((const char*)projectorXml->name) == "projector")
     {
-      gzerr << "there is a <plugin> block in the deprecated xml\n";
+      sdf::ElementPtr sdfProjector = _sdf->AddElement("projector");
+      initAttr(projectorXml, "name", sdfProjector->GetAttribute("name"));
 
-      sdf::ElementPtr sdfPlugin = _sdf->AddElement("plugin");
-      initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
-      initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
+      deprecated_sdf::copyBlockChildren(projectorXml, sdfProjector);
 
-      for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;
-          dataXml != NULL; dataXml = dataXml->next)
-      {
-        if (std::string((const char*) dataXml->ns->prefix) != "interface")
-        {
-          sdf::ElementPtr sdfData = sdfPlugin->AddElement("data");
-          sdfData->GetAttribute("value")->SetFromString(getValue(dataXml));
-        }
-        else
-          gzerr << "<interface:...> are not copied\n";
-      }
+      /// Get all the controllers and convert to plugins
+      controller2Plugins(projectorXml, sdfProjector);
     }
   }
 
@@ -228,7 +232,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr _sdf)
     sdf::ElementPtr ray = _sdf->AddElement("ray");
     initRay(_config, ray);
 
-    if (!_sdf->GetAttribute("type")->SetFromString("ray"))
+    if (!_sdf->GetAttribute("type")->SetFromString("gpu_ray"))
     {
       gzerr << "Unable to set type to ray\n";
       return false;
@@ -236,7 +240,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  getPlugins(_config, _sdf);
+  controller2Plugins(_config, _sdf);
 
   return true;
 }
@@ -370,7 +374,7 @@ bool initContact(xmlNodePtr _config, sdf::ElementPtr _sdf)
   return true;
 }
 
-// _config = <body>
+// _config = <body><div class="kforgenav"><ul><li><a href="/">kforge.ros.org</a></li><li><a href="/people/home/">Profile</a></li><li><a href="/projects/">Projects</a></li><li><a href="/projects/gazebo/">Gazebo</a></li><li><a href="/projects/gazebo/services/">Services</a></li><li><a href="/projects/gazebo/members/">Members</a></li></ul></div>
 // _sdf = <inertial>
 bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
@@ -613,7 +617,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
   return true;
 }
 
-// _config = <body>
+// _config = <body><div class="kforgenav"><ul><li><a href="/">kforge.ros.org</a></li><li><a href="/people/home/">Profile</a></li><li><a href="/projects/">Projects</a></li><li><a href="/projects/gazebo/">Gazebo</a></li><li><a href="/projects/gazebo/services/">Services</a></li><li><a href="/projects/gazebo/members/">Members</a></li></ul></div>
 // _sdf = <link>
 bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
@@ -692,7 +696,6 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   // Get all sensor elements
-  // FIXME: instead of child elements, get namespace == sensor blocks
   for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor");
       sensor_xml; sensor_xml = getNextByNSPrefix(sensor_xml, "sensor"))
   {
@@ -704,6 +707,9 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
     }
     // TODO: check for duplicate sensors
   }
+
+  // Get projector elements
+  getProjectors(_config, _sdf);
 
   return true;
 }
@@ -837,7 +843,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
   // Get Parent Link
   // parent is specified by <anchor> element in old xml
-  // once anchor is found, <body1> or <body2> are parsed
+  // once anchor is found, <body1><div class="kforgenav"><ul><li><a href="/">kforge.ros.org</a></li><li><a href="/people/home/">Profile</a></li><li><a href="/projects/">Projects</a></li><li><a href="/projects/gazebo/">Gazebo</a></li><li><a href="/projects/gazebo/services/">Services</a></li><li><a href="/projects/gazebo/members/">Members</a></li></ul></div> or <body2><div class="kforgenav"><ul><li><a href="/">kforge.ros.org</a></li><li><a href="/people/home/">Profile</a></li><li><a href="/projects/">Projects</a></li><li><a href="/projects/gazebo/">Gazebo</a></li><li><a href="/projects/gazebo/services/">Services</a></li><li><a href="/projects/gazebo/members/">Members</a></li></ul></div> are parsed
   // as child and parent
   if (!firstChildElement(_config, "anchor"))
   {
@@ -1006,7 +1012,7 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  getPlugins(_config, _sdf);
+  controller2Plugins(_config, _sdf);
 
   return true;
 }
@@ -1052,7 +1058,7 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  getPlugins(_config, _sdf);
+  controller2Plugins(_config, _sdf);
 
   return true;
 }
@@ -1143,8 +1149,8 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
     std::string value = getNodeValue(_node, _key);
     if (value.empty())
     {
-      gzdbg << "Node[" << _node->name << "] Has empty key value["
-            << _key << "]\n";
+      //gzdbg << "Node[" << _node->name << "] does not have key value["
+      //      << _key << "] defined, will use default value.\n";
       return false;
     }
     if (!_attr->SetFromString(value))

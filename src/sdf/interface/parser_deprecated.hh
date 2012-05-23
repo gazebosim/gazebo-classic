@@ -94,9 +94,8 @@ namespace deprecated_sdf
   bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   /// copying <controller:...> to <plugins>
-  void copyChildren(xmlNodePtr _config, sdf::ElementPtr _sdf);
-  bool getPlugins(xmlNodePtr pluginXml, std::map<std::string,
-      sdf::ElementPtr > &_sdf);
+  void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool controller2Plugins(xmlNodePtr pluginXml, sdf::ElementPtr _sdf);
 
   bool initAttr(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
 
