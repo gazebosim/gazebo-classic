@@ -23,7 +23,7 @@
 #include <list>
 #include <vector>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/SingletonT.hh"
 
 #include "transport/Publisher.hh"

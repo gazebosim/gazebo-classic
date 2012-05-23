@@ -29,7 +29,7 @@
 #include "common/Event.hh"
 #include "common/Color.hh"
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 namespace Ogre
 {

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for animated models
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
-
 #ifndef ACTOR_HH
 #define ACTOR_HH
 
@@ -47,6 +42,7 @@ namespace gazebo
       double duration;
       double startTime;
       double endTime;
+      bool translated;
     };
 
     /// \addtogroup gazebo_physics
@@ -110,6 +106,9 @@ namespace gazebo
 
       private: void LoadScript(sdf::ElementPtr _sdf);
 
+      private: void SetPose(std::map<std::string, math::Matrix4> _frame,
+                     std::map<std::string, std::string> _skelMap, double _time);
+
       protected: const common::Mesh *mesh;
 
       protected: common::Skeleton *skeleton;
@@ -136,7 +135,7 @@ namespace gazebo
 
       protected: common::Time playStartTime;
 
-      protected: std::vector<common::PoseAnimation*> trajectories;
+      protected: std::map<unsigned int, common::PoseAnimation*> trajectories;
 
       protected: std::vector<TrajectoryInfo> trajInfo;
 
@@ -147,6 +146,12 @@ namespace gazebo
                                                             skelNodesMap;
 
       protected: std::map<std::string, bool> interpolateX;
+
+      protected: math::Vector3 lastPos;
+
+      protected: double pathLength;
+
+      protected: unsigned int lastTraj;
 
       protected: std::string visualName;
 

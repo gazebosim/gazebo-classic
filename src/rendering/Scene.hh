@@ -24,8 +24,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/sdf.h"
-#include "msgs/msgs.h"
+#include "sdf/sdf.hh"
+#include "msgs/msgs.hh"
 
 #include "rendering/RenderTypes.hh"
 
@@ -367,6 +367,7 @@ namespace gazebo
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
       private: transport::SubscriberPtr skeletonPoseSub;
+      private: transport::SubscriberPtr triggerSub;
       private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;

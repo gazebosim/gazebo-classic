@@ -22,8 +22,8 @@
 #ifndef SURFACEPARAMS_HH
 #define SURFACEPARAMS_HH
 
-#include "msgs/msgs.h"
-#include "sdf/sdf.h"
+#include "msgs/msgs.hh"
+#include "sdf/sdf.hh"
 
 namespace gazebo
 {

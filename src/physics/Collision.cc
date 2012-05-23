@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "msgs/MessageTypes.hh"
 
 #include "common/Events.hh"

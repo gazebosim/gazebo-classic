@@ -32,7 +32,7 @@
 #include "math/Pose.hh"
 #include "math/Vector2i.hh"
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 namespace Ogre
 {

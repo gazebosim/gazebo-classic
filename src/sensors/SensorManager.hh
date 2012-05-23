@@ -30,7 +30,7 @@
 
 #include "common/SingletonT.hh"
 #include "sensors/SensorTypes.hh"
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 namespace gazebo
 {

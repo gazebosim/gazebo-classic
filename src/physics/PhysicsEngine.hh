@@ -27,7 +27,7 @@
 
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "transport/TransportTypes.hh"
 #include "physics/PhysicsTypes.hh"
 

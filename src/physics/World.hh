@@ -30,14 +30,14 @@
 
 #include "transport/TransportTypes.hh"
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/WorldState.hh"
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 namespace boost
 {

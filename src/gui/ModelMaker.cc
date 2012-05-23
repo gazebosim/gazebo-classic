@@ -16,7 +16,7 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "common/Console.hh"
 #include "common/MouseEvent.hh"

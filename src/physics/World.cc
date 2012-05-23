@@ -25,7 +25,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
 #include "transport/Publisher.hh"
@@ -506,11 +506,11 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
   actor->SetWorld(shared_from_this());
   actor->Load(_sdf);
 
-  /*event::Events::addEntity(model->GetScopedName());
+  event::Events::addEntity(actor->GetScopedName());
 
   msgs::Model msg;
-  model->FillModelMsg(msg);
-  this->modelPub->Publish(msg);*/
+  actor->FillModelMsg(msg);
+  this->modelPub->Publish(msg);
 
   return actor;
 }

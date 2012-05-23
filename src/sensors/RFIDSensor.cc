@@ -24,7 +24,7 @@
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "math/Vector3.hh"
 

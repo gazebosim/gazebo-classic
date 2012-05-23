@@ -1,0 +1,11 @@
+#include <gazebo/common/common.hh>
+#include <gazebo/math/math.hh>
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/rendering/rendering.hh>
+#include <gazebo/sdf/sdf.hh>
+#include <gazebo/sensors/sensors.hh>
+#include <gazebo/transport/transport.hh>
+#include <gazebo/Server.hh>
+#include <gazebo/Master.hh>
+#include <gazebo/gazebo.hh>

@@ -16,8 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/Physics.hh"
-#include "physics/physics.h"
+#include "physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 
 using namespace gazebo;

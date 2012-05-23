@@ -15,9 +15,9 @@
  *
  */
 #include <vector>
-#include "transport/transport.h"
-#include "common/common.h"
-#include "math/gzmath.h"
+#include "transport/transport.hh"
+#include "common/common.hh"
+#include "math/gzmath.hh"
 #include "gazebo_config.h"
 #include "gazebo.hh"
 

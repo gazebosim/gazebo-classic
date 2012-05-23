@@ -16,7 +16,7 @@
 */
 #include <stdlib.h>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 #include "parser_deprecated.hh"
 

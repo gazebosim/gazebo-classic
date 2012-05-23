@@ -16,7 +16,7 @@
 */
 
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "transport/Node.hh"
 #include "transport/Publication.hh"
 #include "transport/TopicManager.hh"
