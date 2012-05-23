@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Events.hh"
@@ -30,7 +30,7 @@
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 using namespace gazebo;
 using namespace physics;

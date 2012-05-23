@@ -19,7 +19,7 @@
  * Date: 6th December 2011
  */
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"
 #include "common/MeshManager.hh"

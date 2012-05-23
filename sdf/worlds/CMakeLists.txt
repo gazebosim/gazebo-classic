@@ -1,9 +1,13 @@
 set (files 
   actor.world
+  actor_demo.world
+  actor_circle.world
+  two_actors.world
   camera.world
   depth_camera.world
   empty.world
   joints.world
+  heightmap.world
   kitchen.world
   lights.world
   model_nesting.world

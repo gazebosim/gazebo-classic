@@ -21,7 +21,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "common/Events.hh"
 #include "common/Console.hh"
@@ -243,12 +243,14 @@ math::Pose Entity::GetRelativePose() const
 }
 
 //////////////////////////////////////////////////
-void Entity::SetRelativePose(const math::Pose &_pose, bool _notify)
+void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
+        bool _publish)
 {
   if (this->parent && this->parentEntity)
-    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify);
+    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify,
+                              _publish);
   else
-    this->SetWorldPose(_pose, _notify);
+    this->SetWorldPose(_pose, _notify, _publish);
 }
 
 //////////////////////////////////////////////////
@@ -280,7 +282,8 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
+void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
+        bool _publish)
 {
   math::Pose oldModelWorldPose = this->worldPose;
 
@@ -312,7 +315,8 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
       else
       {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-        entity->PublishPose();
+        if (_publish)
+          entity->PublishPose();
       }
 
       if (_notify)
@@ -322,7 +326,8 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
+void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
+        bool _publish)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -344,7 +349,8 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
     if (_notify)
       this->parentEntity->UpdatePhysicsPose(false);
 
-    this->parentEntity->PublishPose();
+    if (_publish)
+      this->parentEntity->PublishPose();
   }
   else
     gzerr << "SWP for CB[" << this->GetName() << "] but parent["
@@ -352,7 +358,8 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
+void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
+        bool /*_publish*/)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -392,15 +399,16 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
+void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
 {
   this->GetWorld()->setWorldPoseMutex->lock();
 
-  (*this.*setWorldPoseFunc)(_pose, _notify);
+  (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
 
   this->GetWorld()->setWorldPoseMutex->unlock();
 
-  this->PublishPose();
+  if (_publish)
+    this->PublishPose();
 }
 
 //////////////////////////////////////////////////

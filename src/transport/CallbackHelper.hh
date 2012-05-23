@@ -25,7 +25,7 @@
 #include <string>
 
 #include "common/Console.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/Exception.hh"
 
 namespace gazebo

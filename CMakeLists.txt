@@ -12,16 +12,12 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 set (GAZEBO_VERSION_NAME "hydrogen")
 set (GAZEBO_MAJOR_VERSION 1)
 set (GAZEBO_MINOR_VERSION 0)
-set (GAZEBO_PATCH_VERSION 1)
+set (GAZEBO_PATCH_VERSION 2)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
-
-#if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-#  set (CMAKE_INSTALL_PREFIX "/usr/" CACHE PATH "Gazebo install prefix" FORCE)
-#endif()
 
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
 
@@ -208,7 +204,7 @@ else (build_errors)
 
   ########################################
   # Make the package config files
-  set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
+  set (pkgconfig_files gazebo)
 
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)

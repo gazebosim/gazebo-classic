@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "common/Exception.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/SingletonT.hh"
 
 #include "transport/TransportTypes.hh"

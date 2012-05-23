@@ -16,7 +16,9 @@
 */
 #include <stdlib.h>
 
-#include "sdf/sdf.h"
+#include "sdf/interface/SDF.hh"
+#include "sdf/interface/Param.hh"
+#include "sdf/interface/parser.hh"
 
 #include "parser_deprecated.hh"
 

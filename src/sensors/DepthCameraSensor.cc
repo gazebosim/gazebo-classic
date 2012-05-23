@@ -26,7 +26,7 @@
 #include "common/Events.hh"
 #include "common/Exception.hh"
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
 
 #include "rendering/DepthCamera.hh"
 #include "rendering/Scene.hh"

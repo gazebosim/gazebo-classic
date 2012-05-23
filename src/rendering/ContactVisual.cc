@@ -22,7 +22,7 @@
 #include "common/MeshManager.hh"
 #include "transport/Node.hh"
 #include "transport/Subscriber.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"
 #include "rendering/DynamicLines.hh"

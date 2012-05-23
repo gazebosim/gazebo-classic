@@ -15,7 +15,7 @@
  *
 */
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Visual.hh"
@@ -61,6 +61,13 @@ ModelRightMenu::ModelRightMenu()
   connect(this->transparentAction, SIGNAL(triggered()), this,
           SLOT(OnTransparent()));
 
+  this->skeletonAction = new QAction(tr("Skeleton"), this);
+  this->skeletonAction->setStatusTip(tr("Show model skeleton"));
+  this->skeletonAction->setCheckable(true);
+  connect(this->skeletonAction, SIGNAL(triggered()), this,
+          SLOT(OnSkeleton()));
+
+
   this->showJointsAction = new QAction(tr("Joints"), this);
   this->showJointsAction->setStatusTip(tr("Show joints"));
   this->showJointsAction->setCheckable(true);
@@ -98,6 +105,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(this->showJointsAction);
   menu.addAction(this->showCOMAction);
   menu.addAction(this->transparentAction);
+  menu.addAction(this->skeletonAction);
   menu.addAction(this->deleteAction);
   menu.addAction(this->jointControlAction);
 
@@ -105,6 +113,11 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
     this->transparentAction->setChecked(true);
   else
     this->transparentAction->setChecked(false);
+
+  if (this->skeletonActionState[this->modelName])
+    this->skeletonAction->setChecked(true);
+  else
+    this->skeletonAction->setChecked(false);
 
   if (this->showCollisionsActionState[this->modelName])
     this->showCollisionAction->setChecked(true);
@@ -184,6 +197,26 @@ void ModelRightMenu::OnTransparent()
   else
   {
     this->requestMsg = msgs::CreateRequest("set_transparency", this->modelName);
+    this->requestMsg->set_dbl_data(0.0);
+  }
+
+  this->requestPub->Publish(*this->requestMsg);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnSkeleton()
+{
+  this->skeletonActionState[this->modelName] =
+    this->skeletonAction->isChecked();
+
+  if (this->skeletonAction->isChecked())
+  {
+    this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+    this->requestMsg->set_dbl_data(1.0);
+  }
+  else
+  {
+    this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
     this->requestMsg->set_dbl_data(0.0);
   }
 

@@ -44,11 +44,6 @@ HeightmapShape::~HeightmapShape()
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::Update()
-{
-}
-
-//////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
@@ -59,13 +54,96 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   if (this->img.GetWidth() != this->img.GetHeight() ||
       !math::isPowerOfTwo(this->img.GetWidth()-1))
   {
-    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
+    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
   }
 }
 
 //////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
+  this->subSampling = 4;
+
+  math::Vector3 terrainSize = this->GetSize();
+
+  // sampling size along image width and height
+  this->vertSize = this->img.GetWidth() * this->subSampling;
+  this->scale.x = terrainSize.x / this->vertSize;
+  this->scale.y = terrainSize.y / this->vertSize;
+
+  if (math::equal(this->img.GetMaxColor().R(), 0))
+    this->scale.z = terrainSize.z;
+  else
+    this->scale.z = terrainSize.z / this->img.GetMaxColor().R();
+
+  // Step 1: Construct the heightmap lookup table, using the ogre ray scene
+  // query functionality
+  this->FillHeightMap();
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::FillHeightMap()
+{
+  unsigned int x, y;
+  float h = 0;
+  float h1 = 0;
+  float h2 = 0;
+
+  // Resize the vector to match the size of the vertices
+  this->heights.resize(this->vertSize * this->vertSize);
+
+  common::Color pixel;
+
+  double yf, xf, dy, dx;
+  int y1, y2, x1, x2;
+  double px1, px2, px3, px4;
+
+  int imgHeight = this->img.GetHeight();
+  int imgWidth = this->img.GetWidth();
+  // Bytes per row
+  unsigned int pitch = this->img.GetPitch();
+  // Bytes per pixel
+  unsigned int bpp = pitch / imgWidth;
+
+  unsigned char *data = NULL;
+  unsigned int count;
+  this->img.GetData(&data, count);
+
+  // Iterate over all the verices
+  for (y = 0; y < this->vertSize; y++)
+  {
+    yf = y / static_cast<double>(this->subSampling);
+    y1 = floor(yf);
+    y2 = ceil(yf);
+    if (y2 >= imgHeight)
+      y2 = y1;
+    dy = yf - y1;
+
+    for (x = 0; x < this->vertSize; x++)
+    {
+      xf = x / static_cast<double>(this->subSampling);
+      x1 = floor(xf);
+      x2 = ceil(xf);
+      if (x2 >= imgWidth)
+        x2 = x1;
+
+      dx = xf - x1;
+
+      px1 = static_cast<int>(data[y1 * pitch + x1 * bpp]) / 255.0;
+      px2 = static_cast<int>(data[y1 * pitch + x2 * bpp]) / 255.0;
+      h1 = (px1 - ((px1 - px2) * dx));
+
+      px3 = static_cast<int>(data[y2 * pitch + x1 * bpp]) / 255.0;
+      px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
+      h2 = (px3 - ((px3 - px4) * dx));
+
+      h = (h1 - ((h1 - h2) * dy)) * this->scale.z;
+
+      // Store the height for future use
+      this->heights[y * this->vertSize + x] = h;
+    }
+  }
+
+  delete [] data;
 }
 
 //////////////////////////////////////////////////
@@ -100,4 +178,42 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
 void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
+}
+
+//////////////////////////////////////////////////
+math::Vector2i HeightmapShape::GetVertexCount() const
+{
+  return math::Vector2i(this->img.GetWidth(), this->img.GetHeight());
+}
+
+/////////////////////////////////////////////////
+float HeightmapShape::GetHeight(int _x, int _y)
+{
+  return this->heights[_y * this->vertSize + _x];
+}
+
+/////////////////////////////////////////////////
+float HeightmapShape::GetMaxHeight() const
+{
+  float max = GZ_FLT_MIN;
+  for (unsigned int i = 0; i < this->heights.size(); ++i)
+  {
+    if (this->heights[i] > max)
+      max = this->heights[i];
+  }
+
+  return max;
+}
+
+/////////////////////////////////////////////////
+float HeightmapShape::GetMinHeight() const
+{
+  float min = GZ_FLT_MAX;
+  for (unsigned int i = 0; i < this->heights.size(); ++i)
+  {
+    if (this->heights[i] < min)
+      min = this->heights[i];
+  }
+
+  return min;
 }

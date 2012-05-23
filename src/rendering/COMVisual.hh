@@ -24,7 +24,7 @@
 #include <string>
 
 #include "rendering/Visual.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 namespace ogre
 {

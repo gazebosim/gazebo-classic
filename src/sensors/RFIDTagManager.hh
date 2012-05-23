@@ -23,7 +23,6 @@
 
 #include <vector>
 #include "common/SingletonT.hh"
-#include "physics/physics.h"
 #include "RFIDTag.hh"
 
 namespace gazebo

@@ -16,9 +16,9 @@
 */
 
 #include "ServerFixture.hh"
-#include "physics/physics.h"
-#include "sensors/sensors.h"
-#include "common/common.h"
+#include "physics/physics.hh"
+#include "sensors/sensors.hh"
+#include "common/common.hh"
 #include "scans_cmp.h"
 
 using namespace gazebo;
@@ -81,7 +81,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     std::vector<double> scan;
     laser->GetRanges(scan);
 
-    ScanCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+    DoubleCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
     EXPECT_LT(diffMax, 1e-6);
     EXPECT_LT(diffSum, 1e-5);
     EXPECT_LT(diffAvg, 1e-6);
@@ -116,14 +116,14 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
       laser->Update(true);
       laser->GetRanges(scan2);
 
-      ScanCompare(&scan[0], &scan2[0], 640, diffMax, diffSum, diffAvg);
+      DoubleCompare(&scan[0], &scan2[0], 640, diffMax, diffSum, diffAvg);
       EXPECT_LT(diffMax, 1e-6);
       EXPECT_LT(diffSum, 1e-6);
       EXPECT_LT(diffAvg, 1e-6);
     }
     laser->Update(true);
 
-    ScanCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+    DoubleCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
     EXPECT_LT(diffMax, 1e-6);
     EXPECT_LT(diffSum, 1e-6);
     EXPECT_LT(diffAvg, 1e-6);

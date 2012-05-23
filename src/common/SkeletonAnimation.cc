@@ -24,6 +24,7 @@ using namespace common;
 NodeAnimation::NodeAnimation(const std::string& _name)
 {
   this->name = _name;
+  this->length = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -139,7 +140,7 @@ math::Matrix4 NodeAnimation::GetFrameAt(double _time, bool _loop) const
   math::Matrix4 prevTrans = it2->second;
 
   double t = (time - prevKey) / (nextKey - prevKey);
-  assert(t > 0.0 && t < 1.0);
+  assert(t >= 0.0 && t <= 1.0);
 
   math::Vector3 nextPos = nextTrans.GetTranslation();
   math::Vector3 prevPos = prevTrans.GetTranslation();

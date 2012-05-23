@@ -40,6 +40,10 @@ typedef OgrePassMap::iterator OgrePassMapIterator;
 Projector::Projector(rendering::VisualPtr _parent)
 {
   this->visual = _parent;
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->visual->GetScene()->GetName());
+
 }
 
 /////////////////////////////////////////////////
@@ -50,12 +54,18 @@ Projector::~Projector()
 }
 
 /////////////////////////////////////////////////
-void Projector::Load(const math::Pose &_pose,
+void Projector::Load(const std::string &_name,
+                     const math::Pose &_pose,
                      const std::string &_textureName,
                      double _nearClip,
                      double _farClip,
                      double _fov)
 {
+  std::string topicName = std::string("~/") + _name;
+
+  boost::replace_all(topicName, "::", "/");
+  this->controlSub = this->node->Subscribe(topicName, &Projector::OnMsg, this);
+
   if (!this->visual)
   {
     gzerr << "Projector does not have a valid parent visual\n";
@@ -114,7 +124,8 @@ void Projector::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("fov"))
     fov = _sdf->GetValueDouble("fov");
 
-  this->Load(pose, textureName, nearClip, farClip, fov);
+  this->Load(_sdf->GetValueString("name"), pose, textureName,
+             nearClip, farClip, fov);
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +152,7 @@ void Projector::Load(const msgs::Projector &_msg)
   if (_msg.has_fov())
     fov = _msg.fov();
 
-  this->Load(pose, textureName, nearClip, farClip, fov);
+  this->Load(_msg.name(), pose, textureName, nearClip, farClip, fov);
 }
 
 /////////////////////////////////////////////////
@@ -157,7 +168,6 @@ void Projector::Toggle()
   if (this->projector.initialized)
   {
     this->projector.SetEnabled(!this->projector.enabled);
-    rendering::RTShaderSystem::Instance()->UpdateShaders();
   }
   else
     gzwarn << "could not start projector, toggle failed\n";
@@ -263,6 +273,7 @@ void Projector::ProjectorFrameListener::SetEnabled(bool _enabled)
   this->enabled = _enabled;
   if (!this->enabled)
     this->RemovePassFromMaterials();
+  rendering::RTShaderSystem::Instance()->UpdateShaders();
 }
 
 /////////////////////////////////////////////////
@@ -526,4 +537,11 @@ void Projector::ProjectorFrameListener::RemovePassFromMaterial(
   this->projectorTargets[_matName]->getParent()->removePass(
     this->projectorTargets[_matName]->getIndex());
   this->projectorTargets.erase(this->projectorTargets.find(_matName));
+}
+
+/////////////////////////////////////////////////
+void Projector::OnMsg(ConstProjectorPtr &_msg)
+{
+  if (_msg->has_enabled())
+    this->projector.SetEnabled(_msg->enabled());
 }

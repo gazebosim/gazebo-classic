@@ -50,5 +50,3 @@ namespace gazebo
   }
 }
 #endif
-
-

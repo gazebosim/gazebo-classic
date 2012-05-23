@@ -15,7 +15,7 @@
  *
 */
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/Events.hh"
 #include "transport/TopicManager.hh"
 #include "transport/ConnectionManager.hh"

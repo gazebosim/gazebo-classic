@@ -17,8 +17,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include "rendering/ogre.h"
-#include "msgs/msgs.h"
-#include "sdf/sdf.h"
+#include "msgs/msgs.hh"
+#include "sdf/sdf.hh"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -90,6 +90,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
           &Scene::OnSkeletonPoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection",
@@ -146,6 +147,7 @@ Scene::~Scene()
   this->visSub.reset();
   this->lightSub.reset();
   this->poseSub.reset();
+  this->jointSub.reset();
   this->skeletonPoseSub.reset();
   this->selectionSub.reset();
   this->responseSub.reset();
@@ -256,12 +258,6 @@ void Scene::Init()
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
-
-  /*this->projector = new Projector(this->worldVisual);
-  this->projector->Load(math::Pose(0, 0 , 2, 0, 0, 0),
-      "stereo_projection_pattern_high_res.png");
-  this->projector->Toggle();
-  */
 
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
@@ -1252,7 +1248,6 @@ void Scene::PreRender()
   }
   this->lightMsgs.clear();
 
-
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
   // over the wire before  we recieve the visual
@@ -1269,7 +1264,6 @@ void Scene::PreRender()
           std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
-
         iter->second->SetPose(pose);
       }
       PoseMsgs_L::iterator prev = pIter++;
@@ -1284,6 +1278,24 @@ void Scene::PreRender()
   while (spIter != this->skeletonPoseMsgs.end())
   {
     Visual_M::iterator iter = this->visuals.find((*spIter)->model_name());
+    for (int i = 0; i < (*spIter)->pose_size(); i++)
+    {
+      const msgs::Pose& pose_msg = (*spIter)->pose(i);
+      Visual_M::iterator iter2 = this->visuals.find(pose_msg.name());
+      if (iter2 != this->visuals.end())
+      {
+        // If an object is selected, don't let the physics engine move it.
+        if (this->selectionObj->GetVisualName().empty() ||
+           !this->selectionObj->IsActive() ||
+           iter->first.find(this->selectionObj->GetVisualName()) ==
+            std::string::npos)
+        {
+          math::Pose pose = msgs::Convert(pose_msg);
+          iter2->second->SetPose(pose);
+        }
+      }
+    }
+
     if (iter != this->visuals.end())
     {
       iter->second->SetSkeletonPose(*(*spIter).get());
@@ -1416,17 +1428,25 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
   if (!linkVis)
     return false;
 
-  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
-  comVis->Load(_msg);
-  comVis->SetVisible(false);
-  this->visuals[comVis->GetName()] = comVis;
+  if (this->visuals.find(_msg->name() + "_COM_VISUAL__") == this->visuals.end())
+  {
+    COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
+    comVis->Load(_msg);
+    comVis->SetVisible(false);
+    this->visuals[comVis->GetName()] = comVis;
+  }
 
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
-    Projector *projector = new Projector(linkVis);
-    projector->Load(_msg->projector(i));
-    projector->Toggle();
-    this->projectors.push_back(projector);
+    std::string pname = _msg->name() + "::" + _msg->projector(i).name();
+
+    if (this->projectors.find(pname) == this->projectors.end())
+    {
+      Projector *projector = new Projector(linkVis);
+      projector->Load(_msg->projector(i));
+      projector->Toggle();
+      this->projectors[pname] = projector;
+    }
   }
 
   return true;
@@ -1521,6 +1541,13 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     if (vis)
       vis->SetTransparency(_msg->dbl_data());
   }
+  else if (_msg->request() == "show_skeleton")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    bool show = (math::equal(_msg->dbl_data(), 1.0)) ? true : false;
+      if (vis)
+        vis->ShowSkeleton(show);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1591,7 +1618,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       result = true;
       visual->LoadFromMsg(_msg);
       this->visuals[_msg->name()] = visual;
-      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
+          visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
       {
         visual->SetVisible(false);
       }

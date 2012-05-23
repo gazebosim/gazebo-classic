@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "common/Image.hh"
+#include "math/Vector3.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Shape.hh"
 
@@ -44,9 +45,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~HeightmapShape();
 
-      /// \brief Update function
-      public: void Update();
-
       /// \brief Load the heightmap
       public: virtual void Load(sdf::ElementPtr _sdf);
 
@@ -54,20 +52,42 @@ namespace gazebo
       public: virtual void Init();
 
       public: std::string GetFilename() const;
+
+      /// \brief Get the size in meters
       public: math::Vector3 GetSize() const;
+
+      /// \brief Get the origin in world coordinate frame
       public: math::Vector3 GetOrigin() const;
+
+      /// \brief Return the number of vertices, which equals the size of the
+      /// image used to load the heightmap
+      /// \return math::Vector2i, result.x = width, result.y = length/height
+      public: math::Vector2i GetVertexCount() const;
+
+      /// \brief Get a height at a vertex
+      public: float GetHeight(int x, int y);
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      protected: std::vector<float> heights;
+      /// \brief Get the maximum height
+      public: float GetMaxHeight() const;
 
+      /// \brief Get the minimum height
+      public: float GetMinHeight() const;
+
+      /// Create a lookup table of the terrain's height
+      private: void FillHeightMap();
+
+      protected: std::vector<float> heights;
       protected: common::Image img;
+
+      protected: unsigned int vertSize;
+      protected: math::Vector3 scale;
+      protected: int subSampling;
     };
     /// \}
   }
 }
 #endif
-
-

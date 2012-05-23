@@ -22,20 +22,23 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 set (gtest_sources
-  transport.cc
-  speed.cc
-  factory.cc
-  physics.cc
-  msgs.cc
-  math.cc
-  pr2.cc
   common.cc
-  laser.cc
+  factory.cc
   file_handling.cc
+  heightmap.cc
+  laser.cc
+  math.cc
+  msgs.cc
+  physics.cc
   pioneer2dx.cc
-  projector.cc)
+  pr2.cc
+  projector.cc
+  speed.cc
+  transport.cc)
 
 set (plugins )
+
+configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build plugins
 foreach (src ${plugins})
@@ -48,7 +51,7 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
   add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc ${PROJECT_SOURCE_DIR}/src/gazebo.cc)
 
-  target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
+target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
     gazebo_common
     gazebo_sdf_interface
     gazebo_transport

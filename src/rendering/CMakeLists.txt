@@ -69,6 +69,7 @@ set (headers
   RenderEngine.hh
   RenderEvents.hh
   Rendering.hh
+  RenderTypes.hh
   RFIDVisual.hh
   RFIDTagVisual.hh
   RTShaderSystem.hh
@@ -83,9 +84,11 @@ set (headers
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(rendering_headers "Rendering Headers" "#include \"rendering/${hdr}\"\n")
+  APPEND_TO_CACHED_STRING(rendering_headers
+    "Rendering Headers" "#include \"rendering/${hdr}\"\n")
 endforeach()
-configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/rendering.h.in ${CMAKE_CURRENT_BINARY_DIR}/rendering.h )
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
+                ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
 
 gz_add_library(gazebo_rendering ${sources})
 
@@ -98,4 +101,4 @@ target_link_libraries( gazebo_rendering gazebo_common
                                       
 
 INSTALL_LIBRARY(gazebo_rendering)
-INSTALL_INCLUDES("rendering" ${headers})
+INSTALL_INCLUDES("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)

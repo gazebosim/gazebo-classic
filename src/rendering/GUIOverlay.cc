@@ -19,7 +19,7 @@
 #include "common/Console.hh"
 
 #include "common/SystemPaths.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 #include "math/Vector2d.hh"

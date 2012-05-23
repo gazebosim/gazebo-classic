@@ -24,9 +24,9 @@
 #include <string>
 #include <vector>
 
-#include "common/common.h"
-#include "physics/physics.h"
-#include "transport/transport.h"
+#include "common/common.hh"
+#include "physics/physics.hh"
+#include "transport/transport.hh"
 #include "gazebo.hh"
 
 namespace gazebo

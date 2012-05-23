@@ -99,5 +99,5 @@ target_link_libraries(libgazebo gazebo_common
 add_dependencies(libgazebo gazebo_msgs)
 INSTALL_LIBRARY(libgazebo)
 
-set(headers Server.hh gazebo.hh)
+set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
 INSTALL_INCLUDES("" ${headers})

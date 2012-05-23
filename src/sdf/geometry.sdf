@@ -28,7 +28,7 @@
   <element name="heightmap" required="0">
     <attribute name="filename" type="string" default="__default__" required="1"/>
     <attribute name="size" type="vector3" default="1 1 1" required="1"/>
-    <attribute name="origin" type="vector3" default="0 0 0" required="1"/>
+    <attribute name="origin" type="vector3" default="0 0 0" required="0"/>
 
     <element name="texture" required="*">
       <element name="size" type="double" default="10" required="1"/>

@@ -26,8 +26,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "common/common.h"
-#include "math/gzmath.h"
+#include "common/common.hh"
+#include "math/gzmath.hh"
 #include "rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0

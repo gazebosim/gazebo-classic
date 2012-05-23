@@ -35,8 +35,8 @@
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
 
-#include "sdf/sdf.h"
-#include "msgs/msgs.h"
+#include "sdf/sdf.hh"
+#include "msgs/msgs.hh"
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
 
@@ -270,6 +270,8 @@ namespace gazebo
 
       public: void ShowBoundingBox();
       public: void ShowCollision(bool _show);
+
+      public: void ShowSkeleton(bool _show);
 
       public: void SetScene(ScenePtr _scene);
       public: ScenePtr GetScene() const;
