@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <msgs/msgs.h>
+#include <msgs/msgs.hh>
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>

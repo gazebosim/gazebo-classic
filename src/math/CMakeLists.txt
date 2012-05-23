@@ -39,11 +39,11 @@ set (math_headers "" CACHE INTERNAL "transport headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(math_headers "Math Headers" "#include \"math/${hdr}\"\n")
 endforeach()
-configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/gzmath.h.in ${CMAKE_CURRENT_BINARY_DIR}/gzmath.h )
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/gzmath.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh )
 
 
 gz_add_library(gazebo_math ${sources})
 target_link_libraries(gazebo_math ${boost_libraries})
 
 INSTALL_LIBRARY(gazebo_math)
-INSTALL_INCLUDES("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.h)
+INSTALL_INCLUDES("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh gzmath.h)

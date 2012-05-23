@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "msgs/msgs.h"
-#include "sdf/sdf.h"
+#include "msgs/msgs.hh"
+#include "sdf/sdf.hh"
 #include "math/Quaternion.hh"
 #include "math/Vector3.hh"
 

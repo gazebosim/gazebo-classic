@@ -21,7 +21,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "common/Image.hh"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"

@@ -15,7 +15,7 @@
  *
 */
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Visual.hh"

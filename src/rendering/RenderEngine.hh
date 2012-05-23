@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 #include "common/SingletonT.hh"
 #include "common/Event.hh"
 #include "transport/TransportTypes.hh"

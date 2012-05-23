@@ -32,7 +32,7 @@
 
 #include "math/Pose.hh"
 
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 #include "gui/BoxMaker.hh"
 #include "gui/SphereMaker.hh"

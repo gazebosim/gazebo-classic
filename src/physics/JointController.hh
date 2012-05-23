@@ -25,7 +25,7 @@
 #include "common/Time.hh"
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
-#include "msgs/msgs.h"
+#include "msgs/msgs.hh"
 
 namespace gazebo
 {

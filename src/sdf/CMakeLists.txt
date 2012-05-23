@@ -1,6 +1,6 @@
 add_subdirectory(interface)
 
-set (headers sdf.h)
+set (headers sdf.hh sdf.h)
 set (sdfs
   actor.sdf 
   camera.sdf

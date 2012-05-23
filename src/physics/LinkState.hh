@@ -24,7 +24,7 @@
 #include <vector>
 #include <string>
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 #include "physics/State.hh"
 #include "physics/CollisionState.hh"
 #include "math/Pose.hh"

@@ -20,12 +20,12 @@
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo.hh"
-#include "transport/transport.h"
+#include "transport/transport.hh"
 #include "common/Timer.hh"
 #include "common/Exception.hh"
 #include "common/Plugin.hh"
 
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 #include "sensors/Sensors.hh"
 

@@ -25,6 +25,8 @@
 
 #include "transport/TransportTypes.hh"
 #include "sensors/Sensor.hh"
+#include "math/gzmath.hh"
+#include "physics/physics.hh"
 
 namespace gazebo
 {

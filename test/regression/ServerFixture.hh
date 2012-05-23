@@ -25,15 +25,15 @@
 #include <map>
 #include <string>
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
 
 #include "common/SystemPaths.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Physics.hh"
-#include "sensors/sensors.h"
-#include "rendering/rendering.h"
-#include "msgs/msgs.h"
+#include "sensors/sensors.hh"
+#include "rendering/rendering.hh"
+#include "msgs/msgs.hh"
 
 #include "gazebo_config.h"
 #include "src/Server.hh"

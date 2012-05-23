@@ -15,8 +15,8 @@
  *
 */
 
-#include "physics/physics.h"
-#include "transport/transport.h"
+#include "physics/physics.hh"
+#include "transport/transport.hh"
 #include "plugins/VehiclePlugin.hh"
 
 using namespace gazebo;
@@ -237,6 +237,6 @@ void VehiclePlugin::OnUpdate()
 }
 
 /////////////////////////////////////////////////
-void VehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
+void VehiclePlugin::OnVelMsg(ConstPosePtr &/*_msg*/)
 {
 }

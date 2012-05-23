@@ -2,6 +2,12 @@
 <gazebo version="1.0">
   <world name="default">
 
+    <scene>
+      <grid enabled="false"/>
+      <background rgba="1 1 1 1"/>
+      <ambient rgba="0.5 0.5 0.5 1"/>
+    </scene>
+
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
@@ -11,13 +17,32 @@
     </physics>
 
     <!-- A ground plane -->
-    <include filename="ground_plane.model"/>
+    <!--<include filename="ground_plane.model"/>-->
 
     <!-- A global light source -->
     <include filename="sun.light"/>
 
     <include filename="simple_arm.model"/>
 
+    <model name="ground" static="true">
+      <origin pose="0 0 -0.025 0 0 0"/>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box size="2 2 0.05"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="3 3 0.05"/>
+          </geometry>
+          <material script="Gazebo/Grey"/>
+        </visual>
+      </link>
+    </model>
+
+    <!--
     <model name="cylinder">
       <origin pose="0.25 0 0.2 0 0 0"/>
       <link name="link" gravity="true">
@@ -43,5 +68,6 @@
         </visual>
       </link>
     </model>
+    -->
   </world>
 </gazebo>

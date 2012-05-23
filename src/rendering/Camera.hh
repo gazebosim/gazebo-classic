@@ -37,7 +37,7 @@
 
 #include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"
-#include "sdf/sdf.h"
+#include "sdf/sdf.hh"
 
 // Forward Declarations
 namespace Ogre
