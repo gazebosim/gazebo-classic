@@ -23,6 +23,7 @@ set (files hanoi_red_disk.dae
            hanoi_green_disk.dae
            hanoi_blue_disk.dae
            bowl.dae
+           sub_16.dae
            moonwalk.dae
            run.dae
            sit_down.dae

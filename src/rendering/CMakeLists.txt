@@ -70,6 +70,7 @@ set (headers
   RenderEvents.hh
   RenderTypes.hh
   Rendering.hh
+  RenderTypes.hh
   RFIDVisual.hh
   RFIDTagVisual.hh
   RTShaderSystem.hh
