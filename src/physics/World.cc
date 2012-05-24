@@ -1117,15 +1117,45 @@ void World::ProcessFactoryMsgs()
     }
     else
     {
+      bool isActor = false;
       sdf::ElementPtr elem = factorySDF->root->GetElement("model");
+      if (!elem)
+      {
+        elem = factorySDF->root->GetElement("actor");
+        if (elem)
+          isActor = true;
+      }
       if (!elem && factorySDF->root->GetElement("world"))
+      {
         elem = factorySDF->root->GetElement("world")->GetElement("model");
+        if (!elem)
+        {
+          elem = factorySDF->root->GetElement("world")->GetElement("actor");
+          if (elem)
+            isActor = true;
+        }
+      }
       if (!elem && factorySDF->root->GetElement("gazebo"))
+      {
         elem = factorySDF->root->GetElement("gazebo")->GetElement("model");
+        if (!elem)
+        {
+          elem = factorySDF->root->GetElement("gazebo")->GetElement("actor");
+          if (elem)
+            isActor = true;
+        }
+      }
       if (!elem && factorySDF->root->GetElement("gazebo")->GetElement("world"))
       {
         elem = factorySDF->root->GetElement("gazebo")->GetElement(
             "world")->GetElement("model");
+        if (!elem)
+        {
+          elem = factorySDF->root->GetElement("gazebo")->GetElement(
+              "world")->GetElement("actor");
+          if (elem)
+            isActor = true;
+        }
       }
 
       if (!elem)
@@ -1140,8 +1170,16 @@ void World::ProcessFactoryMsgs()
         elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
             msgs::Convert((*iter).pose()));
 
-      ModelPtr model = this->LoadModel(elem, this->rootElement);
-      model->Init();
+      if (isActor)
+      {
+        ActorPtr actor = this->LoadActor(elem, this->rootElement);
+        actor->Init();
+      }
+      else
+      {
+        ModelPtr model = this->LoadModel(elem, this->rootElement);
+        model->Init();
+      }
     }
   }
 
