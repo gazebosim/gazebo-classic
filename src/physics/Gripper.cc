@@ -57,6 +57,30 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 {
   this->fixedJoint = this->physics->CreateJoint("revolute");
 
+  if (_sdf->GetElement("minContactCount"))
+  {
+    this->min_contact_count =
+     _sdf->GetElement("minContactCount")->GetValueUInt();
+  }
+  else
+    this->min_contact_count = 2;  // default
+
+  if (_sdf->GetElement("contactSteps"))
+  {
+    this->contact_steps =
+     _sdf->GetElement("contactSteps")->GetValueInt();
+  }
+  else
+    this->contact_steps = 20;  // default
+
+  if (_sdf->GetElement("detachSteps"))
+  {
+    this->detach_steps =
+     _sdf->GetElement("detachSteps")->GetValueInt();
+  }
+  else
+    this->detach_steps = 40;  // default
+
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
   this->palmLink = this->model->GetLink(palmLinkElem->GetValueString());
   if (!this->palmLink)
@@ -104,7 +128,8 @@ void Gripper::OnUpdate()
   if (common::Time::GetWallTime() - this->prevUpdateTime < this->updateRate)
     return;
 
-  if (this->contacts.size() >= 2)
+  // @todo: should package the decision into a function
+  if (this->contacts.size() >= this->min_contact_count)
   {
     this->posCount++;
     this->zeroCount = 0;
@@ -115,9 +140,9 @@ void Gripper::OnUpdate()
     this->posCount = std::max(0, this->posCount-1);
   }
 
-  if (this->posCount > 20 && !this->attached)
+  if (this->posCount > this->contact_steps && !this->attached)
     this->HandleAttach();
-  else if (this->zeroCount > 40 && this->attached)
+  else if (this->zeroCount > this->detach_steps && this->attached)
     this->HandleDetach();
 
   this->contacts.clear();
@@ -178,7 +203,7 @@ void Gripper::HandleAttach()
         {
           this->attached = true;
 
-          this->fixedJoint->Load(this->model->GetLink("palm"),
+          this->fixedJoint->Load(this->palmLink,
               cc[iter->first]->GetLink(), math::Pose(0, 0, 0, 0, 0, 0));
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);

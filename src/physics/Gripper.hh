@@ -87,6 +87,12 @@ namespace gazebo
 
       private: common::Time updateRate, prevUpdateTime;
       private: int posCount, zeroCount;
+      /// \brief minimum number of links touching
+      private: unsigned int min_contact_count;
+      /// \brief Steps touching before engaging fixed joint
+      private: int contact_steps;
+      /// \brief Steps not touching before deisengaging fixed joint
+      private: int detach_steps;
     };
   }
 }
