@@ -259,12 +259,6 @@ void Scene::Init()
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 
-  /*this->projector = new Projector(this->worldVisual);
-  this->projector->Load(math::Pose(0, 0 , 2, 0, 0, 0),
-      "stereo_projection_pattern_high_res.png");
-  this->projector->Toggle();
-  */
-
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
         "_GUIONLY_world_contact_vis",
@@ -1434,17 +1428,25 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
   if (!linkVis)
     return false;
 
-  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
-  comVis->Load(_msg);
-  comVis->SetVisible(false);
-  this->visuals[comVis->GetName()] = comVis;
+  if (this->visuals.find(_msg->name() + "_COM_VISUAL__") == this->visuals.end())
+  {
+    COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
+    comVis->Load(_msg);
+    comVis->SetVisible(false);
+    this->visuals[comVis->GetName()] = comVis;
+  }
 
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
-    Projector *projector = new Projector(linkVis);
-    projector->Load(_msg->projector(i));
-    projector->Toggle();
-    this->projectors.push_back(projector);
+    std::string pname = _msg->name() + "::" + _msg->projector(i).name();
+
+    if (this->projectors.find(pname) == this->projectors.end())
+    {
+      Projector *projector = new Projector(linkVis);
+      projector->Load(_msg->projector(i));
+      projector->Toggle();
+      this->projectors[pname] = projector;
+    }
   }
 
   return true;

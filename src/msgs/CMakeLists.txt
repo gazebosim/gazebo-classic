@@ -103,10 +103,11 @@ set (message_headers "" CACHE INTERNAL "Include dirs description")
 
 foreach (hdr ${PROTO_HDRS})
   string (REPLACE "${CMAKE_CURRENT_BINARY_DIR}/" "" hdr ${hdr})
-  APPEND_TO_CACHED_STRING(message_headers "Message Types" "#include \"${hdr}\"\n")
+  APPEND_TO_CACHED_STRING(message_headers
+    "Message Types" "#include \"${hdr}\"\n")
 endforeach()
-
-configure_file ( ${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
+configure_file (${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in
+                ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
 
 INSTALL_LIBRARY(gazebo_msgs)
 INSTALL_INCLUDES("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh msgs.h)

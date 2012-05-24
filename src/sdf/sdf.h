@@ -17,5 +17,5 @@
 // DEPRECATED
 #ifndef __SDF_H__
 #define __SDF_H__
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 #endif
