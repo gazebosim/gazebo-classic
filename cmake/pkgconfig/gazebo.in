@@ -7,4 +7,4 @@ Description: Gazebo Libraries
 Version: @GAZEBO_VERSION@
 Requires:
 Libs: -Wl,-rpath,${libdir},-rpath,${prefix}/lib/gazebo-@GAZEBO_VERSION@/plugins -L${libdir} -L${prefix}/lib/gazebo-@GAZEBO_VERSION@/plugins -lgazebo_transport -lgazebo_physics -lgazebo_sensors -lgazebo_rendering -lgazebo_sdf_interface -lgazebo_msgs -lgazebo_math -lgazebo_common
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@-I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo

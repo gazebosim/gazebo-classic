@@ -1,0 +1,57 @@
+<?xml version="1.0"?> 
+<gazebo version="1.0">
+  <world name="default">
+    <include filename="ground_plane.model"/>
+    <include filename="sun.light"/>
+
+    <model name="projector_model" static="true">
+      <origin pose="0 0 1 0.0 0.0 0"/>
+      <link name="projector_link">
+
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.1"/>
+          </geometry>
+          <material script="Gazebo/Grey"/>
+        </visual>
+
+        <projector name="texture_projector">
+          <pose>0 0 0 0 -1.5707 0</pose>
+          <texture>stereo_projection_pattern_high_res_red.png</texture>
+          <fov>0.959931088597</fov>
+          <near_clip>0.1</near_clip>
+          <far_clip>10</far_clip>
+        </projector>
+      </link>
+
+      <plugin filename="libprojector_plugin.so" name="projector">
+        <projector>projector_link/texture_projector</projector>
+      </plugin>
+    </model>
+
+    <model name="texture_test_model" static="true">
+      <origin pose="3 0 1 0.0 0.0 0"/>
+      <link name="texture_test_link">
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+          <material script="Gazebo/Grey"/>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</gazebo>
