@@ -121,7 +121,6 @@ bool controller2Plugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
 bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
-  gzerr << "checking for projector\n";
   // Get all projectors
   for (xmlNodePtr projectorXml = _config->xmlChildrenNode;
        projectorXml != NULL; projectorXml = projectorXml->next)
@@ -135,7 +134,8 @@ bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf)
       deprecated_sdf::copyBlockChildren(projectorXml, sdfProjector);
 
       /// Get all the controllers and convert to plugins
-      controller2Plugins(projectorXml, sdfProjector);
+      ///   if the projector had a plugin, but probably will not
+      // controller2Plugins(projectorXml, sdfProjector);
     }
   }
 

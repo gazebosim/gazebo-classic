@@ -73,8 +73,7 @@ namespace gazebo
       private: physics::PhysicsEnginePtr physics;
       private: physics::JointPtr fixedJoint;
 
-      private: std::vector<physics::JointPtr> joints;
-      private: std::vector<physics::LinkPtr> links;
+      private: physics::LinkPtr palmLink;
       private: std::vector<event::ConnectionPtr> connections;
 
       private: std::map<std::string, physics::CollisionPtr> collisions;
