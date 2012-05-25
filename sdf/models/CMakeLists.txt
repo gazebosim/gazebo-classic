@@ -30,6 +30,7 @@ set (models
   car.model
   actor_circle.model
   actor_demo.model
+  actor.model
   )
 
 set (lights

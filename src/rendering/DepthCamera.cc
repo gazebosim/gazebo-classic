@@ -180,56 +180,59 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 void DepthCamera::PostRender()
 {
   this->depthTarget->swapBuffers();
+  if (this->output_points)
+    this->pcdTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
-    // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->depthTexture->getBuffer();
-
-    Ogre::PixelFormat format = pixelBuffer->getFormat();
-
-    // Blit the depth buffer if needed
-    if (!this->depthBuffer)
-      this->depthBuffer = new float[width*height];
-
-    Ogre::Box src_box(0, 0, width, height);
-    Ogre::PixelBox dst_box(width, height,
-        1, format, this->depthBuffer);
-
-    pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
-    pixelBuffer->blitToMemory(src_box, dst_box);
-    pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
-
-    this->newDepthFrame(this->depthBuffer, width, height, 1, "FLOAT32");
-
-    if (this->output_points)
+    if (!this->output_points)
     {
-      this->pcdTarget->swapBuffers();
+      Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+
+      // Get access to the buffer and make an image and write it to file
+      pixelBuffer = this->depthTexture->getBuffer();
+
+      Ogre::PixelFormat format = pixelBuffer->getFormat();
+
+      // Blit the depth buffer if needed
+      if (!this->depthBuffer)
+        this->depthBuffer = new float[width * height];
+
+      Ogre::Box src_box(0, 0, width, height);
+      Ogre::PixelBox dst_box(width, height,
+          1, format, this->depthBuffer);
+
+      pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+      pixelBuffer->blitToMemory(src_box, dst_box);
+      pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
+
+      this->newDepthFrame(this->depthBuffer, width, height, 1, "FLOAT32");
+    }
+    else
+    {
       Ogre::HardwarePixelBufferSharedPtr pcdPixelBuffer;
 
       // Get access to the buffer and make an image and write it to file
       pcdPixelBuffer = this->pcdTexture->getBuffer();
 
-      Ogre::PixelFormat pcdFormat = pcdPixelBuffer->getFormat();
-
-      size_t size = Ogre::PixelUtil::getMemorySize(width, height, 1, pcdFormat);
-
       // Blit the depth buffer if needed
       if (!this->pcdBuffer)
-        this->pcdBuffer = new float[size];
+        this->pcdBuffer = new float[width * height * 4];
 
-      memset(this->pcdBuffer, 128, size);
+      memset(this->pcdBuffer, 0, width * height * 4);
 
       Ogre::Box pcd_src_box(0, 0, width, height);
       Ogre::PixelBox pcd_dst_box(width, height,
           1, Ogre::PF_FLOAT32_RGBA, this->pcdBuffer);
 
+      pcdPixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
       pcdPixelBuffer->blitToMemory(pcd_src_box, pcd_dst_box);
+      pcdPixelBuffer->unlock();
+
+      std::cerr << *reinterpret_cast<int*>(&this->pcdBuffer[4 * 153920 + 3]) << "\n";
 
       this->newRGBPointCloud(this->pcdBuffer, width, height, 1, "RGBPOINTS");
     }
@@ -337,7 +340,8 @@ void DepthCamera::RenderImpl()
   this->depthTarget->update(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+  sceneMgr->setShadowTechnique(
+    Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
   // for camera image
   Camera::RenderImpl();
