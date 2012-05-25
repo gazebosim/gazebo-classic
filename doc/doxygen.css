@@ -655,7 +655,7 @@ div.headertitle
 }
 
 #content { 
-  position: absolute; 
+  /*position: absolute; */
   left:12em; 
   top:0em; 
   padding-left:3em; 
@@ -679,7 +679,7 @@ div.headertitle
 
 
 div.leftbar{
-  position:absolute;
+  /*position:absolute;*/
   text-align:left;
   float: left;
   width: 12em;
