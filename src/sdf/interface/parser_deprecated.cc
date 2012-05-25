@@ -132,10 +132,25 @@ bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf)
       initAttr(projectorXml, "name", sdfProjector->GetAttribute("name"));
 
       deprecated_sdf::copyBlockChildren(projectorXml, sdfProjector);
+    }
+  }
 
-      /// Get all the controllers and convert to plugins
-      ///   if the projector had a plugin, but probably will not
-      // controller2Plugins(projectorXml, sdfProjector);
+  return true;
+}
+
+bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf)
+{
+  // Get all grippers
+  for (xmlNodePtr gripperXml = _config->xmlChildrenNode;
+       gripperXml != NULL; gripperXml = gripperXml->next)
+  {
+    if (gripperXml->name &&
+        std::string((const char*)gripperXml->name) == "gripper")
+    {
+      sdf::ElementPtr sdfGripper = _sdf->AddElement("gripper");
+      initAttr(gripperXml, "name", sdfGripper->GetAttribute("name"));
+
+      deprecated_sdf::copyBlockChildren(gripperXml, sdfGripper);
     }
   }
 
@@ -1013,6 +1028,7 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
   /// Get all the plugins
   controller2Plugins(_config, _sdf);
+  getGrippers(_config, _sdf);
 
   return true;
 }

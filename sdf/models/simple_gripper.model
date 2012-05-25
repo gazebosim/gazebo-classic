@@ -198,8 +198,9 @@
     </joint>
 
     <gripper name="simple_gripper">
-      <contactSteps>20</contactSteps>
-      <minContactCount>2</minContactCount>
+      <attach_steps>20</attach_steps>
+      <detach_steps>40</detach_steps>
+      <min_contact_count>2</min_contact_count>
       <gripper_link>right_finger</gripper_link>
       <gripper_link>right_finger_tip</gripper_link>
       <gripper_link>left_finger</gripper_link>

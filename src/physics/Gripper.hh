@@ -90,7 +90,7 @@ namespace gazebo
       /// \brief minimum number of links touching
       private: unsigned int min_contact_count;
       /// \brief Steps touching before engaging fixed joint
-      private: int contact_steps;
+      private: int attach_steps;
       /// \brief Steps not touching before deisengaging fixed joint
       private: int detach_steps;
     };
