@@ -108,6 +108,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
+  // FIXME: should read <origin pose="..."/> like everyone else
   if (_sdf->HasElement("pose"))
     pose = _sdf->GetValuePose("pose");
 
@@ -123,6 +124,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("fov"))
     fov = _sdf->GetValueDouble("fov");
 
+  gzerr << "pose " << pose << "\n";
   this->Load(_sdf->GetValueString("name"), pose, textureName,
              nearClip, farClip, fov);
 }
