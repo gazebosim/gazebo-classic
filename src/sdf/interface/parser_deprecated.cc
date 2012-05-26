@@ -247,7 +247,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr _sdf)
     sdf::ElementPtr ray = _sdf->AddElement("ray");
     initRay(_config, ray);
 
-    if (!_sdf->GetAttribute("type")->SetFromString("gpu_ray"))
+    if (!_sdf->GetAttribute("type")->SetFromString("ray"))
     {
       gzerr << "Unable to set type to ray\n";
       return false;
