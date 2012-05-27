@@ -55,39 +55,67 @@ void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
   for (xmlNodePtr elemXml = xmlFirstElementChild(_config);
        elemXml != NULL; elemXml = xmlNextElementSibling(elemXml))
   {
-    sdf::ElementPtr element(new sdf::Element);
-    element->SetParent(_sdf);
-
-    // copy name (with prefix if exists?
+    // copy name (skip prefixed elements if exist)?
     std::string prefix;
     if (elemXml->ns) prefix = (const char*)elemXml->ns->prefix;
     if (prefix.empty())
     {
-      element->SetName((const char*)elemXml->name);
 
-      // copy attributes
-      for (xmlAttrPtr attrXml = elemXml->properties;
-           attrXml && attrXml->name && attrXml->children;
-           attrXml = attrXml->next)
+      std::string elem_name((const char*)elemXml->name);
+      if (_sdf->HasElementDescription(elem_name))
       {
-        element->AddAttribute((const char*)attrXml->name, "string",
-            "defaultvalue", false);
-        initAttr(elemXml, (const char*)attrXml->name,
-            element->GetAttribute((const char*)attrXml->name));
+        gzdbg << "has this element [" << elem_name << "] defined, copying.\n";
+        sdf::ElementPtr element = _sdf->AddElement(elem_name);
+
+        // copy attributes
+        for (xmlAttrPtr attrXml = elemXml->properties;
+             attrXml && attrXml->name && attrXml->children;
+             attrXml = attrXml->next)
+        {
+          initAttr(elemXml, (const char*)attrXml->name,
+              element->GetAttribute((const char*)attrXml->name));
+        }
+        // copy value
+        std::string value = getValue(elemXml);
+        if (!value.empty())
+            element->GetValue()->SetFromString(value);
+
+      }
+      else
+      {
+        gzdbg << "undefined element [" << elem_name
+              << "], copy elements as string type.\n";
+        sdf::ElementPtr element(new sdf::Element);
+        element->SetParent(_sdf);
+        element->SetName((const char*)elemXml->name);
+
+        // copy attributes
+        for (xmlAttrPtr attrXml = elemXml->properties;
+             attrXml && attrXml->name && attrXml->children;
+             attrXml = attrXml->next)
+        {
+          element->AddAttribute((const char*)attrXml->name, "string",
+              "defaultvalue", false);
+          initAttr(elemXml, (const char*)attrXml->name,
+              element->GetAttribute((const char*)attrXml->name));
+        }
+
+        // copy value
+        std::string value = getValue(elemXml);
+        if (!value.empty())
+            element->AddValue("string", value, "1");
+
+        _sdf->InsertElement(element);
       }
 
-      // copy value
-      std::string value = getValue(elemXml);
-      if (!value.empty())
-        element->AddValue("string", value, "1");
-
-      _sdf->InsertElement(element);
     }
     else
     {
       //gzwarn << "skipped: check to make sure the deprecated prefixed element ["
       //       << prefix << ":"
       //       << (const char*)elemXml->name << "] is not used.\n";
+      // sdf::ElementPtr element(new sdf::Element);
+      // element->SetParent(_sdf);
       // element->SetName(prefix + ":" + (const char*)elemXml->name);
     }
   }
@@ -1190,6 +1218,14 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
 
   return true;
 }
+
+bool initElement(xmlNodePtr _node, const std::string &_key,
+              sdf::ElementPtr _attr)
+{
+  // to be implemented
+  return false;
+}
+
 //////////////////////////////////////////////////
 bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {

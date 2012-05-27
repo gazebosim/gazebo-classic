@@ -125,7 +125,6 @@ void Projector::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("fov"))
     fov = _sdf->GetValueDouble("fov");
 
-  gzerr << "pose " << pose << "\n";
   this->Load(_sdf->GetValueString("name"), pose, textureName,
              nearClip, farClip, fov);
 }
@@ -154,7 +153,6 @@ void Projector::Load(const msgs::Projector &_msg)
   if (_msg.has_fov())
     fov = _msg.fov();
 
-  gzerr << "pose " << pose << "\n";
   this->Load(_msg.name(), pose, textureName, nearClip, farClip, fov);
 }
 

@@ -639,10 +639,6 @@ void Link::FillLinkMsg(msgs::Link &_msg)
     proj->set_fov(elem->GetValueDouble("fov"));
     proj->set_near_clip(elem->GetValueDouble("near_clip"));
     proj->set_far_clip(elem->GetValueDouble("far_clip"));
-    gzerr << "debug pose1 " << elem->GetValuePose("pose")
-          << " pose2 " << elem->GetElement("pose")->GetValuePose() << "\n";
-    gzerr << "debug fov1 " << elem->GetElement("fov")->GetValueDouble()
-          << " fov2 " << elem->GetValueDouble("fov") << "\n";
     msgs::Set(proj->mutable_pose(), elem->GetValuePose("pose"));
   }
 }
