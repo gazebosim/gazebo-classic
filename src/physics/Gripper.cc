@@ -59,24 +59,21 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 
   if (_sdf->GetElement("min_contact_count"))
   {
-    this->min_contact_count =
-     _sdf->GetElement("min_contact_count")->GetValueUInt();
+    this->min_contact_count = _sdf->GetValueUInt("min_contact_count");
   }
   else
     this->min_contact_count = 2;  // default
 
   if (_sdf->GetElement("attach_steps"))
   {
-    this->attach_steps =
-     _sdf->GetElement("attach_steps")->GetValueInt();
+    this->attach_steps = _sdf->GetValueInt("attach_steps");
   }
   else
     this->attach_steps = 20;  // default
 
   if (_sdf->GetElement("detach_steps"))
   {
-    this->detach_steps =
-     _sdf->GetElement("detach_steps")->GetValueInt();
+    this->detach_steps = _sdf->GetValueInt("detach_steps");
   }
   else
     this->detach_steps = 40;  // default

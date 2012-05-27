@@ -108,7 +108,8 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
-  // FIXME: should read <origin pose="..."/> like everyone else
+  //sdf::ElementPtr originElem = _sdf->GetOrCreateElement("origin");
+  //pose = originElem->GetValuePose("pose");
   if (_sdf->HasElement("pose"))
     pose = _sdf->GetValuePose("pose");
 
@@ -153,6 +154,7 @@ void Projector::Load(const msgs::Projector &_msg)
   if (_msg.has_fov())
     fov = _msg.fov();
 
+  gzerr << "pose " << pose << "\n";
   this->Load(_msg.name(), pose, textureName, nearClip, farClip, fov);
 }
 
@@ -459,7 +461,7 @@ void Projector::ProjectorFrameListener::AddPassToMaterial(
 {
   if (this->projectorTargets.find(_matName) != this->projectorTargets.end())
   {
-    gzerr << "Adding a Material [" << _matName << "] that already exists.";
+    gzwarn << "Adding a Material [" << _matName << "] that already exists.\n";
     return;
   }
 

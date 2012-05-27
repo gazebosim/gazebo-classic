@@ -562,6 +562,12 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
 // _sdf = an sdf element that has an origin child element
 bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
+  // goes from _config
+  //   <xyz>0 0 0</xyz>
+  //   <rpy>0 0 0</rpy>
+  // to _sdf
+  //   <origin pose="0 0 0 0 0 0" />
+
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
 
