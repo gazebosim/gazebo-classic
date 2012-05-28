@@ -51,7 +51,8 @@ void ModelTrajectoryTestPlugin::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg(ConstPoseTrajectoryPtr &_msg)
+void ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg(
+  ConstPoseTrajectoryPtr &_msg)
 {
 }
 

@@ -21,6 +21,9 @@ namespace gazebo
 {
   class ProjectorPlugin : public ModelPlugin
   {
+    public: ProjectorPlugin():state(true) {};
+    public: ~ProjectorPlugin() {};
+
     //////////////////////////////////////////////////
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
@@ -36,7 +39,6 @@ namespace gazebo
       // Create a publisher on the ~/physics topic
       this->projectorPub = node->Advertise<msgs::Projector>(name);
 
-      this->state = true;
       this->prevTime = common::Time::GetWallTime();
 
       // Listen to the update event. This event is broadcast every

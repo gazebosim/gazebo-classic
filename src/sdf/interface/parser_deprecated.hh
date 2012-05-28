@@ -100,7 +100,7 @@ namespace deprecated_sdf
   bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   bool initAttr(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
-  bool initElement(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
+  bool initElem(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
 
   ////////////////////////////////////////////////////////////////////////////
   //

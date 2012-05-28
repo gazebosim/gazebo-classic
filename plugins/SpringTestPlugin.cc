@@ -57,6 +57,6 @@ void SpringTestPlugin::OnUpdate()
     double pos = joint->GetAngle(0).GetAsRadian();
     double force = -this->k * pos;
     gzdbg << "joint pos [" << pos << "] force [" << force << "]\n";
-    joint->SetForce(0,force);
+    joint->SetForce(0, force);
   }
 }

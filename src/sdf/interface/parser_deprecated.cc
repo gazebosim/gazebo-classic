@@ -60,7 +60,6 @@ void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
     if (elemXml->ns) prefix = (const char*)elemXml->ns->prefix;
     if (prefix.empty())
     {
-
       std::string elem_name((const char*)elemXml->name);
       if (_sdf->HasElementDescription(elem_name))
       {
@@ -79,7 +78,6 @@ void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
         std::string value = getValue(elemXml);
         if (!value.empty())
             element->GetValue()->SetFromString(value);
-
       }
       else
       {
@@ -107,13 +105,12 @@ void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
         _sdf->InsertElement(element);
       }
-
     }
     else
     {
-      //gzwarn << "skipped: check to make sure the deprecated prefixed element ["
-      //       << prefix << ":"
-      //       << (const char*)elemXml->name << "] is not used.\n";
+      // gzwarn << "skipped: deprecated prefixed element ["
+      //        << prefix << ":"
+      //        << (const char*)elemXml->name << "] is not used.\n";
       // sdf::ElementPtr element(new sdf::Element);
       // element->SetParent(_sdf);
       // element->SetName(prefix + ":" + (const char*)elemXml->name);
@@ -1199,8 +1196,8 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
     std::string value = getNodeValue(_node, _key);
     if (value.empty())
     {
-      //gzdbg << "Node[" << _node->name << "] does not have key value["
-      //      << _key << "] defined, will use default value.\n";
+      // gzdbg << "Node[" << _node->name << "] does not have key value["
+      //       << _key << "] defined, will use default value.\n";
       return false;
     }
     if (!_attr->SetFromString(value))
@@ -1219,8 +1216,7 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
   return true;
 }
 
-bool initElement(xmlNodePtr _node, const std::string &_key,
-              sdf::ElementPtr _attr)
+bool initElem(xmlNodePtr _node, const std::string &_key, sdf::ElementPtr _attr)
 {
   // to be implemented
   return false;

@@ -108,8 +108,6 @@ void Projector::Load(sdf::ElementPtr _sdf)
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
-  //sdf::ElementPtr originElem = _sdf->GetOrCreateElement("origin");
-  //pose = originElem->GetValuePose("pose");
   if (_sdf->HasElement("pose"))
     pose = _sdf->GetValuePose("pose");
 
