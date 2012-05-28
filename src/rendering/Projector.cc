@@ -457,7 +457,7 @@ void Projector::ProjectorFrameListener::AddPassToMaterial(
 {
   if (this->projectorTargets.find(_matName) != this->projectorTargets.end())
   {
-    gzerr << "Adding a Material [" << _matName << "] that already exists.";
+    gzwarn << "Adding a Material [" << _matName << "] that already exists.\n";
     return;
   }
 

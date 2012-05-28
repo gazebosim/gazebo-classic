@@ -9,7 +9,10 @@ set (plugins
   DepthCameraPlugin
   GpuRayPlugin
   ContactPlugin
+  CartTestPlugin
+  ModelTrajectoryTestPlugin
   RayPlugin
+  SpringTestPlugin
   DiffDrivePlugin
   VehiclePlugin)
 

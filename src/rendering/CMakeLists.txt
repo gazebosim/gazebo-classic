@@ -68,6 +68,7 @@ set (headers
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
+  RenderTypes.hh
   Rendering.hh
   RenderTypes.hh
   RFIDVisual.hh

@@ -56,36 +56,54 @@ Gripper::~Gripper()
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
   this->fixedJoint = this->physics->CreateJoint("revolute");
-  sdf::ElementPtr jointElem = _sdf->GetElement("joint");
 
-  physics::JointPtr joint;
-  physics::LinkPtr tmplinks[2];
-  physics::CollisionPtr collision;
-  std::map<std::string, physics::CollisionPtr>::iterator collIter;
-
-  while (jointElem)
+  if (_sdf->GetElement("min_contact_count"))
   {
-    joint = this->model->GetJoint(jointElem->GetValueString());
-    tmplinks[0] = joint->GetParent();
-    tmplinks[1] = joint->GetChild();
+    this->min_contact_count = _sdf->GetValueUInt("min_contact_count");
+  }
+  else
+    this->min_contact_count = 2;  // default
 
-    for (unsigned int i = 0; i < 2; ++i)
+  if (_sdf->GetElement("attach_steps"))
+  {
+    this->attach_steps = _sdf->GetValueInt("attach_steps");
+  }
+  else
+    this->attach_steps = 20;  // default
+
+  if (_sdf->GetElement("detach_steps"))
+  {
+    this->detach_steps = _sdf->GetValueInt("detach_steps");
+  }
+  else
+    this->detach_steps = 40;  // default
+
+  sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
+  this->palmLink = this->model->GetLink(palmLinkElem->GetValueString());
+  if (!this->palmLink)
+    gzerr << "palm link [" << palmLinkElem->GetValueString()
+          << "] not found!\n";
+
+  sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
+
+
+  while (gripperLinkElem)
+  {
+    physics::LinkPtr gripperLink
+      = this->model->GetLink(gripperLinkElem->GetValueString());
+    for (unsigned int j = 0; j < gripperLink->GetChildCount(); ++j)
     {
-      for (unsigned int j = 0; j < tmplinks[i]->GetChildCount(); ++j)
-      {
-        collision = tmplinks[i]->GetCollision(j);
-        collIter = this->collisions.find(collision->GetScopedName());
-        if (collIter != this->collisions.end())
-          continue;
-
-        collision->SetContactsEnabled(true);
-        this->connections.push_back(collision->ConnectContact(
-              boost::bind(&Gripper::OnContact, this, _1, _2)));
-        this->collisions[collision->GetScopedName()] = collision;
-      }
+      physics::CollisionPtr collision = gripperLink->GetCollision(j);
+      std::map<std::string, physics::CollisionPtr>::iterator collIter
+        = this->collisions.find(collision->GetScopedName());
+      if (collIter != this->collisions.end())
+        continue;
+      collision->SetContactsEnabled(true);
+      this->connections.push_back(collision->ConnectContact(
+            boost::bind(&Gripper::OnContact, this, _1, _2)));
+      this->collisions[collision->GetScopedName()] = collision;
     }
-
-    jointElem = jointElem->GetNextElement("joint");
+    gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");
   }
 
   this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
@@ -107,7 +125,8 @@ void Gripper::OnUpdate()
   if (common::Time::GetWallTime() - this->prevUpdateTime < this->updateRate)
     return;
 
-  if (this->contacts.size() >= 2)
+  // @todo: should package the decision into a function
+  if (this->contacts.size() >= this->min_contact_count)
   {
     this->posCount++;
     this->zeroCount = 0;
@@ -118,9 +137,9 @@ void Gripper::OnUpdate()
     this->posCount = std::max(0, this->posCount-1);
   }
 
-  if (this->posCount > 20 && !this->attached)
+  if (this->posCount > this->attach_steps && !this->attached)
     this->HandleAttach();
-  else if (this->zeroCount > 40 && this->attached)
+  else if (this->zeroCount > this->detach_steps && this->attached)
     this->HandleDetach();
 
   this->contacts.clear();
@@ -130,6 +149,12 @@ void Gripper::OnUpdate()
 /////////////////////////////////////////////////
 void Gripper::HandleAttach()
 {
+  if (!this->palmLink)
+  {
+    gzwarn << "palm link not found, not enforcing grasp hack!\n";
+    return;
+  }
+
   std::map<std::string, physics::Collision*> cc;
   std::map<std::string, int> contactCounts;
   std::map<std::string, int>::iterator iter;
@@ -161,7 +186,7 @@ void Gripper::HandleAttach()
       if (!this->attached)
       {
         math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
-          this->model->GetLink("palm")->GetWorldPose();
+          this->palmLink->GetWorldPose();
 
         double dd = (diff - prevDiff).pos.GetSquaredLength();
 
@@ -175,7 +200,7 @@ void Gripper::HandleAttach()
         {
           this->attached = true;
 
-          this->fixedJoint->Load(this->model->GetLink("palm"),
+          this->fixedJoint->Load(this->palmLink,
               cc[iter->first]->GetLink(), math::Pose(0, 0, 0, 0, 0, 0));
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);

@@ -33,6 +33,8 @@ set (msgs axis.proto
           planegeom.proto
           pid.proto
           pose.proto
+          pose_stamped.proto
+          pose_trajectory.proto
           projector.proto
           publishers.proto
           publish.proto

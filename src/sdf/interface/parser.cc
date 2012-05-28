@@ -619,16 +619,37 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
   std::string modelName = modelPtr->GetValueString("name");
   while (elem)
   {
-    std::string elemName = elem->GetValueString("name");
-    std::string newName =  modelName + "__" + elemName;
-    replace[elemName] = newName;
-    if (elem->HasElementDescription("origin"))
+    if (elem->GetName() == "link")
     {
-      ElementPtr originElem = elem->GetOrCreateElement("origin");
-      gazebo::math::Pose newPose = modelPose + originElem->GetValuePose("pose");
-      originElem->GetAttribute("pose")->Set(newPose);
+      std::string elemName = elem->GetValueString("name");
+      std::string newName =  modelName + "__" + elemName;
+      replace[elemName] = newName;
+      if (elem->HasElementDescription("origin"))
+      {
+        ElementPtr originElem = elem->GetOrCreateElement("origin");
+        gazebo::math::Pose newPose = gazebo::math::Pose(
+          modelPose.pos +
+            modelPose.rot.RotateVector(originElem->GetValuePose("pose").pos),
+            modelPose.rot * originElem->GetValuePose("pose").rot);
+        originElem->GetAttribute("pose")->Set(newPose);
+      }
     }
-
+    else if (elem->GetName() == "joint")
+    {
+      // for joints, we need to
+      //   prefix name like we did with links, and
+      std::string elemName = elem->GetValueString("name");
+      std::string newName =  modelName + "__" + elemName;
+      replace[elemName] = newName;
+      //   rotate the joint axis because they are model-global
+      if (elem->HasElement("axis"))
+      {
+        ElementPtr axisElem = elem->GetElement("axis");
+        gazebo::math::Vector3 newAxis =  modelPose.rot.RotateVector(
+          axisElem->GetValueVector3("xyz"));
+        axisElem->GetAttribute("xyz")->Set(newAxis);
+      }
+    }
     elem = elem->GetNextElement();
   }
 
