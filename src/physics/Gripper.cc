@@ -57,26 +57,10 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 {
   this->fixedJoint = this->physics->CreateJoint("revolute");
 
-  if (_sdf->GetElement("min_contact_count"))
-  {
-    this->min_contact_count = _sdf->GetValueUInt("min_contact_count");
-  }
-  else
-    this->min_contact_count = 2;  // default
-
-  if (_sdf->GetElement("attach_steps"))
-  {
-    this->attach_steps = _sdf->GetValueInt("attach_steps");
-  }
-  else
-    this->attach_steps = 20;  // default
-
-  if (_sdf->GetElement("detach_steps"))
-  {
-    this->detach_steps = _sdf->GetValueInt("detach_steps");
-  }
-  else
-    this->detach_steps = 40;  // default
+  sdf::ElementPtr grasp_check = _sdf->GetOrCreateElement("grasp_check");
+  this->min_contact_count = grasp_check->GetValueUInt("min_contact_count");
+  this->attach_steps = grasp_check->GetValueInt("attach_steps");
+  this->detach_steps = grasp_check->GetValueInt("detach_steps");
 
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
   this->palmLink = this->model->GetLink(palmLinkElem->GetValueString());
