@@ -593,36 +593,16 @@ void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
   for (elemXml = _xml->FirstChildElement(); elemXml;
        elemXml = elemXml->NextSiblingElement())
   {
-    std::string elem_name = elemXml->ValueStr();
-    if (_sdf->HasElementDescription(elem_name))
-    {
-      sdf::ElementPtr element = _sdf->AddElement(elem_name);
-
-      // FIXME: copy attributes
-      for (TiXmlAttribute *attribute = elemXml->FirstAttribute();
-           attribute; attribute = attribute->Next())
-      {
-        element->GetAttribute(attribute->Name())->SetFromString(attribute->ValueStr());
-      }
-
-      // copy value
-      std::string value = elemXml->GetText();
-      if (!value.empty())
-          element->GetValue()->SetFromString(value);
-    }
+    ElementPtr element(new Element);
+    element->SetParent(_sdf);
+    element->SetName(elemXml->ValueStr());
+    if (elemXml->GetText() != NULL)
+      element->AddValue("string", elemXml->GetText(), "1");
     else
-    {
-      ElementPtr element(new Element);
-      element->SetParent(_sdf);
-      element->SetName(elem_name);
-      if (elemXml->GetText() != NULL)
-        element->AddValue("string", elemXml->GetText(), "1");
-      else
-        gzerr << "trying to copy stuff inside <plugin> block, "
-              << "but they have NULL contents\n";
+      gzerr << "trying to copy stuff inside <plugin> block, "
+            << "but they have NULL contents\n";
 
-      _sdf->InsertElement(element);
-    }
+    _sdf->InsertElement(element);
   }
 }
 
