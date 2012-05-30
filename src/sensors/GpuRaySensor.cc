@@ -217,6 +217,7 @@ void GpuRaySensor::Init()
 
     this->laserCam->Init();
     this->laserCam->SetRangeCount(width_2nd, height_2nd);
+    this->laserCam->SetClipDist(this->GetRangeMin(), this->GetRangeMax());
     this->laserCam->SetParentSensor(this);
     this->laserCam->CreateLaserTexture(this->GetName() + "_RttTex_Laser");
     this->laserCam->CreateRenderTexture(this->GetName() + "_RttTex_Image");
