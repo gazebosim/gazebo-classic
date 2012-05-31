@@ -2,12 +2,11 @@
 <actor name="actor1" static="true">
   <origin pose="0 0 0 0 0 0"/>
   <skin filename="sub_16.dae" scale="1.0"/>
-  <animation name="stand" filename="stand.dae" scale="1.0" interpolate_x="false"/>
   <animation name="walking" filename="walk.dae" scale="1.0" interpolate_x="true"/>
  
   <script loop="true" delay_start="0.0" auto_start="true">
    
-    <trajectory id="4" type="walking">
+    <trajectory id="0" type="walking">
       <waypoint time="0.0" pose="0 1 0 0 0 0"/>
       <waypoint time="0.5" pose="0.19509 0.980785 0 0 0 -0.19635"/>
       <waypoint time="1.0" pose="0.382683 0.92388 0 0 0 -0.392699"/>
