@@ -20,3 +20,4 @@ message JointCmd
   optional PID velocity    = 5;
   optional bool reset      = 6;
 }
+/// \endverbatim

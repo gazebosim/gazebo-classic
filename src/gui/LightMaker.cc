@@ -30,6 +30,7 @@ using namespace gui;
 
 unsigned int LightMaker::counter = 0;
 
+/////////////////////////////////////////////////
 LightMaker::LightMaker() : EntityMaker()
 {
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
@@ -45,6 +46,7 @@ LightMaker::LightMaker() : EntityMaker()
   this->msg.set_range(20);
 }
 
+/////////////////////////////////////////////////
 void LightMaker::Start(const rendering::UserCameraPtr _camera)
 {
   this->camera = _camera;
@@ -55,17 +57,20 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
   this->state = 1;
 }
 
+/////////////////////////////////////////////////
 void LightMaker::Stop()
 {
   this->state = 0;
   gui::Events::moveMode(true);
 }
 
+/////////////////////////////////////////////////
 bool LightMaker::IsActive() const
 {
   return this->state > 0;
 }
 
+/////////////////////////////////////////////////
 void LightMaker::OnMousePush(const common::MouseEvent &_event)
 {
   if (this->state == 0)
@@ -87,6 +92,7 @@ void LightMaker::OnMousePush(const common::MouseEvent &_event)
   this->msg.mutable_pose()->mutable_position()->set_z(1);
 }
 
+/////////////////////////////////////////////////
 void LightMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
 {
   if (this->state == 0)
@@ -98,6 +104,7 @@ void LightMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
   this->Stop();
 }
 
+/////////////////////////////////////////////////
 void LightMaker::CreateTheEntity()
 {
   this->lightPub->Publish(this->msg);

@@ -98,8 +98,8 @@ target_link_libraries(gazebo_physics
   gazebo_physics_ode
   ${TBB_LIBRARIES} 
   ${libtool_library} 
-  ${boost_libraries}
-  ${tinyxml_libraries})
+  ${Boost_LIBRARIES}
+  ${TINYXML_LIBRARIES})
 
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)

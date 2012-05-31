@@ -17,6 +17,7 @@
 #ifndef GAZEBO_MATH_FUNCTIONS_HH
 #define GAZEBO_MATH_FUNCTIONS_HH
 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -36,6 +37,16 @@ namespace gazebo
   {
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
     static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
+
+    inline bool isnan(float _v)
+    {
+      return (boost::math::isnan)(_v);
+    }
+
+    inline bool isnan(double _v)
+    {
+      return (boost::math::isnan)(_v);
+    }
 
     template<typename T>
     inline T mean(const std::vector<T> &_values)

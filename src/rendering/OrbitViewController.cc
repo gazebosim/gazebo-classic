@@ -100,7 +100,7 @@ void OrbitViewController::Init()
   }
 
   // If the plane is too far away.
-  if (dist < 0 || dist > 20 || isnan(dist))
+  if (dist < 0 || dist > 20 || math::isnan(dist))
   {
     // First, see if the camera is looking at the origin.
     math::Vector3 dir = this->camera->GetDirection();

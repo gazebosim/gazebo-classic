@@ -899,7 +899,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
   // Get the angle between the two vectors. This is the amount to
   // rotate the entity
   float angle = acos(a.GetDotProd(b));
-  if (isnan(angle))
+  if (math::isnan(angle))
     angle = 0;
 
   // Compute the normal to the plane which is defined by the
