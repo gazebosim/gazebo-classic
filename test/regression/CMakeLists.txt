@@ -4,13 +4,13 @@ include_directories (
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
-  ${BOOST_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
 )
 
 link_directories(  
   ${OGRE_LIBRARY_PATH}
-  ${BOOST_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIRS} 
   ${ODE_LIBRARY_DIRS}
 )
 
@@ -60,7 +60,7 @@ target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES}
     gazebo_rendering
     gazebo_msgs
     pthread
-    ${tinyxml_libraries}
+    ${TINYXML_LIBRARIES}
     )
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
 endforeach()

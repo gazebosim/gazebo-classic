@@ -26,6 +26,7 @@
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
 #include "gui/ModelListWidget.hh"
+#include "gui/LightListWidget.hh"
 #include "gui/WorldPropertiesWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
@@ -86,6 +87,12 @@ MainWindow::MainWindow()
   this->modelsDock->setWidget(modelListWidget);
   this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
 
+  this->lightsDock = new QDockWidget(tr("Lights"), this);
+  this->lightsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+  LightListWidget *lightListWidget = new LightListWidget();
+  this->lightsDock->setWidget(lightListWidget);
+  this->addDockWidget(Qt::LeftDockWidgetArea, this->lightsDock);
+
   this->insertModelsDock = new QDockWidget(tr("Insert Model"), this);
   this->insertModelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
   InsertModelWidget *insertModel = new InsertModelWidget();
@@ -101,7 +108,8 @@ MainWindow::MainWindow()
   mainLayout->addWidget(this->timePanel);
   mainWidget->setLayout(mainLayout);
 
-  this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
+  this->tabifyDockWidget(this->modelsDock, this->lightsDock);
+  this->tabifyDockWidget(this->lightsDock, this->insertModelsDock);
   this->modelsDock->raise();
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
@@ -358,6 +366,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
     this->showFullScreen();
     this->removeDockWidget(this->modelsDock);
+    this->removeDockWidget(this->lightsDock);
     this->removeDockWidget(this->insertModelsDock);
     this->playToolbar->hide();
     this->editToolbar->hide();
@@ -369,14 +378,17 @@ void MainWindow::OnFullScreen(bool _value)
     this->centralWidget()->layout()->setContentsMargins(4, 4, 4, 4);
     this->showNormal();
     this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, this->lightsDock);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->insertModelsDock);
     this->modelsDock->show();
+    this->lightsDock->show();
     this->insertModelsDock->show();
     this->playToolbar->show();
     this->editToolbar->show();
     this->mouseToolbar->show();
     this->menuBar()->show();
 
+    this->tabifyDockWidget(this->modelsDock, this->lightsDock);
     this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
   }
 }

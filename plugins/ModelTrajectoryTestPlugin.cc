@@ -30,7 +30,7 @@ ModelTrajectoryTestPlugin::ModelTrajectoryTestPlugin()
 
 /////////////////////////////////////////////////
 void ModelTrajectoryTestPlugin::Load(physics::ModelPtr _model,
-                           sdf::ElementPtr _sdf)
+                           sdf::ElementPtr /*_sdf*/)
 {
   this->model = _model;
 
@@ -52,7 +52,7 @@ void ModelTrajectoryTestPlugin::Init()
 
 /////////////////////////////////////////////////
 void ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg(
-  ConstPoseTrajectoryPtr &_msg)
+    ConstPoseTrajectoryPtr &/*_msg*/)
 {
 }
 

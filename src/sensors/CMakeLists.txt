@@ -43,7 +43,7 @@ target_link_libraries(gazebo_sensors gazebo_common
                                      gazebo_rendering
                                      gazebo_physics
                                      ${libtool_library} 
-                                     ${boost_libraries}
+                                     ${Boost_LIBRARIES}
                                      ${ogre_ldflags}
                                      )
 

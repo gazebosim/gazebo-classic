@@ -230,6 +230,9 @@ unsigned int Skeleton::GetNumAnimations()
 
 SkeletonAnimation *Skeleton::GetAnimation(const unsigned int _i)
 {
+  if (_i >= this->anims.size())
+    return NULL;
+
   return this->anims[_i];
 }
 

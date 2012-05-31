@@ -41,7 +41,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/transport.hh.in
 gz_add_library(gazebo_transport ${sources})
 target_link_libraries(gazebo_transport gazebo_common 
                                        gazebo_msgs 
-                                       ${boost_libraries})
+                                       ${Boost_LIBRARIES})
 
 INSTALL_LIBRARY(gazebo_transport)
 INSTALL_INCLUDES("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh transport.h)
