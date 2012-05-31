@@ -22,7 +22,7 @@
 
 #include <boost/bind.hpp>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "sdf/sdf.hh"
 #include "msgs/msgs.hh"

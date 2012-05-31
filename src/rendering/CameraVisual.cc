@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Camera.hh"

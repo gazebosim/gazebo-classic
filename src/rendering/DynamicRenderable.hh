@@ -17,7 +17,7 @@
 #ifndef OGREDYNAMICRENDERABLE_HH
 #define OGREDYNAMICRENDERABLE_HH
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo

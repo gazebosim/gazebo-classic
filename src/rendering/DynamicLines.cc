@@ -23,7 +23,7 @@
 
 #include <cmath>
 #include <sstream>
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "common/Exception.hh"
 #include "rendering/DynamicLines.hh"
