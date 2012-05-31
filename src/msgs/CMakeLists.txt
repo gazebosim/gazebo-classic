@@ -13,6 +13,8 @@ set (msgs axis.proto
           fog.proto
           friction.proto
           geometry.proto
+          gz_string.proto
+          gz_string_v.proto
           header.proto
           heightmapgeom.proto
           imagegeom.proto
@@ -48,8 +50,6 @@ set (msgs axis.proto
           server_control.proto
           shadows.proto
           spheregeom.proto
-          string.proto
-          string_v.proto
           subscribe.proto
           surface.proto
           time.proto

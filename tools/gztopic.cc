@@ -103,7 +103,7 @@ transport::ConnectionPtr connect_to_master(const std::string &host,
   packet.ParseFromString(data);
   if (packet.type() == "init")
   {
-    msgs::String msg;
+    msgs::GzString msg;
     msg.ParseFromString(packet.serialized_data());
     if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
       std::cerr << "Conflicting gazebo versions\n";
@@ -141,13 +141,13 @@ void list()
 }
 
 /////////////////////////////////////////////////
-void echo_cb(ConstStringPtr &_data)
+void echo_cb(ConstGzStringPtr &_data)
 {
   std::cout << _data->data() << "\n";
 }
 
 /////////////////////////////////////////////////
-void hz_cb(ConstStringPtr &/*_data*/)
+void hz_cb(ConstGzStringPtr &/*_data*/)
 {
   common::Time cur_time = common::Time::GetWallTime();
 

@@ -20,7 +20,7 @@
 
 #include "common/MeshManager.hh"
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "rendering/Scene.hh"
 #include "rendering/ArrowVisual.hh"
 #include "rendering/AxisVisual.hh"

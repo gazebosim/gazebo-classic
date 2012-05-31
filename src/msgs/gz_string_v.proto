@@ -5,7 +5,7 @@ package gazebo.msgs;
 /// \brief A message for a vector of string data
 /// \verbatim
 
-message String_V
+message GzString_V
 {
   repeated string data = 1;
 }

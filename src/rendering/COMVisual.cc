@@ -24,7 +24,7 @@
 #include "math/Pose.hh"
 
 #include "rendering/DynamicLines.hh"
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "rendering/Scene.hh"
 #include "rendering/COMVisual.hh"
 

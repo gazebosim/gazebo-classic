@@ -16,7 +16,7 @@
 */
 #include <math.h>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "common/Events.hh"
 #include "common/Color.hh"

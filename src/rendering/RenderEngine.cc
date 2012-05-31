@@ -30,7 +30,7 @@
 
 #include <iostream>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "gazebo_config.h"
 

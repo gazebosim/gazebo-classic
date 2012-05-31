@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "gazebo_config.h"
 
 #include "rendering/Camera.hh"

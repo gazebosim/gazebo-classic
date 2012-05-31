@@ -16,7 +16,7 @@
 */
 #include <boost/lexical_cast.hpp>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "rendering/Visual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"

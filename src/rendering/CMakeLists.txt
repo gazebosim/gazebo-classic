@@ -79,7 +79,7 @@ set (headers
   ViewController.hh
   Visual.hh
   WindowManager.hh
-  ogre.h
+  ogre_gazebo.h
   cegui.h)
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
