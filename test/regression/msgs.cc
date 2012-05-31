@@ -75,7 +75,7 @@ TEST_F(MsgsTest, Misc)
   }
 
   {
-    msgs::String msg;
+    msgs::GzString msg;
     msg.set_data("test_string");
     std::string data = msgs::Package("test_type", msg);
 
@@ -89,7 +89,7 @@ TEST_F(MsgsTest, Misc)
 
   // Throw, msgs::Package, bad message
   {
-    msgs::String msg;
+    msgs::GzString msg;
     EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
   }
 }

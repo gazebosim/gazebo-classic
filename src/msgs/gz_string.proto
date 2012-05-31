@@ -5,7 +5,7 @@ package gazebo.msgs;
 /// \brief A message for string data
 /// \verbatim
 
-message String
+message GzString
 {
   required string data = 1;
 }

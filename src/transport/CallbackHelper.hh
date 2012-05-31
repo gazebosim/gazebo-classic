@@ -109,7 +109,7 @@ namespace gazebo
     class DebugCallbackHelper : public CallbackHelper
     {
       public: DebugCallbackHelper(
-                  const boost::function<void (ConstStringPtr &)> &cb)
+                  const boost::function<void (ConstGzStringPtr &)> &cb)
               : callback(cb)
               {
               }
@@ -117,7 +117,7 @@ namespace gazebo
       /// \brief Get the typename of the message that is handled
       public: std::string GetMsgType() const
               {
-                msgs::String m;
+                msgs::GzString m;
                 return m.GetTypeName();
               }
 
@@ -126,7 +126,7 @@ namespace gazebo
                 msgs::Packet packet;
                 packet.ParseFromString(newdata);
 
-                boost::shared_ptr<msgs::String> m(new msgs::String);
+                boost::shared_ptr<msgs::GzString> m(new msgs::GzString);
                 m->ParseFromString(newdata);
                 this->callback(m);
                 return true;
@@ -137,7 +137,7 @@ namespace gazebo
                 return true;
               }
 
-      private: boost::function<void (boost::shared_ptr<msgs::String> &)>
+      private: boost::function<void (boost::shared_ptr<msgs::GzString> &)>
                callback;
     };
     /// \}
