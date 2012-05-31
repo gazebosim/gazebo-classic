@@ -72,6 +72,7 @@ World::World(const std::string &_name)
   sdf::initFile("sdf/world.sdf", this->sdf);
 
   this->receiveMutex = new boost::mutex();
+  this->loadModelMutex = new boost::mutex();
 
   this->initialized = false;
   this->needsReset = false;
@@ -94,6 +95,10 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
+  delete this->receiveMutex;
+  this->receiveMutex = NULL;
+  delete this->loadModelMutex;
+  this->loadModelMutex = NULL;
   delete this->setWorldPoseMutex;
   this->setWorldPoseMutex = NULL;
   delete this->worldUpdateMutex;
@@ -468,6 +473,7 @@ ModelPtr World::GetModelByName(const std::string &_name)
 //////////////////////////////////////////////////
 ModelPtr World::GetModel(const std::string &_name)
 {
+  boost::mutex::scoped_lock lock(*this->loadModelMutex);
   return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
 }
 
@@ -486,6 +492,7 @@ EntityPtr World::GetEntity(const std::string &_name)
 //////////////////////////////////////////////////
 ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 {
+  boost::mutex::scoped_lock lock(*this->loadModelMutex);
   ModelPtr model(new Model(_parent));
   model->SetWorld(shared_from_this());
   model->Load(_sdf);
