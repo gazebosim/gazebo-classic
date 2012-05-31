@@ -38,5 +38,5 @@ gazebo_msgs
 gazebo_math
 )
 
-INSTALL_LIBRARY(gazebo_player)
-#INSTALL_INCLUDES("player" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)
+gz_install_library(gazebo_player)
+#gz_install_includes("player" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)

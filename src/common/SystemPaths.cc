@@ -18,7 +18,6 @@
  * Author: Nate Koenig, Jordi Polo
  * Date: 3 May 2008
  */
-#include <tinyxml.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>

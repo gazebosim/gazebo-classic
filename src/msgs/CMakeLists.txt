@@ -111,5 +111,5 @@ endforeach()
 configure_file (${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
 
-INSTALL_LIBRARY(gazebo_msgs)
-INSTALL_INCLUDES("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh msgs.h)
+gz_install_library(gazebo_msgs)
+gz_install_includes("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh msgs.h)

@@ -91,8 +91,8 @@ bool Server::ParseArgs(int argc, char **argv)
   {
     po::store(
         po::command_line_parser(argc, argv).options(desc).positional(
-          p_desc).allow_unregistered().run(), vm);
-    po::notify(vm);
+          p_desc).allow_unregistered().run(), this->vm);
+    po::notify(this->vm);
   } catch(boost::exception &_e)
   {
     std::cerr << "Error. Invalid arguments\n";
@@ -100,7 +100,7 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
-  if (vm.count("help"))
+  if (this->vm.count("help"))
   {
     this->PrintUsage();
     std::cerr << v_desc << "\n";
@@ -108,10 +108,10 @@ bool Server::ParseArgs(int argc, char **argv)
   }
 
   /// Load all the plugins specified on the command line
-  if (vm.count("server-plugin"))
+  if (this->vm.count("server-plugin"))
   {
     std::vector<std::string> pp =
-      vm["server-plugin"].as<std::vector<std::string> >();
+      this->vm["server-plugin"].as<std::vector<std::string> >();
 
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
@@ -120,13 +120,13 @@ bool Server::ParseArgs(int argc, char **argv)
     }
   }
 
-  if (vm.count("pause"))
+  if (this->vm.count("pause"))
     this->params["pause"] = "true";
   else
     this->params["pause"] = "false";
 
-  if (vm.count("world_file"))
-    configFilename = vm["world_file"].as<std::string>();
+  if (this->vm.count("world_file"))
+    configFilename = this->vm["world_file"].as<std::string>();
   else
     configFilename = "worlds/empty.world";
 

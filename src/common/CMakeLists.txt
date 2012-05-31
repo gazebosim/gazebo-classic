@@ -65,10 +65,9 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_
 gz_add_library(gazebo_common ${sources})
 target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
-                                    ${TINYXML_LIBRARIES}
                                     ${Boost_LIBRARIES}
                                     ${freeimage_library}
                                     ${TINYXML_LIBRARIES})
 
-INSTALL_LIBRARY(gazebo_common)
-INSTALL_INCLUDES("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)
+gz_install_library(gazebo_common)
+gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)

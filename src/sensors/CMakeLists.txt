@@ -55,6 +55,6 @@ target_link_libraries( gzsensor gazebo_common
                                 gazebo_msgs
                                 pthread)
 
-INSTALL_EXECUTABLE( gzsensor )
-INSTALL_LIBRARY(gazebo_sensors)
-INSTALL_INCLUDES("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh sensors.h)
+gz_install_executable( gzsensor )
+gz_install_library(gazebo_sensors)
+gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh sensors.h)

@@ -19,7 +19,7 @@
 //////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  int result = 0;
+  int result;
   if (!gazebo::gui::run(_argc, _argv))
     result = -1;
   return result;

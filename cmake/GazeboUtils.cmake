@@ -108,18 +108,18 @@ endmacro ()
 
 
 #################################################
-macro (INSTALL_INCLUDES _subdir)
+macro (gz_install_includes _subdir)
   install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
 endmacro()
 
 #################################################
-macro (INSTALL_LIBRARY _name)
+macro (gz_install_library _name)
   set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION})
   install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 endmacro ()
 
 #################################################
-macro (INSTALL_EXECUTABLE _name)
+macro (gz_install_executable _name)
   set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
 endmacro ()

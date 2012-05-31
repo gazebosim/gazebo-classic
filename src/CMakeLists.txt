@@ -79,9 +79,9 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
 endif()
 
 
-INSTALL_EXECUTABLE(gzmaster)
-INSTALL_EXECUTABLE(gzserver)
-INSTALL_EXECUTABLE(gazebo)
+gz_install_executable(gzmaster)
+gz_install_executable(gzserver)
+gz_install_executable(gazebo)
 
 gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
@@ -97,7 +97,7 @@ target_link_libraries(libgazebo gazebo_common
                                 pthread)
 
 add_dependencies(libgazebo gazebo_msgs)
-INSTALL_LIBRARY(libgazebo)
+gz_install_library(libgazebo)
 
 set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
-INSTALL_INCLUDES("" ${headers})
+gz_install_includes("" ${headers})

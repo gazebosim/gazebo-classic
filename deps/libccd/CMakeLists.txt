@@ -13,4 +13,4 @@ src/vec3.c
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/libccd/include )
 
 gz_add_library(gazebo_ccd ${sources})
-INSTALL_LIBRARY(gazebo_ccd)
+gz_install_library(gazebo_ccd)

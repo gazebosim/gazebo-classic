@@ -190,7 +190,7 @@ else (build_errors)
   ########################################
   # Write the config.h file
   configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
-  INSTALL_INCLUDES("" ${PROJECT_BINARY_DIR}/gazebo_config.h)
+  gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/)
