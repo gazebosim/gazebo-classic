@@ -64,8 +64,7 @@ DepthCamera::~DepthCamera()
 void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
-  if (_sdf->GetElement("depth_camera") &&
-      _sdf->GetElement("depth_camera")->GetValueString("output") == "points")
+  if (_sdf->GetOrCreateElement("depth_camera")->GetValueString("output") == "points")
     this->output_points = true;
 }
 

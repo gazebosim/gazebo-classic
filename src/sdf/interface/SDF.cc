@@ -511,7 +511,7 @@ ElementPtr Element::GetElement(const std::string &_name) const
       return (*iter);
   }
 
-  gzdbg << "Unable to find element with name[" << _name << "] return empty\n";
+  // gzdbg << "Unable to find element with name[" << _name << "] return empty\n";
   return ElementPtr();
 }
 
