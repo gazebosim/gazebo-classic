@@ -602,7 +602,8 @@ void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
       for (TiXmlAttribute *attribute = elemXml->FirstAttribute();
            attribute; attribute = attribute->Next())
       {
-        element->GetAttribute(attribute->Name())->SetFromString(attribute->ValueStr());
+        element->GetAttribute(attribute->Name())->SetFromString(
+          attribute->ValueStr());
       }
 
       // copy value

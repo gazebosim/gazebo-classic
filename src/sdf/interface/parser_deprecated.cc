@@ -63,7 +63,7 @@ void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
       std::string elem_name((const char*)elemXml->name);
       if (_sdf->HasElementDescription(elem_name))
       {
-        // gzdbg << "has this element [" << elem_name << "] defined, copying.\n";
+        // gzdbg << "has element [" << elem_name << "] defined, copying.\n";
         sdf::ElementPtr element = _sdf->AddElement(elem_name);
 
         // copy attributes
