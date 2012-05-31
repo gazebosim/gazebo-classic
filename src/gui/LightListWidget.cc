@@ -253,7 +253,8 @@ void LightListWidget::InitTransport(const std::string &_name)
       &LightListWidget::OnLightMsg, this);
 
   // this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
-  // this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
+  // this->requestPub = 
+  //     this->node->Advertise<msgs::Request>("~/request", 5, true);
   // this->responseSub = this->node->Subscribe("~/response",
   //     &LightListWidget::OnResponse, this);
 
