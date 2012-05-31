@@ -61,7 +61,8 @@ if(UNIX AND NOT WIN32)
      ADD_DEFINITIONS(-fPIC)
    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
  endif(CMAKE_UNAME)
-endif(UNIX AND NOT WIN32)
+endif()
+
 
 
 set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
@@ -156,6 +157,16 @@ endif()
 message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
 add_subdirectory(deps)
 message (STATUS "----------------------------------------\n")
+
+#################################################
+# OS Specific initialization
+if (UNIX)
+  gz_setup_unix()
+else (WIN32)
+  gz_setup_windows()
+else (APPLE)
+  gz_setup_apple()
+endif()
 
 #################################################
 # Print warnings and errors

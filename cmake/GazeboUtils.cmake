@@ -123,3 +123,16 @@ macro (INSTALL_EXECUTABLE _name)
   set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
 endmacro ()
+
+#################################################
+macro (gz_setup_unix)
+endmacro()
+
+#################################################
+macro (gz_setup_windows)
+endmacro()
+
+#################################################
+macro (gz_setup_apple)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
+endmacro()
