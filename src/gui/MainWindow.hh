@@ -150,6 +150,7 @@ namespace gazebo
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
       private: QDockWidget *modelsDock;
+      private: QDockWidget *lightsDock;
       private: QDockWidget *insertModelsDock;
 
       private: std::vector<event::ConnectionPtr> connections;

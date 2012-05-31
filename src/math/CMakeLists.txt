@@ -43,7 +43,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/gzmath.hh.in ${CMAKE_CURRENT_BINARY
 
 
 gz_add_library(gazebo_math ${sources})
-target_link_libraries(gazebo_math ${boost_libraries})
+target_link_libraries(gazebo_math ${Boost_LIBRARIES})
 
 INSTALL_LIBRARY(gazebo_math)
 INSTALL_INCLUDES("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh gzmath.h)

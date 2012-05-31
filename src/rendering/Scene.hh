@@ -159,9 +159,12 @@ namespace gazebo
       /// \brief Get a visual by name
       public: VisualPtr GetVisual(const std::string &_name) const;
 
-      public: VisualPtr SelectVisualAt(CameraPtr camera,
-                                       math::Vector2i mousePos);
-
+      /// \brief Select a visual element at a screen location
+      /// \param _camera The camera through which to project the mouse pos
+      /// \param _mousePos Screen position
+      /// \return Pointer the a visual. NULL if none found
+      public: VisualPtr SelectVisualAt(CameraPtr _camera,
+                                       math::Vector2i _mousePos);
 
       /// \brief Select a visual by name
       public: void SelectVisual(const std::string &_name) const;

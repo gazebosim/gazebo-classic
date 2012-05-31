@@ -2,7 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include ( ${QT_USE_FILE} )
 
 link_directories(  
-  ${BOOST_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIRS} 
 )
 
 add_definitions( ${QT_DEFINITIONS} )
@@ -17,6 +17,7 @@ set (sources main.cc
              GLWidget.cc 
              TimePanel.cc
              InsertModelWidget.cc
+             LightListWidget.cc
              ModelListWidget.cc
              WorldPropertiesWidget.cc
              EntityMaker.cc
@@ -37,6 +38,7 @@ set (qt_headers MainWindow.hh
                 GLWidget.hh 
                 TimePanel.hh
                 InsertModelWidget.hh
+                LightListWidget.hh
                 ModelListWidget.hh
                 WorldPropertiesWidget.hh
                 ModelEditWidget.hh
@@ -73,7 +75,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gzqtpropertybrowser 
                                  ${QT_LIBRARIES} 
                                  ${ogre_libraries} 
-                                 ${boost_libraries} 
+                                 ${Boost_LIBRARIES} 
                                  pthread)
 
 target_link_libraries(gzclient  gazebo_common
@@ -85,7 +87,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gzqtpropertybrowser 
                                 ${QT_LIBRARIES} 
                                 ${ogre_libraries} 
-                                ${boost_libraries} 
+                                ${Boost_LIBRARIES} 
                                 pthread)
 
  
