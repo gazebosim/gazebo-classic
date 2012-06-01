@@ -429,7 +429,10 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 
         if (this->IsStatic())
         {
-          coll->worldPose = this->worldPose + coll->GetRelativePose();
+          coll->worldPose.pos = this->worldPose.pos +
+            this->worldPose.rot.RotateVector(coll->GetRelativePose().pos);
+          coll->worldPose.rot = this->worldPose.rot *
+            coll->GetRelativePose().rot;
         }
         coll->OnPoseChange();
       }
