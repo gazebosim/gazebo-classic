@@ -323,7 +323,8 @@ bool Param::Get(gazebo::math::Vector3 &_value)
   }
   else
   {
-    gzwarn << "Parameter [" << this->key << "] is not a vector3, try parsing\n";
+    // gzwarn << "Parameter [" << this->key
+    //        << "] is not a vector3, parse as string\n";
     std::string val_str = this->GetAsString();
     std::vector<double> elements;
     std::vector<std::string> pieces;
@@ -371,7 +372,8 @@ bool Param::Get(gazebo::math::Vector2i &_value)
   }
   else
   {
-    gzwarn << "Parameter [" << this->key << "] is not a vector2i,try parsing\n";
+    // gzwarn << "Parameter [" << this->key
+    //        << "] is not a vector2i,parse as string\n";
     std::string val_str = this->GetAsString();
     std::vector<int> elements;
     std::vector<std::string> pieces;
@@ -418,7 +420,8 @@ bool Param::Get(gazebo::math::Vector2d &_value)
   }
   else
   {
-    gzwarn << "Parameter [" << this->key << "] is not vector2d, try parsing\n";
+    // gzwarn << "Parameter [" << this->key
+    //        << "] is not vector2d, parse as string\n";
     std::string val_str = this->GetAsString();
     std::vector<double> elements;
     std::vector<std::string> pieces;
