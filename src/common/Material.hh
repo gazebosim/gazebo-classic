@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MATERIAL_HH
-#define MATERIAL_HH
+#ifndef __MATERIAL_HH__
+#define __MATERIAL_HH__
 
 #include <string>
 #include <iostream>
@@ -43,65 +43,85 @@ namespace gazebo
       public: virtual ~Material();
 
       /// \brief Create a material with a default color
+      /// \param _clr Color of the material
       public: Material(const Color &_clr);
 
       /// \brief Get the name of the material
+      /// \return The name of the material
       public: std::string GetName() const;
 
       /// \brief Set a texture image
+      /// \param _tex The name of the texture, which must be in Gazebo's
+      ///             resource path
       public: void SetTextureImage(const std::string &_tex);
 
       /// \brief Set a texture image
-      public: void SetTextureImage(const std::string &tex,
-                                   const std::string &resource_path);
+      /// \param _tex The name of the texture
+      /// \param _resourcePath Path which contains _tex
+      public: void SetTextureImage(const std::string &_tex,
+                                   const std::string &_resourcePath);
 
       /// \brief Get a thie texture image
+      /// \return The name of the texture image, if one exists
       public: std::string GetTextureImage() const;
 
       /// \brief Set the ambient color
+      /// \param _clr The ambient color
       public: void SetAmbient(const Color &_clr);
 
       /// \brief Get the ambient color
+      /// \return The ambient color
       public: Color GetAmbient() const;
 
       /// \brief Set the diffuse color
+      /// \param _clr The diffuse color
       public: void SetDiffuse(const Color &_clr);
 
       /// \brief Get the diffuse color
+      /// \return The diffuse color
       public: Color GetDiffuse() const;
 
       /// \brief Set the specular color
+      /// \param _clr The specular color
       public: void SetSpecular(const Color &_clr);
 
       /// \brief Get the specular color
+      /// \return The specular color
       public: Color GetSpecular() const;
 
       /// \brief Set the emissive color
+      /// \param _clr The emissive color
       public: void SetEmissive(const Color &_clr);
 
       /// \brief Get the emissive color
+      /// \return The emissive color
       public: Color GetEmissive() const;
 
       /// \brief Set the transparency percentage (0..1)
+      /// \param _t The amount of transparency (0..1)
       public: void SetTransparency(double _t);
 
       /// \brief Get the transparency percentage (0..1)
-      public: double SetTransparency() const;
+      /// \return The transparency percentage
+      public: double GetTransparency() const;
 
       /// \brief Set the shininess
+      /// \param _t The shininess value
       public: void SetShininess(double _t);
 
       /// \brief Get the shininess
+      /// \return The shininess value
       public: double GetShininess() const;
-
-      /// \brief Get the shininess
-      public: double GetTransparency() const;
 
       /// \brief Set the blende factors. Will be interpreted as:
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
+      /// \param _srcFactor The source factor
+      /// \param _dstFactor The destination factor
       public: void SetBlendFactors(double _srcFactor, double _dstFactor);
 
       /// \brief Get the blend factors
+      /// \param _srcFactor Source factor is returned in this variable
+      /// \param _dstFactor Destination factor is returned in this variable
       public: void GetBlendFactors(double &_srcFactor, double &_dstFactor);
 
       /// \brief Set the blending mode

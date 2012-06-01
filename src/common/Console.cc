@@ -116,5 +116,3 @@ std::ofstream &Console::Log()
 {
   return this->logStream;
 }
-
-

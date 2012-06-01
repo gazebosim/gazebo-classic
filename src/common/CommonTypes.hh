@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_TYPES_HH
-#define GAZEBO_COMMON_TYPES_HH
+#ifndef __GAZEBO_COMMON_TYPES_HH__
+#define __GAZEBO_COMMON_TYPES_HH__
 
 #include <vector>
 #include <map>
@@ -93,5 +93,3 @@ namespace gazebo
 }
 
 #endif
-
-

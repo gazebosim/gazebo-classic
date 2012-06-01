@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "transport/Transport.hh"
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
@@ -22,6 +23,7 @@
 using namespace gazebo;
 using namespace gui;
 
+/////////////////////////////////////////////////
 WorldPropertiesWidget::WorldPropertiesWidget(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -41,21 +43,25 @@ WorldPropertiesWidget::WorldPropertiesWidget(QWidget *_parent)
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
+/////////////////////////////////////////////////
 WorldPropertiesWidget::~WorldPropertiesWidget()
 {
 }
 
+/////////////////////////////////////////////////
 void WorldPropertiesWidget::showEvent(QShowEvent * /*_event*/)
 {
   this->sceneWidget->Init();
   this->physicsWidget->Init();
 }
 
+/////////////////////////////////////////////////
 void WorldPropertiesWidget::closeEvent(QCloseEvent * /*_event*/)
 {
   this->sceneWidget->initialized = false;
 }
 
+/////////////////////////////////////////////////
 PhysicsWidget::PhysicsWidget(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -204,9 +210,9 @@ PhysicsWidget::PhysicsWidget(QWidget *_parent)
   this->node->Init();
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
 
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response",
-      &PhysicsWidget::OnResponse, this);
+  //this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  //this->responseSub = this->node->Subscribe("~/response",
+  //    &PhysicsWidget::OnResponse, this);
 
   this->requestMsg = NULL;
 
@@ -235,30 +241,35 @@ PhysicsWidget::PhysicsWidget(QWidget *_parent)
            this, SLOT(OnSurfaceLayer()));
 }
 
+/////////////////////////////////////////////////
 PhysicsWidget::~PhysicsWidget()
 {
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::Init()
 {
-  this->initialized = false;
-  this->requestMsg = msgs::CreateRequest("physics_info");
-  this->requestPub->Publish(*this->requestMsg);
-}
+  //this->initialized = false;
+  //this->requestMsg = msgs::CreateRequest("physics_info");
+  //this->requestPub->Publish(*this->requestMsg);
 
-void PhysicsWidget::OnResponse(
-    ConstResponsePtr &_msg)
-{
-  if (this->initialized || !this->requestMsg ||
-      this->requestMsg->id() != _msg->id())
-  {
-    return;
-  }
+  msgs::Response response = transport::request("default",
+      *msgs::CreateRequest("physics_info"));
+//}
+
+/////////////////////////////////////////////////
+//void PhysicsWidget::OnResponse(ConstResponsePtr &_msg)
+//{
+  //if (this->initialized || !this->requestMsg ||
+  //    this->requestMsg->id() != _msg->id())
+  //{
+  //  return;
+  //}
 
   msgs::Physics physicsMsg;
-  if (_msg->has_type() && _msg->type() == physicsMsg.GetTypeName())
-  {
-    physicsMsg.ParseFromString(_msg->serialized_data());
+  //if (_msg->has_type() && _msg->type() == physicsMsg.GetTypeName())
+  //{
+    physicsMsg.ParseFromString(response.serialized_data());
 
     if (physicsMsg.has_gravity())
     {
@@ -354,12 +365,13 @@ void PhysicsWidget::OnResponse(
       this->surfaceLayerLineEdit->setText(tr("0"));
 
     this->initialized = true;
-  }
+  //}
 
-  delete this->requestMsg;
-  this->requestMsg = NULL;
+  //delete this->requestMsg;
+  //this->requestMsg = NULL;
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnSolverType(int _index)
 {
   if (!this->initialized)
@@ -374,6 +386,7 @@ void PhysicsWidget::OnSolverType(int _index)
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnGravity()
 {
   if (!this->initialized)
@@ -392,6 +405,7 @@ void PhysicsWidget::OnGravity()
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnDt()
 {
   if (!this->initialized)
@@ -405,6 +419,7 @@ void PhysicsWidget::OnDt()
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnSOR()
 {
   if (!this->initialized)
@@ -418,6 +433,7 @@ void PhysicsWidget::OnSOR()
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnIters()
 {
   if (!this->initialized)
@@ -432,6 +448,7 @@ void PhysicsWidget::OnIters()
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnCFM()
 {
   if (!this->initialized)
@@ -445,6 +462,7 @@ void PhysicsWidget::OnCFM()
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnERP()
 {
   if (!this->initialized)
@@ -458,6 +476,7 @@ void PhysicsWidget::OnERP()
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnMaxVel()
 {
   if (!this->initialized)
@@ -471,6 +490,7 @@ void PhysicsWidget::OnMaxVel()
   this->physicsPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void PhysicsWidget::OnSurfaceLayer()
 {
   if (!this->initialized)
@@ -488,6 +508,7 @@ void PhysicsWidget::OnSurfaceLayer()
 
 
 
+/////////////////////////////////////////////////
 SceneWidget::SceneWidget(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -604,9 +625,9 @@ SceneWidget::SceneWidget(QWidget *_parent)
   this->node->Init();
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
 
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response",
-      &SceneWidget::OnResponse, this);
+  //this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  //this->responseSub = this->node->Subscribe("~/response",
+  //    &SceneWidget::OnResponse, this);
 
   connect(this->ambientColorButton, SIGNAL(clicked()),
            this, SLOT(OnAmbientColor()));
@@ -631,192 +652,39 @@ SceneWidget::SceneWidget(QWidget *_parent)
   connect(this->fogBox, SIGNAL(toggled(bool)),
            this, SLOT(OnFogToggle(bool)));
 
-  this->requestMsg = NULL;
+  // this->requestMsg = NULL;
 }
 
+/////////////////////////////////////////////////
 SceneWidget::~SceneWidget()
 {
-  delete this->requestMsg;
-  this->requestMsg = NULL;
+  //delete this->requestMsg;
+  //this->requestMsg = NULL;
 }
 
+/////////////////////////////////////////////////
 void SceneWidget::Init()
 {
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
-  this->initialized = false;
-}
+  //this->requestMsg = msgs::CreateRequest("scene_info");
+  //this->requestPub->Publish(*this->requestMsg);
+  //this->initialized = false;
 
-void SceneWidget::OnFogToggle(bool _value)
-{
-  if (!this->initialized)
-    return;
-
-  msgs::Scene msg;
-  if (_value)
-  {
-    int index = this->fogTypeBox->currentIndex();
-    this->OnFogType(index);
-  }
-  else
-    msg.mutable_fog()->set_type(msgs::Fog::NONE);
-
-  msg.set_name(this->sceneName);
-  this->scenePub->Publish(msg);
-}
-
-void SceneWidget::OnFogType(int _index)
-{
-  if (!this->initialized)
-    return;
-  msgs::Scene msg;
-
-  if (_index == 0)
-    msg.mutable_fog()->set_type(msgs::Fog::LINEAR);
-  else if (_index == 1)
-    msg.mutable_fog()->set_type(msgs::Fog::EXPONENTIAL);
-  else
-    msg.mutable_fog()->set_type(msgs::Fog::EXPONENTIAL2);
-
-  msg.set_name(this->sceneName);
-  this->scenePub->Publish(msg);
-}
-
-void SceneWidget::OnFogDensity(double _density)
-{
-  if (!this->initialized)
-    return;
-  msgs::Scene msg;
-  msg.mutable_fog()->set_density(_density);
-
-  msg.set_name(this->sceneName);
-  this->scenePub->Publish(msg);
-}
-
-void SceneWidget::OnFogStart()
-{
-  if (!this->initialized)
-    return;
-  msgs::Scene msg;
-  std::string value = this->fogStart->text().toStdString();
-  if (!value.empty())
-  {
-    msg.mutable_fog()->set_start(boost::lexical_cast<double>(value));
-
-    msg.set_name(this->sceneName);
-    this->scenePub->Publish(msg);
-  }
-}
-
-void SceneWidget::OnFogEnd()
-{
-  if (!this->initialized)
-    return;
-  msgs::Scene msg;
-  std::string value = this->fogEnd->text().toStdString();
-  if (!value.empty())
-  {
-    msg.mutable_fog()->set_end(boost::lexical_cast<double>(value));
-
-    msg.set_name(this->sceneName);
-    this->scenePub->Publish(msg);
-  }
-}
-
-void SceneWidget::OnAmbientColor()
-{
-  if (!this->initialized)
-    return;
-
-  QColor color;
-  color = QColorDialog::getColor(Qt::yellow, this);
-
-  std::ostringstream styleStr;
-  styleStr << "background-color:rgb(" << color.red()
-           << ", " << color.green() << ", " << color.blue() << ");";
-  this->ambientColorButton->setAutoFillBackground(true);
-  this->ambientColorButton->setStyleSheet(styleStr.str().c_str());
-
-  msgs::Scene msg;
-  msg.mutable_ambient()->set_r(color.red() /255.0);
-  msg.mutable_ambient()->set_g(color.green() /255.0);
-  msg.mutable_ambient()->set_b(color.blue() /255.0);
-  msg.mutable_ambient()->set_a(1.0);
-
-  msg.set_name(this->sceneName);
-  this->scenePub->Publish(msg);
-}
-
-void SceneWidget::OnBackgroundColor()
-{
-  if (!this->initialized)
-    return;
-
-  QColor color;
-  color = QColorDialog::getColor(Qt::yellow, this);
-
-  std::ostringstream styleStr;
-  styleStr << "background-color:rgb(" << color.red()
-           << ", " << color.green() << ", " << color.blue() << ");";
-  this->backgroundColorButton->setAutoFillBackground(true);
-  this->backgroundColorButton->setStyleSheet(styleStr.str().c_str());
-
-
-  msgs::Scene msg;
-  msg.mutable_background()->set_r(color.red() / 255.0);
-  msg.mutable_background()->set_g(color.green() / 255.0);
-  msg.mutable_background()->set_b(color.blue() / 255.0);
-  msg.mutable_background()->set_a(1.0);
-  msg.set_name(this->sceneName);
-  this->scenePub->Publish(msg);
-}
-
-void SceneWidget::OnFogColor()
-{
-  if (!this->initialized)
-    return;
-
-  QColor color;
-  color = QColorDialog::getColor(Qt::yellow, this);
-
-  std::ostringstream styleStr;
-  styleStr << "background-color:rgb(" << color.red() << ", "
-           << color.green() << ", " << color.blue() << ");";
-  this->fogColorButton->setAutoFillBackground(true);
-  this->fogColorButton->setStyleSheet(styleStr.str().c_str());
-
-  msgs::Scene msg;
-  msg.mutable_fog()->mutable_color()->set_r(color.red() / 255.0);
-  msg.mutable_fog()->mutable_color()->set_g(color.green() / 255.0);
-  msg.mutable_fog()->mutable_color()->set_b(color.blue() / 255.0);
-  msg.mutable_fog()->mutable_color()->set_a(1.0);
-  msg.set_name(this->sceneName);
-  this->scenePub->Publish(msg);
-}
-
-void SceneWidget::OnShadows(bool _state)
-{
-  if (!this->initialized)
-    return;
-
-  msgs::Scene msg;
-  msg.set_shadows(_state);
-  msg.set_name(this->sceneName);
-  this->scenePub->Publish(msg);
-}
-
-void SceneWidget::OnResponse(ConstResponsePtr &_msg)
-{
-  if (this->initialized || !this->requestMsg ||
-      this->requestMsg->id() != _msg->id())
-  {
-    return;
-  }
+  msgs::Response response = transport::request("default",
+      *msgs::CreateRequest("scene_info"));
+//}
+/////////////////////////////////////////////////
+//void SceneWidget::OnResponse(ConstResponsePtr &_msg)
+//{
+  //if (this->initialized || !this->requestMsg ||
+  //    this->requestMsg->id() != _msg->id())
+  //{
+  //  return;
+  //}
 
   msgs::Scene sceneMsg;
-  if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
-  {
-    sceneMsg.ParseFromString(_msg->serialized_data());
+  //if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
+  //{
+    sceneMsg.ParseFromString(response.serialized_data());
     this->sceneName = sceneMsg.name();
 
     if (sceneMsg.has_ambient())
@@ -880,6 +748,175 @@ void SceneWidget::OnResponse(ConstResponsePtr &_msg)
     {
       this->fogBox->setChecked(false);
     }
-  }
+  //}
   this->initialized = true;
 }
+
+/////////////////////////////////////////////////
+void SceneWidget::OnFogToggle(bool _value)
+{
+  if (!this->initialized)
+    return;
+
+  msgs::Scene msg;
+  if (_value)
+  {
+    int index = this->fogTypeBox->currentIndex();
+    this->OnFogType(index);
+  }
+  else
+    msg.mutable_fog()->set_type(msgs::Fog::NONE);
+
+  msg.set_name(this->sceneName);
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnFogType(int _index)
+{
+  if (!this->initialized)
+    return;
+  msgs::Scene msg;
+
+  if (_index == 0)
+    msg.mutable_fog()->set_type(msgs::Fog::LINEAR);
+  else if (_index == 1)
+    msg.mutable_fog()->set_type(msgs::Fog::EXPONENTIAL);
+  else
+    msg.mutable_fog()->set_type(msgs::Fog::EXPONENTIAL2);
+
+  msg.set_name(this->sceneName);
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnFogDensity(double _density)
+{
+  if (!this->initialized)
+    return;
+  msgs::Scene msg;
+  msg.mutable_fog()->set_density(_density);
+
+  msg.set_name(this->sceneName);
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnFogStart()
+{
+  if (!this->initialized)
+    return;
+  msgs::Scene msg;
+  std::string value = this->fogStart->text().toStdString();
+  if (!value.empty())
+  {
+    msg.mutable_fog()->set_start(boost::lexical_cast<double>(value));
+
+    msg.set_name(this->sceneName);
+    this->scenePub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnFogEnd()
+{
+  if (!this->initialized)
+    return;
+  msgs::Scene msg;
+  std::string value = this->fogEnd->text().toStdString();
+  if (!value.empty())
+  {
+    msg.mutable_fog()->set_end(boost::lexical_cast<double>(value));
+
+    msg.set_name(this->sceneName);
+    this->scenePub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnAmbientColor()
+{
+  if (!this->initialized)
+    return;
+
+  QColor color;
+  color = QColorDialog::getColor(Qt::yellow, this);
+
+  std::ostringstream styleStr;
+  styleStr << "background-color:rgb(" << color.red()
+           << ", " << color.green() << ", " << color.blue() << ");";
+  this->ambientColorButton->setAutoFillBackground(true);
+  this->ambientColorButton->setStyleSheet(styleStr.str().c_str());
+
+  msgs::Scene msg;
+  msg.mutable_ambient()->set_r(color.red() /255.0);
+  msg.mutable_ambient()->set_g(color.green() /255.0);
+  msg.mutable_ambient()->set_b(color.blue() /255.0);
+  msg.mutable_ambient()->set_a(1.0);
+
+  msg.set_name(this->sceneName);
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnBackgroundColor()
+{
+  if (!this->initialized)
+    return;
+
+  QColor color;
+  color = QColorDialog::getColor(Qt::yellow, this);
+
+  std::ostringstream styleStr;
+  styleStr << "background-color:rgb(" << color.red()
+           << ", " << color.green() << ", " << color.blue() << ");";
+  this->backgroundColorButton->setAutoFillBackground(true);
+  this->backgroundColorButton->setStyleSheet(styleStr.str().c_str());
+
+
+  msgs::Scene msg;
+  msg.mutable_background()->set_r(color.red() / 255.0);
+  msg.mutable_background()->set_g(color.green() / 255.0);
+  msg.mutable_background()->set_b(color.blue() / 255.0);
+  msg.mutable_background()->set_a(1.0);
+  msg.set_name(this->sceneName);
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnFogColor()
+{
+  if (!this->initialized)
+    return;
+
+  QColor color;
+  color = QColorDialog::getColor(Qt::yellow, this);
+
+  std::ostringstream styleStr;
+  styleStr << "background-color:rgb(" << color.red() << ", "
+           << color.green() << ", " << color.blue() << ");";
+  this->fogColorButton->setAutoFillBackground(true);
+  this->fogColorButton->setStyleSheet(styleStr.str().c_str());
+
+  msgs::Scene msg;
+  msg.mutable_fog()->mutable_color()->set_r(color.red() / 255.0);
+  msg.mutable_fog()->mutable_color()->set_g(color.green() / 255.0);
+  msg.mutable_fog()->mutable_color()->set_b(color.blue() / 255.0);
+  msg.mutable_fog()->mutable_color()->set_a(1.0);
+  msg.set_name(this->sceneName);
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void SceneWidget::OnShadows(bool _state)
+{
+  if (!this->initialized)
+    return;
+
+  msgs::Scene msg;
+  msg.set_shadows(_state);
+  msg.set_name(this->sceneName);
+  this->scenePub->Publish(msg);
+}
+
+

@@ -102,42 +102,51 @@ namespace gazebo
                               unsigned int &_count) const;
 
       /// \brief Get the width
+      /// \return The image width
       public: unsigned int GetWidth() const;
 
       /// \brief Get the height
+      /// \return The image height
       public: unsigned int GetHeight() const;
 
       /// \brief Get the size of one pixel in bits
+      /// \return The BPP of the image
       public: unsigned int GetBPP() const;
 
       // \brief Get the size of a row of pixel
+      /// \return The pitch of the image
       public: int GetPitch() const;
 
       /// \brief Get the full filename of the image
+      /// \return The filename used to load the image
       public: std::string GetFilename() const;
 
       /// \brief Get the pixel format
+      /// \return PixelFormat
       public: PixelFormat GetPixelFormat() const;
 
-
       /// \brief Get a pixel color value
+      /// \param _x Column location in the image
+      /// \param _y Row location in the image
       public: Color GetPixel(unsigned int _x, unsigned int _y);
 
       /// \brief Get the average color
+      /// \return The average color
       public: Color GetAvgColor();
 
       /// \brief Get the max color
+      /// \return The max color
       public: Color GetMaxColor();
 
       /// \brief Rescale the image
+      /// \param _width New image width
+      /// \param _height New image height
       public: void Rescale(int _width, int _height);
-
-      /// \brief Render this image using opengl
-      // public: void RenderOpengl(float destW, float destH);
 
       /// \brief Returns whether this is a valid image
       public: bool Valid() const;
 
+      /// \brief Implementation of GetData
       private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
                         FIBITMAP *_img) const;
 

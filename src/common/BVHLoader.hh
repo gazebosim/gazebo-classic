@@ -36,13 +36,22 @@ namespace gazebo
   {
     class Skeleton;
 
+    /// \addtogroup gazebo_common
+    /// \{
+    /// \brief Handles loading BVH animation files
     class BVHLoader
     {
+      /// \brief Constructor
       public: BVHLoader();
 
+      /// \brief Desutrctor
       public: ~BVHLoader();
 
-      public: Skeleton* Load(const std::string &filename, double scale);
+      /// \brief Load a BVH file
+      /// \param _filename BVH file to load
+      /// \param _scale Scaling factor to apply to the skeleton
+      /// \return A pointer to a new Skeleton
+      public: Skeleton* Load(const std::string &_filename, double _scale);
     };
   }
 }

@@ -56,5 +56,3 @@ std::string Exception::GetErrorStr() const
 {
   return this->str;
 }
-
-
