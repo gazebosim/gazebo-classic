@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "common/Console.hh"
 #include "common/Exception.hh"

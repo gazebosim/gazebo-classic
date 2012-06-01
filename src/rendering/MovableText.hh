@@ -25,7 +25,7 @@
 #include <string>
 
 // TODO: remove this line
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "common/CommonTypes.hh"
 #include "common/Color.hh"

@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"

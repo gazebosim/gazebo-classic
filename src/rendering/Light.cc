@@ -22,7 +22,7 @@
 
 #include <boost/bind.hpp>
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
 #include "sdf/sdf.hh"
 #include "msgs/msgs.hh"
@@ -47,7 +47,7 @@ Light::Light(Scene *scene_)
   this->scene = scene_;
 
   std::ostringstream stream;
-  stream << "LIGHT" << this->lightCounter << "_VISUAL";
+  stream << "__LIGHT__" << this->lightCounter << "__VISUAL";
   this->visual = new Visual(stream.str(), this->scene->GetWorldVisual());
 
   this->lightCounter++;

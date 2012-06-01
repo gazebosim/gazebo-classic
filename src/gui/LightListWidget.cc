@@ -41,18 +41,15 @@
 #include "math/Helpers.hh"
 
 #include "gui/GuiEvents.hh"
-#include "gui/ModelRightMenu.hh"
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
-#include "gui/ModelListWidget.hh"
+#include "gui/LightListWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-extern ModelRightMenu *g_modelRightMenu;
-
 /////////////////////////////////////////////////
-ModelListWidget::ModelListWidget(QWidget *_parent)
+LightListWidget::LightListWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->requestMsg = NULL;
@@ -62,17 +59,17 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   setMinimumWidth(280);
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  this->modelTreeWidget = new QTreeWidget();
-  this->modelTreeWidget->setColumnCount(1);
-  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->modelTreeWidget->header()->hide();
-  connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-          this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
-  connect(this->modelTreeWidget,
-      SIGNAL(customContextMenuRequested(const QPoint &)),
-      this, SLOT(OnCustomContextMenu(const QPoint &)));
+  this->lightListWidget = new QListWidget();
+  // this->lightListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  // this->lightListWidget->header()->hide();
+  // connect(this->lightListWidget, SIGNAL(itemClicked(QListWidgetItem *)),
+  //         this, SLOT(OnLightSelection(QListWidgetItem *)));
+  /* connect(this->lightListWidget,
+       SIGNAL(customContextMenuRequested(const QPoint &)),
+       this, SLOT(OnCustomContextMenu(const QPoint &)));
+       */
 
-  this->variantManager = new QtVariantPropertyManager();
+/*  this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
@@ -83,10 +80,11 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   connect(this->propTreeBrowser,
           SIGNAL(currentItemChanged(QtBrowserItem*)),
           this, SLOT(OnCurrentPropertyChanged(QtBrowserItem *)));
+          */
 
 
-  mainLayout->addWidget(this->modelTreeWidget, 0);
-  mainLayout->addWidget(this->propTreeBrowser, 1);
+  mainLayout->addWidget(this->lightListWidget, 0);
+  // mainLayout->addWidget(this->propTreeBrowser, 1);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(2, 2, 2, 2);
 
@@ -95,35 +93,34 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->fillingPropertyTree = false;
   this->selectedProperty = NULL;
 
-  this->connections.push_back(
-      gui::Events::ConnectModelUpdate(
-        boost::bind(&ModelListWidget::OnModelUpdate, this, _1)));
-
-  this->connections.push_back(
+  /*this->connections.push_back(
       rendering::Events::ConnectCreateScene(
-        boost::bind(&ModelListWidget::OnCreateScene, this, _1)));
+        boost::bind(&LightListWidget::OnCreateScene, this, _1)));
 
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
-        boost::bind(&ModelListWidget::OnRemoveScene, this, _1)));
+        boost::bind(&LightListWidget::OnRemoveScene, this, _1)));
 
   this->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
-        boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1)));
+        boost::bind(&LightListWidget::OnSetSelectedEntity, this, _1)));
+        */
 
   QTimer::singleShot(500, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
-ModelListWidget::~ModelListWidget()
+LightListWidget::~LightListWidget()
 {
   delete this->propMutex;
   delete this->receiveMutex;
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
+void LightListWidget::OnLightSelection(QListWidgetItem * /*_item*/,
+  int /*_column*/)
 {
+  /*
   if (_item)
   {
     std::string name = _item->data(1, Qt::UserRole).toString().toStdString();
@@ -131,11 +128,13 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   }
   else
     this->selectedModelName.clear();
+    */
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
+void LightListWidget::OnSetSelectedEntity(const std::string &/*_name*/)
 {
+  /*
   this->selectedModelName = _name;
 
   this->propTreeBrowser->clear();
@@ -145,11 +144,13 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
         this->selectedModelName);
     this->requestPub->Publish(*this->requestMsg);
   }
+  */
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::Update()
+void LightListWidget::Update()
 {
+  /*
   if (this->fillPropertyTree)
   {
     this->receiveMutex->lock();
@@ -160,85 +161,134 @@ void ModelListWidget::Update()
     this->fillPropertyTree = false;
     this->receiveMutex->unlock();
   }
+  */
 
-  this->ProcessModelMsgs();
-  this->ProcessPoseMsgs();
+  this->ProcessLightMsgs();
+  // this->ProcessPoseMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
+void LightListWidget::OnLightMsg(ConstLightPtr &_msg)
 {
-  this->receiveMutex->lock();
-  msgs::Model msg;
-  msg.CopyFrom(_msg);
-  this->modelMsgs.push_back(msg);
-  this->receiveMutex->unlock();
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->lightMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::ProcessModelMsgs()
+void LightListWidget::ProcessLightMsgs()
 {
   this->receiveMutex->lock();
 
-  for (ModelMsgs_L::iterator iter = this->modelMsgs.begin();
-       iter != this->modelMsgs.end(); ++iter)
+  for (LightMsgs_L::iterator iter = this->lightMsgs.begin();
+       iter != this->lightMsgs.end(); ++iter)
   {
-    std::string name = (*iter).name();
+    std::string name = (*iter)->name();
 
-    QTreeWidgetItem *listItem = this->GetModelListItem((*iter).id());
+    QListWidgetItem *listItem = this->GetLightListItem((*iter)->name());
 
     if (!listItem)
     {
-      if (!(*iter).has_deleted() || !(*iter).deleted())
-      {
-        // Create a top-level tree item for the path
-        QTreeWidgetItem *topItem = new QTreeWidgetItem(
-            static_cast<QTreeWidgetItem*>(0),
-            QStringList(QString("%1").arg(QString::fromStdString(name))));
+      // Create a top-level tree item for the path
+      QListWidgetItem *item = new QListWidgetItem(
+          QString::fromStdString(name));
 
-        topItem->setData(0, Qt::UserRole, QVariant((*iter).id()));
-        topItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
-        this->modelTreeWidget->addTopLevelItem(topItem);
-
-        for (int i = 0; i < (*iter).link_size(); i++)
-        {
-          std::string linkName = (*iter).link(i).name();
-          int index = linkName.rfind("::") + 2;
-          std::string linkNameShort = linkName.substr(
-              index, linkName.size() - index);
-
-          QTreeWidgetItem *linkItem = new QTreeWidgetItem(topItem,
-              QStringList(QString("%1").arg(
-                  QString::fromStdString(linkNameShort))));
-
-          linkItem->setData(0, Qt::UserRole, QVariant((*iter).link(i).id()));
-          linkItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
-          this->modelTreeWidget->addTopLevelItem(linkItem);
-        }
-      }
+      item->setData(Qt::UserRole, QVariant((*iter)->name().c_str()));
+      this->lightListWidget->addItem(item);
     }
     else
     {
-      if ((*iter).has_deleted() && (*iter).deleted())
-      {
-        int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
-        this->modelTreeWidget->takeTopLevelItem(i);
-      }
-      else
-      {
-        listItem->setText(0, (*iter).name().c_str());
-        listItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
-      }
+      listItem->setData(Qt::UserRole, QVariant((*iter)->name().c_str()));
     }
   }
-  this->modelMsgs.clear();
+  this->lightMsgs.clear();
 
   this->receiveMutex->unlock();
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
+void LightListWidget::OnRemoveScene(const std::string &/*_name*/)
+{
+  this->poseMsgs.clear();
+  this->lightListWidget->clear();
+  this->propTreeBrowser->clear();
+  this->node->Fini();
+  this->node.reset();
+
+  this->requestPub.reset();
+  this->modelPub.reset();
+  this->responseSub.reset();
+  this->requestSub.reset();
+  this->poseSub.reset();
+}
+
+/////////////////////////////////////////////////
+void LightListWidget::OnCreateScene(const std::string &_name)
+{
+  this->lightListWidget->clear();
+  this->propTreeBrowser->clear();
+
+  this->InitTransport(_name);
+}
+
+/////////////////////////////////////////////////
+void LightListWidget::InitTransport(const std::string &_name)
+{
+  if (this->node)
+  {
+    this->node->Fini();
+    this->node.reset();
+    this->requestPub.reset();
+    // this->modelPub.reset();
+    this->responseSub.reset();
+    this->requestSub.reset();
+    // this->poseSub.reset();
+  }
+
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_name);
+
+  this->lightSub = this->node->Subscribe("~/light",
+      &LightListWidget::OnLightMsg, this);
+
+  // this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
+  // this->requestPub =
+  //     this->node->Advertise<msgs::Request>("~/request", 5, true);
+  // this->responseSub = this->node->Subscribe("~/response",
+  //     &LightListWidget::OnResponse, this);
+
+  // this->requestSub = this->node->Subscribe("~/request",
+  //     &LightListWidget::OnRequest, this);
+
+  // this->poseSub = this->node->Subscribe("~/pose/info",
+  //     &LightListWidget::OnPose, this);
+}
+
+/////////////////////////////////////////////////
+QListWidgetItem *LightListWidget::GetLightListItem(const std::string &_name)
+{
+  QListWidgetItem *listItem = NULL;
+
+  // Find an existing element with the name from the message
+  for (int i = 0; i < this->lightListWidget->count() && !listItem; ++i)
+  {
+    QListWidgetItem *item = this->lightListWidget->item(i);
+    std::string listData = item->data(Qt::UserRole).toString().toStdString();
+    if (listData == _name)
+    {
+      listItem = item;
+      break;
+    }
+  }
+
+  return listItem;
+}
+
+
+/*
+/////////////////////////////////////////////////
+void LightListWidget::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -262,18 +312,20 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   delete this->requestMsg;
   this->requestMsg = NULL;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::RemoveEntity(const std::string &_name)
+void LightListWidget::RemoveEntity(const std::string &_name)
 {
   if (gui::has_entity_name(_name))
   {
-    QTreeWidgetItem *listItem =
+    QListWidgetItem *listItem =
       this->GetModelListItem(gui::get_entity_id(_name));
     if (listItem)
     {
-      int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
-      this->modelTreeWidget->takeTopLevelItem(i);
+      int i = this->lightListWidget->indexOfTopLevelItem(listItem);
+      this->lightListWidget->takeTopLevelItem(i);
 
       this->propTreeBrowser->clear();
       this->selectedModelName.clear();
@@ -282,62 +334,36 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
     }
   }
 }
+  */
 
+/*
 /////////////////////////////////////////////////
-QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
+void LightListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
-  QTreeWidgetItem *listItem = NULL;
-
-  // Find an existing element with the name from the message
-  for (int i = 0; i < this->modelTreeWidget->topLevelItemCount()
-      && !listItem; ++i)
-  {
-    QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
-    unsigned int listData = item->data(0, Qt::UserRole).toUInt();
-    if (listData == _id)
-    {
-      listItem = item;
-      break;
-    }
-
-    for (int j = 0; j < item->childCount(); j++)
-    {
-      QTreeWidgetItem *childItem = item->child(j);
-      listData = childItem->data(0, Qt::UserRole).toUInt();
-      if (listData == _id)
-      {
-        listItem = childItem;
-        break;
-      }
-    }
-  }
-
-  return listItem;
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
-{
-  QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
+  QListWidgetItem *item = this->lightListWidget->itemAt(_pt);
 
   if (item)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->lightListWidget->mapToGlobal(_pt));
   }
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem *_item)
+void LightListWidget::OnCurrentPropertyChanged(QtBrowserItem *_item)
 {
   if (_item)
     this->selectedProperty = _item->property();
   else
     this->selectedProperty = NULL;
 }
+    */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::OnPropertyChanged(QtProperty *_item)
+void LightListWidget::OnPropertyChanged(QtProperty *_item)
 {
   if (!this->propMutex->try_lock())
     return;
@@ -398,9 +424,11 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 
   this->propMutex->unlock();
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillMsgField(QtProperty *_item,
+void LightListWidget::FillMsgField(QtProperty *_item,
     google::protobuf::Message *_message,
     const google::protobuf::Reflection *_reflection,
     const google::protobuf::FieldDescriptor *_field)
@@ -426,13 +454,16 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
   else
     gzerr << "Unable to fill message field[" << _field->type() << "]\n";
 }
+    */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillGeometryMsg(QtProperty *_item,
+void LightListWidget::FillGeometryMsg(QtProperty *_item,
     google::protobuf::Message *_message,
     const google::protobuf::Descriptor *_descriptor,
-    QtProperty * /*_changedItem*/)
+    QtProperty *_changedItem)
 {
+
   QtProperty *typeProperty = this->GetChildItem(_item, "type");
 
   std::string type = typeProperty->valueText().toStdString();
@@ -575,9 +606,11 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   else
     gzerr << "Unknown geom type[" << type << "]\n";
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillPoseMsg(QtProperty *_item,
+void LightListWidget::FillPoseMsg(QtProperty *_item,
     google::protobuf::Message *_message,
     const google::protobuf::Descriptor *_descriptor)
 {
@@ -635,9 +668,11 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
       orientDescriptor->FindFieldByName("w"),
       q.w);
 }
+      */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillMsg(QtProperty *_item,
+void LightListWidget::FillMsg(QtProperty *_item,
     google::protobuf::Message *_message,
     const google::protobuf::Descriptor *_descriptor,
     QtProperty *_changedItem)
@@ -714,9 +749,11 @@ void ModelListWidget::FillMsg(QtProperty *_item,
     }
   }
 }
+*/
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
+QtProperty *LightListWidget::PopChildItem(QList<QtProperty*> &_list,
     const std::string &_name)
 {
   for (QList<QtProperty*>::iterator iter = _list.begin();
@@ -731,9 +768,11 @@ QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
 
   return NULL;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItemValue(const std::string &_name)
+QtProperty *LightListWidget::GetParentItemValue(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -749,11 +788,14 @@ QtProperty *ModelListWidget::GetParentItemValue(const std::string &_name)
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItemValue(QtProperty *_item,
+QtProperty *LightListWidget::GetParentItemValue(QtProperty *_item,
                                            const std::string &_name)
 {
+  return NULL;
   if (!_item)
     return NULL;
 
@@ -774,9 +816,11 @@ QtProperty *ModelListWidget::GetParentItemValue(QtProperty *_item,
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
+QtProperty *LightListWidget::GetParentItem(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -792,11 +836,14 @@ QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItem(QtProperty *_item,
+QtProperty *LightListWidget::GetParentItem(QtProperty *_item,
                                            const std::string &_name)
 {
+  return NULL;
   if (!_item)
     return NULL;
 
@@ -817,10 +864,13 @@ QtProperty *ModelListWidget::GetParentItem(QtProperty *_item,
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-bool ModelListWidget::HasChildItem(QtProperty *_parent, QtProperty *_child)
+bool LightListWidget::HasChildItem(QtProperty *_parent, QtProperty *_child)
 {
+  return false;
   if (!_parent)
     return false;
   if (_parent == _child)
@@ -837,9 +887,11 @@ bool ModelListWidget::HasChildItem(QtProperty *_parent, QtProperty *_child)
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItemValue(const std::string &_name)
+QtProperty *LightListWidget::GetChildItemValue(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -852,12 +904,14 @@ QtProperty *ModelListWidget::GetChildItemValue(const std::string &_name)
   }
 
   return result;
-}
+}*/
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItemValue(QtProperty *_item,
+/*
+QtProperty *LightListWidget::GetChildItemValue(QtProperty *_item,
                                           const std::string &_name)
 {
+  return NULL;
   if (!_item)
     return NULL;
   if (_item->valueText().toStdString() == _name)
@@ -874,9 +928,11 @@ QtProperty *ModelListWidget::GetChildItemValue(QtProperty *_item,
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItem(const std::string &_name)
+QtProperty *LightListWidget::GetChildItem(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -890,11 +946,14 @@ QtProperty *ModelListWidget::GetChildItem(const std::string &_name)
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
+QtProperty *LightListWidget::GetChildItem(QtProperty *_item,
                                           const std::string &_name)
 {
+  return NULL;
   if (!_item)
     return NULL;
   if (_item->propertyName().toStdString() == _name)
@@ -911,9 +970,11 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
 
   return result;
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
+void LightListWidget::FillPropertyTree(const msgs::Link &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -970,23 +1031,23 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::LinearDamping
-/*  item = this->variantManager->addProperty(QVariant::Double,
-                                           tr("linear_damping"));
-  if (_msg.has_linear_damping())
-    item->setValue(_msg.linear_damping());
-  else
-    item->setValue(0.0);
-  inertialItem->addSubProperty(item);
+//  item = this->variantManager->addProperty(QVariant::Double,
+//                                           tr("linear_damping"));
+//  if (_msg.has_linear_damping())
+//    item->setValue(_msg.linear_damping());
+//  else
+//    item->setValue(0.0);
+//  inertialItem->addSubProperty(item);
+//
+//  // Inertial::AngularDamping
+//  item = this->variantManager->addProperty(QVariant::Double,
+//                                           tr("angular_damping"));
+//  if (_msg.has_angular_damping())
+//    item->setValue(_msg.angular_damping());
+//  else
+//    item->setValue(0.0);
+//  inertialItem->addSubProperty(item);
 
-  // Inertial::AngularDamping
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           tr("angular_damping"));
-  if (_msg.has_angular_damping())
-    item->setValue(_msg.angular_damping());
-  else
-    item->setValue(0.0);
-  inertialItem->addSubProperty(item);
-*/
   // Inertial::ixx
   item = this->variantManager->addProperty(QVariant::Double, tr("ixx"));
   if (_msg.inertial().has_ixx())
@@ -1072,9 +1133,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     // this->FillPropertyTree(_msg.sensor(i), prop);
   }
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
+void LightListWidget::FillPropertyTree(const msgs::Collision &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -1118,9 +1181,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
   _parent->addSubProperty(topItem);
   this->FillPropertyTree(_msg.surface(), topItem);
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
+void LightListWidget::FillPropertyTree(const msgs::Surface &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -1214,9 +1279,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
     topItem->addSubProperty(fdirItem);
     this->FillVector3dProperty(_msg.friction().fdir1(), fdirItem);
 }
+    */
+  /*
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
+void LightListWidget::FillPropertyTree(const msgs::Geometry &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -1338,9 +1405,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     this->FillVector3dProperty(_msg.heightmap().origin(), sizeItem);
   }
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
+void LightListWidget::FillPropertyTree(const msgs::Visual &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -1397,10 +1466,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
   _parent->addSubProperty(topItem);
   this->FillPropertyTree(_msg.geometry(), topItem);
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
-                                       QtProperty * /*_parent*/)
+void LightListWidget::FillPropertyTree(const msgs::Model &_msg,
+                                       QtProperty *_parent)
 {
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
@@ -1437,9 +1508,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
     this->FillPropertyTree(_msg.link(i), prop);
   }
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
+void LightListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
                                            QtProperty *_parent)
 {
   if (!_parent)
@@ -1487,9 +1560,11 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
     item))->setAttribute(item, "decimals", 6);
   item->setValue(value.z);
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
+void LightListWidget::FillPoseProperty(const msgs::Pose &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
@@ -1543,9 +1618,11 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
     item))->setAttribute(item, "decimals", 6);
   item->setValue(GZ_RTOD(rpy.z));
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::ProcessPoseMsgs()
+void LightListWidget::ProcessPoseMsgs()
 {
   this->receiveMutex->lock();
   this->propMutex->lock();
@@ -1571,11 +1648,13 @@ void ModelListWidget::ProcessPoseMsgs()
   this->propMutex->unlock();
   this->receiveMutex->unlock();
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::OnPose(ConstPosePtr &/*_msg*/)
+void LightListWidget::OnPose(ConstPosePtr &_msg)
 {
-  /*this->receiveMutex->lock();
+  this->receiveMutex->lock();
   if (!this->selectedModelName.empty() &&
       _msg->name().find(this->selectedModelName) != std::string::npos)
   {
@@ -1593,69 +1672,17 @@ void ModelListWidget::OnPose(ConstPosePtr &/*_msg*/)
     this->poseMsgs.push_back(_msg);
   }
   this->receiveMutex->unlock();
-  */
 }
+  */
 
+  /*
 /////////////////////////////////////////////////
-void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
+void LightListWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
     this->RemoveEntity(_msg->data());
   }
 }
+  */
 
-/////////////////////////////////////////////////
-void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
-{
-  this->poseMsgs.clear();
-  this->modelTreeWidget->clear();
-  this->propTreeBrowser->clear();
-  this->node->Fini();
-  this->node.reset();
-
-  this->requestPub.reset();
-  this->modelPub.reset();
-  this->responseSub.reset();
-  this->requestSub.reset();
-  this->poseSub.reset();
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnCreateScene(const std::string &_name)
-{
-  this->poseMsgs.clear();
-  this->modelTreeWidget->clear();
-  this->propTreeBrowser->clear();
-
-  this->InitTransport(_name);
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::InitTransport(const std::string &_name)
-{
-  if (this->node)
-  {
-    this->node->Fini();
-    this->node.reset();
-    this->requestPub.reset();
-    this->modelPub.reset();
-    this->responseSub.reset();
-    this->requestSub.reset();
-    this->poseSub.reset();
-  }
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_name);
-
-  this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
-  this->responseSub = this->node->Subscribe("~/response",
-      &ModelListWidget::OnResponse, this);
-
-  this->poseSub = this->node->Subscribe("~/pose/info",
-      &ModelListWidget::OnPose, this);
-
-  this->requestSub = this->node->Subscribe("~/request",
-      &ModelListWidget::OnRequest, this);
-}

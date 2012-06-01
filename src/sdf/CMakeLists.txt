@@ -28,6 +28,6 @@ set (sdfs
   visual.sdf 
   world.sdf)
 
-INSTALL_INCLUDES("sdf" ${headers})
+gz_install_includes("sdf" ${headers})
 
 INSTALL(FILES ${sdfs} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/sdf/)

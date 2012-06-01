@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "common/MeshManager.hh"
 #include "transport/Node.hh"
 #include "transport/Subscriber.hh"

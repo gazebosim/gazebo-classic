@@ -68,7 +68,6 @@ set (headers
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
-  RenderTypes.hh
   Rendering.hh
   RenderTypes.hh
   RFIDVisual.hh
@@ -80,13 +79,13 @@ set (headers
   ViewController.hh
   Visual.hh
   WindowManager.hh
-  ogre.h
+  ogre_gazebo.h
   cegui.h)
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(rendering_headers
-    "Rendering Headers" "#include \"rendering/${hdr}\"\n")
+                          "Rendering Headers" "#include \"rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
@@ -101,5 +100,5 @@ target_link_libraries( gazebo_rendering gazebo_common
                                         X11 )
                                       
 
-INSTALL_LIBRARY(gazebo_rendering)
-INSTALL_INCLUDES("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)
+gz_install_library(gazebo_rendering)
+gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)

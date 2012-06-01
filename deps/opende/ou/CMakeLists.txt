@@ -16,4 +16,4 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CO
 
 gz_add_library(gazebo_opende_ou ${sources})
 #target_link_libraries(gazebo_fcl gazebo_ccd gazebo_ann)
-INSTALL_LIBRARY(gazebo_opende_ou)
+gz_install_library(gazebo_opende_ou)

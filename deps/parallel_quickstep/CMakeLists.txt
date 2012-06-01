@@ -19,12 +19,12 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps/opende/include
   ${CMAKE_SOURCE_DIR}/deps/opende/src
   ${CMAKE_SOURCE_DIR}/deps/parallel_quickstep/include/parallel_quickstep
-  ${BOOST_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/deps/threadpool
 )
 
 link_directories(  
-  ${BOOST_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIRS} 
 )
 
 set (NDEBUG bool true)
@@ -150,11 +150,11 @@ if(DEFINED USE_CUDA)
   add_executable(parallel_quickstep_lib_test src/main_for_lib.cpp )
   target_link_libraries(parallel_quickstep gazebo_ode)
   target_link_libraries(parallel_quickstep ${CUDA_LIBRARIES})
-  target_link_libraries(parallel_quickstep ${boost_libraries})
+  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
   target_link_libraries(parallel_quickstep_lib_test parallel_quickstep)
   cuda_build_clean_target()
   add_dependencies(parallel_quickstep gazebo_ode)
-  INSTALL_LIBRARY(parallel_quickstep)
+  gz_install_library(parallel_quickstep)
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")
 
 elseif( DEFINED USE_OPENMP )
@@ -174,7 +174,7 @@ elseif( DEFINED USE_OPENMP )
     ${OPENMP_SOLVER_SOURCE_FILES}
     )
   target_link_libraries(parallel_quickstep gazebo_ode)
-  target_link_libraries(parallel_quickstep ${boost_libraries})
+  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")
 
 elseif( DEFINED USE_OPENCL )
@@ -201,7 +201,7 @@ elseif( DEFINED USE_OPENCL )
 
   target_link_libraries(parallel_quickstep gazebo_ode)
   target_link_libraries(parallel_quickstep ${OPENCL_LIBRARIES})
-  target_link_libraries(parallel_quickstep ${boost_libraries})
+  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
   add_executable(parallel_quickstep_lib_test src/main_for_lib.cpp src/test_lib.cpp)
   target_link_libraries(parallel_quickstep_lib_test parallel_quickstep)
 
@@ -218,7 +218,7 @@ elseif( DEFINED USE_CPU )
     )
 
   target_link_libraries(parallel_quickstep gazebo_ode)
-  target_link_libraries(parallel_quickstep ${boost_libraries})
+  target_link_libraries(parallel_quickstep ${Boost_LIBRARIES})
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")
 
 endif()

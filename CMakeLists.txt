@@ -61,7 +61,8 @@ if(UNIX AND NOT WIN32)
      ADD_DEFINITIONS(-fPIC)
    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
  endif(CMAKE_UNAME)
-endif(UNIX AND NOT WIN32)
+endif()
+
 
 
 set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
@@ -158,6 +159,16 @@ add_subdirectory(deps)
 message (STATUS "----------------------------------------\n")
 
 #################################################
+# OS Specific initialization
+if (UNIX)
+  gz_setup_unix()
+else (WIN32)
+  gz_setup_windows()
+else (APPLE)
+  gz_setup_apple()
+endif()
+
+#################################################
 # Print warnings and errors
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")
@@ -179,7 +190,7 @@ else (build_errors)
   ########################################
   # Write the config.h file
   configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
-  INSTALL_INCLUDES("" ${PROJECT_BINARY_DIR}/gazebo_config.h)
+  gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/)
@@ -204,7 +215,7 @@ else (build_errors)
 
   ########################################
   # Make the package config files
-  set (pkgconfig_files gazebo gazebo_ode gazebo_transport)
+  set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
 
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)

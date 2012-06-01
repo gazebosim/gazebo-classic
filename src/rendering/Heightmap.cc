@@ -26,7 +26,7 @@
 #include <Terrain/OgreTerrainGroup.h>
 
 #include "math/Helpers.hh"
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "common/Exception.hh"
 
 #include "rendering/Scene.hh"

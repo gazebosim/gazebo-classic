@@ -98,8 +98,8 @@ target_link_libraries(gazebo_physics
   gazebo_physics_ode
   ${TBB_LIBRARIES} 
   ${libtool_library} 
-  ${boost_libraries}
-  ${tinyxml_libraries})
+  ${Boost_LIBRARIES}
+  ${TINYXML_LIBRARIES})
 
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
@@ -115,6 +115,6 @@ target_link_libraries(gzphysics gazebo_common
                                 pthread
                                 )
 
-INSTALL_EXECUTABLE( gzphysics )
-INSTALL_LIBRARY(gazebo_physics)
-INSTALL_INCLUDES("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh physics.h)
+gz_install_executable( gzphysics )
+gz_install_library(gazebo_physics)
+gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh physics.h)

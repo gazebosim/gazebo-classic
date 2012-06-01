@@ -306,6 +306,7 @@ namespace gazebo
       private: common::Time realTimeOffset;
 
       private: boost::mutex *receiveMutex;
+      private: boost::mutex *loadModelMutex;
 
       /// TODO: Add an accessor for this, and make it private
       /// lock all pose updates when worldPose is being updated for a model

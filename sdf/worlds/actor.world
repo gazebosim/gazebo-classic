@@ -12,21 +12,7 @@
       <direction xyz="0.0 0.2 -8.0"/>
     </light>
 
-    <actor name="actor1" static="true">
-      <origin pose="0 0 0 0 0 0"/>
-      <skin filename="sub_16.dae" scale="1.0"/>
-      <animation name="stand" filename="stand.dae" scale="1.0" interpolate_x="false"/>
-      
-      <script loop="true" delay_start="0.0" auto_start="true">
-        
-        <trajectory id="0" type="stand">
-          <waypoint time="0.0" pose="0 0 0 0 0 0"/> 
-          <waypoint time="10.0" pose="0 0 0 0 0 0"/>
-        </trajectory>
-
-      </script>
-    
-    </actor>
+    <include filename="actor.model" />
 
   </world>
 </gazebo>

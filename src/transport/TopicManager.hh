@@ -106,7 +106,7 @@ namespace gazebo
                   else
                   {
                     t = _topic + "/__dbg";
-                    msgs::String tmp;
+                    msgs::GzString tmp;
                     msgTypename = tmp.GetTypeName();
                   }
 

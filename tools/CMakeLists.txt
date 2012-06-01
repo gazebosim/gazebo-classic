@@ -1,31 +1,30 @@
 include_directories( 
   ${PROJECT_BINARY_DIR}/src 
   ${PROJECT_SOURCE_DIR}/src 
-  ${tinyxml_include_dirs}
+  ${TINYXML_INCLUDE_DIRS}
   ${XML_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-link_directories(${tinyxml_library_dirs})
-add_definitions(${tinyxml_cflags})
+link_directories(${TINYXML_LIBRARY_DIRS})
+add_definitions(${TINYXML_CFLAGS})
 
-add_executable( gzsdf gzsdf.cc )
-target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface)
-INSTALL_EXECUTABLE( gzsdf )
+add_executable(gzsdf gzsdf.cc)
+target_link_libraries(gzsdf ${TINYXML_LIBRARIES} gazebo_sdf_interface)
+gz_install_executable(gzsdf)
 
-add_executable( gztopic gztopic.cc )
+add_executable(gztopic gztopic.cc)
 target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport )
-INSTALL_EXECUTABLE( gztopic )
+gz_install_executable(gztopic)
 
-add_executable( gzstats gzstats.cc )
+add_executable(gzstats gzstats.cc)
 target_link_libraries(gzstats gazebo_msgs gazebo_common gazebo_transport )
-INSTALL_EXECUTABLE( gzstats )
+gz_install_executable(gzstats)
 
-add_executable( sdf2pov sdf2pov.cc )
+add_executable(sdf2pov sdf2pov.cc)
 target_link_libraries(sdf2pov gazebo_common gazebo_sdf_interface)
-INSTALL_EXECUTABLE( sdf2pov )
+gz_install_executable(sdf2pov)
 
-add_executable( gzfactory gzfactory.cc )
-target_link_libraries(gzfactory gazebo_common gazebo_transport boost_program_options)
-INSTALL_EXECUTABLE( gzfactory )
-
+add_executable(gzfactory gzfactory.cc)
+target_link_libraries(gzfactory gazebo_common gazebo_transport ${Boost_LIBRARIES})
+gz_install_executable(gzfactory)
