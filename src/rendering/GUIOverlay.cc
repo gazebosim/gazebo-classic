@@ -247,7 +247,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
 #else
 bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &/*_evt*/)
 {
-  return true;
+  return false;
 }
 #endif
 
