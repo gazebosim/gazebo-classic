@@ -31,9 +31,10 @@ set (headers Sensors.hh
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(sensors_headers "sensors headers" "#include \"sensors/${hdr}\"\n")
+  APPEND_TO_CACHED_STRING(sensors_headers "sensors headers"
+    "#include \"sensors/${hdr}\"\n")
 endforeach()
-configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh )
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 
 
 add_library(gazebo_sensors SHARED ${sources})
@@ -54,6 +55,6 @@ target_link_libraries( gzsensor gazebo_common
                                 gazebo_msgs
                                 pthread)
 
-INSTALL_EXECUTABLE( gzsensor )
-INSTALL_LIBRARY(gazebo_sensors)
-INSTALL_INCLUDES("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh sensors.h)
+gz_install_executable( gzsensor )
+gz_install_library(gazebo_sensors)
+gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh sensors.h)

@@ -30,9 +30,11 @@
 #include <map>
 #include <list>
 
-#include "sdf/sdf.hh"
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 
+#include "msgs/msgs.hh"
+#include "sdf/sdf.hh"
+#include "transport/transport.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -54,7 +56,8 @@ namespace gazebo
       /// \brief Load from a message
       public: void Load(const msgs::Projector &_msg);
 
-      public: void Load(const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
+      public: void Load(const std::string &_name,
+                     const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
                      const std::string &_textureName = "",
                      double _nearClip = 0.25,
                      double _farClip = 15.0,
@@ -66,7 +69,11 @@ namespace gazebo
       /// \brief Toggle the activation of the projector
       public: void Toggle();
 
+      private: void OnMsg(ConstProjectorPtr &_msg);
+
       private: VisualPtr visual;
+      private: transport::NodePtr node;
+      private: transport::SubscriberPtr controlSub;
 
       private: class ProjectorFrameListener : public Ogre::FrameListener
       {

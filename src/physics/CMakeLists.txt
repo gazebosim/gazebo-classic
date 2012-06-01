@@ -84,9 +84,11 @@ set (headers
 
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(physics_headers "Physics Headers" "#include \"physics/${hdr}\"\n")
+  APPEND_TO_CACHED_STRING(physics_headers
+    "Physics Headers" "#include \"physics/${hdr}\"\n")
 endforeach()
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
+                ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 gz_add_library(gazebo_physics ${sources})
 
@@ -113,6 +115,6 @@ target_link_libraries(gzphysics gazebo_common
                                 pthread
                                 )
 
-INSTALL_EXECUTABLE( gzphysics )
-INSTALL_LIBRARY(gazebo_physics)
-INSTALL_INCLUDES("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh physics.h)
+gz_install_executable( gzphysics )
+gz_install_library(gazebo_physics)
+gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh physics.h)

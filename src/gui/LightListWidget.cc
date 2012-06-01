@@ -60,14 +60,14 @@ LightListWidget::LightListWidget(QWidget *_parent)
   setMinimumWidth(280);
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->lightListWidget = new QListWidget();
-  //this->lightListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  //this->lightListWidget->header()->hide();
-  //connect(this->lightListWidget, SIGNAL(itemClicked(QListWidgetItem *)),
-  //        this, SLOT(OnLightSelection(QListWidgetItem *)));
-  /*connect(this->lightListWidget,
-      SIGNAL(customContextMenuRequested(const QPoint &)),
-      this, SLOT(OnCustomContextMenu(const QPoint &)));
-      */
+  // this->lightListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  // this->lightListWidget->header()->hide();
+  // connect(this->lightListWidget, SIGNAL(itemClicked(QListWidgetItem *)),
+  //         this, SLOT(OnLightSelection(QListWidgetItem *)));
+  /* connect(this->lightListWidget,
+       SIGNAL(customContextMenuRequested(const QPoint &)),
+       this, SLOT(OnCustomContextMenu(const QPoint &)));
+       */
 
 /*  this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
@@ -84,7 +84,7 @@ LightListWidget::LightListWidget(QWidget *_parent)
 
 
   mainLayout->addWidget(this->lightListWidget, 0);
-  //mainLayout->addWidget(this->propTreeBrowser, 1);
+  // mainLayout->addWidget(this->propTreeBrowser, 1);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(2, 2, 2, 2);
 
@@ -117,7 +117,8 @@ LightListWidget::~LightListWidget()
 }
 
 /////////////////////////////////////////////////
-void LightListWidget::OnLightSelection(QListWidgetItem * /*_item*/, int /*_column*/)
+void LightListWidget::OnLightSelection(QListWidgetItem * /*_item*/,
+  int /*_column*/)
 {
   /*
   if (_item)
@@ -238,10 +239,10 @@ void LightListWidget::InitTransport(const std::string &_name)
     this->node->Fini();
     this->node.reset();
     this->requestPub.reset();
-    //this->modelPub.reset();
+    // this->modelPub.reset();
     this->responseSub.reset();
     this->requestSub.reset();
-    //this->poseSub.reset();
+    // this->poseSub.reset();
   }
 
 
@@ -251,16 +252,17 @@ void LightListWidget::InitTransport(const std::string &_name)
   this->lightSub = this->node->Subscribe("~/light",
       &LightListWidget::OnLightMsg, this);
 
-  //this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
-  //this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
-  //this->responseSub = this->node->Subscribe("~/response",
-  //    &LightListWidget::OnResponse, this);
+  // this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
+  // this->requestPub =
+  //     this->node->Advertise<msgs::Request>("~/request", 5, true);
+  // this->responseSub = this->node->Subscribe("~/response",
+  //     &LightListWidget::OnResponse, this);
 
-  //this->requestSub = this->node->Subscribe("~/request",
-  //    &LightListWidget::OnRequest, this);
+  // this->requestSub = this->node->Subscribe("~/request",
+  //     &LightListWidget::OnRequest, this);
 
-  //this->poseSub = this->node->Subscribe("~/pose/info",
-  //    &LightListWidget::OnPose, this);
+  // this->poseSub = this->node->Subscribe("~/pose/info",
+  //     &LightListWidget::OnPose, this);
 }
 
 /////////////////////////////////////////////////

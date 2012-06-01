@@ -198,10 +198,12 @@
     </joint>
 
     <gripper name="simple_gripper">
-      <joint>palm_right_finger</joint>
-      <joint>right_finger_tip</joint>
-      <joint>palm_left_finger</joint>
-      <joint>left_finger_tip</joint>
+      <grasp_check attach_steps="20" detach_steps="40" min_contact_count="2" />
+      <gripper_link>right_finger</gripper_link>
+      <gripper_link>right_finger_tip</gripper_link>
+      <gripper_link>left_finger</gripper_link>
+      <gripper_link>left_finger_tip</gripper_link>
+      <palm_link>palm</palm_link>
     </gripper>
   </model>
 </gazebo>

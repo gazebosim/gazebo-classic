@@ -26,48 +26,48 @@ set (sources
 )
 
 set (headers 
-  Animation.hh
-  BVHLoader.hh
-  ColladaLoader.hh
-  CommonTypes.hh
-  Color.hh
-  Console.hh
-  Diagnostics.hh
-  Event.hh
-  Events.hh
-  Exception.hh
-  Image.hh 
-  KeyFrame.hh
-  Material.hh
-  Mesh.hh
-  MeshLoader.hh
-  MeshManager.hh
-  MouseEvent.hh
-  PID.hh
-  Plugin.hh
-  SkeletonAnimation.hh
-  Skeleton.hh
-  SingletonT.hh
-  STLLoader.hh
-  SystemPaths.hh
-  Time.hh
-  Timer.hh
+Animation.hh
+BVHLoader.hh
+ColladaLoader.hh
+CommonTypes.hh
+Color.hh
+Console.hh
+Diagnostics.hh
+Event.hh
+Events.hh
+Exception.hh
+Image.hh 
+KeyFrame.hh
+Material.hh
+Mesh.hh
+MeshLoader.hh
+MeshManager.hh
+MouseEvent.hh
+PID.hh
+Plugin.hh
+SkeletonAnimation.hh
+Skeleton.hh
+SingletonT.hh
+STLLoader.hh
+SystemPaths.hh
+Time.hh
+Timer.hh
 )
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})
-  APPEND_TO_CACHED_STRING(common_headers "Common Headers" "#include \"common/${hdr}\"\n")
+  APPEND_TO_CACHED_STRING(common_headers
+    "Common Headers" "#include \"common/${hdr}\"\n")
 endforeach()
-configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
 
 gz_add_library(gazebo_common ${sources})
 target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
-                                    ${TINYXML_LIBRARIES}
                                     ${Boost_LIBRARIES}
                                     ${freeimage_library}
                                     ${TINYXML_LIBRARIES})
 
-INSTALL_LIBRARY(gazebo_common)
-INSTALL_INCLUDES("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)
+gz_install_library(gazebo_common)
+gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)

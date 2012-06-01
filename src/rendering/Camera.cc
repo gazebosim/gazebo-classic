@@ -24,7 +24,7 @@
 #include <sstream>
 
 #include "sdf/sdf.hh"
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "rendering/RTShaderSystem.hh"
 
 #include "common/Events.hh"
@@ -445,7 +445,6 @@ void Camera::SetClipDist()
   {
     this->camera->setNearClipDistance(clipElem->GetValueDouble("near"));
     this->camera->setFarClipDistance(clipElem->GetValueDouble("far"));
-    this->camera->setFarClipDistance(0);
     this->camera->setRenderingDistance(clipElem->GetValueDouble("far"));
   }
   else

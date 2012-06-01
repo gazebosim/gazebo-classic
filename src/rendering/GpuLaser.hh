@@ -22,6 +22,7 @@
 #ifndef RENDERING_GPULASER_HH
 #define RENDERING_GPULASER_HH
 #include <string>
+#include <vector>
 
 #include "rendering/Camera.hh"
 #include "OGRE/OgreRenderObjectListener.h"
@@ -115,7 +116,9 @@ namespace gazebo
       private: virtual void RenderImpl();
 
       private: void UpdateRenderTarget(Ogre::RenderTarget *target,
-               Ogre::Material *material, Ogre::Camera *cam);
+                                       Ogre::Material *material,
+                                       Ogre::Camera *cam,
+                                       bool updateTex = false);
 
       private: void CreateOrthoCam();
 
@@ -168,6 +171,9 @@ namespace gazebo
 
       protected: sensors::GpuRaySensor *parent_sensor;
       protected: double lastRenderDuration;
+
+      protected: std::vector<int> texIdx;
+      protected: static int texCount;
     };
 
     /// \}

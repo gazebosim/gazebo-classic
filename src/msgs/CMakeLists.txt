@@ -13,6 +13,8 @@ set (msgs axis.proto
           fog.proto
           friction.proto
           geometry.proto
+          gz_string.proto
+          gz_string_v.proto
           header.proto
           heightmapgeom.proto
           imagegeom.proto
@@ -33,6 +35,8 @@ set (msgs axis.proto
           planegeom.proto
           pid.proto
           pose.proto
+          pose_stamped.proto
+          pose_trajectory.proto
           projector.proto
           publishers.proto
           publish.proto
@@ -46,8 +50,6 @@ set (msgs axis.proto
           server_control.proto
           shadows.proto
           spheregeom.proto
-          string.proto
-          string_v.proto
           subscribe.proto
           surface.proto
           time.proto
@@ -103,10 +105,11 @@ set (message_headers "" CACHE INTERNAL "Include dirs description")
 
 foreach (hdr ${PROTO_HDRS})
   string (REPLACE "${CMAKE_CURRENT_BINARY_DIR}/" "" hdr ${hdr})
-  APPEND_TO_CACHED_STRING(message_headers "Message Types" "#include \"${hdr}\"\n")
+  APPEND_TO_CACHED_STRING(message_headers
+    "Message Types" "#include \"${hdr}\"\n")
 endforeach()
+configure_file (${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in
+                ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
 
-configure_file ( ${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
-
-INSTALL_LIBRARY(gazebo_msgs)
-INSTALL_INCLUDES("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh msgs.h)
+gz_install_library(gazebo_msgs)
+gz_install_includes("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh msgs.h)

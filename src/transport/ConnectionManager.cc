@@ -101,7 +101,7 @@ bool ConnectionManager::Init(const std::string &master_host,
 
   if (packet.type() == "version_init")
   {
-    msgs::String msg;
+    msgs::GzString msg;
     msg.ParseFromString(packet.serialized_data());
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
@@ -121,7 +121,7 @@ bool ConnectionManager::Init(const std::string &master_host,
   packet.ParseFromString(namespacesData);
   if (packet.type() == "topic_namepaces_init")
   {
-    msgs::String_V result;
+    msgs::GzString_V result;
     result.ParseFromString(packet.serialized_data());
     this->listMutex->lock();
     for (int i = 0; i < result.data_size(); i++)
@@ -295,7 +295,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
   else if (packet.type() == "topic_namespace_add")
   {
-    msgs::String result;
+    msgs::GzString result;
     result.ParseFromString(packet.serialized_data());
     this->listMutex->lock();
     this->namespaces.push_back(std::string(result.data()));
@@ -409,7 +409,7 @@ void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
   if (!this->initialized)
     return;
 
-  msgs::String msg;
+  msgs::GzString msg;
   msg.set_data(_name);
   this->masterConn->EnqueueMsg(msgs::Package("register_topic_namespace", msg));
 }

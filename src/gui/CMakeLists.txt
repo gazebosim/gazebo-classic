@@ -94,6 +94,6 @@ target_link_libraries(gzclient  gazebo_common
 
 add_definitions(${QT_DEFINITIONS})
 
-INSTALL_LIBRARY(gazebo_gui)
-INSTALL_INCLUDES("gui" ${headers})
-INSTALL_EXECUTABLE(gzclient)
+gz_install_library(gazebo_gui)
+gz_install_includes("gui" ${headers})
+gz_install_executable(gzclient)

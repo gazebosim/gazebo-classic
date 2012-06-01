@@ -385,7 +385,7 @@ namespace gazebo
 
       private: Heightmap *heightmap;
 
-      private: std::vector<Projector *> projectors;
+      private: std::map<std::string, Projector *> projectors;
     };
     /// \}
   }

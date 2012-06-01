@@ -154,7 +154,7 @@ if(DEFINED USE_CUDA)
   target_link_libraries(parallel_quickstep_lib_test parallel_quickstep)
   cuda_build_clean_target()
   add_dependencies(parallel_quickstep gazebo_ode)
-  INSTALL_LIBRARY(parallel_quickstep)
+  gz_install_library(parallel_quickstep)
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp ")
 
 elseif( DEFINED USE_OPENMP )

@@ -378,7 +378,7 @@
         <origin pose="0 0 0 0 0 0"/>
         <axis xyz="0 0 1"/>
       </joint>
-      <plugin name="joint_test_plugin" filename="libJointTestPlugin.so">
+      <plugin name="cart_test_plugin" filename="libCartTestPlugin.so">
         <steer>bar_2_joint</steer>
         <steer_pid>10 0.1 0.5</steer_pid>
         <steer_ilim>-10 10</steer_ilim>

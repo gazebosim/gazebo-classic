@@ -27,4 +27,4 @@ gz_add_library(gazebo_physics_bullet ${sources})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
 target_link_libraries(gazebo_physics_bullet ${BULLET_LIBRARIES})
 
-INSTALL_LIBRARY(gazebo_physics_bullet)
+gz_install_library(gazebo_physics_bullet)

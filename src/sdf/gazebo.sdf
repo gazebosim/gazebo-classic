@@ -3,6 +3,7 @@
 
   <include filename="world.sdf" required="*"/>
   <include filename="model.sdf" required="*"/>
+  <include filename="actor.sdf" required="*"/>
   <include filename="light.sdf" required="*"/>
 
 </element> <!-- End Gazebo -->

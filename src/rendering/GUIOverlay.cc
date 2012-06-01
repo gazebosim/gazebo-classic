@@ -24,7 +24,7 @@
 #include "transport/Node.hh"
 #include "math/Vector2d.hh"
 
-#include "rendering/ogre.h"
+#include "rendering/ogre_gazebo.h"
 #include "rendering/RenderTypes.hh"
 #include "rendering/Camera.hh"
 #include "rendering/DepthCamera.hh"

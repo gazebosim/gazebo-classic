@@ -73,8 +73,7 @@ namespace gazebo
       private: physics::PhysicsEnginePtr physics;
       private: physics::JointPtr fixedJoint;
 
-      private: std::vector<physics::JointPtr> joints;
-      private: std::vector<physics::LinkPtr> links;
+      private: physics::LinkPtr palmLink;
       private: std::vector<event::ConnectionPtr> connections;
 
       private: std::map<std::string, physics::CollisionPtr> collisions;
@@ -88,6 +87,12 @@ namespace gazebo
 
       private: common::Time updateRate, prevUpdateTime;
       private: int posCount, zeroCount;
+      /// \brief minimum number of links touching
+      private: unsigned int min_contact_count;
+      /// \brief Steps touching before engaging fixed joint
+      private: int attach_steps;
+      /// \brief Steps not touching before deisengaging fixed joint
+      private: int detach_steps;
     };
   }
 }

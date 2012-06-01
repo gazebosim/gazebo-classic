@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef SDF_H_
-#define SDF_H_
+#ifndef SDF_HH_
+#define SDF_HH_
 
 #include "sdf/interface/SDF.hh"
 #include "sdf/interface/Param.hh"

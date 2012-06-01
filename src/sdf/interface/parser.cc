@@ -16,7 +16,9 @@
 */
 #include <stdlib.h>
 
-#include "sdf/sdf.hh"
+#include "sdf/interface/SDF.hh"
+#include "sdf/interface/Param.hh"
+#include "sdf/interface/parser.hh"
 
 #include "parser_deprecated.hh"
 
@@ -607,16 +609,37 @@ void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
   for (elemXml = _xml->FirstChildElement(); elemXml;
        elemXml = elemXml->NextSiblingElement())
   {
-    ElementPtr element(new Element);
-    element->SetParent(_sdf);
-    element->SetName(elemXml->ValueStr());
-    if (elemXml->GetText() != NULL)
-      element->AddValue("string", elemXml->GetText(), "1");
-    else
-      gzerr << "trying to copy stuff inside <plugin> block, "
-            << "but they have NULL contents\n";
+    std::string elem_name = elemXml->ValueStr();
+    if (_sdf->HasElementDescription(elem_name))
+    {
+      sdf::ElementPtr element = _sdf->AddElement(elem_name);
 
-    _sdf->InsertElement(element);
+      // FIXME: copy attributes
+      for (TiXmlAttribute *attribute = elemXml->FirstAttribute();
+           attribute; attribute = attribute->Next())
+      {
+        element->GetAttribute(attribute->Name())->SetFromString(
+          attribute->ValueStr());
+      }
+
+      // copy value
+      std::string value = elemXml->GetText();
+      if (!value.empty())
+          element->GetValue()->SetFromString(value);
+    }
+    else
+    {
+      ElementPtr element(new Element);
+      element->SetParent(_sdf);
+      element->SetName(elem_name);
+      if (elemXml->GetText() != NULL)
+        element->AddValue("string", elemXml->GetText(), "1");
+      else
+        gzerr << "trying to copy stuff inside <plugin> block, "
+              << "but they have NULL contents\n";
+
+      _sdf->InsertElement(element);
+    }
   }
 }
 
@@ -633,16 +656,37 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
   std::string modelName = modelPtr->GetValueString("name");
   while (elem)
   {
-    std::string elemName = elem->GetValueString("name");
-    std::string newName =  modelName + "__" + elemName;
-    replace[elemName] = newName;
-    if (elem->HasElementDescription("origin"))
+    if (elem->GetName() == "link")
     {
-      ElementPtr originElem = elem->GetOrCreateElement("origin");
-      gazebo::math::Pose newPose = modelPose + originElem->GetValuePose("pose");
-      originElem->GetAttribute("pose")->Set(newPose);
+      std::string elemName = elem->GetValueString("name");
+      std::string newName =  modelName + "__" + elemName;
+      replace[elemName] = newName;
+      if (elem->HasElementDescription("origin"))
+      {
+        ElementPtr originElem = elem->GetOrCreateElement("origin");
+        gazebo::math::Pose newPose = gazebo::math::Pose(
+          modelPose.pos +
+            modelPose.rot.RotateVector(originElem->GetValuePose("pose").pos),
+            modelPose.rot * originElem->GetValuePose("pose").rot);
+        originElem->GetAttribute("pose")->Set(newPose);
+      }
     }
-
+    else if (elem->GetName() == "joint")
+    {
+      // for joints, we need to
+      //   prefix name like we did with links, and
+      std::string elemName = elem->GetValueString("name");
+      std::string newName =  modelName + "__" + elemName;
+      replace[elemName] = newName;
+      //   rotate the joint axis because they are model-global
+      if (elem->HasElement("axis"))
+      {
+        ElementPtr axisElem = elem->GetElement("axis");
+        gazebo::math::Vector3 newAxis =  modelPose.rot.RotateVector(
+          axisElem->GetValueVector3("xyz"));
+        axisElem->GetAttribute("xyz")->Set(newAxis);
+      }
+    }
     elem = elem->GetNextElement();
   }
 

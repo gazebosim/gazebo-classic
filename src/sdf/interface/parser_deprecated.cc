@@ -49,52 +49,78 @@
 
 namespace deprecated_sdf
 {
-void copyChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
+void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Iterate over all the child elements
   for (xmlNodePtr elemXml = xmlFirstElementChild(_config);
        elemXml != NULL; elemXml = xmlNextElementSibling(elemXml))
   {
-    sdf::ElementPtr element(new sdf::Element);
-    element->SetParent(_sdf);
-
-    // copy name (with prefix if exists?
+    // copy name (skip prefixed elements if exist)?
     std::string prefix;
     if (elemXml->ns) prefix = (const char*)elemXml->ns->prefix;
     if (prefix.empty())
     {
-      element->SetName((const char*)elemXml->name);
-
-      // copy attributes
-      for (xmlAttrPtr attrXml = elemXml->properties;
-           attrXml && attrXml->name && attrXml->children;
-           attrXml = attrXml->next)
+      std::string elem_name((const char*)elemXml->name);
+      if (_sdf->HasElementDescription(elem_name))
       {
-        element->AddAttribute((const char*)attrXml->name, "string",
-            "defaultvalue", false);
-        initAttr(elemXml, (const char*)attrXml->name,
-            element->GetAttribute((const char*)attrXml->name));
+        // gzdbg << "has element [" << elem_name << "] defined, copying.\n";
+        sdf::ElementPtr element = _sdf->AddElement(elem_name);
+
+        // copy attributes
+        for (xmlAttrPtr attrXml = elemXml->properties;
+             attrXml && attrXml->name && attrXml->children;
+             attrXml = attrXml->next)
+        {
+          initAttr(elemXml, (const char*)attrXml->name,
+              element->GetAttribute((const char*)attrXml->name));
+        }
+        // copy value
+        std::string value = getValue(elemXml);
+        if (!value.empty())
+            element->GetValue()->SetFromString(value);
       }
+      else
+      {
+        // gzdbg << "undefined element [" << elem_name
+        //       << "], copy elements as string type.\n";
+        sdf::ElementPtr element(new sdf::Element);
+        element->SetParent(_sdf);
+        element->SetName((const char*)elemXml->name);
 
-      // copy value
-      std::string value = getValue(elemXml);
-      if (!value.empty())
-        element->AddValue("string", value, "1");
+        // copy attributes
+        for (xmlAttrPtr attrXml = elemXml->properties;
+             attrXml && attrXml->name && attrXml->children;
+             attrXml = attrXml->next)
+        {
+          element->AddAttribute((const char*)attrXml->name, "string",
+              "defaultvalue", false);
+          initAttr(elemXml, (const char*)attrXml->name,
+              element->GetAttribute((const char*)attrXml->name));
+        }
 
-      _sdf->InsertElement(element);
+        // copy value
+        std::string value = getValue(elemXml);
+        if (!value.empty())
+            element->AddValue("string", value, "1");
+
+        _sdf->InsertElement(element);
+      }
     }
     else
     {
-      gzdbg << "skipping prefixed element [" << prefix << ":"
-             << (const char*)elemXml->name << "] when copying plugins\n";
+      // gzwarn << "skipped: deprecated prefixed element ["
+      //        << prefix << ":"
+      //        << (const char*)elemXml->name << "] is not used.\n";
+      // sdf::ElementPtr element(new sdf::Element);
+      // element->SetParent(_sdf);
       // element->SetName(prefix + ":" + (const char*)elemXml->name);
     }
   }
 }
 
-bool getPlugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool controller2Plugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
-  // Get all plugins
+  // Get all controllers and convert to plugins
   for (xmlNodePtr pluginXml = _config->xmlChildrenNode;
        pluginXml != NULL; pluginXml = pluginXml->next)
   {
@@ -111,27 +137,45 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
         // (const char*)pluginXml->name);
         initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
 
-      deprecated_sdf::copyChildren(pluginXml, sdfPlugin);
+      deprecated_sdf::copyBlockChildren(pluginXml, sdfPlugin);
     }
-    else if (std::string((const char*)pluginXml->name) == "plugin")
+  }
+
+  return true;
+}
+
+bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf)
+{
+  // Get all projectors
+  for (xmlNodePtr projectorXml = _config->xmlChildrenNode;
+       projectorXml != NULL; projectorXml = projectorXml->next)
+  {
+    if (projectorXml->name &&
+        std::string((const char*)projectorXml->name) == "projector")
     {
-      gzerr << "there is a <plugin> block in the deprecated xml\n";
+      sdf::ElementPtr sdfProjector = _sdf->AddElement("projector");
+      initAttr(projectorXml, "name", sdfProjector->GetAttribute("name"));
 
-      sdf::ElementPtr sdfPlugin = _sdf->AddElement("plugin");
-      initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
-      initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
+      deprecated_sdf::copyBlockChildren(projectorXml, sdfProjector);
+    }
+  }
 
-      for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;
-          dataXml != NULL; dataXml = dataXml->next)
-      {
-        if (std::string((const char*) dataXml->ns->prefix) != "interface")
-        {
-          sdf::ElementPtr sdfData = sdfPlugin->AddElement("data");
-          sdfData->GetAttribute("value")->SetFromString(getValue(dataXml));
-        }
-        else
-          gzerr << "<interface:...> are not copied\n";
-      }
+  return true;
+}
+
+bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf)
+{
+  // Get all grippers
+  for (xmlNodePtr gripperXml = _config->xmlChildrenNode;
+       gripperXml != NULL; gripperXml = gripperXml->next)
+  {
+    if (gripperXml->name &&
+        std::string((const char*)gripperXml->name) == "gripper")
+    {
+      sdf::ElementPtr sdfGripper = _sdf->AddElement("gripper");
+      initAttr(gripperXml, "name", sdfGripper->GetAttribute("name"));
+
+      deprecated_sdf::copyBlockChildren(gripperXml, sdfGripper);
     }
   }
 
@@ -236,7 +280,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  getPlugins(_config, _sdf);
+  controller2Plugins(_config, _sdf);
 
   return true;
 }
@@ -543,6 +587,12 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
 // _sdf = an sdf element that has an origin child element
 bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
+  // goes from _config
+  //   <xyz>0 0 0</xyz>
+  //   <rpy>0 0 0</rpy>
+  // to _sdf
+  //   <origin pose="0 0 0 0 0 0" />
+
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
 
@@ -692,7 +742,6 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   // Get all sensor elements
-  // FIXME: instead of child elements, get namespace == sensor blocks
   for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor");
       sensor_xml; sensor_xml = getNextByNSPrefix(sensor_xml, "sensor"))
   {
@@ -704,6 +753,9 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
     }
     // TODO: check for duplicate sensors
   }
+
+  // Get projector elements
+  getProjectors(_config, _sdf);
 
   return true;
 }
@@ -1006,7 +1058,8 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  getPlugins(_config, _sdf);
+  controller2Plugins(_config, _sdf);
+  getGrippers(_config, _sdf);
 
   return true;
 }
@@ -1052,7 +1105,7 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  getPlugins(_config, _sdf);
+  controller2Plugins(_config, _sdf);
 
   return true;
 }
@@ -1143,8 +1196,8 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
     std::string value = getNodeValue(_node, _key);
     if (value.empty())
     {
-      gzdbg << "Node[" << _node->name << "] Has empty key value["
-            << _key << "]\n";
+      // gzdbg << "Node[" << _node->name << "] does not have key value["
+      //       << _key << "] defined, will use default value.\n";
       return false;
     }
     if (!_attr->SetFromString(value))
@@ -1162,6 +1215,13 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
 
   return true;
 }
+
+bool initElem(xmlNodePtr _node, const std::string &_key, sdf::ElementPtr _attr)
+{
+  // to be implemented
+  return false;
+}
+
 //////////////////////////////////////////////////
 bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {

@@ -133,7 +133,7 @@ void TopicManager::Publish(const std::string &_topic,
 
   if (dbgPub && dbgPub->GetCallbackCount() > 0)
   {
-    msgs::String dbgMsg;
+    msgs::GzString dbgMsg;
     dbgMsg.set_data(_message.DebugString());
     dbgPub->Publish(dbgMsg);
   }
@@ -282,7 +282,7 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
   else
   {
     PublicationPtr dbgPub;
-    msgs::String tmp;
+    msgs::GzString tmp;
 
     pub = PublicationPtr(new Publication(topic, msgType));
     dbgPub = PublicationPtr(new Publication(topic+"/__dbg",
