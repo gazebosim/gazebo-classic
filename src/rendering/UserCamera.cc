@@ -55,10 +55,6 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   stream << "UserCamera_" << this->count++;
   this->name = stream.str();
 
-  this->connections.push_back(
-      event::Events::ConnectShowCameras(
-        boost::bind(&UserCamera::ToggleShowVisual, this)));
-
   this->gui = new GUIOverlay();
 
   this->orbitViewController = new OrbitViewController(this);

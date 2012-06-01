@@ -31,18 +31,21 @@
 using namespace gazebo;
 using namespace common;
 
+/////////////////////////////////////////////////
 BVHLoader::BVHLoader()
 {
 }
 
+/////////////////////////////////////////////////
 BVHLoader::~BVHLoader()
 {
 }
 
-Skeleton *BVHLoader::Load(const std::string &filename, double scale)
+/////////////////////////////////////////////////
+Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
 {
   std::string fullname =
-    SystemPaths::Instance()->FindFileWithGazeboPaths(filename);
+    SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
 
   Skeleton *skeleton = NULL;
   std::ifstream file;
@@ -91,9 +94,9 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
             return NULL;
           }
           math::Vector3 offset = math::Vector3(
-              math::parseFloat(words[1]) * scale,
-              math::parseFloat(words[2]) * scale,
-              math::parseFloat(words[3]) * scale);
+              math::parseFloat(words[1]) * _scale,
+              math::parseFloat(words[2]) * _scale,
+              math::parseFloat(words[3]) * _scale);
           math::Matrix4 transform(math::Matrix4::IDENTITY);
           transform.SetTranslate(offset);
           node->SetTransform(transform);
@@ -167,7 +170,7 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
   double time = 0.0;
   unsigned int frameNo = 0;
 
-  SkeletonAnimation *animation = new SkeletonAnimation(filename);
+  SkeletonAnimation *animation = new SkeletonAnimation(_filename);
 
   while (!file.eof())
   {
@@ -204,14 +207,14 @@ Skeleton *BVHLoader::Load(const std::string &filename, double scale)
         cursor++;
         std::string channel = channels[j];
         if (channel == "Xposition")
-          translation.x = value * scale;
+          translation.x = value * _scale;
         else
           if (channel == "Yposition")
-            translation.y = value * scale;
+            translation.y = value * _scale;
           else
             if (channel == "Zposition")
             {
-              translation.z = value * scale;
+              translation.z = value * _scale;
             }
             else
               if (channel == "Zrotation")

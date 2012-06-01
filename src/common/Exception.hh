@@ -15,7 +15,6 @@
  *
 */
 /*
- * Desc: Gazebo Error
  * Author: Nathan Koenig
  * Date: 07 May 2007
  */
@@ -84,5 +83,3 @@ namespace gazebo
 }
 
 #endif
-
-

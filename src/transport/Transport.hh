@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_TRANSPORT_HH
-#define GAZEBO_TRANSPORT_HH
+#ifndef __GAZEBO_TRANSPORT_HH__
+#define __GAZEBO_TRANSPORT_HH__
 
 #include <boost/bind.hpp>
 #include <string>
@@ -67,11 +67,7 @@ namespace gazebo
     /// \brief Send a request, and receive a response.
     msgs::Response request(const std::string &_worldName,
                            const msgs::Request &_request);
-
     /// \}
   }
 }
-
 #endif
-
-

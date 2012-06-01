@@ -22,6 +22,7 @@ using namespace gazebo;
 using namespace event;
 
 int Connection::counter = 0;
+
 //////////////////////////////////////////////////
 Connection::Connection(Event *_e, int _i)
   : event(_e), id(_i)

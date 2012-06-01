@@ -88,58 +88,8 @@ namespace gazebo
               { return addEntity.Connect(_subscriber); }
       public: static void DisconnectAddEntity(ConnectionPtr _subscriber)
               { addEntity.Disconnect(_subscriber); }
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the show light source signal
-      public: template<typename T>
-              static ConnectionPtr ConnectShowLights(T _subscriber)
-              { return showLights.Connect(_subscriber); }
-      public: static void DisconnectShowLights(ConnectionPtr _subscriber)
-              { showLights.Disconnect(_subscriber); }
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the show camera source signal
-      public: template<typename T>
-              static ConnectionPtr ConnectShowCameras(T _subscriber)
-              { return showCameras.Connect(_subscriber); }
-      public: static void DisconnectShowCameras(ConnectionPtr _subscriber)
-              { showCameras.Disconnect(_subscriber); }
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the show contacts signal
-      public: template<typename T>
-              static ConnectionPtr ConnectShowContacts(T _subscriber)
-              { return showContacts.Connect(_subscriber); }
-      public: static void DisconnectShowContacts(ConnectionPtr _subscriber)
-              { showContacts.Disconnect(_subscriber); }
 
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the show wireframe signal
-      public: template<typename T>
-              static ConnectionPtr ConnectShowWireframe(T _subscriber)
-              { return wireframe.Connect(_subscriber); }
-      public: static void DisconnectShowWireframe(ConnectionPtr _subscriber)
-              { wireframe.Disconnect(_subscriber); }
 
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the show physics signal
-      public: template<typename T>
-              static ConnectionPtr ConnectShowPhysics(T _subscriber)
-              { return showPhysics.Connect(_subscriber); }
-      public: static void DisconnectShowPhysics(ConnectionPtr _subscriber)
-              { showPhysics.Disconnect(_subscriber); }
-
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the show joints signal
-      public: template<typename T>
-              static ConnectionPtr ConnectShowJoints(T _subscriber)
-              { return showJoints.Connect(_subscriber); }
-      public: static void DisconnectShowJoints(ConnectionPtr _subscriber)
-              { showJoints.Disconnect(_subscriber); }
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the show bounding boxes signal
-      public: template<typename T>
-              static ConnectionPtr ConnectShowBoundingBoxes(T _subscriber)
-              { return showBoundingBoxes.Connect(_subscriber); }
-      public: static void DisconnectShowBoundingBoxes(ConnectionPtr _subscriber)
-              { showBoundingBoxes.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update start signal
       public: template<typename T>
@@ -223,21 +173,6 @@ namespace gazebo
       /// \brief An entity has been deleted
       public: static EventT<void (std::string)> deleteEntity;
 
-      /// \brief Light visuals should be shown
-      public: static EventT<void (bool)> showLights;
-      /// \brief Joint visuals should be shown
-      public: static EventT<void (bool)> showJoints;
-      /// \brief Camera visuals should be shown
-      public: static EventT<void (bool)> showCameras;
-      /// \brief Contact visuals should be shown
-      public: static EventT<void (bool)> showContacts;
-      /// \brief Wireframe enable signal
-      public: static EventT<void (bool)> wireframe;
-      /// \brief Show masses
-      public: static EventT<void (bool)> showPhysics;
-      /// \brief Show bounding boxes
-      public: static EventT<void (bool)> showBoundingBoxes;
-
       /// \brief Entity has been selected
       public: static EventT<void (std::string)> entitySelected;
 
@@ -248,13 +183,16 @@ namespace gazebo
 
       /// \brief Pre-render
       public: static EventT<void ()> preRender;
+
       /// \brief Render
       public: static EventT<void ()> render;
+
       /// \brief Post-Render
       public: static EventT<void ()> postRender;
 
       /// \brief Diagnostic timer start
       public: static EventT<void (std::string)> diagTimerStart;
+
       /// \brief Diagnostic timer stop
       public: static EventT<void (std::string)> diagTimerStop;
     };
@@ -262,5 +200,3 @@ namespace gazebo
   }
 }
 #endif
-
-

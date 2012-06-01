@@ -39,6 +39,7 @@ DiagnosticManager::~DiagnosticManager()
 {
 }
 
+//////////////////////////////////////////////////
 DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &_name)
 {
   if (this->GetEnabled())
@@ -113,7 +114,3 @@ Time DiagnosticManager::GetTime(const std::string &_label) const
 
   return Time();
 }
-
-
-
-

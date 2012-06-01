@@ -97,7 +97,7 @@ double Animation::GetTime() const
 }
 
 /////////////////////////////////////////////////
-unsigned int Animation::GetNumKeyFrames() const
+unsigned int Animation::GetKeyFrameCount() const
 {
   return this->keyFrames.size();
 }
@@ -112,8 +112,6 @@ KeyFrame* Animation::GetKeyFrame(unsigned int _index) const
 double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
     KeyFrame **_kf2,
     unsigned int &_firstKeyIndex) const
-
-
 {
   // Parametric time
   // t1 = time of previous keyframe
@@ -314,5 +312,3 @@ void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
     _kf.SetValue(k1->GetValue() + diff * t);
   }
 }
-
-

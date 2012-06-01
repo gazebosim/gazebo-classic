@@ -711,6 +711,7 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
 
   _node->SetTransform(transform);
 }
+
 /////////////////////////////////////////////////
 void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
                                  const math::Matrix4 &_transform, Mesh *_mesh)

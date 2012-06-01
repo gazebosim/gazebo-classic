@@ -240,16 +240,24 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
     return true;
   else
   {
-    gzwarn << "parser for sdf version 1.0 failed, "
-           << "trying to parse as old deprecated format\n";
     if (deprecated_sdf::initWorldFile(filename, _sdf))
+    {
+      gzwarn << "DEPRECATED GAZEBO WORLD FILE\n"
+             << "On July 1st, 2012, this formate will no longer by supported\n"
+             << "Convert your files using the gzsdf command line tool\n"
+             << "You have been warned!\n\n";
       return true;
+    }
     else
     {
-      gzwarn << "parsing using deprecated world file failed "
-             << "trying old model format.\n";
       if (deprecated_sdf::initModelFile(filename, _sdf))
+      {
+        gzwarn << "DEPRECATED GAZEBO MODEL FILE\n"
+          << "On July 1st, 2012, this formate will no longer by supported\n"
+          << "Convert your files using the gzsdf command line tool\n"
+          << "You have been warned!\n\n";
         return true;
+      }
       else
       {
         gzerr << "parse as old deprecated model file failed.\n";
@@ -268,16 +276,24 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
     return true;
   else
   {
-    gzwarn << "parse as sdf version 1.0 failed, "
-           << "trying to parse as old deprecated format\n";
     if (deprecated_sdf::initWorldString(_xmlString, _sdf))
+    {
+      gzwarn << "DEPRECATED GAZEBO WORLD FILE\n"
+             << "On July 1st, 2012, this formate will no longer by supported\n"
+             << "Convert your files using the gzsdf command line tool\n"
+             << "You have been warned!\n\n";
       return true;
+    }
     else
     {
-      gzwarn << "parse as old deprecated world file failed, "
-             << "trying old model format.\n";
       if (deprecated_sdf::initModelString(_xmlString, _sdf))
+      {
+        gzwarn << "DEPRECATED GAZEBO MODEL FILE\n"
+          << "On July 1st, 2012, this formate will no longer by supported\n"
+          << "Convert your files using the gzsdf command line tool\n"
+          << "You have been warned!\n\n";
         return true;
+      }
       else
       {
         gzerr << "parse as old deprecated model file failed.\n";
