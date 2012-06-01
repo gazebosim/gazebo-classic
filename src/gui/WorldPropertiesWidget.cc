@@ -210,12 +210,6 @@ PhysicsWidget::PhysicsWidget(QWidget *_parent)
   this->node->Init();
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
 
-  //this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  //this->responseSub = this->node->Subscribe("~/response",
-  //    &PhysicsWidget::OnResponse, this);
-
-  this->requestMsg = NULL;
-
   connect(this->gravityXLineEdit, SIGNAL(editingFinished()),
            this, SLOT(OnGravity()));
   connect(this->gravityYLineEdit, SIGNAL(editingFinished()),
@@ -249,126 +243,106 @@ PhysicsWidget::~PhysicsWidget()
 /////////////////////////////////////////////////
 void PhysicsWidget::Init()
 {
-  //this->initialized = false;
-  //this->requestMsg = msgs::CreateRequest("physics_info");
-  //this->requestPub->Publish(*this->requestMsg);
-
   msgs::Response response = transport::request("default",
       *msgs::CreateRequest("physics_info"));
-//}
-
-/////////////////////////////////////////////////
-//void PhysicsWidget::OnResponse(ConstResponsePtr &_msg)
-//{
-  //if (this->initialized || !this->requestMsg ||
-  //    this->requestMsg->id() != _msg->id())
-  //{
-  //  return;
-  //}
 
   msgs::Physics physicsMsg;
-  //if (_msg->has_type() && _msg->type() == physicsMsg.GetTypeName())
-  //{
-    physicsMsg.ParseFromString(response.serialized_data());
+  physicsMsg.ParseFromString(response.serialized_data());
 
-    if (physicsMsg.has_gravity())
-    {
-      std::ostringstream px, py, pz;
-      double xDbl = physicsMsg.gravity().x();
-      double yDbl = physicsMsg.gravity().y();
-      double zDbl = physicsMsg.gravity().z();
+  if (physicsMsg.has_gravity())
+  {
+    std::ostringstream px, py, pz;
+    double xDbl = physicsMsg.gravity().x();
+    double yDbl = physicsMsg.gravity().y();
+    double zDbl = physicsMsg.gravity().z();
 
-      px << std::fixed << std::setprecision(3) << xDbl;
-      py << std::fixed << std::setprecision(3) << yDbl;
-      pz << std::fixed << std::setprecision(3) << zDbl;
+    px << std::fixed << std::setprecision(3) << xDbl;
+    py << std::fixed << std::setprecision(3) << yDbl;
+    pz << std::fixed << std::setprecision(3) << zDbl;
 
-      this->gravityXLineEdit->setText(tr(px.str().c_str()));
-      this->gravityYLineEdit->setText(tr(py.str().c_str()));
-      this->gravityZLineEdit->setText(tr(pz.str().c_str()));
-    }
+    this->gravityXLineEdit->setText(tr(px.str().c_str()));
+    this->gravityYLineEdit->setText(tr(py.str().c_str()));
+    this->gravityZLineEdit->setText(tr(pz.str().c_str()));
+  }
 
-    if (physicsMsg.has_iters())
-    {
-      std::ostringstream iters;
-      iters << std::fixed << std::setprecision(0) << physicsMsg.iters();
-      this->itersLineEdit->setText(tr(iters.str().c_str()));
-    }
+  if (physicsMsg.has_iters())
+  {
+    std::ostringstream iters;
+    iters << std::fixed << std::setprecision(0) << physicsMsg.iters();
+    this->itersLineEdit->setText(tr(iters.str().c_str()));
+  }
+  else
+    this->itersLineEdit->setText(tr("0"));
+
+  if (physicsMsg.has_solver_type())
+  {
+    int index = this->solverTypeBox->findText(
+        physicsMsg.solver_type().c_str());
+
+    if (index >= 0)
+      this->solverTypeBox->setCurrentIndex(index);
     else
-      this->itersLineEdit->setText(tr("0"));
+      gzerr << "Unknown physics solver type\n";
+  }
 
-    if (physicsMsg.has_solver_type())
-    {
-      int index = this->solverTypeBox->findText(
-          physicsMsg.solver_type().c_str());
-
-      if (index >= 0)
-        this->solverTypeBox->setCurrentIndex(index);
-      else
-        gzerr << "Unknown physics solver type\n";
-    }
-
-    if (physicsMsg.has_dt())
-    {
-      std::ostringstream dt;
-      dt << std::fixed << std::setprecision(5) << physicsMsg.dt();
-      this->dtLineEdit->setText(tr(dt.str().c_str()));
-    }
-    else
-      this->dtLineEdit->setText(tr("0"));
+  if (physicsMsg.has_dt())
+  {
+    std::ostringstream dt;
+    dt << std::fixed << std::setprecision(5) << physicsMsg.dt();
+    this->dtLineEdit->setText(tr(dt.str().c_str()));
+  }
+  else
+    this->dtLineEdit->setText(tr("0"));
 
 
-    if (physicsMsg.has_sor())
-    {
-      std::ostringstream sor;
-      sor << std::fixed << std::setprecision(3) << physicsMsg.sor();
-      this->sorLineEdit->setText(tr(sor.str().c_str()));
-    }
-    else
-      this->sorLineEdit->setText(tr("0"));
+  if (physicsMsg.has_sor())
+  {
+    std::ostringstream sor;
+    sor << std::fixed << std::setprecision(3) << physicsMsg.sor();
+    this->sorLineEdit->setText(tr(sor.str().c_str()));
+  }
+  else
+    this->sorLineEdit->setText(tr("0"));
 
-    if (physicsMsg.has_cfm())
-    {
-      std::ostringstream cfm;
-      cfm << std::fixed << std::setprecision(3) << physicsMsg.cfm();
-      this->cfmLineEdit->setText(tr(cfm.str().c_str()));
-    }
-    else
-      this->cfmLineEdit->setText(tr("0"));
+  if (physicsMsg.has_cfm())
+  {
+    std::ostringstream cfm;
+    cfm << std::fixed << std::setprecision(3) << physicsMsg.cfm();
+    this->cfmLineEdit->setText(tr(cfm.str().c_str()));
+  }
+  else
+    this->cfmLineEdit->setText(tr("0"));
 
-    if (physicsMsg.has_erp())
-    {
-      std::ostringstream erp;
-      erp << std::fixed << std::setprecision(3) << physicsMsg.erp();
-      this->erpLineEdit->setText(tr(erp.str().c_str()));
-    }
-    else
-      this->erpLineEdit->setText(tr("0"));
+  if (physicsMsg.has_erp())
+  {
+    std::ostringstream erp;
+    erp << std::fixed << std::setprecision(3) << physicsMsg.erp();
+    this->erpLineEdit->setText(tr(erp.str().c_str()));
+  }
+  else
+    this->erpLineEdit->setText(tr("0"));
 
-    if (physicsMsg.has_contact_max_correcting_vel())
-    {
-      std::ostringstream max;
-      max << std::fixed << std::setprecision(3)
-          << physicsMsg.contact_max_correcting_vel();
-      this->maxVelLineEdit->setText(tr(max.str().c_str()));
-    }
-    else
-      this->maxVelLineEdit->setText(tr("0"));
+  if (physicsMsg.has_contact_max_correcting_vel())
+  {
+    std::ostringstream max;
+    max << std::fixed << std::setprecision(3)
+      << physicsMsg.contact_max_correcting_vel();
+    this->maxVelLineEdit->setText(tr(max.str().c_str()));
+  }
+  else
+    this->maxVelLineEdit->setText(tr("0"));
 
-    if (physicsMsg.has_contact_surface_layer())
-    {
-      std::ostringstream sur;
-      sur << std::fixed << std::setprecision(3)
-          << physicsMsg.contact_surface_layer();
-      this->surfaceLayerLineEdit->setText(tr(sur.str().c_str()));
-    }
-    else
-      this->surfaceLayerLineEdit->setText(tr("0"));
+  if (physicsMsg.has_contact_surface_layer())
+  {
+    std::ostringstream sur;
+    sur << std::fixed << std::setprecision(3)
+      << physicsMsg.contact_surface_layer();
+    this->surfaceLayerLineEdit->setText(tr(sur.str().c_str()));
+  }
+  else
+    this->surfaceLayerLineEdit->setText(tr("0"));
 
-    this->initialized = true;
-  //}
-
-  //delete this->requestMsg;
-  //this->requestMsg = NULL;
+  this->initialized = true;
 }
 
 /////////////////////////////////////////////////
@@ -625,10 +599,6 @@ SceneWidget::SceneWidget(QWidget *_parent)
   this->node->Init();
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
 
-  //this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  //this->responseSub = this->node->Subscribe("~/response",
-  //    &SceneWidget::OnResponse, this);
-
   connect(this->ambientColorButton, SIGNAL(clicked()),
            this, SLOT(OnAmbientColor()));
   connect(this->backgroundColorButton, SIGNAL(clicked()),
@@ -651,104 +621,88 @@ SceneWidget::SceneWidget(QWidget *_parent)
 
   connect(this->fogBox, SIGNAL(toggled(bool)),
            this, SLOT(OnFogToggle(bool)));
-
-  // this->requestMsg = NULL;
 }
 
 /////////////////////////////////////////////////
 SceneWidget::~SceneWidget()
 {
-  //delete this->requestMsg;
-  //this->requestMsg = NULL;
 }
 
 /////////////////////////////////////////////////
 void SceneWidget::Init()
 {
-  //this->requestMsg = msgs::CreateRequest("scene_info");
-  //this->requestPub->Publish(*this->requestMsg);
-  //this->initialized = false;
-
+  printf("Scene Init\n");
   msgs::Response response = transport::request("default",
       *msgs::CreateRequest("scene_info"));
-//}
-/////////////////////////////////////////////////
-//void SceneWidget::OnResponse(ConstResponsePtr &_msg)
-//{
-  //if (this->initialized || !this->requestMsg ||
-  //    this->requestMsg->id() != _msg->id())
-  //{
-  //  return;
-  //}
 
   msgs::Scene sceneMsg;
-  //if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
-  //{
-    sceneMsg.ParseFromString(response.serialized_data());
-    this->sceneName = sceneMsg.name();
+  sceneMsg.ParseFromString(response.serialized_data());
+  this->sceneName = sceneMsg.name();
 
-    if (sceneMsg.has_ambient())
+  std::cout << sceneMsg.DebugString() << "\n";
+
+  if (sceneMsg.has_ambient())
+  {
+    std::ostringstream styleStr;
+    styleStr << "background-color:rgb(" << sceneMsg.ambient().r()*255
+      << ", " << sceneMsg.ambient().g() * 255 << ", "
+      << sceneMsg.ambient().b()*255 << ");";
+    this->ambientColorButton->setAutoFillBackground(true);
+    this->ambientColorButton->setStyleSheet(styleStr.str().c_str());
+  }
+
+  if (sceneMsg.has_background())
+  {
+    std::ostringstream styleStr;
+    styleStr << "background-color:rgb(" << sceneMsg.background().r()*255
+      << ", " << sceneMsg.background().g() * 255 << ", "
+      << sceneMsg.background().b()*255 << ");";
+    this->backgroundColorButton->setAutoFillBackground(true);
+    this->backgroundColorButton->setStyleSheet(styleStr.str().c_str());
+  }
+
+  if (sceneMsg.has_shadows() && sceneMsg.shadows())
+    this->shadowsButton->setCheckState(Qt::Checked);
+  else
+    this->shadowsButton->setCheckState(Qt::Unchecked);
+
+  if (sceneMsg.has_fog() && sceneMsg.fog().type() != msgs::Fog::NONE)
+  {
+    this->fogBox->setChecked(true);
+
+    if (sceneMsg.fog().has_color())
     {
       std::ostringstream styleStr;
-      styleStr << "background-color:rgb(" << sceneMsg.ambient().r()*255
-               << ", " << sceneMsg.ambient().g() * 255 << ", "
-               << sceneMsg.ambient().b()*255 << ");";
-      this->ambientColorButton->setAutoFillBackground(true);
-      this->ambientColorButton->setStyleSheet(styleStr.str().c_str());
+      styleStr << "background-color:rgb("
+        << sceneMsg.fog().color().r()*255
+        << ", " << sceneMsg.fog().color().g() * 255 << ", "
+        << sceneMsg.fog().color().b()*255 << ");";
+      this->fogColorButton->setAutoFillBackground(true);
+      this->fogColorButton->setStyleSheet(styleStr.str().c_str());
     }
 
-    if (sceneMsg.has_background())
+    if (sceneMsg.fog().has_density())
+      this->fogDensitySpin->setValue(sceneMsg.fog().density());
+
+    if (sceneMsg.fog().has_start())
     {
-      std::ostringstream styleStr;
-      styleStr << "background-color:rgb(" << sceneMsg.background().r()*255
-               << ", " << sceneMsg.background().g() * 255 << ", "
-               << sceneMsg.background().b()*255 << ");";
-      this->backgroundColorButton->setAutoFillBackground(true);
-      this->backgroundColorButton->setStyleSheet(styleStr.str().c_str());
+      this->fogStart->setText(
+          tr(boost::lexical_cast<std::string>(
+              sceneMsg.fog().start()).c_str()));
     }
 
-    if (sceneMsg.has_shadows() && sceneMsg.shadows())
-      this->shadowsButton->setCheckState(Qt::Checked);
-    else
-      this->shadowsButton->setCheckState(Qt::Unchecked);
-
-    if (sceneMsg.has_fog() && sceneMsg.fog().type() != msgs::Fog::NONE)
+    if (sceneMsg.fog().has_end())
     {
-      this->fogBox->setChecked(true);
-
-      if (sceneMsg.fog().has_color())
-      {
-        std::ostringstream styleStr;
-        styleStr << "background-color:rgb("
-                 << sceneMsg.fog().color().r()*255
-                 << ", " << sceneMsg.fog().color().g() * 255 << ", "
-                 << sceneMsg.fog().color().b()*255 << ");";
-        this->fogColorButton->setAutoFillBackground(true);
-        this->fogColorButton->setStyleSheet(styleStr.str().c_str());
-      }
-
-      if (sceneMsg.fog().has_density())
-        this->fogDensitySpin->setValue(sceneMsg.fog().density());
-
-      if (sceneMsg.fog().has_start())
-      {
-        this->fogStart->setText(
-            tr(boost::lexical_cast<std::string>(
-                sceneMsg.fog().start()).c_str()));
-      }
-
-      if (sceneMsg.fog().has_end())
-      {
-        this->fogEnd->setText(
-            tr(boost::lexical_cast<std::string>(
-                sceneMsg.fog().end()).c_str()));
-      }
+      this->fogEnd->setText(
+          tr(boost::lexical_cast<std::string>(
+              sceneMsg.fog().end()).c_str()));
     }
-    else
-    {
-      this->fogBox->setChecked(false);
-    }
-  //}
+  }
+  else
+  {
+    this->fogBox->setChecked(false);
+  }
+
   this->initialized = true;
 }
 

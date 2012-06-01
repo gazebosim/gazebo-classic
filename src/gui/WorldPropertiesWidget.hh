@@ -70,12 +70,8 @@ namespace gazebo
       private slots: void OnMaxVel();
       private slots: void OnSurfaceLayer();
 
-      //private: void OnResponse(ConstResponsePtr &_msg);
-
       private: transport::NodePtr node;
-      private: transport::PublisherPtr physicsPub;//, requestPub;
-      //private: transport::SubscriberPtr responseSub;
-      private: msgs::Request *requestMsg;
+      private: transport::PublisherPtr physicsPub;
       private: bool initialized;
 
       private: QLineEdit *gravityXLineEdit;
@@ -111,8 +107,6 @@ namespace gazebo
 
       private slots: void OnShadows(bool _state = false);
 
-      //private: void OnResponse(ConstResponsePtr &_msg);
-
       public: bool initialized;
       private: std::string sceneName;
       private: QPushButton *ambientColorButton;
@@ -131,9 +125,7 @@ namespace gazebo
       private: QComboBox *fogTypeBox;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr scenePub;//, requestPub;
-      //private: transport::SubscriberPtr responseSub;
-      //private: msgs::Request *requestMsg;
+      private: transport::PublisherPtr scenePub;
     };
   }
 }
