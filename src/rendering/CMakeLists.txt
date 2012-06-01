@@ -100,5 +100,5 @@ target_link_libraries( gazebo_rendering gazebo_common
                                         X11 )
                                       
 
-INSTALL_LIBRARY(gazebo_rendering)
-INSTALL_INCLUDES("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)
+gz_install_library(gazebo_rendering)
+gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)

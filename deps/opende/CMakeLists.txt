@@ -242,5 +242,5 @@ target_link_libraries(gazebo_ode gazebo_opcode gazebo_ccd gazebo_opende_ou)
 add_dependencies(gazebo_ode gazebo_opcode)
 add_dependencies(gazebo_ode gazebo_opende_ou)
 
-INSTALL_LIBRARY(gazebo_ode)
-INSTALL_INCLUDES("ode" ${headers})
+gz_install_library(gazebo_ode)
+gz_install_includes("ode" ${headers})
