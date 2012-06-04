@@ -19,8 +19,8 @@
  * Date: 2 Feb 2011
  */
 
-#ifndef DIAGNOSTICMANAGER_HH
-#define DIAGNOSTICMANAGER_HH
+#ifndef __DIAGNOSTICMANAGER_HH__
+#define __DIAGNOSTICMANAGER_HH__
 
 #include <map>
 #include <string>
@@ -48,28 +48,46 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~DiagnosticManager();
 
+      /// \brief Create a new timer instance
+      /// \param _name Name of the timer.
+      /// \return A pointer to the new diagnostic timer
       public: DiagnosticTimerPtr CreateTimer(const std::string &_name);
 
       /// \brief A diagnostic timer has started
+      /// \param _timer The timer to start
       public: void TimerStart(DiagnosticTimer *_timer);
 
       /// \brief A diagnostic timer has stoped
+      /// \param _time The timer to stop
       public: void TimerStop(DiagnosticTimer *_timer);
 
       /// \brief Get the number of timers
+      /// \return The number of timers
       public: int GetTimerCount() const;
 
-      /// \brief Get a specific time
+      /// \brief Get the time of a timer instance
+      /// \param _index The index of a timer instance
+      /// \param Time of the specified timer
       public: Time GetTime(int _index) const;
 
       /// \brief Get a time based on a label
+      /// \param _label Name of the timer instance
+      /// \param Time of the specified timer
       public: Time GetTime(const std::string &_label) const;
 
       /// \brief Get a label for a timer
+      /// \param _index Index of a timer instance
+      /// \return Lable of the specified timer
       public: std::string GetLabel(int _index) const;
 
+      /// \brief Set whether timers are enabled
+      /// \param _e True = timers are enabled
       public: void SetEnabled(bool _e) {this->enabled = _e;}
+
+      /// \brief Get whether the timers are enabled
+      /// \return TRue if the timers are enabled
       public: inline bool GetEnabled() const {return this->enabled;}
+
       private: bool enabled;
 
       private: std::map<std::string, Time> timers;
@@ -82,6 +100,7 @@ namespace gazebo
     class DiagnosticTimer : public Timer
     {
       /// \brief Constructor
+      /// \param _name Name of the timer
       public: DiagnosticTimer(const std::string &_name) : Timer()
               {
                 this->Start();
@@ -95,8 +114,11 @@ namespace gazebo
                 this->diagManager->TimerStop(this);
               }
 
+      /// \brief Get the name of the timer
+      /// \return The name of timer
       public: inline const std::string GetName() const
               { return this->name; }
+
       private: std::string name;
       private: static DiagnosticManager *diagManager;
     };
@@ -104,5 +126,3 @@ namespace gazebo
   }
 }
 #endif
-
-

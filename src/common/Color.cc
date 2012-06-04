@@ -308,11 +308,13 @@ Color Color::operator+(const Color &pt) const
   return Color(this->r + pt.r, this->g + pt.g, this->b + pt.b, this->a + pt.a);
 }
 
+//////////////////////////////////////////////////
 Color Color::operator+(const float &v) const
 {
   return Color(this->r + v, this->g + v, this->b + v, this->a + v);
 }
 
+//////////////////////////////////////////////////
 const Color &Color::operator+=(const Color &pt)
 {
   this->r += pt.r;
@@ -331,11 +333,13 @@ Color Color::operator-(const Color &pt) const
   return Color(this->r - pt.r, this->g - pt.g, this->b - pt.b, this->a - pt.a);
 }
 
+//////////////////////////////////////////////////
 Color Color::operator-(const float &v) const
 {
   return Color(this->r - v, this->g - v, this->b - v, this->a - v);
 }
 
+//////////////////////////////////////////////////
 const Color &Color::operator-=(const Color &pt)
 {
   this->r -= pt.r;
@@ -355,11 +359,13 @@ const Color Color::operator/(const float &i) const
   return Color(this->r / i, this->g / i, this->b / i, this->a / i);
 }
 
+//////////////////////////////////////////////////
 const Color Color::operator/(const Color &pt) const
 {
   return Color(this->r / pt.r, this->g / pt.g, this->b / pt.b, this->a / pt.a);
 }
 
+//////////////////////////////////////////////////
 const Color &Color::operator/=(const Color &pt)
 {
   this->r /= pt.r;
@@ -379,11 +385,13 @@ const Color Color::operator*(const float &i) const
   return Color(this->r * i, this->g * i, this->b * i, this->a * i);
 }
 
+//////////////////////////////////////////////////
 const Color Color::operator*(const Color &pt) const
 {
   return Color(this->r * pt.r, this->g * pt.g, this->b * pt.b, this->a * pt.a);
 }
 
+//////////////////////////////////////////////////
 const Color &Color::operator*=(const Color &pt)
 {
   this->r *= pt.r;

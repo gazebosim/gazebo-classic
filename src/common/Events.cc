@@ -28,13 +28,6 @@ EventT<void (std::string)> Events::entityCreated;
 EventT<void (std::string)> Events::setSelectedEntity;
 EventT<void (std::string)> Events::addEntity;
 EventT<void (std::string)> Events::deleteEntity;
-EventT<void (bool)> Events::showLights;
-EventT<void (bool)> Events::showCameras;
-EventT<void (bool)> Events::showContacts;
-EventT<void (bool)> Events::wireframe;
-EventT<void (bool)> Events::showPhysics;
-EventT<void (bool)> Events::showJoints;
-EventT<void (bool)> Events::showBoundingBoxes;
 EventT<void (std::string)> Events::entitySelected;
 
 EventT<void ()> Events::worldUpdateStart;
@@ -46,6 +39,3 @@ EventT<void ()> Events::postRender;
 
 EventT<void (std::string)> Events::diagTimerStart;
 EventT<void (std::string)> Events::diagTimerStop;
-
-
-

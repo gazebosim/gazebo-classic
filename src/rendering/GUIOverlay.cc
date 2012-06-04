@@ -56,12 +56,12 @@ GUIOverlay::~GUIOverlay()
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_CEGUI
 void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
 {
   if (this->initialized)
     return;
 
-#ifdef HAVE_CEGUI
   CEGUI::System::getSingletonPtr();
 
   std::string logPath = common::SystemPaths::Instance()->GetLogPath();
@@ -98,9 +98,14 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
     CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
   rootWindow->setMousePassThroughEnabled(true);
   CEGUI::System::getSingleton().setGUISheet(rootWindow);
-#endif
   this->initialized = true;
 }
+#else
+void GUIOverlay::Init(Ogre::RenderTarget * /*_renderTarget*/)
+{
+  this->initialized = true;
+}
+#endif
 
 /////////////////////////////////////////////////
 void GUIOverlay::Hide()
@@ -127,6 +132,7 @@ void GUIOverlay::Update()
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_CEGUI
 void GUIOverlay::CreateWindow(const std::string &_type,
                                const std::string &_name,
                                const std::string &_parent,
@@ -134,7 +140,6 @@ void GUIOverlay::CreateWindow(const std::string &_type,
                                const math::Vector2d &_size,
                                const std::string &_text)
 {
-#ifdef HAVE_CEGUI
 
   CEGUI::Window *parent =
     CEGUI::WindowManager::getSingleton().getWindow(_parent);
@@ -149,40 +154,59 @@ void GUIOverlay::CreateWindow(const std::string &_type,
   window->setSize(CEGUI::UVector2(CEGUI::UDim(_size.x, 0),
                                          CEGUI::UDim(_size.y, 0)));
   window->setText(_text);
-#endif
 }
+#else
+void GUIOverlay::CreateWindow(const std::string &/*_type*/,
+                               const std::string &/*_name*/,
+                               const std::string &/*_parent*/,
+                               const math::Vector2d &/*_position*/,
+                               const math::Vector2d &/*_size*/,
+                               const std::string &/*_text*/)
+{
+}
+#endif
 
 /////////////////////////////////////////////////
+#ifdef HAVE_CEGUI
 bool GUIOverlay::HandleKeyPressEvent(const std::string &_key)
 {
-#ifdef HAVE_CEGUI
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
   int unicode = static_cast<int>(_key[0]);
   if (unicode >= 32 && unicode <= 126)
     system->injectChar(unicode);
   else
     system->injectKeyDown(this->GetKeyCode(_key));
-#endif
   return true;
 }
+#else
+bool GUIOverlay::HandleKeyPressEvent(const std::string &/*_key*/)
+{
+  return true;
+}
+#endif
 
 /////////////////////////////////////////////////
+#ifdef HAVE_CEGUI
 bool GUIOverlay::HandleKeyReleaseEvent(const std::string &_key)
 {
-#ifdef HAVE_CEGUI
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
   int unicode = static_cast<int>(_key[0]);
   if (unicode <= 32 || unicode >= 126)
     system->injectKeyUp(this->GetKeyCode(_key));
-#endif
   return true;
 }
+#else
+bool GUIOverlay::HandleKeyReleaseEvent(const std::string &/*_key*/)
+{
+  return true;
+}
+#endif
 
 /////////////////////////////////////////////////
+#ifdef HAVE_CEGUI
 bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   bool result = false;
-#ifdef HAVE_CEGUI
   bool press, release, pos, scroll;
 
   press = false;
@@ -217,10 +241,15 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
     scroll = system->injectMouseWheelChange(-1 * _evt.scroll.y);
 
   result = pos || release || press || scroll;
-#endif
 
   return result;
 }
+#else
+bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &/*_evt*/)
+{
+  return false;
+}
+#endif
 
 /////////////////////////////////////////////////
 bool GUIOverlay::IsInitialized()
@@ -281,9 +310,10 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl(const std::string &_filename)
 }
 #endif
 
+/////////////////////////////////////////////////
+#ifdef HAVE_CEGUI
 void GUIOverlay::Resize(unsigned int _width, unsigned int _height)
 {
-#ifdef HAVE_CEGUI
   if (this->guiRenderer)
   {
     this->guiRenderer->setDisplaySize(CEGUI::Size(_width, _height));
@@ -295,8 +325,12 @@ void GUIOverlay::Resize(unsigned int _width, unsigned int _height)
     rootWindow->setArea(CEGUI::UDim(0, 0), CEGUI::UDim(0, 0),
                         CEGUI::UDim(1, 0), CEGUI::UDim(1, 0));
   }
-#endif
 }
+#else
+void GUIOverlay::Resize(unsigned int /*_width*/, unsigned int /*_height*/)
+{
+}
+#endif
 
 /////////////////////////////////////////////////
 bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
@@ -307,11 +341,11 @@ bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_CEGUI
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
                                      const std::string &_windowName)
 {
   bool result = false;
-#ifdef HAVE_CEGUI
   CEGUI::Window *window = NULL;
   CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
 
@@ -353,9 +387,15 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
   window->setProperty("Image",
       CEGUI::PropertyHelper::imageToString(&imageSet.getImage("RTTImage")));
   result = true;
-#endif
   return result;
 }
+#else
+bool GUIOverlay::AttachCameraToImage(CameraPtr &/*_camera*/,
+                                     const std::string &/*_windowName*/)
+{
+  return true;
+}
+#endif
 
 /////////////////////////////////////////////////
 #ifdef HAVE_CEGUI

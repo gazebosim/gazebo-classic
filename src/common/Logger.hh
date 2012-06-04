@@ -19,8 +19,8 @@
  * Date: 1 Jun 2010
  */
 
-#ifndef LOGGER_HH
-#define LOGGER_HH
+#ifndef __LOGGER_HH__
+#define __LOGGER_HH__
 
 #include <vector>
 #include <fstream>
@@ -44,15 +44,19 @@ namespace gazebo
       public: virtual ~Logger();
 
       /// \brief Add a log file
+      /// \param _model Model name
+      /// \param _filename Filename of the log file
       public: void AddLog(const std::string &_model,
                           const std::string &_filename);
 
       /// \brief Remove a log
+      /// \param _entity Name of the entity to stop logging
       public: void RemoveLog(const std::string &_entity);
 
       /// \brief Update the log files
       public: void Update();
 
+      /// \brief A logger for an entitiy
       private: class LogObj
                {
                  public: LogObj(const std::string &entityName,
@@ -76,5 +80,3 @@ namespace gazebo
   }
 }
 #endif
-
-

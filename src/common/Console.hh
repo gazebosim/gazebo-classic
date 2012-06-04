@@ -20,8 +20,8 @@
  * Date: 09 June 2007
  */
 
-#ifndef GAZEBO_CONSOLE_HH
-#define GAZEBO_CONSOLE_HH
+#ifndef __GAZEBO_CONSOLE_HH__
+#define __GAZEBO_CONSOLE_HH__
 
 #include <iostream>
 #include <fstream>
@@ -72,16 +72,23 @@ namespace gazebo
       /// \param q True to prevent warning
       public: void SetQuiet(bool _q);
 
-      /// \brief Use this to output a message to the terminal
-      /// \param level Level of the message
-      public: std::ostream &ColorMsg(const std::string &lbl, int color);
+      /// \brief Use this to output a colored message to the terminal
+      /// \param _lbl Text label
+      /// \param _color Color to make the label
+      /// \return Reference to an output stream
+      public: std::ostream &ColorMsg(const std::string &_lbl, int _color);
 
       /// \brief Use this to output an error to the terminal
-      /// \param level Level of the message
-      public: std::ostream &ColorErr(const std::string &lbl,
-                  const std::string &file, unsigned int line, int color);
+      /// \param _lbl Text label
+      /// \param _file File containing the error
+      /// \param _line Line containing the error
+      /// \param _color Color to make the label
+      /// \return Reference to an output stream
+      public: std::ostream &ColorErr(const std::string &_lbl,
+                  const std::string &_file, unsigned int _line, int _color);
 
       /// \brief Use this to output a message to a log file
+      /// \return Reference to output stream
       public: std::ofstream &Log();
 
       /// \brief True if logging data
@@ -100,10 +107,7 @@ namespace gazebo
       /// Pointer to myself
       private: static Console *myself;
     };
-
     /// \}
   }
 }
 #endif
-
-

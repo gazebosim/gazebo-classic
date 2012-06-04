@@ -97,21 +97,25 @@ void RTShaderSystem::Fini()
   this->initialized = false;
 }
 
+#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 &&\
+    OGRE_VERSION_MINOR >= MINOR_VERSION
 //////////////////////////////////////////////////
 void RTShaderSystem::AddScene(Scene *_scene)
 {
   if (!this->initialized)
     return;
 
-#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 &&\
-    OGRE_VERSION_MINOR >= MINOR_VERSION
   // Set the scene manager
   this->shaderGenerator->addSceneManager(_scene->GetManager());
   this->shaderGenerator->createScheme(_scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
   this->scenes.push_back(_scene);
-#endif
 }
+#else
+void RTShaderSystem::AddScene(Scene * /*_scene*/)
+{
+}
+#endif
 
 //////////////////////////////////////////////////
 void RTShaderSystem::RemoveScene(Scene *_scene)
