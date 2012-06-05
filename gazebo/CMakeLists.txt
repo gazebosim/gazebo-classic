@@ -9,8 +9,8 @@ include_directories(SYSTEM
 )
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/src 
-  ${PROJECT_BINARY_DIR}/src 
+  ${PROJECT_SOURCE_DIR}/gazebo 
+  ${PROJECT_BINARY_DIR}/gazebo 
 )
 
 link_directories(  

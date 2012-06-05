@@ -18,6 +18,7 @@
 #define __GAZEBO_HH__
 
 #include <string>
+#include <gazebo/gazebo_core.hh>
 
 namespace gazebo
 {
