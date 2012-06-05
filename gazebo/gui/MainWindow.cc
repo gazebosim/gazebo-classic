@@ -157,8 +157,6 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  this->worldPropertiesWidget->hide();
-
   delete this->worldPropertiesWidget;
   delete this->renderWidget;
   delete this->timePanel;

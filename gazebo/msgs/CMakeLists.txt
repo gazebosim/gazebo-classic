@@ -108,7 +108,7 @@ foreach (hdr ${PROTO_HDRS})
   APPEND_TO_CACHED_STRING(message_headers
     "Message Types" "#include \"${hdr}\"\n")
 endforeach()
-configure_file (${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in
+configure_file (${PROJECT_SOURCE_DIR}/gazebo/msgs/MessageTypes.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
 
 gz_install_library(gazebo_msgs)

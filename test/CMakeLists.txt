@@ -1,6 +1,6 @@
 include_directories (
-  ${PROJECT_SOURCE_DIR}/src 
-  ${PROJECT_BINARY_DIR}/src 
+  ${PROJECT_SOURCE_DIR}/gazebo 
+  ${PROJECT_BINARY_DIR}/gazebo 
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}

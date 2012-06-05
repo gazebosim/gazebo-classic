@@ -5,7 +5,7 @@ set (sources GazeboDriver.cc
              Position2dInterface.cc
              LaserInterface.cc
              CameraInterface.cc
-             ../../src/gazebo.cc
+             ../../gazebo/gazebo.cc
 )
              #Position3dInterface.cc
              #FiducialInterface.cc
@@ -19,8 +19,8 @@ set (sources GazeboDriver.cc
 
 include_directories( 
   ${PLAYER_INCLUDE_DIRS} 
-  ${PROJECT_SOURCE_DIR}/src 
-  ${PROJECT_BINARY_DIR}/src 
+  ${PROJECT_SOURCE_DIR}/gazebo 
+  ${PROJECT_BINARY_DIR}/gazebo 
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}

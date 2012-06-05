@@ -639,8 +639,6 @@ void SceneWidget::Init()
   sceneMsg.ParseFromString(response.serialized_data());
   this->sceneName = sceneMsg.name();
 
-  std::cout << sceneMsg.DebugString() << "\n";
-
   if (sceneMsg.has_ambient())
   {
     std::ostringstream styleStr;
