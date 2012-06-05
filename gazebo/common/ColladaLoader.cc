@@ -1372,37 +1372,42 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material * /*_mat*/)
+void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
 {
-  // const char *opaque = _elem->Attribute("opaque");
-  /*if (!opaque)
-    gzerr << "No Opaque set\n";
-    */
-
-  const char *colorStr = _elem->FirstChildElement("color")->GetText();
-  if (!colorStr)
-    gzerr << "No color string\n";
-
-  /*std::string opaque =
-    std::string colorStr = _elem->FirstChildElement("color")->GetText();
-    Color color = boost::lexical_cast<Color>(colorStr);
-    */
-
-  // double srcFactor, dstFactor;
-
-  /*if (opaque == "RGB_ZERO")
-    {
-  // srcFactor = color.R() * _mat->GetTransparency();
-  // dstFactor = 1.0 - color.R() * _mat->GetTransparency();
-  }
-  else if (opaque == "A_ONE")
+  const char *opaqueCStr = _elem->Attribute("opaque");
+  if (!opaqueCStr)
   {
-  // _mat->SetBlendFactors(ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
-  // srcFactor = 1.0 - color.A() * _mat->GetTransparency();
-  // dstFactor = color.A() * _mat->GetTransparency();
+    gzerr << "No Opaque set\n";
+    return;
   }
-  */
 
-  // _mat->SetBlendFactors(ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
-  // _mat->SetBlendFactors(srcFactor, dstFactor);
+  // TODO: Handle transparent textures
+  if (_elem->FirstChildElement("color"))
+  {
+    const char *colorCStr = _elem->FirstChildElement("color")->GetText();
+    if (!colorCStr)
+    {
+      gzerr << "No color string\n";
+      return;
+    }
+
+    std::string opaqueStr = opaqueCStr;
+    std::string colorStr = colorCStr;
+    Color color = boost::lexical_cast<Color>(colorStr);
+
+    double srcFactor, dstFactor;
+
+    if (opaqueStr == "RGB_ZERO")
+    {
+      srcFactor = color.R() * _mat->GetTransparency();
+      dstFactor = 1.0 - color.R() * _mat->GetTransparency();
+    }
+    else if (opaqueStr == "A_ONE")
+    {
+      srcFactor = 1.0 - color.A() * _mat->GetTransparency();
+      dstFactor = color.A() * _mat->GetTransparency();
+    }
+
+    _mat->SetBlendFactors(srcFactor, dstFactor);
+  }
 }
