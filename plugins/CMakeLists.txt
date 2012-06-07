@@ -1,6 +1,6 @@
 include_directories(
-  ${PROJECT_BINARY_DIR}/src 
-  ${PROJECT_SOURCE_DIR}/src 
+  ${PROJECT_BINARY_DIR}/gazebo 
+  ${PROJECT_SOURCE_DIR}/gazebo 
   ${PROTOBUF_INCLUDE_DIR}
 )
 

@@ -204,7 +204,7 @@ else (build_errors)
   add_subdirectory(doc)
 
   if (BUILD_GAZEBO)
-    add_subdirectory(src)
+    add_subdirectory(gazebo)
     add_subdirectory(sdf)
     add_subdirectory(Media)
     add_subdirectory(test)

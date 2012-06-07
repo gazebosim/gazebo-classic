@@ -36,7 +36,7 @@
 #include "msgs/msgs.hh"
 
 #include "gazebo_config.h"
-#include "src/Server.hh"
+#include "gazebo/Server.hh"
 
 #include "test_config.h"
 
