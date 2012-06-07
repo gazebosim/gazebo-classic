@@ -604,6 +604,7 @@ ModelPtr World::GetModel(unsigned int _index)
 //////////////////////////////////////////////////
 void World::Reset(bool _resetTime)
 {
+  this->worldUpdateMutex->lock();
   if (_resetTime)
   {
     this->simTime = common::Time(0);
@@ -619,6 +620,7 @@ void World::Reset(bool _resetTime)
     (*iter)->Reset();
   }
   this->physicsEngine->Reset();
+  this->worldUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
