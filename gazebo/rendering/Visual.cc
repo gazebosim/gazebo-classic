@@ -328,6 +328,7 @@ void Visual::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
   this->Load();
+  this->scene->RegisterVisual(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -1373,11 +1374,12 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
   node->_updateBounds();
 
   Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
-
+ 
   for (int i = 0; i < node->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = node->getAttachedObject(i);
-    if (obj->isVisible() && obj->getMovableType() != "gazebo::ogredynamiclines"
+
+    if (obj->isVisible() && obj->getMovableType() != "gazebo::dynamiclines"
         && obj->getVisibilityFlags() != GZ_VISIBILITY_GUI)
     {
       Ogre::Any any = obj->getUserAny();
@@ -1389,11 +1391,19 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       }
 
       Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
-      Ogre::Vector3 min = bb.getMinimum();
-      Ogre::Vector3 max = bb.getMaximum();
+      math::Vector3 min = Conversions::Convert(bb.getMinimum());
+      math::Vector3 max = Conversions::Convert(bb.getMaximum());
 
-      box.Merge(math::Box(math::Vector3(min.x, min.y, min.z),
-                          math::Vector3(max.x, max.y, max.z)));
+      // Ogre does not return a valid bounding box for lights.
+      if (obj->getMovableType() == "Light")
+      {
+        min = Conversions::Convert(node->getPosition());
+        max = Conversions::Convert(node->getPosition());
+        min -= math::Vector3(0.5, 0.5, 0.5);
+        max += math::Vector3(0.5, 0.5, 0.5);
+      }
+
+      box.Merge(math::Box(min, max));
     }
   }
 

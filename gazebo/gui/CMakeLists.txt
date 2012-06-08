@@ -9,28 +9,30 @@ add_definitions( ${QT_DEFINITIONS} )
 
 add_subdirectory(qtpropertybrowser)
 
-set (sources main.cc 
-             ../gazebo.cc
-             Gui.cc 
-             MainWindow.cc 
-             RenderWidget.cc 
-             GLWidget.cc 
-             TimePanel.cc
-             InsertModelWidget.cc
-             LightListWidget.cc
-             ModelListWidget.cc
-             WorldPropertiesWidget.cc
-             EntityMaker.cc
-             BoxMaker.cc
-             SphereMaker.cc
-             CylinderMaker.cc
-             LightMaker.cc
-             GuiEvents.cc
-             ModelEditWidget.cc
-             MeshMaker.cc
-             ModelMaker.cc
-             ModelRightMenu.cc
-             JointControlWidget.cc
+set (sources
+  main.cc 
+  ../gazebo.cc
+  Gui.cc 
+  MainWindow.cc 
+  RenderWidget.cc 
+  GLWidget.cc 
+  TimePanel.cc
+  InsertModelWidget.cc
+  LightListWidget.cc
+  LightRightMenu.cc
+  ModelListWidget.cc
+  WorldPropertiesWidget.cc
+  EntityMaker.cc
+  BoxMaker.cc
+  SphereMaker.cc
+  CylinderMaker.cc
+  LightMaker.cc
+  GuiEvents.cc
+  ModelEditWidget.cc
+  MeshMaker.cc
+  ModelMaker.cc
+  ModelRightMenu.cc
+  JointControlWidget.cc
 )
 
 set (qt_headers MainWindow.hh 
@@ -42,6 +44,7 @@ set (qt_headers MainWindow.hh
                 ModelListWidget.hh
                 WorldPropertiesWidget.hh
                 ModelEditWidget.hh
+                LightRightMenu.hh
                 ModelRightMenu.hh
                 JointControlWidget.hh
 )

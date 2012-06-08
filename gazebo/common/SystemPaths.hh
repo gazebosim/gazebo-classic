@@ -83,6 +83,8 @@ namespace gazebo
       public: void ClearPluginPaths();
 
       private: void UpdateGazeboPaths();
+      private: void UpdatePluginPaths();
+      private: void UpdateOgrePaths();
       private: void InsertUnique(const std::string &_path,
                                std::list<std::string> &_list);
 

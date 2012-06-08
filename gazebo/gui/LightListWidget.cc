@@ -40,6 +40,7 @@
 #include "math/Angle.hh"
 #include "math/Helpers.hh"
 
+#include "gui/LightRightMenu.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
@@ -47,6 +48,8 @@
 
 using namespace gazebo;
 using namespace gui;
+
+extern LightRightMenu *g_lightRightMenu;
 
 /////////////////////////////////////////////////
 LightListWidget::LightListWidget(QWidget *_parent)
@@ -60,14 +63,12 @@ LightListWidget::LightListWidget(QWidget *_parent)
   setMinimumWidth(280);
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->lightListWidget = new QListWidget();
-  // this->lightListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  // this->lightListWidget->header()->hide();
+  this->lightListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   // connect(this->lightListWidget, SIGNAL(itemClicked(QListWidgetItem *)),
   //         this, SLOT(OnLightSelection(QListWidgetItem *)));
-  /* connect(this->lightListWidget,
+  connect(this->lightListWidget,
        SIGNAL(customContextMenuRequested(const QPoint &)),
        this, SLOT(OnCustomContextMenu(const QPoint &)));
-       */
 
 /*  this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
@@ -172,6 +173,7 @@ void LightListWidget::Update()
 void LightListWidget::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  printf("LightListWidget::OnLightMsg\n");
   this->lightMsgs.push_back(_msg);
 }
 
@@ -239,7 +241,6 @@ void LightListWidget::InitTransport(const std::string &_name)
     this->node->Fini();
     this->node.reset();
     this->requestPub.reset();
-    // this->modelPub.reset();
     this->responseSub.reset();
     this->requestSub.reset();
     // this->poseSub.reset();
@@ -252,7 +253,6 @@ void LightListWidget::InitTransport(const std::string &_name)
   this->lightSub = this->node->Subscribe("~/light",
       &LightListWidget::OnLightMsg, this);
 
-  // this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   // this->requestPub =
   //     this->node->Advertise<msgs::Request>("~/request", 5, true);
   // this->responseSub = this->node->Subscribe("~/response",
@@ -336,7 +336,6 @@ void LightListWidget::RemoveEntity(const std::string &_name)
 }
   */
 
-/*
 /////////////////////////////////////////////////
 void LightListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
@@ -344,11 +343,10 @@ void LightListWidget::OnCustomContextMenu(const QPoint &_pt)
 
   if (item)
   {
-    g_modelRightMenu->Run(item->text(0).toStdString(),
+    g_lightRightMenu->Run(item->text().toStdString(),
                           this->lightListWidget->mapToGlobal(_pt));
   }
 }
-  */
 
   /*
 /////////////////////////////////////////////////
