@@ -18,16 +18,17 @@
 #ifndef __EVENT_HH__
 #define __EVENT_HH__
 
-#include <iostream>
-#include <vector>
+#include <gazebo/gazebo_config.h>
+#include <gazebo/common/Time.hh>
+#include <gazebo/common/CommonTypes.hh>
+
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "common/Time.hh"
-#include "common/CommonTypes.hh"
-#include "gazebo_config.h"
+#include <iostream>
+#include <vector>
 
 namespace gazebo
 {
@@ -43,11 +44,11 @@ namespace gazebo
       /// \brief Constructor
       public: virtual ~Event() {}
 
-      /// \brief Disconnect 
+      /// \brief Disconnect
       /// \param _c A pointer to a connection
       public: virtual void Disconnect(ConnectionPtr _c) = 0;
 
-      /// \brief Disconnect 
+      /// \brief Disconnect
       /// \param _id Integer ID of a connection
       public: virtual void Disconnect(int _id) = 0;
     };
