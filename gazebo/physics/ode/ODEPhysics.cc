@@ -164,8 +164,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   this->stepTimeDouble = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
 
-  // No default damping. Damping should be applied on a link-by-link basis.
-  dWorldSetDamping(this->worldId, 0.0, 0.0);
+  dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,

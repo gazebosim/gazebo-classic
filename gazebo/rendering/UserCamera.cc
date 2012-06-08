@@ -380,13 +380,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimationState("cameratrack");
   }
 
-  Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", .5);
-  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
-
-  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
-
   math::Box box = _visual->GetBoundingBox();
   math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
@@ -420,6 +413,18 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   end = mid + dir*(dist - scale);
 
+  dist = start.Distance(end);
+  double vel = 5.0;
+  double time = dist / vel;
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation("cameratrack", time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
+
+
   Ogre::TransformKeyFrame *key;
 
   key = strack->createNodeKeyFrame(0);
@@ -429,18 +434,19 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  key = strack->createNodeKeyFrame(.2);
+  /*key = strack->createNodeKeyFrame(time * 0.5);
   key->setTranslate(Ogre::Vector3(mid.x, mid.y, mid.z));
   key->setRotation(yawFinal);
 
-  key = ptrack->createNodeKeyFrame(.2);
+  key = ptrack->createNodeKeyFrame(time * 0.5);
   key->setRotation(pitchFinal);
+  */
 
-  key = strack->createNodeKeyFrame(.5);
+  key = strack->createNodeKeyFrame(time);
   key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
   key->setRotation(yawFinal);
 
-  key = ptrack->createNodeKeyFrame(.5);
+  key = ptrack->createNodeKeyFrame(time);
   key->setRotation(pitchFinal);
 
   this->animState =

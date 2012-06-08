@@ -20,13 +20,14 @@
 #include "gui/qt.h"
 #include "gazebo.hh"
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/Plugin.hh"
-#include "common/CommonTypes.hh"
-#include "gui/MainWindow.hh"
-#include "gui/ModelRightMenu.hh"
-#include "gui/Gui.hh"
+#include <gazebo/common/Exception.hh>
+#include <gazebo/common/Console.hh>
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/common/CommonTypes.hh>
+#include <gazebo/gui/MainWindow.hh>
+#include <gazebo/gui/LightRightMenu.hh>
+#include <gazebo/gui/ModelRightMenu.hh>
+#include <gazebo/gui/Gui.hh>
 
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
@@ -40,6 +41,7 @@ po::variables_map vm;
 using namespace gazebo;
 
 gui::ModelRightMenu *g_modelRightMenu = NULL;
+gui::LightRightMenu *g_lightRightMenu = NULL;
 
 std::string g_worldname = "default";
 
@@ -123,6 +125,8 @@ namespace gazebo
     void load()
     {
       g_modelRightMenu = new gui::ModelRightMenu();
+      g_lightRightMenu = new gui::LightRightMenu();
+
       rendering::load();
       rendering::init();
 

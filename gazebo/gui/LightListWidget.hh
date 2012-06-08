@@ -62,9 +62,10 @@ namespace gazebo
       private slots: void Update();
       private: void OnSetSelectedEntity(const std::string &_name);
 
+      private slots: void OnCustomContextMenu(const QPoint &_pt);
+
       /*
       private slots: void OnPropertyChanged(QtProperty *_item);
-      private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
       private: void OnResponse(ConstResponsePtr &_msg);
 

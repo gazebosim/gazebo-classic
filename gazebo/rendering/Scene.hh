@@ -153,9 +153,6 @@ namespace gazebo
       /// \brief Get a light based on an index
       public: LightPtr GetLight(unsigned int _index) const;
 
-      /// \brief Create a visual
-      public: VisualPtr CreateVisual(const std::string &_name);
-
       /// \brief Get a visual by name
       public: VisualPtr GetVisual(const std::string &_name) const;
 
@@ -304,6 +301,8 @@ namespace gazebo
 
       public: void Clear();
 
+      public: void RegisterVisual(VisualPtr _vis);
+
       // private: void ClearImpl();
       private: std::string name;
 
@@ -372,6 +371,7 @@ namespace gazebo
       private: transport::SubscriberPtr skeletonPoseSub;
       private: transport::SubscriberPtr triggerSub;
       private: transport::PublisherPtr requestPub;
+      private: transport::PublisherPtr lightPub;
 
       private: std::vector<event::ConnectionPtr> connections;
 
