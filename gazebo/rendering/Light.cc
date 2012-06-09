@@ -46,10 +46,6 @@ Light::Light(Scene *scene_)
 {
   this->scene = scene_;
 
-  std::ostringstream stream;
-  stream << "__LIGHT__" << this->lightCounter << "__VISUAL";
-  this->visual = new Visual(stream.str(), this->scene->GetWorldVisual());
-
   this->lightCounter++;
 
   this->sdf.reset(new sdf::Element);
@@ -64,7 +60,7 @@ Light::~Light()
 
   this->sdf->Reset();
   this->sdf.reset();
-  delete this->visual;
+  this->visual.reset();
 }
 
 //////////////////////////////////////////////////
@@ -117,7 +113,10 @@ void Light::Load()
     this->SetSpotFalloff(elem->GetValueDouble("falloff"));
   }
 
+  this->visual.reset(new Visual(this->GetName(),
+                     this->scene->GetWorldVisual()));
   this->visual->AttachObject(this->light);
+  this->scene->RegisterVisual(this->visual);
 
   this->CreateVisual();
 }
@@ -339,17 +338,14 @@ void Light::CreateVisual()
 }
 
 //////////////////////////////////////////////////
-void Light::SetPosition(const math::Vector3 &p)
+void Light::SetPosition(const math::Vector3 &_p)
 {
-  this->visual->SetPosition(p);
+  this->visual->SetPosition(_p);
 }
 
 //////////////////////////////////////////////////
 bool Light::SetSelected(bool s)
 {
-  // NATY: FIX
-  // Entity::SetSelected(s);
-
   if (this->light->getType() != Ogre::Light::LT_DIRECTIONAL)
   {
     if (s)

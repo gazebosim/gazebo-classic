@@ -66,6 +66,8 @@ SystemPaths::SystemPaths()
   this->logPath = fullPath;
 
   this->UpdateGazeboPaths();
+  this->UpdatePluginPaths();
+  this->UpdateOgrePaths();
 }
 
 /////////////////////////////////////////////////
@@ -79,6 +81,20 @@ const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {
   this->UpdateGazeboPaths();
   return this->gazeboPaths;
+}
+
+/////////////////////////////////////////////////
+const std::list<std::string> &SystemPaths::GetPluginPaths()
+{
+  this->UpdatePluginPaths();
+  return this->pluginPaths;
+}
+
+/////////////////////////////////////////////////
+const std::list<std::string> &SystemPaths::GetOgrePaths()
+{
+  this->UpdateOgrePaths();
+  return this->ogrePaths;
 }
 
 /////////////////////////////////////////////////
@@ -109,36 +125,7 @@ void SystemPaths::UpdateGazeboPaths()
 }
 
 //////////////////////////////////////////////////
-const std::list<std::string> &SystemPaths::GetOgrePaths()
-{
-  std::string delim(":");
-  std::string path;
-
-  char *pathCStr = getenv("OGRE_RESOURCE_PATH");
-  if (!pathCStr || *pathCStr == '\0')
-  {
-    // gzdbg << "ogrePaths is empty and OGRE_RESOURCE_PATH doesn't exist. "
-    //  << "Set OGRE_RESOURCE_PATH to Ogre's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return this->ogrePaths;
-  }
-  path = pathCStr;
-
-  size_t pos1 = 0;
-  size_t pos2 = path.find(delim);
-  while (pos2 != std::string::npos)
-  {
-    this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
-    pos1 = pos2+1;
-    pos2 = path.find(delim, pos2+1);
-  }
-  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
-
-  return this->ogrePaths;
-}
-
-//////////////////////////////////////////////////
-const std::list<std::string> &SystemPaths::GetPluginPaths()
+void SystemPaths::UpdatePluginPaths()
 {
   std::string delim(":");
   std::string path;
@@ -149,7 +136,7 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
     // gzdbg << "pluginPaths and GAZEBO_PLUGIN_PATH doesn't exist."
     //  << "Set GAZEBO_PLUGIN_PATH to Ogre's installation path."
     //  << " ...or are you loading via SystemPlugins?\n";
-    return this->pluginPaths;
+    return;
   }
   path = pathCStr;
 
@@ -162,8 +149,33 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
     pos2 = path.find(delim, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
+}
 
-  return this->pluginPaths;
+//////////////////////////////////////////////////
+void SystemPaths::UpdateOgrePaths()
+{
+  std::string delim(":");
+  std::string path;
+
+  char *pathCStr = getenv("OGRE_RESOURCE_PATH");
+  if (!pathCStr || *pathCStr == '\0')
+  {
+    // gzdbg << "ogrePaths is empty and OGRE_RESOURCE_PATH doesn't exist. "
+    //  << "Set OGRE_RESOURCE_PATH to Ogre's installation path. "
+    //  << "...or are you using SystemPlugins?\n";
+    return;
+  }
+  path = pathCStr;
+
+  size_t pos1 = 0;
+  size_t pos2 = path.find(delim);
+  while (pos2 != std::string::npos)
+  {
+    this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
+    pos1 = pos2+1;
+    pos2 = path.find(delim, pos2+1);
+  }
+  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
 }
 
 //////////////////////////////////////////////////

@@ -131,7 +131,7 @@ namespace gazebo
       /// The OGRE light source
       private: Ogre::Light *light;
 
-      private: Visual *visual;
+      private: VisualPtr visual;
       private: DynamicLines *line;
 
       private: sdf::ElementPtr sdf;
