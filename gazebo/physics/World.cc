@@ -80,8 +80,6 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
 
-  this->resetType_ = Base::BASE;
-
   this->name = _name;
 
   this->setWorldPoseMutex = new boost::recursive_mutex();
@@ -616,12 +614,7 @@ void World::Reset(bool _resetTime, Base::EntityType _resetType)
     this->startTime = common::Time::GetWallTime();
   }
 
-  this->resetType_ = _resetType;
-  this->rootElement->Reset();
-  // FIXME:  reset default reset type to all, in case Base::Reset()
-  //   is called from outside of World::Reset(...)
-  //   I feel this could be made cleaner somehow?
-  this->resetType_ = Base::BASE;
+  this->rootElement->ResetAll(_resetType);
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)

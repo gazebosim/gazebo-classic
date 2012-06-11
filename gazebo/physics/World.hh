@@ -109,8 +109,6 @@ namespace gazebo
 
       /// \brief Reset the simulation to the initial settings
       public: void Reset(bool _resetTime = true, Base::EntityType _resetType = Base::BASE);
-      // reset with option to reset models only
-      public: Base::EntityType resetType_;
 
       /// \brief Get the selected entity
       public: EntityPtr GetSelectedEntity() const;

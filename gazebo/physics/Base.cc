@@ -104,11 +104,19 @@ void Base::Fini()
 //////////////////////////////////////////////////
 void Base::Reset()
 {
+  // this->Reset(BASE);
+}
+
+//////////////////////////////////////////////////
+void Base::ResetAll(Base::EntityType _resetType)
+{
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
-    if ((*iter)->HasType(this->world->resetType_))
+    if ((*iter)->HasType(_resetType))
       (*iter)->Reset();
+
+    (*iter)->ResetAll(_resetType);
   }
 }
 
