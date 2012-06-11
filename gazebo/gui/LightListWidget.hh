@@ -64,6 +64,8 @@ namespace gazebo
       private slots: void OnLightSelection(QListWidgetItem *item);
       private slots: void Update();
 
+      private slots: void OnCustomContextMenu(const QPoint &_pt);
+
       /*
       private slots: void OnPropertyChanged(QtProperty *_item);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);

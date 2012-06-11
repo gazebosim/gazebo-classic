@@ -602,7 +602,7 @@ ModelPtr World::GetModel(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void World::Reset(bool _resetTime)
+void World::Reset(bool _resetTime, bool _resetModelsOnly)
 {
   bool currently_paused = this->IsPaused();
   this->SetPaused(true);
@@ -614,7 +614,7 @@ void World::Reset(bool _resetTime)
     this->startTime = common::Time::GetWallTime();
   }
 
-  this->rootElement->Reset();
+  this->rootElement->Reset(_resetModelsOnly);
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
