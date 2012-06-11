@@ -115,10 +115,6 @@ namespace gazebo
       public: virtual void Reset();
       public: virtual void Update() {}
 
-      // reset with option to reset models only
-      public: virtual void Reset(bool _resetModelsOnly);
-      public: bool resetModelsOnly_;
-
       /// \brief Update the parameters using new sdf values
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 

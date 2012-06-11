@@ -39,7 +39,6 @@ Base::Base(BasePtr _parent)
   this->id = ++idCounter;
   this->saveable = true;
   this->selected = false;
-  this->resetModelsOnly_ = false;
 
   this->sdf.reset(new sdf::Element);
   this->sdf->AddAttribute("name", "string", "__default__", true);
@@ -103,21 +102,12 @@ void Base::Fini()
 }
 
 //////////////////////////////////////////////////
-void Base::Reset(bool _resetModelsOnly)
-{
-  this->resetModelsOnly_ = _resetModelsOnly;
-  this->Reset();
-}
-
-//////////////////////////////////////////////////
 void Base::Reset()
 {
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
-    // FIXME: this will not work on nested model
-    (*iter)->resetModelsOnly_ = this->resetModelsOnly_;
-    if (!this->resetModelsOnly_ || (*iter)->HasType(Base::MODEL))
+    if ((*iter)->HasType(this->world->resetType_))
       (*iter)->Reset();
   }
 }
