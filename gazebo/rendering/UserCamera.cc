@@ -91,63 +91,7 @@ void UserCamera::Init()
 {
   Camera::Init();
   this->SetHFOV(GZ_DTOR(60));
-  this->SetClipDist(0.1, 100);
-
-  /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
-
-  // The lines draw a visualization of the camera
-  DynamicLines *line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
-
-  float f = 0.2;
-
-  // Create the front face
-  line->AddPoint(math::Vector3(0, -f, -f));
-  line->AddPoint(math::Vector3(0, -f, +f));
-
-  line->AddPoint(math::Vector3(0, -f, +f));
-  line->AddPoint(math::Vector3(0, +f, +f));
-
-  line->AddPoint(math::Vector3(0, +f, +f));
-  line->AddPoint(math::Vector3(0, +f, -f));
-
-  line->AddPoint(math::Vector3(0, +f, -f));
-  line->AddPoint(math::Vector3(0, -f, -f));
-
-
-  // Create the connecting lines
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, -f, -f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, -f, +f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, +f, +f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, +f, -f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, -f, -f));
-
-  // Draw up arrow
-  line->AddPoint(math::Vector3(0, 0, +f));
-  line->AddPoint(math::Vector3(0, 0, +f+0.1));
-
-  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1));
-  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1));
-
-  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1));
-  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15));
-
-  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15));
-  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1));
-
-  line->setMaterial("Gazebo/WhiteGlow");
-  line->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  this->visual->SetVisible(false);
-  */
+  this->SetClipDist(0.1, 200);
 }
 
 //////////////////////////////////////////////////
