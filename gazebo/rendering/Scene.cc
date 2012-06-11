@@ -1705,7 +1705,7 @@ void Scene::SetSky(const std::string &_material)
     orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1, 0, 0));
     double curvature = 10;  // ogre recommended default
     double tiling = 8;  // ogre recommended default
-    double distance = 100;  // ogre recommended default
+    double distance = 100;
     this->manager->setSkyDome(true, _material, curvature,
         tiling, distance, true, orientation);
   }

@@ -64,8 +64,8 @@ LightListWidget::LightListWidget(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->lightListWidget = new QListWidget();
   this->lightListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  // connect(this->lightListWidget, SIGNAL(itemClicked(QListWidgetItem *)),
-  //         this, SLOT(OnLightSelection(QListWidgetItem *)));
+  connect(this->lightListWidget, SIGNAL(itemClicked(QListWidgetItem *)),
+          this, SLOT(OnLightSelection(QListWidgetItem *)));
   connect(this->lightListWidget,
        SIGNAL(customContextMenuRequested(const QPoint &)),
        this, SLOT(OnCustomContextMenu(const QPoint &)));
@@ -118,18 +118,15 @@ LightListWidget::~LightListWidget()
 }
 
 /////////////////////////////////////////////////
-void LightListWidget::OnLightSelection(QListWidgetItem * /*_item*/,
-  int /*_column*/)
+void LightListWidget::OnLightSelection(QListWidgetItem *_item)
 {
-  /*
   if (_item)
   {
-    std::string name = _item->data(1, Qt::UserRole).toString().toStdString();
+    std::string name = _item->data(Qt::UserRole).toString().toStdString();
     event::Events::setSelectedEntity(name);
   }
   else
     this->selectedModelName.clear();
-    */
 }
 
 /////////////////////////////////////////////////
