@@ -63,13 +63,16 @@ foreach (hdr ${headers})
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
-
 gz_add_library(gazebo_common ${sources})
 target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
                                     ${Boost_LIBRARIES}
                                     ${freeimage_library}
-                                    ${TINYXML_LIBRARIES})
+                                    ${TINYXML_LIBRARIES}
+                                    ${libavcodec_LIBRARIES}
+                                    ${libavformat_LIBRARIES}
+                                    swscale
+                                    )
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)

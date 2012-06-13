@@ -206,7 +206,7 @@ void World::Load(sdf::ElementPtr _sdf)
   event::Events::worldCreated(this->GetName());
 
   common::Video video;
-  video.Read("/home/nkoenig/Dropbox/kitting1.avi");
+  video.Read("/home/nkoenig/Dropbox/videos/kitting1.avi");
 }
 
 //////////////////////////////////////////////////

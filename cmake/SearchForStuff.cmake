@@ -180,19 +180,19 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find AV format
-  pkg_check_modules(AVF libavformat)
-  if (NOT AVF_FOUND)
+  pkg_check_modules(libavformat libavformat)
+  if (NOT libavformat_FOUND)
     BUILD_WARNING ("libavformat not found. Audio-video capabilities will be disabled.")
   endif ()
 
   ########################################
   # Find avcodec
-  pkg_check_modules(AVC libavcodec)
-  if (NOT AVC_FOUND)
+  pkg_check_modules(libavcodec libavcodec)
+  if (NOT libavcodec_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   endif ()
 
-  if (AVF_FOUND AND AVC_FOUND)
+  if (libavformat_FOUND AND libavcodec_FOUND)
     set (HAVE_FFMPEG TRUE)
   endif ()
 

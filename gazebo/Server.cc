@@ -190,6 +190,7 @@ bool Server::Load(const std::string &_filename)
   /// Load the physics library
   physics::load();
 
+
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
   if (worldElem)
   {
@@ -225,6 +226,8 @@ bool Server::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 void Server::Init()
 {
+  gazebo::init();
+
   sensors::init();
 
   physics::init_worlds();
