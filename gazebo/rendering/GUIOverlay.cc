@@ -140,7 +140,6 @@ void GUIOverlay::CreateWindow(const std::string &_type,
                                const math::Vector2d &_size,
                                const std::string &_text)
 {
-
   CEGUI::Window *parent =
     CEGUI::WindowManager::getSingleton().getWindow(_parent);
   CEGUI::Window *window =
@@ -247,7 +246,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
 #else
 bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &/*_evt*/)
 {
-  return true;
+  return false;
 }
 #endif
 

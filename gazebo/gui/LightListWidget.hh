@@ -58,13 +58,14 @@ namespace gazebo
       private: void OnRemoveScene(const std::string &_name);
       private: void ProcessLightMsgs();
       private: void OnLightMsg(ConstLightPtr &_msg);
-      private slots: void OnLightSelection(QListWidgetItem *item, int column);
-      private slots: void Update();
       private: void OnSetSelectedEntity(const std::string &_name);
+
+      private slots: void OnCustomContextMenu(const QPoint &_pt);
+      private slots: void OnLightSelection(QListWidgetItem *item);
+      private slots: void Update();
 
       /*
       private slots: void OnPropertyChanged(QtProperty *_item);
-      private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
       private: void OnResponse(ConstResponsePtr &_msg);
 

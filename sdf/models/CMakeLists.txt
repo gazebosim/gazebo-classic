@@ -32,6 +32,7 @@ set (models
   actor_circle.model
   actor_demo.model
   actor.model
+  japanese_restaurant.model
   )
 
 set (lights

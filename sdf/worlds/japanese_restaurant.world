@@ -1,0 +1,25 @@
+<?xml version="1.0"?> 
+<gazebo version="1.0">
+  <world name="default">
+
+    <!-- Invisible ground plane -->
+    <model name="ground" static="true">
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <surface>
+            <friction>
+              <ode mu="100" mu2="50"/>
+            </friction>
+          </surface>
+        </collision>
+      </link>
+    </model>
+
+    <include filename="japanese_restaurant.model"/>
+
+    <include filename="sun.light"/>
+  </world>
+</gazebo>

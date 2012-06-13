@@ -1216,7 +1216,9 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
   return true;
 }
 
-bool initElem(xmlNodePtr _node, const std::string &_key, sdf::ElementPtr _attr)
+//////////////////////////////////////////////////
+bool initElem(xmlNodePtr /*_node*/, const std::string &/*_key*/,
+              sdf::ElementPtr /*_attr*/)
 {
   // to be implemented
   return false;

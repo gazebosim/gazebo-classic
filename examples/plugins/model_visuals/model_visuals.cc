@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/gazebo.hh>
 

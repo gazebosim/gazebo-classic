@@ -91,63 +91,7 @@ void UserCamera::Init()
 {
   Camera::Init();
   this->SetHFOV(GZ_DTOR(60));
-  this->SetClipDist(0.1, 100);
-
-  /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
-
-  // The lines draw a visualization of the camera
-  DynamicLines *line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
-
-  float f = 0.2;
-
-  // Create the front face
-  line->AddPoint(math::Vector3(0, -f, -f));
-  line->AddPoint(math::Vector3(0, -f, +f));
-
-  line->AddPoint(math::Vector3(0, -f, +f));
-  line->AddPoint(math::Vector3(0, +f, +f));
-
-  line->AddPoint(math::Vector3(0, +f, +f));
-  line->AddPoint(math::Vector3(0, +f, -f));
-
-  line->AddPoint(math::Vector3(0, +f, -f));
-  line->AddPoint(math::Vector3(0, -f, -f));
-
-
-  // Create the connecting lines
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, -f, -f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, -f, +f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, +f, +f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, +f, -f));
-
-  line->AddPoint(math::Vector3(-0.4, 0, 0));
-  line->AddPoint(math::Vector3(+0.0, -f, -f));
-
-  // Draw up arrow
-  line->AddPoint(math::Vector3(0, 0, +f));
-  line->AddPoint(math::Vector3(0, 0, +f+0.1));
-
-  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1));
-  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1));
-
-  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1));
-  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15));
-
-  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15));
-  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1));
-
-  line->setMaterial("Gazebo/WhiteGlow");
-  line->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  this->visual->SetVisible(false);
-  */
+  this->SetClipDist(0.1, 200);
 }
 
 //////////////////////////////////////////////////
@@ -380,13 +324,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimationState("cameratrack");
   }
 
-  Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", .5);
-  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
-
-  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
-
   math::Box box = _visual->GetBoundingBox();
   math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
@@ -420,6 +357,18 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   end = mid + dir*(dist - scale);
 
+  dist = start.Distance(end);
+  double vel = 5.0;
+  double time = dist / vel;
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation("cameratrack", time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
+
+
   Ogre::TransformKeyFrame *key;
 
   key = strack->createNodeKeyFrame(0);
@@ -429,18 +378,19 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  key = strack->createNodeKeyFrame(.2);
+  /*key = strack->createNodeKeyFrame(time * 0.5);
   key->setTranslate(Ogre::Vector3(mid.x, mid.y, mid.z));
   key->setRotation(yawFinal);
 
-  key = ptrack->createNodeKeyFrame(.2);
+  key = ptrack->createNodeKeyFrame(time * 0.5);
   key->setRotation(pitchFinal);
+  */
 
-  key = strack->createNodeKeyFrame(.5);
+  key = strack->createNodeKeyFrame(time);
   key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
   key->setRotation(yawFinal);
 
-  key = ptrack->createNodeKeyFrame(.5);
+  key = ptrack->createNodeKeyFrame(time);
   key->setRotation(pitchFinal);
 
   this->animState =

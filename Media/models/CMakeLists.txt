@@ -1,6 +1,7 @@
 add_subdirectory(bandit)
 add_subdirectory(blender)
 add_subdirectory(epuck)
+add_subdirectory(japanese_restaurant)
 add_subdirectory(PioneerArm)
 add_subdirectory(pioneer2dx)
 add_subdirectory(pioneer2at)

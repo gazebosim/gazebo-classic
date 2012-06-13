@@ -98,6 +98,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->requestSub = this->node->Subscribe("~/request",
       &Scene::OnRequest, this);
 
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
   this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
@@ -441,22 +443,6 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
     cam = this->userCameras[index];
 
   return cam;
-}
-
-//////////////////////////////////////////////////
-VisualPtr Scene::CreateVisual(const std::string &_name)
-{
-  if (this->GetVisual(_name) != NULL)
-  {
-    gzerr << "Visual with name[" << _name << "] already exists\n";
-    return VisualPtr();
-  }
-
-  VisualPtr result(new Visual(_name, this->worldVisual));
-  result->Load();
-  this->visuals[_name] = result;
-
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -1421,6 +1407,15 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::RegisterVisual(VisualPtr _vis)
+{
+  if (this->visuals.find(_vis->GetName()) != this->visuals.end())
+    gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+
+  this->visuals[_vis->GetName()] = _vis;
+}
+
+/////////////////////////////////////////////////
 bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 {
   VisualPtr linkVis = this->GetVisual(_msg->name());
@@ -1686,6 +1681,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
   {
     LightPtr light(new Light(this));
     light->LoadFromMsg(_msg);
+    this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
@@ -1709,7 +1705,7 @@ void Scene::SetSky(const std::string &_material)
     orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1, 0, 0));
     double curvature = 10;  // ogre recommended default
     double tiling = 8;  // ogre recommended default
-    double distance = 100;  // ogre recommended default
+    double distance = 100;
     this->manager->setSkyDome(true, _material, curvature,
         tiling, distance, true, orientation);
   }

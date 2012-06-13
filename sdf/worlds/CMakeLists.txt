@@ -6,6 +6,7 @@ set (files
   camera.world
   depth_camera.world
   empty.world
+  japanese_restaurant.world
   joints.world
   heightmap.world
   kitchen.world
