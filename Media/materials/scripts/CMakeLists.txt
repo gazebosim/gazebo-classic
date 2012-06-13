@@ -1,12 +1,14 @@
-SET (files Gazebo.material 
-           kitchen.material
-           shadow_receiver.program 
-           shadow_caster.program
-           perpixel.program
-           blur.compositor
-           blur.material
-           pssm.material
-           youbot.material
+set (files
+  grid.material
+  Gazebo.material 
+  kitchen.material
+  shadow_receiver.program 
+  shadow_caster.program
+  perpixel.program
+  blur.compositor
+  blur.material
+  pssm.material
+  youbot.material
 )
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/scripts/)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/scripts/)

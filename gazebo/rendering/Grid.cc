@@ -28,16 +28,16 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-Grid::Grid(Scene *scene_, unsigned int cellCount_, float cellLength_,
-            float lineWidth_, const common::Color& color_)
-: scene(scene_)
+Grid::Grid(Scene *_scene, unsigned int _cellCount, float _cellLength,
+           float _lineWidth, const common::Color& _color)
+: scene(_scene)
 {
   this->height = 0;
 
-  this->cellCountP = cellCount_;
-  this->cellLengthP = cellLength_;
-  this->lineWidthP = lineWidth_;
-  this->colorP = color_;
+  this->cellCountP = _cellCount;
+  this->cellLengthP = _cellLength;
+  this->lineWidthP = _lineWidth;
+  this->colorP = _color;
   this->h_offsetP = 0.001;
 
   static uint32_t gridCount = 0;

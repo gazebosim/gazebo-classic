@@ -1,4 +1,5 @@
 import * from "shadow_receiver.program"
+import * from "grid.material"
 
 vertex_program Gazebo/DepthMapVS glsl
 {
@@ -136,6 +137,15 @@ material Gazebo/Grey
       ambient .1 .1 .1  1.0
       diffuse .5 .5 .5  1.0
       specular 0.1 0.1 0.1 1.000000 12.500000
+    }
+
+    pass
+    {
+      depth_check off
+      depth_write off
+      scene_blend src_alpha one
+      vertex_program_ref grid_vp_glsl {}
+      fragment_program_ref grid_fp_glsl {}
     }
   }
 }
