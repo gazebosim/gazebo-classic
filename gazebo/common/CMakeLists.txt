@@ -23,6 +23,7 @@ set (sources
   SystemPaths.cc
   Time.cc
   Timer.cc
+  Video.cc
 )
 
 set (headers 
@@ -52,6 +53,7 @@ STLLoader.hh
 SystemPaths.hh
 Time.hh
 Timer.hh
+Video.hh
 )
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)

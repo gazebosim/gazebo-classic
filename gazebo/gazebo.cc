@@ -56,6 +56,9 @@ bool gazebo::load()
 /////////////////////////////////////////////////
 bool gazebo::init()
 {
+  // Initialize Video codecs
+  common::Video::Init();
+
   for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
        iter != g_plugins.end(); ++iter)
   {
