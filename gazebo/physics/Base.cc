@@ -108,7 +108,7 @@ void Base::Reset()
 }
 
 //////////////////////////////////////////////////
-void Base::ResetAll(Base::EntityType _resetType)
+void Base::Reset(Base::EntityType _resetType)
 {
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
@@ -116,7 +116,7 @@ void Base::ResetAll(Base::EntityType _resetType)
     if ((*iter)->HasType(_resetType))
       (*iter)->Reset();
 
-    (*iter)->ResetAll(_resetType);
+    (*iter)->Reset(_resetType);
   }
 }
 

@@ -113,7 +113,7 @@ namespace gazebo
 
       public: virtual void Init() {}
       public: virtual void Reset();
-      public: virtual void ResetAll(Base::EntityType _resetType);
+      public: virtual void Reset(Base::EntityType _resetType);
       public: virtual void Update() {}
 
       /// \brief Update the parameters using new sdf values

@@ -614,7 +614,7 @@ void World::Reset(bool _resetTime, Base::EntityType _resetType)
     this->startTime = common::Time::GetWallTime();
   }
 
-  this->rootElement->ResetAll(_resetType);
+  this->rootElement->Reset(_resetType);
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
