@@ -71,6 +71,10 @@ namespace gazebo
       /// \brief Load an image. Return 0 on success
       public: int Load(const std::string &_filename);
 
+      /// \brief Save the image in PNG format
+      /// \param _filename The name of the saved image
+      public: void SavePNG(const std::string &_filename);
+
       /// \brief Set the image from raw data (R8G8B8)
       /// \param data Pointer to the raw image data
       /// \param width Width in pixels

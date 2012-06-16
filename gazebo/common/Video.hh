@@ -18,6 +18,13 @@
 #define __VIDEO_HH__
 
 #include <string>
+#include <gazebo/common/Image.hh>
+
+struct AVFormatContext;
+struct AVCodecContext;
+struct AVFrame;
+struct AVPicture;
+struct SwsContext;
 
 namespace gazebo
 {
@@ -34,10 +41,28 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Video();
 
-      /// \brief Initialize video codec.
-      public: static void Init();
+      /// \brief Load a video file
+      /// \param _filename Full path of the video file
+      public: bool Load(const std::string &_filename);
 
-      public: bool Read(const std::string &_filename);
+      /// \brief Get the width of the video in pixels
+      public: int GetWidth() const;
+
+      /// \brief Get the height of the video in pixels
+      public: int GetHeight() const;
+
+      /// \brief Get the next frame of the video. 
+      /// \param _img Image in which the frame is stored
+      public: bool GetNextFrame(unsigned char **_buffer);
+
+      private: void Cleanup();
+
+      private: AVFormatContext *formatCtx;
+      private: AVCodecContext *codecCtx;
+      private: AVFrame *avFrame;
+      private: AVPicture *pic;
+      private: SwsContext *swsCtx;
+      private: int videoStream;
     };
     /// \}
   }

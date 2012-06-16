@@ -44,6 +44,7 @@
 #include "rendering/DynamicLines.hh"
 #include "rendering/RFIDVisual.hh"
 #include "rendering/RFIDTagVisual.hh"
+#include "rendering/VideoVisual.hh"
 
 #include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
@@ -267,6 +268,8 @@ void Scene::Init()
         this->worldVisual, "~/physics/contacts"));
   this->visuals[contactVis->GetName()] = contactVis;
   */
+
+  VideoVisual *video = new VideoVisual("video_visual", this->worldVisual);
 }
 
 //////////////////////////////////////////////////

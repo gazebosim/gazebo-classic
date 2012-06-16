@@ -25,9 +25,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-
-#include "common/Video.hh"
-
 #include "sdf/sdf.hh"
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
@@ -204,9 +201,6 @@ void World::Load(sdf::ElementPtr _sdf)
   // this->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
-
-  common::Video video;
-  video.Read("/home/nkoenig/Dropbox/videos/kitting1.avi");
 }
 
 //////////////////////////////////////////////////

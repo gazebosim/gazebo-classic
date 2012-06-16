@@ -38,6 +38,7 @@ set (sources
   Scene.cc
   SelectionObj.cc
   UserCamera.cc
+  VideoVisual.cc
   ViewController.cc
   Visual.cc
   WindowManager.cc
@@ -76,11 +77,13 @@ set (headers
   Scene.hh
   SelectionObj.hh
   UserCamera.hh
+  VideoVisual.hh
   ViewController.hh
   Visual.hh
   WindowManager.hh
   ogre_gazebo.h
-  cegui.h)
+  cegui.h
+)
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
