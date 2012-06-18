@@ -719,6 +719,23 @@ material Gazebo/Gold
 	}
 }
 
+material Gazebo/GreyGradientSky
+{
+	technique
+	{
+		pass
+		{
+			depth_write off
+      lighting off
+
+			texture_unit
+			{
+				texture grey_gradient.jpg
+			}
+		}
+	}
+}
+
 material Gazebo/CloudySky
 {
 	technique

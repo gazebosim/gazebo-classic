@@ -4,6 +4,7 @@
     <scene>
       <grid enabled="false"/>
     </scene>
+
     <!-- A ground plane -->
     <include filename="ground_plane.model"/>
 

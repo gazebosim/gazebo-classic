@@ -262,14 +262,30 @@ void Scene::Init()
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 
+  DynamicLines *lines = this->worldVisual->CreateDynamicLine();
+  lines->AddPoint(math::Vector3(0, 0, 0));
+  lines->AddPoint(math::Vector3(5, 0, 0));
+  lines->setMaterial("Gazebo/Red");
+  lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  lines = this->worldVisual->CreateDynamicLine();
+  lines->AddPoint(math::Vector3(0, 0, 0));
+  lines->AddPoint(math::Vector3(0, 5, 0));
+  lines->setMaterial("Gazebo/Green");
+  lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  lines = this->worldVisual->CreateDynamicLine();
+  lines->AddPoint(math::Vector3(0, 0, 0));
+  lines->AddPoint(math::Vector3(0, 0, 5));
+  lines->setMaterial("Gazebo/Blue");
+  lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
         "_GUIONLY_world_contact_vis",
         this->worldVisual, "~/physics/contacts"));
   this->visuals[contactVis->GetName()] = contactVis;
   */
-
-  VideoVisual *video = new VideoVisual("video_visual", this->worldVisual);
 }
 
 //////////////////////////////////////////////////
