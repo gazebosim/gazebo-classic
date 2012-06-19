@@ -145,7 +145,7 @@ int Image::Load(const std::string &_filename)
 //////////////////////////////////////////////////
 void Image::SavePNG(const std::string &_filename)
 {
-  FreeImage_Save(FIF_PNG, this->bitmap, _filename.c_str(),0);
+  FreeImage_Save(FIF_PNG, this->bitmap, _filename.c_str(), 0);
 }
 
 //////////////////////////////////////////////////

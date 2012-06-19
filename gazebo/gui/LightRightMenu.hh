@@ -19,9 +19,9 @@
 
 #include <map>
 #include <string>
-#include <gazebo/gui/qt.h>
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/transport/TransportTypes.hh>
+#include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {

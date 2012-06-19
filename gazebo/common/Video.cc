@@ -25,7 +25,8 @@
 #define UINT64_C(c) (c ## ULL)
 #endif
 
-extern "C" {
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
@@ -36,41 +37,41 @@ using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
-// Declaring this function here to avoid including libavcodec/format headers
-// in Video.hh
-#ifdef HAVE_FFMPEG
-static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
-                     char *filename)
-{
-  FILE *f;
-  int i;
-
-  f=fopen(filename,"w");
-  fprintf(f,"P6\n%d %d\n%d\n",xsize,ysize,255);
-  for(i=0;i<ysize;i++)
-    fwrite(buf + i * wrap,1,xsize*3,f);
-  fclose(f);
-}
-#endif
+// #ifdef HAVE_FFMPEG
+// static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
+//                      char *filename)
+// {
+//   FILE *f;
+//   int i;
+//
+//   f = fopen(filename, "w");
+//   fprintf(f, "P6\n%d %d\n%d\n", xsize, ysize, 255);
+//   for(i = 0; i < ysize; i++)
+//     fwrite(buf + i * wrap, 1, xsize * 3, f);
+//   fclose(f);
+// }
+// #endif
 
 /////////////////////////////////////////////////
 Video::Video()
 {
+  this->formatCtx = NULL;
+  this->codecCtx = NULL;
+  this->avFrame = NULL;
+  this->swsCtx = NULL;
+  this->avFrame = NULL;
+  this->pic = NULL;
+
+#ifdef HAVE_FFMPEG
   static bool first = true;
   if (first)
   {
     first = false;
-#ifdef HAVE_FFMPEG
     av_register_all();
-#endif
   }
 
-  this->formatCtx = NULL;
-  this->codecCtx = NULL;
-  this->avFrame = NULL;
   this->pic = new AVPicture;
-  this->swsCtx = NULL;
-  this->avFrame = NULL;
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -83,6 +84,7 @@ Video::~Video()
 /////////////////////////////////////////////////
 void Video::Cleanup()
 {
+#ifdef HAVE_FFMPEG
   // Free the YUV frame
   av_free(this->avFrame);
 
@@ -93,6 +95,7 @@ void Video::Cleanup()
   avcodec_close(this->codecCtx);
 
   avpicture_free(this->pic);
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -203,10 +206,10 @@ bool Video::Read(const std::string &/*_filename*/)
 #endif
 
 /////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
 bool Video::GetNextFrame(unsigned char **_buffer)
 {
   AVPacket packet, tmpPacket;
-  int processedLength = 0;
   int frameAvailable = 0;
 
   av_init_packet(&packet);
@@ -217,7 +220,7 @@ bool Video::GetNextFrame(unsigned char **_buffer)
 
   if (packet.stream_index == this->videoStream)
   {
-    processedLength = 0;
+    int processedLength = 0;
     tmpPacket.data = packet.data;
     tmpPacket.size = packet.size;
 
@@ -245,10 +248,9 @@ bool Video::GetNextFrame(unsigned char **_buffer)
         memcpy(*_buffer, this->pic->data[0],
             this->codecCtx->height * (this->codecCtx->width*3));
 
-        //_img.SetFromData(this->pic->data[0], this->codecCtx->width,
-        //                 this->codecCtx->height, Image::RGB_INT8);
-        //pgm_save(this->pic.data[0], this->pic.linesize[0],
-        //         this->codecCtx->width, this->codecCtx->height, buf);
+        // Debug:
+        // pgm_save(this->pic.data[0], this->pic.linesize[0],
+        //          this->codecCtx->width, this->codecCtx->height, buf);
       }
     }
   }
@@ -256,15 +258,29 @@ bool Video::GetNextFrame(unsigned char **_buffer)
 
   return true;
 }
+#else
+bool Video::GetNextFrame(unsigned char ** /*_buffer*/)
+{
+  return false;
+}
+#endif
 
 /////////////////////////////////////////////////
 int Video::GetWidth() const
 {
+#ifdef HAVE_FFMPEG
   return this->codecCtx->width;
+#else
+  return 0;
+#endif
 }
 
 /////////////////////////////////////////////////
 int Video::GetHeight() const
 {
+#ifdef HAVE_FFMPEG
   return this->codecCtx->height;
+#else
+  return 0;
+#endif
 }

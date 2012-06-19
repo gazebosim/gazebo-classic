@@ -15,10 +15,10 @@
  *
 */
 
-#include <gazebo/rendering/ogre_gazebo.h>
-#include <gazebo/common/Video.hh>
-#include <gazebo/rendering/VideoVisual.hh>
-#include <gazebo/common/Events.hh>
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/common/Video.hh"
+#include "gazebo/rendering/VideoVisual.hh"
+#include "gazebo/common/Events.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -62,17 +62,17 @@ VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
   mo.begin(_name + "__VideoMaterial__",
            Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
-  mo.position(0,factor * ratio, factor);
-  mo.textureCoord(0,0);
+  mo.position(0, factor * ratio, factor);
+  mo.textureCoord(0, 0);
 
-  mo.position(0,0,factor);
-  mo.textureCoord(1,0);
+  mo.position(0, 0, factor);
+  mo.textureCoord(1, 0);
 
-  mo.position(0,0,0);
-  mo.textureCoord(1,1);
+  mo.position(0, 0, 0);
+  mo.textureCoord(1, 1);
 
-  mo.position(0,ratio*factor,0);
-  mo.textureCoord(0,1);
+  mo.position(0, ratio * factor, 0);
+  mo.textureCoord(0, 1);
 
   mo.triangle(0, 3, 2);
   mo.triangle(2, 1, 0);
@@ -101,17 +101,17 @@ void VideoVisual::PreRender()
 
   // Get the pixel buffer
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
- 
+
   // Lock the pixel buffer and get a pixel box
   pixelBuffer->lock(Ogre::HardwareBuffer::HBL_DISCARD);
-      
+
   const Ogre::PixelBox& pixelBox = pixelBuffer->getCurrentLock();
   uint8_t* pDest = static_cast<uint8_t*>(pixelBox.data);
 
   // The request pixel format of the texture is not always the one that OGRE
   // creates.
   bool unusedAlpha = Ogre::PixelUtil::getNumElemBytes(
-      this->texture->getFormat()) > 3 ? true : false; 
+      this->texture->getFormat()) > 3 ? true : false;
 
   // If OGRE actually created a texture with no alpha channel, then we
   // can use memcpy
@@ -124,13 +124,13 @@ void VideoVisual::PreRender()
     int index;
     for (int j = 0; j < this->height; ++j)
     {
-      for(int i = 0; i < this->width; ++i)
+      for (int i = 0; i < this->width; ++i)
       {
         index = j*(this->width*3) + (i*3);
-        *pDest++ = this->imageBuffer[index + 2]; // B
-        *pDest++ = this->imageBuffer[index + 1]; // G
-        *pDest++ = this->imageBuffer[index + 0]; // R
-        *pDest++ = 255; // Alpha
+        *pDest++ = this->imageBuffer[index + 2];  // B
+        *pDest++ = this->imageBuffer[index + 1];  // G
+        *pDest++ = this->imageBuffer[index + 0];  // R
+        *pDest++ = 255;  // Alpha
       }
     }
   }

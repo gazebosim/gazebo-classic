@@ -18,7 +18,6 @@
 #define __VIDEO_HH__
 
 #include <string>
-#include <gazebo/common/Image.hh>
 
 struct AVFormatContext;
 struct AVCodecContext;
@@ -51,7 +50,7 @@ namespace gazebo
       /// \brief Get the height of the video in pixels
       public: int GetHeight() const;
 
-      /// \brief Get the next frame of the video. 
+      /// \brief Get the next frame of the video.
       /// \param _img Image in which the frame is stored
       public: bool GetNextFrame(unsigned char **_buffer);
 

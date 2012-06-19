@@ -21,7 +21,9 @@
 #ifndef __VIDEO_VISUAL_HH__
 #define __VIDEO_VISUAL_HH__
 
-#include <gazebo/rendering/Visual.hh>
+#include <string>
+#include <vector>
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -32,7 +34,6 @@ namespace gazebo
 
   namespace rendering
   {
-
     /// \addtogroup gazebo_rendering
     /// \{
     /// \brief A visual element that displays a video as a texture
