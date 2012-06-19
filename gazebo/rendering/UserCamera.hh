@@ -131,6 +131,8 @@ namespace gazebo
       private: FPSViewController *fpsViewController;
 
       private: GUIOverlay *gui;
+
+      private: Ogre::SceneNode *axisNode;
     };
     /// \}
   }

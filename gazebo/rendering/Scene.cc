@@ -262,24 +262,6 @@ void Scene::Init()
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 
-  DynamicLines *lines = this->worldVisual->CreateDynamicLine();
-  lines->AddPoint(math::Vector3(0, 0, 0));
-  lines->AddPoint(math::Vector3(5, 0, 0));
-  lines->setMaterial("Gazebo/Red");
-  lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  lines = this->worldVisual->CreateDynamicLine();
-  lines->AddPoint(math::Vector3(0, 0, 0));
-  lines->AddPoint(math::Vector3(0, 5, 0));
-  lines->setMaterial("Gazebo/Green");
-  lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  lines = this->worldVisual->CreateDynamicLine();
-  lines->AddPoint(math::Vector3(0, 0, 0));
-  lines->AddPoint(math::Vector3(0, 0, 5));
-  lines->setMaterial("Gazebo/Blue");
-  lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
         "_GUIONLY_world_contact_vis",
@@ -1805,13 +1787,14 @@ void Scene::SetGrid(bool _enabled)
 {
   if (_enabled)
   {
-    Grid *grid = new Grid(this, 1, 1, 10, common::Color(1, 1, 0, 1));
+    Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
     grid->Init();
     this->grids.push_back(grid);
 
-    grid = new Grid(this, 20, 1, 10, common::Color(1, 1, 1, 1));
+    grid = new Grid(this, 4, 5, 20, common::Color(0.8, 0.8, 0.8, 0.5));
     grid->Init();
     this->grids.push_back(grid);
+
   }
 }
 

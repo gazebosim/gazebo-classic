@@ -61,7 +61,7 @@ set (headers Gui.hh
              qt.h
 )
 
-set (resources images.qrc)
+set (resources resources.qrc)
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})

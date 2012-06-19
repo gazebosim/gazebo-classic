@@ -60,12 +60,11 @@ GLWidget::GLWidget(QWidget *_parent)
 //  setMinimumSize(320, 240);
 
   this->renderFrame = new QFrame;
-  this->renderFrame->setLineWidth(1);
-  this->renderFrame->setFrameShadow(QFrame::Sunken);
-  this->renderFrame->setFrameShape(QFrame::Box);
+  this->renderFrame->setFrameShape(QFrame::NoFrame);
   this->renderFrame->show();
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
   this->connections.push_back(
@@ -707,7 +706,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  this->userCamera->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0));
+  this->userCamera->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0.0));
 
   if (this->windowId >= 0)
   {

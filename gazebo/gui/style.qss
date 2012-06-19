@@ -1,0 +1,16 @@
+QMainWindow
+{
+  background: #666666;
+}
+
+QLabel
+{
+  color: #202020;
+}
+
+QLineEdit
+{
+  color: #222222;
+  background: #888888;
+  border-radius: 4;
+}

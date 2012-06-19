@@ -282,6 +282,7 @@ void Camera::Render()
   this->RenderImpl();
 }
 
+//////////////////////////////////////////////////
 void Camera::RenderImpl()
 {
   if (this->renderTarget)

@@ -28,6 +28,7 @@
 using namespace gazebo;
 using namespace gui;
 
+/////////////////////////////////////////////////
 RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -36,9 +37,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
-  this->mainFrame->setLineWidth(1);
-  this->mainFrame->setFrameShadow(QFrame::Sunken);
-  this->mainFrame->setFrameShape(QFrame::Box);
+  this->mainFrame->setFrameShape(QFrame::NoFrame);
   this->mainFrame->show();
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
@@ -47,34 +46,34 @@ RenderWidget::RenderWidget(QWidget *_parent)
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->xPosEdit = new QLineEdit;
+  this->xPosEdit->setReadOnly(true);
   this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit));
   this->xPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->xPosEdit->setFixedWidth(100);
 
   this->yPosEdit = new QLineEdit;
+  this->yPosEdit->setReadOnly(true);
   this->yPosEdit->setValidator(new QDoubleValidator(this->yPosEdit));
   this->yPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->yPosEdit->setFixedWidth(100);
 
   this->zPosEdit = new QLineEdit;
+  this->zPosEdit->setReadOnly(true);
   this->zPosEdit->setValidator(new QDoubleValidator(this->zPosEdit));
   this->zPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->zPosEdit->setFixedWidth(100);
 
   this->rollEdit = new QLineEdit;
+  this->rollEdit->setReadOnly(true);
   this->rollEdit->setValidator(new QDoubleValidator(this->rollEdit));
   this->rollEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->rollEdit->setFixedWidth(100);
 
   this->pitchEdit = new QLineEdit;
+  this->pitchEdit->setReadOnly(true);
   this->pitchEdit->setValidator(new QDoubleValidator(this->pitchEdit));
   this->pitchEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->pitchEdit->setFixedWidth(100);
 
   this->yawEdit = new QLineEdit;
+  this->yawEdit->setReadOnly(true);
   this->yawEdit->setValidator(new QDoubleValidator(this->yawEdit));
   this->yawEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->yawEdit->setFixedWidth(100);
 
   /*this->fpsEdit = new QLineEdit;
   this->fpsEdit->setReadOnly(true);
@@ -130,11 +129,13 @@ RenderWidget::RenderWidget(QWidget *_parent)
         boost::bind(&RenderWidget::OnFullScreen, this, _1)));
 }
 
+/////////////////////////////////////////////////
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
 }
 
+/////////////////////////////////////////////////
 void RenderWidget::OnFullScreen(bool &_value)
 {
   if (_value)

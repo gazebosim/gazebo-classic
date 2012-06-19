@@ -121,6 +121,14 @@ namespace gazebo
 {
   namespace gui
   {
+    void set_style()
+    {
+      QFile file(":/style.qss");
+      file.open(QFile::ReadOnly);
+      QString styleSheet = QLatin1String(file.readAll());
+      g_app->setStyleSheet(styleSheet);
+    }
+
     /////////////////////////////////////////////////
     void load()
     {
@@ -138,6 +146,7 @@ namespace gazebo
       }
 
       g_app = new QApplication(g_argc, g_argv);
+      set_style();
 
       g_main_win = new gui::MainWindow();
 

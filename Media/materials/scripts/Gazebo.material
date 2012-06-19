@@ -138,7 +138,7 @@ material Gazebo/Grey
       diffuse .5 .5 .5  1.0
       specular 0.1 0.1 0.1 1.000000 12.500000
     }
-
+/*
     pass
     {
       depth_check off
@@ -146,7 +146,7 @@ material Gazebo/Grey
       scene_blend src_alpha one
       vertex_program_ref grid_vp_glsl {}
       fragment_program_ref grid_fp_glsl {}
-    }
+    }*/
   }
 }
 
@@ -204,6 +204,9 @@ material Gazebo/Red
 	{
 		pass ambient
 		{
+      depth_check off
+      depth_write off
+
 			ambient 1 0 0 
       diffuse 1 0 0
       specular 0.1 0.1 0.1 1 1
@@ -217,6 +220,10 @@ material Gazebo/Green
 	{
 		pass ambient
 		{
+      depth_check off
+      depth_write off
+
+
 			ambient 0 1 0
       diffuse 0 1 0
       specular 0.1 0.1 0.1 1 1
@@ -230,6 +237,10 @@ material Gazebo/Blue
 	{
     pass ambient
     {
+      depth_check off
+      depth_write off
+
+
 			ambient 0 0 1
       diffuse 0 0 1
       specular 0.1 0.1 0.1 1 1
