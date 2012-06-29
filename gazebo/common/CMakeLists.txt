@@ -71,7 +71,7 @@ target_link_libraries(gazebo_common gazebo_math
                                     ${TINYXML_LIBRARIES}
                                     ${libavcodec_LIBRARIES}
                                     ${libavformat_LIBRARIES}
-                                    swscale
+                                    ${libswscale_LIBRARIES}
                                     )
 
 gz_install_library(gazebo_common)

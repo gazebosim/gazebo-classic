@@ -78,14 +78,14 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
   if (NOT CEGUI_FOUND)
     BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
-    set (HAVE_CEGUI FALSE)
+    set (HAVE_CEGUI FALSE FORCE)
   else()
     message (STATUS "Looking for CEGUI, found")
     if (NOT CEGUI_OGRE_FOUND)
       BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
-      set (HAVE_CEGUI FALSE)
+      set (HAVE_CEGUI FALSE FORCE)
     else()
-      set (HAVE_CEGUI TRUE)
+      set (HAVE_CEGUI TRUE FORCE)
       set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
       message (STATUS "Looking for CEGUI-OGRE, found")
     endif()
@@ -177,6 +177,13 @@ if (PKG_CONFIG_FOUND)
   # else (NOT OAL_FOUND)
   #   set (HAVE_OPENAL TRUE)
   # endif ()
+ 
+  ########################################
+  # Find libswscale format
+  pkg_check_modules(libswscale libswscale)
+  if (NOT libswscale_FOUND)
+    BUILD_WARNING ("libswscale not found. Audio-video capabilities will be disabled.")
+  endif ()
 
   ########################################
   # Find AV format
@@ -192,7 +199,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND)
+  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale)
     set (HAVE_FFMPEG TRUE)
   endif ()
 

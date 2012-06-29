@@ -6,6 +6,8 @@ include_directories(SYSTEM
   ${CEGUI_INCLUDE_DIRS}
 )
 
+message (STATUS "||CEGUI||${CEGUI_INCLUDE_DIRS}||")
+
 set (sources
   ArrowVisual.cc
   AxisVisual.cc

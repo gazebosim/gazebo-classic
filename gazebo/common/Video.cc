@@ -199,7 +199,7 @@ bool Video::Load(const std::string &_filename)
   return true;
 }
 #else
-bool Video::Read(const std::string &/*_filename*/)
+bool Video::Load(const std::string &/*_filename*/)
 {
   return false;
 }
