@@ -10,7 +10,7 @@
       <collision name='r_wrist_roll_link_geom' laser_retro='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/forearm_v0/wrist_roll_L.stl' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/forearm_v0/wrist_roll_L.stl' scale='1.000000 1.000000 1.000000'/>
         </geometry>
         <surface>
           <friction>
@@ -25,14 +25,14 @@
       <visual name='r_wrist_roll_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/forearm_v0/wrist_roll.stl' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1.000000 1.000000 1.000000'/>
         </geometry>
         <material script='PR2/RollLinks'/>
       </visual>
       <visual name='r_wrist_roll_link_geom_r_gripper_palm_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/gripper_palm.dae' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1.000000 1.000000 1.000000'/>
         </geometry>
       </visual>
     </link>
@@ -45,7 +45,7 @@
       <collision name='r_gripper_l_finger_link_geom' laser_retro='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger.stl' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1.000000 1.000000 1.000000'/>
         </geometry>
         <surface>
           <friction>
@@ -60,7 +60,7 @@
       <visual name='r_gripper_l_finger_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
         </geometry>
       </visual>
     </link>
@@ -73,7 +73,7 @@
       <collision name='r_gripper_l_finger_tip_link_geom' laser_retro='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger_tip.stl' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1.000000 1.000000 1.000000'/>
         </geometry>
         <surface>
           <friction>
@@ -88,7 +88,7 @@
       <visual name='r_gripper_l_finger_tip_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>
         </geometry>
       </visual>
       <sensor name='r_gripper_l_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100.000000' visualize='0'>
@@ -127,7 +127,7 @@
       <collision name='r_gripper_r_finger_link_geom' laser_retro='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger.stl' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1.000000 1.000000 1.000000'/>
         </geometry>
         <surface>
           <friction>
@@ -142,7 +142,7 @@
       <visual name='r_gripper_r_finger_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1.000000 1.000000 1.000000'/>
         </geometry>
       </visual>
     </link>
@@ -155,7 +155,7 @@
       <collision name='r_gripper_r_finger_tip_link_geom' laser_retro='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 -0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger_tip.stl' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1.000000 1.000000 1.000000'/>
         </geometry>
         <surface>
           <friction>
@@ -170,7 +170,7 @@
       <visual name='r_gripper_r_finger_tip_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
         <origin pose='0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000'/>
         <geometry>
-          <mesh filename='pr2_gripper_meshes/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>
+          <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1.000000 1.000000 1.000000'/>
         </geometry>
       </visual>
       <sensor name='r_gripper_r_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100.000000' visualize='0'>
