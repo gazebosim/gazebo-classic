@@ -471,7 +471,7 @@ void MainWindow::CreateActions()
   this->newModelAct->setStatusTip(tr("Create a new model"));
   connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
-  this->resetModelsAct = new QAction(tr("&Reset Models"), this);
+  this->resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   this->resetModelsAct->setShortcut(tr("Ctrl+R"));
   this->resetModelsAct->setStatusTip(tr("Reset model poses in the world"));
   connect(this->resetModelsAct, SIGNAL(triggered()), this, SLOT(OnResetModels()));
