@@ -24,11 +24,11 @@
 #include <gazebo/gui/ModelRightMenu.hh>
 #include <gazebo/gui/Gui.hh>
 
-#include "gazebo.hh"
-#include "gui/qt.h"
-
 #include <signal.h>
 #include <boost/program_options.hpp>
+
+#include "gazebo.hh"
+#include "gui/qt.h"
 
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
