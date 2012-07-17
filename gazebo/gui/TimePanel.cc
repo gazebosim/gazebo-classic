@@ -185,6 +185,6 @@ void TimePanel::Update()
 void TimePanel::OnTimeReset()
 {
   msgs::WorldControl msg;
-  msg.set_reset_time(true);
+  msg.mutable_reset()->set_time(true);
   this->worldControlPub->Publish(msg);
 }
