@@ -277,7 +277,7 @@ void MainWindow::NewModel()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnResetModels()
+void MainWindow::OnResetModelPoses()
 {
   msgs::WorldControl msg;
   msg.set_reset_world(false);
@@ -474,7 +474,8 @@ void MainWindow::CreateActions()
   this->resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   this->resetModelsAct->setShortcut(tr("Ctrl+R"));
   this->resetModelsAct->setStatusTip(tr("Reset model poses in the world"));
-  connect(this->resetModelsAct, SIGNAL(triggered()), this, SLOT(OnResetModels()));
+  connect(this->resetModelsAct, SIGNAL(triggered()), this,
+    SLOT(OnResetModelPoses()));
 
   this->resetWorldAct = new QAction(tr("&Reset World"), this);
   this->resetWorldAct->setShortcut(tr("Ctrl+Shift+R"));

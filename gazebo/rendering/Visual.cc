@@ -1374,7 +1374,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
   node->_updateBounds();
 
   Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
- 
+
   for (int i = 0; i < node->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = node->getAttachedObject(i);
