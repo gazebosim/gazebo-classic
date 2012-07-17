@@ -659,7 +659,7 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
     if (elem->GetName() == "link")
     {
       std::string elemName = elem->GetValueString("name");
-      std::string newName =  modelName + "__" + elemName;
+      std::string newName =  modelName + "::" + elemName;
       replace[elemName] = newName;
       if (elem->HasElementDescription("origin"))
       {
@@ -676,7 +676,7 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
       // for joints, we need to
       //   prefix name like we did with links, and
       std::string elemName = elem->GetValueString("name");
-      std::string newName =  modelName + "__" + elemName;
+      std::string newName =  modelName + "::" + elemName;
       replace[elemName] = newName;
       //   rotate the joint axis because they are model-global
       if (elem->HasElement("axis"))

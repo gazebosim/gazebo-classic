@@ -277,6 +277,14 @@ void MainWindow::NewModel()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnResetModelPoses()
+{
+  msgs::WorldControl msg;
+  msg.set_reset_world(false);
+  this->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
@@ -463,8 +471,14 @@ void MainWindow::CreateActions()
   this->newModelAct->setStatusTip(tr("Create a new model"));
   connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
+  this->resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
+  this->resetModelsAct->setShortcut(tr("Ctrl+R"));
+  this->resetModelsAct->setStatusTip(tr("Reset model poses in the world"));
+  connect(this->resetModelsAct, SIGNAL(triggered()), this,
+    SLOT(OnResetModelPoses()));
+
   this->resetWorldAct = new QAction(tr("&Reset World"), this);
-  this->resetWorldAct->setShortcut(tr("Ctrl+R"));
+  this->resetWorldAct->setShortcut(tr("Ctrl+Shift+R"));
   this->resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(this->resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
@@ -588,6 +602,7 @@ void MainWindow::CreateMenus()
   this->fileMenu->addAction(this->quitAct);
 
   this->editMenu = this->menuBar()->addMenu(tr("&Edit"));
+  this->editMenu->addAction(this->resetModelsAct);
   this->editMenu->addAction(this->resetWorldAct);
   this->editMenu->addAction(this->editWorldPropertiesAct);
 

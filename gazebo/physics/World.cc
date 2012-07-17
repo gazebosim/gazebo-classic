@@ -602,8 +602,11 @@ ModelPtr World::GetModel(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void World::Reset(bool _resetTime)
+void World::Reset(bool _resetTime, Base::EntityType _resetType)
 {
+  bool currently_paused = this->IsPaused();
+  this->SetPaused(true);
+  this->worldUpdateMutex->lock();
   if (_resetTime)
   {
     this->simTime = common::Time(0);
@@ -611,7 +614,7 @@ void World::Reset(bool _resetTime)
     this->startTime = common::Time::GetWallTime();
   }
 
-  this->rootElement->Reset();
+  this->rootElement->Reset(_resetType);
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
@@ -619,6 +622,8 @@ void World::Reset(bool _resetTime)
     (*iter)->Reset();
   }
   this->physicsEngine->Reset();
+  this->worldUpdateMutex->unlock();
+  this->SetPaused(currently_paused);
 }
 
 //////////////////////////////////////////////////
