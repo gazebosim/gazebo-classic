@@ -110,7 +110,7 @@ namespace gazebo
       /// \brief Reset with options
       public: void ResetEntities(Base::EntityType _type = Base::BASE);
       public: void ResetTime();
-      public: void Reset(); // Reset all
+      public: void Reset();  // Reset all
 
       /// \brief Get the selected entity
       public: EntityPtr GetSelectedEntity() const;
