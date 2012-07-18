@@ -468,25 +468,6 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   this->gui->Init(this->renderTarget);
   this->initialized = true;
-
-  // GBuffer compositor
-  this->gBufferInstance =
-    Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-        "DeferredShading/GBuffer");
-
-  // Deferred lighting
-  this->lightsInstance =
-    Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-        "DeferredShading/ShowLit");
-
-  // Screen space ambient occlusion
-  this->ssaoInstance =
-    Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-        "DeferredShading/SSAO");
-
-  this->gBufferInstance->setEnabled(false);
-  this->lightsInstance->setEnabled(false);
-  this->ssaoInstance->setEnabled(false);
 }
 
 //////////////////////////////////////////////////

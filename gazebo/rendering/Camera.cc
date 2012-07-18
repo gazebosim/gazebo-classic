@@ -1087,6 +1087,25 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
+
+    // GBuffer compositor
+    this->gBufferInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+          "DeferredShading/GBuffer");
+
+    // Deferred lighting
+    this->lightsInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+          "DeferredShading/ShowLit");
+
+    // Screen space ambient occlusion
+    this->ssaoInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+          "DeferredShading/SSAO");
+
+    this->gBufferInstance->setEnabled(false);
+    this->lightsInstance->setEnabled(false);
+    this->ssaoInstance->setEnabled(false);
   }
 }
 

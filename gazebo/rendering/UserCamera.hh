@@ -19,8 +19,8 @@
  * Date: 19 Jun 2008
  */
 
-#ifndef USERCAMERA_HH
-#define USERCAMERA_HH
+#ifndef _USERCAMERA_HH_
+#define _USERCAMERA_HH_
 
 #include <string>
 #include <vector>
@@ -28,11 +28,6 @@
 #include "rendering/Camera.hh"
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
-
-namespace Ogre
-{
-  class CompositorInstance;
-}
 
 namespace gazebo
 {
@@ -138,9 +133,6 @@ namespace gazebo
       private: GUIOverlay *gui;
 
       private: Ogre::SceneNode *axisNode;
-      private: Ogre::CompositorInstance *gBufferInstance;
-      private: Ogre::CompositorInstance *lightsInstance;
-      private: Ogre::CompositorInstance *ssaoInstance;
     };
     /// \}
   }
