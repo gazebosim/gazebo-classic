@@ -134,6 +134,11 @@
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="1.0" max_vel="0"/>
+            </contact>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -155,6 +160,11 @@
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="1.0" max_vel="0"/>
+            </contact>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -176,6 +186,11 @@
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="1.0" max_vel="0"/>
+            </contact>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -197,6 +212,11 @@
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="1.0" max_vel="0"/>
+            </contact>
+          </surface>
         </collision>
 
         <visual name="visual">
@@ -209,6 +229,117 @@
     </model>
     <model name="sphere_5">
       <origin pose="0 1.5 4.5 0 0 0"/>
+      <link name="link">
+        <inertial mass="10000.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+          <surface>
+            <contact>
+              <ode soft_erp="1.0" max_vel="0"/>
+            </contact>
+          </surface>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sphere_1a">
+      <origin pose="1.5 1.5 0.5 0 0 0"/>
+      <link name="link">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+    <model name="sphere_2a">
+      <origin pose="1.5 1.5 1.5 0 0 0"/>
+      <link name="link">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+    <model name="sphere_3a">
+      <origin pose="1.5 1.5 2.5 0 0 0"/>
+      <link name="link">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+    <model name="sphere_4a">
+      <origin pose="1.5 1.5 3.5 0 0 0"/>
+      <link name="link">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere radius="0.5"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+    <model name="sphere_5a">
+      <origin pose="1.5 1.5 4.5 0 0 0"/>
       <link name="link">
         <inertial mass="10000.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>

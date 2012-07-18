@@ -230,7 +230,7 @@
     <include filename="pr2_gripper.model" model_pose="0.81 0.188 1.795 0 1.57079633 0"/>
     <joint name='arm_gripper_joint' type='revolute'>
       <parent link='arm_wrist_roll'/>
-      <child link='pr2_gripper__r_wrist_roll_link'/>
+      <child link='pr2_gripper::r_wrist_roll_link'/>
       <axis xyz='0 0 1'>
         <limit lower='0' upper='0'/>
       </axis>

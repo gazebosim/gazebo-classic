@@ -510,7 +510,6 @@ void Entity::Fini()
 void Entity::Reset()
 {
   this->GetWorld()->setWorldPoseMutex->lock();
-  Base::Reset();
 
   if (this->HasType(Base::MODEL))
     this->SetWorldPose(this->initialRelativePose);

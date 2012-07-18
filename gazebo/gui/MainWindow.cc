@@ -39,7 +39,6 @@ using namespace gui;
 
 extern bool g_fullscreen;
 
-
 /////////////////////////////////////////////////
 MainWindow::MainWindow()
   : renderWidget(0)

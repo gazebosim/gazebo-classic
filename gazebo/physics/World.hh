@@ -35,6 +35,7 @@
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
 
+#include "physics/Base.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/WorldState.hh"
 #include "sdf/sdf.hh"
@@ -107,7 +108,8 @@ namespace gazebo
       public: ModelPtr GetModel(unsigned int index);
 
       /// \brief Reset the simulation to the initial settings
-      public: void Reset(bool _resetTime = true);
+      public: void Reset(bool _resetTime = true,
+        Base::EntityType _resetType = Base::BASE);
 
       /// \brief Get the selected entity
       public: EntityPtr GetSelectedEntity() const;
@@ -328,6 +330,8 @@ namespace gazebo
       private: std::list<msgs::Model> modelMsgs;
 
       private: bool needsReset;
+      private: unsigned int resetModelPoses;
+      private: bool resetTime;
       private: bool initialized;
 
       private: RayShapePtr testRay;

@@ -734,7 +734,12 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
         sdfCollision->GetElement("origin")->GetValuePose("pose");
       gazebo::math::Pose vis_pose =
         sdfVisual->GetElement("origin")->GetValuePose("pose");
-      vis_pose = col_pose*vis_pose;
+
+      // aggregate poses
+      vis_pose.pos = col_pose.pos +
+        col_pose.rot.RotateVector(vis_pose.pos);
+      vis_pose.rot = col_pose.rot * vis_pose.rot;
+
       // update the sdf pose
       sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
     }

@@ -80,28 +80,33 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     this->fileTreeWidget->addTopLevelItem(topItem);
 
     boost::filesystem::path dir(path);
-    boost::filesystem::directory_iterator endIter;
     std::list<boost::filesystem::path> resultSet;
 
     if (boost::filesystem::exists(dir) &&
         boost::filesystem::is_directory(dir))
     {
+      std::vector<boost::filesystem::path> paths;
+      std::copy(boost::filesystem::directory_iterator(dir),
+                boost::filesystem::directory_iterator(),
+                std::back_inserter(paths));
+      std::sort(paths.begin(), paths.end());
+
       // Iterate over all the model in the current gazebo path
-      for (boost::filesystem::directory_iterator dirIter(dir);
-          dirIter != endIter; ++dirIter)
+      for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
+          dIter != paths.end(); ++dIter)
       {
-        if (boost::filesystem::is_regular_file(dirIter->status()))
+        if (boost::filesystem::is_regular_file(*dIter))
         {
           // This is for boost::filesystem version 3+
-          // std::string modelName = dirIter->path().filename().string();
-          std::string modelName = dirIter->path().filename();
+          // std::string modelName = dIter->path().filename().string();
+          std::string modelName = dIter->filename();
 
           if (modelName.find(".model") != std::string::npos)
           {
             // Add a child item for the model
             QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
                 QStringList(QString("%1").arg(
-                    QString::fromStdString(dirIter->path().filename()))));
+                    QString::fromStdString(dIter->filename()))));
             this->fileTreeWidget->addTopLevelItem(childItem);
           }
         }

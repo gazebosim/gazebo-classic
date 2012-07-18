@@ -6,13 +6,13 @@ package gazebo.msgs;
 /// \verbatim
 
 import "header.proto";
+import "world_reset.proto";
 
 message WorldControl
 {
   optional bool pause           = 1;
   optional bool step            = 2;
-  optional bool reset_time      = 3;
-  optional bool reset_world     = 4;
+  optional WorldReset reset     = 3;
 }
 
 /// \endverbatim

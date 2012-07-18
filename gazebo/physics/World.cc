@@ -82,6 +82,9 @@ World::World(const std::string &_name)
 
   this->name = _name;
 
+  this->resetModelPoses = false;
+  this->resetTime = false;
+
   this->setWorldPoseMutex = new boost::recursive_mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -362,7 +365,11 @@ void World::Update()
 {
   if (this->needsReset)
   {
-    this->Reset();
+    if (this->resetModelPoses)
+      this->Reset(this->resetTime, Base::MODEL);
+    else
+      this->Reset(this->resetTime);
+
     this->needsReset = false;
   }
 
@@ -602,8 +609,11 @@ ModelPtr World::GetModel(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void World::Reset(bool _resetTime)
+void World::Reset(bool _resetTime, Base::EntityType _resetType)
 {
+  bool currently_paused = this->IsPaused();
+  this->SetPaused(true);
+  this->worldUpdateMutex->lock();
   if (_resetTime)
   {
     this->simTime = common::Time(0);
@@ -611,7 +621,7 @@ void World::Reset(bool _resetTime)
     this->startTime = common::Time::GetWallTime();
   }
 
-  this->rootElement->Reset();
+  this->rootElement->Reset(_resetType);
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
@@ -619,6 +629,8 @@ void World::Reset(bool _resetTime)
     (*iter)->Reset();
   }
   this->physicsEngine->Reset();
+  this->worldUpdateMutex->unlock();
+  this->SetPaused(currently_paused);
 }
 
 //////////////////////////////////////////////////
@@ -751,16 +763,20 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_step())
     this->OnStep();
 
-  if (_data->has_reset_time())
-  {
-    this->simTime = common::Time(0);
-    this->pauseTime = common::Time(0);
-    this->startTime = common::Time::GetWallTime();
-  }
-
-  if (_data->has_reset_world())
+  if (_data->has_reset())
   {
     this->needsReset = true;
+
+    if (_data->reset().has_time() && _data->reset().time())
+      this->resetTime = true;
+    else
+      this->resetTime = false;
+
+    if (_data->reset().has_model_poses() &&
+        _data->reset().model_poses())
+      this->resetModelPoses = true;
+    else
+      this->resetModelPoses = false;
   }
 }
 
