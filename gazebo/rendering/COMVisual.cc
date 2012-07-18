@@ -43,6 +43,14 @@ COMVisual::~COMVisual()
 }
 
 /////////////////////////////////////////////////
+void COMVisual::Load(sdf::ElementPtr _elem)
+{
+  Visual::Load();
+  math::Pose pose = _elem->GetElement("origin")->GetValuePose("pose");
+  this->Load(pose);
+}
+
+/////////////////////////////////////////////////
 void COMVisual::Load(ConstLinkPtr &_msg)
 {
   Visual::Load();
@@ -54,24 +62,31 @@ void COMVisual::Load(ConstLinkPtr &_msg)
                      _msg->inertial().pose().orientation().x(),
                      _msg->inertial().pose().orientation().y(),
                      _msg->inertial().pose().orientation().z());
+
+  this->Load(math::Pose(xyz, q));
+}
+
+/////////////////////////////////////////////////
+void COMVisual::Load(const math::Pose &_pose)
+{
   math::Vector3 p1(0, 0, -0.04);
   math::Vector3 p2(0, 0, 00.04);
   math::Vector3 p3(0, -0.04, 0);
   math::Vector3 p4(0, 00.04, 0);
   math::Vector3 p5(-0.04, 0, 0);
   math::Vector3 p6(00.04, 0, 0);
-  p1 += xyz;
-  p2 += xyz;
-  p3 += xyz;
-  p4 += xyz;
-  p5 += xyz;
-  p6 += xyz;
-  p1 = q.RotateVector(p1);
-  p2 = q.RotateVector(p2);
-  p3 = q.RotateVector(p3);
-  p4 = q.RotateVector(p4);
-  p5 = q.RotateVector(p5);
-  p6 = q.RotateVector(p6);
+  p1 += _pose.pos;
+  p2 += _pose.pos;
+  p3 += _pose.pos;
+  p4 += _pose.pos;
+  p5 += _pose.pos;
+  p6 += _pose.pos;
+  p1 = _pose.rot.RotateVector(p1);
+  p2 = _pose.rot.RotateVector(p2);
+  p3 = _pose.rot.RotateVector(p3);
+  p4 = _pose.rot.RotateVector(p4);
+  p5 = _pose.rot.RotateVector(p5);
+  p6 = _pose.rot.RotateVector(p6);
 
   this->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   this->crossLines->setMaterial("Gazebo/Green");
@@ -93,8 +108,9 @@ void COMVisual::Load(ConstLinkPtr &_msg)
 
   this->boxNode->attachObject(boxObj);
   this->boxNode->setScale(0.02, 0.02, 0.02);
-  this->boxNode->setPosition(xyz.x, xyz.y, xyz.z);
-  this->boxNode->setOrientation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
+  this->boxNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  this->boxNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
+                                                 _pose.rot.y, _pose.rot.z));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

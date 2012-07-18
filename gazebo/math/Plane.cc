@@ -60,7 +60,7 @@ Plane &Plane::operator =(const Plane & _p)
 //////////////////////////////////////////////////
 double Plane::Distance(const Vector3 &_origin, const Vector3 &_dir) const
 {
-  double denom = this->normal.GetDotProd(_dir);
+  double denom = this->normal.Dot(_dir);
 
   if (fabs(denom) < 1e-3)
   {
@@ -69,7 +69,7 @@ double Plane::Distance(const Vector3 &_origin, const Vector3 &_dir) const
   }
   else
   {
-    double nom = _origin.GetDotProd(this->normal) - this->d;
+    double nom = _origin.Dot(this->normal) - this->d;
     double t = -(nom/denom);
     return t;
   }

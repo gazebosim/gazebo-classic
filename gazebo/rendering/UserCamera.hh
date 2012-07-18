@@ -29,6 +29,11 @@
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
 
+namespace Ogre
+{
+  class CompositorInstance;
+}
+
 namespace gazebo
 {
   namespace rendering
@@ -133,6 +138,9 @@ namespace gazebo
       private: GUIOverlay *gui;
 
       private: Ogre::SceneNode *axisNode;
+      private: Ogre::CompositorInstance *gBufferInstance;
+      private: Ogre::CompositorInstance *lightsInstance;
+      private: Ogre::CompositorInstance *ssaoInstance;
     };
     /// \}
   }

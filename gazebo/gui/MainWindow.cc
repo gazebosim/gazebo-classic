@@ -99,7 +99,8 @@ MainWindow::MainWindow()
   this->treeWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
   this->treeWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  this->treeWidget->setItemDelegate(new TreeViewDelegate(this->treeWidget, this->treeWidget));
+  this->treeWidget->setItemDelegate(
+      new TreeViewDelegate(this->treeWidget, this->treeWidget));
 
   connect(this->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(ItemSelected(QTreeWidgetItem *, int)));
@@ -108,17 +109,17 @@ MainWindow::MainWindow()
       QStringList("Models"));
   this->treeWidget->addTopLevelItem(topItem);
   QTreeWidgetItem *subItem = new QTreeWidgetItem(topItem);
-  this->treeWidget->setItemWidget(subItem,0, modelListWidget);
+  this->treeWidget->setItemWidget(subItem, 0, modelListWidget);
 
   topItem = new QTreeWidgetItem(this->treeWidget, QStringList("Lights"));
   this->treeWidget->addTopLevelItem(topItem);
   subItem = new QTreeWidgetItem(topItem);
-  this->treeWidget->setItemWidget(subItem,0, lightListWidget);
+  this->treeWidget->setItemWidget(subItem, 0, lightListWidget);
 
   topItem = new QTreeWidgetItem(this->treeWidget, QStringList("InsertModel"));
   this->treeWidget->addTopLevelItem(topItem);
   subItem = new QTreeWidgetItem(topItem);
-  this->treeWidget->setItemWidget(subItem,0, insertModel);
+  this->treeWidget->setItemWidget(subItem, 0, insertModel);
 
   this->renderWidget = new RenderWidget(mainWidget);
   this->timePanel = new TimePanel(mainWidget);
@@ -130,7 +131,6 @@ MainWindow::MainWindow()
   this->collapseButton->setSizePolicy(QSizePolicy::Fixed,
                                       QSizePolicy::Expanding);
   this->collapseButton->setFocusPolicy(Qt::NoFocus);
-  //this->collapseButton->setStyleSheet("QPushButton {border:0px; border-radius: 0px; padding: 0px; margin: 0px; background: #202020;}");
   connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
 
   centerLayout->addSpacing(10);
@@ -145,14 +145,10 @@ MainWindow::MainWindow()
   timePanelLayout->addSpacing(5);
   timePanelLayout->addWidget(this->timePanel);
   timePanelLayout->addSpacing(5);
-  
-  //mainLayout->addWidget(this->renderWidget);
+
   mainLayout->addLayout(centerLayout);
   mainLayout->addLayout(timePanelLayout);
   mainWidget->setLayout(mainLayout);
-
-  //this->modelsDock->raise();
-  //this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
@@ -890,7 +886,6 @@ void MainWindow::OnCollapse()
     this->treeWidget->show();
     this->collapseButton->setText("<");
   }
-
 }
 
 /////////////////////////////////////////////////

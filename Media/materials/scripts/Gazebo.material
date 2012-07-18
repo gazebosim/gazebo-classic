@@ -129,24 +129,15 @@ material Gazebo/LaserScan2nd
 
 material Gazebo/Grey
 {
-  receive_shadows on
+  // receive_shadows on
   technique
   {
-    pass
+    pass main
     {
       ambient .1 .1 .1  1.0
       diffuse .5 .5 .5  1.0
       specular 0.1 0.1 0.1 1.000000 12.500000
     }
-/*
-    pass
-    {
-      depth_check off
-      depth_write off
-      scene_blend src_alpha one
-      vertex_program_ref grid_vp_glsl {}
-      fragment_program_ref grid_fp_glsl {}
-    }*/
   }
 }
 
@@ -307,7 +298,7 @@ material Gazebo/RedGlow
     {
       ambient 1 0 0
       diffuse 1 0 0
-      emmissive 1 0 0
+      emissive 1 0 0
 			specular 0 0 0 128 
     }
 
@@ -782,6 +773,24 @@ material Gazebo/WoodPallet
 			}
 		}
 	}
+
+  /*
+  technique
+  {
+    scheme GBuffer
+    pass DeferredShading/GBuffer/Pass_16
+    {
+      lighting off
+
+      vertex_program_ref Gazebo/NateVS
+      {
+      }
+
+      fragment_program_ref Gazebo/NateFS
+      {
+      }
+    }
+  }*/
 }
 
 material Gazebo/Wood
@@ -801,4 +810,23 @@ material Gazebo/Wood
 			}
 		}
 	}
+}
+
+material Gazebo/Road
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.1 0.1 0.1 1.0
+      specular 0.01 0.01 0.01 1.0
+
+			texture_unit
+			{
+				texture road1.jpg
+				filtering trilinear
+			}
+    }
+  }
 }

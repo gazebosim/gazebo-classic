@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef GUI_OVERLAY
-#define GUI_OVERLAY
+#ifndef _GUI_OVERLAY_HH_
+#define _GUI_OVERLAY_HH_
 
 #include <string>
 #include <map>

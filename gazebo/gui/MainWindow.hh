@@ -168,10 +168,10 @@ namespace gazebo
     {
       Q_OBJECT
       public: TreeViewDelegate(QTreeView *_view, QWidget *_parent);
-    
+
       public: void paint(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const;
-    
+
       public: virtual QSize sizeHint(const QStyleOptionViewItem &_opt,
                                      const QModelIndex &_index) const;
       private: QTreeView *view;

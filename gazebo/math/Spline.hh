@@ -1,33 +1,23 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
-
-Copyright (_c) 2000-2009 Torus Knot Software Ltd
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the _"Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
 */
-
-#ifndef SPLINE_HH
-#define SPLINE_HH
+// Note: Originally cribbed from Ogre3d. Modified to implement Cardinal
+// spline and catmull-rom spline
+#ifndef _SPLINE_HH_
+#define _SPLINE_HH_
 
 #include <vector>
 
@@ -43,14 +33,26 @@ namespace gazebo
       public: Spline();
       public: ~Spline();
 
+      /// \brief Set the tension parameter. A value of 0 = Catmull-Rom
+      /// spline.
+      /// \param _t Tension value between 0.0 and 1.0
+      public: void SetTension(double _t);
+
+      /// \brief Get the tension value
+      /// \return The value of the tension, which is between 0.0 and 1.0
+      public: double GetTension() const;
+
       /// \brief  Adds a control point to the end of the spline.
       public: void AddPoint(const Vector3 &_pt);
 
       /// \brief Gets the detail of one of the control points of the spline.
-      public: const Vector3 &GetPoint(unsigned int _index) const;
+      public: Vector3 GetPoint(unsigned int _index) const;
 
       /// \brief  Gets the number of control points in the spline.
-      public: unsigned int GetNumPoints() const;
+      public: unsigned int GetPointCount() const;
+
+      /// \brief Get the tangent value for a point
+      public: Vector3 GetTangent(unsigned int _index) const;
 
       /// \brief  Clears all the points in the spline.
       public: void Clear();
@@ -98,10 +100,10 @@ namespace gazebo
 
       /// Matrix of coefficients
       protected: Matrix4 coeffs;
+
+      /// Tension of 0 = Catmull-Rom spline, otherwise a Cardinal spline
+      protected: double tension;
     };
   }
 }
 #endif
-
-
-

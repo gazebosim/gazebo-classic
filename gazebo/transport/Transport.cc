@@ -183,3 +183,9 @@ msgs::Response transport::request(const std::string &_worldName,
   else
     return msgs::Response();
 }
+
+/////////////////////////////////////////////////
+void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
+{
+  TopicManager::Instance()->GetTopicNamespaces(_namespaces);
+}

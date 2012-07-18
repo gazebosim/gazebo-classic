@@ -203,10 +203,10 @@ void World::Load(sdf::ElementPtr _sdf)
   event::Events::worldCreated(this->GetName());
 }
 
+
 //////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
 {
-  this->sdf->Update();
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
@@ -996,6 +996,21 @@ void World::ProcessRequestMsgs()
         response.set_response("nonexistant");
       }
     }
+    else if ((*iter).request() == "world_sdf")
+    {
+      msgs::GzString msg;
+      this->UpdateStateSDF();
+      std::string data;
+      data = "<?xml version ='1.0'?>\n";
+      data += "<gazebo version ='1.0'>\n";
+      data += this->sdf->ToString("");
+      data += "</gazebo>\n";
+      msg.set_data(data);
+
+      std::string *serializedData = response.mutable_serialized_data();
+      msg.SerializeToString(serializedData);
+      response.set_type(msg.GetTypeName());
+    }
     else if ((*iter).request() == "scene_info")
     {
       this->sceneMsg.clear_model();
@@ -1232,6 +1247,7 @@ WorldState World::GetState()
 //////////////////////////////////////////////////
 void World::UpdateStateSDF()
 {
+  this->sdf->Update();
   sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
   stateElem->ClearElements();
 
@@ -1267,7 +1283,7 @@ void World::SetState(const WorldState &_state)
 }
 
 //////////////////////////////////////////////////
-void World::InsertModel(const std::string &_sdfFilename)
+void World::InsertModelFile(const std::string &_sdfFilename)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Factory msg;
@@ -1276,11 +1292,20 @@ void World::InsertModel(const std::string &_sdfFilename)
 }
 
 //////////////////////////////////////////////////
-void World::InsertModel(const sdf::SDF &_sdf)
+void World::InsertModelSDF(const sdf::SDF &_sdf)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
+  this->factoryMsgs.push_back(msg);
+}
+
+//////////////////////////////////////////////////
+void World::InsertModelString(const std::string &_sdfString)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Factory msg;
+  msg.set_sdf(_sdfString);
   this->factoryMsgs.push_back(msg);
 }
 

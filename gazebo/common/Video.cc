@@ -78,7 +78,10 @@ Video::Video()
 Video::~Video()
 {
   this->Cleanup();
+
+#ifdef HAVE_FFMPEG
   delete this->pic;
+#endif
 }
 
 /////////////////////////////////////////////////

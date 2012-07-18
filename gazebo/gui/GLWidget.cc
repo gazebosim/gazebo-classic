@@ -875,7 +875,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 
   // Compute the normal to the plane on which to rotate
   planeNorm = pose.rot.RotateVector(ray);
-  double d = -pose.pos.GetDotProd(planeNorm);
+  double d = -pose.pos.Dot(planeNorm);
 
   if (!this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pos.x,
        this->mouseEvent.pos.y, math::Plane(planeNorm, d), p1))
@@ -898,17 +898,17 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 
   // Get the angle between the two vectors. This is the amount to
   // rotate the entity
-  float angle = acos(a.GetDotProd(b));
+  float angle = acos(a.Dot(b));
   if (math::isnan(angle))
     angle = 0;
 
   // Compute the normal to the plane which is defined by the
   // direction of rotation
-  planeNorm2 = a.GetCrossProd(b);
+  planeNorm2 = a.Cross(b);
   planeNorm2.Normalize();
 
   // Switch rotation direction if the two normals don't line up
-  if (planeNorm.GetDotProd(planeNorm2) > 0)
+  if (planeNorm.Dot(planeNorm2) > 0)
     angle *= -1;
 
     math::Quaternion delta;
@@ -965,7 +965,7 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
     moveVector.Set(1, 1, 0);
 
   // Compute the distance from the camera to plane of translation
-  double d = -pose.pos.GetDotProd(planeNorm);
+  double d = -pose.pos.Dot(planeNorm);
   math::Plane plane(planeNorm, d);
   double dist1 = plane.Distance(origin1, dir1);
   double dist2 = plane.Distance(origin2, dir2);

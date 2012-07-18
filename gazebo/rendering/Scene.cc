@@ -16,6 +16,8 @@
 */
 #include <boost/lexical_cast.hpp>
 
+#include "gazebo/rendering/Road2d.hh"
+
 #include "rendering/ogre_gazebo.h"
 #include "msgs/msgs.hh"
 #include "sdf/sdf.hh"
@@ -46,6 +48,11 @@
 #include "rendering/RFIDTagVisual.hh"
 #include "rendering/VideoVisual.hh"
 
+#include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
+#include "gazebo/rendering/deferred_shading/GBufferSchemeHandler.hh"
+#include "gazebo/rendering/deferred_shading/NullSchemeHandler.hh"
+#include "gazebo/rendering/deferred_shading/DeferredLightCP.hh"
+
 #include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
@@ -70,6 +77,7 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->iterations = 0;
   this->enableVisualizations = _enableVisualizations;
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_name);
@@ -96,8 +104,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
           &Scene::OnSkeletonPoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection",
       &Scene::OnSelectionMsg, this);
-  this->requestSub = this->node->Subscribe("~/request",
-      &Scene::OnRequest, this);
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
@@ -153,10 +159,6 @@ Scene::~Scene()
   this->jointSub.reset();
   this->skeletonPoseSub.reset();
   this->selectionSub.reset();
-  this->responseSub.reset();
-  this->requestSub.reset();
-  this->requestPub.reset();
-
 
   Visual_M::iterator iter;
   this->visuals.clear();
@@ -249,18 +251,19 @@ void Scene::Init()
   // Force shadows on.
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
   shadowElem->GetAttribute("enabled")->Set(true);
-  RTShaderSystem::Instance()->ApplyShadows(this);
+  // RTShaderSystem::Instance()->ApplyShadows(this);
 
-  // Send a request to get the current world state
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
-  this->responseSub = this->node->Subscribe("~/response",
-      &Scene::OnResponse, this, true);
-
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
+  msgs::Scene sceneMsg;
+  msgs::Response responseMsg = transport::request("default",
+      *msgs::CreateRequest("scene_info"));
+  sceneMsg.ParseFromString(responseMsg.serialized_data());
+  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+  this->sceneMsgs.push_back(sm);
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
+
+  this->SetShadowsEnabled(true);
 
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
@@ -268,6 +271,34 @@ void Scene::Init()
         this->worldVisual, "~/physics/contacts"));
   this->visuals[contactVis->GetName()] = contactVis;
   */
+
+  Road2d *road = new Road2d();
+  road->Load(this->worldVisual);
+  this->InitDeferredShading();
+}
+
+//////////////////////////////////////////////////
+void Scene::InitDeferredShading()
+{
+  static bool firstTime = true;
+  Ogre::CompositorManager &compMgr = Ogre::CompositorManager::getSingleton();
+
+  // Hook up the compositor logic and scheme handlers.
+  if (firstTime)
+  {
+    Ogre::MaterialManager::getSingleton().addListener(
+        new GBufferSchemeHandler, "GBuffer");
+
+    Ogre::MaterialManager::getSingleton().addListener(
+        new NullSchemeHandler, "NoGBuffer");
+
+    compMgr.registerCustomCompositionPass("DeferredLight",
+        new DeferredLightCompositionPass);
+
+    firstTime = false;
+  }
+
+  compMgr.registerCompositorLogic("SSAOLogic", new SSAOLogic);
 }
 
 //////////////////////////////////////////////////
@@ -1016,21 +1047,6 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 }
 
 /////////////////////////////////////////////////
-void Scene::OnResponse(ConstResponsePtr &_msg)
-{
-  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
-    return;
-
-  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene());
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  if (_msg->has_type() && _msg->type() == sm->GetTypeName())
-  {
-    sm->ParseFromString(_msg->serialized_data());
-    this->sceneMsgs.push_back(sm);
-  }
-}
-
-/////////////////////////////////////////////////
 void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   std::string modelName, linkName;
@@ -1187,6 +1203,47 @@ void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 void Scene::PreRender()
 {
+  /* Deferred shading debug code. Delete me soon (July 17, 2012)
+  static bool first = true;
+
+  if (!first)
+  {
+    Ogre::RenderSystem *renderSys = this->manager->getDestinationRenderSystem();
+    Ogre::RenderSystem::RenderTargetIterator renderIter =
+      renderSys->getRenderTargetIterator();
+
+    int i = 0;
+    for (; renderIter.current() != renderIter.end(); renderIter.moveNext())
+    {
+      if (renderIter.current()->second->getNumViewports() > 0)
+      {
+        std::ostringstream filename, filename2;
+        filename << "/tmp/render_targets/iter_" << this->iterations
+                 << "_" << i << ".png";
+        filename2 << "/tmp/render_targets/iter_" 
+                  << this->iterations << "_" << i << "_b.png";
+
+        Ogre::MultiRenderTarget *mtarget = dynamic_cast<Ogre::MultiRenderTarget*>(renderIter.current()->second);
+        if (mtarget)
+        {
+          // std::cout << renderIter.current()->first << "\n";
+          mtarget->getBoundSurface(0)->writeContentsToFile(filename.str());
+        
+          mtarget->getBoundSurface(1)->writeContentsToFile(filename2.str());
+          i++;
+        }
+        else
+        {
+          renderIter.current()->second->writeContentsToFile(filename.str());
+          i++;
+        }
+      }
+    }
+    this->iterations++;
+  }
+  else
+    first = false;
+  */
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
   static RequestMsgs_L::iterator rIter;
@@ -1426,10 +1483,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 
   if (this->visuals.find(_msg->name() + "_COM_VISUAL__") == this->visuals.end())
   {
-    COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__", linkVis));
-    comVis->Load(_msg);
-    comVis->SetVisible(false);
-    this->visuals[comVis->GetName()] = comVis;
+    this->CreateCOMVisual(_msg, linkVis);
   }
 
   for (int i = 0; i < _msg->projector_size(); ++i)
@@ -1720,13 +1774,23 @@ void Scene::SetSky(const std::string &_material)
 void Scene::SetShadowsEnabled(bool _value)
 {
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
-  if (_value != shadowElem->GetValueBool("enabled"))
+  // if (_value != shadowElem->GetValueBool("enabled"))
   {
     shadowElem->GetAttribute("enabled")->Set(_value);
-    if (_value)
+    this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    this->manager->setShadowTextureCasterMaterial(
+        "DeferredShading/Shadows/Caster");
+    this->manager->setShadowTextureCount(1);
+    this->manager->setShadowFarDistance(150);
+    // Use a value of "2" to use a different depth buffer pool and
+    // avoid sharing this with the Backbuffer's
+    this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT16_R, 2);
+    this->manager->setShadowDirectionalLightExtrusionDistance(75);
+    /*if (_value)
       RTShaderSystem::Instance()->ApplyShadows(this);
     else
       RTShaderSystem::Instance()->RemoveShadows(this);
+      */
   }
 }
 
@@ -1794,7 +1858,6 @@ void Scene::SetGrid(bool _enabled)
     grid = new Grid(this, 4, 5, 20, common::Color(0.8, 0.8, 0.8, 0.5));
     grid->Init();
     this->grids.push_back(grid);
-
   }
 }
 
@@ -1825,4 +1888,24 @@ std::string Scene::StripSceneName(const std::string &_name) const
 Heightmap *Scene::GetHeightmap() const
 {
   return this->heightmap;
+}
+
+/////////////////////////////////////////////////
+void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+{
+  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
+                                    _linkVisual));
+  comVis->Load(_msg);
+  comVis->SetVisible(false);
+  this->visuals[comVis->GetName()] = comVis;
+}
+
+/////////////////////////////////////////////////
+void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
+{
+  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
+                                    _linkVisual));
+  comVis->Load(_elem);
+  comVis->SetVisible(false);
+  this->visuals[comVis->GetName()] = comVis;
 }

@@ -172,10 +172,13 @@ namespace gazebo
       public: void SetState(const WorldState &_state);
 
       /// \brief Insert a model from an SDF file
-      public: void InsertModel(const std::string &_sdfFilename);
+      public: void InsertModelFile(const std::string &_sdfFilename);
+
+      /// \brief Insert a model from an SDF string
+      public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF
-      public: void InsertModel(const sdf::SDF &_sdf);
+      public: void InsertModelSDF(const sdf::SDF &_sdf);
 
       /// \brief Return a version of the name with "<world_name>::" removed
       public: std::string StripWorldName(const std::string &_name) const;

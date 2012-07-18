@@ -41,7 +41,11 @@ namespace gazebo
       public: COMVisual(const std::string &_name, VisualPtr _vis);
       public: virtual ~COMVisual();
 
+      public: virtual void Load(sdf::ElementPtr _elem);
       public: virtual void Load(ConstLinkPtr &_msg);
+
+      private: void Load(const math::Pose &_pose);
+
       private: DynamicLines *crossLines;
       private: Ogre::SceneNode *boxNode;
     };

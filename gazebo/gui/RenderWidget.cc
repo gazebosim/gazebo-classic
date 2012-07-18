@@ -49,69 +49,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
-  /*this->xPosEdit = new QLineEdit;
-  this->xPosEdit->setReadOnly(true);
-  this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit));
-  this->xPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-
-  this->yPosEdit = new QLineEdit;
-  this->yPosEdit->setReadOnly(true);
-  this->yPosEdit->setValidator(new QDoubleValidator(this->yPosEdit));
-  this->yPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-
-  this->zPosEdit = new QLineEdit;
-  this->zPosEdit->setReadOnly(true);
-  this->zPosEdit->setValidator(new QDoubleValidator(this->zPosEdit));
-  this->zPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-
-  this->rollEdit = new QLineEdit;
-  this->rollEdit->setReadOnly(true);
-  this->rollEdit->setValidator(new QDoubleValidator(this->rollEdit));
-  this->rollEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-
-  this->pitchEdit = new QLineEdit;
-  this->pitchEdit->setReadOnly(true);
-  this->pitchEdit->setValidator(new QDoubleValidator(this->pitchEdit));
-  this->pitchEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-
-  this->yawEdit = new QLineEdit;
-  this->yawEdit->setReadOnly(true);
-  this->yawEdit->setValidator(new QDoubleValidator(this->yawEdit));
-  this->yawEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  */
-
-  /*this->fpsEdit = new QLineEdit;
-  this->fpsEdit->setReadOnly(true);
-  this->fpsEdit->setFixedWidth(50);
-
-  this->trianglesEdit = new QLineEdit;
-  this->trianglesEdit->setReadOnly(true);
-  this->trianglesEdit->setFixedWidth(80);
-  */
-
-  // this->xyzLabel = new QLabel(tr("XYZ:"));
-  // this->rpyLabel = new QLabel(tr("RPY:"));
-
-  /*
-  bottomBarLayout = new QHBoxLayout;
-  bottomBarLayout->addWidget(this->xyzLabel);
-  bottomBarLayout->addWidget(this->xPosEdit);
-  bottomBarLayout->addWidget(this->yPosEdit);
-  bottomBarLayout->addWidget(this->zPosEdit);
-
-  bottomBarLayout->addItem(new QSpacerItem(10, 20));
-  bottomBarLayout->addWidget(this->rpyLabel);
-  bottomBarLayout->addWidget(this->rollEdit);
-  bottomBarLayout->addWidget(this->pitchEdit);
-  bottomBarLayout->addWidget(this->yawEdit);
-  */
-
-  //bottomBarLayout->addItem(
-  //    new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-  //bottomBarLayout->addSpacing(10);
-
   frameLayout->addWidget(this->glWidget);
-  //frameLayout->addLayout(bottomBarLayout);
 
   this->mainFrame->setLayout(frameLayout);
   this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);

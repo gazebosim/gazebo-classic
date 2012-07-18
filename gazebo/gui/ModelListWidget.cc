@@ -44,7 +44,6 @@
 #include "gui/ModelRightMenu.hh"
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
-#include "gui/sheet_delegate_p.h"
 #include "gui/ModelListWidget.hh"
 
 using namespace gazebo;
@@ -72,8 +71,10 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
   this->modelTreeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
   this->modelTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-  this->modelTreeWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-  this->modelTreeWidget->setItemDelegate(new SheetDelegate(this->modelTreeWidget, this->modelTreeWidget));
+  this->modelTreeWidget->setVerticalScrollMode(
+      QAbstractItemView::ScrollPerPixel);
+  this->modelTreeWidget->setItemDelegate(
+      new ModelListSheetDelegate(this->modelTreeWidget, this->modelTreeWidget));
 
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
@@ -1675,3 +1676,51 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this);
 }
+
+/////////////////////////////////////////////////
+ModelListSheetDelegate::ModelListSheetDelegate(QTreeView *view, QWidget *parent)
+    : QItemDelegate(parent), m_view(view)
+{
+}
+
+/////////////////////////////////////////////////
+void ModelListSheetDelegate::paint(QPainter *painter,
+    const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+  const QAbstractItemModel *model = index.model();
+  Q_ASSERT(model);
+
+  if (!model->parent(index).isValid())
+  {
+    QRect r = option.rect;
+    static const int i = 9;
+
+    // draw text
+    QRect textrect = QRect(r.left()+4, r.top(),
+        r.width() - ((5*i)/2), r.height());
+    QString text = elidedText(option.fontMetrics,
+        textrect.width(),
+        Qt::ElideMiddle,
+        model->data(index, Qt::DisplayRole).toString());
+
+    if (option.state & QStyle::State_Selected)
+      painter->setPen(QPen(QColor(245, 129, 19), 1));
+
+    m_view->style()->drawItemText(painter, textrect, Qt::AlignLeft,
+        option.palette, m_view->isEnabled(), text);
+  }
+  else
+  {
+    QItemDelegate::paint(painter, option, index);
+  }
+}
+
+/////////////////////////////////////////////////
+QSize ModelListSheetDelegate::sizeHint(const QStyleOptionViewItem &opt,
+                                               const QModelIndex &index) const
+{
+  QStyleOptionViewItem option = opt;
+  QSize sz = QItemDelegate::sizeHint(opt, index) + QSize(2, 2);
+  return sz;
+}
+

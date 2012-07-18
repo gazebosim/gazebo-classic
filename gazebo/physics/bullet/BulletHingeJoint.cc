@@ -184,12 +184,10 @@ void BulletHingeJoint::SetForce(int /*_index*/, double _torque)
   this->btHinge->getRigidBodyB().applyTorque(-hingeTorque);
 }
 
-
 //////////////////////////////////////////////////
 double BulletHingeJoint::GetForce(int /*_index*/)
 {
   return this->btHinge->getAppliedImpulse();
-  return 0;
 }
 
 //////////////////////////////////////////////////

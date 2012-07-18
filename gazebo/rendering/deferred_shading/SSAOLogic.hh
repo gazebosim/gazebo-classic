@@ -1,0 +1,68 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+#ifndef _SSAOLOGIC_HH_
+#define _SSAOLOGIC_HH_
+
+#include <OgreCompositorInstance.h>
+#include <OgreCompositorLogic.h>
+#include <map>
+
+namespace gazebo
+{
+  namespace rendering
+  {
+    // The simple types of compositor logics will all do the same thing -
+    // Attach a listener to the created compositor
+    class ListenerFactoryLogic : public Ogre::CompositorLogic
+    {
+      /// @copydoc CompositorLogic::compositorInstanceCreated
+      public: virtual void compositorInstanceCreated(
+                  Ogre::CompositorInstance *_newInstance)
+              {
+                Ogre::CompositorInstance::Listener *listener =
+                  this->createListener(_newInstance);
+
+                _newInstance->addListener(listener);
+                this->listeners[_newInstance] = listener;
+              }
+
+      /// @copydoc CompositorLogic::compositorInstanceDestroyed
+      public: virtual void compositorInstanceDestroyed(
+                  Ogre::CompositorInstance *_destroyedInstance)
+              {
+                delete this->listeners[_destroyedInstance];
+                this->listeners.erase(_destroyedInstance);
+              }
+
+      /// \brief This is the method that implementers will need to create
+      protected: virtual Ogre::CompositorInstance::Listener *createListener(
+                     Ogre::CompositorInstance *_instance) = 0;
+
+      private: typedef std::map<Ogre::CompositorInstance*,
+               Ogre::CompositorInstance::Listener*> ListenerMap;
+      private: ListenerMap listeners;
+    };
+
+    class SSAOLogic : public ListenerFactoryLogic
+    {
+      /// @copydoc ListenerFactoryLogic::createListener
+      protected: virtual Ogre::CompositorInstance::Listener *createListener(
+                     Ogre::CompositorInstance* instance);
+    };
+  }
+}
+#endif

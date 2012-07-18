@@ -57,7 +57,7 @@ namespace gazebo
       public: void Set(int _x, int _y);
 
       /// \brief Return the cross product of this vector and pt
-      public: Vector2i GetCrossProd(const Vector2i &_pt) const;
+      public: Vector2i Cross(const Vector2i &_pt) const;
 
       /// \brief Equal operator
       public: Vector2i &operator =(const Vector2i &pt);

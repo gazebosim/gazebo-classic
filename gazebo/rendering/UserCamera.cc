@@ -110,27 +110,27 @@ void UserCamera::Init()
   Ogre::ManualObject *x =
     this->scene->GetManager()->createManualObject("MyXAxis");
   x->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST);
-  x->position(0,0,0);
-  x->position(1,0,0);
+  x->position(0, 0, 0);
+  x->position(1, 0, 0);
   x->end();
   x->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *y =
     this->scene->GetManager()->createManualObject("MyYAxis");
   y->begin("Gazebo/Green", Ogre::RenderOperation::OT_LINE_LIST);
-  y->position(0,0,0);
-  y->position(0,1,0);
+  y->position(0, 0, 0);
+  y->position(0, 1, 0);
   y->end();
   y->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *z =
     this->scene->GetManager()->createManualObject("MyZAxis");
   z->begin("Gazebo/Blue", Ogre::RenderOperation::OT_LINE_LIST);
-  z->position(0,0,0);
-  z->position(0,0,1);
+  z->position(0, 0, 0);
+  z->position(0, 0, 1);
   z->end();
   z->setVisibilityFlags(GZ_VISIBILITY_GUI);
-  
+
   this->axisNode->attachObject(x);
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
@@ -468,6 +468,25 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   this->gui->Init(this->renderTarget);
   this->initialized = true;
+
+  // GBuffer compositor
+  this->gBufferInstance =
+    Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+        "DeferredShading/GBuffer");
+
+  // Deferred lighting
+  this->lightsInstance =
+    Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+        "DeferredShading/ShowLit");
+
+  // Screen space ambient occlusion
+  this->ssaoInstance =
+    Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+        "DeferredShading/SSAO");
+
+  this->gBufferInstance->setEnabled(false);
+  this->lightsInstance->setEnabled(false);
+  this->ssaoInstance->setEnabled(false);
 }
 
 //////////////////////////////////////////////////

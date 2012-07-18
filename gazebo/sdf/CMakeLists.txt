@@ -21,6 +21,7 @@ set (sdfs
   ray.sdf
   rfidtag.sdf
   rfid.sdf
+  road.sdf
   scene.sdf 
   sensor.sdf 
   state.sdf

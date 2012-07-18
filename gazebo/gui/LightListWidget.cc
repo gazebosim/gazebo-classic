@@ -85,9 +85,9 @@ LightListWidget::LightListWidget(QWidget *_parent)
           */
 
 
-  //mainLayout->addWidget(this->lightListWidget, 0);
+  // mainLayout->addWidget(this->lightListWidget, 0);
   // mainLayout->addWidget(this->propTreeBrowser, 1);
-  
+
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
   frameLayout->addWidget(this->lightListWidget, 0);
@@ -95,7 +95,7 @@ LightListWidget::LightListWidget(QWidget *_parent)
   frame->setLayout(frameLayout);
 
   mainLayout->addWidget(frame);
-  
+
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
@@ -180,7 +180,6 @@ void LightListWidget::Update()
 void LightListWidget::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  printf("LightListWidget::OnLightMsg\n");
   this->lightMsgs.push_back(_msg);
 }
 

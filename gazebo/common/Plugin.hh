@@ -89,9 +89,9 @@ namespace gazebo
 
               if (!found)
                 fullname = _filename;
-              std::string registerName = "RegisterPlugin";
 
               fptr_union_t registerFunc;
+              std::string registerName = "RegisterPlugin";
 
 #ifdef HAVE_DL
               void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
