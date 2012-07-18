@@ -290,6 +290,7 @@ void MainWindow::OnResetModelOnly()
 void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
+  msg.mutable_reset()->set_all(true);
   this->worldControlPub->Publish(msg);
 }
 
