@@ -55,12 +55,13 @@ extern LightRightMenu *g_lightRightMenu;
 LightListWidget::LightListWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->setObjectName("modelList");
+
   this->requestMsg = NULL;
   this->propMutex = new boost::mutex();
   this->receiveMutex = new boost::mutex();
   this->fillPropertyTree = false;
 
-  setMinimumWidth(280);
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->lightListWidget = new QListWidget();
   this->lightListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -84,10 +85,19 @@ LightListWidget::LightListWidget(QWidget *_parent)
           */
 
 
-  mainLayout->addWidget(this->lightListWidget, 0);
+  //mainLayout->addWidget(this->lightListWidget, 0);
   // mainLayout->addWidget(this->propTreeBrowser, 1);
+  
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->addWidget(this->lightListWidget, 0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+
+  mainLayout->addWidget(frame);
+  
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(2, 2, 2, 2);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 
   this->InitTransport();
 

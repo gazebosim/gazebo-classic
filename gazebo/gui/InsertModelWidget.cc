@@ -41,6 +41,8 @@ using namespace gui;
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent)
 {
+  this->setObjectName("insertModel");
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
   this->fileTreeWidget->setColumnCount(1);
@@ -49,7 +51,14 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
 
-  mainLayout->addWidget(this->fileTreeWidget);
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->addWidget(this->fileTreeWidget, 0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+
+
+  mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 

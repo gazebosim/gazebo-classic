@@ -32,6 +32,9 @@ using namespace gui;
 RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->setObjectName("renderWidget");
+  this->show();
+
   this->clear = false;
   this->create = false;
 
@@ -41,11 +44,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->mainFrame->show();
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->setContentsMargins(0, 0, 0, 0);
 
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
-  this->xPosEdit = new QLineEdit;
+  /*this->xPosEdit = new QLineEdit;
   this->xPosEdit->setReadOnly(true);
   this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit));
   this->xPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
@@ -74,6 +78,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->yawEdit->setReadOnly(true);
   this->yawEdit->setValidator(new QDoubleValidator(this->yawEdit));
   this->yawEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  */
 
   /*this->fpsEdit = new QLineEdit;
   this->fpsEdit->setReadOnly(true);
@@ -84,11 +89,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->trianglesEdit->setFixedWidth(80);
   */
 
-  this->xyzLabel = new QLabel(tr("XYZ:"));
-  this->rpyLabel = new QLabel(tr("RPY:"));
-  // QLabel *fpsLabel = new QLabel(tr("FPS:"));
-  // QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
+  // this->xyzLabel = new QLabel(tr("XYZ:"));
+  // this->rpyLabel = new QLabel(tr("RPY:"));
 
+  /*
   bottomBarLayout = new QHBoxLayout;
   bottomBarLayout->addWidget(this->xyzLabel);
   bottomBarLayout->addWidget(this->xPosEdit);
@@ -100,20 +104,17 @@ RenderWidget::RenderWidget(QWidget *_parent)
   bottomBarLayout->addWidget(this->rollEdit);
   bottomBarLayout->addWidget(this->pitchEdit);
   bottomBarLayout->addWidget(this->yawEdit);
+  */
 
-  bottomBarLayout->addItem(
-      new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-  // bottomBarLayout->addWidget(fpsLabel);
-  // bottomBarLayout->addWidget(this->fpsEdit);
-  // bottomBarLayout->addWidget(trianglesLabel);
-  // bottomBarLayout->addWidget(this->trianglesEdit);
-  bottomBarLayout->addSpacing(10);
+  //bottomBarLayout->addItem(
+  //    new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+  //bottomBarLayout->addSpacing(10);
 
   frameLayout->addWidget(this->glWidget);
-  frameLayout->addLayout(bottomBarLayout);
+  //frameLayout->addLayout(bottomBarLayout);
 
   this->mainFrame->setLayout(frameLayout);
-  this->mainFrame->layout()->setContentsMargins(4, 4, 4, 4);
+  this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
   mainLayout->addWidget(this->mainFrame);
 
@@ -145,36 +146,32 @@ void RenderWidget::OnFullScreen(bool &_value)
     this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
     this->glWidget->layout()->setContentsMargins(0, 0, 0, 0);
     this->layout()->setContentsMargins(0, 0, 0, 0);
-    this->xyzLabel->hide();
-    this->rpyLabel->hide();
+    // this->xyzLabel->hide();
+    // this->rpyLabel->hide();
 
-    this->xPosEdit->hide();
-    this->yPosEdit->hide();
-    this->zPosEdit->hide();
+    // this->xPosEdit->hide();
+    // this->yPosEdit->hide();
+    // this->zPosEdit->hide();
 
-    this->rollEdit->hide();
-    this->pitchEdit->hide();
-    this->yawEdit->hide();
-    // this->fpsEdit->hide();
-    // this->trianglesEdit->hide();
+    // this->rollEdit->hide();
+    // this->pitchEdit->hide();
+    // this->yawEdit->hide();
   }
   else
   {
     this->mainFrame->layout()->addItem(this->bottomBarLayout);
     this->mainFrame->setLineWidth(1);
     this->mainFrame->layout()->setContentsMargins(4, 4, 4, 4);
-    this->xyzLabel->show();
-    this->rpyLabel->show();
+    // this->xyzLabel->show();
+    // this->rpyLabel->show();
 
-    this->xPosEdit->show();
-    this->yPosEdit->show();
-    this->zPosEdit->show();
+    // this->xPosEdit->show();
+    // this->yPosEdit->show();
+    // this->zPosEdit->show();
 
-    this->rollEdit->show();
-    this->pitchEdit->show();
-    this->yawEdit->show();
-    // this->fpsEdit->show();
-    // this->trianglesEdit->show();
+    // this->rollEdit->show();
+    // this->pitchEdit->show();
+    // this->yawEdit->show();
   }
 }
 
@@ -203,36 +200,36 @@ void RenderWidget::update()
 
   // float fps = cam->GetAvgFPS();
   // int triangleCount = cam->GetTriangleCount();
-  math::Pose pose = cam->GetWorldPose();
+  // math::Pose pose = cam->GetWorldPose();
 
-  std::ostringstream stream;
+  // std::ostringstream stream;
 
-  stream << std::fixed << std::setprecision(2) << pose.pos.x;
-  this->xPosEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
+  // stream << std::fixed << std::setprecision(2) << pose.pos.x;
+  // this->xPosEdit->setText(tr(stream.str().c_str()));
+  // stream.str("");
 
-  stream << std::fixed << std::setprecision(2) << pose.pos.y;
-  this->yPosEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
+  // stream << std::fixed << std::setprecision(2) << pose.pos.y;
+  // this->yPosEdit->setText(tr(stream.str().c_str()));
+  // stream.str("");
 
-  stream << std::fixed << std::setprecision(2) << pose.pos.z;
-  this->zPosEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
+  // stream << std::fixed << std::setprecision(2) << pose.pos.z;
+  // this->zPosEdit->setText(tr(stream.str().c_str()));
+  // stream.str("");
 
-  stream << std::fixed << std::setprecision(2)
-         << GZ_RTOD(pose.rot.GetAsEuler().x);
-  this->rollEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
+  // stream << std::fixed << std::setprecision(2)
+  //        << GZ_RTOD(pose.rot.GetAsEuler().x);
+  // this->rollEdit->setText(tr(stream.str().c_str()));
+  // stream.str("");
 
-  stream << std::fixed << std::setprecision(2)
-         << GZ_RTOD(pose.rot.GetAsEuler().y);
-  this->pitchEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
+  // stream << std::fixed << std::setprecision(2)
+  //        << GZ_RTOD(pose.rot.GetAsEuler().y);
+  // this->pitchEdit->setText(tr(stream.str().c_str()));
+  // stream.str("");
 
-  stream << std::fixed << std::setprecision(2)
-         << GZ_RTOD(pose.rot.GetAsEuler().z);
-  this->yawEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
+  // stream << std::fixed << std::setprecision(2)
+  //        << GZ_RTOD(pose.rot.GetAsEuler().z);
+  // this->yawEdit->setText(tr(stream.str().c_str()));
+  // stream.str("");
 
   /*stream << std::fixed << std::setprecision(1) << fps;
   this->fpsEdit->setText(tr(stream.str().c_str()));

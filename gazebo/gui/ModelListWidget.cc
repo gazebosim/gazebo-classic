@@ -44,6 +44,7 @@
 #include "gui/ModelRightMenu.hh"
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
+#include "gui/sheet_delegate_p.h"
 #include "gui/ModelListWidget.hh"
 
 using namespace gazebo;
@@ -55,17 +56,25 @@ extern ModelRightMenu *g_modelRightMenu;
 ModelListWidget::ModelListWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->setObjectName("modelList");
+
   this->requestMsg = NULL;
   this->propMutex = new boost::mutex();
   this->receiveMutex = new boost::mutex();
   this->fillPropertyTree = false;
 
-  setMinimumWidth(280);
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();
+  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  this->modelTreeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  this->modelTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->modelTreeWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+  this->modelTreeWidget->setItemDelegate(new SheetDelegate(this->modelTreeWidget, this->modelTreeWidget));
+
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
   connect(this->modelTreeWidget,
@@ -84,11 +93,18 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
           SIGNAL(currentItemChanged(QtBrowserItem*)),
           this, SLOT(OnCurrentPropertyChanged(QtBrowserItem *)));
 
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  mainLayout->addWidget(this->modelTreeWidget, 0);
-  mainLayout->addWidget(this->propTreeBrowser, 1);
+  frameLayout->addWidget(this->modelTreeWidget, 0);
+  frameLayout->addWidget(this->propTreeBrowser, 1);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+
+  mainLayout->addWidget(frame);
+
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(2, 2, 2, 2);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 
   this->InitTransport();
 

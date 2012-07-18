@@ -33,20 +33,23 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   JointControlWidget.cc
+  sheet_delegate.cpp
 )
 
-set (qt_headers MainWindow.hh 
-                RenderWidget.hh 
-                GLWidget.hh 
-                TimePanel.hh
-                InsertModelWidget.hh
-                LightListWidget.hh
-                ModelListWidget.hh
-                WorldPropertiesWidget.hh
-                ModelEditWidget.hh
-                LightRightMenu.hh
-                ModelRightMenu.hh
-                JointControlWidget.hh
+set (qt_headers
+  MainWindow.hh 
+  RenderWidget.hh 
+  GLWidget.hh 
+  TimePanel.hh
+  InsertModelWidget.hh
+  LightListWidget.hh
+  ModelListWidget.hh
+  WorldPropertiesWidget.hh
+  ModelEditWidget.hh
+  LightRightMenu.hh
+  ModelRightMenu.hh
+  JointControlWidget.hh
+  sheet_delegate_p.h
 )
 
 set (headers Gui.hh

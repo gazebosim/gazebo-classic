@@ -46,6 +46,7 @@ extern ModelRightMenu *g_modelRightMenu;
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->setObjectName("GLWidget");
   this->state = "normal";
 
   // This mouse offset is a hack. The glwindow window is not properly sized

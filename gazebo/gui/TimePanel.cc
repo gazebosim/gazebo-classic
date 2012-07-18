@@ -27,7 +27,12 @@ using namespace gui;
 TimePanel::TimePanel(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->setObjectName("timePanel");
+
   QHBoxLayout *mainLayout = new QHBoxLayout;
+
+  QFrame *frame = new QFrame;
+  QHBoxLayout *frameLayout = new QHBoxLayout;
 
   this->percentRealTimeEdit = new QLineEdit;
   this->percentRealTimeEdit->setReadOnly(true);
@@ -42,33 +47,36 @@ TimePanel::TimePanel(QWidget *_parent)
   this->realTimeEdit->setFixedWidth(110);
 
   this->pauseLabel =
-    new QLabel(tr("<font style ='color:'#dddddd'>Paused</font>"));
+    new QLabel(tr("<font style ='color:'#c8c8c8'>Paused</font>"));
 
   QLabel *percentRealTimeLabel = new QLabel(tr("Real Time Factor:"));
   QLabel *simTimeLabel = new QLabel(tr("Sim Time:"));
   QLabel *realTimeLabel = new QLabel(tr("Real Time:"));
 
   QPushButton *timeResetButton = new QPushButton("Reset");
+  timeResetButton->setFocusPolicy(Qt::NoFocus);
   connect(timeResetButton, SIGNAL(clicked()),
           this, SLOT(OnTimeReset()));
 
-  mainLayout->addWidget(percentRealTimeLabel);
-  mainLayout->addWidget(this->percentRealTimeEdit);
+  frameLayout->addWidget(percentRealTimeLabel);
+  frameLayout->addWidget(this->percentRealTimeEdit);
 
-  mainLayout->addWidget(simTimeLabel);
-  mainLayout->addWidget(this->simTimeEdit);
+  frameLayout->addWidget(simTimeLabel);
+  frameLayout->addWidget(this->simTimeEdit);
 
-  mainLayout->addWidget(realTimeLabel);
-  mainLayout->addWidget(this->realTimeEdit);
+  frameLayout->addWidget(realTimeLabel);
+  frameLayout->addWidget(this->realTimeEdit);
 
-  mainLayout->addWidget(timeResetButton);
-  mainLayout->addWidget(this->pauseLabel);
+  frameLayout->addWidget(timeResetButton);
+  frameLayout->addWidget(this->pauseLabel);
 
-  mainLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum));
+  frame->setLayout(frameLayout);
+  frame->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
+
+  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
   this->node = transport::NodePtr(new transport::Node());
@@ -88,6 +96,7 @@ TimePanel::TimePanel(QWidget *_parent)
         boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   this->simTime.Set(0);
+  this->show();
 }
 
 /////////////////////////////////////////////////
@@ -119,10 +128,10 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   this->realTime = msgs::Convert(_msg->real_time());
   if (_msg->paused())
     this->pauseLabel->setText(
-        "<font style ='color:green;font-weight:bold;'>Paused</font>");
+        "<font style ='color:#c8c8c8;'>Paused</font>");
   else
     this->pauseLabel->setText(
-        "<font style ='color:green;font-weight:bold;'>      </font>");
+        "<font style ='color:#c8c8c8;'>      </font>");
 }
 
 /////////////////////////////////////////////////

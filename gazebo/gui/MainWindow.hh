@@ -53,6 +53,8 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
+      private slots: void OnCollapse();
+      private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
       private slots: void Import();
@@ -149,9 +151,8 @@ namespace gazebo
       private: transport::SubscriberPtr worldModSub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
-      private: QDockWidget *modelsDock;
-      private: QDockWidget *lightsDock;
-      private: QDockWidget *insertModelsDock;
+      private: QDockWidget *toolsDock;
+      private: QPushButton *collapseButton;
 
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -159,6 +160,21 @@ namespace gazebo
       private: std::map<std::string, unsigned int> entities;
 
       private: msgs::Request *requestMsg;
+
+      private: QTreeWidget *treeWidget;
+    };
+
+    class TreeViewDelegate: public QItemDelegate
+    {
+      Q_OBJECT
+      public: TreeViewDelegate(QTreeView *_view, QWidget *_parent);
+    
+      public: void paint(QPainter *painter, const QStyleOptionViewItem &option,
+                         const QModelIndex &index) const;
+    
+      public: virtual QSize sizeHint(const QStyleOptionViewItem &_opt,
+                                     const QModelIndex &_index) const;
+      private: QTreeView *view;
     };
   }
 }
