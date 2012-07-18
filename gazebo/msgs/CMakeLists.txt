@@ -60,6 +60,7 @@ set (msgs axis.proto
           world_control.proto
           world_stats.proto 
           world_modify.proto 
+          world_reset.proto 
           gui_overlay_config.proto
           gui_camera.proto
           gui.proto

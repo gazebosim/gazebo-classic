@@ -82,6 +82,9 @@ World::World(const std::string &_name)
 
   this->name = _name;
 
+  this->resetModelPoses = false;
+  this->resetTime = false;
+
   this->setWorldPoseMutex = new boost::recursive_mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -362,7 +365,11 @@ void World::Update()
 {
   if (this->needsReset)
   {
-    this->Reset();
+    if (this->resetModelPoses)
+      this->Reset(this->resetTime, Base::MODEL);
+    else
+      this->Reset(this->resetTime);
+
     this->needsReset = false;
   }
 
@@ -756,16 +763,20 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_step())
     this->OnStep();
 
-  if (_data->has_reset_time())
-  {
-    this->simTime = common::Time(0);
-    this->pauseTime = common::Time(0);
-    this->startTime = common::Time::GetWallTime();
-  }
-
-  if (_data->has_reset_world())
+  if (_data->has_reset())
   {
     this->needsReset = true;
+
+    if (_data->reset().has_time() && _data->reset().time())
+      this->resetTime = true;
+    else
+      this->resetTime = false;
+
+    if (_data->reset().has_model_poses() &&
+        _data->reset().model_poses())
+      this->resetModelPoses = true;
+    else
+      this->resetModelPoses = false;
   }
 }
 

@@ -280,7 +280,8 @@ void MainWindow::NewModel()
 void MainWindow::OnResetModelPoses()
 {
   msgs::WorldControl msg;
-  msg.set_reset_world(false);
+  msg.mutable_reset()->set_time(false);
+  msg.mutable_reset()->set_model_poses(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -288,7 +289,8 @@ void MainWindow::OnResetModelPoses()
 void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
-  msg.set_reset_world(true);
+  msg.mutable_reset()->set_time(true);
+  msg.mutable_reset()->set_model_poses(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -473,7 +475,7 @@ void MainWindow::CreateActions()
 
   this->resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   this->resetModelsAct->setShortcut(tr("Ctrl+R"));
-  this->resetModelsAct->setStatusTip(tr("Reset model poses in the world"));
+  this->resetModelsAct->setStatusTip(tr("Reset model poses"));
   connect(this->resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelPoses()));
 

@@ -327,6 +327,8 @@ namespace gazebo
       private: std::list<msgs::Model> modelMsgs;
 
       private: bool needsReset;
+      private: unsigned int resetModelPoses;
+      private: bool resetTime;
       private: bool initialized;
 
       private: RayShapePtr testRay;
