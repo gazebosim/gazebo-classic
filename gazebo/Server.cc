@@ -68,6 +68,17 @@ void Server::PrintUsage()
 /////////////////////////////////////////////////
 bool Server::ParseArgs(int argc, char **argv)
 {
+  // save a copy of argc and argv for consumption by system plugins
+  this->systemPluginsArgc = argc;
+  this->systemPluginsArgv = new char*[argc];
+  for (int i = 0; i < argc; ++i)
+  {
+    int argv_len = strlen(argv[i]);
+    this->systemPluginsArgv[i] = new char[argv_len];
+    for (int j = 0; j < argv_len; ++j)
+      this->systemPluginsArgv[i][j] = argv[i][j];
+  }
+
   std::string configFilename;
 
   po::options_description v_desc("Allowed options");
@@ -182,7 +193,7 @@ bool Server::Load(const std::string &_filename)
   }
 
   // Load gazebo
-  gazebo::load();
+  gazebo::load(this->systemPluginsArgc,this->systemPluginsArgv);
 
   /// Load the sensors library
   sensors::load();
