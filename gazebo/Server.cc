@@ -93,7 +93,8 @@ bool Server::ParseArgs(int argc, char **argv)
     ("world_file", po::value<std::string>(), "SDF world to load.");
 
   h_desc.add_options()
-    ("pass_through", po::value<std::vector<std::string> >(), "not used, passed through to system plugins.");
+    ("pass_through", po::value<std::vector<std::string> >(),
+     "not used, passed through to system plugins.");
 
   po::options_description desc("Allowed options");
   desc.add(v_desc).add(h_desc);
