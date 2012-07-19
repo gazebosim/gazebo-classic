@@ -52,7 +52,6 @@ const Ogre::MaterialPtr &MaterialGenerator::GetMaterial(Perm _permutation)
   }
   else
   {
-    std::cout << "  Create new Material[" << this->schemeName << "]\n";
     Ogre::MaterialPtr mat;
 
     Ogre::MaterialPtr templ = this->GetTemplateMaterial(_permutation & matMask);
@@ -75,11 +74,11 @@ const Ogre::MaterialPtr &MaterialGenerator::GetMaterial(Perm _permutation)
     pass->setVertexProgram(vertShader->getName());
     pass->setFragmentProgram(fragShader->getName());
 
-    // Ogre::MaterialSerializer serializer;
-    // serializer.queueForExport(mat, true);
-    // Ogre::String matString = serializer.getQueuedAsString();
-    // std::cout << matString << "\n";
-    // std::cout << "*************\n" << fragShader->getSource() << "******\n";
+    Ogre::MaterialSerializer serializer;
+    serializer.queueForExport(mat, true);
+    Ogre::String matString = serializer.getQueuedAsString();
+    std::cout << matString << "\n";
+    std::cout << "*************\n" << fragShader->getSource() << "******\n";
 
     /// And store it
     this->materials[_permutation] = mat;

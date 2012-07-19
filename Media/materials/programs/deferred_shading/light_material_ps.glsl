@@ -158,5 +158,6 @@ void main()
   total_light_contrib *= (1.0 - spotFalloff);
 #endif
 
-  gl_FragColor = vec4(total_light_contrib * color, 0.0);
+  // gl_FragColor = vec4(total_light_contrib * color, 0.0);
+  gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
 }

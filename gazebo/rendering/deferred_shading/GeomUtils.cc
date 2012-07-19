@@ -40,6 +40,7 @@ void GeomUtils::CreateSphere(const Ogre::String &_strName, float _radius,
   // Generate face list
   pSphereVertex->useSharedVertices = true;
 
+  std::cout << "CreateSphere. Radius[" << _radius << "]\n";
   // the original code was missing this line:
   pSphere->_setBounds(Ogre::AxisAlignedBox(
         Ogre::Vector3(-_radius, -_radius, -_radius),

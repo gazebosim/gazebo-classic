@@ -1103,8 +1103,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "DeferredShading/SSAO");
 
-    this->gBufferInstance->setEnabled(false);
-    this->lightsInstance->setEnabled(false);
+    this->gBufferInstance->setEnabled(true);
+    this->lightsInstance->setEnabled(true);
     this->ssaoInstance->setEnabled(false);
   }
 }

@@ -1,3 +1,5 @@
+add_subdirectory(deferred_shading)
+
 set (files
   grid_fp.glsl
   grid_vp.glsl
@@ -13,8 +15,6 @@ set (files
   blur.glsl
   perpixel_vp.glsl
   perpixel_fp.glsl
-  pssm.cg
-  pssm.hlsl
   depth_map.frag
   depth_map.vert
   depth_points_map.frag

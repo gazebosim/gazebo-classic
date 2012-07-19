@@ -316,7 +316,7 @@ void MainWindow::NewModel()
 void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
-  msg.set_reset_world(true);
+  // TODO: fix me msg.set_reset_world(true);
   this->worldControlPub->Publish(msg);
 }
 

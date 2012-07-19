@@ -1,13 +1,23 @@
 set (files
-  grid.material
-  Gazebo.material 
-  kitchen.material
-  shadow_receiver.program 
-  shadow_caster.program
-  perpixel.program
   blur.compositor
   blur.material
+  CMakeLists.txt
+  deferred.compositor
+  deferred_post.material
+  deferred_post_minilight.material
+  deferred_post.program
+  gazebo.material
+  grid.material
+  kitchen.material
+  perpixel.program
   pssm.material
+  ShadowCaster.material
+  shadow_caster.program
+  ShadowCaster.program
+  shadow_receiver.program
+  shadows.material
+  ssao.compositor
+  ssao.material
   youbot.material
 )
 

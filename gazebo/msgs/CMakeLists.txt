@@ -60,6 +60,7 @@ set (msgs
   vector3d.proto
   visual.proto
   world_control.proto
+  world_reset.proto 
   world_stats.proto 
   world_modify.proto 
   gui_overlay_config.proto

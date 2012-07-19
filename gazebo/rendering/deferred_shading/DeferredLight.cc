@@ -193,6 +193,9 @@ void DeferredLight::CreateSphere(float _radius, int _nRings, int _nSegments)
       this->mRenderOp.indexData , _radius , _nRings, _nSegments,
       false, false);
 
+  // Give a little bit of padding
+  _radius *= 1.01;
+
   // Set bounding box and sphere
   this->setBoundingBox(Ogre::AxisAlignedBox(
         Ogre::Vector3(-_radius, -_radius, -_radius),
@@ -300,12 +303,14 @@ bool DeferredLight::IsCameraInsideLight(Ogre::Camera *_camera)
         math::Vector3 lp =
           Conversions::Convert(this->parentLight->getDerivedPosition());
         math::Vector3 cp = Conversions::Convert(_camera->getDerivedPosition());
+
         std::cout << "LightPos[" << lp << "] CamPos[" << cp << "]\n";
-        std::cout << "Dist from light[" << distanceFromLight << "]\n";
+        std::cout << "Dist from light[" << distanceFromLight << "] Radius[" << this->radius << "] NearClip[" << _camera->getNearClipDistance() << "]\n";
+
         // Small epsilon fix to account for the fact that we aren't a
         // true sphere.
         return distanceFromLight <= this->radius +
-          _camera->getNearClipDistance() + 0.1;
+          _camera->getNearClipDistance() + 0.2;
       }
     case Ogre::Light::LT_SPOTLIGHT:
       {

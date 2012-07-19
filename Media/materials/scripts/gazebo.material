@@ -820,7 +820,7 @@ material Gazebo/Road
     {
       ambient 0.1 0.1 0.1 1.0
       diffuse 0.1 0.1 0.1 1.0
-      specular 0.01 0.01 0.01 1.0
+      specular 0.1 0.1 0.1 1.0
 
 			texture_unit
 			{

@@ -101,9 +101,9 @@ void Grid::SetColor(const common::Color& color_)
 
 
 //////////////////////////////////////////////////
-void Grid::SetHeight(uint32_t height_)
+void Grid::SetHeight(uint32_t _height)
 {
-  this->height = height_;
+  this->height = _height;
 
   this->Create();
 }
@@ -200,8 +200,8 @@ void Grid::Create()
 }
 
 //////////////////////////////////////////////////
-void Grid::SetUserData(const Ogre::Any& data_)
+void Grid::SetUserData(const Ogre::Any &_data)
 {
-  this->manualObject->setUserAny(data_);
+  this->manualObject->setUserAny(_data);
 }
 

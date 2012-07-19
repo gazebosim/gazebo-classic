@@ -361,6 +361,7 @@ void RenderEngine::LoadPlugins()
   }
 }
 
+/////////////////////////////////////////////////
 void RenderEngine::AddResourcePath(const std::string &_path)
 {
   try
