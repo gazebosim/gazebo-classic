@@ -17,12 +17,12 @@ void main()
   if (a1.w - 0.0001 < 0.0)
     discard;
 
+  // Calculate ambient color of fragment
+  gl_FragColor = ambientColor * vec4(a0.xyz, 0.0);
+
   // Calculate depth of fragment;
   vec3 viewPos = normalize(gl_TexCoord[1].xyz) * farClipDistance * a1.w;
   vec4 projPos = proj * vec4(viewPos, 1.0);
 
-  gl_FragDepth = projPos.z / projPos.w;
-
-  // Calculate ambient color of fragment
-  gl_FragColor = ambientColor * vec4(a0.xyz, 0.0);
+  gl_FragDepth = (projPos.z / projPos.w) * 0.5 + 0.5;
 }

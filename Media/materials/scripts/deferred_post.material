@@ -12,17 +12,17 @@ material DeferredShading/AmbientLight
       depth_write on
       depth_check on
 
-      texture_unit texA
+      texture_unit tex0
       {
-        texture_alias texA
+        texture_alias tex0
         content_type compositor DeferredShading/GBuffer mrt_output 0
         tex_address_mode clamp
         filtering none
       }
 
-      texture_unit texB
+      texture_unit tex0
       {
-        texture_alias texB
+        texture_alias tex0
         content_type compositor DeferredShading/GBuffer mrt_output 1
         tex_address_mode clamp
         filtering none
@@ -34,8 +34,6 @@ material DeferredShading/AmbientLight
 
       fragment_program_ref DeferredShading/Ambient_ps
       {
-         // param_named texA int 0
-         // param_named texB int 1
       }
     }
   }

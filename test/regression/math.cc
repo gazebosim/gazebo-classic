@@ -200,7 +200,7 @@ TEST_F(MathTest, Vector3)
   EXPECT_TRUE(v.Round() == math::Vector3(1, 2, 4));
 
   // ::GetDotProd
-  EXPECT_TRUE(math::equal(17, v.GetDotProd(math::Vector3(1, 2, 3)), 1e-2));
+  EXPECT_TRUE(math::equal(17, v.Dot(math::Vector3(1, 2, 3)), 1e-2));
 
   // ::GetDistToLine
   v.Set(0, 0, 0);
@@ -453,10 +453,10 @@ TEST_F(MathTest, Spline)
   math::Spline s;
 
   s.AddPoint(math::Vector3(0, 0, 0));
-  EXPECT_EQ(1, s.GetNumPoints());
+  EXPECT_EQ(1, s.GetPointCount());
 
   s.Clear();
-  EXPECT_EQ(0, s.GetNumPoints());
+  EXPECT_EQ(0, s.GetPointCount());
 
   s.AddPoint(math::Vector3(0, 0, 0));
   EXPECT_TRUE(s.GetPoint(0) == math::Vector3(0, 0, 0));

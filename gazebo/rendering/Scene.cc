@@ -1784,8 +1784,10 @@ void Scene::SetShadowsEnabled(bool _value)
     this->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT16_R, 2);
+    //this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT16_R, 2);
+    this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT16_R);
     this->manager->setShadowDirectionalLightExtrusionDistance(75);
+
     /*if (_value)
       RTShaderSystem::Instance()->ApplyShadows(this);
     else

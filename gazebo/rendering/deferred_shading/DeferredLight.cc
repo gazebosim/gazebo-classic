@@ -130,7 +130,6 @@ void DeferredLight::RebuildGeometry(float _radius)
       }
     case Ogre::Light::LT_POINT:
       {
-        std::cout << "New POint Light Radius[" << _radius << "]\n";
         /// XXX some more intelligent expression for rings and segments
         this->CreateSphere(_radius, 10, 10);
         ENABLE_BIT(this->permutation, LightMaterialGenerator::MI_POINT);
@@ -304,9 +303,6 @@ bool DeferredLight::IsCameraInsideLight(Ogre::Camera *_camera)
           Conversions::Convert(this->parentLight->getDerivedPosition());
         math::Vector3 cp = Conversions::Convert(_camera->getDerivedPosition());
 
-        std::cout << "LightPos[" << lp << "] CamPos[" << cp << "]\n";
-        std::cout << "Dist from light[" << distanceFromLight << "] Radius[" << this->radius << "] NearClip[" << _camera->getNearClipDistance() << "]\n";
-
         // Small epsilon fix to account for the fact that we aren't a
         // true sphere.
         return distanceFromLight <= this->radius +
@@ -391,13 +387,11 @@ void DeferredLight::UpdateFromCamera(Ogre::Camera *_camera)
       pass->setDepthCheckEnabled(true);
       if (this->IsCameraInsideLight(_camera))
       {
-        printf("Inside light\n");
         pass->setDepthFunction(Ogre::CMPF_GREATER_EQUAL);
         pass->setCullingMode(Ogre::CULL_ANTICLOCKWISE);
       }
       else
       {
-        printf("Outside light\n");
         pass->setCullingMode(Ogre::CULL_CLOCKWISE);
         pass->setDepthFunction(Ogre::CMPF_LESS_EQUAL);
       }

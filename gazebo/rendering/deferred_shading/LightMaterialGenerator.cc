@@ -108,8 +108,8 @@ class LightMaterialGeneratorGLSL : public MaterialGenerator::Impl
                 "tex0", static_cast<int>(0));
             ptrProgram->getDefaultParameters()->setNamedConstant(
                 "tex1", static_cast<int>(1));
-            // ptrProgram->getDefaultParameters()->setNamedConstant(
-            //    "shadowTex", (int)2);
+            ptrProgram->getDefaultParameters()->setNamedConstant(
+                "shadowTex", (int)2);
 
             return Ogre::GpuProgramPtr(ptrProgram);
           }
