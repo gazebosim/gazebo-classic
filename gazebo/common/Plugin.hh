@@ -205,7 +205,7 @@ namespace gazebo
   class SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Load function
-    public: virtual void Load() = 0;
+    public: virtual void Load(int argc = 0, char**argv = NULL) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
