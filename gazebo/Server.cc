@@ -92,11 +92,14 @@ bool Server::ParseArgs(int argc, char **argv)
   h_desc.add_options()
     ("world_file", po::value<std::string>(), "SDF world to load.");
 
+  h_desc.add_options()
+    ("pass_through", po::value<std::vector<std::string> >(), "not used, passed through to system plugins.");
+
   po::options_description desc("Allowed options");
   desc.add(v_desc).add(h_desc);
 
   po::positional_options_description p_desc;
-  p_desc.add("world_file", 1);
+  p_desc.add("world_file", 1).add("pass_through", -1);
 
   try
   {
@@ -107,7 +110,7 @@ bool Server::ParseArgs(int argc, char **argv)
   } catch(boost::exception &_e)
   {
     std::cerr << "Error. Invalid arguments\n";
-    // std::cerr << boost::diagnostic_information(_e) << "\n";
+    std::cerr << boost::diagnostic_information(_e) << "\n";
     return false;
   }
 
@@ -193,7 +196,7 @@ bool Server::Load(const std::string &_filename)
   }
 
   // Load gazebo
-  gazebo::load(this->systemPluginsArgc,this->systemPluginsArgv);
+  gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
 
   /// Load the sensors library
   sensors::load();
