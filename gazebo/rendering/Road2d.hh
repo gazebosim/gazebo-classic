@@ -18,6 +18,11 @@
 #define _ROAD2D_HH_
 
 #include <vector>
+#include <list>
+
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/math/Vector3.hh"
@@ -28,7 +33,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Road2d : public Ogre::SimpleRenderable
+    class Road2d
     {
       /// \brief Constructor
       public: Road2d();
@@ -38,16 +43,39 @@ namespace gazebo
 
       public: void Load(VisualPtr _parent);
 
-      /// \brief Implementation of Ogre::SimpleRenderable
-      public: virtual Ogre::Real getBoundingRadius(void) const;
+      /// \brief Process all received messages
+      private: void PreRender();
 
-      /// \brief Implementation of Ogre::SimpleRenderable
-      public: virtual Ogre::Real getSquaredViewDepth(
-                  const Ogre::Camera* cam) const;
 
-      private: std::vector<math::Vector3> points;
+      /// \brief Recieve a road msg
+      private: void OnRoadMsg(ConstRoadPtr &_msg);
+
+      private: class Segment : public Ogre::SimpleRenderable
+               {
+                 public: void Load(msgs::Road _msg);
+
+                 /// \brief Implementation of Ogre::SimpleRenderable
+                 public: virtual Ogre::Real getBoundingRadius(void) const;
+           
+                 /// \brief Implementation of Ogre::SimpleRenderable
+                 public: virtual Ogre::Real getSquaredViewDepth(
+                             const Ogre::Camera* cam) const;
+
+                 public: std::string name;
+                 public: std::vector<math::Vector3> points;
+                 public: double width;
+               };
+
+
+      typedef std::list<boost::shared_ptr<msgs::Road const> > RoadMsgs_L;
+      private: RoadMsgs_L msgs;
+      private: std::vector<Road2d::Segment*> segments;
       private: VisualPtr parent;
-      private: double width;
+
+      private: transport::NodePtr node;
+      private: transport::SubscriberPtr sub;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

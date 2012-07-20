@@ -215,7 +215,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
   ss << "}\n";
 
   // Debug output
-  std::cout << ss.str() << "\n\n";
+  // std::cout << ss.str() << "\n\n";
   Ogre::String programSource = ss.str();
   Ogre::String programName = this->baseName + "FP_" +
                              Ogre::StringConverter::toString(_permutation);

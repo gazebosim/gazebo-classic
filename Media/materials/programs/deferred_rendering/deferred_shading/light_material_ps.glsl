@@ -29,9 +29,9 @@ uniform float flip;
 #endif
 
 #ifdef IS_SHADOW_CASTER
+uniform sampler2D shadowTex;
 uniform mat4 invView;
 uniform mat4 shadowViewProjMat;
-uniform sampler2D shadowTex;
 uniform vec3 shadowCamPos;
 uniform float shadowFarClip;
 #endif
@@ -46,11 +46,11 @@ void checkShadow(sampler2D shadowMap, vec3 viewPos, mat4 invView,
 #endif
 	)
 {
-	vec3 worldPos = (invView * vec4(viewPos, 1)).xyz;
+	vec3 worldPos = (invView * vec4(viewPos, 1.0)).xyz;
 #if LIGHT_TYPE == LIGHT_DIRECTIONAL
 	float distanceFromLight = length(shadowCamPos - worldPos);
 #endif
-	vec4 shadowProjPos = shadowViewProj * vec4(worldPos,1);
+	vec4 shadowProjPos = shadowViewProj * vec4(worldPos, 1.0);
 
 	shadowProjPos /= shadowProjPos.w;
 
@@ -59,7 +59,7 @@ void checkShadow(sampler2D shadowMap, vec3 viewPos, mat4 invView,
 	float shadowDistance = shadowDepth * shadowFarClip;
 
 	// clip(shadowDistance - distanceFromLight + 0.1);
-	if (shadowDistance - distanceFromLight + 0.1 < 0.0)
+	if (shadowDistance < distanceFromLight - 0.1)
     discard;
 }
 

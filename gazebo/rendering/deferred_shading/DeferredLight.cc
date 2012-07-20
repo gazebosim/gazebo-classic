@@ -193,7 +193,7 @@ void DeferredLight::CreateSphere(float _radius, int _nRings, int _nSegments)
       false, false);
 
   // Give a little bit of padding
-  _radius *= 1.01;
+  _radius *= 1.1;
 
   // Set bounding box and sphere
   this->setBoundingBox(Ogre::AxisAlignedBox(
@@ -406,7 +406,13 @@ void DeferredLight::UpdateFromCamera(Ogre::Camera *_camera)
 
     // Get the shadow camera position
     if (params->_findNamedConstantDefinition("shadowCamPos"))
+    {
+      std::cout << "Shadow Cam Pos[" 
+        << shadowCam.getPosition().x << " "
+        << shadowCam.getPosition().y << " "
+        << shadowCam.getPosition().z << "]\n";
       params->setNamedConstant("shadowCamPos", shadowCam.getPosition());
+    }
 
     if (params->_findNamedConstantDefinition("shadowFarClip"))
       params->setNamedConstant("shadowFarClip", shadowCam.getFarClipDistance());

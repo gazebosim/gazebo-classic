@@ -213,6 +213,9 @@ namespace gazebo
       /// \brief Load an actor
       private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr parent);
 
+      /// \brief Load a road
+      private: RoadPtr LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent);
+
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
       private: void Step();

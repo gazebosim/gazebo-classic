@@ -69,8 +69,8 @@ class LightMaterialGeneratorGLSL : public MaterialGenerator::Impl
             {
               Ogre::DataStreamPtr ptrMasterSource =
                 Ogre::ResourceGroupManager::getSingleton().openResource(
-                    "deferred_shading/light_material_ps.glsl",
-                    Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                   "deferred_rendering/deferred_shading/light_material_ps.glsl",
+                   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
               if (ptrMasterSource.isNull())
                 gzthrow("Null Pointer\n");
@@ -108,8 +108,10 @@ class LightMaterialGeneratorGLSL : public MaterialGenerator::Impl
                 "tex0", static_cast<int>(0));
             ptrProgram->getDefaultParameters()->setNamedConstant(
                 "tex1", static_cast<int>(1));
-            ptrProgram->getDefaultParameters()->setNamedConstant(
-                "shadowTex", (int)2);
+
+            if (_permutation & LightMaterialGenerator::MI_SHADOW_CASTER)
+              ptrProgram->getDefaultParameters()->setNamedConstant(
+                  "shadowTex", (int)2);
 
             return Ogre::GpuProgramPtr(ptrProgram);
           }
@@ -160,7 +162,7 @@ class LightMaterialGeneratorGLSL : public MaterialGenerator::Impl
                if (_permutation & LightMaterialGenerator::MI_SHADOW_CASTER)
                  strPPD += "IS_SHADOW_CASTER=1;";
 
-               std::cout << "STRPPD[" << strPPD << "]\n";
+               // std::cout << "STRPPD[" << strPPD << "]\n";
                return strPPD;
              }
 
@@ -232,8 +234,8 @@ LightMaterialGenerator::LightMaterialGenerator()
 {
   vsMask = 0x00000004;
   fsMask = 0x0000003F;
-  matMask = LightMaterialGenerator::MI_DIRECTIONAL |
-            LightMaterialGenerator::MI_SHADOW_CASTER;
+  this->matMask = LightMaterialGenerator::MI_DIRECTIONAL |
+                  LightMaterialGenerator::MI_SHADOW_CASTER;
 
   this->schemeName.clear();
   materialBaseName = "DeferredShading/LightMaterial/";

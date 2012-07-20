@@ -5,6 +5,6 @@
     <include filename="ground_plane.model"/>
 
     <!-- A global light source -->
-    <!--<include filename="sun.light"/>-->
+    <include filename="sun.light"/>
   </world>
 </gazebo>

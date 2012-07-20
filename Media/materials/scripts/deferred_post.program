@@ -1,6 +1,6 @@
 fragment_program DeferredShading/Ambient_ps glsl
 {
-	source deferred_shading/ambient_ps.glsl
+	source deferred_rendering/deferred_shading/ambient_ps.glsl
 	
 	default_params
 	{
@@ -15,7 +15,7 @@ fragment_program DeferredShading/Ambient_ps glsl
 // Auxiliary lights
 vertex_program DeferredShading/LightMaterial_vs glsl
 {
-	source deferred_shading/light_material_vs.glsl
+	source deferred_rendering/deferred_shading/light_material_vs.glsl
 	// profiles vs_1_1 arbvp1
 
 	default_params
@@ -27,7 +27,7 @@ vertex_program DeferredShading/LightMaterial_vs glsl
 // Post processors
 vertex_program DeferredShading/vs glsl
 {
-	source deferred_shading/vs.glsl
+	source deferred_rendering/deferred_shading/vs.glsl
 	profiles vs_1_1 arbvp1
 	default_params
 	{
@@ -36,40 +36,15 @@ vertex_program DeferredShading/vs glsl
 	}
 }
 
-//fragment_program DeferredShading/ShowNormal_ps glsl
-//{
-//	source deferred_shading/show_normal_ps.glsl
-//	profiles ps_2_0 arbfp1
-//}
-//
-//fragment_program DeferredShading/ShowDS_ps glssl
-//{
-//	source deferred_shading/show_ds_ps.glsl
-//	profiles ps_2_0 arbfp1
-//}
-//
-//fragment_program DeferredShading/ShowColor_ps glsl
-//{
-//	source deferred_shading/show_color_ps.glsl
-//	profiles ps_2_0 arbfp1
-//}
-//
-//fragment_program DeferredShading/ShowNormal_ps glsl
-//{
-//	source deferred_shading/show_normal_ps.glsl
-//	profiles ps_2_0 arbfp1
-//}
-//
-//fragment_program DeferredShading/ShowDS_ps glsl
-//{
-//	source deferred_shading/show_ds_ps.glsl
-//	profiles ps_2_0 arbfp1
-//}
-//
-//fragment_program DeferredShading/ShowColor_ps glsl
-//{
-//	source deferred_shading/show_color_ps.cg
-//	profiles ps_2_0 arbfp1
-//}
-
-
+fragment_program DeferredLighting/Ambient_ps glsl
+{
+	source deferred_rendering/deferred_lighting/ambient_ps.glsl
+	profiles ps_2_0 arbfp1
+	
+	default_params
+	{
+		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto proj projection_matrix
+		param_named_auto farClipDistance far_clip_distance
+	}
+}

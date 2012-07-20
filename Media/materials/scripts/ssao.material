@@ -1,8 +1,7 @@
 // full screen quad with camera-to-pixel ray calculations
-
 vertex_program ssao_vs glsl
 {
-  source deferred_shading/ssao_vp.glsl
+  source deferred_rendering/ssao_vp.glsl
   default_params
   {
     param_named_auto wvp worldviewproj_matrix
@@ -11,7 +10,7 @@ vertex_program ssao_vs glsl
 
 fragment_program ssao_ps glsl
 {
-  source deferred_shading/ssao_fp.glsl
+  source deferred_rendering/ssao_fp.glsl
   default_params
   {
   }
@@ -19,7 +18,7 @@ fragment_program ssao_ps glsl
 
 fragment_program ssaoBlurX_ps glsl
 {
-  source deferred_shading/ssao_blurx.glsl
+  source deferred_rendering/ssao_blurx.glsl
   default_params
   {
     param_named_auto invTexSize inverse_texture_size 0
@@ -28,7 +27,7 @@ fragment_program ssaoBlurX_ps glsl
 
 fragment_program ssaoBlurY_ps glsl
 {
-  source deferred_shading/ssao_blury.glsl
+  source deferred_rendering/ssao_blury.glsl
   default_params
   {
     param_named_auto invTexSize inverse_texture_size 0

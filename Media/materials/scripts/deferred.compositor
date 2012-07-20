@@ -1,3 +1,109 @@
+/////////////////////////////////////////////////
+// Deferred Lightin Compositor
+/////////////////////////////////////////////////
+//Postfilter generating the Deferred Lighting GBuffer
+compositor DeferredLighting/GBuffer
+{
+	technique
+	{
+		// temporary textures
+		texture mrt_output target_width target_height PF_FLOAT16_RGBA chain_scope
+		
+		target mrt_output
+		{
+			input none
+			pass clear
+			{
+			}
+			
+			shadows off
+			material_scheme DLGBuffer
+			
+			// everything but the lights and their meshes
+			// could do this with something like a visibility mask too
+			pass render_scene
+			{
+				// These values are synchronized with the code
+				first_render_queue 10
+				last_render_queue  79	
+			}
+		}
+	}
+}
+
+//Postfilter lighting the scene using the GBuffer
+compositor DeferredLighting/ShowLit
+{
+	technique
+	{
+		// Reference the main Gbuffer texture
+		texture_ref mrt_output DeferredLighting/GBuffer mrt_output
+		texture LBuffer target_width target_height PF_FLOAT16_RGBA chain_scope
+    target LBuffer
+    {
+			input none
+			// We will dispatch the shadow texture rendering ourselves
+			shadows off
+			
+			pass clear
+			{
+			}
+
+			// Render the lights and their meshes
+			pass render_custom DeferredLightingLight
+			{
+				input 0 mrt_output 0
+			}
+			// Render the objects that skipped rendering into the gbuffer
+		}
+
+		target_output
+    {
+			input none
+
+			// We will dispatch the shadow texture rendering ourselves
+			shadows off
+			
+			pass clear
+			{
+			}
+			
+			// render skies and other pre-gbuffer objects
+			pass render_scene
+			{
+				first_render_queue 1
+				last_render_queue  9			
+			}
+			
+			pass render_scene
+			{
+				material_scheme DLMerge
+				// These values are synchronized with the code
+				first_render_queue 10
+				last_render_queue  79	
+			}
+
+			// Render the objects that skipped rendering into the gbuffer
+			pass render_scene
+			{
+				material_scheme NoGBufferDL
+				first_render_queue 10
+				last_render_queue 79
+			}
+			
+			// Render the post-GBuffer render queue objects
+			pass render_scene
+			{
+				// This value is synchronized with the code
+				first_render_queue 80
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////
+// Deferred Shading Compositor
+/////////////////////////////////////////////////
 // Postfilter generating the GBuffer
 compositor DeferredShading/GBuffer
 {

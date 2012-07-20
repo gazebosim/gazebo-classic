@@ -427,6 +427,8 @@ void RTShaderSystem::RemoveShadows(Scene *_scene)
 /////////////////////////////////////////////////
 void RTShaderSystem::ApplyShadows(Scene *_scene)
 {
+  return;
+
   if (!this->initialized)
     return;
 

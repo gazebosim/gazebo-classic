@@ -503,28 +503,36 @@ bool RenderEngine::HasGLSL()
 
 void RenderEngine::CreateContext()
 {
-  this->dummyDisplay = XOpenDisplay(0);
-  if (!this->dummyDisplay)
-    gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
 
-  int screen = DefaultScreen(this->dummyDisplay);
+  try
+  {
+    this->dummyDisplay = XOpenDisplay(0);
+    if (!this->dummyDisplay)
+      gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
 
-  int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16,
-    GLX_STENCIL_SIZE, 8, None };
+    int screen = DefaultScreen(this->dummyDisplay);
 
-  XVisualInfo *dummyVisual = glXChooseVisual(
-      static_cast<Display*>(this->dummyDisplay),
-      screen, static_cast<int *>(attribList));
+    int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16,
+      GLX_STENCIL_SIZE, 8, None };
 
-  this->dummyWindowId = XCreateSimpleWindow(
-      static_cast<Display*>(this->dummyDisplay),
-      RootWindow(static_cast<Display*>(this->dummyDisplay), screen),
-      0, 0, 1, 1, 0, 0, 0);
+    XVisualInfo *dummyVisual = glXChooseVisual(
+        static_cast<Display*>(this->dummyDisplay),
+        screen, static_cast<int *>(attribList));
 
-  this->dummyContext = glXCreateContext(
-      static_cast<Display*>(this->dummyDisplay),
-      dummyVisual, NULL, 1);
+    this->dummyWindowId = XCreateSimpleWindow(
+        static_cast<Display*>(this->dummyDisplay),
+        RootWindow(static_cast<Display*>(this->dummyDisplay), screen),
+        0, 0, 1, 1, 0, 0, 0);
 
-  glXMakeCurrent(static_cast<Display*>(this->dummyDisplay),
-      this->dummyWindowId, static_cast<GLXContext>(this->dummyContext));
+    this->dummyContext = glXCreateContext(
+        static_cast<Display*>(this->dummyDisplay),
+        dummyVisual, NULL, 1);
+
+    glXMakeCurrent(static_cast<Display*>(this->dummyDisplay),
+        this->dummyWindowId, static_cast<GLXContext>(this->dummyContext));
+  }
+  catch (...)
+  {
+    printf("Bad\n\n\n");
+  }
 }

@@ -16,8 +16,6 @@
 */
 #include <boost/lexical_cast.hpp>
 
-#include "gazebo/rendering/Road2d.hh"
-
 #include "rendering/ogre_gazebo.h"
 #include "msgs/msgs.hh"
 #include "sdf/sdf.hh"
@@ -25,28 +23,29 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
-#include "rendering/Projector.hh"
-#include "rendering/Heightmap.hh"
-#include "rendering/RenderEvents.hh"
-#include "rendering/LaserVisual.hh"
-#include "rendering/CameraVisual.hh"
-#include "rendering/JointVisual.hh"
-#include "rendering/COMVisual.hh"
-#include "rendering/ContactVisual.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Light.hh"
-#include "rendering/Visual.hh"
-#include "rendering/RenderEngine.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Camera.hh"
-#include "rendering/DepthCamera.hh"
-#include "rendering/GpuLaser.hh"
-#include "rendering/Grid.hh"
-#include "rendering/SelectionObj.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/RFIDVisual.hh"
-#include "rendering/RFIDTagVisual.hh"
-#include "rendering/VideoVisual.hh"
+#include "gazebo/rendering/Road2d.hh"
+#include "gazebo/rendering/Projector.hh"
+#include "gazebo/rendering/Heightmap.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/LaserVisual.hh"
+#include "gazebo/rendering/CameraVisual.hh"
+#include "gazebo/rendering/JointVisual.hh"
+#include "gazebo/rendering/COMVisual.hh"
+#include "gazebo/rendering/ContactVisual.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/rendering/GpuLaser.hh"
+#include "gazebo/rendering/Grid.hh"
+#include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/RFIDVisual.hh"
+#include "gazebo/rendering/RFIDTagVisual.hh"
+#include "gazebo/rendering/VideoVisual.hh"
 
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
 #include "gazebo/rendering/deferred_shading/GBufferSchemeHandler.hh"
@@ -210,6 +209,7 @@ void Scene::Load()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
+  this->manager->setAmbientLight(Ogre::ColourValue(0, 0, 0, 0));
 }
 
 //////////////////////////////////////////////////
@@ -280,23 +280,17 @@ void Scene::Init()
 //////////////////////////////////////////////////
 void Scene::InitDeferredShading()
 {
-  static bool firstTime = true;
   Ogre::CompositorManager &compMgr = Ogre::CompositorManager::getSingleton();
 
   // Hook up the compositor logic and scheme handlers.
-  if (firstTime)
-  {
-    Ogre::MaterialManager::getSingleton().addListener(
-        new GBufferSchemeHandler, "GBuffer");
+  Ogre::MaterialManager::getSingleton().addListener(
+      new GBufferSchemeHandler, "GBuffer");
 
-    Ogre::MaterialManager::getSingleton().addListener(
-        new NullSchemeHandler, "NoGBuffer");
+  Ogre::MaterialManager::getSingleton().addListener(
+      new NullSchemeHandler, "NoGBuffer");
 
-    compMgr.registerCustomCompositionPass("DeferredLight",
-        new DeferredLightCompositionPass);
-
-    firstTime = false;
-  }
+  compMgr.registerCustomCompositionPass("DeferredLight",
+      new DeferredLightCompositionPass);
 
   compMgr.registerCompositorLogic("SSAOLogic", new SSAOLogic);
 }
@@ -1780,13 +1774,21 @@ void Scene::SetShadowsEnabled(bool _value)
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
     this->manager->setShadowTextureCasterMaterial(
         "DeferredShading/Shadows/Caster");
+    //this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 1);
+  //this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+  //this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
+
+  this->manager->setShadowTextureSelfShadow(true);
+  this->manager->setShadowCasterRenderBackFaces(false);
+
     this->manager->setShadowTextureCount(1);
-    this->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    //this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT16_R, 2);
-    this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT16_R);
-    this->manager->setShadowDirectionalLightExtrusionDistance(75);
+    this->manager->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R, 2);
+
+    //this->manager->setShadowDirectionalLightExtrusionDistance(100.0);
+    //this->manager->setShadowDirLightTextureOffset(1.75);
+    //this->manager->setShadowFarDistance(10);
 
     /*if (_value)
       RTShaderSystem::Instance()->ApplyShadows(this);

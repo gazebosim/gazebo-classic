@@ -1,4 +1,4 @@
-add_subdirectory(deferred_shading)
+add_subdirectory(deferred_rendering)
 
 set (files
   grid_fp.glsl

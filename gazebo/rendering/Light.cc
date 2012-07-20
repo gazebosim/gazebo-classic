@@ -478,15 +478,10 @@ void Light::SetRange(const double &range)
 //////////////////////////////////////////////////
 void Light::SetCastShadows(const bool &_cast)
 {
-  this->light->setCastShadows(_cast);
-  /*if (this->light->getType() == Ogre::Light::LT_POINT)
-    this->light->setCastShadows(false);
+  if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
+    this->light->setCastShadows(_cast);
   else
-  {
-    this->sdf->GetAttribute("cast_shadows")->Set(cast);
-    this->light->setCastShadows(cast);
-  }
-  */
+    this->light->setCastShadows(false);
 }
 
 //////////////////////////////////////////////////

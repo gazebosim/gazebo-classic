@@ -1076,6 +1076,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
+    this->viewport->setShadowsEnabled(true);
+
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
@@ -1105,7 +1107,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
 
     this->gBufferInstance->setEnabled(true);
     this->lightsInstance->setEnabled(true);
-    this->ssaoInstance->setEnabled(false);
+    this->ssaoInstance->setEnabled(true);
   }
 }
 
