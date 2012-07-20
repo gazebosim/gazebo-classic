@@ -3,7 +3,7 @@ uniform mat4 World;
 uniform mat4 View;
 uniform mat4 ViewProj;
 uniform mat4 InvShadowProjMatrix;
-uniform half radius;
+uniform float radius;
 
 vs_3_0 vec4 getClipCoords(vec3 coords)
 {
@@ -20,7 +20,7 @@ gp4vp vec4 getClipCoords(vec3 coords)
 void main()
 {
   vec3 RSMNormal;
-  half3 RSMFlux;
+  vec3 RSMFlux;
 
   vec4 RSMVal = texture2D(RSM, vec2(gl_MultiTexCoord0.xy));
 

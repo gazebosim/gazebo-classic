@@ -51,11 +51,11 @@ material DeferredLighting/AmbientLight
 			depth_write on
 			depth_check on
 			
-			vertex_program_ref DeferredShading/post/vs
+			vertex_program_ref DeferredShading/vs
 			{
 			}
 
-			fragment_program_ref DeferredLighting/post/Ambient_ps
+			fragment_program_ref DeferredLighting/Ambient_ps
 			{
 			}
 			

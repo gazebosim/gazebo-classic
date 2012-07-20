@@ -22,6 +22,7 @@ set (files
   stereo_projection_pattern_high_res_red.png
   terrain_detail.jpg
   terrain.png
+  white.bmp
   willowMap.png
   wood.jpg
   WoodPallet.png
@@ -29,4 +30,3 @@ set (files
 
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/textures/)
-
