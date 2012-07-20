@@ -62,5 +62,5 @@ target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES}
     pthread
     ${TINYXML_LIBRARIES}
     )
-  add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
+  add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 endforeach()
