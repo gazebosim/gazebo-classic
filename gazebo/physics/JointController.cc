@@ -228,7 +228,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
           axis = _joint->GetGlobalAxis(0);
         }
 
-        this->RotateBodyAndChildren(childLink, anchor, axis, dangle, true);
+        this->RotateLinkAndChildren(childLink, anchor, axis, dangle, true);
       }
       else if (_joint->HasType(Base::SLIDER_JOINT))
       {
@@ -249,7 +249,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
           axis = _joint->GetGlobalAxis(0);
         }
 
-        this->SlideBodyAndChildren(childLink, anchor,
+        this->SlideLinkAndChildren(childLink, anchor,
             axis, dposition, true);
       }
       else
@@ -266,78 +266,100 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
 
 //////////////////////////////////////////////////
-void JointController::RotateBodyAndChildren(LinkPtr _link1,
+void JointController::RotateLinkAndChildren(LinkPtr _link1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dangle, bool _updateChildren)
 {
-  math::Pose linkWorldPose = _link1->GetWorldPose();
+  if (_updateChildren)
+    this->updated_links.clear();
+  if (this->FindLink( this->updated_links.begin(),
+                      this->updated_links.end(),
+                      _link1) == this->updated_links.end())
+  {
+    gzerr << _link1->GetName() << "\n";
+    math::Pose linkWorldPose = _link1->GetWorldPose();
 
-  // relative to anchor point
-  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+    // relative to anchor point
+    gzerr << "should be 0 " << linkWorldPose.pos - _anchor << "\n";
+    math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
 
-  // take axis rotation and turn it int a quaternion
-  math::Quaternion rotation(_axis, _dangle);
+    // take axis rotation and turn it int a quaternion
+    math::Quaternion rotation(_axis, _dangle);
 
-  // rotate relative pose by rotation
-  math::Pose newRelativePose;
+    // rotate relative pose by rotation
+    math::Pose newRelativePose;
 
-  newRelativePose.pos = rotation.RotateVector(relativePose.pos);
-  newRelativePose.rot = rotation * relativePose.rot;
+    newRelativePose.pos = rotation.RotateVector(relativePose.pos);
+    newRelativePose.rot = rotation * relativePose.rot;
 
-  math::Pose newWorldPose(newRelativePose.pos + _anchor,
-                          newRelativePose.rot);
+    math::Pose newWorldPose(newRelativePose.pos + _anchor,
+                            newRelativePose.rot);
 
-  _link1->SetWorldPose(newWorldPose);
+    _link1->SetWorldPose(newWorldPose);
 
-  // recurse through children bodies
+    this->updated_links.push_back(_link1);
+  }
+
+  // recurse through children links
   if (_updateChildren)
   {
-    std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _link1);
+    std::vector<LinkPtr> links;
+    this->GetAllChildrenLinks(links, _link1);
 
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
-        biter != bodies.end(); ++biter)
+    for (std::vector<LinkPtr>::iterator biter = links.begin();
+        biter != links.end(); ++biter)
     {
-      this->RotateBodyAndChildren((*biter), _anchor, _axis, _dangle, false);
+      this->RotateLinkAndChildren((*biter), _anchor, _axis, _dangle, false);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void JointController::SlideBodyAndChildren(LinkPtr _link1,
+void JointController::SlideLinkAndChildren(LinkPtr _link1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
-  math::Pose linkWorldPose = _link1->GetWorldPose();
+  if (_updateChildren)
+    this->updated_links.clear();
+  if (this->FindLink( this->updated_links.begin(),
+                      this->updated_links.end(),
+                      _link1) == this->updated_links.end())
+  {
+    gzerr << _link1->GetName() << "\n";
+    math::Pose linkWorldPose = _link1->GetWorldPose();
 
-  // relative to anchor point
-  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+    // relative to anchor point
+    math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
 
-  // slide relative pose by dposition along axis
-  math::Pose newRelativePose;
-  newRelativePose.pos = relativePose.pos + _axis * _dposition;
-  newRelativePose.rot = relativePose.rot;
+    // slide relative pose by dposition along axis
+    math::Pose newRelativePose;
+    newRelativePose.pos = relativePose.pos + _axis * _dposition;
+    newRelativePose.rot = relativePose.rot;
 
-  math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
-  _link1->SetWorldPose(newWorldPose);
+    math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
 
-  // recurse through children bodies
+    _link1->SetWorldPose(newWorldPose);
+
+    this->updated_links.push_back(_link1);
+  }
+
+  // recurse through children links
   if (_updateChildren)
   {
-    std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _link1);
+    std::vector<LinkPtr> links;
+    this->GetAllChildrenLinks(links, _link1);
 
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
-        biter != bodies.end(); ++biter)
+    for (std::vector<LinkPtr>::iterator biter = links.begin();
+        biter != links.end(); ++biter)
     {
-      this->SlideBodyAndChildren((*biter), _anchor, _axis, _dposition, false);
+      this->SlideLinkAndChildren((*biter), _anchor, _axis, _dposition, false);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void JointController::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
-                                           const LinkPtr &_body)
+void JointController::GetAllChildrenLinks(std::vector<LinkPtr> &_links,
+                                           const LinkPtr &_link)
 {
   // strategy, for each child, recursively look for children
   //           for each child, also look for parents to catch multiple roots
@@ -351,19 +373,20 @@ void JointController::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
     LinkPtr childLink = joint->GetChild();
     if (parentLink && childLink
         && parentLink->GetName() != childLink->GetName()
-        && parentLink->GetName() == _body->GetName()
-        && !this->InBodies(childLink, _bodies))
+        && parentLink->GetName() == _link->GetName()
+        && this->FindLink(_links.begin(), _links.end(), childLink)
+                       == _links.end())
     {
-      _bodies.push_back(childLink);
-      this->GetAllChildrenBodies(_bodies, childLink);
-      this->GetAllParentBodies(_bodies, childLink, _body);
+      _links.push_back(childLink);
+      this->GetAllChildrenLinks(_links, childLink);
+      this->GetAllParentLinks(_links, childLink, _link);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void JointController::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
-    const LinkPtr &_body, const LinkPtr &_origParentBody)
+void JointController::GetAllParentLinks(std::vector<LinkPtr> &_links,
+    const LinkPtr &_link, const LinkPtr &_origParentLink)
 {
   std::map<std::string, JointPtr>::iterator iter;
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
@@ -376,26 +399,13 @@ void JointController::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
 
     if (parentLink && childLink
         && parentLink->GetName() != childLink->GetName()
-        && childLink->GetName() == _body->GetName()
-        && parentLink->GetName() != _origParentBody->GetName()
-        && !this->InBodies(parentLink, _bodies))
+        && childLink->GetName() == _link->GetName()
+        && parentLink->GetName() != _origParentLink->GetName()
+        && this->FindLink(_links.begin(), _links.end(), parentLink)
+                       == _links.end())
     {
-      _bodies.push_back(parentLink);
-      this->GetAllParentBodies(_bodies, childLink, _origParentBody);
+      _links.push_back(parentLink);
+      this->GetAllParentLinks(_links, childLink, _origParentLink);
     }
   }
-}
-
-//////////////////////////////////////////////////
-bool JointController::InBodies(const LinkPtr &_body,
-                               const std::vector<LinkPtr> &_bodies)
-{
-  for (std::vector<LinkPtr>::const_iterator bit = _bodies.begin();
-       bit != _bodies.end(); ++bit)
-  {
-    if ((*bit)->GetName() == _body->GetName())
-      return true;
-  }
-
-  return false;
 }
