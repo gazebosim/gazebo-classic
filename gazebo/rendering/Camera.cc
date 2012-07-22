@@ -1090,24 +1090,38 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
-    // GBuffer compositor
-    this->gBufferInstance =
+    // Deferred shading GBuffer compositor
+    this->dsGBufferInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "DeferredShading/GBuffer");
 
-    // Deferred lighting
-    this->lightsInstance =
+    // Deferred lighting GBuffer compositor
+    this->dlGBufferInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+          "DeferredLighting/GBuffer");
+
+    // Deferred shading: Merging compositor 
+    this->dsMergeInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "DeferredShading/ShowLit");
+
+    // Deferred lighting: Merging compositor 
+    this->dlMergeInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+          "DeferredLighting/ShowLit");
 
     // Screen space ambient occlusion
     this->ssaoInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "DeferredShading/SSAO");
 
-    this->gBufferInstance->setEnabled(true);
-    this->lightsInstance->setEnabled(true);
-    this->ssaoInstance->setEnabled(true);
+    this->dsGBufferInstance->setEnabled(false);
+    this->dsMergeInstance->setEnabled(false);
+
+    this->dlGBufferInstance->setEnabled(true);
+    this->dlMergeInstance->setEnabled(true);
+
+    this->ssaoInstance->setEnabled(false);
   }
 }
 

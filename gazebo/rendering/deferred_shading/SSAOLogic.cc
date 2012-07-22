@@ -27,7 +27,7 @@ class SSAOListener: public Ogre::CompositorInstance::Listener
           : instance(_instance) {}
 
   // this callback we will use to modify SSAO parameters
-  public: void NotifyMaterialRender(Ogre::uint32 _passId,
+  public: void NotifyMaterialRender(uint32_t _passId,
                                     Ogre::MaterialPtr &_mat)
           {
             // not SSAO, return

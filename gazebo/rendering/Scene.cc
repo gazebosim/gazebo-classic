@@ -50,6 +50,7 @@
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
 #include "gazebo/rendering/deferred_shading/GBufferSchemeHandler.hh"
 #include "gazebo/rendering/deferred_shading/NullSchemeHandler.hh"
+#include "gazebo/rendering/deferred_shading/MergeSchemeHandler.hh"
 #include "gazebo/rendering/deferred_shading/DeferredLightCP.hh"
 
 #include "rendering/RTShaderSystem.hh"
@@ -282,17 +283,61 @@ void Scene::InitDeferredShading()
 {
   Ogre::CompositorManager &compMgr = Ogre::CompositorManager::getSingleton();
 
-  // Hook up the compositor logic and scheme handlers.
+  // Deferred Shading scheme handler
   Ogre::MaterialManager::getSingleton().addListener(
-      new GBufferSchemeHandler, "GBuffer");
+      new GBufferSchemeHandler(GBufferMaterialGenerator::GBT_FAT),
+      "DSGBuffer");
+
+  // Deferred Lighting scheme handlers
+  Ogre::MaterialManager::getSingleton().addListener(
+      new GBufferSchemeHandler(GBufferMaterialGenerator::GBT_NORMAL_AND_DEPTH),
+      "DLGBuffer");
+  Ogre::MaterialManager::getSingleton().addListener(
+      new MergeSchemeHandler(false), "DLMerge");
 
   Ogre::MaterialManager::getSingleton().addListener(
       new NullSchemeHandler, "NoGBuffer");
 
   compMgr.registerCustomCompositionPass("DeferredLight",
-      new DeferredLightCompositionPass);
+      new DeferredLightCompositionPass<DeferredShading>);
+  compMgr.registerCustomCompositionPass("DeferredLightingLight",
+      new DeferredLightCompositionPass<DeferredLighting>);
 
   compMgr.registerCompositorLogic("SSAOLogic", new SSAOLogic);
+
+  // Create and instance geometry for VPL 
+  Ogre::MeshPtr VPLMesh =
+    Ogre::MeshManager::getSingleton().createManual("VPLMesh",
+        Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
+  Ogre::SubMesh *submeshMesh = VPLMesh->createSubMesh();
+  submeshMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
+  submeshMesh->indexData = new Ogre::IndexData();
+  submeshMesh->vertexData = new Ogre::VertexData();
+  submeshMesh->useSharedVertices = false;
+  VPLMesh->_setBoundingSphereRadius(10.8f);
+  VPLMesh->_setBounds(Ogre::AxisAlignedBox(
+        Ogre::Vector3(-10.8, -10.8, -10.8), Ogre::Vector3(10.8, 10.8, 10.8)));
+
+  GeomUtils::CreateSphere(submeshMesh->vertexData, submeshMesh->indexData,
+      1.0, 6, 6, false, false);
+
+  int numVPLs = 400;
+  Ogre::InstanceManager *im =
+    this->manager->createInstanceManager("VPL_InstanceMgr",
+      "VPLMesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+          Ogre::InstanceManager::HWInstancingBasic, numVPLs, Ogre::IM_USEALL);
+          //Ogre::InstanceManager::HWInstancingIdOnly, numVPLs, Ogre::IM_USEALL);
+  
+  for (int i = 0; i < numVPLs; ++i)
+  {
+    // Set DeferredShading to DeferredLighting to use deferred lighting
+    Ogre::InstancedEntity *new_entity = 
+      im->createInstancedEntity("DeferredShading/VPL");
+  }
+
+
+  im->setBatchesAsStaticAndUpdate(true);
 }
 
 //////////////////////////////////////////////////

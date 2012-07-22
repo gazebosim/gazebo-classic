@@ -35,19 +35,15 @@ namespace gazebo
     /// specify the techniques in the materials.
     class GBufferSchemeHandler : public Ogre::MaterialManager::Listener
     {
+      public: GBufferSchemeHandler(GBufferMaterialGenerator::GBufferType _type)
+              : type(_type), materialGenerator(_type) {}
+
       public: virtual Ogre::Technique* handleSchemeNotFound(
                   uint16_t _schemeIndex,
                   const Ogre::String &_schemeName,
                   Ogre::Material *_originalMaterial,
                   uint16_t _lodIndex,
                   const Ogre::Renderable *_rend);
-
-      /// \brief The material generator
-      protected: GBufferMaterialGenerator materialGenerator;
-
-      /// \brief The string that will be checked in textures to determine
-      ///       whether they are normal maps
-      protected: static const Ogre::String NORMAL_MAP_PATTERN;
 
       /// \brief A structure for containing the properties of a material,
       ///        relevant to GBuffer rendering.
@@ -86,8 +82,16 @@ namespace gazebo
       ///        accordingly
       protected: bool CheckNormalMap(Ogre::TextureUnitState *_tus,
                                      PassProperties &_props);
+
+      protected: GBufferMaterialGenerator::GBufferType type;
+
+      /// \brief The material generator
+      protected: GBufferMaterialGenerator materialGenerator;
+
+      // The string that will be checked in textures to determine whether
+      // they are normal maps
+      protected: static const std::string normal_map_pattern;
     };
   }
 }
-
 #endif

@@ -1,14 +1,13 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources
-  AmbientLight.cc
   DeferredLight.cc
-  DeferredLightCP.cc
   GBufferMaterialGenerator.cc
   GBufferSchemeHandler.cc
   GeomUtils.cc
-  LightMaterialGenerator.cc
   MaterialGenerator.cc
+  MergeMaterialGenerator.cc
+  MergeSchemeHandler.cc
   SSAOLogic.cc
 )
 
@@ -20,9 +19,14 @@ set (headers
   GBufferSchemeHandler.hh
   GeomUtils.hh
   LightMaterialGenerator.hh
+  ListenerFactoryLogic.hh
   MaterialGenerator.hh
+  MergeCP.hh
+  MergeMaterialGenerator.hh
+  MergeSchemeHandler.hh
   NullSchemeHandler.hh
   SSAOLogic.hh
+  TechniqueDefinitions.hh
 )
 
 gz_add_library(gazebo_rendering_deferred ${sources})

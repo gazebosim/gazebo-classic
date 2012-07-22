@@ -14,10 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef DEFERREDLIGHT_HH_
-#define DEFERREDLIGHT_HH_
+#ifndef _DEFERREDLIGHT_HH_
+#define _DEFERREDLIGHT_HH_
 
 #include <OgreSimpleRenderable.h>
+#include <OgreInstancedEntity.h>
+#include <OgreTechnique.h>
+
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
 
 namespace gazebo
@@ -30,7 +33,8 @@ namespace gazebo
     class DeferredLight: public Ogre::SimpleRenderable
     {
       /// \brief Constructor
-      public: DeferredLight(MaterialGenerator *_gen, Ogre::Light *_parentLight);
+      public: DeferredLight(MaterialGenerator *_gen, Ogre::Light *_parentLight,
+                            Ogre::MaterialPtr _vplMaterial);
 
       /// \brief Destructor
       public: ~DeferredLight();
@@ -55,6 +59,16 @@ namespace gazebo
 
       /// @copydoc Renderable::getBoundingRadius
       public: virtual void getWorldTransforms(Ogre::Matrix4 *_xform) const;
+
+      public: virtual void UpdateRSM(const Ogre::TexturePtr &_shadowTex);
+      public: virtual void UpdateShadowInvProj(Ogre::Matrix4 &_invproj);
+      public: Ogre::Light *GetParentLight() {return this->parentLight;}
+
+      public: void SetVPLCount(uint32_t _n, Ogre::SceneManager *_sm,
+                               Ogre::InstanceManager *_im);
+
+      public: void RenderVPLs(Ogre::SceneManager *_sm,
+                              Ogre::InstanceManager *_im);
 
       /// Check if the camera is inside a light
       protected: bool IsCameraInsideLight(Ogre::Camera *_camera);
@@ -92,6 +106,8 @@ namespace gazebo
 
       /// Material permutation
       protected: unsigned int permutation;
+
+      protected: Ogre::MaterialPtr VPLMaterial;
     };
   }
 }

@@ -33,8 +33,12 @@ using namespace rendering;
 // This is the concrete implementation of the material generator.
 class GBufferMaterialGeneratorImpl : public MaterialGenerator::Impl
 {
-  public: GBufferMaterialGeneratorImpl(const Ogre::String &_baseName)
-          : baseName(_baseName) {}
+  public: GBufferMaterialGeneratorImpl(const Ogre::String &_baseName,
+              GBufferMaterialGenerator::GBufferType _type)
+          : baseName(_baseName), type(_type) {}
+
+  public: void SetType(GBufferMaterialGenerator::GBufferType _type)
+          {this->type = _type;};
 
   protected: virtual Ogre::GpuProgramPtr GenerateVertexShader(
                  MaterialGenerator::Perm permutation);
@@ -44,17 +48,35 @@ class GBufferMaterialGeneratorImpl : public MaterialGenerator::Impl
                  MaterialGenerator::Perm permutation);
 
   protected: Ogre::String baseName;
+  private: GBufferMaterialGenerator::GBufferType type;
 };
 
 /////////////////////////////////////////////////
-GBufferMaterialGenerator::GBufferMaterialGenerator()
+GBufferMaterialGenerator::GBufferMaterialGenerator(GBufferType _type)
+  : MaterialGenerator()
 {
   vsMask = VS_MASK;
   fsMask = FS_MASK;
   matMask = MAT_MASK;
-  materialBaseName = "DeferredShading/GBuffer/";
-  this->schemeName = "GBuffer";
-  this->impl = new GBufferMaterialGeneratorImpl(materialBaseName);
+
+  if (_type == GBT_FAT)
+  {
+    materialBaseName = "DeferredShading";
+    this->schemeName = "GBuffer";
+  }
+  else if (_type == GBT_NORMAL_AND_DEPTH)
+  {
+    materialBaseName = "DeferredLighting";
+    this->schemeName = "DLGBuffer";
+  }
+  else if (_type == GBT_DSF)
+  {
+    materialBaseName = "InferredLighting";
+    this->schemeName = "ILGBuffer";
+  }
+
+  materialBaseName += "/GBuffer/";
+  this->impl = new GBufferMaterialGeneratorImpl(materialBaseName, _type);
 }
 
 /////////////////////////////////////////////////
@@ -62,12 +84,11 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateVertexShader(
     MaterialGenerator::Perm _permutation)
 {
   Ogre::StringStream ss;
+  uint32_t numTexCoords = (_permutation &
+      GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
 
   if (_permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
     ss << "attribute vec3 tangentMap;\n";
-
-  // TODO : Skinning inputs
-  ss << std::endl;
 
   ss << "uniform mat4 worldViewProj;\n";
   ss << "uniform mat4 worldView;\n";
@@ -85,16 +106,14 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateVertexShader(
     ss << "varying vec3 biNormal;\n";
   }
 
-  ss << std::endl;
-
   ss << "void main()\n{\n";
-  ss << "  gl_Position = worldViewProj * gl_Vertex;" << std::endl;
-  ss << "  normal = (worldView * vec4(gl_Normal,0)).xyz;" << std::endl;
+  ss << "  gl_Position = worldViewProj * gl_Vertex;\n";
+  ss << "  normal = (worldView * vec4(gl_Normal, 0)).xyz;\n";
 
   if (_permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
   {
     // THis is probably wrong because I copied it incorrectly
-    ss << " tangent = (worldView * vec4(tangentMap,0)).xyz;\n";
+    ss << " tangent = (worldView * vec4(tangentMap, 0)).xyz;\n";
     ss << " biNormal = cross(normal, tangent);\n";
   }
 
@@ -104,11 +123,11 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateVertexShader(
   ss << "  depth = gl_Position.w;\n";
 #endif
 
-  ss << "  gl_TexCoord[0] = gl_MultiTexCoord0;\n";
+  for (uint32_t i = 0; i < numTexCoords; ++i)
+  {
+    ss << "  gl_TexCoord[" << 0 << "] = gl_MultiTexCoord" << 0 << ";\n";
+  }
   ss << "}\n";
-
-  // Debug output
-  // std::cout << ss.str() << "\n\n";
 
   Ogre::String programSource = ss.str();
   Ogre::String programName = this->baseName + "VP_" +
@@ -144,15 +163,15 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
 {
   Ogre::StringStream ss;
 
-  Ogre::uint32 numTexCoords =
+  uint32_t numTexCoords =
     (_permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
-  Ogre::uint32 numTextures =
+  uint32_t numTextures =
     _permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
 
   if (_permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
     ss << "uniform sampler2D normalMap;\n";
 
-  for (Ogre::uint32 i = 0; i < numTextures; ++i)
+  for (uint32_t i = 0; i < numTextures; ++i)
     ss << "uniform sampler2D tex" << i << ";\n";
 
   if (numTextures == 0 ||
@@ -163,7 +182,10 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
   ss << "uniform float farDistance;\n";
 #endif
 
-  ss << "uniform float specularity;\n";
+  if (this->type == GBufferMaterialGenerator::GBT_FAT)
+    ss << "uniform float specularity;\n";
+  else if (this->type == GBufferMaterialGenerator::GBT_DSF)
+    ss << "uniform vec4 objectId;\n";
 
 #ifdef WRITE_LINEAR_DEPTH
   ss << "varying vec3 viewPos;\n";
@@ -181,18 +203,21 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
   ss << std::endl;
   ss << "void main()\n{\n";
 
-  if (numTexCoords > 0 && numTextures > 0)
+  if (this->type == GBufferMaterialGenerator::GBT_FAT)
   {
-    ss << "  gl_FragData[0] = texture2D(tex0, gl_TexCoord[0].st);\n";
-    if (_permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
-      ss << "  gl_FragData[0] *= diffuseColor;\n";
-  }
-  else
-  {
-    ss << "  gl_FragData[0] = diffuseColor;\n";
+    if (numTexCoords > 0 && numTextures > 0)
+    {
+      ss << "  gl_FragData[0] = texture2D(tex0, gl_TexCoord[0].st);\n";
+      if (_permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+        ss << "  gl_FragData[0] *= diffuseColor;\n";
+    }
+    else
+    {
+      ss << "  gl_FragData[0] = diffuseColor;\n";
+    }
+    ss << "  gl_FragData[0].w = specularity;\n";
   }
 
-  ss << "  gl_FragData[0].w = specularity;\n";
 
   if (_permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
   {
@@ -212,10 +237,17 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
   ss << "  gl_FragData[1].w = depth;\n";
 #endif
 
+  if (this->type == GBufferMaterialGenerator::GBT_DSF)
+  {
+    ss << "  vec3 norm = normalize(normal);\n";
+    ss << "  gl_FragData[0].x = length(viewPos) / farDistance;\n";
+    ss << "  gl_FragData[0].y = objectId.r;\n";
+    ss << "  gl_FragData[0].z = normal.x;\n";
+    ss << "  gl_FragData[0].w = normal.y;\n";
+  }
+
   ss << "}\n";
 
-  // Debug output
-  // std::cout << ss.str() << "\n\n";
   Ogre::String programSource = ss.str();
   Ogre::String programName = this->baseName + "FP_" +
                              Ogre::StringConverter::toString(_permutation);
@@ -236,14 +268,23 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateFragmentShader(
   const Ogre::GpuProgramParametersSharedPtr &params =
     ptrProgram->getDefaultParameters();
 
-  params->setNamedAutoConstant("specularity",
-      Ogre::GpuProgramParameters::ACT_SURFACE_SHININESS);
-
-  if (numTextures == 0 ||
-      _permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+  if (this->type == GBufferMaterialGenerator::GBT_FAT)
   {
-    params->setNamedAutoConstant("diffuseColor",
-        Ogre::GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+    params->setNamedAutoConstant("specularity",
+        Ogre::GpuProgramParameters::ACT_SURFACE_SHININESS);
+
+    if (numTextures == 0 ||
+        _permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+    {
+      params->setNamedAutoConstant("diffuseColor",
+          Ogre::GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+    }
+  }
+
+  if (this->type == GBufferMaterialGenerator::GBT_DSF)
+  {
+    params->setNamedAutoConstant("objectId",
+        Ogre::GpuProgramParameters::ACT_CUSTOM, 0);
   }
 
 #ifdef WRITE_LINEAR_DEPTH
@@ -275,10 +316,9 @@ Ogre::MaterialPtr GBufferMaterialGeneratorImpl::GenerateTemplateMaterial(
   if (_permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
     pass->createTextureUnitState();
 
-  Ogre::uint32 numTextures = _permutation &
-    GBufferMaterialGenerator::GBP_TEXTURE_MASK;
+  uint32_t numTextures = _permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
 
-  for (Ogre::uint32 i = 0; i < numTextures; ++i)
+  for (uint32_t i = 0; i < numTextures; ++i)
     pass->createTextureUnitState();
 
   return matPtr;

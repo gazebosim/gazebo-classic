@@ -21,42 +21,12 @@
 #include <OgreCompositorLogic.h>
 #include <map>
 
+#include "gazebo/rendering/deferred_shading/ListenerFactoryLogic.hh"
+
 namespace gazebo
 {
   namespace rendering
   {
-    // The simple types of compositor logics will all do the same thing -
-    // Attach a listener to the created compositor
-    class ListenerFactoryLogic : public Ogre::CompositorLogic
-    {
-      /// @copydoc CompositorLogic::compositorInstanceCreated
-      public: virtual void compositorInstanceCreated(
-                  Ogre::CompositorInstance *_newInstance)
-              {
-                Ogre::CompositorInstance::Listener *listener =
-                  this->createListener(_newInstance);
-
-                _newInstance->addListener(listener);
-                this->listeners[_newInstance] = listener;
-              }
-
-      /// @copydoc CompositorLogic::compositorInstanceDestroyed
-      public: virtual void compositorInstanceDestroyed(
-                  Ogre::CompositorInstance *_destroyedInstance)
-              {
-                delete this->listeners[_destroyedInstance];
-                this->listeners.erase(_destroyedInstance);
-              }
-
-      /// \brief This is the method that implementers will need to create
-      protected: virtual Ogre::CompositorInstance::Listener *createListener(
-                     Ogre::CompositorInstance *_instance) = 0;
-
-      private: typedef std::map<Ogre::CompositorInstance*,
-               Ogre::CompositorInstance::Listener*> ListenerMap;
-      private: ListenerMap listeners;
-    };
-
     class SSAOLogic : public ListenerFactoryLogic
     {
       /// @copydoc ListenerFactoryLogic::createListener

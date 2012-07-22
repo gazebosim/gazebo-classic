@@ -22,7 +22,7 @@
 using namespace gazebo;
 using namespace rendering;
 
-const Ogre::String GBufferSchemeHandler::NORMAL_MAP_PATTERN = "normal";
+const std::string GBufferSchemeHandler::normal_map_pattern = "normal";
 
 /////////////////////////////////////////////////
 Ogre::Technique *GBufferSchemeHandler::handleSchemeNotFound(
@@ -84,7 +84,7 @@ bool GBufferSchemeHandler::CheckNormalMap(
   bool isNormal = false;
   Ogre::String lowerCaseAlias = _tus->getTextureNameAlias();
   Ogre::StringUtil::toLowerCase(lowerCaseAlias);
-  if (lowerCaseAlias.find(NORMAL_MAP_PATTERN) != Ogre::String::npos)
+  if (lowerCaseAlias.find(normal_map_pattern) != Ogre::String::npos)
   {
     isNormal = true;
   }
@@ -92,7 +92,7 @@ bool GBufferSchemeHandler::CheckNormalMap(
   {
     Ogre::String lowerCaseName = _tus->getTextureName();
     Ogre::StringUtil::toLowerCase(lowerCaseName);
-    if (lowerCaseName.find(NORMAL_MAP_PATTERN) != Ogre::String::npos)
+    if (lowerCaseName.find(normal_map_pattern) != Ogre::String::npos)
     {
       isNormal = true;
     }

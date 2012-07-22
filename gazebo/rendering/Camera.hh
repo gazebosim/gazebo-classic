@@ -411,8 +411,12 @@ namespace gazebo
       protected: common::Time prevAnimTime;
       protected: boost::function<void()> onAnimationComplete;
 
-      private: Ogre::CompositorInstance *gBufferInstance;
-      private: Ogre::CompositorInstance *lightsInstance;
+      private: Ogre::CompositorInstance *dsGBufferInstance;
+      private: Ogre::CompositorInstance *dsMergeInstance;
+
+      private: Ogre::CompositorInstance *dlGBufferInstance;
+      private: Ogre::CompositorInstance *dlMergeInstance;
+
       private: Ogre::CompositorInstance *ssaoInstance;
     };
     /// \}

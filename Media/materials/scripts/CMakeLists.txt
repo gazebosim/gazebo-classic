@@ -19,8 +19,6 @@ set (files
   ssao.compositor
   ssao.material
   youbot.material
-  VPL.material
-  VPL.program
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/scripts/)

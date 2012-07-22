@@ -27,6 +27,7 @@
 #include "gazebo/rendering/Conversions.hh"
 
 #include "gazebo/rendering/deferred_shading/GeomUtils.hh"
+#include "gazebo/rendering/deferred_shading/TechniqueDefinitions.hh"
 #include "gazebo/rendering/deferred_shading/LightMaterialGenerator.hh"
 #include "gazebo/rendering/deferred_shading/DeferredLight.hh"
 
@@ -38,9 +39,10 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 DeferredLight::DeferredLight(MaterialGenerator *_sys,
-                             Ogre::Light *_parentLight)
+                             Ogre::Light *_parentLight,
+                             Ogre::MaterialPtr _vplMaterial)
   : parentLight(_parentLight), ignoreWorld(false), generator(_sys),
-    permutation(0)
+    permutation(0), VPLMaterial(_vplMaterial)
 {
   // Set up geometry
   // Allocate render operation
@@ -49,6 +51,7 @@ DeferredLight::DeferredLight(MaterialGenerator *_sys,
   this->mRenderOp.vertexData = 0;
   this->mRenderOp.useIndexes = true;
 
+  this->VPLMaterial->load();
   this->UpdateFromParent();
 }
 
@@ -64,14 +67,14 @@ DeferredLight::~DeferredLight()
 void DeferredLight::SetAttenuation(float _c, float _b, float _a)
 {
   // Set Attenuation parameter to shader
-  // setCustomParameter(3, Vector4(c, b, a, 0));
+  setCustomParameter(3, Ogre::Vector4(_c, _b, _a, 0));
   float outerRadius = this->parentLight->getAttenuationRange();
 
   /// There is attenuation? Set material accordingly
   if (!math::equal(_c, 1.0f) || !math::equal(_b, 0.0f) ||
       !math::equal(_a, 0.0f))
   {
-    ENABLE_BIT(this->permutation, LightMaterialGenerator::MI_ATTENUATED);
+    ENABLE_BIT(this->permutation, LightMaterialGenerator<NullTechnique>::MI_ATTENUATED);
 
     if (this->parentLight->getType() == Ogre::Light::LT_POINT)
     {
@@ -89,7 +92,8 @@ void DeferredLight::SetAttenuation(float _c, float _b, float _a)
   }
   else
   {
-    DISABLE_BIT(this->permutation, LightMaterialGenerator::MI_ATTENUATED);
+    DISABLE_BIT(this->permutation,
+        LightMaterialGenerator<NullTechnique>::MI_ATTENUATED);
   }
 
   this->RebuildGeometry(outerRadius);
@@ -104,11 +108,13 @@ void DeferredLight::SetSpecularColor(const Ogre::ColourValue &_col)
   if (!math::equal(_col.r, 0.0f) || !math::equal(_col.g, 0.0f) ||
       !math::equal(_col.b, 0.0f))
   {
-    ENABLE_BIT(this->permutation, LightMaterialGenerator::MI_SPECULAR);
+    ENABLE_BIT(this->permutation,
+        LightMaterialGenerator<NullTechnique>::MI_SPECULAR);
   }
   else
   {
-    DISABLE_BIT(this->permutation, LightMaterialGenerator::MI_SPECULAR);
+    DISABLE_BIT(this->permutation,
+        LightMaterialGenerator<NullTechnique>::MI_SPECULAR);
   }
 }
 
@@ -116,23 +122,28 @@ void DeferredLight::SetSpecularColor(const Ogre::ColourValue &_col)
 void DeferredLight::RebuildGeometry(float _radius)
 {
   // Disable all 3 bits
-  DISABLE_BIT(this->permutation, LightMaterialGenerator::MI_POINT);
-  DISABLE_BIT(this->permutation, LightMaterialGenerator::MI_SPOTLIGHT);
-  DISABLE_BIT(this->permutation, LightMaterialGenerator::MI_DIRECTIONAL);
+  DISABLE_BIT(this->permutation,
+      LightMaterialGenerator<NullTechnique>::MI_POINT);
+  DISABLE_BIT(this->permutation,
+      LightMaterialGenerator<NullTechnique>::MI_SPOTLIGHT);
+  DISABLE_BIT(this->permutation,
+      LightMaterialGenerator<NullTechnique>::MI_DIRECTIONAL);
 
   switch (this->parentLight->getType())
   {
     case Ogre::Light::LT_DIRECTIONAL:
       {
         this->CreateRectangle2D();
-        ENABLE_BIT(this->permutation, LightMaterialGenerator::MI_DIRECTIONAL);
+        ENABLE_BIT(this->permutation,
+            LightMaterialGenerator<NullTechnique>::MI_DIRECTIONAL);
         break;
       }
     case Ogre::Light::LT_POINT:
       {
         /// XXX some more intelligent expression for rings and segments
         this->CreateSphere(_radius, 10, 10);
-        ENABLE_BIT(this->permutation, LightMaterialGenerator::MI_POINT);
+        ENABLE_BIT(this->permutation,
+            LightMaterialGenerator<NullTechnique>::MI_POINT);
         break;
       }
     case Ogre::Light::LT_SPOTLIGHT:
@@ -145,7 +156,8 @@ void DeferredLight::RebuildGeometry(float _radius)
 
         rad = Ogre::Math::Tan(coneRadiusAngle) * height;
         this->CreateCone(rad, height, 20);
-        ENABLE_BIT(this->permutation, LightMaterialGenerator::MI_SPOTLIGHT);
+        ENABLE_BIT(this->permutation,
+            LightMaterialGenerator<NullTechnique>::MI_SPOTLIGHT);
         break;
       }
     default:
@@ -173,7 +185,7 @@ void DeferredLight::CreateRectangle2D()
   this->setBoundingBox(Ogre::AxisAlignedBox(
         -10000, -10000, -10000, 10000, 10000, 10000));
 
-  this->radius = 5000;
+  this->radius = 15000;
   this->ignoreWorld = true;
 }
 
@@ -282,9 +294,11 @@ void DeferredLight::UpdateFromParent()
   this->SetSpecularColor(this->parentLight->getSpecularColour());
 
   if (this->getCastShadows())
-    ENABLE_BIT(this->permutation, LightMaterialGenerator::MI_SHADOW_CASTER);
+    ENABLE_BIT(this->permutation,
+        LightMaterialGenerator<NullTechnique>::MI_SHADOW_CASTER);
   else
-    DISABLE_BIT(this->permutation, LightMaterialGenerator::MI_SHADOW_CASTER);
+    DISABLE_BIT(this->permutation,
+        LightMaterialGenerator<NullTechnique>::MI_SHADOW_CASTER);
 }
 
 /////////////////////////////////////////////////
@@ -299,14 +313,12 @@ bool DeferredLight::IsCameraInsideLight(Ogre::Camera *_camera)
         Ogre::Real distanceFromLight =
           _camera->getDerivedPosition().distance(
               this->parentLight->getDerivedPosition());
-        math::Vector3 lp =
-          Conversions::Convert(this->parentLight->getDerivedPosition());
-        math::Vector3 cp = Conversions::Convert(_camera->getDerivedPosition());
 
         // Small epsilon fix to account for the fact that we aren't a
         // true sphere.
         return distanceFromLight <= this->radius +
-          _camera->getNearClipDistance() + 0.2;
+           _camera->getNearClipDistance() + 0.1;
+          //OLD: _camera->getNearClipDistance() + 0.2;
       }
     case Ogre::Light::LT_SPOTLIGHT:
       {
@@ -318,7 +330,7 @@ bool DeferredLight::IsCameraInsideLight(Ogre::Camera *_camera)
         // moving its tip accordingly.
         // Some trigonometry needed here.
         Ogre::Vector3 clipRangeFix = -lightDir *
-          (_camera->getNearClipDistance() / Ogre::Math::Tan(attAngle/2));
+          (_camera->getNearClipDistance() / Ogre::Math::Tan(attAngle/2.0));
         lightPos = lightPos + clipRangeFix;
 
         Ogre::Vector3 lightToCamDir = _camera->getDerivedPosition() - lightPos;
@@ -371,6 +383,10 @@ void DeferredLight::UpdateFromCamera(Ogre::Camera *_camera)
       params->setNamedConstant("farCorner", farCorner);
     }
 
+    // FIX:
+    //this->VPLMaterial->getBestTechnique()->getPass(0)->
+    //  getFragmentProgramParameters()->setNamedConstant("farCorner", farCorner);
+
     params = pass->getFragmentProgramParameters();
     if (params->_findNamedConstantDefinition("farCorner"))
       params->setNamedConstant("farCorner", farCorner);
@@ -406,15 +422,42 @@ void DeferredLight::UpdateFromCamera(Ogre::Camera *_camera)
 
     // Get the shadow camera position
     if (params->_findNamedConstantDefinition("shadowCamPos"))
-    {
-      std::cout << "Shadow Cam Pos[" 
-        << shadowCam.getPosition().x << " "
-        << shadowCam.getPosition().y << " "
-        << shadowCam.getPosition().z << "]\n";
       params->setNamedConstant("shadowCamPos", shadowCam.getPosition());
-    }
 
     if (params->_findNamedConstantDefinition("shadowFarClip"))
       params->setNamedConstant("shadowFarClip", shadowCam.getFarClipDistance());
   }
 }
+
+/////////////////////////////////////////////////
+void DeferredLight::UpdateRSM(const Ogre::TexturePtr &_shadowTex)
+{
+  this->VPLMaterial->getBestTechnique()->getPass(0)->
+    getTextureUnitState("RSM")->setTexture(_shadowTex);
+}
+
+/////////////////////////////////////////////////
+void DeferredLight::UpdateShadowInvProj(Ogre::Matrix4 &_invproj)
+{
+  this->VPLMaterial->getBestTechnique()->getPass(0)->
+   getVertexProgramParameters()->setNamedConstant("InvShadowProjMatrix",
+       _invproj);
+}
+
+/////////////////////////////////////////////////
+void DeferredLight::SetVPLCount(uint32_t _n,
+    Ogre::SceneManager *_sm, Ogre::InstanceManager *_im)
+{
+}
+
+/////////////////////////////////////////////////
+void DeferredLight::RenderVPLs(Ogre::SceneManager *_sm,
+                               Ogre::InstanceManager *_im)
+{
+  Ogre::InstanceManager::InstanceBatchIterator it =
+    _im->getInstanceBatchIterator(this->VPLMaterial->getName());
+
+  _sm->_injectRenderWithPass(this->VPLMaterial->getBestTechnique()->getPass(0),
+      (*it.current()), false);
+}
+

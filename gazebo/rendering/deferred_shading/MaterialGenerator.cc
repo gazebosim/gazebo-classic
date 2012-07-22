@@ -32,6 +32,7 @@ using namespace rendering;
 MaterialGenerator::MaterialGenerator()
   : vsMask(0), fsMask(0), matMask(0), impl(0)
 {
+  this->impl = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -76,11 +77,12 @@ const Ogre::MaterialPtr &MaterialGenerator::GetMaterial(Perm _permutation)
     pass->setVertexProgram(vertShader->getName());
     pass->setFragmentProgram(fragShader->getName());
 
-    //  Ogre::MaterialSerializer serializer;
-    //  serializer.queueForExport(mat, true);
-    //  Ogre::String matString = serializer.getQueuedAsString();
-    //  std::cout << matString << "\n";
-    //  std::cout << "*************\n" << fragShader->getSource() << "******\n";
+    Ogre::MaterialSerializer serializer;
+    serializer.queueForExport(mat, true);
+    Ogre::String matString = serializer.getQueuedAsString();
+    std::cout << matString << "\n";
+    std::cout << "*************\n" << fragShader->getSource() << "******\n";
+
     /// And store it
     this->materials[_permutation] = mat;
     return this->materials[_permutation];
@@ -127,6 +129,8 @@ const Ogre::MaterialPtr &MaterialGenerator::GetTemplateMaterial(
     return i->second;
   else
   {
+    if (this->impl == NULL)
+      printf("ERROR NULL\n");
     /// Create it
     this->templateMat[_permutation] =
       this->impl->GenerateTemplateMaterial(_permutation);

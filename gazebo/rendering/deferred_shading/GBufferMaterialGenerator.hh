@@ -31,8 +31,13 @@ namespace gazebo
     /// materials generated for them.
     class GBufferMaterialGenerator : public MaterialGenerator
     {
-      /// \brief Constructor
-      public: GBufferMaterialGenerator();
+      /// \brief The types of g buffers
+      public: enum GBufferType
+              {
+                GBT_NORMAL_AND_DEPTH,
+                GBT_DSF,
+                GBT_FAT
+              };
 
       /// \brief The relevant options for objects that are rendered to the
       ///        GBuffer
@@ -61,14 +66,17 @@ namespace gazebo
           GBP_SKINNED = 0x00010000
         };
 
-        // The mask of the flags that matter for generating the fragment shader
-        static const Ogre::uint32 FS_MASK = 0x0000FFFF;
+      /// \brief Constructor
+      public: GBufferMaterialGenerator(GBufferType _type);
 
-        // The mask of the flags that matter for generating the vertex shader
-        static const Ogre::uint32 VS_MASK = 0x00FFFF00;
+      // The mask of the flags that matter for generating the fragment shader
+      public: static const uint32_t FS_MASK = 0x0000FFFF;
 
-        // The mask of the flags that matter for generating the material
-        static const Ogre::uint32 MAT_MASK = 0xFF00FFFF;
+      // The mask of the flags that matter for generating the vertex shader
+      public: static const uint32_t VS_MASK = 0x00FFFF00;
+
+      // The mask of the flags that matter for generating the material
+      public: static const uint32_t MAT_MASK = 0xFF00FFFF;
     };
   }
 }

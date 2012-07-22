@@ -38,7 +38,14 @@ namespace gazebo
     class MaterialGenerator
     {
       /// Bitfield used to signify a material permutations
-      public: typedef Ogre::uint32 Perm;
+      public: typedef uint32_t Perm;
+
+      /// \briefThe constructor is protected as this base class should never
+      /// be constructed as-is. It is meant to be subclassed so that values
+      /// can be assigned to the various fields controlling material
+      /// generator, and most importantly, the mImpl field.
+      protected: MaterialGenerator();
+
       public: virtual ~MaterialGenerator();
 
       public: const Ogre::MaterialPtr &GetMaterial(Perm permutation);
@@ -59,11 +66,6 @@ namespace gazebo
                             Perm permutation) = 0;
               };
 
-      /// \briefThe constructor is protected as this base class should never
-      /// be constructed as-is. It is meant to be subclassed so that values
-      /// can be assigned to the various fields controlling material
-      /// generator, and most importantly, the mImpl field.
-      protected: MaterialGenerator();
 
       protected: const Ogre::GpuProgramPtr &GetVertexShader(Perm _perm);
       protected: const Ogre::GpuProgramPtr &GetFragmentShader(Perm _perm);
