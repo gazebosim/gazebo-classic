@@ -55,7 +55,7 @@ namespace gazebo
 
       /// The string that will be checked in textures to determine whether
       /// they are normal maps
-      protected: static const Ogre::String NORMAL_MAP_PATTERN;
+      protected: static const std::string normal_map_pattern;
       protected: bool useDSF;
       protected: Ogre::String techName;
       protected: MergeMaterialGenerator *materialGenerator;

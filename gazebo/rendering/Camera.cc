@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
@@ -1115,11 +1114,11 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "DeferredShading/SSAO");
 
-    this->dsGBufferInstance->setEnabled(false);
-    this->dsMergeInstance->setEnabled(false);
+    this->dsGBufferInstance->setEnabled(true);
+    this->dsMergeInstance->setEnabled(true);
 
-    this->dlGBufferInstance->setEnabled(true);
-    this->dlMergeInstance->setEnabled(true);
+    this->dlGBufferInstance->setEnabled(false);
+    this->dlMergeInstance->setEnabled(false);
 
     this->ssaoInstance->setEnabled(false);
   }

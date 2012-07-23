@@ -383,9 +383,8 @@ void DeferredLight::UpdateFromCamera(Ogre::Camera *_camera)
       params->setNamedConstant("farCorner", farCorner);
     }
 
-    // FIX:
-    //this->VPLMaterial->getBestTechnique()->getPass(0)->
-    //  getFragmentProgramParameters()->setNamedConstant("farCorner", farCorner);
+    this->VPLMaterial->getBestTechnique()->getPass(0)->
+      getFragmentProgramParameters()->setNamedConstant("farCorner", farCorner);
 
     params = pass->getFragmentProgramParameters();
     if (params->_findNamedConstantDefinition("farCorner"))

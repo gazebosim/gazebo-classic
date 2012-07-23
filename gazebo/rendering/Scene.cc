@@ -334,8 +334,8 @@ void Scene::InitDeferredShading()
     // Set DeferredShading to DeferredLighting to use deferred lighting
     Ogre::InstancedEntity *new_entity = 
       im->createInstancedEntity("DeferredShading/VPL");
+      //im->createInstancedEntity("DeferredLighting/VPL");
   }
-
 
   im->setBatchesAsStaticAndUpdate(true);
 }

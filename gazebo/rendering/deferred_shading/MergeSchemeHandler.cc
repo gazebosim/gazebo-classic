@@ -29,7 +29,7 @@ using namespace rendering;
 //faster, and allows us to ignore the GBuffer completely in this step(less
 //texture sampling is the whole purpose of this technique).
 
-const Ogre::String MergeSchemeHandler::NORMAL_MAP_PATTERN = "normal";
+const std::string MergeSchemeHandler::normal_map_pattern = "normal";
 
 /////////////////////////////////////////////////
 Ogre::Technique *MergeSchemeHandler::handleSchemeNotFound(
@@ -89,13 +89,13 @@ bool MergeSchemeHandler::CheckNormalMap(Ogre::TextureUnitState *_tus,
   Ogre::String lowerCaseAlias = _tus->getTextureNameAlias();
   Ogre::StringUtil::toLowerCase(lowerCaseAlias);
 
-  if (lowerCaseAlias.find(NORMAL_MAP_PATTERN) != Ogre::String::npos)
+  if (lowerCaseAlias.find(normal_map_pattern) != Ogre::String::npos)
     isNormal = true;
   else 
   {
     Ogre::String lowerCaseName = _tus->getTextureName();
     Ogre::StringUtil::toLowerCase(lowerCaseName);
-    if (lowerCaseName.find(NORMAL_MAP_PATTERN) != Ogre::String::npos)
+    if (lowerCaseName.find(normal_map_pattern) != Ogre::String::npos)
       isNormal = true;
   }
 
@@ -115,7 +115,8 @@ bool MergeSchemeHandler::CheckNormalMap(Ogre::TextureUnitState *_tus,
 
 /////////////////////////////////////////////////
 MergeSchemeHandler::PassProperties MergeSchemeHandler::InspectPass(
-	Ogre::Pass *_pass, unsigned short /*_lodIndex*/, const Ogre::Renderable * /*_rend*/)
+    Ogre::Pass *_pass, unsigned short /*_lodIndex*/,
+    const Ogre::Renderable * /*_rend*/)
 {
 	PassProperties props;
 	

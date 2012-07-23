@@ -13,6 +13,7 @@ material DeferredShading/VPL
       {
         // tex_address_mode clamp
         filtering none
+
         // content_type shadow
         binding_type vertex
       }
@@ -33,9 +34,13 @@ material DeferredShading/VPL
 
       vertex_program_ref DeferredRendering/VPL_VP
       {
+        param_named RSM int 0
       }
+
       fragment_program_ref DeferredRendering/VPL_FP
       {
+        param_named GBuff int 1
+        param_named GBuff1 int 2
       }
     }
   }
@@ -56,6 +61,7 @@ material DeferredLighting/VPL
       {
         // tex_address_mode clamp
         filtering none
+
         // content_type shadow
         binding_type vertex
       }
@@ -69,9 +75,12 @@ material DeferredLighting/VPL
 
       vertex_program_ref DeferredRendering/VPL_VP
       {
+        param_named RSM int 0
       }
+
       fragment_program_ref DeferredRendering/VPL_FP_LBuffer
       {
+        param_named GBuff int 1
       }
     }
   }

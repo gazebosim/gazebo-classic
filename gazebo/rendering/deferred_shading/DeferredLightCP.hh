@@ -46,15 +46,6 @@ namespace gazebo
       {
         this->viewport = _instance->getChain()->getViewport();
      
-        /*const Ogre::CompositionPass::InputTex &input0 = _pass->getInput(0);
-        this->texName0 = _instance->getTextureInstanceName(input0.name,
-            input0.mrtIndex);
-
-        const Ogre::CompositionPass::InputTex &input1 = _pass->getInput(1);
-        this->texName1 = _instance->getTextureInstanceName(input1.name,
-            input1.mrtIndex);
-            */
-
         /// Get the names of the GBuffer textures
         for (int i = 0; i < this->GetGBufferSize(); ++i)
         {
@@ -126,7 +117,7 @@ namespace gazebo
           // Update shadow texture
           if (dLight->getCastShadows())
           {
-          /*  Ogre::SceneManager::RenderContext *context = _sm->_pauseRendering();
+            Ogre::SceneManager::RenderContext *context = _sm->_pauseRendering();
       
             _sm->prepareShadowTextures(cam, this->viewport, &ll);
             _sm->_resumeRendering(context);
@@ -165,7 +156,6 @@ namespace gazebo
 
              if (tus->_getTexturePtr() != shadowTex)
               tus->_setTexturePtr(shadowTex);
-              */
           }
       
           InjectTechnique(_sm, tech, dLight, &ll);

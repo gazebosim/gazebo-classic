@@ -20,14 +20,14 @@ vec2 fixUV(vec2 texCoord)
 
 void main()
 {
-	vec2 texcoord = gl_FradCoord.xy * viewportSize.zw;
+	vec2 texcoord = gl_FragCoord.xy * viewportSize.zw;
 	texcoord.y *= -flip;
 	texcoord = fixUV(texcoord);
 	vec4 normDepth = texture2D(GBuff, texcoord);
 	vec3 normal = normalize(normDepth.xyz);
 	vec3 ray = vec3(gl_TexCoord[0].x, flip * gl_TexCoord[1].y, 1.0) * farCorner;
 	
-	vec3 viewPos = normalize(ray) * normDepth.z * farClipDistance;
+	vec3 viewPos = normalize(ray) * normDepth.w * farClipDistance;
 	vec3 lightToFrag = gl_TexCoord[2].xyz - viewPos;
 	vec3 L = normalize(lightToFrag);
 	float NL = max(0.0, dot(normal, L));
