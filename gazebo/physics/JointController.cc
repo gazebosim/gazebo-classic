@@ -189,13 +189,17 @@ void JointController::SetJointPositions(
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
     jiter = _jointPositions.find(iter->second->GetName());
-    this->SetJointPosition(iter->second, jiter->second);
+    if (jiter != _jointPositions.end())
+      this->SetJointPosition(iter->second, jiter->second);
   }
 }
 
 //////////////////////////////////////////////////
 void JointController::SetJointPosition(JointPtr _joint, double _position)
 {
+  // keep track of updatd links, make sure each is upated only once
+  this->updated_links.clear();
+
   // only deal with hinge and revolute joints in the user
   // request joint_names list
   if (_joint->HasType(Base::HINGE_JOINT) || _joint->HasType(Base::SLIDER_JOINT))
@@ -270,17 +274,13 @@ void JointController::RotateLinkAndChildren(LinkPtr _link1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dangle, bool _updateChildren)
 {
-  if (_updateChildren)
-    this->updated_links.clear();
   if (this->FindLink( this->updated_links.begin(),
                       this->updated_links.end(),
                       _link1) == this->updated_links.end())
   {
-    gzerr << _link1->GetName() << "\n";
     math::Pose linkWorldPose = _link1->GetWorldPose();
 
     // relative to anchor point
-    gzerr << "should be 0 " << linkWorldPose.pos - _anchor << "\n";
     math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
 
     // take axis rotation and turn it int a quaternion
@@ -319,13 +319,10 @@ void JointController::SlideLinkAndChildren(LinkPtr _link1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
-  if (_updateChildren)
-    this->updated_links.clear();
   if (this->FindLink( this->updated_links.begin(),
                       this->updated_links.end(),
                       _link1) == this->updated_links.end())
   {
-    gzerr << _link1->GetName() << "\n";
     math::Pose linkWorldPose = _link1->GetWorldPose();
 
     // relative to anchor point
