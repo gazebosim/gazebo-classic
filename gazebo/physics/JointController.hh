@@ -71,11 +71,11 @@ namespace gazebo
 
       /// \brief Helper for SetJointPositions
       private: template<class InputIterator, class T>
-                 InputIterator FindLink ( InputIterator first,
+                 InputIterator FindLink(InputIterator first,
                                       InputIterator last,
-                                      const T& value )
+                                      const T& value)
                  {
-                   for (;first != last; ++first)
+                   for (; first != last; ++first)
                      if ((*first)->GetName() == value->GetName())
                        return first;
                    return last;
