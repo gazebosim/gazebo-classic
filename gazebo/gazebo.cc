@@ -40,13 +40,13 @@ void gazebo::add_plugin(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
-bool gazebo::load()
+bool gazebo::load(int argc, char** argv)
 {
   // Load all the plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
        g_plugins.begin(); iter != g_plugins.end(); ++iter)
   {
-    (*iter)->Load();
+    (*iter)->Load(argc, argv);
   }
 
   // Start the transport system by connecting to the master.

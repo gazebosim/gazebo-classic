@@ -52,28 +52,37 @@ namespace gazebo
       private: void SetJointPosition(JointPtr _joint, double _position);
 
       /// \brief Helper for SetJointPositions
-      private: void RotateBodyAndChildren(LinkPtr _link1,
+      private: void RotateLinkAndChildren(LinkPtr _link1,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
                    double _dangle, bool _updateChildren);
 
       /// \brief Helper for SetJointPositions
-      private: void SlideBodyAndChildren(LinkPtr _link1,
+      private: void SlideLinkAndChildren(LinkPtr _link1,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
                    double _dposition, bool _updateChildren);
 
       /// \brief Helper for SetJointPositions
-      private: void GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
-                                         const LinkPtr &_body);
+      private: void GetAllChildrenLinks(std::vector<LinkPtr> &_links,
+                                         const LinkPtr &_link);
 
       /// \brief Helper for SetJointPositions
-      private: void GetAllParentBodies(std::vector<LinkPtr> &_bodies,
-                   const LinkPtr &_body, const LinkPtr &_origParentBody);
+      private: void GetAllParentLinks(std::vector<LinkPtr> &_links,
+                   const LinkPtr &_link, const LinkPtr &_origParentLink);
 
       /// \brief Helper for SetJointPositions
-      private: bool InBodies(const LinkPtr &_body,
-                             const std::vector<LinkPtr> &_bodies);
+      private: template<class InputIterator, class T>
+                 InputIterator FindLink(InputIterator first,
+                                      InputIterator last,
+                                      const T& value)
+                 {
+                   for (; first != last; ++first)
+                     if ((*first)->GetName() == value->GetName())
+                       return first;
+                   return last;
+                 }
 
       private: ModelPtr model;
+      private: std::vector<LinkPtr> updated_links;
       private: std::map<std::string, JointPtr> joints;
       private: std::map<std::string, common::PID> posPids;
       private: std::map<std::string, common::PID> velPids;

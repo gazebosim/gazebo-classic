@@ -9,8 +9,9 @@ import "header.proto";
 
 message WorldReset
 {
-  optional bool time         = 1;
-  optional bool model_poses  = 2;
+  optional bool all          = 1[default = true];
+  optional bool time_only    = 2[default = false];
+  optional bool model_only   = 3[default = false];
 }
 
 /// \endverbatim

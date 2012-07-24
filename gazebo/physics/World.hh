@@ -107,9 +107,10 @@ namespace gazebo
       /// \brief Get a model based on an index
       public: ModelPtr GetModel(unsigned int index);
 
-      /// \brief Reset the simulation to the initial settings
-      public: void Reset(bool _resetTime = true,
-        Base::EntityType _resetType = Base::BASE);
+      /// \brief Reset with options
+      public: void ResetEntities(Base::EntityType _type = Base::BASE);
+      public: void ResetTime();
+      public: void Reset();  // Reset all
 
       /// \brief Get the selected entity
       public: EntityPtr GetSelectedEntity() const;
@@ -333,8 +334,12 @@ namespace gazebo
       private: std::list<msgs::Model> modelMsgs;
 
       private: bool needsReset;
-      private: unsigned int resetModelPoses;
-      private: bool resetTime;
+      // Options to reset All, Time Only, or Model Only
+      // reset All overrides Time Only and Model Only
+      private: bool resetAll;
+      private: bool resetTimeOnly;
+      private: bool resetModelOnly;
+
       private: bool initialized;
 
       private: RayShapePtr testRay;

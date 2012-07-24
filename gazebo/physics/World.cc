@@ -76,15 +76,16 @@ World::World(const std::string &_name)
   this->loadModelMutex = new boost::mutex();
 
   this->initialized = false;
-  this->needsReset = false;
   this->stepInc = 0;
   this->pause = false;
   this->thread = NULL;
 
   this->name = _name;
 
-  this->resetModelPoses = false;
-  this->resetTime = false;
+  this->needsReset = false;
+  this->resetAll = true;
+  this->resetTimeOnly = false;
+  this->resetModelOnly = false;
 
   this->setWorldPoseMutex = new boost::recursive_mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
@@ -366,11 +367,12 @@ void World::Update()
 {
   if (this->needsReset)
   {
-    if (this->resetModelPoses)
-      this->Reset(this->resetTime, Base::MODEL);
-    else
-      this->Reset(this->resetTime);
-
+    if (this->resetAll)
+      this->Reset();
+    else if (this->resetTimeOnly)
+      this->ResetTime();
+    else if (this->resetModelOnly)
+      this->ResetEntities(Base::MODEL);
     this->needsReset = false;
   }
 
@@ -628,26 +630,33 @@ ModelPtr World::GetModel(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void World::Reset(bool _resetTime, Base::EntityType _resetType)
+void World::ResetTime()
+{
+  this->simTime = common::Time(0);
+  this->pauseTime = common::Time(0);
+  this->startTime = common::Time::GetWallTime();
+}
+
+//////////////////////////////////////////////////
+void World::ResetEntities(Base::EntityType _type)
+{
+  this->rootElement->Reset(_type);
+}
+
+//////////////////////////////////////////////////
+void World::Reset()
 {
   bool currently_paused = this->IsPaused();
   this->SetPaused(true);
   this->worldUpdateMutex->lock();
-  if (_resetTime)
-  {
-    this->simTime = common::Time(0);
-    this->pauseTime = common::Time(0);
-    this->startTime = common::Time::GetWallTime();
-  }
 
-  this->rootElement->Reset(_resetType);
-
+  this->ResetTime();
+  this->ResetEntities(Base::BASE);
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
-  {
     (*iter)->Reset();
-  }
   this->physicsEngine->Reset();
+
   this->worldUpdateMutex->unlock();
   this->SetPaused(currently_paused);
 }
@@ -786,16 +795,20 @@ void World::OnControl(ConstWorldControlPtr &_data)
   {
     this->needsReset = true;
 
-    if (_data->reset().has_time() && _data->reset().time())
-      this->resetTime = true;
+    if (_data->reset().has_all() && _data->reset().all())
+    {
+        this->resetAll = true;
+    }
     else
-      this->resetTime = false;
+    {
+      this->resetAll = false;
 
-    if (_data->reset().has_model_poses() &&
-        _data->reset().model_poses())
-      this->resetModelPoses = true;
-    else
-      this->resetModelPoses = false;
+      if (_data->reset().has_time_only() && _data->reset().time_only())
+        this->resetTimeOnly = true;
+
+      if (_data->reset().has_model_only() && _data->reset().model_only())
+        this->resetModelOnly = true;
+    }
   }
 }
 

@@ -313,10 +313,20 @@ void MainWindow::NewModel()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnResetModelOnly()
+{
+  msgs::WorldControl msg;
+  msg.mutable_reset()->set_all(false);
+  msg.mutable_reset()->set_time_only(false);
+  msg.mutable_reset()->set_model_only(true);
+  this->worldControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
-  // TODO: fix me msg.set_reset_world(true);
+  msg.mutable_reset()->set_all(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -497,6 +507,12 @@ void MainWindow::CreateActions()
   this->newModelAct->setShortcut(tr("Ctrl+M"));
   this->newModelAct->setStatusTip(tr("Create a new model"));
   connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
+
+  this->resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
+  this->resetModelsAct->setShortcut(tr("Ctrl+R"));
+  this->resetModelsAct->setStatusTip(tr("Reset model poses"));
+  connect(this->resetModelsAct, SIGNAL(triggered()), this,
+    SLOT(OnResetModelOnly()));
 
   this->resetWorldAct = new QAction(tr("&Reset World"), this);
   this->resetWorldAct->setShortcut(tr("Ctrl+R"));
