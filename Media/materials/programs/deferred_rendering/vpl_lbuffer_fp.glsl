@@ -8,24 +8,14 @@ uniform float flip;
 uniform float attenuation;
 uniform float clampTo;
 
-ps_2_x ps_3_0 vec2 fixUV(vec2 texCoord)
-{
-	return vec2(texCoord.x, -texCoord.y);
-}
-
-vec2 fixUV(vec2 texCoord)
-{
-	return texCoord;
-}
-
 void main()
 {
 	vec2 texcoord = gl_FragCoord.xy * viewportSize.zw;
-	texcoord.y *= -flip;
-	texcoord = fixUV(texcoord);
+	texcoord.y = texcoord.y * float(-flip);
+	// texcoord = fixUV(texcoord);
 	vec4 normDepth = texture2D(GBuff, texcoord);
 	vec3 normal = normalize(normDepth.xyz);
-	vec3 ray = vec3(gl_TexCoord[0].x, flip * gl_TexCoord[1].y, 1.0) * farCorner;
+	vec3 ray = vec3(gl_TexCoord[0].x, flip * gl_TexCoord[0].y, 1.0) * farCorner;
 	
 	vec3 viewPos = normalize(ray) * normDepth.w * farClipDistance;
 	vec3 lightToFrag = gl_TexCoord[2].xyz - viewPos;
@@ -35,6 +25,8 @@ void main()
 	float att = clamp(dot(gl_TexCoord[3], -normal), 0.0, 1.0);
 
 	att *= 1.0 / (1.0 + attenuation * dot(lightToFrag, lightToFrag)); 
+
+  // clampTo is a parameter that can be tuned
   gl_FragColor = vec4(clamp(gl_TexCoord[1].xyz * att * NL * LightColor, 0.0, clampTo), 0.0);
 
 	// return vec4(clamp(gl_TexCoord[1].xyz*att*NL*LightColor,0,clampTo),0);

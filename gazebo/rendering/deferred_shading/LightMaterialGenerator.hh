@@ -86,6 +86,7 @@ namespace gazebo
       public: virtual Ogre::GpuProgramPtr GenerateVertexShader(Perm _permutation)
       {
         std::string programName = "DeferredShading/";
+        //OLD: std::string programName = "DeferredShading/post/";
 
         if (_permutation &
             LightMaterialGenerator<techniquePolicy>::MI_DIRECTIONAL)
@@ -102,7 +103,51 @@ namespace gazebo
 
         return ptr;
       }
+      ///////////////////////////////////////////////
+      /* public: virtual Ogre::GpuProgramPtr GenerateFragmentShader(
+                  Perm _permutation)
+      {
+        /// Create shader
+        if (this->masterSource.empty())
+        {
+          Ogre::DataStreamPtr ptrMasterSource =
+            Ogre::ResourceGroupManager::getSingleton().openResource(
+                //NEW "deferred_rendering/deferred_shading/LightMaterial_ps.cg",
+                "DeferredShading/post/LightMaterial_ps.cg",
+                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+          if (ptrMasterSource.isNull())
+            gzthrow("Null Pointer\n");
+
+          this->masterSource = ptrMasterSource->getAsString();
+        }
+
+        if (this->masterSource.empty())
+          gzthrow("Empty string");
+
+        // Create name
+        std::string name = this->baseName +
+          Ogre::StringConverter::toString(_permutation) + "_ps";
+
+        // Create shader object
+        Ogre::HighLevelGpuProgramPtr ptrProgram =
+          Ogre::HighLevelGpuProgramManager::getSingleton().createProgram(
+              name, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+              "cg", Ogre::GPT_FRAGMENT_PROGRAM);
+
+        ptrProgram->setSource(this->masterSource);
+        ptrProgram->setParameter("entry_point","main");
+        ptrProgram->setParameter("profiles","ps_3_0 arbfp1");
+
+        // set up the preprocessor defines
+        // Important to do this before any call to get parameters,
+        // i.e. before the program gets loaded
+        ptrProgram->setParameter("compile_arguments",
+            this->GetPPDefines(_permutation));
+        this->SetUpBaseParameters(ptrProgram->getDefaultParameters());
+        
+        return Ogre::GpuProgramPtr(ptrProgram);
+      }*/
       ///////////////////////////////////////////////
       public: virtual Ogre::GpuProgramPtr GenerateFragmentShader(
                   Perm _permutation)
@@ -135,7 +180,6 @@ namespace gazebo
               "glsl", Ogre::GPT_FRAGMENT_PROGRAM);
 
         ptrProgram->setSource(this->masterSource);
-        ptrProgram->setParameter("profiles", "ps_2_x arbfp1");
 
         // set up the preprocessor defines
         // Important to do this before any call to get parameters,
@@ -149,14 +193,14 @@ namespace gazebo
 
         ptrProgram->getDefaultParameters()->setNamedConstant(
             "tex0", static_cast<int>(0));
-        ptrProgram->getDefaultParameters()->setNamedConstant(
-            "tex1", static_cast<int>(1));
+        //ptrProgram->getDefaultParameters()->setNamedConstant(
+        //    "tex1", static_cast<int>(1));
 
         if (_permutation &
             LightMaterialGenerator<techniquePolicy>::MI_SHADOW_CASTER)
         {
           ptrProgram->getDefaultParameters()->setNamedConstant(
-              "shadowTex", static_cast<int>(2));
+              "shadowTex", static_cast<int>(1));
         }
 
         return Ogre::GpuProgramPtr(ptrProgram);
@@ -182,6 +226,49 @@ namespace gazebo
             materialName);
       }
 
+    /*Ogre::String GetPPDefines(Perm permutation)
+		{
+      Ogre::String strPPD;
+
+			//Get the type of light
+      Ogre::String lightType;
+			if (permutation & LightMaterialGenerator<techniquePolicy>::MI_POINT)
+			{
+				lightType = "POINT";
+			}
+			else if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SPOTLIGHT)
+			{
+				lightType = "SPOT";
+			}
+			else if (permutation & LightMaterialGenerator<techniquePolicy>::MI_DIRECTIONAL)
+			{
+				lightType = "DIRECTIONAL";
+			}
+			else
+			{
+				assert(false && "Permutation must have a light type");
+			}
+			strPPD += "-DLIGHT_TYPE=LIGHT_" + lightType + " ";
+
+			//Optional parameters
+            if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SPECULAR)
+			{
+				strPPD += "-DIS_SPECULAR ";
+			}
+			if (permutation & LightMaterialGenerator<techniquePolicy>::MI_ATTENUATED)
+			{
+				strPPD += "-DIS_ATTENUATED ";
+			}
+			if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SHADOW_CASTER)
+			{
+				strPPD += "-DIS_SHADOW_CASTER ";
+			}
+			if(this->UseMaterialProperties()){
+				strPPD += "-DUSE_MAT_PROPERTIES ";
+			}
+			
+			return strPPD;
+		}*/
       ///////////////////////////////////////////////
       // Utility method
       protected: std::string GetPPDefines(Perm _permutation)

@@ -2,7 +2,6 @@
 vertex_program DeferredShading/Shadows/CasterVP glsl
 {
 	source deferred_rendering/deferred_shading/ShadowCaster_vp.glsl
-  // profiles vs_1_1 arbvp1
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -13,9 +12,87 @@ vertex_program DeferredShading/Shadows/CasterVP glsl
 fragment_program DeferredShading/Shadows/CasterFP glsl
 {
 	source deferred_rendering/deferred_shading/ShadowCaster_fp.glsl
-	//profiles ps_2_0 arbfp1
 	default_params
 	{
 		param_named_auto farDistance far_clip_distance
 	}
+}
+
+vertex_program DeferredShading/Shadows/RSMCasterVP glsl
+{
+	source deferred_rendering/RSM_vp.glsl
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto worldView worldview_matrix
+		param_named_auto worldMatrix world_matrix 
+	}
+}
+
+fragment_program DeferredShading/Shadows/RSMCasterFP_Directional glsl
+{
+	source deferred_rendering/RSM_fp.glsl
+
+	default_params
+	{
+    param_named diffuse int 0
+		param_named_auto farDistance far_clip_distance
+		//param_named_auto cLightColor light_diffuse_colour 0
+	}
+	compile_arguments -DDIRECTIONAL
+}
+
+
+fragment_program DeferredShading/Shadows/RSMCasterFP_Spot glsl
+{
+	source deferred_rendering/RSM_fp.glsl
+
+	default_params
+	{
+    param_named diffuse int 0
+		param_named_auto farDistance far_clip_distance
+		//param_named_auto cFarDistance far_clip_distance
+		//param_named_auto cLightColor light_diffuse_colour 0
+	}
+	compile_arguments -DSPOT
+}
+
+fragment_program DeferredShading/Shadows/RSMCasterFP_Spot1 glsl
+{
+	source deferred_rendering/RSM_fp.glsl
+	default_params
+	{
+    param_named diffuse int 0
+		param_named_auto farDistance far_clip_distance
+  }
+	compile_arguments -DDIRECTIONAL
+}
+
+
+vertex_program DeferredShading/Shadows/RSMCasterVP_ogre cg
+{
+	source RSM.cg
+	profiles vs_1_1 arbvp1
+	entry_point ShadowCasterVP
+	default_params
+	{
+		param_named_auto cWorldViewProj worldviewproj_matrix
+		param_named_auto cWorldView worldview_matrix
+		param_named_auto cWorldMatrix world_matrix 
+		
+	}
+}
+
+fragment_program DeferredShading/Shadows/RSMCasterFP_Spot_ogre cg
+{
+	source RSM.cg
+	profiles ps_3_0 fp30
+	entry_point ShadowCasterFP
+
+	default_params
+	{
+		//param_named_auto cFarDistance far_clip_distance
+		//param_named_auto cLightColor light_diffuse_colour 0
+	}
+	compile_arguments -DSPOT
 }

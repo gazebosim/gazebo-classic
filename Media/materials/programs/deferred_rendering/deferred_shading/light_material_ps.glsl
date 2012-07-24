@@ -4,14 +4,10 @@
 #define LIGHT_DIRECTIONAL 3
 
 uniform sampler2D tex0;
-uniform sampler2D tex1;
-uniform float farClipDistance;
 
-// Attributes of light
-uniform vec4 lightDiffuseColor;
-uniform vec4 lightSpecularColor;
-uniform vec4 lightFalloff;
-uniform vec4 lightPos;
+#ifdef USE_MAT_PROPERTIES
+uniform sampler2D tex1;
+#endif
 
 #if LIGHT_TYPE != LIGHT_POINT
 uniform vec3 lightDir;
@@ -29,37 +25,33 @@ uniform float flip;
 #endif
 
 #ifdef IS_SHADOW_CASTER
-uniform sampler2D shadowTex;
 uniform mat4 invView;
 uniform mat4 shadowViewProjMat;
 uniform vec3 shadowCamPos;
 uniform float shadowFarClip;
+uniform sampler2D shadowTex;
 #endif
 
+uniform float farClipDistance;
+
+// Attributes of light
+uniform vec4 lightDiffuseColor;
+uniform vec4 lightSpecularColor;
+uniform vec4 lightFalloff;
+uniform vec4 lightPos;
 
 void checkShadow(sampler2D shadowMap, vec3 viewPos, mat4 invView,
-	               mat4 shadowViewProj, float shadowFarClip,
-#if LIGHT_TYPE == LIGHT_DIRECTIONAL
-	vec3 shadowCamPos
-#else
-	float distanceFromLight
-#endif
-	)
+	               mat4 shadowViewProj, float shadowFarClip)
 {
 	vec3 worldPos = (invView * vec4(viewPos, 1.0)).xyz;
-#if LIGHT_TYPE == LIGHT_DIRECTIONAL
-	float distanceFromLight = length(shadowCamPos - worldPos);
-#endif
 	vec4 shadowProjPos = shadowViewProj * vec4(worldPos, 1.0);
 
 	shadowProjPos /= shadowProjPos.w;
 
 	vec2 shadowSampleTexCoord = shadowProjPos.xy;
-	float shadowDepth = texture2D(shadowMap, shadowSampleTexCoord).r;
-	float shadowDistance = shadowDepth * shadowFarClip;
+	float shadowDepth = texture2D(shadowMap, shadowSampleTexCoord).x;
 
-	// clip(shadowDistance - distanceFromLight + 0.1);
-	if (shadowDistance < distanceFromLight - 0.1)
+  if (shadowDepth < shadowProjPos.z - 0.005)
     discard;
 }
 
@@ -68,6 +60,9 @@ void checkShadow(sampler2D shadowMap, vec3 viewPos, mat4 invView,
 //////////////////////////////////////////////////////////////////////////////	
 void main()
 {
+  float NL = 0.0;
+  float specular = 0.0;
+
 	// None directional lights have some calculations to do in the beginning
   // of the pixel shader
 #if LIGHT_TYPE != LIGHT_DIRECTIONAL
@@ -85,19 +80,21 @@ void main()
   vec3 ray = gl_TexCoord[1].xyz;
 #endif
 
-	// Attribute 0: Diffuse color + shininess
+  // Attribute 0: Normal + depth
 	vec4 a0 = texture2D(tex0, texCoord);
 
-  // Attribute 1: Normal + depth
+  // Distance from viewer (w)
+	float distance = a0.w;
+	vec3 normal = normalize(a0.xyz);
+
+#ifdef USE_MAT_PROPERTIES
+	// Attribute 1: Diffuse color + shininess
 	vec4 a1 = texture2D(tex1, texCoord);
 
 	// Attributes
-	vec3 color = a0.xyz;
-	float specularity = a0.w;
-
-  // Distance from viewer (w)
-	float distance = a1.w;
-	vec3 normal = a1.xyz;
+	vec3 color = a1.xyz;
+	float specularity = a1.w;
+#endif
 
 	// Calculate position of texel in view space
 	vec3 viewPos = normalize(ray) * distance * farClipDistance;
@@ -113,40 +110,45 @@ void main()
 #endif
 
 #ifdef IS_SHADOW_CASTER
-#if LIGHT_TYPE == LIGHT_DIRECTIONAL
-  checkShadow(shadowTex, viewPos, invView, shadowViewProjMat,
-              shadowFarClip, shadowCamPos);
-#else
-  checkShadow(shadowTex, viewPos, invView, shadowViewProjMat,
-              shadowFarClip, len);
-#endif
+  checkShadow(shadowTex, viewPos, invView, shadowViewProjMat, shadowFarClip);
 #endif
 	
 	// Calculate diffuse color
-	vec3 total_light_contrib;
+	// vec3 total_light_contrib;
 
   // Lambertian term
-	total_light_contrib = max(0.0, dot(objToLightDir, normal)) *
-                        lightDiffuseColor.xyz;
+	NL = max(0.0, dot(objToLightDir, normal));
+                        // * lightDiffuseColor.xyz;
 
+  vec3 viewDir;
+  vec3 h;
 #ifdef IS_SPECULAR
 	// Calculate specular component
-  vec3 viewDir = -normalize(viewPos);
-  vec3 h = normalize(viewDir + objToLightDir);
-  vec3 light_specular = pow(dot(normal, h), 32.0) * lightSpecularColor.xyz;
-  total_light_contrib += specularity * light_specular;
+  viewDir = -normalize(viewPos);
+  h = normalize(viewDir + objToLightDir);
+  //specular = max(0.0, dot(viewDir, h));
+  specular = max(0.0, dot(normal, h));
+#ifdef USE_MAT_PROPERTIES
+  specular = pow(specular, specularity);
+#else
+  specular = pow(specular, 30.0);
+  //specular = pow(dot(normal, h), 30.0);
+  //vec3 light_specular = pow(dot(normal, h), 32.0) * lightSpecularColor.xyz;
+  //total_light_contrib += specularity * light_specular;
+#endif
 #endif
 
+float attenuation = 1.0;
 #if LIGHT_TYPE != LIGHT_DIRECTIONAL
 #ifdef IS_ATTENUATED
   // clip(lightFalloff.x - len);
-  if (lightFalloff.x - len < 0.0)
-    discard;
+  //if (lightFalloff.x - len < 0.0)
+  //  discard;
   
   // Calculate attenuation
-  float attenuation = dot(lightFalloff.yzw, vec3(1.0, len, len_sq));
+  attenuation /= dot(lightFalloff.yzw, vec3(1.0, len, len_sq));
   
-  total_light_contrib /= attenuation;
+  // total_light_contrib /= attenuation;
 #endif
 #endif
 
@@ -155,8 +157,15 @@ void main()
   float spotFalloff = clamp((spotlightAngle - spotParams.x) /
                       (spotParams.y - spotParams.x), 0.0, 1.0);
 
-  total_light_contrib *= (1.0 - spotFalloff);
+  attenuation *= (1.0 - spotFalloff);
+  //total_light_contrib *= (1.0 - spotFalloff);
 #endif
 
-  gl_FragColor = vec4(total_light_contrib * color, 0.0);
+#ifdef USE_MAT_PROPERTIES
+  // gl_FragColor = vec4(total_light_contrib * color, 0.0);
+  gl_FragColor = vec4((NL * (lightDiffuseColor.xyz + specular * lightSpecularColor.xyz)) * color * attenuation, 1.0);
+#else
+  gl_FragColor = vec4(NL * attenuation * lightDiffuseColor.xyz,
+                      specular * NL * attenuation);
+#endif
 }

@@ -351,6 +351,8 @@ bool DeferredLight::IsCameraInsideLight(Ogre::Camera *_camera)
 /////////////////////////////////////////////////
 bool DeferredLight::getCastShadows() const
 {
+  std::cout << "GetCastShadows[" << this->parentLight->getCastShadows() << "]\n";
+
   return this->parentLight->_getManager()->isShadowTechniqueInUse() &&
          this->parentLight->getCastShadows() &&
          (this->parentLight->getType() == Ogre::Light::LT_DIRECTIONAL ||
@@ -418,6 +420,11 @@ void DeferredLight::UpdateFromCamera(Ogre::Camera *_camera)
     Ogre::SceneManager *sm = this->parentLight->_getManager();
     sm->getShadowCameraSetup()->getShadowCamera(sm,
         _camera, _camera->getViewport(), this->parentLight, &shadowCam, 0);
+
+    std::cout << "ShadowCamPos["
+      << shadowCam.getPosition().x << " "
+      << shadowCam.getPosition().y << " "
+      << shadowCam.getPosition().z << "] Clip[" << shadowCam.getFarClipDistance() << "]\n";
 
     // Get the shadow camera position
     if (params->_findNamedConstantDefinition("shadowCamPos"))

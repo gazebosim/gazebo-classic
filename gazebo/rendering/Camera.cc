@@ -1108,19 +1108,20 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     this->dlMergeInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "DeferredLighting/ShowLit");
+          
 
     // Screen space ambient occlusion
-    this->ssaoInstance =
-      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-          "DeferredShading/SSAO");
+    //this->ssaoInstance =
+    //  Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+    //      "DeferredShading/SSAO");
 
-    this->dsGBufferInstance->setEnabled(true);
-    this->dsMergeInstance->setEnabled(true);
+    this->dsGBufferInstance->setEnabled(false);
+    this->dsMergeInstance->setEnabled(false);
 
-    this->dlGBufferInstance->setEnabled(false);
-    this->dlMergeInstance->setEnabled(false);
+    this->dlGBufferInstance->setEnabled(true);
+    this->dlMergeInstance->setEnabled(true);
 
-    this->ssaoInstance->setEnabled(false);
+    //this->ssaoInstance->setEnabled(false);
   }
 }
 

@@ -210,7 +210,7 @@ void Scene::Load()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-  this->manager->setAmbientLight(Ogre::ColourValue(0, 0, 0, 0));
+  this->manager->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
 }
 
 //////////////////////////////////////////////////
@@ -298,7 +298,7 @@ void Scene::InitDeferredShading()
   Ogre::MaterialManager::getSingleton().addListener(
       new NullSchemeHandler, "NoGBuffer");
 
-  compMgr.registerCustomCompositionPass("DeferredLight",
+  compMgr.registerCustomCompositionPass("DeferredShadingLight",
       new DeferredLightCompositionPass<DeferredShading>);
   compMgr.registerCustomCompositionPass("DeferredLightingLight",
       new DeferredLightCompositionPass<DeferredLighting>);
@@ -333,8 +333,7 @@ void Scene::InitDeferredShading()
   {
     // Set DeferredShading to DeferredLighting to use deferred lighting
     Ogre::InstancedEntity *new_entity = 
-      im->createInstancedEntity("DeferredShading/VPL");
-      //im->createInstancedEntity("DeferredLighting/VPL");
+      im->createInstancedEntity("DeferredLighting/VPL");
   }
 
   im->setBatchesAsStaticAndUpdate(true);
@@ -1816,24 +1815,20 @@ void Scene::SetShadowsEnabled(bool _value)
   // if (_value != shadowElem->GetValueBool("enabled"))
   {
     shadowElem->GetAttribute("enabled")->Set(_value);
+
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
     this->manager->setShadowTextureCasterMaterial(
-        "DeferredShading/Shadows/Caster");
-    //this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 1);
-  //this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
-  //this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 1);
-
-  this->manager->setShadowTextureSelfShadow(true);
-  this->manager->setShadowCasterRenderBackFaces(false);
-
+        "DeferredRendering/Shadows/RSMCaster_Spot_ogre");
     this->manager->setShadowTextureCount(1);
+    this->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->manager->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R, 2);
+    this->manager->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_RGBA, 0, 2);
+    this->manager->setShadowDirectionalLightExtrusionDistance(75);
+    this->manager->setShadowCasterRenderBackFaces(false);
 
-    //this->manager->setShadowDirectionalLightExtrusionDistance(100.0);
+    //this->manager->setShadowTextureSelfShadow(true);
     //this->manager->setShadowDirLightTextureOffset(1.75);
-    //this->manager->setShadowFarDistance(10);
 
     /*if (_value)
       RTShaderSystem::Instance()->ApplyShadows(this);

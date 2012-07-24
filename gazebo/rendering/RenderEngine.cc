@@ -339,6 +339,7 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_ParticleFX.so");
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+    plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
     for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
     {

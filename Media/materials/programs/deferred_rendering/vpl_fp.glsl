@@ -23,10 +23,10 @@ void main()
 {
   vec2 texcoord = gl_FragCoord.xy * viewportSize.zw;
   texcoord.y *= -flip;
-  texcoord = fixUV(texcoord);
+  //texcoord = fixUV(texcoord);
 
-  vec4 normDepth = texture2D(GBuff, vec2(texcoord.x, texcoord.y));
-  vec3 albedo =    texture2D(GBuff1, vec2(texcoord.x, texcoord.y)).xyz;
+  vec4 normDepth = texture2D(GBuff1, vec2(texcoord.x, texcoord.y));
+  vec3 albedo =    texture2D(GBuff, vec2(texcoord.x, texcoord.y)).xyz;
   vec3 normal = normalize(normDepth.xyz);
   vec3 ray = vec3(gl_TexCoord[0].x, flip * gl_TexCoord[0].y, 1.0) * farCorner;
 
@@ -40,6 +40,4 @@ void main()
 
   gl_FragColor = vec4(clamp(albedo * gl_TexCoord[1].xyz * att * NL * LightColor,
                             0.0, clampTo), 1.0);
-
-  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

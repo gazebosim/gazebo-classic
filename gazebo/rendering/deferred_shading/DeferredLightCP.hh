@@ -63,6 +63,7 @@ namespace gazebo
         const Ogre::MaterialPtr &mat = this->ambientLight->getMaterial();
         mat->load();
         this->instanceManager = NULL;
+        this->rsmActive = false;
       }
 
       /// @copydoc CompositorInstance::RenderSystemOperation::execute
@@ -131,21 +132,20 @@ namespace gazebo
             {
               cameraSetup = _sm->getShadowCameraSetup();
             }
-            Ogre::Camera shadowCam("temp_shadow_cam", _sm);
-            shadowCam.setAspectRatio(1.0);
+            //Ogre::Camera shadowCam("temp_shadow_cam", _sm);
+            //shadowCam.setAspectRatio(1.0);
 
-            cameraSetup->getShadowCamera(_sm, cam, this->viewport,
-                dLight->GetParentLight(), &shadowCam, 0);
-            Ogre::Matrix4 proj = shadowCam.getProjectionMatrix();
-            Ogre::Matrix4 view = shadowCam.getViewMatrix();
-            proj = proj*view;
-            Ogre::Matrix4 invProj = proj.inverse();
-            dLight->UpdateShadowInvProj(invProj);
+            //cameraSetup->getShadowCamera(_sm, cam, this->viewport,
+            //    dLight->GetParentLight(), &shadowCam, 0);
+            //Ogre::Matrix4 proj = shadowCam.getProjectionMatrix();
+            //Ogre::Matrix4 view = shadowCam.getViewMatrix();
+            //proj = proj*view;
+            //Ogre::Matrix4 invProj = proj.inverse();
+            //dLight->UpdateShadowInvProj(invProj);
             if (this->rsmActive)
             {
               dLight->RenderVPLs(_sm, this->instanceManager);
             }
-
     
             Ogre::Pass *pass = tech->getPass(0);
             Ogre::TextureUnitState *tus =
@@ -157,9 +157,12 @@ namespace gazebo
              if (tus->_getTexturePtr() != shadowTex)
               tus->_setTexturePtr(shadowTex);
           }
+          else
+            printf("NO SHADOWS\n");
       
           InjectTechnique(_sm, tech, dLight, &ll);
         }
+      
         // restore previous settings
         _sm->setFindVisibleObjects(findVisible);
       }

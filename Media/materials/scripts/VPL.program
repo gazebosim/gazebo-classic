@@ -1,8 +1,6 @@
 fragment_program DeferredRendering/VPL_FP glsl
 {
   source deferred_rendering/vpl_fp.glsl
-  profiles ps_3_0 arbfp1
-  // entry_point VPL_FP
 
   default_params
   {
@@ -16,8 +14,6 @@ fragment_program DeferredRendering/VPL_FP glsl
 fragment_program DeferredRendering/VPL_FP_LBuffer glsl
 {
   source deferred_rendering/vpl_lbuffer_fp.glsl
-  profiles ps_3_0 arbfp1
-  // entry_point VPL_FP_LBuffer
 
   default_params
   {
@@ -25,18 +21,17 @@ fragment_program DeferredRendering/VPL_FP_LBuffer glsl
     param_named_auto viewportSize viewport_size
     param_named_auto farClipDistance far_clip_distance	
     param_named_auto flip render_target_flipping 		
+    param_named clampTo float 0.1
   }
 }
 
 vertex_program DeferredRendering/VPL_VP glsl
 {
   source deferred_rendering/vpl_vp.glsl
-  profiles vs_3_0 gp4vp
-  // entry_point VPL_VP
 
   default_params
   {
-    param_named_auto ViewProj viewproj_matrix
-    param_named_auto View view_matrix
+    param_named_auto viewProj viewproj_matrix
+    param_named_auto view view_matrix
   }
 }

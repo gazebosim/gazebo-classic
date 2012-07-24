@@ -10,17 +10,17 @@ set (files
   grid.material
   kitchen.material
   perpixel.program
-  pssm.material
   ShadowCaster.material
-  shadow_caster.program
   ShadowCaster.program
-  shadow_receiver.program
-  shadows.material
   ssao.compositor
   ssao.material
   youbot.material
   VPL.material
   VPL.program
 )
+  #pssm.material
+  #shadow_receiver.program
+  #shadows.material
 
+  #shadow_caster.program
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/scripts/)

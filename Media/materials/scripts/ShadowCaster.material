@@ -1,4 +1,4 @@
-material DeferredShading/Shadows/Caster
+material DeferredRendering/Shadows/Caster
 {
 	technique
 	{
@@ -8,6 +8,75 @@ material DeferredShading/Shadows/Caster
 			{
 			}
 			fragment_program_ref DeferredShading/Shadows/CasterFP
+			{
+			}
+		}
+	}
+}
+
+material DeferredRendering/Shadows/RSMCaster_Directional
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref DeferredShading/Shadows/RSMCasterVP
+			{
+			}
+			fragment_program_ref DeferredShading/Shadows/RSMCasterFP_Directional
+			{
+			}
+		}
+	}
+}
+
+material DeferredRendering/Shadows/RSMCaster_Spot1
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture rockwall.tga
+			}
+			vertex_program_ref DeferredShading/Shadows/RSMCasterVP
+			{
+			}
+			fragment_program_ref DeferredShading/Shadows/RSMCasterFP_Spot1
+			{
+			}
+		}
+	}
+}
+
+material DeferredRendering/Shadows/RSMCaster_Spot_ogre
+{
+	technique
+	{
+		pass
+		{
+
+			vertex_program_ref DeferredShading/Shadows/RSMCasterVP_ogre
+			{
+			}
+			fragment_program_ref DeferredShading/Shadows/RSMCasterFP_Spot_ogre
+			{
+			}
+		}
+	}
+}
+
+material DeferredRendering/Shadows/RSMCaster_Spot
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref DeferredShading/Shadows/RSMCasterVP
+			{
+			}
+			fragment_program_ref DeferredShading/Shadows/RSMCasterFP_Spot
 			{
 			}
 		}

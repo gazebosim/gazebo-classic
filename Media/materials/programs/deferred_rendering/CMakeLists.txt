@@ -9,6 +9,8 @@ set (files
   vpl_fp.glsl
   vpl_lbuffer_fp.glsl
   vpl_vp.glsl
+  RSM_vp.glsl
+  RSM_fp.glsl
 ) 
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/programs/deferred_rendering)

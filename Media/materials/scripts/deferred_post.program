@@ -24,6 +24,21 @@ vertex_program DeferredShading/LightMaterial_vs glsl
   }
 }
 
+// Auxiliary lights
+//vertex_program DeferredShading/CGLightMaterial_vs cg
+//{
+//	source deferred_rendering/deferred_shading/LightMaterial_vs.cg
+//	profiles vs_1_1 arbvp1
+//	entry_point main
+//	default_params
+//	{
+//		param_named_auto worldViewProj worldviewproj_matrix
+//		//param_named_auto invProj inverse_projection_matrix
+//		//param_named_auto vpWidth viewport_width
+//		//param_named_auto vpHeight viewport_height
+//	}
+//}
+
 // Post processors
 vertex_program DeferredShading/vs glsl
 {
