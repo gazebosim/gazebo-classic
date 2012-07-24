@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ModelConfiguration 
+/// \brief Message for model configuration (joint positions)
+/// \verbatim
+
+import "time.proto";
+
+message ModelConfiguration
+{
+  required Time time                        = 1; // Time when the pose should be enforced
+  repeated string joint_names               = 2;
+  repeated double joint_positions           = 3;
+}
+/// \endverbatim

@@ -29,6 +29,7 @@ set (msgs axis.proto
           material.proto
           meshgeom.proto
           model.proto
+          model_configuration.proto
           model_v.proto
           packet.proto
           physics.proto
