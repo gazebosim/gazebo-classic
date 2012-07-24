@@ -67,32 +67,3 @@ fragment_program DeferredShading/Shadows/RSMCasterFP_Spot1 glsl
   }
 	compile_arguments -DDIRECTIONAL
 }
-
-
-vertex_program DeferredShading/Shadows/RSMCasterVP_ogre cg
-{
-	source RSM.cg
-	profiles vs_1_1 arbvp1
-	entry_point ShadowCasterVP
-	default_params
-	{
-		param_named_auto cWorldViewProj worldviewproj_matrix
-		param_named_auto cWorldView worldview_matrix
-		param_named_auto cWorldMatrix world_matrix 
-		
-	}
-}
-
-fragment_program DeferredShading/Shadows/RSMCasterFP_Spot_ogre cg
-{
-	source RSM.cg
-	profiles ps_3_0 fp30
-	entry_point ShadowCasterFP
-
-	default_params
-	{
-		//param_named_auto cFarDistance far_clip_distance
-		//param_named_auto cLightColor light_diffuse_colour 0
-	}
-	compile_arguments -DSPOT
-}

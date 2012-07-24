@@ -17,10 +17,7 @@ set (files
   youbot.material
   VPL.material
   VPL.program
+  shadow_caster.program
 )
-  #pssm.material
-  #shadow_receiver.program
-  #shadows.material
 
-  #shadow_caster.program
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/scripts/)

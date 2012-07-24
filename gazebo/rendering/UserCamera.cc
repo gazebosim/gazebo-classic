@@ -27,6 +27,7 @@
 #include "common/Exception.hh"
 #include "common/Events.hh"
 
+#include "rendering/RenderEngine.hh"
 #include "rendering/GUIOverlay.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/WindowManager.hh"
@@ -97,7 +98,19 @@ void UserCamera::Init()
   // lighting. When using deferred shading, the light's use geometry that
   // trigger shaders. If the far clip is too close, the light's geometry is
   // clipped and wholes appear in the lighting.
-  this->SetClipDist(0.1, 500);
+  if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::VERTEX)
+  {
+    this->SetClipDist(0.1, 50);
+  }
+  else if (RenderEngine::Instance()->GetRenderPathType() ==
+           RenderEngine::FORWARD)
+  {
+    this->SetClipDist(0.1, 100);
+  }
+  else
+  {
+    this->SetClipDist(0.1, 500);
+  }
 
   this->axisNode =
     this->pitchNode->createChildSceneNode(this->name + "AxisNode");

@@ -224,7 +224,12 @@ void Scene::Init()
 {
   this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
+  // RTShader system self-enables if the render path type is FORWARD,
   RTShaderSystem::Instance()->AddScene(this);
+  RTShaderSystem::Instance()->ApplyShadows(this);
+
+  if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
+    this->InitDeferredShading();
 
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
@@ -252,7 +257,7 @@ void Scene::Init()
   // Force shadows on.
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
   shadowElem->GetAttribute("enabled")->Set(true);
-  // RTShaderSystem::Instance()->ApplyShadows(this);
+  this->SetShadowsEnabled(true);
 
   msgs::Scene sceneMsg;
   msgs::Response responseMsg = transport::request("default",
@@ -264,7 +269,6 @@ void Scene::Init()
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 
-  this->SetShadowsEnabled(true);
 
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
@@ -275,7 +279,6 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
-  this->InitDeferredShading();
 }
 
 //////////////////////////////////////////////////
@@ -332,8 +335,8 @@ void Scene::InitDeferredShading()
   for (int i = 0; i < numVPLs; ++i)
   {
     // Set DeferredShading to DeferredLighting to use deferred lighting
-    Ogre::InstancedEntity *new_entity = 
-      im->createInstancedEntity("DeferredLighting/VPL");
+    //Ogre::InstancedEntity *new_entity = 
+    im->createInstancedEntity("DeferredLighting/VPL");
   }
 
   im->setBatchesAsStaticAndUpdate(true);
@@ -1812,10 +1815,10 @@ void Scene::SetSky(const std::string &_material)
 void Scene::SetShadowsEnabled(bool _value)
 {
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
-  // if (_value != shadowElem->GetValueBool("enabled"))
-  {
-    shadowElem->GetAttribute("enabled")->Set(_value);
+  shadowElem->GetAttribute("enabled")->Set(_value);
 
+  if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
+  {
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
     this->manager->setShadowTextureCasterMaterial(
         "DeferredRendering/Shadows/RSMCaster_Spot_ogre");
@@ -1823,18 +1826,32 @@ void Scene::SetShadowsEnabled(bool _value)
     this->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->manager->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_RGBA, 0, 2);
+    this->manager->setShadowTextureConfig(0, 1024, 1024,
+        Ogre::PF_FLOAT32_RGBA, 0, 2);
     this->manager->setShadowDirectionalLightExtrusionDistance(75);
     this->manager->setShadowCasterRenderBackFaces(false);
-
-    //this->manager->setShadowTextureSelfShadow(true);
-    //this->manager->setShadowDirLightTextureOffset(1.75);
-
-    /*if (_value)
+    this->manager->setShadowTextureSelfShadow(true);
+    this->manager->setShadowDirLightTextureOffset(1.75);
+  }
+  else if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+  {
+    // RT Shader shadows
+    if (_value)
       RTShaderSystem::Instance()->ApplyShadows(this);
     else
       RTShaderSystem::Instance()->RemoveShadows(this);
-      */
+  }
+  else
+  {
+    this->manager->setShadowCasterRenderBackFaces(false);
+    this->manager->setShadowTextureSize(512);
+
+    // The default shadows. 
+    if (_value)
+      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    else
+      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   }
 }
 

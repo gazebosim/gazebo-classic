@@ -1,6 +1,6 @@
 <gazebo version='1.0'>
   <!-- Light Source -->
-  <light type="spot" name="sun" cast_shadows="true">
+  <light type="directional" name="sun" cast_shadows="true">
     <origin pose="0 0 10 0 0 0"/>
     <diffuse rgba="0.8 0.8 0.8 1"/>
     <specular rgba="0.01 0.01 0.01 1"/>

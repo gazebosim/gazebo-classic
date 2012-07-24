@@ -67,6 +67,8 @@ RenderEngine::RenderEngine()
 
   this->initialized = false;
 
+  this->renderPathType = FORWARD;
+
   this->connections.push_back(event::Events::ConnectPreRender(
         boost::bind(&RenderEngine::PreRender, this)));
   this->connections.push_back(event::Events::ConnectRender(
@@ -114,7 +116,6 @@ void RenderEngine::Load()
   // Load all the plugins
   this->LoadPlugins();
 
-
   // Setup the rendering system, and create the context
   this->SetupRenderSystem();
 
@@ -128,12 +129,14 @@ void RenderEngine::Load()
   stream << (int32_t)this->dummyWindowId;
 
   WindowManager::Instance()->CreateWindow(stream.str(), 1, 1);
+  this->CheckSystemCapabilities();
 }
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
                                    bool _enableVisualizations)
 {
+
   ScenePtr scene(new Scene(_name, _enableVisualizations));
   this->scenes.push_back(scene);
 
@@ -339,7 +342,6 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_ParticleFX.so");
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
-    plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
     for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
     {
@@ -375,6 +377,12 @@ void RenderEngine::AddResourcePath(const std::string &_path)
     gzthrow(std::string("Unable to load Ogre Resources.\nMake sure the") +
         "resources path in the world file is set correctly.");
   }
+}
+
+//////////////////////////////////////////////////
+RenderEngine::RenderPathType RenderEngine::GetRenderPathType() const
+{
+  return this->renderPathType;
 }
 
 //////////////////////////////////////////////////
@@ -448,10 +456,11 @@ void RenderEngine::SetupRenderSystem()
 
   // Set parameters of render system (window size, etc.)
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
-    rsList = this->root->getAvailableRenderers();
+  rsList = this->root->getAvailableRenderers();
 #else
-    rsList = &(this->root->getAvailableRenderers());
+  rsList = &(this->root->getAvailableRenderers());
 #endif
+
 
   int c = 0;
 
@@ -486,25 +495,9 @@ void RenderEngine::SetupRenderSystem()
   this->root->setRenderSystem(renderSys);
 }
 
-//////////////////////////////////////////////////
-bool RenderEngine::HasGLSL()
-{
-  const Ogre::RenderSystemCapabilities *capabilities;
-  Ogre::RenderSystemCapabilities::ShaderProfiles profiles;
-  Ogre::RenderSystemCapabilities::ShaderProfiles::const_iterator iter;
-
-  capabilities = this->root->getRenderSystem()->getCapabilities();
-  profiles = capabilities->getSupportedShaderProfiles();
-
-  iter = std::find(profiles.begin(), profiles.end(), "glsl");
-
-  return iter != profiles.end();
-}
-
-
+/////////////////////////////////////////////////
 void RenderEngine::CreateContext()
 {
-
   try
   {
     this->dummyDisplay = XOpenDisplay(0);
@@ -536,4 +529,53 @@ void RenderEngine::CreateContext()
   {
     printf("Bad\n\n\n");
   }
+}
+
+/////////////////////////////////////////////////
+void RenderEngine::CheckSystemCapabilities()
+{
+  const Ogre::RenderSystemCapabilities *capabilities;
+  Ogre::RenderSystemCapabilities::ShaderProfiles profiles;
+  Ogre::RenderSystemCapabilities::ShaderProfiles::const_iterator iter;
+
+  capabilities = this->root->getRenderSystem()->getCapabilities();
+  profiles = capabilities->getSupportedShaderProfiles();
+
+  bool hasFragmentPrograms =
+    capabilities->hasCapability(Ogre::RSC_FRAGMENT_PROGRAM);
+
+  bool hasVertexPrograms =
+    capabilities->hasCapability(Ogre::RSC_VERTEX_PROGRAM);
+
+  // bool hasGeometryPrograms =
+  //  capabilities->hasCapability(Ogre::RSC_GEOMETRY_PROGRAM);
+
+  // bool hasRenderToVertexBuffer =
+  //  capabilities->hasCapability(Ogre::RSC_HWRENDER_TO_VERTEX_BUFFER);
+
+  // int multiRenderTargetCount = capabilities->getNumMultiRenderTargets();
+
+  bool hasFBO = 
+    capabilities->hasCapability(Ogre::RSC_FBO);
+
+  bool hasGLSL =
+    std::find(profiles.begin(), profiles.end(), "glsl") != profiles.end();
+
+  if (!hasGLSL || !hasFBO)
+  {
+    gzerr << "Your machine does not meet the minimal rendering requirements.\n";
+    if (!hasGLSL)
+      gzerr << "   GLSL is missing.\n";
+    if (!hasFBO)
+      gzerr << "   Frame Buffer Objects (FBO) is missing.\n";
+  }
+
+  if (hasVertexPrograms && hasFragmentPrograms)
+    this->renderPathType = RenderEngine::FORWARD;
+  else
+    this->renderPathType = RenderEngine::VERTEX;
+
+  // Disable deferred rendering for now. Needs more work.
+  // if (hasRenderToVertexBuffer && multiRenderTargetCount >= 8)
+  //  this->renderPathType = RenderEngine::DEFERRED;
 }
