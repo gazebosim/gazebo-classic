@@ -371,7 +371,7 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 
 //////////////////////////////////////////////////
 //   The entity stores an initialRelativePose and dynamic worldPose
-//   When calling SetWroldPose (SWP) or SetRelativePose on an entity
+//   When calling SetWorldPose (SWP) or SetRelativePose on an entity
 //   that is a Model (M), Canonical Body (CB) or Body (B), different
 //   considerations need to be taken.
 // Below is a table that summarizes the current code.
@@ -433,6 +433,13 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
             this->worldPose.rot.RotateVector(coll->GetRelativePose().pos);
           coll->worldPose.rot = this->worldPose.rot *
             coll->GetRelativePose().rot;
+        }
+        else
+        {
+          coll->worldPose.pos = this->worldPose.pos +
+            this->worldPose.rot.RotateVector(coll->initialRelativePose.pos);
+          coll->worldPose.rot = this->worldPose.rot *
+            coll->initialRelativePose.rot;
         }
         coll->OnPoseChange();
       }
