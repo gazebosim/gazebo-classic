@@ -117,6 +117,9 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find OGRE 
+  execute_process(COMMAND pkg-config --modversion OGRE 
+    OUTPUT_VARIABLE OGRE_VERSION)
+
   pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
   if (OGRE-RTShaderSystem_FOUND)
     set(ogre_ldflags ${OGRE-RTShaderSystem_LDFLAGS})

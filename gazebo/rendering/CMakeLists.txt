@@ -5,7 +5,9 @@ include_directories(SYSTEM
   ${CEGUI_INCLUDE_DIRS}
 )
 
-add_subdirectory(deferred_shading)
+if (${OGRE_VERSION} GREATER 1.7.4)
+  add_subdirectory(deferred_shading)
+endif()
 
 set (sources
   ArrowVisual.cc
@@ -98,13 +100,18 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering gazebo_common 
-                                        gazebo_sdf_interface
-                                        gazebo_rendering_deferred
-                                        ${ogre_libraries} 
-                                        ${OPENGL_LIBRARIES} 
-                                        ${CEGUI_LIBRARIES}
-                                        X11 )
+target_link_libraries( gazebo_rendering
+  gazebo_common 
+  gazebo_sdf_interface
+  ${ogre_libraries} 
+  ${OPENGL_LIBRARIES} 
+  ${CEGUI_LIBRARIES}
+  X11
+)
+
+if (${OGRE_VERSION} GREATER 1.7.4)
+  target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
+endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)
