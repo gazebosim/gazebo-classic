@@ -1010,29 +1010,41 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   }
   else if (typeElem->FirstChildElement("texture"))
   {
+    TiXmlElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
+
     TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
-    TiXmlElement *sampler = textureXml->FirstChildElement("sampler2D");
-    if (sampler)
+
+    if (std::string(textureXml->Value()) == "image")
     {
-      std::string sourceName = sampler->FirstChildElement("source")->GetText();
-      TiXmlElement *sourceXml = this->GetElementId("newparam", sourceName);
-      if (sourceXml)
+      imageXml = textureXml;
+    }
+    else
+    {
+      TiXmlElement *sampler = textureXml->FirstChildElement("sampler2D");
+      if (sampler)
       {
-        TiXmlElement *surfaceXml = sourceXml->FirstChildElement("surface");
-        if (surfaceXml && surfaceXml->FirstChildElement("init_from"))
+        std::string sourceName =
+          sampler->FirstChildElement("source")->GetText();
+        TiXmlElement *sourceXml = this->GetElementId("newparam", sourceName);
+        if (sourceXml)
         {
-          TiXmlElement *imageXml = this->GetElementId("image",
-              surfaceXml->FirstChildElement("init_from")->GetText());
-          if (imageXml && imageXml->FirstChildElement("init_from"))
+          TiXmlElement *surfaceXml = sourceXml->FirstChildElement("surface");
+          if (surfaceXml && surfaceXml->FirstChildElement("init_from"))
           {
-            std::string imgFile =
-              imageXml->FirstChildElement("init_from")->GetText();
-            _mat->SetTextureImage(imgFile, this->path);
+            imageXml = this->GetElementId("image",
+                surfaceXml->FirstChildElement("init_from")->GetText());
           }
         }
       }
+    }
+
+    if (imageXml && imageXml->FirstChildElement("init_from"))
+    {
+      std::string imgFile =
+        imageXml->FirstChildElement("init_from")->GetText();
+      _mat->SetTextureImage(imgFile, this->path);
     }
   }
 }
