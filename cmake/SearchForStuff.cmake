@@ -280,13 +280,6 @@ if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
 
-find_package(GTest)
-if (GTEST_FOUND)
-  enable_testing()
-else()
-  message (STATUS "  Tests will not be built")
-endif()
-
 ########################################
 # Find Boost, if not specified manually
 if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )

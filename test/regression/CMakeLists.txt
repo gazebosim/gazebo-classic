@@ -18,8 +18,7 @@ if (INCLUDE_PLAYER)
   add_subdirectory(player)
 endif()
 
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
   common.cc
@@ -51,7 +50,9 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
   add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc ${PROJECT_SOURCE_DIR}/src/gazebo.cc)
 
-target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
+target_link_libraries(${BINARY_NAME}
+  ${GTEST_LIBRARY} 
+  ${GTEST_MAIN_LIBRARY} 
     gazebo_common
     gazebo_sdf_interface
     gazebo_transport

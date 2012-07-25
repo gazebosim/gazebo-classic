@@ -32,8 +32,8 @@ TEST_F(ProjectorTest, Projector)
   unsigned int width;
   unsigned int height;
   GetFrame("camera_sensor", &img, width, height);
-  ASSERT_EQ(width, 320);
-  ASSERT_EQ(height, 240);
+  ASSERT_EQ(width, static_cast<unsigned int>(320));
+  ASSERT_EQ(height, static_cast<unsigned int>(240));
 
   unsigned int diffMax = 0;
   unsigned int diffSum = 0;
@@ -41,8 +41,8 @@ TEST_F(ProjectorTest, Projector)
   ImageCompare(&img, &projector_world_camera,
       width, height, 3, diffMax, diffSum, diffAvg);
   // PrintImage("projector_world_camera", &img, width, height, 3);
-  ASSERT_EQ(diffSum, 0);
-  ASSERT_EQ(diffMax, 0);
+  ASSERT_EQ(diffSum, static_cast<unsigned int>(0));
+  ASSERT_EQ(diffMax, static_cast<unsigned int>(0));
   ASSERT_EQ(diffAvg, 0.0);
 }
 

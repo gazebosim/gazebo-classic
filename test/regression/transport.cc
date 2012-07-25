@@ -120,7 +120,7 @@ TEST_F(TransportTest, Errors)
   transport::PublisherPtr factoryPub =
     testNode->Advertise<msgs::Factory>("~/factory");
   factoryPub->WaitForConnection();
-  EXPECT_EQ(0, factoryPub->GetOutgoingCount());
+  EXPECT_EQ(static_cast<unsigned int>(0), factoryPub->GetOutgoingCount());
   EXPECT_STREQ("/gazebo/default/factory", factoryPub->GetTopic().c_str());
   EXPECT_STREQ("gazebo.msgs.Factory", factoryPub->GetMsgType().c_str());
 
@@ -157,7 +157,7 @@ TEST_F(TransportTest, Errors)
   unsigned int masterPort;
   EXPECT_FALSE(transport::get_master_uri(masterHost, masterPort));
   EXPECT_STREQ("localhost", masterHost.c_str());
-  EXPECT_EQ(11345, masterPort);
+  EXPECT_EQ(static_cast<unsigned int>(11345), masterPort);
 
   // restore original URI
   putenv(const_cast<char*>(origURI.c_str()));
