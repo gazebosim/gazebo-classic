@@ -453,10 +453,10 @@ TEST_F(MathTest, Spline)
   math::Spline s;
 
   s.AddPoint(math::Vector3(0, 0, 0));
-  EXPECT_EQ(1, s.GetPointCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), s.GetPointCount());
 
   s.Clear();
-  EXPECT_EQ(0, s.GetPointCount());
+  EXPECT_EQ(static_cast<unsigned int>(0), s.GetPointCount());
 
   s.AddPoint(math::Vector3(0, 0, 0));
   EXPECT_TRUE(s.GetPoint(0) == math::Vector3(0, 0, 0));
@@ -483,10 +483,10 @@ TEST_F(MathTest, RotationSpline)
   math::RotationSpline s;
 
   s.AddPoint(math::Quaternion(0, 0, 0));
-  EXPECT_EQ(1, s.GetNumPoints());
+  EXPECT_EQ(static_cast<unsigned int>(1), s.GetNumPoints());
 
   s.Clear();
-  EXPECT_EQ(0, s.GetNumPoints());
+  EXPECT_EQ(static_cast<unsigned int>(0), s.GetNumPoints());
 
   s.AddPoint(math::Quaternion(0, 0, 0));
   EXPECT_TRUE(s.GetPoint(0) == math::Quaternion(0, 0, 0));

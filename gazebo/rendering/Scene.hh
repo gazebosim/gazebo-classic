@@ -277,6 +277,7 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
 
+      private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnRequest(ConstRequestPtr &_msg);
       private: void OnJointMsg(ConstJointPtr &_msg);
 
@@ -377,6 +378,7 @@ namespace gazebo
       private: transport::SubscriberPtr skeletonPoseSub;
       private: transport::SubscriberPtr triggerSub;
       private: transport::PublisherPtr lightPub;
+      private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;
 

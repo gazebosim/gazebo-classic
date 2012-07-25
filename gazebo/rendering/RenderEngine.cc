@@ -67,14 +67,7 @@ RenderEngine::RenderEngine()
 
   this->initialized = false;
 
-  this->renderPathType = FORWARD;
-
-  this->connections.push_back(event::Events::ConnectPreRender(
-        boost::bind(&RenderEngine::PreRender, this)));
-  this->connections.push_back(event::Events::ConnectRender(
-        boost::bind(&RenderEngine::Render, this)));
-  this->connections.push_back(event::Events::ConnectPostRender(
-        boost::bind(&RenderEngine::PostRender, this)));
+  this->renderPathType = NONE;
 }
 
 
@@ -87,7 +80,15 @@ RenderEngine::~RenderEngine()
 //////////////////////////////////////////////////
 void RenderEngine::Load()
 {
-  this->CreateContext();
+  if (!this->CreateContext())
+    return;
+
+  this->connections.push_back(event::Events::ConnectPreRender(
+        boost::bind(&RenderEngine::PreRender, this)));
+  this->connections.push_back(event::Events::ConnectRender(
+        boost::bind(&RenderEngine::Render, this)));
+  this->connections.push_back(event::Events::ConnectPostRender(
+        boost::bind(&RenderEngine::PostRender, this)));
 
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
@@ -136,6 +137,8 @@ void RenderEngine::Load()
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
                                    bool _enableVisualizations)
 {
+  if (this->renderPathType == NONE)
+    return ScenePtr();
 
   ScenePtr scene(new Scene(_name, _enableVisualizations));
   this->scenes.push_back(scene);
@@ -154,6 +157,9 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
 //////////////////////////////////////////////////
 void RenderEngine::RemoveScene(const std::string &_name)
 {
+  if (this->renderPathType == NONE)
+    return;
+
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
@@ -174,6 +180,9 @@ void RenderEngine::RemoveScene(const std::string &_name)
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::GetScene(const std::string &_name)
 {
+  if (this->renderPathType == NONE)
+    return ScenePtr();
+
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
@@ -201,6 +210,7 @@ unsigned int RenderEngine::GetSceneCount() const
   return this->scenes.size();
 }
 
+//////////////////////////////////////////////////
 void RenderEngine::PreRender()
 {
   this->root->_fireFrameStarted();
@@ -222,6 +232,9 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
+  if (this->renderPathType == NONE)
+    return;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->initialized = false;
@@ -496,8 +509,10 @@ void RenderEngine::SetupRenderSystem()
 }
 
 /////////////////////////////////////////////////
-void RenderEngine::CreateContext()
+bool RenderEngine::CreateContext()
 {
+  bool result = true;
+
   try
   {
     this->dummyDisplay = XOpenDisplay(0);
@@ -527,8 +542,11 @@ void RenderEngine::CreateContext()
   }
   catch (...)
   {
-    printf("Bad\n\n\n");
+    gzwarn << "Unable to create X window. Rendering will be disabled\n";
+    result = false;
   }
+  
+  return result;
 }
 
 /////////////////////////////////////////////////

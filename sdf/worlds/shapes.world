@@ -24,7 +24,7 @@
     </model>
 
     <model name="sphere">
-      <origin pose="-1.2 0 0.5 0 0 0"/>
+      <origin pose="0 1.5 0.5 0 0 0"/>
       <link name="link">
         <collision name="collision">
           <mass>1</mass>

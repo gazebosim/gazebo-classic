@@ -105,6 +105,10 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->selectionSub = this->node->Subscribe("~/selection",
       &Scene::OnSelectionMsg, this);
 
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->responseSub = this->node->Subscribe("~/response",
+      &Scene::OnResponse, this);
+
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   this->selectionObj = new SelectionObj(this);
@@ -259,12 +263,8 @@ void Scene::Init()
   shadowElem->GetAttribute("enabled")->Set(true);
   this->SetShadowsEnabled(true);
 
-  msgs::Scene sceneMsg;
-  msgs::Response responseMsg = transport::request("default",
-      *msgs::CreateRequest("scene_info"));
-  sceneMsg.ParseFromString(responseMsg.serialized_data());
-  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
-  this->sceneMsgs.push_back(sm);
+  this->requestMsg = msgs::CreateRequest("scene_info");
+  this->requestPub->Publish(*this->requestMsg);
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
@@ -1564,6 +1564,20 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   this->visuals[jointVis->GetName()] = jointVis;
   return true;
 }
+
+/////////////////////////////////////////////////
+void Scene::OnResponse(ConstResponsePtr &_msg)
+{
+  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
+    return;
+
+  msgs::Scene sceneMsg;
+  sceneMsg.ParseFromString(_msg->serialized_data());
+  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+  this->sceneMsgs.push_back(sm);
+  this->requestMsg = NULL;
+}
+
 
 /////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)

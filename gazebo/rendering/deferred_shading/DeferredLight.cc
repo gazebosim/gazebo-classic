@@ -451,8 +451,8 @@ void DeferredLight::UpdateShadowInvProj(Ogre::Matrix4 &_invproj)
 }
 
 /////////////////////////////////////////////////
-void DeferredLight::SetVPLCount(uint32_t _n,
-    Ogre::SceneManager *_sm, Ogre::InstanceManager *_im)
+void DeferredLight::SetVPLCount(uint32_t /*_n*/,
+    Ogre::SceneManager * /*_sm*/, Ogre::InstanceManager * /*_im*/)
 {
 }
 
