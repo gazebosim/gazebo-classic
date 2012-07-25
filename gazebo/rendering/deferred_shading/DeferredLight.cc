@@ -74,7 +74,8 @@ void DeferredLight::SetAttenuation(float _c, float _b, float _a)
   if (!math::equal(_c, 1.0f) || !math::equal(_b, 0.0f) ||
       !math::equal(_a, 0.0f))
   {
-    ENABLE_BIT(this->permutation, LightMaterialGenerator<NullTechnique>::MI_ATTENUATED);
+    ENABLE_BIT(this->permutation,
+        LightMaterialGenerator<NullTechnique>::MI_ATTENUATED);
 
     if (this->parentLight->getType() == Ogre::Light::LT_POINT)
     {
@@ -318,7 +319,6 @@ bool DeferredLight::IsCameraInsideLight(Ogre::Camera *_camera)
         // true sphere.
         return distanceFromLight <= this->radius +
            _camera->getNearClipDistance() + 0.1;
-          //OLD: _camera->getNearClipDistance() + 0.2;
       }
     case Ogre::Light::LT_SPOTLIGHT:
       {
@@ -351,8 +351,6 @@ bool DeferredLight::IsCameraInsideLight(Ogre::Camera *_camera)
 /////////////////////////////////////////////////
 bool DeferredLight::getCastShadows() const
 {
-  std::cout << "GetCastShadows[" << this->parentLight->getCastShadows() << "]\n";
-
   return this->parentLight->_getManager()->isShadowTechniqueInUse() &&
          this->parentLight->getCastShadows() &&
          (this->parentLight->getType() == Ogre::Light::LT_DIRECTIONAL ||
@@ -421,11 +419,6 @@ void DeferredLight::UpdateFromCamera(Ogre::Camera *_camera)
     sm->getShadowCameraSetup()->getShadowCamera(sm,
         _camera, _camera->getViewport(), this->parentLight, &shadowCam, 0);
 
-    std::cout << "ShadowCamPos["
-      << shadowCam.getPosition().x << " "
-      << shadowCam.getPosition().y << " "
-      << shadowCam.getPosition().z << "] Clip[" << shadowCam.getFarClipDistance() << "]\n";
-
     // Get the shadow camera position
     if (params->_findNamedConstantDefinition("shadowCamPos"))
       params->setNamedConstant("shadowCamPos", shadowCam.getPosition());
@@ -446,8 +439,8 @@ void DeferredLight::UpdateRSM(const Ogre::TexturePtr &_shadowTex)
 void DeferredLight::UpdateShadowInvProj(Ogre::Matrix4 &_invproj)
 {
   this->VPLMaterial->getBestTechnique()->getPass(0)->
-   getVertexProgramParameters()->setNamedConstant("InvShadowProjMatrix",
-       _invproj);
+    getVertexProgramParameters()->setNamedConstant("InvShadowProjMatrix",
+        _invproj);
 }
 
 /////////////////////////////////////////////////

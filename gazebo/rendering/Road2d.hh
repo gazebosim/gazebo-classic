@@ -17,6 +17,7 @@
 #ifndef _ROAD2D_HH_
 #define _ROAD2D_HH_
 
+#include <string>
 #include <vector>
 #include <list>
 
@@ -56,7 +57,7 @@ namespace gazebo
 
                  /// \brief Implementation of Ogre::SimpleRenderable
                  public: virtual Ogre::Real getBoundingRadius(void) const;
-           
+
                  /// \brief Implementation of Ogre::SimpleRenderable
                  public: virtual Ogre::Real getSquaredViewDepth(
                              const Ogre::Camera* cam) const;

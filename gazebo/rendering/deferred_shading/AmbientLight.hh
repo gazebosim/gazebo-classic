@@ -40,27 +40,27 @@ namespace gazebo
       public: AmbientLight()
       {
         this->setRenderQueueGroup(Ogre::RENDER_QUEUE_2);
-      
+
         this->mRenderOp.vertexData = new Ogre::VertexData();
         this->mRenderOp.indexData = 0;
-      
+
         GeomUtils::CreateQuad(mRenderOp.vertexData);
-      
+
         this->mRenderOp.operationType =
           Ogre::RenderOperation::OT_TRIANGLE_STRIP;
         this->mRenderOp.useIndexes = false;
-      
+
         // Set bounding
         this->setBoundingBox(Ogre::AxisAlignedBox(-10000, -10000, -10000,
                                                    10000,  10000,  10000));
         this->radius = 15000;
- 
+
         this->matPtr = Ogre::MaterialManager::getSingleton().getByName(
             this->GetMaterialPrefix() + "/AmbientLight");
-      
+
         if (this->matPtr.isNull())
           gzthrow("Is Null");
-      
+
         this->matPtr->load();
       }
 
@@ -100,19 +100,19 @@ namespace gazebo
         Ogre::Technique* tech = this->getMaterial()->getBestTechnique();
         Ogre::Vector3 farCorner = _camera->getViewMatrix(true) *
                                   _camera->getWorldSpaceCorners()[4];
-      
+
         for (uint16_t i = 0; i < tech->getNumPasses(); ++i)
         {
           Ogre::Pass *pass = tech->getPass(i);
-      
+
           // get the vertex shader parameters
           Ogre::GpuProgramParametersSharedPtr params =
             pass->getVertexProgramParameters();
-      
+
           // set the camera's far-top-right corner
           if (params->_findNamedConstantDefinition("farCorner"))
             params->setNamedConstant("farCorner", farCorner);
-      
+
           params = pass->getFragmentProgramParameters();
           if (params->_findNamedConstantDefinition("farCorner"))
             params->setNamedConstant("farCorner", farCorner);

@@ -17,40 +17,47 @@
 #ifndef _TECHNIQUEDEFINITIONS_HH_
 #define _TECHNIQUEDEFINITIONS_HH_
 
+#include <string>
+
 namespace gazebo
 {
   namespace rendering
   {
-    // Technique related policies. The purpose here is to allow new deferred
-    // techniques to be added with as little effort as possible. Deferred
-    // shading can also be modified to allow more data to be stored in the
-    // GBuffer(specular power, screen space speed, etc).
     class NullTechnique
     {
-    	Ogre::String GetMaterialPrefix() {return "NullTechnique";}
-    	int GetNumInputs() {return 0;}
-    	bool UseMaterialProperties() {return true;}
+      protected: std::string GetMaterialPrefix() const
+                 {return "NullTechnique";}
+      protected: int GetNumInputs() const
+                 {return 0;}
+      protected: bool UseMaterialProperties() const
+                 {return true;}
     };
-
     class DeferredShading
     {
-      protected: Ogre::String GetMaterialPrefix(){return "DeferredShading";}
-      protected: int GetGBufferSize(){return 2;}
-      protected: bool UseMaterialProperties(){return true;}
+      protected: std::string GetMaterialPrefix() const
+                 {return "DeferredShading";}
+      protected: int GetGBufferSize() const
+                 {return 2;}
+      protected: bool UseMaterialProperties() const
+                 {return true;}
     };
-
     class DeferredLighting
     {
-      protected: Ogre::String GetMaterialPrefix(){return "DeferredLighting";}
-      protected: int GetGBufferSize(){return 1;}
-      protected: bool UseMaterialProperties(){return false;}
+      protected: std::string GetMaterialPrefix() const
+                 {return "DeferredLighting";}
+      protected: int GetGBufferSize() const
+                 {return 1;}
+      protected: bool UseMaterialProperties() const
+                 {return false;}
     };
-
     class InferredLighting
     {
-      protected: Ogre::String GetMaterialPrefix(){return "InferredLighting";}
-      protected: int GetGBufferSize(){return 1;}
-      protected: bool UseMaterialProperties(){return false;}
+      protected: std::string GetMaterialPrefix() const
+                 {return "InferredLighting";}
+      protected: int GetGBufferSize() const
+                 {return 1;}
+      protected: bool UseMaterialProperties() const
+                 {return false;}
     };
   }
 }

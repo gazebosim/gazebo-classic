@@ -53,7 +53,7 @@ void RTShaderSystem::Init()
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 &&\
     OGRE_VERSION_MINOR >= MINOR_VERSION
 
-  // Only initialize if using FORWARD rendering 
+  // Only initialize if using FORWARD rendering
   if (RenderEngine::Instance()->GetRenderPathType() != RenderEngine::FORWARD)
     return;
 
@@ -459,7 +459,7 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   // TODO: We have two different shadow caster materials, both taken from
   // OGRE samples. They should be compared and tested.
   // Set up caster material - this is just a standard depth/shadow map caster
-  //sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+  // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
   sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
 
   sceneMgr->setShadowCasterRenderBackFaces(true);

@@ -308,7 +308,7 @@ void Scene::InitDeferredShading()
 
   compMgr.registerCompositorLogic("SSAOLogic", new SSAOLogic);
 
-  // Create and instance geometry for VPL 
+  // Create and instance geometry for VPL
   Ogre::MeshPtr VPLMesh =
     Ogre::MeshManager::getSingleton().createManual("VPLMesh",
         Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
@@ -330,12 +330,10 @@ void Scene::InitDeferredShading()
     this->manager->createInstanceManager("VPL_InstanceMgr",
       "VPLMesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
           Ogre::InstanceManager::HWInstancingBasic, numVPLs, Ogre::IM_USEALL);
-          //Ogre::InstanceManager::HWInstancingIdOnly, numVPLs, Ogre::IM_USEALL);
-  
+
   for (int i = 0; i < numVPLs; ++i)
   {
-    // Set DeferredShading to DeferredLighting to use deferred lighting
-    //Ogre::InstancedEntity *new_entity = 
+    // Ogre::InstancedEntity *new_entity =
     im->createInstancedEntity("DeferredLighting/VPL");
   }
 
@@ -1261,7 +1259,7 @@ void Scene::PreRender()
         std::ostringstream filename, filename2;
         filename << "/tmp/render_targets/iter_" << this->iterations
                  << "_" << i << ".png";
-        filename2 << "/tmp/render_targets/iter_" 
+        filename2 << "/tmp/render_targets/iter_"
                   << this->iterations << "_" << i << "_b.png";
 
         Ogre::MultiRenderTarget *mtarget = dynamic_cast<Ogre::MultiRenderTarget*>(renderIter.current()->second);
@@ -1269,7 +1267,7 @@ void Scene::PreRender()
         {
           // std::cout << renderIter.current()->first << "\n";
           mtarget->getBoundSurface(0)->writeContentsToFile(filename.str());
-        
+
           mtarget->getBoundSurface(1)->writeContentsToFile(filename2.str());
           i++;
         }
@@ -1861,7 +1859,7 @@ void Scene::SetShadowsEnabled(bool _value)
     this->manager->setShadowCasterRenderBackFaces(false);
     this->manager->setShadowTextureSize(512);
 
-    // The default shadows. 
+    // The default shadows.
     if (_value)
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
     else

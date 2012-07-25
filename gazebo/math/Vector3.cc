@@ -210,7 +210,7 @@ Vector3 &Vector3::operator =(const Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-const Vector3 &Vector3::operator =(double value)
+Vector3 &Vector3::operator =(double value)
 {
   this->x = value;
   this->y = value;

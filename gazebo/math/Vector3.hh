@@ -116,7 +116,7 @@ namespace gazebo
       public: Vector3 &operator =(const Vector3 &_pt);
 
       /// \brief Equal operator
-      public: const Vector3 &operator =(double _value);
+      public: Vector3 &operator =(double _value);
 
       /// \brief Addition operator
       public: Vector3 operator+(const Vector3 &_pt) const;

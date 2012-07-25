@@ -1103,19 +1103,19 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/GBuffer");
 
-      // Deferred shading: Merging compositor 
+      // Deferred shading: Merging compositor
       this->dsMergeInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredShading/ShowLit");
 
-      // Deferred lighting: Merging compositor 
+      // Deferred lighting: Merging compositor
       this->dlMergeInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
             "DeferredLighting/ShowLit");
 
 
       // Screen space ambient occlusion
-      //this->ssaoInstance =
+      // this->ssaoInstance =
       //  Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
       //      "DeferredShading/SSAO");
 
@@ -1125,7 +1125,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
       this->dlGBufferInstance->setEnabled(true);
       this->dlMergeInstance->setEnabled(true);
 
-      //this->ssaoInstance->setEnabled(false);
+      // this->ssaoInstance->setEnabled(false);
     }
   }
 }

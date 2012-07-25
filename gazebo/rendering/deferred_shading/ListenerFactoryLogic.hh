@@ -29,33 +29,33 @@ namespace gazebo
     /// Attach a listener to the created compositor
     class ListenerFactoryLogic : public Ogre::CompositorLogic
     {
-    	//// @copydoc CompositorLogic::compositorInstanceCreated
+      //// @copydoc CompositorLogic::compositorInstanceCreated
       public: virtual void compositorInstanceCreated(
-                  Ogre::CompositorInstance *_newInstance) 
-    	{
-    		Ogre::CompositorInstance::Listener *listener =
+                  Ogre::CompositorInstance *_newInstance)
+      {
+        Ogre::CompositorInstance::Listener *listener =
           createListener(_newInstance);
 
-    		_newInstance->addListener(listener);
-    		this->listeners[_newInstance] = listener;
-    	}
-    	
-    	/// @copydoc CompositorLogic::compositorInstanceDestroyed
+        _newInstance->addListener(listener);
+        this->listeners[_newInstance] = listener;
+      }
+
+      /// @copydoc CompositorLogic::compositorInstanceDestroyed
       public: virtual void compositorInstanceDestroyed(
                   Ogre::CompositorInstance *_destroyedInstance)
-    	{
-    		delete this->listeners[_destroyedInstance];
-    		this->listeners.erase(_destroyedInstance);
-    	}
-    
-    	// This is the method that implementers will need to create
+      {
+        delete this->listeners[_destroyedInstance];
+        this->listeners.erase(_destroyedInstance);
+      }
+
+      // This is the method that implementers will need to create
       protected: virtual Ogre::CompositorInstance::Listener *createListener(
                      Ogre::CompositorInstance *instance) = 0;
 
       private: typedef std::map<Ogre::CompositorInstance*,
                Ogre::CompositorInstance::Listener*> ListenerMap;
 
-    	ListenerMap listeners;
+      ListenerMap listeners;
     };
   }
 }

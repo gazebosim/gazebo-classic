@@ -540,12 +540,12 @@ bool RenderEngine::CreateContext()
     glXMakeCurrent(static_cast<Display*>(this->dummyDisplay),
         this->dummyWindowId, static_cast<GLXContext>(this->dummyContext));
   }
-  catch (...)
+  catch(...)
   {
     gzwarn << "Unable to create X window. Rendering will be disabled\n";
     result = false;
   }
-  
+
   return result;
 }
 
@@ -573,7 +573,7 @@ void RenderEngine::CheckSystemCapabilities()
 
   // int multiRenderTargetCount = capabilities->getNumMultiRenderTargets();
 
-  bool hasFBO = 
+  bool hasFBO =
     capabilities->hasCapability(Ogre::RSC_FBO);
 
   bool hasGLSL =

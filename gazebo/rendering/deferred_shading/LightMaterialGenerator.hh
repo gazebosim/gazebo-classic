@@ -27,6 +27,8 @@
 #include <OgreHighLevelGpuProgram.h>
 #include <OgreHighLevelGpuProgramManager.h>
 
+#include <string>
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/rendering/deferred_shading/TechniqueDefinitions.hh"
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
@@ -58,7 +60,7 @@ namespace gazebo
         fsMask = 0x0000003F;
         this->matMask = LightMaterialGenerator::MI_DIRECTIONAL |
                         LightMaterialGenerator::MI_SHADOW_CASTER;
-      
+
         this->schemeName.clear();
         materialBaseName = this->GetMaterialPrefix() + "/LightMaterial/";
         this->impl = new LightMaterialGeneratorGLSL<techniquePolicy>(
@@ -75,18 +77,18 @@ namespace gazebo
     {
       public: typedef MaterialGenerator::Perm Perm;
 
-              ///////////////////////////////////////////////
+      ///////////////////////////////////////////////
       public: LightMaterialGeneratorGLSL(const std::string &_baseName)
               : baseName(_baseName) {}
 
-              ///////////////////////////////////////////////
+      ///////////////////////////////////////////////
       public: virtual ~LightMaterialGeneratorGLSL() {}
 
-              ///////////////////////////////////////////////
-      public: virtual Ogre::GpuProgramPtr GenerateVertexShader(Perm _permutation)
+      ///////////////////////////////////////////////
+      public: virtual Ogre::GpuProgramPtr GenerateVertexShader(
+                  Perm _permutation)
       {
         std::string programName = "DeferredShading/";
-        //OLD: std::string programName = "DeferredShading/post/";
 
         if (_permutation &
             LightMaterialGenerator<techniquePolicy>::MI_DIRECTIONAL)
@@ -193,7 +195,10 @@ namespace gazebo
 
         ptrProgram->getDefaultParameters()->setNamedConstant(
             "tex0", static_cast<int>(0));
-        //ptrProgram->getDefaultParameters()->setNamedConstant(
+
+        // TODO: This requires a test for Deferred Shading. Deferred
+        // Lighting does not use this
+        // ptrProgram->getDefaultParameters()->setNamedConstant(
         //    "tex1", static_cast<int>(1));
 
         if (_permutation &
@@ -227,48 +232,48 @@ namespace gazebo
       }
 
     /*Ogre::String GetPPDefines(Perm permutation)
-		{
+    {
       Ogre::String strPPD;
 
-			//Get the type of light
+      //Get the type of light
       Ogre::String lightType;
-			if (permutation & LightMaterialGenerator<techniquePolicy>::MI_POINT)
-			{
-				lightType = "POINT";
-			}
-			else if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SPOTLIGHT)
-			{
-				lightType = "SPOT";
-			}
-			else if (permutation & LightMaterialGenerator<techniquePolicy>::MI_DIRECTIONAL)
-			{
-				lightType = "DIRECTIONAL";
-			}
-			else
-			{
-				assert(false && "Permutation must have a light type");
-			}
-			strPPD += "-DLIGHT_TYPE=LIGHT_" + lightType + " ";
+      if (permutation & LightMaterialGenerator<techniquePolicy>::MI_POINT)
+      {
+        lightType = "POINT";
+      }
+      else if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SPOTLIGHT)
+      {
+        lightType = "SPOT";
+      }
+      else if (permutation & LightMaterialGenerator<techniquePolicy>::MI_DIRECTIONAL)
+      {
+        lightType = "DIRECTIONAL";
+      }
+      else
+      {
+        assert(false && "Permutation must have a light type");
+      }
+      strPPD += "-DLIGHT_TYPE=LIGHT_" + lightType + " ";
 
-			//Optional parameters
+      //Optional parameters
             if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SPECULAR)
-			{
-				strPPD += "-DIS_SPECULAR ";
-			}
-			if (permutation & LightMaterialGenerator<techniquePolicy>::MI_ATTENUATED)
-			{
-				strPPD += "-DIS_ATTENUATED ";
-			}
-			if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SHADOW_CASTER)
-			{
-				strPPD += "-DIS_SHADOW_CASTER ";
-			}
-			if(this->UseMaterialProperties()){
-				strPPD += "-DUSE_MAT_PROPERTIES ";
-			}
-			
-			return strPPD;
-		}*/
+      {
+        strPPD += "-DIS_SPECULAR ";
+      }
+      if (permutation & LightMaterialGenerator<techniquePolicy>::MI_ATTENUATED)
+      {
+        strPPD += "-DIS_ATTENUATED ";
+      }
+      if (permutation & LightMaterialGenerator<techniquePolicy>::MI_SHADOW_CASTER)
+      {
+        strPPD += "-DIS_SHADOW_CASTER ";
+      }
+      if(this->UseMaterialProperties()){
+        strPPD += "-DUSE_MAT_PROPERTIES ";
+      }
+      
+      return strPPD;
+    }*/
       ///////////////////////////////////////////////
       // Utility method
       protected: std::string GetPPDefines(Perm _permutation)

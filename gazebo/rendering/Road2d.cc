@@ -204,8 +204,6 @@ void Road2d::OnRoadMsg(ConstRoadPtr &_msg)
 /////////////////////////////////////////////////
 void Road2d::Segment::Load(msgs::Road _msg)
 {
-  //this->parent = _parent;
-
   this->width = _msg.width();
 
   for (int i = 0; i < _msg.point_size(); ++i)
@@ -343,7 +341,6 @@ void Road2d::Segment::Load(msgs::Road _msg)
                         Conversions::Convert(bounds.max));
 
   vBuf->unlock();
-  //this->parent->AttachObject(this);
 
   this->setMaterial("Gazebo/Road");
 }

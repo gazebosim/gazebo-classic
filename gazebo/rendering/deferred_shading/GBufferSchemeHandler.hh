@@ -19,6 +19,7 @@
 #include <OgreMaterialManager.h>
 
 #include <vector>
+#include <string>
 
 #include "gazebo/rendering/deferred_shading/GBufferMaterialGenerator.hh"
 

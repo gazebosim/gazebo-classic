@@ -504,9 +504,9 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 {
   // This code makes plane render before grids. This allows grids to overlay
   // planes, and then other elements to overlay both planes and grids.
-  //if (this->sdf->HasElement("geometry"))
-    //if (this->sdf->GetElement("geometry")->HasElement("plane"))
-      //_obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_EARLY+1);
+  // if (this->sdf->HasElement("geometry"))
+  // if (this->sdf->GetElement("geometry")->HasElement("plane"))
+  // _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_EARLY+1);
 
   if (!this->HasAttachedObject(_obj->getName()))
   {

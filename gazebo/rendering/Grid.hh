@@ -46,7 +46,7 @@ namespace gazebo
     /// \{
     ///  \class Grid
     ///  \brief Displays a grid of cells, drawn with lines
-    /// 
+    ///
     ///  Displays a grid of cells, drawn with lines.  A grid with an
     ///  identity orientation is drawn along the XY plane.
     class Grid
@@ -77,23 +77,23 @@ namespace gazebo
 
       public: void SetColor(const common::Color &_color);
 
-      public: common::Color GetColor() {return this->colorP;}
+      public: common::Color GetColor() const {return this->colorP;}
 
       public: void SetCellCount(uint32_t _count);
 
-      public: float GetCellCount() {return this->cellCountP;}
+      public: float GetCellCount() const {return this->cellCountP;}
 
       public: void SetCellLength(float _len);
 
-      public: float GetCellLength() {return this->cellLengthP;}
+      public: float GetCellLength() const {return this->cellLengthP;}
 
       public: void SetLineWidth(float _width);
 
-      public: float GetLineWidth() {return this->lineWidthP;}
+      public: float GetLineWidth() const {return this->lineWidthP;}
 
       public: void SetHeight(uint32_t _count);
 
-      public: uint32_t GetHeight() {return this->height;}
+      public: uint32_t GetHeight() const {return this->height;}
 
       private: void Create();
 

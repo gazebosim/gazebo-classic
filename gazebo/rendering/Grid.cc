@@ -115,9 +115,9 @@ void Grid::Init()
     this->scene->GetManager()->createManualObject(this->name);
   this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
   this->manualObject->setDynamic(true);
-  //this->manualObject->setRenderQueueGroup(
+  // this->manualObject->setRenderQueueGroup(
   //    Ogre::RENDER_QUEUE_SKIES_EARLY+3);
-      //Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
+  //    Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
   Ogre::SceneNode *parent_node = this->scene->GetManager()->getRootSceneNode();
 

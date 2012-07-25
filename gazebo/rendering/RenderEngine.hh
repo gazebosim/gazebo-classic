@@ -50,10 +50,10 @@ namespace gazebo
     {
       public: enum RenderPathType
               {
-                NONE,     // No rendering. 
-                VERTEX,   // Most basic rendering, with least fidelity. 
-                FORWARD,  // Utilizes the RTT shader system.
-                DEFERRED, // Utilizes deferred rendering. Best fidelity.
+                NONE,      // No rendering.
+                VERTEX,    // Most basic rendering, with least fidelity.
+                FORWARD,   // Utilizes the RTT shader system.
+                DEFERRED,  // Utilizes deferred rendering. Best fidelity.
                 RENDER_PATH_COUNT
               };
 

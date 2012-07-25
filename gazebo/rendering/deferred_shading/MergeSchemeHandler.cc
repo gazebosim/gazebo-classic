@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 
 #include <OgreMaterialManager.h>
@@ -24,18 +24,18 @@
 using namespace gazebo;
 using namespace rendering;
 
-//The merge pass doesn't necesarily need normals, since they can be
-//retreived from the GBuffer. However, getting them from the input stream is
-//faster, and allows us to ignore the GBuffer completely in this step(less
-//texture sampling is the whole purpose of this technique).
+// The merge pass doesn't necesarily need normals, since they can be
+// retreived from the GBuffer. However, getting them from the input stream is
+// faster, and allows us to ignore the GBuffer completely in this step(less
+// texture sampling is the whole purpose of this technique).
 
 const std::string MergeSchemeHandler::normal_map_pattern = "normal";
 
 /////////////////////////////////////////////////
 Ogre::Technique *MergeSchemeHandler::handleSchemeNotFound(
-    unsigned short /*_schemeIndex*/, const Ogre::String &_schemeName,
-    Ogre::Material *_originalMaterial, unsigned short _lodIndex, 
-		const Ogre::Renderable *_rend)
+    uint16_t /*_schemeIndex*/, const Ogre::String &_schemeName,
+    Ogre::Material *_originalMaterial, uint16_t _lodIndex,
+    const Ogre::Renderable *_rend)
 {
   Ogre::MaterialManager &matMgr = Ogre::MaterialManager::getSingleton();
   Ogre::String curSchemeName = matMgr.getActiveScheme();
@@ -54,7 +54,7 @@ Ogre::Technique *MergeSchemeHandler::handleSchemeNotFound(
   // objects that don't render in the GBuffer, won't need to be merged
   noMergeTech->setSchemeName("NoGBuffer");
 
-  for (unsigned short i = 0; i < originalTechnique->getNumPasses(); ++i)
+  for (uint16_t i = 0; i < originalTechnique->getNumPasses(); ++i)
   {
     Ogre::Pass *originalPass = originalTechnique->getPass(i);
     PassProperties props = InspectPass(originalPass, _lodIndex, _rend);
@@ -75,7 +75,7 @@ Ogre::Technique *MergeSchemeHandler::handleSchemeNotFound(
 
     // We assume that the Merge technique contains only one pass. But its true.
     *newPass = *(templateMat->getTechnique(0)->getPass(0));
-    this->FillPass(newPass, originalPass, props);    
+    this->FillPass(newPass, originalPass, props);
   }
 
   return mergeTech;
@@ -91,7 +91,7 @@ bool MergeSchemeHandler::CheckNormalMap(Ogre::TextureUnitState *_tus,
 
   if (lowerCaseAlias.find(normal_map_pattern) != Ogre::String::npos)
     isNormal = true;
-  else 
+  else
   {
     Ogre::String lowerCaseName = _tus->getTextureName();
     Ogre::StringUtil::toLowerCase(lowerCaseName);
@@ -115,26 +115,26 @@ bool MergeSchemeHandler::CheckNormalMap(Ogre::TextureUnitState *_tus,
 
 /////////////////////////////////////////////////
 MergeSchemeHandler::PassProperties MergeSchemeHandler::InspectPass(
-    Ogre::Pass *_pass, unsigned short /*_lodIndex*/,
+    Ogre::Pass *_pass, uint16_t /*_lodIndex*/,
     const Ogre::Renderable * /*_rend*/)
 {
-	PassProperties props;
-	
-	// TODO : Use renderable to indicate wether this has skinning.
-	// Probably use same const cast that renderSingleObject uses.
-	if (_pass->hasVertexProgram())
-		props.isSkinned = _pass->getVertexProgram()->isSkeletalAnimationIncluded();
-	else 
-		props.isSkinned = false;
+  PassProperties props;
 
-	for (unsigned short i = 0; i < _pass->getNumTextureUnitStates(); ++i) 
-	{
+  // TODO : Use renderable to indicate wether this has skinning.
+  // Probably use same const cast that renderSingleObject uses.
+  if (_pass->hasVertexProgram())
+    props.isSkinned = _pass->getVertexProgram()->isSkeletalAnimationIncluded();
+  else
+    props.isSkinned = false;
+
+  for (uint16_t i = 0; i < _pass->getNumTextureUnitStates(); ++i)
+  {
     Ogre::TextureUnitState *tus = _pass->getTextureUnitState(i);
-		if (!this->CheckNormalMap(tus, props))
-			props.regularTextures.push_back(tus);
-		if (tus->getEffects().size() > 0)
-			props.isDeferred = false;
-	}
+    if (!this->CheckNormalMap(tus, props))
+      props.regularTextures.push_back(tus);
+    if (tus->getEffects().size() > 0)
+      props.isDeferred = false;
+  }
 
   if (_pass->getDiffuse() != Ogre::ColourValue::White)
   {
@@ -148,15 +148,15 @@ MergeSchemeHandler::PassProperties MergeSchemeHandler::InspectPass(
     props.isDeferred = false;
   }
 
-	return props;
+  return props;
 }
 
 /////////////////////////////////////////////////
 MaterialGenerator::Perm MergeSchemeHandler::GetPermutation(
     const PassProperties &_props)
 {
-	MaterialGenerator::Perm perm = 0;
-	switch (_props.regularTextures.size())
+  MaterialGenerator::Perm perm = 0;
+  switch (_props.regularTextures.size())
   {
     case 0:
       {
@@ -194,39 +194,39 @@ MaterialGenerator::Perm MergeSchemeHandler::GetPermutation(
       }
   }
 
-	if (_props.isSkinned)
-		perm |= MergeMaterialGenerator::MP_SKINNED;
+  if (_props.isSkinned)
+    perm |= MergeMaterialGenerator::MP_SKINNED;
 
-	if (_props.normalMap != 0)
-		perm |= MergeMaterialGenerator::MP_NORMAL_MAP;
+  if (_props.normalMap != 0)
+    perm |= MergeMaterialGenerator::MP_NORMAL_MAP;
 
   if (_props.hasDiffuseColor)
     perm |= MergeMaterialGenerator::MP_HAS_DIFFUSE_COLOUR;
 
-	return perm;
+  return perm;
 }
 
 /////////////////////////////////////////////////
-void MergeSchemeHandler::FillPass( Ogre::Pass *_mergePass,
+void MergeSchemeHandler::FillPass(Ogre::Pass *_mergePass,
     Ogre::Pass *_originalPass, const PassProperties &_props)
 {
-	// Reference the correct textures. Normal map first!
-	int texUnitIndex = 0;
-	
-	if (_props.normalMap != 0)
-	{
-		*(_mergePass->getTextureUnitState(texUnitIndex)) = *(_props.normalMap);
-		texUnitIndex++;
-	}
+  // Reference the correct textures. Normal map first!
+  int texUnitIndex = 0;
 
-	for (size_t i = 0; i < _props.regularTextures.size(); ++i)
-	{
-		*(_mergePass->getTextureUnitState(texUnitIndex)) =
+  if (_props.normalMap != 0)
+  {
+    *(_mergePass->getTextureUnitState(texUnitIndex)) = *(_props.normalMap);
+    texUnitIndex++;
+  }
+
+  for (size_t i = 0; i < _props.regularTextures.size(); ++i)
+  {
+    *(_mergePass->getTextureUnitState(texUnitIndex)) =
       *(_props.regularTextures[i]);
-		++texUnitIndex;
-	}
+    ++texUnitIndex;
+  }
 
-	// Use the LBuffer as an input
+  // Use the LBuffer as an input
   _mergePass->getTextureUnitState(texUnitIndex)->setContentType(
       Ogre::TextureUnitState::CONTENT_COMPOSITOR);
 
@@ -236,28 +236,28 @@ void MergeSchemeHandler::FillPass( Ogre::Pass *_mergePass,
   _mergePass->getTextureUnitState(texUnitIndex)->setDesiredFormat(
       Ogre::PF_FLOAT16_RGBA);
 
- _mergePass->getTextureUnitState(texUnitIndex)->setTextureFiltering(
-     Ogre::TFO_NONE);
+  _mergePass->getTextureUnitState(texUnitIndex)->setTextureFiltering(
+      Ogre::TFO_NONE);
 
-	++texUnitIndex;
+  ++texUnitIndex;
 
-	// If we're using inferred lighting, handle the extra GBuffer input
-	if (this->useDSF)
+  // If we're using inferred lighting, handle the extra GBuffer input
+  if (this->useDSF)
   {
-		_mergePass->getTextureUnitState(texUnitIndex)->setContentType(
+    _mergePass->getTextureUnitState(texUnitIndex)->setContentType(
         Ogre::TextureUnitState::CONTENT_COMPOSITOR);
-		_mergePass->getTextureUnitState(texUnitIndex)->setCompositorReference(
+    _mergePass->getTextureUnitState(texUnitIndex)->setCompositorReference(
         this->techName + "/GBuffer", "mrt_output", 1);
-		_mergePass->getTextureUnitState(texUnitIndex)->setTextureFiltering(
+    _mergePass->getTextureUnitState(texUnitIndex)->setTextureFiltering(
         Ogre::TFO_NONE);
-		_mergePass->getTextureUnitState(texUnitIndex)->setDesiredFormat(
+    _mergePass->getTextureUnitState(texUnitIndex)->setDesiredFormat(
         Ogre::PF_FLOAT16_RGBA);
-	}
+  }
 
-	_mergePass->setAmbient(_originalPass->getAmbient());
-	_mergePass->setDiffuse(_originalPass->getDiffuse());
-	_mergePass->setSpecular(_originalPass->getSpecular());
-	_mergePass->setShininess(_originalPass->getShininess());
+  _mergePass->setAmbient(_originalPass->getAmbient());
+  _mergePass->setDiffuse(_originalPass->getDiffuse());
+  _mergePass->setSpecular(_originalPass->getSpecular());
+  _mergePass->setShininess(_originalPass->getShininess());
   _mergePass->setCullingMode(_originalPass->getCullingMode());
   _mergePass->setLightingEnabled(false);
 }

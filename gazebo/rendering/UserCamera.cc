@@ -93,7 +93,7 @@ void UserCamera::Init()
   Camera::Init();
   this->SetHFOV(GZ_DTOR(60));
 
-  // Careful when setting this value. 
+  // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
   // lighting. When using deferred shading, the light's use geometry that
   // trigger shaders. If the far clip is too close, the light's geometry is

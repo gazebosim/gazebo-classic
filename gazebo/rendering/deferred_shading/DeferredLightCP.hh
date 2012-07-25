@@ -21,6 +21,7 @@
 #include <OgreCustomCompositionPass.h>
 
 #include <map>
+#include <vector>
 
 #include "gazebo/rendering/deferred_shading/LightMaterialGenerator.hh"
 #include "gazebo/rendering/deferred_shading/TechniqueDefinitions.hh"
@@ -45,7 +46,7 @@ namespace gazebo
                                            const Ogre::CompositionPass *_pass)
       {
         this->viewport = _instance->getChain()->getViewport();
-     
+
         /// Get the names of the GBuffer textures
         for (int i = 0; i < this->GetGBufferSize(); ++i)
         {
@@ -53,11 +54,11 @@ namespace gazebo
           this->inputTexNames.push_back(
               _instance->getTextureInstanceName(input.name, input.mrtIndex));
         }
-      
+
         // Create lights material generator
         this->lightMaterialGenerator =
           new LightMaterialGenerator<techniquePolicy>();
-      
+
         // Create the ambient light
         this->ambientLight = new AmbientLight<techniquePolicy>();
         const Ogre::MaterialPtr &mat = this->ambientLight->getMaterial();
@@ -77,14 +78,14 @@ namespace gazebo
 
         Ogre::Camera *cam = this->viewport->getCamera();
         Ogre::Technique *tech;
-      
+
         // Update the ambient light based on the camera
         this->ambientLight->UpdateFromCamera(cam);
-      
+
         tech = this->ambientLight->getMaterial()->getBestTechnique();
         InjectTechnique(_sm, tech, this->ambientLight, 0);
-   
-        // TODO: Improve this. 
+
+        // TODO: Improve this.
         bool findVisible = _sm->getFindVisibleObjects();
         _sm->setFindVisibleObjects(true);
 
@@ -95,7 +96,7 @@ namespace gazebo
           Ogre::Light *light = *it;
           Ogre::LightList ll;
           ll.push_back(light);
-      
+
           LightsMap::iterator dLightIt = this->lights.find(light);
           DeferredLight* dLight = 0;
           if (dLightIt == this->lights.end())
@@ -111,15 +112,15 @@ namespace gazebo
             dLight = dLightIt->second;
             dLight->UpdateFromParent();
           }
-      
+
           dLight->UpdateFromCamera(cam);
           tech = dLight->getMaterial()->getBestTechnique();
-      
+
           // Update shadow texture
           if (dLight->getCastShadows())
           {
             Ogre::SceneManager::RenderContext *context = _sm->_pauseRendering();
-      
+
             _sm->prepareShadowTextures(cam, this->viewport, &ll);
             _sm->_resumeRendering(context);
 
@@ -132,21 +133,22 @@ namespace gazebo
             {
               cameraSetup = _sm->getShadowCameraSetup();
             }
-            //Ogre::Camera shadowCam("temp_shadow_cam", _sm);
-            //shadowCam.setAspectRatio(1.0);
+            // TODO: Put this back in
+            // Ogre::Camera shadowCam("temp_shadow_cam", _sm);
+            // shadowCam.setAspectRatio(1.0);
 
-            //cameraSetup->getShadowCamera(_sm, cam, this->viewport,
-            //    dLight->GetParentLight(), &shadowCam, 0);
-            //Ogre::Matrix4 proj = shadowCam.getProjectionMatrix();
-            //Ogre::Matrix4 view = shadowCam.getViewMatrix();
-            //proj = proj*view;
-            //Ogre::Matrix4 invProj = proj.inverse();
-            //dLight->UpdateShadowInvProj(invProj);
+            // cameraSetup->getShadowCamera(_sm, cam, this->viewport,
+            //     dLight->GetParentLight(), &shadowCam, 0);
+            // Ogre::Matrix4 proj = shadowCam.getProjectionMatrix();
+            // Ogre::Matrix4 view = shadowCam.getViewMatrix();
+            // proj = proj*view;
+            // Ogre::Matrix4 invProj = proj.inverse();
+            // dLight->UpdateShadowInvProj(invProj);
             if (this->rsmActive)
             {
               dLight->RenderVPLs(_sm, this->instanceManager);
             }
-    
+
             Ogre::Pass *pass = tech->getPass(0);
             Ogre::TextureUnitState *tus =
               pass->getTextureUnitState("ShadowMap");
@@ -159,10 +161,10 @@ namespace gazebo
           }
           else
             printf("NO SHADOWS\n");
-      
+
           InjectTechnique(_sm, tech, dLight, &ll);
         }
-      
+
         // restore previous settings
         _sm->setFindVisibleObjects(findVisible);
       }
@@ -175,7 +177,7 @@ namespace gazebo
           delete it->second;
         }
         this->lights.clear();
-      
+
         delete this->ambientLight;
         delete this->lightMaterialGenerator;
       }
@@ -197,7 +199,7 @@ namespace gazebo
         for (uint16_t i = 0; i < _tech->getNumPasses(); ++i)
         {
           Ogre::Pass *pass = _tech->getPass(i);
-      
+
           if (_lightList != 0)
             _sm->_injectRenderWithPass(pass, _rend, false, false, _lightList);
           else
@@ -207,7 +209,6 @@ namespace gazebo
 
       /// The texture names of the GBuffer components
       private: std::vector<Ogre::String> inputTexNames;
-      //private: Ogre::String texName0, texName1;
 
       /// The material generator for the light geometry
       private: MaterialGenerator *lightMaterialGenerator;
