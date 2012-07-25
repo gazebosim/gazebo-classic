@@ -424,6 +424,8 @@ void RenderEngine::SetupResources()
     archNames.push_back(
         std::make_pair((*iter)+"/Media", "General"));
     archNames.push_back(
+        std::make_pair((*iter)+"/Media/SkyX", "SkyX"));
+    archNames.push_back(
         std::make_pair((*iter)+"/Media/rtshaderlib", "General"));
     archNames.push_back(
         std::make_pair((*iter)+"/Media/materials/programs", "General"));

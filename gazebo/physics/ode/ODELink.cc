@@ -75,7 +75,7 @@ void ODELink::Init()
     if (this->GetModel()->GetJointCount() == 0)
     {
       dBodySetAutoDisableDefaults(this->linkId);
-      dBodySetAutoDisableFlag(this->linkId, 0);
+      dBodySetAutoDisableFlag(this->linkId, 1);
     }
   }
 
@@ -136,7 +136,6 @@ void ODELink::Init()
 //////////////////////////////////////////////////
 void ODELink::DisabledCallback(dBodyID /*_id*/)
 {
-  printf("Disabled\n");
 }
 
 //////////////////////////////////////////////////
