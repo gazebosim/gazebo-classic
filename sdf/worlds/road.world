@@ -1,0 +1,34 @@
+<?xml version="1.0"?> 
+<gazebo version="1.0">
+  <world name="default">
+    <scene>
+      <grid enabled="false"/>
+    </scene>
+
+    <!-- A global light source -->
+    <include filename="sun.light"/>
+
+    <!-- Invisible ground plane -->
+    <model name="ground" static="true">
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <surface>
+            <friction>
+              <ode mu="100" mu2="50"/>
+            </friction>
+          </surface>
+        </collision>
+      </link>
+    </model>
+
+    <road name="my_road">
+      <width>7.34</width>
+      <point>0 0 0</point>
+      <point>100 0 0</point>
+    </road>
+
+  </world>
+</gazebo>

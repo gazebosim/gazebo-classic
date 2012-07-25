@@ -1,12 +1,12 @@
 <gazebo version="1.0">
 <model name="kitchen" static="true">
   <link name="link">
+  <origin pose="0 0 3.29 0 0 0"/>
     <inertial mass="1.0">
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
 
     <visual name="visual">
-      <origin pose="0 0 0 0 0 0"/>
       <geometry>
         <mesh filename="japanese_restaurant/japanese_restaurant.dae" scale=".0254 .0254 0.0254"/>
       </geometry>

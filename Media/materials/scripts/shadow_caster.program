@@ -20,7 +20,7 @@ fragment_program shadow_caster_fp_glsl glsl
 }
 
 
-material shadow_caster
+material Gazebo/shadow_caster
 {
   technique
   {

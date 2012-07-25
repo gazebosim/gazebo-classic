@@ -17,12 +17,11 @@
 #ifndef __LIGHTRIGHTMENU_HH__
 #define __LIGHTRIGHTMENU_HH__
 
-#include <gazebo/gui/qt.h>
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/transport/TransportTypes.hh>
-
 #include <map>
 #include <string>
+#include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {

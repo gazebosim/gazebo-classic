@@ -19,8 +19,8 @@
  * Date: 19 Jun 2008
  */
 
-#ifndef USERCAMERA_HH
-#define USERCAMERA_HH
+#ifndef _USERCAMERA_HH_
+#define _USERCAMERA_HH_
 
 #include <string>
 #include <vector>
@@ -131,6 +131,8 @@ namespace gazebo
       private: FPSViewController *fpsViewController;
 
       private: GUIOverlay *gui;
+
+      private: Ogre::SceneNode *axisNode;
     };
     /// \}
   }

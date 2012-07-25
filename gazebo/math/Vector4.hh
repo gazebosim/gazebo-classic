@@ -68,7 +68,7 @@ namespace gazebo
       public: Vector4 &operator =(const Vector4 &pt);
 
       /// \brief Equal operator
-      public: const Vector4 &operator =(double value);
+      public: Vector4 &operator =(double value);
 
       /// \brief Addition operator
       public: Vector4 operator+(const Vector4 &pt) const;

@@ -144,6 +144,12 @@ int Image::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+void Image::SavePNG(const std::string &_filename)
+{
+  FreeImage_Save(FIF_PNG, this->bitmap, _filename.c_str(), 0);
+}
+
+//////////////////////////////////////////////////
 void Image::SetFromData(const unsigned char *data, unsigned int width,
     unsigned int height, int scanline_bytes, unsigned int bpp)
 {
@@ -173,13 +179,13 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
   this->bitmap = NULL;
 
   // int redmask = FI_RGBA_RED_MASK;
-  int redmask = 0xff0000;
+  int redmask = 0x0000ff;
 
   // int greenmask = FI_RGBA_GREEN_MASK;
   int greenmask = 0x00ff00;
 
   // int bluemask = FI_RGBA_BLUE_MASK;
-  int bluemask = 0x0000ff;
+  int bluemask = 0xff0000;
 
   unsigned int bpp;
   int scanlineBytes;
@@ -220,7 +226,7 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
   }
 
   this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(_data),
-      _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask);
+      _width, _height, scanlineBytes, bpp, redmask, greenmask, bluemask, true);
 }
 
 //////////////////////////////////////////////////
@@ -277,7 +283,6 @@ void Image::GetDataImpl(unsigned char **_data, unsigned int &_count,
   {
 #endif
 #endif
-
     int i = 0;
     for (unsigned int y = 0; y < this->GetHeight(); ++y)
     {

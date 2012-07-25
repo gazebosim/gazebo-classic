@@ -2,6 +2,10 @@
 <gazebo version="1.0">
   <world name="default">
 
+    <scene>
+      <grid enabled="false"/>
+    </scene>
+
     <!-- Invisible ground plane -->
     <model name="ground" static="true">
       <link name="body">

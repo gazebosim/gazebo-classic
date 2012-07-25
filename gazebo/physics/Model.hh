@@ -178,10 +178,6 @@ namespace gazebo
       /// \brief Update parameters from a model message
       public: void ProcessMsg(const msgs::Model &_msg);
 
-      /// \brief Set the positions of a set of joints
-      public: void SetJointPositions(
-                  const std::map<std::string, double> &_jointPositions);
-
       public: void SetJointAnimation(
                   const std::map<std::string, common::NumericAnimationPtr> anim,
                   boost::function<void()> _onComplete = NULL);

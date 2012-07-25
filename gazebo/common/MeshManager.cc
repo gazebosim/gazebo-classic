@@ -310,7 +310,7 @@ void MeshManager::CreatePlane(const std::string &name,
   zAxis = normal;
   zAxis.Normalize();
   yAxis = zAxis.GetPerpendicular();
-  xAxis = yAxis.GetCrossProd(zAxis);
+  xAxis = yAxis.Cross(zAxis);
 
   math::Matrix4 xlate, xform, rot;
   xlate = rot = math::Matrix4::IDENTITY;

@@ -82,7 +82,7 @@ double Vector3::GetSquaredLength() const
 }
 
 //////////////////////////////////////////////////
-void Vector3::Normalize()
+Vector3 Vector3::Normalize()
 {
   double d = sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 
@@ -92,6 +92,8 @@ void Vector3::Normalize()
     this->y /= d;
     this->z /= d;
   }
+
+  return *this;
 }
 
 //////////////////////////////////////////////////
@@ -112,7 +114,7 @@ Vector3 Vector3::GetRounded() const
 }
 
 //////////////////////////////////////////////////
-Vector3 Vector3::GetCrossProd(const Vector3 &_pt) const
+Vector3 Vector3::Cross(const Vector3 &_pt) const
 {
   Vector3 c(0, 0, 0);
 
@@ -124,7 +126,7 @@ Vector3 Vector3::GetCrossProd(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-double Vector3::GetDotProd(const Vector3 &_pt) const
+double Vector3::Dot(const Vector3 &_pt) const
 {
   return this->x * _pt.x + this->y * _pt.y + this->z * _pt.z;
 }
@@ -140,12 +142,12 @@ Vector3 Vector3::GetPerpendicular() const
 {
   static const double sqrZero = 1e-06 * 1e-06;
 
-  Vector3 perp = this->GetCrossProd(Vector3(1, 0, 0));
+  Vector3 perp = this->Cross(Vector3(1, 0, 0));
 
   // Check the length of the vector
   if (perp.GetSquaredLength() < sqrZero)
   {
-    perp = this->GetCrossProd(Vector3(0, 1, 0));
+    perp = this->Cross(Vector3(0, 1, 0));
   }
 
   return perp;
@@ -157,14 +159,14 @@ Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
 {
   Vector3 a = v2 - v1;
   Vector3 b = v3 - v1;
-  Vector3 n = a.GetCrossProd(b);
+  Vector3 n = a.Cross(b);
   return n;
 }
 
 //////////////////////////////////////////////////
 double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
 {
-  double d = ((*this) - _pt1).GetCrossProd((*this) - _pt2).GetLength();
+  double d = ((*this) - _pt1).Cross((*this) - _pt2).GetLength();
   d = d / (_pt2 - _pt1).GetLength();
   return d;
 }
@@ -208,7 +210,7 @@ Vector3 &Vector3::operator =(const Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-const Vector3 &Vector3::operator =(double value)
+Vector3 &Vector3::operator =(double value)
 {
   this->x = value;
   this->y = value;

@@ -28,17 +28,17 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-Grid::Grid(Scene *scene_, unsigned int cellCount_, float cellLength_,
-            float lineWidth_, const common::Color& color_)
-: scene(scene_)
+Grid::Grid(Scene *_scene, unsigned int _cellCount, float _cellLength,
+           float _lineWidth, const common::Color& _color)
+: scene(_scene)
 {
   this->height = 0;
 
-  this->cellCountP = cellCount_;
-  this->cellLengthP = cellLength_;
-  this->lineWidthP = lineWidth_;
-  this->colorP = color_;
-  this->h_offsetP = 0.001;
+  this->cellCountP = _cellCount;
+  this->cellLengthP = _cellLength;
+  this->lineWidthP = _lineWidth;
+  this->colorP = _color;
+  this->h_offsetP = 0.015;
 
   static uint32_t gridCount = 0;
   std::stringstream ss;
@@ -81,12 +81,12 @@ void Grid::SetLineWidth(float width_)
 }
 
 //////////////////////////////////////////////////
-void Grid::SetColor(const common::Color& color_)
+void Grid::SetColor(const common::Color &_color)
 {
-  this->colorP = color_;
+  this->colorP = _color;
 
-  this->material->setDiffuse(color_.R(), color_.G(), color_.B(), color_.A());
-  this->material->setAmbient(color_.R(), color_.G(), color_.B());
+  this->material->setDiffuse(_color.R(), _color.G(), _color.B(), _color.A());
+  this->material->setAmbient(_color.R(), _color.G(), _color.B());
 
   if ((this->colorP).A() < 0.9998)
     this->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
@@ -94,16 +94,16 @@ void Grid::SetColor(const common::Color& color_)
     this->material->setSceneBlending(Ogre::SBT_REPLACE);
 
   this->material->setDepthWriteEnabled(false);
-  this->material->setDepthCheckEnabled(false);
+  this->material->setDepthCheckEnabled(true);
 
   this->Create();
 }
 
 
 //////////////////////////////////////////////////
-void Grid::SetHeight(uint32_t height_)
+void Grid::SetHeight(uint32_t _height)
 {
-  this->height = height_;
+  this->height = _height;
 
   this->Create();
 }
@@ -115,8 +115,9 @@ void Grid::Init()
     this->scene->GetManager()->createManualObject(this->name);
   this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
   this->manualObject->setDynamic(true);
-  this->manualObject->setRenderQueueGroup(
-      Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
+  // this->manualObject->setRenderQueueGroup(
+  //    Ogre::RENDER_QUEUE_SKIES_EARLY+3);
+  //    Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
   Ogre::SceneNode *parent_node = this->scene->GetManager()->getRootSceneNode();
 
@@ -200,8 +201,8 @@ void Grid::Create()
 }
 
 //////////////////////////////////////////////////
-void Grid::SetUserData(const Ogre::Any& data_)
+void Grid::SetUserData(const Ogre::Any &_data)
 {
-  this->manualObject->setUserAny(data_);
+  this->manualObject->setUserAny(_data);
 }
 

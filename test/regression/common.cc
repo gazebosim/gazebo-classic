@@ -116,9 +116,9 @@ TEST_F(CommonTest, Image)
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
   EXPECT_EQ(0, img.Load("wood.jpg"));
-  EXPECT_EQ(496, img.GetWidth());
-  EXPECT_EQ(329, img.GetHeight());
-  EXPECT_EQ(24, img.GetBPP());
+  EXPECT_EQ(static_cast<unsigned int>(496), img.GetWidth());
+  EXPECT_EQ(static_cast<unsigned int>(329), img.GetHeight());
+  EXPECT_EQ(static_cast<unsigned int>(24), img.GetBPP());
   EXPECT_TRUE(img.GetPixel(10, 10) ==
       common::Color(0.133333, 0.376471, 0.654902, 1));
   EXPECT_TRUE(img.GetAvgColor() ==
@@ -132,7 +132,7 @@ TEST_F(CommonTest, Image)
   unsigned char *data = NULL;
   unsigned int size = 0;
   img.GetData(&data, size);
-  EXPECT_EQ(489552, size);
+  EXPECT_EQ(static_cast<unsigned int>(489552), size);
 
   img.SetFromData(data, img.GetWidth(), img.GetHeight(),
                   common::Image::RGB_INT8);
@@ -159,19 +159,19 @@ TEST_F(CommonTest, Paths)
 
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
   const std::list<std::string> pathList1 = paths->GetGazeboPaths();
-  EXPECT_EQ(2, pathList1.size());
+  EXPECT_EQ(static_cast<unsigned int>(2), pathList1.size());
   EXPECT_STREQ("/tmp/resource", pathList1.front().c_str());
   EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
 
   putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
   const std::list<std::string> pathList2 = paths->GetOgrePaths();
-  EXPECT_EQ(2, pathList2.size());
+  EXPECT_EQ(static_cast<unsigned int>(2), pathList2.size());
   EXPECT_STREQ("/tmp/ogre", pathList2.front().c_str());
   EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
 
   putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
   const std::list<std::string> pathList3 = paths->GetPluginPaths();
-  EXPECT_EQ(2, pathList3.size());
+  EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
@@ -179,36 +179,36 @@ TEST_F(CommonTest, Paths)
   EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
 
   paths->AddGazeboPaths("/gazebo/path:/other/gazebo");
-  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetGazeboPaths().size());
   EXPECT_STREQ("/other/gazebo", paths->GetGazeboPaths().back().c_str());
 
   paths->AddPluginPaths("/plugin/path:/other/plugin");
-  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetGazeboPaths().size());
   EXPECT_STREQ("/other/plugin", paths->GetPluginPaths().back().c_str());
 
   paths->AddOgrePaths("/ogre/path:/other/ogre");
-  EXPECT_EQ(4, paths->GetOgrePaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetOgrePaths().size());
   EXPECT_STREQ("/other/ogre", paths->GetOgrePaths().back().c_str());
 
   paths->ClearGazeboPaths();
   paths->ClearOgrePaths();
   paths->ClearPluginPaths();
 
-  EXPECT_EQ(2, paths->GetGazeboPaths().size());
-  EXPECT_EQ(2, paths->GetOgrePaths().size());
-  EXPECT_EQ(2, paths->GetPluginPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths->GetOgrePaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths->GetPluginPaths().size());
 
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH="));
   paths->ClearGazeboPaths();
-  EXPECT_EQ(0, paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetGazeboPaths().size());
 
   putenv(const_cast<char*>("OGRE_RESOURCE_PATH="));
   paths->ClearOgrePaths();
-  EXPECT_EQ(0, paths->GetOgrePaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetOgrePaths().size());
 
   putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH="));
   paths->ClearPluginPaths();
-  EXPECT_EQ(0, paths->GetPluginPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetPluginPaths().size());
 
   std::cout << "GAZEBO_RESOURCE_BACKUP[" << gazeboResourcePathBackup << "]\n";
   std::cout << "OGRE_RESOURCE_BACKUP[" << ogreResourcePathBackup << "]\n";
@@ -621,11 +621,11 @@ TEST_F(CommonTest, Mesh)
 
   const common::Mesh *mesh =
     common::MeshManager::Instance()->GetMesh("unit_box");
-  EXPECT_EQ(24, mesh->GetVertexCount());
-  EXPECT_EQ(24, mesh->GetNormalCount());
-  EXPECT_EQ(36, mesh->GetIndexCount());
-  EXPECT_EQ(24, mesh->GetTexCoordCount());
-  EXPECT_EQ(0, mesh->GetMaterialCount());
+  EXPECT_EQ(static_cast<unsigned int>(24), mesh->GetVertexCount());
+  EXPECT_EQ(static_cast<unsigned int>(24), mesh->GetNormalCount());
+  EXPECT_EQ(static_cast<unsigned int>(36), mesh->GetIndexCount());
+  EXPECT_EQ(static_cast<unsigned int>(24), mesh->GetTexCoordCount());
+  EXPECT_EQ(static_cast<unsigned int>(0), mesh->GetMaterialCount());
 
   math::Vector3 center, min, max;
   mesh->GetAABB(center, min, max);
@@ -702,10 +702,10 @@ TEST_F(CommonTest, Mesh)
   subMesh->SetNormalCount(1);
   subMesh->SetTexCoordCount(1);
 
-  EXPECT_EQ(1, subMesh->GetVertexCount());
-  EXPECT_EQ(1, subMesh->GetIndexCount());
-  EXPECT_EQ(1, subMesh->GetNormalCount());
-  EXPECT_EQ(1, subMesh->GetTexCoordCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetVertexCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetIndexCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetNormalCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetTexCoordCount());
 
   subMesh->SetVertex(0, math::Vector3(1, 2, 3));
   EXPECT_TRUE(subMesh->GetVertex(0) == math::Vector3(1, 2, 3));
