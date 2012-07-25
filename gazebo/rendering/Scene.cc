@@ -15,7 +15,7 @@
  *
 */
 #include <boost/lexical_cast.hpp>
-#include <SkyX.h>
+// #include <SkyX.h>
 
 #include "rendering/ogre_gazebo.h"
 #include "msgs/msgs.hh"
@@ -245,7 +245,7 @@ void Scene::Init()
   if (this->sdf->HasElement("sky"))
     this->SetSky(this->sdf->GetElement("sky")->GetValueString("material"));
 
-  this->SetSky();
+  // this->SetSky();
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
@@ -1808,7 +1808,8 @@ void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
   this->selectionMsg = _msg;
 }
 
-void Scene::SetSky()
+/////////////////////////////////////////////////
+/*void Scene::SetSky()
 {
   // Create SkyX
   this->skyxController = new SkyX::BasicController();
@@ -1829,47 +1830,47 @@ void Scene::SetSky()
         9.77501f, 10.2963f, 0.01f, 0.0017f, 0.000675f, 30,
         Ogre::Vector3(0.57f, 0.54f, 0.44f), -0.991f, 2.5f, 4));
 
-	/*this->skyx->getVCloudsManager()->setWindSpeed(preset.vcWindSpeed);
-	this->skyx->getVCloudsManager()->setAutoupdate(preset.vcAutoupdate);
+	//this->skyx->getVCloudsManager()->setWindSpeed(preset.vcWindSpeed);
+	//this->skyx->getVCloudsManager()->setAutoupdate(preset.vcAutoupdate);
 
-	SkyX::VClouds::VClouds* vclouds = this->skyx->getVCloudsManager()->getVClouds();
+	//SkyX::VClouds::VClouds* vclouds = this->skyx->getVCloudsManager()->getVClouds();
 
-	vclouds->setWindDirection(preset.vcWindDir);
-	vclouds->setAmbientColor(preset.vcAmbientColor);
-	vclouds->setLightResponse(preset.vcLightResponse);
-	vclouds->setAmbientFactors(preset.vcAmbientFactors);
-	vclouds->setWheater(preset.vcWheater.x, preset.vcWheater.y, false);
+	//vclouds->setWindDirection(preset.vcWindDir);
+	//vclouds->setAmbientColor(preset.vcAmbientColor);
+	//vclouds->setLightResponse(preset.vcLightResponse);
+	//vclouds->setAmbientFactors(preset.vcAmbientFactors);
+	//vclouds->setWheater(preset.vcWheater.x, preset.vcWheater.y, false);
 
-	if (preset.volumetricClouds)
-	{
-		// Create VClouds
-		if (!this->skyx->getVCloudsManager()->isCreated())
-		{
-			// SkyX::MeshManager::getSkydomeRadius(...) works for both finite and infinite(=0) camera far clip distances
-			this->skyx->getVCloudsManager()->create(this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
-		}
-	}
-	else
-	{
-		// Remove VClouds
-		if (this->skyx->getVCloudsManager()->isCreated())
-		{
-			this->skyx->getVCloudsManager()->remove();
-		}
-	}
+	//if (preset.volumetricClouds)
+	//{
+	//	// Create VClouds
+	//	if (!this->skyx->getVCloudsManager()->isCreated())
+	//	{
+	//		// SkyX::MeshManager::getSkydomeRadius(...) works for both finite and infinite(=0) camera far clip distances
+	//		this->skyx->getVCloudsManager()->create(this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
+	//	}
+	//}
+	//else
+	//{
+	//	// Remove VClouds
+	//	if (this->skyx->getVCloudsManager()->isCreated())
+	//	{
+	//		this->skyx->getVCloudsManager()->remove();
+	//	}
+	//}
 
-	vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
-	vclouds->getLightningManager()->setAverageLightningApparitionTime(preset.vcLightningsAT);
-	vclouds->getLightningManager()->setLightningColor(preset.vcLightningsColor);
-	vclouds->getLightningManager()->setLightningTimeMultiplier(preset.vcLightningsTM);
-  */
+	//vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
+	//vclouds->getLightningManager()->setAverageLightningApparitionTime(preset.vcLightningsAT);
+	//vclouds->getLightningManager()->setLightningColor(preset.vcLightningsColor);
+	//vclouds->getLightningManager()->setLightningTimeMultiplier(preset.vcLightningsTM);
+  
 
 
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 
 	this->skyx->update(0);
 
-}
+}*/
 
 /////////////////////////////////////////////////
 void Scene::SetSky(const std::string &_material)

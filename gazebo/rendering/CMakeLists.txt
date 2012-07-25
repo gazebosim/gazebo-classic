@@ -3,7 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${CEGUI_INCLUDE_DIRS}
-  ${SKYX_INCLUDE_DIRS}
+  #${SKYX_INCLUDE_DIRS}
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)
@@ -108,7 +108,7 @@ target_link_libraries( gazebo_rendering
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}
   X11 
-  ${SKYX_LIBRARIES}
+  #${SKYX_LIBRARIES}
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)
