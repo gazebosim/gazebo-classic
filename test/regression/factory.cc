@@ -18,6 +18,8 @@
 #include "math/Helpers.hh"
 #include "transport/TransportTypes.hh"
 #include "transport/Node.hh"
+
+#include "rendering/RenderEngine.hh"
 #include "rendering/Camera.hh"
 #include "sensors/Sensors.hh"
 #include "sensors/CameraSensor.hh"
@@ -91,6 +93,10 @@ TEST_F(FactoryTest, Cylinder)
 
 TEST_F(FactoryTest, BlackCamera)
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+    return;
+
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
   setPose.Set(math::Vector3(0, 0, -5), math::Quaternion(0, GZ_DTOR(15), 0));
@@ -120,6 +126,10 @@ TEST_F(FactoryTest, BlackCamera)
 
 TEST_F(FactoryTest, Camera)
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+    return;
+
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
   setPose.Set(math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));

@@ -29,6 +29,7 @@
 
 #include "physics/World.hh"
 
+#include "rendering/RenderEngine.hh"
 #include "rendering/Camera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Rendering.hh"
@@ -86,6 +87,13 @@ void CameraSensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void CameraSensor::Init()
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "Unable to create CameraSensor. Rendering is disabled.\n";
+    return;
+  }
+
   std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
@@ -94,6 +102,13 @@ void CameraSensor::Init()
     if (!this->scene)
     {
       this->scene = rendering::create_scene(worldName, false);
+
+      // This usually means rendering is not available
+      if (!this->scene)
+      {
+        gzerr << "Unable to create CameraSensor.\n";
+        return;
+      }
     }
 
     this->camera = this->scene->CreateCamera(
