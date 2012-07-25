@@ -596,6 +596,4 @@ void RenderEngine::CheckSystemCapabilities()
   // Disable deferred rendering for now. Needs more work.
   //if (hasRenderToVertexBuffer && multiRenderTargetCount >= 8)
   //  this->renderPathType = RenderEngine::DEFERRED;
-
-  std::cout << "RenderPath[" << this->renderPathType << "]\n";
 }

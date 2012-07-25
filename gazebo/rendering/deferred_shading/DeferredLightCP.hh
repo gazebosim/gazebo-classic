@@ -134,7 +134,7 @@ namespace gazebo
               cameraSetup = _sm->getShadowCameraSetup();
             }
 
-            Ogre::Camera shadowCam("temp_shadow_cam", _sm);
+            /*Ogre::Camera shadowCam("temp_shadow_cam", _sm);
             shadowCam.setAspectRatio(1.0);
 
             cameraSetup->getShadowCamera(_sm, cam, this->viewport,
@@ -144,6 +144,7 @@ namespace gazebo
             proj = proj*view;
             Ogre::Matrix4 invProj = proj.inverse();
             dLight->UpdateShadowInvProj(invProj);
+            */
 
             if (this->rsmActive)
             {
