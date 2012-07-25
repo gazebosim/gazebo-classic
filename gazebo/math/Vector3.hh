@@ -26,6 +26,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "common/CommonTypes.hh"
+
 namespace gazebo
 {
   namespace math
@@ -81,9 +83,17 @@ namespace gazebo
 
       /// \brief Return the cross product of this vector and pt
       public: Vector3 Cross(const Vector3 &_pt) const;
+      public: Vector3 GetCrossProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
+              {
+                return this->Cross(_pt);
+              }
 
       /// \brief Return the dot product of this vector and pt
       public: double Dot(const Vector3 &_pt) const;
+      public: double GetDotProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
+              {
+                return this->Dot(_pt);
+              }
 
       /// \breif Get the absolute value of the vector
       public: Vector3 GetAbs() const;
