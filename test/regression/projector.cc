@@ -24,6 +24,10 @@ class ProjectorTest : public ServerFixture
 
 TEST_F(ProjectorTest, Projector)
 {
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+    return;
+
   Load("worlds/projector.world");
   SpawnCamera("camera_model", "camera_sensor", math::Vector3(-4, 0, 1),
               math::Vector3(0, GZ_DTOR(10), 0));

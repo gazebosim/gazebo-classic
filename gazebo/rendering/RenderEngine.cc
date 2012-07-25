@@ -81,7 +81,10 @@ RenderEngine::~RenderEngine()
 void RenderEngine::Load()
 {
   if (!this->CreateContext())
+  {
+    gzwarn << "Unable to create X window. Rendering will be disabled\n";
     return;
+  }
 
   this->connections.push_back(event::Events::ConnectPreRender(
         boost::bind(&RenderEngine::PreRender, this)));
@@ -517,7 +520,10 @@ bool RenderEngine::CreateContext()
   {
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay)
-      gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
+    {
+      gzerr << "Can't open display: " << XDisplayName(0) << "\n";
+      return false;
+    }
 
     int screen = DefaultScreen(this->dummyDisplay);
 
@@ -528,6 +534,12 @@ bool RenderEngine::CreateContext()
         static_cast<Display*>(this->dummyDisplay),
         screen, static_cast<int *>(attribList));
 
+    if (!dummyVisual)
+    {
+      gzerr << "Unable to create glx visual\n";
+      return false;
+    }
+
     this->dummyWindowId = XCreateSimpleWindow(
         static_cast<Display*>(this->dummyDisplay),
         RootWindow(static_cast<Display*>(this->dummyDisplay), screen),
@@ -537,14 +549,20 @@ bool RenderEngine::CreateContext()
         static_cast<Display*>(this->dummyDisplay),
         dummyVisual, NULL, 1);
 
+    if (!this->dummyContext)
+    {
+      gzerr << "Unable to create glx context\n";
+      return false;
+    }
+
     glXMakeCurrent(static_cast<Display*>(this->dummyDisplay),
         this->dummyWindowId, static_cast<GLXContext>(this->dummyContext));
   }
   catch(...)
   {
-    gzwarn << "Unable to create X window. Rendering will be disabled\n";
     result = false;
   }
+
 
   return result;
 }
