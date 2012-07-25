@@ -3,6 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${CEGUI_INCLUDE_DIRS}
+  ${SKYX_INCLUDE_DIRS}
 )
 
 add_subdirectory(deferred_shading)
@@ -98,13 +99,16 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering gazebo_common 
-                                        gazebo_sdf_interface
-                                        gazebo_rendering_deferred
-                                        ${ogre_libraries} 
-                                        ${OPENGL_LIBRARIES} 
-                                        ${CEGUI_LIBRARIES}
-                                        X11 )
+target_link_libraries( gazebo_rendering
+  gazebo_common 
+  gazebo_sdf_interface
+  gazebo_rendering_deferred
+  ${ogre_libraries} 
+  ${OPENGL_LIBRARIES} 
+  ${CEGUI_LIBRARIES}
+  X11 
+  ${SKYX_LIBRARIES}
+)
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)

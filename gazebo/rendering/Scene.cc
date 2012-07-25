@@ -15,6 +15,7 @@
  *
 */
 #include <boost/lexical_cast.hpp>
+#include <SkyX.h>
 
 #include "rendering/ogre_gazebo.h"
 #include "msgs/msgs.hh"
@@ -1807,10 +1808,10 @@ void Scene::SetSky(const std::string &_material)
   this->sdf->GetOrCreateElement("background")->GetOrCreateElement(
       "sky")->GetAttribute("material")->Set(_material);
 
-  try
+  /*try
   {
     Ogre::Quaternion orientation;
-    orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1, 0, 0));
+    orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(0, 1, 0));
     double curvature = 10;  // ogre recommended default
     double tiling = 8;  // ogre recommended default
     double distance = 100;
@@ -1820,7 +1821,7 @@ void Scene::SetSky(const std::string &_material)
   catch(int)
   {
     gzwarn << "Unable to set sky dome to material[" << _material << "]\n";
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

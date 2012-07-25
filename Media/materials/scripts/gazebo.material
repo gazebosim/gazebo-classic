@@ -173,16 +173,12 @@ material Gazebo/Black
 {
 	technique
 	{
-		pass ambient
+		pass
 		{
-			ambient 0 0 0 
+			ambient 0 0 0 1
+			diffuse 0 0 0 1 
+      specular 0.1 0.1 0.1 1 5.0
 		}
-
-    pass light
-    {
-			diffuse 0 0 0 
-      specular 0.1 0.1 0.1 128
-    }
 	}
 }
 
@@ -193,9 +189,6 @@ material Gazebo/Red
 	{
 		pass ambient
 		{
-      depth_check off
-      depth_write off
-
 			ambient 1 0 0 
       diffuse 1 0 0
       specular 0.1 0.1 0.1 1 1
@@ -209,10 +202,6 @@ material Gazebo/Green
 	{
 		pass ambient
 		{
-      depth_check off
-      depth_write off
-
-
 			ambient 0 1 0
       diffuse 0 1 0
       specular 0.1 0.1 0.1 1 1
@@ -226,10 +215,6 @@ material Gazebo/Blue
 	{
     pass ambient
     {
-      depth_check off
-      depth_write off
-
-
 			ambient 0 0 1
       diffuse 0 0 1
       specular 0.1 0.1 0.1 1 1
