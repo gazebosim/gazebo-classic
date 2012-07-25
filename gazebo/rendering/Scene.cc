@@ -1833,7 +1833,7 @@ void Scene::SetShadowsEnabled(bool _value)
   {
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
     this->manager->setShadowTextureCasterMaterial(
-        "DeferredRendering/Shadows/RSMCaster_Spot_ogre");
+        "DeferredRendering/Shadows/RSMCaster_Spot");
     this->manager->setShadowTextureCount(1);
     this->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and

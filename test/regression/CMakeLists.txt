@@ -14,9 +14,10 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-if (INCLUDE_PLAYER)
-  add_subdirectory(player)
-endif()
+# Disable the player test for now, until we figure out a better way to test them
+#if (INCLUDE_PLAYER)
+#  add_subdirectory(player)
+#endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 

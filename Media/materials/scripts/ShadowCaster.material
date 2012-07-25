@@ -50,17 +50,16 @@ material DeferredRendering/Shadows/RSMCaster_Spot1
 	}
 }
 
-material DeferredRendering/Shadows/RSMCaster_Spot_ogre
+material DeferredRendering/Shadows/RSMCaster_Spot
 {
 	technique
 	{
 		pass
 		{
-
-			vertex_program_ref DeferredShading/Shadows/RSMCasterVP_ogre
+			vertex_program_ref DeferredShading/Shadows/RSMCasterVP
 			{
 			}
-			fragment_program_ref DeferredShading/Shadows/RSMCasterFP_Spot_ogre
+			fragment_program_ref DeferredShading/Shadows/RSMCasterFP_Spot
 			{
 			}
 		}
