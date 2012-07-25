@@ -34,6 +34,7 @@ set (files
   coke_can.dae
   cube_20k.stl
   14_4v_cordless_drill.dae
+  14_4v_cordless_drill.jpg
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models)
