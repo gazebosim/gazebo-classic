@@ -810,7 +810,7 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf)
       // FIXME: using first elem
       double sx =
         boost::lexical_cast<double>(getNodeTuple(_config, "size", 0));
-      sdfSphere->GetAttribute("radius")->Set(0.5*sx);
+      sdfSphere->GetAttribute("radius")->Set(sx);
     }
     else
       sdfSphere->GetAttribute("radius")->SetFromString("1.0");
