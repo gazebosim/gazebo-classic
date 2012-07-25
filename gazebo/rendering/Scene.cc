@@ -47,11 +47,13 @@
 #include "gazebo/rendering/RFIDTagVisual.hh"
 #include "gazebo/rendering/VideoVisual.hh"
 
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
 #include "gazebo/rendering/deferred_shading/GBufferSchemeHandler.hh"
 #include "gazebo/rendering/deferred_shading/NullSchemeHandler.hh"
 #include "gazebo/rendering/deferred_shading/MergeSchemeHandler.hh"
 #include "gazebo/rendering/deferred_shading/DeferredLightCP.hh"
+#endif
 
 #include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
@@ -284,7 +286,7 @@ void Scene::Init()
 //////////////////////////////////////////////////
 void Scene::InitDeferredShading()
 {
-  /* Disabled for now. Depends on ogre 1.8
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
   Ogre::CompositorManager &compMgr = Ogre::CompositorManager::getSingleton();
 
   // Deferred Shading scheme handler
@@ -339,7 +341,7 @@ void Scene::InitDeferredShading()
   }
 
   im->setBatchesAsStaticAndUpdate(true);
-  */
+#endif
 }
 
 //////////////////////////////////////////////////
