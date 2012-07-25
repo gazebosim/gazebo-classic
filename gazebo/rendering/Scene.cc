@@ -284,6 +284,7 @@ void Scene::Init()
 //////////////////////////////////////////////////
 void Scene::InitDeferredShading()
 {
+  /* Disabled for now. Depends on ogre 1.8
   Ogre::CompositorManager &compMgr = Ogre::CompositorManager::getSingleton();
 
   // Deferred Shading scheme handler
@@ -338,6 +339,7 @@ void Scene::InitDeferredShading()
   }
 
   im->setBatchesAsStaticAndUpdate(true);
+  */
 }
 
 //////////////////////////////////////////////////
