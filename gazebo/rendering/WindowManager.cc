@@ -15,6 +15,7 @@
  *
 */
 #include <math.h>
+#include <SkyX.h>
 
 #include "rendering/ogre_gazebo.h"
 
@@ -23,11 +24,12 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/RTShaderSystem.hh"
-#include "rendering/Camera.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/WindowManager.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/WindowManager.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -65,6 +67,7 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
   this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
   RTShaderSystem::AttachViewport(_camera->GetViewport(), _camera->GetScene());
+  this->windows[_windowId]->addListener(_camera->GetScene()->skyx);
 }
 
 //////////////////////////////////////////////////

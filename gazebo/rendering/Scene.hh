@@ -34,6 +34,11 @@
 #include "common/Color.hh"
 #include "math/Vector2i.hh"
 
+namespace SkyX
+{
+  class SkyX;
+  class BasicController;
+}
 
 namespace Ogre
 {
@@ -235,6 +240,7 @@ namespace gazebo
                                           Ogre::Node *node);
 
       public: void SetSky(const std::string &_material);
+      public: void SetSky();
 
       /// \brief Set whether shadows are on or off
       /// \param _value True to enable shadows, False to disable
@@ -395,6 +401,9 @@ namespace gazebo
       private: std::map<std::string, Projector *> projectors;
 
       private: int iterations;
+
+      public: SkyX::SkyX *skyx;
+      private: SkyX::BasicController *skyxController;
     };
     /// \}
   }
