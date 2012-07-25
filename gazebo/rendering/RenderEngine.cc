@@ -568,10 +568,10 @@ void RenderEngine::CheckSystemCapabilities()
   // bool hasGeometryPrograms =
   //  capabilities->hasCapability(Ogre::RSC_GEOMETRY_PROGRAM);
 
-  //bool hasRenderToVertexBuffer =
+  // bool hasRenderToVertexBuffer =
   //  capabilities->hasCapability(Ogre::RSC_HWRENDER_TO_VERTEX_BUFFER);
 
-  //int multiRenderTargetCount = capabilities->getNumMultiRenderTargets();
+  // int multiRenderTargetCount = capabilities->getNumMultiRenderTargets();
 
   bool hasFBO =
     capabilities->hasCapability(Ogre::RSC_FBO);
@@ -594,6 +594,6 @@ void RenderEngine::CheckSystemCapabilities()
     this->renderPathType = RenderEngine::VERTEX;
 
   // Disable deferred rendering for now. Needs more work.
-  //if (hasRenderToVertexBuffer && multiRenderTargetCount >= 8)
+  // if (hasRenderToVertexBuffer && multiRenderTargetCount >= 8)
   //  this->renderPathType = RenderEngine::DEFERRED;
 }
