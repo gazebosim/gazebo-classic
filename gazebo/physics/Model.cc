@@ -227,7 +227,7 @@ void Model::Update()
     }
     if (!jointPositions.empty())
     {
-      this->jointController->SetJointPositions(jointPositions);
+      // this->jointController->SetJointPositions(jointPositions);
     }
     else
     {
@@ -238,14 +238,6 @@ void Model::Update()
   }
 
   this->updateMutex->unlock();
-}
-
-//////////////////////////////////////////////////
-void Model::SetJointPositions(
-    const std::map<std::string, double> &_jointPositions)
-{
-  if (this->jointController)
-    this->jointController->SetJointPositions(_jointPositions);
 }
 
 //////////////////////////////////////////////////

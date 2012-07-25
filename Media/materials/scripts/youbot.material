@@ -1,7 +1,6 @@
 material youbot/Orange
 {
   receive_shadows on
-  lighting on
   technique
   {
     pass
@@ -11,7 +10,6 @@ material youbot/Orange
       specular 1.000 0.40 0.000 1.000
       emissive 0.000 0.0 0.000 1.000
       shading gouraud
-      lighting on
     }
   }
 }
@@ -19,7 +17,6 @@ material youbot/Orange
 material youbot/DarkGrey
 {
   receive_shadows on
-  lighting on
 
   technique
   {
@@ -29,7 +26,6 @@ material youbot/DarkGrey
       diffuse 1.000 1.000 1.000 1.0
       specular 0.8 0.8 0.8 1
       shading gouraud
-      lighting on
     }
   }
 }
@@ -37,7 +33,6 @@ material youbot/DarkGrey
 material youbot/Grey
 {
   receive_shadows on
-  lighting on
 
   technique
   {

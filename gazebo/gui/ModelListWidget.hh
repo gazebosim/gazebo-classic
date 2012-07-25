@@ -177,6 +177,21 @@ namespace gazebo
       private: msgs::Model modelMsg;
       private: bool fillPropertyTree;
     };
+
+    class ModelListSheetDelegate: public QItemDelegate
+    {
+      Q_OBJECT
+      public: ModelListSheetDelegate(QTreeView *view, QWidget *parent);
+
+      public: virtual void paint(QPainter *painter,
+                  const QStyleOptionViewItem &option,
+                  const QModelIndex &index) const;
+
+      public: virtual QSize sizeHint(const QStyleOptionViewItem &opt,
+                  const QModelIndex &index) const;
+
+      private: QTreeView *m_view;
+    };
   }
 }
 #endif

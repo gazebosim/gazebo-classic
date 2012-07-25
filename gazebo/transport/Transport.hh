@@ -19,6 +19,7 @@
 
 #include <boost/bind.hpp>
 #include <string>
+#include <list>
 
 #include "transport/TransportTypes.hh"
 #include "transport/SubscribeOptions.hh"
@@ -48,6 +49,9 @@ namespace gazebo
     /// \brief Run the transport component. This starts message passing. This is
     ///        a blocking call
     void run();
+
+    /// \brief Return all the namespace (world names) on the master
+    void get_topic_namespaces(std::list<std::string> &_namespaces);
 
     /// \brief Return true if the transport system is stopped
     bool is_stopped();

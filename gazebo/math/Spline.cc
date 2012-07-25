@@ -1,34 +1,26 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
-
-Copyright ( _c) 2000-2009 Torus Knot Software Ltd
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the _"Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
 */
+// Note: Originally cribbed from Ogre3d. Modified to implement Cardinal
+// spline and catmull-rom spline
+#include "gazebo/common/Console.hh"
 
-#include "math/Helpers.hh"
-#include "math/Vector4.hh"
-#include "math/Spline.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector4.hh"
+#include "gazebo/math/Spline.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -42,25 +34,42 @@ Spline::Spline()
   this->coeffs[0][1] = -2;
   this->coeffs[0][2] = 1;
   this->coeffs[0][3] = 1;
+
   this->coeffs[1][0] = -3;
   this->coeffs[1][1] = 3;
   this->coeffs[1][2] = -2;
   this->coeffs[1][3] = -1;
+
   this->coeffs[2][0] = 0;
   this->coeffs[2][1] = 0;
   this->coeffs[2][2] = 1;
   this->coeffs[2][3] = 0;
+
   this->coeffs[3][0] = 1;
   this->coeffs[3][1] = 0;
   this->coeffs[3][2] = 0;
   this->coeffs[3][3] = 0;
 
   this->autoCalc = true;
+  this->tension = 0.0;
 }
 
 ///////////////////////////////////////////////////////////
 Spline::~Spline()
 {
+}
+
+///////////////////////////////////////////////////////////
+void Spline::SetTension(double _t)
+{
+  this->tension = _t;
+  this->RecalcTangents();
+}
+
+///////////////////////////////////////////////////////////
+double Spline::GetTension() const
+{
+  return this->tension;
 }
 
 ///////////////////////////////////////////////////////////
@@ -91,8 +100,12 @@ Vector3 Spline::Interpolate(double _t) const
 Vector3 Spline::Interpolate(unsigned int _fromIndex, double _t) const
 {
   // Bounds check
-  assert (_fromIndex < this->points.size() &&
-      "_fromIndex out of bounds");
+  if (_fromIndex >= this->points.size())
+  {
+    gzerr << "Invalid spline interpolation. _fromIndex["
+          << _fromIndex << "] >= points size[" << this->points.size() << "]\n";
+    return Vector3(0, 0, 0);
+  }
 
   if ((_fromIndex + 1) == this->points.size())
   {
@@ -170,6 +183,7 @@ void Spline::RecalcTangents()
   else
     isClosed = false;
 
+  double t = 1.0 - this->tension;
   this->tangents.resize(numPoints);
 
   for (i = 0; i < numPoints; ++i)
@@ -181,11 +195,13 @@ void Spline::RecalcTangents()
       {
         // Use nuthis->points-2 since nuthis->points-1 is the last
         // point and == [0]
-        this->tangents[i] = (this->points[1] - this->points[numPoints-2]) * 0.5;
+        this->tangents[i] =
+          ((this->points[1] - this->points[numPoints-2]) * 0.5) * t;
       }
       else
       {
-        this->tangents[i] = (this->points[1] - this->points[0]) * 0.5;
+        this->tangents[i] =
+          ((this->points[1] - this->points[0]) * 0.5) * t;
       }
     }
     else if (i == numPoints-1)
@@ -198,25 +214,46 @@ void Spline::RecalcTangents()
       }
       else
       {
-        this->tangents[i] = (this->points[i] - this->points[i-1]) * 0.5;
+        this->tangents[i] =
+          ((this->points[i] - this->points[i-1]) * 0.5) * t;
       }
     }
     else
     {
-      this->tangents[i] = (this->points[i+1] - this->points[i-1]) * 0.5;
+      this->tangents[i] =
+        ((this->points[i+1] - this->points[i-1]) * 0.5) * t;
     }
   }
 }
 
 ///////////////////////////////////////////////////////////
-const Vector3 &Spline::GetPoint(unsigned int _index) const
+Vector3 Spline::GetPoint(unsigned int _index) const
 {
-  assert (_index < this->points.size() && "Point index is out of bounds!!");
+  if (_index >= this->points.size())
+  {
+    gzerr << "Index[" << _index << "] is out of bounds[0.."
+          << this->points.size()-1 << "]\n";
+    return Vector3(0, 0, 0);
+  }
+
   return this->points[_index];
 }
 
 ///////////////////////////////////////////////////////////
-unsigned int Spline::GetNumPoints() const
+Vector3 Spline::GetTangent(unsigned int _index) const
+{
+  if (_index >= this->points.size())
+  {
+    gzerr << "Index[" << _index << "] is out of bounds[0.."
+          << this->points.size()-1 << "]\n";
+    return Vector3(0, 0, 0);
+  }
+
+  return this->tangents[_index];
+}
+
+///////////////////////////////////////////////////////////
+unsigned int Spline::GetPointCount() const
 {
   return this->points.size();
 }
@@ -231,7 +268,12 @@ void Spline::Clear()
 ///////////////////////////////////////////////////////////
 void Spline::UpdatePoint(unsigned int _index, const Vector3 &_value)
 {
-  assert (_index < this->points.size() && "Point index is out of bounds!!");
+  if (_index >= this->points.size())
+  {
+    gzerr << "Index[" << _index << "] is out of bounds[0.."
+          << this->points.size()-1 << "]\n";
+    return;
+  }
 
   this->points[_index] = _value;
   if (this->autoCalc)
@@ -243,5 +285,3 @@ void Spline::SetAutoCalculate(bool _autoCalc)
 {
   this->autoCalc = _autoCalc;
 }
-
-

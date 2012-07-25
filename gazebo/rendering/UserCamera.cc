@@ -27,6 +27,7 @@
 #include "common/Exception.hh"
 #include "common/Events.hh"
 
+#include "rendering/RenderEngine.hh"
 #include "rendering/GUIOverlay.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/WindowManager.hh"
@@ -91,7 +92,67 @@ void UserCamera::Init()
 {
   Camera::Init();
   this->SetHFOV(GZ_DTOR(60));
-  this->SetClipDist(0.1, 200);
+
+  // Careful when setting this value.
+  // A far clip that is too close will have bad side effects on the
+  // lighting. When using deferred shading, the light's use geometry that
+  // trigger shaders. If the far clip is too close, the light's geometry is
+  // clipped and wholes appear in the lighting.
+  if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::VERTEX)
+  {
+    this->SetClipDist(0.1, 50);
+  }
+  else if (RenderEngine::Instance()->GetRenderPathType() ==
+           RenderEngine::FORWARD)
+  {
+    this->SetClipDist(0.1, 100);
+  }
+  else
+  {
+    this->SetClipDist(0.1, 500);
+  }
+
+  this->axisNode =
+    this->pitchNode->createChildSceneNode(this->name + "AxisNode");
+
+  const Ogre::Vector3 *corners =
+    this->camera->getWorldSpaceCorners();
+
+  double width = corners[1].y - corners[0].y;
+
+  this->axisNode->setPosition(corners[0].x + 0.01,
+                              corners[0].y + 0.0005,
+                              corners[0].z + 0.0005);
+  axisNode->setScale(width * 0.05, width * 0.05, width * 0.05);
+  axisNode->setInheritOrientation(false);
+
+  Ogre::ManualObject *x =
+    this->scene->GetManager()->createManualObject("MyXAxis");
+  x->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST);
+  x->position(0, 0, 0);
+  x->position(1, 0, 0);
+  x->end();
+  x->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  Ogre::ManualObject *y =
+    this->scene->GetManager()->createManualObject("MyYAxis");
+  y->begin("Gazebo/Green", Ogre::RenderOperation::OT_LINE_LIST);
+  y->position(0, 0, 0);
+  y->position(0, 1, 0);
+  y->end();
+  y->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  Ogre::ManualObject *z =
+    this->scene->GetManager()->createManualObject("MyZAxis");
+  z->begin("Gazebo/Blue", Ogre::RenderOperation::OT_LINE_LIST);
+  z->position(0, 0, 0);
+  z->position(0, 0, 1);
+  z->end();
+  z->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->axisNode->attachObject(x);
+  this->axisNode->attachObject(y);
+  this->axisNode->attachObject(z);
 }
 
 //////////////////////////////////////////////////
@@ -153,18 +214,21 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
     this->viewController->HandleMouseEvent(_evt);
 }
 
+/////////////////////////////////////////////////
 void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyPressEvent(_key);
 }
 
+/////////////////////////////////////////////////
 void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyReleaseEvent(_key);
 }
 
+/////////////////////////////////////////////////
 bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
                                      double _minDist, double _maxDist)
 {
@@ -436,4 +500,3 @@ void UserCamera::EnableViewController(bool _value) const
 {
   this->viewController->SetEnabled(_value);
 }
-

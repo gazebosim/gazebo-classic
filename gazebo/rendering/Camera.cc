@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
@@ -24,18 +23,19 @@
 #include <sstream>
 
 #include "sdf/sdf.hh"
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RTShaderSystem.hh"
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "math/Pose.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Pose.hh"
 
-#include "rendering/Visual.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Camera.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Camera.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -282,6 +282,7 @@ void Camera::Render()
   this->RenderImpl();
 }
 
+//////////////////////////////////////////////////
 void Camera::RenderImpl()
 {
   if (this->renderTarget)
@@ -1075,6 +1076,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
+    this->viewport->setShadowsEnabled(true);
+
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
@@ -1086,6 +1089,44 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
+
+    // Setup Deferred rendering for the camera
+    if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
+    {
+      // Deferred shading GBuffer compositor
+      this->dsGBufferInstance =
+        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+            "DeferredShading/GBuffer");
+
+      // Deferred lighting GBuffer compositor
+      this->dlGBufferInstance =
+        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+            "DeferredLighting/GBuffer");
+
+      // Deferred shading: Merging compositor
+      this->dsMergeInstance =
+        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+            "DeferredShading/ShowLit");
+
+      // Deferred lighting: Merging compositor
+      this->dlMergeInstance =
+        Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+            "DeferredLighting/ShowLit");
+
+
+      // Screen space ambient occlusion
+      // this->ssaoInstance =
+      //  Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+      //      "DeferredShading/SSAO");
+
+      this->dsGBufferInstance->setEnabled(false);
+      this->dsMergeInstance->setEnabled(false);
+
+      this->dlGBufferInstance->setEnabled(true);
+      this->dlMergeInstance->setEnabled(true);
+
+      // this->ssaoInstance->setEnabled(false);
+    }
   }
 }
 

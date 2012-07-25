@@ -32,6 +32,10 @@ TEST_F(PR2Test, Load)
     common::Time::MSleep(100);
   EXPECT_LT(i, 40);
 
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+    return;
+
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
   EXPECT_TRUE(sensor);

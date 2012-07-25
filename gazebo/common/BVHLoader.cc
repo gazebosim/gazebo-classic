@@ -81,7 +81,6 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
         SkeletonNode::SkeletonNodeType type = SkeletonNode::JOINT;
         std::string name = words[1];
         node = new SkeletonNode(parent, name, name, type);
-        std::string parentName = "NULL";
         if (words[0] != "End")
           nodes.push_back(node);
       }

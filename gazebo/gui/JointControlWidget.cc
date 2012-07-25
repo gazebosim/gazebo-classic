@@ -258,6 +258,9 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   scrollArea->setFrameShape(QFrame::NoFrame);
   scrollArea->setFrameShadow(QFrame::Plain);
 
+  QFrame *forceFrame = new QFrame;
+  forceFrame->setLineWidth(0);
+
   QGridLayout *gridLayout = new QGridLayout;
   gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum), 0, 0, 2);
@@ -276,7 +279,9 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
             this, SLOT(OnForceChanged(double, const std::string &)));
   }
 
-  scrollArea->setLayout(gridLayout);
+  forceFrame->setLayout(gridLayout);
+  forceFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  scrollArea->setWidget(forceFrame);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
@@ -286,6 +291,9 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   pidPosScrollArea->setLineWidth(0);
   pidPosScrollArea->setFrameShape(QFrame::NoFrame);
   pidPosScrollArea->setFrameShadow(QFrame::Plain);
+
+  QFrame *pidPosFrame = new QFrame;
+  pidPosFrame->setLineWidth(0);
 
   gridLayout = new QGridLayout;
   gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
@@ -322,7 +330,9 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
             this, SLOT(OnDPosGainChanged(double, const std::string &)));
   }
 
-  pidPosScrollArea->setLayout(gridLayout);
+  pidPosFrame->setLayout(gridLayout);
+  pidPosFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  pidPosScrollArea->setWidget(pidPosFrame);
   pidPosScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
@@ -380,8 +390,6 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   tabWidget->addTab(scrollArea, tr("Force"));
   tabWidget->addTab(pidPosScrollArea, tr("Position"));
   tabWidget->addTab(pidVelScrollArea, tr("Velocity"));
-
-  // mainLayout->addWidget(scrollArea);
 
   // Add the the force and pid scroll areas to the tab
   QVBoxLayout *mainLayout = new QVBoxLayout;
