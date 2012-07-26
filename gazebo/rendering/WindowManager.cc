@@ -15,7 +15,7 @@
  *
 */
 #include <math.h>
-// #include <SkyX.h>
+#include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "rendering/ogre_gazebo.h"
 
@@ -67,7 +67,7 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
   this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
   RTShaderSystem::AttachViewport(_camera->GetViewport(), _camera->GetScene());
-  //this->windows[_windowId]->addListener(_camera->GetScene()->skyx);
+  this->windows[_windowId]->addListener(_camera->GetScene()->skyx);
 }
 
 //////////////////////////////////////////////////
