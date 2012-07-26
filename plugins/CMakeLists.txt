@@ -13,6 +13,7 @@ set (plugins
   ModelTrajectoryTestPlugin
   RayPlugin
   SpringTestPlugin
+  TriggerPlugin
   DiffDrivePlugin
   VehiclePlugin)
 
