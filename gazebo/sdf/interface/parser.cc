@@ -343,10 +343,6 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
   }
   else
   {
-    std::ostringstream stream;
-    stream << *_xmlDoc;
-    gzerr << stream.str() << "\n";
-
     // try to use the old deprecated parser
     if (!gazebo_node)
       gzwarn << "Gazebo SDF has no gazebo element\n";
