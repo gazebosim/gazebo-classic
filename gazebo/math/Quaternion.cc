@@ -36,6 +36,7 @@ Quaternion::Quaternion(const double &_w, const double &_x,
                        const double &_y, const double &_z)
     : w(_w), x(_x), y(_y), z(_z)
 {
+  this->Normalize();
 }
 
 //////////////////////////////////////////////////
