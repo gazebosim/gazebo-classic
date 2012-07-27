@@ -111,7 +111,8 @@ bool Server::ParseArgs(int argc, char **argv)
   } catch(boost::exception &_e)
   {
     std::cerr << "Error. Invalid arguments\n";
-    std::cerr << boost::diagnostic_information(_e) << "\n";
+    // NOTE: boost::diagnostic_information(_e) breaks lucid
+    // std::cerr << boost::diagnostic_information(_e) << "\n";
     return false;
   }
 
@@ -240,6 +241,7 @@ bool Server::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 void Server::Init()
 {
+  gazebo::init();
   sensors::init();
 
   physics::init_worlds();
