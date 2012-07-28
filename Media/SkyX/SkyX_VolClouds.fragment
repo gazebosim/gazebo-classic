@@ -67,10 +67,10 @@ void main(void)
 	
 	if (Density.x > 0.0)
 	{
-	    float cos0 = clamp(dot(uSunDirection,vEyePixel), 0.0, 1.0);
-	    float c2=cos0*cos0;
+    float cos0 = clamp(dot(uSunDirection, vEyePixel), 0.0, 1.0);
+    float c2=cos0*cos0;
 		
-		float Beta = c2*uLightResponse.y*(0.5+2.5*clamp(1.0-2.0*uSunDirection.y, 0.0, 1.0)*Density.y);
+		float Beta = c2*uLightResponse.y*(0.5+2.5*clamp(1.0-2.0*uSunDirection.z, 0.0, 1.0)*Density.y);
 
 		float sunaccumulation = max(0.2, clamp(Beta+Density.y*uLightResponse.x+pow(vDistance,1.5)*uLightResponse.w, 0.0, 1.0));
 		float ambientaccumulation = 
@@ -80,10 +80,5 @@ void main(void)
 		Opacity = (1.0 - exp(-Density.x*(7.5-6.5*v3DCoord.z)))*vOpacity;
 	}
 	
-    gl_FragColor = vec4(finalcolor, Opacity);
-
- //oColor.xyz*=0.0001;
- // oColor.a = saturate(oColor.a+1)*iOpacity;
- // oColor.xyz+=Noise;
-//oColor.rgb*=0.0001;oColor.r = dot(uLightDirection,iEyePixel);
+  gl_FragColor = vec4(finalcolor, Opacity);
 }

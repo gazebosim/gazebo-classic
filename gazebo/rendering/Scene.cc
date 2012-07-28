@@ -1881,7 +1881,7 @@ void Scene::SetSky()
 
   // Set the time: x = current time[0-24], y = sunrise time[0-24],
   // z = sunset time[0-24]
-  this->skyxController->setTime(Ogre::Vector3(10.0, 6.0, 20.0f));
+this->skyxController->setTime(Ogre::Vector3(6.0, 6.0, 20.0f));
 
   // Moon phase in [-1,1] range, where -1 means fully covered Moon,
   // 0 clear Moon and 1 fully covered Moon
@@ -1901,15 +1901,14 @@ void Scene::SetSky()
   this->skyx->getVCloudsManager()->setWindSpeed(0.6);
 
   // Use true to update volumetric clouds based on the time multiplier
-  this->skyx->getVCloudsManager()->setAutoupdate(true);
-  //this->skyx->getVCloudsManager()->setHeight(Ogre::Vector2(20, 80));
+  this->skyx->getVCloudsManager()->setAutoupdate(false);
 
   SkyX::VClouds::VClouds *vclouds =
     this->skyx->getVCloudsManager()->getVClouds();
 
   // Set wind direction in radians
   vclouds->setWindDirection(Ogre::Radian(0.0));
-  vclouds->setAmbientColor(Ogre::Vector3(0.8f, 0.8f, 0.9f));
+  vclouds->setAmbientColor(Ogre::Vector3(0.63f,0.63f,0.7f));
 
   // x = sun light power
   // y = sun beta multiplier
