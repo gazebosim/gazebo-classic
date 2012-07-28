@@ -100,7 +100,7 @@ namespace gazebo
       /// \brief Get paths for the shader system
       private: bool GetPaths(std::string &coreLibsPath, std::string &cachePath);
 
-  #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+  #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 7
       private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
       private: std::list<Visual*> entities;
   #endif

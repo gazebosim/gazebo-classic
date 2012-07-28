@@ -15,7 +15,7 @@
  *
 */
 // DEPRECATED
-#ifndef __MSGS_H__
-#define __MSGS_H__
+#ifndef _MSGS_H_
+#define _MSGS_H_
 #include "msgs/msgs.hh"
 #endif

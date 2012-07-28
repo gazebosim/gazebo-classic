@@ -217,7 +217,7 @@ void VehiclePlugin::OnUpdate()
     bodyPoint = this->joints[ix]->GetAnchor(1);
 
     axis = this->joints[ix]->GetGlobalAxis(0).Round();
-    displacement = (bodyPoint - hingePoint).GetDotProd(axis);
+    displacement = (bodyPoint - hingePoint).Dot(axis);
 
     float amt = displacement * this->swayForce;
     if (displacement > 0)

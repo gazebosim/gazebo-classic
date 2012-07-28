@@ -142,7 +142,7 @@ void Light::LoadFromMsg(ConstLightPtr &msg)
   if (msg->has_specular())
   {
     this->sdf->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->diffuse()));
+        msgs::Convert(msg->specular()));
   }
 
   if (msg->has_direction())
@@ -406,14 +406,14 @@ common::Color Light::GetDiffuseColor() const
 }
 
 //////////////////////////////////////////////////
-void Light::SetSpecularColor(const common::Color &color)
+void Light::SetSpecularColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("specular");
 
-  if (elem->GetValueColor("rgba") != color)
-    elem->GetAttribute("rgba")->Set(color);
+  if (elem->GetValueColor("rgba") != _color)
+    elem->GetAttribute("rgba")->Set(_color);
 
-  this->light->setSpecularColour(color.R(), color.G(), color.B());
+  this->light->setSpecularColour(_color.R(), _color.G(), _color.B());
 }
 
 //////////////////////////////////////////////////
@@ -478,15 +478,16 @@ void Light::SetRange(const double &range)
 //////////////////////////////////////////////////
 void Light::SetCastShadows(const bool &_cast)
 {
-  this->light->setCastShadows(_cast);
-  /*if (this->light->getType() == Ogre::Light::LT_POINT)
-    this->light->setCastShadows(false);
+    this->light->setCastShadows(true);
+  /*if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT ||
+      this->light->getType() == Ogre::Light::LT_DIRECTIONAL)
+  {
+    this->light->setCastShadows(_cast);
+  }
   else
   {
-    this->sdf->GetAttribute("cast_shadows")->Set(cast);
-    this->light->setCastShadows(cast);
-  }
-  */
+    this->light->setCastShadows(false);
+  }*/
 }
 
 //////////////////////////////////////////////////

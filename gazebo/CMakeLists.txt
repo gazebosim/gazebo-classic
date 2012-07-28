@@ -47,9 +47,8 @@ target_link_libraries(gzmaster gazebo_common
                                gazebo_transport
                                gazebo_sdf_interface
                                gazebo_msgs
-                               ${Boost_LIBRARIES}
-                               ${freeimage_library}
-                               ${PROTOBUF_LIBRARY})
+)
+
 
 target_link_libraries(gzserver gazebo_common
                                gazebo_sdf_interface
@@ -59,8 +58,7 @@ target_link_libraries(gzserver gazebo_common
                                gazebo_rendering
                                gazebo_msgs
                                pthread
-                               ${TINYXML_LIBRARIES}
-                               ${Boost_LIBRARIES})
+)
 
 target_link_libraries(gazebo gazebo_common
                              gazebo_sdf_interface
@@ -71,8 +69,7 @@ target_link_libraries(gazebo gazebo_common
                              gazebo_msgs
                              gazebo_gui
                              pthread
-                             ${TINYXML_LIBRARIES}
-                             ${Boost_LIBRARIES})
+)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)

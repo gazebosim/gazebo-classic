@@ -21,11 +21,13 @@
 #include <sys/stat.h>
 #include <boost/bind.hpp>
 
-#include "rendering/Scene.hh"
-#include "rendering/Visual.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "rendering/RTShaderSystem.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
 
 #define MINOR_VERSION 7
 using namespace gazebo;
@@ -50,6 +52,11 @@ void RTShaderSystem::Init()
 {
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 &&\
     OGRE_VERSION_MINOR >= MINOR_VERSION
+
+  // Only initialize if using FORWARD rendering
+  if (RenderEngine::Instance()->GetRenderPathType() != RenderEngine::FORWARD)
+    return;
+
   if (Ogre::RTShader::ShaderGenerator::initialize())
   {
     std::string coreLibsPath, cachePath;
@@ -452,8 +459,8 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   // TODO: We have two different shadow caster materials, both taken from
   // OGRE samples. They should be compared and tested.
   // Set up caster material - this is just a standard depth/shadow map caster
-  sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
-  // sceneMgr->setShadowTextureCasterMaterial("Ogre/shadow/depth/caster");
+  // sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+  sceneMgr->setShadowTextureCasterMaterial("Gazebo/shadow_caster");
 
   sceneMgr->setShadowCasterRenderBackFaces(true);
 
@@ -492,7 +499,6 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
 
   pssm3SubRenderState->setSplitPoints(dstSplitPoints);
   schemRenderState->addTemplateSubRenderState(this->shadowRenderState);
-
 
   this->shaderGenerator->invalidateScheme(_scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);

@@ -31,6 +31,7 @@ set (sources
   PhysicsFactory.cc
   PlaneShape.cc
   RayShape.cc
+  Road.cc
   Shape.cc
   SphereShape.cc
   State.cc
@@ -71,6 +72,7 @@ set (headers
   PhysicsTypes.hh
   PlaneShape.hh
   RayShape.hh
+  Road.hh
   Shape.hh
   ScrewJoint.hh
   SliderJoint.hh

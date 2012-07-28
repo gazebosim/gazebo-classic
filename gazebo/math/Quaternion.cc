@@ -385,8 +385,8 @@ Vector3 Quaternion::operator*(const Vector3 &v) const
 {
   Vector3 uv, uuv;
   Vector3 qvec(this->x, this->y, this->z);
-  uv = qvec.GetCrossProd(v);
-  uuv = qvec.GetCrossProd(uv);
+  uv = qvec.Cross(v);
+  uuv = qvec.Cross(uv);
   uv *= (2.0f * this->w);
   uuv *= 2.0f;
 

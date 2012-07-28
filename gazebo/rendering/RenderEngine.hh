@@ -48,6 +48,15 @@ namespace gazebo
     /// \brief Adaptor to Ogre3d
     class RenderEngine : public SingletonT<RenderEngine>
     {
+      public: enum RenderPathType
+              {
+                NONE,      // No rendering.
+                VERTEX,    // Most basic rendering, with least fidelity.
+                FORWARD,   // Utilizes the RTT shader system.
+                DEFERRED,  // Utilizes deferred rendering. Best fidelity.
+                RENDER_PATH_COUNT
+              };
+
       /// \brief Constructor
       private: RenderEngine();
 
@@ -85,12 +94,14 @@ namespace gazebo
       /// \brief Get the number of scene managers
       public: unsigned int GetSceneCount() const;
 
-      /// \brief Returns true if the graphics card support GLSL
-      public: bool HasGLSL();
-
       public: void AddResourcePath(const std::string &_path);
 
-      private: void CreateContext();
+      /// \brief Get the type of rendering path to use. This is
+      /// automatically determined based on the computers capabilities
+      /// \return The RenderPathType
+      public: RenderPathType GetRenderPathType() const;
+
+      private: bool CreateContext();
 
       private: void LoadPlugins();
 
@@ -100,6 +111,8 @@ namespace gazebo
       private: void PreRender();
       private: void Render();
       private: void PostRender();
+
+      private: void CheckSystemCapabilities();
 
       /// Pointer to the root scene node
       public: Ogre::Root *root;
@@ -130,6 +143,8 @@ namespace gazebo
 
       private: bool removeScene;
       private: std::string removeSceneName;
+
+      private: RenderPathType renderPathType;
     };
     /// \}
   }

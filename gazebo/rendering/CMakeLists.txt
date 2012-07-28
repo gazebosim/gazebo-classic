@@ -1,10 +1,14 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${CEGUI_INCLUDE_DIRS}
+  #${SKYX_INCLUDE_DIRS}
 )
+
+if (${OGRE_VERSION} GREATER 1.7.4)
+  add_subdirectory(deferred_shading)
+endif()
 
 set (sources
   ArrowVisual.cc
@@ -32,12 +36,14 @@ set (sources
   RenderEngine.cc
   RenderEvents.cc
   Rendering.cc
+  Road2d.cc
   RFIDVisual.cc
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
   SelectionObj.cc
   UserCamera.cc
+  VideoVisual.cc
   ViewController.cc
   Visual.cc
   WindowManager.cc
@@ -70,17 +76,20 @@ set (headers
   RenderEvents.hh
   Rendering.hh
   RenderTypes.hh
+  Road2d.hh
   RFIDVisual.hh
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
   SelectionObj.hh
   UserCamera.hh
+  VideoVisual.hh
   ViewController.hh
   Visual.hh
   WindowManager.hh
   ogre_gazebo.h
-  cegui.h)
+  cegui.h
+)
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
@@ -92,13 +101,19 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering gazebo_common 
-                                        gazebo_sdf_interface
-                                        ${ogre_libraries} 
-                                        ${OPENGL_LIBRARIES} 
-                                        ${CEGUI_LIBRARIES}
-                                        X11 )
-                                      
+target_link_libraries( gazebo_rendering
+  gazebo_common 
+  gazebo_sdf_interface
+  ${ogre_libraries} 
+  ${OPENGL_LIBRARIES} 
+  ${CEGUI_LIBRARIES}
+  X11 
+  #${SKYX_LIBRARIES}
+)
+
+if (${OGRE_VERSION} GREATER 1.7.4)
+  target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
+endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh rendering.h)

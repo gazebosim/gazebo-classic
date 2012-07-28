@@ -16,8 +16,8 @@
 */
 // This was leveraged from rviz.
 
-#ifndef GRID_HH
-#define GRID_HH
+#ifndef _GRID_HH_
+#define _GRID_HH_
 
 #include <stdint.h>
 #include <vector>
@@ -44,12 +44,11 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
-    /**
-     * \class Grid
-     * \brief Displays a grid of cells, drawn with lines
-     *
-     * Displays a grid of cells, drawn with lines.  A grid with an identity orientation is drawn along the XZ plane.
-     */
+    ///  \class Grid
+    ///  \brief Displays a grid of cells, drawn with lines
+    ///
+    ///  Displays a grid of cells, drawn with lines.  A grid with an
+    ///  identity orientation is drawn along the XY plane.
     class Grid
     {
       /// \brief Constructor
@@ -60,34 +59,46 @@ namespace gazebo
       /// \param r Red color component, in the range [0, 1]
       /// \param g Green color component, in the range [0, 1]
       /// \param b Blue color component, in the range [0, 1]
-      public: Grid(Scene *scene_, uint32_t cellCount_, float cellLength_,
-                    float lineWidth_, const common::Color &color_);
+      public: Grid(Scene *_scene, uint32_t _cellCount, float _cellLength,
+                   float _lineWidth, const common::Color &_color);
 
       /// \brief Destructor
       public: ~Grid();
 
+      /// \brief Initialize the grid
       public: void Init();
 
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
-      public: Ogre::SceneNode* GetSceneNode() { return this->sceneNode; }
-      /// \brief Sets user data on all ogre objects we own
-      public: void SetUserData(const Ogre::Any& data_);
+      public: Ogre::SceneNode *GetSceneNode() { return this->sceneNode; }
 
-      public: void SetColor(const common::Color& color_);
-      public: common::Color GetColor() { return this->colorP; }
-      public: void SetCellCount(uint32_t count_);
-      public: float GetCellCount() { return this->cellCountP; }
-      public: void SetCellLength(float len_);
-      public: float GetCellLength() { return this->cellLengthP; }
-      public: void SetLineWidth(float width_);
-      public: float GetLineWidth() { return this->lineWidthP; }
-      public: void SetHeight(uint32_t count_);
-      public: uint32_t GetHeight() { return this->height; }
+      /// \brief Sets user data on all ogre objects we own
+      public: void SetUserData(const Ogre::Any &_data);
+
+      public: void SetColor(const common::Color &_color);
+
+      public: common::Color GetColor() const {return this->colorP;}
+
+      public: void SetCellCount(uint32_t _count);
+
+      public: float GetCellCount() const {return this->cellCountP;}
+
+      public: void SetCellLength(float _len);
+
+      public: float GetCellLength() const {return this->cellLengthP;}
+
+      public: void SetLineWidth(float _width);
+
+      public: float GetLineWidth() const {return this->lineWidthP;}
+
+      public: void SetHeight(uint32_t _count);
+
+      public: uint32_t GetHeight() const {return this->height;}
+
       private: void Create();
 
-      private: Ogre::SceneNode* sceneNode;
-      private: Ogre::ManualObject* manualObject;
+      private: Ogre::SceneNode *sceneNode;
+      private: Ogre::ManualObject *manualObject;
 
       private: Ogre::MaterialPtr material;
 
