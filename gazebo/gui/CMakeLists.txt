@@ -33,6 +33,7 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   JointControlWidget.cc
+  SkyWidget.cc
 )
 
 set (qt_headers
@@ -48,6 +49,7 @@ set (qt_headers
   LightRightMenu.hh
   ModelRightMenu.hh
   JointControlWidget.hh
+  SkyWidget.hh
 )
 
 set (headers Gui.hh

@@ -25,6 +25,7 @@
 
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
+#include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/LightListWidget.hh"
 #include "gui/WorldPropertiesWidget.hh"
@@ -82,6 +83,7 @@ MainWindow::MainWindow()
   ModelListWidget *modelListWidget = new ModelListWidget(this);
   LightListWidget *lightListWidget = new LightListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
+  SkyWidget *skyWidget = new SkyWidget(this);
 
 
   this->treeWidget = new QTreeWidget();
@@ -119,6 +121,11 @@ MainWindow::MainWindow()
   this->treeWidget->addTopLevelItem(topItem);
   subItem = new QTreeWidgetItem(topItem);
   this->treeWidget->setItemWidget(subItem, 0, insertModel);
+
+  topItem = new QTreeWidgetItem(this->treeWidget, QStringList("Sky"));
+  this->treeWidget->addTopLevelItem(topItem);
+  subItem = new QTreeWidgetItem(topItem);
+  this->treeWidget->setItemWidget(subItem, 0, skyWidget);
 
   this->renderWidget = new RenderWidget(mainWidget);
   this->timePanel = new TimePanel(mainWidget);

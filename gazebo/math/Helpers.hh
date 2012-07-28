@@ -38,6 +38,12 @@ namespace gazebo
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
     static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
 
+    template<typename T>
+    inline T clamp(T _v, T _min, T _max)
+    {
+      return std::max(std::min(_v, _max), _min);
+    }
+
     inline bool isnan(float _v)
     {
       return (boost::math::isnan)(_v);

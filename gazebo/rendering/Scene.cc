@@ -80,6 +80,7 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->requestMsg = NULL;
   this->iterations = 0;
   this->enableVisualizations = _enableVisualizations;
   this->node = transport::NodePtr(new transport::Node());
@@ -107,6 +108,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
           &Scene::OnSkeletonPoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection",
       &Scene::OnSelectionMsg, this);
+  this->skySub = this->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
@@ -1809,6 +1811,65 @@ void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnSkyMsg(ConstSkyPtr &_msg)
+{
+  SkyX::VClouds::VClouds *vclouds =
+    this->skyx->getVCloudsManager()->getVClouds();
+
+  if (_msg->has_time())
+  {
+    Ogre::Vector3 t = this->skyxController->getTime();
+    t.x = math::clamp(_msg->time(), 0.0, 24.0);
+    this->skyxController->setTime(t);
+  }
+
+  if (_msg->has_sunrise())
+  {
+    Ogre::Vector3 t = this->skyxController->getTime();
+    t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
+    this->skyxController->setTime(t);
+  }
+
+  if (_msg->has_sunset())
+  {
+    Ogre::Vector3 t = this->skyxController->getTime();
+    t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
+    this->skyxController->setTime(t);
+  }
+
+  if (_msg->has_wind_speed())
+    vclouds->setWindSpeed(_msg->wind_speed());
+
+  if (_msg->has_wind_direction())
+    vclouds->setWindDirection(Ogre::Radian(_msg->wind_direction()));
+
+  if (_msg->has_cloud_ambient())
+  {
+    vclouds->setAmbientFactors(Ogre::Vector4(
+          _msg->cloud_ambient().r(),
+          _msg->cloud_ambient().g(),
+          _msg->cloud_ambient().b(),
+          _msg->cloud_ambient().a()));
+  }
+
+  if (_msg->has_humidity())
+  {
+    Ogre::Vector2 wheater = vclouds->getWheater();
+    vclouds->setWheater(math::clamp(_msg->humidity(), 0.0, 1.0),
+                        wheater.y, true);
+  }
+
+  if (_msg->has_avg_cloud_size())
+  {
+    Ogre::Vector2 wheater = vclouds->getWheater();
+    vclouds->setWheater(wheater.x,
+                        math::clamp(_msg->avg_cloud_size(), 0.0, 1.0), true);
+  }
+
+ this->skyx->update(0);
+}
+
+/////////////////////////////////////////////////
 void Scene::SetSky()
 {
   // Create SkyX
@@ -1837,17 +1898,18 @@ void Scene::SetSky()
         Ogre::Vector3(0.57f, 0.54f, 0.44f),  // Wavelength
         -0.991f, 2.5f, 4));
 
-  this->skyx->getVCloudsManager()->setWindSpeed(0.2);
+  this->skyx->getVCloudsManager()->setWindSpeed(0.6);
 
   // Use true to update volumetric clouds based on the time multiplier
-  this->skyx->getVCloudsManager()->setAutoupdate(false);
+  this->skyx->getVCloudsManager()->setAutoupdate(true);
+  //this->skyx->getVCloudsManager()->setHeight(Ogre::Vector2(20, 80));
 
   SkyX::VClouds::VClouds *vclouds =
     this->skyx->getVCloudsManager()->getVClouds();
 
   // Set wind direction in radians
   vclouds->setWindDirection(Ogre::Radian(0.0));
-  vclouds->setAmbientColor(Ogre::Vector3(0.63f,0.63f,0.7f));
+  vclouds->setAmbientColor(Ogre::Vector3(0.8f, 0.8f, 0.9f));
 
   // x = sun light power
   // y = sun beta multiplier
@@ -1855,7 +1917,7 @@ void Scene::SetSky()
   // w = distance attenuation
   vclouds->setLightResponse(Ogre::Vector4(0.25, 0.4, 0.5, 0.1));
   vclouds->setAmbientFactors(Ogre::Vector4(0.45, 0.3, 0.6, 0.1));
-  vclouds->setWheater(1, 1, false);
+  vclouds->setWheater(.6, .6, false);
 
   if (true) // If using clouds
   {
@@ -1863,7 +1925,7 @@ void Scene::SetSky()
     if (!this->skyx->getVCloudsManager()->isCreated())
     {
       // SkyX::MeshManager::getSkydomeRadius(...) works for both finite and infinite(=0) camera far clip distances
-      this->skyx->getVCloudsManager()->create(-1);
+      this->skyx->getVCloudsManager()->create(80.0);
           //this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
     }
   }
