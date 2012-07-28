@@ -1978,6 +1978,7 @@ void Scene::SetShadowsEnabled(bool _value)
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
   {
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
     this->manager->setShadowTextureCasterMaterial(
         "DeferredRendering/Shadows/RSMCaster_Spot");
@@ -1991,6 +1992,7 @@ void Scene::SetShadowsEnabled(bool _value)
     this->manager->setShadowCasterRenderBackFaces(false);
     this->manager->setShadowTextureSelfShadow(true);
     this->manager->setShadowDirLightTextureOffset(1.75);
+#endif
   }
   else if (RenderEngine::Instance()->GetRenderPathType() ==
       RenderEngine::FORWARD)
