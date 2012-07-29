@@ -138,8 +138,12 @@ namespace SkyX
 	     */
 		void _updateMoonBounds(Ogre::Camera* c);
 
+		/// SkyX parent pointer
+		SkyX *mSkyX;
+
 		/// Moon billboard
 		Ogre::BillboardSet* mMoonBillboard;
+
 		/// Moon scene node
 		Ogre::SceneNode* mMoonSceneNode;
 
@@ -148,16 +152,15 @@ namespace SkyX
 
 		/// Moon size
 		Ogre::Real mMoonSize;
+
 		/// Moon halo intensity
 		Ogre::Real mMoonHaloIntensity;
+
 		/// Moon halo strength
 		Ogre::Real mMoonHaloStrength;
 
 		/// Moon material
 		Ogre::MaterialPtr mMoonMaterial;
-
-		/// SkyX parent pointer
-		SkyX *mSkyX;
 	};
 }
 

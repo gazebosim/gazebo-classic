@@ -30,108 +30,122 @@ namespace SkyX
 {
 	class SkyX;
 
-    class DllExport GPUManager 
-	{
-	public:
-		/** Gpu program enum
-		 */
-		enum GpuProgram
-		{
-			// Vertex program
-			GPUP_VERTEX   = 0,
-			// Fragment program
-			GPUP_FRAGMENT = 1
-		};
+  class DllExport GPUManager 
+  {
+    public:
+      /** Gpu program enum
+      */
+      enum GpuProgram
+      {
+        // Vertex program
+        GPUP_VERTEX   = 0,
+        // Fragment program
+        GPUP_FRAGMENT = 1
+      };
 
-	    /** Constructor
-		    @param s Parent SkyX pointer
-		 */
-		GPUManager(SkyX *s);
+      /** Constructor
+        @param s Parent SkyX pointer
+        */
+      GPUManager(SkyX *s);
 
-		/** Destructor 
-		 */
-		~GPUManager();
+      /** Destructor 
+      */
+      ~GPUManager();
 
-		/** Add ground pass (Use for atmospheric scattering effect on the terrain)
-		    @param GroundPass Ground pass
-			@param AtmosphereRaidus Atmosphere radius (typically far carmera clip plane)
-			@param SBT Scene blend type
-		 */
-		void addGroundPass(Ogre::Pass* GroundPass, const Ogre::Real& AtmosphereRadius, const Ogre::SceneBlendType& SBT = Ogre::SBT_ADD);
+      /** Add ground pass (Use for atmospheric scattering effect on the terrain)
+        @param GroundPass Ground pass
+        @param AtmosphereRaidus Atmosphere radius (typically far carmera
+        clip plane)
+        @param SBT Scene blend type
+        */
+      void addGroundPass(Ogre::Pass* GroundPass,
+          const Ogre::Real& AtmosphereRadius,
+          const Ogre::SceneBlendType& SBT = Ogre::SBT_ADD);
 
-		/** Set gpu program int parameter
-		    @param GpuP Gpu program type (Vertex/Fragment)
-			@param Name param name
-			@param Value value
-			@param UpdateGroundPasses true to update ground passes
-		 */
-		void setGpuProgramParameter(const GpuProgram &GpuP, const Ogre::String &Name, const int &Value, const bool& UpdateGroundPasses = true);
+      /** Set gpu program int parameter
+        @param GpuP Gpu program type (Vertex/Fragment)
+        @param Name param name
+        @param Value value
+        @param UpdateGroundPasses true to update ground passes
+        */
+      void setGpuProgramParameter(const GpuProgram &GpuP,
+          const Ogre::String &Name, const int &Value,
+          const bool& UpdateGroundPasses = true);
 
-		/** Set gpu program Ogre::Real parameter
-		    @param GpuP Gpu program type (Vertex/Fragment)
-			@param Name param name
-			@param Value value
-			@param UpdateGroundPasses true to update ground passes
-		 */
-		void setGpuProgramParameter(const GpuProgram &GpuP, const Ogre::String &Name, const Ogre::Real &Value, const bool& UpdateGroundPasses = true);
+      /** Set gpu program Ogre::Real parameter
+        @param GpuP Gpu program type (Vertex/Fragment)
+        @param Name param name
+        @param Value value
+        @param UpdateGroundPasses true to update ground passes
+        */
+      void setGpuProgramParameter(const GpuProgram &GpuP,
+          const Ogre::String &Name, const Ogre::Real &Value,
+          const bool& UpdateGroundPasses = true);
 
-		/** Set gpu program Ogre::Vector2 parameter
-		    @param GpuP Gpu program type (Vertex/Fragment)
-			@param Name param name
-			@param Value value
-			@param UpdateGroundPasses true to update ground passes
-		 */
-		void setGpuProgramParameter(const GpuProgram &GpuP, const Ogre::String &Name, const Ogre::Vector2 &Value, const bool& UpdateGroundPasses = true); 
+      /** Set gpu program Ogre::Vector2 parameter
+        @param GpuP Gpu program type (Vertex/Fragment)
+        @param Name param name
+        @param Value value
+        @param UpdateGroundPasses true to update ground passes
+        */
+      void setGpuProgramParameter(const GpuProgram &GpuP,
+          const Ogre::String &Name, const Ogre::Vector2 &Value,
+          const bool& UpdateGroundPasses = true); 
 
-		/** Set gpu program Ogre::Vector3 parameter
-		    @param GpuP Gpu program type (Vertex/Fragment)
-			@param Name param name
-			@param Value value
-			@param UpdateGroundPasses true to update ground passes
-		 */
-		void setGpuProgramParameter(const GpuProgram &GpuP, const Ogre::String &Name, const Ogre::Vector3 &Value, const bool& UpdateGroundPasses = true); 
+      /** Set gpu program Ogre::Vector3 parameter
+        @param GpuP Gpu program type (Vertex/Fragment)
+        @param Name param name
+        @param Value value
+        @param UpdateGroundPasses true to update ground passes
+        */
+      void setGpuProgramParameter(const GpuProgram &GpuP,
+          const Ogre::String &Name, const Ogre::Vector3 &Value,
+          const bool& UpdateGroundPasses = true); 
 
-		/** Get skydome material name
-		    @return Skydome material name
-		 */
-		const Ogre::String getSkydomeMaterialName() const;
+      /** Get skydome material name
+        @return Skydome material name
+        */
+      const Ogre::String getSkydomeMaterialName() const;
 
-		/** Get moon material name
-		    @return Moon material name
-		 */
-		inline const Ogre::String getMoonMaterialName() const
-		{
-			return "SkyX_Moon";
-		}
+      /** Get moon material name
+        @return Moon material name
+        */
+      inline const Ogre::String getMoonMaterialName() const
+      {
+        return "SkyX_Moon";
+      }
 
-		/** Update fragment program materials
-		    @remarks Only for internal use
-		 */
-		void _updateFP();
+      /** Update fragment program materials
+        @remarks Only for internal use
+        */
+      void _updateFP();
 
-		/** Notify skydome material changed
-		    @remarks Only for internal use
-		 */
-		inline void _notifySkydomeMaterialChanged()
-		{
-			mSkydomeMaterial = static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName(getSkydomeMaterialName()));
+      /** Notify skydome material changed
+        @remarks Only for internal use
+        */
+      inline void _notifySkydomeMaterialChanged()
+      {
+        mSkydomeMaterial = static_cast<Ogre::MaterialPtr>(
+              Ogre::MaterialManager::getSingleton().getByName(
+                getSkydomeMaterialName()));
 
-			if (mSkydomeMaterial.isNull())
-			{
-				SkyXLOG("Error in SkyX::GPUManager: '" + getSkydomeMaterialName() + "' material not found");
-				return;
-			}
-		}
-		
-	private:
-		/// Skydome material
-		Ogre::MaterialPtr mSkydomeMaterial;
-		/// Ground pass vector
-		std::vector<Ogre::Pass*> mGroundPasses;
+        if (mSkydomeMaterial.isNull())
+        {
+          SkyXLOG("Error in SkyX::GPUManager: '" + getSkydomeMaterialName() +
+                  "' material not found");
+          return;
+        }
+      }
 
-		/// SkyX parent pointer
-		SkyX *mSkyX;
-	};
+    private:
+      /// SkyX parent pointer
+      SkyX *mSkyX;
+
+      /// Ground pass vector
+      std::vector<Ogre::Pass*> mGroundPasses;
+
+      /// Skydome material
+      Ogre::MaterialPtr mSkydomeMaterial;
+  };
 }
-
 #endif

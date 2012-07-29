@@ -1,5 +1,5 @@
 /*
-   --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
    This source file is part of SkyX.
    Visit http://www.paradise-studios.net/products/skyx/
 
@@ -21,17 +21,18 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include "AtmosphereManager.h"
 
 #include "SkyX.h"
-
 #include "GPUManager.h"
+
+#include "gazebo/math/Helpers.hh"
+
+#include "AtmosphereManager.h"
 
 namespace SkyX
 {
   AtmosphereManager::AtmosphereManager(SkyX *s)
-    : mSkyX(s)
-      , mOptions(Options())
+    : mSkyX(s), mOptions(Options())
   {
   }
 
@@ -39,12 +40,13 @@ namespace SkyX
   {
   }
 
-  void AtmosphereManager::_update(const Options& NewOptions, const bool& ForceToUpdateAll)
+  void AtmosphereManager::_update(const Options& NewOptions,
+                                  const bool& ForceToUpdateAll)
   {
     GPUManager *mGPUManager = mSkyX->getGPUManager();
 
-    if (NewOptions.InnerRadius != mOptions.InnerRadius || 
-        NewOptions.OuterRadius != mOptions.OuterRadius ||
+    if (!gazebo::math::equal(NewOptions.InnerRadius, mOptions.InnerRadius) || 
+        !gazebo::math::equal(NewOptions.OuterRadius, mOptions.OuterRadius) ||
         ForceToUpdateAll)
     {
       mOptions.InnerRadius = NewOptions.InnerRadius;
@@ -64,19 +66,20 @@ namespace SkyX
       mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uScaleOverScaleDepth", ScaleOverScaleDepth);
     }
 
-    if (NewOptions.HeightPosition != mOptions.HeightPosition ||
-        ForceToUpdateAll)
+    if (!gazebo::math::equal(NewOptions.HeightPosition, mOptions.HeightPosition)
+        || ForceToUpdateAll)
     {
       mOptions.HeightPosition = NewOptions.HeightPosition;
 
       mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uCameraPos",
-          Ogre::Vector3(0, 0,
-            mOptions.InnerRadius +
-            (mOptions.OuterRadius-mOptions.InnerRadius)*mOptions.HeightPosition));
+          Ogre::Vector3(0, 0, mOptions.InnerRadius +
+            (mOptions.OuterRadius - mOptions.InnerRadius) *
+            mOptions.HeightPosition));
     }
 
-    if (NewOptions.RayleighMultiplier != mOptions.RayleighMultiplier ||
-        NewOptions.SunIntensity       != mOptions.SunIntensity       ||
+    if (!gazebo::math::equal(NewOptions.RayleighMultiplier,
+                             mOptions.RayleighMultiplier) ||
+        !gazebo::math::equal(NewOptions.SunIntensity, mOptions.SunIntensity) ||
         ForceToUpdateAll)
     {
       mOptions.RayleighMultiplier = NewOptions.RayleighMultiplier;
@@ -90,8 +93,9 @@ namespace SkyX
           KrESun);
     }
 
-    if (NewOptions.MieMultiplier != mOptions.MieMultiplier ||
-        NewOptions.SunIntensity  != mOptions.SunIntensity  ||
+    if (!gazebo::math::equal(NewOptions.MieMultiplier,
+                             mOptions.MieMultiplier) ||
+        !gazebo::math::equal(NewOptions.SunIntensity, mOptions.SunIntensity) ||
         ForceToUpdateAll)
     {
       mOptions.MieMultiplier = NewOptions.MieMultiplier;
@@ -124,16 +128,16 @@ namespace SkyX
             1.0f / Ogre::Math::Pow(mOptions.WaveLength.z, 4.0f)));
     }
 
-    if (NewOptions.G != mOptions.G ||
-        ForceToUpdateAll)
+    if (!gazebo::math::equal(NewOptions.G, mOptions.G) || ForceToUpdateAll)
     {
       mOptions.G = NewOptions.G;
-
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uG", mOptions.G, false);
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uG2", mOptions.G*mOptions.G, false);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uG",
+                                          mOptions.G, false);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uG2",
+                                          mOptions.G*mOptions.G, false);
     }
 
-    if ((NewOptions.Exposure != mOptions.Exposure ||
+    if ((!gazebo::math::equal(NewOptions.Exposure, mOptions.Exposure) ||
           ForceToUpdateAll) && 
         (mSkyX->getLightingMode() == SkyX::LM_LDR))
     {
@@ -145,7 +149,7 @@ namespace SkyX
     mSkyX->getCloudsManager()->update();
   }
 
-  const float AtmosphereManager::_scale(const float& cos, const float& uScaleDepth) const
+  float AtmosphereManager::_scale(const float& cos, const float& uScaleDepth) const
   {
     float x = 1 - cos;
     return uScaleDepth * Ogre::Math::Exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));

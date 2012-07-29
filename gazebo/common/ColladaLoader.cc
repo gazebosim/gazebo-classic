@@ -1411,13 +1411,13 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
 
     if (opaqueStr == "RGB_ZERO")
     {
-      srcFactor = color.R() * _mat->GetTransparency();
-      dstFactor = 1.0 - color.R() * _mat->GetTransparency();
+      srcFactor = color.r * _mat->GetTransparency();
+      dstFactor = 1.0 - color.r * _mat->GetTransparency();
     }
     else if (opaqueStr == "A_ONE")
     {
-      srcFactor = 1.0 - color.A() * _mat->GetTransparency();
-      dstFactor = color.A() * _mat->GetTransparency();
+      srcFactor = 1.0 - color.a * _mat->GetTransparency();
+      dstFactor = color.a * _mat->GetTransparency();
     }
 
     _mat->SetBlendFactors(srcFactor, dstFactor);

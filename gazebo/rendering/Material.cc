@@ -159,17 +159,17 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color emissive = _mat->GetEmissive();
 
   pass->setLightingEnabled(_mat->GetLighting());
-  pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
-  pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
+  pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+  pass->setAmbient(ambient.r, ambient.g, ambient.b);
 
-  if (diffuse.A() < 1.0)
+  if (diffuse.a < 1.0)
   {
     pass->setDepthWriteEnabled(false);
     pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   }
 
-  pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
-  pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
+  pass->setSpecular(specular.r, specular.g, specular.b, specular.a);
+  pass->setSelfIllumination(emissive.r, emissive.g, emissive.b);
 
   pass->setShininess(_mat->GetShininess());
 

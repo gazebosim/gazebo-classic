@@ -354,7 +354,7 @@ void MovableText::_setupGeometry()
   pVert = static_cast<float*>(ptbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // Derive space width from a capital A
-  if (math::equal(this->spaceWidth, 0))
+  if (math::equal(this->spaceWidth, 0.0f))
     this->spaceWidth =
       this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 
@@ -610,8 +610,8 @@ void MovableText::_updateColors(void)
   assert(!this->material.isNull());
 
   // Convert to system-specific
-  Ogre::ColourValue cv(this->color.R(), this->color.G(),
-                       this->color.B(), this->color.A());
+  Ogre::ColourValue cv(this->color.r, this->color.g,
+                       this->color.b, this->color.a);
   Ogre::Root::getSingleton().convertColourValue(cv, &clr);
 
   vbuf = this->renderOp.vertexData->vertexBufferBinding->getBuffer(

@@ -72,7 +72,7 @@ namespace SkyX
 		/** Check bounds
 		    @return false if the Color gradient is mal-formed
 		 */
-		const bool _checkBounds() const;
+		bool _checkBounds() const;
 
 		/// Mal formed color gradient?
 		bool mMalFormed;

@@ -85,12 +85,13 @@ void Heightmap::Load()
   if (this->heightImage.GetWidth() != this->heightImage.GetHeight() ||
       !math::isPowerOfTwo(this->heightImage.GetWidth() - 1))
   {
-    gzthrow("Heightmap image size must be square, with a size of 2^n-1\n");
+    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
   }
 
   this->imageSize = this->heightImage.GetWidth();
-  this->maxPixel = this->heightImage.GetMaxColor().R();
-  if (math::equal(this->maxPixel, 0))
+  this->maxPixel = this->heightImage.GetMaxColor().r;
+
+  if (math::equal(this->maxPixel, 0.0))
     this->maxPixel = 1.0;
 
   // Create terrain group, which holds all the individual terrain instances.
@@ -140,7 +141,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(0);
+  this->terrainGlobals->setMaxPixelError(5);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -212,6 +213,7 @@ void Heightmap::ConfigureTerrainDefaults()
 void Heightmap::DefineTerrain(int x, int y)
 {
   Ogre::String filename = this->terrainGroup->generateFilename(x, y);
+
   if (Ogre::ResourceGroupManager::getSingleton().resourceExists(
         this->terrainGroup->getResourceGroup(), filename))
   {

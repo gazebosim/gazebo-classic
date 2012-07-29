@@ -37,6 +37,7 @@ namespace gazebo
     class FPSViewController;
     class Visual;
     class GUIOverlay;
+    class SelectionBuffer;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -113,6 +114,16 @@ namespace gazebo
       /// \brief Set whether the view controller is enabled
       public: void EnableViewController(bool _value) const;
 
+      /// \brief Get an entity at a pixel location using a camera. Used for
+      ///        mouse picking.
+      /// \param mousePos The position of the mouse in screen coordinates
+      /// \param _mod Used for object manipulation
+      /// \return The selected entity, or NULL
+      public: VisualPtr GetVisual(math::Vector2i mousePos, std::string &mod);
+
+      /// \brief Get a visual at a mouse position
+      public: VisualPtr GetVisual(math::Vector2i _mousePos);
+
       /// \brief Toggle whether to show the visual
       private: void ToggleShowVisual();
 
@@ -121,7 +132,6 @@ namespace gazebo
 
       private: void OnMoveToVisualComplete();
 
-      private: std::string name;
       private: static int count;
 
       private: Visual *visual;
@@ -133,6 +143,7 @@ namespace gazebo
       private: GUIOverlay *gui;
 
       private: Ogre::SceneNode *axisNode;
+      private: SelectionBuffer *selectionBuffer;
     };
     /// \}
   }

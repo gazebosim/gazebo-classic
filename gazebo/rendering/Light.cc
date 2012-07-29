@@ -396,7 +396,7 @@ void Light::SetDiffuseColor(const common::Color &_color)
   if (elem->GetValueColor("rgba") != _color)
     elem->GetAttribute("rgba")->Set(_color);
 
-  this->light->setDiffuseColour(_color.R(), _color.G(), _color.B());
+  this->light->setDiffuseColour(_color.r, _color.g, _color.b);
 }
 
 //////////////////////////////////////////////////
@@ -413,7 +413,7 @@ void Light::SetSpecularColor(const common::Color &_color)
   if (elem->GetValueColor("rgba") != _color)
     elem->GetAttribute("rgba")->Set(_color);
 
-  this->light->setSpecularColour(_color.R(), _color.G(), _color.B());
+  this->light->setSpecularColour(_color.r, _color.g, _color.b);
 }
 
 //////////////////////////////////////////////////
@@ -476,7 +476,7 @@ void Light::SetRange(const double &range)
 }
 
 //////////////////////////////////////////////////
-void Light::SetCastShadows(const bool &_cast)
+void Light::SetCastShadows(const bool & /*_cast*/)
 {
     this->light->setCastShadows(true);
   /*if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT ||

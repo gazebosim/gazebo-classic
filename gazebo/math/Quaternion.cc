@@ -170,7 +170,7 @@ void Quaternion::Normalize()
   s = sqrt(this->w * this->w + this->x * this->x + this->y * this->y +
            this->z * this->z);
 
-  if (math::equal(s, 0))
+  if (math::equal(s, 0.0))
   {
     this->w = 1.0;
     this->x = 0.0;

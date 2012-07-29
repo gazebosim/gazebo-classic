@@ -11,6 +11,7 @@ if (${OGRE_VERSION} GREATER 1.7.4)
   add_subdirectory(deferred_shading)
 endif()
 add_subdirectory(skyx)
+add_subdirectory(selection_buffer)
 
 set (sources
   ArrowVisual.cc
@@ -107,6 +108,7 @@ target_link_libraries( gazebo_rendering
   gazebo_common 
   gazebo_sdf_interface
   gazebo_skyx
+  gazebo_selection_buffer
   ${ogre_libraries} 
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}

@@ -24,6 +24,8 @@ set (files
   laser_1st_pass.vert
   laser_2nd_pass.frag
   laser_2nd_pass.vert
+  plain_color_vs.glsl
+  plain_color_fs.glsl
 ) 
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/programs/)

@@ -304,6 +304,8 @@ namespace gazebo
 
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
+      private: void OnSkyMsg(ConstSkyPtr &_msg);
+
       private: void OnPoseMsg(ConstPosePtr &_msg);
 
       private: void OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg);
@@ -382,7 +384,7 @@ namespace gazebo
       private: transport::SubscriberPtr selectionSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr skeletonPoseSub;
-      private: transport::SubscriberPtr triggerSub;
+      private: transport::SubscriberPtr skySub;
       private: transport::PublisherPtr lightPub;
       private: transport::PublisherPtr requestPub;
 

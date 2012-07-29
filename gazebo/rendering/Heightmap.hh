@@ -70,6 +70,7 @@ namespace gazebo
       private: unsigned int imageSize;
       private: double maxPixel;
       private: math::Vector3 terrainOrigin;
+
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
       private: Ogre::TerrainGroup *terrainGroup;
       private: bool terrainsImported;

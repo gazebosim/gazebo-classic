@@ -207,18 +207,19 @@ namespace SkyX
 		 */
 		void _updatePassParameters();
 
+		/// SkyX parent pointer
+		SkyX *mSkyX;
+
 		/// Cloud layer options
 		Options mOptions;
-
-		/// Ambient and Sun color gradients
-		ColorGradient mAmbientGradient;
-		ColorGradient mSunGradient;
 
 		/// Cloud layer pass
 		Ogre::Pass *mCloudLayerPass;
 
-		/// SkyX parent pointer
-		SkyX *mSkyX;
+		/// Ambient and Sun color gradients
+		ColorGradient mAmbientGradient;
+
+		ColorGradient mSunGradient;
 	};
 
     class DllExport CloudsManager 

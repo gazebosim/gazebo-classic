@@ -51,6 +51,7 @@ set (msgs
   sensor.proto
   server_control.proto
   shadows.proto
+  sky.proto
   spheregeom.proto
   subscribe.proto
   surface.proto

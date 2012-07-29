@@ -156,17 +156,17 @@ namespace SkyX
 	
 	private:
 		/** Shader scale funtion 
-		    @param cos Cos
+	    @param cos Cos
 			@param uScaleDepth Scale Depth
 			@return Scale
 		 */
-		const float _scale(const float& cos, const float& uScaleDepth) const;
-
-		/// Our options
-		Options mOptions;
+		float _scale(const float& cos, const float& uScaleDepth) const;
 
 		/// SkyX parent pointer
 		SkyX *mSkyX;
+
+		/// Our options
+		Options mOptions;
 	};
 }
 

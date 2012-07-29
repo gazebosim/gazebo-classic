@@ -58,7 +58,8 @@ namespace SkyX
 		minBound.second = -1;
 		for (unsigned int k = 0; k < CFrameVector.size(); k++)
 		{
-			if (CFrameVector.at(k).second < p && CFrameVector.at(k).second > minBound.second)
+			if (CFrameVector.at(k).second < p &&
+          CFrameVector.at(k).second > minBound.second)
 			{
 				minBound.first = k;
 				minBound.second = CFrameVector.at(k).second;
@@ -70,7 +71,8 @@ namespace SkyX
 		maxBound.second = 2;
 		for (unsigned int k = 0; k < CFrameVector.size(); k++)
 		{
-			if (CFrameVector.at(k).second > p && CFrameVector.at(k).second < maxBound.second)
+			if (CFrameVector.at(k).second > p &&
+          CFrameVector.at(k).second < maxBound.second)
 			{
 				maxBound.first = k;
 				maxBound.second = CFrameVector.at(k).second;
@@ -80,10 +82,11 @@ namespace SkyX
 		float range = maxBound.second - minBound.second,
 		      rangepoint = (p - minBound.second) / range;
 
-		return CFrameVector.at(minBound.first).first*(1-rangepoint) + CFrameVector.at(maxBound.first).first*rangepoint;
+		return CFrameVector.at(minBound.first).first*(1-rangepoint) +
+           CFrameVector.at(maxBound.first).first*rangepoint;
 	}
 
-	const bool ColorGradient::_checkBounds() const
+	bool ColorGradient::_checkBounds() const
 	{
 		std::pair<bool, bool> existbounds;
 		existbounds.first = false; existbounds.second = false;

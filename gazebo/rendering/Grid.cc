@@ -85,10 +85,10 @@ void Grid::SetColor(const common::Color &_color)
 {
   this->colorP = _color;
 
-  this->material->setDiffuse(_color.R(), _color.G(), _color.B(), _color.A());
-  this->material->setAmbient(_color.R(), _color.G(), _color.B());
+  this->material->setDiffuse(_color.r, _color.g, _color.b, _color.a);
+  this->material->setAmbient(_color.r, _color.g, _color.b);
 
-  if ((this->colorP).A() < 0.9998)
+  if ((this->colorP).a < 0.9998)
     this->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   else
     this->material->setSceneBlending(Ogre::SBT_REPLACE);
@@ -113,8 +113,10 @@ void Grid::Init()
 {
   this->manualObject =
     this->scene->GetManager()->createManualObject(this->name);
-  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->manualObject->setDynamic(true);
+  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI |
+                                         GZ_VISIBILITY_NOT_SELECTABLE);
+
+  this->manualObject->setDynamic(false);
   // this->manualObject->setRenderQueueGroup(
   //    Ogre::RENDER_QUEUE_SKIES_EARLY+3);
   //    Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);

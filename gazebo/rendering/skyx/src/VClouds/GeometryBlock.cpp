@@ -21,9 +21,10 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include "VClouds/GeometryBlock.h"
-
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "VClouds/VClouds.h"
+#include "VClouds/GeometryBlock.h"
 
 namespace SkyX { namespace VClouds
   {
@@ -91,6 +92,7 @@ namespace SkyX { namespace VClouds
       mEntity->setMaterialName("SkyX_VolClouds");
       mEntity->setCastShadows(false);
       mEntity->setRenderQueueGroup(mVClouds->getRenderQueueGroups().vclouds);
+      mEntity->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
 
       // Set bounds
       mMesh->_setBounds(_buildAABox(mLastFallingDistance));
@@ -147,8 +149,8 @@ namespace SkyX { namespace VClouds
 
     void GeometryBlock::_calculateDataSize()
     {
-      mVertexCount = 7 * mNa;// + 6 * mNb + 4 * mNc;
-      mNumberOfTriangles = 5 * mNa;// + 4 * mNb + 2 * mNc;
+      mVertexCount = 7 * mNa + 6 * mNb;// + 4 * mNc;
+      mNumberOfTriangles = 5 * mNa + 4 * mNb;// + 2 * mNc;
 
       mV2Cos = Ogre::Vector2(Ogre::Math::Cos(mPosition*mPhi),
                              Ogre::Math::Cos((mPosition+1)*mPhi));
@@ -220,6 +222,7 @@ namespace SkyX { namespace VClouds
         IndexOffset  += 6;
         VertexOffset += 4;
       }
+      */
 
       // B
       for (int k = 0; k < mNb; k++)
@@ -246,7 +249,7 @@ namespace SkyX { namespace VClouds
 
         IndexOffset  += 12;
         VertexOffset += 6;
-      }*/
+      }
 
       // A
       for (int k = 0; k < mNa; k++)
@@ -333,7 +336,7 @@ namespace SkyX { namespace VClouds
         }
       }
 
-      if (fallingDistance != mLastFallingDistance)
+      if (!gazebo::math::equal(fallingDistance, mLastFallingDistance))
       {
         mLastFallingDistance = fallingDistance;
         mMesh->_setBounds(_buildAABox(mLastFallingDistance));
@@ -353,12 +356,13 @@ namespace SkyX { namespace VClouds
       {
         _updateZoneCSlice(k);
       }
+      */
 
       // Update zone B
       for (int k = 0; k < mNb; k++)
       {
         _updateZoneBSlice(k);
-      }*/
+      }
 
       // Update zone A
       for (int k = 0; k < mNa; k++)
@@ -416,7 +420,7 @@ namespace SkyX { namespace VClouds
 
     void GeometryBlock::_updateZoneBSlice(const int& n)
     {
-      int VertexOffset = mNc*4 + n*6;
+      int VertexOffset = /*mNc*4 +*/ n*6;
 
       // TODO
       float Radius = mA+((mB-mA)/mNb)*(mNb-n);
@@ -434,50 +438,54 @@ namespace SkyX { namespace VClouds
         opacity = mDisplacement.y/((mB-mA)/mNb);
       }
 
-      Ogre::Vector2 x1 = Radius*mV2Cos,
-        x2 = Radius*mBetaSin*mV2Cos,
-        z1 = Radius*mV2Sin,
-        z2 = Radius*mBetaSin*mV2Sin;
+      Ogre::Vector2 x1 = Radius * mV2Cos;
+      Ogre::Vector2 x2 = Radius * mBetaSin*mV2Cos;
+      Ogre::Vector2 z1 = Radius * mV2Sin;
+      Ogre::Vector2 z2 = Radius * mBetaSin*mV2Sin;
 
       float y0 = Radius*Ogre::Math::Sin(mAlpha);
 
       // Vertex 0
-      _setVertexData(VertexOffset, Ogre::Vector3(x1.x, 0, z1.x), opacity);
+      _setVertexData(VertexOffset, Ogre::Vector3(x1.x, z1.x, 0), opacity);
       // Vertex 1
-      _setVertexData(VertexOffset+1, Ogre::Vector3(x1.y, 0, z1.y), opacity);
+      _setVertexData(VertexOffset+1, Ogre::Vector3(x1.y, z1.y, 0), opacity);
       // Vertex 2
-      _setVertexData(VertexOffset+2, Ogre::Vector3(x2.x, y0, z2.x), opacity);
+      _setVertexData(VertexOffset+2, Ogre::Vector3(x2.x, z2.x, y0), opacity);
       // Vertex 3
-      _setVertexData(VertexOffset+3, Ogre::Vector3(x2.y, y0, z2.y), opacity);
+      _setVertexData(VertexOffset+3, Ogre::Vector3(x2.y, z2.y, y0), opacity);
 
-      Ogre::Vector2 x3 = Radius*mAlphaSin*mV2Cos,
-        z3 = Radius*mAlphaSin*mV2Sin;
+      Ogre::Vector2 x3 = Radius*mAlphaSin * mV2Cos;
+      Ogre::Vector2 z3 = Radius*mAlphaSin * mV2Sin;
 
-      Ogre::Vector3 or0 = Ogre::Vector3(x2.x, y0, z2.x),
-        or1 = Ogre::Vector3(x2.y, y0, z2.y);
+      Ogre::Vector3 or0 = Ogre::Vector3(x2.x, z2.x, y0);
+      Ogre::Vector3 or1 = Ogre::Vector3(x2.y, z2.y, y0);
 
-      float y1 = Radius*Ogre::Math::Sin(mBeta),
-            y3 = y1-y0,
-            d = Ogre::Vector2(x3.x - x2.x, z3.x - z2.x).length(),
-            ang = Ogre::Math::ATan(y3/d).valueRadians(),
-            hip = (mHeight-y0) / Ogre::Math::Sin(ang);
+      float y1 = Radius * Ogre::Math::Sin(mBeta);
+      float y3 = y1 - y0;
+      float d = Ogre::Vector2(x3.x - x2.x, z3.x - z2.x).length();
+      float ang = Ogre::Math::ATan(y3/d).valueRadians();
+      float hip = (mHeight-y0) / Ogre::Math::Sin(ang);
 
       // Vertex 4
-      _setVertexData(VertexOffset+4, or0 + (Ogre::Vector3(x3.x, y1, z3.x)-or0).normalisedCopy()*hip, opacity);
+      _setVertexData(VertexOffset + 4,
+          or0 + (Ogre::Vector3(x3.x, z3.x, y1)-or0).normalisedCopy()*hip,
+          opacity);
       // Vertex 5
-      _setVertexData(VertexOffset+5, or1 + (Ogre::Vector3(x3.y, y1, z3.y)-or1).normalisedCopy()*hip, opacity);
+      _setVertexData(VertexOffset+5,
+          or1 + (Ogre::Vector3(x3.y, z3.y, y1)-or1).normalisedCopy()*hip,
+          opacity);
     }
 
     void GeometryBlock::_updateZoneASlice(const int& n)
     {
-      int VertexOffset = /*mNc*4 + mNb*6 +*/n*7;
+      int VertexOffset = /*mNc*4 +*/ mNb * 6 + n * 7;
 
       // TODO
       float Radius = (mA/mNa)*(mNa-n);
 
       Radius += mDisplacement.x;
 
-      float opacity = (n == 0) ? (1-mDisplacement.x/(mA/mNa)) : 1.0f;
+      float opacity = (n == 0) ? (1 - mDisplacement.x/(mA/mNa)) : 1.0f;
 
       Ogre::Vector2 x1 = Radius*mV2Cos;
       Ogre::Vector2 x2 = Radius*mBetaSin*mV2Cos;
@@ -507,30 +515,6 @@ namespace SkyX { namespace VClouds
 
       // Vertex 6
       _setVertexData(VertexOffset+6, Ogre::Vector3(0, 0, Radius), opacity);
-
-      /*
-      // Vertex 0
-      _setVertexData(VertexOffset, Ogre::Vector3(x1.x, 0, z1.x), opacity);
-      // Vertex 1
-      _setVertexData(VertexOffset+1, Ogre::Vector3(x1.y, 0, z1.y), opacity);
-      // Vertex 2
-      _setVertexData(VertexOffset+2, Ogre::Vector3(x2.x, y0, z2.x), opacity);
-      // Vertex 3
-      _setVertexData(VertexOffset+3, Ogre::Vector3(x2.y, y0, z2.y), opacity);
-
-      Ogre::Vector2 x3 = Radius * mAlphaSin * mV2Cos;
-      Ogre::Vector2 z3 = Radius * mAlphaSin * mV2Sin;
-
-      float y1 = Radius*Ogre::Math::Sin(mBeta);
-
-      // Vertex 4
-      _setVertexData(VertexOffset+4, Ogre::Vector3(x3.x, y1, z3.x), opacity);
-      // Vertex 5
-      _setVertexData(VertexOffset+5, Ogre::Vector3(x3.y, y1, z3.y), opacity);
-
-      // Vertex 6
-      _setVertexData(VertexOffset+6, Ogre::Vector3(0, Radius, 0), opacity);
-      */
     }
 
     void GeometryBlock::_setVertexData(const int& index,
@@ -579,7 +563,6 @@ namespace SkyX { namespace VClouds
             mCamera->getDerivedPosition().z) - mRadius *
           (0.5f + 0.5f * Ogre::Vector2(p.x, p.y).length()/mRadius));
 
-      //Ogre::Vector3 dir = (p-origin).normalisedCopy();
       Ogre::Vector3 dir = (p - origin).normalisedCopy();
 
       float hip = Ogre::Math::Sqrt(
@@ -658,7 +641,7 @@ namespace SkyX { namespace VClouds
       mVertices[index].o = o * mVClouds->getGlobalOpacity();
     }*/
 
-    const bool GeometryBlock::isInFrustum(Ogre::Camera *c) const
+    bool GeometryBlock::isInFrustum(Ogre::Camera *c) const
     {
       if (!mCreated)
       {

@@ -10,6 +10,7 @@ set (files
   grid.material
   kitchen.material
   perpixel.program
+  picker.material
   ShadowCaster.material
   ShadowCaster.program
   ssao.compositor
