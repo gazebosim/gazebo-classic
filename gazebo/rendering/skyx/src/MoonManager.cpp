@@ -21,9 +21,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include "MoonManager.h"
-
 #include "SkyX.h"
+#include "MoonManager.h"
 
 namespace SkyX
 {

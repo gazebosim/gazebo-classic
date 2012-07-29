@@ -135,7 +135,7 @@ namespace SkyX
 		/** Is SkyX created?
 		    @return true if yes, false if not
 		 */
-		inline const bool isCreated() const
+		inline bool isCreated() const
 		{
 			return mCreated;
 		}
@@ -339,37 +339,42 @@ namespace SkyX
 		}
 
 	private:
-		/// Is SkyX created?
-		bool mCreated;
-
-		/// Mesh manager
-		MeshManager* mMeshManager;
-		/// Atmosphere manager
-		AtmosphereManager* mAtmosphereManager;
-		/// GPU manager
-		GPUManager* mGPUManager;
-		/// Moon manager
-		MoonManager* mMoonManager;
-		/// Clouds manager
-		CloudsManager* mCloudsManager;
-		/// Volumetric clouds manager
-		VCloudsManager* mVCloudsManager;
+		/// Scene manager
+    Ogre::SceneManager *mSceneManager;
 
 		/// Controller
 		Controller* mController;
 
-		/// Render queue groups
-		RenderQueueGroups mRenderQueueGroups;
-
-		/// Scene manager
-        Ogre::SceneManager *mSceneManager;
 		/// Current rendering camera
 		Ogre::Camera* mCamera;
 
+		/// Mesh manager
+		MeshManager* mMeshManager;
+
+		/// Atmosphere manager
+		AtmosphereManager* mAtmosphereManager;
+
+		/// GPU manager
+		GPUManager* mGPUManager;
+
+		/// Moon manager
+		MoonManager* mMoonManager;
+
+		/// Clouds manager
+		CloudsManager* mCloudsManager;
+
+		/// Render queue groups
+		RenderQueueGroups mRenderQueueGroups;
+
+		/// Is SkyX created?
+		bool mCreated;
+
 		/// Last camera position
 		Ogre::Vector3 mLastCameraPosition;
+
 		/// Last camera far clip distance
 		Ogre::Real mLastCameraFarClipDistance;
+
 		/// Infinite camera far clip distance
 		Ogre::Real mInfiniteCameraFarClipDistance;
 
@@ -378,13 +383,18 @@ namespace SkyX
 
 		/// Lighting mode
 		LightingMode mLightingMode;
+
 		/// Enable starfield?
 		bool mStarfield;
 
 		/// Time multiplier
 		Ogre::Real mTimeMultiplier;
+
 		/// Time offset
 		Ogre::Real mTimeOffset;
+
+		/// Volumetric clouds manager
+		VCloudsManager* mVCloudsManager;
 	};
 }
 

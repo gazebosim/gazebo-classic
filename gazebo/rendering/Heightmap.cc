@@ -89,8 +89,8 @@ void Heightmap::Load()
   }
 
   this->imageSize = this->heightImage.GetWidth();
-  this->maxPixel = this->heightImage.GetMaxColor().R();
-  if (math::equal(this->maxPixel, 0))
+  this->maxPixel = this->heightImage.GetMaxColor().r;
+  if (math::equal(this->maxPixel, 0.0))
     this->maxPixel = 1.0;
 
   // Create terrain group, which holds all the individual terrain instances.

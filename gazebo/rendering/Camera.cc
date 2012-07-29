@@ -44,7 +44,7 @@ using namespace rendering;
 unsigned int Camera::cameraCounter = 0;
 
 //////////////////////////////////////////////////
-Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
+Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
 {
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
@@ -52,7 +52,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 
   this->animState = NULL;
   this->windowId = 0;
-  this->scene = scene_;
+  this->scene = _scene;
 
   this->newData = false;
 
@@ -65,7 +65,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
   this->myCount = cameraCounter++;
 
   std::ostringstream stream;
-  stream << namePrefix_ << "(" << this->myCount << ")";
+  stream << _namePrefix << "(" << this->myCount << ")";
   this->name = stream.str();
 
   this->renderTarget = NULL;
@@ -208,11 +208,10 @@ unsigned int Camera::GetWindowId() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetScene(Scene *scene_)
+void Camera::SetScene(Scene *_scene)
 {
-  this->scene = scene_;
+  this->scene = _scene;
 }
-
 
 //////////////////////////////////////////////////
 void Camera::Update()
@@ -1060,7 +1059,7 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 
   _result = origin + dir * dist;
 
-  if (!math::equal(dist, -1))
+  if (!math::equal(dist, -1.0))
     return true;
   else
     return false;

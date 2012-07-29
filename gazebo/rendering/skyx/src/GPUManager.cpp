@@ -28,8 +28,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 namespace SkyX
 {
 	GPUManager::GPUManager(SkyX *s)
-		: mSkyX(s)
-		, mGroundPasses(std::vector<Ogre::Pass*>())
+		: mSkyX(s), mGroundPasses(std::vector<Ogre::Pass*>())
 	{
 		_notifySkydomeMaterialChanged();
 	}
@@ -90,79 +89,23 @@ namespace SkyX
 		Ogre::GpuProgramParametersSharedPtr Parameters;
 
 		switch (GpuP)
-		{
-		    case GPUP_VERTEX:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-			}
-			break;
+    {
+      case GPUP_VERTEX:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getVertexProgramParameters();
+        }
+        break;
 
-			case GPUP_FRAGMENT:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-			}
-			break;
-		}
-
-		Parameters->setNamedConstant(Name, Value);
-
-		if (!UpdateGroundPasses)
-		{
-			return;
-		}
-
-		std::vector<Ogre::Pass*>::iterator PassIt;
-
-		for(PassIt = mGroundPasses.begin(); PassIt != mGroundPasses.end(); PassIt++)
-		{
-			if (!(*PassIt))
-			{
-				mGroundPasses.erase(PassIt);
-				continue;
-			}
-
-			switch (GpuP)
-			{
-			    case GPUP_VERTEX:
-				{
-					Parameters = (*PassIt)->getVertexProgramParameters();
-				}
-				break;
-
-			    case GPUP_FRAGMENT:
-				{
-					Parameters = (*PassIt)->getFragmentProgramParameters();
-				}
-				break;
-			}
-
-			Parameters->setNamedConstant(Name, Value);
-		}
-	}
-
-	void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,  const Ogre::String &Name, const Ogre::Real &Value, const bool& UpdateGroundPasses)
-	{
-		if (!mSkyX->getMeshManager()->isCreated())
-		{
-			return;
-		}
-
-		Ogre::GpuProgramParametersSharedPtr Parameters;
-
-		switch (GpuP)
-		{
-		    case GPUP_VERTEX:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-			}
-			break;
-
-			case GPUP_FRAGMENT:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-			}
-			break;
-		}
+      case GPUP_FRAGMENT:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getFragmentProgramParameters();
+        }
+        break;
+      default:
+        break;
+    }
 
 		Parameters->setNamedConstant(Name, Value);
 
@@ -182,25 +125,29 @@ namespace SkyX
 			}
 
 			switch (GpuP)
-			{
-			    case GPUP_VERTEX:
-				{
-					Parameters = (*PassIt)->getVertexProgramParameters();
-				}
-				break;
+      {
+        case GPUP_VERTEX:
+          {
+            Parameters = (*PassIt)->getVertexProgramParameters();
+          }
+          break;
 
-			    case GPUP_FRAGMENT:
-				{
-					Parameters = (*PassIt)->getFragmentProgramParameters();
-				}
-				break;
-			}
+        case GPUP_FRAGMENT:
+          {
+            Parameters = (*PassIt)->getFragmentProgramParameters();
+          }
+          break;
+        default:
+          break;
+      }
 
 			Parameters->setNamedConstant(Name, Value);
 		}
 	}
 
-	void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,  const Ogre::String &Name, const Ogre::Vector2 &Value, const bool& UpdateGroundPasses)
+	void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,
+      const Ogre::String &Name, const Ogre::Real &Value,
+      const bool& UpdateGroundPasses)
 	{
 		if (!mSkyX->getMeshManager()->isCreated())
 		{
@@ -210,19 +157,91 @@ namespace SkyX
 		Ogre::GpuProgramParametersSharedPtr Parameters;
 
 		switch (GpuP)
-		{
-		    case GPUP_VERTEX:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-			}
-			break;
+    {
+      case GPUP_VERTEX:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getVertexProgramParameters();
+        }
+        break;
 
-			case GPUP_FRAGMENT:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-			}
-			break;
+      case GPUP_FRAGMENT:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getFragmentProgramParameters();
+        }
+        break;
+      default:
+        break;
+    }
+
+		Parameters->setNamedConstant(Name, Value);
+
+		if (!UpdateGroundPasses)
+		{
+			return;
 		}
+
+		std::vector<Ogre::Pass*>::iterator PassIt;
+
+		for(PassIt = mGroundPasses.begin(); PassIt != mGroundPasses.end(); PassIt++)
+		{
+			if (!(*PassIt))
+			{
+				mGroundPasses.erase(PassIt);
+				continue;
+			}
+
+			switch (GpuP)
+      {
+        case GPUP_VERTEX:
+          {
+            Parameters = (*PassIt)->getVertexProgramParameters();
+          }
+          break;
+
+        case GPUP_FRAGMENT:
+          {
+            Parameters = (*PassIt)->getFragmentProgramParameters();
+          }
+          break;
+        default:
+          break;
+      }
+
+			Parameters->setNamedConstant(Name, Value);
+		}
+	}
+
+	void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,
+      const Ogre::String &Name, const Ogre::Vector2 &Value,
+      const bool& UpdateGroundPasses)
+	{
+		if (!mSkyX->getMeshManager()->isCreated())
+		{
+			return;
+		}
+
+		Ogre::GpuProgramParametersSharedPtr Parameters;
+
+		switch (GpuP)
+    {
+      case GPUP_VERTEX:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getVertexProgramParameters();
+        }
+        break;
+
+      case GPUP_FRAGMENT:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getFragmentProgramParameters();
+        }
+        break;
+      default:
+        break;
+    }
 
 		float Value_[2] = {Value.x, Value.y};
 
@@ -244,25 +263,29 @@ namespace SkyX
 			}
 
 			switch (GpuP)
-			{
-			    case GPUP_VERTEX:
-				{
-					Parameters = (*PassIt)->getVertexProgramParameters();
-				}
-				break;
+      {
+        case GPUP_VERTEX:
+          {
+            Parameters = (*PassIt)->getVertexProgramParameters();
+          }
+          break;
 
-			    case GPUP_FRAGMENT:
-				{
-					Parameters = (*PassIt)->getFragmentProgramParameters();
-				}
-				break;
-			}
+        case GPUP_FRAGMENT:
+          {
+            Parameters = (*PassIt)->getFragmentProgramParameters();
+          }
+          break;
+        default:
+          break;
+      }
 
 			Parameters->setNamedConstant(Name, Value_, 1, 2);
 		}
 	}
 
-	void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,  const Ogre::String &Name, const Ogre::Vector3 &Value, const bool& UpdateGroundPasses)
+	void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,
+      const Ogre::String &Name, const Ogre::Vector3 &Value,
+      const bool& UpdateGroundPasses)
 	{
 		if (!mSkyX->getMeshManager()->isCreated())
 		{
@@ -272,19 +295,23 @@ namespace SkyX
 		Ogre::GpuProgramParametersSharedPtr Parameters;
 
 		switch (GpuP)
-		{
-		    case GPUP_VERTEX:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-			}
-			break;
+    {
+      case GPUP_VERTEX:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getVertexProgramParameters();
+        }
+        break;
 
-			case GPUP_FRAGMENT:
-			{
-				Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-			}
-			break;
-		}
+      case GPUP_FRAGMENT:
+        {
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
+            getFragmentProgramParameters();
+        }
+        break;
+      default:
+        break;
+    }
 
 		Parameters->setNamedConstant(Name, Value);
 
@@ -304,19 +331,21 @@ namespace SkyX
 			}
 
 			switch (GpuP)
-			{
-			    case GPUP_VERTEX:
-				{
-					Parameters = (*PassIt)->getVertexProgramParameters();
-				}
-				break;
+      {
+        case GPUP_VERTEX:
+          {
+            Parameters = (*PassIt)->getVertexProgramParameters();
+          }
+          break;
 
-			    case GPUP_FRAGMENT:
-				{
-					Parameters = (*PassIt)->getFragmentProgramParameters();
-				}
-				break;
-			}
+        case GPUP_FRAGMENT:
+          {
+            Parameters = (*PassIt)->getFragmentProgramParameters();
+          }
+          break;
+        default:
+          break;
+      }
 
 			Parameters->setNamedConstant(Name, Value);
 		}
@@ -326,6 +355,7 @@ namespace SkyX
 	{
 		Ogre::String starfield = (mSkyX->isStarfieldEnabled()) ? "STARFIELD_" : "";
 
-		return (mSkyX->getLightingMode() == SkyX::LM_LDR) ? "SkyX_Skydome_" + starfield + "LDR" : "SkyX_Skydome_" + starfield + "HDR";
+		return (mSkyX->getLightingMode() == SkyX::LM_LDR) ?
+      "SkyX_Skydome_" + starfield + "LDR" : "SkyX_Skydome_" + starfield + "HDR";
 	}
 }

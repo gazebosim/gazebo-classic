@@ -153,7 +153,6 @@ namespace gazebo
 
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
-      private: int mouseOffset;
       private: math::Pose mouseMoveVisStartPose;
 
       private: std::string copiedObject;

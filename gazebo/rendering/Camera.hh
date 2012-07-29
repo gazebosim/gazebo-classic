@@ -358,7 +358,7 @@ namespace gazebo
       // Create the ogre camera
       private: void CreateCamera();
 
-      private: std::string name;
+      protected: std::string name;
       protected: sdf::ElementPtr sdf;
 
       protected: unsigned int windowId;

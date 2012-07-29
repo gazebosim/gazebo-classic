@@ -732,18 +732,20 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     if (_msg->camera().has_origin())
     {
       const msgs::Pose &msg_origin = _msg->camera().origin();
-      math::Vector3 cam_origin_pos = math::Vector3(\
-        msg_origin.position().x(), \
-        msg_origin.position().y(), \
-        msg_origin.position().z()
-);
-      math::Quaternion cam_origin_rot = math::Quaternion(\
-        msg_origin.orientation().w(), \
-        msg_origin.orientation().x(), \
-        msg_origin.orientation().y(), \
-        msg_origin.orientation().z()
-);
+
+      math::Vector3 cam_origin_pos = math::Vector3(
+        msg_origin.position().x(),
+        msg_origin.position().y(),
+        msg_origin.position().z());
+
+      math::Quaternion cam_origin_rot = math::Quaternion(
+        msg_origin.orientation().w(),
+        msg_origin.orientation().x(),
+        msg_origin.orientation().y(),
+        msg_origin.orientation().z());
+
       math::Pose cam_origin(cam_origin_pos, cam_origin_rot);
+
       cam->SetWorldPose(cam_origin);
     }
 

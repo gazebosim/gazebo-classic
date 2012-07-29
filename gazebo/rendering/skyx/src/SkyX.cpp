@@ -21,8 +21,6 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#pragma warning(disable:4355)
-
 #include "SkyX.h"
 
 namespace SkyX

@@ -43,26 +43,29 @@ namespace gazebo
       /// \brief Shutdown all the windows
       public: void Fini();
 
-      public: int CreateWindow(const std::string &ogreHandle,
-                               unsigned int width,
-                               unsigned int height);
+      public: int CreateWindow(const std::string &_ogreHandle,
+                               unsigned int _width,
+                               unsigned int _height);
 
-      public: void GetAttribute(unsigned int id,
-                  const std::string &attr, void *data);
+      public: void GetAttribute(unsigned int _id,
+                  const std::string &_attr, void *_data);
 
       /// \brief Attach a camera to a window
-      public: void SetCamera(int windowId, CameraPtr camera);
+      public: void SetCamera(int _windowId, CameraPtr _camera);
 
       /// \brief Resize a window
-      public: void Resize(unsigned int id, int width, int height);
+      public: void Resize(unsigned int _id, int _width, int _height);
 
-      public: void Moved(unsigned int id);
+      public: void Moved(unsigned int _id);
 
       /// \brief Get the average FPS
-      public: float GetAvgFPS(unsigned int windowId);
+      public: float GetAvgFPS(unsigned int _windowId);
 
       /// \brief Get the triangle count
-      public: unsigned int GetTriangleCount(unsigned int windotId);
+      public: unsigned int GetTriangleCount(unsigned int _windotId);
+
+      /// \brief Get the render window associated with _id
+      public: Ogre::RenderWindow *GetWindow(unsigned int _id);
 
       private: std::vector<Ogre::RenderWindow *> windows;
 

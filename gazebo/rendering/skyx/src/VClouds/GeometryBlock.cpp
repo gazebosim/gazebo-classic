@@ -21,9 +21,10 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include "VClouds/GeometryBlock.h"
-
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "VClouds/VClouds.h"
+#include "VClouds/GeometryBlock.h"
 
 namespace SkyX { namespace VClouds
   {
@@ -91,6 +92,7 @@ namespace SkyX { namespace VClouds
       mEntity->setMaterialName("SkyX_VolClouds");
       mEntity->setCastShadows(false);
       mEntity->setRenderQueueGroup(mVClouds->getRenderQueueGroups().vclouds);
+      mEntity->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
 
       // Set bounds
       mMesh->_setBounds(_buildAABox(mLastFallingDistance));
@@ -334,7 +336,7 @@ namespace SkyX { namespace VClouds
         }
       }
 
-      if (fallingDistance != mLastFallingDistance)
+      if (!gazebo::math::equal(fallingDistance, mLastFallingDistance))
       {
         mLastFallingDistance = fallingDistance;
         mMesh->_setBounds(_buildAABox(mLastFallingDistance));
@@ -639,7 +641,7 @@ namespace SkyX { namespace VClouds
       mVertices[index].o = o * mVClouds->getGlobalOpacity();
     }*/
 
-    const bool GeometryBlock::isInFrustum(Ogre::Camera *c) const
+    bool GeometryBlock::isInFrustum(Ogre::Camera *c) const
     {
       if (!mCreated)
       {

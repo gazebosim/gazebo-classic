@@ -1,5 +1,5 @@
 /*
-   --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
    This source file is part of SkyX.
    Visit http://www.paradise-studios.net/products/skyx/
 
@@ -22,6 +22,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 */
 
 #include "MeshManager.h"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/math/Helpers.hh"
 
 #include "SkyX.h"
 
@@ -106,8 +108,10 @@ namespace SkyX
     mEntity->setMaterialName(mMaterialName);
     mEntity->setCastShadows(false);
     mEntity->setRenderQueueGroup(mSkyX->getRenderQueueGroups().skydome);
+    mEntity->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
 
-    mSceneNode = mSkyX->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+    mSceneNode =
+      mSkyX->getSceneManager()->getRootSceneNode()->createChildSceneNode();
     mSceneNode->showBoundingBox(false);
     mSceneNode->attachObject(mEntity);
 
@@ -382,11 +386,11 @@ namespace SkyX
     }
   }
 
-  const float MeshManager::getSkydomeRadius(Ogre::Camera* c) const
+  float MeshManager::getSkydomeRadius(Ogre::Camera* c) const
   {
     float cameraFarClipDistance = c->getFarClipDistance();
 
-    if (!cameraFarClipDistance)
+    if (gazebo::math::equal(cameraFarClipDistance, 0.0f))
     {
       cameraFarClipDistance = mSkyX->getInfiniteCameraFarClipDistance();
     }

@@ -175,5 +175,11 @@ unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
     return 0;
 }
 
-
-
+//////////////////////////////////////////////////
+Ogre::RenderWindow *WindowManager::GetWindow(unsigned int _id)
+{
+  if (_id < this->windows.size())
+    return this->windows[_id];
+  else
+    return NULL;
+}

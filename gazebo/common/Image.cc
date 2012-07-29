@@ -385,9 +385,9 @@ Color Image::GetAvgColor()
     for (x = 0; x < this->GetWidth(); ++x)
     {
       pixel = this->GetPixel(x, y);
-      rsum += pixel.R();
-      gsum += pixel.G();
-      bsum += pixel.B();
+      rsum += pixel.r;
+      gsum += pixel.g;
+      bsum += pixel.b;
     }
   }
 
@@ -413,7 +413,7 @@ Color Image::GetMaxColor()
     {
       clr = this->GetPixel(x, y);
 
-      if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
+      if (clr.r + clr.g + clr.b > maxClr.r + maxClr.g + maxClr.b)
       {
         maxClr = clr;
       }

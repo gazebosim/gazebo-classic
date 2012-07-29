@@ -19,8 +19,9 @@
 
 #include <boost/shared_ptr.hpp>
 
-#define GZ_VISIBILITY_ALL 0xFFFFFFFF
-#define GZ_VISIBILITY_GUI 0x00000001
+#define GZ_VISIBILITY_ALL             0xFFFFFFFF
+#define GZ_VISIBILITY_GUI             0x00000001
+#define GZ_VISIBILITY_NOT_SELECTABLE  0x00000002
 
 /// \file
 /// \ingroup gazebo_rendering

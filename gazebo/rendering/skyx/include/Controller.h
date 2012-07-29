@@ -49,7 +49,7 @@ namespace SkyX
 		    @param simDeltaTime Simulation delta time (It's not the time since last frame, it's the delta simulation time, one
 								time the time since last frame has been multiplied by the time multiplier)
 		 */
-		inline virtual void update(const Ogre::Real& simDeltaTime){}
+		inline virtual void update(const Ogre::Real &/*simDeltaTime*/){}
 
 		/** Get sun direction
 		    @return Sun direction, the Earth-to-Sun direction

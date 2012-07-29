@@ -35,7 +35,8 @@ namespace SkyX
         const Ogre::Real& Density)
       : mA(a), mB(b), mC(c),
         mA2(Ogre::Math::Pow(a, 2)),
-        mB2(Ogre::Math::Pow(b, 2)), mC2(Ogre::Math::Pow(c, 2)),
+        mB2(Ogre::Math::Pow(b, 2)),
+        mC2(Ogre::Math::Pow(c, 2)),
         mNx(nx), mNy(ny), mNz(nz),
         mX(x), mY(y), mZ(z),
         mDensity(Density)
@@ -46,7 +47,7 @@ namespace SkyX
     {
     }
 
-    const float Ellipsoid::_getLength(const int &x, const int &y,
+    float Ellipsoid::_getLength(const int &x, const int &y,
                                       const int &z) const
     {
       //  x^2   y^2   z^2
@@ -119,7 +120,7 @@ namespace SkyX
       mX += Ax; mY += Ay; mZ += Az;
     }
 
-    const bool Ellipsoid::isOutOfCells() const
+    bool Ellipsoid::isOutOfCells() const
     {
       if ((mX+mA) >= mNx || (mX-mA) < 0 ||
           (mY+mB) >= mNy || (mY-mB) < 0 ||

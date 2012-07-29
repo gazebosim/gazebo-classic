@@ -113,15 +113,19 @@ namespace SkyX
 		}
 
 	private:
-		/// Time information: x = time in [0, 24]h range, y = sunrise hour in [0, 24]h range, z = sunset hour in [0, 24] range
+    /// Time information: x = time in [0, 24]h range, y = sunrise hour in
+    /// [0, 24]h range, z = sunset hour in [0, 24] range
 		Ogre::Vector3 mTime;
-		/// East direction (in X,Z world coords)
-		Ogre::Vector2 mEastDirection;
 
 		/// Sun direction
 		Ogre::Vector3 mSunDirection;
+
 		/// Moon direction
 		Ogre::Vector3 mMoonDirection;
+
+		/// East direction (in X,Z world coords)
+		Ogre::Vector2 mEastDirection;
+
 		/// Moon phase
 		Ogre::Real mMoonPhase;
 	};

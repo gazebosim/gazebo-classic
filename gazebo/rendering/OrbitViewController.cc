@@ -50,7 +50,8 @@ OrbitViewController::OrbitViewController(UserCamera *_camera)
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
   this->refVisual->SetWorldPosition(this->focalPoint);
-  this->refVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->refVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI &
+                                      GZ_VISIBILITY_NOT_SELECTABLE);
 }
 
 //////////////////////////////////////////////////
@@ -68,6 +69,8 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
 
   this->focalPoint = _focalPoint;
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
+  if (this->distance <= 1.0)
+    std::cout << "Distance[" << this->distance << "]\n";
 
   this->refVisual->SetVisible(false);
   this->refVisual->SetWorldPosition(this->focalPoint);
@@ -111,7 +114,7 @@ void OrbitViewController::Init()
 
     dist = origin.GetDistToLine(cameraPos, cameraPos + dir * distOrigin);
 
-    if (math::equal(dist, 0, 1e-3))
+    if (math::equal(dist, 0.0, 1e-3))
       dist = distOrigin;
     else
     {
@@ -121,7 +124,7 @@ void OrbitViewController::Init()
       cameraPos.z = 0;
       distOrigin = cameraPos.Distance(origin);
       dist = origin.GetDistToLine(cameraPos, cameraPos + dir * distOrigin);
-      if (math::equal(dist, 0, 1e-3))
+      if (math::equal(dist, 0.0, 1e-3))
         dist = distOrigin;
       else
         dist = 10;

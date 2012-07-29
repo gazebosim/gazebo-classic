@@ -24,9 +24,6 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_Prerequisites_H_
 #define _SkyX_Prerequisites_H_
 
-#pragma warning (disable:4244) // conversion from 'xxx' to 'yyy', possible loss of data
-#pragma warning (disable:4355) // 'this' : used in base member initializer list
-
 /// Include external headers
 #include <OGRE/Ogre.h>
 

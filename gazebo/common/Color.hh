@@ -23,7 +23,8 @@
 #define GAZEBO_COLOR_HH
 
 #include <iostream>
-#include "math/Vector3.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -48,6 +49,11 @@ namespace gazebo
       public: static const Color Yellow;
       /// \brief (1, 0, 1)
       public: static const Color Purple;
+
+      public: typedef unsigned int RGBA;
+      public: typedef unsigned int BGRA;
+      public: typedef unsigned int ARGB;
+      public: typedef unsigned int ABGR;
 
       /// \brief Constructor
       public: Color();
@@ -106,35 +112,60 @@ namespace gazebo
 
       /// \brief Get the red color
       /// \return red color component
-      public: float R() const;
+      public: float R() const GAZEBO_DEPRECATED;
 
       /// \brief Get the green color
       /// \return green color component
-      public: float G() const;
+      public: float G() const GAZEBO_DEPRECATED;
 
       /// \brief Get the blue color
       /// \return blue color component
-      public: float B() const;
+      public: float B() const GAZEBO_DEPRECATED;
 
       /// \brief Get the alpha color
       /// \return alpha value
-      public: float A() const;
+      public: float A() const GAZEBO_DEPRECATED;
 
       /// \brief Set the red color
       /// \param _r Red color component
-      public: void R(float _r);
+      public: void R(float _r) GAZEBO_DEPRECATED;
 
       /// \brief Set the green color
       /// \param _g Green color component
-      public: void G(float _g);
+      public: void G(float _g) GAZEBO_DEPRECATED;
 
       /// \brief Set the blue color
       /// \param _b Blue color component
-      public: void B(float _b);
+      public: void B(float _b) GAZEBO_DEPRECATED;
 
       /// \brief Set the alpha color
       /// \param _a Alpha value
-      public: void A(float _a);
+      public: void A(float _a) GAZEBO_DEPRECATED;
+
+      /// \brief Get as uint32 RGBA packed value
+      public: RGBA GetAsRGBA() const;
+
+      /// \brief Get as uint32 BGRA packed value
+      public: BGRA GetAsBGRA() const;
+
+      /// \brief Get as uint32 ARGB packed value
+      public: ARGB GetAsARGB() const;
+
+      /// \brief Get as uint32 ABGR packed value
+      public: ABGR GetAsABGR() const;
+
+
+      /// \brief Set from uint32 RGBA packed value
+      public: void SetFromRGBA(const RGBA _v);
+
+      /// \brief Set from uint32 BGRA packed value
+      public: void SetFromBGRA(const BGRA _v);
+
+      /// \brief Set from uint32 ARGB packed value
+      public: void SetFromARGB(const ARGB _v);
+
+      /// \brief Set from uint32 ABGR packed value
+      public: void SetFromABGR(const ABGR _v);
 
       /// \brief Addition operator (this + _pt)
       /// \param _pt Color to add
@@ -227,7 +258,7 @@ namespace gazebo
       }
 
       // The values
-      private: float r, g, b, a;
+      public: float r, g, b, a;
     };
     /// \}
   }

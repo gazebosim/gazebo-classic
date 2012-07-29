@@ -297,48 +297,48 @@ TEST_F(CommonTest, NumericAnimation)
 TEST_F(CommonTest, Color)
 {
   common::Color clr(.1, .2, .3, 1.0);
-  EXPECT_EQ(0.1f, clr.R());
-  EXPECT_EQ(0.2f, clr.G());
-  EXPECT_EQ(0.3f, clr.B());
-  EXPECT_EQ(1.0f, clr.A());
+  EXPECT_EQ(0.1f, clr.r);
+  EXPECT_EQ(0.2f, clr.g);
+  EXPECT_EQ(0.3f, clr.b);
+  EXPECT_EQ(1.0f, clr.a);
 
   clr.Reset();
-  EXPECT_EQ(0.0f, clr.R());
-  EXPECT_EQ(0.0f, clr.G());
-  EXPECT_EQ(0.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.0f, clr.r);
+  EXPECT_EQ(0.0f, clr.g);
+  EXPECT_EQ(0.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(0, 0.5, 1.0);
-  EXPECT_EQ(1.0f, clr.R());
-  EXPECT_EQ(0.5f, clr.G());
-  EXPECT_EQ(0.5f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(1.0f, clr.r);
+  EXPECT_EQ(0.5f, clr.g);
+  EXPECT_EQ(0.5f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   EXPECT_TRUE(clr.GetAsHSV() == math::Vector3(6, 0.5, 1));
 
   clr.SetFromHSV(60, 0.0, 1.0);
-  EXPECT_EQ(1.0f, clr.R());
-  EXPECT_EQ(1.0f, clr.G());
-  EXPECT_EQ(1.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(1.0f, clr.r);
+  EXPECT_EQ(1.0f, clr.g);
+  EXPECT_EQ(1.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(120, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.R());
-  EXPECT_EQ(1.0f, clr.G());
-  EXPECT_EQ(0.5f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.5f, clr.r);
+  EXPECT_EQ(1.0f, clr.g);
+  EXPECT_EQ(0.5f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(180, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.R());
-  EXPECT_EQ(1.0f, clr.G());
-  EXPECT_EQ(1.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.5f, clr.r);
+  EXPECT_EQ(1.0f, clr.g);
+  EXPECT_EQ(1.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(240, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.R());
-  EXPECT_EQ(0.5f, clr.G());
-  EXPECT_EQ(1.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.5f, clr.r);
+  EXPECT_EQ(0.5f, clr.g);
+  EXPECT_EQ(1.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(300, 0.5, 1.0);
   EXPECT_EQ(1.0f, clr[0]);
@@ -347,10 +347,10 @@ TEST_F(CommonTest, Color)
   EXPECT_EQ(0.0f, clr[3]);
   EXPECT_EQ(0.0f, clr[4]);
 
-  clr.R(0.1);
-  clr.G(0.2);
-  clr.B(0.3);
-  clr.A(0.4);
+  clr.r = 0.1;
+  clr.g = 0.2;
+  clr.b = 0.3;
+  clr.a = 0.4;
   EXPECT_EQ(0.1f, clr[0]);
   EXPECT_EQ(0.2f, clr[1]);
   EXPECT_EQ(0.3f, clr[2]);
@@ -393,30 +393,30 @@ TEST_F(CommonTest, Color)
 
 
   clr.SetFromYUV(0.5, 0.2, 0.8);
-  EXPECT_TRUE(math::equal(0.00553f, clr.R(), 1e-3f));
-  EXPECT_TRUE(math::equal(0.0f, clr.G()));
-  EXPECT_TRUE(math::equal(0.9064f, clr.B(), 1e-3f));
-  EXPECT_TRUE(math::equal(0.04f, clr.A()));
+  EXPECT_TRUE(math::equal(0.00553f, clr.r, 1e-3f));
+  EXPECT_TRUE(math::equal(0.0f, clr.g));
+  EXPECT_TRUE(math::equal(0.9064f, clr.b, 1e-3f));
+  EXPECT_TRUE(math::equal(0.04f, clr.a));
 
   EXPECT_TRUE(clr.GetAsYUV() == math::Vector3(0.104985, 0.95227, 0.429305));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
-  EXPECT_TRUE(math::equal(0.00431373f, clr.R()));
-  EXPECT_TRUE(math::equal(0.3f, clr.G()));
-  EXPECT_TRUE(math::equal(0.9f, clr.B()));
-  EXPECT_TRUE(math::equal(2.0f, clr.A()));
+  EXPECT_TRUE(math::equal(0.00431373f, clr.r));
+  EXPECT_TRUE(math::equal(0.3f, clr.g));
+  EXPECT_TRUE(math::equal(0.9f, clr.b));
+  EXPECT_TRUE(math::equal(2.0f, clr.a));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) - common::Color(0.1, 0.3, 0.4, 1.0);
-  EXPECT_TRUE(math::equal(0.9f, clr.R()));
-  EXPECT_TRUE(math::equal(0.0f, clr.G()));
-  EXPECT_TRUE(math::equal(0.1f, clr.B()));
-  EXPECT_TRUE(math::equal(0.0f, clr.A()));
+  EXPECT_TRUE(math::equal(0.9f, clr.r));
+  EXPECT_TRUE(math::equal(0.0f, clr.g));
+  EXPECT_TRUE(math::equal(0.1f, clr.b));
+  EXPECT_TRUE(math::equal(0.0f, clr.a));
 
   clr = common::Color(0.5, 0.2, 0.4, 0.6) / 2.0;
-  EXPECT_TRUE(math::equal(0.25f, clr.R()));
-  EXPECT_TRUE(math::equal(0.1f, clr.G()));
-  EXPECT_TRUE(math::equal(0.2f, clr.B()));
-  EXPECT_TRUE(math::equal(0.3f, clr.A()));
+  EXPECT_TRUE(math::equal(0.25f, clr.r));
+  EXPECT_TRUE(math::equal(0.1f, clr.g));
+  EXPECT_TRUE(math::equal(0.2f, clr.b));
+  EXPECT_TRUE(math::equal(0.3f, clr.a));
 }
 
 TEST_F(CommonTest, Time)

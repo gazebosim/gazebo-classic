@@ -244,8 +244,8 @@ void Scene::Init()
     this->grids[i]->Init();
 
   // Create the sky
-  if (this->sdf->HasElement("sky"))
-    this->SetSky(this->sdf->GetElement("sky")->GetValueString("material"));
+  // if (this->sdf->HasElement("sky"))
+  //  this->SetSky(this->sdf->GetElement("sky")->GetValueString("material"));
 
   this->SetSky();
 
@@ -1881,7 +1881,7 @@ void Scene::SetSky()
 
   // Set the time: x = current time[0-24], y = sunrise time[0-24],
   // z = sunset time[0-24]
-this->skyxController->setTime(Ogre::Vector3(6.0, 6.0, 20.0f));
+  this->skyxController->setTime(Ogre::Vector3(10.0, 6.0, 20.0f));
 
   // Moon phase in [-1,1] range, where -1 means fully covered Moon,
   // 0 clear Moon and 1 fully covered Moon
@@ -1918,7 +1918,8 @@ this->skyxController->setTime(Ogre::Vector3(6.0, 6.0, 20.0f));
   vclouds->setAmbientFactors(Ogre::Vector4(0.45, 0.3, 0.6, 0.1));
   vclouds->setWheater(.6, .6, false);
 
-  if (true) // If using clouds
+  // Disable volumetric clouds for now
+  if (false) // If using clouds
   {
     // Create VClouds
     if (!this->skyx->getVCloudsManager()->isCreated())
