@@ -67,7 +67,8 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
   this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
   RTShaderSystem::AttachViewport(_camera->GetViewport(), _camera->GetScene());
-  this->windows[_windowId]->addListener(_camera->GetScene()->skyx);
+  if (_camera->GetScene()->skyx != NULL)
+    this->windows[_windowId]->addListener(_camera->GetScene()->skyx);
 }
 
 //////////////////////////////////////////////////

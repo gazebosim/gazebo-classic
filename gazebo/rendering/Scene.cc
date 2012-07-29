@@ -91,6 +91,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->name = _name;
   this->manager = NULL;
   this->raySceneQuery = NULL;
+  this->skyx = NULL;
 
   this->receiveMutex = new boost::mutex();
 
@@ -1321,6 +1322,14 @@ void Scene::PreRender()
       ++sensorIter;
   }
 
+  // Process the light messages
+  for (lIter =  this->lightMsgs.begin();
+       lIter != this->lightMsgs.end(); ++lIter)
+  {
+    this->ProcessLightMsg(*lIter);
+  }
+  this->lightMsgs.clear();
+
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
   vIter = this->visualMsgs.begin();
@@ -1331,14 +1340,6 @@ void Scene::PreRender()
     else
       ++vIter;
   }
-
-  // Process the light messages
-  for (lIter =  this->lightMsgs.begin();
-       lIter != this->lightMsgs.end(); ++lIter)
-  {
-    this->ProcessLightMsg(*lIter);
-  }
-  this->lightMsgs.clear();
 
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates

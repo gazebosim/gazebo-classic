@@ -359,6 +359,11 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
 
+    // This is needed by the Ogre::Terrain System. 
+    // We should spend some tim fixing Ogre::Terrain so that GLSL is
+    // supported.
+    plugins.push_back(path+"/Plugin_CgProgramManager.so");
+
     for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
     {
       try
@@ -373,6 +378,13 @@ void RenderEngine::LoadPlugins()
           std::string description("Unable to load Ogre Plugin[");
           description.append(*piter);
           description.append("]...This won't end well.");
+          gzerr << description << "\n";
+        }
+        else if ((*piter).find("CgProgramManager") != std::string::npos)
+        {
+          std::string description("Unable to load Ogre Plugin[");
+          description.append(*piter);
+          description.append("]Heightmaps(Terrain) will not display properly.");
           gzerr << description << "\n";
         }
       }

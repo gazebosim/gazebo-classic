@@ -104,11 +104,11 @@ void UserCamera::Init()
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
   {
-    this->SetClipDist(0.1, 100);
+    this->SetClipDist(0.1, 1000);
   }
   else
   {
-    this->SetClipDist(0.1, 500);
+    this->SetClipDist(0.1, 5000);
   }
 
   this->axisNode =
@@ -215,9 +215,8 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
     this->selectionBuffer->Update();
 
     //DEBUG: this->selectionBuffer->ShowOverlay(true);
-
-    Ogre::Entity *entity =
-      this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
+    //Ogre::Entity *entity =
+    //this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
 
     this->viewController->HandleMouseEvent(_evt);
   }
