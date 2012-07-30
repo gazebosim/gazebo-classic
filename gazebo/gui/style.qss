@@ -280,7 +280,7 @@ QTreeView#mainTree
   border-bottom-right-radius: 0px;
   show-decoration-selected: 1;
 
-  margin: 0px;
+  margin-left: 10px;
   padding: 0px;
   color: #808080;
   font-size: 20px;
@@ -352,7 +352,7 @@ QWidget#renderWidget > QWidget
   border-bottom-left-radius: 0px;
 
   background-color: #202020;
-  margin: 0px;
+  margin-right: 10px;
   padding: 4px;
 }
 

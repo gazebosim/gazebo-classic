@@ -102,10 +102,11 @@ TimePanel::TimePanel(QWidget *_parent)
 /////////////////////////////////////////////////
 void TimePanel::OnFullScreen(bool &_value)
 {
-  if (_value)
+  /*if (_value)
     this->hide();
   else
     this->show();
+    */
 }
 
 /////////////////////////////////////////////////
