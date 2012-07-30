@@ -78,39 +78,9 @@ RenderWidget::~RenderWidget()
 void RenderWidget::OnFullScreen(bool &_value)
 {
   if (_value)
-  {
-    this->mainFrame->layout()->removeItem(this->bottomBarLayout);
-    this->mainFrame->setLineWidth(0);
-    this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
-    this->glWidget->layout()->setContentsMargins(0, 0, 0, 0);
-    this->layout()->setContentsMargins(0, 0, 0, 0);
-    // this->xyzLabel->hide();
-    // this->rpyLabel->hide();
-
-    // this->xPosEdit->hide();
-    // this->yPosEdit->hide();
-    // this->zPosEdit->hide();
-
-    // this->rollEdit->hide();
-    // this->pitchEdit->hide();
-    // this->yawEdit->hide();
-  }
+    this->setStyleSheet(tr("QWidget{margin: 0px; padding: 0px; border: 0px;}"));
   else
-  {
-    this->mainFrame->layout()->addItem(this->bottomBarLayout);
-    this->mainFrame->setLineWidth(1);
-    this->mainFrame->layout()->setContentsMargins(4, 4, 4, 4);
-    // this->xyzLabel->show();
-    // this->rpyLabel->show();
-
-    // this->xPosEdit->show();
-    // this->yPosEdit->show();
-    // this->zPosEdit->show();
-
-    // this->rollEdit->show();
-    // this->pitchEdit->show();
-    // this->yawEdit->show();
-  }
+    this->setStyleSheet(tr("QWidget{margin-right: 10px;}"));
 }
 
 void RenderWidget::update()

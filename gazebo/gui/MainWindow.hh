@@ -164,6 +164,7 @@ namespace gazebo
       private: msgs::Request *requestMsg;
 
       private: QTreeWidget *treeWidget;
+      private: QMenuBar *menuBar;
     };
 
     class TreeViewDelegate: public QItemDelegate

@@ -139,12 +139,10 @@ MainWindow::MainWindow()
   this->collapseButton->setFocusPolicy(Qt::NoFocus);
   connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
 
-  centerLayout->addSpacing(10);
   centerLayout->addWidget(this->treeWidget, 0);
   centerLayout->addWidget(collapseButton, 0);
   centerLayout->addWidget(this->renderWidget, 1);
   centerLayout->setContentsMargins(0, 0, 0, 0);
-  centerLayout->addSpacing(10);
   centerLayout->setSpacing(0);
 
   QHBoxLayout *timePanelLayout = new QHBoxLayout;
@@ -417,32 +415,27 @@ void MainWindow::OnFullScreen(bool _value)
 {
   if (_value)
   {
-    this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
     this->showFullScreen();
-    /*this->removeDockWidget(this->modelsDock);
-    this->removeDockWidget(this->lightsDock);
-    this->removeDockWidget(this->insertModelsDock);
-    */
+    this->renderWidget->showFullScreen();
+    this->treeWidget->hide();
+    this->menuBar->hide();
     this->playToolbar->hide();
     this->editToolbar->hide();
     this->mouseToolbar->hide();
-    this->menuBar()->hide();
+    this->timePanel->hide();
+    this->collapseButton->hide();
   }
   else
   {
-    this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
     this->showNormal();
-    /*this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
-    this->addDockWidget(Qt::LeftDockWidgetArea, this->lightsDock);
-    this->addDockWidget(Qt::LeftDockWidgetArea, this->insertModelsDock);
-    this->modelsDock->show();
-    this->lightsDock->show();
-    this->insertModelsDock->show();
-    */
+    this->renderWidget->showNormal();
+    this->treeWidget->show();
+    this->menuBar->show();
     this->playToolbar->show();
     this->editToolbar->show();
     this->mouseToolbar->show();
-    this->menuBar()->show();
+    this->timePanel->show();
+    this->collapseButton->show();
   }
 }
 
@@ -639,10 +632,10 @@ void MainWindow::CreateMenus()
   QHBoxLayout *menuLayout = new QHBoxLayout;
 
   QFrame *frame = new QFrame;
-  QMenuBar *mb = new QMenuBar;
-  mb->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->menuBar =  new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  menuLayout->addWidget(mb);
+  menuLayout->addWidget(this->menuBar);
   menuLayout->addStretch(5);
   menuLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -651,7 +644,7 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  this->fileMenu = mb->addMenu(tr("&File"));
+  this->fileMenu = this->menuBar->addMenu(tr("&File"));
   this->fileMenu->addAction(this->openAct);
   this->fileMenu->addAction(this->importAct);
   this->fileMenu->addAction(this->newAct);
@@ -660,19 +653,19 @@ void MainWindow::CreateMenus()
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(this->quitAct);
 
-  this->editMenu = mb->addMenu(tr("&Edit"));
+  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
   this->editMenu->addAction(this->resetWorldAct);
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
-  this->viewMenu = mb->addMenu(tr("&View"));
+  this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(this->viewResetAct);
   this->viewMenu->addAction(this->viewFullScreenAct);
   this->viewMenu->addAction(this->viewFPSAct);
   this->viewMenu->addAction(this->viewOrbitAct);
 
-  mb->addSeparator();
+  this->menuBar->addSeparator();
 
-  this->helpMenu = mb->addMenu(tr("&Help"));
+  this->helpMenu = this->menuBar->addMenu(tr("&Help"));
   this->helpMenu->addAction(this->aboutAct);
 }
 
@@ -904,11 +897,13 @@ void MainWindow::OnCollapse()
   {
     this->treeWidget->close();
     this->collapseButton->setText(">");
+    this->collapseButton->setStyleSheet(tr("QPushButton{margin-left: 10px;}"));
   }
   else
   {
     this->treeWidget->show();
     this->collapseButton->setText("<");
+    this->collapseButton->setStyleSheet("QPushButton{margin-left:0px;}");
   }
 }
 
