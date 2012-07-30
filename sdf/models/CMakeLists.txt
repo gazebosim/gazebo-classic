@@ -34,6 +34,7 @@ set (models
   actor.model
   japanese_restaurant.model
   multi_visuals.model
+  turtlebot.model
   )
 
 set (lights
