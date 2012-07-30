@@ -627,13 +627,13 @@
           </scan>
           <range min='0.080000' max='10.000000' resolution='0.010000'/>
         </ray>
-        <plugin name='gazebo_ros_laser_controller' filename='libgazebo_ros_laser.so'>
+        <!--plugin name='gazebo_ros_laser_controller' filename='libgazebo_ros_laser.so'>
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>20</updateRate>
           <topicName>scan</topicName>
           <frameName>laser</frameName>
-        </plugin>
+        </plugin-->
       </sensor>
       <sensor name='camera' type='depth' always_on='0' update_rate='20.000000' visualize='0'>
         <origin pose='-0.087098 0.000000 0.303857 0.000000 -0.000000 0.000000'/>
@@ -642,7 +642,7 @@
           <image width='640' height='480' format='R8G8B8'/>
           <clip near='0.050000' far='3.000000'/>
         </camera>
-        <plugin name='kinect_camera_controller' filename='libgazebo_ros_openni_kinect.so'>
+        <!--plugin name='kinect_camera_controller' filename='libgazebo_ros_openni_kinect.so'>
           <alwaysOn>1</alwaysOn>
           <updateRate>20</updateRate>
           <imageTopicName>/camera/image_raw</imageTopicName>
@@ -654,7 +654,7 @@
           <distortion_k3>0.0</distortion_k3>
           <distortion_t1>0.0</distortion_t1>
           <distortion_t2>0.0</distortion_t2>
-        </plugin>
+        </plugin-->
       </sensor>
     </link>
     <link name='left_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -731,7 +731,7 @@
         <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
       </axis>
     </joint>
-    <plugin name='imu_controller' filename='libgazebo_ros_imu.so'>
+    <!--plugin name='imu_controller' filename='libgazebo_ros_imu.so'>
       <alwaysOn>1</alwaysOn>
       <updateRate>30</updateRate>
       <topicName>imu/data</topicName>
@@ -741,8 +741,8 @@
       <xyz>0 0 0</xyz>
       <rpy>0 -0 0</rpy>
       <bodyName>base_footprint</bodyName>
-    </plugin>
-    <plugin name='create_controller' filename='libgazebo_ros_create.so'>
+    </plugin-->
+    <!--plugin name='create_controller' filename='libgazebo_ros_create.so'>
       <alwaysOn>1</alwaysOn>
       <node_namespace>turtlebot_node</node_namespace>
       <left_wheel_joint>left_wheel_joint</left_wheel_joint>
@@ -754,6 +754,6 @@
       <base_geom>base_link_geom_base_link</base_geom>
       <updateRate>40</updateRate>
       <torque>1.0</torque>
-    </plugin>
+    </plugin-->
   </model>
 </gazebo>
