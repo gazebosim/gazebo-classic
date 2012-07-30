@@ -33,6 +33,7 @@ set (models
   actor_demo.model
   actor.model
   japanese_restaurant.model
+  multi_visuals.model
   )
 
 set (lights
