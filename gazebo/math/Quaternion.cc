@@ -173,7 +173,7 @@ void Quaternion::Normalize()
   s = sqrt(this->w * this->w + this->x * this->x + this->y * this->y +
            this->z * this->z);
 
-  if (math::equal(s, 0))
+  if (math::equal(s, 0.0))
   {
     this->w = 1.0;
     this->x = 0.0;
@@ -196,7 +196,7 @@ void Quaternion::SetFromAxis(double _ax, double _ay, double _az, double _aa)
 
   l = _ax * _ax + _ay * _ay + _az * _az;
 
-  if (math::equal(l, 0))
+  if (math::equal(l, 0.0))
   {
     this->w = 1;
     this->x = 0;
@@ -317,7 +317,7 @@ double Quaternion::GetYaw()
 void Quaternion::GetAsAxis(Vector3 &_axis, double &_angle) const
 {
   double len = this->x*this->x + this->y*this->y + this->z*this->z;
-  if (math::equal(len, 0))
+  if (math::equal(len, 0.0))
   {
     _angle = 0.0;
     _axis.Set(1, 0, 0);
