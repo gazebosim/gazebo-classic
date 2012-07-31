@@ -65,4 +65,5 @@ target_link_libraries(${BINARY_NAME}
     ${TINYXML_LIBRARIES}
     )
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+  set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 120)
 endforeach()
