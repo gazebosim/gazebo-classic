@@ -80,6 +80,8 @@ namespace gazebo
       private: rendering::DepthCameraPtr camera;
 
       private: rendering::ScenePtr scene;
+
+      public: bool initialized;
     };
     /// \}
   }
