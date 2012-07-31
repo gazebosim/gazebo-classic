@@ -108,7 +108,7 @@ Vector4 &Vector4::operator =(const Vector4 &pt)
 }
 
 //////////////////////////////////////////////////
-const Vector4 &Vector4::operator =(double value)
+Vector4 &Vector4::operator =(double value)
 {
   this->x = value;
   this->y = value;

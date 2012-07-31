@@ -25,25 +25,26 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "sdf/sdf.hh"
-#include "transport/Node.hh"
-#include "transport/Transport.hh"
-#include "transport/Publisher.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Subscriber.hh"
 
-#include "common/Diagnostics.hh"
-#include "common/Events.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/Plugin.hh"
+#include "gazebo/common/Diagnostics.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Plugin.hh"
 
-#include "physics/RayShape.hh"
-#include "physics/Link.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/PhysicsFactory.hh"
-#include "physics/Model.hh"
-#include "physics/Actor.hh"
-#include "physics/World.hh"
+#include "gazebo/physics/Road.hh"
+#include "gazebo/physics/RayShape.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/World.hh"
 
 #include "physics/Collision.hh"
 
@@ -207,10 +208,10 @@ void World::Load(sdf::ElementPtr _sdf)
   event::Events::worldCreated(this->GetName());
 }
 
+
 //////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
 {
-  this->sdf->Update();
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
@@ -532,6 +533,14 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
+RoadPtr World::LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent)
+{
+  RoadPtr road(new Road(_parent));
+  road->Load(_sdf);
+  return road;
+}
+
+//////////////////////////////////////////////////
 void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   if (_sdf->HasElement("light"))
@@ -570,6 +579,16 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
       this->LoadActor(childElem, _parent);
 
       childElem = childElem->GetNextElement("actor");
+    }
+  }
+
+  if (_sdf->HasElement("road"))
+  {
+    sdf::ElementPtr childElem = _sdf->GetElement("road");
+    while (childElem)
+    {
+      this->LoadRoad(childElem, _parent);
+      childElem = childElem->GetNextElement("road");
     }
   }
 
@@ -956,9 +975,9 @@ void World::ProcessRequestMsgs()
       for (unsigned int i = 0; i < this->rootElement->GetChildCount(); ++i)
       {
         BasePtr entity = this->rootElement->GetChild(i);
-        msgs::Model *modelMsg = modelVMsg.add_models();
         if (entity->HasType(Base::MODEL))
         {
+          msgs::Model *modelMsg = modelVMsg.add_models();
           ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
           model->FillModelMsg(*modelMsg);
         }
@@ -1024,6 +1043,21 @@ void World::ProcessRequestMsgs()
         response.set_type("error");
         response.set_response("nonexistant");
       }
+    }
+    else if ((*iter).request() == "world_sdf")
+    {
+      msgs::GzString msg;
+      this->UpdateStateSDF();
+      std::string data;
+      data = "<?xml version ='1.0'?>\n";
+      data += "<gazebo version ='1.0'>\n";
+      data += this->sdf->ToString("");
+      data += "</gazebo>\n";
+      msg.set_data(data);
+
+      std::string *serializedData = response.mutable_serialized_data();
+      msg.SerializeToString(serializedData);
+      response.set_type(msg.GetTypeName());
     }
     else if ((*iter).request() == "scene_info")
     {
@@ -1261,6 +1295,7 @@ WorldState World::GetState()
 //////////////////////////////////////////////////
 void World::UpdateStateSDF()
 {
+  this->sdf->Update();
   sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
   stateElem->ClearElements();
 
@@ -1296,7 +1331,7 @@ void World::SetState(const WorldState &_state)
 }
 
 //////////////////////////////////////////////////
-void World::InsertModel(const std::string &_sdfFilename)
+void World::InsertModelFile(const std::string &_sdfFilename)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Factory msg;
@@ -1305,11 +1340,20 @@ void World::InsertModel(const std::string &_sdfFilename)
 }
 
 //////////////////////////////////////////////////
-void World::InsertModel(const sdf::SDF &_sdf)
+void World::InsertModelSDF(const sdf::SDF &_sdf)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
+  this->factoryMsgs.push_back(msg);
+}
+
+//////////////////////////////////////////////////
+void World::InsertModelString(const std::string &_sdfString)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Factory msg;
+  msg.set_sdf(_sdfString);
   this->factoryMsgs.push_back(msg);
 }
 

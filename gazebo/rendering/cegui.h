@@ -14,18 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_CEGUI_H_
-#define GAZEBO_CEGUI_H_
+#ifndef _GAZEBO_CEGUI_H_
+#define _GAZEBO_CEGUI_H_
 
-// This disables warning messages for OGRE
+// This disables warning messages
 #pragma GCC system_header
 
 #include "gazebo_config.h"
 
 #ifdef HAVE_CEGUI
-#include "CEGUI/CEGUI.h"
-#include "CEGUI/CEGUIEventArgs.h"
-#include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
+#include <CEGUI/CEGUI.h>
+#include <CEGUI/CEGUIEventArgs.h>
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #endif
 
 #endif

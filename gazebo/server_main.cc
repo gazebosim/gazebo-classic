@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  printf("Server main\n");
   gazebo::Server *server = new gazebo::Server();
   if (!server->ParseArgs(argc, argv))
     return -1;

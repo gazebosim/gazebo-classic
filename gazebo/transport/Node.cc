@@ -23,6 +23,7 @@ using namespace transport;
 
 unsigned int Node::idCounter = 0;
 
+/////////////////////////////////////////////////
 Node::Node()
 {
   this->id = idCounter++;
@@ -31,6 +32,7 @@ Node::Node()
   this->incomingMutex = new boost::recursive_mutex();
 }
 
+/////////////////////////////////////////////////
 Node::~Node()
 {
   this->Fini();
@@ -41,6 +43,7 @@ Node::~Node()
   this->incomingMutex = NULL;
 }
 
+/////////////////////////////////////////////////
 void Node::Fini()
 {
   TopicManager::Instance()->RemoveNode(this->id);
@@ -54,6 +57,7 @@ void Node::Fini()
   this->incomingMutex->unlock();
 }
 
+/////////////////////////////////////////////////
 void Node::Init(const std::string &_space)
 {
   this->topicNamespace = _space;
@@ -81,6 +85,7 @@ std::string Node::GetTopicNamespace() const
   return this->topicNamespace;
 }
 
+/////////////////////////////////////////////////
 std::string Node::DecodeTopicName(const std::string &_topic)
 {
   std::string result = _topic;
@@ -89,6 +94,7 @@ std::string Node::DecodeTopicName(const std::string &_topic)
   return result;
 }
 
+/////////////////////////////////////////////////
 std::string Node::EncodeTopicName(const std::string &topic)
 {
   std::string result = topic;
@@ -98,12 +104,13 @@ std::string Node::EncodeTopicName(const std::string &topic)
   return result;
 }
 
-/// Get the unique ID of the node
+/////////////////////////////////////////////////
 unsigned int Node::GetId() const
 {
   return this->id;
 }
 
+/////////////////////////////////////////////////
 void Node::ProcessPublishers()
 {
   this->publisherMutex->lock();
@@ -115,6 +122,7 @@ void Node::ProcessPublishers()
   this->publisherMutex->unlock();
 }
 
+/////////////////////////////////////////////////
 bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 {
   this->incomingMutex->lock();
@@ -123,6 +131,7 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
   return true;
 }
 
+/////////////////////////////////////////////////
 void Node::ProcessIncoming()
 {
   // Hack...
@@ -163,6 +172,7 @@ void Node::ProcessIncoming()
   this->incomingMutex->unlock();
 }
 
+/////////////////////////////////////////////////
 std::string Node::GetMsgType(const std::string &_topic) const
 {
   Callback_M::const_iterator iter = this->callbacks.find(_topic);
@@ -171,5 +181,3 @@ std::string Node::GetMsgType(const std::string &_topic) const
 
   return std::string();
 }
-
-

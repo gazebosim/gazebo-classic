@@ -78,14 +78,14 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
   if (NOT CEGUI_FOUND)
     BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
-    set (HAVE_CEGUI FALSE)
+    set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
   else()
     message (STATUS "Looking for CEGUI, found")
     if (NOT CEGUI_OGRE_FOUND)
       BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
-      set (HAVE_CEGUI FALSE)
+      set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
     else()
-      set (HAVE_CEGUI TRUE)
+      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI" FORCE)
       set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
       message (STATUS "Looking for CEGUI-OGRE, found")
     endif()
@@ -117,6 +117,9 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find OGRE 
+  execute_process(COMMAND pkg-config --modversion OGRE 
+    OUTPUT_VARIABLE OGRE_VERSION)
+
   pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
   if (OGRE-RTShaderSystem_FOUND)
     set(ogre_ldflags ${OGRE-RTShaderSystem_LDFLAGS})
@@ -167,6 +170,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_ERROR("Missing: libxml2(http://www.xmlsoft.org)")
   endif ()
 
+  # pkg_check_modules(SKYX SKYX)
 
   ########################################
   # Find OpenAL
@@ -177,22 +181,29 @@ if (PKG_CONFIG_FOUND)
   # else (NOT OAL_FOUND)
   #   set (HAVE_OPENAL TRUE)
   # endif ()
+ 
+  ########################################
+  # Find libswscale format
+  pkg_check_modules(libswscale libswscale)
+  if (NOT libswscale_FOUND)
+    BUILD_WARNING ("libswscale not found. Audio-video capabilities will be disabled.")
+  endif ()
 
   ########################################
   # Find AV format
-  pkg_check_modules(AVF libavformat)
-  if (NOT AVF_FOUND)
-    BUILD_WARNING ("libavformat not found. Audio capabilities will be disabled.")
+  pkg_check_modules(libavformat libavformat)
+  if (NOT libavformat_FOUND)
+    BUILD_WARNING ("libavformat not found. Audio-video capabilities will be disabled.")
   endif ()
 
   ########################################
   # Find avcodec
-  pkg_check_modules(AVC libavcodec)
-  if (NOT AVC_FOUND)
-    BUILD_WARNING ("libavcodec not found. Audio capabilities will be disabled.")
+  pkg_check_modules(libavcodec libavcodec)
+  if (NOT libavcodec_FOUND)
+    BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
   endif ()
 
-  if (AVF_FOUND AND AVC_FOUND)
+  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale)
     set (HAVE_FFMPEG TRUE)
   endif ()
 
@@ -220,13 +231,6 @@ endif ()
 find_package (Qt4)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
-endif()
-
-find_package(GTest)
-if (GTEST_FOUND)
-  enable_testing()
-else()
-  message (STATUS "  Tests will not be built")
 endif()
 
 ########################################

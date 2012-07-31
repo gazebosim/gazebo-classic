@@ -57,7 +57,7 @@ namespace gazebo
       public: void Set(double _x, double _y);
 
       /// \brief Return the cross product of this vector and pt
-      public: Vector2d GetCrossProd(const Vector2d &_pt) const;
+      public: Vector2d Cross(const Vector2d &_pt) const;
 
       /// \brief Equal operator
       public: Vector2d &operator =(const Vector2d &pt);

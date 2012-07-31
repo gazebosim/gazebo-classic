@@ -15,20 +15,19 @@
  *
 */
 
-#include <gazebo/common/Exception.hh>
-#include <gazebo/common/Console.hh>
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/common/CommonTypes.hh>
-#include <gazebo/gui/MainWindow.hh>
-#include <gazebo/gui/LightRightMenu.hh>
-#include <gazebo/gui/ModelRightMenu.hh>
-#include <gazebo/gui/Gui.hh>
-
 #include <signal.h>
 #include <boost/program_options.hpp>
+#include "gazebo/gui/qt.h"
+#include "gazebo/gazebo.hh"
 
-#include "gazebo.hh"
-#include "gui/qt.h"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/LightRightMenu.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/Gui.hh"
 
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
@@ -122,6 +121,14 @@ namespace gazebo
 {
   namespace gui
   {
+    void set_style()
+    {
+      QFile file(":/style.qss");
+      file.open(QFile::ReadOnly);
+      QString styleSheet = QLatin1String(file.readAll());
+      g_app->setStyleSheet(styleSheet);
+    }
+
     /////////////////////////////////////////////////
     void load()
     {
@@ -139,6 +146,7 @@ namespace gazebo
       }
 
       g_app = new QApplication(g_argc, g_argv);
+      set_style();
 
       g_main_win = new gui::MainWindow();
 
@@ -169,8 +177,6 @@ unsigned int gui::get_entity_id(const std::string &_name)
   return g_main_win->GetEntityId(_name);
 }
 
-
-
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
@@ -180,13 +186,13 @@ bool gui::run(int _argc, char **_argv)
   if (!gazebo::load())
     return false;
 
-  if (!gazebo::init())
-    return false;
-
   gazebo::run();
 
   gazebo::gui::load();
   gazebo::gui::init();
+
+  if (!gazebo::init())
+    return false;
 
   g_app->exec();
 
@@ -201,8 +207,6 @@ void gui::stop()
   g_active_camera.reset();
   g_app->quit();
 }
-
-
 
 /////////////////////////////////////////////////
 void gui::set_world(const std::string &_name)

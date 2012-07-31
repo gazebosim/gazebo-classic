@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef GUI_OVERLAY
-#define GUI_OVERLAY
+#ifndef _GUI_OVERLAY_HH_
+#define _GUI_OVERLAY_HH_
 
 #include <string>
 #include <map>
@@ -110,7 +110,7 @@ namespace gazebo
       /// Load a CEGUI layout file
       private: CEGUI::Window *LoadLayoutImpl(const std::string &_filename);
 
-      private: bool OnButtonClicked(const CEGUI::EventArgs& _e);
+      private: bool OnButtonClicked(const CEGUI::EventArgs &_e);
       private: int GetKeyCode(const std::string  &_unicode);
 
       private: CEGUI::OgreRenderer *guiRenderer;
