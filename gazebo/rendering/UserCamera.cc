@@ -27,19 +27,20 @@
 #include "common/Exception.hh"
 #include "common/Events.hh"
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/GUIOverlay.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/WindowManager.hh"
-#include "rendering/FPSViewController.hh"
-#include "rendering/OrbitViewController.hh"
-#include "rendering/RenderTypes.hh"
-#include "rendering/Scene.hh"
-#include "rendering/RTShaderSystem.hh"
-#include "rendering/Camera.hh"
-#include "rendering/Visual.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/GUIOverlay.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/WindowManager.hh"
+#include "gazebo/rendering/FPSViewController.hh"
+#include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -48,19 +49,17 @@ using namespace rendering;
 int UserCamera::count = 0;
 
 //////////////////////////////////////////////////
-UserCamera::UserCamera(const std::string &name_, Scene *scene_)
-  : Camera(name_, scene_)
+UserCamera::UserCamera(const std::string &_name, Scene *_scene)
+  : Camera(_name, _scene)
 {
   std::stringstream stream;
-
-  stream << "UserCamera_" << this->count++;
-  this->name = stream.str();
 
   this->gui = new GUIOverlay();
 
   this->orbitViewController = new OrbitViewController(this);
   this->fpsViewController = new FPSViewController(this);
   this->viewController = this->orbitViewController;
+  this->selectionBuffer = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -105,11 +104,11 @@ void UserCamera::Init()
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
   {
-    this->SetClipDist(0.1, 100);
+    this->SetClipDist(0.1, 1000);
   }
   else
   {
-    this->SetClipDist(0.1, 500);
+    this->SetClipDist(0.1, 5000);
   }
 
   this->axisNode =
@@ -153,6 +152,7 @@ void UserCamera::Init()
   this->axisNode->attachObject(x);
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
+
 }
 
 //////////////////////////////////////////////////
@@ -211,7 +211,15 @@ void UserCamera::Fini()
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
+  {
+    this->selectionBuffer->Update();
+
+    //DEBUG: this->selectionBuffer->ShowOverlay(true);
+    //Ogre::Entity *entity =
+    //this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
+
     this->viewController->HandleMouseEvent(_evt);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -487,6 +495,9 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   this->gui->Init(this->renderTarget);
   this->initialized = true;
+
+  this->selectionBuffer = new SelectionBuffer(this->name,
+      this->scene, this->renderTarget);
 }
 
 //////////////////////////////////////////////////
@@ -499,4 +510,50 @@ GUIOverlay *UserCamera::GetGUIOverlay()
 void UserCamera::EnableViewController(bool _value) const
 {
   this->viewController->SetEnabled(_value);
+}
+
+//////////////////////////////////////////////////
+VisualPtr UserCamera::GetVisual(math::Vector2i _mousePos, std::string &_mod)
+{
+  VisualPtr result;
+
+  Ogre::Entity *entity =
+    this->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+
+  _mod = "";
+  if (entity)
+  {
+    // Make sure we set the _mod only if we have found a selection object
+    if (entity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
+        !entity->getUserAny().isEmpty() &&
+        entity->getUserAny().getType() == typeid(std::string))
+    {
+      _mod = Ogre::any_cast<std::string>(entity->getUserAny());
+    }
+
+    if (!entity->getUserAny().isEmpty())
+    {
+      result = this->scene->GetVisual(
+          Ogre::any_cast<std::string>(entity->getUserAny()));
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+VisualPtr UserCamera::GetVisual(math::Vector2i _mousePos)
+{
+  VisualPtr result;
+
+  Ogre::Entity *entity =
+    this->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+
+  if (entity && !entity->getUserAny().isEmpty())
+  {
+    result = this->scene->GetVisual(
+        Ogre::any_cast<std::string>(entity->getUserAny()));
+  }
+
+  return result;
 }

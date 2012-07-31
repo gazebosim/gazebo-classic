@@ -15,7 +15,7 @@
  *
 */
 #include <math.h>
-// #include <SkyX.h>
+#include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "rendering/ogre_gazebo.h"
 
@@ -67,7 +67,8 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
   this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
   RTShaderSystem::AttachViewport(_camera->GetViewport(), _camera->GetScene());
-  //this->windows[_windowId]->addListener(_camera->GetScene()->skyx);
+  if (_camera->GetScene()->skyx != NULL)
+    this->windows[_windowId]->addListener(_camera->GetScene()->skyx);
 }
 
 //////////////////////////////////////////////////
@@ -175,5 +176,11 @@ unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
     return 0;
 }
 
-
-
+//////////////////////////////////////////////////
+Ogre::RenderWindow *WindowManager::GetWindow(unsigned int _id)
+{
+  if (_id < this->windows.size())
+    return this->windows[_id];
+  else
+    return NULL;
+}

@@ -49,9 +49,6 @@ GLWidget::GLWidget(QWidget *_parent)
   this->setObjectName("GLWidget");
   this->state = "normal";
 
-  // This mouse offset is a hack. The glwindow window is not properly sized
-  // when first created....
-  this->mouseOffset = -10;
   this->setFocusPolicy(Qt::StrongFocus);
 
   this->windowId = -1;
@@ -216,7 +213,6 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
   {
-    this->mouseOffset = 0;
     g_fullscreen = !g_fullscreen;
     gui::Events::fullScreen(g_fullscreen);
   }
@@ -297,8 +293,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pressPos.Set(_event->pos().x() + this->mouseOffset,
-                                 _event->pos().y() + this->mouseOffset);
+  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
   /// Set the button which cause the press event
@@ -350,8 +345,9 @@ void GLWidget::OnMousePressRing()
 {
   if (this->selectionObj)
   {
-    this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos,
-                             this->selectionMod);
+    this->userCamera->GetVisual(this->mouseEvent.pressPos, this->selectionMod);
+    // this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos,
+    //                         this->selectionMod);
     if (!this->selectionMod.empty())
     {
       this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
@@ -394,8 +390,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 
   this->setFocus(Qt::MouseFocusReason);
 
-  this->mouseEvent.pos.Set(_event->pos().x()+this->mouseOffset,
-                            _event->pos().y()+this->mouseOffset);
+  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.type = common::MouseEvent::MOVE;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
     common::MouseEvent::LEFT : 0x0;
@@ -518,8 +513,9 @@ void GLWidget::OnMouseMoveRing()
   {
     rendering::VisualPtr newHoverVis;
     std::string mod;
-    newHoverVis = this->scene->GetVisualAt(this->userCamera,
-                                           this->mouseEvent.pos, mod);
+    newHoverVis = this->userCamera->GetVisual(this->mouseEvent.pos, mod);
+    // newHoverVis = this->scene->GetVisualAt(this->userCamera,
+    //                                       this->mouseEvent.pos, mod);
     if (!mod.empty())
     {
       this->setCursor(Qt::PointingHandCursor);
@@ -583,8 +579,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pos.Set(_event->pos().x()+this->mouseOffset,
-                            _event->pos().y()+this->mouseOffset);
+  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 
   if (_event->button() == Qt::LeftButton)
@@ -633,8 +628,10 @@ void GLWidget::OnMouseReleaseRing()
   {
     if (this->mouseEvent.button == common::MouseEvent::LEFT)
     {
-      this->hoverVis = this->scene->GetVisualAt(this->userCamera,
-                                                this->mouseEvent.pos);
+      this->hoverVis = this->userCamera->GetVisual(this->mouseEvent.pos);
+
+      // this->hoverVis = this->scene->GetVisualAt(this->userCamera,
+      //                                           this->mouseEvent.pos);
 
       // Select the current hovervis for positioning
       if (this->hoverVis && !this->hoverVis->IsPlane())

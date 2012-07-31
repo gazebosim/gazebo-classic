@@ -87,7 +87,7 @@ void Color::SetFromHSV(float _h, float _s, float _v)
 
   _h = static_cast<int>(_h) % 360;
 
-  if (math::equal(_s, 0))
+  if (math::equal(_s, 0.0f))
   {
     // acromatic (grey)
     this->r = this->g = this->b = _v;
@@ -233,10 +233,10 @@ float Color::operator[](unsigned int index)
 {
   switch (index)
   {
-    case 0: return this->R();
-    case 1: return this->G();
-    case 2: return this->B();
-    case 3: return this->A();
+    case 0: return this->r;
+    case 1: return this->g;
+    case 2: return this->b;
+    case 3: return this->a;
     default: gzerr << "Invalid color index[" << index << "]\n";
   }
 
@@ -289,6 +289,158 @@ void Color::B(float _v)
 void Color::A(float _v)
 {
   this->a = _v;
+}
+
+//////////////////////////////////////////////////
+Color::RGBA Color::GetAsRGBA() const
+{
+  uint8_t val8;
+  unsigned int val32;
+
+  // Convert to 32bit pattern
+  // (RGBA = 8888)
+
+  val8 = static_cast<uint8_t>(this->r * 255);
+  val32 = val8 << 24;
+
+  val8 = static_cast<uint8_t>(this->g * 255);
+  val32 += val8 << 16;
+
+  val8 = static_cast<uint8_t>(this->b * 255);
+  val32 += val8 << 8;
+
+  val8 = static_cast<uint8_t>(this->a * 255);
+  val32 += val8;
+
+  return val32;
+}
+
+//////////////////////////////////////////////////
+Color::BGRA Color::GetAsBGRA() const
+{
+  uint8_t val8;
+  unsigned int val32 = 0;
+
+  // Convert to 32bit pattern
+  // (BGRA = 8888)
+
+  val8 = static_cast<uint8_t>(this->b * 255);
+  val32 = val8 << 24;
+
+  val8 = static_cast<uint8_t>(this->g * 255);
+  val32 += val8 << 16;
+
+  val8 = static_cast<uint8_t>(this->r * 255);
+  val32 += val8 << 8;
+
+  val8 = static_cast<uint8_t>(this->a * 255);
+  val32 += val8;
+
+  return val32;
+}
+
+//////////////////////////////////////////////////
+Color::ARGB Color::GetAsARGB() const
+{
+  uint8_t val8;
+  unsigned int val32 = 0;
+
+  // Convert to 32bit pattern
+  // (ARGB = 8888)
+
+  val8 = static_cast<uint8_t>(this->a * 255);
+  val32 = val8 << 24;
+
+  val8 = static_cast<uint8_t>(this->r * 255);
+  val32 += val8 << 16;
+
+  val8 = static_cast<uint8_t>(this->g * 255);
+  val32 += val8 << 8;
+
+  val8 = static_cast<uint8_t>(this->b * 255);
+  val32 += val8;
+
+  return val32;
+}
+
+//////////////////////////////////////////////////
+Color::ABGR Color::GetAsABGR() const
+{
+  uint8_t val8;
+  unsigned int val32 = 0;
+
+  // Convert to 32bit pattern
+  // (ABGR = 8888)
+
+  val8 = static_cast<uint8_t>(this->a * 255);
+  val32 = val8 << 24;
+
+  val8 = static_cast<uint8_t>(this->b * 255);
+  val32 += val8 << 16;
+
+  val8 = static_cast<uint8_t>(this->g * 255);
+  val32 += val8 << 8;
+
+  val8 = static_cast<uint8_t>(this->r * 255);
+  val32 += val8;
+
+  return val32;
+}
+
+//////////////////////////////////////////////////
+void Color::SetFromRGBA(const Color::RGBA _v)
+{
+  unsigned int val32 = _v;
+
+  // Convert from 32bit pattern
+  // (RGBA = 8888)
+
+  this->r = ((val32 >> 24) & 0xFF) / 255.0f;
+  this->g = ((val32 >> 16) & 0xFF) / 255.0f;
+  this->b = ((val32 >> 8) & 0xFF) / 255.0f;
+  this->a = (val32 & 0xFF) / 255.0f;
+}
+
+//////////////////////////////////////////////////
+void Color::SetFromBGRA(const Color::BGRA _v)
+{
+  unsigned int val32 = _v;
+
+  // Convert from 32bit pattern
+  // (BGRA = 8888)
+
+  this->b = ((val32 >> 24) & 0xFF) / 255.0f;
+  this->g = ((val32 >> 16) & 0xFF) / 255.0f;
+  this->r = ((val32 >> 8) & 0xFF) / 255.0f;
+  this->a = (val32 & 0xFF) / 255.0f;
+}
+
+//////////////////////////////////////////////////
+void Color::SetFromARGB(const Color::ARGB _v)
+{
+  unsigned int val32 = _v;
+
+  // Convert from 32bit pattern
+  // (ARGB = 8888)
+
+  this->a = ((val32 >> 24) & 0xFF) / 255.0f;
+  this->r = ((val32 >> 16) & 0xFF) / 255.0f;
+  this->g = ((val32 >> 8) & 0xFF) / 255.0f;
+  this->b = (val32 & 0xFF) / 255.0f;
+}
+
+//////////////////////////////////////////////////
+void Color::SetFromABGR(const Color::ABGR _v)
+{
+  unsigned int val32 = _v;
+
+  // Convert from 32bit pattern
+  // (ABGR = 8888)
+
+  this->a = ((val32 >> 24) & 0xFF) / 255.0f;
+  this->b = ((val32 >> 16) & 0xFF) / 255.0f;
+  this->g = ((val32 >> 8) & 0xFF) / 255.0f;
+  this->r = (val32 & 0xFF) / 255.0f;
 }
 
 //////////////////////////////////////////////////

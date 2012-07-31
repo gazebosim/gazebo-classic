@@ -70,10 +70,10 @@ void HeightmapShape::Init()
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
-  if (math::equal(this->img.GetMaxColor().R(), 0))
+  if (math::equal(this->img.GetMaxColor().r, 0.0f))
     this->scale.z = terrainSize.z;
   else
-    this->scale.z = terrainSize.z / this->img.GetMaxColor().R();
+    this->scale.z = terrainSize.z / this->img.GetMaxColor().r;
 
   // Step 1: Construct the heightmap lookup table, using the ogre ray scene
   // query functionality

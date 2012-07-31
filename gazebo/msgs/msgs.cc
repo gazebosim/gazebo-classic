@@ -144,10 +144,10 @@ void Set(msgs::Pose *_p, const math::Pose &_v)
 
 void Set(msgs::Color *_c, const common::Color &_v)
 {
-  _c->set_r(_v.R());
-  _c->set_g(_v.G());
-  _c->set_b(_v.B());
-  _c->set_a(_v.A());
+  _c->set_r(_v.r);
+  _c->set_g(_v.g);
+  _c->set_b(_v.b);
+  _c->set_a(_v.a);
 }
 
 void Set(msgs::Time *_t, const common::Time &_v)
@@ -221,10 +221,10 @@ msgs::Pose Convert(const math::Pose &_p)
 msgs::Color Convert(const common::Color &_c)
 {
   msgs::Color result;
-  result.set_r(_c.R());
-  result.set_g(_c.G());
-  result.set_b(_c.B());
-  result.set_a(_c.A());
+  result.set_r(_c.r);
+  result.set_g(_c.g);
+  result.set_b(_c.b);
+  result.set_a(_c.a);
   return result;
 }
 

@@ -361,8 +361,8 @@ Vector3 Matrix4::operator*(const Vector3 &_vec) const
 //////////////////////////////////////////////////
 bool Matrix4::IsAffine() const
 {
-  return equal(this->m[3][0], 0) && equal(this->m[3][1], 0) &&
-         equal(this->m[3][2], 0) && equal(this->m[3][3], 1);
+  return equal(this->m[3][0], 0.0) && equal(this->m[3][1], 0.0) &&
+         equal(this->m[3][2], 0.0) && equal(this->m[3][3], 1.0);
 }
 
 //////////////////////////////////////////////////

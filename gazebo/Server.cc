@@ -111,7 +111,7 @@ bool Server::ParseArgs(int argc, char **argv)
   } catch(boost::exception &_e)
   {
     std::cerr << "Error. Invalid arguments\n";
-    // boost::diagnostic_information is not in lucid's boost
+    // NOTE: boost::diagnostic_information(_e) breaks lucid
     // std::cerr << boost::diagnostic_information(_e) << "\n";
     return false;
   }

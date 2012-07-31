@@ -155,10 +155,10 @@ TEST_F(MsgsTest, Convert)
     EXPECT_TRUE(math::equal(1.0f, msg.a()));
 
     common::Color v = msgs::Convert(msg);
-    EXPECT_TRUE(math::equal(0.1f, v.R()));
-    EXPECT_TRUE(math::equal(0.2f, v.G()));
-    EXPECT_TRUE(math::equal(0.3f, v.B()));
-    EXPECT_TRUE(math::equal(1.0f, v.A()));
+    EXPECT_TRUE(math::equal(0.1f, v.r));
+    EXPECT_TRUE(math::equal(0.2f, v.g));
+    EXPECT_TRUE(math::equal(0.3f, v.b));
+    EXPECT_TRUE(math::equal(1.0f, v.a));
   }
 
   {

@@ -170,8 +170,6 @@ if (PKG_CONFIG_FOUND)
     BUILD_ERROR("Missing: libxml2(http://www.xmlsoft.org)")
   endif ()
 
-  # pkg_check_modules(SKYX SKYX)
-
   ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)

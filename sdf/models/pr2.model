@@ -622,7 +622,7 @@
         </geometry>
         <material script='Gazebo/Grey'/>
       </visual>
-      <sensor name='head_mount_sensor' type='camera' always_on='0' update_rate='1.000000' visualize='0'>
+      <sensor name='head_mount_sensor' type='camera' always_on='1' update_rate='1.000000' visualize='1'>
         <origin pose='-0.147067 0.012500 0.291953 0.000000 -0.000000 0.000000'/>
         <camera>
           <horizontal_fov angle='0.994838'/>

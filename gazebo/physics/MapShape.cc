@@ -402,7 +402,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
       pixColor = this->mapImage->GetPixel(x, y);
 
       v = (unsigned char)(255 *
-          ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
+          ((pixColor.r + pixColor.g + pixColor.b) / 3.0));
       // if (this->sdf->GetValueBool("negative"))
         // v = 255 - v;
 

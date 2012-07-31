@@ -71,17 +71,17 @@ TEST_F(MathTest, Vector4)
 {
   {
     math::Vector4 v;
-    EXPECT_TRUE(math::equal(v.x, 0));
-    EXPECT_TRUE(math::equal(v.y, 0));
-    EXPECT_TRUE(math::equal(v.z, 0));
-    EXPECT_TRUE(math::equal(v.w, 0));
+    EXPECT_TRUE(math::equal(v.x, 0.0));
+    EXPECT_TRUE(math::equal(v.y, 0.0));
+    EXPECT_TRUE(math::equal(v.z, 0.0));
+    EXPECT_TRUE(math::equal(v.w, 0.0));
   }
 
   math::Vector4 v1(1, 2, 3, 4);
-  EXPECT_TRUE(math::equal(v1.x, 1));
-  EXPECT_TRUE(math::equal(v1.y, 2));
-  EXPECT_TRUE(math::equal(v1.z, 3));
-  EXPECT_TRUE(math::equal(v1.w, 4));
+  EXPECT_TRUE(math::equal(v1.x, 1.0));
+  EXPECT_TRUE(math::equal(v1.y, 2.0));
+  EXPECT_TRUE(math::equal(v1.z, 3.0));
+  EXPECT_TRUE(math::equal(v1.w, 4.0));
 
   math::Vector4 v(v1);
   EXPECT_TRUE(v == v1);
@@ -93,7 +93,7 @@ TEST_F(MathTest, Vector4)
   EXPECT_TRUE(math::equal(v.GetLength(), 5.4772, 1e-3));
 
   // ::GetSquaredLength()
-  EXPECT_TRUE(math::equal(v.GetSquaredLength(), 30));
+  EXPECT_TRUE(math::equal(v.GetSquaredLength(), 30.0));
 
   // ::Normalize
   v.Normalize();
@@ -200,7 +200,7 @@ TEST_F(MathTest, Vector3)
   EXPECT_TRUE(v.Round() == math::Vector3(1, 2, 4));
 
   // ::GetDotProd
-  EXPECT_TRUE(math::equal(17, v.Dot(math::Vector3(1, 2, 3)), 1e-2));
+  EXPECT_TRUE(math::equal(17.0, v.Dot(math::Vector3(1, 2, 3)), 1e-2));
 
   // ::GetDistToLine
   v.Set(0, 0, 0);
@@ -525,18 +525,18 @@ TEST_F(MathTest, Quaternion)
 {
   {
     math::Quaternion q;
-    EXPECT_TRUE(math::equal(q.w, 1));
-    EXPECT_TRUE(math::equal(q.x, 0));
-    EXPECT_TRUE(math::equal(q.y, 0));
-    EXPECT_TRUE(math::equal(q.z, 0));
+    EXPECT_TRUE(math::equal(q.w, 1.0));
+    EXPECT_TRUE(math::equal(q.x, 0.0));
+    EXPECT_TRUE(math::equal(q.y, 0.0));
+    EXPECT_TRUE(math::equal(q.z, 0.0));
   }
 
   {
     math::Quaternion q(1, 2, 3, 4);
-    EXPECT_TRUE(math::equal(q.w, 1));
-    EXPECT_TRUE(math::equal(q.x, 2));
-    EXPECT_TRUE(math::equal(q.y, 3));
-    EXPECT_TRUE(math::equal(q.z, 4));
+    EXPECT_TRUE(math::equal(q.w, 1.0));
+    EXPECT_TRUE(math::equal(q.x, 2.0));
+    EXPECT_TRUE(math::equal(q.y, 3.0));
+    EXPECT_TRUE(math::equal(q.z, 4.0));
   }
 
   {
@@ -545,19 +545,19 @@ TEST_F(MathTest, Quaternion)
   }
 
   math::Quaternion q1(math::Vector3(0, 0, 1), M_PI);
-  EXPECT_TRUE(math::equal(q1.x, 0));
-  EXPECT_TRUE(math::equal(q1.y, 0));
-  EXPECT_TRUE(math::equal(q1.z, 1));
-  EXPECT_TRUE(math::equal(q1.w, 0));
+  EXPECT_TRUE(math::equal(q1.x, 0.0));
+  EXPECT_TRUE(math::equal(q1.y, 0.0));
+  EXPECT_TRUE(math::equal(q1.z, 1.0));
+  EXPECT_TRUE(math::equal(q1.w, 0.0));
 
   math::Quaternion q(q1);
   EXPECT_TRUE(q == q1);
 
   q.SetToIdentity();
-  EXPECT_TRUE(math::equal(q.w, 1));
-  EXPECT_TRUE(math::equal(q.x, 0));
-  EXPECT_TRUE(math::equal(q.y, 0));
-  EXPECT_TRUE(math::equal(q.z, 0));
+  EXPECT_TRUE(math::equal(q.w, 1.0));
+  EXPECT_TRUE(math::equal(q.x, 0.0));
+  EXPECT_TRUE(math::equal(q.y, 0.0));
+  EXPECT_TRUE(math::equal(q.z, 0.0));
 
   q = math::Quaternion(M_PI*0.1, M_PI*0.5, M_PI);
   EXPECT_TRUE(q == math::Quaternion(0.110616, -0.698401, 0.110616, 0.698401));
@@ -589,10 +589,10 @@ TEST_F(MathTest, Quaternion)
   EXPECT_TRUE(q == math::Quaternion(0, 1, 0, 0));
 
   q.Set(1, 2, 3, 4);
-  EXPECT_TRUE(math::equal(q.w, 1));
-  EXPECT_TRUE(math::equal(q.x, 2));
-  EXPECT_TRUE(math::equal(q.y, 3));
-  EXPECT_TRUE(math::equal(q.z, 4));
+  EXPECT_TRUE(math::equal(q.w, 1.0));
+  EXPECT_TRUE(math::equal(q.x, 2.0));
+  EXPECT_TRUE(math::equal(q.y, 3.0));
+  EXPECT_TRUE(math::equal(q.z, 4.0));
 
   q.Normalize();
   EXPECT_TRUE(q == math::Quaternion(0.182574, 0.365148, 0.547723, 0.730297));
@@ -676,7 +676,7 @@ TEST_F(MathTest, Quaternion)
   q.x = q.y = q.z = q.w = 0.0;
   q.GetAsAxis(axis, angle);
   EXPECT_TRUE(axis == math::Vector3(1, 0, 0));
-  EXPECT_TRUE(math::equal(angle, 0, 1e-3));
+  EXPECT_TRUE(math::equal(angle, 0.0, 1e-3));
 }
 
 TEST_F(MathTest, Pose)
@@ -836,7 +836,7 @@ TEST_F(MathTest, Angle)
   EXPECT_TRUE(math::equal(0.3, angle.GetAsRadian()));
 
   angle /= math::Angle(0.1);
-  EXPECT_TRUE(math::equal(3, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(3.0, angle.GetAsRadian()));
   EXPECT_TRUE(angle == math::Angle(3));
   EXPECT_TRUE(angle != math::Angle(2));
   EXPECT_TRUE(angle < math::Angle(4));

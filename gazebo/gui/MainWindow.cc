@@ -25,6 +25,7 @@
 
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
+#include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/LightListWidget.hh"
 #include "gui/WorldPropertiesWidget.hh"
@@ -82,6 +83,7 @@ MainWindow::MainWindow()
   ModelListWidget *modelListWidget = new ModelListWidget(this);
   LightListWidget *lightListWidget = new LightListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
+  SkyWidget *skyWidget = new SkyWidget(this);
 
 
   this->treeWidget = new QTreeWidget();
@@ -120,6 +122,11 @@ MainWindow::MainWindow()
   subItem = new QTreeWidgetItem(topItem);
   this->treeWidget->setItemWidget(subItem, 0, insertModel);
 
+  topItem = new QTreeWidgetItem(this->treeWidget, QStringList("Sky"));
+  this->treeWidget->addTopLevelItem(topItem);
+  subItem = new QTreeWidgetItem(topItem);
+  this->treeWidget->setItemWidget(subItem, 0, skyWidget);
+
   this->renderWidget = new RenderWidget(mainWidget);
   this->timePanel = new TimePanel(mainWidget);
 
@@ -132,12 +139,10 @@ MainWindow::MainWindow()
   this->collapseButton->setFocusPolicy(Qt::NoFocus);
   connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
 
-  centerLayout->addSpacing(10);
   centerLayout->addWidget(this->treeWidget, 0);
   centerLayout->addWidget(collapseButton, 0);
   centerLayout->addWidget(this->renderWidget, 1);
   centerLayout->setContentsMargins(0, 0, 0, 0);
-  centerLayout->addSpacing(10);
   centerLayout->setSpacing(0);
 
   QHBoxLayout *timePanelLayout = new QHBoxLayout;
@@ -410,32 +415,27 @@ void MainWindow::OnFullScreen(bool _value)
 {
   if (_value)
   {
-    this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
     this->showFullScreen();
-    /*this->removeDockWidget(this->modelsDock);
-    this->removeDockWidget(this->lightsDock);
-    this->removeDockWidget(this->insertModelsDock);
-    */
+    this->renderWidget->showFullScreen();
+    this->treeWidget->hide();
+    this->menuBar->hide();
     this->playToolbar->hide();
     this->editToolbar->hide();
     this->mouseToolbar->hide();
-    this->menuBar()->hide();
+    this->timePanel->hide();
+    this->collapseButton->hide();
   }
   else
   {
-    this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
     this->showNormal();
-    /*this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
-    this->addDockWidget(Qt::LeftDockWidgetArea, this->lightsDock);
-    this->addDockWidget(Qt::LeftDockWidgetArea, this->insertModelsDock);
-    this->modelsDock->show();
-    this->lightsDock->show();
-    this->insertModelsDock->show();
-    */
+    this->renderWidget->showNormal();
+    this->treeWidget->show();
+    this->menuBar->show();
     this->playToolbar->show();
     this->editToolbar->show();
     this->mouseToolbar->show();
-    this->menuBar()->show();
+    this->timePanel->show();
+    this->collapseButton->show();
   }
 }
 
@@ -509,7 +509,7 @@ void MainWindow::CreateActions()
   connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
   this->resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
-  this->resetModelsAct->setShortcut(tr("Ctrl+P"));
+  this->resetModelsAct->setShortcut(tr("Ctrl+R"));
   this->resetModelsAct->setStatusTip(tr("Reset model poses"));
   connect(this->resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelOnly()));
@@ -632,10 +632,10 @@ void MainWindow::CreateMenus()
   QHBoxLayout *menuLayout = new QHBoxLayout;
 
   QFrame *frame = new QFrame;
-  QMenuBar *mb = new QMenuBar;
-  mb->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->menuBar =  new QMenuBar;
+  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  menuLayout->addWidget(mb);
+  menuLayout->addWidget(this->menuBar);
   menuLayout->addStretch(5);
   menuLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -644,7 +644,7 @@ void MainWindow::CreateMenus()
 
   this->setMenuWidget(frame);
 
-  this->fileMenu = mb->addMenu(tr("&File"));
+  this->fileMenu = this->menuBar->addMenu(tr("&File"));
   this->fileMenu->addAction(this->openAct);
   this->fileMenu->addAction(this->importAct);
   this->fileMenu->addAction(this->newAct);
@@ -653,20 +653,19 @@ void MainWindow::CreateMenus()
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(this->quitAct);
 
-  this->editMenu = mb->addMenu(tr("&Edit"));
-  this->editMenu->addAction(this->resetModelsAct);
+  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
   this->editMenu->addAction(this->resetWorldAct);
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
-  this->viewMenu = mb->addMenu(tr("&View"));
+  this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(this->viewResetAct);
   this->viewMenu->addAction(this->viewFullScreenAct);
   this->viewMenu->addAction(this->viewFPSAct);
   this->viewMenu->addAction(this->viewOrbitAct);
 
-  mb->addSeparator();
+  this->menuBar->addSeparator();
 
-  this->helpMenu = mb->addMenu(tr("&Help"));
+  this->helpMenu = this->menuBar->addMenu(tr("&Help"));
   this->helpMenu->addAction(this->aboutAct);
 }
 
@@ -726,18 +725,20 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     if (_msg->camera().has_origin())
     {
       const msgs::Pose &msg_origin = _msg->camera().origin();
-      math::Vector3 cam_origin_pos = math::Vector3(\
-        msg_origin.position().x(), \
-        msg_origin.position().y(), \
-        msg_origin.position().z()
-);
-      math::Quaternion cam_origin_rot = math::Quaternion(\
-        msg_origin.orientation().w(), \
-        msg_origin.orientation().x(), \
-        msg_origin.orientation().y(), \
-        msg_origin.orientation().z()
-);
+
+      math::Vector3 cam_origin_pos = math::Vector3(
+        msg_origin.position().x(),
+        msg_origin.position().y(),
+        msg_origin.position().z());
+
+      math::Quaternion cam_origin_rot = math::Quaternion(
+        msg_origin.orientation().w(),
+        msg_origin.orientation().x(),
+        msg_origin.orientation().y(),
+        msg_origin.orientation().z());
+
       math::Pose cam_origin(cam_origin_pos, cam_origin_rot);
+
       cam->SetWorldPose(cam_origin);
     }
 
@@ -896,11 +897,13 @@ void MainWindow::OnCollapse()
   {
     this->treeWidget->close();
     this->collapseButton->setText(">");
+    this->collapseButton->setStyleSheet(tr("QPushButton{margin-left: 10px;}"));
   }
   else
   {
     this->treeWidget->show();
     this->collapseButton->setText("<");
+    this->collapseButton->setStyleSheet("QPushButton{margin-left:0px;}");
   }
 }
 
