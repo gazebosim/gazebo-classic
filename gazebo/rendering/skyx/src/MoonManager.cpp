@@ -22,6 +22,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 */
 
 #include "gazebo/math/Helpers.hh"
+
 #include "SkyX.h"
 #include "MoonManager.h"
 

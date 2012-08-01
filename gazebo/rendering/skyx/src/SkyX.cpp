@@ -202,7 +202,8 @@ namespace SkyX
 		mRenderQueueGroups = rqg;
 
 		mVCloudsManager->getVClouds()->setRenderQueueGroups(
-			VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds, mRenderQueueGroups.vcloudsLightnings));
+			VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds,
+        mRenderQueueGroups.vcloudsLightnings));
 
 		if (!mCreated)
 		{
@@ -253,11 +254,14 @@ namespace SkyX
 
 		if (mStarfield)
 		{
-			mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
+			mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+          "uTime", mTimeOffset*0.5f, false);
 		}
 
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", mController->getSunDirection());
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", mController->getSunDirection());
+		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+        "uLightDir", mController->getSunDirection());
+		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+        "uLightDir", mController->getSunDirection());
 	}
 
 	bool SkyX::frameStarted(const Ogre::FrameEvent& e)

@@ -22,7 +22,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 */
 
 #include "gazebo/math/Helpers.hh"
-#include "ColorGradient.h"
+#include "gazebo/rendering/skyx/include/ColorGradient.h"
 
 namespace SkyX
 {

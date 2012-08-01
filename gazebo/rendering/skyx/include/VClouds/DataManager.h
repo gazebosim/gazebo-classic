@@ -97,7 +97,9 @@ namespace SkyX
         }
 
         /** Set update time
-          @param UpdateTime Time elapsed between data calculations, a little freeze could be experimented during these calculations on old CPU's
+          @param UpdateTime Time elapsed between data calculations, a little
+          freeze could be experimented during these calculations on old
+          CPU's
           */
         inline void setUpdateTime(const float& UpdateTime)
         {
@@ -122,16 +124,23 @@ namespace SkyX
         }
 
         /** Set wheater parameters
-          Use this funtion to update the cloud field parameters, you'll get a smart and smooth transition from your old 
+          Use this funtion to update the cloud field parameters, you'll get
+          a smart and smooth transition from your old 
           setting to your new ones.
-          @param Humidity Humidity, in other words: the percentage of clouds in [0,1] range.
-          @param AverageCloudsSize Average clouds size, for example: if previous wheater clouds size parameter was very different from new one(i.e: more little)
-          only the old biggest clouds are going to be keept and the little ones are going to be replaced
-          @param delayedResponse false to change wheather conditions over several updates, true to change it at the moment
+          @param Humidity Humidity, in other words: the percentage of clouds
+          in [0,1] range.
+          @param AverageCloudsSize Average clouds size, for example: if
+          previous wheater clouds size parameter was very different from new
+          one(i.e: more little) only the old biggest clouds are going to be
+          keept and the little ones are going to be replaced
+          @param delayedResponse false to change wheather conditions over
+          several updates, true to change it at the moment
           */
-        void setWheater(const float& Humidity, const float& AverageCloudsSize, const bool& delayedResponse = true);
+        void setWheater(const float& Humidity, const float& AverageCloudsSize,
+            const bool& delayedResponse = true);
 
-        /** Add ellipsoid: clouds are modelled as ellipsoids in our simulation approach, so.. different kind of clouds 
+        /** Add ellipsoid: clouds are modelled as ellipsoids in our
+          simulation approach, so.. different kind of clouds 
           can be modelled with ellipsoids compositions.
           @param e Ellipsoid
           @param UpdateProbabilities Update probabilities?
@@ -158,7 +167,8 @@ namespace SkyX
           @param init Initialize values
           @return Cell 3d pointer
           */
-        Cell *** _create3DCellArray(const int& nx, const int& ny, const int& nz, const bool& init = true);
+        Cell *** _create3DCellArray(const int& nx, const int& ny,
+            const int& nz, const bool& init = true);
 
         /** Delete tridimensional cell array
           @param c Cell pointer to be deleted
@@ -174,7 +184,8 @@ namespace SkyX
           @param ny Y size
           @param nz Z size
           */
-        void _copy3DCellArraysData(Cell ***src, Cell ***dest, const int& nx, const int& ny, const int& nz);
+        void _copy3DCellArraysData(Cell ***src, Cell ***dest, const int& nx,
+            const int& ny, const int& nz);
 
         /** Perform celullar automata simulation
           @param nx X size
@@ -184,7 +195,8 @@ namespace SkyX
           @param xStart x start cell (included)
           @param xEnd x end cell (not included, until xEnd-1)
           */
-        void _performCalculations(const int& nx, const int& ny, const int& nz, const int& step, const int& xStart, const int& xEnd);
+        void _performCalculations(const int& nx, const int& ny, const int& nz,
+            const int& step, const int& xStart, const int& xEnd);
 
         /** Update volumetric texture data
           @param c Cells data
@@ -194,7 +206,7 @@ namespace SkyX
           @param nz Z size
           */
         void _updateVolTextureData(Cell ***c, const VolTextureId& TexId,
-            const int& nx, const int& ny, const int& nz);
+                                   const int& nx, const int& ny, const int& nz);
 
         /** Get continous density at a point
           @param c Cells data
@@ -208,8 +220,9 @@ namespace SkyX
           @param sgtrength Strength
           */	
         float _getDensityAt(Cell ***c, const int& nx, const int& ny,
-            const int& nz, const int& x, const int& y, const int& z,
-            const int& r, const float& strength) const;
+                            const int& nz, const int& x, const int& y,
+                            const int& z, const int& r,
+                            const float& strength) const;
 
         /** Get discrete density at a point
           @param c Cells data
@@ -310,7 +323,6 @@ namespace SkyX
 
         /// Volumetric textures array
         Ogre::TexturePtr mVolTextures[2];
-
 
         /// Ellipsoids
         std::vector<Ellipsoid*> mEllipsoids;

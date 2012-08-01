@@ -145,13 +145,14 @@ namespace SkyX { namespace VClouds{
      */
     void _updateRenderQueueGroup(const Ogre::uint8& rqg);
 
-  private:
-    /** Update data
-        @param alpha Alpha
-      @param currentPos Current position
-      @param parentTime Parent time
-     */
-    void _updateData(const Ogre::Real& alpha, const Ogre::Real& currentPos, const Ogre::Real& parentTime);
+	private:
+		/** Update data
+		    @param alpha Alpha
+			@param currentPos Current position
+			@param parentTime Parent time
+		 */
+		void _updateData(const Ogre::Real& alpha, const Ogre::Real& currentPos,
+                     const Ogre::Real& parentTime);
 
     /// Ray origin
     Ogre::Vector3 mOrigin;
@@ -171,6 +172,8 @@ namespace SkyX { namespace VClouds{
     Ogre::Real mTime;
     /// Global time multiplier
     Ogre::Real mTimeMultiplier;
+    /// Per step time multipliers
+    Ogre::Vector3 mTimeMultipliers;
 
     /// Lightning intensity
     Ogre::Real mIntensity;

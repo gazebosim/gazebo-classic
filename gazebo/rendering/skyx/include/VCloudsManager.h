@@ -182,8 +182,8 @@ namespace SkyX
 		/// VClouds pointer
 		VClouds::VClouds* mVClouds;
 
-    /// Height parameters, x = Cloud field y-coord start, y: Field height
-    /// (both in world coordinates)
+        /// Height parameters, x = Cloud field y-coord start, y: Field height
+        /// (both in world coordinates)
 		Ogre::Vector2 mHeight;
 
 		/// Wind speed
@@ -201,8 +201,6 @@ namespace SkyX
 
 		/// Current time since last frame
 		Ogre::Real mCurrentTimeSinceLastFrame;
-
 	};
 }
-
 #endif
