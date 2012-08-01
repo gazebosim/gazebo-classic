@@ -52,7 +52,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/visual.sdf", this->sdf);
+  sdf::initFile("visual.sdf", this->sdf);
 
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -85,7 +85,7 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/visual.sdf", this->sdf);
+  sdf::initFile("visual.sdf", this->sdf);
 
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -273,7 +273,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     math::Pose p(msgs::Convert(_msg->pose().position()),
                   msgs::Convert(_msg->pose().orientation()));
 
-    elem->GetAttribute("pose")->Set(p);
+    elem->Set(p);
   }
 
   if (_msg->has_material())
@@ -287,28 +287,28 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->material().has_ambient())
     {
       sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("ambient")->GetAttribute("rgba")->Set(
+      elem->GetOrCreateElement("ambient")->Set(
           msgs::Convert(_msg->material().ambient()));
     }
 
     if (_msg->material().has_diffuse())
     {
       sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("diffuse")->GetAttribute("rgba")->Set(
+      elem->GetOrCreateElement("diffuse")->Set(
           msgs::Convert(_msg->material().diffuse()));
     }
 
     if (_msg->material().has_specular())
     {
       sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
+      elem->GetOrCreateElement("specular")->Set(
           msgs::Convert(_msg->material().specular()));
     }
 
     if (_msg->material().has_emissive())
     {
       sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("emissive")->GetAttribute("rgba")->Set(
+      elem->GetOrCreateElement("emissive")->Set(
           msgs::Convert(_msg->material().emissive()));
     }
   }
@@ -343,7 +343,7 @@ void Visual::Load()
     this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
+  pose = this->sdf->GetValuePose("origin");
 
   std::string meshName = this->GetMeshName();
 
@@ -393,13 +393,13 @@ void Visual::Load()
     if (!script.empty())
       this->SetMaterial(script);
     else if (matElem->HasElement("ambient"))
-      this->SetAmbient(matElem->GetElement("ambient")->GetValueColor("rgba"));
+      this->SetAmbient(matElem->GetValueColor("ambient"));
     else if (matElem->HasElement("diffuse"))
-      this->SetDiffuse(matElem->GetElement("diffuse")->GetValueColor("rgba"));
+      this->SetDiffuse(matElem->GetValueColor("diffuse"));
     else if (matElem->HasElement("specular"))
-      this->SetSpecular(matElem->GetElement("speclar")->GetValueColor("rgba"));
+      this->SetSpecular(matElem->GetValueColor("specular"));
     else if (matElem->HasElement("emissive"))
-      this->SetEmissive(matElem->GetElement("emissive")->GetValueColor("rgba"));
+      this->SetEmissive(matElem->GetValueColor("emissive"));
   }
 
   // Allow the mesh to cast shadows

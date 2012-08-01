@@ -48,7 +48,7 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
 {
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/camera.sdf", this->sdf);
+  sdf::initFile("camera.sdf", this->sdf);
 
   this->animState = NULL;
   this->windowId = 0;

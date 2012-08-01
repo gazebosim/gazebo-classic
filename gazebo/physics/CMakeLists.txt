@@ -101,7 +101,7 @@ target_link_libraries(gazebo_physics
   ${TBB_LIBRARIES} 
   ${libtool_library} 
   ${Boost_LIBRARIES}
-  ${TINYXML_LIBRARIES})
+)
 
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)

@@ -338,14 +338,14 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _modelName << "' static ='true'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<origin>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</origin>"
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
                  << "' type ='camera' always_on ='1' update_rate ='25' "
@@ -375,14 +375,14 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<origin>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</origin>"
                  << "<link name ='body'>"
                  << "  <inertial mass ='1.0'>"
                  << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
@@ -417,14 +417,14 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<origin>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</origin>"
                  << "<link name ='body'>"
                  << "  <inertial mass ='1.0'>"
                  << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
@@ -459,14 +459,14 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<origin>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</origin>"
                  << "<link name ='body'>"
                  << "  <inertial mass ='1.0'>"
                  << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"

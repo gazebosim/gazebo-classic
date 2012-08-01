@@ -1,0 +1,11 @@
+<!-- Gripper -->
+<element name="gripper" required="*">
+  <attribute name="name" type="string" default="__default__" required="1"/>
+  <element name="grasp_check" required="0">
+    <attribute name="detach_steps" type="int" default="40" required="0"/>
+    <attribute name="attach_steps" type="int" default="20" required="0"/>
+    <attribute name="min_contact_count" type="unsigned int" default="2" required="0"/>
+  </element>
+  <element name="gripper_link" type="string" default="__default__" required="+"/>
+  <element name="palm_link" type="string" default="__default__" required="1"/>
+</element>

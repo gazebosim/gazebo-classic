@@ -100,14 +100,13 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   if (this->sdf->HasElement("origin"))
   {
-    sdf::ElementPtr originElem = this->sdf->GetElement("origin");
     if (this->parent && this->parentEntity)
-      this->worldPose = originElem->GetValuePose("pose") +
+      this->worldPose = this->sdf->GetValuePose("origin") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = originElem->GetValuePose("pose");
+      this->worldPose = this->sdf->GetValuePose("origin");
 
-    this->initialRelativePose = originElem->GetValuePose("pose");
+    this->initialRelativePose = this->sdf->GetValuePose("origin");
   }
 
   if (this->parent)
@@ -534,7 +533,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->GetElement("origin")->GetValuePose("pose");
+  math::Pose newPose = _sdf->GetValuePose("origin");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);

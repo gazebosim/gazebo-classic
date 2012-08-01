@@ -1,0 +1,33 @@
+<!-- Physics -->
+<element name="physics" required="1">
+  <attribute name="type" type="string" default="ode" required="1"/>
+  <attribute name="update_rate" type="double" default="0" required="0"/>
+
+  <element name="max_contacts" type="int" default="20" required="0"/>
+
+  <element name="gravity" required="1">
+      <attribute name="xyz" type="vector3" default="0 0 -9.8" required="1"/>
+  </element> <!-- End Gravity -->
+
+  <element name="bullet" required="0">
+    <element name="dt" type="double" default="0.003" required="1"/>
+  </element>
+
+  <element name="ode" required="0">
+    <element name="solver" required="1">
+      <attribute name="type" type="string" default="quick" required="1"/>
+      <attribute name="dt" type="double" default="0.001" required="1"/>
+      <attribute name="iters" type="int" default="50" required="1"/>
+      <attribute name="precon_iters" type="int" default="0" required="0"/>
+      <attribute name="sor" type="double" default="1.3" required="1"/>
+    </element> <!-- End Solver -->
+
+    <element name="constraints" required="1">
+      <attribute name="cfm" type="double" default="0" required="1"/>
+      <attribute name="erp" type="double" default="0.2" required="1"/>
+      <attribute name="contact_max_correcting_vel" type="double" default="100.0" required="1"/>
+      <attribute name="contact_surface_layer" type="double" default="0.001" required="1"/>
+    </element> <!-- End Constraints -->
+  </element> <!-- ODE -->
+
+</element> <!-- Physics -->

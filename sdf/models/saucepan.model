@@ -1,4 +1,4 @@
-<gazebo version="1.0">
+<gazebo version="1.2">
 <model name="saucepan" static="false">
   <link name="body">
     <inertial mass="0.1">

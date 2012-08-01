@@ -69,7 +69,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
   math::Pose origin;
   if (_sdf->HasElement("origin"))
-    origin = _sdf->GetElement("origin")->GetValuePose("pose");
+    origin = _sdf->GetValuePose("origin");
 
   if (this->model)
   {
@@ -271,7 +271,7 @@ void Joint::FillJointMsg(msgs::Joint &_msg)
   if (this->sdf->HasElement("origin"))
   {
     msgs::Set(_msg.mutable_pose(),
-              this->sdf->GetElement("origin")->GetValuePose("pose"));
+              this->sdf->GetValuePose("origin"));
   }
   else
     msgs::Set(_msg.mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));

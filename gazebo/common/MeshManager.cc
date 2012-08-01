@@ -17,18 +17,18 @@
 #include <sys/stat.h>
 #include <string>
 
-#include "math/Plane.hh"
-#include "math/Matrix3.hh"
-#include "math/Matrix4.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/math/Matrix4.hh"
 
-#include "common/SystemPaths.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/Mesh.hh"
-#include "common/ColladaLoader.hh"
-#include "common/STLLoader.hh"
+#include "gazebo/common/Common.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/STLLoader.hh"
 
-#include "common/MeshManager.hh"
+#include "gazebo/common/MeshManager.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -105,8 +105,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     */
   }
 
-  std::string fullname =
-    SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
+  std::string fullname = common::find_file(_filename);
 
   if (!fullname.empty())
   {

@@ -1,0 +1,43 @@
+<!-- Scene -->
+<element name="scene" required="1">
+  <description>Specifies the look of the environment.</description>
+
+  <element name="ambient" type="color" default="0.0 0.0 0.0 1.0" required="1">
+    <description>Color of the ambient light.</description>
+  </element>
+
+  <element name="background" type="color" default=".7 .7 .7 1" required="1">
+    <description>Color of the background.</description>
+  </element>
+
+  <element name="sky" required="0">
+    <element name="time" type="double" default="10.0" required="0"/>
+    <element name="sunrise" type="double" default="6.0" required="0"/>
+    <element name="sunset" type="double" default="20.0" required="0"/>
+
+    <element name="clouds" required="0">
+      <element name="speed" type="double" default="0.6" min="0.0" required="0"/>
+      <element name="direction" type="double" default="0.0"
+               min="0.0" max="3.1456" required="0"/>
+      <element name="humidity" type="double" default="0.5"
+               min="0" max="1" required="0"/>
+      <element name="mean_size" type="double" default="0.5"
+               min="0" max="1" required="0"/>
+
+      <element name="ambient" type="color" default=".8 .8 .8 1" required="0"/>
+    </element>
+  </element>
+
+  <element name="shadows" type="bool" default="true" required="1"/>
+
+  <element name="fog" required="0">
+    <element name="color" type="color" default="1 1 1 1" required="0"/>
+    <element name="type" type="string" default="linear" required="0"/>
+    <element name="start" type="double" default="1.0" min="0.0" required="0"/>
+    <element name="end" type="double" default="100.0" min="0.0" required="0"/>
+    <element name="density" type="double" default="1.0" min="0.0" required="0"/>
+  </element>
+
+  <element name="grid" type="bool" default="true" required="0"/>
+
+</element> <!-- End Scene -->

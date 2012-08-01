@@ -1,0 +1,28 @@
+<!-- State Info -->
+<element name="state" required="*">
+  <!-- Name of the world this state applies to -->
+  <attribute name="world_name" type="string" default="__default__" required="1"/>
+
+  <!-- Time stamp of the state [seconds nanoseconds] -->
+  <attribute name="time" type="time" default="0 0" required="0"/>
+
+  <!-- State information for a model -->
+  <element name="model" required="+">
+    <attribute name="name" type="string" default="__default__" required="1"/>
+    <element name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+
+    <!-- State information for a link -->
+    <element name="link" required="*">
+      <attribute name="name" type="string" default="__default__" required="1"/>
+      <element name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+      <element name="velocity" type="pose" default="0 0 0 0 0 0" required="0"/>
+
+      <!-- Zero or more wrenches -->
+      <element name="wrench" required="*">
+        <element name="pos" type="vector3" default="0 0 0" required="0"/>
+        <element name="mag" type="pose" default="0 0 0 0 0 0" required="1"/>
+      </element>
+
+    </element> <!-- End Link -->
+  </element> <!-- End Model -->
+</element> <!-- End State -->

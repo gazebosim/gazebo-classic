@@ -28,14 +28,14 @@ Inertial::Inertial()
   this->products.Set(0, 0, 0);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/inertial.sdf", this->sdf);
+  sdf::initFile("inertial.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
 Inertial::Inertial(double _m)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/inertial.sdf", this->sdf);
+  sdf::initFile("inertial.sdf", this->sdf);
 
   this->mass = _m;
   this->cog.Set(0, 0, 0);
@@ -47,7 +47,7 @@ Inertial::Inertial(double _m)
 Inertial::Inertial(const Inertial &_inertial)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/inertial.sdf", this->sdf);
+  sdf::initFile("inertial.sdf", this->sdf);
 
   (*this) = _inertial;
 }
@@ -72,7 +72,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   math::Vector3 center(0, 0, 0);
   if (this->sdf->HasElement("origin"))
   {
-    center = this->sdf->GetElement("origin")->GetValuePose("pose").pos;
+    center = this->sdf->GetValuePose("origin").pos;
   }
   this->SetCoG(center.x, center.y, center.z);
 

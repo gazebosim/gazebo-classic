@@ -176,7 +176,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   }
 
   this->cameraElem.reset(new sdf::Element);
-  sdf::initFile("sdf/camera.sdf", this->cameraElem);
+  sdf::initFile("camera.sdf", this->cameraElem);
 
   sdf::ElementPtr ptr = this->cameraElem->GetOrCreateElement("horizontal_fov");
   ptr->GetAttribute("angle")->Set(chfov);

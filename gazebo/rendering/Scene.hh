@@ -239,8 +239,6 @@ namespace gazebo
       private: void PrintSceneGraphHelper(const std::string &prefix,
                                           Ogre::Node *node);
 
-      public: void SetSky(const std::string &_material);
-      public: void SetSky();
 
       /// \brief Set whether shadows are on or off
       /// \param _value True to enable shadows, False to disable
@@ -269,6 +267,8 @@ namespace gazebo
       public: std::string StripSceneName(const std::string &_name) const;
 
       public: Heightmap *GetHeightmap() const;
+
+      private: void SetSky();
 
       private: void InitDeferredShading();
 

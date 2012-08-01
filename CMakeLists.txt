@@ -11,47 +11,17 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set (GAZEBO_VERSION_NAME "hydrogen")
 set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 0)
-set (GAZEBO_PATCH_VERSION 2)
+set (GAZEBO_MINOR_VERSION 2)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
-set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
-
-if (USE_FULL_RPATH)
-  # use, i.e. don't skip the full RPATH for the build tree
-  set(CMAKE_SKIP_BUILD_RPATH  FALSE)
-  
-  # when building, don't use the install RPATH already
-  # (but later on when installing)
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-  
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-  
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  
-  # the RPATH to be used when installing, but only if its not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-  if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-  endif("${isSystemDir}" STREQUAL "-1")
-endif()
-
-set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
-set (build_errors "" CACHE INTERNAL "build errors" FORCE)
-set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
-
-set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
-set (LIB_INSTALL_DIR "lib")
-set (BIN_INSTALL_DIR "bin")
-
 # with -fPIC
 if(UNIX AND NOT WIN32)
+  set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
  find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
  if(CMAKE_UNAME)
    exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
@@ -63,6 +33,38 @@ if(UNIX AND NOT WIN32)
  endif(CMAKE_UNAME)
 endif()
 
+
+set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
+set (LIB_INSTALL_DIR "lib" CACHE STRING "Installation directory for libraries (relative to CMAKE_INSTALL_PREFIX)") 
+set (BIN_INSTALL_DIR "bin" CACHE STRING "Installation directory for binaries (relative to CMAKE_INSTALL_PREFIX)") 
+
+
+set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
+
+if (USE_FULL_RPATH)
+  # use, i.e. don't skip the full RPATH for the build tree
+  set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+  
+  # when building, don't use the install RPATH already
+  # (but later on when installing)
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+  
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
+  
+  # add the automatically determined parts of the RPATH
+  # which point to directories outside the build tree to the install RPATH
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  
+  # the RPATH to be used when installing, but only if its not a system directory
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" isSystemDir)
+  if("${isSystemDir}" STREQUAL "-1")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
+  endif("${isSystemDir}" STREQUAL "-1")
+endif()
+
+set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
+set (build_errors "" CACHE INTERNAL "build errors" FORCE)
+set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 
 set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
@@ -219,7 +221,7 @@ else (build_errors)
 
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
 
   ########################################

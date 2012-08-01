@@ -19,6 +19,6 @@ set (plugins
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} libgazebo gazebo_sensors)
-  install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/gazebo-${GAZEBO_VERSION}/plugins/)
+  install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})

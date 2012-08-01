@@ -39,7 +39,7 @@ namespace gazebo
     {
       /// \brief Constructor
       public: SelectionBuffer(const std::string _cameraName,
-                              Scene *_scene, Ogre::RenderTarget *_renderTarget);
+                  Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget);
 
       /// \brief Destructor
       public: ~SelectionBuffer();

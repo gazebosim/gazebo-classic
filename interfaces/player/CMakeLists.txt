@@ -24,7 +24,6 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-  ${TINYXML_INCLUDE_DIRS}
 )
 
 link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})

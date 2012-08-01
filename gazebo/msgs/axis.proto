@@ -16,7 +16,6 @@ message Axis
   required double limit_velocity = 5;
   required double damping        = 6;
   required double friction       = 7;
-  
 }
 
 /// \endverbatim

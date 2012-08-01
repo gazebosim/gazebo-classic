@@ -24,7 +24,7 @@
 
 #include "sdf/interface/Param.hh"
 
-#define SDF_VERSION "1.0"
+#define SDF_VERSION "1.2"
 
 namespace sdf
 {
@@ -152,6 +152,12 @@ namespace sdf
     public: void SetInclude(const std::string &_filename);
     public: std::string GetInclude() const;
 
+    /// \brief Get a text description of the element
+    public: std::string GetDescription() const;
+
+    /// \brief Set a text description for the element
+    public: void SetDescription(const std::string _desc);
+
     /// \brief Add a new element description
     public: void AddElementDescription(ElementPtr _elem);
 
@@ -161,6 +167,7 @@ namespace sdf
 
     private: std::string name;
     private: std::string required;
+    private: std::string description;
     private: bool copyChildren;
 
     private: ElementPtr parent;
