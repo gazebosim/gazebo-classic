@@ -25,8 +25,10 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX { namespace VClouds
 {
-	Lightning::Lightning(Ogre::SceneManager* sm, Ogre::SceneNode* sn, const Ogre::Vector3& _or, const Ogre::Vector3& dir, 
-		const Ogre::Real& l, const Ogre::uint32& d, const Ogre::uint32& rec, const Ogre::Real& tm, const Ogre::Real& wm, const Ogre::Vector2& b)
+	Lightning::Lightning(Ogre::SceneManager* sm, Ogre::SceneNode* sn,
+      const Ogre::Vector3& _or, const Ogre::Vector3& dir, 
+      const Ogre::Real& l, const Ogre::uint32& d, const Ogre::uint32& rec,
+      const Ogre::Real& tm, const Ogre::Real& wm, const Ogre::Vector2& b)
 		: mOrigin(_or)
 		, mDirection(dir)
 		, mLength(l)
@@ -38,8 +40,11 @@ namespace SkyX { namespace VClouds
 		, mIntensity(0)
 		, mWidthMultiplier(wm)
 		, mBounds(b)
-		, mAngleRange(Ogre::Vector2(Ogre::Math::RangeRandom(0.3,0.5), Ogre::Math::RangeRandom(0.6,0.8)))
-		, mTimeMultipliers(Ogre::Vector3(Ogre::Math::RangeRandom(1.75,4.25), Ogre::Math::RangeRandom(0.4,1.25f), Ogre::Math::RangeRandom(0.2,1.0f)))
+		, mAngleRange(Ogre::Vector2(Ogre::Math::RangeRandom(0.3,0.5),
+          Ogre::Math::RangeRandom(0.6,0.8)))
+		, mTimeMultipliers(Ogre::Vector3(Ogre::Math::RangeRandom(1.75,4.25),
+          Ogre::Math::RangeRandom(0.4,1.25f),
+          Ogre::Math::RangeRandom(0.2,1.0f)))
 		, mSegments(std::vector<Lightning::Segment>())
 		, mChildren(std::vector<Lightning*>())
 		, mBillboardSet(0)
@@ -59,8 +64,8 @@ namespace SkyX { namespace VClouds
 	{
 		remove();
 
-		Ogre::Vector3 end = mOrigin + mDirection*mLength;
-		Ogre::Vector3 current, last = mOrigin;
+		// Ogre::Vector3 end = mOrigin + mDirection*mLength;
+		Ogre::Vector3 last = mOrigin;
 
 		// Create ray segments
 		for(Ogre::uint32 k = 1; k < mDivisions+1; k++)

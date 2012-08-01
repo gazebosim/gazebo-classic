@@ -21,7 +21,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include "ColorGradient.h"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/rendering/skyx/include/ColorGradient.h"
 
 namespace SkyX
 {
@@ -93,7 +94,7 @@ namespace SkyX
 
 		for (unsigned int k = 0; k < CFrameVector.size(); k++)
 		{
-			if (CFrameVector.at(k).second == 0)
+			if (gazebo::math::equal(CFrameVector.at(k).second, 0.0f))
 			{
 				// More than one min bound
 				if (existbounds.first)
@@ -112,7 +113,7 @@ namespace SkyX
 
 		for (unsigned int k = 0; k < CFrameVector.size(); k++)
 		{
-			if (CFrameVector.at(k).second == 1)
+			if (gazebo::math::equal(CFrameVector.at(k).second, 1.0f))
 			{
 				// More than one min bound
 				if (existbounds.second)

@@ -21,6 +21,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include "gazebo/math/Helpers.hh"
+
 #include "SkyX.h"
 #include "MoonManager.h"
 
@@ -292,7 +294,8 @@ namespace SkyX
 				->getVertexProgramParameters()->setNamedConstant("uSkydomeCenter", c->getDerivedPosition());
 		}
 
-		if (mMoonBillboard->getBoundingBox().getMaximum().x != size)
+		if (!gazebo::math::equal(mMoonBillboard->getBoundingBox().getMaximum().x,
+                             size))
 		{
 			_updateMoonBounds(c);
 		}

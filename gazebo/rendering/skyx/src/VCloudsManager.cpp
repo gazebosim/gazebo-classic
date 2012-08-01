@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include "gazebo/math/Helpers.hh"
 #include "VCloudsManager.h"
 
 #include "SkyX.h"
@@ -98,7 +99,9 @@ namespace SkyX
     // Height parameters
 		Ogre::Vector2 defaultheight = Ogre::Vector2(selectedRadius * 0.025f,
         selectedRadius*0.1f); 
-		Ogre::Vector2 height = (mHeight.x == -1 || mHeight.y == -1) ?
+		Ogre::Vector2 height =
+      (gazebo::math::equal(static_cast<double>(mHeight.x), -1.0) ||
+       gazebo::math::equal(static_cast<double>(mHeight.y), -1.0)) ?
       defaultheight : mHeight;
 
 		_setLightParameters();

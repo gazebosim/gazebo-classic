@@ -151,7 +151,8 @@ namespace SkyX { namespace VClouds{
 			@param currentPos Current position
 			@param parentTime Parent time
 		 */
-		void _updateData(const Ogre::Real& alpha, const Ogre::Real& currentPos, const Ogre::Real& parentTime);
+		void _updateData(const Ogre::Real& alpha, const Ogre::Real& currentPos,
+                     const Ogre::Real& parentTime);
 
 		/// Ray origin
 		Ogre::Vector3 mOrigin;
@@ -166,22 +167,28 @@ namespace SkyX { namespace VClouds{
 		Ogre::uint32 mDivisions;
 		/// Recursivity level
 		Ogre::uint32 mRecursivity;
-		/// Width multiplier
-		Ogre::Real mWidthMultiplier;
-		/// Ray bounds (for internal visual calculations)
-		Ogre::Vector2 mBounds;
-		/// Angle range (Little values -> Less derivations, bigger values -> More derivations)
-		Ogre::Vector2 mAngleRange;
 
 		/// Current elapsed time
 		Ogre::Real mTime;
 		/// Global time multiplier
 		Ogre::Real mTimeMultiplier;
-		/// Per step time multipliers
-		Ogre::Vector3 mTimeMultipliers;
 
 		/// Lightning intensity
 		Ogre::Real mIntensity;
+
+		/// Width multiplier
+		Ogre::Real mWidthMultiplier;
+
+		/// Ray bounds (for internal visual calculations)
+		Ogre::Vector2 mBounds;
+
+    /// Angle range (Little values -> Less derivations, bigger values ->
+    //More derivations)
+		Ogre::Vector2 mAngleRange;
+
+		/// Per step time multipliers
+		Ogre::Vector3 mTimeMultipliers;
+
 
 		/// Segments
 		std::vector<Segment> mSegments;
