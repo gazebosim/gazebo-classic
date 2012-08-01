@@ -328,7 +328,7 @@ void DepthCamera::RenderImpl()
 {
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
 
-  // sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   sceneMgr->_suppressRenderStateChanges(true);
 
   this->UpdateRenderTarget(this->depthTarget,
@@ -338,13 +338,12 @@ void DepthCamera::RenderImpl()
   this->depthTarget->update(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
-  // sceneMgr->setShadowTechnique(
-  //   Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+  sceneMgr->setShadowTechnique(
+    Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
   // for camera image
   Camera::RenderImpl();
 
-  /*
   if (this->output_points)
   {
     sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
@@ -359,7 +358,6 @@ void DepthCamera::RenderImpl()
     sceneMgr->setShadowTechnique(
             Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
   }
-  */
 }
 
 //////////////////////////////////////////////////

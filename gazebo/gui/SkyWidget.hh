@@ -46,7 +46,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr pub;
-               
+
       private: QDoubleSpinBox *timeLineEdit;
       private: QDoubleSpinBox *sunriseLineEdit;
       private: QDoubleSpinBox *sunsetLineEdit;

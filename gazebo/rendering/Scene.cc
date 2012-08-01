@@ -1867,7 +1867,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
                         math::clamp(_msg->avg_cloud_size(), 0.0, 1.0), true);
   }
 
- this->skyx->update(0);
+  this->skyx->update(0);
 }
 
 /////////////////////////////////////////////////
@@ -1909,7 +1909,7 @@ void Scene::SetSky()
 
   // Set wind direction in radians
   vclouds->setWindDirection(Ogre::Radian(0.0));
-  vclouds->setAmbientColor(Ogre::Vector3(0.63f,0.63f,0.7f));
+  vclouds->setAmbientColor(Ogre::Vector3(0.63f, 0.63f, 0.7f));
 
   // x = sun light power
   // y = sun beta multiplier
@@ -1920,14 +1920,15 @@ void Scene::SetSky()
   vclouds->setWheater(.6, .6, false);
 
   // Disable volumetric clouds for now
-  if (false) // If using clouds
+  if (false)  // If using clouds
   {
     // Create VClouds
     if (!this->skyx->getVCloudsManager()->isCreated())
     {
-      // SkyX::MeshManager::getSkydomeRadius(...) works for both finite and infinite(=0) camera far clip distances
+      // SkyX::MeshManager::getSkydomeRadius(...) works for both finite and
+      // infinite(=0) camera far clip distances
       this->skyx->getVCloudsManager()->create(80.0);
-          //this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
+      // this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
     }
   }
   else
@@ -1939,11 +1940,14 @@ void Scene::SetSky()
     }
   }
 
-  //vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
-  //vclouds->getLightningManager()->setAverageLightningApparitionTime(preset.vcLightningsAT);
-  //vclouds->getLightningManager()->setLightningColor(preset.vcLightningsColor);
-  //vclouds->getLightningManager()->setLightningTimeMultiplier(preset.vcLightningsTM);
-  
+  // vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
+  // vclouds->getLightningManager()->setAverageLightningApparitionTime(
+  //   preset.vcLightningsAT);
+  // vclouds->getLightningManager()->setLightningColor(
+  //   preset.vcLightningsColor);
+  // vclouds->getLightningManager()->setLightningTimeMultiplier(
+  //   preset.vcLightningsTM);
+
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 
   this->skyx->update(0);

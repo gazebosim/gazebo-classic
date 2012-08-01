@@ -25,7 +25,7 @@ namespace gazebo
   namespace rendering
   {
     class MaterialSwitcher;
-    
+
     // We need this attached to the depth target, otherwise we get problems with
     // the compositor MaterialManager.Listener should NOT be running all the
     // time - rather only when we're specifically rendering the target that

@@ -44,7 +44,6 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 DepthCameraSensor::DepthCameraSensor()
     : Sensor()
 {
-  this->initialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -115,7 +114,6 @@ void DepthCameraSensor::Init()
     gzerr << "No world name\n";
 
   Sensor::Init();
-  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
