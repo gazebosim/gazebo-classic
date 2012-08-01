@@ -96,7 +96,7 @@ void SelectionBuffer::UpdateBufferSize()
   unsigned int width = this->renderTarget->getWidth();
   unsigned int height = this->renderTarget->getHeight();
 
-  if(width != this->renderTexture->getWidth() ||
+  if (width != this->renderTexture->getWidth() ||
      height != this->renderTexture->getHeight())
   {
     Ogre::TextureManager::getSingleton().unload("SelectionPassTex");
