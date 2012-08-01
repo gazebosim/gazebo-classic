@@ -19,6 +19,20 @@ set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PAT
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
+# with -fPIC
+if(UNIX AND NOT WIN32)
+  set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
+ find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
+ if(CMAKE_UNAME)
+   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
+   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
+     "processor type (i386 and x86_64)")
+   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+     ADD_DEFINITIONS(-fPIC)
+   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+ endif(CMAKE_UNAME)
+endif()
+
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
 
 if (USE_FULL_RPATH)
@@ -50,18 +64,6 @@ set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
 set (LIB_INSTALL_DIR "lib")
 set (BIN_INSTALL_DIR "bin")
 
-# with -fPIC
-if(UNIX AND NOT WIN32)
- find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
- if(CMAKE_UNAME)
-   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
-   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
-     "processor type (i386 and x86_64)")
-   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-     ADD_DEFINITIONS(-fPIC)
-   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
- endif(CMAKE_UNAME)
-endif()
 
 
 

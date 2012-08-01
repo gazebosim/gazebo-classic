@@ -1,0 +1,21 @@
+<!-- gui -->
+<element name="gui" required="0">
+  <attribute name="fullscreen" type="bool" default="false" required="0"/>
+
+  <element name="camera" required="0">
+    <attribute name="name" type="string" default="user_camera" required="1"/>
+
+    <element name="view_controller" type="string" default="oribit" required="0"/>
+
+    <element name="origin" required="0">
+      <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+    </element>
+
+    <element name="track_visual" required="0">
+      <element name="name" type="string" default="__default__" required="1"/>
+      <element name="min_dist" type="double" default="0" required="0"/>
+      <element name="max_dist" type="double" default="0" required="0"/>
+    </element>
+
+  </element>
+</element>

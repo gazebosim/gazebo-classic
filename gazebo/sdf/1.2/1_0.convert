@@ -1,0 +1,112 @@
+<convert name="gazebo">
+  <convert name="world">
+    <convert name="scene">
+      <rename>
+        <from element="ambient" attribute="rgba"/>
+        <to element="ambient"/>
+      </rename>
+
+      <rename>
+        <from element="background" attribute="rgba"/>
+        <to element="background"/>
+      </rename>
+
+      <rename>
+        <from element="shadows" attribute="enabled"/>
+        <to element="shadows"/>
+      </rename>
+
+      <rename>
+        <from element="grid" attribute="enabled"/>
+        <to element="grid"/>
+      </rename>
+
+      <convert name="fog">
+        <rename>
+          <from attribute="rgba"/>
+          <to element="color"/>
+        </rename>
+
+        <rename>
+          <from attribute="type"/>
+          <to element="type"/>
+        </rename>
+
+        <rename>
+          <from attribute="start"/>
+          <to element="start"/>
+        </rename>
+
+        <rename>
+          <from attribute="end"/>
+          <to element="end"/>
+        </rename>
+
+        <rename>
+          <from attribute="density"/>
+          <to element="density"/>
+        </rename>
+      </convert>
+   
+      <deprecated>background/sky/rgba</deprecated>
+      <deprecated>background/sky/material</deprecated>
+    </convert>
+
+    <convert name="actor">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="origin"/>
+      </rename>
+    </convert> <!-- End actor -->
+
+    <convert name="light">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="origin"/>
+      </rename>
+    </convert> <!-- End collision -->
+
+    <convert name="model">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="origin"/>
+      </rename>
+
+      <convert name="link">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="origin"/>
+        </rename>
+
+        <convert name="inertial">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="origin"/>
+          </rename>
+        </convert> <!-- End inertial-->
+
+        <convert name="collision">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="origin"/>
+          </rename>
+        </convert> <!-- End collision -->
+
+        <convert name="visual">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="origin"/>
+          </rename>
+        </convert> <!-- End visual -->
+ 
+        <convert name="joint">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="origin"/>
+          </rename>
+        </convert> <!-- End joint -->
+ 
+      </convert> <!-- End link -->
+    </convert> <!-- End model -->
+  </convert> <!-- End world -->
+</convert> <!-- End gazebo -->

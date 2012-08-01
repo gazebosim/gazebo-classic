@@ -20,6 +20,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "common/Common.hh"
 #include "common/BVHLoader.hh"
 #include "common/SystemPaths.hh"
 #include "common/Skeleton.hh"
@@ -44,8 +45,7 @@ BVHLoader::~BVHLoader()
 /////////////////////////////////////////////////
 Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
 {
-  std::string fullname =
-    SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
+  std::string fullname = common::find_file(_filename);
 
   Skeleton *skeleton = NULL;
   std::ifstream file;

@@ -2,8 +2,8 @@
 uniform mat4 worldViewProj;
 
 // Vertex Inputs
-in vec4 position;
-in vec2 texCoord0;
+//in vec4 position;
+//in vec2 texCoord0;
  
 // Outputs
 // out vec4 oPosition;
@@ -13,7 +13,7 @@ void main()
 {
   // Calculate output position
   //oPosition = worldViewProj * position;
-  gl_Position = worldViewProj * position;
+  gl_Position = worldViewProj * gl_Vertex;
  
   // Simply copy the input vertex UV to the output
   //uv0 = texCoord0;

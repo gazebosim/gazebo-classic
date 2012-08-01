@@ -64,7 +64,7 @@ void ModelMaker::InitFromModel(const std::string &_modelName)
   }
 
   // this->modelSDF.reset(new sdf::SDF);
-  // sdf::initFile("sdf/gazebo.sdf", this->modelSDF);
+  // sdf::initFile("gazebo.sdf", this->modelSDF);
   this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
 
   if (!this->modelVisual)
@@ -87,7 +87,7 @@ void ModelMaker::InitFromFile(const std::string &_filename)
   }
 
   this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("sdf/gazebo.sdf", this->modelSDF);
+  sdf::initFile("gazebo.sdf", this->modelSDF);
   sdf::readFile(_filename, this->modelSDF);
 
   // Load the world file

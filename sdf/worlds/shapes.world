@@ -1,5 +1,5 @@
 <?xml version="1.0"?> 
-<gazebo version="1.0">
+<gazebo version="1.2">
   <world name="default">
     <gui fullscreen="false">
       <camera name="mi_cam">

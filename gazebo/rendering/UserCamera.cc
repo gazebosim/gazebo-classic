@@ -212,9 +212,10 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
   {
-    this->selectionBuffer->Update();
+    if (this->selectionBuffer)
+      this->selectionBuffer->Update();
 
-    //DEBUG: this->selectionBuffer->ShowOverlay(true);
+    // DEBUG: this->selectionBuffer->ShowOverlay(true);
     //Ogre::Entity *entity =
     //this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
 

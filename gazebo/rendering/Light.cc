@@ -49,7 +49,7 @@ Light::Light(Scene *scene_)
   this->lightCounter++;
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/light.sdf", this->sdf);
+  sdf::initFile("light.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////

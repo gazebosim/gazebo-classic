@@ -5,6 +5,7 @@ set (sources
   BVHLoader.cc
   ColladaLoader.cc
   Color.cc
+  Common.cc
   Console.cc
   Diagnostics.cc
   Event.cc
@@ -27,34 +28,35 @@ set (sources
 )
 
 set (headers 
-Animation.hh
-BVHLoader.hh
-ColladaLoader.hh
-CommonTypes.hh
-Color.hh
-Console.hh
-Diagnostics.hh
-Event.hh
-Events.hh
-Exception.hh
-Image.hh 
-KeyFrame.hh
-Material.hh
-Mesh.hh
-MeshLoader.hh
-MeshManager.hh
-MouseEvent.hh
-PID.hh
-Plugin.hh
-SkeletonAnimation.hh
-Skeleton.hh
-SingletonT.hh
-STLLoader.hh
-SystemPaths.hh
-Time.hh
-Timer.hh
-Video.hh
-)
+  Animation.hh
+  BVHLoader.hh
+  ColladaLoader.hh
+  Common.hh
+  CommonTypes.hh
+  Color.hh
+  Console.hh
+  Diagnostics.hh
+  Event.hh
+  Events.hh
+  Exception.hh
+  Image.hh 
+  KeyFrame.hh
+  Material.hh
+  Mesh.hh
+  MeshLoader.hh
+  MeshManager.hh
+  MouseEvent.hh
+  PID.hh
+  Plugin.hh
+  SkeletonAnimation.hh
+  Skeleton.hh
+  SingletonT.hh
+  STLLoader.hh
+  SystemPaths.hh
+  Time.hh
+  Timer.hh
+  Video.hh
+  )
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})

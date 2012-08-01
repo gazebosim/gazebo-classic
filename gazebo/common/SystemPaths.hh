@@ -35,8 +35,8 @@
 #include <string>
 #include <list>
 
+#include "common/CommonTypes.hh"
 #include "common/SingletonT.hh"
-
 
 namespace gazebo
 {
@@ -67,7 +67,11 @@ namespace gazebo
       /// \brief Get the world path extension
       public: std::string GetWorldPathExtension();
 
-      public: std::string FindFileWithGazeboPaths(const std::string &_filename);
+      public: std::string FindFileWithGazeboPaths(const std::string &_filename)
+              GAZEBO_DEPRECATED;
+
+      /// \brief Find a file in the gazebo paths
+      public: std::string FindFile(const std::string &_filename);
 
       /// \brief Add colon delimited paths to Gazebo install
       public: void AddGazeboPaths(const std::string &_path);
@@ -81,6 +85,8 @@ namespace gazebo
       public: void ClearGazeboPaths();
       public: void ClearOgrePaths();
       public: void ClearPluginPaths();
+
+      public: void AddSearchPathSuffix(const std::string &_suffix);
 
       private: void UpdateGazeboPaths();
       private: void UpdatePluginPaths();
@@ -96,6 +102,8 @@ namespace gazebo
 
       /// Paths to the plugins
       private: std::list<std::string> pluginPaths;
+
+      private: std::list<std::string> suffixPaths;
 
       private: std::string logPath;
 

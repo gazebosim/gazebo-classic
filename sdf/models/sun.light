@@ -1,4 +1,4 @@
-<gazebo version='1.0'>
+<gazebo version='1.2'>
   <!-- Light Source -->
   <light type="directional" name="sun" cast_shadows="false">
     <origin pose="0 0 10 0 0 0"/>

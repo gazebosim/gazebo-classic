@@ -30,6 +30,9 @@ namespace gazebo
   void run();
   void stop();
   void fini();
+
+  /// \brief Find a file in the gazebo search paths
+  std::string find_file(const std::string &_file);
 }
 
 #endif

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SDF_PARSER_HH
-#define SDF_PARSER_HH
+#ifndef _SDF_PARSER_HH_
+#define _SDF_PARSER_HH_
 
 #include <tinyxml.h>
 #include <string>

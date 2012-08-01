@@ -52,7 +52,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/visual.sdf", this->sdf);
+  sdf::initFile("visual.sdf", this->sdf);
 
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -85,7 +85,7 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/visual.sdf", this->sdf);
+  sdf::initFile("visual.sdf", this->sdf);
 
   this->SetName(_name);
   this->sceneNode = NULL;

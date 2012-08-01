@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __PHYSICS_HH__
-#define __PHYSICS_HH__
+#ifndef _PHYSICS_HH_
+#define _PHYSICS_HH_
 
 #include <string>
 

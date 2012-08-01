@@ -70,7 +70,7 @@ class ModelUpdate_TBB
 World::World(const std::string &_name)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/world.sdf", this->sdf);
+  sdf::initFile("world.sdf", this->sdf);
 
   this->receiveMutex = new boost::mutex();
   this->loadModelMutex = new boost::mutex();
@@ -1122,7 +1122,7 @@ void World::ProcessFactoryMsgs()
        iter != this->factoryMsgs.end(); ++iter)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("sdf/gazebo.sdf", factorySDF);
+    sdf::initFile("gazebo.sdf", factorySDF);
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
