@@ -654,6 +654,7 @@ void MainWindow::CreateMenus()
   this->fileMenu->addAction(this->quitAct);
 
   this->editMenu = this->menuBar->addMenu(tr("&Edit"));
+  this->editMenu->addAction(this->resetModelsAct);
   this->editMenu->addAction(this->resetWorldAct);
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
