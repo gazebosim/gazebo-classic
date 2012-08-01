@@ -193,7 +193,8 @@ namespace SkyX
           @param ny Y size
           @param nz Z size
           */
-        void _updateVolTextureData(Cell ***c, const VolTextureId& TexId, const int& nx, const int& ny, const int& nz);
+        void _updateVolTextureData(Cell ***c, const VolTextureId& TexId,
+            const int& nx, const int& ny, const int& nz);
 
         /** Get continous density at a point
           @param c Cells data
@@ -206,7 +207,9 @@ namespace SkyX
           @param r Radius
           @param sgtrength Strength
           */	
-        float _getDensityAt(Cell ***c, const int& nx, const int& ny, const int& nz, const int& x, const int& y, const int& z, const int& r, const float& strength) const;
+        float _getDensityAt(Cell ***c, const int& nx, const int& ny,
+            const int& nz, const int& x, const int& y, const int& z,
+            const int& r, const float& strength) const;
 
         /** Get discrete density at a point
           @param c Cells data
@@ -236,16 +239,19 @@ namespace SkyX
           @param nz Z size
           @param clearData Clear data?
           */
-        void _clearProbabilities(Cell*** c, const int& nx, const int& ny, const int& nz, const bool& clearData);
+        void _clearProbabilities(Cell*** c, const int& nx, const int& ny,
+            const int& nz, const bool& clearData);
 
         /** Update probabilities based from the Ellipsoid vector
           @param c Cells data
           @param nx X size
           @param ny Y size
           @param nz Z size
-          @param delayedResponse false to change wheather conditions over several updates, true to change it at the moment
+          @param delayedResponse false to change wheather conditions over
+          several updates, true to change it at the moment
           */
-        void _updateProbabilities(Cell*** c, const int& nx, const int& ny, const int& nz, const bool& delayedResponse);
+        void _updateProbabilities(Cell*** c, const int& nx, const int& ny,
+            const int& nz, const bool& delayedResponse);
 
         /** Get light absorcion factor at a point
           @param c Cells data

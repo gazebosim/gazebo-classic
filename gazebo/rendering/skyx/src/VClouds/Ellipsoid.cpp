@@ -80,7 +80,7 @@ namespace SkyX
     }
 
     void Ellipsoid::updateProbabilities(DataManager::Cell ***c, const int &nx,
-        const int &ny, const int &nz, const bool& delayedResponse)
+        const int &ny, const int &/*nz*/, const bool& delayedResponse)
     {
       int u, v, w, uu, vv;
 
