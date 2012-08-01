@@ -847,3 +847,24 @@ void Model::SetEnabled(bool _enabled)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
 }
+
+/////////////////////////////////////////////////
+void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
+{
+  // look for link matching link name
+  LinkPtr link = this->GetLink(_linkName);
+  if (link)
+    this->SetLinkWorldPose(_pose, link);
+  else
+    gzerr << "Setting Model Pose by specifying Link failed:"
+          << " Link[" << _linkName << "] not found.\n";
+}
+
+/////////////////////////////////////////////////
+void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
+{
+  math::Pose linkPose = _link->GetWorldPose();
+  math::Pose currentModelPose = this->GetWorldPose();
+  math::Pose targetModelPose = _pose + (currentModelPose - linkPose);
+  this->SetWorldPose(targetModelPose);
+}

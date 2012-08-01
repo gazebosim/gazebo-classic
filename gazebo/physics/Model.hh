@@ -203,6 +203,10 @@ namespace gazebo
       /// \brief Enable all the links in all the models
       public: void SetEnabled(bool _enabled);
 
+      /// \brief Set the current model pose by specifying pose of a link
+      public: void SetLinkWorldPose(const math::Pose &_pose, std::string _linkName);
+      public: void SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link);
+
       protected: virtual void OnPoseChange();
 
       /// \brief Load a joint helper function
