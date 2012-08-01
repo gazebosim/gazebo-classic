@@ -1,11 +1,11 @@
 <?xml version="1.0"?> 
-<gazebo version="1.0">
+<gazebo version="1.2">
   <world name="default">
     <include filename="ground_plane.model"/>
     <include filename="sun.light"/>
 
     <model name="box">
-      <origin pose="0 0 0.5 0 0 0"/>
+      <origin>0 0 0.5 0 0 0</origin>
       <link name="link">
         <collision name="collision">
           <mass>1</mass>
@@ -24,7 +24,7 @@
     </model>
 
     <model name="sphere">
-      <origin pose="0 1.5 0.5 0 0 0"/>
+      <origin>0 1.5 0.5 0 0 0</origin>
       <link name="link">
         <collision name="collision">
           <mass>1</mass>
@@ -43,7 +43,7 @@
     </model>
 
     <model name="cylinder">
-      <origin pose="0 -1.5 0.5 0 0 0"/>
+      <origin>0 -1.5 0.5 0 0 0</origin>
       <link name="link">
 
         <collision name="collision">

@@ -18,6 +18,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/Common.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/sdf/interface/Converter.hh"
 
 using namespace sdf;
@@ -27,12 +28,21 @@ bool Converter::Convert(TiXmlElement *_elem, const std::string _toVersion)
 {
   if (!_elem->Attribute("version"))
   {
-    std::cout << "Unable to determin original SDF version\n";
+    gzerr << "  Unable to determine original SDF version\n";
     return false;
   }
-      
   std::string origVersion = _elem->Attribute("version");
-  _elem->SetAttribute("version", "1.2");
+
+  //std::cout << gzclr_start(33) <<
+  std::cout << gzclr_start(33)
+            << "  Version[" << origVersion << "] to Version[" << _toVersion 
+            << "]\n"
+            << "  Please use the gzsdf tool to update your SDF files.\n"
+            << "    $ gzsdf print [sdf_file] >> [new_sdf_file]\n"
+            << gzclr_end;
+
+      
+  _elem->SetAttribute("version", _toVersion);
 
   boost::replace_all(origVersion, ".", "_");
 
@@ -41,7 +51,7 @@ bool Converter::Convert(TiXmlElement *_elem, const std::string _toVersion)
   TiXmlDocument xmlDoc;
   if (!xmlDoc.LoadFile(filename))
   {
-    std::cerr << "Unable to load file[" << filename << "]\n";
+    gzerr << "Unable to load file[" << filename << "]\n";
     return false;
   }
 
@@ -86,7 +96,7 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 
     if (!toElemName)
     {
-      std::cerr << "No 'to' element name specified\n";
+      gzerr << "No 'to' element name specified\n";
       continue;
     }
 
@@ -174,6 +184,7 @@ void Converter::CheckDeprecation(TiXmlElement *_elem, TiXmlElement *_convert)
       }
     }
 
-    std::cout << "Warning: Deprecated SDF Values\n" << stream.str() << "\n\n";
+    gzwarn << "Deprecated SDF Values in original file:\n"
+           << stream.str() << "\n\n";
   }
 }

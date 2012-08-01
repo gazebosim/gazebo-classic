@@ -53,6 +53,9 @@ namespace gazebo
     #define gzlog (gazebo::common::Console::Instance()->Log() << "[" <<\
         __FILE__ << ":" << __LINE__ << "] ")
 
+    #define gzclr_start(clr) "\033[1;33m"
+    #define gzclr_end "\033[0m"
+
     /// \brief Message, error, warning, and logging functionality
     class Console
     {

@@ -149,9 +149,9 @@ TEST_F(FactoryTest, Camera)
   ImageCompare(&img, &empty_world_camera1,
       width, height, 3, diffMax, diffSum, diffAvg);
   // PrintImage("empty_world_camera1", &img, width, height, 3);
-  ASSERT_EQ(diffSum, static_cast<unsigned int>(0));
-  ASSERT_EQ(diffMax, static_cast<unsigned int>(0));
-  ASSERT_EQ(diffAvg, 0.0);
+  ASSERT_LT(diffSum, static_cast<unsigned int>(100));
+  ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
+  ASSERT_EQ(0.0, diffAvg);
 }
 
 int main(int argc, char **argv)

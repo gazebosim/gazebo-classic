@@ -234,7 +234,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
   std::string filename = gazebo::common::find_file(_filename);
 
   xmlDoc.LoadFile(filename);
-  if (readDoc(&xmlDoc, _sdf))
+  if (readDoc(&xmlDoc, _sdf, filename))
     return true;
   else
   {
@@ -270,7 +270,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
-  if (readDoc(&xmlDoc, _sdf))
+  if (readDoc(&xmlDoc, _sdf, "data-string"))
     return true;
   else
   {
@@ -306,7 +306,7 @@ bool readString(const std::string &_xmlString, ElementPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
-  if (readDoc(&xmlDoc, _sdf))
+  if (readDoc(&xmlDoc, _sdf, "data-string"))
     return true;
   else
   {
@@ -317,11 +317,11 @@ bool readString(const std::string &_xmlString, ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
+bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
 {
   if (!_xmlDoc)
   {
-    gzwarn << "Could not parse the xml\n";
+    gzwarn << "Could not parse the xml from source[" << _source << "]\n";
     return false;
   }
 
@@ -332,9 +332,9 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
   {
     if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
     {
+      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n"; 
       Converter::Convert(gazeboNode, SDF_VERSION);
     }
-    _xmlDoc->SaveFile("/tmp/test.xml");
 
     /* parse new sdf xml */
     TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
@@ -362,7 +362,8 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
+bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
+             const std::string &_source)
 {
   if (!_xmlDoc)
   {
@@ -376,6 +377,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
   {
     if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
     {
+      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n"; 
       Converter::Convert(gazeboNode, SDF_VERSION);
     }
 
