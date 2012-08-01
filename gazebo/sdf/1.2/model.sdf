@@ -3,6 +3,10 @@
   <attribute name="name" type="string" default="__default__" required="1"/>
   <attribute name="static" type="bool" default="false" required="0"/>
 
+  <element name="allow_auto_disable" type="bool" default="true" required="0">
+    <description>Allows a model to auto-disable, which is means the physics engine can skip updating the model when the model is at rest. This parameter is only used by models with no joints.</description>
+  </element>
+
   <element name="origin" type="pose" default="0 0 0 0 0 0" required="0"/>
 
   <include filename="link.sdf" required="+"/>

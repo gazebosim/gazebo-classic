@@ -262,6 +262,10 @@ namespace gazebo
       /// \brief Update surface parameters
       public: virtual void UpdateSurface() {}
 
+      /// \brief Allow the link to auto disable.
+      /// \param _disable If true, the link is allowed to auto disable. 
+      public: virtual void SetAutoDisable(bool _disable) = 0;
+
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision
       private: void LoadCollision(sdf::ElementPtr _sdf);

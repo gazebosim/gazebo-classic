@@ -203,6 +203,11 @@ namespace gazebo
       /// \brief Enable all the links in all the models
       public: void SetEnabled(bool _enabled);
 
+      /// \brief Allow the model the auto disable. This is ignored if the
+      /// model has joints.
+      /// \param _disable If true, the model is allowed to auto disable. 
+      public: void SetAutoDisable(bool _disable);
+
       protected: virtual void OnPoseChange();
 
       /// \brief Load a joint helper function

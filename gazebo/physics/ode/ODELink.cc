@@ -537,3 +537,12 @@ bool ODELink::GetKinematic() const
 
   return result;
 }
+
+//////////////////////////////////////////////////
+void ODELink::SetAutoDisable(bool _disable)
+{
+  if (this->GetModel()->GetJointCount() == 0 && this->linkId)
+  {
+    dBodySetAutoDisableFlag(this->linkId, _disable);
+  }
+}

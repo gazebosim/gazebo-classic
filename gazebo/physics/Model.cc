@@ -90,6 +90,8 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->sdf->GetAttribute("static")->SetUpdateFunc(
       boost::bind(&Entity::IsStatic, this));
 
+  this->SetAutoDisable(this->sdf->GetValueBool("allow_auto_disable"));
+
   // TODO: check for duplicate model, and raise an error
   // BasePtr dup = Base::GetByName(this->GetScopedName());
 
@@ -847,3 +849,16 @@ void Model::SetEnabled(bool _enabled)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
 }
+
+/////////////////////////////////////////////////
+void Model::SetAutoDisable(bool _auto)
+{
+  if (this->joints.size() > 0)
+    return;
+
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+    if (*iter && (*iter)->HasType(LINK))
+      boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
+}
+
