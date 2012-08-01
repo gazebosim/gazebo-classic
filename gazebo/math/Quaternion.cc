@@ -21,6 +21,7 @@
 #include <math.h>
 #include "math/Helpers.hh"
 #include "math/Quaternion.hh"
+#include "common/Console.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -36,6 +37,8 @@ Quaternion::Quaternion(const double &_w, const double &_x,
                        const double &_y, const double &_z)
     : w(_w), x(_x), y(_y), z(_z)
 {
+  // FIXME:  why does this break pr2?
+  // this->Normalize();
 }
 
 //////////////////////////////////////////////////
@@ -155,11 +158,11 @@ Quaternion Quaternion::GetExp() const
 //////////////////////////////////////////////////
 void Quaternion::Invert()
 {
-  double norm = this->w*this->w+this->x*this->x+this->y*this->y+this->z*this->z;
-  this->w = this->w/norm;
-  this->x = -this->x/norm;
-  this->y = -this->y/norm;
-  this->z = -this->z/norm;
+  this->Normalize();
+  this->w = this->w;
+  this->x = -this->x;
+  this->y = -this->y;
+  this->z = -this->z;
 }
 
 //////////////////////////////////////////////////
@@ -193,7 +196,14 @@ void Quaternion::SetFromAxis(double _ax, double _ay, double _az, double _aa)
 
   l = _ax * _ax + _ay * _ay + _az * _az;
 
-  if (l > 0.0)
+  if (math::equal(l, 0.0))
+  {
+    this->w = 1;
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+  }
+  else
   {
     _aa *= 0.5;
     l = sin(_aa) / sqrt(l);
@@ -201,13 +211,6 @@ void Quaternion::SetFromAxis(double _ax, double _ay, double _az, double _aa)
     this->x = _ax * l;
     this->y = _ay * l;
     this->z = _az * l;
-  }
-  else
-  {
-    this->w = 1;
-    this->x = 0;
-    this->y = 0;
-    this->z = 0;
   }
 
   this->Normalize();
@@ -314,16 +317,16 @@ double Quaternion::GetYaw()
 void Quaternion::GetAsAxis(Vector3 &_axis, double &_angle) const
 {
   double len = this->x*this->x + this->y*this->y + this->z*this->z;
-  if (len > 0.0)
+  if (math::equal(len, 0.0))
+  {
+    _angle = 0.0;
+    _axis.Set(1, 0, 0);
+  }
+  else
   {
     _angle = 2.0 * acos(this->w);
     double invLen =  1.0 / sqrt(len);
     _axis.Set(this->x*invLen, this->y*invLen, this->z*invLen);
-  }
-  else
-  {
-    _angle = 0.0;
-    _axis.Set(1, 0, 0);
   }
 }
 
@@ -572,6 +575,7 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
     // Standard case (slerp)
     double fSin = sqrt(1 - (fCos*fCos));
     double fAngle = atan2(fSin, fCos);
+    // FIXME: should check if (std::fabs(fSin) >= 1e-3)
     double fInvSin = 1.0f / fSin;
     double fCoeff0 = sin((1.0f - _fT) * fAngle) * fInvSin;
     double fCoeff1 = sin(_fT * fAngle) * fInvSin;

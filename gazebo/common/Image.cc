@@ -289,7 +289,8 @@ void Image::GetDataImpl(unsigned char **_data, unsigned int &_count,
       for (unsigned int x = 0; x < this->GetWidth(); ++x)
       {
         std::swap((*_data)[i], (*_data)[i+2]);
-        i += 3;
+        unsigned int d = FreeImage_GetBPP(this->bitmap)/8;
+        i += d;
       }
     }
   }

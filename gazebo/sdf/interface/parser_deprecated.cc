@@ -623,7 +623,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
         }
         catch(boost::bad_lexical_cast &e)
         {
-          gzerr << "rpy value ["
+          gzerr << "rpy [" << rpy_str << "][" << i << "] value ["
                 << pieces[i] << "] is not a valid double from a 3-tuple\n";
           return false;
         }

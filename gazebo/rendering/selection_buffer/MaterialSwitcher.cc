@@ -35,14 +35,14 @@ MaterialSwitcher::~MaterialSwitcher()
 }
 
 /////////////////////////////////////////////////
-Ogre::Technique *MaterialSwitcher::handleSchemeNotFound (
+Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
     unsigned short /*_schemeIndex*/, const Ogre::String & /*_schemeName*/,
     Ogre::Material * /*_originalMaterial*/, unsigned short /*_lodIndex*/,
     const Ogre::Renderable *_rend)
 {
-  if(_rend)
+  if (_rend)
   {
-    if(typeid(*_rend) == typeid(Ogre::SubEntity))
+    if (typeid(*_rend) == typeid(Ogre::SubEntity))
     {
       const Ogre::SubEntity *subEntity =
         static_cast<const Ogre::SubEntity *>(_rend);
@@ -55,7 +55,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound (
         return NULL;
       }
 
-      if(this->lastEntity == subEntity->getParent()->getName())
+      if (this->lastEntity == subEntity->getParent()->getName())
       {
         const_cast<Ogre::SubEntity *>(subEntity)->setCustomParameter(1,
             Ogre::Vector4(this->currentColor.r, this->currentColor.g,
@@ -81,11 +81,11 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound (
       }
       return this->lastTechnique;
     }
-    //else
+    // else
     //   gzerr << "Object is not a SubEntity: "
     //         << _rend->getMaterial()->getName() << std::endl;
   }
-  //else
+  // else
   //  gzerr << "Rendering scheme without a Renderable: " << _schemeName
   //        << ", " + _originalMaterial->getName() << std::endl;
   return NULL;
