@@ -18,6 +18,7 @@ add_subdirectory(hokuyo)
 add_subdirectory(quadrotor)
 add_subdirectory(willowgarage)
 add_subdirectory(kitchen)
+add_subdirectory(turtlebot)
 
 set (files 
   bowl.dae
