@@ -443,7 +443,7 @@ namespace SkyX
       }
     }
 
-    const Ogre::Real DataManager::_getLightAbsorcionAt(Cell*** c,
+    Ogre::Real DataManager::_getLightAbsorcionAt(Cell*** c,
         const int& nx, const int& ny, const int& nz, const int& x,
         const int& y, const int& z, const Ogre::Vector3& d,
         const float& att) const
@@ -568,10 +568,12 @@ namespace SkyX
             }
           }
           break;
+        default:
+          break;
       }
     }
 
-    const bool DataManager::_fact(Cell ***c, const int& nx, const int& ny,
+    bool DataManager::_fact(Cell ***c, const int& nx, const int& ny,
         const int& nz, const int& x, const int& y, const int& z) const
     {
       bool i1m, j1m, k1m, 
@@ -597,7 +599,7 @@ namespace SkyX
              i2m || j2r || j2m || k2r;
     }
 
-    const float DataManager::_getDensityAt(Cell ***c, const int& nx,
+    float DataManager::_getDensityAt(Cell ***c, const int& nx,
         const int& ny, const int& nz, const int& x, const int& y, const int& z,
         const int& r, const float& strength) const
     {    

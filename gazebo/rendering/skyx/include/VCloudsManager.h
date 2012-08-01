@@ -176,20 +176,25 @@ namespace SkyX
 		 */
 		void _setLightParameters();
 
-		/// Ambient and Sun color gradients
-		ColorGradient mAmbientGradient;
-		ColorGradient mSunGradient;
+		/// SkyX parent pointer
+		SkyX *mSkyX;
 
 		/// VClouds pointer
 		VClouds::VClouds* mVClouds;
 
-		/// Height parameters, x = Cloud field y-coord start, y: Field height (both in world coordinates)
+    /// Height parameters, x = Cloud field y-coord start, y: Field height
+    /// (both in world coordinates)
 		Ogre::Vector2 mHeight;
+
+		/// Wind speed
+		Ogre::Real mWindSpeed;
 
 		/// Autoupdate wind speed depending of skyx time multiplier?
 		bool mAutoupdate;
-		/// Wind speed
-		Ogre::Real mWindSpeed;
+
+		/// Ambient and Sun color gradients
+		ColorGradient mAmbientGradient;
+		ColorGradient mSunGradient;
 
 		/// Is vclouds manager created?
 		bool mCreated;
@@ -197,8 +202,6 @@ namespace SkyX
 		/// Current time since last frame
 		Ogre::Real mCurrentTimeSinceLastFrame;
 
-		/// SkyX parent pointer
-		SkyX *mSkyX;
 	};
 }
 
