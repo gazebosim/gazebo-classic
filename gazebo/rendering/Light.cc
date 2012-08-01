@@ -89,9 +89,9 @@ void Light::Load()
 
   this->SetLightType(this->sdf->GetValueString("type"));
   this->SetDiffuseColor(
-      this->sdf->GetOrCreateElement("diffuse")->GetValueColor("rgba"));
+      this->sdf->GetOrCreateElement("diffuse")->GetValueColor());
   this->SetSpecularColor(
-      this->sdf->GetOrCreateElement("specular")->GetValueColor("rgba"));
+      this->sdf->GetOrCreateElement("specular")->GetValueColor());
   this->SetDirection(
       this->sdf->GetOrCreateElement("direction")->GetValueVector3("xyz"));
 
@@ -135,13 +135,13 @@ void Light::LoadFromMsg(ConstLightPtr &msg)
 
   if (msg->has_diffuse())
   {
-    this->sdf->GetOrCreateElement("diffuse")->GetAttribute("rgba")->Set(
+    this->sdf->GetOrCreateElement("diffuse")->Set(
         msgs::Convert(msg->diffuse()));
   }
 
   if (msg->has_specular())
   {
-    this->sdf->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
+    this->sdf->GetOrCreateElement("specular")->Set(
         msgs::Convert(msg->specular()));
   }
 
@@ -393,8 +393,8 @@ void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("diffuse");
 
-  if (elem->GetValueColor("rgba") != _color)
-    elem->GetAttribute("rgba")->Set(_color);
+  if (elem->GetValueColor() != _color)
+    elem->Set(_color);
 
   this->light->setDiffuseColour(_color.r, _color.g, _color.b);
 }
@@ -402,7 +402,7 @@ void Light::SetDiffuseColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Light::GetDiffuseColor() const
 {
-  return this->sdf->GetOrCreateElement("diffuse")->GetValueColor("rgba");
+  return this->sdf->GetOrCreateElement("diffuse")->GetValueColor();
 }
 
 //////////////////////////////////////////////////
@@ -410,8 +410,8 @@ void Light::SetSpecularColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("specular");
 
-  if (elem->GetValueColor("rgba") != _color)
-    elem->GetAttribute("rgba")->Set(_color);
+  if (elem->GetValueColor() != _color)
+    elem->Set(_color);
 
   this->light->setSpecularColour(_color.r, _color.g, _color.b);
 }

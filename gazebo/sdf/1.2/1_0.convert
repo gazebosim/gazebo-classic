@@ -1,5 +1,14 @@
 <convert name="gazebo">
   <convert name="world">
+    <convert name="gui">
+      <convert name="camera">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="origin"/>
+        </rename>
+      </convert> <!-- End camera -->
+    </convert> <!-- End gui -->
+
     <convert name="scene">
       <rename>
         <from element="ambient" attribute="rgba"/>
@@ -64,7 +73,16 @@
         <from element="origin" attribute="pose"/>
         <to element="origin"/>
       </rename>
-    </convert> <!-- End collision -->
+
+      <rename>
+        <from element="diffuse" attribute="rgba"/>
+        <to element="diffuse"/>
+      </rename>
+      <rename>
+        <from element="specular" attribute="rgba"/>
+        <to element="specular"/>
+      </rename>
+    </convert> <!-- End light -->
 
     <convert name="model">
       <rename>
@@ -72,11 +90,19 @@
         <to element="origin"/>
       </rename>
 
+
       <convert name="link">
         <rename>
           <from element="origin" attribute="pose"/>
           <to element="origin"/>
         </rename>
+
+        <convert name="sensor">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="origin"/>
+          </rename>
+        </convert>
 
         <convert name="inertial">
           <rename>
@@ -97,16 +123,102 @@
             <from element="origin" attribute="pose"/>
             <to element="origin"/>
           </rename>
+
+          <convert name="material">
+            <rename>
+              <from element="ambient" attribute="rgba"/>
+              <to element="ambient"/>
+            </rename>
+            <rename>
+              <from element="specular" attribute="rgba"/>
+              <to element="specular"/>
+            </rename>
+            <rename>
+              <from element="diffuse" attribute="rgba"/>
+              <to element="diffuse"/>
+            </rename>
+            <rename>
+              <from element="emissive" attribute="rgba"/>
+              <to element="emissive"/>
+            </rename>
+          </convert> <!-- End material -->
         </convert> <!-- End visual -->
- 
-        <convert name="joint">
-          <rename>
-            <from element="origin" attribute="pose"/>
-            <to element="origin"/>
-          </rename>
-        </convert> <!-- End joint -->
- 
       </convert> <!-- End link -->
+      <convert name="joint">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="origin"/>
+        </rename>
+      </convert> <!-- End joint -->
     </convert> <!-- End model -->
   </convert> <!-- End world -->
+
+
+  <convert name="model">
+    <rename>
+      <from element="origin" attribute="pose"/>
+      <to element="origin"/>
+    </rename>
+
+    <convert name="link">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="origin"/>
+      </rename>
+
+      <convert name="sensor">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="origin"/>
+        </rename>
+      </convert>
+
+      <convert name="inertial">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="origin"/>
+        </rename>
+      </convert> <!-- End inertial-->
+
+      <convert name="collision">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="origin"/>
+        </rename>
+      </convert> <!-- End collision -->
+
+      <convert name="visual">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="origin"/>
+        </rename>
+
+        <convert name="material">
+          <rename>
+            <from element="ambient" attribute="rgba"/>
+            <to element="ambient"/>
+          </rename>
+          <rename>
+            <from element="specular" attribute="rgba"/>
+            <to element="specular"/>
+          </rename>
+          <rename>
+            <from element="diffuse" attribute="rgba"/>
+            <to element="diffuse"/>
+          </rename>
+          <rename>
+            <from element="emissive" attribute="rgba"/>
+            <to element="emissive"/>
+          </rename>
+        </convert> <!-- End material -->
+      </convert> <!-- End visual -->
+    </convert> <!-- End link -->
+    <convert name="joint">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="origin"/>
+      </rename>
+    </convert> <!-- End joint -->
+  </convert> <!-- End model -->
+
 </convert> <!-- End gazebo -->

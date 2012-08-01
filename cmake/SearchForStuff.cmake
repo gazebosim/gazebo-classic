@@ -101,19 +101,41 @@ if (PKG_CONFIG_FOUND)
   endif()
   
   #################################################
-  # Find tinyxml
-  pkg_check_modules(TINYXML tinyxml)
-  if (NOT TINYXML_FOUND)
+  # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
+  find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
+  if (NOT tinyxml_include_dir)
+    message (STATUS "Looking for tinyxml.h - not found") 
     BUILD_ERROR("Missing: tinyxml")
+  else ()
+    message (STATUS "Looking for tinyxml.h - found")
+    set (tinyxml_include_dirs ${tinyxml_include_dir} CACHE STRING 
+      "tinyxml include paths. Use this to override automatic detection.") 
+    set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
   endif ()
 
+  ################################################# 
+  # Find CCD 
+  pkg_check_modules(CCD ccd) 
+  if (NOT CCD_FOUND) 
+    message(STATUS "External CCD not found, using internal copy") 
+    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARIES gazebo_ccd) 
+  endif () 
 
   #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
-  IF (NOT TBB_FOUND)
-    BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
-  ENDIF (NOT TBB_FOUND)
+  if (NOT TBB_FOUND)
+    message(STATUS "TBB not found, attempting to detect manually") 
+
+    find_library(tbb_library tbb ENV LD_LIBRARY_PATH) 
+    if (tbb_library) 
+      set(TBB_FOUND true) 
+      set(TBB_LIBRARIES ${tbb_library}) 
+    else (tbb_library) 
+      BUILD_ERROR ("Missing: TBB - Threading Building Blocks")   
+    endif(tbb_library) 
+  endif (NOT TBB_FOUND)
 
   #################################################
   # Find OGRE 

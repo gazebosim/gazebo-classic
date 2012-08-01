@@ -5,7 +5,6 @@
 
   <element name="origin" type="pose" default="0 0 0 0 0 0" required="0"/>
 
-  </element> <!-- End Origin -->
   <element name="inertia" required="0">
     <attribute name="ixx" type="double" default="0.0" required="1"/>
     <attribute name="ixy" type="double" default="0.0" required="1"/>

@@ -60,9 +60,10 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
   {
     TiXmlElement *elem = NULL;
     elem = _elem->FirstChildElement(convertElem->Attribute("name"));
-    if (elem)
+    while (elem)
     {
       ConvertImpl(elem, convertElem);
+      elem = elem->NextSiblingElement(convertElem->Attribute("name"));
     }
   }
 

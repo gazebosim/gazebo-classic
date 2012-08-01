@@ -298,8 +298,7 @@ namespace gazebo
 
         if (camSDF->HasElement("origin"))
         {
-          msgs::Set(guiCam->mutable_origin(),
-              camSDF->GetElement("origin")->GetValuePose("pose"));
+          msgs::Set(guiCam->mutable_origin(), camSDF->GetValuePose("origin"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -356,20 +355,19 @@ namespace gazebo
 
       if (_sdf->HasElement("origin"))
       {
-        result.mutable_pose()->CopyFrom(
-            Convert(_sdf->GetElement("origin")->GetValuePose("pose")));
+        result.mutable_pose()->CopyFrom(Convert(_sdf->GetValuePose("origin")));
       }
 
       if (_sdf->HasElement("diffuse"))
       {
         result.mutable_diffuse()->CopyFrom(
-            Convert(_sdf->GetElement("diffuse")->GetValueColor("rgba")));
+            Convert(_sdf->GetValueColor("diffuse")));
       }
 
       if (_sdf->HasElement("specular"))
       {
         result.mutable_specular()->CopyFrom(
-            Convert(_sdf->GetElement("specular")->GetValueColor("rgba")));
+            Convert(_sdf->GetValueColor("specular")));
       }
 
       if (_sdf->HasElement("attenuation"))
@@ -530,23 +528,22 @@ namespace gazebo
 
         if (elem->HasElement("ambient"))
           msgs::Set(matMsg->mutable_ambient(),
-              elem->GetElement("ambient")->GetValueColor("rgba"));
+              elem->GetValueColor("ambient"));
         if (elem->HasElement("diffuse"))
           msgs::Set(matMsg->mutable_diffuse(),
-              elem->GetElement("diffuse")->GetValueColor("rgba"));
+              elem->GetValueColor("diffuse"));
         if (elem->HasElement("specular"))
           msgs::Set(matMsg->mutable_specular(),
-              elem->GetElement("specular")->GetValueColor("rgba"));
+              elem->GetValueColor("specular"));
         if (elem->HasElement("emissive"))
           msgs::Set(matMsg->mutable_emissive(),
-              elem->GetElement("emissive")->GetValueColor("rgba"));
+              elem->GetValueColor("emissive"));
       }
 
       // Set the origin of the visual
       if (_sdf->HasElement("origin"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("origin");
-        msgs::Set(result.mutable_pose(), elem->GetValuePose("pose"));
+        msgs::Set(result.mutable_pose(), _sdf->GetValuePose("origin"));
       }
 
       return result;

@@ -1237,8 +1237,7 @@ void World::ProcessFactoryMsgs()
       elem->SetParent(this->sdf);
       elem->GetParent()->InsertElement(elem);
       if ((*iter).has_pose())
-        elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
-            msgs::Convert((*iter).pose()));
+        elem->GetOrCreateElement("origin")->Set(msgs::Convert((*iter).pose()));
 
       if (isActor)
       {

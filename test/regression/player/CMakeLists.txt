@@ -34,7 +34,7 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
     gazebo_rendering
     gazebo_msgs
     pthread
-    ${TINYXML_LIBRARIES}
+    ${tinyxml_libraries}
     ${PLAYER_LINK_LIBS}
     )
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})

@@ -6,9 +6,7 @@
   <attribute name="laser_retro" type="double" default="0.0" required="0"/>
   <attribute name="transparency" type="double" default="0.0" required="0"/>
   
-  <element name="origin" required="0">
-    <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
-  </element> <!-- End Origin -->
+  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0"/>
 
   <element name="material" required="0">
     <attribute name="script" type="string" default="__default__" required="0"/>
@@ -17,18 +15,10 @@
       <attribute name="type" type="string" default="pixel" required="1"/>
       <element name="normal_map" type="string" default="__default__" required="0"/>
     </element>
-    <element name="ambient" required="0">
-      <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
-    </element>
-    <element name="diffuse" required="0">
-      <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
-    </element>
-    <element name="specular" required="0">
-      <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
-    </element>
-    <element name="emissive" required="0">
-      <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
-    </element>
+    <element name="ambient" type="color" default="0 0 0 1" required="0"/>
+    <element name="diffuse"  type="color" default="0 0 0 1" required="0"/>
+    <element name="specular" type="color" default="0 0 0 1" required="0"/>
+    <element name="emissive" type="color" default="0 0 0 1" required="0"/>
   </element> <!-- End Material -->
 
   <include filename="geometry.sdf" required="1"/>

@@ -1,10 +1,7 @@
-add_definitions(${TINYXML_CFLAGS})
-
 include_directories(SYSTEM
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-  ${TINYXML_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
 )
 
@@ -16,7 +13,6 @@ include_directories(
 link_directories(  
   ${OGRE_LIBRARY_PATH}
   ${Boost_LIBRARY_DIRS} 
-  ${TINYXML_LIBRARY_DIRS}
 )
 
 add_subdirectory(msgs)
@@ -47,6 +43,7 @@ target_link_libraries(gzmaster gazebo_common
                                gazebo_transport
                                gazebo_sdf_interface
                                gazebo_msgs
+                               pthread
 )
 
 

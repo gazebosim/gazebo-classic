@@ -225,7 +225,7 @@ std::string SystemPaths::FindFile(const std::string &_filename)
   else
   {
     for (std::list<std::string>::const_iterator iter = paths.begin();
-        iter != paths.end(); ++iter)
+        iter != paths.end() && !found; ++iter)
     {
       fullname = (*iter) + "/" + _filename;
       if (stat(fullname.c_str(), &st) == 0)

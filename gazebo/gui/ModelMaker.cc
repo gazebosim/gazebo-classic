@@ -96,7 +96,7 @@ void ModelMaker::InitFromFile(const std::string &_filename)
 
   sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
   if (modelElem->HasElement("origin"))
-    modelPose = modelElem->GetElement("origin")->GetValuePose("pose");
+    modelPose = modelElem->GetValuePose("origin");
 
   modelName = this->node->GetTopicNamespace() + "::" +
               modelElem->GetValueString("name");
@@ -119,7 +119,7 @@ void ModelMaker::InitFromFile(const std::string &_filename)
     {
       std::string linkName = linkElem->GetValueString("name");
       if (linkElem->HasElement("origin"))
-        linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
+        linkPose = linkElem->GetValuePose("origin");
 
       rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
             linkName, this->modelVisual));
@@ -136,7 +136,7 @@ void ModelMaker::InitFromFile(const std::string &_filename)
       while (visualElem)
       {
         if (visualElem->HasElement("origin"))
-          visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
+          visualPose = visualElem->GetValuePose("origin");
 
         std::ostringstream visualName;
         visualName << modelName << "::" << linkName << "::Visual_"
@@ -275,7 +275,7 @@ void ModelMaker::CreateTheEntity()
 
     // The the SDF model's name
     modelElem->GetAttribute("name")->Set(modelName);
-    modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
+    modelElem->GetOrCreateElement("origin")->Set(
         this->modelVisual->GetWorldPose());
 
     // Spawn the model in the physics server

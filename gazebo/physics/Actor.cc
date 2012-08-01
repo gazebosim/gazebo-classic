@@ -130,7 +130,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
                       bone->GetModelTransform().GetRotation());
       if (bone->IsRootNode())
         pose = math::Pose();
-      linkPose->GetAttribute("pose")->Set(pose);
+      linkPose->Set(pose);
 
       /// FIXME hardcoded inertia of a sphere with mass 1.0 and radius 0.01
       this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
@@ -616,7 +616,7 @@ void Actor::AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
   double ixx = 2.0 * mass * radius * radius / 5.0;
   sdf::ElementPtr inertialSdf = linkSdf->GetOrCreateElement("inertial");
   sdf::ElementPtr inertialPoseSdf = inertialSdf->GetOrCreateElement("origin");
-  inertialPoseSdf->GetAttribute("pose")->Set(pose);
+  inertialPoseSdf->Set(pose);
   inertialSdf->GetAttribute("mass")->Set(mass);
   sdf::ElementPtr tensorSdf = inertialSdf->GetOrCreateElement("inertia");
   tensorSdf->GetAttribute("ixx")->Set(ixx);
@@ -634,7 +634,7 @@ void Actor::AddSphereCollision(sdf::ElementPtr linkSdf, std::string name,
   sdf::ElementPtr collisionSdf = linkSdf->GetOrCreateElement("collision");
   collisionSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr collPoseSdf = collisionSdf->GetOrCreateElement("origin");
-  collPoseSdf->GetAttribute("pose")->Set(pose);
+  collPoseSdf->Set(pose);
   sdf::ElementPtr geomColSdf = collisionSdf->GetOrCreateElement("geometry");
   sdf::ElementPtr sphereColSdf = geomColSdf->GetOrCreateElement("sphere");
   sphereColSdf->GetAttribute("radius")->Set(radius);
@@ -647,14 +647,14 @@ void Actor::AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
   sdf::ElementPtr visualSdf = linkSdf->GetOrCreateElement("visual");
   visualSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
-  visualPoseSdf->GetAttribute("pose")->Set(pose);
+  visualPoseSdf->Set(pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
   sdf::ElementPtr sphereVisSdf = geomVisSdf->GetOrCreateElement("sphere");
   sphereVisSdf->GetAttribute("radius")->Set(radius);
   sdf::ElementPtr matSdf = visualSdf->GetOrCreateElement("material");
   matSdf->GetAttribute("script")->Set(material);
   sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
-  colorSdf->GetAttribute("rgba")->Set(ambient);
+  colorSdf->Set(ambient);
 }
 
 //////////////////////////////////////////////////
@@ -664,14 +664,14 @@ void Actor::AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
   sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
-  visualPoseSdf->GetAttribute("pose")->Set(pose);
+  visualPoseSdf->Set(pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
   sdf::ElementPtr boxSdf = geomVisSdf->GetOrCreateElement("box");
   boxSdf->GetAttribute("size")->Set(size);
   sdf::ElementPtr matSdf = visualSdf->GetOrCreateElement("material");
   matSdf->GetAttribute("script")->Set(material);
   sdf::ElementPtr colorSdf = matSdf->GetOrCreateElement("ambient");
-  colorSdf->GetAttribute("rgba")->Set(ambient);
+  colorSdf->Set(ambient);
 }
 
 //////////////////////////////////////////////////
@@ -681,7 +681,7 @@ void Actor::AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
   sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetOrCreateElement("origin");
-  visualPoseSdf->GetAttribute("pose")->Set(pose);
+  visualPoseSdf->Set(pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetOrCreateElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetOrCreateElement("mesh");
   meshSdf->GetAttribute("filename")->Set(this->skinFile);

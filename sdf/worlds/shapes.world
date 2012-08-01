@@ -1,12 +1,6 @@
 <?xml version="1.0"?> 
-<gazebo version="1.2">
+<gazebo version="1.0">
   <world name="default">
-    <gui fullscreen="false">
-      <camera name="mi_cam">
-        <origin pose= "10 0 2 0 0 3.14"/>
-      </camera>
-    </gui>
-
     <include filename="ground_plane.model"/>
     <include filename="sun.light"/>
 

@@ -72,7 +72,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   math::Vector3 center(0, 0, 0);
   if (this->sdf->HasElement("origin"))
   {
-    center = this->sdf->GetElement("origin")->GetValuePose("pose").pos;
+    center = this->sdf->GetValuePose("origin").pos;
   }
   this->SetCoG(center.x, center.y, center.z);
 

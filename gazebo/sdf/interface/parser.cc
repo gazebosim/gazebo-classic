@@ -70,7 +70,7 @@ bool initFile(const std::string &_filename, ElementPtr _sdf)
   if (xmlDoc.LoadFile(filename))
     return initDoc(&xmlDoc, _sdf);
   else
-    gzerr << "Unable to load file[" << _filename << "]\n";
+    gzerr << "Unable to load file[" << filename << "]\n";
 
   return false;
 }
@@ -326,14 +326,15 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
   }
 
   /* check gazebo version, use old parser if necessary */
-  TiXmlElement* gazebo_node = _xmlDoc->FirstChildElement("gazebo");
+  TiXmlElement* gazeboNode = _xmlDoc->FirstChildElement("gazebo");
 
-  if (gazebo_node && gazebo_node->Attribute("version"))
+  if (gazeboNode && gazeboNode->Attribute("version"))
   {
-    if (strcmp(gazebo_node->Attribute("version"), SDF_VERSION) != 0)
+    if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
     {
-      Converter::Convert(gazebo_node, SDF_VERSION);
+      Converter::Convert(gazeboNode, SDF_VERSION);
     }
+    _xmlDoc->SaveFile("/tmp/test.xml");
 
     /* parse new sdf xml */
     TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
@@ -346,13 +347,13 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
   else
   {
     // try to use the old deprecated parser
-    if (!gazebo_node)
+    if (!gazeboNode)
       gzwarn << "Gazebo SDF has no gazebo element\n";
-    else if (!gazebo_node->Attribute("version"))
+    else if (!gazeboNode->Attribute("version"))
       gzwarn << "Gazebo SDF gazebo element has no version\n";
-    else if (strcmp(gazebo_node->Attribute("version"), SDF_VERSION) != 0)
+    else if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
       gzwarn << "Gazebo SDF version ["
-            << gazebo_node->Attribute("version")
+            << gazeboNode->Attribute("version")
             << "] is not " << SDF_VERSION << "\n";
     return false;
   }
@@ -373,9 +374,9 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
   TiXmlElement* gazeboNode = _xmlDoc->FirstChildElement("gazebo");
   if (gazeboNode && gazeboNode->Attribute("version"))
   {
-    if (strcmp(gazebo_node->Attribute("version"), SDF_VERSION) != 0)
+    if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
     {
-      Converter::Convert(gazebo_node, SDF_VERSION);
+      Converter::Convert(gazeboNode, SDF_VERSION);
     }
 
     TiXmlElement* elemXml = gazeboNode;

@@ -70,7 +70,7 @@ target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
                                     ${Boost_LIBRARIES}
                                     ${freeimage_library}
-                                    ${TINYXML_LIBRARIES}
+                                    ${tinyxml_libraries}
                                     ${libavcodec_LIBRARIES}
                                     ${libavformat_LIBRARIES}
                                     ${libswscale_LIBRARIES}

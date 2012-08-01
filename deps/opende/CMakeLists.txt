@@ -7,9 +7,9 @@ include_directories(SYSTEM
   ${CMAKE_CURRENT_BINARY_DIR} 
   ${CMAKE_SOURCE_DIR}/deps/opende/include
   ${CMAKE_SOURCE_DIR}/deps/opende/ou/include
-  ${CMAKE_SOURCE_DIR}/deps/libccd/include
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
   ${CMAKE_SOURCE_DIR}/deps/threadpool
+  ${CCD_INCLUDE_DIRS}
 )
 
 add_subdirectory(OPCODE)
@@ -237,7 +237,7 @@ endif()
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
 gz_add_library(gazebo_ode ${sources})
-target_link_libraries(gazebo_ode gazebo_opcode gazebo_ccd gazebo_opende_ou)
+target_link_libraries(gazebo_ode gazebo_opcode gazebo_opende_ou ${CCD_LIBRARIES})
 
 add_dependencies(gazebo_ode gazebo_opcode)
 add_dependencies(gazebo_ode gazebo_opende_ou)

@@ -33,6 +33,12 @@ if(UNIX AND NOT WIN32)
  endif(CMAKE_UNAME)
 endif()
 
+
+set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
+set (LIB_INSTALL_DIR "lib" CACHE STRING "Installation directory for libraries (relative to CMAKE_INSTALL_PREFIX)") 
+set (BIN_INSTALL_DIR "bin" CACHE STRING "Installation directory for binaries (relative to CMAKE_INSTALL_PREFIX)") 
+
+
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
 
 if (USE_FULL_RPATH)
@@ -43,28 +49,22 @@ if (USE_FULL_RPATH)
   # (but later on when installing)
   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
   
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
   
   # add the automatically determined parts of the RPATH
   # which point to directories outside the build tree to the install RPATH
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
   
   # the RPATH to be used when installing, but only if its not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" isSystemDir)
   if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
   endif("${isSystemDir}" STREQUAL "-1")
 endif()
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
-
-set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
-set (LIB_INSTALL_DIR "lib")
-set (BIN_INSTALL_DIR "bin")
-
-
 
 
 set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
@@ -221,7 +221,7 @@ else (build_errors)
 
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
 
   ########################################
