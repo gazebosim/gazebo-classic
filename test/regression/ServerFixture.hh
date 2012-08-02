@@ -18,9 +18,11 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
+#define BOOST_FILESYSTEM_VERSION 2
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
 
 #include <map>
 #include <string>
@@ -54,6 +56,26 @@ class ServerFixture : public testing::Test
                this->gotImage = 0;
                this->imgData = NULL;
                this->serverThread = NULL;
+
+               common::SystemPaths::Instance()->AddGazeboPaths(
+                   TEST_REGRESSION_PATH);
+
+               // Add local search paths
+               std::string path = TEST_REGRESSION_PATH;
+               path += "/../..";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../sdf";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../gazebo";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../build/plugins";
+               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
              }
 
   protected: virtual void TearDown()
@@ -92,9 +114,6 @@ class ServerFixture : public testing::Test
                delete this->server;
                this->server = NULL;
 
-               common::SystemPaths::Instance()->AddGazeboPaths(
-                   TEST_REGRESSION_PATH);
-
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
@@ -123,6 +142,7 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
+
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);
