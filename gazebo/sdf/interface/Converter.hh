@@ -26,7 +26,7 @@ namespace sdf
   class Converter
   {
     public: static bool Convert(TiXmlElement *_elem,
-                                const std::string _toVersion);
+                                const std::string &_toVersion);
 
     private: static void ConvertImpl(TiXmlElement *_elem,
                                      TiXmlElement *_convert);
@@ -37,7 +37,6 @@ namespace sdf
 
     private: static void CheckDeprecation(TiXmlElement *_elem,
                                           TiXmlElement *_convert);
-
   };
 }
 #endif

@@ -624,7 +624,8 @@ TEST_F(MsgsTest, SDF)
              <ambient>0.1 0.1 0.1 1</ambient>\
              <background>0 0 0 1</background>\
              <shadows>true</shadows>\
-             <fog><color>1 1 1 1</color> <type>throw</type <start>0</start> <end>10</end> <density>1</density> </fog>\
+             <fog><color>1 1 1 1</color> <type>throw</type>\
+             <start>0</start> <end>10</end> <density>1</density> </fog>\
              <grid>false</grid>\
            </scene>\
         </gazebo>", sdf);

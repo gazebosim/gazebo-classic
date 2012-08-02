@@ -31,8 +31,8 @@ namespace SkyX { namespace VClouds
     GeometryBlock::GeometryBlock(VClouds* vc,
         const float& Height, const Ogre::Radian& Alpha,
         const Ogre::Radian& Beta, const float& Radius,
-        const Ogre::Radian& Phi, const int& Na, 
-        const int& Nb, const int& Nc, const int& A, 
+        const Ogre::Radian& Phi, const int& Na,
+        const int& Nb, const int& Nc, const int& A,
         const int& B, const int& C, const int& Position)
       : mVClouds(vc)
         , mCreated(false)
@@ -314,7 +314,7 @@ namespace SkyX { namespace VClouds
 
       mDisplacement = displacement;
 
-      float fallingDistance = mVClouds->getDistanceFallingParams().x * 
+      float fallingDistance = mVClouds->getDistanceFallingParams().x *
         (mEntity->getParentSceneNode()->_getDerivedPosition().z -
          c->getDerivedPosition().z);
 

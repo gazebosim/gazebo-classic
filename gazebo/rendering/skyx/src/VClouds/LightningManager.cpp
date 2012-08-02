@@ -129,9 +129,9 @@ namespace SkyX
             {
               addLightning(
                   // Ray position
-                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)),
                   // Ray direction
-                  Ogre::Vector3(0,-1,0), 
+                  Ogre::Vector3(0,-1,0),
                   // Ray length
                   mVClouds->getGeometrySettings().Height.x + 0.1*mVClouds->getGeometrySettings().Height.y);
             }
@@ -140,9 +140,9 @@ namespace SkyX
             {
               addLightning(
                   // Ray position
-                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)),
                   // Ray direction
-                  Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1),Ogre::Math::RangeRandom(-1,1)).normalisedCopy(), 
+                  Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1),Ogre::Math::RangeRandom(-1,1)).normalisedCopy(),
                   // Ray length
                   Ogre::Math::RangeRandom(0.5,1.5f)*0.2*mVClouds->getGeometrySettings().Height.y);
             }
@@ -151,17 +151,17 @@ namespace SkyX
             {
               addLightning(
                   // Ray position
-                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)),
                   // Ray direction
-                  Ogre::Vector3(0,-1,0), 
+                  Ogre::Vector3(0,-1,0),
                   // Ray length
                   mVClouds->getGeometrySettings().Height.x + 0.1*mVClouds->getGeometrySettings().Height.y);
 
               addLightning(
                   // Ray position
-                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+                  Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)),
                   // Ray direction
-                  Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1),Ogre::Math::RangeRandom(-1,1)).normalisedCopy(), 
+                  Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1),Ogre::Math::RangeRandom(-1,1)).normalisedCopy(),
                   // Ray length
                   Ogre::Math::RangeRandom(0.5,1.5f)*0.2*mVClouds->getGeometrySettings().Height.y);
             }
@@ -236,14 +236,15 @@ namespace SkyX
           pos = mVClouds->getGeometryManager()->getSceneNode()->_getFullTransform().inverseAffine() * mSceneNodes.at(k)->_getDerivedPosition();
 
           mVolCloudsLightningMaterial->
-            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uLightning" + Ogre::StringConverter::toString(k), 
+            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uLightning" + Ogre::StringConverter::toString(k),
                 Ogre::Vector4(pos.x, pos.y, pos.z, mLightnings.at(k)->getIntensity()));
         }
         else
         {
           mVolCloudsLightningMaterial->
-            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uLightning" + Ogre::StringConverter::toString(k), 
-                Ogre::Vector4(0,0,0,0));
+            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->
+            setNamedConstant("uLightning" + Ogre::StringConverter::toString(k),
+                Ogre::Vector4(0, 0, 0, 0));
         }
       }
     }
@@ -257,16 +258,19 @@ namespace SkyX
         return;
       }
 
-      mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-        ->setNamedConstant("uLightningColor", mLightningColor);
+      mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->
+        getFragmentProgramParameters()->setNamedConstant("uLightningColor",
+            mLightningColor);
 
-      mLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-        ->setNamedConstant("uColor", mLightningColor);
+      mLightningMaterial->getTechnique(0)->getPass(0)->
+        getFragmentProgramParameters()->setNamedConstant("uColor",
+            mLightningColor);
     }
 
     void LightningManager::removeListener(Listener* listener)
     {
-      for(std::vector<Listener*>::iterator it = mListeners.begin(); it != mListeners.end(); it++)
+      for (std::vector<Listener*>::iterator it = mListeners.begin();
+           it != mListeners.end(); ++it)
       {
         if ((*it) == listener)
         {
@@ -284,7 +288,8 @@ namespace SkyX
       {
         if (mEnabled)
         {
-          mVClouds->getGeometryManager()->_setMaterialName("SkyX_VolClouds_Lightning");
+          mVClouds->getGeometryManager()->_setMaterialName(
+              "SkyX_VolClouds_Lightning");
         }
         else
         {
@@ -295,18 +300,19 @@ namespace SkyX
 
     void LightningManager::_updateRenderQueueGroup(const Ogre::uint8& /*rqg*/)
     {
-      for(Ogre::uint32 k = 0; k < mLightnings.size(); k++)
-      {	
-        mLightnings.at(k)->_updateRenderQueueGroup(mVClouds->getRenderQueueGroups().vcloudsLightnings);
+      for (Ogre::uint32 k = 0; k < mLightnings.size(); ++k)
+      {
+        mLightnings.at(k)->_updateRenderQueueGroup(
+            mVClouds->getRenderQueueGroups().vcloudsLightnings);
       }
     }
 
     void LightningManager::_setVisible(const bool& v)
     {
-      for(Ogre::uint32 k = 0; k < mLightnings.size(); k++)
-      {	
+      for (Ogre::uint32 k = 0; k < mLightnings.size(); ++k)
+      {
         mLightnings.at(k)->getBillboardSet()->setVisible(v);
       }
     }
-
-  }}
+  }
+}

@@ -5,7 +5,7 @@ includedir=${prefix}/include
 plugindir=${libdir}/SKYX
 
 Name: SKYX
-Description: 
+Description:
 Version: @SKYX_VERSION@
 Libs: -L${libdir} -lSkyX@SKYX_LIB_SUFFIX@ @SKYX_ADDITIONAL_LIBS@
 Cflags: -I${includedir} -I${includedir}/SKYX @SKYX_CFLAGS@

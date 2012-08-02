@@ -23,7 +23,7 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-SelectionBuffer::SelectionBuffer(const std::string _cameraName,
+SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
     Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
 : sceneMgr(_mgr), renderTarget(_renderTarget),
   buffer(0), pixelBox(0)

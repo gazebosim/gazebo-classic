@@ -82,7 +82,7 @@ namespace SkyX
 
       // Geometry manager
       mGeometryManager->create(mGeometrySettings.Height,
-          mGeometrySettings.Radius, mGeometrySettings.Alpha, 
+          mGeometrySettings.Radius, mGeometrySettings.Alpha,
           mGeometrySettings.Beta, mGeometrySettings.NumberOfBlocks,
           mGeometrySettings.Na, mGeometrySettings.Nb, mGeometrySettings.Nc);
 

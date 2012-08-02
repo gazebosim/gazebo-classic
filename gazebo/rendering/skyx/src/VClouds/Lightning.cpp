@@ -111,12 +111,12 @@ namespace SkyX { namespace VClouds
       bb->setDimensions(width, width);
       bb->setColour(Ogre::ColourValue(1,bounds.x,bounds.x));
       bb->mDirection = (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy();
-      
+
       bb = mBillboardSet->createBillboard(mSegments.at(k).b - (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy()*width/2);
       bb->setDimensions(width, width);
       bb->setColour(Ogre::ColourValue(1,bounds.y,bounds.y));
       bb->mDirection = -(mSegments.at(k).a-mSegments.at(k).b).normalisedCopy();
-    
+
       width *= 1-(1.0f/(mRecursivity*mRecursivity))*(1.0f/mSegments.size());
     }
 
@@ -152,7 +152,7 @@ namespace SkyX { namespace VClouds
 
           Lightning* lightning = new Lightning(mSceneManager, mSceneNode, mSegments.at(k).b, dir, lengthMult*mLength, 2+mDivisions*lengthMult, mRecursivity-1, mTimeMultiplier, mWidthMultiplier, bounds);
           lightning->create();
-          
+
           mChildren.push_back(lightning);
         }
       }
@@ -232,7 +232,7 @@ namespace SkyX { namespace VClouds
     {
       mTime += timeSinceLastFrame*mTimeMultipliers.z;
 
-       if (mTime > 3) 
+       if (mTime > 3)
        {
          mTime = 3; // Prevent big changes
          mFinished = true;
@@ -252,7 +252,7 @@ namespace SkyX { namespace VClouds
     mBillboardSet->setRenderQueueGroup(rqg);
 
     for(Ogre::uint32 k = 0; k < mChildren.size(); k++)
-    {  
+    {
       mChildren.at(k)->_updateRenderQueueGroup(rqg);
     }
   }

@@ -24,6 +24,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_VClouds_H_
 #define _SkyX_VClouds_VClouds_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
 #include "VClouds/DataManager.h"
@@ -45,7 +46,8 @@ namespace SkyX
             @param vc VClouds render queue group
             @param vcl VClouds lightnings render queue group
             */
-          inline RenderQueueGroups(const Ogre::uint8& vc, const Ogre::uint8& vcl)
+          inline RenderQueueGroups(const Ogre::uint8& vc,
+                                   const Ogre::uint8& vcl)
             : vclouds(vc), vcloudsLightnings(vcl)
           {
           }
@@ -58,9 +60,10 @@ namespace SkyX
 
         /** Geometry settings
         */
-        struct GeometrySettings 
+        struct GeometrySettings
         {
-          /// Height: x = Altitude over the camera, y: Field height (both in world coordinates)
+          /// Height: x = Altitude over the camera, y: Field height (both in
+          //world coordinates)
           Ogre::Vector2 Height;
           /// Angles
           Ogre::Radian Alpha, Beta;
@@ -74,7 +77,7 @@ namespace SkyX
           /** Default constructor
           */
           GeometrySettings()
-            : Height(Ogre::Vector2(10,50))
+            : Height(Ogre::Vector2(10, 50))
               , Alpha(Ogre::Degree(12)), Beta(Ogre::Degree(40))
               , Radius(100)
               , NumberOfBlocks(12)
@@ -83,7 +86,8 @@ namespace SkyX
           }
 
           /** Constructor
-            @param _Height x = Cloud field y-coord start, y: Field height (both in world coordinates)
+            @param _Height x = Cloud field y-coord start, y: Field height
+            (both in world coordinates)
             @param _Radius Radius
             @param _Alpha Alpha angle
             @param _Beta Beta angle
@@ -94,7 +98,7 @@ namespace SkyX
             */
           GeometrySettings(const Ogre::Vector2& _Height, const float& _Radius,
               const Ogre::Radian &/*_Alpha = Ogre::Degree(12)*/,
-              const Ogre::Radian& _Beta = Ogre::Degree(40), 
+              const Ogre::Radian& _Beta = Ogre::Degree(40),
               const int &_NumberOfBlocks = 12,
               const int& _Na = 10, const int& _Nb = 8, const int& _Nc = 6)
             : Height(_Height)
@@ -115,20 +119,20 @@ namespace SkyX
             */
             inline CameraData()
               : camera(0)
-                , lastPosition(Ogre::Vector3(0,0,0))
-                , cameraOffset(Ogre::Vector2(0,0))
-                , geometryDisplacement(Ogre::Vector3(0,0,0))
+                , lastPosition(Ogre::Vector3(0, 0, 0))
+                , cameraOffset(Ogre::Vector2(0, 0))
+                , geometryDisplacement(Ogre::Vector3(0, 0, 0))
           {
           }
 
             /** Constructor
               @param c Camera
               */
-            inline CameraData(Ogre::Camera* c)
+            inline explicit CameraData(Ogre::Camera* c)
               : camera(c)
                 , lastPosition(c->getDerivedPosition())
-                , cameraOffset(Ogre::Vector2(0,0))
-                , geometryDisplacement(Ogre::Vector3(0,0,0))
+                , cameraOffset(Ogre::Vector2(0, 0))
+                , geometryDisplacement(Ogre::Vector3(0, 0, 0))
           {
           }
 
@@ -143,7 +147,7 @@ namespace SkyX
         };
 
         /** Simple constructor
-          @param sm Scene manager 
+          @param sm Scene manager
           */
         VClouds(Ogre::SceneManager *sm);
 
@@ -161,7 +165,8 @@ namespace SkyX
         void create(const GeometrySettings& gs);
 
         /** Create
-          @param Height x = Cloud field y-coord start, y: Field height (both in world coordinates)
+          @param Height x = Cloud field y-coord start, y: Field height (both
+          in world coordinates)
           @param Radius Radius
           */
         void create(const Ogre::Vector2& Height, const float& Radius);
@@ -179,19 +184,22 @@ namespace SkyX
           @param c Rendering camera
           @param timeSinceLastCameraFrame Time since last CAMERA frame
           */
-        void notifyCameraRender(Ogre::Camera* c, const Ogre::Real& timeSinceLastCameraFrame);
+        void notifyCameraRender(Ogre::Camera* c,
+            const Ogre::Real& timeSinceLastCameraFrame);
 
         /** Register camera
           @param c Camera
-          @remarks If a rendering camera is used(in notifyCameraRender(...)) without having registered it before,
-          all will work as expected but a warning will be logged since the user should manually unregister 
+          @remarks If a rendering camera is used(in notifyCameraRender(...))
+          without having registered it before, all will work as expected but
+          a warning will be logged since the user should manually unregister
           the camera one time it'll be remove
           */
         void registerCamera(Ogre::Camera* c);
 
         /** Unregister camera
           @param c Camera
-          @remarks After having used a camera (i.e. before removing the camera), the user should manually unregister it
+          @remarks After having used a camera (i.e. before removing the
+          camera), the user should manually unregister it
           */
         void unregisterCamera(Ogre::Camera* c);
 
@@ -222,26 +230,31 @@ namespace SkyX
 
         /** Set distance falling params
           @param DistanceFallingParams
-          DistanceFallingParams.x = Distance falling factor (How much the cloud field geometry falls with the distance)
-          Remember that the geometry falling is relative to the distance(height) between the camera
-          and the cloud field. Typical range is [0, ~2] 0 = no falling
-          DistanceFallingParams.y = Max falling (in world coords), useful when , i.e., you've water and you want to go in. 
-          That param will allow you to avoid the cloud field geometry falls into the ocean. 
-          -1 means not max falling. (default)
+          DistanceFallingParams.x = Distance falling factor (How much the
+          cloud field geometry falls with the distance) Remember that the
+          geometry falling is relative to the distance(height) between the
+          camera and the cloud field. Typical range is [0, ~2] 0 = no
+          falling DistanceFallingParams.y = Max falling (in world coords),
+          useful when , i.e., you've water and you want to go in.  That
+          param will allow you to avoid the cloud field geometry falls into
+          the ocean.  -1 means not max falling. (default)
           @remarks See GoemetryBlock::_setVertexData(...) for more info
           */
-        inline void setDistanceFallingParams(const Ogre::Vector2& DistanceFallingParams)
+        inline void setDistanceFallingParams(
+            const Ogre::Vector2& DistanceFallingParams)
         {
           mDistanceFallingParams = DistanceFallingParams;
         }
 
         /** Get distance falling params
-          @return DistanceFallingParams.x = Distance falling factor (How much the cloud field geometry falls with the distance)
-          Remember that the geometry falling is relative to the distance(height) between the camera
-          and the cloud field.
-          Typical range is [0, ~2] 0 = no falling
-          DistanceFallingParams.y = Max falling (in world coords), useful when , i.e., you've water and you want to go in. 
-          That param will allow you to avoid the cloud field geometry falls into the ocean. 
+          @return DistanceFallingParams.x = Distance falling factor (How
+          much the cloud field geometry falls with the distance) Remember
+          that the geometry falling is relative to the distance(height)
+          between the camera and the cloud field.  Typical range is [0, ~2]
+          0 = no falling DistanceFallingParams.y = Max falling (in world
+          coords), useful when , i.e., you've water and you want to go in.
+          That param will allow you to avoid the cloud field geometry falls
+          into the ocean.
           -1 means not max falling. (default)
           @remarks See GoemetryBlock::_setVertexData(...) for more info
           */
@@ -284,7 +297,8 @@ namespace SkyX
           */
         inline const Ogre::Vector2 getWindDirectionV2() const
         {
-          return Ogre::Vector2(Ogre::Math::Cos(mWindDirection), Ogre::Math::Sin(mWindDirection));
+          return Ogre::Vector2(Ogre::Math::Cos(mWindDirection),
+                               Ogre::Math::Sin(mWindDirection));
         }
 
         /** Set wind speed
@@ -424,17 +438,24 @@ namespace SkyX
         }
 
         /** Set wheater parameters
-          Use this funtion to update the cloud field parameters, you'll get a smart and smooth transition from your old 
+          Use this funtion to update the cloud field parameters, you'll get
+          a smart and smooth transition from your old
           setting to your new ones.
-          @param Humidity Humidity, in other words: the percentage of clouds in [0,1] range.
-          @param AverageCloudsSize Average clouds size, for example: if previous wheater clouds size parameter was very different from new one(i.e: more little)
-          only the old biggest clouds are going to be keept and the little ones are going to be replaced
-          @param DelayedResponse false to change wheather conditions over several updates, true to change it at the moment
+          @param Humidity Humidity, in other words: the percentage of clouds
+          in [0,1] range.
+          @param AverageCloudsSize Average clouds size, for example: if
+          previous wheater clouds size parameter was very different from new
+          one(i.e: more little) only the old biggest clouds are going to be
+          keept and the little ones are going to be replaced
+          @param DelayedResponse false to change wheather conditions over
+          several updates, true to change it at the moment
           */
-        void setWheater(const float& Humidity, const float& AverageCloudsSize, const bool& DelayedResponse);
+        void setWheater(const float& Humidity, const float& AverageCloudsSize,
+                        const bool& DelayedResponse);
 
         /** Get wheater
-          @return Wheater parameters: x = Humidity, y = Average clouds size, both un [0,1] range
+          @return Wheater parameters: x = Humidity, y = Average clouds size,
+          both un [0,1] range
           */
         inline const Ogre::Vector2& getWheater() const
         {

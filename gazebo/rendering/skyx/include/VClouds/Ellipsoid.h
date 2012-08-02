@@ -52,12 +52,12 @@ namespace SkyX
           @param z z Coord (position)
           @param Density Cloud density
           */
-        Ellipsoid(const int& a, const int& b, const int& c, 
+        Ellipsoid(const int& a, const int& b, const int& c,
             const int& nx, const int& ny, const int& nz,
-            const int& x, const int& y, const int& z, 
+            const int& x, const int& y, const int& z,
             const Ogre::Real& DynLibManager = 1.0f);
 
-        /** Destructor 
+        /** Destructor
         */
         ~Ellipsoid();
 
@@ -71,10 +71,11 @@ namespace SkyX
         /** Get probabilities at a point
           @param x x Coord
           @param y y Coord
-          @param z z Coord 
+          @param z z Coord
           @return Probabilities (Hum, Ext, Act)
           */
-        const Ogre::Vector3 getProbabilities(const int& x, const int& y, const int& z) const;
+        const Ogre::Vector3 getProbabilities(const int& x, const int& y,
+                                             const int& z) const;
 
         /** Update probabilities
           @param c Cells

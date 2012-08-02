@@ -576,8 +576,8 @@ namespace SkyX
     bool DataManager::_fact(Cell ***c, const int& nx, const int& ny,
         const int& nz, const int& x, const int& y, const int& z) const
     {
-      bool i1m, j1m, k1m, 
-           i1r, j1r, k1r, 
+      bool i1m, j1m, k1m,
+           i1r, j1r, k1r,
            i2r, i2m, j2r, j2m, k2r;
 
       i1m = ((x+1)>=nx) ? c[0][y][z].act : c[x+1][y][z].act;
@@ -602,10 +602,10 @@ namespace SkyX
     float DataManager::_getDensityAt(Cell ***c, const int& nx,
         const int& ny, const int& nz, const int& x, const int& y, const int& z,
         const int& r, const float& strength) const
-    {    
+    {
       int zr = ((z-r)<0) ? 0 : z-r,
           zm = ((z+r)>=nz) ? nz : z+r,
-          u, uu, v, vv, w, 
+          u, uu, v, vv, w,
           clouds = 0, div = 0;
 
       for (u = x-r; u <= x+r; u++)
@@ -636,11 +636,11 @@ namespace SkyX
     void DataManager::_createVolTexture(const VolTextureId& TexId,
         const int& nx, const int& ny, const int& nz)
     {
-      mVolTextures[static_cast<int>(TexId)] 
+      mVolTextures[static_cast<int>(TexId)]
         = Ogre::TextureManager::getSingleton().
         createManual("_SkyX_VolCloudsData"+
             Ogre::StringConverter::toString(TexId),
-            SKYX_RESOURCE_GROUP, 
+            SKYX_RESOURCE_GROUP,
             Ogre::TEX_TYPE_3D,
             nx, ny, nz, 0,
             Ogre::PF_BYTE_RGB);
@@ -676,7 +676,7 @@ namespace SkyX
       Ogre::uint32 *pbptr = static_cast<Ogre::uint32*>(pb.data);
       size_t x, y, z;
 
-      for (z=pb.front; z<pb.back; z++) 
+      for (z=pb.front; z<pb.back; z++)
       {
         for (y=pb.top; y<pb.bottom; y++)
         {
@@ -684,7 +684,7 @@ namespace SkyX
           {
             Ogre::PixelUtil::packColour(c[x][y][z].dens/* TODO!!!! */,
                 c[x][y][z].light, 0, 0, pb.format, &pbptr[x]);
-          } 
+          }
           pbptr += pb.rowPitch;
         }
         pbptr += pb.getSliceSkip();

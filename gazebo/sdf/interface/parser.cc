@@ -332,7 +332,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   {
     if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
     {
-      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n"; 
+      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
       Converter::Convert(gazeboNode, SDF_VERSION);
     }
 
@@ -377,7 +377,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   {
     if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
     {
-      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n"; 
+      gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
       Converter::Convert(gazeboNode, SDF_VERSION);
     }
 

@@ -24,6 +24,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_DataManager_H_
 #define _SkyX_VClouds_DataManager_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
 #include "VClouds/FastFakeRandom.h"
@@ -35,7 +36,7 @@ namespace SkyX
     class VClouds;
     class Ellipsoid;
 
-    class DllExport DataManager 
+    class DllExport DataManager
     {
       public:
         /** Cell struct
@@ -125,7 +126,7 @@ namespace SkyX
 
         /** Set wheater parameters
           Use this funtion to update the cloud field parameters, you'll get
-          a smart and smooth transition from your old 
+          a smart and smooth transition from your old
           setting to your new ones.
           @param Humidity Humidity, in other words: the percentage of clouds
           in [0,1] range.
@@ -140,7 +141,7 @@ namespace SkyX
             const bool& delayedResponse = true);
 
         /** Add ellipsoid: clouds are modelled as ellipsoids in our
-          simulation approach, so.. different kind of clouds 
+          simulation approach, so.. different kind of clouds
           can be modelled with ellipsoids compositions.
           @param e Ellipsoid
           @param UpdateProbabilities Update probabilities?
@@ -215,10 +216,10 @@ namespace SkyX
           @param nz Z size
           @param x x Coord
           @param y y Coord
-          @param z z Coord 
+          @param z z Coord
           @param r Radius
           @param sgtrength Strength
-          */	
+          */
         float _getDensityAt(Cell ***c, const int& nx, const int& ny,
                             const int& nz, const int& x, const int& y,
                             const int& z, const int& r,
@@ -228,8 +229,8 @@ namespace SkyX
           @param c Cells data
           @param x x Coord
           @param y y Coord
-          @param z z Coord 
-          */	
+          @param z z Coord
+          */
         float _getDensityAt(Cell ***c, const int& x, const int& y,
                             const int& z) const;
 
@@ -240,7 +241,7 @@ namespace SkyX
           @param nz Z size
           @param x x Coord
           @param y y Coord
-          @param z z Coord 
+          @param z z Coord
           */
         bool _fact(Cell ***c, const int& nx, const int& ny, const int& nz,
                    const int& x, const int& y, const int& z) const;
@@ -273,7 +274,7 @@ namespace SkyX
           @param nz Z size
           @param x x Coord
           @param y y Coord
-          @param z z Coord 
+          @param z z Coord
           @param d Light direction
           @param att Attenuation factor
           */

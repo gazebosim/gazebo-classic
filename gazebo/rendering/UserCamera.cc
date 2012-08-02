@@ -152,7 +152,6 @@ void UserCamera::Init()
   this->axisNode->attachObject(x);
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
-
 }
 
 //////////////////////////////////////////////////
@@ -216,8 +215,8 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
       this->selectionBuffer->Update();
 
     // DEBUG: this->selectionBuffer->ShowOverlay(true);
-    //Ogre::Entity *entity =
-    //this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
+    // Ogre::Entity *entity =
+    // this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
 
     this->viewController->HandleMouseEvent(_evt);
   }

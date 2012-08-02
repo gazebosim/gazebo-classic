@@ -12,9 +12,9 @@
 #############################################################
 
 if(WIN32 OR APPLE)
-	set(SKYX_CMAKE_DIR "CMake")
+  set(SKYX_CMAKE_DIR "CMake")
 else()
-	set(SKYX_CMAKE_DIR "${SKYX_LIB_DIRECTORY}/SKYX/cmake")
+  set(SKYX_CMAKE_DIR "${SKYX_LIB_DIRECTORY}/SKYX/cmake")
 endif()
 
 set(INST_FILES
@@ -22,7 +22,7 @@ set(INST_FILES
   Utils/SkyXConfigTargets.cmake
   Utils/SkyXGetVersion.cmake
   Utils/SkyXMacroLogFeature.cmake
-) 
+)
 
 if (WIN32)
   set(INST_FILES ${INST_FILES}

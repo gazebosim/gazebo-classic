@@ -29,8 +29,8 @@ namespace SkyX
   {
 
     Ellipsoid::Ellipsoid(
-        const int &a, const int &b, const int &c, 
-        const int &nx, const int &ny, const int &nz, 
+        const int &a, const int &b, const int &c,
+        const int &nx, const int &ny, const int &nz,
         const int &x, const int &y, const int &z,
         const Ogre::Real& Density)
       : mA(a), mB(b), mC(c),
@@ -53,7 +53,7 @@ namespace SkyX
       //  x^2   y^2   z^2
       //  /   + /   + /    = 1  (Ellipsoid ecuation)
       //  a^2   b^2   c^2
-      // 
+      //
       //  maxradatdir = lambda (Xo, Yo, Zo) = lambda; where Xo, Yo and Zo are the components of the normaliced direction vector
       //
       //  => lambda^2 = 1 / ( EllipsoidEcuation...)
@@ -63,7 +63,7 @@ namespace SkyX
       Ogre::Vector3 Direction = Ogre::Vector3(x-mX, y-mY, z-mZ),
       DirectionNormalized = Direction.normalisedCopy();
 
-      Ogre::Real a = Ogre::Math::Pow(DirectionNormalized.x, 2) / mA2 + 
+      Ogre::Real a = Ogre::Math::Pow(DirectionNormalized.x, 2) / mA2 +
         Ogre::Math::Pow(DirectionNormalized.y, 2) / mB2 +
         Ogre::Math::Pow(DirectionNormalized.z, 2) / mC2,
 
@@ -134,12 +134,12 @@ namespace SkyX
 
     void Ellipsoid::setDimensions(const Ogre::Vector3& Dimensions)
     {
-      mA = Dimensions.x; 
-      mB = Dimensions.y; 
+      mA = Dimensions.x;
+      mB = Dimensions.y;
       mC = Dimensions.z;
 
-      mA2 = Ogre::Math::Pow(mA, 2); 
-      mB2 = Ogre::Math::Pow(mB, 2); 
+      mA2 = Ogre::Math::Pow(mA, 2);
+      mB2 = Ogre::Math::Pow(mB, 2);
       mC2 = Ogre::Math::Pow(mC, 2);
     }
   }

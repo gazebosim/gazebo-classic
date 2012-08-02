@@ -156,7 +156,7 @@ namespace sdf
     public: std::string GetDescription() const;
 
     /// \brief Set a text description for the element
-    public: void SetDescription(const std::string _desc);
+    public: void SetDescription(const std::string &_desc);
 
     /// \brief Add a new element description
     public: void AddElementDescription(ElementPtr _elem);
