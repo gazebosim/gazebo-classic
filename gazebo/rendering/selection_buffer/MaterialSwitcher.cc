@@ -36,8 +36,8 @@ MaterialSwitcher::~MaterialSwitcher()
 
 /////////////////////////////////////////////////
 Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
-    unsigned short /*_schemeIndex*/, const Ogre::String & /*_schemeName*/,
-    Ogre::Material * /*_originalMaterial*/, unsigned short /*_lodIndex*/,
+    uint16_t /*_schemeIndex*/, const Ogre::String & /*_schemeName*/,
+    Ogre::Material * /*_originalMaterial*/, uint16_t /*_lodIndex*/,
     const Ogre::Renderable *_rend)
 {
   if (_rend)
@@ -79,6 +79,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
         this->lastEntity = subEntity->getParent()->getName();
         this->colorDict[this->currentColor.GetAsRGBA()] = this->lastEntity;
       }
+
       return this->lastTechnique;
     }
     // else
@@ -115,7 +116,6 @@ void MaterialSwitcher::GetNextColor()
 void MaterialSwitcher::Reset()
 {
   this->currentColor = common::Color(0.0, 0.0, 0.1);
-
   this->lastEntity.clear();
   this->colorDict.clear();
 }

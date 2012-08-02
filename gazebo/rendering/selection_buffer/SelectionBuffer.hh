@@ -17,6 +17,8 @@
 #ifndef _SELECTIONBUFFER_HH_
 #define _SELECTIONBUFFER_HH_
 
+#include <string>
+
 namespace Ogre
 {
   class SceneManager;
@@ -34,16 +36,16 @@ namespace gazebo
     class MaterialSwitcher;
     class SelectionRenderListener;
     class Scene;
-    
+
     class SelectionBuffer
     {
       /// \brief Constructor
-      public: SelectionBuffer(const std::string _cameraName,
+      public: SelectionBuffer(const std::string &_cameraName,
                   Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget);
 
       /// \brief Destructor
       public: ~SelectionBuffer();
-      
+
       /// \brief Handle on mouse click
       public: Ogre::Entity *OnSelectionClick(int _x, int _y);
 
@@ -54,12 +56,13 @@ namespace gazebo
       public: void Update();
 
       private: void CreateRTTOverlays();
+
       private: void UpdateBufferSize();
-      
+
       // This is the material listener - Note: it is controlled by a separate
       // RenderTargetListener, not applied globally to all targets
       private: MaterialSwitcher *materialSwitchListener;
-      
+
       private: SelectionRenderListener *selectionTargetListener;
 
       private: Ogre::SceneManager *sceneMgr;
@@ -70,9 +73,7 @@ namespace gazebo
       private: uint8_t *buffer;
       private: Ogre::PixelBox *pixelBox;
       private: Ogre::Overlay *selectionDebugOverlay;
-      
     };
   }
 }
-
 #endif

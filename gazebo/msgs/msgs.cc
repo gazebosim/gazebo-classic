@@ -410,7 +410,8 @@ namespace gazebo
       // Load the geometry
       if (_sdf->HasElement("geometry"))
       {
-        sdf::ElementPtr geomElem = _sdf->GetElement("geometry")->GetFirstElement();
+        sdf::ElementPtr geomElem =
+          _sdf->GetElement("geometry")->GetFirstElement();
         if (!geomElem)
           gzthrow("Invalid geometry element");
 
@@ -513,9 +514,11 @@ namespace gazebo
             matMsg->set_shader_type(msgs::Material::PIXEL);
           else if (shaderElem->GetValueString("type") == "vertex")
             matMsg->set_shader_type(msgs::Material::VERTEX);
-          else if (shaderElem->GetValueString("type") == "normal_map_object_space")
+          else if (shaderElem->GetValueString("type") ==
+              "normal_map_object_space")
             matMsg->set_shader_type(msgs::Material::NORMAL_MAP_OBJECT_SPACE);
-          else if (shaderElem->GetValueString("type") == "normal_map_tangent_space")
+          else if (shaderElem->GetValueString("type") ==
+              "normal_map_tangent_space")
             matMsg->set_shader_type(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
           else
             gzthrow(std::string("Unknown shader type[") +

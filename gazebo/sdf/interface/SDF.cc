@@ -1117,7 +1117,7 @@ std::string Element::GetDescription() const
 }
 
 /////////////////////////////////////////////////
-void Element::SetDescription(const std::string _desc)
+void Element::SetDescription(const std::string &_desc)
 {
   this->description = _desc;
 }
@@ -1162,7 +1162,6 @@ void SDF::Write(const std::string &_filename)
 /////////////////////////////////////////////////
 std::string SDF::ToString() const
 {
-  std::string result;
   std::ostringstream stream;
 
   if (this->root->GetName() != "gazebo")

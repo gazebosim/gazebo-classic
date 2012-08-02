@@ -359,7 +359,7 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
 
-    // This is needed by the Ogre::Terrain System. 
+    // This is needed by the Ogre::Terrain System.
     // We should spend some tim fixing Ogre::Terrain so that GLSL is
     // supported.
     plugins.push_back(path+"/Plugin_CgProgramManager.so");

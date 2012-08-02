@@ -24,13 +24,14 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_GPUManager_H_
 #define _SkyX_GPUManager_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
 namespace SkyX
 {
-	class SkyX;
+  class SkyX;
 
-  class DllExport GPUManager 
+  class DllExport GPUManager
   {
     public:
       /** Gpu program enum
@@ -48,7 +49,7 @@ namespace SkyX
         */
       GPUManager(SkyX *s);
 
-      /** Destructor 
+      /** Destructor
       */
       ~GPUManager();
 
@@ -90,7 +91,7 @@ namespace SkyX
         */
       void setGpuProgramParameter(const GpuProgram &GpuP,
           const Ogre::String &Name, const Ogre::Vector2 &Value,
-          const bool& UpdateGroundPasses = true); 
+          const bool& UpdateGroundPasses = true);
 
       /** Set gpu program Ogre::Vector3 parameter
         @param GpuP Gpu program type (Vertex/Fragment)
@@ -100,7 +101,7 @@ namespace SkyX
         */
       void setGpuProgramParameter(const GpuProgram &GpuP,
           const Ogre::String &Name, const Ogre::Vector3 &Value,
-          const bool& UpdateGroundPasses = true); 
+          const bool& UpdateGroundPasses = true);
 
       /** Get skydome material name
         @return Skydome material name

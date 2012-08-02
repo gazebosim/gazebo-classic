@@ -51,7 +51,7 @@ TEST_F(Pioneer2dx, StraightLine)
 
   while (currTime - startTime < common::Time(100, 0))
   {
-    //nanosleep(&interval, &remainder);
+    // nanosleep(&interval, &remainder);
     common::Time::MSleep(100);
     currTime = this->simTime;
   }

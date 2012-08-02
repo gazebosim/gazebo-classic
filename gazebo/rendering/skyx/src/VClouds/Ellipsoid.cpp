@@ -27,10 +27,9 @@ namespace SkyX
 {
   namespace VClouds
   {
-
     Ellipsoid::Ellipsoid(
-        const int &a, const int &b, const int &c, 
-        const int &nx, const int &ny, const int &nz, 
+        const int &a, const int &b, const int &c,
+        const int &nx, const int &ny, const int &nz,
         const int &x, const int &y, const int &z,
         const Ogre::Real& Density)
       : mA(a), mB(b), mC(c),
@@ -53,8 +52,10 @@ namespace SkyX
       //  x^2   y^2   z^2
       //  /   + /   + /    = 1  (Ellipsoid ecuation)
       //  a^2   b^2   c^2
-      // 
-      //  maxradatdir = lambda (Xo, Yo, Zo) = lambda; where Xo, Yo and Zo are the components of the normaliced direction vector
+      //
+      //  maxradatdir = lambda (Xo, Yo, Zo) = lambda;
+      //  where Xo, Yo and Zo are the components of the normaliced
+      //  direction vector
       //
       //  => lambda^2 = 1 / ( EllipsoidEcuation...)
       //
@@ -63,7 +64,7 @@ namespace SkyX
       Ogre::Vector3 Direction = Ogre::Vector3(x-mX, y-mY, z-mZ),
       DirectionNormalized = Direction.normalisedCopy();
 
-      Ogre::Real a = Ogre::Math::Pow(DirectionNormalized.x, 2) / mA2 + 
+      Ogre::Real a = Ogre::Math::Pow(DirectionNormalized.x, 2) / mA2 +
         Ogre::Math::Pow(DirectionNormalized.y, 2) / mB2 +
         Ogre::Math::Pow(DirectionNormalized.z, 2) / mC2,
 
@@ -72,9 +73,10 @@ namespace SkyX
       return Ogre::Math::Clamp<Ogre::Real>(Direction.length() / lambda, 0, 1);
     }
 
-    const Ogre::Vector3 Ellipsoid::getProbabilities(const int& x, const int& y, const int& z) const
+    const Ogre::Vector3 Ellipsoid::getProbabilities(const int& x,
+        const int& y, const int& z) const
     {
-      float density = Ogre::Math::Pow(1-_getLength(x, y, z), 1.0f/mDensity);
+      float density = Ogre::Math::Pow(1-_getLength(x, y, z), 1.0f/ mDensity);
 
       return Ogre::Vector3(density, 1-density, density);
     }
@@ -88,11 +90,19 @@ namespace SkyX
 
       for (u = mX-mA; u < mX+mA; u++)
       {
-        uu = (u<0) ? (u + nx) : u; if (u>=nx) { uu-= nx; }
+        uu = (u < 0) ? (u + nx) : u;
+        if (u >= nx)
+        {
+          uu-= nx;
+        }
 
         for (v = mY-mB; v < mY+mB; v++)
         {
-          vv = (v<0) ? (v + ny) : v; if (v>=ny) { vv-= ny; }
+          vv = (v < 0) ? (v + ny) : v;
+          if (v >= ny)
+          {
+            vv-= ny;
+          }
 
           for (w = mZ-mC; w < mZ+mC; w++)
           {
@@ -107,7 +117,7 @@ namespace SkyX
               if (!delayedResponse)
               {
                 c[uu][vv][w].cld =
-                  Ogre::Math::RangeRandom(0,1) > length ? true : false;
+                  Ogre::Math::RangeRandom(0, 1) > length ? true : false;
               }
             }
           }
@@ -117,7 +127,9 @@ namespace SkyX
 
     void Ellipsoid::move(const int& Ax, const int& Ay, const int& Az)
     {
-      mX += Ax; mY += Ay; mZ += Az;
+      mX += Ax;
+      mY += Ay;
+      mZ += Az;
     }
 
     bool Ellipsoid::isOutOfCells() const
@@ -134,12 +146,12 @@ namespace SkyX
 
     void Ellipsoid::setDimensions(const Ogre::Vector3& Dimensions)
     {
-      mA = Dimensions.x; 
-      mB = Dimensions.y; 
+      mA = Dimensions.x;
+      mB = Dimensions.y;
       mC = Dimensions.z;
 
-      mA2 = Ogre::Math::Pow(mA, 2); 
-      mB2 = Ogre::Math::Pow(mB, 2); 
+      mA2 = Ogre::Math::Pow(mA, 2);
+      mB2 = Ogre::Math::Pow(mB, 2);
       mC2 = Ogre::Math::Pow(mC, 2);
     }
   }

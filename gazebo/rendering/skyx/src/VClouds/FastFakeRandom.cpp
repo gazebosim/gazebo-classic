@@ -44,9 +44,13 @@ namespace SkyX
       delete [] mData;
     }
 
-    float& FastFakeRandom::get() 
+    float& FastFakeRandom::get()
     {
-      mIndex ++; if (mIndex >= mCapacity) {mIndex = 0;}
+      mIndex++;
+      if (mIndex >= mCapacity)
+      {
+        mIndex = 0;
+      }
 
       return mData[mIndex];
     }

@@ -205,7 +205,7 @@ namespace gazebo
 
       /// \brief Allow the model the auto disable. This is ignored if the
       /// model has joints.
-      /// \param _disable If true, the model is allowed to auto disable. 
+      /// \param _disable If true, the model is allowed to auto disable.
       public: void SetAutoDisable(bool _disable);
 
       protected: virtual void OnPoseChange();

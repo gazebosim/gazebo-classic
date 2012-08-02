@@ -24,7 +24,7 @@
 using namespace sdf;
 
 /////////////////////////////////////////////////
-bool Converter::Convert(TiXmlElement *_elem, const std::string _toVersion)
+bool Converter::Convert(TiXmlElement *_elem, const std::string &_toVersion)
 {
   if (!_elem->Attribute("version"))
   {
@@ -33,15 +33,13 @@ bool Converter::Convert(TiXmlElement *_elem, const std::string _toVersion)
   }
   std::string origVersion = _elem->Attribute("version");
 
-  //std::cout << gzclr_start(33) <<
   std::cout << gzclr_start(33)
-            << "  Version[" << origVersion << "] to Version[" << _toVersion 
+            << "  Version[" << origVersion << "] to Version[" << _toVersion
             << "]\n"
             << "  Please use the gzsdf tool to update your SDF files.\n"
             << "    $ gzsdf print [sdf_file] >> [new_sdf_file]\n"
             << gzclr_end;
 
-      
   _elem->SetAttribute("version", _toVersion);
 
   boost::replace_all(origVersion, ".", "_");
@@ -126,7 +124,6 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 const char *Converter::GetValue(const char *_valueElem, const char *_valueAttr,
                                 TiXmlElement *_elem)
 {
-
   if (_valueElem)
   {
     // Check to see if the element that is being converted has the value

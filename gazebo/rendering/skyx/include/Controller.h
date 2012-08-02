@@ -28,56 +28,58 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX
 {
-	/** Controller base class
-	 */
-    class Controller 
-	{
-	public:
-	    /** Constructor
-		    @param deleteBySkyX true to automatically destroy the controller by SkyX, false otherwise
-		 */
-		inline Controller(const bool& deleteBySkyX)
-			: mDeleteBySkyX(deleteBySkyX)
-		{
-		}
+  /** Controller base class
+   */
+    class Controller
+  {
+  public:
+      /** Constructor
+        @param deleteBySkyX true to automatically destroy the controller by
+        SkyX, false otherwise
+     */
+    inline explicit Controller(const bool& deleteBySkyX)
+      : mDeleteBySkyX(deleteBySkyX)
+    {
+    }
 
-		/** Destructor
-		 */
-		inline virtual ~Controller(){}
+    /** Destructor
+     */
+    inline virtual ~Controller() {}
 
-		/** Update controller
-		    @param simDeltaTime Simulation delta time (It's not the time since last frame, it's the delta simulation time, one
-								time the time since last frame has been multiplied by the time multiplier)
-		 */
-		inline virtual void update(const Ogre::Real &/*simDeltaTime*/){}
+    /** Update controller
+        @param simDeltaTime Simulation delta time (It's not the time since
+        last frame, it's the delta simulation time, one time the time since
+        last frame has been multiplied by the time multiplier)
+     */
+    inline virtual void update(const Ogre::Real &/*simDeltaTime*/) {}
 
-		/** Get sun direction
-		    @return Sun direction, the Earth-to-Sun direction
-		 */
-		virtual Ogre::Vector3 getSunDirection() = 0;
+    /** Get sun direction
+        @return Sun direction, the Earth-to-Sun direction
+     */
+    virtual Ogre::Vector3 getSunDirection() = 0;
 
-		/** Get moon direction
-		    @return Moon direction, Earth-to-Moon direction
-		 */
-		virtual Ogre::Vector3 getMoonDirection() = 0;
+    /** Get moon direction
+        @return Moon direction, Earth-to-Moon direction
+     */
+    virtual Ogre::Vector3 getMoonDirection() = 0;
 
-		/** Get moon phase
-		    @return Moon phase in [-1,1] range, where -1 means fully covered Moon, 0 clear Moon and 1 fully covered Moon
-		 */
-		virtual Ogre::Real getMoonPhase() = 0;
+    /** Get moon phase
+        @return Moon phase in [-1,1] range, where -1 means fully covered Moon, 0 clear Moon and 1 fully covered Moon
+     */
+    virtual Ogre::Real getMoonPhase() = 0;
 
-		/** Must the controller be destroyed by SkyX?
-		    @return true if yes, false if not
-		 */
-		inline const bool& getDeleteBySkyX() const
-		{
-			return mDeleteBySkyX;
-		}
+    /** Must the controller be destroyed by SkyX?
+        @return true if yes, false if not
+     */
+    inline const bool& getDeleteBySkyX() const
+    {
+      return mDeleteBySkyX;
+    }
 
-	private:
-		/// Must the controller be destroyed by SkyX?
-		bool mDeleteBySkyX;
-	};
+  private:
+    /// Must the controller be destroyed by SkyX?
+    bool mDeleteBySkyX;
+  };
 }
 
 #endif

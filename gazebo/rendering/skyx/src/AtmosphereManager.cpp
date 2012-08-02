@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <algorithm>
 
 #include "SkyX.h"
 #include "GPUManager.h"
@@ -45,7 +46,7 @@ namespace SkyX
   {
     GPUManager *mGPUManager = mSkyX->getGPUManager();
 
-    if (!gazebo::math::equal(NewOptions.InnerRadius, mOptions.InnerRadius) || 
+    if (!gazebo::math::equal(NewOptions.InnerRadius, mOptions.InnerRadius) ||
         !gazebo::math::equal(NewOptions.OuterRadius, mOptions.OuterRadius) ||
         ForceToUpdateAll)
     {
@@ -59,11 +60,16 @@ namespace SkyX
       mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
           "uInnerRadius", mOptions.InnerRadius);
       mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
-          "uCameraPos", Ogre::Vector3(0, 0, mOptions.InnerRadius + (mOptions.OuterRadius-mOptions.InnerRadius)*mOptions.HeightPosition));
+          "uCameraPos", Ogre::Vector3(0, 0, mOptions.InnerRadius +
+            (mOptions.OuterRadius-mOptions.InnerRadius) *
+            mOptions.HeightPosition));
 
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uScale", Scale);
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uScaleDepth", ScaleDepth);
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uScaleOverScaleDepth", ScaleOverScaleDepth);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uScale", Scale);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uScaleDepth", ScaleDepth);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uScaleOverScaleDepth", ScaleOverScaleDepth);
     }
 
     if (!gazebo::math::equal(NewOptions.HeightPosition, mOptions.HeightPosition)
@@ -103,8 +109,10 @@ namespace SkyX
       float Km4PI  = mOptions.MieMultiplier * 4.0f * Ogre::Math::PI,
             KmESun = mOptions.MieMultiplier * mOptions.SunIntensity;
 
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uKm4PI", Km4PI);
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uKmESun", KmESun, false);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uKm4PI", Km4PI);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uKmESun", KmESun, false);
     }
 
     if (NewOptions.NumberOfSamples != mOptions.NumberOfSamples ||
@@ -112,8 +120,10 @@ namespace SkyX
     {
       mOptions.NumberOfSamples = NewOptions.NumberOfSamples;
 
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uNumberOfSamples", mOptions.NumberOfSamples);
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uSamples", static_cast<Ogre::Real>(mOptions.NumberOfSamples));
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uNumberOfSamples", mOptions.NumberOfSamples);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uSamples", static_cast<Ogre::Real>(mOptions.NumberOfSamples));
     }
 
     if (NewOptions.WaveLength != mOptions.WaveLength ||
@@ -121,7 +131,8 @@ namespace SkyX
     {
       mOptions.WaveLength = NewOptions.WaveLength;
 
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uInvWaveLength", 
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+          "uInvWaveLength",
           Ogre::Vector3(
             1.0f / Ogre::Math::Pow(mOptions.WaveLength.x, 4.0f),
             1.0f / Ogre::Math::Pow(mOptions.WaveLength.y, 4.0f),
@@ -138,28 +149,32 @@ namespace SkyX
     }
 
     if ((!gazebo::math::equal(NewOptions.Exposure, mOptions.Exposure) ||
-          ForceToUpdateAll) && 
+          ForceToUpdateAll) &&
         (mSkyX->getLightingMode() == SkyX::LM_LDR))
     {
       mOptions.Exposure = NewOptions.Exposure;
 
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uExposure", mOptions.Exposure);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+          "uExposure", mOptions.Exposure);
     }
 
     mSkyX->getCloudsManager()->update();
   }
 
-  float AtmosphereManager::_scale(const float& cos, const float& uScaleDepth) const
+  float AtmosphereManager::_scale(const float& cos,
+                                  const float& uScaleDepth) const
   {
     float x = 1 - cos;
-    return uScaleDepth * Ogre::Math::Exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));
+    return uScaleDepth * Ogre::Math::Exp(-0.00287 +
+        x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
   }
 
-  const Ogre::Vector3 AtmosphereManager::getColorAt(const Ogre::Vector3& Direction) const
+  const Ogre::Vector3 AtmosphereManager::getColorAt(
+      const Ogre::Vector3& Direction) const
   {
     if (Direction.y < 0)
     {
-      return Ogre::Vector3(0,0,0);
+      return Ogre::Vector3(0, 0, 0);
     }
 
     // Parameters
@@ -175,7 +190,10 @@ namespace SkyX
     Ogre::Vector3
       uLightDir = mSkyX->getController()->getSunDirection(),
                 v3Pos = Direction,
-                uCameraPos = Ogre::Vector3(0, 0, mOptions.InnerRadius + (mOptions.OuterRadius-mOptions.InnerRadius)*mOptions.HeightPosition),
+                uCameraPos = Ogre::Vector3(0, 0,
+                    mOptions.InnerRadius +
+                    (mOptions.OuterRadius - mOptions.InnerRadius) *
+                    mOptions.HeightPosition),
                 uInvWaveLength = Ogre::Vector3(
                     1.0f / Ogre::Math::Pow(mOptions.WaveLength.x, 4.0f),
                     1.0f / Ogre::Math::Pow(mOptions.WaveLength.y, 4.0f),
@@ -187,15 +205,17 @@ namespace SkyX
     double fFar = v3Ray.length();
     v3Ray /= fFar;
 
-    // Calculate the ray's starting position, then calculate its scattering offset
+    // Calculate the ray's starting position, then calculate its scattering
+    // offset
     Ogre::Vector3 v3Start = uCameraPos;
     double fHeight = uCameraPos.z,
            fStartAngle = v3Ray.dotProduct(v3Start) / fHeight,
-           fDepth = Ogre::Math::Exp(ScaleOverScaleDepth * (mOptions.InnerRadius - uCameraPos.z)),
+           fDepth = Ogre::Math::Exp(ScaleOverScaleDepth *
+               (mOptions.InnerRadius - uCameraPos.z)),
            fStartOffset = fDepth * _scale(fStartAngle, ScaleDepth);
 
     // Init loop variables
-    double fSampleLength = fFar /(double)mOptions.NumberOfSamples,
+    double fSampleLength = fFar / static_cast<double>(mOptions.NumberOfSamples),
            fScaledLength = fSampleLength * Scale,
            fHeight_, fDepth_, fLightAngle, fCameraAngle, fScatter;
     Ogre::Vector3 v3SampleRay = v3Ray * fSampleLength,
@@ -206,12 +226,14 @@ namespace SkyX
     for (int i = 0; i < mOptions.NumberOfSamples; i++)
     {
       fHeight_ = v3SamplePoint.length();
-      fDepth_ = Ogre::Math::Exp(ScaleOverScaleDepth * (mOptions.InnerRadius-fHeight_));
+      fDepth_ = Ogre::Math::Exp(ScaleOverScaleDepth *
+          (mOptions.InnerRadius-fHeight_));
 
       fLightAngle = uLightDir.dotProduct(v3SamplePoint) / fHeight_;
       fCameraAngle = v3Ray.dotProduct(v3SamplePoint) / fHeight_;
 
-      fScatter = (fStartOffset + fDepth*(_scale(fLightAngle, ScaleDepth) - _scale(fCameraAngle, ScaleDepth)));
+      fScatter = (fStartOffset + fDepth*(_scale(fLightAngle, ScaleDepth) -
+            _scale(fCameraAngle, ScaleDepth)));
 
       v3Attenuate = Ogre::Vector3(
           Ogre::Math::Exp(-fScatter * (uInvWaveLength.x * Kr4PI + Km4PI)),
@@ -238,17 +260,21 @@ namespace SkyX
            cos2 = cos*cos,
            rayleighPhase = 0.75 * (1.0 + 0.5*cos2),
            g2 = mOptions.G*mOptions.G,
-           miePhase = 1.5f * ((1.0f - g2) / (2.0f + g2)) * 
-             (1.0f + cos2) / Ogre::Math::Pow(1.0f + g2 - 2.0f * mOptions.G * cos, 1.5f);
+           miePhase = 1.5f * ((1.0f - g2) / (2.0f + g2)) *
+             (1.0f + cos2) / Ogre::Math::Pow(1.0f + g2 - 2.0f *
+                                             mOptions.G * cos, 1.5f);
 
     Ogre::Vector3 oColor;
 
     if (mSkyX->getLightingMode() == SkyX::LM_LDR)
     {
       oColor = Ogre::Vector3(
-          1 - Ogre::Math::Exp(-mOptions.Exposure * (rayleighPhase * oRayleighColor.x + miePhase * oMieColor.x)),
-          1 - Ogre::Math::Exp(-mOptions.Exposure * (rayleighPhase * oRayleighColor.y + miePhase * oMieColor.y)),
-          1 - Ogre::Math::Exp(-mOptions.Exposure * (rayleighPhase * oRayleighColor.z + miePhase * oMieColor.z)));
+          1 - Ogre::Math::Exp(-mOptions.Exposure *
+            (rayleighPhase * oRayleighColor.x + miePhase * oMieColor.x)),
+          1 - Ogre::Math::Exp(-mOptions.Exposure *
+            (rayleighPhase * oRayleighColor.y + miePhase * oMieColor.y)),
+          1 - Ogre::Math::Exp(-mOptions.Exposure *
+            (rayleighPhase * oRayleighColor.z + miePhase * oMieColor.z)));
     }
     else
     {
@@ -257,9 +283,10 @@ namespace SkyX
 
     // For night rendering
     oColor += Ogre::Math::Clamp<Ogre::Real>(
-        ((1 - std::max(oColor.x, std::max(oColor.y, oColor.z))*10)), 0, 1) 
+        ((1 - std::max(oColor.x, std::max(oColor.y, oColor.z))*10)), 0, 1)
       * (Ogre::Vector3(0.05, 0.05, 0.1)
-          * (2-0.75f*Ogre::Math::Clamp<Ogre::Real>(-uLightDir.z, 0, 1)) * Ogre::Math::Pow(1-Direction.z, 3));
+          * (2-0.75f*Ogre::Math::Clamp<Ogre::Real>(-uLightDir.z, 0, 1))
+          * Ogre::Math::Pow(1-Direction.z, 3));
 
     // --- End fragment program simulation ---
 

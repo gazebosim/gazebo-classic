@@ -1899,7 +1899,7 @@ void Scene::SetSky()
 
   // Set wind direction in radians
   vclouds->setWindDirection(Ogre::Radian(0.0));
-  vclouds->setAmbientColor(Ogre::Vector3(0.63f, 0.63f, 0.7f));
+  vclouds->setAmbientColor(Ogre::Vector3(0.9, 0.9, 1.0));
 
   // x = sun light power
   // y = sun beta multiplier
@@ -1917,7 +1917,7 @@ void Scene::SetSky()
     {
       // SkyX::MeshManager::getSkydomeRadius(...) works for both finite and
       // infinite(=0) camera far clip distances
-      this->skyx->getVCloudsManager()->create(80.0);
+      this->skyx->getVCloudsManager()->create(120.0);
       // this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
     }
   }
