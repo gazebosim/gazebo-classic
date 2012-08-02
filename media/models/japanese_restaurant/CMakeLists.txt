@@ -10,5 +10,5 @@ __auto_6.jpg
 Wood_Bamboo_Medium_.jpg
 )
 
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models/japanese_restaurant)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/models/japanese_restaurant)
 

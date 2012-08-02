@@ -434,33 +434,33 @@ void RenderEngine::SetupResources()
     archNames.push_back(
         std::make_pair((*iter)+"/", "General"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media", "General"));
+        std::make_pair((*iter)+"/media", "General"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/skyx", "SkyX"));
+        std::make_pair((*iter)+"/media/skyx", "SkyX"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/rtshaderlib", "General"));
+        std::make_pair((*iter)+"/media/rtshaderlib", "General"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/materials/programs", "General"));
+        std::make_pair((*iter)+"/media/materials/programs", "General"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/materials/scripts", "General"));
+        std::make_pair((*iter)+"/media/materials/scripts", "General"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/materials/textures", "General"));
+        std::make_pair((*iter)+"/media/materials/textures", "General"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/models", "General"));
+        std::make_pair((*iter)+"/media/models", "General"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/fonts", "Fonts"));
+        std::make_pair((*iter)+"/media/fonts", "Fonts"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/looknfeel", "LookNFeel"));
+        std::make_pair((*iter)+"/media/gui/looknfeel", "LookNFeel"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/schemes", "Schemes"));
+        std::make_pair((*iter)+"/media/gui/schemes", "Schemes"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/imagesets", "Imagesets"));
+        std::make_pair((*iter)+"/media/gui/imagesets", "Imagesets"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/fonts", "Fonts"));
+        std::make_pair((*iter)+"/media/gui/fonts", "Fonts"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/layouts", "Layouts"));
+        std::make_pair((*iter)+"/media/gui/layouts", "Layouts"));
     archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/animations", "Animations"));
+        std::make_pair((*iter)+"/media/gui/animations", "Animations"));
 
     for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
     {
