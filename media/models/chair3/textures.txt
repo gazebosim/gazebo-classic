@@ -1,0 +1,3 @@
+<../images/DSCI0887noCulling.JPG> <../images/DSCI0887noCulling.JPG>
+<../images/Wood_Bamboo_LightnoCulling.jpg> <../images/Wood_Bamboo_LightnoCulling.jpg>
+<../images/Wood_CherrynoCulling.jpg> <../images/Wood_CherrynoCulling.jpg>
