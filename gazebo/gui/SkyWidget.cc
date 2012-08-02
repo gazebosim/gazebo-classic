@@ -225,6 +225,6 @@ void SkyWidget::OnHumidity(double _v)
 void SkyWidget::OnAvgCloudSize(double _v)
 {
   msgs::Sky msg;
-  msg.set_avg_cloud_size(_v);
+  msg.set_mean_cloud_size(_v);
   this->pub->Publish(msg);
 }

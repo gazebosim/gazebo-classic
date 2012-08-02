@@ -508,7 +508,11 @@ void RenderEngine::SetupRenderSystem()
          renderSys->getName().compare("OpenGL Rendering Subsystem") != 0);
 
   if (renderSys == NULL)
-    gzthrow("unable to find rendering system");
+  {
+    gzthrow("unable to find OpenGL rendering system. OGRE is probably\
+        installed incorrectly. Double check the OGRE cmake output, and make\
+        sure OpenGL is enabled.");
+  }
 
   // We operate in windowed mode
   renderSys->setConfigOption("Full Screen", "No");

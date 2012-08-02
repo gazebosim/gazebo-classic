@@ -90,7 +90,7 @@ void ModelState::FillStateSDF(sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void ModelState::UpdateModelSDF(sdf::ElementPtr _elem)
 {
-  _elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->pose);
+  _elem->GetOrCreateElement("origin")->Set(this->pose);
 
   if (_elem->HasElement("link"))
   {

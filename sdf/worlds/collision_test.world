@@ -1,5 +1,5 @@
 <?xml version="1.0"?> 
-<gazebo version="1.0">
+<gazebo version="1.2">
   <world name="default">
     <physics type="ode">
       <gravity xyz="0 0 0"/>
@@ -10,7 +10,7 @@
     </physics>
 
     <model name="box">
-      <origin pose="0 0 0 0 0 0"/>
+      <origin>0 0 0 0 0 0</origin>
       <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -42,7 +42,7 @@
     </model>
 
     <model name="sphere">
-      <origin pose="2 0 0 0 0 0"/>
+      <origin>2 0 0 0 0 0</origin>
       <link name="link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -73,9 +73,9 @@
     </model>
 
     <light type="directional" name="sun" cast_shadows="true">
-      <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba=".8 .8 .8 1"/>
-      <specular rgba=".1 .1 .1 1"/>
+      <origin>0 0 10 0 0 0</origin>
+      <diffuse>.8 .8 .8 1</diffuse>
+      <specular>.1 .1 .1 1</specular>
       <attenuation range="10" constant="0.8" linear="0.01" quadratic="0.0"/>
       <direction xyz="0 .5 -.5"/>
     </light>

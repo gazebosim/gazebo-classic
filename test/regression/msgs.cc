@@ -274,13 +274,13 @@ TEST_F(MsgsTest, SDF)
   // GUI With camera
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/gui.sdf", sdf);
+    sdf::initFile("gui.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <gui fullscreen='true'>\
            <camera name='camera'>\
-             <view_controller type='fps'/>\
-             <origin pose='1 2 3 0 0 0'/>\
+             <view_controller>fps</view_controller>\
+             <origin>1 2 3 0 0 0</origin>\
              <track_visual name='track'>\
                <min_dist>0.2</min_dist>\
                <max_dist>1.0</max_dist>\
@@ -293,14 +293,17 @@ TEST_F(MsgsTest, SDF)
   // Empty track visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/gui.sdf", sdf);
+    sdf::initFile("gui.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <gui fullscreen='true'>\
            <camera name='camera'>\
-             <view_controller type='fps'/>\
-             <origin pose='1 2 3 0 0 0'/>\
-             <track_visual name='track'>\
+             <view_controller>fps</view_controller>\
+             <origin>1 2 3 0 0 0</origin>\
+             <track_visual>\
+               <name>visual_name</name>\
+               <min_dist>0.1</min_dist>\
+               <max_dist>1.0</max_dist>\
              </track_visual>\
            </camera>\
          </gazebo>", sdf);
@@ -311,9 +314,9 @@ TEST_F(MsgsTest, SDF)
   // GUI With empty camera
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/gui.sdf", sdf);
+    sdf::initFile("gui.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <gui fullscreen='true'>\
            <camera name='camera'>\
            </camera>\
@@ -323,9 +326,9 @@ TEST_F(MsgsTest, SDF)
   // GUI without camera
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/gui.sdf", sdf);
+    sdf::initFile("gui.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <gui fullscreen='true'>\
          </gazebo>", sdf);
     msgs::GUI msg = msgs::GUIFromSDF(sdf);
@@ -334,13 +337,13 @@ TEST_F(MsgsTest, SDF)
   // List Directional
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/light.sdf", sdf);
+    sdf::initFile("light.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <light type='directional' name='sun' cast_shadows='true'>\
-             <origin pose='0 0 10 0 0 0'/>\
-             <diffuse rgba='0.8 0.8 0.8 1'/>\
-             <specular rgba='0 0 0 1'/>\
+             <origin>0 0 10 0 0 0</origin>\
+             <diffuse>0.8 0.8 0.8 1</diffuse>\
+             <specular>0 0 0 1</specular>\
              <attenuation range='20' constant='0.8' linear='0.01'\
                           quadratic='0.0'/>\
              <direction xyz='1.0 1.0 -1.0'/>\
@@ -352,13 +355,13 @@ TEST_F(MsgsTest, SDF)
   // Light Spot
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/light.sdf", sdf);
+    sdf::initFile("light.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <light type='spot' name='lamp' cast_shadows='true'>\
-             <origin pose='0 0 10 0 0 0'/>\
-             <diffuse rgba='0.8 0.8 0.8 1'/>\
-             <specular rgba='0 0 0 1'/>\
+             <origin>0 0 10 0 0 0</origin>\
+             <diffuse>0.8 0.8 0.8 1</diffuse>\
+             <specular>0 0 0 1</specular>\
              <spot inner_angle='0' outer_angle='1' falloff='0.1'/>\
              <attenuation range='20' constant='0.8' linear='0.01'\
                           quadratic='0.0'/>\
@@ -371,13 +374,13 @@ TEST_F(MsgsTest, SDF)
   // Light Point
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/light.sdf", sdf);
+    sdf::initFile("light.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <light type='point' name='lamp' cast_shadows='true'>\
-             <origin pose='0 0 10 0 0 0'/>\
-             <diffuse rgba='0.8 0.8 0.8 1'/>\
-             <specular rgba='0 0 0 1'/>\
+             <origin>0 0 10 0 0 0</origin>\
+             <diffuse>0.8 0.8 0.8 1</diffuse>\
+             <specular>0 0 0 1</specular>\
              <attenuation range='20' constant='0.8' linear='0.01'\
                           quadratic='0.0'/>\
            </light>\
@@ -388,9 +391,9 @@ TEST_F(MsgsTest, SDF)
   // Light bad type
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/light.sdf", sdf);
+    sdf::initFile("light.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <light type='_bad_' name='lamp' cast_shadows='true'>\
            </light>\
          </gazebo>", sdf);
@@ -401,9 +404,9 @@ TEST_F(MsgsTest, SDF)
   // Plane visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
              <geometry>\
                <plane normal='0 0 1'/>\
@@ -417,9 +420,9 @@ TEST_F(MsgsTest, SDF)
   // Box visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
              <geometry>\
                <box size='1 1 1'/>\
@@ -433,9 +436,9 @@ TEST_F(MsgsTest, SDF)
   // Sphere visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
              <geometry>\
                <sphere radius='1'/>\
@@ -453,9 +456,9 @@ TEST_F(MsgsTest, SDF)
   // Cylinder visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
              <geometry>\
                <cylinder radius='1' length='1.0'/>\
@@ -471,9 +474,9 @@ TEST_F(MsgsTest, SDF)
   // Mesh visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
              <geometry>\
                <mesh scale='1 1 1' filename='test.mesh'/>\
@@ -489,21 +492,21 @@ TEST_F(MsgsTest, SDF)
   // Image visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
-             <origin pose='1 1 1 1 2 3'/>\
+             <origin>1 1 1 1 2 3</origin>\
              <geometry>\
                <image scale='1' height='1' threshold='255' granularity='10'\
                       filename='test.mesh'/>\
              </geometry>\
              <material script='Gazebo/Grey'>\
                <shader type='pixel'/>\
-               <ambient rgba='.1 .2 .3 1'/>\
-               <diffuse rgba='.1 .2 .3 1'/>\
-               <specular rgba='.1 .2 .3 1'/>\
-               <emissive rgba='.1 .2 .3 1'/>\
+               <ambient>.1 .2 .3 1</ambient>\
+               <diffuse>.1 .2 .3 1</diffuse>\
+               <specular>.1 .2 .3 1</specular>\
+               <emissive>.1 .2 .3 1</emissive>\
              </material>\
            </visual>\
         </gazebo>", sdf);
@@ -513,11 +516,11 @@ TEST_F(MsgsTest, SDF)
   // Heightmap visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
-             <origin pose='1 1 1 1 2 3'/>\
+             <origin>1 1 1 1 2 3</origin>\
              <geometry>\
                <heightmap size='1 2 3' filename='test.mesh' offset='0 0 1'/>\
              </geometry>\
@@ -532,9 +535,9 @@ TEST_F(MsgsTest, SDF)
   // Visual no geometry
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
            </visual>\
         </gazebo>", sdf);
@@ -545,11 +548,11 @@ TEST_F(MsgsTest, SDF)
   // Shader type throw
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
-             <origin pose='1 1 1 1 2 3'/>\
+             <origin>1 1 1 1 2 3</origin>\
              <geometry>\
                <heightmap size='1 2 3' filename='test.mesh' origin='0 0 0'/>\
              </geometry>\
@@ -565,11 +568,11 @@ TEST_F(MsgsTest, SDF)
   // THROW bad geometry visual
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
-             <origin pose='1 1 1 1 2 3'/>\
+             <origin>1 1 1 1 2 3</origin>\
              <geometry>\
              </geometry>\
              <material script='Gazebo/Grey'>\
@@ -584,11 +587,11 @@ TEST_F(MsgsTest, SDF)
   // Error bad geometry type
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/visual.sdf", sdf);
+    sdf::initFile("visual.sdf", sdf);
     EXPECT_FALSE(sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual' cast_shadows='false'>\
-             <origin pose='1 1 1 1 2 3'/>\
+             <origin>1 1 1 1 2 3</origin>\
              <geometry>\
                <bad_type/>\
              </geometry>\
@@ -599,7 +602,7 @@ TEST_F(MsgsTest, SDF)
         </gazebo>", sdf));
 
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <visual name='visual'>\
            </visual>\
         </gazebo>", sdf);
@@ -614,15 +617,15 @@ TEST_F(MsgsTest, SDF)
   // Throw bad fog type
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/scene.sdf", sdf);
+    sdf::initFile("scene.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <scene>\
-             <ambient rgba='0.1 0.1 0.1 1'/>\
-             <background rgba='0 0 0 1'/>\
-             <shadows enabled='true'/>\
-             <fog rgba='1 1 1 1' type='throw' start='0' end='10' density='1'/>\
-             <grid enabled='false'/>\
+             <ambient>0.1 0.1 0.1 1</ambient>\
+             <background>0 0 0 1</background>\
+             <shadows>true</shadows>\
+             <fog><color>1 1 1 1</color> <type>throw</type <start>0</start> <end>10</end> <density>1</density> </fog>\
+             <grid>false</grid>\
            </scene>\
         </gazebo>", sdf);
     EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf), common::Exception);
@@ -632,15 +635,15 @@ TEST_F(MsgsTest, SDF)
   // Scene A
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/scene.sdf", sdf);
+    sdf::initFile("scene.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <scene>\
-             <ambient rgba='0.1 0.1 0.1 1'/>\
-             <background rgba='0 0 0 1'/>\
-             <shadows enabled='true'/>\
-             <fog rgba='1 1 1 1' type='linear' start='0' end='10' density='1'/>\
-             <grid enabled='false'/>\
+             <ambient>0.1 0.1 0.1 1</ambient>\
+             <background>0 0 0 1</background>\
+             <shadows>true</shadows>\
+             <fog>1 1 1 1' type='linear' start='0' end='10' density='1'/>\
+             <grid>false</grid>\
            </scene>\
         </gazebo>", sdf);
     msgs::Scene msg = msgs::SceneFromSDF(sdf);
@@ -649,14 +652,14 @@ TEST_F(MsgsTest, SDF)
   // Scene B
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/scene.sdf", sdf);
+    sdf::initFile("scene.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <scene>\
-             <ambient rgba='0.1 0.1 0.1 1'/>\
-             <background rgba='0 0 0 1'/>\
-             <shadows enabled='false'/>\
-             <fog rgba='1 1 1 1' type='exp' start='0' end='10' density='1'/>\
+             <ambient>0.1 0.1 0.1 1</ambient>\
+             <background>0 0 0 1</background>\
+             <shadows>false</shadows>\
+             <fog>1 1 1 1' type='exp' start='0' end='10' density='1'/>\
            </scene>\
         </gazebo>", sdf);
     msgs::Scene msg = msgs::SceneFromSDF(sdf);
@@ -665,15 +668,15 @@ TEST_F(MsgsTest, SDF)
   // Scene C
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/scene.sdf", sdf);
+    sdf::initFile("scene.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <scene>\
-             <ambient rgba='0.1 0.1 0.1 1'/>\
-             <background rgba='0 0 0 1'/>\
-             <shadows enabled='false'/>\
-             <fog rgba='1 1 1 1' type='exp2' start='0' end='10' density='1'/>\
-             <grid enabled='true'/>\
+             <ambient>0.1 0.1 0.1 1</ambient>\
+             <background>0 0 0 1</background>\
+             <shadows>false</shadows>\
+             <fog>1 1 1 1' type='exp2' start='0' end='10' density='1'/>\
+             <grid>true</grid>\
            </scene>\
         </gazebo>", sdf);
     msgs::Scene msg = msgs::SceneFromSDF(sdf);
@@ -682,9 +685,9 @@ TEST_F(MsgsTest, SDF)
   // Scene C empty
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/scene.sdf", sdf);
+    sdf::initFile("scene.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <scene>\
            </scene>\
         </gazebo>", sdf);
@@ -694,13 +697,11 @@ TEST_F(MsgsTest, SDF)
   // Scene C no sky
   {
     sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("sdf/scene.sdf", sdf);
+    sdf::initFile("scene.sdf", sdf);
     sdf::readString(
-        "<gazebo version='1.0'>\
+        "<gazebo version='1.2'>\
            <scene>\
-             <background rgba='0 0 0 1'>\
-               <sky material='Gazebo/Clouds'/>\
-             </background>\
+             <background>0 0 0 1</background>\
            </scene>\
         </gazebo>", sdf);
     msgs::Scene msg = msgs::SceneFromSDF(sdf);

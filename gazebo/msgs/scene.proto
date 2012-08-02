@@ -8,6 +8,7 @@ package gazebo.msgs;
 import "header.proto";
 import "color.proto";
 import "fog.proto";
+import "sky.proto";
 import "shadows.proto";
 import "visual.proto";
 import "pose.proto";
@@ -20,7 +21,7 @@ message Scene
   required string name         = 1;
   optional Color ambient       = 2;
   optional Color background    = 3;
-  optional string sky_material = 4;
+  optional Sky sky             = 4;
   optional bool shadows        = 5 [default = true];
   optional Fog fog             = 6;
   optional bool grid           = 7;

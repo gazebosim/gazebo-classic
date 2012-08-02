@@ -210,6 +210,7 @@ void Element::AddAttribute(const std::string &_key, const std::string &_type,
 ElementPtr Element::Clone() const
 {
   ElementPtr clone(new Element);
+  clone->description = this->description;
   clone->name = this->name;
   clone->required = this->required;
   // clone->parent = this->parent;
@@ -246,6 +247,7 @@ ElementPtr Element::Clone() const
 void Element::Copy(const ElementPtr _elem)
 {
   this->name = _elem->GetName();
+  this->description = _elem->GetDescription();
   this->required = _elem->GetRequired();
   this->copyChildren = _elem->GetCopyChildren();
   this->includeFilename = _elem->includeFilename;
@@ -290,6 +292,9 @@ void Element::PrintDescription(std::string _prefix)
 {
   std::cout << _prefix << "<element name ='" << this->name
             << "' required ='" << this->required << "'>\n";
+
+  std::cout << _prefix << "  <description>" << this->description
+            << "</description>\n";
 
   Param_V::iterator aiter;
   for (aiter = this->attributes.begin();
@@ -1105,6 +1110,18 @@ bool Element::Set(const gazebo::common::Time &_value)
   return false;
 }
 
+/////////////////////////////////////////////////
+std::string Element::GetDescription() const
+{
+  return this->description;
+}
+
+/////////////////////////////////////////////////
+void Element::SetDescription(const std::string _desc)
+{
+  this->description = _desc;
+}
+
 
 
 
@@ -1146,22 +1163,23 @@ void SDF::Write(const std::string &_filename)
 std::string SDF::ToString() const
 {
   std::string result;
+  std::ostringstream stream;
 
   if (this->root->GetName() != "gazebo")
-    result = std::string("<gazebo version ='") + SDF_VERSION + "'>";
+    stream << "<gazebo version='" << SDF_VERSION << "'>\n";
 
-  result += this->root->ToString("");
+  stream << this->root->ToString("");
 
   if (this->root->GetName() != "gazebo")
-    result += "</gazebo>";
+    stream << "</gazebo>";
 
-  return result;
+  return stream.str();
 }
 
 /////////////////////////////////////////////////
 void SDF::SetFromString(const std::string &_sdfData)
 {
-  sdf::initFile("sdf/gazebo.sdf", this->root);
+  sdf::initFile("gazebo.sdf", this->root);
   if (!sdf::readString(_sdfData, this->root))
   {
     gzerr << "Unable to parse sdf string[" << _sdfData << "]\n";

@@ -29,7 +29,7 @@ void help()
   std::cout << "Commands:\n";
   std::cout << "    describe   Print the SDF format.\n";
   std::cout << "    check      Check the SDF format for the given file.\n";
-  std::cout << "    print      Prints SDF, useful for debugging parser "
+  std::cout << "    print      Prints SDF, useful for debugging "
             << "and as a conversion tool.\n\n";
 }
 

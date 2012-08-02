@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include "gazebo/math/Helpers.hh"
 #include "SkyX.h"
 
 namespace SkyX
@@ -124,7 +125,7 @@ namespace SkyX
 			return;
 		}
 
-		if (mTimeMultiplier != 0)
+		if (!gazebo::math::equal(static_cast<double>(mTimeMultiplier), 0.0))
 		{
 			float timemultiplied = timeSinceLastFrame * mTimeMultiplier;
 
@@ -134,12 +135,15 @@ namespace SkyX
 
 			if (mStarfield)
 			{
-				mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
+				mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+            "uTime", mTimeOffset*0.5f, false);
 			}
 		}
 
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", mController->getSunDirection());
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", mController->getSunDirection());
+		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+        "uLightDir", mController->getSunDirection());
+		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+        "uLightDir", mController->getSunDirection());
 
 		mMoonManager->updateMoonPhase(mController->getMoonPhase());
 		mCloudsManager->update();
@@ -162,7 +166,8 @@ namespace SkyX
 			mLastCameraPosition = mCamera->getDerivedPosition();
 		}
 
-		if (mLastCameraFarClipDistance != c->getFarClipDistance())
+		if (!gazebo::math::equal(mLastCameraFarClipDistance,
+                             c->getFarClipDistance()))
 		{
 			mMeshManager->updateGeometry(c);
 
@@ -197,7 +202,8 @@ namespace SkyX
 		mRenderQueueGroups = rqg;
 
 		mVCloudsManager->getVClouds()->setRenderQueueGroups(
-			VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds, mRenderQueueGroups.vcloudsLightnings));
+			VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds,
+        mRenderQueueGroups.vcloudsLightnings));
 
 		if (!mCreated)
 		{
@@ -248,11 +254,14 @@ namespace SkyX
 
 		if (mStarfield)
 		{
-			mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
+			mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+          "uTime", mTimeOffset*0.5f, false);
 		}
 
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", mController->getSunDirection());
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", mController->getSunDirection());
+		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
+        "uLightDir", mController->getSunDirection());
+		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+        "uLightDir", mController->getSunDirection());
 	}
 
 	bool SkyX::frameStarted(const Ogre::FrameEvent& e)

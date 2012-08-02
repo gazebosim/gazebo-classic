@@ -17,6 +17,6 @@ message Sky
   optional double wind_direction = 5;
   optional Color cloud_ambient   = 6;
   optional double humidity       = 7;
-  optional double avg_cloud_size = 8;
+  optional double mean_cloud_size = 8;
 }
 /// \endverbatim

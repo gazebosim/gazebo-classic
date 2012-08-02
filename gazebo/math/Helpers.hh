@@ -201,6 +201,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-

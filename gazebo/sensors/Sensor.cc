@@ -42,7 +42,7 @@ using namespace sensors;
 Sensor::Sensor()
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/sensor.sdf", this->sdf);
+  sdf::initFile("sensor.sdf", this->sdf);
 
   this->active = false;
 
@@ -72,7 +72,7 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("origin"))
   {
-    this->pose = this->sdf->GetElement("origin")->GetValuePose("pose");
+    this->pose = this->sdf->GetValuePose("origin");
   }
 
   if (this->sdf->GetValueBool("always_on"))

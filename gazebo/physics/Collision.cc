@@ -84,7 +84,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   Entity::Load(_sdf);
 
   this->SetRelativePose(
-    this->sdf->GetOrCreateElement("origin")->GetValuePose("pose"));
+    this->sdf->GetValuePose("origin"));
 
   this->surface->Load(this->sdf->GetOrCreateElement("surface"));
 
@@ -123,7 +123,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
 void Collision::Init()
 {
   this->SetRelativePose(
-    this->sdf->GetOrCreateElement("origin")->GetValuePose("pose"));
+    this->sdf->GetValuePose("origin"));
 
   this->shape->Init();
 }

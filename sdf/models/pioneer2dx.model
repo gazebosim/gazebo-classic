@@ -1,12 +1,9 @@
-<gazebo version='1.0'>
+<gazebo version='1.2'>
   <model name="pioneer2dx" static="0">
     <link name="chassis">
-      <origin pose="0.0 0.0 0.16 0 0 0"/>
+      <origin>0.0 0.0 0.16 0 0 0</origin>
 
       <inertial mass="5.0"/>
-        <!--<origin pose="0.0 0 -0.07 0 0 0"/>
-        <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01'/>
-      </inertial> -->
 
       <collision name="collision">
         <geometry>
@@ -14,16 +11,8 @@
         </geometry>
       </collision>
    
-      <visual name="visual">
-        <origin pose="0 0 0.04 0 0 0"/>
-        <geometry>
-          <mesh filename="pioneer2dx/chassis.dae"/>
-        </geometry>
-      </visual>
-
-
       <collision name="castor_collision">
-        <origin pose="-0.200 0 -0.12 0 0 0"/>
+        <origin>-0.200 0 -0.12 0 0 0</origin>
         <geometry>
           <sphere radius="0.04"/>
         </geometry>
@@ -33,9 +22,16 @@
           </friction>
         </surface>
       </collision>
-    
+
+      <visual name="visual">
+        <origin>0 0 0.04 0 0 0</origin>
+        <geometry>
+          <mesh filename="pioneer2dx/chassis.dae"/>
+        </geometry>
+      </visual>
+
       <visual name="castor_visual">
-        <origin pose="-0.200 0 -0.12 0 0 0"/>
+        <origin>-0.200 0 -0.12 0 0 0</origin>
         <geometry>
           <sphere radius="0.04"/>
         </geometry>
@@ -43,12 +39,12 @@
       </visual>
 
     </link>
-    
+
     <link name="right_wheel">
-      <origin pose="0.1 -.17 0.11 0 1.5707 1.5707"/>
-  
+      <origin>0.1 -.17 0.11 0 1.5707 1.5707</origin>
+
       <inertial mass="0.5">
-        <inertia ixx='0.001' ixy='0.0' ixz='0'
+        <inertia ixx='0.001' ixy='0.0' ixz='0.0'
                  iyy='0.001' iyz='0.0'
                  izz='0.001'/>
       </inertial>
@@ -73,14 +69,14 @@
     </link>
 
     <link name="left_wheel">
-      <origin pose="0.1 .17 0.11 0 1.5707 1.5707"/>
-  
-      <inertial mass="0.5">
-        <inertia ixx='0.001' ixy='0.0' ixz='0'
+      <origin>0.1 .17 0.11 0 1.5707 1.5707</origin>
+
+       <inertial mass="0.5">
+        <inertia ixx='0.001' ixy='0.0' ixz='0.0'
                  iyy='0.001' iyz='0.0'
                  izz='0.001'/>
       </inertial>
-  
+ 
       <collision name="collision">
         <geometry>
           <cylinder radius="0.11" length="0.05"/>
@@ -101,14 +97,14 @@
     </link>
 
     <joint type="revolute" name="left_wheel_hinge">
-      <origin pose="0 0 -0.03 0 0 0"/>
+      <origin>0 0 -0.03 0 0 0</origin>
       <child link="left_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>
     </joint>
 
     <joint type="revolute" name="right_wheel_hinge">
-      <origin pose="0 0 0.03 0 0 0"/>
+      <origin>0 0 0.03 0 0 0</origin>
       <child link="right_wheel"/>
       <parent link="chassis"/>
       <axis xyz="0 1 0"/>

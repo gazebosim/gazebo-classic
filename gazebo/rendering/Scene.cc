@@ -120,7 +120,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/scene.sdf", this->sdf);
+  sdf::initFile("scene.sdf", this->sdf);
 
   this->clearAll = false;
   this->heightmap = NULL;
@@ -244,10 +244,6 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
-  // Create the sky
-  // if (this->sdf->HasElement("sky"))
-  //  this->SetSky(this->sdf->GetElement("sky")->GetValueString("material"));
-
   this->SetSky();
 
   // Create Fog
@@ -255,10 +251,10 @@ void Scene::Init()
   {
     boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
     this->SetFog(fogElem->GetValueString("type"),
-                  fogElem->GetValueColor("rgba"),
-                  fogElem->GetValueDouble("density"),
-                  fogElem->GetValueDouble("start"),
-                  fogElem->GetValueDouble("end"));
+                 fogElem->GetValueColor("color"),
+                 fogElem->GetValueDouble("density"),
+                 fogElem->GetValueDouble("start"),
+                 fogElem->GetValueDouble("end"));
   }
 
   // Create ray scene query
@@ -267,8 +263,6 @@ void Scene::Init()
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
   // Force shadows on.
-  sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
-  shadowElem->GetAttribute("enabled")->Set(true);
   this->SetShadowsEnabled(true);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
@@ -363,37 +357,33 @@ std::string Scene::GetName() const
 }
 
 //////////////////////////////////////////////////
-void Scene::SetAmbientColor(const common::Color &color)
+void Scene::SetAmbientColor(const common::Color &_color)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("ambient");
-  elem->GetAttribute("rgba")->Set(color);
+  this->sdf->GetOrCreateElement("ambient")->Set(_color);
 
   // Ambient lighting
   if (this->manager)
   {
-    this->manager->setAmbientLight(
-        Conversions::Convert(elem->GetValueColor("rgba")));
+    this->manager->setAmbientLight(Conversions::Convert(_color));
   }
 }
 
 //////////////////////////////////////////////////
 common::Color Scene::GetAmbientColor() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("ambient");
-  return elem->GetValueColor("rgba");
+  return this->sdf->GetValueColor("ambient");
 }
 
 //////////////////////////////////////////////////
-void Scene::SetBackgroundColor(const common::Color &color)
+void Scene::SetBackgroundColor(const common::Color &_color)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("background");
-  elem->GetAttribute("rgba")->Set(color);
+  this->sdf->GetOrCreateElement("background")->Set(_color);
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
     if ((*iter)->GetViewport())
-      (*iter)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
+      (*iter)->GetViewport()->setBackgroundColour(Conversions::Convert(_color));
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
@@ -401,15 +391,17 @@ void Scene::SetBackgroundColor(const common::Color &color)
        iter2 != this->userCameras.end(); ++iter2)
   {
     if ((*iter2)->GetViewport())
-      (*iter2)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
+    {
+      (*iter2)->GetViewport()->setBackgroundColour(
+          Conversions::Convert(_color));
+    }
   }
 }
 
 //////////////////////////////////////////////////
 common::Color Scene::GetBackgroundColor() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("background");
-  return elem->GetValueColor("rgba");
+  return this->sdf->GetValueColor("background");
 }
 
 //////////////////////////////////////////////////
@@ -939,11 +931,11 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
 
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
 
-  elem->GetAttribute("type")->Set(_type);
-  elem->GetAttribute("rgba")->Set(_color);
-  elem->GetAttribute("density")->Set(_density);
-  elem->GetAttribute("start")->Set(_start);
-  elem->GetAttribute("end")->Set(_end);
+  elem->GetElement("type")->Set(_type);
+  elem->GetElement("color")->Set(_color);
+  elem->GetElement("density")->Set(_density);
+  elem->GetElement("start")->Set(_start);
+  elem->GetElement("end")->Set(_end);
 
   if (this->manager)
     this->manager->setFog(fogType, Conversions::Convert(_color),
@@ -1180,9 +1172,6 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   if (_msg->has_background())
     this->SetBackgroundColor(msgs::Convert(_msg->background()));
 
-  if (_msg->has_sky_material())
-    this->SetSky(_msg->sky_material());
-
   if (_msg->has_shadows())
     this->SetShadowsEnabled(_msg->shadows());
 
@@ -1194,16 +1183,17 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
 
     if (_msg->fog().has_color())
-      elem->GetAttribute("rgba")->Set(msgs::Convert(_msg->fog().color()));
+      elem->GetOrCreateElement("color")->Set(
+          msgs::Convert(_msg->fog().color()));
 
     if (_msg->fog().has_density())
-      elem->GetAttribute("density")->Set(_msg->fog().density());
+      elem->GetOrCreateElement("density")->Set(_msg->fog().density());
 
     if (_msg->fog().has_start())
-      elem->GetAttribute("start")->Set(_msg->fog().start());
+      elem->GetOrCreateElement("start")->Set(_msg->fog().start());
 
     if (_msg->fog().has_end())
-      elem->GetAttribute("end")->Set(_msg->fog().end());
+      elem->GetOrCreateElement("end")->Set(_msg->fog().end());
 
     if (_msg->fog().has_type())
     {
@@ -1217,14 +1207,14 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       else
         type = "none";
 
-      elem->GetAttribute("type")->Set(type);
+      elem->GetOrCreateElement("type")->Set(type);
     }
 
     this->SetFog(elem->GetValueString("type"),
-                  elem->GetValueColor("rgba"),
-                  elem->GetValueDouble("density"),
-                  elem->GetValueDouble("start"),
-                  elem->GetValueDouble("end"));
+                 elem->GetValueColor("color"),
+                 elem->GetValueDouble("density"),
+                 elem->GetValueDouble("start"),
+                 elem->GetValueDouble("end"));
   }
 }
 
@@ -1860,11 +1850,11 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
                         wheater.y, true);
   }
 
-  if (_msg->has_avg_cloud_size())
+  if (_msg->has_mean_cloud_size())
   {
     Ogre::Vector2 wheater = vclouds->getWheater();
     vclouds->setWheater(wheater.x,
-                        math::clamp(_msg->avg_cloud_size(), 0.0, 1.0), true);
+                        math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
   }
 
   this->skyx->update(0);
@@ -1954,32 +1944,9 @@ void Scene::SetSky()
 }
 
 /////////////////////////////////////////////////
-void Scene::SetSky(const std::string &_material)
-{
-  this->sdf->GetOrCreateElement("background")->GetOrCreateElement(
-      "sky")->GetAttribute("material")->Set(_material);
-
-  /*try
-  {
-    Ogre::Quaternion orientation;
-    orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(0, 1, 0));
-    double curvature = 10;  // ogre recommended default
-    double tiling = 8;  // ogre recommended default
-    double distance = 100;
-    this->manager->setSkyDome(true, _material, curvature,
-        tiling, distance, true, orientation);
-  }
-  catch(int)
-  {
-    gzwarn << "Unable to set sky dome to material[" << _material << "]\n";
-  }*/
-}
-
-/////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
-  sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
-  shadowElem->GetAttribute("enabled")->Set(_value);
+  this->sdf->GetOrCreateElement("shadows")->Set(_value);
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
   {
@@ -2024,8 +1991,7 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
-  sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
-  return shadowElem->GetValueBool("enabled");
+  return this->sdf->GetValueBool("shadows");
 }
 
 /////////////////////////////////////////////////

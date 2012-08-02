@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SDF_PARSER_HH
-#define SDF_PARSER_HH
+#ifndef _SDF_PARSER_HH_
+#define _SDF_PARSER_HH_
 
 #include <tinyxml.h>
 #include <string>
@@ -54,9 +54,10 @@ namespace sdf
   bool readString(const std::string &_xmlString, ElementPtr _sdf);
 
   /// \brief Populate the SDF values from a TinyXML document
-  bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf);
+  bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source);
 
-  bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf);
+  bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
+               const std::string &_source);
 
   // \brief For internal use only. Do not use this function.
   bool readXml(TiXmlElement *_xml, ElementPtr _sdf);

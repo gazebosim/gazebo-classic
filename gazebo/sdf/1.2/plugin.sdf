@@ -1,0 +1,6 @@
+<!-- Plugin -->
+<element name="plugin" required="*">
+  <attribute name="name" type="string" default="__default__" required="1"/>
+  <attribute name="filename" type="string" default="__default__" required="1"/>
+  <element copy_data="true" required="*"/>
+</element> <!-- End Plugin -->

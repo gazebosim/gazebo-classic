@@ -1,4 +1,4 @@
-<gazebo version="1.0">
+<gazebo version="1.2">
 <model name="coke_can_model" static="false">
   <link name="body">
     <origin pose="0 0 0.05 0 0 0"/>

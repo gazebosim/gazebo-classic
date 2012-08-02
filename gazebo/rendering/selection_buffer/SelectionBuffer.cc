@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
@@ -24,8 +24,8 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 SelectionBuffer::SelectionBuffer(const std::string _cameraName,
-    Scene *_scene, Ogre::RenderTarget *_renderTarget)
-: sceneMgr(_scene->GetManager()), renderTarget(_renderTarget),
+    Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
+: sceneMgr(_mgr), renderTarget(_renderTarget),
   buffer(0), pixelBox(0)
 {
   this->camera = this->sceneMgr->getCamera(_cameraName);

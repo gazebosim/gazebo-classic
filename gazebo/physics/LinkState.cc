@@ -110,5 +110,5 @@ void LinkState::FillStateSDF(sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void LinkState::UpdateLinkSDF(sdf::ElementPtr _elem)
 {
-  _elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->pose);
+  _elem->GetOrCreateElement("origin")->Set(this->pose);
 }

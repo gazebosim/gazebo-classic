@@ -19,22 +19,23 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "gazebo.hh"
-#include "transport/transport.hh"
-#include "common/Timer.hh"
-#include "common/Exception.hh"
-#include "common/Plugin.hh"
+#include "gazebo/gazebo.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/common/Timer.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Common.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
-#include "sensors/Sensors.hh"
+#include "gazebo/sensors/Sensors.hh"
 
-#include "physics/Physics.hh"
-#include "physics/World.hh"
-#include "physics/Base.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Base.hh"
 
-#include "Master.hh"
-#include "Server.hh"
+#include "gazebo/Master.hh"
+#include "gazebo/Server.hh"
 
 using namespace gazebo;
 
@@ -165,8 +166,7 @@ bool Server::GetInitialized() const
 bool Server::Load(const std::string &_filename)
 {
   // Quick test for a valid file
-  FILE *test = fopen(common::SystemPaths::Instance()->FindFileWithGazeboPaths(
-        _filename).c_str(), "r");
+  FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
   {
     gzerr << "Could not open file[" << _filename << "]\n";

@@ -236,9 +236,8 @@ void Link::Init()
   this->enabled = true;
 
   // DO THIS LAST!
-  sdf::ElementPtr originElem = this->sdf->GetOrCreateElement("origin");
-  this->SetRelativePose(originElem->GetValuePose("pose"));
-  this->SetInitialRelativePose(originElem->GetValuePose("pose"));
+  this->SetRelativePose(this->sdf->GetValuePose("origin"));
+  this->SetInitialRelativePose(this->sdf->GetValuePose("origin"));
 }
 
 //////////////////////////////////////////////////
