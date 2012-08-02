@@ -1,0 +1,15 @@
+Console
+{
+  type truetype
+  source console.ttf
+  size 18
+  resolution 96
+}
+
+Arial
+{
+  type truetype
+  source arial.ttf
+  size 18
+  resolution 96
+}

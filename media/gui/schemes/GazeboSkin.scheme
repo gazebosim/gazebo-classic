@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="GazeboSkin">
+	<Imageset Filename="Gazebo.imageset" />
+	<LookNFeel Filename="Gazebo.looknfeel" />
+	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
+	<FalagardMapping WindowType="Gazebo/Titlebar" TargetType="CEGUI/Titlebar" Renderer="Falagard/Titlebar" LookNFeel="Gazebo/Titlebar" />
+	<FalagardMapping WindowType="Gazebo/Button" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="Gazebo/Button" />
+	<FalagardMapping WindowType="Gazebo/FrameWindow" TargetType="CEGUI/FrameWindow" Renderer="Falagard/FrameWindow" LookNFeel="Gazebo/FrameWindow" />
+	<FalagardMapping WindowType="Gazebo/VerticalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="Gazebo/VerticalScrollbarThumb" />
+	<FalagardMapping WindowType="Gazebo/VerticalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="Gazebo/VerticalScrollbar" />
+	<FalagardMapping WindowType="Gazebo/HorizontalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="Gazebo/HorizontalScrollbarThumb" />
+	<FalagardMapping WindowType="Gazebo/HorizontalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="Gazebo/HorizontalScrollbar" />
+	<FalagardMapping WindowType="Gazebo/StaticImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="Gazebo/StaticImage" />
+	<FalagardMapping WindowType="Gazebo/StaticText" TargetType="DefaultWindow" Renderer="Falagard/StaticText" LookNFeel="Gazebo/StaticText" />
+	<FalagardMapping WindowType="Gazebo/Listbox" TargetType="CEGUI/Listbox" Renderer="Falagard/Listbox" LookNFeel="Gazebo/Listbox" />
+	<FalagardMapping WindowType="Gazebo/MultiLineEditbox" TargetType="CEGUI/MultiLineEditbox" Renderer="Falagard/MultiLineEditbox" LookNFeel="Gazebo/MultiLineEditbox" />
+	<FalagardMapping WindowType="Gazebo/Editbox" TargetType="CEGUI/Editbox" Renderer="Falagard/Editbox" LookNFeel="Gazebo/Editbox" />
+	<FalagardMapping WindowType="Gazebo/ComboDropList" TargetType="CEGUI/ComboDropList" Renderer="Falagard/Listbox" LookNFeel="Gazebo/ComboDropList" />
+	<FalagardMapping WindowType="Gazebo/Combobox" TargetType="CEGUI/Combobox" Renderer="Falagard/Default" LookNFeel="Gazebo/Combobox" />
+	<FalagardMapping WindowType="Gazebo/ProgressBar" TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="Gazebo/ProgressBar" />
+<!--	
+	<FalagardMapping WindowType="Gazebo/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="Gazebo/ScrollablePane" />
+	<FalagardMapping WindowType="Gazebo/Checkbox" TargetType="Falagard/Checkbox" LookNFeel="Gazebo/Checkbox" />
+	<FalagardMapping WindowType="Gazebo/RadioButton" TargetType="Falagard/RadioButton" LookNFeel="Gazebo/RadioButton" />
+	<FalagardMapping WindowType="Gazebo/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="Gazebo/ScrollablePane" />
+-->
+</GUIScheme>
