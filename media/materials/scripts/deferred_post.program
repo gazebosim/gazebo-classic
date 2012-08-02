@@ -1,0 +1,50 @@
+fragment_program DeferredShading/Ambient_ps glsl
+{
+	source deferred_rendering/deferred_shading/ambient_ps.glsl
+	
+	default_params
+	{
+		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto proj projection_matrix
+		param_named_auto farClipDistance far_clip_distance
+    param_named tex0 int 0
+    param_named tex1 int 1
+	}
+}
+
+// Auxiliary lights
+vertex_program DeferredShading/LightMaterial_vs glsl
+{
+	source deferred_rendering/deferred_shading/light_material_vs.glsl
+	// profiles vs_1_1 arbvp1
+
+	default_params
+  {
+		param_named_auto worldViewProj worldviewproj_matrix
+  }
+}
+
+// Post processors
+vertex_program DeferredShading/vs glsl
+{
+	source deferred_rendering/deferred_shading/vs.glsl
+	profiles vs_1_1 arbvp1
+	default_params
+	{
+		param_named_auto flip render_target_flipping
+		param_named farCorner float3 1 1 1
+	}
+}
+
+fragment_program DeferredLighting/Ambient_ps glsl
+{
+	source deferred_rendering/deferred_lighting/ambient_ps.glsl
+	profiles ps_2_0 arbfp1
+	
+	default_params
+	{
+		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto proj projection_matrix
+		param_named_auto farClipDistance far_clip_distance
+	}
+}

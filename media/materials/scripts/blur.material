@@ -1,0 +1,26 @@
+fragment_program blur_ps glsl
+{
+    source blur.glsl
+    default_params
+    {
+      param_named_auto invSMSize inverse_texture_size 0
+      param_named map int 0
+    }
+}
+
+material blur
+{
+  technique
+  {
+    pass
+    {
+      fragment_program_ref blur_ps
+      {}
+
+      texture_unit
+      {
+        filtering bilinear
+      }
+    }
+  }
+}
