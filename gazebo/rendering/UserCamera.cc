@@ -104,7 +104,7 @@ void UserCamera::Init()
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
   {
-    this->SetClipDist(0.1, 1000);
+    this->SetClipDist(0.1, 5000);
   }
   else
   {

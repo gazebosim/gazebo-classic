@@ -509,12 +509,17 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
         }
 
         if (elemXml->Attribute("model_name"))
+        {
           includeSDF->root->GetElement("model")->GetAttribute(
               "name")->SetFromString(elemXml->Attribute("model_name"));
+        }
+
         if (elemXml->Attribute("model_pose"))
+        {
           includeSDF->root->GetElement("model")->GetOrCreateElement(
-              "origin")->GetAttribute("pose")->SetFromString(
+              "origin")->GetValue()->SetFromString(
                 elemXml->Attribute("model_pose"));
+        }
 
         for (TiXmlElement *childElemXml = elemXml->FirstChildElement();
              childElemXml; childElemXml = childElemXml->NextSiblingElement())
@@ -658,7 +663,7 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
   std::map<std::string, std::string> replace;
 
   gazebo::math::Pose modelPose =
-    modelPtr->GetOrCreateElement("origin")->GetValuePose("pose");
+    modelPtr->GetValuePose("origin");
 
   std::string modelName = modelPtr->GetValueString("name");
   while (elem)
@@ -670,12 +675,11 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
       replace[elemName] = newName;
       if (elem->HasElementDescription("origin"))
       {
-        ElementPtr originElem = elem->GetOrCreateElement("origin");
         gazebo::math::Pose newPose = gazebo::math::Pose(
           modelPose.pos +
-            modelPose.rot.RotateVector(originElem->GetValuePose("pose").pos),
-            modelPose.rot * originElem->GetValuePose("pose").rot);
-        originElem->GetAttribute("pose")->Set(newPose);
+            modelPose.rot.RotateVector(elem->GetValuePose("origin").pos),
+            modelPose.rot * elem->GetValuePose("origin").rot);
+        elem->GetElement("origin")->Set(newPose);
       }
     }
     else if (elem->GetName() == "joint")

@@ -155,6 +155,11 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 /////////////////////////////////////////////////
 void SelectionBuffer::CreateRTTOverlays()
 {
+  Ogre::OverlayManager *mgr = Ogre::OverlayManager::getSingletonPtr();
+
+  if (mgr->getByName("SelectionDebugOverlay"))
+    return;
+
   Ogre::MaterialPtr baseWhite =
     Ogre::MaterialManager::getSingleton().getDefaultSettings();
   Ogre::MaterialPtr selectionBufferTexture =
@@ -166,7 +171,6 @@ void SelectionBuffer::CreateRTTOverlays()
 
   textureUnit->setTextureName("SelectionPassTex");
 
-  Ogre::OverlayManager *mgr = Ogre::OverlayManager::getSingletonPtr();
   this->selectionDebugOverlay = mgr->create("SelectionDebugOverlay");
 
   Ogre::OverlayContainer *panel =

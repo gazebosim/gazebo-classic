@@ -812,3 +812,23 @@ material Gazebo/Road
     }
   }
 }
+
+material drc/san_fauxcity_sign
+{
+  receive_shadows off
+  technique
+  {
+    pass
+    {
+      ambient 0.8 0.8 0.8 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.1 0.1 0.1 1.0 2.0
+
+			texture_unit
+			{
+				texture san_fauxcity.png
+				filtering trilinear
+			}
+    }
+  }
+}

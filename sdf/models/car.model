@@ -1,7 +1,7 @@
-<gazebo version='1.0'>
+<gazebo version='1.2'>
   <model name="car" static="false">
     <link name="chassis">
-      <origin pose="0 0 0.3 0 0 0"/>
+      <origin>0 0 0.3 0 0 0</origin>
       <collision name="collision">
         <mass>10.0</mass>
         <geometry>
@@ -18,7 +18,7 @@
     </link>
 
     <link name="front_left_wheel">
-      <origin pose="0.8 0.6 0.3 0 1.5707 1.5707"/>
+      <origin>0.8 0.6 0.3 0 1.5707 1.5707</origin>
 
       <collision name="collision">
         <mass>0.4</mass>
@@ -36,7 +36,7 @@
     </link>
 
     <link name="front_right_wheel">
-      <origin pose="0.8 -0.6 0.3 0  1.5707 1.5707"/>
+      <origin>0.8 -0.6 0.3 0  1.5707 1.5707</origin>
 
       <collision name="collision">
         <mass>0.4</mass>
@@ -54,7 +54,7 @@
     </link>
 
     <link name="back_right_wheel">
-      <origin pose="-0.8 -0.6 0.3 0 1.5707 1.5707"/>
+      <origin>-0.8 -0.6 0.3 0 1.5707 1.5707</origin>
 
       <collision name="collision">
         <mass>0.4</mass>
@@ -72,7 +72,7 @@
     </link>
 
     <link name="back_left_wheel">
-      <origin pose="-0.8 0.6 0.3 0 1.5707 1.5707"/>
+      <origin>-0.8 0.6 0.3 0 1.5707 1.5707</origin>
 
       <collision name="collision">
         <mass>0.4</mass>
@@ -90,7 +90,7 @@
     </link>
 
     <link name="gas_pedal">
-      <origin pose="0.3 0.1 0.5 0 0 0"/>
+      <origin>0.3 0.1 0.5 0 0 0</origin>
 
       <collision name="collision">
         <mass>0.01</mass>
@@ -108,7 +108,7 @@
     </link>
 
     <link name="brake_pedal">
-      <origin pose="0.3 0.25 0.5 0 0 0"/>
+      <origin>0.3 0.25 0.5 0 0 0</origin>
 
       <collision name="collision">
         <mass>0.01</mass>
@@ -126,7 +126,7 @@
     </link>
 
     <link name="steering_wheel">
-      <origin pose="0.3 0.2 1.0 0 1.5707 0"/>
+      <origin>0.3 0.2 1.0 0 1.5707 0</origin>
 
       <collision name="collision">
         <mass>0.01</mass>
