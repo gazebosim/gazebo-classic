@@ -296,6 +296,8 @@ void JointController::RotateLinkAndChildren(LinkPtr _link1,
                             newRelativePose.rot);
 
     _link1->SetWorldPose(newWorldPose);
+    _link1->SetLinearVel(math::Vector3(0, 0, 0));
+    _link1->SetAngularVel(math::Vector3(0, 0, 0));
 
     this->updated_links.push_back(_link1);
   }
@@ -336,6 +338,8 @@ void JointController::SlideLinkAndChildren(LinkPtr _link1,
     math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
 
     _link1->SetWorldPose(newWorldPose);
+    _link1->SetLinearVel(math::Vector3(0, 0, 0));
+    _link1->SetAngularVel(math::Vector3(0, 0, 0));
 
     this->updated_links.push_back(_link1);
   }
