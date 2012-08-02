@@ -865,6 +865,7 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 {
   math::Pose linkPose = _link->GetWorldPose();
   math::Pose currentModelPose = this->GetWorldPose();
-  math::Pose targetModelPose = _pose + (currentModelPose - linkPose);
+  math::Pose linkRelPose = currentModelPose - linkPose;
+  math::Pose targetModelPose =  linkRelPose * _pose;
   this->SetWorldPose(targetModelPose);
 }
