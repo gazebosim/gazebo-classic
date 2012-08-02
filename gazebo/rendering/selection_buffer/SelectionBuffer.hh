@@ -17,6 +17,8 @@
 #ifndef _SELECTIONBUFFER_HH_
 #define _SELECTIONBUFFER_HH_
 
+#include <string>
+
 namespace Ogre
 {
   class SceneManager;
@@ -54,6 +56,7 @@ namespace gazebo
       public: void Update();
 
       private: void CreateRTTOverlays();
+
       private: void UpdateBufferSize();
 
       // This is the material listener - Note: it is controlled by a separate
@@ -70,9 +73,7 @@ namespace gazebo
       private: uint8_t *buffer;
       private: Ogre::PixelBox *pixelBox;
       private: Ogre::Overlay *selectionDebugOverlay;
-
     };
   }
 }
-
 #endif

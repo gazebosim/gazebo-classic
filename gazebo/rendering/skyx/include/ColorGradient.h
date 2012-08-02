@@ -25,6 +25,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #define _SkyX_ColorGradient_H_
 
 #include <vector>
+#include <utility>
 #include "Prerequisites.h"
 
 namespace SkyX
@@ -34,7 +35,7 @@ namespace SkyX
   public:
     /** Color frame type definition
         ColorFrame.first: Colour value
-      ColorFrame.second: Position in the gradient [0,1] range
+        ColorFrame.second: Position in the gradient [0,1] range
      */
     typedef std::pair<Ogre::Vector3, Ogre::Real> ColorFrame;
 

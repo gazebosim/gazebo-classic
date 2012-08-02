@@ -75,7 +75,7 @@ namespace SkyX
             const Ogre::Vector3& _or, const Ogre::Vector3& dir,
             const Ogre::Real& l, const Ogre::uint32& d, const Ogre::uint32& rec,
             const Ogre::Real& tm, const Ogre::Real& wm,
-            const Ogre::Vector2& b = Ogre::Vector2(0,1));
+            const Ogre::Vector2& b = Ogre::Vector2(0, 1));
 
         /** Destructor
         */

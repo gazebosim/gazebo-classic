@@ -85,7 +85,8 @@ namespace SkyX
           @param delayedResponse true to get a delayed response, updating only
           probabilities, false to also set clouds
           */
-        void updateProbabilities(DataManager::Cell ***c, const int &nx, const int &ny, const int &nz, const bool& delayedResponse = true);
+        void updateProbabilities(DataManager::Cell ***c, const int &nx,
+            const int &ny, const int &nz, const bool& delayedResponse = true);
 
         /** Determines if the ellipsoid is out of the cells domain and needs to
          * be removed

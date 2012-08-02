@@ -160,7 +160,7 @@ namespace SkyX
 
       uvr = static_cast<float>(y+1)/(mCircles-mUnderHorizonCircles);
 
-      for(x = 0; x < mSteps; ++x)
+      for (x = 0; x < mSteps; ++x)
       {
         currentPhiAngle = Ogre::Math::TWO_PI * x / mSteps;
 
@@ -193,7 +193,7 @@ namespace SkyX
     float op;  // Opacity
 
     // Under-horizon
-    for(y = mCircles - mUnderHorizonCircles; y < mCircles; ++y)
+    for (y = mCircles - mUnderHorizonCircles; y < mCircles; ++y)
     {
       currentTethaAngle = Ogre::Math::PI/2 - AngleStep*(y+1);
 
@@ -207,7 +207,7 @@ namespace SkyX
             mUnderHorizonCircles, mUnderHorizonFadingExponent) *
           mUnderHorizonFadingMultiplier, 0, 1);
 
-      for(x = 0;x < mSteps; ++x)
+      for (x = 0; x < mSteps; ++x)
       {
         currentPhiAngle = Ogre::Math::TWO_PI * x / mSteps;
 

@@ -24,8 +24,9 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_LightningManager_H_
 #define _SkyX_VClouds_LightningManager_H_
 
-#include "Prerequisites.h"
+#include <vector>
 
+#include "Prerequisites.h"
 #include "Lightning.h"
 
 namespace SkyX
@@ -52,7 +53,7 @@ namespace SkyX
               a sound, etc.  The lightning position is accessible through
               Lightning::getSceneNode()->getPosition().
               */
-            inline virtual void lightningAdded(Lightning* l){}
+            inline virtual void lightningAdded(Lightning* l) {}
         };
 
         /** Constructor
@@ -85,7 +86,10 @@ namespace SkyX
           @remarks The lightning will be automatically destroyed one time it'll be finished, so the returned ptr will not
           be available one time the lightning will have disappeared
           */
-        Lightning* addLightning(const Ogre::Vector3& p, const Ogre::Vector3& d, const Ogre::Real l, const Ogre::uint32& div = static_cast<Ogre::uint32>(Ogre::Math::RangeRandom(12, 30)));
+        Lightning* addLightning(const Ogre::Vector3& p,
+            const Ogre::Vector3& d, const Ogre::Real l,
+            const Ogre::uint32& div = static_cast<Ogre::uint32>(
+              Ogre::Math::RangeRandom(12, 30)));
 
         /** Update material
           @remarks To be invoked before each camera rendering process

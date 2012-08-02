@@ -39,7 +39,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 #endif
 
 /// Log macro
-#define SkyXLOG(msg) Ogre::LogManager::getSingleton().logMessage("[SkyX] " + Ogre::String(msg));
+#define SkyXLOG(msg) Ogre::LogManager::getSingleton().logMessage("[SkyX] " +\
+    Ogre::String(msg));
 
 /// SkyX defines
 #define SKYX_VERSION_MAJOR 0

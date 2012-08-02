@@ -1,22 +1,22 @@
 /*
 --------------------------------------------------------------------------------
-This source file is part of SkyX.
-Visit http://www.paradise-studios.net/products/skyx/
+   This source file is part of SkyX.
+   Visit http://www.paradise-studios.net/products/skyx/
 
-Copyright (C) 2009-2012 Xavier Verguín González <xavyiy@gmail.com>
+   Copyright (C) 2009-2012 Xavier Verguín González <xavyiy@gmail.com>
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU Lesser General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+   This program is free software; you can redistribute it and/or modify it under
+   the terms of the GNU Lesser General Public License as published by the Free Software
+   Foundation; either version 2 of the License, or (at your option) any later
+   version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+   This program is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+   FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License along with
-this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-Place - Suite 330, Boston, MA 02111-1307, USA, or go to
+   You should have received a copy of the GNU Lesser General Public License along with
+   this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+   Place - Suite 330, Boston, MA 02111-1307, USA, or go to
 http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
@@ -30,8 +30,8 @@ namespace SkyX
   /// -------------- CloudLayer -----------------
   CloudLayer::CloudLayer(SkyX *s)
     : mSkyX(s)
-    , mOptions(Options())
-    , mCloudLayerPass(0)
+      , mOptions(Options())
+      , mCloudLayerPass(0)
   {
     mAmbientGradient = ColorGradient();
     mAmbientGradient.addCFrame(ColorGradient::ColorFrame(
@@ -70,8 +70,8 @@ namespace SkyX
 
   CloudLayer::CloudLayer(SkyX *s, const Options& o)
     : mSkyX(s)
-    , mOptions(o)
-    , mCloudLayerPass(0)
+      , mOptions(o)
+      , mCloudLayerPass(0)
   {
     mAmbientGradient = ColorGradient();
     mAmbientGradient.addCFrame(ColorGradient::ColorFrame(
@@ -167,7 +167,8 @@ namespace SkyX
     mCloudLayerPass->getFragmentProgramParameters()
       ->setNamedConstant("uHeight", mOptions.Height);
 
-    float WindDirection_[2] = {mOptions.WindDirection.x, mOptions.WindDirection.y};
+    float WindDirection_[2] = {mOptions.WindDirection.x,
+                               mOptions.WindDirection.y};
 
     mCloudLayerPass->getFragmentProgramParameters()
       ->setNamedConstant("uWindDirection", WindDirection_, 1, 2);
@@ -175,7 +176,8 @@ namespace SkyX
     mCloudLayerPass->getFragmentProgramParameters()
       ->setNamedConstant("uCloudLayerHeightVolume", mOptions.HeightVolume);
     mCloudLayerPass->getFragmentProgramParameters()
-      ->setNamedConstant("uCloudLayerVolumetricDisplacement", mOptions.VolumetricDisplacement);
+      ->setNamedConstant("uCloudLayerVolumetricDisplacement",
+          mOptions.VolumetricDisplacement);
     mCloudLayerPass->getFragmentProgramParameters()
       ->setNamedConstant("uDetailAttenuation", mOptions.DetailAttenuation);
     mCloudLayerPass->getFragmentProgramParameters()
@@ -191,55 +193,56 @@ namespace SkyX
 
     if (mSkyX->getLightingMode() == SkyX::LM_LDR)
     {
-      mCloudLayerPass->getFragmentProgramParameters()
-        ->setNamedConstant("uExposure", mSkyX->getAtmosphereManager()->getOptions().Exposure);
+      mCloudLayerPass->getFragmentProgramParameters()->setNamedConstant(
+          "uExposure", mSkyX->getAtmosphereManager()->getOptions().Exposure);
     }
-    mCloudLayerPass->getFragmentProgramParameters()
-      ->setNamedConstant("uTime", mSkyX->_getTimeOffset()*mOptions.TimeMultiplier);
+    mCloudLayerPass->getFragmentProgramParameters()->setNamedConstant("uTime",
+        mSkyX->_getTimeOffset()*mOptions.TimeMultiplier);
     /*
-    mCloudLayerPass->getFragmentProgramParameters()
-      ->setNamedConstant("uSunPosition", -mSkyX->getAtmosphereManager()->getSunDirection()*mSkyX->getMeshManager()->getSkydomeRadius());
+       mCloudLayerPass->getFragmentProgramParameters()
+       ->setNamedConstant("uSunPosition", -mSkyX->getAtmosphereManager()->getSunDirection()*mSkyX->getMeshManager()->getSkydomeRadius());
 
-    Ogre::Vector3 AmbientColor = Ogre::Vector3::ZERO;
+       Ogre::Vector3 AmbientColor = Ogre::Vector3::ZERO;
 
-    Ogre::Vector3 SunDir   = -mSkyX->getAtmosphereManager()->getSunDirection();
-    Ogre::Real Ang = 0;
-    for (int k = 0; k < 3; k++)
-    {
-      Ogre::Vector2 Coords = Ogre::Vector2(Ogre::Math::Cos(Ang), Ogre::Math::Sin(Ang));
-      Ang += 2*Ogre::Math::PI/3;
-      AmbientColor += mSkyX->getAtmosphereManager()->getColorAt(Ogre::Vector3(Coords.x, mOptions.Height/mSkyX->getMeshManager()->getSkydomeRadius(), Coords.y).normalisedCopy());
-    }
+       Ogre::Vector3 SunDir   = -mSkyX->getAtmosphereManager()->getSunDirection();
+       Ogre::Real Ang = 0;
+       for (int k = 0; k < 3; k++)
+       {
+       Ogre::Vector2 Coords = Ogre::Vector2(Ogre::Math::Cos(Ang), Ogre::Math::Sin(Ang));
+       Ang += 2*Ogre::Math::PI/3;
+       AmbientColor += mSkyX->getAtmosphereManager()->getColorAt(Ogre::Vector3(Coords.x, mOptions.Height/mSkyX->getMeshManager()->getSkydomeRadius(), Coords.y).normalisedCopy());
+       }
 
-    AmbientColor /= 3;
+       AmbientColor /= 3;
 
-    mCloudLayerPass->getFragmentProgramParameters()
-      ->setNamedConstant("uAmbientLuminosity", AmbientColor*0.75f);
+       mCloudLayerPass->getFragmentProgramParameters()
+       ->setNamedConstant("uAmbientLuminosity", AmbientColor*0.75f);
 
-    float Mult = 1.5f;
+       float Mult = 1.5f;
 
-    mCloudLayerPass->getFragmentProgramParameters()
-      ->setNamedConstant("uSunColor", Ogre::Vector3(
-           Ogre::Math::Clamp<Ogre::Real>(AmbientColor.x*Mult, 0, 1),
-           Ogre::Math::Clamp<Ogre::Real>(AmbientColor.y*Mult, 0, 1),
-           Ogre::Math::Clamp<Ogre::Real>(AmbientColor.z*Mult, 0, 1)));
-    */
+       mCloudLayerPass->getFragmentProgramParameters()
+       ->setNamedConstant("uSunColor", Ogre::Vector3(
+       Ogre::Math::Clamp<Ogre::Real>(AmbientColor.x*Mult, 0, 1),
+       Ogre::Math::Clamp<Ogre::Real>(AmbientColor.y*Mult, 0, 1),
+       Ogre::Math::Clamp<Ogre::Real>(AmbientColor.z*Mult, 0, 1)));
+       */
 
-    //Ogre::Vector3 SunDir = mSkyX->getAtmosphereManager()->getSunDirection();
-    //if (SunDir.y > 0.15f)
-    //{
+    // Ogre::Vector3 SunDir = mSkyX->getAtmosphereManager()->getSunDirection();
+    // if (SunDir.y > 0.15f)
+    // {
     //  SunDir = -SunDir;
-    //}
+    // }
 
-  //  mCloudLayerPass->getFragmentProgramParameters()
-  //    ->setNamedConstant("uSunPosition", -SunDir*mSkyX->getMeshManager()->getSkydomeRadius());
+    // mCloudLayerPass->getFragmentProgramParameters()
+    // ->setNamedConstant("uSunPosition",
+    // -SunDir*mSkyX->getMeshManager()->getSkydomeRadius());
 
     float point = (mSkyX->getController()->getSunDirection().y + 1.0f) / 2.0f;
 
     mCloudLayerPass->getFragmentProgramParameters()
       ->setNamedConstant("uSunColor", mSunGradient.getColor(point));
-    mCloudLayerPass->getFragmentProgramParameters()
-      ->setNamedConstant("uAmbientLuminosity", mAmbientGradient.getColor(point));
+    mCloudLayerPass->getFragmentProgramParameters()->setNamedConstant(
+        "uAmbientLuminosity", mAmbientGradient.getColor(point));
   }
 
   /// ------------- CloudsManager ---------------
@@ -259,8 +262,9 @@ namespace SkyX
 
     // TODO
     NewCloudLayer->_registerCloudLayer(static_cast<Ogre::MaterialPtr>(
-      Ogre::MaterialManager::getSingleton().getByName(mSkyX->getGPUManager()->getSkydomeMaterialName()))
-      ->getTechnique(0)->createPass());
+          Ogre::MaterialManager::getSingleton().getByName(
+            mSkyX->getGPUManager()->getSkydomeMaterialName()))->
+        getTechnique(0)->createPass());
 
     mCloudLayers.push_back(NewCloudLayer);
 
@@ -271,7 +275,8 @@ namespace SkyX
     {
       if (k+1 < mCloudLayers.size())
       {
-        if (mCloudLayers.at(k)->getOptions().Height < mCloudLayers.at(k+1)->getOptions().Height)
+        if (mCloudLayers.at(k)->getOptions().Height <
+            mCloudLayers.at(k+1)->getOptions().Height)
         {
           // Swap
           CloudLayer* cl = mCloudLayers.at(k);
@@ -295,21 +300,23 @@ namespace SkyX
 
   void CloudsManager::remove(CloudLayer* cl)
   {
-    for(CloudLayersIt = mCloudLayers.begin(); CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
-        {
-            if((*CloudLayersIt) == cl)
-            {
+    for (CloudLayersIt = mCloudLayers.begin();
+         CloudLayersIt != mCloudLayers.end(); ++CloudLayersIt)
+    {
+      if ((*CloudLayersIt) == cl)
+      {
         delete (*CloudLayersIt);
         mCloudLayers.erase(CloudLayersIt);
         return;
-            }
+      }
     }
   }
 
   void CloudsManager::removeAll()
   {
-    for(CloudLayersIt = mCloudLayers.begin(); CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
-        {
+    for (CloudLayersIt = mCloudLayers.begin();
+         CloudLayersIt != mCloudLayers.end(); ++CloudLayersIt)
+    {
       delete (*CloudLayersIt);
     }
 
@@ -318,37 +325,41 @@ namespace SkyX
 
   void CloudsManager::registerAll()
   {
-    for(unsigned int k = 0; k < mCloudLayers.size(); k++)
+    for (unsigned int k = 0; k < mCloudLayers.size(); ++k)
     {
       mCloudLayers.at(k)->_registerCloudLayer(static_cast<Ogre::MaterialPtr>(
-        Ogre::MaterialManager::getSingleton().getByName(mSkyX->getGPUManager()->getSkydomeMaterialName()))
-        ->getTechnique(0)->createPass());
+            Ogre::MaterialManager::getSingleton().getByName(
+              mSkyX->getGPUManager()->getSkydomeMaterialName()))->
+          getTechnique(0)->createPass());
     }
   }
 
   void CloudsManager::unregister(CloudLayer* cl)
   {
-    for(CloudLayersIt = mCloudLayers.begin(); CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
-        {
-            if((*CloudLayersIt) == cl)
-            {
+    for (CloudLayersIt = mCloudLayers.begin();
+         CloudLayersIt != mCloudLayers.end(); ++CloudLayersIt)
+    {
+      if ((*CloudLayersIt) == cl)
+      {
         (*CloudLayersIt)->_unregister();
-            }
+      }
     }
   }
 
   void CloudsManager::unregisterAll()
   {
-    for(CloudLayersIt = mCloudLayers.begin(); CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
-        {
+    for (CloudLayersIt = mCloudLayers.begin();
+        CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
+    {
       (*CloudLayersIt)->_unregister();
     }
   }
 
   void CloudsManager::update()
   {
-    for(CloudLayersIt = mCloudLayers.begin(); CloudLayersIt != mCloudLayers.end(); CloudLayersIt++)
-        {
+    for (CloudLayersIt = mCloudLayers.begin();
+         CloudLayersIt != mCloudLayers.end(); ++CloudLayersIt)
+    {
       (*CloudLayersIt)->_updateInternalPassParameters();
     }
   }

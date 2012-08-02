@@ -233,7 +233,7 @@ std::string SystemPaths::FindFile(const std::string &_filename)
         found = true;
         break;
       }
-      
+
       std::list<std::string>::iterator suffixIter;
       for (suffixIter = this->suffixPaths.begin();
            suffixIter != this->suffixPaths.end(); ++suffixIter)

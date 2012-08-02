@@ -124,7 +124,6 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
 const char *Converter::GetValue(const char *_valueElem, const char *_valueAttr,
                                 TiXmlElement *_elem)
 {
-
   if (_valueElem)
   {
     // Check to see if the element that is being converted has the value

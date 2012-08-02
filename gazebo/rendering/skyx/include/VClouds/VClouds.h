@@ -63,14 +63,18 @@ namespace SkyX
         struct GeometrySettings
         {
           /// Height: x = Altitude over the camera, y: Field height (both in
-          //world coordinates)
+          /// world coordinates)
           Ogre::Vector2 Height;
+
           /// Angles
           Ogre::Radian Alpha, Beta;
+
           /// Radius
           float Radius;
+
           /// Number of blocks
           int NumberOfBlocks;
+
           /// Number of slices per geometry zone
           int Na, Nb, Nc;
 

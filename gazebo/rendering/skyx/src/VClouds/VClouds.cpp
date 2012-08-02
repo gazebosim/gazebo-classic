@@ -21,8 +21,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <vector>
 #include "VClouds/VClouds.h"
-
 #include "SkyX.h"
 
 namespace SkyX
@@ -34,18 +34,18 @@ namespace SkyX
         , mCamera(0)
         , mCreated(false)
         , mGeometrySettings(GeometrySettings())
-        , mDistanceFallingParams(Ogre::Vector2(1,-1))
+        , mDistanceFallingParams(Ogre::Vector2(1, -1))
         , mRenderQueueGroups(RenderQueueGroups(Ogre::RENDER_QUEUE_MAIN,
               Ogre::RENDER_QUEUE_9))
         , mWindDirection(Ogre::Degree(0))
         , mWindSpeed(80.0f)
         , mWheater(Ogre::Vector2(0.5f, 1.0f))
         , mDelayedResponse(false)
-        , mSunDirection(Ogre::Vector3(0,0,-1))
-        , mSunColor(Ogre::Vector3(1,1,1))
-        , mAmbientColor(Ogre::Vector3(0.63f,0.63f,0.7f))
-        , mLightResponse(Ogre::Vector4(0.25f,0.2f,1.0f,0.1f))
-        , mAmbientFactors(Ogre::Vector4(0.45f,0.3f,0.6f,1))
+        , mSunDirection(Ogre::Vector3(0, 0, -1))
+        , mSunColor(Ogre::Vector3(1, 1, 1))
+        , mAmbientColor(Ogre::Vector3(0.63f, 0.63f, 0.7f))
+        , mLightResponse(Ogre::Vector4(0.25f, 0.2f, 1.0f, 0.1f))
+        , mAmbientFactors(Ogre::Vector4(0.45f, 0.3f, 0.6f, 1))
         , mGlobalOpacity(1.0f)
         , mCloudFieldScale(1.0f)
         , mNoiseScale(4.2f)
@@ -68,17 +68,21 @@ namespace SkyX
     {
       remove();
 
-      mVolCloudsMaterial = static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName("SkyX_VolClouds"));
-      mVolCloudsLightningMaterial = static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName("SkyX_VolClouds_Lightning"));
+      mVolCloudsMaterial = static_cast<Ogre::MaterialPtr>(
+          Ogre::MaterialManager::getSingleton().getByName("SkyX_VolClouds"));
+      mVolCloudsLightningMaterial = static_cast<Ogre::MaterialPtr>(
+          Ogre::MaterialManager::getSingleton().getByName(
+            "SkyX_VolClouds_Lightning"));
 
       if (mVolCloudsMaterial.isNull() || mVolCloudsLightningMaterial.isNull())
       {
-        SkyXLOG("Error while creating SkyX::VClouds::VClouds, materials are not found");
+        SkyXLOG("Error while creating SkyX::VClouds::VClouds, \
+            materials are not found");
         return;
       }
 
       // Data manager
-      mDataManager->create(128,128,20);
+      mDataManager->create(128, 128, 20);
 
       // Geometry manager
       mGeometryManager->create(mGeometrySettings.Height,

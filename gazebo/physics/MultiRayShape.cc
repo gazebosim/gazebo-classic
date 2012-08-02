@@ -91,7 +91,7 @@ void MultiRayShape::Init()
         j * pDiff / (vertSamples - 1) + vertMinAngle;
 
       axis.Set(cos(pitchAngle) * cos(yawAngle),
-               cos(pitchAngle) * sin(yawAngle)
+               cos(pitchAngle) * sin(yawAngle),
                sin(pitchAngle));
 
       start = (axis * minRange) + this->offset;

@@ -21,8 +21,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <vector>
 #include "VClouds/GeometryManager.h"
-
 #include "VClouds/VClouds.h"
 
 namespace SkyX

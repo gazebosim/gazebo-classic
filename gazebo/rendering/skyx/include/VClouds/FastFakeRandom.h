@@ -30,7 +30,6 @@ namespace SkyX
 {
   namespace VClouds
   {
-
     class DllExport FastFakeRandom
     {
       public:

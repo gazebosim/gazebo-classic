@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <utility>
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/rendering/skyx/include/ColorGradient.h"
 
@@ -40,12 +41,12 @@ namespace SkyX
     if (mMalFormed)
     {
       SkyXLOG("Mal-formed ColorGradient");
-      return Ogre::Vector3(0,0,0);
+      return Ogre::Vector3(0, 0, 0);
     }
 
     if (CFrameVector.size() == 0)
     {
-      return Ogre::Vector3(0,0,0);
+      return Ogre::Vector3(0, 0, 0);
     }
     else if (CFrameVector.size() == 1)
     {
@@ -90,7 +91,8 @@ namespace SkyX
   bool ColorGradient::_checkBounds() const
   {
     std::pair<bool, bool> existbounds;
-    existbounds.first = false; existbounds.second = false;
+    existbounds.first = false;
+    existbounds.second = false;
 
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {

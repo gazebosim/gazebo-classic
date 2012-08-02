@@ -161,7 +161,8 @@ namespace SkyX
     mSkyX->getCloudsManager()->update();
   }
 
-  float AtmosphereManager::_scale(const float& cos, const float& uScaleDepth) const
+  float AtmosphereManager::_scale(const float& cos,
+                                  const float& uScaleDepth) const
   {
     float x = 1 - cos;
     return uScaleDepth * Ogre::Math::Exp(-0.00287 +
@@ -189,7 +190,10 @@ namespace SkyX
     Ogre::Vector3
       uLightDir = mSkyX->getController()->getSunDirection(),
                 v3Pos = Direction,
-                uCameraPos = Ogre::Vector3(0, 0, mOptions.InnerRadius + (mOptions.OuterRadius-mOptions.InnerRadius)*mOptions.HeightPosition),
+                uCameraPos = Ogre::Vector3(0, 0,
+                    mOptions.InnerRadius +
+                    (mOptions.OuterRadius - mOptions.InnerRadius) *
+                    mOptions.HeightPosition),
                 uInvWaveLength = Ogre::Vector3(
                     1.0f / Ogre::Math::Pow(mOptions.WaveLength.x, 4.0f),
                     1.0f / Ogre::Math::Pow(mOptions.WaveLength.y, 4.0f),
@@ -281,7 +285,7 @@ namespace SkyX
     oColor += Ogre::Math::Clamp<Ogre::Real>(
         ((1 - std::max(oColor.x, std::max(oColor.y, oColor.z))*10)), 0, 1)
       * (Ogre::Vector3(0.05, 0.05, 0.1)
-          * (2-0.75f*Ogre::Math::Clamp<Ogre::Real>(-uLightDir.z, 0, 1)) *
+          * (2-0.75f*Ogre::Math::Clamp<Ogre::Real>(-uLightDir.z, 0, 1))
           * Ogre::Math::Pow(1-Direction.z, 3));
 
     // --- End fragment program simulation ---

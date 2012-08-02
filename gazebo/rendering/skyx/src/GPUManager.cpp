@@ -21,8 +21,9 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include "GPUManager.h"
+#include <vector>
 
+#include "GPUManager.h"
 #include "SkyX.h"
 
 namespace SkyX
@@ -60,8 +61,8 @@ namespace SkyX
 
     GroundPass->setSceneBlending(SBT);
 
-    ///TODO
-        mGroundPasses.push_back(GroundPass);
+    /// TODO
+    mGroundPasses.push_back(GroundPass);
 
     mSkyX->getAtmosphereManager()->_update(
         mSkyX->getAtmosphereManager()->getOptions(), true);
