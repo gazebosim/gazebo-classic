@@ -28,16 +28,6 @@ using namespace transport;
 unsigned int Connection::idCounter = 0;
 IOManager *Connection::iomanager = NULL;
 
-bool g_connect_succeeded = false;
-void connect_handler(const boost::system::error_code &_error)
-{
-  if (!_error)
-    g_connect_succeeded = true;
-  else
-    gzerr << "Unable to open a socket connection.\n";
-}
-
-
 //////////////////////////////////////////////////
 Connection::Connection()
 {
@@ -59,7 +49,6 @@ Connection::Connection()
 
   this->localURI = std::string("http://") + this->GetLocalHostname() + ":" +
                    boost::lexical_cast<std::string>(this->GetLocalPort());
-
   this->localAddress = this->GetLocalEndpoint().address().to_string();
 }
 
@@ -100,35 +89,37 @@ bool Connection::Connect(const std::string &host, unsigned int port)
     resolver.resolve(query);
   boost::asio::ip::tcp::resolver::iterator end;
 
-  boost::system::error_code error = boost::asio::error::host_not_found;
+  this->connectError = false;
+  this->remoteURI.clear();
 
-  g_connect_succeeded = false;
-  while (!g_connect_succeeded && endpoint_iter != end)
+  // Use async connect so that we can use a custom timeout. This is useful
+  // when trying to detect errors.
+  this->socket->async_connect(*endpoint_iter++,
+      boost::bind(&Connection::OnConnect, this,
+        boost::asio::placeholders::error, endpoint_iter));
+
+  // Hack to make the connections work...
+  common::Time::MSleep(10);
+
+  // We want the ::Connection call to block untill a connection is
+  // established
+  int count = 0;
+  while (this->remoteURI.empty() && count < 20 && !this->connectError)
   {
-    this->socket->close();
-
-    g_connect_succeeded = false;
-    this->socket->async_connect(*endpoint_iter++, connect_handler);
-
-    int count = 0;
-    while (!g_connect_succeeded && count < 50)
-    {
-      common::Time::MSleep(100);
-      ++count;
-    }
+    common::Time::MSleep(50);
+    ++count;
   }
 
-  if (!g_connect_succeeded)
+  if (this->connectError)
   {
-    gzerr << "Unable to connect to [" << host << ":" << port << "].\n";
     return false;
   }
 
-  this->remoteURI =  std::string("http://") + this->GetRemoteHostname()
-    + ":" + boost::lexical_cast<std::string>(this->GetRemotePort());
-
-  if (this->socket && this->socket->is_open())
-    this->remoteAddress = this->socket->remote_endpoint().address().to_string();
+  if (this->remoteURI.empty())
+  {
+    gzerr << "Unable to connect to host[" << host << ":" << port << "]\n";
+    return false;
+  }
 
   return true;
 }
@@ -629,6 +620,30 @@ std::string Connection::GetLocalHostname() const
   return this->GetHostname(this->GetLocalEndpoint());
 }
 
+//////////////////////////////////////////////////
+void Connection::OnConnect(const boost::system::error_code &_error,
+    boost::asio::ip::tcp::resolver::iterator _endPointIter)
+{
+  if (_error == 0)
+  {
+    this->remoteURI = std::string("http://") + this->GetRemoteHostname()
+      + ":" + boost::lexical_cast<std::string>(this->GetRemotePort());
 
+    if (this->socket && this->socket->is_open())
+      this->remoteAddress =
+        this->socket->remote_endpoint().address().to_string();
 
+  }
+  else if (_endPointIter != boost::asio::ip::tcp::resolver::iterator() &&
+           this->socket)
+  {
+    this->socket->close();
+    boost::asio::ip::tcp::endpoint endPoint = *_endPointIter;
 
+    this->socket->async_connect(endPoint,
+        boost::bind(&Connection::OnConnect, this,
+          boost::asio::placeholders::error, ++_endPointIter));
+  }
+  else
+    this->connectError = true;
+}

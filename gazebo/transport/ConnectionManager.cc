@@ -513,24 +513,33 @@ void ConnectionManager::Subscribe(const std::string &_topic,
 
 //////////////////////////////////////////////////
 ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
-                                                       unsigned int port)
+                                                     unsigned int port)
 {
   ConnectionPtr conn;
 
   if (!this->initialized)
     return conn;
 
-  conn = this->FindConnection(host, port);
-  if (!conn)
+  // Sharing connections is broken
+  // conn = this->FindConnection(host, port);
+  //if (!conn)
   {
     // Connect to the remote host
     conn.reset(new Connection());
-    conn->Connect(host, port);
-
-    this->connectionMutex->lock();
-    this->connections.push_back(conn);
-    this->connectionMutex->unlock();
+    if (conn->Connect(host, port))
+    {
+      this->connectionMutex->lock();
+      this->connections.push_back(conn);
+      this->connectionMutex->unlock();
+    }
+    else
+    {
+      conn.reset();
+      return ConnectionPtr();
+    }
   }
+  // else
+  //  printf("Found Connections\n");
 
   return conn;
 }
@@ -554,22 +563,27 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
 
 
 //////////////////////////////////////////////////
-ConnectionPtr ConnectionManager::FindConnection(const std::string &host,
-                                                 unsigned int port)
+ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
+                                                 unsigned int _port)
 {
   ConnectionPtr conn;
 
   std::list<ConnectionPtr>::iterator iter;
 
-  std::string uri = "http://" + host + ":" +
-    boost::lexical_cast<std::string>(port);
+  std::string uri = "http://" + _host + ":" +
+    boost::lexical_cast<std::string>(_port);
+
+  std::cout << "FindConnection[" << _host << ":" << _port << "] URI[" << uri << "]\n";
 
   // Check to see if we are already connected to the remote publisher
   this->connectionMutex->lock();
   for (iter = this->connections.begin();
        iter != this->connections.end(); ++iter)
   {
-    if ((*iter)->IsOpen() && (*iter)->GetRemoteURI() == uri)
+    std::cout << "    " << (*iter)->GetRemoteAddress() << "\n";
+    //if ((*iter)->IsOpen() && (*iter)->GetRemoteURI() == uri)
+    if ((*iter)->IsOpen() && (*iter)->GetRemoteAddress() == _host &&
+        (*iter)->GetRemotePort() == _port)
       conn = *iter;
   }
   this->connectionMutex->unlock();

@@ -253,13 +253,16 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
     ConnectionPtr conn = ConnectionManager::Instance()->ConnectToRemoteHost(
         _pub.host(), _pub.port());
 
-    // Create a transport link that will read from the connection, and
-    // send data to a Publication.
-    PublicationTransportPtr publink(new PublicationTransport(_pub.topic(),
-          _pub.msg_type()));
-    publink->Init(conn);
+    if (conn)
+    {
+      // Create a transport link that will read from the connection, and
+      // send data to a Publication.
+      PublicationTransportPtr publink(new PublicationTransport(_pub.topic(),
+            _pub.msg_type()));
+      publink->Init(conn);
 
-    publication->AddTransport(publink);
+      publication->AddTransport(publink);
+    }
   }
 
   this->ConnectSubscribers(_pub.topic());
@@ -342,5 +345,3 @@ void TopicManager::PauseIncoming(bool _pause)
 {
   this->pauseIncoming = _pause;
 }
-
-
