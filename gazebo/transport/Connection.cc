@@ -28,6 +28,16 @@ using namespace transport;
 unsigned int Connection::idCounter = 0;
 IOManager *Connection::iomanager = NULL;
 
+bool g_connect_succeeded = false;
+void connect_handler(const boost::system::error_code &_error)
+{
+  if (!_error)
+    g_connect_succeeded = true;
+  else
+    gzerr << "Unable to open a socket connection.\n";
+}
+
+
 //////////////////////////////////////////////////
 Connection::Connection()
 {
@@ -49,6 +59,7 @@ Connection::Connection()
 
   this->localURI = std::string("http://") + this->GetLocalHostname() + ":" +
                    boost::lexical_cast<std::string>(this->GetLocalPort());
+
   this->localAddress = this->GetLocalEndpoint().address().to_string();
 }
 
@@ -91,14 +102,25 @@ bool Connection::Connect(const std::string &host, unsigned int port)
 
   boost::system::error_code error = boost::asio::error::host_not_found;
 
-  while (error && endpoint_iter != end)
+  g_connect_succeeded = false;
+  while (!g_connect_succeeded && endpoint_iter != end)
   {
     this->socket->close();
-    this->socket->connect(*endpoint_iter++, error);
+
+    g_connect_succeeded = false;
+    this->socket->async_connect(*endpoint_iter++, connect_handler);
+
+    int count = 0;
+    while (!g_connect_succeeded && count < 50)
+    {
+      common::Time::MSleep(100);
+      ++count;
+    }
   }
 
-  if (error)
+  if (!g_connect_succeeded)
   {
+    gzerr << "Unable to connect to [" << host << ":" << port << "].\n";
     return false;
   }
 
