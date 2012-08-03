@@ -326,7 +326,8 @@ QTreeView#mainTree::branch:open:has-children:has-siblings
 QWidget#modelList,
 QWidget#lightList,
 QWidget#insertModel,
-QWidget#sky
+QWidget#sky,
+QWidget#jointControl
 {
   background: #202020;
 }
@@ -335,11 +336,12 @@ QWidget#sky
 QWidget#modelList > QFrame,
 QWidget#lightList > QFrame,
 QWidget#insertModel > QFrame,
-QWidget#sky > QFrame
+QWidget#sky > QFrame,
+QWidget#jointControl > QFrame
 {
   margin-left: 8px;
   padding: 4px;
-  border-left: 1px solid #4763b7;/*f58113;*/
+  border-left: 1px solid #4763b7;
   background: #202020;
 }
 
