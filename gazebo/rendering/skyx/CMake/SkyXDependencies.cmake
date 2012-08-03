@@ -15,16 +15,16 @@ set(SKYX_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt SKYX dependencies")
 include(SkyXFindPkgMacros)
 
 set(SKYX_DEP_SEARCH_PATH
-	${SKYX_DEPENDENCIES_DIR}
-	${ENV_SKYX_DEPENDENCIES_DIR}
-	${ENV_OGRE_HOME}
+  ${SKYX_DEPENDENCIES_DIR}
+  ${ENV_SKYX_DEPENDENCIES_DIR}
+  ${ENV_OGRE_HOME}
 )
 message(STATUS "Search path: ${SKYX_DEP_SEARCH_PATH}")
 
 # Set hardcoded path guesses for various platforms
 if (UNIX)
-	set(SKYX_DEP_SEARCH_PATH ${SKYX_DEP_SEARCH_PATH}
-	                         /usr/local)
+  set(SKYX_DEP_SEARCH_PATH ${SKYX_DEP_SEARCH_PATH}
+                           /usr/local)
 endif ()
 
 # give guesses as hints to the find_package calls
@@ -43,13 +43,13 @@ set(Boost_ADDITIONAL_VERSIONS "1.47.0" "1.47" "1.46.0" "1.46" "1.45.0" "1.45" "1
 #set(SKYX_BOOST_COMPONENTS thread date_time)
 find_package(Boost COMPONENTS ${SKYX_BOOST_COMPONENTS} QUIET)
 if (NOT Boost_FOUND)
-	# Try again with the other type of libs
-	if(Boost_USE_STATIC_LIBS)
-		set(Boost_USE_STATIC_LIBS)
-	else()
-		set(Boost_USE_STATIC_LIBS ON)
-	endif()
-	find_package(Boost COMPONENTS ${SKYX_BOOST_COMPONENTS} QUIET)
+  # Try again with the other type of libs
+  if(Boost_USE_STATIC_LIBS)
+    set(Boost_USE_STATIC_LIBS)
+  else()
+    set(Boost_USE_STATIC_LIBS ON)
+  endif()
+  find_package(Boost COMPONENTS ${SKYX_BOOST_COMPONENTS} QUIET)
 endif()
 macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" TRUE "" "")
 macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
@@ -86,12 +86,12 @@ MACRO_DISPLAY_FEATURE_LOG()
 
 # Add library and include paths from the dependencies
 include_directories(
-	${OGRE_INCLUDE_DIRS}
-	${Boost_INCLUDE_DIRS}
+  ${OGRE_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 link_directories(
-	${OGRE_LIBRARY_DIRS}
-	${Boost_LIBRARY_DIRS}
+  ${OGRE_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
 )
 

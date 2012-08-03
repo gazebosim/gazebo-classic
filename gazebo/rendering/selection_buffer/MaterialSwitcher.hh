@@ -18,6 +18,8 @@
 #ifndef _MATERIALSWITCHER_HH_
 #define _MATERIALSWITCHER_HH_
 
+#include <map>
+#include <string>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Color.hh"
 
@@ -34,43 +36,41 @@ namespace gazebo
     };*/
 
     class SelectionBuffer;
-    
     class MaterialSwitcher : public Ogre::MaterialManager::Listener
     {
       /// \brief Constructor
       public: MaterialSwitcher();
-    
+
       /// \brief Destructor
       public: ~MaterialSwitcher();
-    
+
       /// \brief Get the entity with a specific color
       public: const std::string &GetEntityName(
                   const common::Color &_color) const;
-        
+
       /// \brief Reset the color value incrementor
       public: void Reset();
-    
+
       /// \brief Ogre callback that assigns colors to new renderables
       public: virtual Ogre::Technique *handleSchemeNotFound(
-                  unsigned short _schemeIndex, const Ogre::String &_schemeName,
-                  Ogre::Material *_originalMaterial, unsigned short _lodIndex,
+                  uint16_t _schemeIndex, const Ogre::String &_schemeName,
+                  Ogre::Material *_originalMaterial, uint16_t _lodIndex,
                   const Ogre::Renderable *_rend);
-    
-      //private: typedef std::map<unsigned int, std::string, cmp_color> ColorMap;
+
+      // private: typedef std::map<unsigned int, std::string, cmp_color>
+      // ColorMap;
       private: typedef std::map<unsigned int, std::string> ColorMap;
       private: typedef ColorMap::const_iterator ColorMapConstIter;
-    
       private: std::string emptyString;
       private: common::Color currentColor;
       private: std::string lastEntity;
       private: Ogre::Technique *lastTechnique;
       private: MaterialSwitcher::ColorMap colorDict;
-    
+
       private: void GetNextColor();
-    
+
       public: friend class SelectionBuffer;
     };
   }
 }
-
 #endif

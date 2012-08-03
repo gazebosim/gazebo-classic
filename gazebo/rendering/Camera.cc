@@ -24,6 +24,8 @@
 
 #include "sdf/sdf.hh"
 
+#include "gazebo/rendering/skyx/include/SkyX.h"
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -1020,7 +1022,6 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       Ogre::TU_RENDERTARGET)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->GetViewport(), this->GetScene());
   this->initialized = true;
 }
 
@@ -1077,6 +1078,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
 
+    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
+
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
@@ -1126,6 +1129,9 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
 
       // this->ssaoInstance->setEnabled(false);
     }
+
+    if (this->GetScene()->skyx != NULL)
+      this->renderTarget->addListener(this->GetScene()->skyx);
   }
 }
 

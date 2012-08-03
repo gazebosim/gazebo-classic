@@ -24,8 +24,9 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_LightningManager_H_
 #define _SkyX_VClouds_LightningManager_H_
 
-#include "Prerequisites.h"
+#include <vector>
 
+#include "Prerequisites.h"
 #include "Lightning.h"
 
 namespace SkyX
@@ -39,17 +40,20 @@ namespace SkyX
       public:
         /** Listener class
         */
-        class Listener 
+        class Listener
         {
+          public: virtual ~Listener() {}
           public:
             /** Lightning added
-              @param l Lightning that has been added
-              @remarks Useful when, for example, the app needs to known when a Lightning has been created (by manually
-              invoking LightningManager::addLightning(...) or automatically based on the lightning creation
-              probabilities) in order to play a sound, etc.
-              The lightning position is accessible through Lightning::getSceneNode()->getPosition().
+              @param l Lightning that has been added @remarks Useful when,
+              for example, the app needs to known when a Lightning has been
+              created (by manually invoking
+              LightningManager::addLightning(...) or automatically based on
+              the lightning creation probabilities) in order to play
+              a sound, etc.  The lightning position is accessible through
+              Lightning::getSceneNode()->getPosition().
               */
-            inline virtual void lightningAdded(Lightning* l){}
+            inline virtual void lightningAdded(Lightning* l) {}
         };
 
         /** Constructor
@@ -82,7 +86,10 @@ namespace SkyX
           @remarks The lightning will be automatically destroyed one time it'll be finished, so the returned ptr will not
           be available one time the lightning will have disappeared
           */
-        Lightning* addLightning(const Ogre::Vector3& p, const Ogre::Vector3& d, const Ogre::Real l, const Ogre::uint32& div = static_cast<Ogre::uint32>(Ogre::Math::RangeRandom(12, 30)));
+        Lightning* addLightning(const Ogre::Vector3& p,
+            const Ogre::Vector3& d, const Ogre::Real l,
+            const Ogre::uint32& div = static_cast<Ogre::uint32>(
+              Ogre::Math::RangeRandom(12, 30)));
 
         /** Update material
           @remarks To be invoked before each camera rendering process
@@ -142,7 +149,7 @@ namespace SkyX
         inline const Ogre::Vector3& getLightningColor() const
         {
           return mLightningColor;
-        } 
+        }
 
         /** Set lightning time multiplier
           @param c Lightning time multiplier
@@ -159,7 +166,7 @@ namespace SkyX
         inline const Ogre::Real& getLightningTimeMultiplier() const
         {
           return mLightningTimeMultiplier;
-        } 
+        }
 
         /** Set average lightning apparition time
           @param alat Average lightning apparition time

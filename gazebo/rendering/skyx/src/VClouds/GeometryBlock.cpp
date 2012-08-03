@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <algorithm>
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "VClouds/VClouds.h"
@@ -31,8 +32,8 @@ namespace SkyX { namespace VClouds
     GeometryBlock::GeometryBlock(VClouds* vc,
         const float& Height, const Ogre::Radian& Alpha,
         const Ogre::Radian& Beta, const float& Radius,
-        const Ogre::Radian& Phi, const int& Na, 
-        const int& Nb, const int& Nc, const int& A, 
+        const Ogre::Radian& Phi, const int& Na,
+        const int& Nb, const int& Nc, const int& A,
         const int& B, const int& C, const int& Position)
       : mVClouds(vc)
         , mCreated(false)
@@ -49,8 +50,8 @@ namespace SkyX { namespace VClouds
         , mNa(Na) , mNb(Nb) , mNc(Nc)
         , mA(A) , mB(B) , mC(C)
         , mPosition(Position)
-        , mDisplacement(Ogre::Vector3(0,0,0))
-        , mWorldOffset(Ogre::Vector2(0,0))
+        , mDisplacement(Ogre::Vector3(0, 0, 0))
+        , mWorldOffset(Ogre::Vector2(0, 0))
         , mCamera(0)
         , mLastFallingDistance(0)
     {
@@ -123,13 +124,13 @@ namespace SkyX { namespace VClouds
 
     const Ogre::AxisAlignedBox GeometryBlock::_buildAABox(const float& fd) const
     {
-      Ogre::Vector2 Center = Ogre::Vector2(0,0);
+      Ogre::Vector2 Center = Ogre::Vector2(0, 0);
       Ogre::Vector2 V1     = mRadius * Ogre::Vector2(
           Ogre::Math::Cos(mPhi * mPosition),
           Ogre::Math::Sin(mPhi * mPosition));
       Ogre::Vector2 V2     = mRadius * Ogre::Vector2(
-          Ogre::Math::Cos(mPhi*(mPosition+1)),
-          Ogre::Math::Sin(mPhi*(mPosition+1)));
+          Ogre::Math::Cos(mPhi*(mPosition + 1)),
+          Ogre::Math::Sin(mPhi*(mPosition + 1)));
 
       Ogre::Vector2 Max    = Ogre::Vector2(
           std::max<float>(std::max<float>(V1.x, V2.x), Center.x),
@@ -142,15 +143,15 @@ namespace SkyX { namespace VClouds
       // Nate: Fixed this
       return Ogre::AxisAlignedBox(
           // Min x,y,z
-          Min.x, Min.y, -std::max<float>(fd,0),
+          Min.x, Min.y, -std::max<float>(fd, 0),
           // Max x,y,z
-          Max.x, Max.y, mHeight - std::min<float>(fd,0));
+          Max.x, Max.y, mHeight - std::min<float>(fd, 0));
     }
 
     void GeometryBlock::_calculateDataSize()
     {
-      mVertexCount = 7 * mNa + 6 * mNb;// + 4 * mNc;
-      mNumberOfTriangles = 5 * mNa + 4 * mNb;// + 2 * mNc;
+      mVertexCount = 7 * mNa + 6 * mNb;  // + 4 * mNc;
+      mNumberOfTriangles = 5 * mNa + 4 * mNb;  // + 2 * mNc;
 
       mV2Cos = Ogre::Vector2(Ogre::Math::Cos(mPosition*mPhi),
                              Ogre::Math::Cos((mPosition+1)*mPhi));
@@ -201,7 +202,7 @@ namespace SkyX { namespace VClouds
 
       vbind->setBinding(0, mVertexBuffer);
 
-      unsigned short *indexbuffer = new unsigned short[mNumberOfTriangles*3];
+      uint16_t *indexbuffer = new uint16_t[mNumberOfTriangles * 3];
 
       int IndexOffset = 0;
       int VertexOffset = 0;
@@ -314,11 +315,12 @@ namespace SkyX { namespace VClouds
 
       mDisplacement = displacement;
 
-      float fallingDistance = mVClouds->getDistanceFallingParams().x * 
+      float fallingDistance = mVClouds->getDistanceFallingParams().x *
         (mEntity->getParentSceneNode()->_getDerivedPosition().z -
          c->getDerivedPosition().z);
 
-      if (mVClouds->getDistanceFallingParams().y > 0) // -1 means no max falling
+      // -1 means no max falling
+      if (mVClouds->getDistanceFallingParams().y > 0)
       {
         if (fallingDistance > 0)
         {
@@ -379,7 +381,7 @@ namespace SkyX { namespace VClouds
     {
       int VertexOffset = n * 4;
 
-      // TODO, calculate constants by zone, not by slice
+      // TODO: calculate constants by zone, not by slice
       float Radius = mB + ((mC - mB) / mNc) * (mNc - n);
 
       Radius += mDisplacement.z;
@@ -413,9 +415,11 @@ namespace SkyX { namespace VClouds
       // Vertex 1
       _setVertexData(VertexOffset+1, or1, opacity);
       // Vertex 2
-      _setVertexData(VertexOffset+2, or0+(Ogre::Vector3(x2.x, y0, z2.x)-or0).normalisedCopy()*hip, opacity);
+      _setVertexData(VertexOffset + 2, or0 +
+          (Ogre::Vector3(x2.x, y0, z2.x)-or0).normalisedCopy()*hip, opacity);
       // Vertex 3
-      _setVertexData(VertexOffset+3, or1+(Ogre::Vector3(x2.y, y0, z2.y)-or1).normalisedCopy()*hip, opacity);
+      _setVertexData(VertexOffset + 3, or1 +
+          (Ogre::Vector3(x2.y, y0, z2.y) - or1).normalisedCopy()*hip, opacity);
     }
 
     void GeometryBlock::_updateZoneBSlice(const int& n)
@@ -525,7 +529,8 @@ namespace SkyX { namespace VClouds
          mCamera->getDerivedPosition().z) *
         (Ogre::Vector2(p.x, p.y).length()/mRadius);
 
-      if (mVClouds->getDistanceFallingParams().y > 0) // -1 means no max falling
+      // -1 means no max falling
+      if (mVClouds->getDistanceFallingParams().y > 0)
       {
         if (fallingDistance > 0)
         {
@@ -569,9 +574,9 @@ namespace SkyX { namespace VClouds
           Ogre::Math::Pow(xz_length_radius * mRadius, 2) +
           Ogre::Math::Pow(origin.z, 2));
 
-      Ogre::Vector3 uv = dir * hip; // Only x/z, += origin doesn't need
-      mVertices[index].u = (uv.y+mWorldOffset.x) * noise_scale;
-      mVertices[index].v = (uv.x+mWorldOffset.y) * noise_scale;
+      Ogre::Vector3 uv = dir * hip;  // Only x/z, += origin doesn't need
+      mVertices[index].u = (uv.y + mWorldOffset.x) * noise_scale;
+      mVertices[index].v = (uv.x + mWorldOffset.y) * noise_scale;
 
       // Opacity
       mVertices[index].o = o * mVClouds->getGlobalOpacity();
@@ -649,7 +654,8 @@ namespace SkyX { namespace VClouds
       }
 
       // TODO: Use a world bounding box for each geometry zone, this way the
-      // culling is going to be more acurrated and the geometry falling is going to be culled
+      // culling is going to be more acurrated and the geometry falling is
+      // going to be culled
       // when the falling factor is bigger than 1.
       return c->isVisible(mEntity->getParentSceneNode()->_getWorldAABB());
     }

@@ -151,9 +151,8 @@ namespace gazebo
       public: virtual bool GetKinematic() const;
 
       /// \brief Allow the link to auto disable.
-      /// \param _disable If true, the link is allowed to auto disable. 
+      /// \param _disable If true, the link is allowed to auto disable.
       public: virtual void SetAutoDisable(bool _disable);
-
 
       protected: math::Pose pose;
 

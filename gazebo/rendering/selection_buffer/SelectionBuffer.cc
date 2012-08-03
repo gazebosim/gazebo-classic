@@ -23,18 +23,15 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-SelectionBuffer::SelectionBuffer(const std::string _cameraName,
+SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
     Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
 : sceneMgr(_mgr), renderTarget(_renderTarget),
   buffer(0), pixelBox(0)
 {
   this->camera = this->sceneMgr->getCamera(_cameraName);
-
   this->materialSwitchListener = new MaterialSwitcher();
-
   this->selectionTargetListener = new SelectionRenderListener(
       this->materialSwitchListener);
-
   unsigned int width = this->renderTarget->getWidth();
   unsigned int height = this->renderTarget->getHeight();
 
@@ -55,15 +52,13 @@ SelectionBuffer::SelectionBuffer(const std::string _cameraName,
       ~GZ_VISIBILITY_NOT_SELECTABLE);
 
   this->renderTexture->addListener(this->selectionTargetListener);
-
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
-  size_t bufferSize = pixelBuffer->getSizeInBytes();
 
+  size_t bufferSize = pixelBuffer->getSizeInBytes();
   this->buffer = new uint8_t[bufferSize];
   this->pixelBox = new Ogre::PixelBox(pixelBuffer->getWidth(),
       pixelBuffer->getHeight(), pixelBuffer->getDepth(),
       pixelBuffer->getFormat(), this->buffer);
-
   this->CreateRTTOverlays();
 }
 
@@ -71,7 +66,6 @@ SelectionBuffer::SelectionBuffer(const std::string _cameraName,
 SelectionBuffer::~SelectionBuffer()
 {
   Ogre::TextureManager::getSingleton().unload("SelectionPassTex");
-
   delete this->pixelBox;
   delete [] this->buffer;
   delete this->selectionTargetListener;
@@ -82,10 +76,8 @@ SelectionBuffer::~SelectionBuffer()
 void SelectionBuffer::Update()
 {
   this->UpdateBufferSize();
-
   this->materialSwitchListener->Reset();
   this->renderTexture->update();
-
   this->renderTexture->copyContentsToMemory(*this->pixelBox,
       Ogre::RenderTarget::FB_FRONT);
 }
@@ -102,7 +94,6 @@ void SelectionBuffer::UpdateBufferSize()
     Ogre::TextureManager::getSingleton().unload("SelectionPassTex");
     delete [] this->buffer;
     delete this->pixelBox;
-
     this->texture = Ogre::TextureManager::getSingleton().createManual(
         "SelectionPassTex",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -119,7 +110,6 @@ void SelectionBuffer::UpdateBufferSize()
     this->renderTexture->getViewport(0)->setMaterialScheme("aa");
     this->renderTexture->getViewport(0)->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_NOT_SELECTABLE);
-
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
     size_t bufferSize = pixelBuffer->getSizeInBytes();
 
@@ -134,16 +124,14 @@ void SelectionBuffer::UpdateBufferSize()
 Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 {
   // this->Update();
-
   size_t posInStream = (this->pixelBox->getWidth() * _y) * 4;
   posInStream += _x * 4;
-
   common::Color::BGRA color(0);
-  memcpy((void *)&color, this->buffer + posInStream, 4);
+  memcpy(static_cast<void *>(&color), this->buffer + posInStream, 4);
   common::Color cv;
   cv.SetFromARGB(color);
-  cv.a = 1.0;
 
+  cv.a = 1.0;
   const std::string &entName = this->materialSwitchListener->GetEntityName(cv);
 
   if (entName.empty())
@@ -155,18 +143,21 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 /////////////////////////////////////////////////
 void SelectionBuffer::CreateRTTOverlays()
 {
+  Ogre::OverlayManager *mgr = Ogre::OverlayManager::getSingletonPtr();
+
+  if (mgr->getByName("SelectionDebugOverlay"))
+    return;
+
   Ogre::MaterialPtr baseWhite =
     Ogre::MaterialManager::getSingleton().getDefaultSettings();
+
   Ogre::MaterialPtr selectionBufferTexture =
     baseWhite->clone("SelectionDebugMaterial");
-
   Ogre::TextureUnitState *textureUnit =
     selectionBufferTexture->getTechnique(0)->getPass(0)->
     createTextureUnitState();
-
   textureUnit->setTextureName("SelectionPassTex");
 
-  Ogre::OverlayManager *mgr = Ogre::OverlayManager::getSingletonPtr();
   this->selectionDebugOverlay = mgr->create("SelectionDebugOverlay");
 
   Ogre::OverlayContainer *panel =
@@ -178,9 +169,10 @@ void SelectionBuffer::CreateRTTOverlays()
   panel->setDimensions(400, 280);
   panel->setMaterialName("SelectionDebugMaterial");
   this->selectionDebugOverlay->add2D(panel);
-
   this->selectionDebugOverlay->hide();
 }
+
+
 
 /////////////////////////////////////////////////
 void SelectionBuffer::ShowOverlay(bool _show)

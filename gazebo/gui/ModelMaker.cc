@@ -254,7 +254,6 @@ void ModelMaker::OnMouseDrag(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::CreateTheEntity()
 {
-  std::cout << "Create the entity\n";
   msgs::Factory msg;
   if (!this->clone)
   {

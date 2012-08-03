@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
 
@@ -23,7 +22,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 SelectionRenderListener::SelectionRenderListener(MaterialSwitcher *_switcher)
-: materialListener(_switcher)
+  : materialListener(_switcher)
 {
 }
 

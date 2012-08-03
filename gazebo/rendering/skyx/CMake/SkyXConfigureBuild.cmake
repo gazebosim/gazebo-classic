@@ -7,7 +7,7 @@
 
 #######################################################################
 # This file takes care of configuring SkyX to build with the settings
-# given in CMake. It creates the necessary config.h file and will 
+# given in CMake. It creates the necessary config.h file and will
 # also prepare package files for pkg-config and CMake.
 #######################################################################
 
@@ -39,7 +39,7 @@ if (UNIX)
   set(SKYX_CFLAGS "")
   set(SKYX_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
   configure_file(${SKYX_TEMPLATES_DIR}/SKYX.pc.in ${SKYX_BINARY_DIR}/pkgconfig/SKYX${SKYX_LIB_SUFFIX}.pc @ONLY)
-  
+
   install(FILES ${SKYX_BINARY_DIR}/pkgconfig/SKYX${SKYX_LIB_SUFFIX}.pc DESTINATION lib/pkgconfig)
 endif ()
 

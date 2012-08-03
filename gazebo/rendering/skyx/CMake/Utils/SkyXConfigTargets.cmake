@@ -132,7 +132,7 @@ function(skyx_config_sample_common SAMPLENAME)
   endif ()
 
   if(NOT SKYX_STATIC)
-    # add GCC visibility flags to shared library build  
+    # add GCC visibility flags to shared library build
     if (CMAKE_COMPILER_IS_GNUCXX)
       set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${SKYX_GCC_VISIBILITY_FLAGS}")
       # disable "lib" prefix on Unix
@@ -146,7 +146,7 @@ endfunction(skyx_config_sample_common)
 function(skyx_config_sample_exe SAMPLENAME)
   skyx_config_sample_common(${SAMPLENAME})
 
-  # install debug pdb files - no _d on exe  
+  # install debug pdb files - no _d on exe
   if (SKYX_INSTALL_PDB)
     install(FILES ${SKYX_BINARY_DIR}/bin${SKYX_DEBUG_PATH}/${SAMPLENAME}.pdb
       DESTINATION bin${SKYX_DEBUG_PATH}

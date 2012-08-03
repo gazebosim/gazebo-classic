@@ -249,6 +249,9 @@ namespace gazebo
 
      private: static std::string GetHostname(boost::asio::ip::tcp::endpoint ep);
 
+     private: void OnConnect(const boost::system::error_code &_error,
+                  boost::asio::ip::tcp::resolver::iterator _endPointIter);
+
       private: boost::asio::ip::tcp::socket *socket;
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
@@ -279,6 +282,8 @@ namespace gazebo
       private: std::string localAddress;
       private: std::string remoteURI;
       private: std::string remoteAddress;
+
+      private: bool connectError;
     };
     /// \}
   }

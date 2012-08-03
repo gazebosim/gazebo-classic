@@ -87,7 +87,7 @@ macro(get_debug_names PREFIX)
   endforeach(i)
 endmacro(get_debug_names)
 
-# Add the parent dir from DIR to VAR 
+# Add the parent dir from DIR to VAR
 macro(add_parent_dir VAR DIR)
   get_filename_component(${DIR}_TEMP "${${DIR}}/.." ABSOLUTE)
   set(${VAR} ${${VAR}} ${${DIR}_TEMP})

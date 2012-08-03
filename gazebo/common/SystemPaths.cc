@@ -72,7 +72,7 @@ SystemPaths::SystemPaths()
 
   // Add some search paths
   this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
-  this->suffixPaths.push_back("/Media/models/");
+  this->suffixPaths.push_back("/media/models/");
 }
 
 /////////////////////////////////////////////////
@@ -233,7 +233,7 @@ std::string SystemPaths::FindFile(const std::string &_filename)
         found = true;
         break;
       }
-      
+
       std::list<std::string>::iterator suffixIter;
       for (suffixIter = this->suffixPaths.begin();
            suffixIter != this->suffixPaths.end(); ++suffixIter)

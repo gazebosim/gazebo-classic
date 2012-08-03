@@ -24,6 +24,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_GeometryManager_H_
 #define _SkyX_VClouds_GeometryManager_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
 #include "VClouds/GeometryBlock.h"
@@ -58,7 +59,7 @@ namespace SkyX
           @param Nc Number of slices in C zone
           */
         void create(const Ogre::Vector2& Height, const float& Radius,
-            const Ogre::Radian& Alpha, const Ogre::Radian& Beta, 
+            const Ogre::Radian& Alpha, const Ogre::Radian& Beta,
             const int& NumberOfBlocks, const int& Na, const int& Nb,
             const int& Nc);
 
@@ -155,7 +156,6 @@ namespace SkyX
 
         /// Scene node
         Ogre::SceneNode *mSceneNode;
-
     };
   }
 }

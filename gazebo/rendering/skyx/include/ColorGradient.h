@@ -24,62 +24,64 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_ColorGradient_H_
 #define _SkyX_ColorGradient_H_
 
+#include <vector>
+#include <utility>
 #include "Prerequisites.h"
 
 namespace SkyX
 {
-    class DllExport ColorGradient 
-	{
-	public:
-		/** Color frame type definition
-		    ColorFrame.first: Colour value
-			ColorFrame.second: Position in the gradient [0,1] range
-		 */
-		typedef std::pair<Ogre::Vector3, Ogre::Real> ColorFrame;
+    class DllExport ColorGradient
+  {
+  public:
+    /** Color frame type definition
+        ColorFrame.first: Colour value
+        ColorFrame.second: Position in the gradient [0,1] range
+     */
+    typedef std::pair<Ogre::Vector3, Ogre::Real> ColorFrame;
 
-	    /** Constructor
-		 */
-		ColorGradient();
+      /** Constructor
+     */
+    ColorGradient();
 
-		/** Destructor 
-		 */
-		~ColorGradient();
+    /** Destructor
+     */
+    ~ColorGradient();
 
-		/** Add color frame
-		    @param CFrame Color frame
-		 */
-		inline void addCFrame(const ColorFrame& CFrame)
-		{
-			CFrameVector.push_back(CFrame);
+    /** Add color frame
+        @param CFrame Color frame
+     */
+    inline void addCFrame(const ColorFrame& CFrame)
+    {
+      CFrameVector.push_back(CFrame);
 
-			mMalFormed = !_checkBounds();
-		}
+      mMalFormed = !_checkBounds();
+    }
 
-		/** Clear color gradient
-		 */
-		inline void clear()
-		{
-			CFrameVector.clear();
-		}
+    /** Clear color gradient
+     */
+    inline void clear()
+    {
+      CFrameVector.clear();
+    }
 
-		/** Get color value
-		    @param p The gradient point in [0,1] range
-			@return Color at the given gradient position
-		 */
-		const Ogre::Vector3 getColor(const Ogre::Real& p) const;
+    /** Get color value
+        @param p The gradient point in [0,1] range
+      @return Color at the given gradient position
+     */
+    const Ogre::Vector3 getColor(const Ogre::Real& p) const;
 
-	private:
-		/** Check bounds
-		    @return false if the Color gradient is mal-formed
-		 */
-		bool _checkBounds() const;
+  private:
+    /** Check bounds
+        @return false if the Color gradient is mal-formed
+     */
+    bool _checkBounds() const;
 
-		/// Mal formed color gradient?
-		bool mMalFormed;
+    /// Mal formed color gradient?
+    bool mMalFormed;
 
-		/// Color frame vector
-		std::vector<ColorFrame> CFrameVector;
-	};
+    /// Color frame vector
+    std::vector<ColorFrame> CFrameVector;
+  };
 }
 
 #endif

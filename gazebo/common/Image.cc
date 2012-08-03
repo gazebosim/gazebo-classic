@@ -84,6 +84,15 @@ int Image::Load(const std::string &_filename)
          iter != gazeboPaths.end() && !found; ++iter)
     {
       std::vector<std::string> pathNames;
+      pathNames.push_back((*iter)+"/media");
+      pathNames.push_back((*iter)+"/media/fonts");
+      pathNames.push_back((*iter)+"/media/materials/programs");
+      pathNames.push_back((*iter)+"/media/materials/scripts");
+      pathNames.push_back((*iter)+"/media/materials/textures");
+      pathNames.push_back((*iter)+"/media/models");
+      pathNames.push_back((*iter)+"/media/sets");
+      pathNames.push_back((*iter)+"/media/maps");
+
       pathNames.push_back((*iter)+"/Media");
       pathNames.push_back((*iter)+"/Media/fonts");
       pathNames.push_back((*iter)+"/Media/materials/programs");

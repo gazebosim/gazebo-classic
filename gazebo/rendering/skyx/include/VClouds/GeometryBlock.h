@@ -38,8 +38,8 @@ namespace SkyX
         /** Vertex struct
         */
         struct VERTEX
-        {	      // Position
-          float x,y,z,
+        {        // Position
+          float x, y, z,
                 // 3D Coords
                 xc, yc, zc,
                 // Noise coords
@@ -63,9 +63,10 @@ namespace SkyX
           @param C C radius
           */
         GeometryBlock(VClouds *vc,
-            const float& Height, const Ogre::Radian& Alpha, const Ogre::Radian& Beta, 
-            const float& Radius, const Ogre::Radian& Phi, const int& Na, 
-            const int& Nb, const int& Nc, const int& A, 
+            const float& Height, const Ogre::Radian& Alpha,
+            const Ogre::Radian& Beta,
+            const float& Radius, const Ogre::Radian& Phi, const int& Na,
+            const int& Nb, const int& Nc, const int& A,
             const int& B, const int& C, const int& Position);
 
         /** Destructor
