@@ -1,4 +1,5 @@
 set (models
+  pioneer2at.model
   pioneer2dx.model
   pr2.model
   pr2_visual_only.model

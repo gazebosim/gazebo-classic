@@ -422,6 +422,10 @@ void RenderEngine::SetupResources()
   std::list<std::string> paths =
     common::SystemPaths::Instance()->GetGazeboPaths();
 
+  std::list<std::string> mediaDirs;
+  mediaDirs.push_back("media");
+  mediaDirs.push_back("Media");
+
   for (iter = paths.begin(); iter != paths.end(); ++iter)
   {
     DIR *dir;
@@ -433,34 +437,41 @@ void RenderEngine::SetupResources()
 
     archNames.push_back(
         std::make_pair((*iter)+"/", "General"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media", "General"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/skyx", "SkyX"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/rtshaderlib", "General"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/materials/programs", "General"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/materials/scripts", "General"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/materials/textures", "General"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/models", "General"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/fonts", "Fonts"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/looknfeel", "LookNFeel"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/schemes", "Schemes"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/imagesets", "Imagesets"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/fonts", "Fonts"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/layouts", "Layouts"));
-    archNames.push_back(
-        std::make_pair((*iter)+"/Media/gui/animations", "Animations"));
+
+    for (std::list<std::string>::iterator mediaIter = mediaDirs.begin();
+         mediaIter != mediaDirs.end(); ++mediaIter)
+    {
+      std::string prefix = (*iter) + "/" + (*mediaIter);
+
+      archNames.push_back(
+          std::make_pair(prefix, "General"));
+      archNames.push_back(
+          std::make_pair(prefix + "/skyx", "SkyX"));
+      archNames.push_back(
+          std::make_pair(prefix + "/rtshaderlib", "General"));
+      archNames.push_back(
+          std::make_pair(prefix + "/materials/programs", "General"));
+      archNames.push_back(
+          std::make_pair(prefix + "/materials/scripts", "General"));
+      archNames.push_back(
+          std::make_pair(prefix + "/materials/textures", "General"));
+      archNames.push_back(
+          std::make_pair(prefix + "/media/models", "General"));
+      archNames.push_back(
+          std::make_pair(prefix + "/fonts", "Fonts"));
+      archNames.push_back(
+          std::make_pair(prefix + "/gui/looknfeel", "LookNFeel"));
+      archNames.push_back(
+          std::make_pair(prefix + "/gui/schemes", "Schemes"));
+      archNames.push_back(
+          std::make_pair(prefix + "/gui/imagesets", "Imagesets"));
+      archNames.push_back(
+          std::make_pair(prefix + "/gui/fonts", "Fonts"));
+      archNames.push_back(
+          std::make_pair(prefix + "/gui/layouts", "Layouts"));
+      archNames.push_back(
+          std::make_pair(prefix + "/gui/animations", "Animations"));
+    }
 
     for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
     {

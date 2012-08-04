@@ -856,7 +856,6 @@ TEST_F(MathTest, Random)
   EXPECT_GE(d, 1);
 
   d = math::Rand::GetDblNormal(2, 3);
-
   i = math::Rand::GetIntUniform(1, 2);
   EXPECT_LE(i, 2);
   EXPECT_GE(i, 1);

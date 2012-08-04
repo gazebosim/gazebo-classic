@@ -69,6 +69,8 @@ TEST_F(PhysicsTest, State)
   world->GetModel("box")->SetWorldPose(
       math::Pose(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0)));
 
+  gazebo::common::Time::MSleep(10);
+
   // Make sure the box has been moved
   physics::ModelState modelState2 = world->GetState().GetModelState("box");
   pose.Set(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0));
