@@ -170,7 +170,6 @@ msgs::Response transport::request(const std::string &_worldName,
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
 
-  std::cout << "Request[" << _request.DebugString() << "]\n";
   requestPub->Publish(_request);
 
   g_responseCondition.wait(lock);
