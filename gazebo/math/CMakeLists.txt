@@ -1,38 +1,40 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set ( sources Angle.cc
-              Box.cc
-              Matrix3.cc
-              Matrix4.cc
-              Plane.cc
-              Pose.cc
-              Quaternion.cc
-              Rand.cc
-              Vector2d.cc
-              Vector2i.cc
-              Vector3.cc
-              Vector4.cc
-              Helpers.cc
-              Spline.cc
-              RotationSpline.cc
+set (sources
+  Angle.cc
+  Box.cc
+  Matrix3.cc
+  Matrix4.cc
+  Plane.cc
+  Pose.cc
+  Quaternion.cc
+  Rand.cc
+  Vector2d.cc
+  Vector2i.cc
+  Vector3.cc
+  Vector4.cc
+  Helpers.cc
+  Spline.cc
+  RotationSpline.cc
 )
 
-set ( headers Angle.hh
-              Box.hh
-              Matrix3.hh
-              Matrix4.hh
-              Plane.hh
-              Pose.hh
-              Quaternion.hh
-              Rand.hh
-              Vector2d.hh
-              Vector2i.hh
-              Vector3.hh
-              Vector4.hh
-              MathTypes.hh
-              Helpers.hh
-              Spline.hh
-              RotationSpline.hh
+set (headers
+  Angle.hh
+  Box.hh
+  Matrix3.hh
+  Matrix4.hh
+  Plane.hh
+  Pose.hh
+  Quaternion.hh
+  Rand.hh
+  Vector2d.hh
+  Vector2i.hh
+  Vector3.hh
+  Vector4.hh
+  MathTypes.hh
+  Helpers.hh
+  Spline.hh
+  RotationSpline.hh
 )
 
 set (math_headers "" CACHE INTERNAL "transport headers" FORCE)

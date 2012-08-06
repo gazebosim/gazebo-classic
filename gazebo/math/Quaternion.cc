@@ -21,7 +21,6 @@
 #include <math.h>
 #include "math/Helpers.hh"
 #include "math/Quaternion.hh"
-#include "common/Console.hh"
 
 using namespace gazebo;
 using namespace math;

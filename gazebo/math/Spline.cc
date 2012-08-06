@@ -16,7 +16,6 @@
 */
 // Note: Originally cribbed from Ogre3d. Modified to implement Cardinal
 // spline and catmull-rom spline
-#include "gazebo/common/Console.hh"
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Vector4.hh"
@@ -102,7 +101,7 @@ Vector3 Spline::Interpolate(unsigned int _fromIndex, double _t) const
   // Bounds check
   if (_fromIndex >= this->points.size())
   {
-    gzerr << "Invalid spline interpolation. _fromIndex["
+    std::cerr << "Invalid spline interpolation. _fromIndex["
           << _fromIndex << "] >= points size[" << this->points.size() << "]\n";
     return Vector3(0, 0, 0);
   }
@@ -231,7 +230,7 @@ Vector3 Spline::GetPoint(unsigned int _index) const
 {
   if (_index >= this->points.size())
   {
-    gzerr << "Index[" << _index << "] is out of bounds[0.."
+    std::cerr << "Index[" << _index << "] is out of bounds[0.."
           << this->points.size()-1 << "]\n";
     return Vector3(0, 0, 0);
   }
@@ -244,7 +243,7 @@ Vector3 Spline::GetTangent(unsigned int _index) const
 {
   if (_index >= this->points.size())
   {
-    gzerr << "Index[" << _index << "] is out of bounds[0.."
+    std::cerr << "Index[" << _index << "] is out of bounds[0.."
           << this->points.size()-1 << "]\n";
     return Vector3(0, 0, 0);
   }
@@ -270,7 +269,7 @@ void Spline::UpdatePoint(unsigned int _index, const Vector3 &_value)
 {
   if (_index >= this->points.size())
   {
-    gzerr << "Index[" << _index << "] is out of bounds[0.."
+    std::cerr << "Index[" << _index << "] is out of bounds[0.."
           << this->points.size()-1 << "]\n";
     return;
   }
