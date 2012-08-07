@@ -237,6 +237,8 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
                                        QWidget *_parent)
   : QWidget(_parent)
 {
+  this->setObjectName("jointControl");
+
   this->setWindowTitle("Joint Control");
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
