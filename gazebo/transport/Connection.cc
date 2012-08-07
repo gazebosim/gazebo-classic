@@ -632,7 +632,6 @@ void Connection::OnConnect(const boost::system::error_code &_error,
     if (this->socket && this->socket->is_open())
       this->remoteAddress =
         this->socket->remote_endpoint().address().to_string();
-
   }
   else if (_endPointIter != boost::asio::ip::tcp::resolver::iterator() &&
            this->socket)
