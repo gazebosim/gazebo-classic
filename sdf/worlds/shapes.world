@@ -61,5 +61,6 @@
         </visual>
       </link>
     </model>
+
   </world>
 </gazebo>
