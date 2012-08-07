@@ -91,38 +91,6 @@ TEST_F(FactoryTest, Cylinder)
   }
 }
 
-TEST_F(FactoryTest, BlackCamera)
-{
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-    return;
-
-  math::Pose setPose, testPose;
-  Load("worlds/empty.world");
-  setPose.Set(math::Vector3(0, 0, -5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera("camera_model", "camera_sensor", setPose.pos,
-      setPose.rot.GetAsEuler());
-
-  unsigned char *img = NULL;
-  unsigned int width;
-  unsigned int height;
-  GetFrame("camera_sensor", &img, width, height);
-  ASSERT_EQ(width, static_cast<unsigned int>(320));
-  ASSERT_EQ(height, static_cast<unsigned int>(240));
-
-  unsigned char *trueImage = new unsigned char[width * height * 3];
-  memset(trueImage, 178, width*height*3);
-
-  unsigned int diffMax = 0;
-  unsigned int diffSum = 0;
-  double diffAvg = 0;
-  ImageCompare(&img, &trueImage, width, height, 3, diffMax, diffSum, diffAvg);
-  ASSERT_EQ(diffSum, static_cast<unsigned int>(0));
-  ASSERT_EQ(diffMax, static_cast<unsigned int>(0));
-  ASSERT_EQ(diffAvg, 0.0);
-}
-
-
 
 TEST_F(FactoryTest, Camera)
 {
