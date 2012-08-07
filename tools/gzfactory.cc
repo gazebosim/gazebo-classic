@@ -74,7 +74,6 @@ void Spawn(po::variables_map &vm)
   }
 
   sdf::ElementPtr modelElem = sdf->root->GetElement("model");
-  sdf::ElementPtr modelPose = modelElem->GetOrCreateElement("origin");
 
   // Get/Set the model name
   if (modelName.empty())
@@ -82,7 +81,7 @@ void Spawn(po::variables_map &vm)
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 
-  math::Pose pose = modelPose->GetValuePose("pose");
+  math::Pose pose = modelElem->GetValuePose("origin");
   math::Vector3 rpy = pose.rot.GetAsEuler();
   if (vm.count("pose-x"))
     pose.pos.x = vm["pose-x"].as<double>();
@@ -97,7 +96,7 @@ void Spawn(po::variables_map &vm)
   if (vm.count("pose-Y"))
     rpy.z = vm["pose-Y"].as<double>();
   pose.rot.SetFromEuler(rpy);
-  modelPose->GetAttribute("pose")->Set(pose);
+  modelElem->GetElement("origin")->Set(pose);
 
   std::cout << "Spawning " << modelName << " into "
             << worldName  << " world.\n";
