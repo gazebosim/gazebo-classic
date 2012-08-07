@@ -22,12 +22,20 @@ namespace gazebo
   {
     public: void Load(physics::WorldPtr /*_parent*/, sdf::ElementPtr _sdf)
     {
-      sdf::ElementPtr elem = _sdf->GetElement("param_list");
+      this->PrintValues("", _sdf);
+    }
+
+    private: void PrintValues(std::string _prefix, sdf::ElementPtr _sdf)
+    {
+      if (_sdf->GetValue())
+        std::cout << _prefix << _sdf->GetValue()->GetAsString() << "\n";
+
+      _prefix += "  ";
+      sdf::ElementPtr elem = _sdf->GetFirstElement();
       while (elem)
       {
-        std::string value = elem->GetValueString("param");
-        std::cout << "Value=" << value << "\n";
-        elem = elem->GetNextElement("param_list");
+        this->PrintValues(_prefix, elem);
+        elem = elem->GetNextElement();
       }
     }
   };

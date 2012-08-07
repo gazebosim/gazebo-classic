@@ -10,6 +10,14 @@
     <plugin name="parameters" filename="libparameters.so">
       <param_list>
         <param>value1</param>
+
+        <param_list_two>
+          <param>list_1_value_1</param>
+        </param_list_two>
+
+        <param_list_two>
+          <param>list_1_value_1</param>
+        </param_list_two>
       </param_list>
 
       <param_list>
