@@ -118,13 +118,13 @@
           </rename>
 
           <convert name="geometry">
-            <convert plane>
+            <convert name="plane">
               <rename>
                 <from attribute="normal"/>
                 <to element="normal"/>
               </rename>
             </convert>
-          </convert>
+          </convert> <!-- End geometry -->
         </convert> <!-- End collision -->
 
         <convert name="visual">
@@ -134,7 +134,7 @@
           </rename>
 
           <convert name="geometry">
-            <convert plane>
+            <convert name="plane">
               <rename>
                 <from attribute="normal"/>
                 <to element="normal"/>
@@ -204,7 +204,7 @@
           <to element="origin"/>
         </rename>
         <convert name="geometry">
-          <convert plane>
+          <convert name="plane">
             <rename>
               <from attribute="normal"/>
               <to element="normal"/>
@@ -220,7 +220,7 @@
         </rename>
 
         <convert name="geometry">
-          <convert plane>
+          <convert name="plane">
             <rename>
               <from attribute="normal"/>
               <to element="normal"/>
