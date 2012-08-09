@@ -142,6 +142,9 @@ namespace gazebo
       ///        body's own frame of reference.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
+      /// \copydoc Link::SetAutoDisable(bool)
+      public: virtual void SetAutoDisable(bool _disable);
+
       private: btCompoundShape *compoundShape;
       private: BulletMotionState *motionState;
       private: btRigidBody *rigidLink;

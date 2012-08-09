@@ -157,12 +157,13 @@ bool Collision::IsPlaceable() const
 void Collision::SetLaserRetro(float _retro)
 {
   this->sdf->GetElement("laser_retro")->Set(_retro);
+  this->laserRetro = _retro;
 }
 
 //////////////////////////////////////////////////
 float Collision::GetLaserRetro() const
 {
-  return this->sdf->GetValueDouble("laser_retro");
+  return this->laserRetro;
 }
 
 //////////////////////////////////////////////////

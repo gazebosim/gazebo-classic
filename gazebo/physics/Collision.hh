@@ -185,6 +185,8 @@ namespace gazebo
 
       private: SurfaceParamsPtr surface;
       private: std::vector<event::ConnectionPtr> connections;
+
+      private: float laserRetro;
     };
     /// \}
   }

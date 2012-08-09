@@ -304,7 +304,7 @@ namespace gazebo
         if (camSDF->HasElement("view_controller"))
         {
           guiCam->set_view_controller(
-              camSDF->GetElement("view_controller")->GetValueString("type"));
+              camSDF->GetValueString("view_controller"));
         }
 
         if (camSDF->HasElement("track_visual"))
