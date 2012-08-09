@@ -15,7 +15,12 @@
     <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
   </element> <!-- End Mesh -->
   <element name="plane" required="0">
-    <attribute name="normal" type="vector3" default="0 0 1" required="1"/>
+    <element name="normal" type="vector3" default="0 0 1" required="1">
+      <description>Normal direction for the plane</description>
+    </element>
+    <element name="size" type="vector2d" default="1 1" min="0 0" required="1">
+      <description>Length of each side of the plane</description> 
+    </element>
   </element> <!-- End Plane -->
   <element name="image" required="0">
     <attribute name="filename" type="string" default="__default__" required="1"/>

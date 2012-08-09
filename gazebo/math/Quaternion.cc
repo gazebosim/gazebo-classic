@@ -265,8 +265,6 @@ Vector3 Quaternion::GetAsEuler() const
   sqy = copy.y * copy.y;
   sqz = copy.z * copy.z;
 
-  copy.Normalize();
-
   // Roll
   vec.x = atan2(2 * (copy.y*copy.z + copy.w*copy.x), squ - sqx - sqy + sqz);
 

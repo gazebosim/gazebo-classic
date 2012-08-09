@@ -203,6 +203,12 @@ namespace gazebo
       /// \brief Enable all the links in all the models
       public: void SetEnabled(bool _enabled);
 
+      /// \brief Set the current model pose by specifying pose of a link
+      public: void SetLinkWorldPose(const math::Pose &_pose,
+                                    std::string _linkName);
+      public: void SetLinkWorldPose(const math::Pose &_pose,
+                                    const LinkPtr &_link);
+
       /// \brief Allow the model the auto disable. This is ignored if the
       /// model has joints.
       /// \param _disable If true, the model is allowed to auto disable.

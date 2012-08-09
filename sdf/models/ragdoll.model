@@ -1,0 +1,887 @@
+<!-- this was initially generated from ragdoll.urdf,
+     but have sence been updated to turn off gravity for certain links
+     and various tweaks -->
+<gazebo version='1.0'>
+  <model name='ragdoll' static='0'>
+    <origin pose='0.000000 0.000000 1.4 0.000000 -0.000000 0.000000'/>
+    <link name='hip' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='10.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.100000' ixy='0.000000' ixz='0.000000' iyy='0.100000' iyz='0.000000' izz='0.100000'/>
+      </inertial>
+      <collision name='hip_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.125000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.100000 0.500000 0.250000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='hip_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.125000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.100000 0.500000 0.250000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_thigh_pan' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.220000 0.000000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='l_thigh_pan_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.030000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.060000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_thigh_pan_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.030000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.060000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_thigh_lift' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.220000 0.000000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='5.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.050000' ixy='0.000000' ixz='0.000000' iyy='0.050000' iyz='0.000000' izz='0.050000'/>
+      </inertial>
+      <collision name='l_thigh_lift_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.350000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.060000' length='0.700000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_thigh_lift_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.350000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.060000' length='0.700000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_calf' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.220000 -0.700000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='2.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.020000' ixy='0.000000' ixz='0.000000' iyy='0.020000' iyz='0.000000' izz='0.020000'/>
+      </inertial>
+      <collision name='l_calf_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.600000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_calf_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.600000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_ankle' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.220000 -1.325000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='l_ankle_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.050000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_ankle_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.050000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_foot' gravity='1' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.220000 -1.350000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.100000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='l_foot_geom' laser_retro='0.000000'>
+        <origin pose='0.100000 0.000000 -0.025000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.200000 0.030000 0.050000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_foot_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.100000 0.000000 -0.025000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.200000 0.030000 0.050000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_thigh_pan' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.220000 0.000000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='r_thigh_pan_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.030000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.060000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_thigh_pan_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.030000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.060000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_thigh_lift' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.220000 0.000000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='5.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.050000' ixy='0.000000' ixz='0.000000' iyy='0.050000' iyz='0.000000' izz='0.050000'/>
+      </inertial>
+      <collision name='r_thigh_lift_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.350000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.060000' length='0.700000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_thigh_lift_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.350000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.060000' length='0.700000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_calf' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.220000 -0.700000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='2.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.020000' ixy='0.000000' ixz='0.000000' iyy='0.020000' iyz='0.000000' izz='0.020000'/>
+      </inertial>
+      <collision name='r_calf_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.600000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_calf_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.600000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_ankle' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.220000 -1.325000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='r_ankle_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.050000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_ankle_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.050000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_foot' gravity='1' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.220000 -1.350000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.100000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='r_foot_geom' laser_retro='0.000000'>
+        <origin pose='0.100000 0.000000 -0.025000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.200000 0.030000 0.050000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_foot_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.100000 0.000000 -0.025000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.200000 0.030000 0.050000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='torso' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.000000 0.250000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='30.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.300000' ixy='0.000000' ixz='0.000000' iyy='0.300000' iyz='0.000000' izz='0.300000'/>
+      </inertial>
+      <collision name='torso_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.350000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.100000 0.600000 0.700000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='torso_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.350000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.100000 0.600000 0.700000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_shoulder' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.327500 0.922500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='l_shoulder_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.055000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_shoulder_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.055000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_upper_arm' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.327500 0.922500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='2.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.020000' ixy='0.000000' ixz='0.000000' iyy='0.020000' iyz='0.000000' izz='0.020000'/>
+      </inertial>
+      <collision name='l_upper_arm_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.055000' length='0.600000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_upper_arm_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.055000' length='0.600000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_forearm' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.327500 0.322500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='l_forearm_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.225000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.450000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_forearm_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.225000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.450000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_wrist' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.327500 -0.142500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='l_wrist_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.030000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_wrist_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.030000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='l_hand' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.327500 -0.157500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='l_hand_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.100000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.030000 0.100000 0.200000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='l_hand_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.100000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.030000 0.100000 0.200000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='neck' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.000000 0.950000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='neck_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.100000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.075000' length='0.200000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='neck_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.100000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.075000' length='0.200000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='head' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 0.000000 1.225000 0.000000 -0.000000 0.000000'/>
+      <inertial mass='10.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.100000' ixy='0.000000' ixz='0.000000' iyy='0.100000' iyz='0.000000' izz='0.100000'/>
+      </inertial>
+      <collision name='head_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.150000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='head_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.150000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_shoulder' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.327500 0.922500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='r_shoulder_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.055000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_shoulder_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.055000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_upper_arm' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.327500 0.922500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='2.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.020000' ixy='0.000000' ixz='0.000000' iyy='0.020000' iyz='0.000000' izz='0.020000'/>
+      </inertial>
+      <collision name='r_upper_arm_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.055000' length='0.600000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_upper_arm_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.300000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.055000' length='0.600000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_forearm' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.327500 0.322500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='r_forearm_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.225000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.450000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_forearm_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.225000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <cylinder radius='0.050000' length='0.450000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_wrist' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.327500 -0.142500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='r_wrist_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.030000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_wrist_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <sphere radius='0.030000'/>
+        </geometry>
+      </visual>
+    </link>
+    <link name='r_hand' gravity='0' self_collide='0' kinematic='0'>
+      <origin pose='0.000000 -0.327500 -0.157500 0.000000 -0.000000 0.000000'/>
+      <inertial mass='1.000000' density='1.000000'>
+        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+        <inertia ixx='0.010000' ixy='0.000000' ixz='0.000000' iyy='0.010000' iyz='0.000000' izz='0.010000'/>
+      </inertial>
+      <collision name='r_hand_geom' laser_retro='0.000000'>
+        <origin pose='0.000000 0.000000 -0.100000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.030000 0.100000 0.200000'/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
+          </friction>
+          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
+          <contact>
+            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='0.000000' min_depth='0.001000'/>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='r_hand_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
+        <origin pose='0.000000 0.000000 -0.100000 0.000000 -0.000000 0.000000'/>
+        <geometry>
+          <box size='0.030000 0.100000 0.200000'/>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='l_thigh_pan_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='hip'/>
+      <child link='l_thigh_pan'/>
+      <axis xyz='0.000000 0.000000 1.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_thigh_lift_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_thigh_pan'/>
+      <child link='l_thigh_lift'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_calf_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_thigh_lift'/>
+      <child link='l_calf'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_ankle_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_calf'/>
+      <child link='l_ankle'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_foot_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_ankle'/>
+      <child link='l_foot'/>
+      <axis xyz='1.000000 0.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_thigh_pan_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='hip'/>
+      <child link='r_thigh_pan'/>
+      <axis xyz='0.000000 0.000000 1.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_thigh_lift_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_thigh_pan'/>
+      <child link='r_thigh_lift'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_calf_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_thigh_lift'/>
+      <child link='r_calf'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_ankle_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_calf'/>
+      <child link='r_ankle'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_foot_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_ankle'/>
+      <child link='r_foot'/>
+      <axis xyz='1.000000 0.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='torso_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='hip'/>
+      <child link='torso'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_shoulder_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='torso'/>
+      <child link='l_shoulder'/>
+      <axis xyz='1.000000 0.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_upper_arm_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_shoulder'/>
+      <child link='l_upper_arm'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_forearm_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_upper_arm'/>
+      <child link='l_forearm'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_wrist_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_forearm'/>
+      <child link='l_wrist'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='l_hand_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='l_wrist'/>
+      <child link='l_hand'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='neck_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='torso'/>
+      <child link='neck'/>
+      <axis xyz='0.000000 0.000000 1.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='head_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='neck'/>
+      <child link='head'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_shoulder_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='torso'/>
+      <child link='r_shoulder'/>
+      <axis xyz='1.000000 0.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_upper_arm_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_shoulder'/>
+      <child link='r_upper_arm'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_forearm_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_upper_arm'/>
+      <child link='r_forearm'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_wrist_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_forearm'/>
+      <child link='r_wrist'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+    <joint name='r_hand_joint' type='revolute'>
+      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
+      <parent link='r_wrist'/>
+      <child link='r_hand'/>
+      <axis xyz='0.000000 1.000000 0.000000'>
+        <dynamics damping='0.000000' friction='0.000000'/>
+        <limit lower='-1.570800' upper='1.570800' effort='0.000000' velocity='0.000000'/>
+      </axis>
+    </joint>
+  </model>
+</gazebo>

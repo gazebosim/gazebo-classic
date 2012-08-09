@@ -851,6 +851,28 @@ void Model::SetEnabled(bool _enabled)
 }
 
 /////////////////////////////////////////////////
+void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
+{
+  // look for link matching link name
+  LinkPtr link = this->GetLink(_linkName);
+  if (link)
+    this->SetLinkWorldPose(_pose, link);
+  else
+    gzerr << "Setting Model Pose by specifying Link failed:"
+          << " Link[" << _linkName << "] not found.\n";
+}
+
+/////////////////////////////////////////////////
+void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
+{
+  math::Pose linkPose = _link->GetWorldPose();
+  math::Pose currentModelPose = this->GetWorldPose();
+  math::Pose linkRelPose = currentModelPose - linkPose;
+  math::Pose targetModelPose =  linkRelPose * _pose;
+  this->SetWorldPose(targetModelPose);
+}
+
+/////////////////////////////////////////////////
 void Model::SetAutoDisable(bool _auto)
 {
   if (this->joints.size() > 0)

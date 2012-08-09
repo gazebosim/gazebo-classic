@@ -116,6 +116,15 @@
             <from element="origin" attribute="pose"/>
             <to element="origin"/>
           </rename>
+
+          <convert name="geometry">
+            <convert name="plane">
+              <rename>
+                <from attribute="normal"/>
+                <to element="normal"/>
+              </rename>
+            </convert>
+          </convert> <!-- End geometry -->
         </convert> <!-- End collision -->
 
         <convert name="visual">
@@ -123,6 +132,15 @@
             <from element="origin" attribute="pose"/>
             <to element="origin"/>
           </rename>
+
+          <convert name="geometry">
+            <convert name="plane">
+              <rename>
+                <from attribute="normal"/>
+                <to element="normal"/>
+              </rename>
+            </convert>
+          </convert>
 
           <convert name="material">
             <rename>
@@ -185,6 +203,14 @@
           <from element="origin" attribute="pose"/>
           <to element="origin"/>
         </rename>
+        <convert name="geometry">
+          <convert name="plane">
+            <rename>
+              <from attribute="normal"/>
+              <to element="normal"/>
+            </rename>
+          </convert>
+        </convert>
       </convert> <!-- End collision -->
 
       <convert name="visual">
@@ -192,6 +218,15 @@
           <from element="origin" attribute="pose"/>
           <to element="origin"/>
         </rename>
+
+        <convert name="geometry">
+          <convert name="plane">
+            <rename>
+              <from attribute="normal"/>
+              <to element="normal"/>
+            </rename>
+          </convert>
+        </convert>
 
         <convert name="material">
           <rename>

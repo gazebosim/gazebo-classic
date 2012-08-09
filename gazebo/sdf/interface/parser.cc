@@ -622,6 +622,7 @@ void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
        elemXml = elemXml->NextSiblingElement())
   {
     std::string elem_name = elemXml->ValueStr();
+
     if (_sdf->HasElementDescription(elem_name))
     {
       sdf::ElementPtr element = _sdf->AddElement(elem_name);
@@ -638,6 +639,7 @@ void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
       std::string value = elemXml->GetText();
       if (!value.empty())
           element->GetValue()->SetFromString(value);
+      copyChildren(element, elemXml);
     }
     else
     {
@@ -646,10 +648,8 @@ void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
       element->SetName(elem_name);
       if (elemXml->GetText() != NULL)
         element->AddValue("string", elemXml->GetText(), "1");
-      else
-        gzerr << "trying to copy stuff inside <plugin> block, "
-              << "but they have NULL contents\n";
 
+      copyChildren(element, elemXml);
       _sdf->InsertElement(element);
     }
   }

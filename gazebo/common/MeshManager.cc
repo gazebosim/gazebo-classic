@@ -41,8 +41,8 @@ MeshManager::MeshManager()
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
-  this->CreatePlane("unit_plane", math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(100, 100), 0),
+  this->CreatePlane("unit_plane",
+      math::Plane(math::Vector3(0, 0, 1), math::Vector2d(1, 1), 0),
       math::Vector2d(1, 1),
       math::Vector2d(1, 1));
 
@@ -281,8 +281,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 
 //////////////////////////////////////////////////
 void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
-    const math::Vector2d &segments,
-    const math::Vector2d &uvTile)
+                              const math::Vector2d &segments,
+                              const math::Vector2d &uvTile)
 {
   this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
 }
