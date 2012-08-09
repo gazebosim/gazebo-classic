@@ -442,7 +442,9 @@ namespace gazebo
         {
           geomMsg->set_type(msgs::Geometry::PLANE);
           msgs::Set(geomMsg->mutable_plane()->mutable_normal(),
-              geomElem->GetValueVector3("normal"));
+                    geomElem->GetValueVector3("normal"));
+          msgs::Set(geomMsg->mutable_plane()->mutable_size(),
+                    geomElem->GetValueVector2d("size"));
         }
         else if (geomElem->GetName() == "image")
         {

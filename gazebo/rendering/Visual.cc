@@ -258,7 +258,8 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
       math::Plane plane = msgs::Convert(_msg->geometry().plane());
       sdf::ElementPtr elem = geomElem->AddElement("plane");
-      elem->GetAttribute("normal")->Set(plane.normal);
+      elem->GetOrCreateElement("normal")->Set(plane.normal);
+      elem->GetOrCreateElement("size")->Set(plane.size);
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
@@ -640,7 +641,9 @@ math::Vector3 Visual::GetScale()
     }
     else if (geomElem->HasElement("plane"))
     {
-      result.Set(1, 1, 1);
+      math::Vector2d size =
+        geomElem->GetElement("plane")->GetValueVector2d("size");
+      result.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {

@@ -99,7 +99,7 @@ void UserCamera::Init()
   // clipped and wholes appear in the lighting.
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::VERTEX)
   {
-    this->SetClipDist(0.1, 50);
+    this->SetClipDist(0.1, 100);
   }
   else if (RenderEngine::Instance()->GetRenderPathType() ==
            RenderEngine::FORWARD)
