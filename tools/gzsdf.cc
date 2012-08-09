@@ -25,12 +25,14 @@ using namespace sdf;
 void help()
 {
   std::cout << "This tool provides information about SDF files.\n\n";
-  std::cout << "gzsdf <command> [file]\n\n";
+  std::cout << "gzsdf <command>\n\n";
   std::cout << "Commands:\n";
-  std::cout << "    describe   Print the SDF format.\n";
-  std::cout << "    check      Check the SDF format for the given file.\n";
-  std::cout << "    print      Prints SDF, useful for debugging "
-            << "and as a conversion tool.\n\n";
+  std::cout << "    describe [SDF version]     Print the SDF format.\n";
+  std::cout << "    doc [SDF version]          Print HTML SDF.\n";
+  std::cout << "    check [file] [SDF version] Check the SDF format for the";
+  std::cout << " given file.\n";
+  std::cout << "    print [SDF verison]         Prints SDF, useful for ";
+  std::cout << " debugging and as a conversion tool.\n\n";
 }
 
 /////////////////////////////////////////////////
@@ -44,6 +46,17 @@ int main(int argc, char** argv)
     params.push_back(p);
   }
 
+  if (params.empty() || params[0] == "help" || params[0] == "h")
+  {
+    help();
+    return 0;
+  }
+
+  if (params[0] == "check" && params.size() == 3)
+    SDF::version = params[2];
+  else if (params.size() == 2)
+    SDF::version = params[1];
+
   boost::shared_ptr<SDF> sdf(new SDF());
   if (!init(sdf))
   {
@@ -51,11 +64,7 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  if (params.empty() || params[0] == "help" || params[0] == "h")
-  {
-    help();
-  }
-  else if (params[0] == "check")
+  if (params[0] == "check")
   {
     if (params.size() < 2)
     {
@@ -74,6 +83,14 @@ int main(int argc, char** argv)
   else if (params[0] == "describe")
   {
     sdf->PrintDescription();
+  }
+  else if (params[0] == "wiki")
+  {
+    sdf->PrintWiki();
+  }
+  else if (params[0] == "doc")
+  {
+    sdf->PrintDoc();
   }
   else if (params[0] == "print")
   {

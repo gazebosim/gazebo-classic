@@ -532,3 +532,15 @@ bool Param::Get(gazebo::math::Quaternion &_value)
     return false;
   }
 }
+
+/////////////////////////////////////////////////
+void Param::SetDescription(const std::string &_desc)
+{
+  this->description = _desc;
+}
+
+/////////////////////////////////////////////////
+std::string Param::GetDescription() const
+{
+  return this->description;
+}
