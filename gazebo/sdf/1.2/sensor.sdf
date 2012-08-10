@@ -22,7 +22,7 @@
     <description>If true, the sensor is visualized in the GUI</description>
   </element>
 
-  <element name="origin"  type="pose" default="0 0 0 0 0 0" required="0">
+  <element name="pose"  type="pose" default="0 0 0 0 0 0" required="0">
     <description>This is the pose of the sensor, relative to the parent link reference frame.</description>
   </element>
 

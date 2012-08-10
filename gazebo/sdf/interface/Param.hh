@@ -60,6 +60,7 @@ namespace sdf
             {return std::string();}
     public: virtual std::string GetDefaultAsString() const
             {return std::string();}
+
     /// \brief Set the parameter value from a string
     public: virtual bool SetFromString(const std::string &)
             {return true;}
@@ -251,6 +252,12 @@ namespace sdf
     public: T GetValue() const
     {
       return this->value;
+    }
+
+    /// \brief Get the value
+    public: T GetDefaultValue() const
+    {
+      return this->defaultValue;
     }
 
     /// \brief Set the value of the parameter

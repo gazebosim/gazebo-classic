@@ -87,7 +87,7 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->GetValueBool("static"));
-  this->sdf->GetAttribute("static")->SetUpdateFunc(
+  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
       boost::bind(&Entity::IsStatic, this));
 
   this->SetAutoDisable(this->sdf->GetValueBool("allow_auto_disable"));

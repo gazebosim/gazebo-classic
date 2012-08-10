@@ -334,36 +334,6 @@ void Element::PrintDescription(std::string _prefix)
   std::cout << _prefix << "</element>\n";
 }
 
-/////////////////////////////////////////////////
-void Element::PrintWiki(std::string _prefix)
-{
-  std::cout << _prefix << " . '''<" << this->name << ">''' ";
-  std::cout << " ''(required=" << this->required << ")''";
-  if (this->value)
-    std::cout << " ''(type=" << this->value->GetTypeName() << ")''";
-  std::cout << std::endl;
-  if (!this->description.empty())
-    std::cout << _prefix << "  . " << this->description << "\n";
-
-  Param_V::iterator aiter;
-  for (aiter = this->attributes.begin();
-       aiter != this->attributes.end(); ++aiter)
-  {
-    std::cout << _prefix << "  . '''" << (*aiter)->GetKey() << "'''"
-              << " ''(type=" << (*aiter)->GetTypeName() << ")''"
-              << " ''(default=" << (*aiter)->GetDefaultAsString() << ")''\n";
-    std::cout << _prefix  << "   . " << (*aiter)->GetDescription() << "\n";
-  }
-
-  ElementPtr_V::iterator eiter;
-  for (eiter = this->elementDescriptions.begin();
-      eiter != this->elementDescriptions.end(); ++eiter)
-  {
-
-    (*eiter)->PrintWiki(_prefix + " ");
-  }
-}
-
 
 /////////////////////////////////////////////////
 void Element::PrintDoc(std::string &_divs, std::string &_html,
@@ -461,7 +431,7 @@ void Element::PrintValues(std::string _prefix)
 
   Param_V::iterator aiter;
   for (aiter = this->attributes.begin();
-      aiter != this->attributes.end(); ++aiter)
+       aiter != this->attributes.end(); ++aiter)
   {
     std::cout << " " << (*aiter)->GetKey() << "='"
       << (*aiter)->GetAsString() << "'";
@@ -642,7 +612,7 @@ bool Element::HasElement(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-ElementPtr Element::GetElement(const std::string &_name) const
+ElementPtr Element::GetElementImpl(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
   for (iter = this->elements.begin(); iter != this->elements.end(); ++iter)
@@ -697,10 +667,16 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
+ElementPtr Element::GetOrCreateElement(const std::string &_name)
+{
+  return this->GetElement(_name);
+}
+
+/////////////////////////////////////////////////
+ElementPtr Element::GetElement(const std::string &_name)
 {
   if (this->HasElement(_name))
-    return this->GetElement(_name);
+    return this->GetElementImpl(_name);
   else
     return this->AddElement(_name);
 }
@@ -761,7 +737,7 @@ bool Element::GetValueBool(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueBool();
+      result = this->GetElementImpl(_key)->GetValueBool();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueBool();
     else
@@ -782,7 +758,7 @@ int Element::GetValueInt(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueInt();
+      result = this->GetElementImpl(_key)->GetValueInt();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueInt();
     else
@@ -803,7 +779,7 @@ float Element::GetValueFloat(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueFloat();
+      result = this->GetElementImpl(_key)->GetValueFloat();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueFloat();
     else
@@ -829,7 +805,7 @@ double Element::GetValueDouble(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueDouble();
+      result = this->GetElementImpl(_key)->GetValueDouble();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueDouble();
     else
@@ -855,7 +831,7 @@ unsigned int Element::GetValueUInt(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueUInt();
+      result = this->GetElementImpl(_key)->GetValueUInt();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueUInt();
     else
@@ -881,7 +857,7 @@ char Element::GetValueChar(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueChar();
+      result = this->GetElementImpl(_key)->GetValueChar();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueChar();
     else
@@ -902,7 +878,7 @@ std::string Element::GetValueString(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueString();
+      result = this->GetElementImpl(_key)->GetValueString();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueString();
     else
@@ -923,7 +899,7 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueVector3();
+      result = this->GetElementImpl(_key)->GetValueVector3();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueVector3();
     else
@@ -944,7 +920,7 @@ gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueVector2d();
+      result = this->GetElementImpl(_key)->GetValueVector2d();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueVector2d();
     else
@@ -965,7 +941,7 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueQuaternion();
+      result = this->GetElementImpl(_key)->GetValueQuaternion();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueQuaternion();
     else
@@ -986,7 +962,7 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValuePose();
+      result = this->GetElementImpl(_key)->GetValuePose();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValuePose();
     else
@@ -1007,7 +983,7 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
     if (param)
       param->Get(result);
     else if (this->HasElement(_key))
-      result = this->GetElement(_key)->GetValueColor();
+      result = this->GetElementImpl(_key)->GetValueColor();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueColor();
     else
@@ -1276,12 +1252,6 @@ void SDF::PrintDescription()
 void SDF::PrintValues()
 {
   this->root->PrintValues("");
-}
-
-/////////////////////////////////////////////////
-void SDF::PrintWiki()
-{
-  this->root->PrintWiki("");
 }
 
 /////////////////////////////////////////////////

@@ -14,11 +14,7 @@
     <description>Maximum number of contacts allowed between two entities. This value overrides the max_contacts element defined in physics.</description>
   </element>
 
-  <element name="mass" type="double" default="0" required="0">
-    <description>Mass of the collision element</description>
-  </element>
-
-  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0">
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
     <description>The reference frame of the collision element, relative to the reference frame of the link.</description>
   </element>
 

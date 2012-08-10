@@ -23,8 +23,8 @@ using namespace physics;
 //////////////////////////////////////////////////
 Inertial::Inertial()
 {
-  this->mass = 0;
-  this->principals.Set(0, 0, 0);
+  this->mass = 1;
+  this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
 
   this->sdf.reset(new sdf::Element);
@@ -39,7 +39,7 @@ Inertial::Inertial(double _m)
 
   this->mass = _m;
   this->cog.Set(0, 0, 0);
-  this->principals.Set(0, 0, 0);
+  this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
 }
 
@@ -70,9 +70,9 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   math::Vector3 center(0, 0, 0);
-  if (this->sdf->HasElement("origin"))
+  if (this->sdf->HasElement("pose"))
   {
-    center = this->sdf->GetValuePose("origin").pos;
+    center = this->sdf->GetValuePose("pose").pos;
   }
   this->SetCoG(center.x, center.y, center.z);
 
@@ -87,32 +87,40 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
         inertiaElem->GetValueDouble("ixz"),
         inertiaElem->GetValueDouble("iyz"));
 
-  inertiaElem->GetAttribute("ixx")->SetUpdateFunc(
+  inertiaElem->GetElement("ixx")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetIXX, this));
-  inertiaElem->GetAttribute("iyy")->SetUpdateFunc(
+  inertiaElem->GetElement("iyy")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetIYY, this));
-  inertiaElem->GetAttribute("izz")->SetUpdateFunc(
+  inertiaElem->GetElement("izz")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetIZZ, this));
-  inertiaElem->GetAttribute("ixy")->SetUpdateFunc(
+  inertiaElem->GetElement("ixy")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetIXY, this));
-  inertiaElem->GetAttribute("ixz")->SetUpdateFunc(
+  inertiaElem->GetElement("ixz")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetIXZ, this));
-  inertiaElem->GetAttribute("iyz")->SetUpdateFunc(
+  inertiaElem->GetElement("iyz")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetIYZ, this));
   }
 
   this->SetMass(this->sdf->GetValueDouble("mass"));
-  this->sdf->GetAttribute("mass")->SetUpdateFunc(
+  this->sdf->GetElement("mass")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetMass, this));
 }
 
 //////////////////////////////////////////////////
 void Inertial::Reset()
 {
-  this->mass = 0;
+  sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
+
+  this->mass = this->sdf->GetValueDouble("mass");
   this->cog.Set(0, 0, 0);
-  this->principals.Set(0, 0, 0);
-  this->products.Set(0, 0, 0);
+  this->SetInertiaMatrix(
+        inertiaElem->GetValueDouble("ixx"),
+        inertiaElem->GetValueDouble("iyy"),
+        inertiaElem->GetValueDouble("izz"),
+
+        inertiaElem->GetValueDouble("ixy"),
+        inertiaElem->GetValueDouble("ixz"),
+        inertiaElem->GetValueDouble("iyz"));
 }
 
 //////////////////////////////////////////////////

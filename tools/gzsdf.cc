@@ -52,10 +52,15 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  if (params[0] == "check" && params.size() == 3)
-    SDF::version = params[2];
+  if ((params[0] == "check" || params[0] == "print"))
+  {
+    if (params.size() == 3)
+      SDF::version = params[2];
+  }
   else if (params.size() == 2)
     SDF::version = params[1];
+
+  std::cout << "VERSION[" << SDF::version << "]\n";
 
   boost::shared_ptr<SDF> sdf(new SDF());
   if (!init(sdf))
@@ -83,10 +88,6 @@ int main(int argc, char** argv)
   else if (params[0] == "describe")
   {
     sdf->PrintDescription();
-  }
-  else if (params[0] == "wiki")
-  {
-    sdf->PrintWiki();
   }
   else if (params[0] == "doc")
   {

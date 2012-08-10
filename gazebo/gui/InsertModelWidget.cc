@@ -177,7 +177,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 
     // The the SDF model's name
     modelElem->GetAttribute("name")->Set(modelName);
-    modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
+    modelElem->GetElement("origin")->GetAttribute("pose")->Set(
         this->modelVisual->GetWorldPose());
 
     // Spawn the model in the physics server

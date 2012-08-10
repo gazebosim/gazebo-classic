@@ -146,7 +146,8 @@ namespace sdf
 
     public: ElementPtr GetNextElement(const std::string &_name = "") const;
 
-    public: ElementPtr GetOrCreateElement(const std::string &_name);
+    public: ElementPtr GetOrCreateElement(const std::string &_name) GAZEBO_DEPRECATED;
+    public: ElementPtr GetElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);
     public: void InsertElement(ElementPtr _elem);
     public: void ClearElements();
@@ -169,6 +170,8 @@ namespace sdf
     private: boost::shared_ptr<Param> CreateParam(const std::string &_key,
                  const std::string &_type, const std::string &_defaultValue,
                  bool _required, const std::string &_description="");
+
+    public: ElementPtr GetElementImpl(const std::string &_name) const;
 
     private: std::string name;
     private: std::string required;

@@ -10,8 +10,8 @@
     <description></description>
   </attribute>
 
-  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0">
-    <description></description>
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
+    <description>Origin of the actor</description>
   </element>
 
   <element name="skin" required="1">

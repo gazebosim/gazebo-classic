@@ -73,7 +73,7 @@
     <element name="size" type="vector3" default="1 1 1" required="1">
       <description>The size of the heightmap in world units</description>
     </element>
-    <element name="origin" type="vector3" default="0 0 0" required="0">
+    <element name="pos" type="vector3" default="0 0 0" required="0">
       <description>A position offset.</description>
     </element>
 

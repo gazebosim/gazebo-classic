@@ -161,7 +161,7 @@ math::Vector3 HeightmapShape::GetSize() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetOrigin() const
 {
-  return this->sdf->GetValueVector3("origin");
+  return this->sdf->GetValueVector3("pose");
 }
 
 //////////////////////////////////////////////////

@@ -15,6 +15,7 @@
  *
 */
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "gazebo/sdf/interface/Converter.hh"
 #include "gazebo/sdf/interface/SDF.hh"
@@ -32,13 +33,23 @@ namespace sdf
 
 std::string find_file(const std::string &_filename)
 {
-  if (_filename[0] == '/')
-    return gazebo::common::find_file(_filename);
-  else
+  FILE *test = fopen(_filename.c_str(), "r");
+  std::string result = _filename;
+
+  if (!test)
   {
-    std::string tmp = std::string("sdf/") + SDF::version + "/" + _filename;
-    return gazebo::common::find_file(tmp);
+    if (_filename[0] == '/')
+      result = gazebo::common::find_file(_filename);
+    else
+    {
+      std::string tmp = std::string("sdf/") + SDF::version + "/" + _filename;
+      result = gazebo::common::find_file(tmp);
+    }
   }
+  else
+    fclose(test);
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -544,7 +555,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 
         if (elemXml->Attribute("model_pose"))
         {
-          includeSDF->root->GetElement("model")->GetOrCreateElement(
+          includeSDF->root->GetElement("model")->GetElement(
               "origin")->GetValue()->SetFromString(
                 elemXml->Attribute("model_pose"));
         }

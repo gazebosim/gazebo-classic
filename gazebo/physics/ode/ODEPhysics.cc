@@ -158,8 +158,8 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  sdf::ElementPtr odeElem = this->sdf->GetOrCreateElement("ode");
-  sdf::ElementPtr solverElem = odeElem->GetOrCreateElement("solver");
+  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
+  sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
   this->stepTimeDouble = solverElem->GetValueDouble("dt");
   this->stepType = solverElem->GetValueString("type");
@@ -168,12 +168,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId,
-      odeElem->GetOrCreateElement("constraints")->GetValueDouble(
+      odeElem->GetElement("constraints")->GetValueDouble(
         "contact_max_correcting_vel"));
 
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId,
-       odeElem->GetOrCreateElement("constraints")->GetValueDouble(
+       odeElem->GetElement("constraints")->GetValueDouble(
         "contact_surface_layer"));
 
   // If auto-disable is active, then user interaction with the joints
@@ -186,8 +186,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
   dWorldSetAutoDisableSteps(this->worldId, 20);
 
-  math::Vector3 g = this->sdf->GetOrCreateElement(
-      "gravity")->GetValueVector3("xyz");
+  math::Vector3 g = this->sdf->GetValueVector3("gravity");
 
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
@@ -257,7 +256,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_solver_type())
   {
     sdf::ElementPtr solverElem =
-      this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver");
+      this->sdf->GetElement("ode")->GetElement("solver");
     if (_msg->solver_type() == "quick")
     {
       solverElem->GetAttribute("type")->Set("quick");
@@ -376,8 +375,8 @@ void ODEPhysics::Reset()
 //////////////////////////////////////////////////
 void ODEPhysics::SetStepTime(double _value)
 {
-  this->sdf->GetOrCreateElement("ode")->GetOrCreateElement(
-      "solver")->GetAttribute("dt")->Set(_value);
+  this->sdf->GetElement("ode")->GetElement(
+      "solver")->GetElement("dt")->Set(_value);
 
   this->stepTimeDouble = _value;
 }
@@ -475,12 +474,9 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
-  if (!this->sdf->GetElement("ode")->GetElement(
-      "solver")->HasAttribute("percon_iters"))
-    this->sdf->GetElement("ode")->GetElement(
-      "solver")->AddAttribute("percon_iters", "int", "0", false);
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetAttribute("percon_iters")->Set(_iters);
+  this->sdf->GetElement("ode")->GetElement("solver")->
+    GetElement("percon_iters")->Set(_iters);
+
   dWorldSetQuickStepPreconIterations(this->worldId, _iters);
 }
 
@@ -488,7 +484,7 @@ void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetAttribute("iters")->Set(_iters);
+      "solver")->GetElement("iters")->Set(_iters);
   dWorldSetQuickStepNumIterations(this->worldId, _iters);
 }
 
@@ -496,7 +492,7 @@ void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 void ODEPhysics::SetSORPGSW(double _w)
 {
   this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetAttribute("sor")->Set(_w);
+      "solver")->GetElement("sor")->Set(_w);
   dWorldSetQuickStepW(this->worldId, _w);
 }
 
@@ -504,8 +500,8 @@ void ODEPhysics::SetSORPGSW(double _w)
 void ODEPhysics::SetWorldCFM(double _cfm)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem = elem->GetOrCreateElement("constraints");
-  elem->GetAttribute("cfm")->Set(_cfm);
+  elem = elem->GetElement("constraints");
+  elem->GetElement("cfm")->Set(_cfm);
 
   dWorldSetCFM(this->worldId, _cfm);
 }
@@ -514,41 +510,38 @@ void ODEPhysics::SetWorldCFM(double _cfm)
 void ODEPhysics::SetWorldERP(double _erp)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem = elem->GetOrCreateElement("constraints");
-  elem->GetAttribute("erp")->Set(_erp);
+  elem = elem->GetElement("constraints");
+  elem->GetElement("erp")->Set(_erp);
   dWorldSetERP(this->worldId, _erp);
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
 {
-  this->sdf->GetElement("ode")->GetOrCreateElement(
-      "constraints")->GetAttribute("contact_max_correcting_vel")->Set(_vel);
+  this->sdf->GetElement("ode")->GetElement(
+      "constraints")->GetElement(
+        "contact_max_correcting_vel")->Set(_vel);
   dWorldSetContactMaxCorrectingVel(this->worldId, _vel);
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetContactSurfaceLayer(double _depth)
 {
-  this->sdf->GetElement("ode")->GetOrCreateElement(
-      "constraints")->GetAttribute("contact_surface_layer")->Set(_depth);
+  this->sdf->GetElement("ode")->GetElement(
+      "constraints")->GetElement("contact_surface_layer")->Set(_depth);
   dWorldSetContactSurfaceLayer(this->worldId, _depth);
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->sdf->GetElement("ode")->GetOrCreateElement(
+  this->sdf->GetElement("ode")->GetElement(
       "max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSPreconIters()
 {
-  if (!this->sdf->GetElement("ode")->GetElement(
-      "solver")->HasAttribute("percon_iters"))
-    this->sdf->GetElement("ode")->GetElement(
-      "solver")->AddAttribute("percon_iters", "int", "0", false);
   return this->sdf->GetElement("ode")->GetElement(
       "solver")->GetValueInt("precon_iters");
 }
@@ -570,7 +563,7 @@ double ODEPhysics::GetSORPGSW()
 double ODEPhysics::GetWorldCFM()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem = elem->GetOrCreateElement("constraints");
+  elem = elem->GetElement("constraints");
   return elem->GetValueDouble("cfm");
 }
 
@@ -578,28 +571,28 @@ double ODEPhysics::GetWorldCFM()
 double ODEPhysics::GetWorldERP()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem = elem->GetOrCreateElement("constraints");
+  elem = elem->GetElement("constraints");
   return elem->GetValueDouble("erp");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetContactMaxCorrectingVel()
 {
-  return this->sdf->GetElement("ode")->GetOrCreateElement(
+  return this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetValueDouble("contact_max_correcting_vel");
 }
 
 //////////////////////////////////////////////////
 double ODEPhysics::GetContactSurfaceLayer()
 {
-  return this->sdf->GetElement("ode")->GetOrCreateElement(
+  return this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetValueDouble("contact_surface_layer");
 }
 
 //////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return this->sdf->GetOrCreateElement("max_contacts")->GetValueInt();
+  return this->sdf->GetElement("max_contacts")->GetValueInt();
 }
 
 //////////////////////////////////////////////////
@@ -666,21 +659,21 @@ std::string ODEPhysics::GetStepType() const
 void ODEPhysics::SetStepType(const std::string &_type)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
-  elem->GetAttribute("type")->Set(_type);
+  elem->GetElement("type")->Set(_type);
   this->stepType = _type;
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetOrCreateElement("gravity")->GetAttribute("xyz")->Set(_gravity);
+  this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
   dWorldSetGravity(this->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODEPhysics::GetGravity() const
 {
-  return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
+  return this->sdf->GetElement("gravity")->GetValueVector3("xyz");
 }
 
 //////////////////////////////////////////////////

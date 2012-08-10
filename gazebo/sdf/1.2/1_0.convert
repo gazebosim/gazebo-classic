@@ -65,7 +65,7 @@
       <convert name="camera">
         <rename>
           <from element="origin" attribute="pose"/>
-          <to element="origin"/>
+          <to element="pose"/>
         </rename>
       </convert> <!-- End camera -->
     </convert> <!-- End gui -->
@@ -125,7 +125,7 @@
     <convert name="actor">
       <rename>
         <from element="origin" attribute="pose"/>
-        <to element="origin"/>
+        <to element="pose"/>
       </rename>
 
       <convert name="skin">
@@ -189,7 +189,7 @@
     <convert name="light">
       <rename>
         <from element="origin" attribute="pose"/>
-        <to element="origin"/>
+        <to element="pose"/>
       </rename>
 
       <rename>
@@ -248,7 +248,7 @@
     <convert name="model">
       <rename>
         <from element="origin" attribute="pose"/>
-        <to element="origin"/>
+        <to element="pose"/>
       </rename>
       <rename>
         <from attribute="static"/>
@@ -290,6 +290,10 @@
 
         <convert name="inertial">
           <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="pose"/>
+          </rename>
+          <rename>
             <from attribute="mass"/>
             <to element="mass"/>
           </rename>
@@ -326,6 +330,11 @@
         </convert> <!-- End inertial -->
 
         <convert name="sensor">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="pose"/>
+          </rename>
+
           <rename>
             <from attribute="always_on"/>
             <to element="always_on"/>
@@ -441,29 +450,10 @@
           </convert> <!-- End depth_camera -->
         </convert> <!-- End sensor -->
 
-        <rename>
-          <from element="origin" attribute="pose"/>
-          <to element="origin"/>
-        </rename>
-
-        <convert name="sensor">
-          <rename>
-            <from element="origin" attribute="pose"/>
-            <to element="origin"/>
-          </rename>
-        </convert>
-
-        <convert name="inertial">
-          <rename>
-            <from element="origin" attribute="pose"/>
-            <to element="origin"/>
-          </rename>
-        </convert> <!-- End inertial-->
-
         <convert name="collision">
           <rename>
             <from element="origin" attribute="pose"/>
-            <to element="origin"/>
+            <to element="pose"/>
           </rename>
 
           <rename>
@@ -605,7 +595,7 @@
               </rename>
               <rename>
                 <from attribute="origin"/>
-                <to element="origin"/>
+                <to element="pos"/>
               </rename>
             </convert> <!-- End heightmap -->
 
@@ -622,7 +612,7 @@
         <convert name="visual">
           <rename>
             <from element="origin" attribute="pose"/>
-            <to element="origin"/>
+            <to element="pose"/>
           </rename>
           <rename>
             <from attribute="cast_shadows"/>
@@ -704,7 +694,7 @@
               </rename>
               <rename>
                 <from attribute="origin"/>
-                <to element="origin"/>
+                <to element="pos"/>
               </rename>
             </convert> <!-- End heightmap -->
 
@@ -744,7 +734,7 @@
       <convert name="joint">
         <rename>
           <from element="origin" attribute="pose"/>
-          <to element="origin"/>
+          <to element="pose"/>
         </rename>
         <rename>
           <from element="parent" attribute="link"/>
@@ -820,7 +810,7 @@
   <convert name="model">
     <rename>
       <from element="origin" attribute="pose"/>
-      <to element="origin"/>
+      <to element="pose"/>
     </rename>
     <rename>
       <from attribute="static"/>
@@ -1015,27 +1005,27 @@
 
       <rename>
         <from element="origin" attribute="pose"/>
-        <to element="origin"/>
+        <to element="pose"/>
       </rename>
 
       <convert name="sensor">
         <rename>
           <from element="origin" attribute="pose"/>
-          <to element="origin"/>
+          <to element="pose"/>
         </rename>
       </convert>
 
       <convert name="inertial">
         <rename>
           <from element="origin" attribute="pose"/>
-          <to element="origin"/>
+          <to element="pose"/>
         </rename>
       </convert> <!-- End inertial-->
 
       <convert name="collision">
         <rename>
           <from element="origin" attribute="pose"/>
-          <to element="origin"/>
+          <to element="pose"/>
         </rename>
 
         <rename>
@@ -1177,7 +1167,7 @@
             </rename>
             <rename>
               <from attribute="origin"/>
-              <to element="origin"/>
+              <to element="pos"/>
             </rename>
           </convert> <!-- End heightmap -->
 
@@ -1194,7 +1184,7 @@
       <convert name="visual">
         <rename>
           <from element="origin" attribute="pose"/>
-          <to element="origin"/>
+          <to element="pose"/>
         </rename>
         <rename>
           <from attribute="cast_shadows"/>
@@ -1276,7 +1266,7 @@
             </rename>
             <rename>
               <from attribute="origin"/>
-              <to element="origin"/>
+              <to element="pos"/>
             </rename>
           </convert> <!-- End heightmap -->
 
@@ -1316,7 +1306,7 @@
     <convert name="joint">
       <rename>
         <from element="origin" attribute="pose"/>
-        <to element="origin"/>
+        <to element="pose"/>
       </rename>
       <rename>
         <from element="parent" attribute="link"/>

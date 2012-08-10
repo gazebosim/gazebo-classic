@@ -6,17 +6,13 @@
     <description>The mass of the link.</description>
   </element>
 
-  <element name="density" type="double" default="1.0" required="0">
-    <description></description>
-  </element>
-
-  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0">
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
     <description>This is the pose of the inertial reference frame, relative to the link reference frame. The origin of the inertial reference frame needs to be at the center of gravity. The axes of the inertial reference frame do not need to be aligned with the principal axes of the inertia.</description>
   </element>
 
   <element name="inertia" required="0">
     <description>The 3x3 rotational inertia matrix. Because the rotational inertia matrix is symmetric, only 6 above-diagonal elements of this matrix are specified here, using the attributes ixx, ixy, ixz, iyy, iyz, izz.</description>
-    <element name="ixx" type="double" default="0.0" required="1">
+    <element name="ixx" type="double" default="1.0" required="1">
       <description></description>
     </element>
     <element name="ixy" type="double" default="0.0" required="1">
@@ -25,13 +21,13 @@
     <element name="ixz" type="double" default="0.0" required="1">
       <description></description>
     </element>
-    <element name="iyy" type="double" default="0.0" required="1">
+    <element name="iyy" type="double" default="1.0" required="1">
       <description></description>
     </element>
     <element name="iyz" type="double" default="0.0" required="1">
       <description></description>
     </element>
-    <element name="izz" type="double" default="0.0" required="1">
+    <element name="izz" type="double" default="1.0" required="1">
       <description></description>
     </element>
   </element> <!-- End Inertia -->

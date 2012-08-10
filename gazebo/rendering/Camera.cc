@@ -132,7 +132,7 @@ void Camera::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Camera::Load()
 {
-  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   if (imgElem)
   {
     this->imageWidth = imgElem->GetValueInt("width");
@@ -157,8 +157,7 @@ void Camera::Load()
 
   if (this->sdf->HasElement("horizontal_fov"))
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
-    double angle = elem->GetValueDouble("angle");
+    double angle = this->sdf->GetValueDouble("horizontal_fov");
     if (angle < 0.01 || angle > M_PI)
     {
       gzthrow("Camera horizontal field of veiw invalid.");
@@ -439,7 +438,7 @@ void Camera::RotatePitch(float angle)
 //////////////////////////////////////////////////
 void Camera::SetClipDist()
 {
-  sdf::ElementPtr clipElem = this->sdf->GetOrCreateElement("clip");
+  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
   if (!clipElem)
     gzthrow("Camera has no <clip> tag.");
 
@@ -456,26 +455,24 @@ void Camera::SetClipDist()
 //////////////////////////////////////////////////
 void Camera::SetClipDist(float _near, float _far)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("clip");
+  sdf::ElementPtr elem = this->sdf->GetElement("clip");
 
-  elem->GetAttribute("near")->Set(_near);
-  elem->GetAttribute("far")->Set(_far);
+  elem->GetElement("near")->Set(_near);
+  elem->GetElement("far")->Set(_far);
 
   this->SetClipDist();
 }
 
 //////////////////////////////////////////////////
-void Camera::SetHFOV(float radians)
+void Camera::SetHFOV(float _radians)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("horizontal_fov");
-  elem->GetAttribute("angle")->Set(radians);
+  this->sdf->GetElement("horizontal_fov")->Set(_radians);
 }
 
 //////////////////////////////////////////////////
 math::Angle Camera::GetHFOV() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("horizontal_fov");
-  return math::Angle(elem->GetValueDouble("angle"));
+  return math::Angle(this->sdf->GetValueDouble("horizontal_fov"));
 }
 
 //////////////////////////////////////////////////
@@ -494,28 +491,28 @@ void Camera::SetImageSize(unsigned int _w, unsigned int _h)
 //////////////////////////////////////////////////
 void Camera::SetImageWidth(unsigned int _w)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  elem->GetAttribute("width")->Set(_w);
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  elem->GetElement("width")->Set(_w);
 }
 
 //////////////////////////////////////////////////
 void Camera::SetImageHeight(unsigned int _h)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  elem->GetAttribute("height")->Set(_h);
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  elem->GetElement("height")->Set(_h);
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
   return elem->GetValueInt("width");
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
   // gzerr << "image height " << elem->GetValueInt("height") << "\n";
   return elem->GetValueInt("height");
 }
@@ -523,7 +520,7 @@ unsigned int Camera::GetImageHeight() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageDepth() const
 {
-  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   std::string imgFmt = imgElem->GetValueString("format");
 
   if (imgFmt == "L8")
@@ -546,7 +543,7 @@ unsigned int Camera::GetImageDepth() const
 //////////////////////////////////////////////////
 std::string Camera::GetImageFormat() const
 {
-  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   return imgElem->GetValueString("format");
 }
 
@@ -566,7 +563,7 @@ unsigned int Camera::GetTextureHeight() const
 //////////////////////////////////////////////////
 size_t Camera::GetImageByteSize() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
   return this->GetImageByteSize(elem->GetValueInt("width"),
                                 elem->GetValueInt("height"),
                                 this->GetImageFormat());
@@ -618,7 +615,7 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 //////////////////////////////////////////////////
 void Camera::EnableSaveFrame(bool enable)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
+  sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
 
@@ -630,8 +627,8 @@ void Camera::EnableSaveFrame(bool enable)
 //////////////////////////////////////////////////
 void Camera::SetSaveFramePathname(const std::string &_pathname)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
-  elem->GetAttribute("path")->Set(_pathname);
+  sdf::ElementPtr elem = this->sdf->GetElement("save");
+  elem->GetElement("path")->Set(_pathname);
 
   // Create the directory to store frames
   if (elem->GetValueBool("enabled"))
@@ -768,7 +765,7 @@ bool Camera::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 std::string Camera::GetFrameFilename()
 {
-  sdf::ElementPtr saveElem = this->sdf->GetOrCreateElement("save");
+  sdf::ElementPtr saveElem = this->sdf->GetElement("save");
 
   std::string path = saveElem->GetValueString("path");
 

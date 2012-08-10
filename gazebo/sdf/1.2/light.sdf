@@ -14,7 +14,7 @@
     <description>When true, the light will cast shadows.</description>
   </element>
 
-  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0">
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
     <description>A position and orientation in the global coordinate frame for the light.</description>
   </element>
 

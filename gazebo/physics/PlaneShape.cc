@@ -54,7 +54,7 @@ void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/)
 //////////////////////////////////////////////////
 void PlaneShape::SetNormal(const math::Vector3 &_norm)
 {
-  this->sdf->GetAttribute("normal")->Set(_norm);
+  this->sdf->GetElement("normal")->Set(_norm);
   this->CreatePlane();
 }
 
@@ -65,10 +65,23 @@ math::Vector3 PlaneShape::GetNormal() const
 }
 
 //////////////////////////////////////////////////
+void PlaneShape::SetSize(const math::Vector2d &_size)
+{
+  this->sdf->GetElement("size")->Set(_size);
+}
+
+//////////////////////////////////////////////////
+math::Vector2d PlaneShape::GetSize() const
+{
+  return this->sdf->GetValueVector2d("size");
+}
+
+//////////////////////////////////////////////////
 void PlaneShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
   msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal());
+  msgs::Set(_msg.mutable_plane()->mutable_size(), this->GetSize());
 }
 
 //////////////////////////////////////////////////
@@ -76,4 +89,3 @@ void PlaneShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetNormal(msgs::Convert(_msg.plane().normal()));
 }
-

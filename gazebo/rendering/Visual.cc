@@ -232,7 +232,7 @@ void Visual::Init()
 //////////////////////////////////////////////////
 void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 {
-  sdf::ElementPtr geomElem = this->sdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
   geomElem->ClearElements();
 
   if (_msg->has_geometry())
@@ -240,37 +240,37 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
       sdf::ElementPtr elem = geomElem->AddElement("box");
-      elem->GetAttribute("size")->Set(
+      elem->GetElement("size")->Set(
           msgs::Convert(_msg->geometry().box().size()));
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
     {
       sdf::ElementPtr elem = geomElem->AddElement("sphere");
-      elem->GetAttribute("radius")->Set(_msg->geometry().sphere().radius());
+      elem->GetElement("radius")->Set(_msg->geometry().sphere().radius());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
       sdf::ElementPtr elem = geomElem->AddElement("cylinder");
-      elem->GetAttribute("radius")->Set(_msg->geometry().cylinder().radius());
-      elem->GetAttribute("length")->Set(_msg->geometry().cylinder().length());
+      elem->GetElement("radius")->Set(_msg->geometry().cylinder().radius());
+      elem->GetElement("length")->Set(_msg->geometry().cylinder().length());
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
       math::Plane plane = msgs::Convert(_msg->geometry().plane());
       sdf::ElementPtr elem = geomElem->AddElement("plane");
-      elem->GetOrCreateElement("normal")->Set(plane.normal);
-      elem->GetOrCreateElement("size")->Set(plane.size);
+      elem->GetElement("normal")->Set(plane.normal);
+      elem->GetElement("size")->Set(plane.size);
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       sdf::ElementPtr elem = geomElem->AddElement("mesh");
-      elem->GetAttribute("filename")->Set(_msg->geometry().mesh().filename());
+      elem->GetElement("filename")->Set(_msg->geometry().mesh().filename());
     }
   }
 
   if (_msg->has_pose())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("origin");
+    sdf::ElementPtr elem = this->sdf->GetElement("pose");
     math::Pose p(msgs::Convert(_msg->pose().position()),
                   msgs::Convert(_msg->pose().orientation()));
 
@@ -281,44 +281,44 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   {
     if (_msg->material().has_script())
     {
-      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetAttribute("script")->Set(_msg->material().script());
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
+      elem->GetElement("script")->Set(_msg->material().script());
     }
 
     if (_msg->material().has_ambient())
     {
-      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("ambient")->Set(
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
+      elem->GetElement("ambient")->Set(
           msgs::Convert(_msg->material().ambient()));
     }
 
     if (_msg->material().has_diffuse())
     {
-      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("diffuse")->Set(
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
+      elem->GetElement("diffuse")->Set(
           msgs::Convert(_msg->material().diffuse()));
     }
 
     if (_msg->material().has_specular())
     {
-      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("specular")->Set(
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
+      elem->GetElement("specular")->Set(
           msgs::Convert(_msg->material().specular()));
     }
 
     if (_msg->material().has_emissive())
     {
-      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-      elem->GetOrCreateElement("emissive")->Set(
+      sdf::ElementPtr elem = this->sdf->GetElement("material");
+      elem->GetElement("emissive")->Set(
           msgs::Convert(_msg->material().emissive()));
     }
   }
 
   if (_msg->has_cast_shadows())
-    this->sdf->GetAttribute("cast_shadows")->Set(_msg->cast_shadows());
+    this->sdf->GetElement("cast_shadows")->Set(_msg->cast_shadows());
 
   if (_msg->has_laser_retro())
-    this->sdf->GetAttribute("laser_retro")->Set(_msg->laser_retro());
+    this->sdf->GetElement("laser_retro")->Set(_msg->laser_retro());
 
   this->Load();
   this->UpdateFromMsg(_msg);
@@ -344,7 +344,7 @@ void Visual::Load()
     this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->sdf->GetValuePose("origin");
+  pose = this->sdf->GetValuePose("pose");
 
   std::string meshName = this->GetMeshName();
 
@@ -599,19 +599,19 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
-  sdf::ElementPtr geomElem = this->sdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
-    geomElem->GetElement("box")->GetAttribute("size")->Set(_scale);
+    geomElem->GetElement("box")->GetElement("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
-    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(_scale.x/2.0);
-    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(_scale.z);
+    geomElem->GetElement("cylinder")->GetElement("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
   }
   else if (geomElem->HasElement("mesh"))
-    geomElem->GetElement("mesh")->GetAttribute("scale")->Set(_scale);
+    geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
 
   this->sceneNode->setScale(Conversions::Convert(_scale));
 }
@@ -1250,15 +1250,15 @@ void Visual::DisableTrackVisual()
 //////////////////////////////////////////////////
 std::string Visual::GetNormalMap() const
 {
-  return this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
-      "shader")->GetOrCreateElement("normal_map")->GetValueString();
+  return this->sdf->GetElement("material")->GetElement(
+      "shader")->GetElement("normal_map")->GetValueString();
 }
 
 //////////////////////////////////////////////////
 void Visual::SetNormalMap(const std::string &_nmap)
 {
-  this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
-      "shader")->GetOrCreateElement("normal_map")->GetValue()->Set(_nmap);
+  this->sdf->GetElement("material")->GetElement(
+      "shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
   if (this->useRTShader)
     RTShaderSystem::Instance()->UpdateShaders();
 }
@@ -1266,15 +1266,15 @@ void Visual::SetNormalMap(const std::string &_nmap)
 //////////////////////////////////////////////////
 std::string Visual::GetShaderType() const
 {
-  return this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
+  return this->sdf->GetElement("material")->GetElement(
       "shader")->GetValueString("type");
 }
 
 //////////////////////////////////////////////////
 void Visual::SetShaderType(const std::string &_type)
 {
-  this->sdf->GetOrCreateElement("material")->GetOrCreateElement(
-      "shader")->GetAttribute("type")->Set(_type);
+  this->sdf->GetElement("material")->GetElement(
+      "shader")->GetElement("type")->Set(_type);
   if (this->useRTShader)
     RTShaderSystem::Instance()->UpdateShaders();
 }

@@ -9,14 +9,16 @@
   <element name="cast_shadows" type="bool" default="true" required="0">
     <description>If true the visual will cast shadows.</description>
   </element>
+
   <element name="laser_retro" type="double" default="0.0" required="0">
     <description>will be implemented in the future release.</description>
   </element>
+
   <element name="transparency" type="double" default="0.0" required="0">
     <description>The amount of transparency( 0=opaque, 1 = fully transparent)</description>
   </element>
   
-  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0">
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
     <description>Origin of the visual relative to its parent.</description>
   </element>
 

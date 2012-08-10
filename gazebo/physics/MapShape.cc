@@ -67,11 +67,11 @@ void MapShape::Load(sdf::ElementPtr _sdf)
 
   // Make sure they are ok
   if (_sdf->GetValueDouble("scale") <= 0)
-    _sdf->GetAttribute("scale")->Set(0.1);
+    _sdf->GetElement("scale")->Set(0.1);
   if (this->sdf->GetValueInt("threshold") <= 0)
-    _sdf->GetAttribute("threshold")->Set(200);
+    _sdf->GetElement("threshold")->Set(200);
   if (this->sdf->GetValueDouble("height") <= 0)
-    _sdf->GetAttribute("height")->Set(1.0);
+    _sdf->GetElement("height")->Set(1.0);
 
   // Load the image
   this->mapImage = new common::Image();

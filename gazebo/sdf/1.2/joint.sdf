@@ -18,7 +18,7 @@
     <description>Name of the child link</description>
   </element> <!-- End Child -->
 
-  <element name="origin"  type="pose" default="0 0 0 0 0 0" required="0">
+  <element name="pose"  type="pose" default="0 0 0 0 0 0" required="0">
     <description>offset from child link origin in child link frame.</description>
   </element>
 
