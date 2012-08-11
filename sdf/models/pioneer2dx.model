@@ -125,14 +125,19 @@
       <pose>0 0 -0.03 0 0 0</pose>
       <child>left_wheel</child>
       <parent>chassis</parent>
-      <axis>0 1 0</axis>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
     </joint>
     <joint type="revolute" name="right_wheel_hinge">
       <pose>0 0 0.03 0 0 0</pose>
       <child>right_wheel</child>
       <parent>chassis</parent>
-      <axis>0 1 0</axis>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
     </joint>
+
     <plugin filename="libDiffDrivePlugin.so" name="diff_drive">
       <left_joint>left_wheel_hinge</left_joint>
       <right_joint>right_wheel_hinge</right_joint>
