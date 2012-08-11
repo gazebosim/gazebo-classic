@@ -1,71 +1,91 @@
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
-
-    <include filename="ground_plane.model"/>
-
+    <include filename="ground_plane.model" />
     <scene>
-      <ambient rgba="0.5 0.5 0.5 1"/>
-      <background rgba="0.5 0.5 0.5 1"/>
-      <shadows enabled="false"/>
+      <ambient>0.5 0.5 0.5 1</ambient>
+      <background>0.5 0.5 0.5 1</background>
+      <shadows>false</shadows>
     </scene>
-
-    <include filename="sun.light"/>
-
+    <include filename="sun.light" />
     <physics type="ode">
-      <gravity xyz="0.0 0.0 -10.0"/>
+      <gravity>0.0 0.0 -10.0</gravity>
       <ode>
-        <solver type="quick" dt="0.001" iters="100" sor="1.0"/>
-        <constraints cfm="0" erp="0.2" contact_max_correcting_vel="0" contact_surface_layer="0.0"/>
+        <solver>
+          <type>quick</type>
+          <dt>0.001</dt>
+          <iters>100</iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
       </ode>
     </physics>
-
-
     <!-- model slides when cg is 0.3 0 0 -->
-    <model name="model_1" static="false">
-
-      <origin pose="0.5 -0.5 0.5 0.0 0.0 0.0"/>
-
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
-
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-
-        <inertial mass="10000.0">
-          <origin pose="0.45 0 0.0 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
-          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                   iyy="1.0" iyz="0.0"
-                   izz="1.0"/>
+    <model name="model_1">
+      <pose>0.5 -0.5 0.5 0.0 0.0 0.0</pose>
+      <link name="link_1">
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        <inertial>
+          <pose>0.45 0 0.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>10000.0</mass>
         </inertial>
-
-        <visual name="visual_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+        <visual name="visual_box">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material script="Gazebo/Green"/>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <laser_retro>100.0</laser_retro>
         </visual>
-
-        <collision name="collision_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+        <collision name="collision_box">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <surface>
             <friction>
-              <ode mu="100.0" mu2="100.0" />
+              <ode>
+                <mu>100.0</mu>
+                <mu2>100.0</mu2>
+              </ode>
             </friction>
             <contact>
-              <ode kp="1000000000000.0" kd="10000000000.0" max_vel="0" min_depth="0.0" />
+              <ode>
+                <kp>1000000000000.0</kp>
+                <kd>10000000000.0</kd>
+                <max_vel>0</max_vel>
+                <min_depth>0.0</min_depth>
+              </ode>
             </contact>
           </surface>
+          <laser_retro>100.0</laser_retro>
         </collision>
-
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
       </link>
-
+      <static>false</static>
     </model>
-
-
     <!-- by shifting cg down, the block will not slide.
          coupling of box rotation and the moment arm about contact points
     <model name="model_2" static="false">
@@ -78,7 +98,6 @@
 
         <inertial mass="10000.0">
           <origin pose="0.45 0.0 -0.5 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
                    izz="1.0"/>
@@ -109,6 +128,5 @@
 
     </model>
     -->
-
   </world>
 </gazebo>

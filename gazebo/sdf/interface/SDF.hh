@@ -146,7 +146,8 @@ namespace sdf
 
     public: ElementPtr GetNextElement(const std::string &_name = "") const;
 
-    public: ElementPtr GetOrCreateElement(const std::string &_name) GAZEBO_DEPRECATED;
+    public: ElementPtr GetOrCreateElement(
+                const std::string &_name) GAZEBO_DEPRECATED;
     public: ElementPtr GetElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);
     public: void InsertElement(ElementPtr _elem);

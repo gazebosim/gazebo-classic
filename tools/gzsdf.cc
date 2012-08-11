@@ -15,7 +15,7 @@
  *
 */
 
-#include "sdf/interface/parser.hh"
+#include "sdf/sdf.hh"
 
 std::vector<std::string> params;
 
@@ -52,15 +52,13 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  if ((params[0] == "check" || params[0] == "print"))
+  if ((params[0] == "check" || params[0] == "print" || params[0] == "convert"))
   {
     if (params.size() == 3)
       SDF::version = params[2];
   }
   else if (params.size() == 2)
     SDF::version = params[1];
-
-  std::cout << "VERSION[" << SDF::version << "]\n";
 
   boost::shared_ptr<SDF> sdf(new SDF());
   if (!init(sdf))
@@ -92,6 +90,18 @@ int main(int argc, char** argv)
   else if (params[0] == "doc")
   {
     sdf->PrintDoc();
+  }
+  else if (params[0] == "convert")
+  {
+    TiXmlDocument xmlDoc;
+    if (xmlDoc.LoadFile(params[1]))
+    {
+      TiXmlElement *gazeboNode = xmlDoc.FirstChildElement("gazebo");
+      sdf::Converter::Convert(gazeboNode, SDF::version, true);
+      xmlDoc.SaveFile(params[1]);
+    }
+    else
+      std::cerr << "Unable to load file[" << params[1] << "]\n";
   }
   else if (params[0] == "print")
   {

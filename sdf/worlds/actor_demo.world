@@ -1,37 +1,43 @@
-<?xml version="1.0"?> 
-<gazebo version="1.0">
-  <world name="default">
-
-    <include filename="ground_plane.model"/>
-    
-    <light type="directional" name="sun" cast_shadows="true">
-      <origin pose="0 0 100 0 0 0"/>
-      <diffuse rgba="0.5 0.5 0.5 1"/>
-      <specular rgba="0.2 0.2 0.2 1"/>
-      <attenuation range="100" constant="0.8" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 0.2 -8.0"/>
-    </light>
-
-    <model name="cube">
-      <origin pose="-0.4 0 0.275 0 0 0"/>
-      <link name="link">
-        <collision name="collision">
-          <mass>1</mass>
-          <geometry>
-            <box size="0.45 0.5 0.45"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <box size="0.45 0.5 0.45"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-
-  <include filename="actor_demo.model" />
-
-  </world>
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <world name="default">
+        <include filename="ground_plane.model" />
+        <light type="directional" name="sun">
+            <pose>0 0 100 0 0 0</pose>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <attenuation>
+                <range>100</range>
+                <linear>0.01</linear>
+                <constant>0.8</constant>
+                <quadratic>0.0</quadratic>
+            </attenuation>
+            <direction>0.0 0.2 -8.0</direction>
+            <cast_shadows>true</cast_shadows>
+        </light>
+        <model name="cube">
+            <pose>-0.4 0 0.275 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <mass>1</mass>
+                    <geometry>
+                        <box>
+                            <size>0.45 0.5 0.45</size>
+                        </box>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <box>
+                            <size>0.45 0.5 0.45</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>Gazebo/WoodPallet</script>
+                    </material>
+                </visual>
+            </link>
+        </model>
+        <include filename="actor_demo.model" />
+    </world>
 </gazebo>

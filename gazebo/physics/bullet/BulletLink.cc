@@ -410,3 +410,8 @@ void BulletLink::AddTorque(const math::Vector3 &/*_torque*/)
 void BulletLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 {
 }
+
+/////////////////////////////////////////////////
+void BulletLink::SetAutoDisable(bool /*_disable*/)
+{
+}
