@@ -748,6 +748,11 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       cam->SetViewController(_msg->camera().view_controller());
     }
 
+    if (_msg->camera().has_view_controller())
+    {
+      cam->SetViewController(_msg->camera().view_controller());
+    }
+
     if (_msg->camera().has_track())
     {
       std::string name = _msg->camera().track().name();
