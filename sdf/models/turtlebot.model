@@ -1,648 +1,1425 @@
-<gazebo version='1.0'>
-  <model name='turtlebot' static='0'>
-    <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-    <link name='base_footprint' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='2.234000' density='1.000000'>
-        <origin pose='0.001453 -0.000453 0.029787 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.058640' ixy='0.000124' ixz='0.000615' iyy='0.058786' iyz='0.000014' izz='1.532440'/>
-      </inertial>
-      <collision name='base_footprint_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.017000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.001000 0.001000 0.001000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 -0.983000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_base_link' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.047800 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.016495' length='0.061163'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_base_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.047800 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/create_body.dae' scale='1.000000 1.000000 1.000000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_camera_link' laser_retro='0.000000'>
-        <origin pose='-0.087098 0.000000 0.303857 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.073000 0.276000 0.072000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_camera_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.087098 0.000000 0.303857 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/kinect.dae' scale='1.000000 1.000000 1.000000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_front_wheel_link' laser_retro='0.000000'>
-        <origin pose='0.130000 0.000000 0.017000 0.000000 1.570700 1.570700'/>
-        <geometry>
-          <sphere radius='0.018000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='0.000000' mu2='0.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='100000000.000000' kd='10000.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_front_wheel_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.130000 -0.000000 0.017000 -0.000000 1.570700 1.570700'/>
-        <geometry>
-          <sphere radius='0.009000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_plate_0_link' laser_retro='0.000000'>
-        <origin pose='-0.043340 0.000000 0.084757 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.233502 0.314845 0.006401'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_plate_0_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.043340 0.000000 0.084757 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/plate_0_logo.dae' scale='1.000000 1.000000 1.000000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_plate_1_link' laser_retro='0.000000'>
-        <origin pose='-0.002660 0.000000 0.141907 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.314856 0.314856 0.006401'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_plate_1_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.002660 0.000000 0.141907 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/plate_1_logo.dae' scale='1.000000 1.000000 1.000000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_plate_2_link' laser_retro='0.000000'>
-        <origin pose='-0.002660 0.000000 0.199108 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.314856 0.314856 0.006401'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_plate_2_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.002660 0.000000 0.199108 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/plate_1_logo.dae' scale='1.000000 1.000000 1.000000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_plate_3_link' laser_retro='0.000000'>
-        <origin pose='-0.015820 0.000000 0.405457 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.288000 0.315000 0.006401'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_plate_3_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.015820 0.000000 0.405457 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/plate_2_logo.dae' scale='1.000000 1.000000 1.000000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_rear_wheel_link' laser_retro='0.000000'>
-        <origin pose='-0.130000 0.000000 0.017000 0.000000 1.570700 1.570700'/>
-        <geometry>
-          <sphere radius='0.015000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='0.000000' mu2='0.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='100000000.000000' kd='10000.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_rear_wheel_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.130000 -0.000000 0.017000 -0.000000 1.570700 1.570700'/>
-        <geometry>
-          <sphere radius='0.007500'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_spacer_0_link' laser_retro='0.000000'>
-        <origin pose='-0.002540 0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.012700' length='0.003175'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_spacer_0_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.002540 0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02403-125_Spacer.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_spacer_1_link' laser_retro='0.000000'>
-        <origin pose='-0.002540 -0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.012700' length='0.003175'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_spacer_1_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.002540 -0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02403-125_Spacer.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_spacer_2_link' laser_retro='0.000000'>
-        <origin pose='-0.072390 -0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.012700' length='0.003175'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_spacer_2_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.072390 -0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02403-125_Spacer.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_spacer_3_link' laser_retro='0.000000'>
-        <origin pose='-0.072390 0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.012700' length='0.003175'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_spacer_3_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.072390 0.111468 0.079992 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02403-125_Spacer.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_0_link' laser_retro='0.000000'>
-        <origin pose='0.067640 0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_0_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.067640 0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_1_link' laser_retro='0.000000'>
-        <origin pose='0.067640 -0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_1_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.067640 -0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_2_link' laser_retro='0.000000'>
-        <origin pose='-0.052832 -0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_2_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.052832 -0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_3_link' laser_retro='0.000000'>
-        <origin pose='-0.052832 0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_3_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.052832 0.131420 0.087980 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_4_link' laser_retro='0.000000'>
-        <origin pose='0.067640 0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_4_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.067640 0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_5_link' laser_retro='0.000000'>
-        <origin pose='0.067640 -0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_5_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.067640 -0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_6_link' laser_retro='0.000000'>
-        <origin pose='-0.052832 -0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_6_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.052832 -0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_2in_7_link' laser_retro='0.000000'>
-        <origin pose='-0.052832 0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.038100' length='0.063500'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_2in_7_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.052832 0.131420 0.145130 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_8in_0_link' laser_retro='0.000000'>
-        <origin pose='0.067640 0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.011113' length='0.203200'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_8in_0_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.067640 0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_8in_1_link' laser_retro='0.000000'>
-        <origin pose='0.067640 -0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.011113' length='0.203200'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_8in_1_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.067640 -0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_8in_2_link' laser_retro='0.000000'>
-        <origin pose='-0.052832 -0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.011113' length='0.203200'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_8in_2_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.052832 -0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_8in_3_link' laser_retro='0.000000'>
-        <origin pose='-0.052832 0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.011113' length='0.203200'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_8in_3_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.052832 0.131420 0.202280 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_kinect_0_link' laser_retro='0.000000'>
-        <origin pose='-0.105098 0.098000 0.202308 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.001111' length='0.008585'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_kinect_0_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.105098 0.098000 0.202308 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04556-RA_Kinect_Standoff_Assy.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <collision name='base_footprint_geom_standoff_kinect_1_link' laser_retro='0.000000'>
-        <origin pose='-0.105098 -0.098000 0.202308 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <cylinder radius='0.001111' length='0.008585'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='base_footprint_geom_standoff_kinect_1_link_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='-0.105098 -0.098000 0.202308 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <mesh filename='turtlebot/68-04556-RA_Kinect_Standoff_Assy.dae' scale='0.001000 0.001000 0.001000'/>
-        </geometry>
-      </visual>
-      <sensor name='left_cliff_sensor' type='ray' always_on='0' update_rate='0.000000' visualize='0'>
-        <origin pose='0.070000 0.140000 0.027000 0.000000 1.570790 0.000000'/>
-        <ray>
-          <scan>
-            <horizontal samples='1' resolution='1.000000' min_angle='0.000000' max_angle='0.000000'/>
-          </scan>
-          <range min='0.010000' max='0.040000' resolution='0.100000'/>
-        </ray>
-      </sensor>
-      <sensor name='leftfront_cliff_sensor' type='ray' always_on='0' update_rate='0.000000' visualize='0'>
-        <origin pose='0.150000 0.040000 0.027000 0.000000 1.570790 0.000000'/>
-        <ray>
-          <scan>
-            <horizontal samples='1' resolution='1.000000' min_angle='0.000000' max_angle='0.000000'/>
-          </scan>
-          <range min='0.010000' max='0.040000' resolution='0.100000'/>
-        </ray>
-      </sensor>
-      <sensor name='right_cliff_sensor' type='ray' always_on='0' update_rate='0.000000' visualize='0'>
-        <origin pose='0.070000 -0.140000 0.027000 0.000000 1.570790 0.000000'/>
-        <ray>
-          <scan>
-            <horizontal samples='1' resolution='1.000000' min_angle='0.000000' max_angle='0.000000'/>
-          </scan>
-          <range min='0.010000' max='0.040000' resolution='0.100000'/>
-        </ray>
-      </sensor>
-      <sensor name='rightfront_cliff_sensor' type='ray' always_on='0' update_rate='0.000000' visualize='0'>
-        <origin pose='0.150000 -0.040000 0.027000 0.000000 1.570790 0.000000'/>
-        <ray>
-          <scan>
-            <horizontal samples='1' resolution='1.000000' min_angle='0.000000' max_angle='0.000000'/>
-          </scan>
-          <range min='0.010000' max='0.040000' resolution='0.100000'/>
-        </ray>
-      </sensor>
-      <sensor name='wall_sensor' type='ray' always_on='0' update_rate='0.000000' visualize='0'>
-        <origin pose='0.090000 -0.120000 0.059000 0.000000 0.000000 -1.000000'/>
-        <ray>
-          <scan>
-            <horizontal samples='1' resolution='1.000000' min_angle='0.000000' max_angle='0.000000'/>
-          </scan>
-          <range min='0.016000' max='0.040000' resolution='0.100000'/>
-        </ray>
-      </sensor>
-      <sensor name='laser' type='ray' always_on='0' update_rate='20.000000' visualize='0'>
-        <origin pose='-0.065000 0.000000 0.092000 0.000000 -0.000000 0.000000'/>
-        <ray>
-          <scan>
-            <horizontal samples='180' resolution='1.000000' min_angle='-2.268928' max_angle='2.268928'/>
-          </scan>
-          <range min='0.080000' max='10.000000' resolution='0.010000'/>
-        </ray>
-        <!--plugin name='gazebo_ros_laser_controller' filename='libgazebo_ros_laser.so'>
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <model name="turtlebot">
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <link name="base_footprint">
+            <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+            <inertial>
+                <pose>0.001453 -0.000453 0.029787 0.000000 -0.000000 0.000000</pose>
+                <inertia>
+                    <ixx>0.058640</ixx>
+                    <ixy>0.000124</ixy>
+                    <ixz>0.000615</ixz>
+                    <iyy>0.058786</iyy>
+                    <iyz>0.000014</iyz>
+                    <izz>1.532440</izz>
+                </inertia>
+                <mass>2.234000</mass>
+                <density>1.000000</density>
+            </inertial>
+            <collision name="base_footprint_geom">
+                <pose>0.000000 0.000000 0.017000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.001000 0.001000 0.001000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_visual">
+                <pose>0.000000 0.000000 -0.983000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.001000 0.001000 0.001000</size>
+                    </box>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_base_link">
+                <pose>0.000000 0.000000 0.047800 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.016495</radius>
+                        <length>0.061163</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_base_link_visual">
+                <pose>0.000000 0.000000 0.047800 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/create_body.dae</filename>
+                        <scale>1.000000 1.000000 1.000000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_camera_link">
+                <pose>-0.087098 0.000000 0.303857 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.073000 0.276000 0.072000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_camera_link_visual">
+                <pose>-0.087098 0.000000 0.303857 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/kinect.dae</filename>
+                        <scale>1.000000 1.000000 1.000000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_front_wheel_link">
+                <pose>0.130000 0.000000 0.017000 0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <sphere>
+                        <radius>0.018000</radius>
+                    </sphere>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>0.000000</mu>
+                            <mu2>0.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>100000000.000000</kp>
+                            <kd>10000.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_front_wheel_link_visual">
+                <pose>0.130000 -0.000000 0.017000 -0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <sphere>
+                        <radius>0.009000</radius>
+                    </sphere>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_plate_0_link">
+                <pose>-0.043340 0.000000 0.084757 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.233502 0.314845 0.006401</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_plate_0_link_visual">
+                <pose>-0.043340 0.000000 0.084757 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/plate_0_logo.dae</filename>
+                        <scale>1.000000 1.000000 1.000000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_plate_1_link">
+                <pose>-0.002660 0.000000 0.141907 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.314856 0.314856 0.006401</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_plate_1_link_visual">
+                <pose>-0.002660 0.000000 0.141907 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/plate_1_logo.dae</filename>
+                        <scale>1.000000 1.000000 1.000000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_plate_2_link">
+                <pose>-0.002660 0.000000 0.199108 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.314856 0.314856 0.006401</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_plate_2_link_visual">
+                <pose>-0.002660 0.000000 0.199108 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/plate_1_logo.dae</filename>
+                        <scale>1.000000 1.000000 1.000000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_plate_3_link">
+                <pose>-0.015820 0.000000 0.405457 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.288000 0.315000 0.006401</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_plate_3_link_visual">
+                <pose>-0.015820 0.000000 0.405457 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/plate_2_logo.dae</filename>
+                        <scale>1.000000 1.000000 1.000000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_rear_wheel_link">
+                <pose>-0.130000 0.000000 0.017000 0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <sphere>
+                        <radius>0.015000</radius>
+                    </sphere>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>0.000000</mu>
+                            <mu2>0.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>100000000.000000</kp>
+                            <kd>10000.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_rear_wheel_link_visual">
+                <pose>-0.130000 -0.000000 0.017000 -0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <sphere>
+                        <radius>0.007500</radius>
+                    </sphere>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_spacer_0_link">
+                <pose>-0.002540 0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.012700</radius>
+                        <length>0.003175</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_spacer_0_link_visual">
+                <pose>-0.002540 0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02403-125_Spacer.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_spacer_1_link">
+                <pose>-0.002540 -0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.012700</radius>
+                        <length>0.003175</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_spacer_1_link_visual">
+                <pose>-0.002540 -0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02403-125_Spacer.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_spacer_2_link">
+                <pose>-0.072390 -0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.012700</radius>
+                        <length>0.003175</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_spacer_2_link_visual">
+                <pose>-0.072390 -0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02403-125_Spacer.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_spacer_3_link">
+                <pose>-0.072390 0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.012700</radius>
+                        <length>0.003175</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_spacer_3_link_visual">
+                <pose>-0.072390 0.111468 0.079992 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02403-125_Spacer.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_0_link">
+                <pose>0.067640 0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_0_link_visual">
+                <pose>0.067640 0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_1_link">
+                <pose>0.067640 -0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_1_link_visual">
+                <pose>0.067640 -0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_2_link">
+                <pose>-0.052832 -0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_2_link_visual">
+                <pose>-0.052832 -0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_3_link">
+                <pose>-0.052832 0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_3_link_visual">
+                <pose>-0.052832 0.131420 0.087980 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_4_link">
+                <pose>0.067640 0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_4_link_visual">
+                <pose>0.067640 0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_5_link">
+                <pose>0.067640 -0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_5_link_visual">
+                <pose>0.067640 -0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_6_link">
+                <pose>-0.052832 -0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_6_link_visual">
+                <pose>-0.052832 -0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_2in_7_link">
+                <pose>-0.052832 0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.038100</radius>
+                        <length>0.063500</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_2in_7_link_visual">
+                <pose>-0.052832 0.131420 0.145130 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_8in_0_link">
+                <pose>0.067640 0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.011113</radius>
+                        <length>0.203200</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_8in_0_link_visual">
+                <pose>0.067640 0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_8in_1_link">
+                <pose>0.067640 -0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.011113</radius>
+                        <length>0.203200</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_8in_1_link_visual">
+                <pose>0.067640 -0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_8in_2_link">
+                <pose>-0.052832 -0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.011113</radius>
+                        <length>0.203200</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_8in_2_link_visual">
+                <pose>-0.052832 -0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_8in_3_link">
+                <pose>-0.052832 0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.011113</radius>
+                        <length>0.203200</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_8in_3_link_visual">
+                <pose>-0.052832 0.131420 0.202280 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_kinect_0_link">
+                <pose>-0.105098 0.098000 0.202308 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.001111</radius>
+                        <length>0.008585</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_kinect_0_link_visual">
+                <pose>-0.105098 0.098000 0.202308 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04556-RA_Kinect_Standoff_Assy.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="base_footprint_geom_standoff_kinect_1_link">
+                <pose>-0.105098 -0.098000 0.202308 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.001111</radius>
+                        <length>0.008585</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="base_footprint_geom_standoff_kinect_1_link_visual">
+                <pose>-0.105098 -0.098000 0.202308 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <mesh>
+                        <filename>turtlebot/68-04556-RA_Kinect_Standoff_Assy.dae</filename>
+                        <scale>0.001000 0.001000 0.001000</scale>
+                    </mesh>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <sensor name="left_cliff_sensor" type="ray">
+                <pose>0.070000 0.140000 0.027000 0.000000 1.570790 0.000000</pose>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>1</samples>
+                            <resolution>1.000000</resolution>
+                            <min_angle>0.000000</min_angle>
+                            <max_angle>0.000000</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.010000</min>
+                        <max>0.040000</max>
+                        <resolution>0.100000</resolution>
+                    </range>
+                </ray>
+                <always_on>0</always_on>
+                <update_rate>0.000000</update_rate>
+                <visualize>0</visualize>
+            </sensor>
+            <sensor name="leftfront_cliff_sensor" type="ray">
+                <pose>0.150000 0.040000 0.027000 0.000000 1.570790 0.000000</pose>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>1</samples>
+                            <resolution>1.000000</resolution>
+                            <min_angle>0.000000</min_angle>
+                            <max_angle>0.000000</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.010000</min>
+                        <max>0.040000</max>
+                        <resolution>0.100000</resolution>
+                    </range>
+                </ray>
+                <always_on>0</always_on>
+                <update_rate>0.000000</update_rate>
+                <visualize>0</visualize>
+            </sensor>
+            <sensor name="right_cliff_sensor" type="ray">
+                <pose>0.070000 -0.140000 0.027000 0.000000 1.570790 0.000000</pose>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>1</samples>
+                            <resolution>1.000000</resolution>
+                            <min_angle>0.000000</min_angle>
+                            <max_angle>0.000000</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.010000</min>
+                        <max>0.040000</max>
+                        <resolution>0.100000</resolution>
+                    </range>
+                </ray>
+                <always_on>0</always_on>
+                <update_rate>0.000000</update_rate>
+                <visualize>0</visualize>
+            </sensor>
+            <sensor name="rightfront_cliff_sensor" type="ray">
+                <pose>0.150000 -0.040000 0.027000 0.000000 1.570790 0.000000</pose>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>1</samples>
+                            <resolution>1.000000</resolution>
+                            <min_angle>0.000000</min_angle>
+                            <max_angle>0.000000</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.010000</min>
+                        <max>0.040000</max>
+                        <resolution>0.100000</resolution>
+                    </range>
+                </ray>
+                <always_on>0</always_on>
+                <update_rate>0.000000</update_rate>
+                <visualize>0</visualize>
+            </sensor>
+            <sensor name="wall_sensor" type="ray">
+                <pose>0.090000 -0.120000 0.059000 0.000000 0.000000 -1.000000</pose>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>1</samples>
+                            <resolution>1.000000</resolution>
+                            <min_angle>0.000000</min_angle>
+                            <max_angle>0.000000</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.016000</min>
+                        <max>0.040000</max>
+                        <resolution>0.100000</resolution>
+                    </range>
+                </ray>
+                <always_on>0</always_on>
+                <update_rate>0.000000</update_rate>
+                <visualize>0</visualize>
+            </sensor>
+            <sensor name="laser" type="ray">
+                <pose>-0.065000 0.000000 0.092000 0.000000 -0.000000 0.000000</pose>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>180</samples>
+                            <resolution>1.000000</resolution>
+                            <min_angle>-2.268928</min_angle>
+                            <max_angle>2.268928</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.080000</min>
+                        <max>10.000000</max>
+                        <resolution>0.010000</resolution>
+                    </range>
+                </ray>
+                <!--plugin name='gazebo_ros_laser_controller' filename='libgazebo_ros_laser.so'>
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>1</alwaysOn>
           <updateRate>20</updateRate>
           <topicName>scan</topicName>
           <frameName>laser</frameName>
         </plugin-->
-      </sensor>
-      <sensor name='camera' type='depth' always_on='0' update_rate='20.000000' visualize='0'>
-        <origin pose='-0.087098 0.000000 0.303857 0.000000 -0.000000 0.000000'/>
-        <camera>
-          <horizontal_fov angle='1.047198'/>
-          <image width='640' height='480' format='R8G8B8'/>
-          <clip near='0.050000' far='3.000000'/>
-        </camera>
-        <!--plugin name='kinect_camera_controller' filename='libgazebo_ros_openni_kinect.so'>
+                <always_on>0</always_on>
+                <update_rate>20.000000</update_rate>
+                <visualize>0</visualize>
+            </sensor>
+            <sensor name="camera" type="depth">
+                <pose>-0.087098 0.000000 0.303857 0.000000 -0.000000 0.000000</pose>
+                <camera>
+                    <horizontal_fov>1.047198</horizontal_fov>
+                    <image>
+                        <width>640</width>
+                        <height>480</height>
+                        <format>R8G8B8</format>
+                    </image>
+                    <clip near="0.050000" far="3.000000" />
+                </camera>
+                <!--plugin name='kinect_camera_controller' filename='libgazebo_ros_openni_kinect.so'>
           <alwaysOn>1</alwaysOn>
           <updateRate>20</updateRate>
           <imageTopicName>/camera/image_raw</imageTopicName>
@@ -655,83 +1432,173 @@
           <distortion_t1>0.0</distortion_t1>
           <distortion_t2>0.0</distortion_t2>
         </plugin-->
-      </sensor>
-    </link>
-    <link name='left_wheel_link' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='0.000000 0.130000 0.032000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='0.010000' density='1.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.001000' ixy='0.000000' ixz='0.000000' iyy='0.001000' iyz='0.000000' izz='0.001000'/>
-      </inertial>
-      <collision name='left_wheel_link_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 1.570700 1.570700'/>
-        <geometry>
-          <cylinder radius='0.033000' length='0.023000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='10.000000' mu2='10.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='100000000.000000' kd='10000.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='left_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 -0.000000 0.000000 -0.000000 1.570700 1.570700'/>
-        <geometry>
-          <cylinder radius='0.033000' length='0.023000'/>
-        </geometry>
-      </visual>
-    </link>
-    <link name='right_wheel_link' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='0.000000 -0.130000 0.032000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='0.010000' density='1.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='0.001000' ixy='0.000000' ixz='0.000000' iyy='0.001000' iyz='0.000000' izz='0.001000'/>
-      </inertial>
-      <collision name='right_wheel_link_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.000000 0.000000 1.570700 1.570700'/>
-        <geometry>
-          <cylinder radius='0.033000' length='0.023000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='10.000000' mu2='10.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='100000000.000000' kd='10000.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='right_wheel_link_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 -0.000000 0.000000 -0.000000 1.570700 1.570700'/>
-        <geometry>
-          <cylinder radius='0.033000' length='0.023000'/>
-        </geometry>
-      </visual>
-    </link>
-    <joint name='left_wheel_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <parent link='base_footprint'/>
-      <child link='left_wheel_link'/>
-      <axis xyz='0.000000 1.000000 0.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
-      </axis>
-    </joint>
-    <joint name='right_wheel_joint' type='revolute'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <parent link='base_footprint'/>
-      <child link='right_wheel_link'/>
-      <axis xyz='0.000000 1.000000 0.000000'>
-        <dynamics damping='0.000000' friction='0.000000'/>
-        <limit lower='-10000000000000000.000000' upper='10000000000000000.000000' effort='0.000000' velocity='0.000000'/>
-      </axis>
-    </joint>
-    <!--plugin name='imu_controller' filename='libgazebo_ros_imu.so'>
+                <always_on>0</always_on>
+                <update_rate>20.000000</update_rate>
+                <visualize>0</visualize>
+            </sensor>
+            <gravity>1</gravity>
+            <self_collide>0</self_collide>
+            <kinematic>0</kinematic>
+        </link>
+        <link name="left_wheel_link">
+            <pose>0.000000 0.130000 0.032000 0.000000 -0.000000 0.000000</pose>
+            <inertial>
+                <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+                <inertia>
+                    <ixx>0.001000</ixx>
+                    <ixy>0.000000</ixy>
+                    <ixz>0.000000</ixz>
+                    <iyy>0.001000</iyy>
+                    <iyz>0.000000</iyz>
+                    <izz>0.001000</izz>
+                </inertia>
+                <mass>0.010000</mass>
+                <density>1.000000</density>
+            </inertial>
+            <collision name="left_wheel_link_geom">
+                <pose>0.000000 0.000000 0.000000 0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.033000</radius>
+                        <length>0.023000</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>10.000000</mu>
+                            <mu2>10.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>100000000.000000</kp>
+                            <kd>10000.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="left_wheel_link_geom_visual">
+                <pose>0.000000 -0.000000 0.000000 -0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.033000</radius>
+                        <length>0.023000</length>
+                    </cylinder>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <gravity>1</gravity>
+            <self_collide>0</self_collide>
+            <kinematic>0</kinematic>
+        </link>
+        <link name="right_wheel_link">
+            <pose>0.000000 -0.130000 0.032000 0.000000 -0.000000 0.000000</pose>
+            <inertial>
+                <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+                <inertia>
+                    <ixx>0.001000</ixx>
+                    <ixy>0.000000</ixy>
+                    <ixz>0.000000</ixz>
+                    <iyy>0.001000</iyy>
+                    <iyz>0.000000</iyz>
+                    <izz>0.001000</izz>
+                </inertia>
+                <mass>0.010000</mass>
+                <density>1.000000</density>
+            </inertial>
+            <collision name="right_wheel_link_geom">
+                <pose>0.000000 0.000000 0.000000 0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.033000</radius>
+                        <length>0.023000</length>
+                    </cylinder>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>10.000000</mu>
+                            <mu2>10.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>100000000.000000</kp>
+                            <kd>10000.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="right_wheel_link_geom_visual">
+                <pose>0.000000 -0.000000 0.000000 -0.000000 1.570700 1.570700</pose>
+                <geometry>
+                    <cylinder>
+                        <radius>0.033000</radius>
+                        <length>0.023000</length>
+                    </cylinder>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <gravity>1</gravity>
+            <self_collide>0</self_collide>
+            <kinematic>0</kinematic>
+        </link>
+        <joint name="left_wheel_joint" type="revolute">
+            <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+            <parent>base_footprint</parent>
+            <child>left_wheel_link</child>
+            <axis>
+                <dynamics>
+                    <damping>0.000000</damping>
+                    <friction>0.000000</friction>
+                </dynamics>
+                <limit lower="-10000000000000000.000000" upper="10000000000000000.000000" effort="0.000000" velocity="0.000000" />
+                <xyz>0.000000 1.000000 0.000000</xyz>
+            </axis>
+        </joint>
+        <joint name="right_wheel_joint" type="revolute">
+            <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+            <parent>base_footprint</parent>
+            <child>right_wheel_link</child>
+            <axis>
+                <dynamics>
+                    <damping>0.000000</damping>
+                    <friction>0.000000</friction>
+                </dynamics>
+                <limit lower="-10000000000000000.000000" upper="10000000000000000.000000" effort="0.000000" velocity="0.000000" />
+                <xyz>0.000000 1.000000 0.000000</xyz>
+            </axis>
+        </joint>
+        <!--plugin name='imu_controller' filename='libgazebo_ros_imu.so'>
       <alwaysOn>1</alwaysOn>
       <updateRate>30</updateRate>
       <topicName>imu/data</topicName>
@@ -742,7 +1609,7 @@
       <rpy>0 -0 0</rpy>
       <bodyName>base_footprint</bodyName>
     </plugin-->
-    <!--plugin name='create_controller' filename='libgazebo_ros_create.so'>
+        <!--plugin name='create_controller' filename='libgazebo_ros_create.so'>
       <alwaysOn>1</alwaysOn>
       <node_namespace>turtlebot_node</node_namespace>
       <left_wheel_joint>left_wheel_joint</left_wheel_joint>
@@ -755,5 +1622,6 @@
       <updateRate>40</updateRate>
       <torque>1.0</torque>
     </plugin-->
-  </model>
+        <static>0</static>
+    </model>
 </gazebo>

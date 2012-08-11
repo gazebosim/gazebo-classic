@@ -1,18 +1,34 @@
+<?xml version="1.0" ?>
 <gazebo version="1.2">
-<model name="bowl" static="false">
-  <link name="body">
-    <inertial mass="0.1">
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <collision name="surface_1">
-      <geometry>
-        <cylinder radius="0.098" length="0.035"/>
-      </geometry>
-    </collision>
-    <visual name="visual1">
-      <geometry>
-        <mesh filename="bowl.dae"/>
-      </geometry>
-    </visual>
-  </link>
-</model>
+    <model name="bowl">
+        <link name="body">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>0.1</mass>
+            </inertial>
+            <collision name="surface_1">
+                <geometry>
+                    <cylinder>
+                        <radius>0.098</radius>
+                        <length>0.035</length>
+                    </cylinder>
+                </geometry>
+            </collision>
+            <visual name="visual1">
+                <geometry>
+                    <mesh>
+                        <filename>bowl.dae</filename>
+                    </mesh>
+                </geometry>
+            </visual>
+        </link>
+        <static>false</static>
+    </model>
+</gazebo>

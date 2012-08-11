@@ -40,6 +40,7 @@
             <to element="sor"/>
           </rename>
         </convert> <!-- End solver -->
+
         <convert name="constraints">
           <rename>
             <from attribute="cfm"/>
@@ -50,8 +51,8 @@
             <to element="erp"/>
           </rename>
           <rename>
-            <from attribute="contact_max_correctiong_vel"/>
-            <to element="contact_max_correctiong_vel"/>
+            <from attribute="contact_max_correcting_vel"/>
+            <to element="contact_max_correcting_vel"/>
           </rename>
           <rename>
             <from attribute="contact_surface_layer"/>
@@ -228,19 +229,19 @@
       <convert name="attenuation">
         <rename>
           <from attribute="range"/>
-          <from element="range"/>
+          <to element="range"/>
         </rename>
         <rename>
           <from attribute="linear"/>
-          <from element="linear"/>
+          <to element="linear"/>
         </rename>
         <rename>
           <from attribute="constant"/>
-          <from element="constant"/>
+          <to element="constant"/>
         </rename>
         <rename>
           <from attribute="quadratic"/>
-          <from element="quadratic"/>
+          <to element="quadratic"/>
         </rename>
       </convert> <!-- End attenuation -->
     </convert> <!-- End light -->
@@ -277,15 +278,15 @@
       <convert name="link">
         <rename>
           <from attribute="gravity"/>
-          <from element="gravity"/>
+          <to element="gravity"/>
         </rename>
         <rename>
           <from attribute="self_collide"/>
-          <from element="self_collide"/>
+          <to element="self_collide"/>
         </rename>
         <rename>
           <from attribute="kinematic"/>
-          <from element="kinematic"/>
+          <to element="kinematic"/>
         </rename>
 
         <convert name="inertial">
@@ -466,11 +467,11 @@
             <convert name="bounce">
               <rename>
                 <from attribute="restitution_coefficient"/>
-                <from element="restitution_coefficient"/>
+                <to element="restitution_coefficient"/>
               </rename>
               <rename>
                 <from attribute="threshold"/>
-                <from element="threshold"/>
+                <to element="threshold"/>
               </rename>
             </convert> <!-- End bounce -->
             <convert name="friction">
@@ -779,7 +780,7 @@
           </convert> <!-- End dynamics -->
         </convert> <!-- End axis2 -->
 
-        <convert name="physics>
+        <convert name="physics">
           <convert name="limit">
             <rename>
               <from attribute="cfm"/>
@@ -839,15 +840,15 @@
     <convert name="link">
       <rename>
         <from attribute="gravity"/>
-        <from element="gravity"/>
+        <to element="gravity"/>
       </rename>
       <rename>
         <from attribute="self_collide"/>
-        <from element="self_collide"/>
+        <to element="self_collide"/>
       </rename>
       <rename>
         <from attribute="kinematic"/>
-        <from element="kinematic"/>
+        <to element="kinematic"/>
       </rename>
 
       <convert name="inertial">
@@ -1038,11 +1039,11 @@
           <convert name="bounce">
             <rename>
               <from attribute="restitution_coefficient"/>
-              <from element="restitution_coefficient"/>
+              <to element="restitution_coefficient"/>
             </rename>
             <rename>
               <from attribute="threshold"/>
-              <from element="threshold"/>
+              <to element="threshold"/>
             </rename>
           </convert> <!-- End bounce -->
           <convert name="friction">
@@ -1351,7 +1352,7 @@
         </convert> <!-- End dynamics -->
       </convert> <!-- End axis2 -->
 
-      <convert name="physics>
+      <convert name="physics">
         <convert name="limit">
           <rename>
             <from attribute="cfm"/>

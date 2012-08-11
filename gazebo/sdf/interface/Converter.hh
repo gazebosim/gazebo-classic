@@ -26,7 +26,8 @@ namespace sdf
   class Converter
   {
     public: static bool Convert(TiXmlElement *_elem,
-                                const std::string &_toVersion);
+                                const std::string &_toVersion,
+                                bool _quiet = false);
 
     private: static void ConvertImpl(TiXmlElement *_elem,
                                      TiXmlElement *_convert);

@@ -1,58 +1,79 @@
-<?xml version="1.0"?> 
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
-
-    <include filename="ground_plane.model"/>
-    <include filename="sun.light"/>
-    
+    <include filename="ground_plane.model" />
+    <include filename="sun.light" />
     <model name="revolute_model">
-      <origin pose="0 0 0.5 0 0 0"/>
+      <pose>0 0 0.5 0 0 0</pose>
       <link name="body1">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
         </inertial>
-
         <collision name="geom">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material script="Gazebo/WoodPallet"/>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
-
       <link name="body2">
-        <origin pose="0 0.5 2.0 0 0 0"/>
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        <origin pose="0 0.5 2.0 0 0 0" />
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
         </inertial>
-
         <collision name="geom">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material script="Gazebo/WoodPallet"/>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
-
       <joint type="revolute" name="revolute_joint">
-        <origin pose="0 0 1 0 0 0"/>
-        <parent link="body2"/>
-        <child link="body1"/>
-        <axis xyz="0 0 1"/>
+        <pose>0 0 1 0 0 0</pose>
+        <parent>body2</parent>
+        <child>body1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
       </joint>
     </model>
-
   </world>
 </gazebo>

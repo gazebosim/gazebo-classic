@@ -24,7 +24,8 @@
 using namespace sdf;
 
 /////////////////////////////////////////////////
-bool Converter::Convert(TiXmlElement *_elem, const std::string &_toVersion)
+bool Converter::Convert(TiXmlElement *_elem, const std::string &_toVersion,
+                        bool _quiet)
 {
   if (!_elem->Attribute("version"))
   {
@@ -33,18 +34,25 @@ bool Converter::Convert(TiXmlElement *_elem, const std::string &_toVersion)
   }
   std::string origVersion = _elem->Attribute("version");
 
-  std::cout << gzclr_start(33)
-            << "  Version[" << origVersion << "] to Version[" << _toVersion
-            << "]\n"
-            << "  Please use the gzsdf tool to update your SDF files.\n"
-            << "    $ gzsdf print [sdf_file] >> [new_sdf_file]\n"
-            << gzclr_end;
+  if (origVersion == _toVersion)
+    return true;
+
+  if (!_quiet)
+  {
+    std::cout << gzclr_start(33)
+              << "  Version[" << origVersion << "] to Version[" << _toVersion
+              << "]\n"
+              << "  Please use the gzsdf tool to update your SDF files.\n"
+              << "    $ gzsdf convert [sdf_file]\n"
+              << gzclr_end;
+  }
 
   _elem->SetAttribute("version", _toVersion);
 
   boost::replace_all(origVersion, ".", "_");
 
-  std::string filename = gazebo::common::find_file(origVersion + ".convert");
+  std::string filename = gazebo::common::find_file(
+      std::string("sdf/") + _toVersion + "/" + origVersion + ".convert");
 
   TiXmlDocument xmlDoc;
   if (!xmlDoc.LoadFile(filename))
@@ -74,7 +82,6 @@ void Converter::ConvertImpl(TiXmlElement *_elem, TiXmlElement *_convert)
       elem = elem->NextSiblingElement(convertElem->Attribute("name"));
     }
   }
-
 
   for (TiXmlElement *renameElem = _convert->FirstChildElement("rename");
        renameElem; renameElem = renameElem->NextSiblingElement("rename"))

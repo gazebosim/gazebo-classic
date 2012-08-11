@@ -1,22 +1,26 @@
-<?xml version="1.0"?> 
+<?xml version="1.0" ?>
 <gazebo version="1.2">
   <world name="default">
-    <include filename="ground_plane.model"/>
-
+    <include filename="ground_plane.model" />
     <model name="box_1">
       <origin>0 0 .5 0 0 0</origin>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -25,15 +29,20 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -42,15 +51,20 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -59,15 +73,20 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -76,41 +95,50 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box><size>1 1 1</size></box>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
-
     <model name="sphere_1">
       <origin>0 1.5 0.5 0 0 0</origin>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
           <surface>
             <contact>
-               <ode>
+              <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
               </ode>
             </contact>
           </surface>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -119,49 +147,58 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
           <surface>
             <contact>
-               <ode>
+              <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
               </ode>
             </contact>
           </surface>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
     <model name="sphere_3">
       <origin>0 1.5 2.5 0 0 0</origin>
       <link name="link">
-
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
           <surface>
             <contact>
-               <ode>
+              <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
               </ode>
-           </contact>
+            </contact>
           </surface>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -170,7 +207,9 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
           <surface>
             <contact>
@@ -181,25 +220,26 @@
             </contact>
           </surface>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
     <model name="sphere_5">
       <origin>0 1.5 4.5 0 0 0</origin>
       <link name="link">
-        
-          
-        
-
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
           <surface>
             <contact>
@@ -210,30 +250,37 @@
             </contact>
           </surface>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
-
     <model name="sphere_1a">
       <origin>1.5 1.5 0.5 0 0 0</origin>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -242,15 +289,20 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -259,15 +311,20 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -276,15 +333,20 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -293,33 +355,44 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere><radius>0.5</radius></sphere>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
-
     <model name="cylinder_1">
       <origin>0 -1.5 0.5 0 0 0</origin>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -328,15 +401,22 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -345,15 +425,22 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -362,15 +449,22 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
@@ -379,19 +473,25 @@
       <link name="link">
         <collision name="collision">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <cylinder><radius>0.1</radius><length>1.0</length></cylinder>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material><script>Gazebo/WoodPallet</script></material>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
       </link>
     </model>
-
     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>
       <origin>0 0 10 0 0 0</origin>
@@ -405,6 +505,5 @@
         <direction>0 .5 -.5</direction>
       </attenuation>
     </light>
-
   </world>
 </gazebo>

@@ -1,41 +1,50 @@
-<?xml version="1.0"?> 
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
-
-    <plugin name="world_edit" filename="libworld_edit.so"/>
-
-    <include filename="ground_plane.model"/>
-    <include filename="sun.light"/>
-
+    <plugin name="world_edit" filename="libworld_edit.so" />
+    <include filename="ground_plane.model" />
+    <include filename="sun.light" />
     <model name="box_model">
-      <origin pose="0 0 0.5 0 0 0"/>
+      <pose>0 0 0.5 0 0 0</pose>
       <link name="body">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
         </inertial>
-
         <collision name="geom">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
           <surface>
             <friction>
-              <ode mu="0" mu2="0"/>
+              <ode>
+                <mu>0</mu>
+                <mu2>0</mu2>
+              </ode>
             </friction>
           </surface>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
-          <material script="Gazebo/WoodPallet"/>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
         </visual>
-
       </link>
-
-      <plugin name="my_plugin" filename="libmodel_push.so"/>
+      <plugin name="my_plugin" filename="libmodel_push.so" />
     </model>
-
   </world>
 </gazebo>

@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  if ((params[0] == "check" || params[0] == "print"))
+  if ((params[0] == "check" || params[0] == "print" || params[0] == "convert"))
   {
     if (params.size() == 3)
       SDF::version = params[2];
@@ -97,8 +97,8 @@ int main(int argc, char** argv)
     if (xmlDoc.LoadFile(params[1]))
     {
       TiXmlElement *gazeboNode = xmlDoc.FirstChildElement("gazebo");
-      sdf::Converter::Convert(gazeboNode, SDF::version);
-      xmlDoc.Print();
+      sdf::Converter::Convert(gazeboNode, SDF::version, true);
+      xmlDoc.SaveFile(params[1]);
     }
     else
       std::cerr << "Unable to load file[" << params[1] << "]\n";

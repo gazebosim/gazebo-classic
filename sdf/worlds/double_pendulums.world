@@ -1,111 +1,171 @@
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
-
     <scene>
-      <ambient rgba="0.5 0.5 0.5 1"/>
-      <background rgba="0.5 0.5 0.5 1"/>
-      <shadows enabled="false"/>
+      <ambient>0.5 0.5 0.5 1</ambient>
+      <background>0.5 0.5 0.5 1</background>
+      <shadows>false</shadows>
     </scene>
-
-    <include filename="sun.light"/>
-
+    <include filename="sun.light" />
     <physics type="ode">
-      <gravity xyz="0.0 0.0 -9.81"/>
+      <gravity>0.0 0.0 -9.81</gravity>
       <ode>
-        <solver type="quick" dt="0.001" iters="100" sor="1.3"/>
-        <constraints cfm="0" erp="1.0" contact_max_correcting_vel="0.0" contact_surface_layer="0.0"/>
+        <solver>
+          <type>quick</type>
+          <dt>0.001</dt>
+          <iters>100</iters>
+          <sor>1.3</sor>
+        </solver>
+        <constraints>
+          <cfm>0</cfm>
+          <erp>1.0</erp>
+          <contact_max_correcting_vel>0.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
       </ode>
     </physics>
-
-    <model name="model_1" static="false">
-
-      <origin pose="0.0 0.0 2.1 30.0 0.0 0.0"/>
-
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
-
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-
-        <inertial mass="10.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+    <model name="model_1">
+      <pose>0.0 0.0 2.1 30.0 0.0 0.0</pose>
+      <link name="link_1">
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        <inertial>
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
-          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                   iyy="1.0" iyz="0.0"
-                   izz="1.0"/>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>10.0</mass>
         </inertial>
-
-        <visual name="visual_cylinder" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <cylinder radius="0.1" length="1.0"/>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material script="Gazebo/Green"/>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <laser_retro>100.0</laser_retro>
         </visual>
-
-        <collision name="collision_cylinder" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <cylinder radius="0.1" length="1.0"/>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
           <surface>
             <friction>
-              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1.0 0 0</fdir1>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
             </friction>
-            <bounce restitution_coefficient="0" threshold="1000000.0"/>
+            <bounce>
+              <restitution_coefficient>0</restitution_coefficient>
+              <threshold>1000000.0</threshold>
+            </bounce>
             <contact>
-              <ode soft_cfm="0" kp="1e15" kd="1e13" max_vel="100.0" min_depth="0.0001"/>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <kp>1e15</kp>
+                <kd>1e13</kd>
+                <max_vel>100.0</max_vel>
+                <min_depth>0.0001</min_depth>
+              </ode>
             </contact>
           </surface>
+          <laser_retro>100.0</laser_retro>
         </collision>
-
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
       </link>
-
       <link name="link_2">
-
-        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0"/>
-
-        <inertial mass="10.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0" />
+        <inertial>
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
-          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                   iyy="1.0" iyz="0.0"
-                   izz="1.0"/>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>10.0</mass>
         </inertial>
-
-        <visual name="visual_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <visual name="visual_box">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <box size="0.1 0.1 1.0"/>
+            <box>
+              <size>0.1 0.1 1.0</size>
+            </box>
           </geometry>
-          <material script="Gazebo/Red"/>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+          <laser_retro>100.0</laser_retro>
         </visual>
-
-        <collision name="collision_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <collision name="collision_box">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <box size="0.1 0.1 1.0"/>
+            <box>
+              <size>0.1 0.1 1.0</size>
+            </box>
           </geometry>
           <surface>
             <friction>
-              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1.0 0 0</fdir1>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
             </friction>
-            <bounce restitution_coefficient="0" threshold="1000000.0"/>
+            <bounce>
+              <restitution_coefficient>0</restitution_coefficient>
+              <threshold>1000000.0</threshold>
+            </bounce>
             <contact>
-              <ode soft_cfm="0" kp="1e15" kd="1e13" max_vel="100.0" min_depth="0.0001"/>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <kp>1e15</kp>
+                <kd>1e13</kd>
+                <max_vel>100.0</max_vel>
+                <min_depth>0.0001</min_depth>
+              </ode>
             </contact>
           </surface>
+          <laser_retro>100.0</laser_retro>
         </collision>
-
       </link>
-
       <joint name="joint_0" type="revolute">
-        <parent link="world"/>
-        <child link="link_1"/>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-        <axis xyz="1.0 0.0 0.0">
-          <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
-          <dynamics damping="0.0" friction="0.0"/>
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit lower="-100" upper="100" effort="1000" velocity="1000" />
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>1.0 0.0 0.0</xyz>
         </axis>
         <physics>
           <ode>
@@ -114,19 +174,22 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0" erp="0.1"/>
-            <suspension cfm="0.0" erp="0.2"/>
+            <limit cfm="0" erp="0.1" />
+            <suspension cfm="0.0" erp="0.2" />
           </ode>
         </physics>
       </joint>
-
       <joint name="joint_1" type="revolute">
-        <parent link="link_1"/>
-        <child link="link_2"/>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-        <axis xyz="1.0 0.0 0.0">
-          <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
-          <dynamics damping="0.0" friction="0.0"/>
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit lower="-100" upper="100" effort="1000" velocity="1000" />
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>1.0 0.0 0.0</xyz>
         </axis>
         <physics>
           <ode>
@@ -135,105 +198,155 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0" erp="0.1"/>
-            <suspension cfm="0.0" erp="0.2"/>
+            <limit cfm="0" erp="0.1" />
+            <suspension cfm="0.0" erp="0.2" />
           </ode>
         </physics>
       </joint>
-
+      <static>false</static>
     </model>
-
-
-
-    <model name="model_2" static="false">
-
-      <origin pose="1.0 0.0 2.1 30.0 0.0 0.0"/>
-
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
-
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-
-        <inertial mass="10.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+    <model name="model_2">
+      <pose>1.0 0.0 2.1 30.0 0.0 0.0</pose>
+      <link name="link_1">
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        <inertial>
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
-          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                   iyy="1.0" iyz="0.0"
-                   izz="1.0"/>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>10.0</mass>
         </inertial>
-
-        <visual name="visual_cylinder" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <cylinder radius="0.1" length="1.0"/>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material script="Gazebo/Green"/>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <laser_retro>100.0</laser_retro>
         </visual>
-
-        <collision name="collision_cylinder" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <cylinder radius="0.1" length="1.0"/>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
           <surface>
             <friction>
-              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1.0 0 0</fdir1>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
             </friction>
-            <bounce restitution_coefficient="0" threshold="1000000.0"/>
+            <bounce>
+              <restitution_coefficient>0</restitution_coefficient>
+              <threshold>1000000.0</threshold>
+            </bounce>
             <contact>
-              <ode soft_cfm="0" kp="1e15" kd="1e13" max_vel="100.0" min_depth="0.0001"/>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <kp>1e15</kp>
+                <kd>1e13</kd>
+                <max_vel>100.0</max_vel>
+                <min_depth>0.0001</min_depth>
+              </ode>
             </contact>
           </surface>
+          <laser_retro>100.0</laser_retro>
         </collision>
-
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
       </link>
-
       <link name="link_2">
-
-        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0"/>
-
-        <inertial mass="10.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0" />
+        <inertial>
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
-          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                   iyy="1.0" iyz="0.0"
-                   izz="1.0"/>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>10.0</mass>
         </inertial>
-
-        <visual name="visual_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <visual name="visual_box">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <box size="0.1 0.1 1.0"/>
+            <box>
+              <size>0.1 0.1 1.0</size>
+            </box>
           </geometry>
-          <material script="Gazebo/Red"/>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+          <laser_retro>100.0</laser_retro>
         </visual>
-
-        <collision name="collision_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <collision name="collision_box">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <box size="0.1 0.1 1.0"/>
+            <box>
+              <size>0.1 0.1 1.0</size>
+            </box>
           </geometry>
           <surface>
             <friction>
-              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1.0 0 0</fdir1>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
             </friction>
-            <bounce restitution_coefficient="0" threshold="1000000.0"/>
+            <bounce>
+              <restitution_coefficient>0</restitution_coefficient>
+              <threshold>1000000.0</threshold>
+            </bounce>
             <contact>
-              <ode soft_cfm="0" kp="1e15" kd="1e13" max_vel="100.0" min_depth="0.0001"/>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <kp>1e15</kp>
+                <kd>1e13</kd>
+                <max_vel>100.0</max_vel>
+                <min_depth>0.0001</min_depth>
+              </ode>
             </contact>
           </surface>
+          <laser_retro>100.0</laser_retro>
         </collision>
-
       </link>
-
       <joint name="joint_0" type="revolute">
-        <parent link="world"/>
-        <child link="link_1"/>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-        <axis xyz="1.0 0.0 0.0">
-          <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
-          <dynamics damping="0.0" friction="0.0"/>
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit lower="-100" upper="100" effort="1000" velocity="1000" />
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>1.0 0.0 0.0</xyz>
         </axis>
         <physics>
           <ode>
@@ -242,19 +355,22 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0" erp="0.1"/>
-            <suspension cfm="0.0" erp="0.2"/>
+            <limit cfm="0" erp="0.1" />
+            <suspension cfm="0.0" erp="0.2" />
           </ode>
         </physics>
       </joint>
-
       <joint name="joint_1" type="revolute">
-        <parent link="link_1"/>
-        <child link="link_2"/>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-        <axis xyz="1.0 0.0 0.0">
-          <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
-          <dynamics damping="0.0" friction="0.0"/>
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit lower="-100" upper="100" effort="1000" velocity="1000" />
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>1.0 0.0 0.0</xyz>
         </axis>
         <physics>
           <ode>
@@ -263,103 +379,155 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0" erp="0.1"/>
-            <suspension cfm="0.0" erp="0.2"/>
+            <limit cfm="0" erp="0.1" />
+            <suspension cfm="0.0" erp="0.2" />
           </ode>
         </physics>
       </joint>
-
+      <static>false</static>
     </model>
-
-    <model name="model_3" static="false">
-
-      <origin pose="0.0 -2.5 2.1 0.0 30.0 0.0"/>
-
-      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
-
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-
-        <inertial mass="10.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+    <model name="model_3">
+      <pose>0.0 -2.5 2.1 0.0 30.0 0.0</pose>
+      <link name="link_1">
+        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        <inertial>
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
-          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                   iyy="1.0" iyz="0.0"
-                   izz="1.0"/>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>10.0</mass>
         </inertial>
-
-        <visual name="visual_cylinder" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <cylinder radius="0.1" length="1.0"/>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
-          <material script="Gazebo/Green"/>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <laser_retro>100.0</laser_retro>
         </visual>
-
-        <collision name="collision_cylinder" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <cylinder radius="0.1" length="1.0"/>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>1.0</length>
+            </cylinder>
           </geometry>
           <surface>
             <friction>
-              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1.0 0 0</fdir1>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
             </friction>
-            <bounce restitution_coefficient="0" threshold="1000000.0"/>
+            <bounce>
+              <restitution_coefficient>0</restitution_coefficient>
+              <threshold>1000000.0</threshold>
+            </bounce>
             <contact>
-              <ode soft_cfm="0" kp="1e15" kd="1e13" max_vel="100.0" min_depth="0.0001"/>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <kp>1e15</kp>
+                <kd>1e13</kd>
+                <max_vel>100.0</max_vel>
+                <min_depth>0.0001</min_depth>
+              </ode>
             </contact>
           </surface>
+          <laser_retro>100.0</laser_retro>
         </collision>
-
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
       </link>
-
       <link name="link_2">
-
-        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0"/>
-
-        <inertial mass="10.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0" />
+        <inertial>
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
-          <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                   iyy="1.0" iyz="0.0"
-                   izz="1.0"/>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>10.0</mass>
         </inertial>
-
-        <visual name="visual_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <visual name="visual_box">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <box size="0.1 0.1 1.0"/>
+            <box>
+              <size>0.1 0.1 1.0</size>
+            </box>
           </geometry>
-          <material script="Gazebo/Red"/>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+          <laser_retro>100.0</laser_retro>
         </visual>
-
-        <collision name="collision_box" laser_retro="100.0">
-          <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
+        <collision name="collision_box">
+          <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <box size="0.1 0.1 1.0"/>
+            <box>
+              <size>0.1 0.1 1.0</size>
+            </box>
           </geometry>
           <surface>
             <friction>
-              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.2</mu2>
+                <fdir1>1.0 0 0</fdir1>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
             </friction>
-            <bounce restitution_coefficient="0" threshold="1000000.0"/>
+            <bounce>
+              <restitution_coefficient>0</restitution_coefficient>
+              <threshold>1000000.0</threshold>
+            </bounce>
             <contact>
-              <ode soft_cfm="0" kp="1e15" kd="1e13" max_vel="100.0" min_depth="0.0001"/>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <kp>1e15</kp>
+                <kd>1e13</kd>
+                <max_vel>100.0</max_vel>
+                <min_depth>0.0001</min_depth>
+              </ode>
             </contact>
           </surface>
+          <laser_retro>100.0</laser_retro>
         </collision>
-
       </link>
-
       <joint name="joint_0" type="revolute">
-        <parent link="world"/>
-        <child link="link_1"/>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-        <axis xyz="0.0 1.0 0.0">
-          <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
-          <dynamics damping="0.0" friction="0.0"/>
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit lower="-100" upper="100" effort="1000" velocity="1000" />
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>0.0 1.0 0.0</xyz>
         </axis>
         <physics>
           <ode>
@@ -368,19 +536,22 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0" erp="0.1"/>
-            <suspension cfm="0.0" erp="0.2"/>
+            <limit cfm="0" erp="0.1" />
+            <suspension cfm="0.0" erp="0.2" />
           </ode>
         </physics>
       </joint>
-
       <joint name="joint_1" type="revolute">
-        <parent link="link_1"/>
-        <child link="link_2"/>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
-        <axis xyz="0.0 1.0 0.0">
-          <limit lower="-100" upper="100" effort="1000" velocity="1000"/>
-          <dynamics damping="0.0" friction="0.0"/>
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit lower="-100" upper="100" effort="1000" velocity="1000" />
+          <dynamics>
+            <damping>0.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <xyz>0.0 1.0 0.0</xyz>
         </axis>
         <physics>
           <ode>
@@ -389,12 +560,12 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0" erp="0.1"/>
-            <suspension cfm="0.0" erp="0.2"/>
+            <limit cfm="0" erp="0.1" />
+            <suspension cfm="0.0" erp="0.2" />
           </ode>
         </physics>
       </joint>
-
+      <static>false</static>
     </model>
   </world>
 </gazebo>
