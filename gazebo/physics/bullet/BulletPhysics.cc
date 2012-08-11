@@ -122,12 +122,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  sdf::ElementPtr bulletElem = this->sdf->GetOrCreateElement("bullet");
+  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  this->stepTimeDouble = bulletElem->GetOrCreateElement("dt")->GetValueDouble();
+  this->stepTimeDouble = bulletElem->GetElement("dt")->GetValueDouble();
 
-  math::Vector3 g = this->sdf->GetOrCreateElement(
-      "gravity")->GetValueVector3("xyz");
+  math::Vector3 g = this->sdf->GetValueVector3("gravity");
   this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
@@ -182,7 +181,7 @@ void BulletPhysics::Fini()
 //////////////////////////////////////////////////
 void BulletPhysics::SetStepTime(double _value)
 {
-  this->sdf->GetOrCreateElement("ode")->GetOrCreateElement(
+  this->sdf->GetElement("ode")->GetElement(
       "solver")->GetAttribute("dt")->Set(_value);
 
   this->stepTimeDouble = _value;
@@ -319,7 +318,7 @@ btTransform BulletPhysics::ConvertPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetOrCreateElement("gravity")->GetAttribute("xyz")->Set(_gravity);
+  this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
   this->dynamicsWorld->setGravity(btVector3(_gravity.x,
         _gravity.y, _gravity.z));
 }

@@ -178,17 +178,16 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->cameraElem.reset(new sdf::Element);
   sdf::initFile("camera.sdf", this->cameraElem);
 
-  sdf::ElementPtr ptr = this->cameraElem->GetOrCreateElement("horizontal_fov");
-  ptr->GetAttribute("angle")->Set(chfov);
+  this->cameraElem->GetElement("horizontal_fov")->Set(chfov);
 
-  ptr = this->cameraElem->GetOrCreateElement("image");
-  ptr->GetAttribute("width")->Set(width_1st);
-  ptr->GetAttribute("height")->Set(height_1st);
-  ptr->GetAttribute("format")->Set("R8G8B8");
+  sdf::ElementPtr ptr = this->cameraElem->GetElement("image");
+  ptr->GetElement("width")->Set(width_1st);
+  ptr->GetElement("height")->Set(height_1st);
+  ptr->GetElement("format")->Set("R8G8B8");
 
-  ptr = this->cameraElem->GetOrCreateElement("clip");
-  ptr->GetAttribute("near")->Set(near);
-  ptr->GetAttribute("far")->Set(far);
+  ptr = this->cameraElem->GetElement("clip");
+  ptr->GetElement("near")->Set(near);
+  ptr->GetElement("far")->Set(far);
 }
 
 //////////////////////////////////////////////////
@@ -322,7 +321,7 @@ math::Angle GpuRaySensor::GetAngleMin() const
 //////////////////////////////////////////////////
 void GpuRaySensor::SetAngleMin(double _angle)
 {
-  this->horzElem->GetAttribute("min_angle")->Set(_angle);
+  this->horzElem->GetElement("min_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -334,7 +333,7 @@ math::Angle GpuRaySensor::GetAngleMax() const
 //////////////////////////////////////////////////
 void GpuRaySensor::SetAngleMax(double _angle)
 {
-  this->horzElem->GetAttribute("max_angle")->Set(_angle);
+  this->horzElem->GetElement("max_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -413,7 +412,7 @@ math::Angle GpuRaySensor::GetVerticalAngleMin() const
 void GpuRaySensor::SetVerticalAngleMin(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
-    this->vertElem->GetAttribute("min_angle")->Set(_angle);
+    this->vertElem->GetElement("min_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -429,7 +428,7 @@ math::Angle GpuRaySensor::GetVerticalAngleMax() const
 void GpuRaySensor::SetVerticalAngleMax(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
-    this->vertElem->GetAttribute("max_angle")->Set(_angle);
+    this->vertElem->GetElement("max_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////

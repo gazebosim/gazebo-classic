@@ -51,85 +51,85 @@ std::string Param::GetTypeName() const
 //////////////////////////////////////////////////
 bool Param::IsBool() const
 {
-  return this->GetTypeName() == typeid(bool).name();
+  return this->GetTypeName() == "bool";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsInt() const
 {
-  return this->GetTypeName() == typeid(int).name();
+  return this->GetTypeName() == "int";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsUInt() const
 {
-  return this->GetTypeName() == typeid(unsigned int).name();
+  return this->GetTypeName() == "unsigned int";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsFloat() const
 {
-  return this->GetTypeName() == typeid(float).name();
+  return this->GetTypeName() == "float";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsDouble() const
 {
-  return this->GetTypeName() == typeid(double).name();
+  return this->GetTypeName() == "double";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsChar() const
 {
-  return this->GetTypeName() == typeid(char).name();
+  return this->GetTypeName() == "char";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsStr() const
 {
-  return this->GetTypeName() == typeid(std::string).name();
+  return this->GetTypeName() == "string";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsVector3() const
 {
-  return this->GetTypeName() == typeid(gazebo::math::Vector3).name();
+  return this->GetTypeName() == "vector3";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsVector2i() const
 {
-  return this->GetTypeName() == typeid(gazebo::math::Vector2i).name();
+  return this->GetTypeName() == "vector2i";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsVector2d() const
 {
-  return this->GetTypeName() == typeid(gazebo::math::Vector2d).name();
+  return this->GetTypeName() == "vector2d";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsQuaternion() const
 {
-  return this->GetTypeName() == typeid(gazebo::math::Quaternion).name();
+  return this->GetTypeName() == "quaternion";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsPose() const
 {
-  return this->GetTypeName() == typeid(gazebo::math::Pose).name();
+  return this->GetTypeName() == "pose";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsColor() const
 {
-  return this->GetTypeName() == typeid(gazebo::common::Color).name();
+  return this->GetTypeName() == "color";
 }
 
 //////////////////////////////////////////////////
 bool Param::IsTime() const
 {
-  return this->GetTypeName() == typeid(gazebo::common::Time).name();
+  return this->GetTypeName() == "time";
 }
 
 //////////////////////////////////////////////////
@@ -531,4 +531,16 @@ bool Param::Get(gazebo::math::Quaternion &_value)
     gzerr << "Parameter [" << this->key << "] is not a quaternion\n";
     return false;
   }
+}
+
+/////////////////////////////////////////////////
+void Param::SetDescription(const std::string &_desc)
+{
+  this->description = _desc;
+}
+
+/////////////////////////////////////////////////
+std::string Param::GetDescription() const
+{
+  return this->description;
 }

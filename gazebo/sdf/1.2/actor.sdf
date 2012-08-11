@@ -1,32 +1,80 @@
 <!-- Actor -->
 <element name="actor" required="*">
-  <attribute name="name" type="string" default="__default__" required="1"/>
-  <attribute name="static" type="bool" default="false" required="0"/>
+  <description></description>
 
-  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0"/>
+  <attribute name="name" type="string" default="__default__" required="1">
+    <description></description>
+  </attribute>
+
+  <attribute name="static" type="bool" default="false" required="0">
+    <description></description>
+  </attribute>
+
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
+    <description>Origin of the actor</description>
+  </element>
 
   <element name="skin" required="1">
-    <attribute name="filename" type="string" default="__default__" required="1"/>
-    <attribute name="scale" type="double" default="1.0" required="0"/> 
+    <description></description>
+    <element name="filename" type="string" default="__default__" required="1">
+      <description></description>
+    </element>
+    <element name="scale" type="double" default="1.0" required="0"> 
+      <description></description>
+    </element>
   </element> <!-- End Skin -->
 
   <element name="animation" required="+">
-    <attribute name="name" type="string" default="__default__" required="1"/>
-    <attribute name="filename" type="string" default="__default__" required="1"/>
-    <attribute name="scale" type="double" default="1.0" required="0"/>
-    <attribute name="interpolate_x" type="bool" default="false" required="0"/>
+    <description></description>
+
+    <attribute name="name" type="string" default="__default__" required="1">
+      <description></description>
+    </attribute>
+
+    <element name="filename" type="string" default="__default__" required="1">
+      <description></description>
+    </element>
+    <element name="scale" type="double" default="1.0" required="0">
+      <description></description>
+    </element>
+    <element name="interpolate_x" type="bool" default="false" required="0">
+      <description></description>
+    </element>
   </element> <!-- End Animation -->
 
   <element name="script" required="1">
-    <attribute name="loop" type="bool" default="true" required="0"/>
-    <attribute name="delay_start" type="double" default="0.0" required="0"/>
-    <attribute name="auto_start" type="bool" default="true" required="0"/>
+    <description></description>
+
+    <element name="loop" type="bool" default="true" required="0">
+      <description></description>
+    </element>
+
+    <element name="delay_start" type="double" default="0.0" required="0">
+      <description></description>
+    </element>
+
+    <element name="auto_start" type="bool" default="true" required="0">
+      <description></description>
+    </element>
+
     <element name="trajectory" required="*">
-      <attribute name="id" type="int" default="0" required="1"/>
-      <attribute name="type" type="string" default="__default__" required="1"/>
+      <description></description>
+      <attribute name="id" type="int" default="0" required="1">
+        <description></description>
+      </attribute>
+
+      <attribute name="type" type="string" default="__default__" required="1">
+        <description></description>
+      </attribute>
+
       <element name="waypoint" required="*">
-        <attribute name="time" type="double" default="0.0" required="1"/>
-        <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+        <description></description>
+        <element name="time" type="double" default="0.0" required="1">
+          <description></description>
+        </element>
+        <element name="pose" type="pose" default="0 0 0 0 0 0" required="1">
+          <description></description>
+        </element>
       </element> <!-- End Waypoint -->
     </element> <!-- End Action -->
   </element> <!-- End Script -->

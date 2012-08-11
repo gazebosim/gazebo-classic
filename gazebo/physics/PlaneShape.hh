@@ -51,12 +51,18 @@ namespace gazebo
       public: virtual void CreatePlane();
 
       /// \brief Set the altitude of the plane
-      public: virtual void SetAltitude(const math::Vector3 &pos);
+      public: virtual void SetAltitude(const math::Vector3 &_pos);
 
       /// \brief Set the normal
-      public: void SetNormal(const math::Vector3 &norm);
+      public: void SetNormal(const math::Vector3 &_norm);
 
       public: math::Vector3 GetNormal() const;
+
+      /// \brief Set the size
+      public: void SetSize(const math::Vector2d &_size);
+
+      /// \brief Get the size
+      public: math::Vector2d GetSize() const;
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
 

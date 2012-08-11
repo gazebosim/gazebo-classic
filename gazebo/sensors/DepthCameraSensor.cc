@@ -94,7 +94,7 @@ void DepthCameraSensor::Init()
     }
     this->camera->SetCaptureData(true);
 
-    sdf::ElementPtr cameraSdf = this->sdf->GetOrCreateElement("camera");
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
     this->camera->Load(cameraSdf);
 
     // Do some sanity checks

@@ -296,9 +296,9 @@ namespace gazebo
 
         guiCam->set_name(camSDF->GetValueString("name"));
 
-        if (camSDF->HasElement("origin"))
+        if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_origin(), camSDF->GetValuePose("origin"));
+          msgs::Set(guiCam->mutable_origin(), camSDF->GetValuePose("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -353,9 +353,9 @@ namespace gazebo
       else if (type == "directional")
         result.set_type(msgs::Light::DIRECTIONAL);
 
-      if (_sdf->HasElement("origin"))
+      if (_sdf->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->GetValuePose("origin")));
+        result.mutable_pose()->CopyFrom(Convert(_sdf->GetValuePose("pose")));
       }
 
       if (_sdf->HasElement("diffuse"))
@@ -381,9 +381,8 @@ namespace gazebo
 
       if (_sdf->HasElement("direction"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("direction");
         result.mutable_direction()->CopyFrom(
-            Convert(elem->GetValueVector3("xyz")));
+            Convert(_sdf->GetValueVector3("direction")));
       }
 
       if (_sdf->HasElement("spot"))
@@ -462,7 +461,7 @@ namespace gazebo
           msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
               geomElem->GetValueVector3("size"));
           msgs::Set(geomMsg->mutable_heightmap()->mutable_origin(),
-              geomElem->GetValueVector3("origin"));
+              geomElem->GetValueVector3("pos"));
 
           common::Image img(geomElem->GetValueString("filename"));
           msgs::Set(geomMsg->mutable_heightmap()->mutable_image(), img);
@@ -546,9 +545,9 @@ namespace gazebo
       }
 
       // Set the origin of the visual
-      if (_sdf->HasElement("origin"))
+      if (_sdf->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->GetValuePose("origin"));
+        msgs::Set(result.mutable_pose(), _sdf->GetValuePose("pose"));
       }
 
       return result;

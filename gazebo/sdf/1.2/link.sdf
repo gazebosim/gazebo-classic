@@ -1,16 +1,36 @@
 <!-- Link -->
 <element name="link" required="+">
-  <attribute name="name" type="string" default="__default__" required="1"/>
-  <attribute name="gravity" type="bool" default="true" required="0"/>
-  <attribute name="self_collide" type="bool" default="false" required="0"/>
-  <attribute name="kinematic" type="bool" default="false" required="0"/>
+  <description>A physical link with inertia, collision, and visual properties. A link must be a child of a model, and any number of links may exist in a model.</description>
 
-  <element name="origin" type="pose" default="0 0 0 0 0 0" required="0"/>
+  <attribute name="name" type="string" default="__default__" required="1">
+    <description>A unique name for the link within the scope of the model.</description>
+  </attribute>
 
-  <element name="damping" required="1">
-    <element name="linear" type="double" default="0.0" required="1"/>
-    <element name="angular" type="double" default="0.0" required="1"/>
-  </element> <!-- End damping -->
+  <element name="gravity" type="bool" default="true" required="0">
+    <description>If true, the link is affected by gravity.</description>
+  </element>
+
+  <element name="self_collide" type="bool" default="false" required="0">
+    <description>If true, the link can collide with other links in the model.</description>
+  </element>
+
+  <element name="kinematic" type="bool" default="false" required="0">
+    <description>If true, the link is kinematic only</description>
+  </element>
+
+  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0">
+    <description>This is the pose of the link reference frame, relative to the model reference frame.</description>
+  </element>
+
+  <element name="velocity_decay" required="1">
+    <description>Exponential damping of the link's velocity.</description>
+    <element name="linear" type="double" default="0.0" required="1">
+      <description>Linear damping</description>
+    </element>
+    <element name="angular" type="double" default="0.0" required="1">
+      <description>Angular damping</description>
+    </element>
+  </element> <!-- End velocity decay -->
 
   <include filename="inertial.sdf" required="0"/>
   <include filename="collision.sdf" required="*"/>

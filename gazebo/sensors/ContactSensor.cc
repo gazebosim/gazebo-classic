@@ -85,7 +85,7 @@ void ContactSensor::Load(const std::string &_worldName)
   while (collisionElem)
   {
     // get collision name
-    collisionName = collisionElem->GetValueString("name");
+    collisionName = collisionElem->GetValueString();
     collisionScopedName =
       this->world->GetEntity(this->parentName)->GetScopedName();
     collisionScopedName += "::" + collisionName;

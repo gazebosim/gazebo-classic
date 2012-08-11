@@ -94,7 +94,7 @@ void Link::Load(sdf::ElementPtr _sdf)
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
-  this->sdf->GetAttribute("self_collide")->SetUpdateFunc(
+  this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
 
   // TODO: this shouldn't be in the physics sim
@@ -150,10 +150,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
   if (!this->IsStatic())
   {
-    if (this->sdf->HasElement("inertial"))
-      this->inertial->Load(this->sdf->GetElement("inertial"));
-    else
-      this->SetInertialFromCollisions();
+    this->inertial->Load(this->sdf->GetElement("inertial"));
   }
 }
 
@@ -236,8 +233,8 @@ void Link::Init()
   this->enabled = true;
 
   // DO THIS LAST!
-  this->SetRelativePose(this->sdf->GetValuePose("origin"));
-  this->SetInitialRelativePose(this->sdf->GetValuePose("origin"));
+  this->SetRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -291,9 +288,9 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     this->inertial->UpdateParameters(inertialElem);
   }
 
-  this->sdf->GetAttribute("gravity")->SetUpdateFunc(
+  this->sdf->GetElement("gravity")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetGravityMode, this));
-  this->sdf->GetAttribute("kinematic")->SetUpdateFunc(
+  this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
   if (this->sdf->GetValueBool("gravity") != this->GetGravityMode())
@@ -771,22 +768,6 @@ void Link::SetState(const LinkState &_state)
       collision->SetState(collisionState);
     else
       gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
-  }
-}
-
-/////////////////////////////////////////////////
-void Link::SetInertialFromCollisions()
-{
-  Base_V::iterator iter;
-
-  CollisionPtr coll;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->HasType(Base::COLLISION))
-    {
-      coll = boost::shared_static_cast<Collision>(*iter);
-      (*this->inertial) += *(coll->GetInertial());
-    }
   }
 }
 

@@ -89,11 +89,11 @@ void Light::Load()
 
   this->SetLightType(this->sdf->GetValueString("type"));
   this->SetDiffuseColor(
-      this->sdf->GetOrCreateElement("diffuse")->GetValueColor());
+      this->sdf->GetElement("diffuse")->GetValueColor());
   this->SetSpecularColor(
-      this->sdf->GetOrCreateElement("specular")->GetValueColor());
+      this->sdf->GetElement("specular")->GetValueColor());
   this->SetDirection(
-      this->sdf->GetOrCreateElement("direction")->GetValueVector3("xyz"));
+      this->sdf->GetValueVector3("direction"));
 
   if (this->sdf->HasElement("attenuation"))
   {
@@ -135,65 +135,65 @@ void Light::LoadFromMsg(ConstLightPtr &msg)
 
   if (msg->has_diffuse())
   {
-    this->sdf->GetOrCreateElement("diffuse")->Set(
+    this->sdf->GetElement("diffuse")->Set(
         msgs::Convert(msg->diffuse()));
   }
 
   if (msg->has_specular())
   {
-    this->sdf->GetOrCreateElement("specular")->Set(
+    this->sdf->GetElement("specular")->Set(
         msgs::Convert(msg->specular()));
   }
 
   if (msg->has_direction())
   {
-    this->sdf->GetOrCreateElement("direction")->GetAttribute("xyz")->Set(
+    this->sdf->GetElement("direction")->Set(
         msgs::Convert(msg->direction()));
   }
 
   if (msg->has_attenuation_constant())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("attenuation");
-    elem->GetAttribute("constant")->Set(msg->attenuation_constant());
+    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
+    elem->GetElement("constant")->Set(msg->attenuation_constant());
   }
 
   if (msg->has_attenuation_linear())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("attenuation");
-    elem->GetAttribute("linear")->Set(msg->attenuation_linear());
+    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
+    elem->GetElement("linear")->Set(msg->attenuation_linear());
   }
 
   if (msg->has_attenuation_quadratic())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("attenuation");
-    elem->GetAttribute("quadratic")->Set(msg->attenuation_quadratic());
+    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
+    elem->GetElement("quadratic")->Set(msg->attenuation_quadratic());
   }
 
   if (msg->has_range())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("attenuation");
-    elem->GetAttribute("range")->Set(msg->range());
+    sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
+    elem->GetElement("range")->Set(msg->range());
   }
 
   if (msg->has_cast_shadows())
-    this->sdf->GetAttribute("cast_shadows")->Set(msg->cast_shadows());
+    this->sdf->GetElement("cast_shadows")->Set(msg->cast_shadows());
 
   if (msg->has_spot_inner_angle())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
-    elem->GetAttribute("inner_angle")->Set(msg->spot_inner_angle());
+    sdf::ElementPtr elem = this->sdf->GetElement("spot");
+    elem->GetElement("inner_angle")->Set(msg->spot_inner_angle());
   }
 
   if (msg->has_spot_outer_angle())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
-    elem->GetAttribute("outer_angle")->Set(msg->spot_outer_angle());
+    sdf::ElementPtr elem = this->sdf->GetElement("spot");
+    elem->GetElement("outer_angle")->Set(msg->spot_outer_angle());
   }
 
   if (msg->has_spot_falloff())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
-    elem->GetAttribute("falloff")->Set(msg->spot_falloff());
+    sdf::ElementPtr elem = this->sdf->GetElement("spot");
+    elem->GetElement("falloff")->Set(msg->spot_falloff());
   }
 
   this->Load();
@@ -391,7 +391,7 @@ void Light::SetLightType(const std::string &_type)
 //////////////////////////////////////////////////
 void Light::SetDiffuseColor(const common::Color &_color)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("diffuse");
+  sdf::ElementPtr elem = this->sdf->GetElement("diffuse");
 
   if (elem->GetValueColor() != _color)
     elem->Set(_color);
@@ -402,13 +402,13 @@ void Light::SetDiffuseColor(const common::Color &_color)
 //////////////////////////////////////////////////
 common::Color Light::GetDiffuseColor() const
 {
-  return this->sdf->GetOrCreateElement("diffuse")->GetValueColor();
+  return this->sdf->GetElement("diffuse")->GetValueColor();
 }
 
 //////////////////////////////////////////////////
 void Light::SetSpecularColor(const common::Color &_color)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("specular");
+  sdf::ElementPtr elem = this->sdf->GetElement("specular");
 
   if (elem->GetValueColor() != _color)
     elem->Set(_color);
@@ -423,9 +423,8 @@ void Light::SetDirection(const math::Vector3 &_dir)
   math::Vector3 vec = _dir;
   vec.Normalize();
 
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("direction");
-  if (elem->GetValueVector3("xyz") != vec)
-    elem->GetAttribute("xyz")->Set(vec);
+  if (this->sdf->GetValueVector3("direction") != vec)
+    this->sdf->GetElement("direction")->Set(vec);
 
   this->light->setDirection(vec.x, vec.y, vec.z);
 }
@@ -433,7 +432,7 @@ void Light::SetDirection(const math::Vector3 &_dir)
 //////////////////////////////////////////////////
 math::Vector3 Light::GetDirection() const
 {
-  return this->sdf->GetOrCreateElement("direction")->GetValueVector3("xyz");
+  return this->sdf->GetElement("direction")->GetValueVector3("xyz");
 }
 
 //////////////////////////////////////////////////
@@ -451,10 +450,10 @@ void Light::SetAttenuation(double constant, double linear, double quadratic)
   else if (linear > 1.0)
     linear = 1.0;
 
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("attenuation");
-  elem->GetAttribute("constant")->Set(constant);
-  elem->GetAttribute("linear")->Set(linear);
-  elem->GetAttribute("quadratic")->Set(quadratic);
+  sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
+  elem->GetElement("constant")->Set(constant);
+  elem->GetElement("linear")->Set(linear);
+  elem->GetElement("quadratic")->Set(quadratic);
 
   // Set attenuation
   this->light->setAttenuation(elem->GetValueDouble("range"),
@@ -465,14 +464,14 @@ void Light::SetAttenuation(double constant, double linear, double quadratic)
 //////////////////////////////////////////////////
 void Light::SetRange(const double &range)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("attenuation");
+  sdf::ElementPtr elem = this->sdf->GetElement("attenuation");
 
-  elem->GetAttribute("range")->Set(range);
+  elem->GetElement("range")->Set(range);
 
   this->light->setAttenuation(elem->GetValueDouble("range"),
-                               elem->GetValueDouble("constant"),
-                               elem->GetValueDouble("linear"),
-                               elem->GetValueDouble("quadratic"));
+                              elem->GetValueDouble("constant"),
+                              elem->GetValueDouble("linear"),
+                              elem->GetValueDouble("quadratic"));
 }
 
 //////////////////////////////////////////////////
@@ -493,8 +492,8 @@ void Light::SetCastShadows(const bool & /*_cast*/)
 //////////////////////////////////////////////////
 void Light::SetSpotInnerAngle(const double &angle)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
-  elem->GetAttribute("inner_angle")->Set(angle);
+  sdf::ElementPtr elem = this->sdf->GetElement("spot");
+  elem->GetElement("inner_angle")->Set(angle);
 
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
@@ -508,8 +507,8 @@ void Light::SetSpotInnerAngle(const double &angle)
 //////////////////////////////////////////////////
 void Light::SetSpotOuterAngle(const double &_angle)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
-  elem->GetAttribute("outer_angle")->Set(_angle);
+  sdf::ElementPtr elem = this->sdf->GetElement("spot");
+  elem->GetElement("outer_angle")->Set(_angle);
 
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
@@ -523,8 +522,8 @@ void Light::SetSpotOuterAngle(const double &_angle)
 //////////////////////////////////////////////////
 void Light::SetSpotFalloff(const double &_angle)
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
-  elem->GetAttribute("falloff")->Set(_angle);
+  sdf::ElementPtr elem = this->sdf->GetElement("spot");
+  elem->GetElement("falloff")->Set(_angle);
 
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {

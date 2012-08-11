@@ -1237,7 +1237,7 @@ void World::ProcessFactoryMsgs()
       elem->SetParent(this->sdf);
       elem->GetParent()->InsertElement(elem);
       if ((*iter).has_pose())
-        elem->GetOrCreateElement("origin")->Set(msgs::Convert((*iter).pose()));
+        elem->GetElement("pose")->Set(msgs::Convert((*iter).pose()));
 
       if (isActor)
       {
@@ -1295,11 +1295,11 @@ WorldState World::GetState()
 void World::UpdateStateSDF()
 {
   this->sdf->Update();
-  sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
+  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
   stateElem->ClearElements();
 
   stateElem->GetAttribute("world_name")->Set(this->GetName());
-  stateElem->GetAttribute("time")->Set(this->GetSimTime());
+  stateElem->GetElement("time")->Set(this->GetSimTime());
 
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
   {
@@ -1311,10 +1311,10 @@ void World::UpdateStateSDF()
 //////////////////////////////////////////////////
 void World::SetState(const WorldState &_state)
 {
-  sdf::ElementPtr stateElem = this->sdf->GetOrCreateElement("state");
+  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
 
   stateElem->GetAttribute("world_name")->Set(_state.GetName());
-  stateElem->GetAttribute("time")->Set(_state.GetSimTime());
+  stateElem->GetElement("time")->Set(_state.GetSimTime());
 
   this->SetSimTime(_state.GetSimTime());
   for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
