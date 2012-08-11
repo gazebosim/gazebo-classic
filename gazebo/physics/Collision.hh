@@ -154,14 +154,6 @@ namespace gazebo
       public: inline SurfaceParamsPtr GetSurface() const
               {return this->surface;}
 
-      /// \brief Get the inertial properties
-      /// \return A pointer to the inertial properties
-      public: const InertialPtr GetInertial() const;
-
-      /// \brief Set the inertial properties
-      /// \param _inertial The new inertial properties
-      public: void SetInertial(InertialPtr _inertial);
-
       private: msgs::Visual CreateCollisionVisual();
 
       /// The link this collision belongs to
@@ -175,8 +167,6 @@ namespace gazebo
       private: std::string bbVisual;
 
       protected: ShapePtr shape;
-
-      private: InertialPtr inertial;
 
       private: bool contactsEnabled;
 

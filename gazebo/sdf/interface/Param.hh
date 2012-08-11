@@ -60,6 +60,7 @@ namespace sdf
             {return std::string();}
     public: virtual std::string GetDefaultAsString() const
             {return std::string();}
+
     /// \brief Set the parameter value from a string
     public: virtual bool SetFromString(const std::string &)
             {return true;}
@@ -124,6 +125,12 @@ namespace sdf
     public: bool Get(gazebo::common::Color &_value);
     public: bool Get(gazebo::common::Time &_value);
 
+    /// \brief Set the description of the parameter
+    public: void SetDescription(const std::string &_desc);
+
+    /// \brief Get the description of the parameter
+    public: std::string GetDescription() const;
+
     /// List of created parameters
     private: static std::vector<Param*> *params;
 
@@ -131,8 +138,10 @@ namespace sdf
     protected: bool required;
     protected: bool set;
     protected: std::string typeName;
+    protected: std::string description;
 
     protected: boost::function<boost::any ()> updateFunc;
+
   };
 
 
@@ -142,12 +151,17 @@ namespace sdf
   {
     /// \brief Constructor
     public: ParamT(const std::string &_key, const std::string &_default,
-                   bool _required)
+                   bool _required, const std::string &_typeName = "",
+                   const std::string &_description = "")
             : Param(this)
     {
       this->key = _key;
       this->required = _required;
-      this->typeName = typeid(T).name();
+      if (_typeName.empty())
+        this->typeName = typeid(T).name();
+      else
+        this->typeName = _typeName;
+      this->description = _description;
 
       this->Set(_default);
       this->defaultValue = this->value;
@@ -240,6 +254,12 @@ namespace sdf
       return this->value;
     }
 
+    /// \brief Get the value
+    public: T GetDefaultValue() const
+    {
+      return this->defaultValue;
+    }
+
     /// \brief Set the value of the parameter
     public: void SetValue(const T &_value)
     {
@@ -258,7 +278,8 @@ namespace sdf
             {
               boost::shared_ptr<ParamT<T> > clone(
                   new ParamT<T>(this->GetKey(), this->GetAsString(),
-                                this->required));
+                                this->required, this->typeName,
+                                this->description));
               return clone;
             }
 

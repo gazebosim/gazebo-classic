@@ -64,7 +64,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
-  if (this->sdf->HasAttribute("update_rate"))
+  if (this->sdf->HasElement("update_rate"))
     this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 }
 
@@ -90,7 +90,7 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
+  return this->sdf->GetValueVector3("gravity");
 }
 
 //////////////////////////////////////////////////

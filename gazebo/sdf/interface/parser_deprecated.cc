@@ -951,9 +951,9 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
   // "thread_pitch" in sdf
   xmlNodePtr threadPitchXml = firstChildElement(_config, "threadPitch");
   if (threadPitchXml)
-    _sdf->GetOrCreateElement("thread_pitch")->GetValue()->SetFromString(
+    _sdf->GetElement("thread_pitch")->GetValue()->SetFromString(
         getValue(threadPitchXml));
-    // _sdf->GetOrCreateElement("thread_pitch")->value->SetFromString(
+    // _sdf->GetElement("thread_pitch")->value->SetFromString(
     // getValue(threadPitchXml));
 
   initAttr(_config, "anchor", sdfChild->GetAttribute("link"));

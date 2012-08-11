@@ -77,7 +77,7 @@ void ModelState::Load(sdf::ElementPtr _elem)
 void ModelState::FillStateSDF(sdf::ElementPtr _elem)
 {
   _elem->GetAttribute("name")->Set(this->GetName());
-  _elem->GetOrCreateElement("pose")->GetValue()->Set(this->pose);
+  _elem->GetElement("pose")->GetValue()->Set(this->pose);
 
   for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)
@@ -90,7 +90,7 @@ void ModelState::FillStateSDF(sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void ModelState::UpdateModelSDF(sdf::ElementPtr _elem)
 {
-  _elem->GetOrCreateElement("origin")->Set(this->pose);
+  _elem->GetElement("pose")->Set(this->pose);
 
   if (_elem->HasElement("link"))
   {

@@ -15,6 +15,7 @@
  *
 */
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "gazebo/sdf/interface/Converter.hh"
 #include "gazebo/sdf/interface/SDF.hh"
@@ -29,11 +30,35 @@
 
 namespace sdf
 {
+
+std::string find_file(const std::string &_filename)
+{
+  FILE *test = fopen(_filename.c_str(), "r");
+  std::string result = _filename;
+
+  if (!test)
+  {
+    if (_filename[0] == '/')
+      result = gazebo::common::find_file(_filename);
+    else
+    {
+      std::string tmp = std::string("sdf/") + SDF::version + "/" + _filename;
+      result = gazebo::common::find_file(tmp);
+    }
+  }
+  else
+    fclose(test);
+
+  return result;
+}
+
 //////////////////////////////////////////////////
 bool init(SDFPtr _sdf)
 {
   bool result = false;
-  std::string filename = gazebo::common::find_file("gazebo.sdf");
+
+  std::string filename;
+  filename = find_file("gazebo.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -48,7 +73,7 @@ bool init(SDFPtr _sdf)
 //////////////////////////////////////////////////
 bool initFile(const std::string &_filename, SDFPtr _sdf)
 {
-  std::string filename = gazebo::common::find_file(_filename);
+  std::string filename = find_file(_filename);
 
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(filename))
@@ -64,7 +89,7 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 //////////////////////////////////////////////////
 bool initFile(const std::string &_filename, ElementPtr _sdf)
 {
-  std::string filename = gazebo::common::find_file(_filename);
+  std::string filename = find_file(_filename);
 
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(filename))
@@ -146,16 +171,23 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
   {
     bool required = std::string(requiredString) == "1" ? true : false;
     const char *elemDefaultValue = _xml->Attribute("default");
-    _sdf->AddValue(elemTypeString, elemDefaultValue, required);
+    std::string description;
+    TiXmlElement *descChild = _xml->FirstChildElement("description");
+    if (descChild && descChild->GetText())
+      description = descChild->GetText();
+
+    _sdf->AddValue(elemTypeString, elemDefaultValue, required, description);
   }
 
   // Get all attributes
   for (TiXmlElement *child = _xml->FirstChildElement("attribute");
       child; child = child->NextSiblingElement("attribute"))
   {
+    TiXmlElement *descriptionChild = child->FirstChildElement("description");
     const char *name = child->Attribute("name");
     const char *type = child->Attribute("type");
     const char *defaultValue = child->Attribute("default");
+
     requiredString = child->Attribute("required");
 
     if (!name)
@@ -181,13 +213,17 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
     std::string requiredStr = requiredString;
     boost::trim(requiredStr);
     bool required = requiredStr == "1" ? true : false;
+    std::string description;
 
-    _sdf->AddAttribute(name, type, defaultValue, required);
+    if (descriptionChild && descriptionChild->GetText())
+      description = descriptionChild->GetText();
+
+    _sdf->AddAttribute(name, type, defaultValue, required, description);
   }
 
   // Read the element description
   TiXmlElement *descChild = _xml->FirstChildElement("description");
-  if (descChild)
+  if (descChild && descChild->GetText())
   {
     _sdf->SetDescription(descChild->GetText());
   }
@@ -310,7 +346,7 @@ bool readString(const std::string &_xmlString, ElementPtr _sdf)
     return true;
   else
   {
-    gzerr << "parse as sdf version " << SDF_VERSION << " failed, "
+    gzerr << "parse as sdf version " << SDF::version << " failed, "
           << "should try to parse as old deprecated format\n";
     return false;
   }
@@ -330,10 +366,10 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
 
   if (gazeboNode && gazeboNode->Attribute("version"))
   {
-    if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
+    if (strcmp(gazeboNode->Attribute("version"), SDF::version.c_str()) != 0)
     {
       gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
-      Converter::Convert(gazeboNode, SDF_VERSION);
+      Converter::Convert(gazeboNode, SDF::version);
     }
 
     /* parse new sdf xml */
@@ -351,10 +387,11 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
       gzwarn << "Gazebo SDF has no gazebo element\n";
     else if (!gazeboNode->Attribute("version"))
       gzwarn << "Gazebo SDF gazebo element has no version\n";
-    else if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
+    else if (strcmp(gazeboNode->Attribute("version"),
+                    SDF::version.c_str()) != 0)
       gzwarn << "Gazebo SDF version ["
             << gazeboNode->Attribute("version")
-            << "] is not " << SDF_VERSION << "\n";
+            << "] is not " << SDF::version << "\n";
     return false;
   }
 
@@ -375,10 +412,11 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   TiXmlElement* gazeboNode = _xmlDoc->FirstChildElement("gazebo");
   if (gazeboNode && gazeboNode->Attribute("version"))
   {
-    if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
+    if (strcmp(gazeboNode->Attribute("version"),
+               SDF::version.c_str()) != 0)
     {
       gzwarn << "Converting a deprecatd SDF source[" << _source << "].\n";
-      Converter::Convert(gazeboNode, SDF_VERSION);
+      Converter::Convert(gazeboNode, SDF::version);
     }
 
     TiXmlElement* elemXml = gazeboNode;
@@ -403,10 +441,11 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
       gzwarn << "Gazebo SDF has no gazebo element\n";
     else if (!gazeboNode->Attribute("version"))
       gzwarn << "Gazebo SDF gazebo element has no version\n";
-    else if (strcmp(gazeboNode->Attribute("version"), SDF_VERSION) != 0)
+    else if (strcmp(gazeboNode->Attribute("version"),
+                    SDF::version.c_str()) != 0)
       gzwarn << "Gazebo SDF version ["
             << gazeboNode->Attribute("version")
-            << "] is not " << SDF_VERSION << "\n";
+            << "] is not " << SDF::version << "\n";
     return false;
   }
 
@@ -516,7 +555,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 
         if (elemXml->Attribute("model_pose"))
         {
-          includeSDF->root->GetElement("model")->GetOrCreateElement(
+          includeSDF->root->GetElement("model")->GetElement(
               "origin")->GetValue()->SetFromString(
                 elemXml->Attribute("model_pose"));
         }
@@ -730,4 +769,6 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
     elem = nextElem;
   }
 }
+
 }
+

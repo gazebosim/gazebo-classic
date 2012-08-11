@@ -42,7 +42,7 @@ void BoxShape::Init()
 //////////////////////////////////////////////////
 void BoxShape::SetSize(const math::Vector3 &_size)
 {
-  this->sdf->GetAttribute("size")->Set(_size);
+  this->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////

@@ -174,7 +174,7 @@ void UserCamera::Update()
 void UserCamera::PostRender()
 {
   Camera::PostRender();
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
+  sdf::ElementPtr elem = this->sdf->GetElement("save");
 
   if (elem->GetValueBool("enabled"))
   {
@@ -330,7 +330,7 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
                    static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
-      this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
+      this->sdf->GetElement("horizontal_fov")->GetValueDouble("angle");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));

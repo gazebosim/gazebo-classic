@@ -70,9 +70,9 @@ void Sensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Sensor::Load(const std::string &_worldName)
 {
-  if (this->sdf->HasElement("origin"))
+  if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->GetValuePose("origin");
+    this->pose = this->sdf->GetValuePose("pose");
   }
 
   if (this->sdf->GetValueBool("always_on"))

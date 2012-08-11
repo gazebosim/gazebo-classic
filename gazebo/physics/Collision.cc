@@ -56,7 +56,6 @@ Collision::Collision(LinkPtr _link)
   this->contactsEnabled = false;
 
   this->surface.reset(new SurfaceParams());
-  this->inertial.reset(new Inertial());
 }
 
 //////////////////////////////////////////////////
@@ -83,10 +82,9 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->SetRelativePose(
-    this->sdf->GetValuePose("origin"));
+  this->SetRelativePose(this->sdf->GetValuePose("pose"));
 
-  this->surface->Load(this->sdf->GetOrCreateElement("surface"));
+  this->surface->Load(this->sdf->GetElement("surface"));
 
 
   if (this->shape)
@@ -106,24 +104,13 @@ void Collision::Load(sdf::ElementPtr _sdf)
   {
     this->surface->maxVel = 0.0;
   }
-
-  this->inertial->SetCoG(this->GetRelativePose().pos);
-
-  // Get the mass of the shape
-  double mass = 0.0;
-  if (this->sdf->HasElement("mass"))
-    mass = this->sdf->GetValueDouble("mass");
-  else if (this->sdf->HasElement("density"))
-    mass = this->shape->GetMass(this->sdf->HasElement("density"));
-
-  this->shape->GetInertial(mass, this->inertial);
 }
 
 //////////////////////////////////////////////////
 void Collision::Init()
 {
   this->SetRelativePose(
-    this->sdf->GetValuePose("origin"));
+    this->sdf->GetValuePose("pose"));
 
   this->shape->Init();
 }
@@ -423,16 +410,4 @@ CollisionState Collision::GetState()
 void Collision::SetState(const CollisionState &_state)
 {
   this->SetWorldPose(_state.GetPose());
-}
-
-/////////////////////////////////////////////////
-const InertialPtr Collision::GetInertial() const
-{
-  return this->inertial;
-}
-
-/////////////////////////////////////////////////
-void Collision::SetInertial(InertialPtr _inertial)
-{
-  this->inertial = _inertial;
 }

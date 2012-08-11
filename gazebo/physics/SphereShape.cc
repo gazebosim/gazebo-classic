@@ -44,7 +44,7 @@ void SphereShape::Init()
 //////////////////////////////////////////////////
 void SphereShape::SetRadius(const double &_radius)
 {
-  this->sdf->GetAttribute("radius")->Set(_radius);
+  this->sdf->GetElement("radius")->Set(_radius);
 }
 
 //////////////////////////////////////////////////

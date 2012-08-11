@@ -359,7 +359,7 @@ std::string Scene::GetName() const
 //////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &_color)
 {
-  this->sdf->GetOrCreateElement("ambient")->Set(_color);
+  this->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
   if (this->manager)
@@ -377,7 +377,7 @@ common::Color Scene::GetAmbientColor() const
 //////////////////////////////////////////////////
 void Scene::SetBackgroundColor(const common::Color &_color)
 {
-  this->sdf->GetOrCreateElement("background")->Set(_color);
+  this->sdf->GetElement("background")->Set(_color);
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
@@ -929,7 +929,7 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   else if (_type == "exp2")
     fogType = Ogre::FOG_EXP2;
 
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
+  sdf::ElementPtr elem = this->sdf->GetElement("fog");
 
   elem->GetElement("type")->Set(_type);
   elem->GetElement("color")->Set(_color);
@@ -1180,20 +1180,20 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 
   if (_msg->has_fog())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
+    sdf::ElementPtr elem = this->sdf->GetElement("fog");
 
     if (_msg->fog().has_color())
-      elem->GetOrCreateElement("color")->Set(
+      elem->GetElement("color")->Set(
           msgs::Convert(_msg->fog().color()));
 
     if (_msg->fog().has_density())
-      elem->GetOrCreateElement("density")->Set(_msg->fog().density());
+      elem->GetElement("density")->Set(_msg->fog().density());
 
     if (_msg->fog().has_start())
-      elem->GetOrCreateElement("start")->Set(_msg->fog().start());
+      elem->GetElement("start")->Set(_msg->fog().start());
 
     if (_msg->fog().has_end())
-      elem->GetOrCreateElement("end")->Set(_msg->fog().end());
+      elem->GetElement("end")->Set(_msg->fog().end());
 
     if (_msg->fog().has_type())
     {
@@ -1207,7 +1207,7 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       else
         type = "none";
 
-      elem->GetOrCreateElement("type")->Set(type);
+      elem->GetElement("type")->Set(type);
     }
 
     this->SetFog(elem->GetValueString("type"),
@@ -1946,7 +1946,7 @@ void Scene::SetSky()
 /////////////////////////////////////////////////
 void Scene::SetShadowsEnabled(bool _value)
 {
-  this->sdf->GetOrCreateElement("shadows")->Set(_value);
+  this->sdf->GetElement("shadows")->Set(_value);
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
   {

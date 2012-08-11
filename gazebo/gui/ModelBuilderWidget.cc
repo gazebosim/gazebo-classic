@@ -105,7 +105,7 @@ ModelBuilderWidget::ModelBuilderWidget(QWidget *_parent)
 
   newModelStr << "<model name ='my_new_model'>\
     <static>true</static>\
-    <origin> 0 0 0</origin>\
+    <pose>0 0 0 0 0 0</pose>\
     <link name ='body'>\
       <collision name ='geom'>\
         <geometry>\

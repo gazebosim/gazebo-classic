@@ -49,14 +49,14 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_origin)
+void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 {
   this->world = _parent->GetWorld();
   this->model = _parent->GetModel();
 
   this->parentLink = _parent;
   this->childLink = _child;
-  this->LoadImpl(_origin);
+  this->LoadImpl(_pose);
 }
 
 //////////////////////////////////////////////////
@@ -64,12 +64,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetElement("parent")->GetValueString("link");
-  std::string childName = _sdf->GetElement("child")->GetValueString("link");
+  std::string parentName = _sdf->GetValueString("parent");
+  std::string childName = _sdf->GetValueString("child");
 
-  math::Pose origin;
-  if (_sdf->HasElement("origin"))
-    origin = _sdf->GetValuePose("origin");
+  math::Pose pose;
+  if (_sdf->HasElement("pose"))
+    pose = _sdf->GetValuePose("pose");
 
   if (this->model)
   {
@@ -91,11 +91,11 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName);
 
-  this->LoadImpl(origin);
+  this->LoadImpl(pose);
 }
 
 /////////////////////////////////////////////////
-void Joint::LoadImpl(const math::Pose &_origin)
+void Joint::LoadImpl(const math::Pose &_pose)
 {
   BasePtr myBase = shared_from_this();
 
@@ -103,9 +103,9 @@ void Joint::LoadImpl(const math::Pose &_origin)
     this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
   this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
 
-  // setting anchor relative to gazebo link frame origin
+  // setting anchor relative to gazebo link frame pose
   if (this->childLink)
-    this->anchorPos = (_origin + this->childLink->GetWorldPose()).pos;
+    this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
   else
     this->anchorPos = math::Vector3(0, 0, 0);
 }
@@ -175,11 +175,11 @@ void Joint::Init()
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetElement("parent")->GetValueString("link") != "world")
+      if (this->sdf->GetValueString("parent") != "world")
       {
         gzwarn << "joint [" << this->GetName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link")
+          << this->sdf->GetValueString("parent")
           << "], loading axis from SDF ["
           << this->sdf->GetElement("axis")->GetValueVector3("xyz")
           << "]\n";
@@ -189,11 +189,11 @@ void Joint::Init()
     {
       this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
 
-      if (this->sdf->GetElement("parent")->GetValueString("link") != "world")
+      if (this->sdf->GetValueString("parent") != "world")
       {
         gzwarn << "joint [" << this->GetName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetElement("parent")->GetValueString("link")
+          << this->sdf->GetValueString("parent")
           << "], loading axis2 from SDF ["
           << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
           << "]\n";
@@ -268,10 +268,10 @@ void Joint::FillJointMsg(msgs::Joint &_msg)
 {
   _msg.set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("origin"))
+  if (this->sdf->HasElement("pose"))
   {
     msgs::Set(_msg.mutable_pose(),
-              this->sdf->GetValuePose("origin"));
+              this->sdf->GetValuePose("pose"));
   }
   else
     msgs::Set(_msg.mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));

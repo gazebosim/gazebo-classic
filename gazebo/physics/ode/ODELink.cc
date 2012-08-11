@@ -184,7 +184,7 @@ void ODELink::Update()
 //////////////////////////////////////////////////
 void ODELink::SetGravityMode(bool _mode)
 {
-  this->sdf->GetAttribute("gravity")->Set(_mode);
+  this->sdf->GetElement("gravity")->Set(_mode);
   if (this->linkId)
   {
     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
@@ -206,7 +206,7 @@ bool ODELink::GetGravityMode()
 //////////////////////////////////////////////////
 void ODELink::SetSelfCollide(bool _collide)
 {
-  this->sdf->GetAttribute("self_collide")->Set(_collide);
+  this->sdf->GetElement("self_collide")->Set(_collide);
   if (_collide && !this->spaceId)
     this->spaceId = dSimpleSpaceCreate(this->odePhysics->GetSpaceId());
 }
@@ -517,7 +517,7 @@ void ODELink::SetAngularDamping(double _damping)
 //////////////////////////////////////////////////
 void ODELink::SetKinematic(const bool &_state)
 {
-  this->sdf->GetAttribute("kinematic")->Set(_state);
+  this->sdf->GetElement("kinematic")->Set(_state);
   if (this->linkId)
   {
     if (_state)

@@ -54,7 +54,7 @@ void TrimeshShape::Init()
 //////////////////////////////////////////////////
 void TrimeshShape::SetScale(const math::Vector3 &_scale)
 {
-  this->sdf->GetAttribute("scale")->Set(_scale);
+  this->sdf->GetElement("scale")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
@@ -72,7 +72,7 @@ std::string TrimeshShape::GetFilename() const
 //////////////////////////////////////////////////
 void TrimeshShape::SetFilename(const std::string &_filename)
 {
-  this->sdf->GetAttribute("filename")->Set(_filename);
+  this->sdf->GetElement("filename")->Set(_filename);
   this->Init();
 }
 

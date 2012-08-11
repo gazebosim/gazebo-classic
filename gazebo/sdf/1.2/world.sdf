@@ -1,5 +1,9 @@
 <element name="world" required="*">
-  <attribute name="name" type="string" default="__default__" required="1"/>
+  <description>The world element encapsulates an entire world description including: models, scene, physics, joints, and plugins</description>
+
+  <attribute name="name" type="string" default="__default__" required="1">
+    <description>Unique name of the world</description>
+  </attribute>
 
   <include filename="gui.sdf" required="0"/>
   <include filename="physics.sdf" required="1"/>
