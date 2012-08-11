@@ -281,6 +281,10 @@
           <to element="gravity"/>
         </rename>
         <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+        <rename>
           <from attribute="self_collide"/>
           <to element="self_collide"/>
         </rename>

@@ -53,7 +53,7 @@
     </model>
     <!--
     <model name="cylinder">
-      <origin pose="0.25 0 0.2 0 0 0"/>
+      <pose>0.25 0 0.2 0 0 0</pose>
       <link name="link" gravity="true">
         <inertial mass="0.1"/>
         <collision name="collision">

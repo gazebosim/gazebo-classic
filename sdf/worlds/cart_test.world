@@ -28,7 +28,6 @@
     <model name="test_model">
       <pose>0 0 0.7 0 0 0</pose>
       <link name="link">
-        <origin pose="0 0 0 0 0 0" />
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -106,7 +105,7 @@
         </visual>
       </link>
       <link name="bar_1">
-        <origin pose="0.45 0 -0.5 0 0 0" />
+        <pose>0.45 0 -0.5 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.001</ixx>
@@ -166,7 +165,7 @@
         </axis>
       </joint>
       <link name="bar_2">
-        <origin pose="0.5 0.5 -0.5 0 0 0" />
+        <pose>0.5 0.5 -0.5 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.001</ixx>
@@ -220,7 +219,7 @@
         </axis>
       </joint>
       <link name="bar_3">
-        <origin pose="0.5 -0.5 -0.5 0 0 0" />
+        <pose>0.5 -0.5 -0.5 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.001</ixx>
@@ -274,7 +273,7 @@
         </axis>
       </joint>
       <link name="wheel_1">
-        <origin pose="0.5 0.55 -0.5 1.57079633 0 0" />
+        <pose>0.5 0.55 -0.5 1.57079633 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.01</ixx>
@@ -328,7 +327,7 @@
         </axis>
       </joint>
       <link name="wheel_2">
-        <origin pose="0.5 -0.55 -0.5 1.57079633 0 0" />
+        <pose>0.5 -0.55 -0.5 1.57079633 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.01</ixx>
@@ -382,7 +381,7 @@
         </axis>
       </joint>
       <link name="wheel_3">
-        <origin pose="-0.5 0.55 -0.5 1.57079633 0 0" />
+        <pose>-0.5 0.55 -0.5 1.57079633 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.01</ixx>
@@ -440,7 +439,7 @@
         </axis>
       </joint>
       <link name="wheel_4">
-        <origin pose="-0.5 -0.55 -0.5 1.57079633 0 0" />
+        <pose>-0.5 -0.55 -0.5 1.57079633 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.01</ixx>
@@ -498,7 +497,7 @@
         </axis>
       </joint>
       <link name="sphere_link">
-        <origin pose="0 0 0.5 0 0 0" />
+        <pose>0 0 0.5 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.1</ixx>
@@ -550,7 +549,7 @@
         </axis>
       </joint>
       <link name="cylinder_link">
-        <origin pose="0 0 0.25 0 0 0" />
+        <pose>0 0 0.25 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>0.1</ixx>
