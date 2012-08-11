@@ -851,6 +851,11 @@
         <to element="kinematic"/>
       </rename>
 
+      <rename>
+        <from element="damping"/>
+        <to element="velocity_decay"/>
+      </rename>
+
       <convert name="inertial">
         <rename>
           <from attribute="mass"/>
