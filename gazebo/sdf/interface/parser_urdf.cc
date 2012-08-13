@@ -114,36 +114,6 @@ urdf::Vector3 URDF2Gazebo::parseVector3(TiXmlNode* key, double scale)
   }
   else
     return urdf::Vector3(0,0,0);
-
-/* do some checks
-
-    if (vals.empty())
-    {
-      poseStr += "0 0 0";
-    }
-    else
-    {
-      if (vals.size() != 3)
-      {
-        gzerr << "Vector contains [" << static_cast<int>(vals.size())
-              << "] elements instead of 3 elements\n";
-        return false;
-      }
-      // convert vals to radian
-      std::ostringstream rpy_stream;
-      rpy_stream << GZ_DTOR(vals[0]) << " "
-                 << GZ_DTOR(vals[1]) << " "
-                 << GZ_DTOR(vals[2]);
-      if (rpy_stream.str().empty())
-      {
-        gzerr << "rpy_stream is empty, something is wrong\n";
-        return false;
-      }
-      poseStr += rpy_stream.str();
-    }
-*/
-
-
 }
 
 void URDF2Gazebo::addVisual(boost::shared_ptr<urdf::Link> link, std::string group_name, boost::shared_ptr<urdf::Visual> visual)
