@@ -1,112 +1,152 @@
-<gazebo version="1.0">
-<model name="bookshelf" static="true">
-  <link name="body">
-    <inertial mass="1.0">
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-
-    <collision name="back">
-      <origin pose="0 0.005 0.6 0 0 0"/>
-      <geometry>
-        <box size="0.9 0.01 1.2"/>
-      </geometry>
-    </collision>
-    <visual name="visual1">
-      <origin pose="0 0.005 0.6 0 0 0"/>
-      <geometry>
-        <box size="0.9 0.01 1.2"/>
-      </geometry>
-      <material script="Gazebo/Wood"/>
-    </visual>
-
-    <collision name="left_side">
-      <origin pose="0.45 -0.195 0.6 0 0 0"/>
-      <geometry>
-        <box size="0.02 0.4 1.2"/>
-      </geometry>
-    </collision>
-    <visual name="visual2">
-      <origin pose="0.45 -0.195 0.6 0 0 0"/>
-      <geometry>
-        <box size="0.02 0.4 1.2"/>
-      </geometry>
-      <material script="Gazebo/Wood"/>
-    </visual>
-
-    <collision name="right_side">
-      <origin pose="-0.45 -0.195 0.6 0 0 0"/>
-      <geometry>
-        <box size="0.02 0.4 1.2"/>
-      </geometry>
-    </collision>
-    <visual name="visual3">
-      <origin pose="-0.45 -0.195 0.6 0 0 0"/>
-      <geometry>
-        <box size="0.02 0.4 1.2"/>
-      </geometry>
-      <material script="Gazebo/Wood"/>
-    </visual>
-
-    <collision name="bottom">
-      <origin pose="0 -0.195 0.03 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.06"/>
-      </geometry>
-    </collision>
-    <visual name="visual4">
-      <origin pose="0 -0.195 0.03 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.06"/>
-      </geometry>
-      <material script="Gazebo/Wood"/>
-    </visual>
-
-    <collision name="top">
-      <origin pose="0 -0.195 1.19 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.02"/>
-      </geometry>
-    </collision>
-    <visual name="visual5">
-      <origin pose="0 -0.195 1.19 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.02"/>
-      </geometry>
-      <material script="Gazebo/Wood"/>
-    </visual>
-
-    <collision name="low_shelf">
-      <origin pose="0 -0.195 0.43 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.02"/>
-      </geometry>
-    </collision>
-    <visual name="visual6">
-      <origin pose="0 -0.195 0.43 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.02"/>
-      </geometry>
-      <material script="Gazebo/Wood"/>
-    </visual>
-
-    <collision name="high_shelf">
-      <origin pose="0 -0.195 0.8 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.02"/>
-      </geometry>
-    </collision>
-    <visual name="visual7">
-      <origin pose="0 -0.195 0.8 0 0 0"/>
-      <geometry>
-        <box size="0.88 0.4 0.02"/>
-      </geometry>
-      <material script="Gazebo/Wood"/>
-    </visual>
-
-
-
-
-  </link>
-</model>
-
-
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <model name="bookshelf">
+        <link name="body">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="back">
+                <pose>0 0.005 0.6 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.9 0.01 1.2</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual1">
+                <pose>0 0.005 0.6 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.9 0.01 1.2</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/Wood</script>
+                </material>
+            </visual>
+            <collision name="left_side">
+                <pose>0.45 -0.195 0.6 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.02 0.4 1.2</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <pose>0.45 -0.195 0.6 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.02 0.4 1.2</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/Wood</script>
+                </material>
+            </visual>
+            <collision name="right_side">
+                <pose>-0.45 -0.195 0.6 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.02 0.4 1.2</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual3">
+                <pose>-0.45 -0.195 0.6 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.02 0.4 1.2</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/Wood</script>
+                </material>
+            </visual>
+            <collision name="bottom">
+                <pose>0 -0.195 0.03 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.06</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual4">
+                <pose>0 -0.195 0.03 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.06</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/Wood</script>
+                </material>
+            </visual>
+            <collision name="top">
+                <pose>0 -0.195 1.19 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.02</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual5">
+                <pose>0 -0.195 1.19 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.02</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/Wood</script>
+                </material>
+            </visual>
+            <collision name="low_shelf">
+                <pose>0 -0.195 0.43 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.02</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual6">
+                <pose>0 -0.195 0.43 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.02</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/Wood</script>
+                </material>
+            </visual>
+            <collision name="high_shelf">
+                <pose>0 -0.195 0.8 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.02</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual7">
+                <pose>0 -0.195 0.8 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.88 0.4 0.02</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>Gazebo/Wood</script>
+                </material>
+            </visual>
+        </link>
+        <static>true</static>
+    </model>
+</gazebo>

@@ -1,19 +1,20 @@
-<?xml version="1.0"?> 
-
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
     <scene>
-      <ambient rgba="0 0 0 1"/>
-      <fog rgba="1 2 3 4" type="linear" start=".1" end="100.1" density="0.5"/>
-      <background rgba=".5 .5 .5 1">
-        <sky rgba="1 1 1 1" material="Gazebo/Red"/>
-      </background>
+      <ambient>0 0 0 1</ambient>
+      <fog>
+        <color>1 2 3 4</color>
+        <type>linear</type>
+        <start>.1</start>
+        <end>100.1</end>
+        <density>0.5</density>
+      </fog>
+      <background>.5 .5 .5 1</background>
     </scene>
-
     <!-- A ground plane -->
-    <include filename="ground_plane.model"/>
-
+    <include filename="ground_plane.model" />
     <!-- A global light source -->
-    <include filename="sun.light"/>
+    <include filename="sun.light" />
   </world>
 </gazebo>

@@ -141,7 +141,6 @@ namespace sdf
     protected: std::string description;
 
     protected: boost::function<boost::any ()> updateFunc;
-
   };
 
 

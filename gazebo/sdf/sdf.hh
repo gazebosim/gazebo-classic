@@ -21,5 +21,6 @@
 #include "sdf/interface/SDF.hh"
 #include "sdf/interface/Param.hh"
 #include "sdf/interface/parser.hh"
+#include "sdf/interface/Converter.hh"
 
 #endif

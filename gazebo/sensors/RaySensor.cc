@@ -259,7 +259,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   {
     this->laserMsg.add_ranges(
       this->laserShape->GetRange(j * this->GetRayCount() + i));
-    this->laserMsg.add_intensities(0);
+    this->laserMsg.add_intensities(
+        this->laserShape->GetRetro(j * this->GetRayCount() + i));
   }
   this->mutex->unlock();
 

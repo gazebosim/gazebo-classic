@@ -16,9 +16,11 @@
 
   <element name="skin" required="1">
     <description></description>
+
     <element name="filename" type="string" default="__default__" required="1">
       <description></description>
     </element>
+
     <element name="scale" type="double" default="1.0" required="0"> 
       <description></description>
     </element>

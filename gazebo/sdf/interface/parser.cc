@@ -30,7 +30,6 @@
 
 namespace sdf
 {
-
 std::string find_file(const std::string &_filename)
 {
   FILE *test = fopen(_filename.c_str(), "r");
@@ -556,7 +555,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
         if (elemXml->Attribute("model_pose"))
         {
           includeSDF->root->GetElement("model")->GetElement(
-              "origin")->GetValue()->SetFromString(
+              "pose")->GetValue()->SetFromString(
                 elemXml->Attribute("model_pose"));
         }
 
@@ -702,7 +701,7 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
   std::map<std::string, std::string> replace;
 
   gazebo::math::Pose modelPose =
-    modelPtr->GetValuePose("origin");
+    modelPtr->GetValuePose("pose");
 
   std::string modelName = modelPtr->GetValueString("name");
   while (elem)
@@ -712,13 +711,13 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
       std::string elemName = elem->GetValueString("name");
       std::string newName =  modelName + "::" + elemName;
       replace[elemName] = newName;
-      if (elem->HasElementDescription("origin"))
+      if (elem->HasElementDescription("pose"))
       {
         gazebo::math::Pose newPose = gazebo::math::Pose(
           modelPose.pos +
-            modelPose.rot.RotateVector(elem->GetValuePose("origin").pos),
-            modelPose.rot * elem->GetValuePose("origin").rot);
-        elem->GetElement("origin")->Set(newPose);
+            modelPose.rot.RotateVector(elem->GetValuePose("pose").pos),
+            modelPose.rot * elem->GetValuePose("pose").rot);
+        elem->GetElement("pose")->Set(newPose);
       }
     }
     else if (elem->GetName() == "joint")
@@ -734,7 +733,7 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
         ElementPtr axisElem = elem->GetElement("axis");
         gazebo::math::Vector3 newAxis =  modelPose.rot.RotateVector(
           axisElem->GetValueVector3("xyz"));
-        axisElem->GetAttribute("xyz")->Set(newAxis);
+        axisElem->GetElement("xyz")->Set(newAxis);
       }
     }
     elem = elem->GetNextElement();
@@ -761,7 +760,7 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
   {
     nextElem = elem->GetNextElement();
 
-    if (elem->GetName() != "origin")
+    if (elem->GetName() != "pose")
     {
       elem->SetParent(_sdf);
       _sdf->InsertElement(elem);
@@ -769,6 +768,4 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
     elem = nextElem;
   }
 }
-
 }
-

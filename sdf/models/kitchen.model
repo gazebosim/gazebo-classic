@@ -1,30 +1,46 @@
+<?xml version="1.0" ?>
 <gazebo version="1.2">
-<model name="kitchen" static="true">
-  <origin pose="0 0 0 0 0 0"/>
-  <link name="link">
-    <inertial mass="1.0">
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-
-    <collision name="collision_counter">
-      <origin pose="2.8 4.5189 0.450 0 0 0"/>
-      <geometry>
-        <box size="5.2116 0.6 .9"/>
-      </geometry>
-    </collision>
-
-    <collision name="collision_bar">
-      <origin pose="1.3561 .9721 .550 0 0 0"/>
-      <geometry>
-        <mesh filename="kitchen/kitchen.dae" scale=".0254 .0254 0.0254"/>
-      </geometry>
-    </collision>
-
-    <visual name="visual">
-      <origin pose="0 0 0 0 0 0"/>
-      <geometry>
-        <mesh filename="kitchen/kitchen.dae" scale=".0254 .0254 0.0254"/>
-      </geometry>
-    </visual>
-  </link>
-</model>
+    <model name="kitchen">
+        <pose>0 0 0 0 0 0</pose>
+        <link name="link">
+            <inertial>
+                <inertia>
+                    <ixx>1</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>1</iyy>
+                    <iyz>0</iyz>
+                    <izz>1</izz>
+                </inertia>
+                <mass>1.0</mass>
+            </inertial>
+            <collision name="collision_counter">
+                <pose>2.8 4.5189 0.450 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>5.2116 0.6 .9</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="collision_bar">
+                <pose>1.3561 .9721 .550 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <filename>kitchen/kitchen.dae</filename>
+                        <scale>.0254 .0254 0.0254</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <filename>kitchen/kitchen.dae</filename>
+                        <scale>.0254 .0254 0.0254</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+        </link>
+        <static>true</static>
+    </model>
+</gazebo>

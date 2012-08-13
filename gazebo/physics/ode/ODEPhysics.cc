@@ -666,14 +666,14 @@ void ODEPhysics::SetStepType(const std::string &_type)
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
+  this->sdf->GetElement("gravity")->Set(_gravity);
   dWorldSetGravity(this->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODEPhysics::GetGravity() const
 {
-  return this->sdf->GetElement("gravity")->GetValueVector3("xyz");
+  return this->sdf->GetValueVector3("gravity");
 }
 
 //////////////////////////////////////////////////

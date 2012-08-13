@@ -1,138 +1,296 @@
-<gazebo version='1.0'>
-  <model name='cabinet_model' static='0'>
-    <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-    <link name='cabinet_bottom_plate' gravity='1' self_collide='0' kinematic='0'>
-      <origin pose='0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000'/>
-      <inertial mass='25.000000' density='1.000000'>
-        <origin pose='0.000000 0.000000 -1.000000 0.000000 -0.000000 0.000000'/>
-        <inertia ixx='2.050000' ixy='0.000000' ixz='0.000000' iyy='2.050000' iyz='0.000000' izz='2.050000'/>
-      </inertial>
-      <collision name='cabinet_bottom_plate_geom' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.010000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.450000 0.020000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='100.000000' mu2='100.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='cabinet_bottom_plate_geom_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.010000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.450000 0.020000'/>
-        </geometry>
-      </visual>
-      <collision name='cabinet_bottom_plate_geom_cabinet_back_plate' laser_retro='0.000000'>
-        <origin pose='0.235000 0.000000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.020000 0.450000 1.020000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='cabinet_bottom_plate_geom_cabinet_back_plate_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.235000 0.000000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.020000 0.450000 1.020000'/>
-        </geometry>
-      </visual>
-      <collision name='cabinet_bottom_plate_geom_cabinet_left_plate' laser_retro='0.000000'>
-        <origin pose='0.000000 0.235000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.020000 1.020000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='cabinet_bottom_plate_geom_cabinet_left_plate_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.235000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.020000 1.020000'/>
-        </geometry>
-      </visual>
-      <collision name='cabinet_bottom_plate_geom_cabinet_middle_plate' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.450000 0.020000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='cabinet_bottom_plate_geom_cabinet_middle_plate_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.450000 0.020000'/>
-        </geometry>
-      </visual>
-      <collision name='cabinet_bottom_plate_geom_cabinet_right_plate' laser_retro='0.000000'>
-        <origin pose='0.000000 -0.235000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.020000 1.020000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='cabinet_bottom_plate_geom_cabinet_right_plate_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 -0.235000 0.510000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.020000 1.020000'/>
-        </geometry>
-      </visual>
-      <collision name='cabinet_bottom_plate_geom_cabinet_top_plate' laser_retro='0.000000'>
-        <origin pose='0.000000 0.000000 1.010000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.450000 0.020000'/>
-        </geometry>
-        <surface>
-          <friction>
-            <ode mu='-1.000000' mu2='-1.000000' fdir1='0.000000 0.000000 0.000000' slip1='0.000000' slip2='0.000000'/>
-          </friction>
-          <bounce restitution_coefficient='0.000000' threshold='100000.000000'/>
-          <contact>
-            <ode soft_cfm='0.000000' soft_erp='0.200000' kp='1000000000000.000000' kd='1.000000' max_vel='100.000000' min_depth='0.001000'/>
-          </contact>
-        </surface>
-      </collision>
-      <visual name='cabinet_bottom_plate_geom_cabinet_top_plate_visual' cast_shadows='1' laser_retro='0.000000' transparency='0.000000'>
-        <origin pose='0.000000 0.000000 1.010000 0.000000 -0.000000 0.000000'/>
-        <geometry>
-          <box size='0.450000 0.450000 0.020000'/>
-        </geometry>
-      </visual>
-    </link>
-  </model>
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <model name="cabinet_model">
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <link name="cabinet_bottom_plate">
+            <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+            <inertial>
+                <pose>0.000000 0.000000 -1.000000 0.000000 -0.000000 0.000000</pose>
+                <inertia>
+                    <ixx>2.050000</ixx>
+                    <ixy>0.000000</ixy>
+                    <ixz>0.000000</ixz>
+                    <iyy>2.050000</iyy>
+                    <iyz>0.000000</iyz>
+                    <izz>2.050000</izz>
+                </inertia>
+                <mass>25.000000</mass>
+                <density>1.000000</density>
+            </inertial>
+            <collision name="cabinet_bottom_plate_geom">
+                <pose>0.000000 0.000000 0.010000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.450000 0.020000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>100.000000</mu>
+                            <mu2>100.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="cabinet_bottom_plate_geom_visual">
+                <pose>0.000000 0.000000 0.010000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.450000 0.020000</size>
+                    </box>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="cabinet_bottom_plate_geom_cabinet_back_plate">
+                <pose>0.235000 0.000000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.020000 0.450000 1.020000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="cabinet_bottom_plate_geom_cabinet_back_plate_visual">
+                <pose>0.235000 0.000000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.020000 0.450000 1.020000</size>
+                    </box>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="cabinet_bottom_plate_geom_cabinet_left_plate">
+                <pose>0.000000 0.235000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.020000 1.020000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="cabinet_bottom_plate_geom_cabinet_left_plate_visual">
+                <pose>0.000000 0.235000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.020000 1.020000</size>
+                    </box>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="cabinet_bottom_plate_geom_cabinet_middle_plate">
+                <pose>0.000000 0.000000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.450000 0.020000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="cabinet_bottom_plate_geom_cabinet_middle_plate_visual">
+                <pose>0.000000 0.000000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.450000 0.020000</size>
+                    </box>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="cabinet_bottom_plate_geom_cabinet_right_plate">
+                <pose>0.000000 -0.235000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.020000 1.020000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="cabinet_bottom_plate_geom_cabinet_right_plate_visual">
+                <pose>0.000000 -0.235000 0.510000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.020000 1.020000</size>
+                    </box>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <collision name="cabinet_bottom_plate_geom_cabinet_top_plate">
+                <pose>0.000000 0.000000 1.010000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.450000 0.020000</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>-1.000000</mu>
+                            <mu2>-1.000000</mu2>
+                            <fdir1>0.000000 0.000000 0.000000</fdir1>
+                            <slip1>0.000000</slip1>
+                            <slip2>0.000000</slip2>
+                        </ode>
+                    </friction>
+                    <bounce>
+                        <restitution_coefficient>0.000000</restitution_coefficient>
+                        <threshold>100000.000000</threshold>
+                    </bounce>
+                    <contact>
+                        <ode>
+                            <soft_cfm>0.000000</soft_cfm>
+                            <soft_erp>0.200000</soft_erp>
+                            <kp>1000000000000.000000</kp>
+                            <kd>1.000000</kd>
+                            <max_vel>100.000000</max_vel>
+                            <min_depth>0.001000</min_depth>
+                        </ode>
+                    </contact>
+                </surface>
+                <laser_retro>0.000000</laser_retro>
+            </collision>
+            <visual name="cabinet_bottom_plate_geom_cabinet_top_plate_visual">
+                <pose>0.000000 0.000000 1.010000 0.000000 -0.000000 0.000000</pose>
+                <geometry>
+                    <box>
+                        <size>0.450000 0.450000 0.020000</size>
+                    </box>
+                </geometry>
+                <cast_shadows>1</cast_shadows>
+                <laser_retro>0.000000</laser_retro>
+                <transparency>0.000000</transparency>
+            </visual>
+            <gravity>1</gravity>
+            <self_collide>0</self_collide>
+            <kinematic>0</kinematic>
+        </link>
+        <static>0</static>
+    </model>
 </gazebo>

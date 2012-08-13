@@ -1274,7 +1274,7 @@ std::string Visual::GetShaderType() const
 void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetElement("material")->GetElement(
-      "shader")->GetElement("type")->Set(_type);
+      "shader")->GetAttribute("type")->Set(_type);
   if (this->useRTShader)
     RTShaderSystem::Instance()->UpdateShaders();
 }

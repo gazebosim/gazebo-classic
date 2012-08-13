@@ -1,73 +1,82 @@
-<?xml version="1.0"?> 
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
     <!-- A ground plane -->
-    <include filename="ground_plane.model"/>
-
+    <include filename="ground_plane.model" />
     <!-- A global light source -->
-    <include filename="sun.light"/>
-
+    <include filename="sun.light" />
     <plugin filename="libTriggerPlugin.so" name="trigger">
       <point>0 0 0</point>
       <radius>5</radius>
     </plugin>
-
     <model name="sphere">
-      <origin pose="0 0 10.0 0 0 0"/>
+      <pose>0 0 10.0 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <mass>1</mass>
           <geometry>
-            <sphere radius="0.1"/>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere radius="0.1"/>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
           </geometry>
-          <material script="Gazebo/Grey"/>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
         </visual>
       </link>
     </model>
-
     <model name="box">
-      <origin pose="1 0 50.0 0 0 0"/>
+      <pose>1 0 50.0 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <mass>1</mass>
           <geometry>
-            <sphere radius="0.1"/>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere radius="0.1"/>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
           </geometry>
-          <material script="Gazebo/Grey"/>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
         </visual>
       </link>
     </model>
-
     <model name="cylinder">
-      <origin pose="5 0 50.0 0 0 0"/>
+      <pose>5 0 50.0 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <mass>1</mass>
           <geometry>
-            <sphere radius="0.2"/>
+            <sphere>
+              <radius>0.2</radius>
+            </sphere>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
-            <sphere radius="0.2"/>
+            <sphere>
+              <radius>0.2</radius>
+            </sphere>
           </geometry>
-          <material script="Gazebo/Grey"/>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
         </visual>
       </link>
     </model>
-
   </world>
 </gazebo>

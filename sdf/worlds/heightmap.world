@@ -1,20 +1,22 @@
-<?xml version="1.0"?> 
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
-
     <!-- A global light source -->
-    <include filename="sun.light"/>
-
-    <model name="heightmap" static="true">
+    <include filename="sun.light" />
+    <model name="heightmap">
       <link name="link">
         <collision name="collision">
           <geometry>
-            <heightmap filename="heightmap_bowl.png" size="129 129 10" origin="0 0 0"/>
+            <heightmap>
+              <filename>heightmap_bowl.png</filename>
+              <size>129 129 10</size>
+              <pos>0 0 0</pos>
+            </heightmap>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
-            <heightmap filename="heightmap_bowl.png" size="129 129 10" origin="0 0 0">
+            <heightmap>
               <texture>
                 <diffuse>dirt_diffusespecular.png</diffuse>
                 <normal>dirt_normal.png</normal>
@@ -38,11 +40,14 @@
                 <min_height>4</min_height>
                 <fade_dist>5</fade_dist>
               </blend>
+              <filename>heightmap_bowl.png</filename>
+              <size>129 129 10</size>
+              <pos>0 0 0</pos>
             </heightmap>
           </geometry>
         </visual>
       </link>
+      <static>true</static>
     </model>
-
   </world>
 </gazebo>

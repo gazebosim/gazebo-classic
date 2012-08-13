@@ -112,7 +112,7 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 //////////////////////////////////////////////////
 void PhysicsEngine::SetUpdateRate(double _value)
 {
-  this->sdf->GetAttribute("update_rate")->Set(_value);
+  this->sdf->GetElement("update_rate")->Set(_value);
   this->updateRateDouble = _value;
 }
 

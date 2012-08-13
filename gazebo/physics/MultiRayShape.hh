@@ -115,7 +115,7 @@ namespace gazebo
                                      const math::Vector3 &end);
 
       /// Ray data
-      protected: std::vector< RayShapePtr > rays;
+      protected: std::vector<RayShapePtr> rays;
 
       protected: math::Vector3 offset;
       protected: sdf::ElementPtr rayElem;
