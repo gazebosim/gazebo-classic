@@ -281,6 +281,10 @@
           <to element="gravity"/>
         </rename>
         <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+        <rename>
           <from attribute="self_collide"/>
           <to element="self_collide"/>
         </rename>
@@ -761,7 +765,26 @@
               <to element="friction"/>
             </rename>
           </convert> <!-- End dynamics -->
+          <convert name="limit">
+            <rename>
+              <from attribute="lower"/>
+              <to element="lower"/>
+            </rename>
+            <rename>
+              <from attribute="upper"/>
+              <to element="upper"/>
+            </rename>
+            <rename>
+              <from attribute="effort"/>
+              <to element="effort"/>
+            </rename>
+            <rename>
+              <from attribute="velocity"/>
+              <to element="velocity"/>
+            </rename>
+          </convert> <!-- End limit -->
         </convert> <!-- End axis -->
+
         <convert name="axis2">
           <rename>
             <from attribute="xyz"/>
@@ -778,6 +801,24 @@
               <to element="friction"/>
             </rename>
           </convert> <!-- End dynamics -->
+          <convert name="limit">
+            <rename>
+              <from attribute="lower"/>
+              <to element="lower"/>
+            </rename>
+            <rename>
+              <from attribute="upper"/>
+              <to element="upper"/>
+            </rename>
+            <rename>
+              <from attribute="effort"/>
+              <to element="effort"/>
+            </rename>
+            <rename>
+              <from attribute="velocity"/>
+              <to element="velocity"/>
+            </rename>
+          </convert> <!-- End limit -->
         </convert> <!-- End axis2 -->
 
         <convert name="physics">
@@ -849,6 +890,11 @@
       <rename>
         <from attribute="kinematic"/>
         <to element="kinematic"/>
+      </rename>
+
+      <rename>
+        <from element="damping"/>
+        <to element="velocity_decay"/>
       </rename>
 
       <convert name="inertial">
@@ -1333,6 +1379,24 @@
             <to element="friction"/>
           </rename>
         </convert> <!-- End dynamics -->
+        <convert name="limit">
+          <rename>
+            <from attribute="lower"/>
+            <to element="lower"/>
+          </rename>
+          <rename>
+            <from attribute="upper"/>
+            <to element="upper"/>
+          </rename>
+          <rename>
+            <from attribute="effort"/>
+            <to element="effort"/>
+          </rename>
+          <rename>
+            <from attribute="velocity"/>
+            <to element="velocity"/>
+          </rename>
+        </convert> <!-- End limit -->
       </convert> <!-- End axis -->
       <convert name="axis2">
         <rename>
@@ -1350,6 +1414,24 @@
             <to element="friction"/>
           </rename>
         </convert> <!-- End dynamics -->
+        <convert name="limit">
+          <rename>
+            <from attribute="lower"/>
+            <to element="lower"/>
+          </rename>
+          <rename>
+            <from attribute="upper"/>
+            <to element="upper"/>
+          </rename>
+          <rename>
+            <from attribute="effort"/>
+            <to element="effort"/>
+          </rename>
+          <rename>
+            <from attribute="velocity"/>
+            <to element="velocity"/>
+          </rename>
+        </convert> <!-- End limit -->
       </convert> <!-- End axis2 -->
 
       <convert name="physics">

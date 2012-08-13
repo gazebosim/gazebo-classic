@@ -42,11 +42,11 @@
     <model name="model_0">
       <pose>0.0 0.0 2.1 0 0.0 0.0</pose>
       <link name="link_1">
-        <damping>
+        <velocity_decay>
           <linear>0.0</linear>
           <angular>0.0</angular>
-        </damping>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        </velocity_decay>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <inertia>
@@ -115,10 +115,6 @@
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit lower="0" upper="0" effort="1000" velocity="1000" />
-          <dynamics>
-            <damping>0.0</damping>
-            <friction>0.0</friction>
-          </dynamics>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -138,11 +134,11 @@
     <model name="model_1">
       <pose>0.0 0.3 2.1 0 0.0 0.0</pose>
       <link name="link_1">
-        <damping>
+        <velocity_decay>
           <linear>0.0</linear>
           <angular>0.0</angular>
-        </damping>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        </velocity_decay>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <inertia>
@@ -211,10 +207,6 @@
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit lower="0" upper="0" effort="1000" velocity="1000" />
-          <dynamics>
-            <damping>0.0</damping>
-            <friction>0.0</friction>
-          </dynamics>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -234,11 +226,7 @@
     <model name="model_2">
       <pose>0.0 0.6 2.1 0 0.0 0.0</pose>
       <link name="link_1">
-        <damping>
-          <linear>0.0</linear>
-          <angular>0.0</angular>
-        </damping>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <inertia>
@@ -307,10 +295,6 @@
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit lower="0" upper="0" effort="1000" velocity="1000" />
-          <dynamics>
-            <damping>0.0</damping>
-            <friction>0.0</friction>
-          </dynamics>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -330,11 +314,7 @@
     <model name="model_3">
       <pose>0.0 0.9 2.1 0 0.0 0.0</pose>
       <link name="link_1">
-        <damping>
-          <linear>0.0</linear>
-          <angular>0.0</angular>
-        </damping>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <inertia>
@@ -403,10 +383,6 @@
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit lower="0" upper="0" effort="1000" velocity="1000" />
-          <dynamics>
-            <damping>0.0</damping>
-            <friction>0.0</friction>
-          </dynamics>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -426,11 +402,7 @@
     <model name="model_4">
       <pose>0.0 1.2 2.1 0 0.0 0.0</pose>
       <link name="link_1">
-        <damping>
-          <linear>0.0</linear>
-          <angular>0.0</angular>
-        </damping>
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <inertia>
@@ -499,10 +471,6 @@
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit lower="-1.0" upper="1.0" effort="1000" velocity="1000" />
-          <dynamics>
-            <damping>0.0</damping>
-            <friction>0.0</friction>
-          </dynamics>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
       </joint>

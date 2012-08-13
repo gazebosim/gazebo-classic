@@ -19,7 +19,7 @@
       </ode>
     </physics>
     <model name="box">
-      <origin>0 0 0 0 0 0</origin>
+      <pose>0 0 0 0 0 0</pose>
       <link name="link">
         <inertial>
           <inertia>
@@ -32,10 +32,10 @@
           </inertia>
           <mass>1.0</mass>
         </inertial>
-        <damping>
+        <velocity_decay>
           <linear>0.0</linear>
           <angular>0.0</angular>
-        </damping>
+        </velocity_decay>
         <collision name="collision">
           <geometry>
             <box>
@@ -64,7 +64,7 @@
       </link>
     </model>
     <model name="sphere">
-      <origin>2 0 0 0 0 0</origin>
+      <pose>2 0 0 0 0 0</pose>
       <link name="link">
         <inertial>
           <inertia>
@@ -77,10 +77,10 @@
           </inertia>
           <mass>1.0</mass>
         </inertial>
-        <damping>
+        <velocity_decay>
           <linear>0.0</linear>
           <angular>0.0</angular>
-        </damping>
+        </velocity_decay>
         <collision name="collision">
           <geometry>
             <sphere>
@@ -109,7 +109,7 @@
       </link>
     </model>
     <light type="directional" name="sun">
-      <origin>0 0 10 0 0 0</origin>
+      <pose>0 0 10 0 0 0</pose>
       <diffuse>.8 .8 .8 1</diffuse>
       <specular>.1 .1 .1 1</specular>
       <attenuation>

@@ -36,7 +36,7 @@
         </visual>
       </link>
       <link name="body2">
-        <origin pose="0 0.5 2.0 0 0 0" />
+        <pose>0 0.5 2.0 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>

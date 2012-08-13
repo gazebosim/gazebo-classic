@@ -27,7 +27,6 @@
     <model name="model_1">
       <pose>0.0 0.0 2.1 30.0 0.0 0.0</pose>
       <link name="link_1">
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
@@ -94,7 +93,7 @@
         <kinematic>false</kinematic>
       </link>
       <link name="link_2">
-        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0" />
+        <pose>0.0 0.0 -1.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
@@ -208,7 +207,6 @@
     <model name="model_2">
       <pose>1.0 0.0 2.1 30.0 0.0 0.0</pose>
       <link name="link_1">
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
@@ -275,7 +273,7 @@
         <kinematic>false</kinematic>
       </link>
       <link name="link_2">
-        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0" />
+        <pose>0.0 0.0 -1.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
@@ -389,7 +387,6 @@
     <model name="model_3">
       <pose>0.0 -2.5 2.1 0.0 30.0 0.0</pose>
       <link name="link_1">
-        <origin pose="0.0 0.0 0.0 0.0 0.0 0.0" />
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
@@ -456,7 +453,7 @@
         <kinematic>false</kinematic>
       </link>
       <link name="link_2">
-        <origin pose="0.0 0.0 -1.0 0.0 0.0 0.0" />
+        <pose>0.0 0.0 -1.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <damping linear="0.0" angular="0.0" />
