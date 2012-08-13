@@ -71,7 +71,7 @@ SystemPaths::SystemPaths()
   this->UpdateOgrePaths();
 
   // Add some search paths
-  //this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
+  // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
   this->suffixPaths.push_back("/media/models/");
 }
 
