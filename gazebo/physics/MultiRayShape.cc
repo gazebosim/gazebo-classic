@@ -40,6 +40,7 @@ void MultiRayShape::Init()
 {
   math::Vector3 start, end, axis;
   double yawAngle, pitchAngle;
+  math::Quaternion ray;
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
@@ -77,7 +78,7 @@ void MultiRayShape::Init()
   minRange = this->rangeElem->GetValueDouble("min");
   maxRange = this->rangeElem->GetValueDouble("max");
 
-  this->offset = this->collisionParent->GetRelativePose().pos;
+  this->offset = this->collisionParent->GetRelativePose();
 
   // Create and array of ray collisions
   for (unsigned int j = 0; j < (unsigned int)vertSamples; j++)
@@ -90,11 +91,11 @@ void MultiRayShape::Init()
       pitchAngle = (vertSamples == 1)? 0 :
         j * pDiff / (vertSamples - 1) + vertMinAngle;
 
-      axis.Set(cos(pitchAngle) * cos(yawAngle),
-               sin(yawAngle), sin(pitchAngle)* cos(yawAngle));
+      ray.SetFromEuler(math::Vector3(0.0, pitchAngle, yawAngle));
+      axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
-      start = (axis * minRange) + this->offset;
-      end = (axis * maxRange) + this->offset;
+      start = (axis * minRange) + this->offset.pos;
+      end = (axis * maxRange) + this->offset.pos;
 
       this->AddRay(start, end);
     }
