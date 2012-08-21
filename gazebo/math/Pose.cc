@@ -119,7 +119,7 @@ bool Pose::operator!=(const Pose &_pose) const
 //////////////////////////////////////////////////
 Pose Pose::operator*(const Pose &pose)
 {
-  return Pose(this->CoordPositionAdd(pose), this->rot * pose.rot);
+  return Pose(this->CoordPositionAdd(pose),  pose.rot * this->rot);
 }
 
 //////////////////////////////////////////////////

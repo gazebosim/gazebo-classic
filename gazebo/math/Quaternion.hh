@@ -80,16 +80,25 @@ namespace gazebo
     /// \return Inverse quarenion
     public: inline Quaternion GetInverse() const
             {
-              Quaternion q;
-              double norm = this->w*this->w + this->x*this->x +
-                            this->y*this->y + this->z*this->z;
+              double s = 0;
+              Quaternion q(this->w, this->x, this->y, this->z);
 
-              if (norm > 0.0)
+              s = sqrt(q.w * q.w + q.x * q.x + q.y * q.y +
+                       q.z * q.z);
+
+              if (math::equal(s, 0))
               {
-                q.w = this->w / norm;
-                q.x = -this->x / norm;
-                q.y = -this->y / norm;
-                q.z = -this->z / norm;
+                q.w = 1.0;
+                q.x = 0.0;
+                q.y = 0.0;
+                q.z = 0.0;
+              }
+              else
+              {
+                q.w = q.w / s;
+                q.x = -q.x / s;
+                q.y = -q.y / s;
+                q.z = -q.z / s;
               }
               return q;
             }
