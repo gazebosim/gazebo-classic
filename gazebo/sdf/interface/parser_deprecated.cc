@@ -364,8 +364,10 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
   */
 
   sdf::ElementPtr sdfHoriz = sdfScan->AddElement("horizontal");
+  sdf::ElementPtr sdfVerti = sdfScan->AddElement("vertical");
 
   initAttr(_config, "rangeCount", sdfHoriz->GetAttribute("samples"));
+  initAttr(_config, "verticalRangeCount", sdfVerti->GetAttribute("samples"));
 
   int rangeCount =
     boost::lexical_cast<int>(getNodeValue(_config, "rangeCount"));
@@ -376,6 +378,20 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
   {
     gzerr << "Unable to parse ray sensor rayCount\n";
     return false;
+  }
+
+  try {
+    int verticalRangeCount =
+      boost::lexical_cast<int>(getNodeValue(_config, "verticalRangeCount"));
+    int verticalRayCount = boost::lexical_cast<int>(getNodeValue(_config, "verticalRayCount"));
+
+    if (!sdfVerti->GetAttribute("resolution")->SetFromString(
+          boost::lexical_cast<std::string>(verticalRangeCount / verticalRayCount)))
+    {
+      gzerr << "Unable to parse ray sensor verticalRayCount";
+      return false;
+    }
+  } catch(boost::bad_lexical_cast& e) {
   }
 
   double minAngle =
@@ -395,6 +411,28 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
   {
     gzerr << "Unable to parse max_angle\n";
     return false;
+  }
+
+  try {
+    double verticalMinAngle =
+      boost::lexical_cast<double>(getNodeValue(_config, "verticalMinAngle"));
+    double verticalMaxAngle =
+      boost::lexical_cast<double>(getNodeValue(_config, "verticalMaxAngle"));
+
+    if (!sdfVerti->GetAttribute("min_angle")->SetFromString(
+          boost::lexical_cast<std::string>(GZ_DTOR(verticalMinAngle))))
+    {
+      gzerr << "Unable to parse vertical min_angle\n";
+      return false;
+    }
+
+    if (!sdfVerti->GetAttribute("max_angle")->SetFromString(
+          boost::lexical_cast<std::string>(GZ_DTOR(verticalMaxAngle))))
+    {
+      gzerr << "Unable to parse vertical max_angle\n";
+      return false;
+    }
+  } catch(boost::bad_lexical_cast& e) {
   }
 
   sdf::ElementPtr sdfRange = _sdf->AddElement("range");
