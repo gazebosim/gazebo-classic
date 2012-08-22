@@ -672,7 +672,7 @@ std::string URDF2Gazebo::getGeometryBoundingBox(boost::shared_ptr<urdf::Geometry
         {
             boost::shared_ptr<const urdf::Sphere> sphere;
             sphere = boost::dynamic_pointer_cast<const urdf::Sphere >(geometry);
-            sizeVals[0] = sizeVals[1] = sizeVals[2] = sphere->radius;
+            sizeVals[0] = sizeVals[1] = sizeVals[2] = sphere->radius * 2;
         }
         break;
     case urdf::Geometry::MESH:
