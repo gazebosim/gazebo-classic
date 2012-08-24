@@ -1,0 +1,37 @@
+<?xml version="1.0"?> 
+<gazebo version="1.2">
+  <world name="default">
+
+    <model name="box">
+      <pose>0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>1.0</mass>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <plugin name="custom_messages" filename="libcustom_messages.so"/>
+    </model>
+
+    <!-- A ground plane -->
+    <include filename="ground_plane.model" />
+    <!-- A global light source -->
+    <include filename="sun.light" />
+  </world>
+</gazebo>
