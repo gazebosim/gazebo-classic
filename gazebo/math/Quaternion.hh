@@ -86,7 +86,7 @@ namespace gazebo
               s = sqrt(q.w * q.w + q.x * q.x + q.y * q.y +
                        q.z * q.z);
 
-              if (math::equal(s, 0))
+              if (math::equal(s, 0.0))
               {
                 q.w = 1.0;
                 q.x = 0.0;
