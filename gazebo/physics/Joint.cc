@@ -51,8 +51,18 @@ Joint::~Joint()
 //////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_origin)
 {
-  this->world = _parent->GetWorld();
-  this->model = _parent->GetModel();
+  if (_parent)
+  {
+    this->world = _parent->GetWorld();
+    this->model = _parent->GetModel();
+  }
+  else if (_child)
+  {
+    this->world = _child->GetWorld();
+    this->model = _child->GetModel();
+  }
+  else
+    gzthrow("both parent and child link do no exist");
 
   this->parentLink = _parent;
   this->childLink = _child;
