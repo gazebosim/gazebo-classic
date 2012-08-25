@@ -70,6 +70,7 @@ Model::Model(BasePtr _parent)
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
   this->jointController = NULL;
+  this->doPhysics = true;
 }
 
 //////////////////////////////////////////////////

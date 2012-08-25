@@ -247,6 +247,9 @@ namespace gazebo
 
       protected: std::vector<ModelPtr> attachedModels;
       protected: std::vector<math::Pose> attachedModelsOffset;
+
+      /// \brief set this to false to disable physics update for the model
+      public: bool doPhysics;
     };
     /// \}
   }
