@@ -79,21 +79,18 @@ std::string SystemPaths::GetLogPath() const
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {
-  this->UpdateGazeboPaths();
   return this->gazeboPaths;
 }
 
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetPluginPaths()
 {
-  this->UpdatePluginPaths();
   return this->pluginPaths;
 }
 
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetOgrePaths()
 {
-  this->UpdateOgrePaths();
   return this->ogrePaths;
 }
 
