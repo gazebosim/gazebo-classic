@@ -111,11 +111,12 @@ void HeightmapShape::FillHeightMap()
   // Iterate over all the verices
   for (y = 0; y < this->vertSize; y++)
   {
+    // yf ranges between 0 and 4
     yf = y / static_cast<double>(this->subSampling);
     y1 = floor(yf);
     y2 = ceil(yf);
     if (y2 >= imgHeight)
-      y2 = y1;
+      y2 = imgHeight-1;
     dy = yf - y1;
 
     for (x = 0; x < this->vertSize; x++)
@@ -124,8 +125,7 @@ void HeightmapShape::FillHeightMap()
       x1 = floor(xf);
       x2 = ceil(xf);
       if (x2 >= imgWidth)
-        x2 = x1;
-
+        x2 = imgWidth-1;
       dx = xf - x1;
 
       px1 = static_cast<int>(data[y1 * pitch + x1 * bpp]) / 255.0;
