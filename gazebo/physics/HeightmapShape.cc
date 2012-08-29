@@ -71,9 +71,9 @@ void HeightmapShape::Init()
   this->scale.y = terrainSize.y / this->vertSize;
 
   if (math::equal(this->img.GetMaxColor().R(), 0))
-    this->scale.z = terrainSize.z;
+    this->scale.z = fabs(terrainSize.z);
   else
-    this->scale.z = terrainSize.z / this->img.GetMaxColor().R();
+    this->scale.z = fabs(terrainSize.z) / this->img.GetMaxColor().R();
 
   // Step 1: Construct the heightmap lookup table, using the ogre ray scene
   // query functionality
@@ -137,6 +137,12 @@ void HeightmapShape::FillHeightMap()
       h2 = (px3 - ((px3 - px4) * dx));
 
       h = (h1 - ((h1 - h2) * dy)) * this->scale.z;
+
+      // invert pixel definition so 1=ground, 0=full height,
+      //   if the terrain size has a negative z component
+      //   this is mainly for backward compatibility
+      if (this->GetSize().z < 0)
+        h = 1.0 - h;
 
       // Store the height for future use
       this->heights[y * this->vertSize + x] = h;
