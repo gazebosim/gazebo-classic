@@ -85,6 +85,7 @@ World::World(const std::string &_name)
   this->resetAll = true;
   this->resetTimeOnly = false;
   this->resetModelOnly = false;
+  this->enablePhysicsEngine = true;
 
   this->setWorldPoseMutex = new boost::recursive_mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
@@ -384,7 +385,7 @@ void World::Update()
   // Logger::Instance()->Update();
 
   // Update the physics engine
-  if (this->physicsEngine)
+  if (this->enablePhysicsEngine && this->physicsEngine)
   {
     this->physicsEngine->UpdateCollision();
 
