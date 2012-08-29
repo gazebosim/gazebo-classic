@@ -197,6 +197,11 @@ void JointController::SetJointPositions(
 //////////////////////////////////////////////////
 void JointController::SetJointPosition(JointPtr _joint, double _position)
 {
+  // truncate position by joint limits
+  double lower = _joint->GetLowStop(0).GetAsRadian();
+  double upper = _joint->GetHighStop(0).GetAsRadian();
+  _position = _position < lower? lower : (_position > upper? upper : _position); 
+
   // keep track of updatd links, make sure each is upated only once
   this->updated_links.clear();
 
