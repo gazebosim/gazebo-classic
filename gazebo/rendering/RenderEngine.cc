@@ -73,6 +73,8 @@ RenderEngine::RenderEngine()
         boost::bind(&RenderEngine::Render, this)));
   this->connections.push_back(event::Events::ConnectPostRender(
         boost::bind(&RenderEngine::PostRender, this)));
+
+  this->xAvailable = true;
 }
 
 
@@ -85,7 +87,17 @@ RenderEngine::~RenderEngine()
 //////////////////////////////////////////////////
 void RenderEngine::Load()
 {
-  this->CreateContext();
+  try
+  {
+    this->CreateContext();
+  }
+  catch(common::Exception &e)
+  {
+    this->xAvailable = false;
+    gzerr << this->xAvailable << "\n";
+    gzthrow(std::string("unable to RenderEngine::CreateContext, ") +
+            std::string("disabling all rendering capabilities"));
+  }
 
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
@@ -135,15 +147,19 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
                                    bool _enableVisualizations)
 {
   ScenePtr scene(new Scene(_name, _enableVisualizations));
-  this->scenes.push_back(scene);
 
-  scene->Load();
-  if (this->initialized)
-    scene->Init();
-  else
-    gzerr << "RenderEngine is not initialized\n";
+  if (this->xAvailable)
+  {
+    this->scenes.push_back(scene);
 
-  rendering::Events::createScene(_name);
+    scene->Load();
+    if (this->initialized)
+      scene->Init();
+    else
+      gzerr << "RenderEngine is not initialized\n";
+
+    rendering::Events::createScene(_name);
+  }
 
   return scene;
 }
@@ -200,7 +216,8 @@ unsigned int RenderEngine::GetSceneCount() const
 
 void RenderEngine::PreRender()
 {
-  this->root->_fireFrameStarted();
+  if (this->xAvailable)
+    this->root->_fireFrameStarted();
 }
 
 //////////////////////////////////////////////////
@@ -211,6 +228,8 @@ void RenderEngine::Render()
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
+  if (!this->xAvailable)
+    return;
   // _fireFrameRenderingQueued needs to be here for CEGUI to work
   this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();
@@ -230,16 +249,20 @@ void RenderEngine::Init()
   /// initialize properly
 
   // Set default mipmap level (NB some APIs ignore this)
-  Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
+  gzerr << this->xAvailable << "\n";
+  if (this->xAvailable)
+  {
+    Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 
-  // init the resources
-  Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    // init the resources
+    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
-      Ogre::TFO_ANISOTROPIC);
+    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
+        Ogre::TFO_ANISOTROPIC);
 
-  RTShaderSystem::Instance()->Init();
-  rendering::Material::CreateMaterials();
+    RTShaderSystem::Instance()->Init();
+    rendering::Material::CreateMaterials();
+  }
 
   for (unsigned int i = 0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();

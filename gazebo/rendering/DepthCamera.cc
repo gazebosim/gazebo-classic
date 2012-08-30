@@ -36,6 +36,7 @@
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"
 #include "rendering/DepthCamera.hh"
+#include "rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -92,6 +93,12 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 {
   // Create the depth buffer
   std::string depthMaterialName = this->GetName() + "_RttMat_Camera_Depth";
+
+  if (!rendering::RenderEngine::Instance()->xAvailable)
+  {
+    gzwarn <<  "No X, no camera\n";
+    return;
+  }
 
   this->depthTexture = Ogre::TextureManager::getSingleton().createManual(
       _textureName,
@@ -179,6 +186,11 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void DepthCamera::PostRender()
 {
+  if (this->depthTarget == NULL)
+  {
+    gzwarn <<  "No X, no camera\n";
+    return;
+  }
   this->depthTarget->swapBuffers();
   if (this->output_points)
     this->pcdTarget->swapBuffers();
@@ -327,6 +339,12 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target,
 void DepthCamera::RenderImpl()
 {
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+
+  if (sceneMgr == NULL)
+  {
+    gzwarn <<  "No X, no camera\n";
+    return;
+  }
 
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   sceneMgr->_suppressRenderStateChanges(true);
