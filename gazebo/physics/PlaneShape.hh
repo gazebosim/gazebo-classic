@@ -31,8 +31,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Collision for an infinite plane.
-    ///
     /// This collision is used primarily for ground planes.  Note that while
     /// the plane in infinite, only the part near the camera is drawn.
     class PlaneShape : public Shape

@@ -31,6 +31,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief A slider joint
     template<class T>
     class SliderJoint : public T

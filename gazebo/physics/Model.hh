@@ -46,6 +46,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief A model
     class Model : public Entity
     {

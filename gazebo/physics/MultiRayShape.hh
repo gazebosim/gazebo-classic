@@ -40,6 +40,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Laser collision contains a set of ray-collisions,
     ///        structured to simulate a laser range scanner
     class MultiRayShape : public Shape

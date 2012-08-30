@@ -30,6 +30,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Cylinder collision
     class CylinderShape : public Shape
     {

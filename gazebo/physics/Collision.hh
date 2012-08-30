@@ -38,6 +38,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Base class for all collision entities
     class Collision : public Entity
     {

@@ -48,6 +48,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Base class for all physics objects in Gazebo
     class Entity : public Base
     {

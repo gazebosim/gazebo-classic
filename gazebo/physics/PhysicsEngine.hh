@@ -37,6 +37,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Base class for a physics engine
     class PhysicsEngine
     {

@@ -30,7 +30,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief Box geometry
+
+    /// \brief Box geometry primitive
     class BoxShape : public Shape
     {
       /// \brief Constructor
