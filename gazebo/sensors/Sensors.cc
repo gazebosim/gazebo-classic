@@ -36,7 +36,8 @@ bool sensors::load()
 
   // Load the rendering system
   if (!gazebo::rendering::load())
-    gzthrow("Unable to load the rendering engine");
+    gzerr << "Unable to load the rendering engine";
+    //gzthrow("Unable to load the rendering engine");
 
   return true;
 }

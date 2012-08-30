@@ -20,9 +20,10 @@
 
 /// \file
 /// \ingroup gazebo_physics
-/// \brief Physics forward declarations and type defines
+///\brief default namespace for gazebo
 namespace gazebo
 {
+  /// \brief Physics forward declarations and type defines
   namespace physics
   {
     class Base;

@@ -34,7 +34,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief Ray collision
+    /// \brief Base class for Ray collision geometry
     class RayShape : public Shape
     {
       /// \brief Constructor for a global ray
