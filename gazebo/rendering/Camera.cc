@@ -1158,7 +1158,7 @@ bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 {
   if (this->sceneNode == NULL)
   {
-    gzwarn <<  "No X, no camera\n";
+    // gzwarn <<  "No X, no camera\n";
     return false;
   }
 

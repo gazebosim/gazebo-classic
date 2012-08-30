@@ -188,7 +188,7 @@ void DepthCamera::PostRender()
 {
   if (this->depthTarget == NULL)
   {
-    gzwarn <<  "No X, no camera\n";
+    // gzwarn <<  "No X, no camera\n";
     return;
   }
   this->depthTarget->swapBuffers();
@@ -342,7 +342,7 @@ void DepthCamera::RenderImpl()
 
   if (sceneMgr == NULL)
   {
-    gzwarn <<  "No X, no camera\n";
+    // gzwarn <<  "No X, no camera\n";
     return;
   }
 
