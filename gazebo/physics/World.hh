@@ -341,6 +341,11 @@ namespace gazebo
       private: bool resetModelOnly;
 
       private: bool initialized;
+      private: bool enablePhysicsEngine;
+      public: bool GetEnablePhysicsEngine()
+              { return this->enablePhysicsEngine; }
+      public: void EnablePhysicsEngine(bool _enable)
+              { this->enablePhysicsEngine = _enable; }
 
       private: RayShapePtr testRay;
     };

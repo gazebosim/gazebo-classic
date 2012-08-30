@@ -415,6 +415,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 {
   this->OnPoseChange();
 
+  // why not collision type?
   if (!this->HasType(COLLISION) && (_updateChildren || this->IsStatic()))
   {
     for (Base_V::iterator iter = this->children.begin();

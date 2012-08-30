@@ -292,6 +292,7 @@ void Image::GetDataImpl(unsigned char **_data, unsigned int &_count,
   {
 #endif
 #endif
+/*  FIXME:  why shift by 2 pixels?  this breaks heighmaps by wrapping artificially
     int i = 0;
     for (unsigned int y = 0; y < this->GetHeight(); ++y)
     {
@@ -302,6 +303,7 @@ void Image::GetDataImpl(unsigned char **_data, unsigned int &_count,
         i += d;
       }
     }
+*/
   }
 }
 
