@@ -36,6 +36,7 @@
 #include "rendering/Conversions.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Camera.hh"
+#include "rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -168,6 +169,12 @@ void Camera::Load()
 //////////////////////////////////////////////////
 void Camera::Init()
 {
+  if (this->scene->GetManager() == NULL)
+  {
+    gzwarn << "No X, no camera\n";
+    return;
+  }
+
   this->SetSceneNode(
       this->scene->GetManager()->getRootSceneNode()->createChildSceneNode(
         this->GetName() + "_SceneNode"));
@@ -394,6 +401,11 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
+  if (this->sceneNode == NULL)
+  {
+    gzwarn <<  "No X, no camera\n";
+    return;
+  }
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
@@ -405,6 +417,11 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
   s.SetFromEuler(math::Vector3(rpy.x, 0, rpy.z));
 
+  if (this->sceneNode == NULL)
+  {
+    gzwarn <<  "No X, no camera\n";
+    return;
+  }
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
 
@@ -1008,6 +1025,12 @@ void Camera::SetCaptureData(bool _value)
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &textureName)
 {
+  if (!rendering::RenderEngine::Instance()->xAvailable)
+  {
+    gzwarn <<  "No X, no camera\n";
+    return;
+  }
+
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       textureName,
@@ -1133,6 +1156,12 @@ bool Camera::AttachToVisualImpl(const std::string &_name,
 bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     double /*_minDist*/, double /*_maxDist*/)
 {
+  if (this->sceneNode == NULL)
+  {
+    gzwarn <<  "No X, no camera\n";
+    return false;
+  }
+
   if (this->sceneNode->getParent())
       this->sceneNode->getParent()->removeChild(this->sceneNode);
 

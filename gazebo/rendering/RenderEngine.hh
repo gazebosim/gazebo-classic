@@ -130,6 +130,7 @@ namespace gazebo
 
       private: bool removeScene;
       private: std::string removeSceneName;
+      public: bool xAvailable;
     };
     /// \}
   }
