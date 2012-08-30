@@ -28,7 +28,11 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
+    /// load gazebo::SystemPlugin's and call gazebo::transport::init()
     bool load();
+
+    /// finalize transport by calling gazebo::transport::fini()
     bool fini();
 
     /// \brief create a world

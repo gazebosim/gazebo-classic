@@ -142,7 +142,11 @@ namespace gazebo
       /// \brief Set the angular damping factor
       public: virtual void SetAngularDamping(double damping);
 
+      /// \brief callback when ODE determines a body is disabled
       public: static void DisabledCallback(dBodyID _id);
+
+      /// \brief when ODE updates dynamics bodies, this callback
+      ///        propagates the chagnes in pose back to Gazebo
       public: static void MoveCallback(dBodyID id);
 
       /// \brief Set whether this link is in the kinematic state

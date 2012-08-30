@@ -193,6 +193,7 @@ namespace gazebo
       /// \brief Attach a static model to this model
       public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
 
+      /// \brief Detach a static model from this model
       public: void DetachStaticModel(const std::string &_model);
 
       /// \brief Get the current model state
