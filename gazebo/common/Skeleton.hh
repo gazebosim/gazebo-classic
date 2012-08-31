@@ -41,8 +41,9 @@ namespace gazebo
     typedef std::vector<std::vector<std::pair<std::string, double> > >
                                                               RawNodeWeights;
 
-    /// \addtogroup gazebo_common Common
+    /// \addtogroup gazebo_common Common Animation
     /// \{
+
     /// \brief A skeleton
     class Skeleton
     {
@@ -107,7 +108,7 @@ namespace gazebo
       protected: std::vector<SkeletonAnimation*> anims;
     };
 
-    /// \brief A node
+    /// \brief A skeleton node
     class SkeletonNode
     {
       public: enum SkeletonNodeType {NODE, JOINT};

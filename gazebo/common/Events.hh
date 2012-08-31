@@ -28,6 +28,7 @@ namespace gazebo
     {
       /// \addtogroup gazebo_event
       /// \{
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
       public: template<typename T>

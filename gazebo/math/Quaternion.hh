@@ -38,6 +38,7 @@ namespace gazebo
   {
   /// \addtogroup gazebo_math
   /// \{
+
   /// \brief A quaternion class
   class Quaternion
   {

@@ -44,6 +44,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Functions to handle getting system paths
     class SystemPaths : public SingletonT<SystemPaths>
     {

@@ -33,6 +33,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief A 3D mesh
     class Mesh
     {

@@ -28,6 +28,10 @@ namespace gazebo
 {
   namespace math
   {
+    /// \addtogroup gazebo_math
+    /// \{
+
+    /// \brief Splines
     class Spline
     {
       public: Spline();
@@ -104,6 +108,7 @@ namespace gazebo
       /// Tension of 0 = Catmull-Rom spline, otherwise a Cardinal spline
       protected: double tension;
     };
+    /// \}
   }
 }
 #endif

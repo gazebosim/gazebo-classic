@@ -33,6 +33,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Class used to load STL mesh files
     class STLLoader : public MeshLoader
     {

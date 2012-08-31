@@ -24,6 +24,7 @@
 
 /// \addtogroup gazebo_common Common
 /// \{
+
 /// \brief Singleton class
 template <class T>
 class SingletonT

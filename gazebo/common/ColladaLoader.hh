@@ -35,6 +35,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Class used to load Collada mesh files
     class ColladaLoader : public MeshLoader
     {
