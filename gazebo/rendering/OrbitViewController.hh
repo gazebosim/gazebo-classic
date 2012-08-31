@@ -30,6 +30,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Orbit view controller
     class OrbitViewController : public ViewController
     {

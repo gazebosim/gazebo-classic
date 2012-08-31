@@ -27,6 +27,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Base class for view controllers
     class ViewController
     {

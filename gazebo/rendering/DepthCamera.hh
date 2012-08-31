@@ -54,11 +54,9 @@ namespace gazebo
     class Scene;
 
     /// \addtogroup gazebo_rendering Rendering
-    /// \brief A set of rendering related class, functions, and definitions
     /// \{
-    /// \brief Basic camera sensor
-    ///
-    /// This is the base class for all cameras.
+
+    /// \brief depth camera sensor, depends on rendering::Camera class
     class DepthCamera : public Camera
     {
       /// \brief Constructor

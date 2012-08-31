@@ -35,6 +35,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief Manager of connections
     class ConnectionManager : public SingletonT<ConnectionManager>
     {

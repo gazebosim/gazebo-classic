@@ -33,6 +33,10 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Visualization for joints
     class JointVisual : public Visual
     {
       public: JointVisual(const std::string &_name, VisualPtr _vis);
@@ -41,6 +45,7 @@ namespace gazebo
       public: void Load(ConstJointPtr &_msg);
       private: AxisVisualPtr axisVisual;
     };
+    /// \}
   }
 }
 #endif

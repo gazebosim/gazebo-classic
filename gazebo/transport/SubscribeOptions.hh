@@ -28,6 +28,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief Options for a subscription
     class SubscribeOptions
     {

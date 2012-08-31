@@ -45,6 +45,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Adaptor to Ogre3d
     class RenderEngine : public SingletonT<RenderEngine>
     {

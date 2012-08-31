@@ -33,6 +33,10 @@ namespace gazebo
   namespace rendering
   {
     class DynamicLines;
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Visualization for RFID sensor
     class RFIDVisual : public Visual
     {
       public: RFIDVisual(const std::string &_name, VisualPtr _vis,
@@ -45,6 +49,7 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::SubscriberPtr rfidSub;
     };
+    /// \}
   }
 }
 #endif

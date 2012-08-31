@@ -32,6 +32,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief A subscriber to a topic
     class Subscriber
     {

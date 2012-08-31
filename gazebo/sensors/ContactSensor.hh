@@ -39,8 +39,8 @@ namespace gazebo
 
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief Contact sensor.
-    ///
     /// This sensor detects and reports contacts between objects
     class ContactSensor: public Sensor
     {

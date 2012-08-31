@@ -38,6 +38,7 @@ namespace gazebo
 
   /// \addtogroup gazebo_sensors
   /// \{
+
   /// \brief The sensor factory; the class is just for namespacing purposes.
   class SensorFactory
   {
