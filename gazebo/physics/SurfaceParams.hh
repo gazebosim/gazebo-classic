@@ -31,7 +31,10 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief SurfaceParams defines surface contact parameters.
+
+    /// \brief SurfaceParams defines various Surface contact parameters.
+    ///        These parameters defines the properties of a
+    ///        physics::Contact constraint.
     class SurfaceParams
     {
       /// \brief Constructor
@@ -63,6 +66,7 @@ namespace gazebo
       /// \sa    See for example
       ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_2
       ///        for more details.
+
       public: double kp;
       /// \brief spring damping constant equivalents of a contact as a
       ///        function of SurfaceParams::cfm and SurfaceParams::erp.
@@ -109,12 +113,12 @@ namespace gazebo
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double mu2;
 
-      /// \brief Artificial contact slip.
+      /// \brief Artificial contact slip in the primary friction direction.
       /// \sa    See dContactSlip1 in
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip1;
 
-      /// \brief Artificial contact slip.
+      /// \brief Artificial contact slip in the secondary friction dirction.
       /// \sa    See dContactSlip2 in
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip2;

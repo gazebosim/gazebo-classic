@@ -51,10 +51,9 @@ namespace gazebo
       public: int feedbackCount;
     };
 
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_physics gazebo_physics_ode ODE Physics
     /// \{
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
+
     /// \brief ODE physics engine
     class ODEPhysics : public PhysicsEngine
     {
@@ -70,6 +69,7 @@ namespace gazebo
       /// \brief Initialize the ODE engine
       public: virtual void Init();
 
+      /// \brief Empties dynamically created contact joints
       public: void Reset();
 
       /// \brief Init the engine for threads.
@@ -97,6 +97,7 @@ namespace gazebo
       public: virtual CollisionPtr CreateCollision(
                   const std::string &_shapeType, LinkPtr _parent);
 
+      /// \brief Create a collision physics::Shape object given its type
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
 
@@ -161,6 +162,7 @@ namespace gazebo
       /// \brief access functions to set ODE parameters
       public: int GetMaxContacts();
 
+      /// \brief Not yet implemented
       public: void CreateContact(ODECollision *collision1,
                                  ODECollision *collision2);
 
@@ -172,14 +174,17 @@ namespace gazebo
       public: void Collide(ODECollision *collision1, ODECollision *collision2,
                            dContactGeom *contactCollisions);
 
+      /// \brief process contact feedbacks into physics::ContactFeedback
       public: void ProcessContactFeedback(ContactFeedback* feedback,
                                           msgs::Contact *_msg);
 
       public: virtual void DebugPrint() const;
 
+      /// \brief act on a msgs::Request for physics
       protected: virtual void OnRequest(
                    ConstRequestPtr &/*_msg*/);
 
+      /// \brief act on a msgs::Physics message request
       protected: virtual void OnPhysicsMsg(
                    ConstPhysicsPtr &/*_msg*/);
 

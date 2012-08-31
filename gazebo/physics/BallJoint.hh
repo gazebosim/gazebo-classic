@@ -31,8 +31,8 @@ namespace gazebo
   namespace physics
   {
     /// \addtogroup gazebo_physics
-    /// \brief A set of physics related class, functions, and definitions
     /// \{
+
     /// \brief A ball joint
     template< class T>
     class BallJoint : public T

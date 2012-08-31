@@ -1457,15 +1457,20 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!parentVis)
       return false;
 
-    CameraVisualPtr cameraVis(new CameraVisual(
-          _msg->name()+"_GUIONLY_camera_vis", parentVis));
+    // image size is 0 if renering is unavailable
+    if (_msg->camera().image_size().x() > 0 &&
+        _msg->camera().image_size().y() > 0)
+    {
+      CameraVisualPtr cameraVis(new CameraVisual(
+            _msg->name()+"_GUIONLY_camera_vis", parentVis));
 
-    cameraVis->SetPose(msgs::Convert(_msg->pose()));
+      cameraVis->SetPose(msgs::Convert(_msg->pose()));
 
-    cameraVis->Load(_msg->camera().image_size().x(),
-                    _msg->camera().image_size().y());
+      cameraVis->Load(_msg->camera().image_size().x(),
+                      _msg->camera().image_size().y());
 
-    this->visuals[cameraVis->GetName()] = cameraVis;
+      this->visuals[cameraVis->GetName()] = cameraVis;
+    }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
            !_msg->topic().empty())

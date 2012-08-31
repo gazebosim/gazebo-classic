@@ -30,6 +30,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief A universal joint
     template<class T>
     class UniversalJoint : public T

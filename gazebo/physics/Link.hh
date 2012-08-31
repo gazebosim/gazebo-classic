@@ -42,7 +42,10 @@ namespace gazebo
 
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief Link class
+
+    /// \brief Link class defines a rigid body entity, containing
+    /// information on inertia, visual and collision properties of
+    /// a rigid body.
     class Link : public Entity
     {
       /// \brief Constructor

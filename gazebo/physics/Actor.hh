@@ -47,6 +47,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Actor class enables GPU based mesh model / skeleton
     ///              scriptable animation.
     class Actor : public Model

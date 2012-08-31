@@ -37,6 +37,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief Base class for all ODE collisions
     class ODECollision : public Collision
     {

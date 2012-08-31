@@ -28,23 +28,55 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
+    /// load gazebo::SystemPlugin's and call gazebo::transport::init()
     bool load();
+
+    /// finalize transport by calling gazebo::transport::fini()
     bool fini();
 
+    /// \brief create a world
     WorldPtr create_world(const std::string &name ="");
+
+    /// \brief Get back a pointer to a world by name
     WorldPtr get_world(const std::string &name = "");
 
+    /// \brief Load world from sdf::Element pointer
     void load_world(WorldPtr world, sdf::ElementPtr _sdf);
+
+    /// \brief initialize world
     void init_world(WorldPtr world);
+
+    /// \brief run world by calling World::Run()
     void run_world(WorldPtr world);
+
+    /// \brief stop world by calling World::Stop()
     void stop_world(WorldPtr world);
+
+    /// \brief stop world by calling World::SetPaused(bool)
     void pause_world(WorldPtr world, bool pause);
 
+    /// \brief load multiple worlds from single sdf::Element pointer
     void load_worlds(sdf::ElementPtr _sdf);
+
+    /// \brief initialize multiple worlds stored in static variable
+    ///        gazebo::g_worlds
     void init_worlds();
+
+    /// \brief run multiple worlds stored in static variable
+    ///        gazebo::g_worlds
     void run_worlds();
+
+    /// \brief stop multiple worlds stored in static variable
+    ///        gazebo::g_worlds
     void stop_worlds();
+
+    /// \brief pause multiple worlds stored in static variable
+    ///        gazebo::g_worlds
     void pause_worlds(bool pause);
+
+    /// \brief remove multiple worlds stored in static variable
+    ///        gazebo::g_worlds
     void remove_worlds();
 
     /// \}
