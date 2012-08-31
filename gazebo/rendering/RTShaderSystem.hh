@@ -41,6 +41,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Implements Ogre's Run-Time Shader system
     class RTShaderSystem : public SingletonT<RTShaderSystem>
     {

@@ -30,6 +30,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief A graphical selection object
     class SelectionObj
     {

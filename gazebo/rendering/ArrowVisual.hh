@@ -33,6 +33,10 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering Rendering
+    /// \{
+
+    /// \brief Basic arrow visualization
     class ArrowVisual : public Visual
     {
       public: ArrowVisual(const std::string &_name, VisualPtr _vis);
@@ -47,6 +51,7 @@ namespace gazebo
       private: Ogre::SceneNode *shaftNode;
       private: Ogre::SceneNode *rotationNode;
     };
+    /// \}
   }
 }
 #endif

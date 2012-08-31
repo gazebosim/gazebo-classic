@@ -32,7 +32,12 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
     class DynamicLines;
+
+    /// \brief Visualization for lasers
     class LaserVisual : public Visual
     {
       public: LaserVisual(const std::string &_name, VisualPtr _vis,
@@ -47,6 +52,7 @@ namespace gazebo
 
       private: DynamicLines *rayFan;
     };
+    /// \}
   }
 }
 #endif

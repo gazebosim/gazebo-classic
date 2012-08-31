@@ -27,6 +27,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief Load the sensor library
     bool load();
 

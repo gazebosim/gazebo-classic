@@ -63,6 +63,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
     /// \{
+
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.

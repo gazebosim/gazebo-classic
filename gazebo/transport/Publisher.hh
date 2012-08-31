@@ -34,6 +34,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief A publisher of messages on a topic
     class Publisher
     {

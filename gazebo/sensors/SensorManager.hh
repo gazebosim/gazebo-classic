@@ -38,6 +38,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
     {

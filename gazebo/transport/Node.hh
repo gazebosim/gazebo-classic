@@ -33,6 +33,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief A node can advertise and subscribe topics, publish on
     ///        advertised topics and listen to subscribed topics.
     class Node : public boost::enable_shared_from_this<Node>

@@ -29,6 +29,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief An IMU sensor
     class ImuSensor: public Sensor
     {

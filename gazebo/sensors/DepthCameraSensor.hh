@@ -35,9 +35,9 @@ namespace gazebo
   namespace sensors
   {
     /// \addtogroup gazebo_sensors Sensors
-    /// \brief A set of sensor classes, functions, and definitions
     /// \{
-    /// \brief Basic camera sensor
+
+    /// \brief Depth camera sensor
     /// This sensor is used for simulating standard monocular cameras
     class DepthCameraSensor : public Sensor
     {

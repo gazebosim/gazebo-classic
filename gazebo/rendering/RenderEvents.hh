@@ -25,6 +25,10 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Base class for rendering events
     class Events
     {
       public: template<typename T>
@@ -43,6 +47,7 @@ namespace gazebo
       public: static event::EventT<void (const std::string &)> createScene;
       public: static event::EventT<void (const std::string &)> removeScene;
     };
+    /// \}
   }
 }
 #endif

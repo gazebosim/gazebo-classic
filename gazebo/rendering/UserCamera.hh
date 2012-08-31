@@ -40,6 +40,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief A camera used for user visualization of a scene
     class UserCamera : public Camera
     {

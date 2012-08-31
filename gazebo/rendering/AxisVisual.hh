@@ -29,6 +29,10 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering Rendering
+    /// \{
+
+    /// \brief Basic axis visualization
     class AxisVisual : public Visual
     {
       public: AxisVisual(const std::string &_name, VisualPtr _vis);
@@ -49,6 +53,7 @@ namespace gazebo
       private: ArrowVisualPtr yAxis;
       private: ArrowVisualPtr zAxis;
     };
+    /// \}
   }
 }
 #endif

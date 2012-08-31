@@ -57,6 +57,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief A renderable object
     class Visual : public boost::enable_shared_from_this<Visual>
     {

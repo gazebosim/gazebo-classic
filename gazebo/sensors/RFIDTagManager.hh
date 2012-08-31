@@ -29,6 +29,10 @@ namespace gazebo
 {
   namespace sensors
   {
+    /// \addtogroup gazebo_sensors
+    /// \{
+
+    /// \brief RFID tag manager
     class RFIDTagManager : public SingletonT<RFIDTagManager>
     {
       public: void AddTaggedModel(RFIDTag *_model);
@@ -40,6 +44,7 @@ namespace gazebo
 
       private: friend class SingletonT<RFIDTagManager>;
     };
+    /// \}
   }
 }
 #endif

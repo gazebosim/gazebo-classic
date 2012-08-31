@@ -47,6 +47,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Wrapper around an ogre light source
     class Light
     {

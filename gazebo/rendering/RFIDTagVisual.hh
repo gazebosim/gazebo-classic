@@ -31,6 +31,10 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Visualization for RFID tags sensor
     class RFIDTagVisual : public Visual
     {
       public: RFIDTagVisual(const std::string &_name, VisualPtr _vis,
@@ -43,6 +47,7 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::SubscriberPtr laserScanSub;
     };
+    /// \}
   }
 }
 #endif
