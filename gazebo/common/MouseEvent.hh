@@ -25,6 +25,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief Generic description of a mouse event
     class MouseEvent
     {

@@ -47,6 +47,8 @@
 
 /// \file
 /// \ingroup gazebo_common
+/// \{
+
 /// \brief Forward declarations for the common classes
 namespace gazebo
 {
@@ -91,5 +93,6 @@ namespace gazebo
     typedef std::vector<ConnectionPtr> Connection_V;
   }
 }
+/// \}
 
 #endif

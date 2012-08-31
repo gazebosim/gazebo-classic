@@ -35,6 +35,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Output a message
     #define gzmsg (gazebo::common::Console::Instance()->ColorMsg("Msg", 32))
 

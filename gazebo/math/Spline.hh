@@ -38,6 +38,10 @@ namespace gazebo
 {
   namespace math
   {
+    /// \addtogroup gazebo_math
+    /// \{
+
+    /// \brief Splines
     class Spline
     {
       public: Spline();
@@ -99,6 +103,7 @@ namespace gazebo
       /// Matrix of coefficients
       protected: Matrix4 coeffs;
     };
+    /// \}
   }
 }
 #endif

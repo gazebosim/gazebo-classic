@@ -37,6 +37,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Encapsulates an image
     class Image
     {

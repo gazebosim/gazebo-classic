@@ -33,6 +33,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_math
     /// \{
+
     /// \brief Encapsulates a position and rotation in three space
     class Pose
     {

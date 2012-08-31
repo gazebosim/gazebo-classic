@@ -39,6 +39,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_math
     /// \{
+
     /// \brief Random number generator class
     class Rand
     {

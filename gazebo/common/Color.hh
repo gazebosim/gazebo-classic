@@ -31,6 +31,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Defines a color
     class Color
     {

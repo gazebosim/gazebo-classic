@@ -37,6 +37,7 @@
 namespace gazebo
 {
   /// \ingroup gazebo_math
+
   /// \brief Math namespace
   namespace math
   {
@@ -44,6 +45,7 @@ namespace gazebo
   /// \brief A set of classes that encapsulate math related properties and
   ///        functions.
   /// \{
+
   /// \brief An angle and related functions.
   class Angle
   {

@@ -26,6 +26,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief A key frame in an animation
     class KeyFrame
     {

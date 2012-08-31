@@ -32,6 +32,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_math
     /// \{
+
     /// \brief Generic double x, y, z vector
     class Vector3
     {
