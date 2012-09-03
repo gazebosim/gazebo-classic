@@ -94,7 +94,6 @@ void RenderEngine::Load()
   catch(common::Exception &e)
   {
     this->xAvailable = false;
-    gzerr << this->xAvailable << "\n";
     gzthrow(std::string("unable to RenderEngine::CreateContext, ") +
             std::string("disabling all rendering capabilities"));
   }
