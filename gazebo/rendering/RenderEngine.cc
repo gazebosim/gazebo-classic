@@ -248,7 +248,6 @@ void RenderEngine::Init()
   /// initialize properly
 
   // Set default mipmap level (NB some APIs ignore this)
-  gzerr << this->xAvailable << "\n";
   if (this->xAvailable)
   {
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
