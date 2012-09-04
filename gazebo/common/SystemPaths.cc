@@ -73,6 +73,7 @@ SystemPaths::SystemPaths()
   // Add some search paths
   // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
   this->suffixPaths.push_back("/media/models/");
+  this->suffixPaths.push_back("/Media/models/");
 
   this->pluginPathsFromEnv = true;
   this->gazeboPathsFromEnv = true;
