@@ -23,7 +23,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/OrbitViewController.hh"
 
-#define TYPE_STRING "OrbitViewController"
+#define TYPE_STRING "orbit"
 #define MIN_DISTANCE 0.01
 
 using namespace gazebo;
