@@ -46,6 +46,7 @@ namespace gazebo
 
   /// \addtogroup gazebo_common Common
   /// \{
+
   /// \brief A class which all plugins must inherit from
   template<class T>
   class PluginT

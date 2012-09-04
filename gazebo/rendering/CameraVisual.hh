@@ -29,7 +29,12 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering Rendering
+    /// \{
+
     class Camera;
+
+    /// \brief Basic camera visualization
     class CameraVisual : public Visual
     {
       public: CameraVisual(const std::string &_name, VisualPtr _vis);
@@ -39,6 +44,7 @@ namespace gazebo
 
       private: CameraPtr camera;
     };
+    /// \}
   }
 }
 #endif

@@ -35,6 +35,10 @@ namespace gazebo
 {
   namespace math
   {
+    /// \addtogroup gazebo_math
+    /// \{
+
+    /// \brief Spline for rotations
     class  RotationSpline
     {
       public: RotationSpline();
@@ -103,6 +107,7 @@ namespace gazebo
       protected: std::vector<Quaternion> points;
       protected: std::vector<Quaternion> tangents;
     };
+    /// \}
   }
 }
 

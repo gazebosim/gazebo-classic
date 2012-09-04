@@ -26,6 +26,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief Managers boost::asio IO
     class IOManager
     {

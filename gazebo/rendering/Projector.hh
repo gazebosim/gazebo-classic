@@ -41,7 +41,10 @@ namespace gazebo
 {
   namespace rendering
   {
-    /// \brief A Bumper controller
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Projector simulation
     class Projector
     {
       /// \brief Constructor
@@ -129,6 +132,7 @@ namespace gazebo
 
       private: ProjectorFrameListener projector;
     };
+    /// \}
   }
 }
 

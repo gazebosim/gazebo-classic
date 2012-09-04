@@ -38,6 +38,7 @@ namespace gazebo
     /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
     /// \{
+
     /// \brief Basic camera sensor
     /// This sensor is used for simulating standard monocular cameras
     class CameraSensor : public Sensor

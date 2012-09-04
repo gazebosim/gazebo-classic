@@ -33,6 +33,7 @@
 
 namespace gazebo
 {
+  ///\brief namespace for physics
   namespace physics
   {
     /// \addtogroup gazebo_physics Physics

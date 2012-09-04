@@ -24,10 +24,9 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_physics gazebo_physics_ode ODE Physics
     /// \{
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
+
     /// \brief ODE cylinder shape
     class ODECylinderShape : public CylinderShape
     {

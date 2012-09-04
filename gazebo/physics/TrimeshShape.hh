@@ -35,7 +35,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief Triangle mesh collision
+
+    /// \brief Triangle mesh collision shape
     class TrimeshShape : public Shape
     {
       /// \brief Constructor

@@ -37,6 +37,7 @@ namespace gazebo
     /// \addtogroup gazebo_transport Transport
     /// \brief Handles transportation of messages
     /// \{
+
     /// \brief A helper class to handle callbacks when messages arrive
     class CallbackHelper
     {

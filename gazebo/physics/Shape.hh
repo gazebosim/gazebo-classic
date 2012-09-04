@@ -32,6 +32,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Base class for all shapes
     class Shape : public Base
     {

@@ -42,6 +42,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Movable text
     class MovableText : public Ogre::MovableObject, public Ogre::Renderable
     {

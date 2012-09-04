@@ -36,8 +36,12 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering Rendering
+    /// \{
+
     class DynamicLines;
 
+    /// \brief baseic contact visualization
     class ContactVisual : public Visual
     {
       public: ContactVisual(const std::string &_name, VisualPtr _vis,
@@ -63,6 +67,7 @@ namespace gazebo
                };
       private: std::vector<ContactVisual::ContactPoint*> points;
     };
+    /// \}
   }
 }
 #endif

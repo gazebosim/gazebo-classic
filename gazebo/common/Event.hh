@@ -38,6 +38,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_event Events
     /// \{
+
     /// \brief Base class for all events
     class Event
     {

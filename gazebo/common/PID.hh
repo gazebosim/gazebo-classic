@@ -24,6 +24,10 @@ namespace gazebo
 {
   namespace common
   {
+    /// \addtogroup gazebo_common
+    /// \{
+
+    /// \brief Generic PID controller class.
     class PID
     {
       ///  \brief Constructor, zeros out Pid values when created and
@@ -129,6 +133,7 @@ namespace gazebo
       private: double cmdMax;
       private: double cmdMin;
     };
+    /// \}
   }
 }
 #endif

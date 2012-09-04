@@ -26,6 +26,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_math
     /// \{
+
     /// \brief A plane and related functions.
     class Plane
     {

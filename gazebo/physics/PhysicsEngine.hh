@@ -37,6 +37,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Base class for a physics engine
     class PhysicsEngine
     {
@@ -90,6 +91,7 @@ namespace gazebo
       public: CollisionPtr CreateCollision(const std::string &_shapeType,
                                            const std::string &_linkName);
 
+      /// \brief Create a physics::Shape object
       public: virtual ShapePtr CreateShape(
                   const std::string &_shapeType,
                   CollisionPtr _collision) = 0;
@@ -150,8 +152,10 @@ namespace gazebo
       public: boost::recursive_mutex* GetPhysicsUpdateMutex() const
               { return this->physicsUpdateMutex; }
 
+      /// \brief
       protected: virtual void OnRequest(ConstRequestPtr &/*_msg*/) {}
 
+      /// \brief 
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/) {}
 
       protected: WorldPtr world;

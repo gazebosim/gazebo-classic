@@ -44,6 +44,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     ///  \class Grid
     ///  \brief Displays a grid of cells, drawn with lines
     ///

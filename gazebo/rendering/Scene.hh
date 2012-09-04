@@ -70,6 +70,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Representation of an entire scene graph
     class Scene : public boost::enable_shared_from_this<Scene>
     {

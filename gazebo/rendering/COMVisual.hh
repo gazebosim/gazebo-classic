@@ -35,7 +35,12 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering Rendering
+    /// \{
+
     class DynamicLines;
+
+    /// \brief Basic Center of Mass visualization
     class COMVisual : public Visual
     {
       public: COMVisual(const std::string &_name, VisualPtr _vis);
@@ -49,6 +54,7 @@ namespace gazebo
       private: DynamicLines *crossLines;
       private: Ogre::SceneNode *boxNode;
     };
+    /// \}
   }
 }
 #endif

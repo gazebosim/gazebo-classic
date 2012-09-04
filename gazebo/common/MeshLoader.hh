@@ -29,6 +29,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Base class for loading meshes
     class MeshLoader
     {

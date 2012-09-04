@@ -34,6 +34,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Class for drawing lines
     class DynamicLines : public DynamicRenderable
     {

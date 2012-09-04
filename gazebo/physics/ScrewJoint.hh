@@ -33,8 +33,9 @@ namespace gazebo
 {
   namespace physics
   {
-/// \addtogroup gazebo_screw_joint Screw Joint
-/// \{
+    /// \addtogroup gazebo_physics gazebo_screw_joint Screw Joint
+    /// \{
+
     /// \brief A screw joint
     template<class T>
     class ScrewJoint : public T

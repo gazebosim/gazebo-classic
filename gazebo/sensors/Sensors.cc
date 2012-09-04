@@ -35,10 +35,7 @@ bool sensors::load()
   sensors::SensorFactory::RegisterAll();
 
   // Load the rendering system
-  if (!gazebo::rendering::load())
-    gzthrow("Unable to load the rendering engine");
-
-  return true;
+  return gazebo::rendering::load();
 }
 
 /////////////////////////////////////////////////

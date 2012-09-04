@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
@@ -157,7 +158,8 @@ void Camera::Load()
 
   if (this->sdf->HasElement("horizontal_fov"))
   {
-    double angle = this->sdf->GetValueDouble("horizontal_fov");
+    sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
+    double angle = elem->GetValueDouble();
     if (angle < 0.01 || angle > M_PI)
     {
       gzthrow("Camera horizontal field of veiw invalid.");

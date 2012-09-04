@@ -38,7 +38,9 @@ namespace gazebo
 
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief Map collision
+
+    /// Creates box extrusions based on an image.
+    /// This function is not yet complete, to be implemented.
     class MapShape : public Shape
     {
       /// \brief Constructor
@@ -56,14 +58,30 @@ namespace gazebo
       /// \brief Init the map
       public: virtual void Init();
 
+      /// \brief Fills out a msgs::Geometry message containing
+      ///        information about this map geometry object.
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
+      /// \brief Not yet implemented.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
+      /// \brief Returns the image filename givne for this geometry.
       public: std::string GetFilename() const;
+
+      /// \brief Returns scaling factor for this geometry.
       public: double GetScale() const;
+
+      /// \brief Returns image threshold for this geometry.
+      ///        All regions in image with value larger than MapShape::scale
+      ///        will be replaced by boxes with MapShape::height.
       public: int GetThreshold() const;
+
+      /// \brief Returns height of this geometry.  All regions in image with
+      ///        value larger than MapShape::scale will be replaced by boxes
+      ///        with MapShape::height.
       public: double GetHeight() const;
+
+      /// \brief Returns granularity of this geometry.
       public: int GetGranularity() const;
 
       /// \brief Build the quadtree
@@ -81,6 +99,7 @@ namespace gazebo
       /// \brief Try to merge to nodes
       private: void Merge(QuadNode *nodeA, QuadNode *nodeB);
 
+      /// \brief Create boxes that represents the map.
       private: void CreateBox();
 
       /// \brief Create the boxes for the map

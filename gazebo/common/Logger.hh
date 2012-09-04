@@ -34,6 +34,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Handles logging of data to disk
     class Logger : public SingletonT<Logger>
     {
