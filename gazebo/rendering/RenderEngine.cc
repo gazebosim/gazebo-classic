@@ -502,7 +502,6 @@ void RenderEngine::SetupRenderSystem()
   rsList = &(this->root->getAvailableRenderers());
 #endif
 
-
   int c = 0;
 
   renderSys = NULL;
