@@ -12,7 +12,7 @@
     </attribute>
 
 
-    <element name="view_controller" type="string" default="oribit" required="0">
+    <element name="view_controller" type="string" default="orbit" required="0">
       <description></description>
     </element>
 
