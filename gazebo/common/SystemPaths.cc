@@ -27,9 +27,10 @@
 #include <fstream>
 #include <sstream>
 
-#include "common/SystemPaths.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -68,6 +69,14 @@ SystemPaths::SystemPaths()
   this->UpdateGazeboPaths();
   this->UpdatePluginPaths();
   this->UpdateOgrePaths();
+
+  // Add some search paths
+  // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
+  this->suffixPaths.push_back("/media/models/");
+
+  this->pluginPathsFromEnv = true;
+  this->gazeboPathsFromEnv = true;
+  this->ogrePathsFromEnv = true;
 }
 
 /////////////////////////////////////////////////
@@ -79,18 +88,24 @@ std::string SystemPaths::GetLogPath() const
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {
+  if (this->gazeboPathsFromEnv)
+    this->UpdateGazeboPaths();
   return this->gazeboPaths;
 }
 
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetPluginPaths()
 {
+  if (this->pluginPathsFromEnv)
+    this->UpdatePluginPaths();
   return this->pluginPaths;
 }
 
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetOgrePaths()
 {
+  if (this->ogrePathsFromEnv)
+    this->UpdateOgrePaths();
   return this->ogrePaths;
 }
 
@@ -190,6 +205,12 @@ std::string SystemPaths::GetWorldPathExtension()
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
 {
+  return this->FindFile(_filename);
+}
+
+//////////////////////////////////////////////////
+std::string SystemPaths::FindFile(const std::string &_filename)
+{
   if (_filename[0] == '/')
     return _filename;
 
@@ -197,7 +218,7 @@ std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
   std::string fullname = std::string("./")+_filename;
   bool found = false;
 
-  std::list<std::string> paths = GetGazeboPaths();
+  std::list<std::string> paths = this->GetGazeboPaths();
 
   if (stat(fullname.c_str(), &st) == 0)
   {
@@ -211,7 +232,7 @@ std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
   else
   {
     for (std::list<std::string>::const_iterator iter = paths.begin();
-        iter != paths.end(); ++iter)
+        iter != paths.end() && !found; ++iter)
     {
       fullname = (*iter) + "/" + _filename;
       if (stat(fullname.c_str(), &st) == 0)
@@ -220,13 +241,16 @@ std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
         break;
       }
 
-      // also search under some default hardcoded subdirectories
-      // is this a good idea?
-      fullname = (*iter)+"/Media/models/"+_filename;
-      if (stat(fullname.c_str(), &st) == 0)
+      std::list<std::string>::iterator suffixIter;
+      for (suffixIter = this->suffixPaths.begin();
+           suffixIter != this->suffixPaths.end(); ++suffixIter)
       {
-        found = true;
-        break;
+        fullname = (*iter) + *suffixIter + _filename;
+        if (stat(fullname.c_str(), &st) == 0)
+        {
+          found = true;
+          break;
+        }
       }
     }
   }
@@ -234,7 +258,8 @@ std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
   if (!found)
   {
     fullname.clear();
-    gzerr << "cannot load file [" << _filename << "]in GAZEBO_RESOURCE_PATH\n";
+    gzerr << "cannot load file [" << _filename << "]in GAZEBO_RESOURCE_PATH["
+      << getenv("GAZEBO_RESOURCE_PATH") << "]\n";
   }
 
   return fullname;
@@ -310,4 +335,22 @@ void SystemPaths::InsertUnique(const std::string &_path,
 {
   if (std::find(_list.begin(), _list.end(), _path) == _list.end())
     _list.push_back(_path);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
+{
+  std::string s;
+
+  if (_suffix[0] != '/')
+    s = std::string("/") + _suffix;
+  else
+    s = _suffix;
+
+  if (_suffix[_suffix.size()-1] != '/')
+    s += "/";
+
+  std::cout << "AddSuffix[" << _suffix << "]\n";
+
+  this->suffixPaths.push_back(s);
 }
