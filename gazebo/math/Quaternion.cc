@@ -36,8 +36,6 @@ Quaternion::Quaternion(const double &_w, const double &_x,
                        const double &_y, const double &_z)
     : w(_w), x(_x), y(_y), z(_z)
 {
-  // FIXME:  why does this break pr2?
-  // this->Normalize();
 }
 
 //////////////////////////////////////////////////
