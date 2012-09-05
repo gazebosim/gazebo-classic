@@ -24,7 +24,8 @@
 #include <string>
 #include <vector>
 
-#include "rendering/Visual.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace Ogre
 {
