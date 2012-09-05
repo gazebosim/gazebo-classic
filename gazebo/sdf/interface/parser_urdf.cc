@@ -869,7 +869,7 @@ void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root, boost::shared_ptr<urdf::
         // go down the tree until we hit a parent joint that is not fixed
         boost::shared_ptr<urdf::Link> new_parent_link = link;
         gazebo::math::Pose joint_anchor_transform; // set to identity first
-        while(new_parent_link->parent_joint && new_parent_link->parent_joint->type == urdf::Joint::FIXED) {
+        while(new_parent_link->parent_joint && new_parent_link->getParent()->name != "world" && new_parent_link->parent_joint->type == urdf::Joint::FIXED) {
           logDebug("  ...JOINT: searching: at [%s] checking if parent [%s] is attachable",new_parent_link->name.c_str(),new_parent_link->getParent()->name.c_str());
           joint_anchor_transform = joint_anchor_transform*joint_anchor_transform;
           parent_joint->parent_to_joint_origin_transform = transformToParentFrame(parent_joint->parent_to_joint_origin_transform,
@@ -911,9 +911,7 @@ urdf::Pose  URDF2Gazebo::transformToParentFrame(urdf::Pose transform_in_link_fra
     // transform to gazebo::math::Pose then call transformToParentFrame
     gazebo::math::Pose p1 = URDF2Gazebo::copyPose(transform_in_link_frame);
     gazebo::math::Pose p2 = URDF2Gazebo::copyPose(parent_to_link_transform);
-    gazebo::math::Pose pose = transformToParentFrame(p1,p2);
-    urdf::Pose urdf_pose = URDF2Gazebo::copyPose(pose);
-    return urdf_pose;
+    return URDF2Gazebo::copyPose(transformToParentFrame(p1,p2));
 }
 gazebo::math::Pose  URDF2Gazebo::transformToParentFrame(gazebo::math::Pose transform_in_link_frame, urdf::Pose parent_to_link_transform)
 {
@@ -1132,6 +1130,7 @@ void URDF2Gazebo::updateGazeboExtensionFrameReplace(GazeboExtension* ge, boost::
               xyz_key = new TiXmlElement("xyzOffset");
               rpy_key = new TiXmlElement("rpyOffset");
 
+              // create new offset xml blocks
               urdf::Vector3 reduction_xyz(ge->reduction_transform.pos.x,ge->reduction_transform.pos.y,ge->reduction_transform.pos.z);
               urdf::Rotation reduction_q(ge->reduction_transform.rot.x,ge->reduction_transform.rot.y,ge->reduction_transform.rot.z,ge->reduction_transform.rot.w);
 
@@ -1504,7 +1503,7 @@ void URDF2Gazebo::createBody(TiXmlElement *root, boost::shared_ptr<const urdf::L
     {
       logDebug("%s has a parent joint",link->name.c_str());
       localTransform = URDF2Gazebo::copyPose(link->parent_joint->parent_to_joint_origin_transform);
-      currentTransform = currentTransform*localTransform;
+      currentTransform = localTransform * currentTransform;
     }
     else
       logDebug("%s has no parent joint",link->name.c_str());
