@@ -85,8 +85,7 @@ namespace gazebo
               Quaternion q(this->w, this->x, this->y, this->z);
 
               // use s to test if quaternion is valid
-              s = sqrt(q.w * q.w + q.x * q.x + q.y * q.y +
-                       q.z * q.z);
+              s = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 
               if (math::equal(s, 0))
               {
@@ -97,12 +96,12 @@ namespace gazebo
               }
               else
               {
-                // not normalized so inverse of non-normalized
-                // quaternion is correct
-                q.w = q.w;
-                q.x = -q.x;
-                q.y = -q.y;
-                q.z = -q.z;
+                // deal with non-normalized quaternion
+                // div by s so q * qinv = identity
+                q.w =  q.w / s;
+                q.x = -q.x / s;
+                q.y = -q.y / s;
+                q.z = -q.z / s;
               }
               return q;
             }
