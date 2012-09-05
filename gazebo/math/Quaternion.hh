@@ -84,6 +84,7 @@ namespace gazebo
               double s = 0;
               Quaternion q(this->w, this->x, this->y, this->z);
 
+              // use s to test if quaternion is valid
               s = sqrt(q.w * q.w + q.x * q.x + q.y * q.y +
                        q.z * q.z);
 
@@ -96,10 +97,12 @@ namespace gazebo
               }
               else
               {
-                q.w = q.w / s;
-                q.x = -q.x / s;
-                q.y = -q.y / s;
-                q.z = -q.z / s;
+                // not normalized so inverse of non-normalized
+                // quaternion is correct
+                q.w = q.w;
+                q.x = -q.x;
+                q.y = -q.y;
+                q.z = -q.z;
               }
               return q;
             }
