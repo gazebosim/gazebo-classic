@@ -35,9 +35,9 @@ namespace gazebo
     class BulletMotionState;
 
     /// \addtogroup gazebo_physics
-    /// \brief The body class
     /// \{
-    /// Link class
+
+    /// \brief Bullet Link class
     class BulletLink : public Link
     {
       /// \brief Constructor

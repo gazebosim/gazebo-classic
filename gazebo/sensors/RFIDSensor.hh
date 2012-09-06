@@ -35,6 +35,10 @@ namespace gazebo
 {
   namespace sensors
   {
+    /// \addtogroup gazebo_sensors
+    /// \{
+
+    /// \brief RFID sensor
     class RFIDSensor: public Sensor
     {
       /// \brief  Constructor
@@ -72,6 +76,7 @@ namespace gazebo
 
       private: RFIDTagManager *rtm;
     };
+    /// \}
   }
 }
 #endif

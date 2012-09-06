@@ -26,6 +26,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Abstract base class providing mechanisms for dynamically
     ///        growing hardware buffers.
     class DynamicRenderable : public Ogre::SimpleRenderable

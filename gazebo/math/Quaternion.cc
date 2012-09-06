@@ -29,6 +29,8 @@ using namespace math;
 Quaternion::Quaternion()
     : w(1), x(0), y(0), z(0)
 {
+  // quaternion not normalized, because that breaks
+  // Pose::CoordPositionAdd(...)
 }
 
 //////////////////////////////////////////////////
@@ -36,8 +38,6 @@ Quaternion::Quaternion(const double &_w, const double &_x,
                        const double &_y, const double &_z)
     : w(_w), x(_x), y(_y), z(_z)
 {
-  // FIXME:  why does this break pr2?
-  // this->Normalize();
 }
 
 //////////////////////////////////////////////////

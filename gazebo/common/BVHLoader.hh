@@ -38,6 +38,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief Handles loading BVH animation files
     class BVHLoader
     {
@@ -53,6 +54,7 @@ namespace gazebo
       /// \return A pointer to a new Skeleton
       public: Skeleton* Load(const std::string &_filename, double _scale);
     };
+    /// \}
   }
 }
 

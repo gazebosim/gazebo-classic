@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <gazebo version="1.2">
   <model name="pioneer2dx">
     <link name="chassis">

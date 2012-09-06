@@ -51,8 +51,18 @@ Joint::~Joint()
 //////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 {
-  this->world = _parent->GetWorld();
-  this->model = _parent->GetModel();
+  if (_parent)
+  {
+    this->world = _parent->GetWorld();
+    this->model = _parent->GetModel();
+  }
+  else if (_child)
+  {
+    this->world = _child->GetWorld();
+    this->model = _child->GetModel();
+  }
+  else
+    gzthrow("both parent and child link do no exist");
 
   this->parentLink = _parent;
   this->childLink = _child;
@@ -211,9 +221,8 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
     vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
   else if (this->sdf->HasElement("axis2"))
     vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
-
-  vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
-  vec.Round();
+  // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
+  // vec.Round();
   return vec;
 }
 

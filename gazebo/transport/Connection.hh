@@ -50,6 +50,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief TCP/IP Connection
     class Connection : public boost::enable_shared_from_this<Connection>
     {

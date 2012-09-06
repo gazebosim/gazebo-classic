@@ -35,6 +35,9 @@ namespace gazebo
 {
   namespace math
   {
+    /// \addtogroup gazebo_math
+    /// \{
+
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
     static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
 
@@ -44,6 +47,7 @@ namespace gazebo
       return std::max(std::min(_v, _max), _min);
     }
 
+    /// \brief check if a float is NaN
     inline bool isnan(float _v)
     {
       return (boost::math::isnan)(_v);
@@ -198,6 +202,7 @@ namespace gazebo
       }
       return s * acc;
     }
+    /// \}
   }
 }
 #endif

@@ -40,6 +40,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Laser collision contains a set of ray-collisions,
     ///        structured to simulate a laser range scanner
     class MultiRayShape : public Shape
@@ -117,7 +118,7 @@ namespace gazebo
       /// Ray data
       protected: std::vector<RayShapePtr> rays;
 
-      protected: math::Vector3 offset;
+      protected: math::Pose offset;
       protected: sdf::ElementPtr rayElem;
       protected: sdf::ElementPtr scanElem;
       protected: sdf::ElementPtr horzElem;

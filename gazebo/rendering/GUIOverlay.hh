@@ -49,6 +49,10 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief GUI overlays
     class GUIOverlay
     {
       public: GUIOverlay();
@@ -123,6 +127,7 @@ namespace gazebo
       private: unsigned int rttImageSetCount;
       private: bool initialized;
     };
+    /// \}
   }
 }
 

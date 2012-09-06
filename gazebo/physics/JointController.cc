@@ -68,6 +68,7 @@ void JointController::Update()
       this->joints[iter->first]->SetForce(0, iter->second);
   }
 
+  /*
   if (this->positions.size() > 0)
   {
     double cmd;
@@ -80,7 +81,7 @@ void JointController::Update()
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
-  }
+  }*/
 
   if (this->velocities.size() > 0)
   {
@@ -97,7 +98,7 @@ void JointController::Update()
     }
   }
 
-  /* Disabled for now. Collisions don't update properly
+  // Disabled for now. Collisions don't update properly
   if (this->positions.size() > 0)
   {
     std::map<std::string, JointPtr>::iterator iter;
@@ -109,7 +110,6 @@ void JointController::Update()
     this->SetJointPositions(this->positions);
     this->positions.clear();
   }
-  */
 }
 
 /////////////////////////////////////////////////
@@ -197,6 +197,11 @@ void JointController::SetJointPositions(
 //////////////////////////////////////////////////
 void JointController::SetJointPosition(JointPtr _joint, double _position)
 {
+  // truncate position by joint limits
+  double lower = _joint->GetLowStop(0).GetAsRadian();
+  double upper = _joint->GetHighStop(0).GetAsRadian();
+  _position = _position < lower? lower : (_position > upper? upper : _position); 
+
   // keep track of updatd links, make sure each is upated only once
   this->updated_links.clear();
 

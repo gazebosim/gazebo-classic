@@ -32,7 +32,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common
     /// \{
-    /// Throw an error
+
+    /// Throws an error
     #define gzthrow(msg) {std::ostringstream throwStream;\
       throwStream << msg << std::endl << std::flush;\
       throw gazebo::common::Exception(__FILE__, __LINE__, throwStream.str()); }

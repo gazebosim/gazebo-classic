@@ -40,8 +40,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
-    /// \brief Sensor with one or more rays.
-    ///
+
+    /// \brief Ray or laser sensor with one or more rays.
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).

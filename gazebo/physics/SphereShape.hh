@@ -31,6 +31,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Sphere collision
     class SphereShape : public Shape
     {

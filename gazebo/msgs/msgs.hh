@@ -40,6 +40,7 @@ namespace gazebo
     /// \addtogroup gazebo_msgs Messages
     /// \brief All messages and helper functions
     /// \{
+
     /// \brief Create a request message
     /// \param _request Request string
     /// \param _data Optional data string

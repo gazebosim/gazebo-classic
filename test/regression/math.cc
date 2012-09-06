@@ -15,6 +15,7 @@
  *
 */
 #include <string.h>
+#include "common/Console.hh"
 #include "math/gzmath.hh"
 #include "msgs/msgs.hh"
 #include "ServerFixture.hh"
@@ -629,23 +630,11 @@ TEST_F(MathTest, Quaternion)
   q = q * 5.0;
   EXPECT_TRUE(q == math::Quaternion(7.67918, -1.184, 2.7592, 4.0149));
 
+  gzerr << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
+  gzerr << q.RotateVectorReverse(math::Vector3(1, 2, 3)) << "\n";
+
   EXPECT_TRUE(q.RotateVectorReverse(math::Vector3(1, 2, 3)) ==
       math::Vector3(-0.104115, 0.4975, 3.70697));
-
-  EXPECT_TRUE(q.GetXAxis() == math::Vector3(-46.4652, 55.1284, -51.8841));
-  EXPECT_TRUE(q.GetYAxis() == math::Vector3(-68.196, -34.0425, 3.97149));
-  EXPECT_TRUE(q.GetZAxis() == math::Vector3(32.8695, 40.3402, -17.0301));
-
-  EXPECT_TRUE(-q == math::Quaternion(-7.67918, 1.184, -2.7592, -4.0149));
-  EXPECT_TRUE(q.GetAsMatrix3() == math::Matrix3(
-       0.435639, -0.810851, 0.390819,
-       0.655477, 0.583344, 0.479645,
-       -0.616903, 0.047221, 0.785622));
-  EXPECT_TRUE(q.GetAsMatrix4() == math::Matrix4(
-       0.435639, -0.810851, 0.390819, 0,
-       0.655477, 0.583344, 0.479645, 0,
-       -0.616903, 0.047221, 0.785622, 0,
-       0, 0, 0, 1));
 
   EXPECT_TRUE(math::equal(q.Dot(math::Quaternion(.4, .2, .1)), 7.67183, 1e-3));
 
@@ -677,6 +666,90 @@ TEST_F(MathTest, Quaternion)
   q.GetAsAxis(axis, angle);
   EXPECT_TRUE(axis == math::Vector3(1, 0, 0));
   EXPECT_TRUE(math::equal(angle, 0.0, 1e-3));
+  {
+    // simple 180 rotation about yaw, should result in x and y flipping signs
+    q = math::Quaternion(0, 0, M_PI);
+    math::Vector3 v = math::Vector3(1, 2, 3);
+    math::Vector3 r1 = q.RotateVector(v);
+    math::Vector3 r2 = q.RotateVectorReverse(v);
+    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
+    gzdbg << " forward turns [" << v << "] to [" << r1 << "]\n";
+    gzdbg << " reverse turns [" << v << "] to [" << r2 << "]\n";
+    EXPECT_TRUE(r1 == math::Vector3(-1, -2, 3));
+    EXPECT_TRUE(r2 == math::Vector3(-1, -2, 3));
+  }
+
+  {
+    // simple  90 rotation about yaw, should map x to y, y to -x
+    // simple -90 rotation about yaw, should map x to -y, y to x
+    q = math::Quaternion(0, 0, 0.5*M_PI);
+    math::Vector3 v = math::Vector3(1, 2, 3);
+    math::Vector3 r1 = q.RotateVector(v);
+    math::Vector3 r2 = q.RotateVectorReverse(v);
+    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
+    gzdbg << " forward turns [" << v << "] to [" << r1 << "]\n";
+    gzdbg << " reverse turns [" << v << "] to [" << r2 << "]\n";
+    gzdbg << " x axis [" << q.GetXAxis() << "]\n";
+    gzdbg << " y axis [" << q.GetYAxis() << "]\n";
+    gzdbg << " z axis [" << q.GetZAxis() << "]\n";
+    EXPECT_TRUE(r1 == math::Vector3(-2, 1, 3));
+    EXPECT_TRUE(r2 == math::Vector3(2, -1, 3));
+    EXPECT_TRUE(q.GetInverse().GetXAxis() == math::Vector3(0, -1, 0));
+    EXPECT_TRUE(q.GetInverse().GetYAxis() == math::Vector3(1, 0, 0));
+    EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(0, 0, 1));
+  }
+
+  {
+    // now try a harder case (axis[1,2,3], rotation[0.3*pi])
+    // verified with octave
+    q.SetFromAxis(math::Vector3(1, 2, 3), 0.3*M_PI);
+    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
+    gzdbg << " x [" << q.GetInverse().GetXAxis() << "]\n";
+    gzdbg << " y [" << q.GetInverse().GetYAxis() << "]\n";
+    gzdbg << " z [" << q.GetInverse().GetZAxis() << "]\n";
+    EXPECT_TRUE(q.GetInverse().GetXAxis() == math::Vector3(0.617229, -0.589769, 0.520770));
+    EXPECT_TRUE(q.GetInverse().GetYAxis() == math::Vector3(0.707544, 0.705561, -0.039555));
+    EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(-0.344106, 0.392882, 0.852780));
+  
+    // rotate about the axis of rotation should not change axis
+    math::Vector3 v = math::Vector3(1, 2, 3);
+    math::Vector3 r1 = q.RotateVector(v);
+    math::Vector3 r2 = q.RotateVectorReverse(v);
+    EXPECT_TRUE(r1 == math::Vector3(1, 2, 3));
+    EXPECT_TRUE(r2 == math::Vector3(1, 2, 3));
+  
+    // rotate unit vectors
+    v = math::Vector3(0, 0, 1);
+    r1 = q.RotateVector(v);
+    r2 = q.RotateVectorReverse(v);
+    EXPECT_TRUE(r1 == math::Vector3(0.520770, -0.039555, 0.852780));
+    EXPECT_TRUE(r2 == math::Vector3(-0.34411, 0.39288, 0.85278));
+    v = math::Vector3(0, 1, 0);
+    r1 = q.RotateVector(v);
+    r2 = q.RotateVectorReverse(v);
+    EXPECT_TRUE(r1 == math::Vector3(-0.58977, 0.70556, 0.39288));
+    EXPECT_TRUE(r2 == math::Vector3(0.707544, 0.705561, -0.039555));
+    v = math::Vector3(1, 0, 0);
+    r1 = q.RotateVector(v);
+    r2 = q.RotateVectorReverse(v);
+    EXPECT_TRUE(r1 == math::Vector3(0.61723, 0.70754, -0.34411));
+    EXPECT_TRUE(r2 == math::Vector3(0.61723, -0.58977, 0.52077));
+
+    EXPECT_TRUE(-q == math::Quaternion(-0.891007, -0.121334, -0.242668, -0.364002));
+
+    EXPECT_TRUE(q.GetAsMatrix3() == math::Matrix3(
+                0.617229, -0.589769, 0.52077,
+                0.707544, 0.705561, -0.0395554,
+                -0.344106, 0.392882, 0.85278));
+
+    EXPECT_TRUE(q.GetAsMatrix4() == math::Matrix4(
+                0.617229, -0.589769, 0.52077, 0,
+                0.707544, 0.705561, -0.0395554, 0,
+                -0.344106, 0.392882, 0.85278, 0,
+                0, 0, 0, 1));
+  }
+
+
 }
 
 TEST_F(MathTest, Pose)

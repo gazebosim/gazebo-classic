@@ -31,6 +31,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief A timer class
     class Timer
     {

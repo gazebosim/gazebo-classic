@@ -357,13 +357,15 @@ void Element::PrintDoc(std::string &_divs, std::string &_html,
 
   stream << "<a href=\"javascript:animatedcollapse.toggle('"
             << start << "')\">+ &lt" << this->name << "&gt</a>";
-  stream << "<a style='padding-left: 5px' href=\"javascript:animatedcollapse.toggle([";
+  stream << "<a style='padding-left: 5px' "
+         << "href=\"javascript:animatedcollapse.toggle([";
   int i;
-  for (i=start; i <end-1; ++i)
+  for (i = start; i < end - 1; ++i)
     stream << "'" << i << "',";
   stream << "'" << i << "'])\">all</a><br>";
 
-  stream << "<div id='" << start << "' style='padding-left:" << _spacing << "px; display:none; width: 404px;'>\n";
+  stream << "<div id='" << start << "' style='padding-left:" << _spacing
+         << "px; display:none; width: 404px;'>\n";
 
   stream << "<div style='background-color: #ffffff'>\n";
 
@@ -386,7 +388,8 @@ void Element::PrintDoc(std::string &_divs, std::string &_html,
 
   if (this->attributes.size() > 0)
   {
-    stream << "<div style='background-color: #dedede; padding-left:10px; display:inline-block;'>\n";
+    stream << "<div style='background-color: #dedede; padding-left:10px; "
+           << "display:inline-block;'>\n";
     stream << "<font style='font-weight:bold'>Attributes</font><br>";
 
     Param_V::iterator aiter;
@@ -1261,43 +1264,36 @@ void SDF::PrintDoc()
   int index = 0;
   this->root->PrintDoc(divs, html, 10, index);
 
-  std::cout << "\
-  <!DOCTYPE HTML>\n\
-  <html>\n\
-  <head>\n\
-    <link href='style.css' rel='stylesheet' type='text/css'>\n\
-    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'></script>\n\
-    <script type='text/javascript' src='animatedcollapse.js'>\n\
-    /***********************************************\n\
-     * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code\n\
-     * library (www.dynamicdrive.com)\n\
-     * This notice MUST stay intact for legal use\n\
-     * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this\n\
-     * script and 100s more\n\
-     ***********************************************/\n\
-    </script>\n\
-    <script type='text/javascript'>\n";
+  std::cout << "<!DOCTYPE HTML>\n"
+  << "<html>\n"
+  << "<head>\n"
+  << "  <link href='style.css' rel='stylesheet' type='text/css'>\n"
+  << "  <script type='text/javascript'"
+  << "  src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'>"
+  << "  </script>\n"
+  << "  <script type='text/javascript' src='animatedcollapse.js'>\n"
+  << "  /***********************************************\n"
+  << "   * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code\n"
+  << "   * library (www.dynamicdrive.com)\n"
+  << "   * This notice MUST stay intact for legal use\n"
+  << "   * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this\n"
+  << "   * script and 100s more\n"
+  << "   ***********************************************/\n"
+  << "  </script>\n"
+  << "  <script type='text/javascript'>\n";
 
   std::cout << divs << "\n";
 
-  std::cout << "\
-      animatedcollapse.ontoggle=function($, divobj, state)\n\
-      { //fires each time a DIV is expanded/contracted\n\
-          //$: Access to jQuery\n\
-          //divobj: DOM reference to DIV being expanded/ collapsed. Use\n\
-          // 'divobj.id' to get its ID\n\
-          // state: 'block' or 'none', depending on state\n\
-       }\n\
-       animatedcollapse.init()\n\
-      </script>\n\
-    </head>\n\
-    <body>\n";
+  std::cout << "animatedcollapse.ontoggle=function($, divobj, state)\n"
+      << "{ }\n animatedcollapse.init()\n </script>\n";
+  std::cout << "</head>\n<body>\n";
 
   std::cout << "<div style='padding:4px'>\n"
             << "<h1>SDF " << SDF::version << "</h1>\n";
 
-  std::cout << "<p>The Simulation Description Format (SDF) is an XML file format used to describe all the elements in a simulation environment.\n";
-  std::cout << "</p>";
+  std::cout << "<p>The Simulation Description Format (SDF) is an XML file "
+    << "format used to describe all the elements in a simulation "
+    << "environment.\n</p>";
 
   std::cout << "<div style='margin-left: 20px'>\n";
   std::cout << html;

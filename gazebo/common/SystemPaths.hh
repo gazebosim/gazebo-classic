@@ -44,6 +44,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Functions to handle getting system paths
     class SystemPaths : public SingletonT<SystemPaths>
     {
@@ -106,6 +107,15 @@ namespace gazebo
       private: std::list<std::string> suffixPaths;
 
       private: std::string logPath;
+
+      /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
+      public: bool gazeboPathsFromEnv;
+
+      /// \brief if true, call UpdatePluginPaths() within GetPluginPaths()
+      public: bool pluginPathsFromEnv;
+
+      /// \brief if true, call UpdateOgrePaths() within GetOgrePaths()
+      public: bool ogrePathsFromEnv;
 
       private: friend class SingletonT<SystemPaths>;
     };

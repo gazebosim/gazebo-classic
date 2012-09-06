@@ -36,6 +36,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
     class Animation
@@ -98,10 +99,11 @@ namespace gazebo
       protected: typedef std::vector<KeyFrame*> KeyFrame_V;
       protected: KeyFrame_V keyFrames;
     };
-    /// /}
+    /// \}
 
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief A pose animation.
     class PoseAnimation : public Animation
     {
@@ -140,6 +142,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief A numeric animation.
     class NumericAnimation : public Animation
     {

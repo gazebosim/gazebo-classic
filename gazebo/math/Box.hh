@@ -26,7 +26,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_math
     /// \{
-    /// \brief A box and related functions.
+
+    /// \brief Mathematical representation of a box and related functions.
     class Box
     {
       /// \brief Default constructor

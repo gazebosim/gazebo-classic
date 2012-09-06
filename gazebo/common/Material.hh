@@ -27,6 +27,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Encapsulates a description of a material
     class Material
     {

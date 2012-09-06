@@ -31,6 +31,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
     /// environment variable
     /// \param master_host The hostname of the master is set to this param

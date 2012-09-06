@@ -71,8 +71,13 @@ SystemPaths::SystemPaths()
   this->UpdateOgrePaths();
 
   // Add some search paths
-  //this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
+  // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
   this->suffixPaths.push_back("/media/models/");
+  this->suffixPaths.push_back("/Media/models/");
+
+  this->pluginPathsFromEnv = true;
+  this->gazeboPathsFromEnv = true;
+  this->ogrePathsFromEnv = true;
 }
 
 /////////////////////////////////////////////////
@@ -84,21 +89,24 @@ std::string SystemPaths::GetLogPath() const
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {
-  this->UpdateGazeboPaths();
+  if (this->gazeboPathsFromEnv)
+    this->UpdateGazeboPaths();
   return this->gazeboPaths;
 }
 
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetPluginPaths()
 {
-  this->UpdatePluginPaths();
+  if (this->pluginPathsFromEnv)
+    this->UpdatePluginPaths();
   return this->pluginPaths;
 }
 
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetOgrePaths()
 {
-  this->UpdateOgrePaths();
+  if (this->ogrePathsFromEnv)
+    this->UpdateOgrePaths();
   return this->ogrePaths;
 }
 

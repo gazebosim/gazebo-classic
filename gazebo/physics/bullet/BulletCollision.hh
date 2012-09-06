@@ -43,9 +43,9 @@ namespace gazebo
   namespace physics
   {
     /// \addtogroup gazebo_physics_ode
-    /// \brief Base class for all Bullet collisions
     /// \{
-    /// \brief Base class for all collisions
+
+    /// \brief Bullet collisions
     class BulletCollision : public Collision
     {
       /// \brief Constructor

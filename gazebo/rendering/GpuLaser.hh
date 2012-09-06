@@ -63,9 +63,9 @@ namespace gazebo
     class Scene;
 
     /// \addtogroup gazebo_rendering Rendering
-    /// \brief A set of rendering related class, functions, and definitions
     /// \{
-    /// \brief Basic camera sensor
+
+    /// \brief GPU based laser distance sensor
     ///
     /// This is the base class for all cameras.
     class GpuLaser : public Camera, public Ogre::RenderObjectListener

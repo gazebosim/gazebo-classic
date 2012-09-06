@@ -33,6 +33,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
+
     /// \brief A publication for a topic. This facilitates transport of
     /// messages
     class Publication

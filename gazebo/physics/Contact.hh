@@ -42,6 +42,7 @@ namespace gazebo
     class Collision;
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief A contact between two collisions. Each contact can consist of
     ///        a numnber of contact points
     class Contact

@@ -36,7 +36,10 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \brief Height map collision
+
+    /// HeightmapShape collision shape builds a heightmap from
+    /// an image.  The supplied image must be square with
+    /// N*N+1 pixels per side, where N is an integer.
     class HeightmapShape : public Shape
     {
       /// \brief Constructor

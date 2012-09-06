@@ -20,7 +20,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/FPSViewController.hh"
 
-#define TYPE_STRING "FPSViewController"
+#define TYPE_STRING "fps"
 
 using namespace gazebo;
 using namespace rendering;

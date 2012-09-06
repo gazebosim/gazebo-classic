@@ -30,7 +30,6 @@
 
 namespace sdf
 {
-
 std::string find_file(const std::string &_filename)
 {
   FILE *test = fopen(_filename.c_str(), "r");
@@ -769,6 +768,4 @@ void addNestedModel(ElementPtr _sdf, ElementPtr _includeSDF)
     elem = nextElem;
   }
 }
-
 }
-

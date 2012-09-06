@@ -38,6 +38,9 @@
                   erp = hk / (hk + r);
                   cfm = 1.0f / (hk + r);
       }
+      in the end,
+      erp = dt * kp / ( dt * kp + kd )
+      cfm = 1 / ( dt * kp + kd )
     -->
     <model name="model_0">
       <pose>0.0 0.0 2.1 0 0.0 0.0</pose>

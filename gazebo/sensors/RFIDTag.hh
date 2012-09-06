@@ -32,6 +32,10 @@ namespace gazebo
 {
   namespace sensors
   {
+    /// \addtogroup gazebo_sensors
+    /// \{
+
+    /// \brief RFID tag sensor
     class RFIDTag: public Sensor
     {
       /// \brief  Constructor
@@ -62,6 +66,7 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
     };
+    /// \}
   }
 }
 #endif

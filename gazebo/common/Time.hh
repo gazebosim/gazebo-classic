@@ -32,6 +32,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief A Time class
     class Time
     {

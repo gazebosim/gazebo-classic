@@ -38,6 +38,7 @@ namespace gazebo
 
     /// \addtogroup gazebo_common Common
     /// \{
+
     /// \brief Maintains and manages all meshes
     class MeshManager : public SingletonT<MeshManager>
     {

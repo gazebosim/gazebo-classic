@@ -42,6 +42,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
     /// \brief Height map geom
     class Heightmap
     {

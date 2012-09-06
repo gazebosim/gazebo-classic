@@ -28,6 +28,10 @@ namespace gazebo
 {
   namespace common
   {
+    /// \addtogroup gazebo_common Common Animation
+    /// \{
+
+    /// \brief Node animation
     class NodeAnimation
     {
       public: NodeAnimation(const std::string& _name);
@@ -65,6 +69,7 @@ namespace gazebo
       protected: double length;
     };
 
+    /// \brief Skeleton animation
     class SkeletonAnimation
     {
       public: SkeletonAnimation(const std::string& _name);
@@ -104,6 +109,7 @@ namespace gazebo
 
       protected: std::map<std::string, NodeAnimation*> animations;
     };
+    /// \}
   }
 }
 

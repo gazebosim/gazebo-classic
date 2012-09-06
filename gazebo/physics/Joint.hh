@@ -39,6 +39,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     /// \brief Base class for all joints
     class Joint : public Base
     {
