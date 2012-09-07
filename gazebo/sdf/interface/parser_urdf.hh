@@ -238,7 +238,7 @@ namespace urdf2gazebo
       /// do the heavy lifting of conversion
       void convertLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, const gazebo::math::Pose &transform,
                        bool enforce_limits,bool reduce_fixed_joints);
-      void createBody(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link,
+      void createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link,
                       gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints);
       void createGeom(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link, std::string collision_type,
                       boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual,

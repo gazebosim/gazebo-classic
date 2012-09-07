@@ -1392,7 +1392,7 @@ void URDF2Gazebo::convertLink(TiXmlElement *root, boost::shared_ptr<const urdf::
     /* create <body:...> block for non fixed joint attached bodies */
     if ((link->getParent() && link->getParent()->name == "world") || 
         !reduce_fixed_joints || (!link->parent_joint || link->parent_joint->type != urdf::Joint::FIXED))
-      createBody(root, link, currentTransform, enforce_limits, reduce_fixed_joints);
+      createLink(root, link, currentTransform, enforce_limits, reduce_fixed_joints);
 
     // recurse into children
     for (unsigned int i = 0 ; i < link->child_links.size() ; ++i)
@@ -1424,16 +1424,19 @@ urdf::Pose  URDF2Gazebo::copyPose(gazebo::math::Pose pose)
   return p;
 }
 
-void URDF2Gazebo::createBody(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints)
+void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints)
 {
     int linkGeomSize;
     double linkSize[3];
 
     /* create new body */
-    TiXmlElement *elem     = new TiXmlElement("body:empty"); // FIXME:  does it matter what the collision type of the body is?
+    TiXmlElement *elem     = new TiXmlElement("link");
 
     /* set body name */
     elem->SetAttribute("name", link->name);
+
+    /* create new ineria */
+    // move mass information to createInertia(elem, currentTransform);
 
     /* set mass properties */
     addKeyValue(elem, "massMatrix", "true");
