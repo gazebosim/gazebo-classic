@@ -26,6 +26,6 @@
       <static>true</static>
     </model>
     <include filename="japanese_restaurant.model" />
-    <include filename="sun.light" />
+    <include><uri>models://sun</uri></include>
   </world>
 </gazebo>

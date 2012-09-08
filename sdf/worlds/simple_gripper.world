@@ -26,7 +26,7 @@
     <!-- A ground plane -->
     <!--<include filename="ground_plane.model"/>-->
     <!-- A global light source -->
-    <include filename="sun.light" />
+    <include><uri>models://sun</uri></include>
     <include filename="simple_arm.model" />
     <model name="ground">
       <pose>0 0 -0.025 0 0 0</pose>

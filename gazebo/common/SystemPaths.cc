@@ -42,6 +42,10 @@ SystemPaths::SystemPaths()
   this->gazeboPaths.clear();
   this->ogrePaths.clear();
   this->pluginPaths.clear();
+  this->modelPaths.clear();
+
+  //Nate:
+  this->modelPaths.push_back("/home/nkoenig/local/share/gazebo_models");
 
   char *path = getenv("GAZEBO_LOG_PATH");
   std::string fullPath;
@@ -100,6 +104,12 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
   if (this->pluginPathsFromEnv)
     this->UpdatePluginPaths();
   return this->pluginPaths;
+}
+
+/////////////////////////////////////////////////
+const std::list<std::string> &SystemPaths::GetModelPaths()
+{
+  return this->modelPaths;
 }
 
 /////////////////////////////////////////////////
@@ -191,11 +201,6 @@ void SystemPaths::UpdateOgrePaths()
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
 }
 
-//////////////////////////////////////////////////
-std::string SystemPaths::GetModelPathExtension()
-{
-  return "/models";
-}
 
 //////////////////////////////////////////////////
 std::string SystemPaths::GetWorldPathExtension()
@@ -210,8 +215,27 @@ std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
+std::string SystemPaths::FindFileURI(const std::string &_uri)
+{
+  int index = _uri.find("://");
+  std::string prefix = _uri.substr(0, index);
+  std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
+  std::string filename;
+
+  if (prefix == "models")
+    filename = "/home/nkoenig/local/share/gazebo_models/" + suffix;
+  else
+    gzerr << "Unknown URI prefix[" << prefix << "]\n";
+
+  return filename;
+}
+
+//////////////////////////////////////////////////
 std::string SystemPaths::FindFile(const std::string &_filename)
 {
+  if (_filename.find("://") != std::string::npos)
+    return this->FindFileURI(_filename);
+
   if (_filename[0] == '/')
     return _filename;
 

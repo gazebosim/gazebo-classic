@@ -14,9 +14,14 @@
  * limitations under the License.
  *
  */
+#define BOOST_FILESYSTEM_VERSION 2
+
+#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
-#include "common/Material.hh"
+
+#include "gazebo/common/Material.hh"
+#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -79,6 +84,17 @@ void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
   this->texImage = _resourcePath + "/" + _tex;
+
+  // If the texture image doesn't exist then try the next most likely path.
+  if (!boost::filesystem::exists(this->texImage))
+  {
+    this->texImage = _resourcePath + "/../materials/textures/" + _tex;
+    if (!boost::filesystem::exists(this->texImage))
+    {
+      gzerr << "Unable to find texture[" << _tex << "] in path["
+            << _resourcePath << "]\n";
+    }
+  }
 }
 
 //////////////////////////////////////////////////

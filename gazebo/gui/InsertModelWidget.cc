@@ -63,15 +63,14 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
   std::list<std::string> gazeboPaths =
-    common::SystemPaths::Instance()->GetGazeboPaths();
+    common::SystemPaths::Instance()->GetModelPaths();
 
   // Iterate over all the gazebo paths
   for (std::list<std::string>::iterator iter = gazeboPaths.begin();
       iter != gazeboPaths.end(); ++iter)
   {
     // This is the full model path
-    std::string path = (*iter) +
-      common::SystemPaths::Instance()->GetModelPathExtension();
+    std::string path = (*iter);
 
     // Create a top-level tree item for the path
     QTreeWidgetItem *topItem =
@@ -91,31 +90,59 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
                 std::back_inserter(paths));
       std::sort(paths.begin(), paths.end());
 
-      // Iterate over all the model in the current gazebo path
+      // Iterate over all the models in the current gazebo path
       for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
           dIter != paths.end(); ++dIter)
       {
-        if (boost::filesystem::is_regular_file(*dIter))
-        {
-          // This is for boost::filesystem version 3+
-          // std::string modelName = dIter->path().filename().string();
-          std::string modelName = dIter->filename();
+        // This is for boost::filesystem version 3+
+        std::string modelName;
+        std::string fullPath = path + "/" + dIter->filename();
+        std::string manifest = fullPath + "/manifest.xml";
 
-          if (modelName.find(".model") != std::string::npos)
-          {
-            // Add a child item for the model
-            QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
-                QStringList(QString("%1").arg(
-                    QString::fromStdString(dIter->filename()))));
-            this->fileTreeWidget->addTopLevelItem(childItem);
-          }
+        TiXmlDocument xmlDoc;
+        if (xmlDoc.LoadFile(manifest))
+        {
+          TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
+          if (!modelXML || !modelXML->FirstChildElement("name"))
+            gzerr << "No model name in manifest[" << manifest << "]\n";
+          else
+            modelName = modelXML->FirstChildElement("name")->GetText();
         }
+
+        // Add a child item for the model
+        QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
+            QStringList(QString("%1").arg(
+                QString::fromStdString(modelName))));
+        childItem->setData(0, Qt::UserRole, QVariant(fullPath.c_str()));
+        this->fileTreeWidget->addTopLevelItem(childItem);
       }
     }
 
     // Make all top-level items expanded. Trying to reduce mouse clicks.
     this->fileTreeWidget->expandItem(topItem);
   }
+
+  transport::Connection *conn = new transport::Connection();
+  conn->Connect("127.0.0.1", 5018);
+  conn->AsyncRead(boost::bind(&InsertModelWidget::OnResponse, this, _1));
+
+  msgs::Request *request = msgs::CreateRequest("models");
+  std::string requestData;
+  request->SerializeToString(&requestData);
+  conn->EnqueueMsg(requestData);
+
+  conn->ProcessWriteQueue();
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::OnResponse(const std::string &_data)
+{
+  std::cout << "RR:" << _data << "||\n";
+  msgs::Response response;
+  msgs::GzString_V models;
+
+  response.ParseFromString(_data);
+  models.ParseFromString(response.serialized_data());
 }
 
 /////////////////////////////////////////////////
@@ -129,70 +156,35 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 {
   if (_item)
   {
-    std::string path, filename;
+    std::string path, manifest, filename;
 
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
     if (_item->parent())
       path = _item->parent()->text(0).toStdString() + "/";
 
-    filename = _item->text(0).toStdString();
+    path = _item->data(0, Qt::UserRole).toString().toStdString();
+    manifest = path + "/manifest.xml";
 
-    if (filename.find(".model") == std::string::npos)
-      return;
 
-    gui::Events::createEntity("model", path + filename);
-    this->fileTreeWidget->clearSelection();
+    TiXmlDocument xmlDoc;
+    if (xmlDoc.LoadFile(manifest))
+    {
+      TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
+      if (!modelXML)
+        gzerr << "No <model> element in manifest[" << manifest << "]\n";
+      else
+      {
+        filename = path + "/" + modelXML->FirstChildElement("sdf")->GetText();
+      }
+    }
+
+    if (!filename.empty())
+    {
+      gui::Events::createEntity("model", filename);
+      this->fileTreeWidget->clearSelection();
+    }
 
     QApplication::setOverrideCursor(Qt::ArrowCursor);
   }
 }
-
-/////////////////////////////////////////////////
-/*void InsertModelWidget::OnMouseRelease(const common::MouseEvent &_event)
-{
-  if (!this->modelSDF || _event.dragging ||
-      (_event.button != common::MouseEvent::LEFT &&
-       _event.button != common::MouseEvent::RIGHT))
-  {
-    return;
-  }
-
-  if (_event.button == common::MouseEvent::LEFT)
-  {
-    sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
-    std::string modelName = modelElem->GetValueString("name");
-
-    // Automatically create a new name if the model exists
-    int i = 0;
-    while (has_entity_name(modelName))
-    {
-      modelName = modelElem->GetValueString("name") + "_" +
-                  boost::lexical_cast<std::string>(i++);
-    }
-
-    // Remove the topic namespace from the model name. This will get re-inserted
-    // by the World automatically
-    modelName.erase(0, this->node->GetTopicNamespace().size()+2);
-
-    // The the SDF model's name
-    modelElem->GetAttribute("name")->Set(modelName);
-    modelElem->GetElement("origin")->GetAttribute("pose")->Set(
-        this->modelVisual->GetWorldPose());
-
-    // Spawn the model in the physics server
-    msgs::Factory msg;
-    msg.set_sdf(this->modelSDF->ToString());
-    this->factoryPub->Publish(msg);
-  }
-
-  // Remove the temporary visual from the scene
-  rendering::Scene *scene = gui::get_active_camera()->GetScene();
-  scene->RemoveVisual(this->modelVisual);
-  this->modelVisual.reset();
-  this->visuals.clear();
-
-  this->fileTreeWidget->clearSelection();
-
-  this->modelSDF.reset();
-}*/

@@ -1713,7 +1713,9 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       // visual
       iter = this->visuals.find(_msg->parent_name());
       if (iter != this->visuals.end())
+      {
         visual.reset(new Visual(_msg->name(), iter->second));
+      }
     }
     else
     {

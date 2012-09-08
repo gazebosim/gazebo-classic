@@ -631,13 +631,13 @@ math::Vector3 Visual::GetScale()
     else if (geomElem->HasElement("sphere"))
     {
       double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
-      result.Set(r, r, r);
+      result.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
       double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
       double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
-      result.Set(r, r, l);
+      result.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {

@@ -93,7 +93,7 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
-  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
+  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 200);
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
   this->visualMsg->set_name(this->GetScopedName());

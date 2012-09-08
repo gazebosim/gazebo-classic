@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <gazebo version="1.2">
   <world name="default">
-    <include filename="ground_plane.model" />
-    <include filename="sun.light" />
+    <include><uri>models://ground_plane</uri></include>
+    <include><uri>models://sun</uri></include>
     <include filename="kitchen.model" />
   </world>
 </gazebo>

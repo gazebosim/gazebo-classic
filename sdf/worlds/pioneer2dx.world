@@ -2,10 +2,10 @@
 <gazebo version="1.2">
   <world name="default">
     <!-- Ground -->
-    <include filename="ground_plane.model" />
+    <include><uri>models://ground_plane</uri></include>
     <!-- Pioneer2dx model -->
     <include filename="pioneer2dx.model" />
     <!-- A global light source -->
-    <include filename="sun.light" />
+    <include><uri>models://sun</uri></include>
   </world>
 </gazebo>

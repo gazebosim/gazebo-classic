@@ -2,7 +2,7 @@
 <gazebo version="1.2">
   <world name="default">
     <!-- A global light source -->
-    <include filename="sun.light" />
+    <include><uri>models://sun</uri></include>
     <model name="heightmap">
       <link name="link">
         <collision name="collision">

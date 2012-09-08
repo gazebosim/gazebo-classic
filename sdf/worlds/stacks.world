@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <gazebo version="1.2">
   <world name="default">
-    <include filename="ground_plane.model" />
+    <include><uri>models://ground_plane</uri></include>
     <model name="box_1">
       <pose>0 0 .5 0 0 0</pose>
       <link name="link">

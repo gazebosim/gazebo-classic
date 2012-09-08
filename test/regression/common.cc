@@ -175,7 +175,6 @@ TEST_F(CommonTest, Paths)
   EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
-  EXPECT_STREQ("/models", paths->GetModelPathExtension().c_str());
   EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
 
   paths->AddGazeboPaths("/gazebo/path:/other/gazebo");
