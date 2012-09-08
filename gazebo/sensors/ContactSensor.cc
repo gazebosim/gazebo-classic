@@ -174,7 +174,7 @@ std::string ContactSensor::GetCollisionName(unsigned int _index) const
   std::string result;
 
   if (_index < this->collisions.size())
-    result = this->collisions[_index]->GetName();
+    result = this->collisions[_index]->GetScopedName();
 
   return result;
 }
