@@ -208,7 +208,7 @@ bool ODELink::GetGravityMode()
 void ODELink::SetSelfCollide(bool _collide)
 {
   this->sdf->GetAttribute("self_collide")->Set(_collide);
-  if (_collide && !this->spaceId)
+  if (_collide)
     this->spaceId = dSimpleSpaceCreate(this->odePhysics->GetSpaceId());
 }
 
