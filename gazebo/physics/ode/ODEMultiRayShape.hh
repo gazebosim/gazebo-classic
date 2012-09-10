@@ -25,8 +25,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_ode
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief ODE specific version of MultiRayShape
     class ODEMultiRayShape : public MultiRayShape
     {

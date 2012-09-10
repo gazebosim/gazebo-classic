@@ -51,7 +51,9 @@ namespace gazebo
       public: int feedbackCount;
     };
 
-    /// \addtogroup gazebo_physics gazebo_physics_ode ODE Physics
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
     /// \brief ODE physics engine

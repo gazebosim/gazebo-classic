@@ -31,8 +31,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_ode
+    /// \addtogroup gazebo_physics_ode ode Physics
     /// \{
+
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
@@ -42,7 +43,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ODEJoint();
 
-      /// \brief Load a joint
+      /// \brief Load ODEJoint
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Reset the joint

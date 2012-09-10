@@ -39,7 +39,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// Creates box extrusions based on an image.
+    /// \brief Creates box extrusions based on an image.
     /// This function is not yet complete, to be implemented.
     class MapShape : public Shape
     {

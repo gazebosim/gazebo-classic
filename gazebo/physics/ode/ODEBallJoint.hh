@@ -31,9 +31,10 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \addtogroup gazebo_physics_ode ode Physics
     /// \{
-    /// \brief An ODe ball joint
+
+    /// \brief An ODEBallJoint
     class ODEBallJoint : public BallJoint<ODEJoint>
     {
       /// \brief Constructor

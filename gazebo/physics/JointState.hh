@@ -31,6 +31,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief keeps track of state of a physics::Joint
     class JointState : public State
     {
       /// \brief Default constructor
@@ -53,6 +57,7 @@ namespace gazebo
 
       private: std::vector<math::Angle> angles;
     };
+    /// \}
   }
 }
 #endif

@@ -37,6 +37,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief A slider joint
     class BulletSliderJoint : public SliderJoint<BulletJoint>
     {

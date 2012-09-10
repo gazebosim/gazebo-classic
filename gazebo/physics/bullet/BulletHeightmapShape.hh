@@ -35,8 +35,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_bulet Bullet Physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief Height map collision
     class BulletHeightmapShape : public HeightmapShape
     {

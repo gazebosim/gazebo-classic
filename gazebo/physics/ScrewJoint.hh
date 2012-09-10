@@ -93,7 +93,7 @@ namespace gazebo
       protected: math::Vector3 fakeAnchor;
       protected: double threadPitch;
     };
-/// \}
+    /// \}
   }
 }
 #endif

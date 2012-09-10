@@ -43,6 +43,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief Bullet physics engine
     class BulletPhysics : public PhysicsEngine
     {

@@ -24,14 +24,21 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics gazebo_physics_ode ODE Physics
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
     /// \brief ODE cylinder shape
     class ODECylinderShape : public CylinderShape
     {
+      /// constructor
       public: ODECylinderShape(CollisionPtr _parent) : CylinderShape(_parent) {}
+
+      /// destructor
       public: virtual ~ODECylinderShape() {}
+
+      /// Set radius and length of a cylinder
       public: void SetSize(const double &_radius, const double &_length)
       {
         CylinderShape::SetSize(_radius, _length);

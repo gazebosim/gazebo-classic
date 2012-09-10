@@ -42,7 +42,9 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics_ode
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief Bullet collisions
@@ -82,6 +84,7 @@ namespace gazebo
 
       protected: btCollisionShape *collisionShape;
     };
+    /// \}
     /// \}
   }
 }

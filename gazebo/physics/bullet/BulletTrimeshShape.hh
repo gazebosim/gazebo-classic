@@ -32,6 +32,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief Triangle mesh collision
     class BulletTrimeshShape : public TrimeshShape
     {

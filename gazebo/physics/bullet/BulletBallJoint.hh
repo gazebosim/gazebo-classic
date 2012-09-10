@@ -36,6 +36,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief A ball joint
     class BulletBallJoint : public BallJoint<BulletJoint>
     {
@@ -84,6 +85,7 @@ namespace gazebo
 
       private: btPoint2PointConstraint *btBall;
     };
+
     /// \}
     /// \}
   }

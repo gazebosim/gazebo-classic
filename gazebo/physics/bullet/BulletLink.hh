@@ -36,6 +36,8 @@ namespace gazebo
 
     /// \addtogroup gazebo_physics
     /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
 
     /// \brief Bullet Link class
     class BulletLink : public Link
@@ -151,6 +153,7 @@ namespace gazebo
       private: BulletPhysicsPtr bulletPhysics;
       protected: math::Pose pose;
     };
+    /// \}
     /// \}
   }
 }

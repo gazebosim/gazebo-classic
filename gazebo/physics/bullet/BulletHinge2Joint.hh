@@ -38,6 +38,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief A two axis hinge joint
     class BulletHinge2Joint : public Hinge2Joint<BulletJoint>
     {

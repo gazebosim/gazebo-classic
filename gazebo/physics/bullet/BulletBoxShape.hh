@@ -31,8 +31,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_bullet ODE Physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief Bullet box collision
     class BulletBoxShape : public BoxShape
     {

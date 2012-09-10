@@ -31,6 +31,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief A class for manipulating physics::Joint
     class JointController
     {
       public: JointController(ModelPtr _model);
@@ -96,6 +100,7 @@ namespace gazebo
 
       private: common::Time prevUpdateTime;
     };
+    /// \}
   }
 }
 #endif

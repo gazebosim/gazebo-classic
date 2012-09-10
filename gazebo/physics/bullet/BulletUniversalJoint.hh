@@ -36,6 +36,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief A universal joint
     class BulletUniversalJoint : public UniversalJoint<BulletJoint>
     {

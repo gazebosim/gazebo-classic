@@ -33,6 +33,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief Keeps track of states of a physics::Link
     class LinkState : public State
     {
       /// \brief Default constructor
@@ -80,6 +84,7 @@ namespace gazebo
 
       private: std::vector<CollisionState> collisionStates;
     };
+    /// \}
   }
 }
 #endif

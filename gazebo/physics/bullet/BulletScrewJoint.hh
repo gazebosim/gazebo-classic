@@ -39,6 +39,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief A screw joint
     class BulletScrewJoint : public ScrewJoint<BulletJoint>
     {

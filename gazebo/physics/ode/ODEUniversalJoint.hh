@@ -33,6 +33,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief A universal joint
     class ODEUniversalJoint : public UniversalJoint<ODEJoint>
     {

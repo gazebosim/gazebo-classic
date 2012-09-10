@@ -31,6 +31,11 @@ namespace gazebo
     class BulletRayCollision;
     class BulletLink;
 
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
+
     /// \brief An Bullet Ray sensor
     class BulletRaySensor : public PhysicsRaySensor
     {
@@ -68,6 +73,8 @@ namespace gazebo
 
       private: BulletLink *body;
     };
+    /// \}
+    /// \}
   }
 }
 #endif

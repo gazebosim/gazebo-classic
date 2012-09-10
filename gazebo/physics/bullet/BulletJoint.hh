@@ -31,7 +31,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_ode
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
     /// \brief Base class for all joints
     class BulletJoint : public Joint
@@ -42,7 +42,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletJoint();
 
-      /// \brief Load a joint
+      /// \brief Load BulletJoint
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Reset the joint

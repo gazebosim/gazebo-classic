@@ -29,6 +29,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief A single axis hinge joint
     template<class T>
     class HingeJoint : public T
@@ -49,7 +52,8 @@ namespace gazebo
                  {
                    T::Init();
                  }
-      };
+    };
+    /// \}
   }
 }
 #endif

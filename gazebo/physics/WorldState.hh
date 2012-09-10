@@ -32,6 +32,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief State of the World
     class WorldState : public State
     {
       /// \brief Default constructor
@@ -61,6 +65,7 @@ namespace gazebo
       private: std::vector<ModelState> modelStates;
       private: sdf::ElementPtr sdf;
     };
+    /// \}
   }
 }
 #endif

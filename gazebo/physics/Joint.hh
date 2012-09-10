@@ -39,6 +39,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+    /// \addtogroup gazebo_physics_ode ode Physics
+    /// \{
 
     /// \brief Base class for all joints
     class Joint : public Base
@@ -62,11 +64,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Joint();
 
-      /// \brief Load a joint
+      /// \brief Set pose, parent and child links of a physics::Joint
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const math::Pose &_origin);
 
-      /// \brief Load a joint
+      /// \brief Load physics::Joint from a SDF sdf::Element
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize a joint
@@ -216,6 +218,7 @@ namespace gazebo
 
       private: math::Angle staticAngle;
     };
+    /// \}
     /// \}
   }
 }

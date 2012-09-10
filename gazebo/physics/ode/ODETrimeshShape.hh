@@ -28,7 +28,9 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics gazebo_physics_ode ODE Physics
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
     /// \brief Triangle mesh collision

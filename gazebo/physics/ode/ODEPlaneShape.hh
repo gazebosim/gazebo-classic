@@ -28,6 +28,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief An ODE Plane shape
     class ODEPlaneShape : public PlaneShape
     {

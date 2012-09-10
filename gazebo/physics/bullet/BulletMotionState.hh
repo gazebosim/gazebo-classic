@@ -33,6 +33,12 @@ namespace gazebo
   {
     class Link;
 
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
+
+    /// \brief Bullet btMotionState encapsulation
     class BulletMotionState : public btMotionState
     {
       /// \brief Constructor
@@ -71,6 +77,8 @@ namespace gazebo
       private: math::Vector3 cog;
       private: Link *link;
     };
+    /// \}
+    /// \}
   }
 }
 #endif

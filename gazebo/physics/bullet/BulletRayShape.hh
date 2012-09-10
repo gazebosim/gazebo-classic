@@ -29,7 +29,9 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics gazebo_physics_bullet Bullet Physics
+    /// \addtogroup gazebo_physics
+    /// \{
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief Ray shape for bullet

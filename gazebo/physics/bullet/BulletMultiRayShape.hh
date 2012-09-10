@@ -25,8 +25,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_bullet
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief Bullet specific version of MultiRayShape
     class BulletMultiRayShape : public MultiRayShape
     {

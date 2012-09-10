@@ -36,6 +36,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief ODE Height map collision
     class ODEHeightmapShape : public HeightmapShape
     {

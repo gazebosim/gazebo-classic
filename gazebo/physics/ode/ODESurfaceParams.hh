@@ -32,6 +32,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief Surface params
     class ODESurfaceParams
     {

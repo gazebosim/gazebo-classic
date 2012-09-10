@@ -45,7 +45,14 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    /// \brief Functions to handle getting system paths
+    /// \brief Functions to handle getting system paths, keeps track of:
+    ///        \li SystemPaths#gazeboPaths - media paths containing
+    ///            worlds, models, sdf descriptions, material scripts,
+    ///            textures.
+    ///        \li SystemPaths#ogrePaths - ogre library paths.
+    ///            Should point to Ogre RenderSystem_GL.so et. al.
+    ///        \li SystemPaths#pluginPaths - plugin library paths
+    ///            for common::WorldPlugin
     class SystemPaths : public SingletonT<SystemPaths>
     {
       private: SystemPaths();
@@ -95,13 +102,13 @@ namespace gazebo
       private: void InsertUnique(const std::string &_path,
                                std::list<std::string> &_list);
 
-      /// Paths gazebo install
+      /// \brief Paths to installed gazebo media files
       private: std::list<std::string> gazeboPaths;
 
-      /// Paths to the ogre install
+      /// \brief Paths to the ogre install
       private: std::list<std::string> ogrePaths;
 
-      /// Paths to the plugins
+      /// \brief Paths to the plugins
       private: std::list<std::string> pluginPaths;
 
       private: std::list<std::string> suffixPaths;
