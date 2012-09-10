@@ -693,6 +693,7 @@ void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root, boost::shared_ptr<urdf::
     // lump gazebo extensions to parent, (give them new reference link names)
     reduceGazeboExtensionToParent(link);
 
+    // lump inertial to parent
     logDebug("TREE:   mass lumping from [%s] to [%s]",link->name.c_str(),link->getParent()->name.c_str());
     /* now lump all contents of this link to parent */
     if (link->inertial)
@@ -816,7 +817,7 @@ void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root, boost::shared_ptr<urdf::
 
     // STRATEGY: later when extracting visuals and collision pairs to construct <geom> for gazebo, given that geom(coillision) wraps visual,
     //           loop through lumped collisions, for each collision,
-    //             call createGeom() using visual_groups.find(lump group name) to find potential visuals to create the <geom> tag for the body.
+    //             call createCollision() using visual_groups.find(lump group name) to find potential visuals to create the <geom> tag for the body.
     //           This way, <geom> is created only if collision exists in first place, and if matching visual exists it is used, other a sphere default
     //             is created
 
@@ -1435,29 +1436,6 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
     /* set body name */
     elem->SetAttribute("name", link->name);
 
-    /* create new ineria */
-    // move mass information to createInertia(elem, currentTransform);
-
-    /* set mass properties */
-    addKeyValue(elem, "massMatrix", "true");
-    addKeyValue(elem, "mass", values2str(1, &link->inertial->mass));
-    
-    addKeyValue(elem, "ixx", values2str(1, &link->inertial->ixx));
-    addKeyValue(elem, "ixy", values2str(1, &link->inertial->ixy));
-    addKeyValue(elem, "ixz", values2str(1, &link->inertial->ixz));
-    addKeyValue(elem, "iyy", values2str(1, &link->inertial->iyy));
-    addKeyValue(elem, "iyz", values2str(1, &link->inertial->iyz));
-    addKeyValue(elem, "izz", values2str(1, &link->inertial->izz));
-    
-    addKeyValue(elem, "cx", values2str(1, &link->inertial->origin.position.x));
-    addKeyValue(elem, "cy", values2str(1, &link->inertial->origin.position.y));
-    addKeyValue(elem, "cz", values2str(1, &link->inertial->origin.position.z));
-  
-    double roll,pitch,yaw;
-    link->inertial->origin.rotation.getRPY(roll,pitch,yaw);
-    if (!gazebo::math::equal(roll, 0.0) || !gazebo::math::equal(pitch, 0.0) || !gazebo::math::equal(yaw, 0.0))
-        logError("rotation of inertial frame is not supported\n");
-
     /* compute global transform */
     gazebo::math::Pose localTransform;
     // this is the transform from parent link to current link
@@ -1475,13 +1453,13 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
     // create origin tag for this element
     addTransform(elem, currentTransform);
 
+
+    /* create new inerial block */
+    createInertial(elem, link);
+
+
     // make additional geoms using the lumped stuff
-    // FIXME:  what's the pairing strategy between visuals and collisions?
-    //      when only visuals exists?
-    //      when only collisions exists?
-    //         originally, there's one visual and one collision per link, which maps nicely to <body><geom><visual> heirarchy
-    //         now we have multiple visuals and collisions...  how do we map?
-    // loop through all default visuals and lump visuals
+    // loop through all collisions and visuals and lump
     for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::const_iterator collisions_it = link->collision_groups.begin();
          collisions_it != link->collision_groups.end(); collisions_it++)
     {
@@ -1498,7 +1476,7 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
           collision_type = getGeometrySize(collision->geometry, &linkGeomSize, linkSize); // add collision information
         
         /* make a <geom:...> block */
-        createGeom(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, link->name);
+        createCollision(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, link->name);
       }
       else if (collisions_it->first.find(std::string("lump::")) == 0) // starts with "lump::"
       {
@@ -1514,7 +1492,7 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
         
         std::string original_reference = collisions_it->first.substr(6);
         /* make a <geom:...> block */
-        createGeom(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, original_reference);
+        createCollision(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, original_reference);
       }
     }
 
@@ -1527,6 +1505,36 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
     /* make a <joint:...> block */
     createJoint(root, link, currentTransform, enforce_limits, reduce_fixed_joints);
 
+}
+
+
+void URDF2Gazebo::createInertial(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link)
+{
+    /* set mass properties */
+    
+    
+    // check and print a warning message
+    double roll,pitch,yaw;
+    link->inertial->origin.rotation.getRPY(roll,pitch,yaw);
+    if (!gazebo::math::equal(roll, 0.0) || !gazebo::math::equal(pitch, 0.0) || !gazebo::math::equal(yaw, 0.0))
+        logError("rotation of inertial frame is not supported\n");
+
+    /// add pose
+    gazebo::math::Pose pose = URDF2Gazebo::copyPose(link->inertial->origin);
+    addTransform(elem, pose);
+
+    // add mass
+    addKeyValue(elem, "mass", values2str(1, &link->inertial->mass));
+
+    // add inertia (ixx, ixy, ixz, iyy, iyz, izz)
+    TiXmlElement *inertia = new TiXmlElement("inertia");
+    addKeyValue(inertia, "ixx", values2str(1, &link->inertial->ixx));
+    addKeyValue(inertia, "ixy", values2str(1, &link->inertial->ixy));
+    addKeyValue(inertia, "ixz", values2str(1, &link->inertial->ixz));
+    addKeyValue(inertia, "iyy", values2str(1, &link->inertial->iyy));
+    addKeyValue(inertia, "iyz", values2str(1, &link->inertial->iyz));
+    addKeyValue(inertia, "izz", values2str(1, &link->inertial->izz));
+    elem->LinkEndChild(inertia);
 }
 
 
@@ -1629,7 +1637,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
 }
 
 
-void URDF2Gazebo::createGeom(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link,std::string collision_type, boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual, int linkGeomSize, double* linkSize, std::string original_reference)
+void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link,std::string collision_type, boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual, int linkGeomSize, double* linkSize, std::string original_reference)
 {
     /* begin create geometry node, skip if no collision specified */
     if (collision_type != "empty")
