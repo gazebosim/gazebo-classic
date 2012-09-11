@@ -75,6 +75,7 @@ namespace gazebo
       /// \brief Helper for the contructor
       public: void Init();
 
+      /// \brief Helper for the destructor
       public: void Fini();
 
       /// \brief Clone the visual with a new name
@@ -143,6 +144,7 @@ namespace gazebo
       /// \brief Set the specular color of the visual
       public: void SetSpecular(const common::Color &_color);
 
+      /// \brief Attach visualization axes
       public: void AttachAxes();
 
       /// \brief Set the transparency
@@ -191,7 +193,11 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual
       public: void SetWorldPose(const math::Pose _pose);
+
+      /// \brief Set the world linear position of the visual
       public: void SetWorldPosition(const math::Vector3 &_pos);
+
+      /// \brief Set the world orientation of the visual
       public: void SetWorldRotation(const math::Quaternion &_q);
 
       /// \brief Return the scene Node of this visual entity
@@ -259,9 +265,13 @@ namespace gazebo
       /// \brief Set the shader type
       public: void SetShaderType(const std::string &_type);
 
+      /// \brief Move to a math::Vector3 Position and
+      ///        rotation specified by roll, pitch, yaw
       public: void MoveToPosition(const math::Vector3 &_end,
                                    double _pitch, double _yaw, double _time);
 
+      /// \brief Move to new math::Vector3 Position and
+      ///        rotation specified by roll, pitch, yaw at a given time
       public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
                                    boost::function<void()> _onComplete = NULL);
@@ -269,16 +279,28 @@ namespace gazebo
       /// \brief Set visibility flags for this visual and all children
       public: void SetVisibilityFlags(uint32_t _flags);
 
+      /// \brief Display the bounding box visuals
       public: void ShowBoundingBox();
+
+      /// \brief Display the collision visuals
       public: void ShowCollision(bool _show);
 
+      /// \brief Display the skeleton visuals
       public: void ShowSkeleton(bool _show);
 
+      /// \brief Set current scene (rendering::Scene)
       public: void SetScene(ScenePtr _scene);
+
+      /// \brief Get current (rendering::Scene)
       public: ScenePtr GetScene() const;
+
+      /// \brief Display joint visuals
       public: void ShowJoints(bool _show);
+
+      /// \brief Display Center of Mass visuals
       public: void ShowCOM(bool _show);
 
+      /// \brief Set animation skeleton pose (msgs::PoseAnimation)
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
 
       private: void GetBoundsHelper(Ogre::SceneNode *node,
@@ -286,6 +308,7 @@ namespace gazebo
 
       private: std::string GetMeshName() const;
 
+      /// \brief Clear parents
       public: void ClearParent();
 
       private: void DestroyAllAttachedMovableObjects(

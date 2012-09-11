@@ -34,6 +34,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectPause(T _subscriber)
               { return pause.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the pause signal
       public: static void DisconnectPause(ConnectionPtr _subscriber)
               { pause.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectStep(T _subscriber)
               { return step.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the step signal
       public: static void DisconnectStep(ConnectionPtr _subscriber)
               { step.Disconnect(_subscriber); }
 
@@ -49,6 +51,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectStop(T _subscriber)
               { return stop.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the stop signal
       public: static void DisconnectStop(ConnectionPtr _subscriber)
               { stop.Disconnect(_subscriber); }
 
@@ -57,6 +60,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectWorldCreated(T _subscriber)
               { return worldCreated.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the world created signal
       public: static void DisconnectWorldCreated(ConnectionPtr _subscriber)
               { worldCreated.Disconnect(_subscriber); }
 
@@ -65,6 +69,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectCreateEntity(T _subscriber)
               { return entityCreated.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the add entity signal
       public: static void DisconnectCreateEntity(ConnectionPtr _subscriber)
               { entityCreated.Disconnect(_subscriber); }
 
@@ -73,6 +78,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectSetSelectedEntity(T _subscriber)
               { return setSelectedEntity.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the set selected entity
       public: static void DisconnectSetSelectedEntity(ConnectionPtr _subscriber)
               { setSelectedEntity.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -80,6 +86,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectDeleteEntity(T _subscriber)
               { return deleteEntity.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the delete entity
       public: static void DisconnectDeleteEntity(ConnectionPtr _subscriber)
               { deleteEntity.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -87,6 +94,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectAddEntity(T _subscriber)
               { return addEntity.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the add entity signal
       public: static void DisconnectAddEntity(ConnectionPtr _subscriber)
               { addEntity.Disconnect(_subscriber); }
 
@@ -96,6 +104,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectWorldUpdateStart(T _subscriber)
               { return worldUpdateStart.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the world update start signal
       public: static void DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
               { worldUpdateStart.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -103,6 +112,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectWorldUpdateEnd(T _subscriber)
               { return worldUpdateEnd.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the the world update end signal
       public: static void DisconnectWorldUpdateEnd(ConnectionPtr _subscriber)
               { worldUpdateEnd.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -126,6 +136,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectRender(T _subscriber)
               { return render.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the render update signal
       public: static void DisconnectRender(ConnectionPtr _subscriber)
               { render.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -133,6 +144,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectPostRender(T _subscriber)
               { return postRender.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the post render update signal
       public: static void DisconnectPostRender(ConnectionPtr _subscriber)
               { postRender.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -140,6 +152,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectDiagTimerStart(T _subscriber)
               { return diagTimerStart.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the diagnostic timer start signal
       public: static void DisconnectDiagTimerStart(ConnectionPtr _subscriber)
               { diagTimerStart.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
@@ -147,6 +160,7 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectDiagTimerStop(T _subscriber)
               { return diagTimerStop.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot the diagnostic timer stop signal
       public: static void DisconnectDiagTimerStop(ConnectionPtr _subscriber)
               { diagTimerStop.Disconnect(_subscriber); }
 

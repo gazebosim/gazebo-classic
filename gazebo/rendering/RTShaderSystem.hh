@@ -65,6 +65,7 @@ namespace gazebo
       /// \brief Finalize the shader system
       public: void Fini();
 
+      /// \brief Clear the shader system
       public: void Clear();
 
       /// \brief Add a scene manager
