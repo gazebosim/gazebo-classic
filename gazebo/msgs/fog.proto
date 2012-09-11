@@ -23,3 +23,4 @@ message Fog
   optional float start = 4;
   optional float end = 5;
 }
+/// \endverbatim

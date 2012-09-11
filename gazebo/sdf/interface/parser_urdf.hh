@@ -58,10 +58,14 @@
 
 #include "math/Pose.hh"
 
+/// \ingroup gazebo_parser
+/// \brief namespace for URDF to SDF parser
 namespace urdf2gazebo
 {
   double rad2deg(double v) { return v * 180.0 / M_PI; }
 
+  /// \addtogroup gazebo_parser
+  /// \{
   class GazeboExtension
   {
     public:
@@ -220,6 +224,7 @@ namespace urdf2gazebo
       std::map<std::string, std::vector<GazeboExtension*> > gazebo_extensions_;
 
   };
+  /// \}
 }
 
 #endif
