@@ -56,6 +56,9 @@ namespace gazebo
       /// Finalize the ray
       protected: virtual void FiniChild();
 
+      /// Returns velocity as a math::Pose
+      /// FIXME storing x,y,z components in a quaternion seems like a bad idea
+      /// @todo storing x,y,z components in a quaternion seems like a bad idea
       public: Pose GetVelocity();
 
       private: Pose prevPose;

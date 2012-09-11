@@ -122,6 +122,8 @@ void ImuSensor::UpdateChild()
 
     this->imuVel.pos.z = 0;
 
+    /// FIXME storing x,y,z components in a quaternion seems like a bad idea
+    /// @todo storing x,y,z components in a quaternion seems like a bad idea
     velocity = this->body->GetWorldAngularVel();
     this->imuVel.rot.x = velocity.x;
     this->imuVel.rot.y = velocity.y;

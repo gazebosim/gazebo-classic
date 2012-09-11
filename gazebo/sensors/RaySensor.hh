@@ -149,6 +149,7 @@ namespace gazebo
       ///         SetActive(true).
       public: int GetFiducial(int index);
 
+      /// \brief Returns a pointer to the internal physics::MultiRayShape
       public: physics::MultiRayShapePtr GetLaserShape() const
               {return this->laserShape;}
 
