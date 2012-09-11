@@ -66,11 +66,19 @@ namespace gazebo
       /// \brief Set the parent of the sensor
       public: virtual void SetParent(const std::string &_name);
 
+      /// \brief Returns the name of the sensor parent.  The parent name is
+      ///        set by Sensor::SetParent.
       public: std::string GetParentName() const;
 
-      /// \brief  Update the sensor
+      /// \brief  Update the sensor, runs in a 
       public: void Update(bool _force);
+
+      /// \brief  This gets overwritten by derived sensor types.
+      ///         This function is called during Sensor::Update.
+      ///         And in turn, Sensor::Update is called by
+      ///         SensorManager::Update
       protected: virtual void UpdateImpl(bool /*_force*/) {}
+
       /// \brief Set the update rate of the sensor
       public: void SetUpdateRate(double _hz);
 
@@ -86,6 +94,7 @@ namespace gazebo
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
 
+      /// \brief Returns true if sensor generation is active.
       public: bool IsActive();
 
       /// \brief Get sensor type
@@ -94,12 +103,17 @@ namespace gazebo
       /// \brief return last update time
       public: common::Time GetLastUpdateTime();
 
+      /// \brief return true if user requests the sensor to be visualized
+      ///        via tag:  <visualize>true</visualize> in SDF
       public: bool GetVisualize() const;
 
+      /// \brief Returns the topic name as set in SDF.
       public: virtual std::string GetTopic() const;
 
+      /// \brief fills a msgs::Sensor message.
       public: void FillMsg(msgs::Sensor &_msg);
 
+      /// \brief Returns the name of the world the sensor is in.
       public: std::string GetWorldName() const;
 
       /// \brief Load a plugin for this sensor

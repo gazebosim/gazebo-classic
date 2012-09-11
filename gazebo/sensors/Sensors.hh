@@ -54,7 +54,10 @@ namespace gazebo
     /// \brief Stop the sensor generation loop.
     void stop();
 
+    /// \brief initialize the sensor generation loop.
     bool init();
+
+    /// \brief shutdown the sensor generation loop.
     bool fini();
 
     // \brief Remove all sensors.
