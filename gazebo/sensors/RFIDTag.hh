@@ -60,6 +60,7 @@ namespace gazebo
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
+      /// \brief  returns pose of tag in world coordinate
       public: math::Pose GetTagPose() {return entity->GetWorldPose();}
 
       private: physics::EntityPtr entity;

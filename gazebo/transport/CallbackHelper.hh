@@ -60,6 +60,8 @@ namespace gazebo
               {return this->latching;}
       protected: bool latching;
     };
+
+    /// boost shared pointer to transport::CallbackHelper
     typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
 
 
