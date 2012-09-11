@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface Joint 
-/// \brief Message for joints
+/// \brief Message for creating joint in rendering::Scene
 /// \verbatim
 
 import "vector3d.proto";

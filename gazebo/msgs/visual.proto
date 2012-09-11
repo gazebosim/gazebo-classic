@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface Visual
-/// \brief A message containing visual information
+/// \brief A message containing visual information for rendering::Visual
 /// \verbatim
 
 import "pose.proto";

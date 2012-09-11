@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Track visual (used in the GUI) 
-/// \brief Message for a trackking a visual with a camera
+/// \interface Trackvisual
+/// \brief Message for a trackking a rendering::Visual with a rendering::Camera
 /// \verbatim
 
 message TrackVisual

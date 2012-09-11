@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface Axis 
-/// \brief Axis message
+/// \brief msgs::Joint axis message
 /// \verbatim
 
 import "vector3d.proto";
