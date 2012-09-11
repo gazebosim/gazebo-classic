@@ -47,7 +47,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletSliderJoint();
 
-      /// \brief Load the joint
+      /// \brief Load the BulletSliderJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint

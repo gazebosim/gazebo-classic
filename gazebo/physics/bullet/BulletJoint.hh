@@ -42,7 +42,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletJoint();
 
-      /// \brief Load BulletJoint
+      /// \brief Load a BulletJoint
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Reset the joint

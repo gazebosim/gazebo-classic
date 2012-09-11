@@ -49,7 +49,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletScrewJoint();
 
-      /// \brief Load the joint
+      /// \brief Load the BulletScrewJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint

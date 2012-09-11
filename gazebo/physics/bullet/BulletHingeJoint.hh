@@ -48,7 +48,7 @@ namespace gazebo
       /// Destructor
       public: virtual ~BulletHingeJoint();
 
-      /// \brief Load joint
+      /// \brief Load the BulletHingeJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint

@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ScrewJoint()
               { }
-      /// \brief Load the joint
+      /// \brief Load a ScreJoint
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);

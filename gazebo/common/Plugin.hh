@@ -176,6 +176,9 @@ namespace gazebo
              } fptr_union_t;
   };
 
+  /// \brief A plugin with access to physics::World.  See
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
+  ///        reference</a>.
   class WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Load function
@@ -185,6 +188,9 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+  /// \brief A plugin with access to physics::Model.  See
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
+  ///        reference</a>.
   class ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Load function
@@ -194,6 +200,9 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+  /// \brief A plugin with access to physics::Sensor.  See
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
+  ///        reference</a>.
   class SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Load function
@@ -203,6 +212,10 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+  /// \brief A plugin loaded within the gzserver on startup.  See
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
+  ///        reference</a>.
+  /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Load function
