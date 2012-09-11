@@ -60,7 +60,7 @@ namespace gazebo
     /// \brief shutdown the sensor generation loop.
     bool fini();
 
-    // \brief Remove all sensors.
+    /// \brief Remove all sensors.
     bool remove_sensors();
 
     /// \brief Get a sensor by name
