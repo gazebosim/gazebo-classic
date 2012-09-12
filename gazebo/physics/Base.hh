@@ -112,9 +112,16 @@ namespace gazebo
       /// \brief Finialize the object
       public: virtual void Fini();
 
+      /// \brief virtual
       public: virtual void Init() {}
+
+      /// \brief empty
       public: virtual void Reset();
+
+      /// \brief calls recursive Reset on one of the Base::EntityType's
       public: virtual void Reset(Base::EntityType _resetType);
+
+      /// \brief empty
       public: virtual void Update() {}
 
       /// \brief Update the parameters using new sdf values
@@ -204,6 +211,7 @@ namespace gazebo
       ///        model1::...::modelN::bodyN::entityName
       public: std::string GetCompleteScopedName() const GAZEBO_DEPRECATED;
 
+      /// \brief print this object to screen via gzmsg
       public: void Print(std::string prefix);
 
       /// \brief True == show parameters in the gui

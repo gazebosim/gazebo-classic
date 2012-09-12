@@ -183,6 +183,7 @@ namespace gazebo
       public: void SetJointPositions(
                   const std::map<std::string, double> &_jointPositions);
 
+      /// \brief Joint Anaimation
       public: void SetJointAnimation(
                   const std::map<std::string, common::NumericAnimationPtr> anim,
                   boost::function<void()> _onComplete = NULL);
@@ -208,6 +209,7 @@ namespace gazebo
       /// \brief Set the current model pose by specifying pose of a link
       public: void SetLinkWorldPose(const math::Pose &_pose,
                                     std::string _linkName);
+      /// \brief Set the current model pose by specifying pose of a link
       public: void SetLinkWorldPose(const math::Pose &_pose,
                                     const LinkPtr &_link);
 
@@ -247,7 +249,10 @@ namespace gazebo
       private: boost::recursive_mutex *updateMutex;
       private: JointController *jointController;
 
+      /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
+
+      /// used by Model::AttachStaticModel
       protected: std::vector<math::Pose> attachedModelsOffset;
     };
     /// \}
