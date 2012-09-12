@@ -41,7 +41,7 @@
       </element>
     </element> <!-- End Dynamics -->
     <element name="limit" required="1">
-      <description></description>
+      <description>specifies the limits of this joint</description>
       <element name="lower" type="double" default="-1e16" required="1">
         <description>An attribute specifying the lower joint limit (radians for revolute joints, meters for prismatic joints). Omit if joint is continuous.</description>
       </element>
