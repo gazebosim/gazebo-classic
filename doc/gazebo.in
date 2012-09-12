@@ -588,7 +588,7 @@ WARN_LOGFILE           = /tmp/gazebo_dox.warn
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @CMAKE_SOURCE_DIR@/doc/mainpage.html @CMAKE_SOURCE_DIR@/gazebo @CMAKE_SOURCE_DIR@/build
+INPUT                  = @CMAKE_SOURCE_DIR@/doc/mainpage.html @CMAKE_SOURCE_DIR@/gazebo
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

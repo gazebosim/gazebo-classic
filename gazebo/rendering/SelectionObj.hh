@@ -68,7 +68,7 @@ namespace gazebo
       private: bool active;
       private: double boxSize;
     };
-    /// \brief
+    /// \}
   }
 }
 #endif
