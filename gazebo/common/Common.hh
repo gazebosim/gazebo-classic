@@ -27,8 +27,10 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    /// \brief add path prefix to common::SystemPaths
     void add_search_path_suffix(const std::string &_suffix);
 
+    /// \brief search for file in common::SystemPaths
     std::string find_file(const std::string &_file);
 
     /// \}

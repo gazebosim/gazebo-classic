@@ -33,7 +33,8 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    /// \brief A Time class
+    /// \brief A Time class, can be used to hold wall- or sim-time.
+    ///        stored as sec and nano-sec.
     class Time
     {
       /// \brief Constructors

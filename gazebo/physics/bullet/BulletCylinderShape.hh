@@ -29,9 +29,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
-    /// \addtogroup gazebo_physics_bullet ODE Physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief Cylinder collision
@@ -56,7 +55,6 @@ namespace gazebo
                     btVector3(_radius, _radius, _length * 0.5)));
               }
     };
-    /// \}
     /// \}
   }
 }

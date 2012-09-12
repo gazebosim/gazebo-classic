@@ -26,13 +26,24 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
+    /// \brief load rendering
     bool load();
+
+    /// \brief init rendering
     bool init();
+
+    /// \brief teardown rendering
     bool fini();
 
+    /// \brief get pointer to rendering::Scene by name
     rendering::ScenePtr get_scene(const std::string &_name);
+
+    /// \brief create rendering::Scene by name
     rendering::ScenePtr create_scene(const std::string &name,
                                      bool _enableVisualizations);
+
+    /// \brief remove a rendering::Scene by name
     void remove_scene(const std::string &name);
     /// \}
   }

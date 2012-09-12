@@ -138,10 +138,12 @@ namespace gazebo
       /// \brief Set the current collision state
       public: void SetState(const CollisionState &_state);
 
+      /// \brief Setup callback for contact event
       public: template<typename T>
               event::ConnectionPtr ConnectContact(T _subscriber)
               {return contact.Connect(_subscriber);}
 
+      /// \brief Disconnect callback for contact event
       public: void DisconnectContact(event::ConnectionPtr &_c)
               {contact.Disconnect(_c);}
 
@@ -160,6 +162,7 @@ namespace gazebo
       /// The link this collision belongs to
       protected: LinkPtr link;
 
+      /// flag for placeable
       protected: bool placeable;
 
       private: float transparency;
@@ -167,10 +170,12 @@ namespace gazebo
       /// All the visual apparence
       private: std::string bbVisual;
 
+      /// pointer to physics::Shape
       protected: ShapePtr shape;
 
       private: bool contactsEnabled;
 
+      /// contact event
       public: event::EventT<void (const std::string &,
                                   const Contact &)> contact;
 

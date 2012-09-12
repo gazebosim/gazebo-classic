@@ -26,6 +26,10 @@ namespace compiler {
 namespace cpp {
 class GeneratorContext;
 
+/// \addtogroup gazebo_msgs Messages
+/// \{
+
+/// \brief Google protobuf message generator for gazebo::msgs
 class GazeboGenerator : public CodeGenerator
 {
   public: GazeboGenerator(const std::string &_name);
@@ -39,6 +43,8 @@ class GazeboGenerator : public CodeGenerator
 
   // private: GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(GazeboGenerator);
 };
+
+/// \}
 }
 }
 }

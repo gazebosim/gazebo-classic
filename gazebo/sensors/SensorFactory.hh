@@ -42,6 +42,14 @@ namespace gazebo
   /// \brief The sensor factory; the class is just for namespacing purposes.
   class SensorFactory
   {
+    /// \brief Register all know sensors
+    ///  \li sensors::CameraSensor
+    ///  \li sensors::DepthCameraSensor
+    ///  \li sensors::GpuRaySensor
+    ///  \li sensors::RaySensor
+    ///  \li sensors::ContactSensor
+    ///  \li sensors::RFIDSensor
+    ///  \li sensors::RFIDTag
     public: static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).

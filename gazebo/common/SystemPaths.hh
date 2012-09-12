@@ -45,9 +45,17 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    /// \brief Functions to handle getting system paths
+    /// \brief Functions to handle getting system paths, keeps track of:
+    ///        \li SystemPaths#gazeboPaths - media paths containing
+    ///            worlds, models, sdf descriptions, material scripts,
+    ///            textures.
+    ///        \li SystemPaths#ogrePaths - ogre library paths.
+    ///            Should point to Ogre RenderSystem_GL.so et. al.
+    ///        \li SystemPaths#pluginPaths - plugin library paths
+    ///            for common::WorldPlugin
     class SystemPaths : public SingletonT<SystemPaths>
     {
+      /// Constructor for SystemPaths
       private: SystemPaths();
 
       /// \brief Get the log path
@@ -65,9 +73,11 @@ namespace gazebo
       /// \brief Get the model path extension
       public: std::string GetModelPathExtension();
 
-      /// \brief Get the world path extension
+      /// Returns the world path extension.
+      /// Right now, it just returns "/worlds"
       public: std::string GetWorldPathExtension();
 
+      /// \brief deprecated
       public: std::string FindFileWithGazeboPaths(const std::string &_filename)
               GAZEBO_DEPRECATED;
 
@@ -83,25 +93,33 @@ namespace gazebo
       /// \brief Add colon delimited paths to plugins
       public: void AddPluginPaths(const std::string &_path);
 
+      /// \brief clear out SystemPaths#gazeboPaths
       public: void ClearGazeboPaths();
+      /// \brief clear out SystemPaths#ogrePaths
       public: void ClearOgrePaths();
+      /// \brief clear out SystemPaths#pluginPaths
       public: void ClearPluginPaths();
 
+      /// \brief add _suffix to the list of path search sufixes
       public: void AddSearchPathSuffix(const std::string &_suffix);
 
+      /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateGazeboPaths();
+      /// \brief re-read SystemPaths#pluginPaths from environment variable
       private: void UpdatePluginPaths();
+      /// \brief re-read SystemPaths#ogrePaths from environment variable
       private: void UpdateOgrePaths();
+
       private: void InsertUnique(const std::string &_path,
                                std::list<std::string> &_list);
 
-      /// Paths gazebo install
+      /// \brief Paths to installed gazebo media files
       private: std::list<std::string> gazeboPaths;
 
-      /// Paths to the ogre install
+      /// \brief Paths to the ogre install
       private: std::list<std::string> ogrePaths;
 
-      /// Paths to the plugins
+      /// \brief Paths to plugins
       private: std::list<std::string> pluginPaths;
 
       private: std::list<std::string> suffixPaths;

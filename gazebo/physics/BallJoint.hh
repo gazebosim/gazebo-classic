@@ -26,8 +26,6 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_physics
-  /// \brief Physics namespace
   namespace physics
   {
     /// \addtogroup gazebo_physics
@@ -48,7 +46,7 @@ namespace gazebo
               {
               }
 
-      /// \brief Load the joint
+      /// \brief Template to ::Load the BallJoint
       protected: void Load(sdf::ElementPtr _sdf)
                  { T::Load(_sdf); }
       /// \brief Set the axis of rotation

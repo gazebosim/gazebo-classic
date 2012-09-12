@@ -42,7 +42,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics_ode
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
     /// \brief Bullet collisions

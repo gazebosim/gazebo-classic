@@ -152,6 +152,7 @@ namespace gazebo
       /// \brief Set an animation for this entity
       public: void SetAnimation(const common::PoseAnimationPtr &_anim,
                                 boost::function<void()> _onComplete);
+      /// \brief Set an animation for this entity
       public: void SetAnimation(common::PoseAnimationPtr _anim);
 
       /// \brief Stop the current animation, if any
@@ -179,14 +180,18 @@ namespace gazebo
       /// \brief Move this entity to be ontop of the nearest entity below
       public: void PlaceOnNearestEntityBelow();
 
+      /// \brief Move this entity to be ontop of another entity by name
       public: void PlaceOnEntity(const std::string &_entityName);
 
+      /// \brief Returns collision bounding box
       public: math::Box GetCollisionBoundingBox() const;
 
+      /// \brief Set angular and linear rates of an physics::Entity
       public: void SetWorldTwist(const math::Vector3 &linear,
                                  const math::Vector3 &angular,
                                  bool updateChildren = true);
 
+      /// \brief Returns Entity#dirtyPose
       public: const math::Pose &GetDirtyPose() const;
 
       private: math::Box GetCollisionBoundingBoxHelper(BasePtr _base) const;

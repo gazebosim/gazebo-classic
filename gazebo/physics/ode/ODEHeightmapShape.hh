@@ -32,10 +32,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief ODE Height map collision
     class ODEHeightmapShape : public HeightmapShape
     {
@@ -54,7 +54,6 @@ namespace gazebo
       private: dHeightfieldDataID odeData;
     };
 
-    /// \}
     /// \}
   }
 }

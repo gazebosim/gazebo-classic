@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface PID 
-/// \brief Message for PID
+/// \brief Message for simple PID controllers
 /// \verbatim
 
 message PID

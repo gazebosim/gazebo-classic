@@ -41,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Contact sensor.
-    /// This sensor detects and reports contacts between objects
+    /// This sensor detects and reports collision contacts between objects.
     class ContactSensor: public Sensor
     {
       /// \brief Constructor
@@ -82,6 +82,8 @@ namespace gazebo
       public: physics::Contact GetCollisionContact(
                   const std::string &_collisionName, unsigned int _index) const;
 
+      /// \brief Returns a std::map of collision names and contacts
+      ///   in collision with _collisionName.
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
@@ -99,6 +101,9 @@ namespace gazebo
       private: transport::PublisherPtr contactsPub;
 
       private: boost::mutex *mutex;
+
+      /// \brief returns a pointer to the mutex for locking while reading
+      ///        internally kept map of map of collision names and contacts
       public: boost::mutex* GetUpdateMutex() const
               {return this->mutex;}
     };

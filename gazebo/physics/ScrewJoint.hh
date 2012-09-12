@@ -33,7 +33,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics gazebo_screw_joint Screw Joint
+    /// \addtogroup gazebo_physics
     /// \{
 
     /// \brief A screw joint
@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ScrewJoint()
               { }
-      /// \brief Load the joint
+      /// \brief Load a ScreJoint
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
@@ -93,7 +93,7 @@ namespace gazebo
       protected: math::Vector3 fakeAnchor;
       protected: double threadPitch;
     };
-/// \}
+    /// \}
   }
 }
 #endif

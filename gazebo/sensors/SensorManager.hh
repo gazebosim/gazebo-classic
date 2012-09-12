@@ -49,6 +49,8 @@ namespace gazebo
       public: virtual ~SensorManager();
 
       /// \brief Update all the sensors
+      /// Checks to see if any sensor need to be initialized first,
+      /// then updates all sensors once.
       public: void Update(bool force = false);
 
       /// \brief Init all the sensors

@@ -29,10 +29,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
-    /// \addtogroup gazebo_physics_ode
-    /// \{
+
     /// \brief Base class for all joints
     class BulletJoint : public Joint
     {
@@ -42,7 +42,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletJoint();
 
-      /// \brief Load a joint
+      /// \brief Load a BulletJoint
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Reset the joint
@@ -93,7 +93,6 @@ namespace gazebo
       protected: btTypedConstraint *constraint;
       protected: btDynamicsWorld *world;
     };
-    /// \}
     /// \}
   }
 }

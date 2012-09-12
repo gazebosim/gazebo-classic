@@ -29,10 +29,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-    /// \addtogroup gazebo_physics_ode
-    /// \{
+
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
@@ -42,7 +42,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ODEJoint();
 
-      /// \brief Load a joint
+      /// \brief Load ODEJoint
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Reset the joint
@@ -113,7 +113,6 @@ namespace gazebo
       /// Feedback data for this joint
       private: dJointFeedback *feedback;
     };
-    /// \}
     /// \}
   }
 }

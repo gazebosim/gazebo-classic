@@ -66,6 +66,7 @@ namespace gazebo
       /// Finalize the ray
       protected: virtual void Fini();
 
+      /// Returns a pointer to the internally kept rendering::GpuLaser
       public: rendering::GpuLaserPtr GetLaserCamera() const
               {return this->laserCam;}
 
@@ -164,26 +165,37 @@ namespace gazebo
       ///         SetActive(true).
       public: int GetFiducial(int index);
 
+      /// @todo Document me
       public: unsigned int GetCameraCount();
 
+      /// @todo Document me
       public: bool IsHorizontal();
 
+      /// @todo Document me
       public: double Get1stRatio();
 
+      /// @todo Document me
       public: double Get2ndRatio();
 
+      /// @todo Document me
       public: double GetHFOV();
 
+      /// @todo Document me
       public: double GetCHFOV();
 
+      /// @todo Document me
       public: double GetVFOV();
 
+      /// @todo Document me
       public: double GetCVFOV();
 
+      /// @todo Document me
       public: double GetHAngle();
 
+      /// @todo Document me
       public: double GetVAngle();
 
+      /// @todo Document me
       private: void OnPose(ConstPosePtr &_msg);
 
       /// \brief Connect a to the add entity signal
@@ -191,6 +203,7 @@ namespace gazebo
         boost::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> subscriber);
 
+      /// @todo Document me
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &c);
 
       protected: math::Vector3 offset;

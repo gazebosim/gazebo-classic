@@ -31,7 +31,8 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Feedback information from a joint
+    /// \brief Feedback information from a joint.  These are
+    ///        forces and torques on parent and child Link's
     class JointFeedback
     {
       /// \brief Operator =

@@ -1,8 +1,9 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Joint Animation 
-/// \brief Message for a model joint animation
+/// \interface JointAnimation 
+/// \brief Message for a model joint animation, does not appear to be used.
+/// \todo Document me.
 /// \verbatim
 
 import "pose.proto";

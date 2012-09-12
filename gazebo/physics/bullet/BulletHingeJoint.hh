@@ -34,10 +34,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief A single axis hinge joint
     class BulletHingeJoint : public HingeJoint<BulletJoint>
     {
@@ -47,7 +47,7 @@ namespace gazebo
       /// Destructor
       public: virtual ~BulletHingeJoint();
 
-      /// \brief Load joint
+      /// \brief Load the BulletHingeJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint
@@ -106,7 +106,6 @@ namespace gazebo
 
       private: btHingeConstraint *btHinge;
     };
-    /// \}
     /// \}
   }
 }

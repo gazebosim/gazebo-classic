@@ -31,7 +31,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics gazebo_physics_ode ODE Physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
     /// \brief Ray collision
@@ -66,13 +67,14 @@ namespace gazebo
       private: dGeomID geomId;
       private: ODEPhysicsPtr physicsEngine;
 
+      /// \brief an intersection class keeping track of name and depth of
+      ///        intersections
       private: class Intersection
                {
                  public: double depth;
                  public: std::string name;
                };
     };
-    /// \}
     /// \}
   }
 }

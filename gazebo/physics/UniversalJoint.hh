@@ -41,7 +41,7 @@ namespace gazebo
       /// \brief Destuctor
       public: virtual ~UniversalJoint()
               { }
-      /// \brief Load the joint
+      /// \brief Load a UniversalJoint
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);

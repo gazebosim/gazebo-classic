@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Joint Command
-/// \brief Message for joint command
+/// \interface JointCmd
+/// \brief Message for joint command, used by physics::JointControlWidget
 /// \verbatim
 
 import "vector3d.proto";

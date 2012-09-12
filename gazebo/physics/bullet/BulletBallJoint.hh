@@ -32,14 +32,14 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
-    /// \brief A ball joint
+
+    /// \brief BulletBallJoint class models a ball joint in Bullet.
     class BulletBallJoint : public BallJoint<BulletJoint>
     {
-      /// \brief Constructor
+      /// \brief Bullet Ball Joint Constructor
       public: BulletBallJoint(btDynamicsWorld *_world);
 
       /// \brief Destructor
@@ -84,7 +84,7 @@ namespace gazebo
 
       private: btPoint2PointConstraint *btBall;
     };
-    /// \}
+
     /// \}
   }
 }

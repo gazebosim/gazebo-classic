@@ -28,6 +28,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief Keeps track of collision state
     class CollisionState : public State
     {
       /// \brief Default constructor
@@ -47,6 +51,7 @@ namespace gazebo
 
       private: math::Pose pose;
     };
+    /// \}
   }
 }
 #endif

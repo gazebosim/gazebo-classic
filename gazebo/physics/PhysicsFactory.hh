@@ -34,6 +34,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
     // Prototype for physics factory functions
     typedef PhysicsEnginePtr (*PhysicsFactoryFn) (WorldPtr world);
 

@@ -70,9 +70,11 @@ namespace gazebo
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
 
+      /// \brief Returns a pointer to the rendering::DepthCamera
       public: rendering::DepthCameraPtr GetDepthCamera() const
               {return this->camera;}
 
+      /// \brief save the image frame to file named _filename.
       public: bool SaveFrame(const std::string &_filename);
 
       private: void OnPose(ConstPosePtr &_msg);

@@ -22,6 +22,8 @@
 
 #include "sdf/interface/SDF.hh"
 
+/// \ingroup gazebo_parser
+/// \brief namespace for Simulation Description Format parser
 namespace sdf
 {
   /// \brief Init based on the installed sdf_format.xml file

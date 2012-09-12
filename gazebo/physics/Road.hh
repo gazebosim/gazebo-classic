@@ -27,6 +27,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief for building a Road from SDF
     class Road : public Base
     {
       /// \brief Constructor
@@ -45,6 +49,7 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr roadPub;
     };
+    /// \}
   }
 }
 #endif
