@@ -28,8 +28,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
@@ -46,7 +45,6 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
     };
     typedef  boost::shared_ptr<ODESurfaceParams> ODESurfaceParamsPtr;
-    /// \}
     /// \}
   }
 }

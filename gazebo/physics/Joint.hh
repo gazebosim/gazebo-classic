@@ -39,8 +39,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    /// \addtogroup gazebo_physics_ode ode Physics
-    /// \{
 
     /// \brief Base class for all joints
     class Joint : public Base
@@ -218,7 +216,6 @@ namespace gazebo
 
       private: math::Angle staticAngle;
     };
-    /// \}
     /// \}
   }
 }

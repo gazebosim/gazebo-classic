@@ -44,17 +44,17 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
+    /// \brief data structure for contact feedbacks
     class ContactFeedback
     {
       public: Contact contact;
       public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
       public: int feedbackCount;
     };
-
-    /// \addtogroup gazebo_physics
-    /// \{
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
 
     /// \brief ODE physics engine
     class ODEPhysics : public PhysicsEngine
@@ -231,7 +231,6 @@ namespace gazebo
     };
     typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
 
-  /// \}
   /// \}
   }
 }

@@ -33,8 +33,7 @@ namespace gazebo
   {
     class Link;
 
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
@@ -77,7 +76,6 @@ namespace gazebo
       private: math::Vector3 cog;
       private: Link *link;
     };
-    /// \}
     /// \}
   }
 }

@@ -26,9 +26,6 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_physics
-  /// \brief Physics namespace
-
   namespace physics
   {
     /// \addtogroup gazebo_physics

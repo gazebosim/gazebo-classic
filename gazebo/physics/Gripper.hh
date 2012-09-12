@@ -94,6 +94,7 @@ namespace gazebo
       /// \brief Steps not touching before deisengaging fixed joint
       private: int detach_steps;
     };
+    /// \}
   }
 }
 #endif

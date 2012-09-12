@@ -29,9 +29,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
-    /// \addtogroup gazebo_physics_ode ode Physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
     /// \brief An ODEBallJoint
@@ -68,7 +67,6 @@ namespace gazebo
               {return math::Angle(0);}
     };
 
-    /// \}
     /// \}
   }
 }

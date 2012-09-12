@@ -39,8 +39,7 @@ namespace gazebo
     class XMLConfigNode;
     class Mass;
 
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 

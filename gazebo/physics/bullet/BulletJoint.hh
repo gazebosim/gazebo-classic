@@ -29,10 +29,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief Base class for all joints
     class BulletJoint : public Joint
     {
@@ -93,7 +93,6 @@ namespace gazebo
       protected: btTypedConstraint *constraint;
       protected: btDynamicsWorld *world;
     };
-    /// \}
     /// \}
   }
 }

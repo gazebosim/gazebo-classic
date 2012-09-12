@@ -36,7 +36,7 @@ namespace gazebo
   ///\brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Physics
+    /// \addtogroup gazebo_physics Classes for physics and dynamics
     /// \{
     static std::string EntityTypename[] = {
       "common",

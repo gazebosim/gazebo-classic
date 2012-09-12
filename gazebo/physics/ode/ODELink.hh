@@ -29,11 +29,9 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
-
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \brief ODE Physics wrapper
+    /// \brief ODE physics engine wrapper
     /// \{
 
     /// \brief ODE Link class
@@ -170,7 +168,6 @@ namespace gazebo
       private: dSpaceID spaceId;
     };
 
-    /// \}
     /// \}
   }
 }

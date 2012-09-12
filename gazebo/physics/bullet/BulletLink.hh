@@ -34,9 +34,9 @@ namespace gazebo
   {
     class BulletMotionState;
 
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \brief bullet physics engine wrapper
     /// \{
 
     /// \brief Bullet Link class
@@ -153,7 +153,6 @@ namespace gazebo
       private: BulletPhysicsPtr bulletPhysics;
       protected: math::Pose pose;
     };
-    /// \}
     /// \}
   }
 }

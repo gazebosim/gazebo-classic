@@ -24,8 +24,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
@@ -76,7 +75,6 @@ namespace gazebo
                             vec4[2], vec4[3]);
       }
     };
-    /// \}
     /// \}
   }
 }

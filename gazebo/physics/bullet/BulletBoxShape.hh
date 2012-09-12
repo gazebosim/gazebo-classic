@@ -29,8 +29,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
@@ -56,7 +55,6 @@ namespace gazebo
                     btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));
               }
     };
-    /// \}
     /// \}
   }
 }

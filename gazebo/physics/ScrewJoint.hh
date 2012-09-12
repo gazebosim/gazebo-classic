@@ -33,7 +33,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics gazebo_screw_joint Screw Joint
+    /// \addtogroup gazebo_physics
     /// \{
 
     /// \brief A screw joint

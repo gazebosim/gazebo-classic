@@ -33,9 +33,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
-    /// \addtogroup gazebo_physics_ode ode Physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
     /// \brief A screw joint
@@ -91,7 +90,6 @@ namespace gazebo
       public: virtual void SetParam(int parameter, double value);
     };
 
-  /// \}
   /// \}
   }
 }
