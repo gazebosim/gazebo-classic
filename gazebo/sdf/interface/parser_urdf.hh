@@ -187,14 +187,20 @@ namespace urdf2gazebo
       /// deal with extensions (things that do not belong in urdf but should be mapped into sdf
       void parseGazeboExtension(TiXmlDocument &urdf_in);
 
+      /// create collision blocks from urdf collisions
+      void createCollisions(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link);
+
+      /// create visual blocks from urdf visuals
+      void createVisuals(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link);
+
       /// insert extensions into collision geoms
-      void insertGazeboExtensionGeom(TiXmlElement *elem,std::string link_name);
+      void insertGazeboExtensionCollision(TiXmlElement *elem,std::string link_name);
 
       /// insert extensions into visuals
       void insertGazeboExtensionVisual(TiXmlElement *elem,std::string link_name);
 
       /// insert extensions into links
-      void insertGazeboExtensionBody(TiXmlElement *elem,std::string link_name);
+      void insertGazeboExtensionLink(TiXmlElement *elem,std::string link_name);
 
       /// insert extensions into joints
       void insertGazeboExtensionJoint(TiXmlElement *elem,std::string joint_name);

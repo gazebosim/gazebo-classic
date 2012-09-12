@@ -400,7 +400,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_in)
   }
 }
 
-void URDF2Gazebo::insertGazeboExtensionGeom(TiXmlElement *elem,std::string link_name)
+void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,std::string link_name)
 {
     for (std::map<std::string,std::vector<GazeboExtension*> >::iterator gazebo_it = this->gazebo_extensions_.begin();
          gazebo_it != this->gazebo_extensions_.end(); gazebo_it++)
@@ -454,7 +454,7 @@ void URDF2Gazebo::insertGazeboExtensionVisual(TiXmlElement *elem,std::string lin
     }
 }
 
-void URDF2Gazebo::insertGazeboExtensionBody(TiXmlElement *elem,std::string link_name)
+void URDF2Gazebo::insertGazeboExtensionLink(TiXmlElement *elem,std::string link_name)
 {
     for (std::map<std::string,std::vector<GazeboExtension*> >::iterator gazebo_it = this->gazebo_extensions_.begin();
          gazebo_it != this->gazebo_extensions_.end(); gazebo_it++)
@@ -1427,9 +1427,6 @@ urdf::Pose  URDF2Gazebo::copyPose(gazebo::math::Pose pose)
 
 void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints)
 {
-    int linkGeomSize;
-    double linkSize[3];
-
     /* create new body */
     TiXmlElement *elem     = new TiXmlElement("link");
 
@@ -1453,51 +1450,17 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
     // create origin tag for this element
     addTransform(elem, currentTransform);
 
-
     /* create new inerial block */
     createInertial(elem, link);
 
+    /* create new collision block */
+    createCollisions(elem, link);
 
-    // make additional geoms using the lumped stuff
-    // loop through all collisions and visuals and lump
-    for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::const_iterator collisions_it = link->collision_groups.begin();
-         collisions_it != link->collision_groups.end(); collisions_it++)
-    {
-      if (collisions_it->first == "default")
-      {
-        logDebug("creating default geom for link [%s]",link->name.c_str());
-        boost::shared_ptr<urdf::Collision> collision = *(collisions_it->second->begin());
-        boost::shared_ptr<urdf::Visual> visual = *(link->visual_groups.find(collisions_it->first)->second->begin());
-
-        std::string collision_type = "empty";
-        if (!collision || !collision->geometry)
-          logDebug("urdf2gazebo: link(%s) does not have a collision or geometry tag. No <geometry> will be assigned.", link->name.c_str());
-        else
-          collision_type = getGeometrySize(collision->geometry, &linkGeomSize, linkSize); // add collision information
-        
-        /* make a <geom:...> block */
-        createCollision(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, link->name);
-      }
-      else if (collisions_it->first.find(std::string("lump::")) == 0) // starts with "lump::"
-      {
-        logDebug("creating lump geom [%s] for link [%s]",collisions_it->first.c_str(),link->name.c_str());
-        boost::shared_ptr<urdf::Collision> collision = *(collisions_it->second->begin());
-        boost::shared_ptr<urdf::Visual> visual = *(link->visual_groups.find(collisions_it->first)->second->begin());
-
-        std::string collision_type = "empty";
-        if (!collision || !collision->geometry)
-          logDebug("urdf2gazebo: link(%s) does not have a collision or geometry tag. No <geometry> will be assigned.", link->name.c_str());
-        else
-          collision_type = getGeometrySize(collision->geometry, &linkGeomSize, linkSize); // add collision information
-        
-        std::string original_reference = collisions_it->first.substr(6);
-        /* make a <geom:...> block */
-        createCollision(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, original_reference);
-      }
-    }
+    /* create new visual block */
+    createVisuals(elem, link);
 
     /* copy gazebo extensions data */
-    insertGazeboExtensionBody(elem,link->name);
+    insertGazeboExtensionLink(elem,link->name);
     
     /* add body to document */
     root->LinkEndChild(elem);
@@ -1505,6 +1468,72 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
     /* make a <joint:...> block */
     createJoint(root, link, currentTransform, enforce_limits, reduce_fixed_joints);
 
+}
+
+void URDF2Gazebo::createCollisions(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link)
+{
+    // loop through all collisions. make additional geoms using the lumped stuff
+    int linkGeomSize;
+    double linkSize[3];
+
+    for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::const_iterator collisions_it = link->collision_groups.begin();
+         collisions_it != link->collision_groups.end(); collisions_it++)
+    {
+      boost::shared_ptr<urdf::Collision> collision = *(collisions_it->second->begin());
+
+      std::string collision_type = "empty";
+      if (!collision || !collision->geometry)
+        logDebug("urdf2gazebo: link(%s) does not have a collision tag. No <geometry> will be assigned.", link->name.c_str());
+      else
+        collision_type = getGeometrySize(collision->geometry, &linkGeomSize, linkSize);
+
+
+      if (collisions_it->first == "default")
+      {
+        logDebug("creating default geom for link [%s]",link->name.c_str());
+        
+        /* make a <geom:...> block */
+        createCollision(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, link->name);
+      }
+      else if (collisions_it->first.find(std::string("lump::")) == 0) // if collision name starts with "lump::", pass through original parent link name
+      {
+        logDebug("creating lump geom [%s] for link [%s]",collisions_it->first.c_str(),link->name.c_str());
+        std::string original_reference = collisions_it->first.substr(6); // original name before lumping
+        createCollision(elem, link, collision_type, collision, linkGeomSize, linkSize, original_reference);
+      }
+    }
+}
+
+void URDF2Gazebo::createVisuals(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link)
+{
+    // loop through all visuals. make additional geoms using the lumped stuff
+    int linkGeomSize;
+    double linkSize[3];
+
+    for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual> > > >::const_iterator visuals_it = link->visual_groups.begin();
+         visuals_it != link->visual_groups.end(); visuals_it++)
+    {
+      boost::shared_ptr<urdf::Visual> visual = *(visuals_it->second->begin());
+      std::string visual_type = "empty";
+      if (!visual || !visual->geometry)
+        logDebug("urdf2gazebo: link(%s) does not have a visual tag. No <geometry> will be assigned.", link->name.c_str());
+      else
+        visual_type = getGeometrySize(visual->geometry, &linkGeomSize, linkSize);
+
+      if (visuals_it->first == "default")
+      {
+        logDebug("creating default geom for link [%s]",link->name.c_str());
+        /* make a <geom:...> block */
+        createVisual(geom, link, visual_type, visual, original_reference);
+      }
+      else if (visuals_it->first.find(std::string("lump::")) == 0) // starts with "lump::"
+      {
+        logDebug("creating lump geom [%s] for link [%s]",visuals_it->first.c_str(),link->name.c_str());
+        std::string original_reference = visuals_it->first.substr(6);
+        /* make a <geom:...> block */
+        createVisual(geom, link, visual_type, visual, original_reference);
+      }
+    }
 }
 
 
@@ -1534,6 +1563,7 @@ void URDF2Gazebo::createInertial(TiXmlElement *elem, boost::shared_ptr<const urd
     addKeyValue(inertia, "iyy", values2str(1, &link->inertial->iyy));
     addKeyValue(inertia, "iyz", values2str(1, &link->inertial->iyz));
     addKeyValue(inertia, "izz", values2str(1, &link->inertial->izz));
+
     elem->LinkEndChild(inertia);
 }
 
@@ -1637,30 +1667,32 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
 }
 
 
-void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link,std::string collision_type, boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual, int linkGeomSize, double* linkSize, std::string original_reference)
+void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link,std::string collision_type, boost::shared_ptr<urdf::Collision> collision, int linkGeomSize, double* linkSize, std::string original_reference)
 {
     /* begin create geometry node, skip if no collision specified */
     if (collision_type != "empty")
     {
-        TiXmlElement *geom     = new TiXmlElement("geom:" + collision_type);
+        TiXmlElement *gazebo_collision     = new TiXmlElement("collision");
+        gazebo_collision->SetAttribute("type", collision_type);
+
         /* set its name */
         if (original_reference == link->name)
-          geom->SetAttribute("name", link->name + std::string("_geom"));
+          gazebo_collision->SetAttribute("name", link->name + std::string("_geom"));
         else
-          geom->SetAttribute("name", link->name + std::string("_geom_")+original_reference);
+          gazebo_collision->SetAttribute("name", link->name + std::string("_geom_")+original_reference);
         
         /* set transform */
-        addKeyValue(geom, "xyz", vector32str(collision->origin.position));
+        addKeyValue(gazebo_collision, "xyz", vector32str(collision->origin.position));
         double rpy[3];
         collision->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
-        addKeyValue(geom, "rpy", values2str(3, rpy, rad2deg));
+        addKeyValue(gazebo_collision, "rpy", values2str(3, rpy, rad2deg));
         
         if (collision->geometry->type == urdf::Geometry::MESH)
         {  
             boost::shared_ptr<const urdf::Mesh> mesh;
             mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(collision->geometry);
             /* set mesh size or scale */
-            addKeyValue(geom, "scale", vector32str(mesh->scale));
+            addKeyValue(gazebo_collision, "scale", vector32str(mesh->scale));
 
             /* set mesh file */
             /* expand to get absolute mesh filename */
@@ -1695,49 +1727,35 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const ur
               logError("filename referred by mesh [%s] does not appear to exist.",mesh->filename.c_str());
 
             // add mesh filename
-            addKeyValue(geom, "mesh", fullname);
+            addKeyValue(gazebo_collision, "mesh", fullname);
             
         }
         else
         {
             /* set geometry size */
-            addKeyValue(geom, "size", values2str(linkGeomSize, linkSize));
+            addKeyValue(gazebo_collision, "size", values2str(linkGeomSize, linkSize));
         }
         
         /* set additional data from extensions */
-        insertGazeboExtensionGeom(geom,original_reference);
-
-        // FIXME: unfortunately, visual is not created if collision is missing!!!
-        createVisual(geom, link, collision_type, collision, visual,original_reference);
+        insertGazeboExtensionCollision(gazebo_collision,original_reference);
 
         /* add geometry to body */
-        elem->LinkEndChild(geom);
+        elem->LinkEndChild(gazebo_collision);
     }
 }
 
-void URDF2Gazebo::createVisual(TiXmlElement *geom, boost::shared_ptr<const urdf::Link> link, std::string collision_type, boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual,std::string original_reference)
+void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, std::string visual_type, boost::shared_ptr<urdf::Visual> visual, std::string original_reference)
 {
     /* begin create gazebo visual node */
     TiXmlElement *gazebo_visual = new TiXmlElement("visual");
+    gazebo_visual->SetAttribute("type", visual_type);
 
-    /* compute the visualisation transfrom */
-    gazebo::math::Pose coll = URDF2Gazebo::copyPose(collision->origin);
+    /* add the visualisation transfrom */
+    addKeyValue(gazebo_visual, "xyz", vector32str(visual->origin.position));
+    double rpy[3];
+    visual->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
+    addKeyValue(gazebo_visual, "rpy", values2str(3, rpy, rad2deg));
 
-    // coll = coll.GetInverse();
-    
-    gazebo::math::Pose vis;
-    if(!visual) 
-    {
-      logWarn("urdf2gazebo: link(%s) does not have a visual tag, using zero transform.", link->name.c_str());
-      vis = gazebo::math::Pose();
-    }
-    else
-      vis = URDF2Gazebo::copyPose(visual->origin);
-
-    coll = coll.GetInverse()*vis;
-    
-    addTransform(gazebo_visual, coll);
-    
     /* set geometry size */                
     
     if (!visual || !visual->geometry)
@@ -1764,8 +1782,8 @@ void URDF2Gazebo::createVisual(TiXmlElement *geom, boost::shared_ptr<const urdf:
         /* set mesh file */
         if (mesh->filename.empty())
         {
-            logError("urdf2gazebo: mesh geometry (%s) was specified but no filename given? using collision type.",link->name.c_str());
-            addKeyValue(gazebo_visual, "mesh", "unit_" + collision_type); // reuse collision type if mesh does not specify filename
+            logError("urdf2gazebo: mesh geometry (%s) was specified but no filename given? using visual type.",link->name.c_str());
+            addKeyValue(gazebo_visual, "mesh", "unit_" + visual_type); // reuse visual type if mesh does not specify filename
         }
         else
         {
@@ -1813,7 +1831,7 @@ void URDF2Gazebo::createVisual(TiXmlElement *geom, boost::shared_ptr<const urdf:
     insertGazeboExtensionVisual(gazebo_visual,original_reference);
 
     /* end create visual node */
-    geom->LinkEndChild(gazebo_visual);
+    elem->LinkEndChild(gazebo_visual);
 }
 
 void URDF2Gazebo::walkChildAddNamespace(TiXmlNode* robot_xml,std::string robot_namespace)
