@@ -122,27 +122,51 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     this->fileTreeWidget->expandItem(topItem);
   }
 
-  transport::Connection *conn = new transport::Connection();
-  conn->Connect("127.0.0.1", 5018);
-  conn->AsyncRead(boost::bind(&InsertModelWidget::OnResponse, this, _1));
+  char *uriStr = getenv("GAZEBO_MODEL_DATABASE_URI");
 
-  msgs::Request *request = msgs::CreateRequest("models");
-  std::string requestData;
-  request->SerializeToString(&requestData);
-  conn->EnqueueMsg(requestData);
+  if (uriStr)
+  {
+    std::string uri = uriStr;
+    int colon = uri.find_last_of(":");
+    if (colon == uri.find("://"))
+    {
+      gzerr << "No port specified for the GAZEBO_MODEL_DATABASE_URI env var\n";
+    }
+    else
+    {
+      std::string host = uri.substr(0, colon);
+      unsigned int port = boost::lexical_cast<unsigned int>(
+          uri.substr(colon + 1, uri.size() - colon));
 
-  conn->ProcessWriteQueue();
+      std::cout << "Host[" << host << "] Port[" << port << "]\n";
+      transport::Connection *conn = new transport::Connection();
+      conn->Connect(host, port);
+      conn->AsyncRead(boost::bind(&InsertModelWidget::OnResponse, this, _1));
+
+      msgs::Request *request = msgs::CreateRequest("models");
+      std::string requestData;
+      request->SerializeToString(&requestData);
+      conn->EnqueueMsg(requestData);
+
+      conn->ProcessWriteQueue();
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 void InsertModelWidget::OnResponse(const std::string &_data)
 {
-  std::cout << "RR:" << _data << "||\n";
+  std::cout << "InsertModelWidget::OnResponse\n";
   msgs::Response response;
   msgs::GzString_V models;
 
   response.ParseFromString(_data);
   models.ParseFromString(response.serialized_data());
+
+  for (int i = 0; i < models.data_size(); i++)
+  {
+    std::cout << "Model: " << models.data(i) << "\n";
+  }
 }
 
 /////////////////////////////////////////////////

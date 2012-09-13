@@ -78,16 +78,30 @@ Connection::~Connection()
 }
 
 //////////////////////////////////////////////////
-bool Connection::Connect(const std::string &host, unsigned int port)
+bool Connection::Connect(const std::string &_host, unsigned int _port)
 {
-  std::string service = boost::lexical_cast<std::string>(port);
+  std::string service = boost::lexical_cast<std::string>(_port);
+
+  int httpIndex = _host.find("http://");
+  std::string host = _host;
+  if (httpIndex != std::string::npos)
+    host = _host.substr(7, _host.size() - 7);
 
   // Resolve the host name into an IP address
-  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
-  boost::asio::ip::tcp::resolver::query query(host, service);
-  boost::asio::ip::tcp::resolver::iterator endpoint_iter =
-    resolver.resolve(query);
   boost::asio::ip::tcp::resolver::iterator end;
+  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
+  boost::asio::ip::tcp::resolver::query query(host, service,
+      boost::asio::ip::resolver_query_base::numeric_service);
+  boost::asio::ip::tcp::resolver::iterator endpoint_iter;
+  try
+  {
+    endpoint_iter = resolver.resolve(query);
+  }
+  catch (...)
+  {
+    gzerr << "Unable to resolve uri[" << host << ":" << _port << "]\n";
+    return false;
+  }
 
   this->connectError = false;
   this->remoteURI.clear();
@@ -117,7 +131,7 @@ bool Connection::Connect(const std::string &host, unsigned int port)
 
   if (this->remoteURI.empty())
   {
-    gzerr << "Unable to connect to host[" << host << ":" << port << "]\n";
+    gzerr << "Unable to connect to host[" << host << ":" << _port << "]\n";
     return false;
   }
 
