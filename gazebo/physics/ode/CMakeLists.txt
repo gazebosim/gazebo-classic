@@ -1,6 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
+link_directories(  
+  ${CCD_LIBRARY_DIRS} 
+)
+
 
 set (sources ODEPhysics.cc
              ODECollision.cc
