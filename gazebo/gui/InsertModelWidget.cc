@@ -122,6 +122,12 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     this->fileTreeWidget->expandItem(topItem);
   }
 
+  this->ConnectToModelDatabase();
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::ConnectToModelDatabase()
+{
   char *uriStr = getenv("GAZEBO_MODEL_DATABASE_URI");
 
   if (uriStr)
@@ -138,7 +144,6 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
       unsigned int port = boost::lexical_cast<unsigned int>(
           uri.substr(colon + 1, uri.size() - colon));
 
-      std::cout << "Host[" << host << "] Port[" << port << "]\n";
       transport::Connection *conn = new transport::Connection();
       conn->Connect(host, port);
       conn->AsyncRead(boost::bind(&InsertModelWidget::OnResponse, this, _1));
@@ -150,6 +155,10 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 
       conn->ProcessWriteQueue();
     }
+  }
+  else
+  {
+    gzwarn << "GAZEBO_MODEL_DATABASE_URI env var not specified\n";
   }
 }
 
@@ -163,9 +172,20 @@ void InsertModelWidget::OnResponse(const std::string &_data)
   response.ParseFromString(_data);
   models.ParseFromString(response.serialized_data());
 
+  // Create a top-level tree item for the model database
+  QTreeWidgetItem *topItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg("Model Database")));
+  this->fileTreeWidget->addTopLevelItem(topItem);
+
   for (int i = 0; i < models.data_size(); i++)
   {
-    std::cout << "Model: " << models.data(i) << "\n";
+    // Add a child item for the model
+    QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
+        QStringList(QString("%1").arg(
+            QString::fromStdString(models.data(i)))));
+    childItem->setData(0, Qt::UserRole, QVariant("database"));
+    this->fileTreeWidget->addTopLevelItem(childItem);
   }
 }
 
