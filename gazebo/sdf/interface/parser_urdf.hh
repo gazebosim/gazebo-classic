@@ -250,13 +250,17 @@ namespace urdf2gazebo
                        bool enforce_limits,bool reduce_fixed_joints);
       void createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link,
                       gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints);
+
       void createInertial(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link);
+
       void createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link, std::string collision_type,
-                      boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual,
-                      int linkGeomSize, double linkSize[3], std::string original_reference = std::string(""));
-      void createVisual(TiXmlElement *geom, boost::shared_ptr<const urdf::Link> link, std::string collision_type,
-                        boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual,
-                        std::string original_reference);
+                           boost::shared_ptr<urdf::Collision> collision, int linkGeomSize, double linkSize[3],
+                           std::string original_reference = std::string(""));
+
+      void createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, std::string visual_type,
+                        boost::shared_ptr<urdf::Visual> visual, int linkGeomSize, double linkSize[3],
+                        std::string original_reference = std::string(""));
+
       void createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform,
                        bool enforce_limits,bool reduce_fixed_joints);
 

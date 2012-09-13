@@ -1493,7 +1493,7 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem, boost::shared_ptr<const u
         logDebug("creating default geom for link [%s]",link->name.c_str());
         
         /* make a <geom:...> block */
-        createCollision(elem, link, collision_type, collision, visual, linkGeomSize, linkSize, link->name);
+        createCollision(elem, link, collision_type, collision, linkGeomSize, linkSize, link->name);
       }
       else if (collisions_it->first.find(std::string("lump::")) == 0) // if collision name starts with "lump::", pass through original parent link name
       {
@@ -1522,16 +1522,16 @@ void URDF2Gazebo::createVisuals(TiXmlElement* elem, boost::shared_ptr<const urdf
 
       if (visuals_it->first == "default")
       {
-        logDebug("creating default geom for link [%s]",link->name.c_str());
-        /* make a <geom:...> block */
-        createVisual(geom, link, visual_type, visual, original_reference);
+        logDebug("creating default visual for link [%s]",link->name.c_str());
+        /* make a visual block */
+        createVisual(elem, link, visual_type, visual, linkGeomSize, linkSize);
       }
       else if (visuals_it->first.find(std::string("lump::")) == 0) // starts with "lump::"
       {
-        logDebug("creating lump geom [%s] for link [%s]",visuals_it->first.c_str(),link->name.c_str());
+        logDebug("creating lump visual [%s] for link [%s]",visuals_it->first.c_str(),link->name.c_str());
         std::string original_reference = visuals_it->first.substr(6);
-        /* make a <geom:...> block */
-        createVisual(geom, link, visual_type, visual, original_reference);
+        /* make a visual block */
+        createVisual(elem, link, visual_type, visual, linkGeomSize, linkSize, original_reference);
       }
     }
 }
@@ -1744,94 +1744,97 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const ur
     }
 }
 
-void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, std::string visual_type, boost::shared_ptr<urdf::Visual> visual, std::string original_reference)
+void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, std::string visual_type, boost::shared_ptr<urdf::Visual> visual, int linkGeomSize, double* linkSize, std::string original_reference)
 {
     /* begin create gazebo visual node */
-    TiXmlElement *gazebo_visual = new TiXmlElement("visual");
-    gazebo_visual->SetAttribute("type", visual_type);
-
-    /* add the visualisation transfrom */
-    addKeyValue(gazebo_visual, "xyz", vector32str(visual->origin.position));
-    double rpy[3];
-    visual->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
-    addKeyValue(gazebo_visual, "rpy", values2str(3, rpy, rad2deg));
-
-    /* set geometry size */                
-    
-    if (!visual || !visual->geometry)
+    if (visual_type != "empty")
     {
-        logWarn("urdf2gazebo: link(%s) does not have a visual->geometry tag, using default SPHERE with 1mm radius.", link->name.c_str());
-        double visualSize[3];
-        visualSize[0]=visualSize[1]=visualSize[2]=0.002;
-        addKeyValue(gazebo_visual, "scale", values2str(3, visualSize));
-        addKeyValue(gazebo_visual, "mesh", "unit_sphere");
-    }
-    else if (visual->geometry->type == urdf::Geometry::MESH)
-    {
-        boost::shared_ptr<const urdf::Mesh>  mesh;
-        mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(visual->geometry);
-        /* set mesh size or scale */
-        /*
-        if (visual->geometry->isSet["size"])
-            addKeyValue(gazebo_visual, "size", values2str(3, mesh->size));        
-        else
-            addKeyValue(gazebo_visual, "scale", values2str(3, mesh->scale));        
-        */
-        addKeyValue(gazebo_visual, "scale", vector32str(mesh->scale));
+      TiXmlElement *gazebo_visual = new TiXmlElement("visual");
+      gazebo_visual->SetAttribute("type", visual_type);
 
-        /* set mesh file */
-        if (mesh->filename.empty())
-        {
-            logError("urdf2gazebo: mesh geometry (%s) was specified but no filename given? using visual type.",link->name.c_str());
-            addKeyValue(gazebo_visual, "mesh", "unit_" + visual_type); // reuse visual type if mesh does not specify filename
-        }
-        else
-        {
-            /* set mesh file */
-            /* expand to get absolute mesh filename */
-            std::string fullname = mesh->filename;
+      /* add the visualisation transfrom */
+      addKeyValue(gazebo_visual, "xyz", vector32str(visual->origin.position));
+      double rpy[3];
+      visual->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
+      addKeyValue(gazebo_visual, "rpy", values2str(3, rpy, rad2deg));
 
-            /* resource retriever is ros based
-            if (fullname.find("package://") == 0)
-            {
-              fullname.erase(0, strlen("package://"));
-              size_t pos = fullname.find("/");
-              if (pos == std::string::npos)
+      /* set geometry size */                
+      
+      if (!visual || !visual->geometry)
+      {
+          logWarn("urdf2gazebo: link(%s) does not have a visual->geometry tag, using default SPHERE with 1mm radius.", link->name.c_str());
+          double visualSize[3];
+          visualSize[0]=visualSize[1]=visualSize[2]=0.002;
+          addKeyValue(gazebo_visual, "scale", values2str(3, visualSize));
+          addKeyValue(gazebo_visual, "mesh", "unit_sphere");
+      }
+      else if (visual->geometry->type == urdf::Geometry::MESH)
+      {
+          boost::shared_ptr<const urdf::Mesh>  mesh;
+          mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(visual->geometry);
+          /* set mesh size or scale */
+          /*
+          if (visual->geometry->isSet["size"])
+              addKeyValue(gazebo_visual, "size", values2str(3, mesh->size));        
+          else
+              addKeyValue(gazebo_visual, "scale", values2str(3, mesh->scale));        
+          */
+          addKeyValue(gazebo_visual, "scale", vector32str(mesh->scale));
+
+          /* set mesh file */
+          if (mesh->filename.empty())
+          {
+              logError("urdf2gazebo: mesh geometry (%s) was specified but no filename given? using visual type.",link->name.c_str());
+              addKeyValue(gazebo_visual, "mesh", "unit_" + visual_type); // reuse visual type if mesh does not specify filename
+          }
+          else
+          {
+              /* set mesh file */
+              /* expand to get absolute mesh filename */
+              std::string fullname = mesh->filename;
+
+              /* resource retriever is ros based
+              if (fullname.find("package://") == 0)
               {
-                logFatal("Could not parse package:// format for [%s]",mesh->filename.c_str());
+                fullname.erase(0, strlen("package://"));
+                size_t pos = fullname.find("/");
+                if (pos == std::string::npos)
+                {
+                  logFatal("Could not parse package:// format for [%s]",mesh->filename.c_str());
+                }
+
+                std::string package = fullname.substr(0, pos);
+                fullname.erase(0, pos);
+                std::string package_path = ros::package::getPath(package);
+
+                if (package_path.empty())
+                {
+                  logFatal("%s Package[%s] does not exist",mesh->filename.c_str(),package.c_str());
+                }
+
+                fullname = package_path + fullname;
               }
+              */
 
-              std::string package = fullname.substr(0, pos);
-              fullname.erase(0, pos);
-              std::string package_path = ros::package::getPath(package);
+              // add mesh filename
+              addKeyValue(gazebo_visual, "mesh", fullname);
+          }
+          
+      }
+      else
+      {
+          double visualSize[3];
+          std::string visual_geom_type = getGeometryBoundingBox(visual->geometry, visualSize);
+          addKeyValue(gazebo_visual, "scale", values2str(3, visualSize));
+          addKeyValue(gazebo_visual, "mesh", "unit_" + visual_geom_type);
+      }
+      
+      /* set additional data from extensions */
+      insertGazeboExtensionVisual(gazebo_visual,original_reference);
 
-              if (package_path.empty())
-              {
-                logFatal("%s Package[%s] does not exist",mesh->filename.c_str(),package.c_str());
-              }
-
-              fullname = package_path + fullname;
-            }
-            */
-
-            // add mesh filename
-            addKeyValue(gazebo_visual, "mesh", fullname);
-        }
-        
+      /* end create visual node */
+      elem->LinkEndChild(gazebo_visual);
     }
-    else
-    {
-        double visualSize[3];
-        std::string visual_geom_type = getGeometryBoundingBox(visual->geometry, visualSize);
-        addKeyValue(gazebo_visual, "scale", values2str(3, visualSize));
-        addKeyValue(gazebo_visual, "mesh", "unit_" + visual_geom_type);
-    }
-    
-    /* set additional data from extensions */
-    insertGazeboExtensionVisual(gazebo_visual,original_reference);
-
-    /* end create visual node */
-    elem->LinkEndChild(gazebo_visual);
 }
 
 void URDF2Gazebo::walkChildAddNamespace(TiXmlNode* robot_xml,std::string robot_namespace)
