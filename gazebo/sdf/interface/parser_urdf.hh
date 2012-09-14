@@ -262,6 +262,7 @@ namespace urdf2gazebo
       void createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform);
 
       bool initModelString(std::string urdf_str, sdf::SDFPtr _sdf);
+      bool initModelDoc(TiXmlDocument* _xmlDoc, sdf::SDFPtr _sdf);
       bool initModelFile(std::string filename, sdf::SDFPtr _sdf);
 
       bool initModelString(std::string urdf_str, sdf::SDFPtr _sdf, bool _enforce_limits, 

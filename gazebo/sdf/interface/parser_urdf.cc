@@ -1964,6 +1964,7 @@ bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf)
     logDebug("\n--------------entire robot------------------\n%s\n--------------------\n",stream_robot.str().c_str());
     gazebo_xml_out.LinkEndChild(robot);  // uncomment if returning old gazebo_xml
 
+    gazebo_xml_out.Print();
 
 
     // at this point, change xml to sdf?
@@ -1992,9 +1993,24 @@ bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf)
     return true;
 }
 
+bool URDF2Gazebo::initModelDoc(TiXmlDocument* _xmlDoc, sdf::SDFPtr _sdf)
+{
+    std::ostringstream stream;
+    stream << *_xmlDoc;
+    std::string urdfStr = stream.str();
+    return initModelString(urdfStr, _sdf);
+}
 
 bool URDF2Gazebo::initModelFile(std::string filename, sdf::SDFPtr _sdf)
 {
+  TiXmlDocument xmlDoc;
+  if (xmlDoc.LoadFile(filename))
+  {
+    return initModelDoc(&xmlDoc, _sdf);
+  }
+  else
+    gzerr << "Unable to load file[" << filename << "]\n";
+
     return true;
 }
 
