@@ -52,6 +52,14 @@ double rad2deg(double v)
 
 URDF2Gazebo::URDF2Gazebo()
 {
+    // default options
+    this->enforce_limits = false;
+    this->xml_declaration = false;
+    this->robot_namespace.clear();
+    this->model_name.clear();
+    this->initial_xyz = urdf::Vector3(0,0,0);
+    this->initial_rpy = urdf::Vector3(0,0,0);
+    this->reduce_fixed_joints = true;
 }
 
 URDF2Gazebo::~URDF2Gazebo()
@@ -200,10 +208,10 @@ std::string URDF2Gazebo::getKeyValueAsString(TiXmlElement* elem)
     return value_str;
 }
 
-void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_in)
+void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
 {
   logDebug("parsing gazebo extension");
-  TiXmlElement* robot_xml = urdf_in.FirstChildElement("robot");
+  TiXmlElement* robot_xml = urdf_xml.FirstChildElement("robot");
 
   // Get all Gazebo extension elements, put everything in this->gazebo_extensions_ map, containing a key string (link/joint name) and values
   for (TiXmlElement* gazebo_xml = robot_xml->FirstChildElement("gazebo"); gazebo_xml; gazebo_xml = gazebo_xml->NextSiblingElement("gazebo"))
@@ -1375,7 +1383,7 @@ void URDF2Gazebo::listGazeboExtensions(std::string reference)
   logDebug("--------------------------------------------------------------------");
 }
 
-void URDF2Gazebo::convertLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, const gazebo::math::Pose &transform, bool enforce_limits,bool reduce_fixed_joints)
+void URDF2Gazebo::initLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, const gazebo::math::Pose &transform)
 {
     gazebo::math::Pose currentTransform = transform;
 
@@ -1397,12 +1405,12 @@ void URDF2Gazebo::convertLink(TiXmlElement *root, boost::shared_ptr<const urdf::
 
     /* create <body:...> block for non fixed joint attached bodies */
     if ((link->getParent() && link->getParent()->name == "world") || 
-        !reduce_fixed_joints || (!link->parent_joint || link->parent_joint->type != urdf::Joint::FIXED))
-      createLink(root, link, currentTransform, enforce_limits, reduce_fixed_joints);
+        !this->reduce_fixed_joints || (!link->parent_joint || link->parent_joint->type != urdf::Joint::FIXED))
+      createLink(root, link, currentTransform);
 
     // recurse into children
     for (unsigned int i = 0 ; i < link->child_links.size() ; ++i)
-        convertLink(root, link->child_links[i], currentTransform, enforce_limits, reduce_fixed_joints);
+        initLink(root, link->child_links[i], currentTransform);
 }
 
 gazebo::math::Pose  URDF2Gazebo::copyPose(urdf::Pose pose)
@@ -1430,7 +1438,7 @@ urdf::Pose  URDF2Gazebo::copyPose(gazebo::math::Pose pose)
   return p;
 }
 
-void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints)
+void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform)
 {
     /* create new body */
     TiXmlElement *elem     = new TiXmlElement("link");
@@ -1471,7 +1479,7 @@ void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::L
     root->LinkEndChild(elem);
 
     /* make a <joint:...> block */
-    createJoint(root, link, currentTransform, enforce_limits, reduce_fixed_joints);
+    createJoint(root, link, currentTransform);
 
 }
 
@@ -1573,7 +1581,7 @@ void URDF2Gazebo::createInertial(TiXmlElement *elem, boost::shared_ptr<const urd
 }
 
 
-void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform, bool enforce_limits,bool reduce_fixed_joints)
+void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform)
 {
     /* compute the joint tag */
     std::string jtype;
@@ -1603,7 +1611,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
     
     // skip if joint type is fixed and we are not faking it with a hinge, skip/return
     //   with the exception of root link being world, because there's no lumping there
-    if (link->getParent() && link->getParent()->name != "world" && jtype == "fixed" && reduce_fixed_joints) return;
+    if (link->getParent() && link->getParent()->name != "world" && jtype == "fixed" && this->reduce_fixed_joints) return;
 
     if (!jtype.empty())
     {
@@ -1641,7 +1649,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
             // double tmpAnchor[3] =  { jointAnchor.x(), jointAnchor.y(), jointAnchor.z() };
             // addKeyValue(joint, "anchorOffset", values2str(3, tmpAnchor));
             
-            if (enforce_limits && link->parent_joint->limits)
+            if (this->enforce_limits && link->parent_joint->limits)
             {
                 if (jtype == "slider")
                 {
@@ -1842,7 +1850,7 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf:
     }
 }
 
-void URDF2Gazebo::walkChildAddNamespace(TiXmlNode* robot_xml,std::string robot_namespace)
+void URDF2Gazebo::walkChildAddNamespace(TiXmlNode* robot_xml)
 {
   TiXmlNode* child = 0;
   child = robot_xml->IterateChildren(child);
@@ -1854,27 +1862,33 @@ void URDF2Gazebo::walkChildAddNamespace(TiXmlNode* robot_xml,std::string robot_n
       if (child->FirstChildElement("robotNamespace") == NULL)
       {
         logDebug("    adding robotNamespace for %s",child->ValueStr().c_str());
-        addKeyValue(child->ToElement(), "robotNamespace", robot_namespace);
+        addKeyValue(child->ToElement(), "robotNamespace", this->robot_namespace);
       }
       else
       {
         logDebug("    robotNamespace already exists for %s",child->ValueStr().c_str());
       }
     }
-    this->walkChildAddNamespace(child,robot_namespace);
+    this->walkChildAddNamespace(child);
     child = robot_xml->IterateChildren(child);
   }
 }
 
-bool URDF2Gazebo::convert(TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out, bool enforce_limits, urdf::Vector3 initial_xyz, urdf::Vector3 initial_rpy,std::string model_name , std::string robot_namespace, bool xml_declaration)
+bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf, bool _enforce_limits, urdf::Vector3 _initial_xyz, urdf::Vector3 _initial_rpy, std::string _model_name , std::string _robot_namespace, bool _xml_declaration)
 {
+    this->model_name = _model_name;
+    this->robot_namespace = _robot_namespace;
+    this->initial_xyz = _initial_xyz;
+    this->initial_rpy = _initial_rpy;
+    this->enforce_limits = _enforce_limits;
+    this->xml_declaration = _xml_declaration;
+    return this->initModelString(urdf_str, _sdf);
+}
 
-    // copy model to a string
-    std::ostringstream stream_in;
-    stream_in << urdf_in;
-
+bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf)
+{
     /* Create a RobotModel from string */
-    boost::shared_ptr<urdf::ModelInterface> robot_model = urdf::parseURDF(stream_in.str().c_str());
+    boost::shared_ptr<urdf::ModelInterface> robot_model = urdf::parseURDF(urdf_str.c_str());
 
     if (!robot_model)
     {
@@ -1882,76 +1896,80 @@ bool URDF2Gazebo::convert(TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out,
         return false;
     }
 
+    // an xml object to hold the xml result
+    TiXmlDocument gazebo_xml_out;
 
     // add xml declaration if needed
-    if (xml_declaration)
+    if (this->xml_declaration)
     {
       TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
       gazebo_xml_out.LinkEndChild(decl);  // uncomment if returning old gazebo_xml
     }
     
     /* create root element and define needed namespaces */
-    TiXmlElement *robot = new TiXmlElement("model:physical");
-    robot->SetAttribute("xmlns:gazebo", "http://playerstage.sourceforge.net/gazebo/xmlschema/#gz");
-    robot->SetAttribute("xmlns:model", "http://playerstage.sourceforge.net/gazebo/xmlschema/#model");
-    robot->SetAttribute("xmlns:sensor", "http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor");
-    robot->SetAttribute("xmlns:body", "http://playerstage.sourceforge.net/gazebo/xmlschema/#body");
-    robot->SetAttribute("xmlns:geom", "http://playerstage.sourceforge.net/gazebo/xmlschema/#geom");
-    robot->SetAttribute("xmlns:joint", "http://playerstage.sourceforge.net/gazebo/xmlschema/#joint");
-    robot->SetAttribute("xmlns:controller", "http://playerstage.sourceforge.net/gazebo/xmlschema/#controller");
-    robot->SetAttribute("xmlns:interface", "http://playerstage.sourceforge.net/gazebo/xmlschema/#interface");
-    robot->SetAttribute("xmlns:rendering", "http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering");
-    robot->SetAttribute("xmlns:physics", "http://playerstage.sourceforge.net/gazebo/xmlschema/#physics");
+    TiXmlElement *robot = new TiXmlElement("model");
     
     // set model name to urdf robot name if not specified
-    if (model_name.empty())
+    if (this->model_name.empty())
       robot->SetAttribute("name", robot_model->getName());
     else
-      robot->SetAttribute("name", model_name);
+      robot->SetAttribute("name", this->model_name);
     
     /* set the transform for the whole model to identity */
-    addKeyValue(robot, "xyz", vector32str(initial_xyz));
-    addKeyValue(robot, "rpy", vector32str(initial_rpy));
+    addKeyValue(robot, "xyz", vector32str(this->initial_xyz));
+    addKeyValue(robot, "rpy", vector32str(this->initial_rpy));
+
+    /* initialize transform for the model, urdf is recursive, while sdf defines all links relative to model frame */
     gazebo::math::Pose transform;
     
     /* parse gazebo extension */
-    parseGazeboExtension( urdf_in );
+    TiXmlDocument urdf_xml;
+    urdf_xml.Parse(urdf_str.c_str());
+    parseGazeboExtension( urdf_xml );
 
     /* start conversion */
 
     boost::shared_ptr<const urdf::Link> root_link = robot_model->getRoot();
     /* if link connects to parent via fixed joint, lump down and remove link */
-    // set reduce_fixed_joints to true will use hinge joints replacements, otherwise, we reduce it down to its parent link recursively
-    bool reduce_fixed_joints = true;
-    if (reduce_fixed_joints)
+    // set reduce_fixed_joints to false will replace fixed joints with zero limit hinge joints,
+    //   otherwise, we reduce it down to its parent link recursively
+    if (this->reduce_fixed_joints)
       reduceFixedJoints(robot, (boost::const_pointer_cast< urdf::Link >(root_link))); // uncomment to test reduction
 
     if (root_link->name == "world")
     {
       /* convert all children link */
-      for (std::vector<boost::shared_ptr<urdf::Link> >::const_iterator child = root_link->child_links.begin(); child != root_link->child_links.end(); child++)
-          convertLink(robot, (*child), transform, enforce_limits, reduce_fixed_joints);
+      for (std::vector<boost::shared_ptr<urdf::Link> >::const_iterator child = root_link->child_links.begin();
+           child != root_link->child_links.end(); child++)
+          initLink(robot, (*child), transform);
     }
     else
     {
       /* convert, starting from root link */
-      convertLink(robot, root_link, transform, enforce_limits, reduce_fixed_joints);
+      initLink(robot, root_link, transform);
     }
     
     /* find all data item types */
     insertGazeboExtensionRobot(robot);
     
-    if (!robot_namespace.empty())
+    if (!this->robot_namespace.empty())
     {
       // traverse all of the: controller::*, add robotNamespace if does not exist already
       logDebug("walking gazebo extension for %s",robot->ValueStr().c_str());
-      this->walkChildAddNamespace(robot,robot_namespace);
+      this->walkChildAddNamespace(robot);
     }
 
     std::ostringstream stream_robot;
     stream_robot << *(robot);
     logDebug("\n--------------entire robot------------------\n%s\n--------------------\n",stream_robot.str().c_str());
     gazebo_xml_out.LinkEndChild(robot);  // uncomment if returning old gazebo_xml
+
+
+
+    // at this point, change xml to sdf?
+
+
+
 
 /* move this bit to parser.cc
     //
@@ -1973,4 +1991,11 @@ bool URDF2Gazebo::convert(TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out,
 
     return true;
 }
+
+
+bool URDF2Gazebo::initModelFile(std::string filename, sdf::SDFPtr _sdf)
+{
+    return true;
+}
+
 }

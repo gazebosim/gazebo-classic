@@ -54,6 +54,7 @@
 #include "ode/rotation.h"
 
 #include "math/Pose.hh"
+#include "gazebo/sdf/interface/SDF.hh"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for URDF to SDF parser
@@ -187,7 +188,7 @@ namespace urdf2gazebo
       std::string getKeyValueAsString(TiXmlElement* elem);
 
       /// deal with extensions (things that do not belong in urdf but should be mapped into sdf
-      void parseGazeboExtension(TiXmlDocument &urdf_in);
+      void parseGazeboExtension(TiXmlDocument &urdf_xml);
 
       /// create collision blocks from urdf collisions
       void createCollisions(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link);
@@ -244,10 +245,9 @@ namespace urdf2gazebo
       void printCollisionGroups(boost::shared_ptr<urdf::Link> link);
 
       /// do the heavy lifting of conversion
-      void convertLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, const gazebo::math::Pose &transform,
-                       bool enforce_limits,bool reduce_fixed_joints);
+      void initLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, const gazebo::math::Pose &transform);
       void createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link,
-                      gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints);
+                      gazebo::math::Pose &currentTransform);
 
       void createInertial(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link);
 
@@ -259,16 +259,24 @@ namespace urdf2gazebo
                         boost::shared_ptr<urdf::Visual> visual, int linkGeomSize, double linkSize[3],
                         std::string original_reference = std::string(""));
 
-      void createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform,
-                       bool enforce_limits,bool reduce_fixed_joints);
+      void createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform);
 
-      bool convert( TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out, bool enforce_limits, 
-                    urdf::Vector3 initial_xyz, urdf::Vector3 initial_rpy,std::string model_name=std::string(),
-                    std::string robot_namespace=std::string(), bool xml_declaration = false);
+      bool initModelString(std::string urdf_str, sdf::SDFPtr _sdf);
+      bool initModelFile(std::string filename, sdf::SDFPtr _sdf);
 
-      void walkChildAddNamespace(TiXmlNode* robot_xml,std::string robot_namespace);
+      bool initModelString(std::string urdf_str, sdf::SDFPtr _sdf, bool _enforce_limits, 
+                   urdf::Vector3 _initial_xyz, urdf::Vector3 _initial_rpy,std::string _model_name = std::string(),
+                   std::string _robot_namespace = std::string(), bool _xml_declaration = false);
+
+      void walkChildAddNamespace(TiXmlNode* robot_xml);
 
       std::map<std::string, std::vector<GazeboExtension*> > gazebo_extensions_;
+
+      private: bool enforce_limits, xml_declaration;
+      private: bool reduce_fixed_joints;
+      private: std::string robot_namespace;
+      private: std::string model_name;
+      private: urdf::Vector3 initial_xyz, initial_rpy;
 
   };
   /// \}

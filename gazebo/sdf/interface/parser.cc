@@ -294,8 +294,17 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
       }
       else
       {
-        gzerr << "parse as old deprecated model file failed.\n";
-        return false;
+        urdf2gazebo::URDF2Gazebo u2g;
+        if (u2g.initModelFile(filename, _sdf))
+        {
+          gzwarn << "parse from urdf.\n";
+          return true;
+        }
+        else
+        {
+          gzerr << "parse as old deprecated model file failed.\n";
+          return false;
+        }
       }
     }
   }
@@ -330,8 +339,17 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
       }
       else
       {
-        gzerr << "parse as old deprecated model file failed.\n";
-        return false;
+        urdf2gazebo::URDF2Gazebo u2g;
+        if (u2g.initModelString(_xmlString, _sdf))
+        {
+          gzwarn << "parse from urdf.\n";
+          return true;
+        }
+        else
+        {
+          gzerr << "parse as old deprecated model file failed.\n";
+          return false;
+        }
       }
     }
   }
