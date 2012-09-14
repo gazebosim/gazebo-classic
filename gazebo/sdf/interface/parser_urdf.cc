@@ -40,10 +40,15 @@
 #include <sstream>
 
 #include "common/SystemPaths.hh"
-#include "sdf/interface/parser.hh"
 #include "sdf/interface/SDF.hh"
 
-using namespace urdf2gazebo;
+namespace urdf2gazebo
+{
+
+double rad2deg(double v)
+{
+  return v * 180.0 / M_PI;
+}
 
 URDF2Gazebo::URDF2Gazebo()
 {
@@ -1653,8 +1658,8 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
                       logWarn("urdf2gazebo: hinge joint limits: lowStop > highStop, setting lowStop to highStop.");
                       *lowstop = *highstop;
                     }
-                    addKeyValue(joint, "lowStop",  values2str(1, &link->parent_joint->limits->lower, rad2deg));
-                    addKeyValue(joint, "highStop", values2str(1, &link->parent_joint->limits->upper, rad2deg));
+                    addKeyValue(joint, "lowStop",  values2str(1, &link->parent_joint->limits->lower, urdf2gazebo::rad2deg));
+                    addKeyValue(joint, "highStop", values2str(1, &link->parent_joint->limits->upper, urdf2gazebo::rad2deg));
                 }
             }
         }
@@ -1685,7 +1690,7 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const ur
         addKeyValue(gazebo_collision, "xyz", vector32str(collision->origin.position));
         double rpy[3];
         collision->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
-        addKeyValue(gazebo_collision, "rpy", values2str(3, rpy, rad2deg));
+        addKeyValue(gazebo_collision, "rpy", values2str(3, rpy, urdf2gazebo::rad2deg));
         
         if (collision->geometry->type == urdf::Geometry::MESH)
         {  
@@ -1756,7 +1761,7 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf:
       addKeyValue(gazebo_visual, "xyz", vector32str(visual->origin.position));
       double rpy[3];
       visual->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
-      addKeyValue(gazebo_visual, "rpy", values2str(3, rpy, rad2deg));
+      addKeyValue(gazebo_visual, "rpy", values2str(3, rpy, urdf2gazebo::rad2deg));
 
       /* set geometry size */                
       
@@ -1948,7 +1953,7 @@ bool URDF2Gazebo::convert(TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out,
     logDebug("\n--------------entire robot------------------\n%s\n--------------------\n",stream_robot.str().c_str());
     gazebo_xml_out.LinkEndChild(robot);  // uncomment if returning old gazebo_xml
 
-
+/* move this bit to parser.cc
     //
     // step 2 of the two step conversion from URDF --> XML --> SDF
     // now convert the old gazebo xml into sdf
@@ -1964,16 +1969,8 @@ bool URDF2Gazebo::convert(TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out,
     std::string sdf_string = robot_sdf->ToString();
     logDebug("--------------sdf---------------\n%s\n--------------------\n",sdf_string.c_str());
     gazebo_xml_out.Parse(sdf_string.c_str());
+*/
 
     return true;
 }
-
-
-
-
-
-
-
-
-
-
+}

@@ -59,8 +59,6 @@
 /// \brief namespace for URDF to SDF parser
 namespace urdf2gazebo
 {
-  double rad2deg(double v) { return v * 180.0 / M_PI; }
-
   /// \addtogroup gazebo_parser
   /// \{
   class GazeboExtension

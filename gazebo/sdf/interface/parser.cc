@@ -22,6 +22,7 @@
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
 #include "gazebo/sdf/interface/parser_deprecated.hh"
+#include "gazebo/sdf/interface/parser_urdf.hh"
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Vector3.hh"
