@@ -233,7 +233,7 @@ namespace urdf2gazebo
       gazebo::math::Pose  copyPose(urdf::Pose pose);
       urdf::Pose  copyPose(gazebo::math::Pose pose);
 
-      std::string getGeometrySize(boost::shared_ptr<urdf::Geometry> geometry, int *sizeCount, double *sizeVals);
+      void createGeometry(TiXmlElement* elem, boost::shared_ptr<urdf::Geometry> geometry);
       
       std::string getGeometryBoundingBox(boost::shared_ptr<urdf::Geometry> geometry, double *sizeVals);
 
@@ -251,12 +251,10 @@ namespace urdf2gazebo
 
       void createInertial(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link);
 
-      void createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link, std::string collision_type,
-                           boost::shared_ptr<urdf::Collision> collision, int linkGeomSize, double linkSize[3],
+      void createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Collision> collision,
                            std::string original_reference = std::string(""));
 
-      void createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, std::string visual_type,
-                        boost::shared_ptr<urdf::Visual> visual, int linkGeomSize, double linkSize[3],
+      void createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Visual> visual,
                         std::string original_reference = std::string(""));
 
       void createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform);
