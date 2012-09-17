@@ -54,7 +54,6 @@
 #include "ode/rotation.h"
 
 #include "math/Pose.hh"
-#include "gazebo/sdf/interface/SDF.hh"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for URDF to SDF parser
@@ -259,11 +258,10 @@ namespace urdf2gazebo
 
       void createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform);
 
-      bool initModelString(std::string urdf_str, sdf::SDFPtr _sdf);
-      bool initModelDoc(TiXmlDocument* _xmlDoc, sdf::SDFPtr _sdf);
-      bool initModelFile(std::string filename, sdf::SDFPtr _sdf);
-
-      bool initModelString(std::string urdf_str, sdf::SDFPtr _sdf, bool _enforce_limits, 
+      TiXmlDocument initModelString(std::string urdf_str);
+      TiXmlDocument initModelDoc(TiXmlDocument* _xmlDoc);
+      TiXmlDocument  initModelFile(std::string filename);
+      TiXmlDocument initModelString(std::string urdf_str, bool _enforce_limits, 
                    urdf::Vector3 _initial_xyz, urdf::Vector3 _initial_rpy,std::string _model_name = std::string(),
                    std::string _robot_namespace = std::string(), bool _xml_declaration = false);
 

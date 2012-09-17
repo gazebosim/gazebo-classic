@@ -40,7 +40,6 @@
 #include <sstream>
 
 #include "common/SystemPaths.hh"
-#include "sdf/interface/SDF.hh"
 
 namespace urdf2gazebo
 {
@@ -1337,27 +1336,22 @@ void URDF2Gazebo::updateGazeboExtensionBlobsReductionTransform(GazeboExtension* 
       if (rpy_key)
         (*blob_it)->RemoveChild(rpy_key);
 
-      xyz_key = new TiXmlElement("xyz");
-      rpy_key = new TiXmlElement("rpy");
+      TiXmlElement* pose_key = new TiXmlElement("pose");
 
       // FIXME:  we should read xyz, rpy and aggregate it to reduction_transform instead of just throwing the info away.
       urdf::Vector3 reduction_xyz(ge->reduction_transform.pos.x,ge->reduction_transform.pos.y,ge->reduction_transform.pos.z);
       urdf::Rotation reduction_q(ge->reduction_transform.rot.x,ge->reduction_transform.rot.y,ge->reduction_transform.rot.z,ge->reduction_transform.rot.w);
 
-      std::ostringstream xyz_stream, rpy_stream;
-      xyz_stream << reduction_xyz.x << " " << reduction_xyz.y << " " << reduction_xyz.z;
       urdf::Vector3 reduction_rpy;
       reduction_q.getRPY(reduction_rpy.x,reduction_rpy.y,reduction_rpy.z); // convert to Euler angles for Gazebo XML
-      rpy_stream << reduction_rpy.x*180./M_PI << " " << reduction_rpy.y*180./M_PI << " " << reduction_rpy.z*180./M_PI; // convert to degrees for Gazebo (though ROS is in Radians)
 
-      TiXmlText* xyz_txt = new TiXmlText(xyz_stream.str());
-      TiXmlText* rpy_txt = new TiXmlText(rpy_stream.str());
+      std::ostringstream pose_stream;
+      pose_stream << reduction_xyz.x << " " << reduction_xyz.y << " " << reduction_xyz.z << " "
+                  << reduction_rpy.x << " " << reduction_rpy.y << " " << reduction_rpy.z;
 
-      xyz_key->LinkEndChild(xyz_txt);
-      rpy_key->LinkEndChild(rpy_txt);
-
-      (*blob_it)->LinkEndChild(xyz_key);
-      (*blob_it)->LinkEndChild(rpy_key);
+      TiXmlText* pose_txt = new TiXmlText(pose_stream.str());
+      pose_key->LinkEndChild(pose_txt);
+      (*blob_it)->LinkEndChild(pose_key);
     }
 
     // overwrite <pose> (xyz/rpy) if it exists
@@ -1388,7 +1382,7 @@ void URDF2Gazebo::updateGazeboExtensionBlobsReductionTransform(GazeboExtension* 
       // output updated pose to text
       std::ostringstream pose_stream;
       pose_stream << reduction_xyz.x << " " << reduction_xyz.y << " " << reduction_xyz.z << " "
-                  << reduction_rpy.x << " " << reduction_rpy.y << " " << reduction_rpy.z; // convert to degrees for Gazebo (though ROS is in Radians)
+                  << reduction_rpy.x << " " << reduction_rpy.y << " " << reduction_rpy.z;
       TiXmlText* pose_txt = new TiXmlText(pose_stream.str());
 
       pose_key = new TiXmlElement("pose");
@@ -1743,10 +1737,12 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const ur
       gazebo_collision->SetAttribute("name", link->name + std::string("_geom_")+original_reference);
     
     /* set transform */
-    addKeyValue(gazebo_collision, "xyz", vector32str(collision->origin.position));
-    double rpy[3];
-    collision->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
-    addKeyValue(gazebo_collision, "rpy", values2str(3, rpy, urdf2gazebo::rad2deg));
+    double pose[6];
+    pose[0] = collision->origin.position.x;
+    pose[1] = collision->origin.position.y;
+    pose[2] = collision->origin.position.z;
+    collision->origin.rotation.getRPY(pose[3],pose[4],pose[5]);
+    addKeyValue(gazebo_collision, "pose", values2str(6, pose));
 
 
     /* add geometry block */
@@ -1767,27 +1763,27 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const ur
 void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Visual> visual, std::string original_reference)
 {
     /* begin create gazebo visual node */
-  TiXmlElement *gazebo_visual = new TiXmlElement("visual");
+    TiXmlElement *gazebo_visual = new TiXmlElement("visual");
 
-  /* add the visualisation transfrom */
-  addKeyValue(gazebo_visual, "xyz", vector32str(visual->origin.position));
-  double rpy[3];
-  visual->origin.rotation.getRPY(rpy[0],rpy[1],rpy[2]);
-  addKeyValue(gazebo_visual, "rpy", values2str(3, rpy, urdf2gazebo::rad2deg));
+    /* add the visualisation transfrom */
+    double pose[6];
+    pose[0] = visual->origin.position.x;
+    pose[1] = visual->origin.position.y;
+    pose[2] = visual->origin.position.z;
+    visual->origin.rotation.getRPY(pose[3],pose[4],pose[5]);
+    addKeyValue(gazebo_visual, "pose", values2str(6, pose));
 
+    /* insert geometry */                
+    if (!visual || !visual->geometry)
+        logWarn("urdf2gazebo: link(%s) does not have a visual->geometry tag", link->name.c_str());
+    else
+      createGeometry(gazebo_visual, visual->geometry);
+    
+    /* set additional data from extensions */
+    insertGazeboExtensionVisual(gazebo_visual,original_reference);
 
-
-  /* insert geometry */                
-  if (!visual || !visual->geometry)
-      logWarn("urdf2gazebo: link(%s) does not have a visual->geometry tag", link->name.c_str());
-  else
-    createGeometry(gazebo_visual, visual->geometry);
-  
-  /* set additional data from extensions */
-  insertGazeboExtensionVisual(gazebo_visual,original_reference);
-
-  /* end create visual node */
-  elem->LinkEndChild(gazebo_visual);
+    /* end create visual node */
+    elem->LinkEndChild(gazebo_visual);
 }
 
 void URDF2Gazebo::walkChildAddNamespace(TiXmlNode* robot_xml)
@@ -1814,7 +1810,7 @@ void URDF2Gazebo::walkChildAddNamespace(TiXmlNode* robot_xml)
   }
 }
 
-bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf, bool _enforce_limits, urdf::Vector3 _initial_xyz, urdf::Vector3 _initial_rpy, std::string _model_name , std::string _robot_namespace, bool _xml_declaration)
+TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str, bool _enforce_limits, urdf::Vector3 _initial_xyz, urdf::Vector3 _initial_rpy, std::string _model_name , std::string _robot_namespace, bool _xml_declaration)
 {
     this->model_name = _model_name;
     this->robot_namespace = _robot_namespace;
@@ -1822,22 +1818,22 @@ bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf, bool _
     this->initial_rpy = _initial_rpy;
     this->enforce_limits = _enforce_limits;
     this->xml_declaration = _xml_declaration;
-    return this->initModelString(urdf_str, _sdf);
+    return this->initModelString(urdf_str);
 }
 
-bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf)
+TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
 {
     /* Create a RobotModel from string */
     boost::shared_ptr<urdf::ModelInterface> robot_model = urdf::parseURDF(urdf_str.c_str());
 
+    // an xml object to hold the xml result
+    TiXmlDocument gazebo_xml_out;
+
     if (!robot_model)
     {
         logError("Unable to load robot model from param server robot_description\n");  
-        return false;
+        return gazebo_xml_out;
     }
-
-    // an xml object to hold the xml result
-    TiXmlDocument gazebo_xml_out;
 
     // add xml declaration if needed
     if (this->xml_declaration)
@@ -1856,8 +1852,14 @@ bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf)
       robot->SetAttribute("name", this->model_name);
     
     /* set the transform for the whole model to identity */
-    addKeyValue(robot, "xyz", vector32str(this->initial_xyz));
-    addKeyValue(robot, "rpy", vector32str(this->initial_rpy));
+    double pose[6];
+    pose[0] = this->initial_xyz.x;
+    pose[1] = this->initial_xyz.y;
+    pose[2] = this->initial_xyz.z;
+    pose[3] = this->initial_rpy.x;
+    pose[4] = this->initial_rpy.y;
+    pose[5] = this->initial_rpy.z;
+    addKeyValue(robot, "pose", values2str(6, pose));
 
     /* initialize transform for the model, urdf is recursive, while sdf defines all links relative to model frame */
     gazebo::math::Pose transform;
@@ -1899,59 +1901,42 @@ bool URDF2Gazebo::initModelString(std::string urdf_str, sdf::SDFPtr _sdf)
       this->walkChildAddNamespace(robot);
     }
 
-    std::ostringstream stream_robot;
-    stream_robot << *(robot);
-    logDebug("\n--------------entire robot------------------\n%s\n--------------------\n",stream_robot.str().c_str());
-    gazebo_xml_out.LinkEndChild(robot);  // uncomment if returning old gazebo_xml
+    // debug
+    // std::ostringstream stream_robot;
+    // stream_robot << *(robot);
+    // logDebug("\n--------------entire robot------------------\n%s\n--------------------\n",stream_robot.str().c_str());
 
+    // add robot to gazebo_xml_out
+    TiXmlElement *gazebo_sdf = new TiXmlElement("gazebo");
+    gazebo_sdf->SetAttribute("version", "1.2");
+    gazebo_sdf->LinkEndChild(robot);  // uncomment if returning old gazebo_xml
+    gazebo_xml_out.LinkEndChild(gazebo_sdf);;
+
+    // debug
     gazebo_xml_out.Print();
 
-
-    // at this point, change xml to sdf?
-
-
-
-
-/* move this bit to parser.cc
-    //
-    // step 2 of the two step conversion from URDF --> XML --> SDF
-    // now convert the old gazebo xml into sdf
-    //
-    sdf::SDFPtr robot_sdf(new sdf::SDF());
-    if (!sdf::init(robot_sdf))  // FIXME: this step requires that GAZEBO_RESOURCE_PATH be set to where *.sdf are located
-    {
-      std::cerr << "ERROR: SDF parsing the xml failed" << std::endl;
-      return -1;
-    }
-    sdf::readString(stream_robot.str(), robot_sdf);
-    // write out sdf as a string, then read string into TiXmlDocument gazebo_xml_out
-    std::string sdf_string = robot_sdf->ToString();
-    logDebug("--------------sdf---------------\n%s\n--------------------\n",sdf_string.c_str());
-    gazebo_xml_out.Parse(sdf_string.c_str());
-*/
-
-    return true;
+    return gazebo_xml_out;
 }
 
-bool URDF2Gazebo::initModelDoc(TiXmlDocument* _xmlDoc, sdf::SDFPtr _sdf)
+TiXmlDocument URDF2Gazebo::initModelDoc(TiXmlDocument* _xmlDoc)
 {
     std::ostringstream stream;
     stream << *_xmlDoc;
     std::string urdfStr = stream.str();
-    return initModelString(urdfStr, _sdf);
+    return initModelString(urdfStr);
 }
 
-bool URDF2Gazebo::initModelFile(std::string filename, sdf::SDFPtr _sdf)
+TiXmlDocument URDF2Gazebo::initModelFile(std::string filename)
 {
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(filename))
   {
-    return initModelDoc(&xmlDoc, _sdf);
+    return initModelDoc(&xmlDoc);
   }
   else
-    gzerr << "Unable to load file[" << filename << "]\n";
+    logError("Unable to load file[%s]\n", filename.c_str());
 
-    return true;
+    return xmlDoc;
 }
 
 }

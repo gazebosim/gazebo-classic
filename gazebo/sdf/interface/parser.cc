@@ -295,7 +295,8 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
       else
       {
         urdf2gazebo::URDF2Gazebo u2g;
-        if (u2g.initModelFile(filename, _sdf))
+        TiXmlDocument doc = u2g.initModelFile(filename);
+        if (sdf::readDoc(&doc, _sdf, "urdf file"))
         {
           gzwarn << "parse from urdf.\n";
           return true;
@@ -340,7 +341,8 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
       else
       {
         urdf2gazebo::URDF2Gazebo u2g;
-        if (u2g.initModelString(_xmlString, _sdf))
+        TiXmlDocument doc = u2g.initModelString(_xmlString);
+        if (sdf::readDoc(&doc, _sdf, "urdf string"))
         {
           gzwarn << "parse from urdf.\n";
           return true;
