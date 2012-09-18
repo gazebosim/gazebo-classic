@@ -73,26 +73,26 @@ namespace urdf2gazebo
 
       // body, default off
       bool setStaticFlag;
-      bool turnGravityOff;
-      bool is_dampingFactor;
-      double dampingFactor;
+      bool gravity;
+      bool is_damping_factor;
+      double damping_factor;
       bool is_maxVel;
       double maxVel;
       bool is_minDepth;
       double minDepth;
-      bool selfCollide;
+      bool self_collide;
 
       // geom, contact dynamics
-      bool is_mu1, is_mu2, is_kp, is_kd, is_genTexCoord;
+      bool is_mu1, is_mu2, is_kp, is_kd, is_generate_texture_coord;
       double mu1, mu2, kp, kd;
       std::string fdir1;
-      bool genTexCoord;
-      bool is_laserRetro;
-      double laserRetro;
+      bool generate_texture_coord;
+      bool is_laser_retro;
+      double laser_retro;
 
       // joint, joint limit dynamics
-      bool is_stopKp, is_stopKd, is_initial_joint_position, is_fudgeFactor;
-      double stopKp, stopKd, initial_joint_position, fudgeFactor;
+      bool is_stop_cfm, is_stop_erp, is_initial_joint_position, is_fudge_factor;
+      double stop_cfm, stop_erp, initial_joint_position, fudge_factor;
       bool provideFeedback;
 
       // blobs into body or robot
@@ -103,8 +103,8 @@ namespace urdf2gazebo
         //initialize
         material.clear();
         setStaticFlag = false;
-        turnGravityOff = false;
-        is_dampingFactor = false;
+        gravity = false;
+        is_damping_factor = false;
         is_maxVel = false;
         is_minDepth = false;
         is_mu1 = false;
@@ -112,13 +112,13 @@ namespace urdf2gazebo
         is_mu2 = false;
         is_kp = false;
         is_kd = false;
-        is_genTexCoord = false;
-        selfCollide = false;
-        is_laserRetro = false;
-        is_stopKp = false;
-        is_stopKd = false;
+        is_generate_texture_coord = false;
+        self_collide = false;
+        is_laser_retro = false;
+        is_stop_cfm = false;
+        is_stop_erp = false;
         is_initial_joint_position = false;
-        is_fudgeFactor = false;
+        is_fudge_factor = false;
         provideFeedback = false;
         blobs.clear();
       };
@@ -128,21 +128,21 @@ namespace urdf2gazebo
         //initialize
         material = ge.material;
         setStaticFlag = ge.setStaticFlag;
-        turnGravityOff = ge.turnGravityOff;
-        is_dampingFactor = ge.is_dampingFactor;
+        gravity = ge.gravity;
+        is_damping_factor = ge.is_damping_factor;
         is_maxVel = ge.is_maxVel;
         is_minDepth = ge.is_minDepth;
         is_mu1 = ge.is_mu1;
         is_mu2 = ge.is_mu2;
         is_kp = ge.is_kp;
         is_kd = ge.is_kd;
-        is_genTexCoord = ge.is_genTexCoord;
-        selfCollide = ge.selfCollide;
-        is_laserRetro = ge.is_laserRetro;
-        is_stopKp = ge.is_stopKp;
-        is_stopKd = ge.is_stopKd;
+        is_generate_texture_coord = ge.is_generate_texture_coord;
+        self_collide = ge.self_collide;
+        is_laser_retro = ge.is_laser_retro;
+        is_stop_cfm = ge.is_stop_cfm;
+        is_stop_erp = ge.is_stop_erp;
         is_initial_joint_position = ge.is_initial_joint_position;
-        is_fudgeFactor = ge.is_fudgeFactor;
+        is_fudge_factor = ge.is_fudge_factor;
         provideFeedback = ge.provideFeedback;
         original_reference = ge.original_reference;
         reduction_transform = ge.reduction_transform;

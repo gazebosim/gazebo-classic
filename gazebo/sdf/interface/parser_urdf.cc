@@ -120,22 +120,22 @@ void URDF2Gazebo::lumpVisual(boost::shared_ptr<urdf::Link> link, std::string gro
 
 void URDF2Gazebo::lumpCollision(boost::shared_ptr<urdf::Link> link, std::string group_name, boost::shared_ptr<urdf::Collision> collision)
 {
-  boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision > > > viss = link->getCollisions(group_name);
-  if (!viss)
+  boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision > > > cols = link->getCollisions(group_name);
+  if (!cols)
   {
     // group does not exist, create one and add to map
-    viss.reset(new std::vector<boost::shared_ptr<urdf::Collision > >);
+    cols.reset(new std::vector<boost::shared_ptr<urdf::Collision > >);
     // new group name, create vector, add vector to map and add Collision to the vector
-    link->collision_groups.insert(make_pair(group_name,viss));
+    link->collision_groups.insert(make_pair(group_name,cols));
     logDebug("successfully added a new collision group name '%s'",group_name.c_str());
   }
 
   // group exists, add Collision to the vector in the map
-  std::vector<boost::shared_ptr<urdf::Collision > >::iterator vis_it = find(viss->begin(),viss->end(),collision);
-  if (vis_it != viss->end())
+  std::vector<boost::shared_ptr<urdf::Collision > >::iterator col_it = find(cols->begin(),cols->end(),collision);
+  if (col_it != cols->end())
     logWarn("attempted to add a collision that already exists under group name '%s', skipping.",group_name.c_str());
   else
-    viss->push_back(collision);
+    cols->push_back(collision);
   logDebug("successfully added a new collision under group name '%s'",group_name.c_str());
 
 }
@@ -269,24 +269,24 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         logDebug("   setStaticFlag %d",gazebo->setStaticFlag);
 
       }
-      else if (child_elem->ValueStr() == "turnGravityOff")
+      else if (child_elem->ValueStr() == "gravity")
       {
         std::string value_str = getKeyValueAsString(child_elem);
 
-        // default of turnGravityOff is false
+        // default of gravity is true
         if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
-          gazebo->turnGravityOff = true;
+          gazebo->gravity = true;
         else
-          gazebo->turnGravityOff = false;
+          gazebo->gravity = false;
 
-        logDebug("   turnGravityOff %d",gazebo->turnGravityOff);
+        logDebug("   gravity %d",gazebo->gravity);
 
       }
-      else if (child_elem->ValueStr() == "dampingFactor")
+      else if (child_elem->ValueStr() == "damping_factor")
       {
-          gazebo->is_dampingFactor = true;
-          gazebo->dampingFactor = atof(getKeyValueAsString(child_elem).c_str());
-          logDebug("   dampingFactor %f",gazebo->dampingFactor);
+          gazebo->is_damping_factor = true;
+          gazebo->damping_factor = atof(getKeyValueAsString(child_elem).c_str());
+          logDebug("   damping_factor %f",gazebo->damping_factor);
       }
       else if (child_elem->ValueStr() == "maxVel")
       {
@@ -329,49 +329,49 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           gazebo->kd = atof(getKeyValueAsString(child_elem).c_str());
           logDebug("   kd %f",gazebo->kd);
       }
-      else if (child_elem->ValueStr() == "genTexCoord")
+      else if (child_elem->ValueStr() == "generate_texture_coord")
       {
         std::string value_str = getKeyValueAsString(child_elem);
 
-        // default of genTexCoord is false
+        // default of generate_texture_coord is false
         if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
-          gazebo->genTexCoord = true;
+          gazebo->generate_texture_coord = true;
         else
-          gazebo->genTexCoord = false;
+          gazebo->generate_texture_coord = false;
 
-        logDebug("   genTexCoord %d",gazebo->genTexCoord);
+        logDebug("   generate_texture_coord %d",gazebo->generate_texture_coord);
 
       }
-      else if (child_elem->ValueStr() == "selfCollide")
+      else if (child_elem->ValueStr() == "self_collide")
       {
         std::string value_str = getKeyValueAsString(child_elem);
 
-        // default of selfCollide is false
+        // default of self_collide is false
         if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
-          gazebo->selfCollide = true;
+          gazebo->self_collide = true;
         else
-          gazebo->selfCollide = false;
+          gazebo->self_collide = false;
 
-        logDebug("   selfCollide %d",gazebo->selfCollide);
+        logDebug("   self_collide %d",gazebo->self_collide);
 
       }
-      else if (child_elem->ValueStr() == "laserRetro")
+      else if (child_elem->ValueStr() == "laser_retro")
       {
-          gazebo->is_laserRetro = true;
-          gazebo->laserRetro = atof(getKeyValueAsString(child_elem).c_str());
-          logDebug("   laserRetro %f",gazebo->laserRetro);
+          gazebo->is_laser_retro = true;
+          gazebo->laser_retro = atof(getKeyValueAsString(child_elem).c_str());
+          logDebug("   laser_retro %f",gazebo->laser_retro);
       }
-      else if (child_elem->ValueStr() == "stopKp")
+      else if (child_elem->ValueStr() == "stop_cfm")
       {
-          gazebo->is_stopKp = true;
-          gazebo->stopKp = atof(getKeyValueAsString(child_elem).c_str());
-          logDebug("   stopKp %f",gazebo->stopKp);
+          gazebo->is_stop_cfm = true;
+          gazebo->stop_cfm = atof(getKeyValueAsString(child_elem).c_str());
+          logDebug("   stop_cfm %f",gazebo->stop_cfm);
       }
-      else if (child_elem->ValueStr() == "stopKd")
+      else if (child_elem->ValueStr() == "stop_erp")
       {
-          gazebo->is_stopKd = true;
-          gazebo->stopKd = atof(getKeyValueAsString(child_elem).c_str());
-          logDebug("   stopKd %f",gazebo->stopKd);
+          gazebo->is_stop_erp = true;
+          gazebo->stop_erp = atof(getKeyValueAsString(child_elem).c_str());
+          logDebug("   stop_erp %f",gazebo->stop_erp);
       }
       else if (child_elem->ValueStr() == "initial_joint_position")
       {
@@ -379,11 +379,11 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           gazebo->initial_joint_position = atof(getKeyValueAsString(child_elem).c_str());
           logDebug("   initial_joint_position %f",gazebo->initial_joint_position);
       }
-      else if (child_elem->ValueStr() == "fudgeFactor")
+      else if (child_elem->ValueStr() == "fudge_factor")
       {
-          gazebo->is_fudgeFactor = true;
-          gazebo->fudgeFactor = atof(getKeyValueAsString(child_elem).c_str());
-          logDebug("   fudgeFactor %f",gazebo->fudgeFactor);
+          gazebo->is_fudge_factor = true;
+          gazebo->fudge_factor = atof(getKeyValueAsString(child_elem).c_str());
+          logDebug("   fudge_factor %f",gazebo->fudge_factor);
       }
       else if (child_elem->ValueStr() == "provideFeedback")
       {
@@ -421,29 +421,43 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,std::string 
       {
         if ((*ge)->original_reference == link_name)
         {
+          TiXmlElement *surface = new TiXmlElement("surface");
+          TiXmlElement *friction = new TiXmlElement("friction");
+          TiXmlElement *friction_ode = new TiXmlElement("ode");
+          TiXmlElement *contact = new TiXmlElement("contact");
+          TiXmlElement *contact_ode = new TiXmlElement("ode");
+
           // insert mu1, mu2, kp, kd for geom
           if ((*ge)->is_mu1)
-              addKeyValue(elem, "mu1", values2str(1, &(*ge)->mu1) );
+              addKeyValue(friction_ode, "mu", values2str(1, &(*ge)->mu1) );
           if ((*ge)->is_mu2)
-              addKeyValue(elem, "mu2", values2str(1, &(*ge)->mu2) );
+              addKeyValue(friction_ode, "mu2", values2str(1, &(*ge)->mu2) );
           if (!(*ge)->fdir1.empty())
-              addKeyValue(elem, "fdir1", (*ge)->fdir1);
+              addKeyValue(friction_ode, "fdir1", (*ge)->fdir1);
           if ((*ge)->is_kp)
-              addKeyValue(elem, "kp", values2str(1, &(*ge)->kp) );
+              addKeyValue(contact_ode, "kp", values2str(1, &(*ge)->kp) );
           if ((*ge)->is_kd)
-              addKeyValue(elem, "kd", values2str(1, &(*ge)->kd) );
+              addKeyValue(contact_ode, "kd", values2str(1, &(*ge)->kd) );
           // max contact interpenetration correction velocity
           if ((*ge)->is_maxVel)
-              addKeyValue(elem, "maxVel", values2str(1, &(*ge)->maxVel) );
+              addKeyValue(contact_ode, "maxVel", values2str(1, &(*ge)->maxVel) );
           // contact interpenetration margin tolerance
           if ((*ge)->is_minDepth)
-              addKeyValue(elem, "minDepth", values2str(1, &(*ge)->minDepth) );
-          if ((*ge)->genTexCoord)
-              addKeyValue(elem, "genTexCoord", "true");
+              addKeyValue(contact_ode, "minDepth", values2str(1, &(*ge)->minDepth) );
+/* gone
+          if ((*ge)->generate_texture_coord)
+              addKeyValue(elem, "generate_texture_coord", "true");
           else
-              addKeyValue(elem, "genTexCoord", "false");
-          if ((*ge)->is_laserRetro)
-              addKeyValue(elem, "laserRetro", values2str(1, &(*ge)->laserRetro) );
+              addKeyValue(elem, "generate_texture_coord", "false");
+*/
+          if ((*ge)->is_laser_retro)
+              addKeyValue(elem, "laser_retro", values2str(1, &(*ge)->laser_retro) );
+
+          contact->LinkEndChild(contact_ode);
+          surface->LinkEndChild(contact);
+          friction->LinkEndChild(friction_ode);
+          surface->LinkEndChild(friction);
+          elem->LinkEndChild(surface);
         }
       }
     }
@@ -476,20 +490,26 @@ void URDF2Gazebo::insertGazeboExtensionLink(TiXmlElement *elem,std::string link_
         logDebug("body: reference %s link name %s",gazebo_it->first.c_str(),link_name.c_str());
         for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ge++)
         {
-          // insert turnGravityOff
-          if ((*ge)->turnGravityOff)
-              addKeyValue(elem, "turnGravityOff", "true");
+          // insert gravity
+          if ((*ge)->gravity)
+              addKeyValue(elem, "gravity", "true");
           else
-              addKeyValue(elem, "turnGravityOff", "false");
+              addKeyValue(elem, "gravity", "false");
 
           // damping factor
-          if ((*ge)->is_dampingFactor)
-              addKeyValue(elem, "dampingFactor", values2str(1, &(*ge)->dampingFactor) );
-          // selfCollide tag
-          if ((*ge)->selfCollide)
-              addKeyValue(elem, "selfCollide", "true");
+          TiXmlElement *velocity_decay     = new TiXmlElement("velocity_decay");
+          if ((*ge)->is_damping_factor)
+          {
+              /// @todo separate linear and angular velocity decay
+              addKeyValue(elem, "linear", values2str(1, &(*ge)->damping_factor) );
+              addKeyValue(elem, "angular", values2str(1, &(*ge)->damping_factor) );
+          }
+          elem->LinkEndChild(velocity_decay);
+          // self_collide tag
+          if ((*ge)->self_collide)
+              addKeyValue(elem, "self_collide", "true");
           else
-              addKeyValue(elem, "selfCollide", "false");
+              addKeyValue(elem, "self_collide", "false");
           // insert blobs into body
           for (std::vector<TiXmlElement*>::iterator blob_it = (*ge)->blobs.begin();
                blob_it != (*ge)->blobs.end(); blob_it++)
@@ -509,22 +529,37 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,std::string join
       {
         for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ge++)
         {
-          logDebug("geom: reference %s joint name %s, stopKp %f",gazebo_it->first.c_str(),joint_name.c_str(),(*ge)->stopKp);
-          // insert stopKp, stopKd, fudgeFactor
-          if ((*ge)->is_stopKp)
-              addKeyValue(elem, "stopKp", values2str(1, &(*ge)->stopKp) );
-          if ((*ge)->is_stopKd)
-              addKeyValue(elem, "stopKd", values2str(1, &(*ge)->stopKd) );
+          logDebug("geom: reference %s joint name %s, stop_cfm %f",gazebo_it->first.c_str(),joint_name.c_str(),(*ge)->stop_cfm);
+          TiXmlElement *physics     = new TiXmlElement("physics");
+          TiXmlElement *physics_ode     = new TiXmlElement("ode");
+          TiXmlElement *limit     = new TiXmlElement("limit");
+          // insert stop_cfm, stop_erp, fudge_factor
+          if ((*ge)->is_stop_cfm)
+          {
+              addKeyValue(limit, "erp", values2str(1, &(*ge)->stop_cfm) );
+          }
+          if ((*ge)->is_stop_erp)
+          {
+              addKeyValue(limit, "cfm", values2str(1, &(*ge)->stop_erp) );
+          }
+/* gone
           if ((*ge)->is_initial_joint_position)
               addKeyValue(elem, "initial_joint_position", values2str(1, &(*ge)->initial_joint_position) );
-          if ((*ge)->is_fudgeFactor)
-              addKeyValue(elem, "fudgeFactor", values2str(1, &(*ge)->fudgeFactor) );
+*/
+          if ((*ge)->is_fudge_factor)
+              addKeyValue(physics_ode, "fudge_factor", values2str(1, &(*ge)->fudge_factor) );
 
+/* gone
           // insert provideFeedback
           if ((*ge)->provideFeedback)
               addKeyValue(elem, "provideFeedback", "true");
           else
               addKeyValue(elem, "provideFeedback", "false");
+*/
+
+          physics->LinkEndChild(physics_ode);
+          physics_ode->LinkEndChild(limit);
+          elem->LinkEndChild(physics);
         }
       }
     }
@@ -565,6 +600,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem, boost::shared_ptr<urdf::Geo
     TiXmlElement *gazebo_geometry     = new TiXmlElement("geometry");
 
     std::string type;
+    TiXmlElement *geometry_type;
     
     switch (geometry->type)
     {
@@ -572,21 +608,24 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem, boost::shared_ptr<urdf::Geo
         type = "box";
         sizeCount = 3;
         {
-            boost::shared_ptr<const urdf::Box> box;
-            box = boost::dynamic_pointer_cast< const urdf::Box >(geometry);
-            sizeVals[0] = box->dim.x;
-            sizeVals[1] = box->dim.y;
-            sizeVals[2] = box->dim.z;
+          boost::shared_ptr<const urdf::Box> box;
+          box = boost::dynamic_pointer_cast< const urdf::Box >(geometry);
+          sizeVals[0] = box->dim.x;
+          sizeVals[1] = box->dim.y;
+          sizeVals[2] = box->dim.z;
+          geometry_type = new TiXmlElement(type);
+          addKeyValue(geometry_type, "size", values2str(sizeCount, sizeVals));
         }
         break;
     case urdf::Geometry::CYLINDER:
         type = "cylinder";
         sizeCount = 2;
         {
-            boost::shared_ptr<const urdf::Cylinder> cylinder;
-            cylinder = boost::dynamic_pointer_cast<const urdf::Cylinder >(geometry);
-            sizeVals[0] = cylinder->radius;
-            sizeVals[1] = cylinder->length;
+          boost::shared_ptr<const urdf::Cylinder> cylinder;
+          cylinder = boost::dynamic_pointer_cast<const urdf::Cylinder >(geometry);
+          geometry_type = new TiXmlElement(type);
+          addKeyValue(geometry_type, "length", values2str(1, &cylinder->length));
+          addKeyValue(geometry_type, "radius", values2str(1, &cylinder->radius));
         }
         break;
     case urdf::Geometry::SPHERE:
@@ -595,7 +634,8 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem, boost::shared_ptr<urdf::Geo
         {
           boost::shared_ptr<const urdf::Sphere> sphere;
           sphere = boost::dynamic_pointer_cast<const urdf::Sphere >(geometry);
-          sizeVals[0] = sphere->radius;
+          geometry_type = new TiXmlElement(type);
+          addKeyValue(geometry_type, "radius", values2str(1, &sphere->radius));
         }
         break;
     case urdf::Geometry::MESH:
@@ -607,6 +647,50 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem, boost::shared_ptr<urdf::Geo
           sizeVals[0] = mesh->scale.x;
           sizeVals[1] = mesh->scale.y;
           sizeVals[2] = mesh->scale.z;
+          geometry_type = new TiXmlElement(type);
+          addKeyValue(geometry_type, "scale", vector32str(mesh->scale));
+          // do something more to meshes
+          {  
+              /* set mesh file */
+              if (mesh->filename.empty())
+              {
+                  logError("urdf2gazebo: mesh geometry with no filename given.");
+                  //addKeyValue(gazebo_visual, "mesh", "unit_" + visual_type); // reuse visual type if mesh does not specify filename
+              }
+
+              /* expand to get absolute mesh filename */
+              std::string fullname = mesh->filename;
+              /* resource retriever is ros based
+              if (fullname.find("package://") == 0)
+              {
+                fullname.erase(0, strlen("package://"));
+                size_t pos = fullname.find("/");
+                if (pos == std::string::npos)
+                {
+                  logFatal("Could not parse package:// format for [%s]",mesh->filename.c_str());
+                }
+
+                std::string package = fullname.substr(0, pos);
+                fullname.erase(0, pos);
+                std::string package_path = ros::package::getPath(package);
+
+                if (package_path.empty())
+                {
+                  logFatal("%s Package[%s] does not exist",mesh->filename.c_str(),package.c_str());
+                }
+
+                fullname = package_path + fullname;
+              }
+              */
+
+              // give some warning if file does not exist.
+              std::ifstream fin; fin.open(fullname.c_str(), std::ios::in); fin.close();
+              if (fin.fail())
+                logError("filename referred by mesh [%s] does not appear to exist.",mesh->filename.c_str());
+
+              // add mesh filename
+              addKeyValue(geometry_type, "filename", fullname);
+          }
         }
         break;
     default:
@@ -615,61 +699,8 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem, boost::shared_ptr<urdf::Geo
         break;
     }
 
-    TiXmlElement *geometry_type     = new TiXmlElement(type);
     gazebo_geometry->LinkEndChild(geometry_type);
     
-    if (geometry->type == urdf::Geometry::MESH)
-    {  
-        boost::shared_ptr<const urdf::Mesh> mesh;
-        mesh = boost::dynamic_pointer_cast<const urdf::Mesh >(geometry);
-        /* set mesh size or scale */
-        addKeyValue(geometry_type, "scale", vector32str(mesh->scale));
-
-        /* set mesh file */
-        if (mesh->filename.empty())
-        {
-            logError("urdf2gazebo: mesh geometry with no filename given.");
-            //addKeyValue(gazebo_visual, "mesh", "unit_" + visual_type); // reuse visual type if mesh does not specify filename
-        }
-
-        /* expand to get absolute mesh filename */
-        std::string fullname = mesh->filename;
-        /* resource retriever is ros based
-        if (fullname.find("package://") == 0)
-        {
-          fullname.erase(0, strlen("package://"));
-          size_t pos = fullname.find("/");
-          if (pos == std::string::npos)
-          {
-            logFatal("Could not parse package:// format for [%s]",mesh->filename.c_str());
-          }
-
-          std::string package = fullname.substr(0, pos);
-          fullname.erase(0, pos);
-          std::string package_path = ros::package::getPath(package);
-
-          if (package_path.empty())
-          {
-            logFatal("%s Package[%s] does not exist",mesh->filename.c_str(),package.c_str());
-          }
-
-          fullname = package_path + fullname;
-        }
-        */
-
-        // give some warning if file does not exist.
-        std::ifstream fin; fin.open(fullname.c_str(), std::ios::in); fin.close();
-        if (fin.fail())
-          logError("filename referred by mesh [%s] does not appear to exist.",mesh->filename.c_str());
-
-        // add mesh filename
-        addKeyValue(geometry_type, "filename", fullname);
-    }
-    else
-    {
-        /* set geometry size */
-        addKeyValue(geometry_type, "size", values2str(sizeCount, sizeVals));
-    }
 
     elem->LinkEndChild(gazebo_geometry);
 }
@@ -857,10 +888,27 @@ void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root, boost::shared_ptr<urdf::
     // lump collision parent
     // lump all collision to parent, assign group name "lump::"+group name+"::'+link name
     // lump but keep the link name in(/as) the group name, so we can correlate visuals to collisions somehow.
+    logDebug("COLLISION LUMPING [%d] collision groups for link [%s] to parent [%s]",link->collision_groups.size(), link->name.c_str(), link->getParent()->name.c_str());
+
+/* additional test checking if collision parsing failed in urdf parser
+    if (link->collision_groups.size() == 0 && link->collision)
+    {
+      boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision > > > cols;
+      logDebug("   no default collision group for link [%s], urdfdom_parser error?  createing default group here.", link->name.c_str());
+      cols->push_back( link->collision );
+      link->collision_groups.insert(std::make_pair("default",cols));
+    }
+    else
+    {
+      logDebug("   no collision at all for link [%s]", link->name.c_str());
+    }
+*/
+
     for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::iterator collisions_it = link->collision_groups.begin();
          collisions_it != link->collision_groups.end(); collisions_it++)
     {
-      // if it's a "default" mesh, it should be added under "lump:"+link name
+      // if it's a "default" mesh, it should be added under "lump::"+link name
+      logDebug("lumping collision [%s] for link [%s] to parent [%s]",collisions_it->first.c_str(), link->name.c_str(), link->getParent()->name.c_str());
       if (collisions_it->first == "default")
       {
         std::string lump_group_name = std::string("lump::")+link->name;
@@ -998,7 +1046,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> li
   logDebug("  EXTENSION: Reference lumping from [%s] to [%s]",link_name.c_str(), new_link_name.c_str());
 
   // update extension map with references to link_name
-  listGazeboExtensions();
+  this->listGazeboExtensions();
 
   std::map<std::string,std::vector<GazeboExtension*> >::iterator ext = this->gazebo_extensions_.find(link_name);
   if (ext != this->gazebo_extensions_.end())
@@ -1032,7 +1080,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> li
     ext->second.clear();
   }
 
-  listGazeboExtensions();
+  this->listGazeboExtensions();
 
   // for extensions with empty reference, search and replace link name patterns within the plugin with new link name
   //   and assign the proper reduction transform for the link name pattern
@@ -1045,7 +1093,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> li
         updateGazeboExtensionFrameReplace(*ge, link, new_link_name);
     }
 
-  listGazeboExtensions();
+  this->listGazeboExtensions();
 }
 
 void URDF2Gazebo::updateGazeboExtensionFrameReplace(GazeboExtension* ge, boost::shared_ptr<urdf::Link> link, std::string new_link_name)
@@ -1655,20 +1703,23 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
 
     if (!jtype.empty())
     {
-        TiXmlElement *joint;
-        if (jtype == "fixed") joint = new TiXmlElement("joint:hinge");
-        else                  joint = new TiXmlElement("joint:" + jtype);
+        TiXmlElement *joint = new TiXmlElement("joint");
+        if (jtype == "fixed")
+          joint->SetAttribute("type", "hinge");
+        else
+          joint->SetAttribute("type", jtype);
         joint->SetAttribute("name", link->parent_joint->name);
-        addKeyValue(joint, "body1", link->name);
-        addKeyValue(joint, "body2", link->getParent()->name);
-        addKeyValue(joint, "anchor", link->name);
-        
+        addKeyValue(joint, "child", link->name);
+        addKeyValue(joint, "parent", link->getParent()->name);
+
+        TiXmlElement *joint_axis = new TiXmlElement("axis");
+        TiXmlElement *joint_axis_limit = new TiXmlElement("limit");
+        TiXmlElement *joint_axis_dynamics = new TiXmlElement("dynamics");
         if (jtype == "fixed")
         {
-            addKeyValue(joint, "lowStop", "0");
-            addKeyValue(joint, "highStop", "0");
-            addKeyValue(joint, "axis", "0 0 1");
-            addKeyValue(joint, "damping", "0");
+            addKeyValue(joint_axis_limit, "lower", "0");
+            addKeyValue(joint_axis_limit, "upper", "0");
+            addKeyValue(joint_axis_dynamics, "damping", "0");
         }
         else
         {
@@ -1676,25 +1727,16 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
                                                                                                              link->parent_joint->axis.y,
                                                                                                              link->parent_joint->axis.z ));
             double rotatedJointAxisArray[3] = { rotatedJointAxis.x, rotatedJointAxis.y, rotatedJointAxis.z };
-            addKeyValue(joint, "axis", values2str(3, rotatedJointAxisArray));
+            addKeyValue(joint_axis, "xyz", values2str(3, rotatedJointAxisArray));
             if (link->parent_joint->dynamics)
-              addKeyValue(joint, "damping",  values2str(1, &link->parent_joint->dynamics->damping       ));
+              addKeyValue(joint_axis_dynamics, "damping",  values2str(1, &link->parent_joint->dynamics->damping       ));
 
-            // Joint Anchor is deprecated
-            // urdf::Transform currentAnchorTransform( currentTransform ); 
-            // currentAnchorTransform.setOrigin( urdf::Vector3(0, 0, 0) ); 
-            // urdf::Vector3 jointAnchor = currentAnchorTransform * urdf::Vector3( link->parent_joint->anchor.x,
-            //                                                             link->parent_joint->anchor.y,
-            //                                                             link->parent_joint->anchor.z ); 
-            // double tmpAnchor[3] =  { jointAnchor.x(), jointAnchor.y(), jointAnchor.z() };
-            // addKeyValue(joint, "anchorOffset", values2str(3, tmpAnchor));
-            
             if (this->enforce_limits && link->parent_joint->limits)
             {
                 if (jtype == "slider")
                 {
-                    addKeyValue(joint, "lowStop",  values2str(1, &link->parent_joint->limits->lower       ));
-                    addKeyValue(joint, "highStop", values2str(1, &link->parent_joint->limits->upper       ));
+                    addKeyValue(joint_axis_limit, "lower",  values2str(1, &link->parent_joint->limits->lower       ));
+                    addKeyValue(joint_axis_limit, "upper", values2str(1, &link->parent_joint->limits->upper       ));
                 }
                 else if (link->parent_joint->type != urdf::Joint::CONTINUOUS)
                 {
@@ -1706,11 +1748,15 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
                       logWarn("urdf2gazebo: hinge joint limits: lowStop > highStop, setting lowStop to highStop.");
                       *lowstop = *highstop;
                     }
-                    addKeyValue(joint, "lowStop",  values2str(1, &link->parent_joint->limits->lower, urdf2gazebo::rad2deg));
-                    addKeyValue(joint, "highStop", values2str(1, &link->parent_joint->limits->upper, urdf2gazebo::rad2deg));
+                    addKeyValue(joint_axis_limit, "lower",  values2str(1, &link->parent_joint->limits->lower, urdf2gazebo::rad2deg));
+                    addKeyValue(joint_axis_limit, "upper", values2str(1, &link->parent_joint->limits->upper, urdf2gazebo::rad2deg));
                 }
             }
         }
+        joint_axis->LinkEndChild(joint_axis_limit);
+        joint_axis->LinkEndChild(joint_axis_dynamics);
+        joint->LinkEndChild(joint_axis);
+
         /* copy gazebo extensions data */
         insertGazeboExtensionJoint(joint,link->parent_joint->name);
 
@@ -1723,14 +1769,11 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
 void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Collision> collision, std::string original_reference)
 {
 
-
-
-
-
     /* begin create geometry node, skip if no collision specified */
     TiXmlElement *gazebo_collision     = new TiXmlElement("collision");
 
     /* set its name */
+    logDebug("original[%s] link[%s]\n",original_reference.c_str(), link->name.c_str());
     if (original_reference == link->name)
       gazebo_collision->SetAttribute("name", link->name + std::string("_geom"));
     else
@@ -1764,6 +1807,13 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf:
 {
     /* begin create gazebo visual node */
     TiXmlElement *gazebo_visual = new TiXmlElement("visual");
+
+    /* set its name */
+    logDebug("original[%s] link[%s]\n",original_reference.c_str(), link->name.c_str());
+    if (original_reference == link->name)
+      gazebo_visual->SetAttribute("name", link->name + std::string("_vis"));
+    else
+      gazebo_visual->SetAttribute("name", link->name + std::string("_vis_")+original_reference);
 
     /* add the visualisation transfrom */
     double pose[6];
