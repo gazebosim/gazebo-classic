@@ -1680,10 +1680,10 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
       {
         case urdf::Joint::CONTINUOUS:
         case urdf::Joint::REVOLUTE:
-            jtype = "hinge";
+            jtype = "revolute";
             break;
         case urdf::Joint::PRISMATIC:
-            jtype = "slider";
+            jtype = "prismatic";
             break;
         case urdf::Joint::FLOATING:
         case urdf::Joint::PLANAR:
@@ -1705,7 +1705,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
     {
         TiXmlElement *joint = new TiXmlElement("joint");
         if (jtype == "fixed")
-          joint->SetAttribute("type", "hinge");
+          joint->SetAttribute("type", "revolute");
         else
           joint->SetAttribute("type", jtype);
         joint->SetAttribute("name", link->parent_joint->name);
@@ -1745,7 +1745,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
                     // enforce ode bounds, this will need to be fixed
                     if (*lowstop > *highstop)
                     {
-                      logWarn("urdf2gazebo: hinge joint limits: lowStop > highStop, setting lowStop to highStop.");
+                      logWarn("urdf2gazebo: revolute joint limits: lowStop > highStop, setting lowStop to highStop.");
                       *lowstop = *highstop;
                     }
                     addKeyValue(joint_axis_limit, "lower",  values2str(1, &link->parent_joint->limits->lower, urdf2gazebo::rad2deg));
@@ -1923,7 +1923,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
 
     boost::shared_ptr<const urdf::Link> root_link = robot_model->getRoot();
     /* if link connects to parent via fixed joint, lump down and remove link */
-    // set reduce_fixed_joints to false will replace fixed joints with zero limit hinge joints,
+    // set reduce_fixed_joints to false will replace fixed joints with zero limit revolute joints,
     //   otherwise, we reduce it down to its parent link recursively
     if (this->reduce_fixed_joints)
       reduceFixedJoints(robot, (boost::const_pointer_cast< urdf::Link >(root_link))); // uncomment to test reduction
