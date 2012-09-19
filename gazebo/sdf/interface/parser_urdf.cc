@@ -962,7 +962,7 @@ void URDF2Gazebo::reduceGazeboExtensionsTransformReduction(GazeboExtension* ge)
   for (std::vector<TiXmlElement*>::iterator blob_it = ge->blobs.begin(); blob_it != ge->blobs.end(); blob_it++)
   {
     /// @todo make sure we are not missing any additional transform reductions needed for other SDF elements
-    this->reduceGazeboExtensionRaySensorTransformReduction(blob_it, reduction_transform);
+    this->reduceGazeboExtensionSensorTransformReduction(blob_it, reduction_transform);
     this->reduceGazeboExtensionProjectorTransformReduction(blob_it, reduction_transform);
   }
 }
@@ -1669,10 +1669,10 @@ void URDF2Gazebo::reduceJointsToParent(boost::shared_ptr<urdf::Link> link)
     }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionRaySensorTransformReduction(std::vector<TiXmlElement*>::iterator blob_it, gazebo::math::Pose reduction_transform)
+void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(std::vector<TiXmlElement*>::iterator blob_it, gazebo::math::Pose reduction_transform)
 {
     // overwrite <xyz> and <rpy> if they exist
-    if ((*blob_it)->ValueStr() == "sensor:ray" || (*blob_it)->ValueStr() == "sensor:camera")
+    if ((*blob_it)->ValueStr() == "sensor")
     {
       // parse it and add/replace the reduction transform
       // find first instance of xyz and rpy, replace with reduction transform

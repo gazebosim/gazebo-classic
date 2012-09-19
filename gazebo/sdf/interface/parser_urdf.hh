@@ -247,7 +247,7 @@ namespace urdf2gazebo
       void reduceGazeboExtensionsTransformReduction(GazeboExtension* ge);
 
       /// reduced fixed joints:  apply transform reduction for ray sensors in extensions when doing fixed joint reduction
-      void reduceGazeboExtensionRaySensorTransformReduction(std::vector<TiXmlElement*>::iterator blob_it, gazebo::math::Pose reduction_transform);
+      void reduceGazeboExtensionSensorTransformReduction(std::vector<TiXmlElement*>::iterator blob_it, gazebo::math::Pose reduction_transform);
 
       /// reduced fixed joints:  apply transform reduction for projectors in extensions when doing fixed joint reduction
       void reduceGazeboExtensionProjectorTransformReduction(std::vector<TiXmlElement*>::iterator blob_it, gazebo::math::Pose reduction_transform);
