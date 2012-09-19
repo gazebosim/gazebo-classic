@@ -298,7 +298,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
         TiXmlDocument doc = u2g.initModelFile(filename);
         if (sdf::readDoc(&doc, _sdf, "urdf file"))
         {
-          gzwarn << "parse from urdf.\n";
+          gzwarn << "parse from urdf file [" << filename << "].\n";
           return true;
         }
         else
