@@ -134,6 +134,16 @@ void Model::Load(sdf::ElementPtr _sdf)
     }
   }
 
+  if (_sdf->HasElement("gripper"))
+  {
+    sdf::ElementPtr gripperElem = _sdf->GetElement("gripper");
+    while (gripperElem)
+    {
+      this->LoadGripper(gripperElem);
+      gripperElem = gripperElem->GetNextElement("gripper");
+    }
+  }
+
   // Load the plugins
   if (_sdf->HasElement("plugin"))
   {
@@ -142,16 +152,6 @@ void Model::Load(sdf::ElementPtr _sdf)
     {
       this->LoadPlugin(pluginElem);
       pluginElem = pluginElem->GetNextElement("plugin");
-    }
-  }
-
-  if (_sdf->HasElement("gripper"))
-  {
-    sdf::ElementPtr gripperElem = _sdf->GetElement("gripper");
-    while (gripperElem)
-    {
-      this->LoadGripper(gripperElem);
-      gripperElem = gripperElem->GetNextElement("gripper");
     }
   }
 }

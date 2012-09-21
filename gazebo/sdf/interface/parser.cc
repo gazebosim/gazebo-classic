@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+#define BOOST_FILESYSTEM_VERSION 2
+#include <boost/filesystem.hpp>
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -535,8 +538,51 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
     {
       if (std::string("include") == elemXml->Value())
       {
-        std::string modelPath = gazebo::common::find_file(
-            elemXml->FirstChildElement("uri")->GetText());
+        std::string modelPath;
+
+        if (elemXml->FirstChildElement("uri"))
+        {
+          modelPath = gazebo::common::find_file(
+              elemXml->FirstChildElement("uri")->GetText());
+
+          // Test the model path
+          if (modelPath.empty())
+          {
+            gzerr << "Unable to find uri["
+              << elemXml->FirstChildElement("uri")->GetText() << "]\n";
+
+            std::string uri = elemXml->FirstChildElement("uri")->GetText();
+            if (uri.find("models://") != 0)
+            {
+              gzerr << "Invalid uri[" << uri << "]. Should be models://"
+                    << uri << "\n";
+            }
+            continue;
+          }
+          else
+          {
+            boost::filesystem::path dir(modelPath);
+            if (!boost::filesystem::exists(dir) ||
+                !boost::filesystem::is_directory(dir))
+            {
+              gzerr << "Directory doesn't exist[" << modelPath << "]\n";
+              continue;
+            }
+          }
+        }
+        else
+        {
+          if (elemXml->Attribute("filename"))
+          {
+            gzerr << "<include filename='...'/> should be <include><uri='...'/>\n";
+          }
+          else
+            gzerr << "<include> element missing 'uri' attribute\n";
+
+          continue;
+        }
+
+
         std::string manifest = modelPath + "/manifest.xml";
         std::string filename;
 
@@ -552,7 +598,6 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
                        modelXML->FirstChildElement("sdf")->GetText();
           }
         }
-        std::cout << "FILENAME[" << filename << "]\n";
 
         SDFPtr includeSDF(new SDF);
         init(includeSDF);

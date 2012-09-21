@@ -18,6 +18,9 @@
  * Author: Nate Koenig, Jordi Polo
  * Date: 3 May 2008
  */
+#define BOOST_FILESYSTEM_VERSION 2
+#include <boost/filesystem.hpp>
+
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -233,61 +236,75 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFile(const std::string &_filename)
 {
+  std::string result;
+
   if (_filename.find("://") != std::string::npos)
-    return this->FindFileURI(_filename);
-
-  if (_filename[0] == '/')
-    return _filename;
-
-  struct stat st;
-  std::string fullname = std::string("./")+_filename;
-  bool found = false;
-
-  std::list<std::string> paths = this->GetGazeboPaths();
-
-  if (stat(fullname.c_str(), &st) == 0)
   {
-    found = true;
+    result = this->FindFileURI(_filename);
   }
-  else if (stat(_filename.c_str(), &st) == 0)
+  else if (_filename[0] == '/')
   {
-    fullname = _filename;
-    found = true;
+    result = _filename;
   }
   else
   {
-    for (std::list<std::string>::const_iterator iter = paths.begin();
-        iter != paths.end() && !found; ++iter)
-    {
-      fullname = (*iter) + "/" + _filename;
-      if (stat(fullname.c_str(), &st) == 0)
-      {
-        found = true;
-        break;
-      }
+    struct stat st;
+    result = std::string("./")+_filename;
+    bool found = false;
 
-      std::list<std::string>::iterator suffixIter;
-      for (suffixIter = this->suffixPaths.begin();
-           suffixIter != this->suffixPaths.end(); ++suffixIter)
+    std::list<std::string> paths = this->GetGazeboPaths();
+
+    if (stat(result.c_str(), &st) == 0)
+    {
+      found = true;
+    }
+    else if (stat(_filename.c_str(), &st) == 0)
+    {
+      result = _filename;
+      found = true;
+    }
+    else
+    {
+      for (std::list<std::string>::const_iterator iter = paths.begin();
+          iter != paths.end() && !found; ++iter)
       {
-        fullname = (*iter) + *suffixIter + _filename;
-        if (stat(fullname.c_str(), &st) == 0)
+        result = (*iter) + "/" + _filename;
+        if (stat(result.c_str(), &st) == 0)
         {
           found = true;
           break;
         }
+
+        std::list<std::string>::iterator suffixIter;
+        for (suffixIter = this->suffixPaths.begin();
+            suffixIter != this->suffixPaths.end(); ++suffixIter)
+        {
+          result = (*iter) + *suffixIter + _filename;
+          if (stat(result.c_str(), &st) == 0)
+          {
+            found = true;
+            break;
+          }
+        }
       }
+    }
+
+    if (!found)
+    {
+      result.clear();
+      gzerr << "cannot load file [" << _filename << "]in GAZEBO_RESOURCE_PATH["
+        << getenv("GAZEBO_RESOURCE_PATH") << "]\n";
     }
   }
 
-  if (!found)
+  boost::filesystem::path dir(result);
+  if (!boost::filesystem::exists(dir))
   {
-    fullname.clear();
-    gzerr << "cannot load file [" << _filename << "]in GAZEBO_RESOURCE_PATH["
-      << getenv("GAZEBO_RESOURCE_PATH") << "]\n";
+    gzerr << "File or path does not exist[" << result << "]\n";
+    result.clear();
   }
 
-  return fullname;
+  return result;
 }
 
 /////////////////////////////////////////////////
