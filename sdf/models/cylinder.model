@@ -1,22 +1,38 @@
-<?xml version="1.0" ?>
-<gazebo version="1.0">
-    <model name="cylinder">
-        <link name="link">
-            <origin pose="0 0 0.5 0 0 0" />
-            <inertial mass="1.0">
-                <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
-            </inertial>
-            <collision name="collision">
-                <geometry>
-                    <cylinder radius="0.5" length="1.0" />
-                </geometry>
-            </collision>
-            <visual name="visual">
-                <geometry>
-                    <cylinder radius="0.5" length="1.0" />
-                </geometry>
-                <material script="Gazebo/Grey" />
-            </visual>
-        </link>
-    </model>
+<gazebo version='1.2'>
+  <model name='cylinder'>
+    <link name='link'>
+      <pose>0.000000 0.000000 0.500000 0.000000 -0.000000 0.000000</pose>
+      <inertial>
+        <inertia>
+          <ixx>1.000000</ixx>
+          <ixy>0.000000</ixy>
+          <ixz>0.000000</ixz>
+          <iyy>1.000000</iyy>
+          <iyz>0.000000</iyz>
+          <izz>1.000000</izz>
+        </inertia>
+        <mass>1.000000</mass>
+      </inertial>
+      <collision name='collision'>
+        <geometry>
+          <cylinder>
+            <radius>0.500000</radius>
+            <length>1.000000</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.500000</radius>
+            <length>1.000000</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>Gazebo/Grey</script>
+        </material>
+      </visual>
+      <velocity_decay/>
+    </link>
+  </model>
 </gazebo>
