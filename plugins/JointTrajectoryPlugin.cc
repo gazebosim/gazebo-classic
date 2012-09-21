@@ -101,7 +101,7 @@ void JointTrajectoryPlugin::UpdateStates()
   joint_position_map["arm_elbow_pan_joint"] = cos(cur_time.Double());
   joint_position_map["arm_wrist_lift_joint"] = -0.35
     + 0.45*cos(0.5*cur_time.Double());
-  joint_position_map["arm_wrist_roll_joint"] = -cos(0.5*cur_time.Double());
+  joint_position_map["arm_wrist_roll_joint"] = -2.9*cos(3.0*cur_time.Double());
 
   this->model_->SetJointPositions(joint_position_map);
 
