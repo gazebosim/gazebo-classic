@@ -270,7 +270,7 @@
             </axis>
         </joint>
         <joint name="arm_shoulder_pan_joint" type="revolute">
-            <parent>world</parent>
+            <parent>arm_base</parent>
             <child>arm_shoulder_pan</child>
             <axis>
                 <xyz>0 0 1</xyz>
@@ -305,6 +305,7 @@
                 <xyz>0 0 1</xyz>
             </axis>
         </joint>
+    <plugin name="simple_arm_plugin" filename="libJointTrajectoryPlugin.so">
         <!--
     <plugin name="simple_arm_plugin" filename="libSimpleArmPlugin.so">
       <joint1>arm_base_joint</joint1>

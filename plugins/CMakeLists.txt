@@ -14,6 +14,7 @@ set (plugins
   RayPlugin
   SpringTestPlugin
   DiffDrivePlugin
+  JointTrajectoryPlugin
   VehiclePlugin)
 
 foreach (src ${plugins})
