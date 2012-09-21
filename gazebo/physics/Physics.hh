@@ -24,36 +24,38 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_physics
+  /// \brief physics namespace
   namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// load gazebo::SystemPlugin's and call gazebo::transport::init()
+    /// \brief Setup gazebo::SystemPlugin's and call gazebo::transport::init.
     bool load();
 
-    /// finalize transport by calling gazebo::transport::fini()
+    /// \brief Finalize transport by calling gazebo::transport::fini.
     bool fini();
 
-    /// \brief create a world
+    /// \brief Create a world given a name.
     WorldPtr create_world(const std::string &name ="");
 
-    /// \brief Get back a pointer to a world by name
+    /// \brief Returns a pointer to a world by name
     WorldPtr get_world(const std::string &name = "");
 
     /// \brief Load world from sdf::Element pointer
     void load_world(WorldPtr world, sdf::ElementPtr _sdf);
 
-    /// \brief initialize world
+    /// \brief Init world given a pointer to it.
     void init_world(WorldPtr world);
 
-    /// \brief run world by calling World::Run()
+    /// \brief Run world by calling World::Run() given a pointer to it.
     void run_world(WorldPtr world);
 
-    /// \brief stop world by calling World::Stop()
+    /// \brief Stop world by calling World::Stop() given a pointer to it.
     void stop_world(WorldPtr world);
 
-    /// \brief stop world by calling World::SetPaused(bool)
+    /// \brief Pause world by calling World::SetPaused.
     void pause_world(WorldPtr world, bool pause);
 
     /// \brief load multiple worlds from single sdf::Element pointer

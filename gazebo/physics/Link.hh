@@ -220,10 +220,12 @@ namespace gazebo
       /// \brief Get sensor name
       public: std::string GetSensorName(unsigned int _i) const;
 
-      /// \brief Connect a to the add entity signal
+      /// \brief Connect to the add entity signal
       public: template<typename T>
               event::ConnectionPtr ConnectEnabled(T subscriber)
               { return enabledSignal.Connect(subscriber); }
+
+      /// \brief Disconnect to the add entity signal
       public: void DisconnectEnabled(event::ConnectionPtr &c)
               { enabledSignal.Disconnect(c); }
 

@@ -28,7 +28,10 @@
                         <width>320</width>
                         <height>240</height>
                     </image>
-                    <clip near="0.1" far="100" />
+                    <clip>
+                      <near>0.1</near>
+                      <far>100</far>
+                    </clip>
                 </camera>
                 <always_on>1</always_on>
                 <update_rate>30</update_rate>

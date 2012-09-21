@@ -29,10 +29,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief A slider joint
     class ODESliderJoint : public SliderJoint<ODEJoint>
     {
@@ -42,7 +42,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ODESliderJoint();
 
-      /// \brief Load the joint
+      /// \brief Load the ODESliderJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Get the axis of rotation
@@ -82,8 +82,7 @@ namespace gazebo
       public: virtual void SetParam(int parameter, double value);
     };
 
-  /// \}
-  /// \}
+    /// \}
   }
 }
 #endif

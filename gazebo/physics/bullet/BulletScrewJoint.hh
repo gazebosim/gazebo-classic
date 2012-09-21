@@ -35,10 +35,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief A screw joint
     class BulletScrewJoint : public ScrewJoint<BulletJoint>
     {
@@ -48,7 +48,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletScrewJoint();
 
-      /// \brief Load the joint
+      /// \brief Load the BulletScrewJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Attach the two bodies with this joint
@@ -98,7 +98,6 @@ namespace gazebo
 
       private: btSliderConstraint *btScrew;
     };
-    /// \}
     /// \}
   }
 }

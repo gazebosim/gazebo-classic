@@ -90,7 +90,7 @@ namespace gazebo
       /// \brief Load the scene with default parameters
       public: void Load();
 
-      /// \brief Init
+      /// \brief Init rendering::Scene
       public: void Init();
 
       /// \brief Process all received messages
@@ -311,6 +311,7 @@ namespace gazebo
 
       private: void OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg);
 
+      /// \brief Clear rendering::Scene
       public: void Clear();
 
       public: void RegisterVisual(VisualPtr _vis);

@@ -31,10 +31,18 @@ http://www.gnu.org/copyleft/lesser.txt.
 #include "VClouds/GeometryManager.h"
 #include "VClouds/LightningManager.h"
 
+/// \ingroup gazebo_rendering
+/// \brief SkyX namespace
 namespace SkyX
 {
+  /// \ingroup gazebo_rendering
+/// \brief VClouds namespace
   namespace VClouds
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief SkyX clouds class
     class DllExport VClouds
     {
       public:
@@ -613,6 +621,7 @@ namespace SkyX
         /// Vol. clouds + lightning material
         Ogre::MaterialPtr mVolCloudsLightningMaterial;
     };
+    /// \}
   }
 }
 #endif

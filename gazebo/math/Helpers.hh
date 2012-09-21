@@ -36,11 +36,14 @@ namespace gazebo
   namespace math
   {
     /// \addtogroup gazebo_math
+    /// \brief A set of classes that encapsulate math related properties and
+    ///        functions.
     /// \{
 
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
     static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
 
+    /// \brief simple clamping function
     template<typename T>
     inline T clamp(T _v, T _min, T _max)
     {
@@ -53,11 +56,13 @@ namespace gazebo
       return (boost::math::isnan)(_v);
     }
 
+    /// \brief check if a double is NaN
     inline bool isnan(double _v)
     {
       return (boost::math::isnan)(_v);
     }
 
+    /// \brief get mean of vector of values
     template<typename T>
     inline T mean(const std::vector<T> &_values)
     {
@@ -67,6 +72,7 @@ namespace gazebo
       return sum / _values.size();
     }
 
+    /// \brief get variance of vector of values
     template<typename T>
     inline T variance(const std::vector<T> &_values)
     {
@@ -78,6 +84,7 @@ namespace gazebo
       return sum / _values.size();
     }
 
+    /// \brief get variance of vector of values
     template<typename T>
     inline T max(const std::vector<T> &_values)
     {
@@ -88,6 +95,7 @@ namespace gazebo
       return max;
     }
 
+    /// \brief get min of vector of values
     template<typename T>
     inline T min(const std::vector<T> &_values)
     {
@@ -98,6 +106,7 @@ namespace gazebo
       return min;
     }
 
+    /// \brief check if two values are equal in the machine precision sense
     template<typename T>
     inline bool equal(const T &_a, const T &_b,
                       const T &_epsilon = 1e-6)
@@ -105,17 +114,20 @@ namespace gazebo
       return std::fabs(_a - _b) <= _epsilon;
     }
 
+    /// \brief get precision of a value
     template<typename T>
     inline T precision(const T &_a, const unsigned int &_precision)
     {
       return round(_a * pow(10, _precision)) / pow(10, _precision);
     }
 
+    /// \brief is this a power of 2?
     inline bool isPowerOfTwo(unsigned int _x)
     {
       return ((_x != 0) && ((_x & (~_x + 1)) == _x));
     }
 
+    /// \brief parse string into int
     inline int parseInt(const std::string& input)
     {
       const char *p = input.c_str();
@@ -145,6 +157,7 @@ namespace gazebo
       return s * acc;
     }
 
+    /// \brief parse string into float
     inline double parseFloat(const std::string& input)
     {
       const char *p = input.c_str();

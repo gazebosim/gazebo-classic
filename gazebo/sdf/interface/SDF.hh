@@ -26,6 +26,8 @@
 
 #define SDF_VERSION "1.2"
 
+/// \ingroup gazebo_parser
+/// \brief namespace for Simulation Description Format parser
 namespace sdf
 {
   class SDF;
@@ -33,6 +35,9 @@ namespace sdf
   typedef boost::shared_ptr<SDF> SDFPtr;
   typedef boost::shared_ptr<Element> ElementPtr;
   typedef std::vector< ElementPtr > ElementPtr_V;
+
+  /// \addtogroup gazebo_parser
+  /// \{
 
   /// \brief SDF Element class
   class Element : public boost::enable_shared_from_this<Element>
@@ -216,5 +221,6 @@ namespace sdf
 
     public: static std::string version;
   };
+  /// \}
 }
 #endif

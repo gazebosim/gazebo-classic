@@ -31,10 +31,12 @@
 
 namespace gazebo
 {
-/// \addtogroup gazebo_screw_joint Screw Joint
-/// \{
   namespace physics
   {
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
     /// \brief A screw joint
     class ODEScrewJoint : public ScrewJoint<ODEJoint>
     {
@@ -44,10 +46,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ODEScrewJoint();
 
-      /// \brief Load the joint
+      /// \brief Load the ODEScrewJoint from ::Element
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Get the axis of rotation
+      /// \brief Get the axis of rotation of an ODEScrewJoint
       public: virtual math::Vector3 GetGlobalAxis(int index) const;
 
       /// \brief Set the axis of motion
@@ -88,7 +90,7 @@ namespace gazebo
       public: virtual void SetParam(int parameter, double value);
     };
 
-/// \}
+  /// \}
   }
 }
 #endif

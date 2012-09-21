@@ -63,6 +63,8 @@ namespace gazebo
       /// \brief Initialize the camera
       public: virtual void Init();
 
+      /// \brief Returns the name of the camera image topic.
+      /// @todo to be implemented
       public: virtual std::string GetTopic() const;
 
       /// \brief Update the sensor information
@@ -74,13 +76,20 @@ namespace gazebo
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
 
+      /// \brief Returns a pointer to the rendering::Camera
       public: rendering::CameraPtr GetCamera() const
               {return this->camera;}
 
+      /// \brief returns the pixel width of an image as an unsigned int
       public: unsigned int GetImageWidth() const;
+
+      /// \brief returns the pixel height of an image as an unsigned int
       public: unsigned int GetImageHeight() const;
+
+      /// \brief returns pixels of an image as an array of unsigned char
       public: const unsigned char *GetImageData();
 
+      /// \brief save the image frame to file named _filename.
       public: bool SaveFrame(const std::string &_filename);
 
       private: rendering::CameraPtr camera;

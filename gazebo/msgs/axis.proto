@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
-/// \ingroup gazebo_msgs
-/// \interface Axis 
-/// \brief Axis message
+/// \ingroup gazebo_msgs Messages
+/// \interface Axis
+/// \brief msgs::Joint axis message
 /// \verbatim
 
 import "vector3d.proto";

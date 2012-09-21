@@ -262,7 +262,10 @@
             <parent>world</parent>
             <child>arm_base</child>
             <axis>
-                <limit lower="0" upper="0" />
+                <limit>
+                  <lower>0</lower>
+                  <upper>0</upper>
+                </limit>
                 <xyz>0 0 1</xyz>
             </axis>
         </joint>
@@ -284,7 +287,10 @@
             <parent>arm_elbow_pan</parent>
             <child>arm_wrist_lift</child>
             <axis>
-                <limit lower="-0.8" upper="0.1" />
+                <limit>
+                  <lower>-0.8</lower>
+                  <upper>0.1</upper>
+                </limit>
                 <xyz>0 0 1</xyz>
             </axis>
         </joint>
@@ -292,7 +298,10 @@
             <parent>arm_wrist_lift</parent>
             <child>arm_wrist_roll</child>
             <axis>
-                <limit lower="-2.999994" upper="2.999994" />
+                <limit>
+                  <lower>-2.999994</lower>
+                  <upper>2.999994</upper>
+                </limit>
                 <xyz>0 0 1</xyz>
             </axis>
         </joint>
@@ -324,7 +333,10 @@
             <parent>arm_wrist_roll</parent>
             <child>pr2_gripper::r_wrist_roll_link</child>
             <axis>
-                <limit lower="0" upper="0" />
+                <limit>
+                  <lower>0</lower>
+                  <upper>0</upper>
+                </limit>
                 <xyz>0 0 1</xyz>
             </axis>
         </joint>

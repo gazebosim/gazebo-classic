@@ -94,17 +94,20 @@ namespace gazebo
                               float outterRadius, float height, int rings,
                               int segments);
 
+      /// \brief Create mesh for a plane
       public: void CreatePlane(const std::string &name,
                                const math::Plane &plane,
                                const math::Vector2d &segments,
                                const math::Vector2d &uvTile);
 
+      /// \brief Create mesh for a plane
       public: void CreatePlane(const std::string &name,
                                const math::Vector3 &normal,
                                double d, const math::Vector2d &size,
                                const math::Vector2d &segments,
                                const math::Vector2d &uvTile);
 
+      /// \brief Tesselate a 2D mesh
       private: void Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
                                     bool doubleSided);
 

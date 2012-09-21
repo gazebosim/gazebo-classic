@@ -52,6 +52,7 @@ namespace gazebo
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
+      /// \brief Load RFID sensor into world _worldName.
       public: virtual void Load(const std::string &_worldName);
 
       /// \brief  Initialize the sensor
@@ -63,7 +64,9 @@ namespace gazebo
       public: virtual void Fini();
 
       private: void EvaluateTags();
+
       private: bool CheckTagRange(const math::Pose &_pose);
+
       private: bool CheckRayIntersection(const math::Pose &_pose);
 
       private: physics::EntityPtr entity;

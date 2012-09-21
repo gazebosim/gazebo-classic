@@ -24,10 +24,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief An ODE Plane shape
     class ODEPlaneShape : public PlaneShape
     {
@@ -75,7 +75,6 @@ namespace gazebo
                             vec4[2], vec4[3]);
       }
     };
-    /// \}
     /// \}
   }
 }

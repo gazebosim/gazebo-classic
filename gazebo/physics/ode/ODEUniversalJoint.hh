@@ -29,10 +29,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
+
     /// \brief A universal joint
     class ODEUniversalJoint : public UniversalJoint<ODEJoint>
     {
@@ -80,7 +80,6 @@ namespace gazebo
       public: virtual void SetParam(int parameter, double value);
     };
 
-    /// \}
     /// \}
   }
 }

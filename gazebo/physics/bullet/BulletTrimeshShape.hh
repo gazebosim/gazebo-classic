@@ -28,10 +28,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
+
     /// \brief Triangle mesh collision
     class BulletTrimeshShape : public TrimeshShape
     {
@@ -47,7 +47,6 @@ namespace gazebo
       protected: virtual void Init();
     };
 
-    /// \}
     /// \}
   }
 }

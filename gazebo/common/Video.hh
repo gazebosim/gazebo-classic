@@ -31,6 +31,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common
     /// \{
+
     /// \brief Handle video encoding and decoding using libavcodec
     class Video
     {
@@ -54,6 +55,7 @@ namespace gazebo
       /// \param _img Image in which the frame is stored
       public: bool GetNextFrame(unsigned char **_buffer);
 
+      /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
       private: AVFormatContext *formatCtx;

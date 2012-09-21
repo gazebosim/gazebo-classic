@@ -18,6 +18,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <curl/curl.h>
+
 #include "sdf/sdf.hh"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
@@ -125,6 +127,19 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->ConnectToModelDatabase();
 }
 
+size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
+{
+  /*
+  std::string *str = static_cast<std::string*>(userp);
+  size *= nmemb;
+
+  str->append(buffer, size);
+  std::cout << "Size[" << size << "] NMemb[" << nmemb << "]\n";
+  */
+  return size;
+}
+
+
 /////////////////////////////////////////////////
 void InsertModelWidget::ConnectToModelDatabase()
 {
@@ -132,8 +147,37 @@ void InsertModelWidget::ConnectToModelDatabase()
 
   if (uriStr)
   {
+    /*
+    std::string manifestURI = uriStr;
+    manifestURI += "/manifest.xml";
+
+    std::string result;
+    CURL *curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, manifestURI.c_str());
+    std::cout << "Manifest URI[" << manifestURI << "]\n";
+
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
+
+    CURLcode success = curl_easy_perform(curl);
+    if (success != CURLE_OK)
+    {
+      gzerr << "Unable to connect to model database using [" << uriStr << "]\n";
+      gzerr << "Error code[" << success << "]\n";
+    }
+    else
+      printf("Success\n");
+
+    std::cout << "Result[" << result << "]\n";
+    curl_easy_cleanup(curl);
+    */
+  }
+
+
+  /*if (uriStr)
+  {
     std::string uri = uriStr;
-    int colon = uri.find_last_of(":");
+    unsigned int colon = uri.find_last_of(":");
     if (colon == uri.find("://"))
     {
       gzerr << "No port specified for the GAZEBO_MODEL_DATABASE_URI env var\n";
@@ -155,7 +199,7 @@ void InsertModelWidget::ConnectToModelDatabase()
 
       conn->ProcessWriteQueue();
     }
-  }
+  }*/
   else
   {
     gzwarn << "GAZEBO_MODEL_DATABASE_URI env var not specified\n";
@@ -196,10 +240,12 @@ InsertModelWidget::~InsertModelWidget()
 
 /////////////////////////////////////////////////
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
-    int /*_column*/)
+                                         int /*_column*/)
 {
+  std::cout << "OnModelSelection\n";
   if (_item)
   {
+    printf("_item valid\n");
     std::string path, manifest, filename;
 
     QApplication::setOverrideCursor(Qt::BusyCursor);
@@ -222,6 +268,8 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
         filename = path + "/" + modelXML->FirstChildElement("sdf")->GetText();
       }
     }
+    else
+      gzerr << "Unable to load manifest[" << manifest << "]\n";
 
     if (!filename.empty())
     {

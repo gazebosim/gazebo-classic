@@ -58,7 +58,9 @@ namespace gazebo
       /// \brief Finilize the physics engine
       public: virtual void Fini();
 
+      /// \brief Empty
       public: virtual void Reset() {}
+
       /// \brief Init the engine for threads.
       public: virtual void InitForThread() = 0;
 
@@ -70,6 +72,8 @@ namespace gazebo
 
       /// \brief Get the simulation update rate
       public: double GetUpdateRate();
+
+      /// \brief Get the simulation update period
       public: double GetUpdatePeriod();
 
       /// \brief Set the simulation step time
@@ -149,13 +153,14 @@ namespace gazebo
       /// \brief Debug print out of the physic engine state
       public: virtual void DebugPrint() const = 0;
 
+      /// \brief returns a pointer to the PhysicsEngine#physicsUpdateMutex
       public: boost::recursive_mutex* GetPhysicsUpdateMutex() const
               { return this->physicsUpdateMutex; }
 
-      /// \brief
+      /// \brief virtual callback for gztopic "~/request"
       protected: virtual void OnRequest(ConstRequestPtr &/*_msg*/) {}
 
-      /// \brief 
+      /// \brief virtual callback for gztopic "~/physics"
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/) {}
 
       protected: WorldPtr world;

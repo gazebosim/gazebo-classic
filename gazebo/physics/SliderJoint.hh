@@ -44,7 +44,7 @@ namespace gazebo
       public: virtual ~SliderJoint()
               {}
 
-      /// \brief Load the joint
+      /// \brief Load a SliderJoint
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  { T::Load(_sdf); }
 

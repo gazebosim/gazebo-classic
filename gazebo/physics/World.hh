@@ -109,8 +109,12 @@ namespace gazebo
 
       /// \brief Reset with options
       public: void ResetEntities(Base::EntityType _type = Base::BASE);
+
+      /// \brief Reset simulation time back to zero
       public: void ResetTime();
-      public: void Reset();  // Reset all
+
+      /// \brief Reset time and model poses, configurations in simulation
+      public: void Reset();
 
       /// \brief Get the selected entity
       public: EntityPtr GetSelectedEntity() const;
@@ -327,6 +331,9 @@ namespace gazebo
       private: std::vector<WorldPluginPtr> plugins;
       private: std::list<std::string> deleteEntity;
 
+      /// \brief when physics engine makes an update and changes a link pose,
+      ///        this flag is set to trigger Entity::SetWorldPose on the
+      ///        physics::Link in World::Update.
       public: std::list<Entity*> dirtyPoses;
 
       private: std::list<msgs::Request> requestMsgs;
@@ -342,8 +349,12 @@ namespace gazebo
 
       private: bool initialized;
       private: bool enablePhysicsEngine;
+
+      /// \brief check if physics engine is enabled/disabled
       public: bool GetEnablePhysicsEngine()
               { return this->enablePhysicsEngine; }
+
+      /// \brief enable/disable physics engine during World::Update
       public: void EnablePhysicsEngine(bool _enable)
               { this->enablePhysicsEngine = _enable; }
 

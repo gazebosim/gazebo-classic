@@ -32,11 +32,11 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
-    /// \{
+    /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
-    /// \brief A universal joint
+
+    /// \brief A bullet universal joint class
     class BulletUniversalJoint : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
@@ -102,7 +102,6 @@ namespace gazebo
       private: btUniversalConstraint *btUniversal;
     };
 
-    /// \}
     /// \}
   }
 }

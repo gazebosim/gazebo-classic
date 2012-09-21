@@ -28,7 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    /// \brief Encapsulates a description of a material
+    /// \brief Encapsulates description of a material
     class Material
     {
       public: enum ShadeMode {FLAT, GOURAUD, PHONG, BLINN, SHADE_COUNT};

@@ -23,10 +23,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
-    /// \addtogroup gazebo_physics_bullet
-    /// \{
+
     /// \brief Bullet specific version of MultiRayShape
     class BulletMultiRayShape : public MultiRayShape
     {
@@ -45,7 +45,6 @@ namespace gazebo
 
       private: BulletPhysicsPtr physicsEngine;
     };
-    /// \}
     /// \}
   }
 }

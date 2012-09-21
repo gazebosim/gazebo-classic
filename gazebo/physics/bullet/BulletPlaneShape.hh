@@ -31,10 +31,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
+
     /// \brief Bullet collision for an infinite plane.
     class BulletPlaneShape : public PlaneShape
     {
@@ -64,7 +64,6 @@ namespace gazebo
                 bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0));
               }
     };
-    /// \}
     /// \}
   }
 }

@@ -29,10 +29,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
-    /// \addtogroup gazebo_physics_bullet ODE Physics
-    /// \{
+
     /// \brief Bullet sphere collision
     class BulletSphereShape : public SphereShape
     {
@@ -53,7 +53,6 @@ namespace gazebo
                 bParent->SetCollisionShape(new btSphereShape(_radius));
               }
     };
-    /// \}
     /// \}
   }
 }

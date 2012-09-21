@@ -28,6 +28,9 @@ namespace gazebo
     class RotationSpline;
   }
 
+  /// \ingroup gazebo_common
+  /// \brief Common namespace
+
   namespace common
   {
     class KeyFrame;

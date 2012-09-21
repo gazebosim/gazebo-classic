@@ -40,10 +40,13 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SelectionObj();
 
+      /// \brief Initialize the rendering::SelectionObj object
       public: void Init();
 
       /// \brief Set the position of the node
       public: void Attach(VisualPtr visual);
+
+      /// \brief Clear the rendering::SelectionObj object
       public: void Clear();
 
       /// \brief Return true if the user is move the selection obj
@@ -65,7 +68,7 @@ namespace gazebo
       private: bool active;
       private: double boxSize;
     };
-    /// \brief
+    /// \}
   }
 }
 #endif

@@ -31,6 +31,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief State of an object
     class State
     {
       /// \brief Default constructor
@@ -62,6 +66,7 @@ namespace gazebo
       protected: std::string name;
       protected: common::Time wallTime, realTime, simTime;
     };
+    /// \}
   }
 }
 #endif

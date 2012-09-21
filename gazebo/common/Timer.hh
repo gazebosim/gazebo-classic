@@ -32,7 +32,7 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    /// \brief A timer class
+    /// \brief A timer class, used to time things in real world walltime
     class Timer
     {
       /// \brief Constructor
@@ -47,6 +47,7 @@ namespace gazebo
       /// \brief Get the elapsed itme
       public: Time GetElapsed() const;
 
+      /// \brief stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const gazebo::common::Timer &t)
               {

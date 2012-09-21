@@ -63,6 +63,7 @@ namespace gazebo
     /// \brief Cleanup the transport component
     void fini();
 
+    /// \brief clear any remaining communication buffers
     void clear_buffers();
 
     /// \brief Set to true to pause incoming messages. They are still queued

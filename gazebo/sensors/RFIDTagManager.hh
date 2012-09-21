@@ -35,8 +35,10 @@ namespace gazebo
     /// \brief RFID tag manager
     class RFIDTagManager : public SingletonT<RFIDTagManager>
     {
+      /// \brief add RFID tag to model _model.
       public: void AddTaggedModel(RFIDTag *_model);
 
+      /// \brief returns a list of sensors::RFIDTag's
       public: std::vector<RFIDTag*> GetTags()
               {return this->taggedModels;}
 
