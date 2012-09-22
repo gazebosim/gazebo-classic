@@ -21,6 +21,13 @@
                         <size>1.0 1.0 0.1</size>
                     </box>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_base_geom_visual">
                 <pose>0 0 0.05 0 0 0</pose>
@@ -41,6 +48,13 @@
                         <length>1.0</length>
                     </cylinder>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_base_geom_arm_trunk_visual">
                 <pose>0 0 0.6 0 0 0</pose>
@@ -77,6 +91,13 @@
                         <length>0.1</length>
                     </cylinder>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_shoulder_pan_geom_visual">
                 <pose>0 0 0.05 0 0 0</pose>
@@ -97,6 +118,13 @@
                         <size>1.0 0.05 0.1</size>
                     </box>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_shoulder_pan_geom_arm_shoulder_visual">
                 <pose>0.55 0 0.05 0 0 0</pose>
@@ -132,6 +160,13 @@
                         <length>0.2</length>
                     </cylinder>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_elbow_pan_geom_visual">
                 <pose>0 0 0.1 0 0 0</pose>
@@ -152,6 +187,13 @@
                         <size>0.5 0.03 0.1</size>
                     </box>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_elbow_pan_geom_arm_elbow_visual">
                 <pose>0.3 0 0.15 0 0 0</pose>
@@ -172,6 +214,13 @@
                         <length>0.3</length>
                     </cylinder>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_elbow_pan_geom_arm_wrist_visual">
                 <pose>0.55 0 0.15 0 0 0</pose>
@@ -208,6 +257,13 @@
                         <length>1.0</length>
                     </cylinder>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_wrist_lift_geom_visual">
                 <pose>0 0 0.5 0 0 0</pose>
@@ -244,6 +300,13 @@
                         <length>0.05</length>
                     </cylinder>
                 </geometry>
+              <surface>
+                <contact>
+                  <ode>
+                    <max_vel>0.0</max_vel>
+                  </ode>
+                </contact>
+              </surface>
             </collision>
             <visual name="arm_wrist_roll_geom_visual">
                 <pose>0 0 0.025 0 0 0</pose>
@@ -270,7 +333,7 @@
             </axis>
         </joint>
         <joint name="arm_shoulder_pan_joint" type="revolute">
-            <parent>world</parent>
+            <parent>arm_base</parent>
             <child>arm_shoulder_pan</child>
             <axis>
                 <xyz>0 0 1</xyz>
@@ -305,6 +368,7 @@
                 <xyz>0 0 1</xyz>
             </axis>
         </joint>
+    <plugin name="simple_arm_plugin" filename="libJointTrajectoryPlugin.so"/>
         <!--
     <plugin name="simple_arm_plugin" filename="libSimpleArmPlugin.so">
       <joint1>arm_base_joint</joint1>

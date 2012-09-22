@@ -1,4 +1,3 @@
-include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${console_bridge_LIBRARY_DIRS} ${XML_LIBRARY_DIRS})
 
 include_directories( 
