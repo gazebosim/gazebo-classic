@@ -29,23 +29,18 @@
 
 namespace gazebo
 {
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 JointTrajectoryPlugin::JointTrajectoryPlugin()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 JointTrajectoryPlugin::~JointTrajectoryPlugin()
 {
   event::Events::DisconnectWorldUpdateStart(this->update_connection_);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the controller
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
                                  sdf::ElementPtr /*_sdf*/)
 {
@@ -53,7 +48,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   this->world_ = _parent->GetWorld();
   this->model_ = _parent;
 
-  //this->world_->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  // this->world_->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
@@ -62,14 +57,13 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
       boost::bind(&JointTrajectoryPlugin::UpdateStates, this));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// glue a link to the world by creating a fixed joint
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::FixLink(physics::LinkPtr link)
 {
   this->joint_ = this->world_->GetPhysicsEngine()->CreateJoint("revolute");
   this->joint_->SetModel(this->model_);
   math::Pose pose = link->GetWorldPose();
-  //math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
+  // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
   this->joint_->Load(physics::LinkPtr(), link, pose);
   this->joint_->SetAxis(0, math::Vector3(0, 0, 0));
   this->joint_->SetHighStop(0, 0);
@@ -78,17 +72,13 @@ void JointTrajectoryPlugin::FixLink(physics::LinkPtr link)
   this->joint_->Init();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// unglue a link to the world by destroying the fixed joint
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::UnfixLink()
 {
   this->joint_.reset();
 }
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Play the trajectory, update states
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates()
 {
   common::Time cur_time = this->world_->GetSimTime();
@@ -105,9 +95,9 @@ void JointTrajectoryPlugin::UpdateStates()
 
   this->model_->SetJointPositions(joint_position_map);
 
-  this->world_->SetPaused(is_paused); // resume original pause-state
+  // resume original pause-state
+  this->world_->SetPaused(is_paused);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(JointTrajectoryPlugin)
-
 }

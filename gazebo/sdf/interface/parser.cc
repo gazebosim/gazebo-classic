@@ -15,10 +15,11 @@
  *
 */
 #define BOOST_FILESYSTEM_VERSION 2
-#include <boost/filesystem.hpp>
 
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <boost/filesystem.hpp>
 
 #include "gazebo/sdf/interface/Converter.hh"
 #include "gazebo/sdf/interface/SDF.hh"
@@ -574,7 +575,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
         {
           if (elemXml->Attribute("filename"))
           {
-            gzerr << "<include filename='...'/> should be <include><uri='...'/>\n";
+            gzerr << "<include filename='...'/> should be "
+                  << "<include><uri='...'/>\n";
           }
           else
             gzerr << "<include> element missing 'uri' attribute\n";

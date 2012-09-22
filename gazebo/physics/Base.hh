@@ -33,7 +33,7 @@
 
 namespace gazebo
 {
-  ///\brief namespace for physics
+  /// \brief namespace for physics
   namespace physics
   {
     /// \addtogroup gazebo_physics Classes for physics and dynamics
@@ -65,6 +65,7 @@ namespace gazebo
       "trimesh"
     };
 
+    /// \class Base Base.hh physics/Base.hh
     /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {

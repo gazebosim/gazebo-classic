@@ -15,10 +15,10 @@
  *
  */
 #define BOOST_FILESYSTEM_VERSION 2
+#include <curl/curl.h>
+
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include <curl/curl.h>
 
 #include "sdf/sdf.hh"
 #include "common/SystemPaths.hh"
@@ -127,18 +127,17 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->ConnectToModelDatabase();
 }
 
+  /*
 size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
 {
-  /*
   std::string *str = static_cast<std::string*>(userp);
   size *= nmemb;
 
   str->append(buffer, size);
   std::cout << "Size[" << size << "] NMemb[" << nmemb << "]\n";
-  */
   return size;
 }
-
+  */
 
 /////////////////////////////////////////////////
 void InsertModelWidget::ConnectToModelDatabase()

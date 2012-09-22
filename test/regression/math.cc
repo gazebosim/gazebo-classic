@@ -707,17 +707,20 @@ TEST_F(MathTest, Quaternion)
     gzdbg << " x [" << q.GetInverse().GetXAxis() << "]\n";
     gzdbg << " y [" << q.GetInverse().GetYAxis() << "]\n";
     gzdbg << " z [" << q.GetInverse().GetZAxis() << "]\n";
-    EXPECT_TRUE(q.GetInverse().GetXAxis() == math::Vector3(0.617229, -0.589769, 0.520770));
-    EXPECT_TRUE(q.GetInverse().GetYAxis() == math::Vector3(0.707544, 0.705561, -0.039555));
-    EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(-0.344106, 0.392882, 0.852780));
-  
+    EXPECT_TRUE(q.GetInverse().GetXAxis() ==
+                math::Vector3(0.617229, -0.589769, 0.520770));
+    EXPECT_TRUE(q.GetInverse().GetYAxis() ==
+                math::Vector3(0.707544, 0.705561, -0.039555));
+    EXPECT_TRUE(q.GetInverse().GetZAxis() ==
+                math::Vector3(-0.344106, 0.392882, 0.852780));
+
     // rotate about the axis of rotation should not change axis
     math::Vector3 v = math::Vector3(1, 2, 3);
     math::Vector3 r1 = q.RotateVector(v);
     math::Vector3 r2 = q.RotateVectorReverse(v);
     EXPECT_TRUE(r1 == math::Vector3(1, 2, 3));
     EXPECT_TRUE(r2 == math::Vector3(1, 2, 3));
-  
+
     // rotate unit vectors
     v = math::Vector3(0, 0, 1);
     r1 = q.RotateVector(v);
@@ -735,7 +738,8 @@ TEST_F(MathTest, Quaternion)
     EXPECT_TRUE(r1 == math::Vector3(0.61723, 0.70754, -0.34411));
     EXPECT_TRUE(r2 == math::Vector3(0.61723, -0.58977, 0.52077));
 
-    EXPECT_TRUE(-q == math::Quaternion(-0.891007, -0.121334, -0.242668, -0.364002));
+    EXPECT_TRUE(-q == math::Quaternion(-0.891007, -0.121334,
+                                       -0.242668, -0.364002));
 
     EXPECT_TRUE(q.GetAsMatrix3() == math::Matrix3(
                 0.617229, -0.589769, 0.52077,
@@ -748,8 +752,6 @@ TEST_F(MathTest, Quaternion)
                 -0.344106, 0.392882, 0.85278, 0,
                 0, 0, 0, 1));
   }
-
-
 }
 
 TEST_F(MathTest, Pose)

@@ -40,6 +40,7 @@ namespace gazebo
 
     class DynamicLines;
 
+    /// \class COMVisual COMVisual.hh rendering/COMVisual.hh
     /// \brief Basic Center of Mass visualization
     class COMVisual : public Visual
     {

@@ -380,18 +380,23 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
 
-  try {
+  try
+  {
     int verticalRangeCount =
       boost::lexical_cast<int>(getNodeValue(_config, "verticalRangeCount"));
-    int verticalRayCount = boost::lexical_cast<int>(getNodeValue(_config, "verticalRayCount"));
+    int verticalRayCount = boost::lexical_cast<int>(getNodeValue(_config,
+          "verticalRayCount"));
 
     if (!sdfVerti->GetAttribute("resolution")->SetFromString(
-          boost::lexical_cast<std::string>(verticalRangeCount / verticalRayCount)))
+          boost::lexical_cast<std::string>(verticalRangeCount /
+                                           verticalRayCount)))
     {
       gzerr << "Unable to parse ray sensor verticalRayCount";
       return false;
     }
-  } catch(boost::bad_lexical_cast& e) {
+  }
+  catch(boost::bad_lexical_cast& e)
+  {
   }
 
   double minAngle =

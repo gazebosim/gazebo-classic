@@ -70,7 +70,7 @@ namespace gazebo
       ///        set by Sensor::SetParent.
       public: std::string GetParentName() const;
 
-      /// \brief  Update the sensor, runs in a 
+      /// \brief Update the sensor, runs in a
       public: void Update(bool _force);
 
       /// \brief  This gets overwritten by derived sensor types.

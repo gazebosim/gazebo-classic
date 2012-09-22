@@ -97,7 +97,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   {
     endpoint_iter = resolver.resolve(query);
   }
-  catch (...)
+  catch(...)
   {
     gzerr << "Unable to resolve uri[" << host << ":" << _port << "]\n";
     return false;

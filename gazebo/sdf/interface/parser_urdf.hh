@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2008, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -50,8 +50,8 @@
 
 #include <tinyxml.h>
 
-//#include "LinearMath/btTransform.h"
-//#include "LinearMath/btVector3.h"
+// #include "LinearMath/btTransform.h"
+// #include "LinearMath/btVector3.h"
 
 #include "ode/mass.h"
 #include "ode/rotation.h"
@@ -69,7 +69,8 @@ namespace urdf2gazebo
   class GazeboExtension
   {
     public:
-      // HACK: add for now, since we are reducing fixed joints and removing links
+      // HACK: add for now, since we are reducing fixed
+      //       joints and removing links
       std::string original_reference;
       gazebo::math::Pose reduction_transform;
 
@@ -162,67 +163,124 @@ namespace urdf2gazebo
       ~URDF2Gazebo();
 
       urdf::Vector3 parseVector3(TiXmlNode* key, double scale = 1.0);
-      void addVisual(boost::shared_ptr<urdf::Link> link, std::string group_name, boost::shared_ptr<urdf::Visual> visual);
-      void addCollision(boost::shared_ptr<urdf::Link> link, std::string group_name, boost::shared_ptr<urdf::Collision> collision);
 
-      std::string values2str(unsigned int count, const double *values, double (*conv)(double));
-      std::string vector32str(const urdf::Vector3 vector, double (*conv)(double));
+      void addVisual(boost::shared_ptr<urdf::Link> link,
+          std::string group_name, boost::shared_ptr<urdf::Visual> visual);
 
-      void addKeyValue(TiXmlElement *elem, const std::string& key, const std::string &value);
+      void addCollision(boost::shared_ptr<urdf::Link> link,
+          std::string group_name, boost::shared_ptr<urdf::Collision> collision);
 
-      void addTransform(TiXmlElement *elem, const::gazebo::math::Pose& transform);
+      std::string values2str(unsigned int count, const double *values,
+          double (*conv)(double));
+
+      std::string vector32str(const urdf::Vector3 vector,
+          double (*conv)(double));
+
+      void addKeyValue(TiXmlElement *elem, const std::string& key,
+          const std::string &value);
+
+      void addTransform(TiXmlElement *elem,
+          const::gazebo::math::Pose& transform);
 
       void printMass(boost::shared_ptr<urdf::Link> link);
+
       void printMass(std::string link_name, dMass mass);
 
       std::string getGazeboValue(TiXmlElement* elem);
+
       void parseGazeboExtension(TiXmlDocument &urdf_in);
-      void insertGazeboExtensionGeom(TiXmlElement *elem,std::string link_name);
-      void insertGazeboExtensionVisual(TiXmlElement *elem,std::string link_name);
+
+      void insertGazeboExtensionGeom(TiXmlElement *elem,
+          std::string link_name);
+
+      void insertGazeboExtensionVisual(TiXmlElement *elem,
+          std::string link_name);
+
       void insertGazeboExtensionBody(TiXmlElement *elem,std::string link_name);
+
       void insertGazeboExtensionJoint(TiXmlElement *elem,std::string joint_name);
       void insertGazeboExtensionRobot(TiXmlElement *elem);
+
       void listGazeboExtensions();
+
       void listGazeboExtensions(std::string reference);
+
       void reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> link);
-      void updateGazeboExtensionFrameReplace(GazeboExtension* ge, boost::shared_ptr<urdf::Link> link, std::string new_link_name);
+
+      void updateGazeboExtensionFrameReplace(GazeboExtension* ge,
+          boost::shared_ptr<urdf::Link> link, std::string new_link_name);
+
       void updateGazeboExtensionBlobsReductionTransform(GazeboExtension* ge);
 
-      urdf::Pose  transformToParentFrame(urdf::Pose transform_in_link_frame, urdf::Pose parent_to_link_transform);
-      gazebo::math::Pose  transformToParentFrame(gazebo::math::Pose transform_in_link_frame, urdf::Pose parent_to_link_transform);
-      gazebo::math::Pose  transformToParentFrame(gazebo::math::Pose transform_in_link_frame, gazebo::math::Pose parent_to_link_transform);
-      gazebo::math::Pose  inverseTransformToParentFrame(gazebo::math::Pose transform_in_link_frame, urdf::Pose parent_to_link_transform);
+      urdf::Pose  transformToParentFrame(urdf::Pose transform_in_link_frame,
+          urdf::Pose parent_to_link_transform);
+
+      gazebo::math::Pose  transformToParentFrame(
+          gazebo::math::Pose transform_in_link_frame,
+          urdf::Pose parent_to_link_transform);
+
+      gazebo::math::Pose  transformToParentFrame(
+          gazebo::math::Pose transform_in_link_frame,
+          gazebo::math::Pose parent_to_link_transform);
+
+      gazebo::math::Pose  inverseTransformToParentFrame(
+          gazebo::math::Pose transform_in_link_frame,
+          urdf::Pose parent_to_link_transform);
+
       gazebo::math::Pose  copyPose(urdf::Pose pose);
       urdf::Pose  copyPose(gazebo::math::Pose pose);
 
-      std::string getGeometrySize(boost::shared_ptr<urdf::Geometry> geometry, int *sizeCount, double *sizeVals);
-      
-      std::string getGeometryBoundingBox(boost::shared_ptr<urdf::Geometry> geometry, double *sizeVals);
+      std::string getGeometrySize(
+          boost::shared_ptr<urdf::Geometry> geometry,
+          int *sizeCount, double *sizeVals);
 
-      void reduceFixedJoints(TiXmlElement *root, boost::shared_ptr<urdf::Link> link);
+      std::string getGeometryBoundingBox(
+          boost::shared_ptr<urdf::Geometry> geometry, double *sizeVals);
+
+      void reduceFixedJoints(TiXmlElement *root,
+          boost::shared_ptr<urdf::Link> link);
+
       void printCollisionGroups(boost::shared_ptr<urdf::Link> link);
 
-      void convertLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, const gazebo::math::Pose &transform,
-                       bool enforce_limits,bool reduce_fixed_joints);
-      void createBody(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link,
-                      gazebo::math::Pose &currentTransform, bool enforce_limits, bool reduce_fixed_joints);
-      void createGeom(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link, std::string collision_type,
-                      boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual,
-                      int linkGeomSize, double linkSize[3], std::string original_reference = std::string(""));
-      void createVisual(TiXmlElement *geom, boost::shared_ptr<const urdf::Link> link, std::string collision_type,
-                        boost::shared_ptr<urdf::Collision> collision, boost::shared_ptr<urdf::Visual> visual,
-                        std::string original_reference);
-      void createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform,
+      void convertLink(TiXmlElement *root,
+          boost::shared_ptr<const urdf::Link> link,
+          const gazebo::math::Pose &transform,
+          bool enforce_limits,bool reduce_fixed_joints);
+
+      void createBody(TiXmlElement *root,
+          boost::shared_ptr<const urdf::Link> link,
+          gazebo::math::Pose &currentTransform, bool enforce_limits,
+          bool reduce_fixed_joints);
+
+      void createGeom(TiXmlElement* elem,
+          boost::shared_ptr<const urdf::Link> link, std::string collision_type,
+          boost::shared_ptr<urdf::Collision> collision,
+          boost::shared_ptr<urdf::Visual> visual,
+          int linkGeomSize, double linkSize[3],
+          std::string original_reference = std::string(""));
+
+      void createVisual(TiXmlElement *geom,
+          boost::shared_ptr<const urdf::Link> link, std::string collision_type,
+          boost::shared_ptr<urdf::Collision> collision,
+          boost::shared_ptr<urdf::Visual> visual,
+          std::string original_reference);
+
+      void createJoint(TiXmlElement *root,
+                       boost::shared_ptr<const urdf::Link> link,
+                       gazebo::math::Pose &currentTransform,
                        bool enforce_limits,bool reduce_fixed_joints);
 
-      bool convert( TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out, bool enforce_limits, 
-                    urdf::Vector3 initial_xyz, urdf::Vector3 initial_rpy,std::string model_name=std::string(),
-                    std::string robot_namespace=std::string(), bool xml_declaration = false);
+      bool convert(TiXmlDocument &urdf_in, TiXmlDocument &gazebo_xml_out,
+                   bool enforce_limits,
+                   urdf::Vector3 initial_xyz, urdf::Vector3 initial_rpy,
+                   std::string model_name=std::string(),
+                   std::string robot_namespace=std::string(),
+                   bool xml_declaration = false);
 
-      void walkChildAddNamespace(TiXmlNode* robot_xml,std::string robot_namespace);
+      void walkChildAddNamespace(TiXmlNode* robot_xml,
+                                 std::string robot_namespace);
 
       std::map<std::string, std::vector<GazeboExtension*> > gazebo_extensions_;
-
   };
   /// \}
 }

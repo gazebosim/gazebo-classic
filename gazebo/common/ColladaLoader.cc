@@ -59,7 +59,6 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   if (_filename.rfind('/') != std::string::npos)
   {
     this->path = _filename.substr(0, _filename.rfind('/'));
-    // gazebo::common::SystemPaths::Instance()->AddGazeboPaths(this->path.c_str());
   }
 
   if (!xmlDoc.LoadFile(_filename))

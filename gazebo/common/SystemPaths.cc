@@ -19,13 +19,13 @@
  * Date: 3 May 2008
  */
 #define BOOST_FILESYSTEM_VERSION 2
-#include <boost/filesystem.hpp>
 
+#include <assert.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <assert.h>
+#include <boost/filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -47,7 +47,7 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
   this->modelPaths.clear();
 
-  //Nate:
+  /// TODO: Nate fix
   this->modelPaths.push_back("/home/nkoenig/local/share/gazebo_models");
 
   char *path = getenv("GAZEBO_LOG_PATH");

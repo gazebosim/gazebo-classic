@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -22,10 +22,12 @@
  * Desc: 3D position interface.
  * Author: Sachin Chitta and John Hsu
  * Date: 10 June 2008
- * SVN: $Id$
  */
 #ifndef GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
 #define GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
+
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "physics/physics.h"
 #include "transport/TransportTypes.hh"
@@ -33,44 +35,34 @@
 #include "common/Plugin.hh"
 #include "common/Events.hh"
 
-#include <boost/thread.hpp>
-#include "boost/thread/mutex.hpp"
 
 namespace gazebo
 {
+  class JointTrajectoryPlugin : public ModelPlugin
+  {
+     /// \brief Constructor
+     public: JointTrajectoryPlugin();
 
-   class JointTrajectoryPlugin : public ModelPlugin
-   {
-      /// \brief Constructor
-      public: JointTrajectoryPlugin();
+     /// \brief Destructor
+     public: virtual ~JointTrajectoryPlugin();
 
-      /// \brief Destructor
-      public: virtual ~JointTrajectoryPlugin();
+     /// \brief Load the controller
+     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
-      /// \brief Load the controller
-      public: void Load( physics::ModelPtr _parent, sdf::ElementPtr _sdf );
+     /// \brief Update the controller
+     private: void UpdateStates();
 
-      /// \brief Update the controller
-      private: void UpdateStates();
+     private: physics::WorldPtr world_;
+     private: physics::ModelPtr model_;
 
-      private: physics::WorldPtr world_;
-      private: physics::ModelPtr model_;
+     private: boost::mutex update_mutex;
 
-      private: boost::mutex update_mutex;
+     // Pointer to the update event connection
+     private: event::ConnectionPtr update_connection_;
 
-      // Pointer to the update event connection
-      private: event::ConnectionPtr update_connection_;
-
-      void FixLink(physics::LinkPtr link);
-      void UnfixLink();
-      private: physics::JointPtr joint_;
-   };
-
-/** \} */
-/// @}
-
-
+     void FixLink(physics::LinkPtr link);
+     void UnfixLink();
+     private: physics::JointPtr joint_;
+  };
 }
-
 #endif
-

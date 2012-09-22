@@ -582,7 +582,6 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
       childElem = childElem->GetNextElement("road");
     }
   }
-
 }
 
 //////////////////////////////////////////////////

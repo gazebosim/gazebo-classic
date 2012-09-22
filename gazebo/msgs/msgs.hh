@@ -37,7 +37,6 @@ namespace gazebo
   /// \brief Messages namespace
   namespace msgs
   {
-
     /// \addtogroup gazebo_msgs Messages
     /// \brief All messages and helper functions
     /// \{
