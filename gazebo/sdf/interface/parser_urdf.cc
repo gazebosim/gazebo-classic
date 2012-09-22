@@ -38,6 +38,8 @@
 
 #include <fstream>
 #include <sstream>
+#include <algorithm>
+#include <string>
 
 #include "common/SystemPaths.hh"
 
@@ -47,6 +49,13 @@ namespace urdf2gazebo
 double rad2deg(double v)
 {
   return v * 180.0 / M_PI;
+}
+
+std::string lowerStr(std::string str)
+{
+  std::string out = str;
+  std::transform(out.begin(), out.end(), out.begin(), ::tolower);
+  return out;
 }
 
 URDF2Gazebo::URDF2Gazebo()
@@ -256,7 +265,8 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         std::string value_str = getKeyValueAsString(child_elem);
 
         // default of setting static flag is false
-        if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
+        if (lowerStr(value_str) == "true" || lowerStr(value_str) == "yes" ||
+            value_str == "1")
           gazebo->setStaticFlag = true;
         else
           gazebo->setStaticFlag = false;
@@ -269,10 +279,11 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         std::string value_str = getKeyValueAsString(child_elem);
 
         // default of gravity is true
-        if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
-          gazebo->gravity = true;
-        else
+        if (lowerStr(value_str) == "false" || lowerStr(value_str) == "no" ||
+            value_str == "0")
           gazebo->gravity = false;
+        else
+          gazebo->gravity = true;
 
         logDebug("   gravity %d",gazebo->gravity);
 
@@ -329,7 +340,8 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         std::string value_str = getKeyValueAsString(child_elem);
 
         // default of generate_texture_coord is false
-        if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
+        if (lowerStr(value_str) == "true" || lowerStr(value_str) == "yes" ||
+            value_str == "1")
           gazebo->generate_texture_coord = true;
         else
           gazebo->generate_texture_coord = false;
@@ -342,7 +354,8 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         std::string value_str = getKeyValueAsString(child_elem);
 
         // default of self_collide is false
-        if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
+        if (lowerStr(value_str) == "true" || lowerStr(value_str) == "yes" ||
+            value_str == "1")
           gazebo->self_collide = true;
         else
           gazebo->self_collide = false;
@@ -384,7 +397,8 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
       {
           std::string value_str = getKeyValueAsString(child_elem);
 
-          if (value_str == "true" || value_str == "True" || value_str == "TRUE" || value_str == "yes" || value_str == "1")
+          if (lowerStr(value_str) == "true" || lowerStr(value_str) == "yes" ||
+              value_str == "1")
             gazebo->provideFeedback = true;
           else
             gazebo->provideFeedback = false;
@@ -946,7 +960,7 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge, boost::
       this->reduceGazeboExtensionContactSensorFrameReplace(blob_it, link);
       this->reduceGazeboExtensionPluginFrameReplace(blob_it, link, "plugin", "bodyName", reduction_transform);
       this->reduceGazeboExtensionPluginFrameReplace(blob_it, link, "plugin", "frameName", reduction_transform);
-      this->reduceGazeboExtensionProjectorFrameReplace(blob_it, link, reduction_transform);
+      this->reduceGazeboExtensionProjectorFrameReplace(blob_it, link);
       this->reduceGazeboExtensionGripperFrameReplace(blob_it, link);
       this->reduceGazeboExtensionJointFrameReplace(blob_it, link);
 
@@ -1859,7 +1873,7 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(std::vector<TiXmlEleme
   }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link, gazebo::math::Pose reduction_transform)
+void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;

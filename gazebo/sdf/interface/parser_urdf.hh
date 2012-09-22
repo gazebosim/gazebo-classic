@@ -234,7 +234,7 @@ namespace urdf2gazebo
       /// reduced fixed joints:  apply appropriate frame updates in plugins inside urdf extensions when doing fixed joint reduction
       void reduceGazeboExtensionPluginFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link, std::string plugin_name, std::string element_name, gazebo::math::Pose reduction_transform);
       /// reduced fixed joints:  apply appropriate frame updates in projector inside urdf extensions when doing fixed joint reduction
-      void reduceGazeboExtensionProjectorFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link, gazebo::math::Pose reduction_transform);
+      void reduceGazeboExtensionProjectorFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link);
       /// reduced fixed joints:  apply appropriate frame updates in gripper inside urdf extensions when doing fixed joint reduction
       void reduceGazeboExtensionGripperFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link);
       /// reduced fixed joints:  apply appropriate frame updates in joint inside urdf extensions when doing fixed joint reduction
