@@ -20,6 +20,13 @@
             <length>1.000000</length>
           </cylinder>
         </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <max_vel>0.0</max_vel>
+            </ode>
+          </contact>
+        </surface>
       </collision>
       <visual name='visual'>
         <geometry>
