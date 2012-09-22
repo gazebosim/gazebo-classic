@@ -218,11 +218,17 @@ namespace gazebo
       /// \param _disable If true, the model is allowed to auto disable.
       public: void SetAutoDisable(bool _disable);
 
+      /// \brief Load all plugins
+      ///
+      /// Load all plugins specified in the SDF for the model.
+      public: void LoadPlugins();
+
       protected: virtual void OnPoseChange();
 
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint(sdf::ElementPtr _sdf);
+
 
       /// \brief Load a plugin helper function
       /// \param _sdf SDF parameter

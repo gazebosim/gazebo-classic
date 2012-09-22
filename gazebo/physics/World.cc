@@ -232,12 +232,6 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
-  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
   // Initialize all the entities
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
@@ -366,6 +360,19 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
+  static bool first = true;
+
+
+  /// Plugins that manipulate joints (and probably other properties) require
+  /// one iteration of the physics engine. Do not remove this.
+  if (first)
+  {
+    this->physicsEngine->UpdatePhysics();
+    this->LoadPlugins();
+    first = false;
+    return;
+  }
+
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -593,16 +600,6 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
     }
   }
 
-  // Load the plugins
-  if (_sdf->HasElement("plugin"))
-  {
-    sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
-    while (pluginElem)
-    {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -882,6 +879,34 @@ void World::ModelUpdateSingleLoop()
     this->rootElement->GetChild(i)->Update();
 }
 
+
+//////////////////////////////////////////////////
+void World::LoadPlugins()
+{
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+  {
+    boost::shared_dynamic_cast<Model>(
+        this->rootElement->GetChild(i))->LoadPlugins();
+  }
+
+  // Load the plugins
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+
+
+  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+}
 
 //////////////////////////////////////////////////
 void World::LoadPlugin(const std::string &_filename,

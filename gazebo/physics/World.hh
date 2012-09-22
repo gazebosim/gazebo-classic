@@ -190,6 +190,7 @@ namespace gazebo
       /// \brief Return a version of the name with "<world_name>::" removed
       public: std::string StripWorldName(const std::string &_name) const;
 
+
       /// \brief Load a plugin
       public: void LoadPlugin(const std::string &_filename,
                               const std::string &_name,
@@ -206,6 +207,11 @@ namespace gazebo
 
       /// \brief Step callback
       public: void StepWorld(int _steps);
+
+      /// \brief Load all plugins
+      ///
+      /// Load all plugins specified in the SDF for the model.
+      private: void LoadPlugins();
 
       /// \brief Create all entities
       /// \param _sdf SDF element

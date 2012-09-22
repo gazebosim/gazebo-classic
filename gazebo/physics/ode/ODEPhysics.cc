@@ -126,6 +126,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->contactGroup = dJointGroupCreate(0);
 
+  this->contactFeedbackIndex = 0;
   this->colliders.resize(100);
 }
 

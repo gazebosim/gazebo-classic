@@ -143,17 +143,6 @@ void Model::Load(sdf::ElementPtr _sdf)
       gripperElem = gripperElem->GetNextElement("gripper");
     }
   }
-
-  // Load the plugins
-  if (_sdf->HasElement("plugin"))
-  {
-    sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
-    while (pluginElem)
-    {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -177,12 +166,6 @@ void Model::Init()
   // Initialize the joints last.
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -633,6 +616,21 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+void Model::LoadPlugins()
+{
+  // Load the plugins
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");
@@ -642,6 +640,7 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
   {
     ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
+    plugin->Init();
     this->plugins.push_back(plugin);
   }
 }
