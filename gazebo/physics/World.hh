@@ -268,17 +268,17 @@ namespace gazebo
       /// \param _steps The number of steps the World should take
       public: void StepWorld(int _steps);
 
-      /// \brief Remove a running plugin
-      /// \param _name The unique name of the plugin to remove
-      private: void RemovePlugin(const std::string &_name);
-
       /// \brief Load a plugin
       /// \param _filename The filename of the plugin
       /// \param _name A unique name for the plugin
       /// \param _sdf The SDF to pass into the plugin.
-      private: void LoadPlugin(const std::string &_filename,
+      public: void LoadPlugin(const std::string &_filename,
                                const std::string &_name,
                                sdf::ElementPtr _sdf);
+
+      /// \brief Remove a running plugin
+      /// \param _name The unique name of the plugin to remove
+      public: void RemovePlugin(const std::string &_name);
 
       /// \brief Get a model by id
       ///

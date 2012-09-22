@@ -31,6 +31,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class BallJoint BallJoint.hh physics/BallJoint.hh
     /// \brief A ball joint
     template< class T>
     class BallJoint : public T
