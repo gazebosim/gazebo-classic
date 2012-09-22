@@ -11,7 +11,6 @@ add_subdirectory(frypan)
 add_subdirectory(people)
 add_subdirectory(hokuyo)
 add_subdirectory(quadrotor)
-add_subdirectory(kitchen)
 
 set (files 
   bowl.dae
