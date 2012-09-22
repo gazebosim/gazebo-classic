@@ -681,8 +681,7 @@ INPUT_ENCODING         = UTF-8
 # *.f90 *.f *.for *.vhd *.vhdl
 
 FILE_PATTERNS          = *.hh \
-                         *.h \
-                         *.proto
+                         *.h
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -697,7 +696,11 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/gui \
-                         @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest
+                         @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest \
+                         @CMAKE_SOURCE_DIR@/gazebo/rendering/skyx \
+                         @CMAKE_SOURCE_DIR@/gazebo/rendering/selection_buffer \
+                         @CMAKE_SOURCE_DIR@/gazebo/rendering/deferred_shading
+
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -725,14 +728,14 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           = .
+EXAMPLE_PATH           = examples
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
 # and *.h) to filter out the source-files in the directories. If left
 # blank all files are included.
 
-EXAMPLE_PATTERNS       =
+EXAMPLE_PATTERNS       = *.cc *.hh
 
 # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be
 # searched for input files to be used with the \include or \dontinclude

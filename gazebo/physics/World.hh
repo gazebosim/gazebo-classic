@@ -54,6 +54,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class World World.hh physics/World.hh
     /// \brief The world provides access to all other object within a simulated
     /// environment.
     ///
@@ -141,123 +142,185 @@ namespace gazebo
       /// \brief Reset time and model poses, configurations in simulation
       public: void Reset();
 
-      /// \brief Get the selected entity
+      /// \brief Get the selected Entity
+      ///
+      /// The selected entity is set via the GUI.
+      /// \return A point to the Entity, NULL if nothing is selected
       public: EntityPtr GetSelectedEntity() const;
 
-      /// \brief Print entity tree
+      /// \brief Print Entity tree
+      ///
+      /// Prints alls the entities to stdout
       public: void PrintEntityTree();
 
-      /// Get the simulation time
+      /// \brief Get the simulation time
       /// \return The simulation time
       public: common::Time GetSimTime() const;
 
       /// \brief Set the sim time
-      public: void SetSimTime(common::Time t);
+      /// \param _t The new simulation time
+      public: void SetSimTime(common::Time _t);
 
-      /// Get the pause time
+      /// \brief Get the amount of time simulation has been paused
       /// \return The pause time
       public: common::Time GetPauseTime() const;
 
-      /// Get the start time
+      /// \brief Get the wall time simulation was started.
       /// \return The start time
       public: common::Time GetStartTime() const;
 
-      /// Get the real time (elapsed time)
+      /// \brief Get the real time (elapsed time)
       /// \return The real time
       public: common::Time GetRealTime() const;
 
       /// \brief Returns the state of the simulation true if paused
+      /// \return True if paused.
       public: bool IsPaused() const;
 
       /// \brief Set whether the simulation is paused
-      public: void SetPaused(bool p);
+      /// \param _p True pauses the simulation. False runs the simulation.
+      public: void SetPaused(bool _p);
 
       /// \brief Get an element by name
-      public: BasePtr GetByName(const std::string &name);
-
-      /// \brief Get a model by id
-      public: ModelPtr GetModelById(unsigned int _id);
+      ///
+      /// Searches the list of entities, and return a pointer to the model
+      /// with a matching _name.
+      /// \param _name The name of the Model to find.
+      /// \return A pointer to the entity, or NULL if no entity was found.
+      public: BasePtr GetByName(const std::string &_name);
 
       /// \brief Get a model by name DEPRECATED
       public: ModelPtr GetModelByName(const std::string &name)GAZEBO_DEPRECATED;
 
       /// \brief Get a model by name
+      ///
+      /// This function is the same as GetByName, but limits the search to
+      /// only models.
+      /// \param _name The name of the Model to find.
+      /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
 
       /// \brief Get a pointer to a entity based on a name
       public: EntityPtr GetEntityByName(
                   const std::string &_name) GAZEBO_DEPRECATED;
 
-      /// \brief Get a pointer to a entity based on a name
+      /// \brief Get a pointer to an Entity based on a name
+      ///
+      /// This function is the same as GetByName, but limits the search to
+      /// only Entities.
+      /// \param _name The name of the Entity to find.
+      /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
       /// \brief Get the nearest model below a point
+      ///
+      /// This function makes use of World::GetEntityBelowPoint.
+      /// \param _pt The 3D point to search below
+      /// \return A pointer to nearest Model, NULL if none is found.
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Get the nearest entity below a point
+      ///
+      /// Projects a Ray down (-Z axis) starting at the given point. The
+      /// first entity hit by the Ray is returned.
+      /// \param _pt The 3D point to search below
+      /// \return A pointer to nearest Entity, NULL if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Get the current world state
+      /// \return A object that contains the entire state of the World
       public: WorldState GetState();
 
       /// \brief Set the current world state
+      /// \param _state The state to set the World to.
       public: void SetState(const WorldState &_state);
 
       /// \brief Insert a model from an SDF file
+      /// \param _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
       /// \brief Insert a model from an SDF string
+      /// \param _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF
+      /// \param _sdf A reference to an SDF object
       public: void InsertModelSDF(const sdf::SDF &_sdf);
 
       /// \brief Return a version of the name with "<world_name>::" removed
+      /// \param _name Usually the name of an entity.
+      /// \return The stripped world name
       public: std::string StripWorldName(const std::string &_name) const;
 
-
-      /// \brief Load a plugin
-      public: void LoadPlugin(const std::string &_filename,
-                              const std::string &_name,
-                              sdf::ElementPtr _sdf);
-
-      /// \brief Remove a running plugin
-      public: void RemovePlugin(const std::string &_name);
-
       /// \brief Enable all links in all the models
+      ///
+      /// Enable is a physics concept. Enabling means that the physics
+      /// engine should update an entity.
       public: void EnableAllModels();
 
       /// \brief Disable all links in all the models
+      ///
+      /// Disable is a physics concept. Disabling means that the physics
+      /// engine should not update an entity.
       public: void DisableAllModels();
 
       /// \brief Step callback
+      /// \param _steps The number of steps the World should take
       public: void StepWorld(int _steps);
+
+      /// \brief Remove a running plugin
+      /// \param _name The unique name of the plugin to remove
+      private: void RemovePlugin(const std::string &_name);
+
+      /// \brief Load a plugin
+      /// \param _filename The filename of the plugin
+      /// \param _name A unique name for the plugin
+      /// \param _sdf The SDF to pass into the plugin.
+      private: void LoadPlugin(const std::string &_filename,
+                               const std::string &_name,
+                               sdf::ElementPtr _sdf);
+
+      /// \brief Get a model by id
+      ///
+      /// Each Entity has a unique ID, this function finds a Model with
+      /// a passed in _id.
+      /// \param _id The id of the Model
+      /// \return A pointer to the model, or NULL if no Model was found.
+      private: ModelPtr GetModelById(unsigned int _id);
 
       /// \brief Load all plugins
       ///
       /// Load all plugins specified in the SDF for the model.
       private: void LoadPlugins();
 
-      /// \brief Create all entities
+      /// \brief Create and load all entities
       /// \param _sdf SDF element
-      /// \param parent Parent of the model to load
-      private: void LoadEntities(sdf::ElementPtr _sdf , BasePtr parent);
+      /// \param _parent Parent of the model to load
+      private: void LoadEntities(sdf::ElementPtr _sdf , BasePtr _parent);
 
       /// \brief Load a model
-      private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr parent);
+      /// \param _sdf SDF element containing the Model description
+      /// \param _parent Parent of the model
+      /// \return Pointer to the newly created Model
+      private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Load an actor
-      private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr parent);
+      /// \param _sdf SDF element containing the Actor description
+      /// \param _parent Parent of the Actor
+      /// \return Pointer to the newly created Actor
+      private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Load a road
+      /// \param _sdf SDF element containing the Road description
+      /// \param _parent Parent of the Road
+      /// \return Pointer to the newly created Road
       private: RoadPtr LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent);
 
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
-      private: void Step();
 
-      /// \brief For keeping track of time step throttling
-      private: common::Time prevStepWallTime;
+      /// \brief Step the world once.
+      private: void Step();
 
       /// \brief Update the world
       private: void Update();
@@ -302,6 +365,9 @@ namespace gazebo
 
       private: void UpdateStateSDF();
       private: void UpdateSDFFromState(const WorldState &_state);
+
+      /// \brief For keeping track of time step throttling
+      private: common::Time prevStepWallTime;
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;

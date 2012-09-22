@@ -200,7 +200,7 @@ if (build_errors)
     message(STATUS ${msg})
   endforeach ()
   message(STATUS "END BUILD ERRORS\n")
-  message (FATAL_ERROR "Errors encountered in build.")
+  message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 
   ########################################
