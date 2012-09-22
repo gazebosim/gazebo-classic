@@ -880,6 +880,9 @@ gazebo::math::Pose  URDF2Gazebo::inverseTransformToParentFrame(gazebo::math::Pos
     return transform_in_parent_link_frame;
 }
 
+/// Take the link's existing list of gazebo extensions, transfer them into parent link.
+/// Along the way, update local transforms by adding the additional transform to parent.
+/// Also, look through all referenced link names with plugins and update references to current link to the parent link. (reduceGazeboExtensionFrameReplace())
 void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> link)
 {
   // this is a very complicated module that updates the plugins based on fixed joint reduction
@@ -887,14 +890,13 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> li
 
   std::string link_name = link->name;
 
-  logDebug("  EXTENSION: Reference lumping from [%s] to [%s]",link_name.c_str(), link->getParent()->name.c_str());
-
   // update extension map with references to link_name
   // this->listGazeboExtensions();
 
   std::map<std::string,std::vector<GazeboExtension*> >::iterator ext = this->gazebo_extensions_.find(link_name);
   if (ext != this->gazebo_extensions_.end())
   {
+    logDebug("  REDUCE EXTENSION: moving reference from [%s] to [%s]",link_name.c_str(), link->getParent()->name.c_str());
 
     // update reduction transform (for rays, cameras for now).  FIXME: contact frames too?
     for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin(); ge != ext->second.end(); ge++)
@@ -902,14 +904,13 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> li
       (*ge)->reduction_transform = transformToParentFrame((*ge)->reduction_transform, link->parent_joint->parent_to_joint_origin_transform);
       // FIXME: if the sensor block has sensor:ray or sensor:camera or sensor:stereo_camera, look for/replace/insert reduction transform into xml block
       reduceGazeboExtensionsTransformReduction((*ge));
-      // replace all instances of the link_name string in blobs with parent link name
-      reduceGazeboExtensionFrameReplace(*ge, link);
     }
 
-    // find existing extension with the new link reference
+    // find pointer to the existing extension with the new link reference
     std::string new_link_name = link->getParent()->name;
     std::map<std::string,std::vector<GazeboExtension*> >::iterator new_ext = this->gazebo_extensions_.find(new_link_name);
-    // create new_extension if none exists
+
+    // if none exist, create new_extension with new_link_name
     if (new_ext == this->gazebo_extensions_.end())
     {
       std::vector<GazeboExtension*> extensions;
@@ -917,11 +918,9 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> li
       new_ext = this->gazebo_extensions_.find(new_link_name);
     }
 
-    // pop extensions from link's vector and push them into the new link's vector
+    // move gazebo extensions from link into the parent link's extensions
     for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin(); ge != ext->second.end(); ge++)
-    {
       new_ext->second.push_back(*ge);
-    }
     ext->second.clear();
   }
 
@@ -929,7 +928,6 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(boost::shared_ptr<urdf::Link> li
   //   and assign the proper reduction transform for the link name pattern
   for (std::map<std::string,std::vector<GazeboExtension*> >::iterator gazebo_it = this->gazebo_extensions_.begin();
                                                         gazebo_it != this->gazebo_extensions_.end(); gazebo_it++)
-    if (gazebo_it->first.empty())
     {
       // update reduction transform (for contacts, rays, cameras for now).
       for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ge++)
