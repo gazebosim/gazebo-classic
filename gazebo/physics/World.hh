@@ -54,35 +54,54 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief The World
-    /*
-     * The world class keps a list of all models, handles loading and saving,
-     * object dynamics and collision detection for contact joints
-     */
+    /// \brief The world provides access to all other object within a simulated
+    /// environment.
+    ///
+    /// The World is the container for all models and their components
+    /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
+    /// Many core function are also handled in the World, including physics
+    /// update, model updates, and message processing.
     class World : public boost::enable_shared_from_this<World>
     {
-      /// Private constructor
+      /// \brief Constructor
+      ///
+      /// Constructor for the World. Must specify a unique name.
+      /// \param _name Name of the world
       public: World(const std::string &_name ="");
 
-      /// Private destructor
+      /// \brief Destructor
       public: ~World();
 
-      /// Load the world using SDF parameters
+      /// \brief Load the world using SDF parameters
+      ///
+      /// Load a world from and SDF pointer
       /// \param _sdf SDF parameters
       public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Save a world to a file
+      ///
+      /// Save the current world and its state to a file
+      /// \param _filename Name of the file to save into
       public: void Save(const std::string &_filename);
 
       /// \brief Initialize the world
+      ///
+      /// This is called after Load.
       public: void Init();
 
       /// \brief Run the world in a thread
+      ///
+      /// Run the update loop.
       public: void Run();
 
       /// \brief Stop the world
+      ///
+      /// Stop the update loop.
       public: void Stop();
 
-      /// Finilize the world
+      /// \brief Finilize the world
+      ///
+      /// Call this function to tear-down the world.
       public: void Fini();
 
       /// \brief Remove all entities from the world
@@ -91,23 +110,29 @@ namespace gazebo
       /// \brief Get the name of the world
       public: std::string GetName() const;
 
-      /// \brief Get the number of parameters
-      public: unsigned int GetParamCount() const;
-
-      /// \brief Get a param
-      public: common::Param *GetParam(unsigned int index) const;
-
-      /// Return the physics engine
+      /// \brief Return the physics engine
+      ///
+      /// Get a pointer to the physics engine used by the world.
       /// \return Pointer to the physics engine
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
       /// \brief Get the number of models
+      /// \return The number of models in the World.
       public: unsigned int GetModelCount() const;
 
       /// \brief Get a model based on an index
-      public: ModelPtr GetModel(unsigned int index);
+      ///
+      /// Get a Model using an index, where index must be greater than zero
+      /// and less than World::GetModelCount()
+      /// \param _index The index of the model [0..GetModelCount)
+      /// \return A pointer to the Model. NULL if _index is invalid.
+      public: ModelPtr GetModel(unsigned int _index);
 
       /// \brief Reset with options
+      ///
+      /// The _type parameter specifies which type of eneities to reset. See
+      /// Base::EntityType.
+      /// \param _type The type of reset.
       public: void ResetEntities(Base::EntityType _type = Base::BASE);
 
       /// \brief Reset simulation time back to zero
@@ -287,9 +312,6 @@ namespace gazebo
       private: boost::thread *thread;
 
       private: bool stop;
-
-      /// List of all the parameters
-      protected: common::Param_V parameters;
 
       /// The entity currently selected by the user
       private: EntityPtr selectedEntity;

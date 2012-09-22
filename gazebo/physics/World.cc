@@ -448,23 +448,6 @@ std::string World::GetName() const
 }
 
 //////////////////////////////////////////////////
-unsigned int World::GetParamCount() const
-{
-  return this->parameters.size();
-}
-
-//////////////////////////////////////////////////
-common::Param *World::GetParam(unsigned int index) const
-{
-  if (index < this->parameters.size())
-    return this->parameters[index];
-  else
-    gzerr << "World::GetParam - Invalid param index\n";
-
-  return NULL;
-}
-
-//////////////////////////////////////////////////
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->physicsEngine;
