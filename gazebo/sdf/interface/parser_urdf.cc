@@ -987,108 +987,141 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
   //         <collision>base_link_collision</collision>
   //         and it needs to be reparented to
   //         <collision>base_footprint_collision</collision>
-  logDebug("  STRING REPLACE: instances of link name [%s] with new link name [%s]",link_name.c_str(),new_link_name.c_str());
-  for (std::vector<TiXmlElement*>::iterator blob_it = blobs.begin(); blob_it != blobs.end(); ++blob_it)
+  gzdbg << "  STRING REPLACE: instances of link name ["
+        << link_name << "] with [" << new_link_name << "]\n";
+  for (std::vector<TiXmlElement*>::iterator blob_it = blobs.begin();
+       blob_it != blobs.end(); ++blob_it)
   {
+    std::ostringstream debug_stream_in;
+    debug_stream_in << *(*blob_it);
+    std::string debug_blob = debug_stream_in.str();
+    gzdbg << "        INITIAL STRING link ["
+          << link_name << "]-->[" << new_link_name << "]: ["
+          << debug_blob << "]\n";
 
-      std::ostringstream debug_stream_in;
-      debug_stream_in << *(*blob_it);
-      std::string debug_blob = debug_stream_in.str();
-      logDebug("        INITIAL STRING [%s-->%s]: %s",link_name.c_str(),new_link_name.c_str(),debug_blob.c_str());
+    this->reduceGazeboExtensionContactSensorFrameReplace(blob_it, link);
+    this->reduceGazeboExtensionPluginFrameReplace(blob_it, link,
+      "plugin", "bodyName", reduction_transform);
+    this->reduceGazeboExtensionPluginFrameReplace(blob_it, link,
+      "plugin", "frameName", reduction_transform);
+    this->reduceGazeboExtensionProjectorFrameReplace(blob_it, link);
+    this->reduceGazeboExtensionGripperFrameReplace(blob_it, link);
+    this->reduceGazeboExtensionJointFrameReplace(blob_it, link);
 
-      this->reduceGazeboExtensionContactSensorFrameReplace(blob_it, link);
-      this->reduceGazeboExtensionPluginFrameReplace(blob_it, link, "plugin", "bodyName", reduction_transform);
-      this->reduceGazeboExtensionPluginFrameReplace(blob_it, link, "plugin", "frameName", reduction_transform);
-      this->reduceGazeboExtensionProjectorFrameReplace(blob_it, link);
-      this->reduceGazeboExtensionGripperFrameReplace(blob_it, link);
-      this->reduceGazeboExtensionJointFrameReplace(blob_it, link);
-
-      std::ostringstream debug_stream_out;
-      debug_stream_out << *(*blob_it);
-      logDebug("        STRING REPLACED: %s",debug_stream_out.str().c_str());
+    std::ostringstream debug_stream_out;
+    debug_stream_out << *(*blob_it);
   }
 }
 
 void URDF2Gazebo::reduceGazeboExtensionsTransformReduction(GazeboExtension* ge)
 {
   gazebo::math::Pose reduction_transform = ge->reduction_transform;
-  for (std::vector<TiXmlElement*>::iterator blob_it = ge->blobs.begin(); blob_it != ge->blobs.end(); ++blob_it)
+  for (std::vector<TiXmlElement*>::iterator blob_it = ge->blobs.begin();
+       blob_it != ge->blobs.end(); ++blob_it)
   {
-    /// @todo make sure we are not missing any additional transform reductions needed for other SDF elements
-    this->reduceGazeboExtensionSensorTransformReduction(blob_it, reduction_transform);
-    this->reduceGazeboExtensionProjectorTransformReduction(blob_it, reduction_transform);
+    /// @todo make sure we are not missing any additional transform reductions
+    this->reduceGazeboExtensionSensorTransformReduction(blob_it,
+      reduction_transform);
+    this->reduceGazeboExtensionProjectorTransformReduction(blob_it,
+      reduction_transform);
   }
 }
 
 
 void URDF2Gazebo::listGazeboExtensions()
 {
-  logDebug("====================================================================");
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator gazebo_it = this->gazebo_extensions_.begin(); gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
+  gzdbg << "================================================================\n";
+  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+       gazebo_it = this->gazebo_extensions_.begin();
+       gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
     int ext_count = 0;
-    for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
+    for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
+         ge != gazebo_it->second.end(); ++ge)
     {
       if ((*ge)->blobs.size() > 0)
       {
-        logDebug("  PRINTING [%d] BLOBS for extension [%d] referencing [%s]",(int)(*ge)->blobs.size(),++ext_count,gazebo_it->first.c_str());
-        for (std::vector<TiXmlElement*>::iterator blob_it = (*ge)->blobs.begin(); blob_it != (*ge)->blobs.end(); ++blob_it)
+        gzdbg <<  "  PRINTING [" << (int)(*ge)->blobs.size()
+              << "] BLOBS for extension [" << ++ext_count
+              << "] referencing [" << gazebo_it->first << "]\n";
+        for (std::vector<TiXmlElement*>::iterator
+          blob_it = (*ge)->blobs.begin();
+          blob_it != (*ge)->blobs.end(); ++blob_it)
         {
-            std::ostringstream stream_in;
-            stream_in << *(*blob_it);
-            logDebug("    BLOB: %s",stream_in.str().c_str());
+          std::ostringstream stream_in;
+          stream_in << *(*blob_it);
+          gzdbg << "    BLOB: [" << stream_in.str() << "]\n";
         }
       }
     }
   }
-  logDebug("====================================================================");
+  gzdbg << "================================================================\n";
 }
 
 void URDF2Gazebo::listGazeboExtensions(std::string reference)
 {
-  logDebug("--------------------------------------------------------------------");
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator gazebo_it = this->gazebo_extensions_.begin(); gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
+  gzdbg << "================================================================\n";
+  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+       gazebo_it = this->gazebo_extensions_.begin();
+       gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
     if (gazebo_it->first == reference)
     {
-      logDebug("  PRINTING [%d] EXTENSIONS referencing [%s]",(int)gazebo_it->second.size(),reference.c_str());
-      for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
+        gzdbg <<  "  PRINTING [" << (int)gazebo_it->second.size()
+              << "] extensions referencing [" << reference << "]\n";
+      for (std::vector<GazeboExtension*>::iterator
+           ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
       {
-        for (std::vector<TiXmlElement*>::iterator blob_it = (*ge)->blobs.begin(); blob_it != (*ge)->blobs.end(); ++blob_it)
+        for (std::vector<TiXmlElement*>::iterator
+          blob_it = (*ge)->blobs.begin();
+          blob_it != (*ge)->blobs.end(); ++blob_it)
         {
           std::ostringstream stream_in;
           stream_in << *(*blob_it);
-          logDebug("    BLOB: %s",stream_in.str().c_str());
+          gzdbg << "    BLOB: [" << stream_in.str() << "]\n";
         }
       }
     }
   }
-  logDebug("--------------------------------------------------------------------");
+  gzdbg << "================================================================\n";
 }
 
-void URDF2Gazebo::createSDF(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, const gazebo::math::Pose &transform)
+void URDF2Gazebo::createSDF(TiXmlElement *root,
+  boost::shared_ptr<const urdf::Link> link,
+  const gazebo::math::Pose &transform)
 {
     gazebo::math::Pose currentTransform = transform;
 
-    // must have an <inertial> block and cannot have zero mass.  allow det(I) == zero, such as in the case of point mass geoms.
-    if (link->name != "world" && ((!link->inertial) || gazebo::math::equal(link->inertial->mass, 0.0)))
+    // must have an <inertial> block and cannot have zero mass.
+    //  allow det(I) == zero, in the case of point mass geoms.
+    // @todo:  keyword "world" should be a constant defined somewhere else
+    if (link->name != "world" &&
+      ((!link->inertial) || gazebo::math::equal(link->inertial->mass, 0.0)))
     {
       if(!link->child_links.empty())
-        logWarn("urdf2gazebo: link(%s) has no inertia, %d children link ignored.", link->name.c_str(),(int)link->child_links.size());
+        gzwarn << "urdf2gazebo: link[" << link->name
+               << "] has no inertia, [" << (int)link->child_links.size()
+               << "] children links ignored\n.";
 
       if(!link->child_joints.empty())
-        logWarn("urdf2gazebo: link(%s) has no inertia, %d children joint ignored.", link->name.c_str(),(int)link->child_joints.size());
+        gzwarn << "urdf2gazebo: link[" << link->name
+               << "] has no inertia, [" << (int)link->child_links.size()
+               << "] children joints ignored\n.";
 
       if(link->parent_joint)
-        logWarn("urdf2gazebo: link(%s) has no inertia, parent joint(%s) is ignored.",link->name.c_str(), link->parent_joint->name.c_str());
+        gzwarn << "urdf2gazebo: link[" << link->name
+               << "] has no inertia, parent joint [" << link->parent_joint->name
+               << "] ignored\n.";
 
-      logWarn("urdf2gazebo: link(%s) has no inertia, not modeled in gazebo.", link->name.c_str());
+        gzwarn << "urdf2gazebo: link[" << link->name
+               << "] has no inertia, not modeled in gazebo\n";
       return;
     }
 
     /* create <body:...> block for non fixed joint attached bodies */
     if ((link->getParent() && link->getParent()->name == "world") || 
-        !this->reduce_fixed_joints || (!link->parent_joint || link->parent_joint->type != urdf::Joint::FIXED))
+        !this->reduce_fixed_joints ||
+        (!link->parent_joint || link->parent_joint->type != urdf::Joint::FIXED))
       createLink(root, link, currentTransform);
 
     // recurse into children
@@ -1121,134 +1154,149 @@ urdf::Pose  URDF2Gazebo::copyPose(gazebo::math::Pose pose)
   return p;
 }
 
-void URDF2Gazebo::createLink(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform)
+void URDF2Gazebo::createLink(TiXmlElement *root,
+  boost::shared_ptr<const urdf::Link> link,
+  gazebo::math::Pose &currentTransform)
 {
-    /* create new body */
-    TiXmlElement *elem     = new TiXmlElement("link");
+  /* create new body */
+  TiXmlElement *elem     = new TiXmlElement("link");
 
-    /* set body name */
-    elem->SetAttribute("name", link->name);
+  /* set body name */
+  elem->SetAttribute("name", link->name);
 
-    /* compute global transform */
-    gazebo::math::Pose localTransform;
-    // this is the transform from parent link to current link
-    // this transform does not exist for the root link
-    if (link->parent_joint)
+  /* compute global transform */
+  gazebo::math::Pose localTransform;
+  // this is the transform from parent link to current link
+  // this transform does not exist for the root link
+  if (link->parent_joint)
+  {
+    localTransform = URDF2Gazebo::copyPose(
+      link->parent_joint->parent_to_joint_origin_transform);
+    currentTransform = localTransform * currentTransform;
+  }
+  else
+    gzdbg << "[" << link->name << "] has no parent joint\n";
+
+  // create origin tag for this element
+  addTransform(elem, currentTransform);
+
+  /* create new inerial block */
+  createInertial(elem, link);
+
+  /* create new collision block */
+  createCollisions(elem, link);
+
+  /* create new visual block */
+  createVisuals(elem, link);
+
+  /* copy gazebo extensions data */
+  insertGazeboExtensionLink(elem,link->name);
+  
+  /* add body to document */
+  root->LinkEndChild(elem);
+
+  /* make a <joint:...> block */
+  createJoint(root, link, currentTransform);
+}
+
+void URDF2Gazebo::createCollisions(TiXmlElement* elem,
+  boost::shared_ptr<const urdf::Link> link)
+{
+  // loop through all collisions. make additional geoms using the lumped stuff
+  for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::const_iterator
+    collisions_it = link->collision_groups.begin();
+    collisions_it != link->collision_groups.end(); ++collisions_it)
+  {
+    boost::shared_ptr<urdf::Collision> collision =
+      *(collisions_it->second->begin());
+
+    if (collisions_it->first == "default")
     {
-      logDebug("%s has a parent joint",link->name.c_str());
-      localTransform = URDF2Gazebo::copyPose(link->parent_joint->parent_to_joint_origin_transform);
-      currentTransform = localTransform * currentTransform;
+      logDebug("creating default collision for link [%s]", link->name.c_str());
+      
+      /* make a <collision> block */
+      createCollision(elem, link, collision, link->name);
     }
-    else
-      logDebug("%s has no parent joint",link->name.c_str());
-
-
-    // create origin tag for this element
-    addTransform(elem, currentTransform);
-
-    /* create new inerial block */
-    createInertial(elem, link);
-
-    /* create new collision block */
-    createCollisions(elem, link);
-
-    /* create new visual block */
-    createVisuals(elem, link);
-
-    /* copy gazebo extensions data */
-    insertGazeboExtensionLink(elem,link->name);
-    
-    /* add body to document */
-    root->LinkEndChild(elem);
-
-    /* make a <joint:...> block */
-    createJoint(root, link, currentTransform);
-
-}
-
-void URDF2Gazebo::createCollisions(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link)
-{
-    // loop through all collisions. make additional geoms using the lumped stuff
-    for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::const_iterator collisions_it = link->collision_groups.begin();
-         collisions_it != link->collision_groups.end(); ++collisions_it)
+    else if (collisions_it->first.find(std::string("lump::")) == 0)
     {
-      boost::shared_ptr<urdf::Collision> collision = *(collisions_it->second->begin());
-
-
-      if (collisions_it->first == "default")
-      {
-        logDebug("creating default collision for link [%s]",link->name.c_str());
-        
-        /* make a <collision> block */
-        createCollision(elem, link, collision, link->name);
-      }
-      else if (collisions_it->first.find(std::string("lump::")) == 0) // if collision name starts with "lump::", pass through original parent link name
-      {
-        logDebug("creating lump collision [%s] for link [%s]",collisions_it->first.c_str(),link->name.c_str());
-        std::string original_reference = collisions_it->first.substr(6); // original name before lumping
-        createCollision(elem, link, collision, original_reference);
-      }
+      // if collision name starts with "lump::", pass through
+      //   original parent link name
+      logDebug("creating lump collision [%s] for link [%s]",
+        collisions_it->first.c_str(),link->name.c_str());
+      /// original_reference is the original name before lumping
+      std::string original_reference = collisions_it->first.substr(6);
+      createCollision(elem, link, collision, original_reference);
     }
+  }
 }
 
-void URDF2Gazebo::createVisuals(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link)
+void URDF2Gazebo::createVisuals(TiXmlElement* elem,
+  boost::shared_ptr<const urdf::Link> link)
 {
-    // loop through all visuals. make additional collisions using the lumped stuff
-    for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual> > > >::const_iterator visuals_it = link->visual_groups.begin();
-         visuals_it != link->visual_groups.end(); ++visuals_it)
+  // loop through all visuals. make additional collisions using the
+  //   lumped stuff
+  for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual> > > >::const_iterator
+    visuals_it = link->visual_groups.begin();
+    visuals_it != link->visual_groups.end(); ++visuals_it)
+  {
+    boost::shared_ptr<urdf::Visual> visual = *(visuals_it->second->begin());
+
+    if (visuals_it->first == "default")
     {
-      boost::shared_ptr<urdf::Visual> visual = *(visuals_it->second->begin());
-
-      if (visuals_it->first == "default")
-      {
-        logDebug("creating default visual for link [%s]",link->name.c_str());
-        /* make a visual block */
-        createVisual(elem, link, visual, link->name);
-      }
-      else if (visuals_it->first.find(std::string("lump::")) == 0) // starts with "lump::"
-      {
-        logDebug("creating lump visual [%s] for link [%s]",visuals_it->first.c_str(),link->name.c_str());
-        std::string original_reference = visuals_it->first.substr(6);
-        /* make a visual block */
-        createVisual(elem, link, visual, original_reference);
-      }
+      logDebug("creating default visual for link [%s]", link->name.c_str());
+      /* make a visual block */
+      createVisual(elem, link, visual, link->name);
     }
+    else if (visuals_it->first.find(std::string("lump::")) == 0)
+    {
+      logDebug("creating lump visual [%s] for link [%s]",
+        visuals_it->first.c_str(),link->name.c_str());
+      std::string original_reference = visuals_it->first.substr(6);
+      /* make a visual block */
+      createVisual(elem, link, visual, original_reference);
+    }
+  }
 }
 
 
-void URDF2Gazebo::createInertial(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link)
+void URDF2Gazebo::createInertial(TiXmlElement *elem,
+  boost::shared_ptr<const urdf::Link> link)
 {
-    TiXmlElement *inertial = new TiXmlElement("inertial");
+  TiXmlElement *inertial = new TiXmlElement("inertial");
 
-    /* set mass properties */
-    // check and print a warning message
-    double roll,pitch,yaw;
-    link->inertial->origin.rotation.getRPY(roll,pitch,yaw);
-    if (!gazebo::math::equal(roll, 0.0) || !gazebo::math::equal(pitch, 0.0) || !gazebo::math::equal(yaw, 0.0))
-        logError("rotation of inertial frame is not supported\n");
+  /* set mass properties */
+  // check and print a warning message
+  double roll,pitch,yaw;
+  link->inertial->origin.rotation.getRPY(roll,pitch,yaw);
+  if (!gazebo::math::equal(roll, 0.0) ||
+    !gazebo::math::equal(pitch, 0.0) || !gazebo::math::equal(yaw, 0.0))
+      gzerr << "rotation of inertial frame in link ["
+            << link->name << "] is not supported\n";
 
-    /// add pose
-    gazebo::math::Pose pose = URDF2Gazebo::copyPose(link->inertial->origin);
-    addTransform(inertial, pose);
+  /// add pose
+  gazebo::math::Pose pose = URDF2Gazebo::copyPose(link->inertial->origin);
+  addTransform(inertial, pose);
 
-    // add mass
-    addKeyValue(inertial, "mass", values2str(1, &link->inertial->mass));
+  // add mass
+  addKeyValue(inertial, "mass", values2str(1, &link->inertial->mass));
 
-    // add inertia (ixx, ixy, ixz, iyy, iyz, izz)
-    TiXmlElement *inertia = new TiXmlElement("inertia");
-    addKeyValue(inertia, "ixx", values2str(1, &link->inertial->ixx));
-    addKeyValue(inertia, "ixy", values2str(1, &link->inertial->ixy));
-    addKeyValue(inertia, "ixz", values2str(1, &link->inertial->ixz));
-    addKeyValue(inertia, "iyy", values2str(1, &link->inertial->iyy));
-    addKeyValue(inertia, "iyz", values2str(1, &link->inertial->iyz));
-    addKeyValue(inertia, "izz", values2str(1, &link->inertial->izz));
-    inertial->LinkEndChild(inertia);
+  // add inertia (ixx, ixy, ixz, iyy, iyz, izz)
+  TiXmlElement *inertia = new TiXmlElement("inertia");
+  addKeyValue(inertia, "ixx", values2str(1, &link->inertial->ixx));
+  addKeyValue(inertia, "ixy", values2str(1, &link->inertial->ixy));
+  addKeyValue(inertia, "ixz", values2str(1, &link->inertial->ixz));
+  addKeyValue(inertia, "iyy", values2str(1, &link->inertial->iyy));
+  addKeyValue(inertia, "iyz", values2str(1, &link->inertial->iyz));
+  addKeyValue(inertia, "izz", values2str(1, &link->inertial->izz));
+  inertial->LinkEndChild(inertia);
 
-    elem->LinkEndChild(inertial);
+  elem->LinkEndChild(inertial);
 }
 
 
-void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::Link> link, gazebo::math::Pose &currentTransform)
+void URDF2Gazebo::createJoint(TiXmlElement *root,
+  boost::shared_ptr<const urdf::Link> link,
+  gazebo::math::Pose &currentTransform)
 {
     /* compute the joint tag */
     std::string jtype;
@@ -1271,14 +1319,17 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
             jtype = "fixed";
             break;
         default:
-            printf("Unknown joint type: %d in link '%s'\n", link->parent_joint->type, link->name.c_str());
+            gzwarn << "Unknown joint type: [" << link->parent_joint->type
+                   << "] in link [" << link->name << "]\n";
             break;
       }
     }
     
-    // skip if joint type is fixed and we are not faking it with a hinge, skip/return
-    //   with the exception of root link being world, because there's no lumping there
-    if (link->getParent() && link->getParent()->name != "world" && jtype == "fixed" && this->reduce_fixed_joints) return;
+    // skip if joint type is fixed and we are not faking it with a hinge,
+    //   skip/return with the exception of root link being world,
+    //   because there's no lumping there
+    if (link->getParent() && link->getParent()->name != "world"
+        && jtype == "fixed" && this->reduce_fixed_joints) return;
 
     if (!jtype.empty())
     {
@@ -1296,41 +1347,57 @@ void URDF2Gazebo::createJoint(TiXmlElement *root, boost::shared_ptr<const urdf::
         TiXmlElement *joint_axis_dynamics = new TiXmlElement("dynamics");
         if (jtype == "fixed")
         {
-            addKeyValue(joint_axis_limit, "lower", "0");
-            addKeyValue(joint_axis_limit, "upper", "0");
-            addKeyValue(joint_axis_dynamics, "damping", "0");
+          addKeyValue(joint_axis_limit, "lower", "0");
+          addKeyValue(joint_axis_limit, "upper", "0");
+          addKeyValue(joint_axis_dynamics, "damping", "0");
         }
         else
         {
-            gazebo::math::Vector3 rotatedJointAxis = currentTransform.rot.RotateVector(gazebo::math::Vector3(link->parent_joint->axis.x,
-                                                                                                             link->parent_joint->axis.y,
-                                                                                                             link->parent_joint->axis.z ));
-            double rotatedJointAxisArray[3] = { rotatedJointAxis.x, rotatedJointAxis.y, rotatedJointAxis.z };
-            addKeyValue(joint_axis, "xyz", values2str(3, rotatedJointAxisArray));
-            if (link->parent_joint->dynamics)
-              addKeyValue(joint_axis_dynamics, "damping",  values2str(1, &link->parent_joint->dynamics->damping       ));
+          gazebo::math::Vector3 rotatedJointAxis =
+            currentTransform.rot.RotateVector(
+            gazebo::math::Vector3(link->parent_joint->axis.x,
+                                  link->parent_joint->axis.y,
+                                  link->parent_joint->axis.z ));
+          double rotatedJointAxisArray[3] =
+            { rotatedJointAxis.x, rotatedJointAxis.y, rotatedJointAxis.z };
+          addKeyValue(joint_axis, "xyz", values2str(3, rotatedJointAxisArray));
+          if (link->parent_joint->dynamics)
+            addKeyValue(joint_axis_dynamics, "damping",
+              values2str(1, &link->parent_joint->dynamics->damping));
 
-            if (this->enforce_limits && link->parent_joint->limits)
+          if (this->enforce_limits && link->parent_joint->limits)
+          {
+            if (jtype == "slider")
             {
-                if (jtype == "slider")
-                {
-                    addKeyValue(joint_axis_limit, "lower",  values2str(1, &link->parent_joint->limits->lower       ));
-                    addKeyValue(joint_axis_limit, "upper", values2str(1, &link->parent_joint->limits->upper       ));
-                }
-                else if (link->parent_joint->type != urdf::Joint::CONTINUOUS)
-                {
-                    double *lowstop  = &link->parent_joint->limits->lower;
-                    double *highstop = &link->parent_joint->limits->upper;
-                    // enforce ode bounds, this will need to be fixed
-                    if (*lowstop > *highstop)
-                    {
-                      logWarn("urdf2gazebo: revolute joint limits: lowStop > highStop, setting lowStop to highStop.");
-                      *lowstop = *highstop;
-                    }
-                    addKeyValue(joint_axis_limit, "lower",  values2str(1, &link->parent_joint->limits->lower, urdf2gazebo::rad2deg));
-                    addKeyValue(joint_axis_limit, "upper", values2str(1, &link->parent_joint->limits->upper, urdf2gazebo::rad2deg));
-                }
+              addKeyValue(joint_axis_limit, "lower",
+                values2str(1, &link->parent_joint->limits->lower));
+              addKeyValue(joint_axis_limit, "upper",
+                values2str(1, &link->parent_joint->limits->upper));
             }
+            else if (link->parent_joint->type != urdf::Joint::CONTINUOUS)
+            {
+              double *lowstop  = &link->parent_joint->limits->lower;
+              double *highstop = &link->parent_joint->limits->upper;
+              // enforce ode bounds, this will need to be fixed
+              if (*lowstop > *highstop)
+              {
+                gzwarn << "urdf2gazebo: revolute joint ["
+                       << link->parent_joint->name
+                       << "] with limits: lowStop[" << *lowstop
+                       << "] > highStop[" << highstop
+                       << "], switching the two.\n";
+                double tmp = *lowstop;
+                *lowstop = *highstop;
+                *highstop = tmp;
+              }
+              addKeyValue(joint_axis_limit, "lower",
+                values2str(1, &link->parent_joint->limits->lower,
+                  urdf2gazebo::rad2deg));
+              addKeyValue(joint_axis_limit, "upper",
+                values2str(1, &link->parent_joint->limits->upper,
+                  urdf2gazebo::rad2deg));
+            }
+          }
         }
         joint_axis->LinkEndChild(joint_axis_limit);
         joint_axis->LinkEndChild(joint_axis_dynamics);
