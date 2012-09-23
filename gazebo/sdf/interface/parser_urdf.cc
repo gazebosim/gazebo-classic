@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2008, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -32,8 +32,6 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include <sdf/interface/parser_urdf.hh>
-#include "console_bridge/console.h"
 #include <urdf_parser/urdf_parser.h>
 
 #include <fstream>
@@ -41,6 +39,7 @@
 #include <algorithm>
 #include <string>
 
+#include <sdf/interface/parser_urdf.hh>
 #include "common/SystemPaths.hh"
 
 namespace urdf2gazebo
@@ -93,14 +92,14 @@ urdf::Vector3 URDF2Gazebo::parseVector3(TiXmlNode* key, double scale)
           gzerr << "xml key [" << str
                 << "][" << i << "] value [" << pieces[i]
                 << "] is not a valid double from a 3-tuple\n";
-          return urdf::Vector3(0,0,0);
+          return urdf::Vector3(0, 0, 0);
         }
       }
     }
-    return urdf::Vector3(vals[0],vals[1],vals[3]);
+    return urdf::Vector3(vals[0], vals[1], vals[3]);
   }
   else
-    return urdf::Vector3(0,0,0);
+    return urdf::Vector3(0, 0, 0);
 }
 
 void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
@@ -114,22 +113,21 @@ void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
     viss.reset(new std::vector<boost::shared_ptr<urdf::Visual > >);
     // new group name, create vector, add vector to map and
     //   add Visual to the vector
-    link->visual_groups.insert(make_pair(group_name,viss));
-    logDebug("successfully added a new visual group name '%s'",
-      group_name.c_str());
+    link->visual_groups.insert(make_pair(group_name, viss));
+    gzdbg << "successfully added a new visual group name ["
+          << group_name << "]\n";
   }
 
-  // group exists, add Visual to the vector in the map
+  // group exists, add Visual to the vector in the map if it's not there
   std::vector<boost::shared_ptr<urdf::Visual > >::iterator vis_it
-    = find(viss->begin(),viss->end(),visual);
+    = find(viss->begin(), viss->end(), visual);
   if (vis_it != viss->end())
-    gzwarn << "skip adding a visual that already exists under group name ["
+    gzwarn << "attempted to add visual to link ["
+           << link->name
+           << "], but it already exists under group ["
            << group_name << "]\n";
   else
     viss->push_back(visual);
-  gzdbg << "successfully added a new visual under group name ["
-        << group_name << "]\n";
-
 }
 
 void URDF2Gazebo::reduceCollisionToParent(boost::shared_ptr<urdf::Link> link,
@@ -142,110 +140,101 @@ void URDF2Gazebo::reduceCollisionToParent(boost::shared_ptr<urdf::Link> link,
     // group does not exist, create one and add to map
     cols.reset(new std::vector<boost::shared_ptr<urdf::Collision > >);
     // new group name, create add vector to map and add Collision to the vector
-    link->collision_groups.insert(make_pair(group_name,cols));
-    gzdbg << "successfully added a new collision group name ["
-          << group_name << "]\n";
+    link->collision_groups.insert(make_pair(group_name, cols));
   }
 
   // group exists, add Collision to the vector in the map
   std::vector<boost::shared_ptr<urdf::Collision > >::iterator col_it =
-    find(cols->begin(),cols->end(),collision);
+    find(cols->begin(), cols->end(), collision);
   if (col_it != cols->end())
-    gzwarn << "attempted to add collision to ["
+    gzwarn << "attempted to add collision to link ["
            << link->name
            << "], but it already exists under group ["
            << group_name << "]\n";
   else
     cols->push_back(collision);
-  gzdbg << "successfully added collision to ["
-        << link->name
-        << "] under group [" << group_name << "]\n";
-
 }
-
-
 
 std::string URDF2Gazebo::vector32str(const urdf::Vector3 vector,
   double (*conv)(double) = NULL)
 {
-    std::stringstream ss;
-    ss << (conv ? conv(vector.x) : vector.x);
-    ss << " ";
-    ss << (conv ? conv(vector.y) : vector.y);
-    ss << " ";
-    ss << (conv ? conv(vector.z) : vector.z);
-    return ss.str();
+  std::stringstream ss;
+  ss << (conv ? conv(vector.x) : vector.x);
+  ss << " ";
+  ss << (conv ? conv(vector.y) : vector.y);
+  ss << " ";
+  ss << (conv ? conv(vector.z) : vector.z);
+  return ss.str();
 }
 
 std::string URDF2Gazebo::values2str(unsigned int count, const double *values,
   double (*conv)(double) = NULL)
 {
-    std::stringstream ss;
-    for (unsigned int i = 0 ; i < count ; ++i)
-    {
-        if (i > 0)
-            ss << " ";
-        ss << (conv ? conv(values[i]) : values[i]);
-    }
-    return ss.str();
+  std::stringstream ss;
+  for (unsigned int i = 0 ; i < count ; ++i)
+  {
+      if (i > 0)
+          ss << " ";
+      ss << (conv ? conv(values[i]) : values[i]);
+  }
+  return ss.str();
 }
 
 void URDF2Gazebo::addKeyValue(TiXmlElement *elem, const std::string& key,
   const std::string &value)
 {
-    TiXmlElement* child_elem = elem->FirstChildElement(key);
-    if (child_elem)
-    {
-      std::string old_value = getKeyValueAsString(child_elem);
-      if (old_value != value)
-        gzwarn << "multiple inconsistent <" << key
-               << "> exists due to fixed joint reduction,"
-               << " overwriting previous value [" << old_value
-               << "] with [" << value << "].\n";
-      else
-        gzdbg << "multiple consistent <" << key
-               << "> exists with [" << value
-               << "] due to fixed joint reduction.\n";
-      elem->RemoveChild(child_elem);  // remove old elem
-    }
+  TiXmlElement* child_elem = elem->FirstChildElement(key);
+  if (child_elem)
+  {
+    std::string old_value = getKeyValueAsString(child_elem);
+    if (old_value != value)
+      gzwarn << "multiple inconsistent <" << key
+             << "> exists due to fixed joint reduction"
+             << " overwriting previous value [" << old_value
+             << "] with [" << value << "].\n";
+    else
+      gzdbg << "multiple consistent <" << key
+             << "> exists with [" << value
+             << "] due to fixed joint reduction.\n";
+    elem->RemoveChild(child_elem);  // remove old elem
+  }
 
-    TiXmlElement *ekey      = new TiXmlElement(key);
-    TiXmlText    *text_ekey = new TiXmlText(value);
-    ekey->LinkEndChild(text_ekey);    
-    elem->LinkEndChild(ekey); 
+  TiXmlElement *ekey      = new TiXmlElement(key);
+  TiXmlText    *text_ekey = new TiXmlText(value);
+  ekey->LinkEndChild(text_ekey);
+  elem->LinkEndChild(ekey);
 }
 
 void URDF2Gazebo::addTransform(TiXmlElement *elem,
   const::gazebo::math::Pose& transform)
 {
-    gazebo::math::Vector3 e = transform.rot.GetAsEuler();
-    double cpose[6] = { transform.pos.x, transform.pos.y,
-                        transform.pos.z, e.x, e.y, e.z };
+  gazebo::math::Vector3 e = transform.rot.GetAsEuler();
+  double cpose[6] = { transform.pos.x, transform.pos.y,
+                      transform.pos.z, e.x, e.y, e.z };
 
-    /* set geometry transform */
-    addKeyValue(elem, "pose", values2str(6, cpose));  
+  /* set geometry transform */
+  addKeyValue(elem, "pose", values2str(6, cpose));
 }
 
 std::string URDF2Gazebo::getKeyValueAsString(TiXmlElement* elem)
 {
-    std::string value_str;
-    if (elem->Attribute("value"))
-    {
-      value_str = elem->Attribute("value");
-    }
-    else if(elem->FirstChild())
-    // FIXME: comment out check for now, different tinyxml versions fails to 
-    //        compile
-    //  && elem->FirstChild()->Type() == TiXmlNode::TINYXML_TEXT)
-    {
-      value_str = elem->FirstChild()->ValueStr();
-    }
-    return value_str;
+  std::string value_str;
+  if (elem->Attribute("value"))
+  {
+    value_str = elem->Attribute("value");
+  }
+  else if(elem->FirstChild())
+  /// @todo: FIXME: comment out check for now, different tinyxml
+  /// versions fails to compile:
+  //  && elem->FirstChild()->Type() == TiXmlNode::TINYXML_TEXT)
+  {
+    value_str = elem->FirstChild()->ValueStr();
+  }
+  return value_str;
 }
 
 void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
 {
-  logDebug("parsing gazebo extension");
   TiXmlElement* robot_xml = urdf_xml.FirstChildElement("robot");
 
   // Get all Gazebo extension elements, put everything in
@@ -319,15 +308,13 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
       else if (child_elem->ValueStr() == "damping_factor")
       {
           gazebo->is_damping_factor = true;
-          gazebo->damping_factor = 
-            boost::lexical_cast<double>(
+          gazebo->damping_factor = boost::lexical_cast<double>(
               getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "maxVel")
       {
           gazebo->is_maxVel = true;
-          gazebo->maxVel = 
-            boost::lexical_cast<double>(
+          gazebo->maxVel = boost::lexical_cast<double>(
               getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "minDepth")
@@ -433,7 +420,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
 void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
   std::string link_name)
 {
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+  for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
@@ -481,7 +468,7 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
 void URDF2Gazebo::insertGazeboExtensionVisual(TiXmlElement *elem,
   std::string link_name)
 {
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+  for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
@@ -501,7 +488,7 @@ void URDF2Gazebo::insertGazeboExtensionVisual(TiXmlElement *elem,
 void URDF2Gazebo::insertGazeboExtensionLink(TiXmlElement *elem,
   std::string link_name)
 {
-    for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+    for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
          gazebo_it = this->gazebo_extensions_.begin();
          gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
     {
@@ -509,7 +496,7 @@ void URDF2Gazebo::insertGazeboExtensionLink(TiXmlElement *elem,
       {
         gzdbg << "inserting extension with reference ["
               << link_name << "] into link.\n";
-        for (std::vector<GazeboExtension*>::iterator ge = 
+        for (std::vector<GazeboExtension*>::iterator ge =
              gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
         {
           // insert gravity
@@ -547,7 +534,7 @@ void URDF2Gazebo::insertGazeboExtensionLink(TiXmlElement *elem,
 void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
   std::string joint_name)
 {
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+  for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
@@ -593,7 +580,7 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
 
 void URDF2Gazebo::insertGazeboExtensionRobot(TiXmlElement *elem)
 {
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+  for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
@@ -632,7 +619,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
 
   std::string type;
   TiXmlElement *geometry_type;
-  
+
   switch (geometry->type)
   {
   case urdf::Geometry::BOX:
@@ -681,11 +668,11 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
       geometry_type = new TiXmlElement(type);
       addKeyValue(geometry_type, "scale", vector32str(mesh->scale));
       // do something more to meshes
-      {  
+      {
         /* set mesh file */
         if (mesh->filename.empty())
         {
-            logError("urdf2gazebo: mesh geometry with no filename given.");
+            gzerr << "urdf2gazebo: mesh geometry with no filename given.\n";
         }
 
         // give some warning if file does not exist.
@@ -703,7 +690,8 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
     break;
   default:
     sizeCount = 0;
-    printf("Unknown body type: %d in geometry\n", geometry->type);
+    gzwarn << "Unknown body type: [" << geometry->type
+           << "] skipped in geometry\n";
     break;
   }
 
@@ -717,7 +705,7 @@ std::string URDF2Gazebo::getGeometryBoundingBox(
   boost::shared_ptr<urdf::Geometry> geometry, double *sizeVals)
 {
   std::string type;
-  
+
   switch (geometry->type)
   {
   case urdf::Geometry::BOX:
@@ -760,10 +748,11 @@ std::string URDF2Gazebo::getGeometryBoundingBox(
       break;
   default:
       sizeVals[0] = sizeVals[1] = sizeVals[2] = 0;
-      printf("Unknown body type: %d in geometry\n", geometry->type);
+      gzwarn << "Unknown body type: [" << geometry->type
+             << "] skipped in geometry\n";
       break;
   }
-  
+
   return type;
 }
 
@@ -853,7 +842,7 @@ urdf::Pose  URDF2Gazebo::transformToParentFrame(
   // transform to gazebo::math::Pose then call transformToParentFrame
   gazebo::math::Pose p1 = URDF2Gazebo::copyPose(transform_in_link_frame);
   gazebo::math::Pose p2 = URDF2Gazebo::copyPose(parent_to_link_transform);
-  return URDF2Gazebo::copyPose(transformToParentFrame(p1,p2));
+  return URDF2Gazebo::copyPose(transformToParentFrame(p1, p2));
 }
 gazebo::math::Pose  URDF2Gazebo::transformToParentFrame(
   gazebo::math::Pose transform_in_link_frame,
@@ -861,7 +850,7 @@ gazebo::math::Pose  URDF2Gazebo::transformToParentFrame(
 {
   // transform to gazebo::math::Pose then call transformToParentFrame
   gazebo::math::Pose p2 = URDF2Gazebo::copyPose(parent_to_link_transform);
-  return transformToParentFrame(transform_in_link_frame,p2);
+  return transformToParentFrame(transform_in_link_frame, p2);
 }
 
 gazebo::math::Pose  URDF2Gazebo::transformToParentFrame(
@@ -919,7 +908,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
 
   // update extension map with references to link_name
   // this->listGazeboExtensions();
-  std::map<std::string,std::vector<GazeboExtension*> >::iterator ext =
+  std::map<std::string, std::vector<GazeboExtension*> >::iterator ext =
     this->gazebo_extensions_.find(link_name);
   if (ext != this->gazebo_extensions_.end())
   {
@@ -940,7 +929,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
 
     // find pointer to the existing extension with the new link reference
     std::string new_link_name = link->getParent()->name;
-    std::map<std::string,std::vector<GazeboExtension*> >::iterator
+    std::map<std::string, std::vector<GazeboExtension*> >::iterator
       new_ext = this->gazebo_extensions_.find(new_link_name);
 
     // if none exist, create new_extension with new_link_name
@@ -962,7 +951,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
   // for extensions with empty reference, search and replace
   // link name patterns within the plugin with new link name
   // and assign the proper reduction transform for the link name pattern
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+  for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
     {
@@ -1033,7 +1022,7 @@ void URDF2Gazebo::reduceGazeboExtensionsTransformReduction(GazeboExtension* ge)
 void URDF2Gazebo::listGazeboExtensions()
 {
   gzdbg << "================================================================\n";
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+  for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
@@ -1063,7 +1052,7 @@ void URDF2Gazebo::listGazeboExtensions()
 void URDF2Gazebo::listGazeboExtensions(std::string reference)
 {
   gzdbg << "================================================================\n";
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+  for (std::map<std::string, std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
@@ -1121,7 +1110,7 @@ void URDF2Gazebo::createSDF(TiXmlElement *root,
     }
 
     /* create <body:...> block for non fixed joint attached bodies */
-    if ((link->getParent() && link->getParent()->name == "world") || 
+    if ((link->getParent() && link->getParent()->name == "world") ||
         !this->reduce_fixed_joints ||
         (!link->parent_joint || link->parent_joint->type != urdf::Joint::FIXED))
       createLink(root, link, currentTransform);
@@ -1192,8 +1181,8 @@ void URDF2Gazebo::createLink(TiXmlElement *root,
   createVisuals(elem, link);
 
   /* copy gazebo extensions data */
-  insertGazeboExtensionLink(elem,link->name);
-  
+  insertGazeboExtensionLink(elem, link->name);
+
   /* add body to document */
   root->LinkEndChild(elem);
 
@@ -1215,8 +1204,9 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
 
     if (collisions_it->first == "default")
     {
-      logDebug("creating default collision for link [%s]", link->name.c_str());
-      
+      gzdbg << "creating default collision for link [" << link->name
+            << "]";
+
       /* make a <collision> block */
       createCollision(elem, link, collision, link->name);
     }
@@ -1224,8 +1214,9 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
     {
       // if collision name starts with "lump::", pass through
       //   original parent link name
-      logDebug("creating lump collision [%s] for link [%s]",
-        collisions_it->first.c_str(),link->name.c_str());
+      gzdbg << "creating lump collision [" << collisions_it->first
+            << "] for link [" << link->name
+            << "].\n";
       /// old_link_name is the original name before lumping
       std::string old_link_name = collisions_it->first.substr(6);
       createCollision(elem, link, collision, old_link_name);
@@ -1247,14 +1238,11 @@ void URDF2Gazebo::createVisuals(TiXmlElement* elem,
 
     if (visuals_it->first == "default")
     {
-      logDebug("creating default visual for link [%s]", link->name.c_str());
       /* make a visual block */
       createVisual(elem, link, visual, link->name);
     }
     else if (visuals_it->first.find(std::string("lump::")) == 0)
     {
-      logDebug("creating lump visual [%s] for link [%s]",
-        visuals_it->first.c_str(),link->name.c_str());
       std::string old_link_name = visuals_it->first.substr(6);
       /* make a visual block */
       createVisual(elem, link, visual, old_link_name);
@@ -1270,8 +1258,8 @@ void URDF2Gazebo::createInertial(TiXmlElement *elem,
 
   /* set mass properties */
   // check and print a warning message
-  double roll,pitch,yaw;
-  link->inertial->origin.rotation.getRPY(roll,pitch,yaw);
+  double roll, pitch, yaw;
+  link->inertial->origin.rotation.getRPY(roll, pitch, yaw);
   if (!gazebo::math::equal(roll, 0.0) ||
     !gazebo::math::equal(pitch, 0.0) || !gazebo::math::equal(yaw, 0.0))
       gzerr << "rotation of inertial frame in link ["
@@ -1328,7 +1316,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
             break;
       }
     }
-    
+
     // skip if joint type is fixed and we are not faking it with a hinge,
     //   skip/return with the exception of root link being world,
     //   because there's no lumping there
@@ -1408,7 +1396,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
         joint->LinkEndChild(joint_axis);
 
         /* copy gazebo extensions data */
-        insertGazeboExtensionJoint(joint,link->parent_joint->name);
+        insertGazeboExtensionJoint(joint, link->parent_joint->name);
 
         /* add joint to document */
         root->LinkEndChild(joint);
@@ -1432,13 +1420,13 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
     else
       gazebo_collision->SetAttribute("name",
         link->name + std::string("_collision_")+old_link_name);
-    
+
     /* set transform */
     double pose[6];
     pose[0] = collision->origin.position.x;
     pose[1] = collision->origin.position.y;
     pose[2] = collision->origin.position.z;
-    collision->origin.rotation.getRPY(pose[3],pose[4],pose[5]);
+    collision->origin.rotation.getRPY(pose[3], pose[4], pose[5]);
     addKeyValue(gazebo_collision, "pose", values2str(6, pose));
 
 
@@ -1454,7 +1442,7 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
     }
 
     /* set additional data from extensions */
-    insertGazeboExtensionCollision(gazebo_collision,old_link_name);
+    insertGazeboExtensionCollision(gazebo_collision, old_link_name);
 
     /* add geometry to body */
     elem->LinkEndChild(gazebo_collision);
@@ -1485,7 +1473,7 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem,
     visual->origin.rotation.getRPY(pose[3], pose[4], pose[5]);
     addKeyValue(gazebo_visual, "pose", values2str(6, pose));
 
-    /* insert geometry */                
+    /* insert geometry */
     if (!visual || !visual->geometry)
     {
       gzdbg << "urdf2gazebo: visual of link [" << link->name
@@ -1493,7 +1481,7 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem,
     }
     else
       createGeometry(gazebo_visual, visual->geometry);
-    
+
     /* set additional data from extensions */
     insertGazeboExtensionVisual(gazebo_visual, old_link_name);
 
@@ -1519,20 +1507,20 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
 
     if (!robot_model)
     {
-        gzerr << "Unable to call parseURDF on robot model\n";  
+        gzerr << "Unable to call parseURDF on robot model\n";
         return gazebo_xml_out;
     }
 
     /* create root element and define needed namespaces */
     TiXmlElement *robot = new TiXmlElement("model");
-    
+
     // set model name to urdf robot name if not specified
     robot->SetAttribute("name", robot_model->getName());
-    
+
     /* initialize transform for the model, urdf is recursive,
        while sdf defines all links relative to model frame */
     gazebo::math::Pose transform;
-    
+
     /* parse gazebo extension */
     TiXmlDocument urdf_xml;
     urdf_xml.Parse(urdf_str.c_str());
@@ -1562,7 +1550,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
       /* convert, starting from root link */
       createSDF(robot, root_link, transform);
     }
-    
+
     /* find all data item types */
     insertGazeboExtensionRobot(robot);
 
@@ -1594,7 +1582,7 @@ TiXmlDocument URDF2Gazebo::initModelFile(std::string filename)
     return initModelDoc(&xmlDoc);
   }
   else
-    logError("Unable to load file[%s]\n", filename.c_str());
+    gzerr << "Unable to load file[" << filename << "].\n";
 
     return xmlDoc;
 }
@@ -1618,7 +1606,7 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
         link->getParent()->inertial->ixx, link->getParent()->inertial->iyy,
         link->getParent()->inertial->izz, link->getParent()->inertial->ixy,
          link->getParent()->inertial->ixz, link->getParent()->inertial->iyz);
-      printMass(link->getParent()->name,parent_mass);
+      printMass(link->getParent()->name, parent_mass);
       printMass(link->getParent());
       // set link mass (in link frame)
       dMass link_mass;
@@ -1628,7 +1616,7 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
         link->inertial->origin.position.z,
         link->inertial->ixx, link->inertial->iyy, link->inertial->izz,
         link->inertial->ixy, link->inertial->ixz, link->inertial->iyz);
-      printMass(link->name,link_mass);
+      printMass(link->name, link_mass);
       printMass(link);
       // un-rotate link mass into parent link frame
       dMatrix3 R;
@@ -1637,16 +1625,16 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
         phi, theta, psi);
       dRFromEulerAngles(R, phi, theta, psi);
       dMassRotate(&link_mass, R);
-      printMass(link->name,link_mass);
+      printMass(link->name, link_mass);
       // un-translate link mass into parent link frame
       dMassTranslate(&link_mass,
         link->parent_joint->parent_to_joint_origin_transform.position.x,
         link->parent_joint->parent_to_joint_origin_transform.position.y,
         link->parent_joint->parent_to_joint_origin_transform.position.z);
-      printMass(link->name,link_mass);
+      printMass(link->name, link_mass);
       // now link_mass is in the parent frame, add link_mass to parent_mass
-      dMassAdd(&parent_mass,&link_mass);
-      printMass(link->getParent()->name,parent_mass);
+      dMassAdd(&parent_mass, &link_mass);
+      printMass(link->getParent()->name, parent_mass);
       // update parent mass
       link->getParent()->inertial->mass = parent_mass.mass;
       link->getParent()->inertial->ixx  = parent_mass.I[0+4*0];
@@ -1823,6 +1811,7 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
     // overwrite <xyz> and <rpy> if they exist
     if ((*blob_it)->ValueStr() == "sensor")
     {
+      /*
       // parse it and add/replace the reduction transform
       // find first instance of xyz and rpy, replace with reduction transform
       for (TiXmlNode* el_it = (*blob_it)->FirstChild();
@@ -1830,8 +1819,9 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
       {
         std::ostringstream stream_in;
         stream_in << *el_it;
-        logDebug("    %s",stream_in.str().c_str());
+        gzdbg << "    " << stream_in << "\n";
       }
+      */
 
       TiXmlNode* xyz_key = (*blob_it)->FirstChild("xyz");
       /// @todo: FIXME:  we should read xyz, rpy and aggregate it to
@@ -1851,7 +1841,7 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
         reduction_transform.rot.z, reduction_transform.rot.w);
 
       urdf::Vector3 reduction_rpy;
-      reduction_q.getRPY(reduction_rpy.x,reduction_rpy.y,reduction_rpy.z);
+      reduction_q.getRPY(reduction_rpy.x, reduction_rpy.y, reduction_rpy.z);
 
       // output updated pose to text
       std::ostringstream pose_stream;
@@ -1874,6 +1864,7 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(
     // overwrite <pose> (xyz/rpy) if it exists
     if ((*blob_it)->ValueStr() == "projector")
     {
+      /*
       // parse it and add/replace the reduction transform
       // find first instance of xyz and rpy, replace with reduction transform
       for (TiXmlNode* el_it = (*blob_it)->FirstChild();
@@ -1881,8 +1872,9 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(
       {
         std::ostringstream stream_in;
         stream_in << *el_it;
-        logDebug("    %s",stream_in.str().c_str());
+        gzdbg << "    " << stream_in << "\n";
       }
+      */
 
       /* should read <pose>...</pose> and agregate reduction_transform */
       TiXmlNode* pose_key = (*blob_it)->FirstChild("pose");
