@@ -79,6 +79,7 @@ SystemPaths::SystemPaths()
 
   // Add some search paths
   // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
+  this->suffixPaths.push_back("/models/");
   this->suffixPaths.push_back("/media/models/");
   this->suffixPaths.push_back("/Media/models/");
 
@@ -227,6 +228,8 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
 
   if (prefix == "model")
     filename = "/home/nkoenig/local/share/gazebo_models/" + suffix;
+  else if (prefix == "file")
+    filename = this->FindFileWithGazeboPaths(suffix);
   else
     gzerr << "Unknown URI prefix[" << prefix << "]\n";
 
@@ -294,6 +297,7 @@ std::string SystemPaths::FindFile(const std::string &_filename)
       result.clear();
       gzerr << "cannot load file [" << _filename << "]in GAZEBO_RESOURCE_PATH["
         << getenv("GAZEBO_RESOURCE_PATH") << "]\n";
+      return std::string();
     }
   }
 
@@ -391,8 +395,6 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
 
   if (_suffix[_suffix.size()-1] != '/')
     s += "/";
-
-  std::cout << "AddSuffix[" << _suffix << "]\n";
 
   this->suffixPaths.push_back(s);
 }

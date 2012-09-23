@@ -27,6 +27,7 @@
 #include "gazebo/sdf/interface/parser.hh"
 #include "gazebo/sdf/interface/parser_deprecated.hh"
 
+#include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
@@ -595,12 +596,15 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
             gzerr << "<include filename='...'/> is deprecated. Should be "
                   << "<include><uri>...</uri></include\n";
 
-            filename = elemXml->Attribute("filename");
+            filename = gazebo::common::find_file(
+                elemXml->Attribute("filename"));
+            std::cout << "FIlename[" << filename << "]\n";
           }
           else
+          {
             gzerr << "<include> element missing 'uri' attribute\n";
-
-          continue;
+            continue;
+          }
         }
 
         SDFPtr includeSDF(new SDF);

@@ -53,7 +53,7 @@ void TrimeshShape::Init()
   common::MeshManager *meshManager = common::MeshManager::Instance();
   if (this->sdf->GetValueString("filename") != "__default__")
   {
-    filename = this->sdf->GetValueString("filename");
+    filename = common::find_file(this->sdf->GetValueString("filename"));
 
     gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
           << " is deprecated.\n";
