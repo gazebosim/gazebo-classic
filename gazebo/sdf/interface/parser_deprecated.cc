@@ -380,18 +380,24 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
 
-  try {
+  try
+  {
     int verticalRangeCount =
       boost::lexical_cast<int>(getNodeValue(_config, "verticalRangeCount"));
-    int verticalRayCount = boost::lexical_cast<int>(getNodeValue(_config, "verticalRayCount"));
+    int verticalRayCount = boost::lexical_cast<int>(getNodeValue(_config,
+      "verticalRayCount"));
 
     if (!sdfVerti->GetAttribute("resolution")->SetFromString(
-          boost::lexical_cast<std::string>(verticalRangeCount / verticalRayCount)))
+          boost::lexical_cast<std::string>(verticalRangeCount
+          / verticalRayCount)))
     {
       gzerr << "Unable to parse ray sensor verticalRayCount";
       return false;
     }
-  } catch(boost::bad_lexical_cast& e) {
+  }
+  catch(boost::bad_lexical_cast& e)
+  {
+    gzerr << "verticalRayCount not parsable\n";
   }
 
   double minAngle =
@@ -413,7 +419,8 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
 
-  try {
+  try
+  {
     double verticalMinAngle =
       boost::lexical_cast<double>(getNodeValue(_config, "verticalMinAngle"));
     double verticalMaxAngle =
@@ -432,7 +439,10 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
       gzerr << "Unable to parse vertical max_angle\n";
       return false;
     }
-  } catch(boost::bad_lexical_cast& e) {
+  }
+  catch(boost::bad_lexical_cast& e)
+  {
+    gzerr << "max_angle not parsable\n";
   }
 
   sdf::ElementPtr sdfRange = _sdf->AddElement("range");
