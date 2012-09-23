@@ -478,7 +478,8 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
   }
 }
 
-void URDF2Gazebo::insertGazeboExtensionVisual(TiXmlElement *elem,std::string link_name)
+void URDF2Gazebo::insertGazeboExtensionVisual(TiXmlElement *elem,
+  std::string link_name)
 {
   for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
@@ -836,7 +837,7 @@ void URDF2Gazebo::printCollisionGroups(boost::shared_ptr<urdf::Link> link)
   gzdbg << "COLLISION LUMPING: link: [" << link->name << "] contains ["
         << (int)link->collision_groups.size() << "] collisions.\n";
   for (std::map<std::string,
-    boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::iterator
+    boost::shared_ptr<std::vector<CollisionPtr > > >::iterator
     cols_it = link->collision_groups.begin();
     cols_it != link->collision_groups.end(); ++cols_it)
   {
@@ -958,8 +959,9 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
     ext->second.clear();
   }
 
-  // for extensions with empty reference, search and replace link name patterns within the plugin with new link name
-  //   and assign the proper reduction transform for the link name pattern
+  // for extensions with empty reference, search and replace
+  // link name patterns within the plugin with new link name
+  // and assign the proper reduction transform for the link name pattern
   for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
@@ -1203,7 +1205,8 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
   boost::shared_ptr<const urdf::Link> link)
 {
   // loop through all collisions. make additional geoms using the lumped stuff
-  for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::const_iterator
+  for (std::map<std::string,
+    boost::shared_ptr<std::vector<CollisionPtr> > >::const_iterator
     collisions_it = link->collision_groups.begin();
     collisions_it != link->collision_groups.end(); ++collisions_it)
   {
@@ -1235,7 +1238,8 @@ void URDF2Gazebo::createVisuals(TiXmlElement* elem,
 {
   // loop through all visuals. make additional collisions using the
   //   lumped stuff
-  for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual> > > >::const_iterator
+  for (std::map<std::string,
+    boost::shared_ptr<std::vector<VisualPtr> > >::const_iterator
     visuals_it = link->visual_groups.begin();
     visuals_it != link->visual_groups.end(); ++visuals_it)
   {
@@ -1641,7 +1645,7 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
         link->parent_joint->parent_to_joint_origin_transform.position.z);
       printMass(link->name,link_mass);
       // now link_mass is in the parent frame, add link_mass to parent_mass
-      dMassAdd(&parent_mass,&link_mass); // now parent_mass contains link_mass in parent frame
+      dMassAdd(&parent_mass,&link_mass);
       printMass(link->getParent()->name,parent_mass);
       // update parent mass
       link->getParent()->inertial->mass = parent_mass.mass;
@@ -1661,10 +1665,12 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
 void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
 {
   // lump visual to parent
-  // lump all visual to parent, assign group name "lump::"+group name+"::'+link name
-  // lump but keep the link name in(/as) the group name, so we can correlate visuals to visuals somehow.
+  // lump all visual to parent, assign group name
+  // "lump::"+group name+"::'+link name
+  // lump but keep the link name in(/as) the group name,
+  // so we can correlate visuals to visuals somehow.
   for (std::map<std::string,
-    boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual> > > >::iterator
+    boost::shared_ptr<std::vector<VisualPtr> > >::iterator
     visuals_it = link->visual_groups.begin();
     visuals_it != link->visual_groups.end(); ++visuals_it)
   {
@@ -1720,7 +1726,7 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
     // lump but keep the link name in(/as) the group name,
     // so we can correlate visuals to collisions somehow.
     for (std::map<std::string,
-      boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::iterator
+      boost::shared_ptr<std::vector<CollisionPtr> > >::iterator
       collisions_it = link->collision_groups.begin();
       collisions_it != link->collision_groups.end(); ++collisions_it)
     {

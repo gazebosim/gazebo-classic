@@ -62,6 +62,10 @@ namespace urdf2gazebo
 {
   /// \addtogroup gazebo_parser
   /// \{
+
+  typedef boost::shared_ptr<urdf::Collision> CollisionPtr;
+  typedef boost::shared_ptr<urdf::Visual> VisualPtr;
+
   class GazeboExtension
   {
     public:
