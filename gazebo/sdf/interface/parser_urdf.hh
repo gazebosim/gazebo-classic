@@ -38,20 +38,19 @@
 #include <cstdlib>
 #include <cmath>
 
+#include <urdf_model/model.h>
+#include <urdf_model/link.h>
+
+#include "ode/mass.h"
+#include "ode/rotation.h"
+
+#include <tinyxml.h>
+
 #include <vector>
 #include <string>
 
 #include <sstream>
 #include <map>
-#include <vector>
-
-#include <urdf_model/model.h>
-#include <urdf_model/link.h>
-
-#include <tinyxml.h>
-
-#include "ode/mass.h"
-#include "ode/rotation.h"
 
 #include "math/Pose.hh"
 #include "common/Console.hh"
@@ -104,15 +103,14 @@ namespace urdf2gazebo
 
       GazeboExtension()
       {
-        //initialize
         material.clear();
         setStaticFlag = false;
         gravity = false;
         is_damping_factor = false;
         is_maxVel = false;
         is_minDepth = false;
-        is_mu1 = false;
         fdir1.clear();
+        is_mu1 = false;
         is_mu2 = false;
         is_kp = false;
         is_kd = false;
@@ -141,13 +139,13 @@ namespace urdf2gazebo
 
       GazeboExtension(const GazeboExtension &ge)
       {
-        //initialize
         material = ge.material;
         setStaticFlag = ge.setStaticFlag;
         gravity = ge.gravity;
         is_damping_factor = ge.is_damping_factor;
         is_maxVel = ge.is_maxVel;
         is_minDepth = ge.is_minDepth;
+        fdir1 = ge.fdir1;
         is_mu1 = ge.is_mu1;
         is_mu2 = ge.is_mu2;
         is_kp = ge.is_kp;
@@ -406,7 +404,6 @@ namespace urdf2gazebo
 
       private: bool enforce_limits;
       private: bool reduce_fixed_joints;
-
   };
   /// \}
 }

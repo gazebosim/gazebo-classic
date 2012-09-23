@@ -33,18 +33,17 @@
 *********************************************************************/
 
 #include <urdf_parser/urdf_parser.h>
+#include <sdf/interface/parser_urdf.hh>
 
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 #include <string>
 
-#include <sdf/interface/parser_urdf.hh>
 #include "common/SystemPaths.hh"
 
 namespace urdf2gazebo
 {
-
 double rad2deg(double v)
 {
   return v * 180.0 / M_PI;
@@ -584,8 +583,9 @@ void URDF2Gazebo::insertGazeboExtensionRobot(TiXmlElement *elem)
        gazebo_it = this->gazebo_extensions_.begin();
        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
   {
-    if (gazebo_it->first.empty()) // no reference
+    if (gazebo_it->first.empty())
     {
+      // no reference specified
       for (std::vector<GazeboExtension*>::iterator
         ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
       {
@@ -824,14 +824,16 @@ void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root,
 void URDF2Gazebo::printCollisionGroups(boost::shared_ptr<urdf::Link> link)
 {
   gzdbg << "COLLISION LUMPING: link: [" << link->name << "] contains ["
-        << (int)link->collision_groups.size() << "] collisions.\n";
+        << static_cast<int>(link->collision_groups.size())
+        << "] collisions.\n";
   for (std::map<std::string,
     boost::shared_ptr<std::vector<CollisionPtr > > >::iterator
     cols_it = link->collision_groups.begin();
     cols_it != link->collision_groups.end(); ++cols_it)
   {
     gzdbg << "    collision_groups: [" << cols_it->first << "] has ["
-          << (int)cols_it->second->size() << "] Collision objects\n";
+          << static_cast<int>(cols_it->second->size())
+          << "] Collision objects\n";
   }
 }
 
@@ -1550,7 +1552,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
       createSDF(robot, root_link, transform);
     }
 
-    /* find all data item types */
+    /* insert the extensions without reference into <robot> root level */
     insertGazeboExtensionRobot(robot);
 
     // add robot to gazebo_xml_out
