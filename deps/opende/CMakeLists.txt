@@ -12,6 +12,10 @@ include_directories(SYSTEM
   ${CCD_INCLUDE_DIRS}
 )
 
+link_directories(  
+  ${CCD_LIBRARY_DIRS} 
+)
+
 add_subdirectory(OPCODE)
 add_subdirectory(ou)
 
