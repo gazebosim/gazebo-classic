@@ -23,7 +23,7 @@
         </constraints>
       </ode>
     </physics>
-    <include><uri>models://ground_plane</uri></include>
+    <include><uri>model://ground_plane</uri></include>
     <!-- 25.3kg total mass -->
     <model name="test_model">
       <pose>0 0 0.7 0 0 0</pose>

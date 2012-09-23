@@ -2,9 +2,9 @@
 <gazebo version="1.2">
   <world name="default">
     <!-- A ground plane -->
-    <include><uri>models://ground_plane</uri></include>
+    <include><uri>model://ground_plane</uri></include>
     <!-- A global light source -->
-    <include><uri>models://sun</uri></include>
+    <include><uri>model://sun</uri></include>
     <plugin filename="libTriggerPlugin.so" name="trigger">
       <point>0 0 0</point>
       <radius>5</radius>

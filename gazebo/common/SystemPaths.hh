@@ -81,7 +81,7 @@ namespace gazebo
       public: std::string FindFileWithGazeboPaths(const std::string &_filename)
               GAZEBO_DEPRECATED;
 
-      /// \brief Find a file using a URI
+      /// \brief Find a file or path using a URI
       public: std::string FindFileURI(const std::string &_uri);
 
       /// \brief Find a file in the gazebo paths

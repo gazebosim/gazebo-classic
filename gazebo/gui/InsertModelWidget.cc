@@ -191,7 +191,7 @@ void InsertModelWidget::ConnectToModelDatabase()
       conn->Connect(host, port);
       conn->AsyncRead(boost::bind(&InsertModelWidget::OnResponse, this, _1));
 
-      msgs::Request *request = msgs::CreateRequest("models");
+      msgs::Request *request = msgs::CreateRequest("model");
       std::string requestData;
       request->SerializeToString(&requestData);
       conn->EnqueueMsg(requestData);

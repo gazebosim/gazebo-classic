@@ -13,12 +13,12 @@
     </physics>
 
     <!-- A ground plane -->
-    <include><uri>models://ground_plane</uri></include>
+    <include><uri>model://ground_plane</uri></include>
 
     <include filename="hokuyo.model" />
 
     <!-- A global light source -->
-    <include><uri>models://sun</uri></include>
+    <include><uri>model://sun</uri></include>
 
   </world>
 </gazebo>

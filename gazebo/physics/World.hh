@@ -236,14 +236,20 @@ namespace gazebo
       public: void SetState(const WorldState &_state);
 
       /// \brief Insert a model from an SDF file
+      ///
+      /// Spawns a model into the world base on and SDF file
       /// \param _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
       /// \brief Insert a model from an SDF string
+      ///
+      /// Spawns a model into the world base on and SDF string
       /// \param _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF
+      ///
+      /// Spawns a model into the world base on and SDF object
       /// \param _sdf A reference to an SDF object
       public: void InsertModelSDF(const sdf::SDF &_sdf);
 

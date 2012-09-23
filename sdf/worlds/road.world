@@ -5,7 +5,7 @@
       <grid>false</grid>
     </scene>
     <!-- A global light source -->
-    <include><uri>models://sun</uri></include>
+    <include><uri>model://sun</uri></include>
     <!-- Invisible ground plane -->
     <model name="ground">
       <link name="body">

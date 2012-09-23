@@ -17,6 +17,7 @@ set (sources
   Mesh.cc
   MeshLoader.cc
   MeshManager.cc
+  ModelDatabase.cc
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc

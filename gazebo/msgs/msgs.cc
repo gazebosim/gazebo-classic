@@ -493,8 +493,9 @@ namespace gazebo
           geomMsg->set_type(msgs::Geometry::MESH);
           msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
               geomElem->GetValueVector3("scale"));
+
           geomMsg->mutable_mesh()->set_filename(
-              geomElem->GetValueString("filename"));
+              geomElem->GetValueString("uri"));
         }
         else
           gzthrow("Unknown geometry type\n");

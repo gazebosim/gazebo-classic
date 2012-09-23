@@ -31,6 +31,8 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
+#include "gazebo/common/ModelDatabase.hh"
+#include "gazebo/common/Common.hh"
 #include "gazebo/common/Diagnostics.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -1143,7 +1145,10 @@ void World::ProcessFactoryMsgs()
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
-      if (!sdf::readFile((*iter).sdf_filename(), factorySDF))
+      std::string filename = common::ModelDatabase::GetModelFile(
+          (*iter).sdf_filename());
+
+      if (!sdf::readFile(filename, factorySDF))
       {
         gzerr << "Unable to read sdf file.\n";
         continue;

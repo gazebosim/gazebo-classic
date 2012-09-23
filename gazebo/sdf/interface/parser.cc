@@ -532,6 +532,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
   }
   else
   {
+    std::string filename;
+
     // Iterate over all the child elements
     TiXmlElement* elemXml = NULL;
     for (elemXml = _xml->FirstChildElement(); elemXml;
@@ -553,9 +555,9 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               << elemXml->FirstChildElement("uri")->GetText() << "]\n";
 
             std::string uri = elemXml->FirstChildElement("uri")->GetText();
-            if (uri.find("models://") != 0)
+            if (uri.find("model://") != 0)
             {
-              gzerr << "Invalid uri[" << uri << "]. Should be models://"
+              gzerr << "Invalid uri[" << uri << "]. Should be model://"
                     << uri << "\n";
             }
             continue;
@@ -570,35 +572,35 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               continue;
             }
           }
+
+          std::string manifest = modelPath + "/manifest.xml";
+
+          TiXmlDocument manifestDoc;
+          if (manifestDoc.LoadFile(manifest))
+          {
+            TiXmlElement *modelXML = manifestDoc.FirstChildElement("model");
+            if (!modelXML)
+              gzerr << "No <model> element in manifest[" << manifest << "]\n";
+            else
+            {
+              filename = modelPath + "/" +
+                         modelXML->FirstChildElement("sdf")->GetText();
+            }
+          }
         }
         else
         {
           if (elemXml->Attribute("filename"))
           {
-            gzerr << "<include filename='...'/> should be "
-                  << "<include><uri='...'/>\n";
+            gzerr << "<include filename='...'/> is deprecated. Should be "
+                  << "<include><uri>...</uri></include\n";
+
+            filename = elemXml->Attribute("filename");
           }
           else
             gzerr << "<include> element missing 'uri' attribute\n";
 
           continue;
-        }
-
-
-        std::string manifest = modelPath + "/manifest.xml";
-        std::string filename;
-
-        TiXmlDocument manifestDoc;
-        if (manifestDoc.LoadFile(manifest))
-        {
-          TiXmlElement *modelXML = manifestDoc.FirstChildElement("model");
-          if (!modelXML)
-            gzerr << "No <model> element in manifest[" << manifest << "]\n";
-          else
-          {
-            filename = modelPath + "/" +
-                       modelXML->FirstChildElement("sdf")->GetText();
-          }
         }
 
         SDFPtr includeSDF(new SDF);

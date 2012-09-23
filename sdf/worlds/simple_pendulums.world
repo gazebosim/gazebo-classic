@@ -6,7 +6,7 @@
       <background>0.5 0.5 0.5 1</background>
       <shadows>false</shadows>
     </scene>
-    <include><uri>models://sun</uri></include>
+    <include><uri>model://sun</uri></include>
     <physics type="ode">
       <gravity>0.0 0.0 -9.81</gravity>
       <ode>

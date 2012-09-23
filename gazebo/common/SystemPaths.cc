@@ -225,7 +225,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
   std::string filename;
 
-  if (prefix == "models")
+  if (prefix == "model")
     filename = "/home/nkoenig/local/share/gazebo_models/" + suffix;
   else
     gzerr << "Unknown URI prefix[" << prefix << "]\n";

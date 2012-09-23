@@ -2,15 +2,15 @@
 <gazebo version="1.2">
   <world name="default">
     <include>
-      <uri>models://ground_plane</uri>
+      <uri>model://ground_plane</uri>
     </include>
 
     <include>
-      <uri>models://sun</uri>
+      <uri>model://sun</uri>
     </include>
 
     <include>
-      <uri>models://willowgarage</uri>
+      <uri>model://willowgarage</uri>
     </include>
   </world>
 </gazebo>

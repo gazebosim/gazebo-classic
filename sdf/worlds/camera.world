@@ -23,7 +23,7 @@
         </constraints>
       </ode>
     </physics>
-    <include><uri>models://ground_plane</uri></include>
+    <include><uri>model://ground_plane</uri></include>
     <model name="camera_model">
       <pose>0 0 .5 0.0 0.0 0</pose>
       <link name="my_link">
@@ -64,8 +64,13 @@
               <height>480</height>
               <format>R8G8B8</format>
             </image>
-            <clip near="0.1" far="50" />
-            <save enabled="true" path="/tmp/camera" />
+            <clip>
+              <near>0.1</near>
+              <far>50</far>
+            </clip>
+            <save enabled="true">
+              <path>/tmp/camera</path>
+            </save>
           </camera>
           <plugin filename="libCameraPlugin.so" name="camera_plugin" />
           <always_on>true</always_on>

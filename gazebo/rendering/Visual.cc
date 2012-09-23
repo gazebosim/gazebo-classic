@@ -24,6 +24,7 @@
 
 #include "msgs/msgs.hh"
 #include "common/Events.hh"
+#include "common/Common.hh"
 
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
@@ -264,7 +265,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       sdf::ElementPtr elem = geomElem->AddElement("mesh");
-      elem->GetElement("filename")->Set(_msg->geometry().mesh().filename());
+      elem->GetElement("uri")->Set(_msg->geometry().mesh().filename());
     }
   }
 
@@ -1817,7 +1818,27 @@ std::string Visual::GetMeshName() const
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
-      return geomElem->GetElement("mesh")->GetValueString("filename");
+    {
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      std::string filename;
+
+      if (tmpElem->GetValueString("filename") != "__default__")
+      {
+        filename = tmpElem->GetValueString("filename");
+
+        gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
+          << " is deprecated.\n";
+        gzerr << "Use <mesh><uri>file://" << filename << "</uri></mesh>\n";
+      }
+      else
+      {
+        filename = common::find_file(tmpElem->GetValueString("uri"));
+        if (filename == "__default__" || filename.empty())
+          gzerr << "No mesh specified\n";
+      }
+
+      return filename;
+    }
   }
 
   return std::string();
