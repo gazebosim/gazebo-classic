@@ -922,56 +922,71 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
     this->gazebo_extensions_.find(link_name);
   if (ext != this->gazebo_extensions_.end())
   {
-    logDebug("  REDUCE EXTENSION: moving reference from [%s] to [%s]",link_name.c_str(), link->getParent()->name.c_str());
+    gzdbg << "  REDUCE EXTENSION: moving reference from ["
+          << link_name << "] to [" << link->getParent()->name << "]\n";
 
-    // update reduction transform (for rays, cameras for now).  FIXME: contact frames too?
-    for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin(); ge != ext->second.end(); ++ge)
+    // update reduction transform (for rays, cameras for now).
+    //   FIXME: contact frames too?
+    for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin();
+         ge != ext->second.end(); ++ge)
     {
-      (*ge)->reduction_transform = transformToParentFrame((*ge)->reduction_transform, link->parent_joint->parent_to_joint_origin_transform);
-      // FIXME: if the sensor block has sensor:ray or sensor:camera or sensor:stereo_camera, look for/replace/insert reduction transform into xml block
+      (*ge)->reduction_transform = transformToParentFrame(
+        (*ge)->reduction_transform,
+        link->parent_joint->parent_to_joint_origin_transform);
+      // for sensor and projector blocks only
       reduceGazeboExtensionsTransformReduction((*ge));
     }
 
     // find pointer to the existing extension with the new link reference
     std::string new_link_name = link->getParent()->name;
-    std::map<std::string,std::vector<GazeboExtension*> >::iterator new_ext = this->gazebo_extensions_.find(new_link_name);
+    std::map<std::string,std::vector<GazeboExtension*> >::iterator
+      new_ext = this->gazebo_extensions_.find(new_link_name);
 
     // if none exist, create new_extension with new_link_name
     if (new_ext == this->gazebo_extensions_.end())
     {
       std::vector<GazeboExtension*> extensions;
-      this->gazebo_extensions_.insert(std::make_pair( new_link_name, extensions ) );
+      this->gazebo_extensions_.insert(std::make_pair(
+        new_link_name, extensions ) );
       new_ext = this->gazebo_extensions_.find(new_link_name);
     }
 
     // move gazebo extensions from link into the parent link's extensions
-    for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin(); ge != ext->second.end(); ++ge)
+    for (std::vector<GazeboExtension*>::iterator ge = ext->second.begin();
+         ge != ext->second.end(); ++ge)
       new_ext->second.push_back(*ge);
     ext->second.clear();
   }
 
   // for extensions with empty reference, search and replace link name patterns within the plugin with new link name
   //   and assign the proper reduction transform for the link name pattern
-  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator gazebo_it = this->gazebo_extensions_.begin();
-                                                        gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
+  for (std::map<std::string,std::vector<GazeboExtension*> >::iterator
+       gazebo_it = this->gazebo_extensions_.begin();
+       gazebo_it != this->gazebo_extensions_.end(); ++gazebo_it)
     {
       // update reduction transform (for contacts, rays, cameras for now).
-      for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
+      for (std::vector<GazeboExtension*>::iterator
+        ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
         reduceGazeboExtensionFrameReplace(*ge, link);
     }
 
   // this->listGazeboExtensions();
 }
 
-void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge, boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
+  boost::shared_ptr<urdf::Link> link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
   std::vector<TiXmlElement*> blobs = ge->blobs;
   gazebo::math::Pose reduction_transform = ge->reduction_transform;
 
-  // HACK: need to do this more generally, but we also need to replace all instances of link name with new link name
-  //       e.g. contact sensor refers to <collision>base_link_collision</collision> and it needs to be reparented to <collision>base_footprint_collision</collision>
+  // HACK: need to do this more generally, but we also need to replace
+  //       all instances of link name with new link name
+  //       e.g. contact sensor refers to
+  //         <collision>base_link_collision</collision>
+  //         and it needs to be reparented to
+  //         <collision>base_footprint_collision</collision>
   logDebug("  STRING REPLACE: instances of link name [%s] with new link name [%s]",link_name.c_str(),new_link_name.c_str());
   for (std::vector<TiXmlElement*>::iterator blob_it = blobs.begin(); blob_it != blobs.end(); ++blob_it)
   {
