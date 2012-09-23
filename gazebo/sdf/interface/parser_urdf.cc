@@ -282,7 +282,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
     for (TiXmlElement *child_elem = gazebo_xml->FirstChildElement();
          child_elem; child_elem = child_elem->NextSiblingElement())
     {
-      gazebo->original_reference = ref_str;
+      gazebo->old_link_name = ref_str;
 
       // go through all elements of the extension,
       //   extract what we know, and save the rest in blobs
@@ -440,7 +440,7 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
     for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
          ge != gazebo_it->second.end(); ++ge)
     {
-      if ((*ge)->original_reference == link_name)
+      if ((*ge)->old_link_name == link_name)
       {
         TiXmlElement *surface = new TiXmlElement("surface");
         TiXmlElement *friction = new TiXmlElement("friction");
@@ -487,7 +487,7 @@ void URDF2Gazebo::insertGazeboExtensionVisual(TiXmlElement *elem,std::string lin
     for (std::vector<GazeboExtension*>::iterator ge = gazebo_it->second.begin();
          ge != gazebo_it->second.end(); ++ge)
     {
-      if ((*ge)->original_reference == link_name)
+      if ((*ge)->old_link_name == link_name)
       {
         // insert material block
         if (!(*ge)->material.empty())
@@ -1223,9 +1223,9 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
       //   original parent link name
       logDebug("creating lump collision [%s] for link [%s]",
         collisions_it->first.c_str(),link->name.c_str());
-      /// original_reference is the original name before lumping
-      std::string original_reference = collisions_it->first.substr(6);
-      createCollision(elem, link, collision, original_reference);
+      /// old_link_name is the original name before lumping
+      std::string old_link_name = collisions_it->first.substr(6);
+      createCollision(elem, link, collision, old_link_name);
     }
   }
 }
@@ -1251,9 +1251,9 @@ void URDF2Gazebo::createVisuals(TiXmlElement* elem,
     {
       logDebug("creating lump visual [%s] for link [%s]",
         visuals_it->first.c_str(),link->name.c_str());
-      std::string original_reference = visuals_it->first.substr(6);
+      std::string old_link_name = visuals_it->first.substr(6);
       /* make a visual block */
-      createVisual(elem, link, visual, original_reference);
+      createVisual(elem, link, visual, old_link_name);
     }
   }
 }
@@ -1412,18 +1412,20 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
 }
 
 
-void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Collision> collision, std::string original_reference)
+void URDF2Gazebo::createCollision(TiXmlElement* elem,
+  boost::shared_ptr<const urdf::Link> link,
+  boost::shared_ptr<urdf::Collision> collision,
+  std::string old_link_name)
 {
 
     /* begin create geometry node, skip if no collision specified */
-    TiXmlElement *gazebo_collision     = new TiXmlElement("collision");
+    TiXmlElement *gazebo_collision = new TiXmlElement("collision");
 
-    /* set its name */
-    logDebug("original[%s] link[%s]\n",original_reference.c_str(), link->name.c_str());
-    if (original_reference == link->name)
+    /* set its name, if lumped, add original link name */
+    if (old_link_name == link->name)
       gazebo_collision->SetAttribute("name", link->name + std::string("_collision"));
     else
-      gazebo_collision->SetAttribute("name", link->name + std::string("_collision_")+original_reference);
+      gazebo_collision->SetAttribute("name", link->name + std::string("_collision_")+old_link_name);
     
     /* set transform */
     double pose[6];
@@ -1443,23 +1445,23 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem, boost::shared_ptr<const ur
     }
 
     /* set additional data from extensions */
-    insertGazeboExtensionCollision(gazebo_collision,original_reference);
+    insertGazeboExtensionCollision(gazebo_collision,old_link_name);
 
     /* add geometry to body */
     elem->LinkEndChild(gazebo_collision);
 }
 
-void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Visual> visual, std::string original_reference)
+void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Visual> visual, std::string old_link_name)
 {
     /* begin create gazebo visual node */
     TiXmlElement *gazebo_visual = new TiXmlElement("visual");
 
     /* set its name */
-    logDebug("original[%s] link[%s]\n",original_reference.c_str(), link->name.c_str());
-    if (original_reference == link->name)
+    logDebug("original[%s] link[%s]\n",old_link_name.c_str(), link->name.c_str());
+    if (old_link_name == link->name)
       gazebo_visual->SetAttribute("name", link->name + std::string("_vis"));
     else
-      gazebo_visual->SetAttribute("name", link->name + std::string("_vis_")+original_reference);
+      gazebo_visual->SetAttribute("name", link->name + std::string("_vis_")+old_link_name);
 
     /* add the visualisation transfrom */
     double pose[6];
@@ -1476,7 +1478,7 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf:
       createGeometry(gazebo_visual, visual->geometry);
     
     /* set additional data from extensions */
-    insertGazeboExtensionVisual(gazebo_visual,original_reference);
+    insertGazeboExtensionVisual(gazebo_visual, old_link_name);
 
     /* end create visual node */
     elem->LinkEndChild(gazebo_visual);

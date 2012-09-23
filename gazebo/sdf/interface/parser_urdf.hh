@@ -66,7 +66,7 @@ namespace urdf2gazebo
   {
     public:
       // for reducing fixed joints and removing links
-      std::string original_reference;
+      std::string old_link_name;
       gazebo::math::Pose reduction_transform;
 
       // visual
@@ -155,7 +155,7 @@ namespace urdf2gazebo
         is_initial_joint_position = ge.is_initial_joint_position;
         is_fudge_factor = ge.is_fudge_factor;
         provideFeedback = ge.provideFeedback;
-        original_reference = ge.original_reference;
+        old_link_name = ge.old_link_name;
         reduction_transform = ge.reduction_transform;
         blobs = ge.blobs;
 
@@ -376,13 +376,13 @@ namespace urdf2gazebo
       void createCollision(TiXmlElement* elem,
         boost::shared_ptr<const urdf::Link> link,
         boost::shared_ptr<urdf::Collision> collision,
-        std::string original_reference = std::string(""));
+        std::string old_link_name = std::string(""));
 
       /// create SDF Visual block based on URDF
       void createVisual(TiXmlElement *elem,
         boost::shared_ptr<const urdf::Link> link,
         boost::shared_ptr<urdf::Visual> visual,
-        std::string original_reference = std::string(""));
+        std::string old_link_name = std::string(""));
 
       /// create SDF Joint block based on URDF
       void createJoint(TiXmlElement *root,
