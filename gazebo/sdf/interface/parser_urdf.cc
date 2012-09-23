@@ -1423,9 +1423,11 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
 
     /* set its name, if lumped, add original link name */
     if (old_link_name == link->name)
-      gazebo_collision->SetAttribute("name", link->name + std::string("_collision"));
+      gazebo_collision->SetAttribute("name",
+        link->name + std::string("_collision"));
     else
-      gazebo_collision->SetAttribute("name", link->name + std::string("_collision_")+old_link_name);
+      gazebo_collision->SetAttribute("name",
+        link->name + std::string("_collision_")+old_link_name);
     
     /* set transform */
     double pose[6];
@@ -1438,7 +1440,10 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
 
     /* add geometry block */
     if (!collision || !collision->geometry)
-      logDebug("urdf2gazebo: link(%s) does not have a collision tag. No <geometry> will be assigned.", link->name.c_str());
+    {
+      gzdbg << "urdf2gazebo: collision of link [" << link->name
+            << "] has no <geometry>.\n";
+    }
     else
     {
       createGeometry(gazebo_collision, collision->geometry);
@@ -1451,29 +1456,37 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
     elem->LinkEndChild(gazebo_collision);
 }
 
-void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf::Link> link, boost::shared_ptr<urdf::Visual> visual, std::string old_link_name)
+void URDF2Gazebo::createVisual(TiXmlElement *elem,
+  boost::shared_ptr<const urdf::Link> link,
+  boost::shared_ptr<urdf::Visual> visual, std::string old_link_name)
 {
     /* begin create gazebo visual node */
     TiXmlElement *gazebo_visual = new TiXmlElement("visual");
 
     /* set its name */
-    logDebug("original[%s] link[%s]\n",old_link_name.c_str(), link->name.c_str());
+    gzdbg << "original link name [" << old_link_name
+          << "] new link name [" << link->name
+          << "]\n";
     if (old_link_name == link->name)
       gazebo_visual->SetAttribute("name", link->name + std::string("_vis"));
     else
-      gazebo_visual->SetAttribute("name", link->name + std::string("_vis_")+old_link_name);
+      gazebo_visual->SetAttribute("name", link->name + std::string("_vis_")
+        + old_link_name);
 
     /* add the visualisation transfrom */
     double pose[6];
     pose[0] = visual->origin.position.x;
     pose[1] = visual->origin.position.y;
     pose[2] = visual->origin.position.z;
-    visual->origin.rotation.getRPY(pose[3],pose[4],pose[5]);
+    visual->origin.rotation.getRPY(pose[3], pose[4], pose[5]);
     addKeyValue(gazebo_visual, "pose", values2str(6, pose));
 
     /* insert geometry */                
     if (!visual || !visual->geometry)
-        logWarn("urdf2gazebo: link(%s) does not have a visual->geometry tag", link->name.c_str());
+    {
+      gzdbg << "urdf2gazebo: visual of link [" << link->name
+            << "] has no <geometry>\n.";
+    }
     else
       createGeometry(gazebo_visual, visual->geometry);
     
@@ -1484,7 +1497,8 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem, boost::shared_ptr<const urdf:
     elem->LinkEndChild(gazebo_visual);
 }
 
-TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str, bool _enforce_limits)
+TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str,
+  bool _enforce_limits)
 {
     this->enforce_limits = _enforce_limits;
     return this->initModelString(urdf_str);
@@ -1493,14 +1507,15 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str, bool _enforce_l
 TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
 {
     /* Create a RobotModel from string */
-    boost::shared_ptr<urdf::ModelInterface> robot_model = urdf::parseURDF(urdf_str.c_str());
+    boost::shared_ptr<urdf::ModelInterface> robot_model =
+      urdf::parseURDF(urdf_str.c_str());
 
     // an xml object to hold the xml result
     TiXmlDocument gazebo_xml_out;
 
     if (!robot_model)
     {
-        logError("Unable to load robot model from param server robot_description\n");  
+        gzerr << "Unable to call parseURDF on robot model\n";  
         return gazebo_xml_out;
     }
 
@@ -1510,7 +1525,8 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     // set model name to urdf robot name if not specified
     robot->SetAttribute("name", robot_model->getName());
     
-    /* initialize transform for the model, urdf is recursive, while sdf defines all links relative to model frame */
+    /* initialize transform for the model, urdf is recursive,
+       while sdf defines all links relative to model frame */
     gazebo::math::Pose transform;
     
     /* parse gazebo extension */
@@ -1518,20 +1534,23 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     urdf_xml.Parse(urdf_str.c_str());
     parseGazeboExtension( urdf_xml );
 
-    /* start conversion */
-
     boost::shared_ptr<const urdf::Link> root_link = robot_model->getRoot();
+
+    /* Fixed Joint Reduction */
     /* if link connects to parent via fixed joint, lump down and remove link */
-    // set reduce_fixed_joints to false will replace fixed joints with zero limit revolute joints,
-    //   otherwise, we reduce it down to its parent link recursively
+    /* set reduce_fixed_joints to false will replace fixed joints with
+       zero limit revolute joints, otherwise, we reduce it down to its
+       parent link recursively */
     if (this->reduce_fixed_joints)
-      reduceFixedJoints(robot, (boost::const_pointer_cast< urdf::Link >(root_link))); // uncomment to test reduction
+      reduceFixedJoints(robot,
+        (boost::const_pointer_cast< urdf::Link >(root_link)));
 
     if (root_link->name == "world")
     {
       /* convert all children link */
-      for (std::vector<boost::shared_ptr<urdf::Link> >::const_iterator child = root_link->child_links.begin();
-           child != root_link->child_links.end(); ++child)
+      for (std::vector<boost::shared_ptr<urdf::Link> >::const_iterator
+        child = root_link->child_links.begin();
+        child != root_link->child_links.end(); ++child)
           createSDF(robot, (*child), transform);
     }
     else
@@ -1546,7 +1565,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     // add robot to gazebo_xml_out
     TiXmlElement *gazebo_sdf = new TiXmlElement("gazebo");
     gazebo_sdf->SetAttribute("version", "1.2");
-    gazebo_sdf->LinkEndChild(robot);  // uncomment if returning old gazebo_xml
+    gazebo_sdf->LinkEndChild(robot);
     gazebo_xml_out.LinkEndChild(gazebo_sdf);;
 
     // debug
@@ -1578,7 +1597,9 @@ TiXmlDocument URDF2Gazebo::initModelFile(std::string filename)
 
 void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
 {
-    logDebug("TREE:   mass lumping from [%s] to [%s]",link->name.c_str(),link->getParent()->name.c_str());
+    gzdbg << "TREE:   mass lumping from [" << link->name
+          << "] to [" << link->getParent()->name
+          << "]\n.";
     /* now lump all contents of this link to parent */
     if (link->inertial)
     {
@@ -1587,15 +1608,20 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
       if (!link->getParent()->inertial)
         link->getParent()->inertial.reset(new urdf::Inertial);
       dMassSetParameters(&parent_mass, link->getParent()->inertial->mass,
-        link->getParent()->inertial->origin.position.x, link->getParent()->inertial->origin.position.y, link->getParent()->inertial->origin.position.z,
-        link->getParent()->inertial->ixx, link->getParent()->inertial->iyy, link->getParent()->inertial->izz,
-        link->getParent()->inertial->ixy, link->getParent()->inertial->ixz, link->getParent()->inertial->iyz);
+        link->getParent()->inertial->origin.position.x,
+        link->getParent()->inertial->origin.position.y,
+        link->getParent()->inertial->origin.position.z,
+        link->getParent()->inertial->ixx, link->getParent()->inertial->iyy,
+        link->getParent()->inertial->izz, link->getParent()->inertial->ixy,
+         link->getParent()->inertial->ixz, link->getParent()->inertial->iyz);
       printMass(link->getParent()->name,parent_mass);
       printMass(link->getParent());
       // set link mass (in link frame)
       dMass link_mass;
       dMassSetParameters(&link_mass, link->inertial->mass,
-        link->inertial->origin.position.x, link->inertial->origin.position.y, link->inertial->origin.position.z,
+        link->inertial->origin.position.x,
+        link->inertial->origin.position.y,
+        link->inertial->origin.position.z,
         link->inertial->ixx, link->inertial->iyy, link->inertial->izz,
         link->inertial->ixy, link->inertial->ixz, link->inertial->iyz);
       printMass(link->name,link_mass);
@@ -1603,15 +1629,16 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
       // un-rotate link mass into parent link frame
       dMatrix3 R;
       double phi, theta, psi;
-      link->parent_joint->parent_to_joint_origin_transform.rotation.getRPY(phi,theta,psi);
-      logDebug("debug: %f %f %f",phi,theta,psi);
+      link->parent_joint->parent_to_joint_origin_transform.rotation.getRPY(
+        phi, theta, psi);
       dRFromEulerAngles(R, phi, theta, psi);
       dMassRotate(&link_mass, R);
       printMass(link->name,link_mass);
       // un-translate link mass into parent link frame
-      dMassTranslate(&link_mass, link->parent_joint->parent_to_joint_origin_transform.position.x
-                               , link->parent_joint->parent_to_joint_origin_transform.position.y
-                               , link->parent_joint->parent_to_joint_origin_transform.position.z);
+      dMassTranslate(&link_mass,
+        link->parent_joint->parent_to_joint_origin_transform.position.x,
+        link->parent_joint->parent_to_joint_origin_transform.position.y,
+        link->parent_joint->parent_to_joint_origin_transform.position.z);
       printMass(link->name,link_mass);
       // now link_mass is in the parent frame, add link_mass to parent_mass
       dMassAdd(&parent_mass,&link_mass); // now parent_mass contains link_mass in parent frame
@@ -1633,90 +1660,115 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
 
 void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
 {
-    // lump visual to parent
-    // lump all visual to parent, assign group name "lump::"+group name+"::'+link name
-    // lump but keep the link name in(/as) the group name, so we can correlate visuals to visuals somehow.
-    for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual> > > >::iterator visuals_it = link->visual_groups.begin();
-         visuals_it != link->visual_groups.end(); ++visuals_it)
+  // lump visual to parent
+  // lump all visual to parent, assign group name "lump::"+group name+"::'+link name
+  // lump but keep the link name in(/as) the group name, so we can correlate visuals to visuals somehow.
+  for (std::map<std::string,
+    boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Visual> > > >::iterator
+    visuals_it = link->visual_groups.begin();
+    visuals_it != link->visual_groups.end(); ++visuals_it)
+  {
+    /// @todo: extend to different groups,
+    /// only work with default meshes right now.
+    if (visuals_it->first == "default")
     {
-      // if it's a "default" mesh, it should be added under "lump:"+link name
-      if (visuals_it->first == "default")
+      std::string lump_group_name = std::string("lump::")+link->name;
+      gzdbg << "adding modified lump group name [" << lump_group_name
+            << "] to link [" << link->getParent()->name
+            << "]\n.";
+      for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator
+        visual_it = visuals_it->second->begin();
+        visual_it != visuals_it->second->end(); ++visual_it)
       {
-        std::string lump_group_name = std::string("lump::")+link->name;
-        logDebug("adding modified lump group name [%s] to link [%s]",lump_group_name.c_str(),link->getParent()->name.c_str());
-        for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator visual_it = visuals_it->second->begin(); visual_it != visuals_it->second->end(); ++visual_it)
-        {
-          // transform visual origin from link frame to parent link frame before adding to parent
-          (*visual_it)->origin = transformToParentFrame((*visual_it)->origin, link->parent_joint->parent_to_joint_origin_transform);
-          // add the modified visual to parent
-          this->reduceVisualToParent(link->getParent(),lump_group_name,*visual_it);
-        }
-      }
-      else if (visuals_it->first.find(std::string("lump::")) == 0) // starts with "lump::"
-      {
-        // if it's a previously lumped mesh, relump under same group_name
-        std::string lump_group_name = visuals_it->first;
-        logDebug("re-lumping group name [%s] to link [%s]",lump_group_name.c_str(),link->getParent()->name.c_str());
-        for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator visual_it = visuals_it->second->begin(); visual_it != visuals_it->second->end(); ++visual_it)
-        {
-          // transform visual origin from link frame to parent link frame before adding to parent
-          (*visual_it)->origin = transformToParentFrame((*visual_it)->origin, link->parent_joint->parent_to_joint_origin_transform);
-          // add the modified visual to parent
-          this->reduceVisualToParent(link->getParent(),lump_group_name,*visual_it);
-        }
+        // transform visual origin from link frame to
+        // parent link frame before adding to parent
+        (*visual_it)->origin = transformToParentFrame((*visual_it)->origin,
+          link->parent_joint->parent_to_joint_origin_transform);
+        // add the modified visual to parent
+        this->reduceVisualToParent(link->getParent(), lump_group_name,
+          *visual_it);
       }
     }
+    else if (visuals_it->first.find(std::string("lump::")) == 0)
+    {
+      // it's a previously lumped mesh, re-lump under same group_name
+      std::string lump_group_name = visuals_it->first;
+      gzdbg << "re-lumping group name [" << lump_group_name
+            << "] to link [" << link->getParent()->name
+            << "]\n";
+      for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator
+           visual_it = visuals_it->second->begin();
+           visual_it != visuals_it->second->end(); ++visual_it)
+      {
+        // transform visual origin from link frame to parent link
+        // frame before adding to parent
+        (*visual_it)->origin = transformToParentFrame((*visual_it)->origin,
+          link->parent_joint->parent_to_joint_origin_transform);
+        // add the modified visual to parent
+        this->reduceVisualToParent(link->getParent(), lump_group_name,
+          *visual_it);
+      }
+    }
+  }
 }
 
 void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
 {
     // lump collision parent
-    // lump all collision to parent, assign group name "lump::"+group name+"::'+link name
-    // lump but keep the link name in(/as) the group name, so we can correlate visuals to collisions somehow.
-    logDebug("COLLISION LUMPING [%d] collision groups for link [%s] to parent [%s]",link->collision_groups.size(), link->name.c_str(), link->getParent()->name.c_str());
-
-/* additional test checking if collision parsing failed in urdf parser
-    if (link->collision_groups.size() == 0 && link->collision)
+    // lump all collision to parent, assign group name
+    // "lump::"+group name+"::'+link name
+    // lump but keep the link name in(/as) the group name,
+    // so we can correlate visuals to collisions somehow.
+    for (std::map<std::string,
+      boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::iterator
+      collisions_it = link->collision_groups.begin();
+      collisions_it != link->collision_groups.end(); ++collisions_it)
     {
-      boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision > > > cols;
-      logDebug("   no default collision group for link [%s], urdfdom_parser error?  createing default group here.", link->name.c_str());
-      cols->push_back( link->collision );
-      link->collision_groups.insert(std::make_pair("default",cols));
-    }
-    else
-    {
-      logDebug("   no collision at all for link [%s]", link->name.c_str());
-    }
-*/
-
-    for (std::map<std::string, boost::shared_ptr<std::vector<boost::shared_ptr<urdf::Collision> > > >::iterator collisions_it = link->collision_groups.begin();
-         collisions_it != link->collision_groups.end(); ++collisions_it)
-    {
-      // if it's a "default" mesh, it should be added under "lump::"+link name
-      logDebug("lumping collision [%s] for link [%s] to parent [%s]",collisions_it->first.c_str(), link->name.c_str(), link->getParent()->name.c_str());
       if (collisions_it->first == "default")
       {
+        // if it's a "default" mesh, it will be added under "lump::"+link name
         std::string lump_group_name = std::string("lump::")+link->name;
-        logDebug("adding modified lump group name [%s] to link [%s]",lump_group_name.c_str(),link->getParent()->name.c_str());
-        for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator collision_it = collisions_it->second->begin(); collision_it != collisions_it->second->end(); ++collision_it)
+        gzdbg << "lumping collision [" << collisions_it->first
+              << "] for link [" << link->name
+              << "] to parent [" << link->getParent()->name
+              << "] with group name [" << lump_group_name
+              << "]\n";
+        for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator
+          collision_it = collisions_it->second->begin();
+          collision_it != collisions_it->second->end(); ++collision_it)
         {
-          // transform collision origin from link frame to parent link frame before adding to parent
-          (*collision_it)->origin = transformToParentFrame((*collision_it)->origin, link->parent_joint->parent_to_joint_origin_transform);
+          // transform collision origin from link frame to
+          // parent link frame before adding to parent
+          (*collision_it)->origin = transformToParentFrame(
+            (*collision_it)->origin,
+            link->parent_joint->parent_to_joint_origin_transform);
+
           // add the modified collision to parent
-          this->reduceCollisionToParent(link->getParent(),lump_group_name,*collision_it);
+          this->reduceCollisionToParent(link->getParent(), lump_group_name,
+            *collision_it);
         }
       }
-      else if (collisions_it->first.find(std::string("lump::")) == 0) // starts with "lump::"
+      else if (collisions_it->first.find(std::string("lump::")) == 0)
       {
         // if it's a previously lumped mesh, relump under same group_name
         std::string lump_group_name = collisions_it->first;
-        logDebug("re-lumping group name [%s] to link [%s]",lump_group_name.c_str(),link->getParent()->name.c_str());
-        for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator collision_it = collisions_it->second->begin(); collision_it != collisions_it->second->end(); ++collision_it)
+        gzdbg << "re-lumping collision [" << collisions_it->first
+              << "] for link [" << link->name
+              << "] to parent [" << link->getParent()->name
+              << "] with group name [" << lump_group_name
+              << "]\n";
+        for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator
+          collision_it = collisions_it->second->begin();
+          collision_it != collisions_it->second->end(); ++collision_it)
         {
-          // transform collision origin from link frame to parent link frame before adding to parent
-          (*collision_it)->origin = transformToParentFrame((*collision_it)->origin, link->parent_joint->parent_to_joint_origin_transform);
+          // transform collision origin from link frame to
+          // parent link frame before adding to parent
+          (*collision_it)->origin = transformToParentFrame(
+            (*collision_it)->origin,
+            link->parent_joint->parent_to_joint_origin_transform);
           // add the modified collision to parent
-          this->reduceCollisionToParent(link->getParent(),lump_group_name,*collision_it);
+          this->reduceCollisionToParent(link->getParent(), lump_group_name,
+            *collision_it);
         }
       }
     }
@@ -1725,40 +1777,50 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
 
 void URDF2Gazebo::reduceJointsToParent(boost::shared_ptr<urdf::Link> link)
 {
-    logDebug("BEGIN JOINT LUMPING");
-    // set child link's parent_joint's parent link to a parent link up stream that does not have a fixed parent_joint
-    for (unsigned int i = 0 ; i < link->child_links.size() ; ++i) {
-      boost::shared_ptr<urdf::Joint> parent_joint = link->child_links[i]->parent_joint;
-      if (parent_joint->type != urdf::Joint::FIXED) {
+    // set child link's parent_joint's parent link to
+    // a parent link up stream that does not have a fixed parent_joint
+    for (unsigned int i = 0 ; i < link->child_links.size() ; ++i)
+    {
+      boost::shared_ptr<urdf::Joint> parent_joint =
+        link->child_links[i]->parent_joint;
+      if (parent_joint->type != urdf::Joint::FIXED)
+      {
         // go down the tree until we hit a parent joint that is not fixed
         boost::shared_ptr<urdf::Link> new_parent_link = link;
-        gazebo::math::Pose joint_anchor_transform; // set to identity first
-        while(new_parent_link->parent_joint && new_parent_link->getParent()->name != "world" && new_parent_link->parent_joint->type == urdf::Joint::FIXED) {
-          logDebug("  ...JOINT: searching: at [%s] checking if parent [%s] is attachable",new_parent_link->name.c_str(),new_parent_link->getParent()->name.c_str());
-          joint_anchor_transform = joint_anchor_transform*joint_anchor_transform;
-          parent_joint->parent_to_joint_origin_transform = transformToParentFrame(parent_joint->parent_to_joint_origin_transform,
-                                                                 new_parent_link->parent_joint->parent_to_joint_origin_transform);
+        gazebo::math::Pose joint_anchor_transform;
+        while(new_parent_link->parent_joint &&
+              new_parent_link->getParent()->name != "world" &&
+              new_parent_link->parent_joint->type == urdf::Joint::FIXED)
+        {
+          joint_anchor_transform = joint_anchor_transform *
+            joint_anchor_transform;
+          parent_joint->parent_to_joint_origin_transform =
+            transformToParentFrame(
+            parent_joint->parent_to_joint_origin_transform,
+            new_parent_link->parent_joint->parent_to_joint_origin_transform);
           new_parent_link = new_parent_link->getParent();
         }
-        // now set the link->child_links[i]->parent_joint's parent link to the new_parent_link
+        // now set the link->child_links[i]->parent_joint's parent link to
+        // the new_parent_link
         link->child_links[i]->setParent(new_parent_link);
         parent_joint->parent_link_name = new_parent_link->name;
-        logDebug("  JOINT: reparenting for link %s joint %s from %s to %s",link->child_links[i]->name.c_str(),link->child_links[i]->parent_joint->name.c_str(),link->name.c_str(),new_parent_link->name.c_str());
-        // and set the link->child_links[i]->parent_joint's parent_to_joint_orogin_transform as the aggregated
-        //   anchor transform?
+        // and set the link->child_links[i]->parent_joint's
+        // parent_to_joint_orogin_transform as the aggregated anchor transform?
       }
     }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(std::vector<TiXmlElement*>::iterator blob_it, gazebo::math::Pose reduction_transform)
+void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
+  std::vector<TiXmlElement*>::iterator blob_it,
+  gazebo::math::Pose reduction_transform)
 {
     // overwrite <xyz> and <rpy> if they exist
     if ((*blob_it)->ValueStr() == "sensor")
     {
       // parse it and add/replace the reduction transform
       // find first instance of xyz and rpy, replace with reduction transform
-      logDebug("testing reduction transform for [%s]",(*blob_it)->ValueStr().c_str());
-      for (TiXmlNode* el_it = (*blob_it)->FirstChild(); el_it; el_it = el_it->NextSibling())
+      for (TiXmlNode* el_it = (*blob_it)->FirstChild();
+           el_it; el_it = el_it->NextSibling())
       {
         std::ostringstream stream_in;
         stream_in << *el_it;
@@ -1766,6 +1828,8 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(std::vector<TiXm
       }
 
       TiXmlNode* xyz_key = (*blob_it)->FirstChild("xyz");
+      /// @todo: FIXME:  we should read xyz, rpy and aggregate it to
+      /// reduction_transform instead of just throwing the info away.
       if (xyz_key)
         (*blob_it)->RemoveChild(xyz_key);
       TiXmlNode* rpy_key = (*blob_it)->FirstChild("rpy");
@@ -1773,17 +1837,21 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(std::vector<TiXm
         (*blob_it)->RemoveChild(rpy_key);
 
       // convert reduction_transform to values
-      // FIXME:  we should read xyz, rpy and aggregate it to reduction_transform instead of just throwing the info away.
-      urdf::Vector3 reduction_xyz(reduction_transform.pos.x,reduction_transform.pos.y,reduction_transform.pos.z);
-      urdf::Rotation reduction_q(reduction_transform.rot.x,reduction_transform.rot.y,reduction_transform.rot.z,reduction_transform.rot.w);
+      urdf::Vector3 reduction_xyz(reduction_transform.pos.x,
+        reduction_transform.pos.y,
+        reduction_transform.pos.z);
+      urdf::Rotation reduction_q(reduction_transform.rot.x,
+        reduction_transform.rot.y,
+        reduction_transform.rot.z, reduction_transform.rot.w);
 
       urdf::Vector3 reduction_rpy;
-      reduction_q.getRPY(reduction_rpy.x,reduction_rpy.y,reduction_rpy.z); // convert to Euler angles for Gazebo XML
+      reduction_q.getRPY(reduction_rpy.x,reduction_rpy.y,reduction_rpy.z);
 
       // output updated pose to text
       std::ostringstream pose_stream;
-      pose_stream << reduction_xyz.x << " " << reduction_xyz.y << " " << reduction_xyz.z << " "
-                  << reduction_rpy.x << " " << reduction_rpy.y << " " << reduction_rpy.z;
+      pose_stream << reduction_xyz.x << " " << reduction_xyz.y
+                  << " " << reduction_xyz.z << " " << reduction_rpy.x
+                  << " " << reduction_rpy.y << " " << reduction_rpy.z;
       TiXmlText* pose_txt = new TiXmlText(pose_stream.str());
 
       TiXmlElement* pose_key = new TiXmlElement("pose");
@@ -1793,15 +1861,17 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(std::vector<TiXm
     }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(std::vector<TiXmlElement*>::iterator blob_it, gazebo::math::Pose reduction_transform)
+void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(
+  std::vector<TiXmlElement*>::iterator blob_it,
+  gazebo::math::Pose reduction_transform)
 {
     // overwrite <pose> (xyz/rpy) if it exists
     if ((*blob_it)->ValueStr() == "projector")
     {
       // parse it and add/replace the reduction transform
       // find first instance of xyz and rpy, replace with reduction transform
-      logDebug("testing reduction transform for [%s]",(*blob_it)->ValueStr().c_str());
-      for (TiXmlNode* el_it = (*blob_it)->FirstChild(); el_it; el_it = el_it->NextSibling())
+      for (TiXmlNode* el_it = (*blob_it)->FirstChild();
+        el_it; el_it = el_it->NextSibling())
       {
         std::ostringstream stream_in;
         stream_in << *el_it;
@@ -1816,17 +1886,22 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(std::vector<T
       if (pose_key) (*blob_it)->RemoveChild(pose_key);
 
       // convert reduction_transform to values
-      // FIXME:  we should read xyz, rpy and aggregate it to reduction_transform instead of just throwing the info away.
-      urdf::Vector3 reduction_xyz(reduction_transform.pos.x,reduction_transform.pos.y,reduction_transform.pos.z);
-      urdf::Rotation reduction_q(reduction_transform.rot.x,reduction_transform.rot.y,reduction_transform.rot.z,reduction_transform.rot.w);
+      urdf::Vector3 reduction_xyz(reduction_transform.pos.x,
+        reduction_transform.pos.y,
+        reduction_transform.pos.z);
+      urdf::Rotation reduction_q(reduction_transform.rot.x,
+        reduction_transform.rot.y,
+        reduction_transform.rot.z,
+        reduction_transform.rot.w);
 
       urdf::Vector3 reduction_rpy;
-      reduction_q.getRPY(reduction_rpy.x,reduction_rpy.y,reduction_rpy.z); // convert to Euler angles for Gazebo XML
+      reduction_q.getRPY(reduction_rpy.x, reduction_rpy.y, reduction_rpy.z);
 
       // output updated pose to text
       std::ostringstream pose_stream;
-      pose_stream << reduction_xyz.x << " " << reduction_xyz.y << " " << reduction_xyz.z << " "
-                  << reduction_rpy.x << " " << reduction_rpy.y << " " << reduction_rpy.z;
+      pose_stream << reduction_xyz.x << " " << reduction_xyz.y
+                  << " " << reduction_xyz.z << " " << reduction_rpy.x
+                  << " " << reduction_rpy.y << " " << reduction_rpy.z;
       TiXmlText* pose_txt = new TiXmlText(pose_stream.str());
 
       pose_key = new TiXmlElement("pose");
@@ -1836,40 +1911,47 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorTransformReduction(std::vector<T
     }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionContactSensorFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceGazeboExtensionContactSensorFrameReplace(
+  std::vector<TiXmlElement*>::iterator blob_it,
+  boost::shared_ptr<urdf::Link> link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
-  logError(" ContactSensor Frame Replace [%s] ", (*blob_it)->ValueStr().c_str());
   if ((*blob_it)->ValueStr() == "sensor")
   {
     // parse it and add/replace the reduction transform
     // find first instance of xyz and rpy, replace with reduction transform
-    TiXmlNode* contact = (*blob_it)->FirstChild("contact"); // FIXME: reference should be collision
+    TiXmlNode* contact = (*blob_it)->FirstChild("contact");
     if (contact)
     {
-      TiXmlNode* collision = contact->FirstChild("collision"); // FIXME: reference should be collision
+      TiXmlNode* collision = contact->FirstChild("collision");
       if (collision)
       {
-        logDebug("  <collision>%s</collision> : %s --> %s",getKeyValueAsString(collision->ToElement()).c_str(),link_name.c_str(),new_link_name.c_str());
-        if (getKeyValueAsString(collision->ToElement()) == link_name + std::string("_collision"))
+        if (getKeyValueAsString(collision->ToElement()) ==
+          link_name + std::string("_collision"))
         {
           contact->RemoveChild(collision);
           TiXmlElement* collision_name_key = new TiXmlElement("collision");
           std::ostringstream collision_name_stream;
           collision_name_stream << new_link_name << "_collision_" << link_name;
-          TiXmlText* collision_name_txt = new TiXmlText(collision_name_stream.str());
+          TiXmlText* collision_name_txt = new TiXmlText(
+            collision_name_stream.str());
           collision_name_key->LinkEndChild(collision_name_txt);
           contact->LinkEndChild(collision_name_key);
         }
-        // FIXME: chagning contact sensor's contact collision should trigger a update in sensor offset as well.
-        // FIXME: but first we need to implement offsets in contact sensors
+        // @todo: FIXME: chagning contact sensor's contact collision
+        //   should trigger a update in sensor offset as well.
+        //   But first we need to implement offsets in contact sensors
       }
     }
   }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link, std::string plugin_name, std::string element_name, gazebo::math::Pose reduction_transform)
+void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(
+  std::vector<TiXmlElement*>::iterator blob_it,
+  boost::shared_ptr<urdf::Link> link,
+  std::string plugin_name, std::string element_name,
+  gazebo::math::Pose reduction_transform)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
@@ -1882,7 +1964,6 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(std::vector<TiXmlEleme
     {
       if (getKeyValueAsString(element_node->ToElement()) == link_name)
       {
-        logDebug("  <%s>%s</%s> : %s --> %s", element_name.c_str(), getKeyValueAsString(element_node->ToElement()).c_str(), element_name.c_str(), link_name.c_str(), new_link_name.c_str());
         (*blob_it)->RemoveChild(element_node);
         TiXmlElement* body_name_key = new TiXmlElement(element_name);
         std::ostringstream body_name_stream;
@@ -1905,27 +1986,35 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(std::vector<TiXmlEleme
         if (rpy_key)
         {
           urdf::Vector3 rpy = parseVector3(rpy_key, M_PI/180.0);
-          reduction_transform.rot = gazebo::math::Quaternion::EulerToQuaternion(rpy.x, rpy.y, rpy.z);
+          reduction_transform.rot =
+            gazebo::math::Quaternion::EulerToQuaternion(rpy.x, rpy.y, rpy.z);
           // remove xyzOffset and rpyOffset
           (*blob_it)->RemoveChild(rpy_key);
         }
 
         // pass through the parent transform from fixed joint reduction
-        reduction_transform = inverseTransformToParentFrame(reduction_transform, link->parent_joint->parent_to_joint_origin_transform);
+        reduction_transform = inverseTransformToParentFrame(reduction_transform,
+          link->parent_joint->parent_to_joint_origin_transform);
 
         // create new offset xml blocks
         xyz_key = new TiXmlElement("xyzOffset");
         rpy_key = new TiXmlElement("rpyOffset");
 
         // create new offset xml blocks
-        urdf::Vector3 reduction_xyz(reduction_transform.pos.x,reduction_transform.pos.y,reduction_transform.pos.z);
-        urdf::Rotation reduction_q(reduction_transform.rot.x,reduction_transform.rot.y,reduction_transform.rot.z,reduction_transform.rot.w);
+        urdf::Vector3 reduction_xyz(reduction_transform.pos.x,
+          reduction_transform.pos.y,
+          reduction_transform.pos.z);
+        urdf::Rotation reduction_q(reduction_transform.rot.x,
+          reduction_transform.rot.y, reduction_transform.rot.z,
+          reduction_transform.rot.w);
 
         std::ostringstream xyz_stream, rpy_stream;
-        xyz_stream << reduction_xyz.x << " " << reduction_xyz.y << " " << reduction_xyz.z;
+        xyz_stream << reduction_xyz.x << " " << reduction_xyz.y << " "
+                   << reduction_xyz.z;
         urdf::Vector3 reduction_rpy;
-        reduction_q.getRPY(reduction_rpy.x,reduction_rpy.y,reduction_rpy.z); // convert to Euler angles for Gazebo XML
-        rpy_stream << reduction_rpy.x << " " << reduction_rpy.y << " " << reduction_rpy.z; // convert to degrees for Gazebo (though ROS is in Radians)
+        reduction_q.getRPY(reduction_rpy.x, reduction_rpy.y, reduction_rpy.z);
+        rpy_stream << reduction_rpy.x << " " << reduction_rpy.y << " "
+                   << reduction_rpy.z;
 
         TiXmlText* xyz_txt = new TiXmlText(xyz_stream.str());
         TiXmlText* rpy_txt = new TiXmlText(rpy_stream.str());
@@ -1940,30 +2029,36 @@ void URDF2Gazebo::reduceGazeboExtensionPluginFrameReplace(std::vector<TiXmlEleme
   }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(
+  std::vector<TiXmlElement*>::iterator blob_it,
+  boost::shared_ptr<urdf::Link> link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
 
-  // updates link reference for <projector> inside of controller:gazebo_ros_projector
-  // update from <projector>MyLinkName/MyProjectorName</projector> to <projector>NewLinkName/MyProjectorName</projector>
+  // updates link reference for <projector> inside of
+  // projector plugins
+  // update from <projector>MyLinkName/MyProjectorName</projector>
+  // to <projector>NewLinkName/MyProjectorName</projector>
   TiXmlNode* projector_elem = (*blob_it)->FirstChild("projector");
   {
     if (projector_elem)
     {
-      std::string projector_name =  getKeyValueAsString(projector_elem->ToElement());
+      std::string projector_name =  getKeyValueAsString(
+        projector_elem->ToElement());
       // extract projector link name and projector name
       size_t pos = projector_name.find("/");
       if (pos == std::string::npos)
-        logError("no slash in projector tag, should be link_name/projector_name");
+        gzerr << "no slash in projector reference tag [" << projector_name
+              << "], expecting link_name/projector_name.\n";
       std::string projector_link_name = projector_name.substr(0, pos);
 
       if (projector_link_name == link_name)
       {
         // do the replacement
-        projector_name = new_link_name+"/"+projector_name.substr(pos+1, projector_name.size());
+        projector_name = new_link_name + "/" +
+          projector_name.substr(pos+1, projector_name.size());
 
-        logDebug("  <projector>%s</projector> : %s --> %s",projector_link_name.c_str(),link_name.c_str(),new_link_name.c_str());
         (*blob_it)->RemoveChild(projector_elem);
         TiXmlElement* body_name_key = new TiXmlElement("projector");
         std::ostringstream body_name_stream;
@@ -1971,13 +2066,14 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(std::vector<TiXmlEl
         TiXmlText* body_name_txt = new TiXmlText(body_name_stream.str());
         body_name_key->LinkEndChild(body_name_txt);
         (*blob_it)->LinkEndChild(body_name_key);
-        logDebug("Re-parenting extension [%s] from [%s] to [%s] is broken, needs the transform to be complete",(*blob_it)->ValueStr().c_str(),link_name.c_str(),new_link_name.c_str());
       }
     }
   }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(
+  std::vector<TiXmlElement*>::iterator blob_it,
+  boost::shared_ptr<urdf::Link> link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
@@ -1989,7 +2085,6 @@ void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(std::vector<TiXmlElem
     {
       if (getKeyValueAsString(gripper_link->ToElement()) == link_name)
       {
-        logDebug("  <gripper_link>%s</gripper_link> : %s --> %s",getKeyValueAsString(gripper_link->ToElement()).c_str(),link_name.c_str(),new_link_name.c_str());
         (*blob_it)->RemoveChild(gripper_link);
         TiXmlElement* body_name_key = new TiXmlElement("gripper_link");
         std::ostringstream body_name_stream;
@@ -1997,7 +2092,6 @@ void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(std::vector<TiXmlElem
         TiXmlText* body_name_txt = new TiXmlText(body_name_stream.str());
         body_name_key->LinkEndChild(body_name_txt);
         (*blob_it)->LinkEndChild(body_name_key);
-        logDebug("Re-parenting extension [%s] from [%s] to [%s] is broken, needs the transform to be complete",(*blob_it)->ValueStr().c_str(),link_name.c_str(),new_link_name.c_str());
       }
     }
     TiXmlNode* palm_link = (*blob_it)->FirstChild("palm_link");
@@ -2005,7 +2099,6 @@ void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(std::vector<TiXmlElem
     {
       if (getKeyValueAsString(palm_link->ToElement()) == link_name)
       {
-        logDebug("  <palm_link>%s</palm_link> : %s --> %s",getKeyValueAsString(palm_link->ToElement()).c_str(),link_name.c_str(),new_link_name.c_str());
         (*blob_it)->RemoveChild(palm_link);
         TiXmlElement* body_name_key = new TiXmlElement("palm_link");
         std::ostringstream body_name_stream;
@@ -2013,13 +2106,14 @@ void URDF2Gazebo::reduceGazeboExtensionGripperFrameReplace(std::vector<TiXmlElem
         TiXmlText* body_name_txt = new TiXmlText(body_name_stream.str());
         body_name_key->LinkEndChild(body_name_txt);
         (*blob_it)->LinkEndChild(body_name_key);
-        logDebug("Re-parenting extension [%s] from [%s] to [%s] is broken, needs the transform to be complete",(*blob_it)->ValueStr().c_str(),link_name.c_str(),new_link_name.c_str());
       }
     }
   }
 }
 
-void URDF2Gazebo::reduceGazeboExtensionJointFrameReplace(std::vector<TiXmlElement*>::iterator blob_it, boost::shared_ptr<urdf::Link> link)
+void URDF2Gazebo::reduceGazeboExtensionJointFrameReplace(
+  std::vector<TiXmlElement*>::iterator blob_it,
+  boost::shared_ptr<urdf::Link> link)
 {
   std::string link_name = link->name;
   std::string new_link_name = link->getParent()->name;
@@ -2033,7 +2127,6 @@ void URDF2Gazebo::reduceGazeboExtensionJointFrameReplace(std::vector<TiXmlElemen
     {
       if (getKeyValueAsString(parent->ToElement()) == link_name)
       {
-        logDebug("  <parent>%s</parent> : %s --> %s",getKeyValueAsString(parent->ToElement()).c_str(),link_name.c_str(),new_link_name.c_str());
         (*blob_it)->RemoveChild(parent);
         TiXmlElement* parent_name_key = new TiXmlElement("parent");
         std::ostringstream parent_name_stream;
@@ -2048,7 +2141,6 @@ void URDF2Gazebo::reduceGazeboExtensionJointFrameReplace(std::vector<TiXmlElemen
     {
       if (getKeyValueAsString(child->ToElement()) == link_name)
       {
-        logDebug("  <child>%s</child> : %s --> %s",getKeyValueAsString(child->ToElement()).c_str(),link_name.c_str(),new_link_name.c_str());
         (*blob_it)->RemoveChild(child);
         TiXmlElement* child_name_key = new TiXmlElement("child");
         std::ostringstream child_name_stream;
