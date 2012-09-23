@@ -223,7 +223,7 @@ std::string URDF2Gazebo::getKeyValueAsString(TiXmlElement* elem)
   {
     value_str = elem->Attribute("value");
   }
-  else if(elem->FirstChild())
+  else if (elem->FirstChild())
   /// @todo: FIXME: comment out check for now, different tinyxml
   /// versions fails to compile:
   //  && elem->FirstChild()->Type() == TiXmlNode::TINYXML_TEXT)
@@ -437,15 +437,15 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
 
         // insert mu1, mu2, kp, kd for collision
         if ((*ge)->is_mu1)
-          addKeyValue(friction_ode, "mu", values2str(1, &(*ge)->mu1) );
+          addKeyValue(friction_ode, "mu", values2str(1, &(*ge)->mu1));
         if ((*ge)->is_mu2)
-          addKeyValue(friction_ode, "mu2", values2str(1, &(*ge)->mu2) );
+          addKeyValue(friction_ode, "mu2", values2str(1, &(*ge)->mu2));
         if (!(*ge)->fdir1.empty())
           addKeyValue(friction_ode, "fdir1", (*ge)->fdir1);
         if ((*ge)->is_kp)
-          addKeyValue(contact_ode, "kp", values2str(1, &(*ge)->kp) );
+          addKeyValue(contact_ode, "kp", values2str(1, &(*ge)->kp));
         if ((*ge)->is_kd)
-          addKeyValue(contact_ode, "kd", values2str(1, &(*ge)->kd) );
+          addKeyValue(contact_ode, "kd", values2str(1, &(*ge)->kd));
         // max contact interpenetration correction velocity
         if ((*ge)->is_maxVel)
           addKeyValue(contact_ode, "maxVel", values2str(1, &(*ge)->maxVel));
@@ -550,16 +550,16 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         // insert stop_cfm, stop_erp, fudge_factor
         if ((*ge)->is_stop_cfm)
         {
-          addKeyValue(limit, "erp", values2str(1, &(*ge)->stop_cfm) );
+          addKeyValue(limit, "erp", values2str(1, &(*ge)->stop_cfm));
         }
         if ((*ge)->is_stop_erp)
         {
-          addKeyValue(limit, "cfm", values2str(1, &(*ge)->stop_erp) );
+          addKeyValue(limit, "cfm", values2str(1, &(*ge)->stop_erp));
         }
         /* gone
         if ((*ge)->is_initial_joint_position)
             addKeyValue(elem, "initial_joint_position",
-              values2str(1, &(*ge)->initial_joint_position) );
+              values2str(1, &(*ge)->initial_joint_position));
         // insert provideFeedback
         if ((*ge)->provideFeedback)
             addKeyValue(elem, "provideFeedback", "true");
@@ -568,7 +568,7 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         */
         if ((*ge)->is_fudge_factor)
           addKeyValue(physics_ode, "fudge_factor",
-                      values2str(1, &(*ge)->fudge_factor) );
+                      values2str(1, &(*ge)->fudge_factor));
 
         physics->LinkEndChild(physics_ode);
         physics_ode->LinkEndChild(limit);
@@ -937,7 +937,7 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
     {
       std::vector<GazeboExtension*> extensions;
       this->gazebo_extensions_.insert(std::make_pair(
-        new_link_name, extensions ) );
+        new_link_name, extensions));
       new_ext = this->gazebo_extensions_.find(new_link_name);
     }
 
@@ -1089,17 +1089,17 @@ void URDF2Gazebo::createSDF(TiXmlElement *root,
     if (link->name != "world" &&
       ((!link->inertial) || gazebo::math::equal(link->inertial->mass, 0.0)))
     {
-      if(!link->child_links.empty())
+      if (!link->child_links.empty())
         gzwarn << "urdf2gazebo: link[" << link->name
                << "] has no inertia, [" << (int)link->child_links.size()
                << "] children links ignored\n.";
 
-      if(!link->child_joints.empty())
+      if (!link->child_joints.empty())
         gzwarn << "urdf2gazebo: link[" << link->name
                << "] has no inertia, [" << (int)link->child_links.size()
                << "] children joints ignored\n.";
 
-      if(link->parent_joint)
+      if (link->parent_joint)
         gzwarn << "urdf2gazebo: link[" << link->name
                << "] has no inertia, parent joint [" << link->parent_joint->name
                << "] ignored\n.";
@@ -1349,7 +1349,7 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
             currentTransform.rot.RotateVector(
             gazebo::math::Vector3(link->parent_joint->axis.x,
                                   link->parent_joint->axis.y,
-                                  link->parent_joint->axis.z ));
+                                  link->parent_joint->axis.z));
           double rotatedJointAxisArray[3] =
             { rotatedJointAxis.x, rotatedJointAxis.y, rotatedJointAxis.z };
           addKeyValue(joint_axis, "xyz", values2str(3, rotatedJointAxisArray));
@@ -1409,7 +1409,6 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
   boost::shared_ptr<urdf::Collision> collision,
   std::string old_link_name)
 {
-
     /* begin create geometry node, skip if no collision specified */
     TiXmlElement *gazebo_collision = new TiXmlElement("collision");
 
@@ -1524,7 +1523,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     /* parse gazebo extension */
     TiXmlDocument urdf_xml;
     urdf_xml.Parse(urdf_str.c_str());
-    parseGazeboExtension( urdf_xml );
+    parseGazeboExtension(urdf_xml);
 
     boost::shared_ptr<const urdf::Link> root_link = robot_model->getRoot();
 
@@ -1782,7 +1781,7 @@ void URDF2Gazebo::reduceJointsToParent(boost::shared_ptr<urdf::Link> link)
         // go down the tree until we hit a parent joint that is not fixed
         boost::shared_ptr<urdf::Link> new_parent_link = link;
         gazebo::math::Pose joint_anchor_transform;
-        while(new_parent_link->parent_joint &&
+        while (new_parent_link->parent_joint &&
               new_parent_link->getParent()->name != "world" &&
               new_parent_link->parent_joint->type == urdf::Joint::FIXED)
         {
