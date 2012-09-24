@@ -104,7 +104,7 @@ namespace urdf2gazebo
       {
         material.clear();
         setStaticFlag = false;
-        gravity = false;
+        gravity = true;
         is_damping_factor = false;
         is_maxVel = false;
         is_minDepth = false;
