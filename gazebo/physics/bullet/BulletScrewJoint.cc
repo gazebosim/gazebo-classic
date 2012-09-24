@@ -137,13 +137,13 @@ void BulletScrewJoint::SetForce(int /*_index*/, double /*_force*/)
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetHighStop(int /*_index*/, math::Angle _angle)
 {
-  this->btScrew->setUpperLinLimit(_angle.GetAsRadian());
+  this->btScrew->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetLowStop(int /*_index*/, math::Angle _angle)
 {
-  this->btScrew->setLowerLinLimit(_angle.GetAsRadian());
+  this->btScrew->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////

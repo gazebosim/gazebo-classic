@@ -139,7 +139,7 @@ double RaySensor::GetRangeMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetAngleResolution() const
 {
-  return (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian() /
+  return (this->GetAngleMax() - this->GetAngleMin()).Radian() /
     (this->GetRangeCount()-1);
 }
 
@@ -248,8 +248,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   // Store the latest laser scans into laserMsg
   msgs::Set(this->laserMsg.mutable_world_pose(),
       this->parentEntity->GetWorldPose() + this->GetPose());
-  this->laserMsg.set_angle_min(this->GetAngleMin().GetAsRadian());
-  this->laserMsg.set_angle_max(this->GetAngleMax().GetAsRadian());
+  this->laserMsg.set_angle_min(this->GetAngleMin().Radian());
+  this->laserMsg.set_angle_max(this->GetAngleMax().Radian());
   this->laserMsg.set_angle_step(this->GetAngleResolution());
 
   this->laserMsg.set_range_min(this->GetRangeMin());

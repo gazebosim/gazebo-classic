@@ -221,13 +221,13 @@ void ODEJoint::SetHighStop(int _index, math::Angle _angle)
   switch (_index)
   {
     case 0:
-      this->SetParam(dParamHiStop, _angle.GetAsRadian());
+      this->SetParam(dParamHiStop, _angle.Radian());
       break;
     case 1:
-      this->SetParam(dParamHiStop2, _angle.GetAsRadian());
+      this->SetParam(dParamHiStop2, _angle.Radian());
       break;
     case 2:
-      this->SetParam(dParamHiStop3, _angle.GetAsRadian());
+      this->SetParam(dParamHiStop3, _angle.Radian());
       break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -241,13 +241,13 @@ void ODEJoint::SetLowStop(int _index, math::Angle _angle)
   switch (_index)
   {
     case 0:
-      this->SetParam(dParamLoStop, _angle.GetAsRadian());
+      this->SetParam(dParamLoStop, _angle.Radian());
       break;
     case 1:
-      this->SetParam(dParamLoStop2, _angle.GetAsRadian());
+      this->SetParam(dParamLoStop2, _angle.Radian());
       break;
     case 2:
-      this->SetParam(dParamLoStop3, _angle.GetAsRadian());
+      this->SetParam(dParamLoStop3, _angle.Radian());
       break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";

@@ -869,8 +869,11 @@ void World::LoadPlugins()
 {
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
   {
-    boost::shared_dynamic_cast<Model>(
-        this->rootElement->GetChild(i))->LoadPlugins();
+    if (boost::shared_dynamic_cast<Model>(this->rootElement->GetChild(i)))
+    {
+      boost::shared_dynamic_cast<Model>(
+          this->rootElement->GetChild(i))->LoadPlugins();
+    }
   }
 
   // Load the plugins

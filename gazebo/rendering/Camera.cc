@@ -425,15 +425,15 @@ void Camera::Translate(const math::Vector3 &direction)
 }
 
 //////////////////////////////////////////////////
-void Camera::RotateYaw(float angle)
+void Camera::RotateYaw(math::Angle _angle)
 {
-  this->sceneNode->roll(Ogre::Radian(angle), Ogre::Node::TS_WORLD);
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
 }
 
 //////////////////////////////////////////////////
-void Camera::RotatePitch(float angle)
+void Camera::RotatePitch(math::Angle _angle)
 {
-  this->pitchNode->yaw(Ogre::Radian(angle));
+  this->pitchNode->yaw(Ogre::Radian(_angle.Radian()));
 }
 
 
@@ -466,9 +466,9 @@ void Camera::SetClipDist(float _near, float _far)
 }
 
 //////////////////////////////////////////////////
-void Camera::SetHFOV(float _radians)
+void Camera::SetHFOV(math::Angle _angle)
 {
-  this->sdf->GetElement("horizontal_fov")->Set(_radians);
+  this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
@@ -1086,7 +1086,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->GetHFOV().GetAsRadian();
+    double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));

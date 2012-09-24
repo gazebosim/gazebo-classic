@@ -199,7 +199,7 @@ void BulletHingeJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
     // implement. Be warned that this function will reset them to default
     // settings
     // this->btHinge->setLimit(this->btHinge->getLowerLimit(),
-    //                         _angle.GetAsRadian());
+    //                         _angle.Radian());
   }
   else
   {
@@ -215,7 +215,7 @@ void BulletHingeJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->btHinge->setLimit(-_angle.GetAsRadian(),
+    // this->btHinge->setLimit(-_angle.Radian(),
     //                         this->btHinge->getUpperLimit());
   }
   else

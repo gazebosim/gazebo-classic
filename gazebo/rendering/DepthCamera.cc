@@ -384,7 +384,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *target)
     double ratio = static_cast<double>(this->depthViewport->getActualWidth()) /
                    static_cast<double>(this->depthViewport->getActualHeight());
 
-    double hfov = this->GetHFOV().GetAsRadian();
+    double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     // gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);

@@ -165,9 +165,9 @@ math::Vector3 HeightmapShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetOrigin() const
+math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->GetValueVector3("pose");
+  return this->sdf->GetValueVector3("pos");
 }
 
 //////////////////////////////////////////////////
@@ -177,7 +177,7 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
   msgs::Set(_msg.mutable_heightmap()->mutable_image(),
             common::Image(this->GetFilename()));
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetOrigin());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
 }
 
 //////////////////////////////////////////////////

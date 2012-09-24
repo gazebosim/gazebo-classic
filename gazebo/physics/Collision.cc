@@ -373,7 +373,7 @@ msgs::Visual Collision::CreateCollisionVisual()
     msgs::Set(geom->mutable_heightmap()->mutable_image(),
               common::Image(hgt->GetFilename()));
     msgs::Set(geom->mutable_heightmap()->mutable_size(), hgt->GetSize());
-    msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetOrigin());
+    msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetPos());
   }
 
   else if (this->shape->HasType(MAP_SHAPE))
