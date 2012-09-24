@@ -44,11 +44,6 @@
 
 namespace urdf2gazebo
 {
-double rad2deg(double v)
-{
-  return v * 180.0 / M_PI;
-}
-
 std::string lowerStr(std::string str)
 {
   std::string out = str;
@@ -59,7 +54,7 @@ std::string lowerStr(std::string str)
 URDF2Gazebo::URDF2Gazebo()
 {
     // default options
-    this->enforce_limits = false;
+    this->enforce_limits = true;
     this->reduce_fixed_joints = true;
 }
 
@@ -154,27 +149,25 @@ void URDF2Gazebo::reduceCollisionToParent(boost::shared_ptr<urdf::Link> link,
     cols->push_back(collision);
 }
 
-std::string URDF2Gazebo::vector32str(const urdf::Vector3 vector,
-  double (*conv)(double t) = NULL)
+std::string URDF2Gazebo::vector32str(const urdf::Vector3 vector)
 {
   std::stringstream ss;
-  ss << (conv ? conv(vector.x) : vector.x);
+  ss << vector.x;
   ss << " ";
-  ss << (conv ? conv(vector.y) : vector.y);
+  ss << vector.y;
   ss << " ";
-  ss << (conv ? conv(vector.z) : vector.z);
+  ss << vector.z;
   return ss.str();
 }
 
-std::string URDF2Gazebo::values2str(unsigned int count, const double *values,
-  double (*conv)(double t) = NULL)
+std::string URDF2Gazebo::values2str(unsigned int count, const double *values)
 {
   std::stringstream ss;
   for (unsigned int i = 0 ; i < count ; ++i)
   {
       if (i > 0)
           ss << " ";
-      ss << (conv ? conv(values[i]) : values[i]);
+      ss << values[i];
   }
   return ss.str();
 }
@@ -1387,11 +1380,9 @@ void URDF2Gazebo::createJoint(TiXmlElement *root,
                 *highstop = tmp;
               }
               addKeyValue(joint_axis_limit, "lower",
-                values2str(1, &link->parent_joint->limits->lower,
-                  urdf2gazebo::rad2deg));
+                values2str(1, &link->parent_joint->limits->lower));
               addKeyValue(joint_axis_limit, "upper",
-                values2str(1, &link->parent_joint->limits->upper,
-                  urdf2gazebo::rad2deg));
+                values2str(1, &link->parent_joint->limits->upper));
             }
           }
         }
