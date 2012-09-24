@@ -155,7 +155,7 @@ void URDF2Gazebo::reduceCollisionToParent(boost::shared_ptr<urdf::Link> link,
 }
 
 std::string URDF2Gazebo::vector32str(const urdf::Vector3 vector,
-  double (*conv)(double) = NULL)
+  double (*conv)(double t) = NULL)
 {
   std::stringstream ss;
   ss << (conv ? conv(vector.x) : vector.x);
@@ -167,7 +167,7 @@ std::string URDF2Gazebo::vector32str(const urdf::Vector3 vector,
 }
 
 std::string URDF2Gazebo::values2str(unsigned int count, const double *values,
-  double (*conv)(double) = NULL)
+  double (*conv)(double t) = NULL)
 {
   std::stringstream ss;
   for (unsigned int i = 0 ; i < count ; ++i)

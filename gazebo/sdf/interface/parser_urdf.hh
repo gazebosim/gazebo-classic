@@ -184,11 +184,11 @@ namespace urdf2gazebo
 
       /// convert values to string
       std::string values2str(unsigned int count, const double *values,
-                             double (*conv)(double));
+                             double (*conv)(double t));
 
       /// convert Vector3 to string
       std::string vector32str(const urdf::Vector3 vector,
-                              double (*conv)(double));
+                              double (*conv)(double t));
 
       /// append key value pair to the end of the xml element
       void addKeyValue(TiXmlElement *elem, const std::string& key,
