@@ -1561,7 +1561,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     TiXmlElement *gazebo_sdf = new TiXmlElement("gazebo");
     gazebo_sdf->SetAttribute("version", "1.2");
     gazebo_sdf->LinkEndChild(robot);
-    gazebo_xml_out.LinkEndChild(gazebo_sdf);;
+    gazebo_xml_out.LinkEndChild(gazebo_sdf);
 
     // debug
     gazebo_xml_out.Print();
