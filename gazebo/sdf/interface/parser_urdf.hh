@@ -38,18 +38,16 @@
 #include <urdf_model/link.h>
 #include <tinyxml.h>
 
-#include "ode/mass.h"
-#include "ode/rotation.h"
-
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
-
 #include <vector>
 #include <string>
-
 #include <sstream>
 #include <map>
+
+#include "ode/mass.h"
+#include "ode/rotation.h"
 
 #include "math/Pose.hh"
 #include "common/Console.hh"
