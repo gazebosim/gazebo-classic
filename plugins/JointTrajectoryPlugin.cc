@@ -29,8 +29,6 @@
 
 namespace gazebo
 {
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 JointTrajectoryPlugin::JointTrajectoryPlugin()
@@ -53,7 +51,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   this->world_ = _parent->GetWorld();
   this->model_ = _parent;
 
-  //this->world_->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  // this->world_->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
@@ -69,7 +67,7 @@ void JointTrajectoryPlugin::FixLink(physics::LinkPtr link)
   this->joint_ = this->world_->GetPhysicsEngine()->CreateJoint("revolute");
   this->joint_->SetModel(this->model_);
   math::Pose pose = link->GetWorldPose();
-  //math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
+  // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
   this->joint_->Load(physics::LinkPtr(), link, pose);
   this->joint_->SetAxis(0, math::Vector3(0, 0, 0));
   this->joint_->SetHighStop(0, 0);
@@ -105,9 +103,8 @@ void JointTrajectoryPlugin::UpdateStates()
 
   this->model_->SetJointPositions(joint_position_map);
 
-  this->world_->SetPaused(is_paused); // resume original pause-state
+  this->world_->SetPaused(is_paused);  // resume original pause-state
 }
 
 GZ_REGISTER_MODEL_PLUGIN(JointTrajectoryPlugin)
-
 }

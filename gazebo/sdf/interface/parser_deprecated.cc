@@ -1626,7 +1626,7 @@ void ExpandIncludes(xmlNodePtr _xml)
             xmlAddChild(_xml, c);
 
           // debug
-          //gzerr << "-------------------\n" << ToString(_xml)
+          // gzerr << "-------------------\n" << ToString(_xml)
           //      << "\n======================\n";
         }
       }
@@ -1641,19 +1641,17 @@ void ExpandIncludes(xmlNodePtr _xml)
     // call recursively
     ExpandIncludes(elemXml);
   }
-
-
 }
 
 std::string ToString(xmlNodePtr _xml)
 {
   xmlDocPtr doc = _xml->doc;
-  //this doesn't appear to work, do i need to allocate some memory here?
-  //or do something else?
+  // this doesn't appear to work, do i need to allocate some memory here?
+  // or do something else?
   xmlOutputBufferPtr output;
   xmlNodeDumpOutput(output, doc, _xml, 0, 1, "UTF-8");
 
-  //somehow convert output to a string?
+  // somehow convert output to a string?
   xmlChar *s;
   int size;
   xmlDocDumpMemory(doc, &s, &size);
@@ -1665,12 +1663,12 @@ std::string ToString(xmlNodePtr _xml)
 
 std::string ToString(xmlDocPtr doc)
 {
-  //this doesn't appear to work, do i need to allocate some memory here?
-  //or do something else?
+  // this doesn't appear to work, do i need to allocate some memory here?
+  // or do something else?
   xmlOutputBufferPtr output;
   xmlNodeDumpOutput(output, doc, xmlDocGetRootElement(doc), 0, 1, "UTF-8");
 
-  //somehow convert output to a string?
+  // somehow convert output to a string?
   xmlChar *s;
   int size;
   xmlDocDumpMemory(doc, &s, &size);

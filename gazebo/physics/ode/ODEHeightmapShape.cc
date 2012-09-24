@@ -79,7 +79,8 @@ void ODEHeightmapShape::Init()
   math::Quaternion quat;
   math::Pose pose = oParent->GetWorldPose();
 
-  // FIXME:  double check this, if Y is up, rotating by roll of 90 deg will put Z-down.
+  // FIXME:  double check this, if Y is up,
+  //         rotating by roll of 90 deg will put Z-down.
   quat.SetFromEuler(math::Vector3(GZ_DTOR(90), 0, 0));
 
   pose.rot = pose.rot * quat;

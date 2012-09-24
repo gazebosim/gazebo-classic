@@ -61,7 +61,7 @@ namespace gazebo
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double bounceThreshold;
 
-      /// \brief spring constant equivalents of a contact as a function of 
+      /// \brief spring constant equivalents of a contact as a function of
       ///        SurfaceParams::cfm and SurfaceParams::erp.
       /// \sa    See for example
       ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_2

@@ -34,17 +34,16 @@
 #ifndef URDF2GAZEBO_HH
 #define URDF2GAZEBO_HH
 
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-
 #include <urdf_model/model.h>
 #include <urdf_model/link.h>
+#include <tinyxml.h>
 
 #include "ode/mass.h"
 #include "ode/rotation.h"
 
-#include <tinyxml.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 
 #include <vector>
 #include <string>
