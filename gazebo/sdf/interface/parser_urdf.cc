@@ -1034,7 +1034,7 @@ void URDF2Gazebo::listGazeboExtensions()
     {
       if ((*ge)->blobs.size() > 0)
       {
-        gzdbg <<  "  PRINTING [" << (int)(*ge)->blobs.size()
+        gzdbg <<  "  PRINTING [" << static_cast<int>((*ge)->blobs.size())
               << "] BLOBS for extension [" << ++ext_count
               << "] referencing [" << gazebo_it->first << "]\n";
         for (std::vector<TiXmlElement*>::iterator
@@ -1060,7 +1060,7 @@ void URDF2Gazebo::listGazeboExtensions(std::string reference)
   {
     if (gazebo_it->first == reference)
     {
-        gzdbg <<  "  PRINTING [" << (int)gazebo_it->second.size()
+        gzdbg <<  "  PRINTING [" << static_cast<int>(gazebo_it->second.size())
               << "] extensions referencing [" << reference << "]\n";
       for (std::vector<GazeboExtension*>::iterator
            ge = gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
@@ -1093,12 +1093,14 @@ void URDF2Gazebo::createSDF(TiXmlElement *root,
     {
       if (!link->child_links.empty())
         gzwarn << "urdf2gazebo: link[" << link->name
-               << "] has no inertia, [" << (int)link->child_links.size()
+               << "] has no inertia, ["
+               << static_cast<int>(link->child_links.size())
                << "] children links ignored\n.";
 
       if (!link->child_joints.empty())
         gzwarn << "urdf2gazebo: link[" << link->name
-               << "] has no inertia, [" << (int)link->child_links.size()
+               << "] has no inertia, ["
+               << static_cast<int>(link->child_links.size())
                << "] children joints ignored\n.";
 
       if (link->parent_joint)
