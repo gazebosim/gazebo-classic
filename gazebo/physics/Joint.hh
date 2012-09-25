@@ -184,9 +184,13 @@ namespace gazebo
       /// \brief Get the angle of rotation of an axis(index)
       public: math::Angle GetAngle(int index) const;
 
-      /// \brief Set the angle of rotation. This will not move the
-      ///        joint. The purpose of this function is purely to support
-      ///        animation of static models.
+      /// \brief If the Joint is static, Gazebo stores the state of
+      /// this Joint as a scalar inside the Joint class, so
+      /// this call will NOT move the joint dynamically for a static Model.
+      /// But if this Model is not static, then it is updated dynamically,
+      /// all the conencted children Link's are moved as a result of the
+      /// Joint angle setting.  Dynamic Joint angle update is accomplished
+      /// by calling JointController::SetJointPosition.
       public: void SetAngle(int _index, math::Angle _angle);
 
       /// \brief Get the forces applied to the center of mass of a physics::Link
