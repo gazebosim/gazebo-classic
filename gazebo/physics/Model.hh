@@ -179,7 +179,7 @@ namespace gazebo
       /// \brief Update parameters from a model message
       public: void ProcessMsg(const msgs::Model &_msg);
 
-      /// \brief Set the positions of a Joint by name
+      /// Set the positions of a Joint by name
       ///        The position is specified in native units, which means,
       ///        if you are using metric system, it's meters for slider joints
       ///        and radians for angular joints, etc.
@@ -190,7 +190,7 @@ namespace gazebo
       ///   Pose affected by this Joint angle change.
       public: void SetJointPosition(std::string _joint_name, double _position);
 
-      /// \brief Set the positions of a set of joints.
+      /// Set the positions of a set of joints.
       ///        The positions are specified in native units, which means,
       ///        if you are using metric system, it's meters for slider joints
       ///        and radians for angular joints, etc.

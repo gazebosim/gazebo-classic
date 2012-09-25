@@ -184,7 +184,7 @@ namespace gazebo
       /// \brief Get the angle of rotation of an axis(index)
       public: math::Angle GetAngle(int index) const;
 
-      /// \brief If the Joint is static, Gazebo stores the state of
+      /// If the Joint is static, Gazebo stores the state of
       /// this Joint as a scalar inside the Joint class, so
       /// this call will NOT move the joint dynamically for a static Model.
       /// But if this Model is not static, then it is updated dynamically,
@@ -193,7 +193,7 @@ namespace gazebo
       /// by calling JointController::SetJointPosition.
       public: void SetAngle(int _index, math::Angle _angle);
 
-      /// \brief Get the forces applied to the center of mass of a physics::Link
+      /// Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
       /// \param index The index of the link(0 or 1)
       /// Note that the unit of force should be consistent with the rest
