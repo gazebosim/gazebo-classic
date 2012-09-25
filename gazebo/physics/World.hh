@@ -122,11 +122,11 @@ namespace gazebo
       /// \brief Print entity tree
       public: void PrintEntityTree();
 
-      /// Get the simulation time
+      /// Get the world simulation time
       /// \return The simulation time
       public: common::Time GetSimTime() const;
 
-      /// \brief Set the sim time
+      /// \brief Set world the simulation time
       public: void SetSimTime(common::Time t);
 
       /// Get the pause time

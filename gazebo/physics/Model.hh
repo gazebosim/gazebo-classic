@@ -206,10 +206,17 @@ namespace gazebo
       /// \brief Enable all the links in all the models
       public: void SetEnabled(bool _enabled);
 
-      /// \brief Set the current model pose by specifying pose of a link
+      /// \brief Set the Pose of the entire Model by specifying
+      ///        desired Pose of a Link within the Model.  Doing so, keeps
+      ///        the configuration of the Model unchanged, i.e. all Joint angles
+      ///        are unchanged.
       public: void SetLinkWorldPose(const math::Pose &_pose,
                                     std::string _linkName);
-      /// \brief Set the current model pose by specifying pose of a link
+
+      /// \brief Set the Pose of the entire Model by specifying
+      ///        desired Pose of a Link within the Model.  Doing so, keeps
+      ///        the configuration of the Model unchanged, i.e. all Joint angles
+      ///        are unchanged.
       public: void SetLinkWorldPose(const math::Pose &_pose,
                                     const LinkPtr &_link);
 
