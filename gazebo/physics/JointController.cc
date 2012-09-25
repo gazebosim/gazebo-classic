@@ -270,8 +270,6 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
     }
   }
 
-  _joint->SetAngle(0, _position);
-
   /// @todo:  Set link and joint "velocities" based on change / time
 }
 
