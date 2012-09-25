@@ -179,26 +179,12 @@ namespace gazebo
       /// \brief Update parameters from a model message
       public: void ProcessMsg(const msgs::Model &_msg);
 
-      /// Set the positions of a Joint by name
-      ///        The position is specified in native units, which means,
-      ///        if you are using metric system, it's meters for slider joints
-      ///        and radians for angular joints, etc.
-      /// Implementation:
-      ///   In order to change the joint position of a Joint inside a Model,
-      ///   this call must recursively crawl through all the connected
-      ///   children links in this model, and update each Link
-      ///   Pose affected by this Joint angle change.
+      /// Set the positions of a Joint by name.
+      ///   \sa JointController::SetJointPosition
       public: void SetJointPosition(std::string _joint_name, double _position);
 
       /// Set the positions of a set of joints.
-      ///        The positions are specified in native units, which means,
-      ///        if you are using metric system, it's meters for slider joints
-      ///        and radians for angular joints, etc.
-      /// Implementation:
-      ///   In order to change the joint position of a Joint inside a Model,
-      ///   this call must recursively crawl through all the connected
-      ///   children links in this model, and update each Link
-      ///   Pose affected by this Joint angle change.
+      ///   \sa JointController::SetJointPositions.
       public: void SetJointPositions(
                   const std::map<std::string, double> &_jointPositions);
 

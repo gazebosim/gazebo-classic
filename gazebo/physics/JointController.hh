@@ -45,31 +45,26 @@ namespace gazebo
       public: void Reset();
 
       /// Set the positions of a Joint by name
-      ///        The position is specified in native units, which means,
-      ///        if you are using metric system, it's meters for slider joints
-      ///        and radians for angular joints, etc.
-      /// Implementation:
-      ///   In order to change the joint position of a Joint inside a Model,
-      ///   this call must recursively crawl through all the connected
-      ///   children links in this model, and update each Link
-      ///   Pose affected by this Joint angle change.
+      ///   \sa JointController::SetJointPosition(JointPtr, double)
       public: void SetJointPosition(const std::string &_name, double _position);
 
-      /// Set the positions of a set of joints.
-      ///        The positions are specified in native units, which means,
-      ///        if you are using metric system, it's meters for slider joints
-      ///        and radians for angular joints, etc.
-      /// Implementation:
-      ///   In order to change the joint position of a Joint inside a Model,
-      ///   this call must recursively crawl through all the connected
-      ///   children links in this model, and update each Link
-      ///   Pose affected by this Joint angle change.
+      /// Set the positions of a set of Joint's.
+      ///   \sa JointController::SetJointPosition(JointPtr, double)
       public: void SetJointPositions(
                   const std::map<std::string, double> &_jointPositions);
 
       private: void OnJointCmd(ConstJointCmdPtr &_msg);
 
-      private: void SetJointPosition(JointPtr _joint, double _position);
+      /// Set the positions of a Joint by name
+      ///        The position is specified in native units, which means,
+      ///        if you are using metric system, it's meters for SliderJoint
+      ///        and radians for HingeJoint, etc.
+      /// Implementation:
+      ///   In order to change the position of a Joint inside a Model,
+      ///   this call must recursively crawl through all the connected
+      ///   children Link's in this Model, and update each Link Pose
+      ///   affected by this Joint angle update.
+      public: void SetJointPosition(JointPtr _joint, double _position);
 
       /// \brief Helper for SetJointPositions
       private: void RotateLinkAndChildren(LinkPtr _link1,
