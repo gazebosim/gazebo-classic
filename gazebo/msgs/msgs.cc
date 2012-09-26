@@ -518,7 +518,15 @@ namespace gazebo
       {
         sdf::ElementPtr elem = _sdf->GetElement("material");
         msgs::Material *matMsg = result.mutable_material();
-        matMsg->set_script(elem->GetValueString("script"));
+
+        if (elem->HasElement("script"))
+        {
+          sdf::ElementPtr scriptElem = elem->GetElement("script");
+          matMsg->mutable_script()->set_name(
+              scriptElem->GetValueString("name"));
+          matMsg->mutable_script()->set_uri(
+              scriptElem->GetValueString("uri"));
+        }
 
         if (elem->HasElement("shader"))
         {

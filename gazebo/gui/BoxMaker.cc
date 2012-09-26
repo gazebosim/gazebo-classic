@@ -40,7 +40,9 @@ BoxMaker::BoxMaker()
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::BOX);
-  this->visualMsg->mutable_material()->set_script(
+  this->visualMsg->mutable_material()->mutable_script()->set_uri(
+      "gazebo://media/materials/scripts/gazebo.material");
+  this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
             math::Quaternion());

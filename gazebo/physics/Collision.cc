@@ -340,7 +340,10 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());
-  msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
+  msg.mutable_material()->mutable_script()->set_uri(
+      "file://media/materials/scripts/gazebo.material");
+  msg.mutable_material()->mutable_script()->set_name(
+      "Gazebo/OrangeTransparent");
   msgs::Geometry *geom = msg.mutable_geometry();
 
   if (this->shape->HasType(BOX_SHAPE))

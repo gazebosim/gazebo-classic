@@ -282,8 +282,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   {
     if (_msg->material().has_script())
     {
-      sdf::ElementPtr elem = this->sdf->GetElement("material");
-      elem->GetElement("script")->Set(_msg->material().script());
+      sdf::ElementPtr elem =
+        this->sdf->GetElement("material")->GetElement("script");
+      elem->GetElement("name")->Set(_msg->material().script().name());
+      elem->GetElement("uri")->Set(_msg->material().script().uri());
     }
 
     if (_msg->material().has_ambient())
@@ -391,9 +393,17 @@ void Visual::Load()
   if (this->sdf->HasElement("material"))
   {
     sdf::ElementPtr matElem = this->sdf->GetElement("material");
-    std::string script = matElem->GetValueString("script");
-    if (!script.empty())
-      this->SetMaterial(script);
+    if (matElem->HasElement("script"))
+    {
+      sdf::ElementPtr scriptElem = matElem->GetElement("script");
+      std::string uri = scriptElem->GetValueString("uri");
+      std::string name = scriptElem->GetValueString("name");
+
+      if (!uri.empty())
+        RenderEngine::Instance()->AddResourcePath(uri);
+      if (!name.empty())
+        this->SetMaterial(name);
+    }
     else if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->GetValueColor("ambient"));
     else if (matElem->HasElement("diffuse"))
@@ -1692,8 +1702,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    if (_msg->material().has_script() && !_msg->material().script().empty())
-      this->SetMaterial(_msg->material().script());
+    if (_msg->material().has_script())
+    {
+      RenderEngine::Instance()->AddResourcePath(
+          _msg->material().script().uri());
+      this->SetMaterial(_msg->material().script().name());
+    }
 
     if (_msg->material().has_ambient())
       this->SetAmbient(msgs::Convert(_msg->material().ambient()));
