@@ -181,27 +181,29 @@ void BoxMaker::CreateTheEntity()
   math::Vector3 size = msgs::Convert(this->visualMsg->geometry().box().size());
 
 
-  newModelStr << "<gazebo version ='1.0'>\
-    <model name='custom_user_box" << counter << "_model'>\
-    <pose>" << p.x << " " << p.y << " " << size.z * 0.5 << " 0 0 0</pose>\
-    <link name ='link'>\
-      <inertial mass ='1.0'>\
-          <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
-      </inertial>\
-      <collision name ='collision'>\
-        <geometry>\
-          <box size ='" << size.x << " " << size.y << " " << size.z << "'/>\
-        </geometry>\
-      </collision>\
-      <visual name ='visual' cast_shadows ='true'>\
-        <geometry>\
-          <box size ='" << size.x << " " << size.y << " " << size.z << "'/>\
-        </geometry>\
-        <material script ='Gazebo/Grey'/>\
-      </visual>\
-    </link>\
-  </model>\
-  </gazebo>";
+  newModelStr << "<gazebo version ='1.2'>"
+    << "<model name='custom_user_box" << counter << "_model'>"
+    << "<pose>" << p.x << " " << p.y << " " << size.z * 0.5 << " 0 0 0</pose>"
+    << "<link name ='link'>"
+    <<   "<inertial><mass>1.0</mass></inertial>"
+    <<   "<collision name ='collision'>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>" << size.x << " " << size.y << " " << size.z << "</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    << "</collision>"
+    << "<visual name ='visual'>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>" << size.x << " " << size.y << " " << size.z << "</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    <<   "<material><script>Gazebo/Grey</script></material>"
+    << "</visual>"
+    << "</link>"
+  << "</model>"
+  << "</gazebo>";
 
   msg.set_sdf(newModelStr.str());
 

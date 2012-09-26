@@ -9,7 +9,6 @@ add_subdirectory(collada_quad_test)
 add_subdirectory(chair3)
 add_subdirectory(frypan)
 add_subdirectory(people)
-add_subdirectory(hokuyo)
 add_subdirectory(quadrotor)
 
 set (files 

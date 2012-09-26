@@ -269,7 +269,7 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   gridLayout->addWidget(new QLabel("Newton-meter", this), 0, 2);
   for (int i = 0; i < modelMsg.joint_size(); ++i)
   {
-    std::string jointName =modelMsg.joint(i).name();
+    std::string jointName = modelMsg.joint(i).name();
     gridLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
     gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                    QSizePolicy::Minimum), i+1, 1);

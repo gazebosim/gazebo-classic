@@ -43,10 +43,6 @@ namespace gazebo
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
-      /// \brief Response callback
-      /// \param _data Data returned to the callback
-      private: void OnResponse(const std::string &_data);
-
       private: QTreeWidget *fileTreeWidget;
     };
   }
