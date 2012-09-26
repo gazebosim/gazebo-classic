@@ -26,6 +26,7 @@ set (models
   camera.model
   simple_gripper.model
   simple_arm.model
+  simple_arm_gripper.model
   14_4v_cordless_drill.model
   coke_can.model
   car.model

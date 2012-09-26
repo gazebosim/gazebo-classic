@@ -50,6 +50,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   // Get the world name.
   this->world_ = _parent->GetWorld();
   this->model_ = _parent;
+  this->world_->EnablePhysicsEngine(true);
 
   // this->world_->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
 
