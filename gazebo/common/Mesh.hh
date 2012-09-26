@@ -116,6 +116,10 @@ namespace gazebo
       /// \brief Return true if mesh is attached to a skeleton.
       public: bool HasSkeleton() const;
 
+      /// \brief Scale all vertices by _factor
+      /// \param _factor Scaling factor
+      public: void Scale(double _factor);
+
       private: std::string name;
       private: std::string path;
       private: std::vector<SubMesh *> submeshes;
@@ -262,6 +266,10 @@ namespace gazebo
       ///        from center
       public: void GenSphericalTexCoord(const math::Vector3 &_center);
 
+      /// \brief Scale all vertices by _factor
+      /// \param _factor Scaling factor
+      public: void Scale(double _factor);
+
       private: std::vector< math::Vector3 > vertices;
       private: std::vector< math::Vector3 > normals;
       private: std::vector< math::Vector2d > texCoords;
@@ -275,5 +283,5 @@ namespace gazebo
     /// \}
   }
 }
-#endif
 
+#endif

@@ -310,6 +310,22 @@ bool Mesh::HasSkeleton() const
 }
 
 //////////////////////////////////////////////////
+void Mesh::Scale(double _factor)
+{
+  std::vector<SubMesh*>::iterator iter;
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
+    (*iter)->Scale(_factor);
+}
+
+//////////////////////////////////////////////////
+void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
+{
+  std::vector<SubMesh*>::iterator siter;
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
+    (*siter)->GenSphericalTexCoord(_center);
+}
+
+//////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -729,13 +745,6 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
   _center.z = 0.5*(_min_xyz.z+_max_xyz.z);
 }
 
-//////////////////////////////////////////////////
-void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
-{
-  std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
-    (*siter)->GenSphericalTexCoord(_center);
-}
 
 //////////////////////////////////////////////////
 void SubMesh::GenSphericalTexCoord(const math::Vector3 &_center)
@@ -745,9 +754,9 @@ void SubMesh::GenSphericalTexCoord(const math::Vector3 &_center)
   {
     // generate projected texture coordinates, projected from center
     // get x, y, z for computing texture coordinate projections
-    double x = (*viter).x-_center.x;
-    double y = (*viter).y-_center.y;
-    double z = (*viter).z-_center.z;
+    double x = (*viter).x - _center.x;
+    double y = (*viter).y - _center.y;
+    double z = (*viter).z - _center.z;
 
     double r = std::max(0.000001, sqrt(x*x+y*y+z*z));
     double s = std::min(1.0, std::max(-1.0, z/r));
@@ -755,5 +764,15 @@ void SubMesh::GenSphericalTexCoord(const math::Vector3 &_center)
     double u = acos(s) / M_PI;
     double v = acos(t) / M_PI;
     this->AddTexCoord(u, v);
+  }
+}
+
+//////////////////////////////////////////////////
+void SubMesh::Scale(double _factor)
+{
+  for (std::vector<math::Vector3>::iterator iter = this->vertices.begin();
+       iter != this->vertices.end(); ++iter)
+  {
+    (*iter) *= _factor;
   }
 }
