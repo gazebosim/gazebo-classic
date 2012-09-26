@@ -91,9 +91,6 @@ void JointTrajectoryPlugin::UpdateStates()
 {
   common::Time cur_time = this->world_->GetSimTime();
 
-  bool is_paused = this->world_->IsPaused();
-  if (!is_paused) this->world_->SetPaused(true);
-
   std::map<std::string, double> joint_position_map;
   joint_position_map["arm_shoulder_pan_joint"] = cos(cur_time.Double());
   joint_position_map["arm_elbow_pan_joint"] = -cos(cur_time.Double());
@@ -102,8 +99,6 @@ void JointTrajectoryPlugin::UpdateStates()
   joint_position_map["arm_wrist_roll_joint"] = -2.9*cos(3.0*cur_time.Double());
 
   this->model_->SetJointPositions(joint_position_map);
-
-  this->world_->SetPaused(is_paused);  // resume original pause-state
 }
 
 GZ_REGISTER_MODEL_PLUGIN(JointTrajectoryPlugin)
