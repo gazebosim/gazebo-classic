@@ -179,7 +179,12 @@ namespace gazebo
       /// \brief Update parameters from a model message
       public: void ProcessMsg(const msgs::Model &_msg);
 
-      /// \brief Set the positions of a set of joints
+      /// Set the positions of a Joint by name.
+      ///   \sa JointController::SetJointPosition
+      public: void SetJointPosition(std::string _joint_name, double _position);
+
+      /// Set the positions of a set of joints.
+      ///   \sa JointController::SetJointPositions.
       public: void SetJointPositions(
                   const std::map<std::string, double> &_jointPositions);
 
@@ -206,10 +211,17 @@ namespace gazebo
       /// \brief Enable all the links in all the models
       public: void SetEnabled(bool _enabled);
 
-      /// \brief Set the current model pose by specifying pose of a link
+      /// \brief Set the Pose of the entire Model by specifying
+      ///        desired Pose of a Link within the Model.  Doing so, keeps
+      ///        the configuration of the Model unchanged, i.e. all Joint angles
+      ///        are unchanged.
       public: void SetLinkWorldPose(const math::Pose &_pose,
                                     std::string _linkName);
-      /// \brief Set the current model pose by specifying pose of a link
+
+      /// \brief Set the Pose of the entire Model by specifying
+      ///        desired Pose of a Link within the Model.  Doing so, keeps
+      ///        the configuration of the Model unchanged, i.e. all Joint angles
+      ///        are unchanged.
       public: void SetLinkWorldPose(const math::Pose &_pose,
                                     const LinkPtr &_link);
 

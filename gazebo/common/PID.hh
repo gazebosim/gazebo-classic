@@ -28,6 +28,9 @@ namespace gazebo
     /// \{
 
     /// \brief Generic PID controller class.
+    /// Generic proportiolnal-integral-derivative controller class that
+    /// keeps track of PID-error states and control inputs given
+    /// the state of a system and a user specified target state.
     class PID
     {
       ///  \brief Constructor, zeros out Pid values when created and
