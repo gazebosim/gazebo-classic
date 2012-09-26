@@ -122,8 +122,9 @@ namespace gazebo
       /// \brief Print entity tree
       public: void PrintEntityTree();
 
-      /// Get the world simulation time
-      /// \return The simulation time
+      /// Get the world simulation time, note if you want the PC wall clock
+      /// call World::GetRealTime.
+      /// \return The current simulation time
       public: common::Time GetSimTime() const;
 
       /// \brief Set world the simulation time
@@ -137,7 +138,8 @@ namespace gazebo
       /// \return The start time
       public: common::Time GetStartTime() const;
 
-      /// Get the real time (elapsed time)
+      /// Get the real time (elapsed time), note if you want the
+      /// simulation time, use World::GetSimTime.
       /// \return The real time
       public: common::Time GetRealTime() const;
 
