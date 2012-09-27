@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef LINK_STATE_HH
-#define LINK_STATE_HH
+#ifndef __LINK_STATE_HH__
+#define __LINK_STATE_HH__
 
 #include <vector>
 #include <string>
@@ -36,38 +36,73 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class LinkState LinkState.hh physics/LinkState.hh
     /// \brief Keeps track of states of a physics::Link
+    ///
+    /// This class captures the entire state of a Link at one
+    /// specific time during a simulation run.
+    ///
+    /// State of a Link includes the state of itself all its child Collision
+    /// entities.
     class LinkState : public State
     {
       /// \brief Default constructor
       public: LinkState();
 
       /// \brief Constructor
+      ///
+      /// Build a LinkState from an existing Link.
+      /// \param _model Pointer to the Link from which to gather state
+      /// info.
       public: LinkState(const LinkPtr _link);
 
       /// \brief Destructor
       public: virtual ~LinkState();
 
       /// \brief Load state from SDF element
+      ///
+      /// Load LinkState information from stored data in and SDF::Element
+      /// \param _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(sdf::ElementPtr _elem);
 
       /// \brief Get the link pose
+      /// \return The math::Pose of the Link
       public: math::Pose GetPose() const;
 
       /// \brief Get the number of link states
+      ///
+      /// This returns the number of Collisions recorded.
+      /// \return Number of CollisionState recorded
       public: unsigned int GetCollisionStateCount() const;
 
-      /// \brief Get a link state
+      /// \brief Get a collision state
+      ///
+      /// Get a Collision State based on an index, where index is in the
+      /// range of  0...LinkState::GetCollisionStateCount
+      /// \param _index Index of the CollisionState
+      /// \return State of the Collision
       public: CollisionState GetCollisionState(unsigned int _index) const;
 
       /// \brief Get a link state by link name
+      ///
+      /// Searches through all CollisionStates.
+      /// Returns the CollisionState with the matching name, if any.
+      /// \param _collisionName Name of the CollisionState
+      /// \return State of the Collision.
       public: CollisionState GetCollisionState(
                   const std::string &_collisionName) const;
 
       /// \brief Fill a State SDF element with state info
+      ///
+      /// Stored state information into an SDF::Element pointer.
+      /// \param _elem Pointer to the SDF::Element which recieves the data.
       public: void FillStateSDF(sdf::ElementPtr _elem);
 
       /// \brief Update a Link SDF element with this state info
+      ///
+      /// Set the values in a Links's SDF::Element with the information
+      /// stored in this instance.
+      /// \param _elem Pointer to a Links's SDF::Element
       public: void UpdateLinkSDF(sdf::ElementPtr _elem);
 
       /// 3D pose of the link relative to the model

@@ -2,8 +2,7 @@
  * Copyright 2011 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * you may not use this file except in compliance with the License.  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,6 +14,7 @@
  *
 */
 
+#include <sys/stat.h>
 #include "sdf/sdf.hh"
 
 std::vector<std::string> params;
@@ -33,6 +33,12 @@ void help()
   std::cout << " given file.\n";
   std::cout << "    print [SDF verison]         Prints SDF, useful for ";
   std::cout << " debugging and as a conversion tool.\n\n";
+}
+
+bool file_exists(const std::string _filename)
+{
+  struct stat st;
+  return stat(_filename.c_str(), &st) == 0;
 }
 
 /////////////////////////////////////////////////
@@ -71,10 +77,13 @@ int main(int argc, char** argv)
   {
     if (params.size() < 2)
     {
-      std::cerr << "Error: Expecting an xml file to parse\n\n";
       help();
+      std::cerr << "Error: Expecting an xml file to parse\n\n";
       return -1;
     }
+
+    if (!file_exists(params[1]))
+      std::cerr << "Error: File doesn't exist[" << params[1] << "]\n";
 
     if (!readFile(params[1], sdf))
     {
@@ -93,6 +102,16 @@ int main(int argc, char** argv)
   }
   else if (params[0] == "convert")
   {
+    if (params.size() < 2)
+    {
+      help();
+      std::cerr << "Error: Missing SDF file to convert\n\n";
+      return -1;
+    }
+
+    if (!file_exists(params[1]))
+      std::cerr << "Error: File doesn't exist[" << params[1] << "]\n";
+
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(params[1]))
     {
@@ -107,10 +126,13 @@ int main(int argc, char** argv)
   {
     if (params.size() < 2)
     {
-      std::cerr << "Error: Expecting an xml file to parse\n\n";
       help();
+      std::cerr << "Error: Expecting an xml file to parse\n\n";
       return -1;
     }
+
+    if (!file_exists(params[1]))
+      std::cerr << "Error: File doesn't exist[" << params[1] << "]\n";
 
     if (!readFile(params[1], sdf))
     {
@@ -121,9 +143,10 @@ int main(int argc, char** argv)
   }
   else
   {
-    std::cerr << "Error: Unknown option[" << params[0] << "]\n";
     help();
+    std::cerr << "Error: Unknown option[" << params[0] << "]\n";
   }
 
+  std::cout << "Success\n";
   return 0;
 }

@@ -241,6 +241,9 @@ std::string SystemPaths::FindFile(const std::string &_filename)
 {
   std::string result;
 
+  if (_filename.empty())
+    return result;
+
   if (_filename.find("://") != std::string::npos)
   {
     result = this->FindFileURI(_filename);

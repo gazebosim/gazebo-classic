@@ -127,7 +127,11 @@ namespace gazebo
       /// and less than World::GetModelCount()
       /// \param _index The index of the model [0..GetModelCount)
       /// \return A pointer to the Model. NULL if _index is invalid.
-      public: ModelPtr GetModel(unsigned int _index);
+      public: ModelPtr GetModel(unsigned int _index) const;
+
+      /// \brief Get a list of all the models
+      /// \return A list of all the Models in the world
+      public: std::list<ModelPtr> GetModels() const;
 
       /// \brief Reset with options
       ///

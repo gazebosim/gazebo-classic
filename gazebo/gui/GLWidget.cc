@@ -604,7 +604,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   gui::Events::mouseRelease(this->mouseEvent);
   emit clicked();
 
-  this->scene->GetSelectionObj()->SetActive(false);
+  if (this->scene->GetSelectionObj())
+    this->scene->GetSelectionObj()->SetActive(false);
 
   if (this->state == "ring")
     this->OnMouseReleaseRing();

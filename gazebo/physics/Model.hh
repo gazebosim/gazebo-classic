@@ -198,6 +198,19 @@ namespace gazebo
       public: virtual void StopAnimation();
 
       /// \brief Attach a static model to this model
+      ///
+      /// This function takes as input a static Model, which is a Model that
+      /// has been marked as static (no physics simulation), and attaches it
+      /// to this Model with a given offset.
+      ///
+      /// This function is useful when you want to simulate a grasp of a
+      /// static object, or move a static object around using a dynamic
+      /// model.
+      ///
+      /// If you are in doubt, do not use this function.
+      ///
+      /// \param _model Pointer to the static model.
+      /// \param _offset Offset, relative to this Model, to place _model.
       public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
 
       /// \brief Detach a static model from this model
