@@ -274,36 +274,11 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
   TiXmlDocument xmlDoc;
   std::string filename = gazebo::common::find_file(_filename);
 
+  if (filename.empty())
+    return false;
+
   xmlDoc.LoadFile(filename);
-  if (readDoc(&xmlDoc, _sdf, filename))
-    return true;
-  else
-  {
-    if (deprecated_sdf::initWorldFile(filename, _sdf))
-    {
-      gzwarn << "DEPRECATED GAZEBO WORLD FILE\n"
-             << "On July 1st, 2012, this formate will no longer by supported\n"
-             << "Convert your files using the gzsdf command line tool\n"
-             << "You have been warned!\n\n";
-      return true;
-    }
-    else
-    {
-      if (deprecated_sdf::initModelFile(filename, _sdf))
-      {
-        gzwarn << "DEPRECATED GAZEBO MODEL FILE\n"
-          << "On July 1st, 2012, this formate will no longer by supported\n"
-          << "Convert your files using the gzsdf command line tool\n"
-          << "You have been warned!\n\n";
-        return true;
-      }
-      else
-      {
-        gzerr << "parse as old deprecated model file failed.\n";
-        return false;
-      }
-    }
-  }
+  return readDoc(&xmlDoc, _sdf, filename);
 }
 
 //////////////////////////////////////////////////
@@ -381,7 +356,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
     TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
     if (!readXml(elemXml, _sdf->root))
     {
-      gzerr << "Unable to parse sdf element[" << _sdf->root->GetName() << "]\n";
+      gzerr << "Unable to read element <" << _sdf->root->GetName() << ">\n";
       return false;
     }
   }
@@ -389,7 +364,8 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   {
     // try to use the old deprecated parser
     if (!gazeboNode)
-      gzwarn << "Gazebo SDF has no gazebo element in file[" << _source << "]\n";
+      gzwarn << "Gazebo SDF has no <gazebo> element in file["
+             << _source << "]\n";
     else if (!gazeboNode->Attribute("version"))
       gzwarn << "Gazebo SDF gazebo element has no version in file["
              << _source << "]\n";
@@ -599,7 +575,6 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 
             filename = gazebo::common::find_file(
                 elemXml->Attribute("filename"));
-            std::cout << "FIlename[" << filename << "]\n";
           }
           else
           {
@@ -680,7 +655,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
             _sdf->InsertElement(element);
           else
           {
-            gzerr << "Error reading element\n";
+            gzerr << "Error reading element <" << elemXml->Value() << ">\n";
             return false;
           }
           break;

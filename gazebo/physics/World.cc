@@ -593,7 +593,7 @@ unsigned int World::GetModelCount() const
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::GetModel(unsigned int _index)
+ModelPtr World::GetModel(unsigned int _index) const
 {
   ModelPtr model;
 
@@ -609,6 +609,18 @@ ModelPtr World::GetModel(unsigned int _index)
   }
 
   return model;
+}
+
+//////////////////////////////////////////////////
+std::list<ModelPtr> World::GetModels() const
+{
+  std::list<ModelPtr> models;
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+  {
+    models.push_back(this->GetModel(i));
+  }
+
+  return models;
 }
 
 //////////////////////////////////////////////////
