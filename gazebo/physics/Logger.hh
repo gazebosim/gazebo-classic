@@ -32,10 +32,10 @@ namespace gazebo
 {
   namespace common
   {
-    /// \addtogroup gazebo_common Common
+    /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class Logger Logger.hh common/Logger.hh
+    /// \class Logger Logger.hh physics/Logger.hh
     /// \brief Handles logging of data to disk
     ///
     /// The Logger class is a Singleton that manages data logging of any

@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \class LinkState LinkState.hh physics/LinkState.hh
-    /// \brief Keeps track of states of a physics::Link
+    /// \brief Store state information of a physics::Link object
     ///
     /// This class captures the entire state of a Link at one
     /// specific time during a simulation run.
@@ -105,18 +105,19 @@ namespace gazebo
       /// \param _elem Pointer to a Links's SDF::Element
       public: void UpdateLinkSDF(sdf::ElementPtr _elem);
 
-      /// 3D pose of the link relative to the model
+      /// 3D pose of the link relative to the model.
       private: math::Pose pose;
 
-      /// Velocity of the link (linear and angular)
+      /// Velocity of the link (linear and angular).
       private: math::Pose velocity;
 
-      /// Acceleration of the link (linear and angular)
+      /// Acceleration of the link (linear and angular).
       private: math::Pose acceleration;
 
-      // Forces on the link(linear and angular)
+      /// Forces on the link(linear and angular).
       private: std::vector<math::Pose> forces;
 
+      /// State of all the child Collision objects.
       private: std::vector<CollisionState> collisionStates;
     };
     /// \}

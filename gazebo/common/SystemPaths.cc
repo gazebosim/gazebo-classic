@@ -229,7 +229,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   if (prefix == "model")
     filename = "/home/nkoenig/local/share/gazebo_models/" + suffix;
   else if (prefix == "file")
-    filename = this->FindFileWithGazeboPaths(suffix);
+    filename = this->FindFile(suffix);
   else if (prefix != "http" && prefix != "https")
     gzerr << "Unknown URI prefix[" << prefix << "]\n";
 

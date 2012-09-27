@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \class ModelState ModelState.hh physics/ModelState.hh
-    /// \brief Keeps track of state of a model object.
+    /// \brief Store state information of a physics::Model object
     ///
     /// This class captures the entire state of a Model at one
     /// specific time during a simulation run.

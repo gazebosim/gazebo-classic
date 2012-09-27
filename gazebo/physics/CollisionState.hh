@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef COLLISION_STATE_HH
-#define COLLISION_STATE_HH
+#ifndef __COLLISION_STATE_HH__
+#define __COLLISION_STATE_HH__
 
 #include "physics/State.hh"
 #include "math/Pose.hh"
@@ -31,24 +31,38 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Keeps track of collision state
+    /// \class CollisionState CollisionState.hh physics/CollisionState.hh
+    /// \brief Store state information of a physics::Collision object
+    ///
+    /// This class captures the entire state of a Collision at one
+    /// specific time during a simulation run.
+    ///
+    /// State of a Collision is its Pose.
     class CollisionState : public State
     {
       /// \brief Default constructor
       public: CollisionState();
 
       /// \brief Constructor
+      ///
+      /// Build a CollisionState from an existing Collision.
+      /// \param _model Pointer to the Link from which to gather state
+      /// info.
       public: CollisionState(const CollisionPtr _collision);
 
       /// \brief Destructor
       public: virtual ~CollisionState();
 
       /// \brief Load state from SDF element
+      ///
+      /// Load CollisionState information from stored data in and SDF::Element
+      /// \param _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(sdf::ElementPtr _elem);
 
-      /// \brief Get the collision pose
+      /// \brief Get the Collision pose
       public: math::Pose GetPose() const;
 
+      /// Pose of the Collision object
       private: math::Pose pose;
     };
     /// \}

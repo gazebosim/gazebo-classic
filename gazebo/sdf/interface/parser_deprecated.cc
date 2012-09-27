@@ -1648,7 +1648,7 @@ std::string ToString(xmlNodePtr _xml)
   xmlDocPtr doc = _xml->doc;
   // this doesn't appear to work, do i need to allocate some memory here?
   // or do something else?
-  xmlOutputBufferPtr output;
+  xmlOutputBufferPtr output = NULL;
   xmlNodeDumpOutput(output, doc, _xml, 0, 1, "UTF-8");
 
   // somehow convert output to a string?
@@ -1661,17 +1661,17 @@ std::string ToString(xmlNodePtr _xml)
   return xmlString;
 }
 
-std::string ToString(xmlDocPtr doc)
+std::string ToString(xmlDocPtr _doc)
 {
   // this doesn't appear to work, do i need to allocate some memory here?
   // or do something else?
-  xmlOutputBufferPtr output;
-  xmlNodeDumpOutput(output, doc, xmlDocGetRootElement(doc), 0, 1, "UTF-8");
+  xmlOutputBufferPtr output = NULL;
+  xmlNodeDumpOutput(output, _doc, xmlDocGetRootElement(_doc), 0, 1, "UTF-8");
 
   // somehow convert output to a string?
   xmlChar *s;
   int size;
-  xmlDocDumpMemory(doc, &s, &size);
+  xmlDocDumpMemory(_doc, &s, &size);
   std::string xmlString = (char *)s;
   xmlFree(s);
 

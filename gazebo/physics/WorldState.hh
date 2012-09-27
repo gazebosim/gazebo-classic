@@ -36,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \class WorldState WorldState.hh physics/WorldState.hh
-    /// \brief State of the World
+    /// \brief Store state information of a physics::World object
     ///
     /// Instances of this class contain the state of a World at a specific
     /// time. World state includes the state of all models, and their
