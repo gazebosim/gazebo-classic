@@ -15,7 +15,6 @@
  *
 */
 #define BOOST_FILESYSTEM_VERSION 2
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -26,10 +25,13 @@
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
 #include "gazebo/sdf/interface/parser_deprecated.hh"
-// #include "gazebo/sdf/interface/parser_urdf.hh"
 
-#include "gazebo/common/Common.hh"
+#ifdef HAVE_URDFDOM
+  #include "gazebo/sdf/interface/parser_urdf.hh"
+#endif
+
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Common.hh"
@@ -146,7 +148,6 @@ bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
   if (!xml)
   {
     gzerr << "Could not find the 'element' element in the xml file\n";
-    _sdf->PrintValues("  ");
     return false;
   }
 
@@ -279,7 +280,27 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
     return false;
 
   xmlDoc.LoadFile(filename);
-  return readDoc(&xmlDoc, _sdf, filename);
+  if (readDoc(&xmlDoc, _sdf, filename))
+    return true;
+  else
+  {
+#ifdef HAVE_URDFDOM
+    urdf2gazebo::URDF2Gazebo u2g;
+    TiXmlDocument doc = u2g.initModelFile(filename);
+    if (sdf::readDoc(&doc, _sdf, "urdf file"))
+    {
+      gzwarn << "parse from urdf file [" << filename << "].\n";
+      return true;
+    }
+    else
+    {
+      gzerr << "parse as old deprecated model file failed.\n";
+      return false;
+    }
+#endif
+  }
+
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -291,7 +312,8 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
     return true;
   else
   {
-    /*urdf2gazebo::URDF2Gazebo u2g;
+#ifdef HAVE_URDFDOM
+      urdf2gazebo::URDF2Gazebo u2g;
       TiXmlDocument doc = u2g.initModelString(_xmlString);
       if (sdf::readDoc(&doc, _sdf, "urdf string"))
       {
@@ -303,7 +325,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
       gzerr << "parse as old deprecated model file failed.\n";
       return false;
       }
-      */
+#endif
   }
 
   return false;
@@ -515,7 +537,10 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 
         if (elemXml->FirstChildElement("uri"))
         {
-          modelPath = gazebo::common::find_file(
+          //modelPath = gazebo::common::find_file(
+          //    elemXml->FirstChildElement("uri")->GetText());
+
+          modelPath = gazebo::common::ModelDatabase::GetModelPath(
               elemXml->FirstChildElement("uri")->GetText());
 
           // Test the model path

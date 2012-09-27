@@ -69,6 +69,18 @@ namespace gazebo
       /// \return The math::Pose of the Link
       public: math::Pose GetPose() const;
 
+      /// \brief Get the link velocity
+      /// \return The velocity represented as a math::Pose
+      public: math::Pose GetVelocity() const;
+
+      /// \brief Get the link acceleration
+      /// \return The acceleration represented as a math::Pose
+      public: math::Pose GetAcceleration() const;
+
+      /// \brief Get the forces applied to the Link
+      /// \return The list of forces represented as a math::Pose
+      public: std::list<math::Pose> GetForces() const;
+
       /// \brief Get the number of link states
       ///
       /// This returns the number of Collisions recorded.

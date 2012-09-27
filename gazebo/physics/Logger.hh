@@ -30,7 +30,7 @@
 
 namespace gazebo
 {
-  namespace common
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
@@ -40,7 +40,8 @@ namespace gazebo
     ///
     /// The Logger class is a Singleton that manages data logging of any
     /// entity within a running simulation. An entity may be a World, Model,
-    /// or any of their child entities.
+    /// or any of their child entities. This class only writes log files,
+    /// see LogPlay for playback functionality.
     ///
     /// State information for an entity may be logged through the Logger::Add
     /// function, and stopped through the Logger::Remove function. Data may
@@ -49,6 +50,8 @@ namespace gazebo
     ///
     /// The Logger is updated at the start of each simulation step. This
     /// guarantees that all data is stored.
+    ///
+    /// \sa Logplay, State
     class Logger : public SingletonT<Logger>
     {
       /// \brief Constructor

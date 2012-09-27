@@ -47,18 +47,23 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
   this->modelPaths.clear();
 
-  /// TODO: Nate fix
-  this->modelPaths.push_back("/home/nkoenig/local/share/gazebo_models");
+  char *homePath = getenv("HOME");
+  std::string home;
+  if (!homePath)
+    home = "/tmp/gazebo";
+  else
+    home = homePath;
+
+  this->modelPaths.push_back(home + "/.gazebo/models");
 
   char *path = getenv("GAZEBO_LOG_PATH");
   std::string fullPath;
   if (!path)
   {
-    path = getenv("HOME");
-    if (!path)
-      fullPath = "/tmp/gazebo";
+    if (home != "/tmp/gazebo")
+      fullPath = home + "/.gazebo";
     else
-      fullPath = std::string(path) + "/.gazebo";
+      fullPath = home;
   }
   else
     fullPath = path;
@@ -227,7 +232,11 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string filename;
 
   if (prefix == "model")
-    filename = "/home/nkoenig/local/share/gazebo_models/" + suffix;
+  {
+    std::string path = getenv("HOME");
+    path += "/.gazebo/models/";
+    filename = path + suffix;
+  }
   else if (prefix == "file")
     filename = this->FindFile(suffix);
   else if (prefix != "http" && prefix != "https")

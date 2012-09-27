@@ -21,6 +21,7 @@
 #include <libtar.h>
 #include <curl/curl.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #include <iostream>
 #include <boost/filesystem.hpp>
@@ -117,8 +118,9 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 std::string ModelDatabase::GetModelPath(const std::string &_uri)
 {
   std::string path = SystemPaths::Instance()->FindFileURI(_uri);
+  struct stat st;
 
-  if (path.empty())
+  if (path.empty() || stat(path.c_str(), &st) != 0 )
   {
     // Get the model name from the uri
     int index = _uri.find_last_of("/");
@@ -135,7 +137,8 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     }
 
     FILE *fp = fopen(filename.c_str(), "wb");
-    curl_easy_setopt(curl, CURLOPT_URL, (_uri + "/model.tar.gz").c_str());
+    curl_easy_setopt(curl, CURLOPT_URL,
+        (ModelDatabase::GetURI() + "/" + modelName + "/model.tar.gz").c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
     CURLcode success = curl_easy_perform(curl);
