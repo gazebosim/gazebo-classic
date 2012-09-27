@@ -15,7 +15,6 @@ set (files
   ShadowCaster.program
   ssao.compositor
   ssao.material
-  youbot.material
   VPL.material
   VPL.program
   shadow_caster.program

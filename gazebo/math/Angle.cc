@@ -68,7 +68,19 @@ double Angle::GetAsRadian() const
 }
 
 //////////////////////////////////////////////////
+double Angle::Radian() const
+{
+  return this->value;
+}
+
+//////////////////////////////////////////////////
 double Angle::GetAsDegree() const
+{
+  return this->value * 180.0 / M_PI;
+}
+
+//////////////////////////////////////////////////
+double Angle::Degree() const
 {
   return this->value * 180.0 / M_PI;
 }

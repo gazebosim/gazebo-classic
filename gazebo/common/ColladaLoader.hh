@@ -197,6 +197,7 @@ namespace gazebo
       private: void LoadTransparent(TiXmlElement *_elem, Material *_mat);
 
       private: double meter;
+      private: std::string filename;
       private: std::map<std::string, std::string> materialMap;
 
       private: TiXmlElement *colladaXml;

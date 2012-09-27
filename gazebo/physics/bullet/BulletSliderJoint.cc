@@ -152,13 +152,13 @@ void BulletSliderJoint::SetForce(int /*_index*/, double _force)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
 {
-  // this->btSlider->setUpperLinLimit(_angle.GetAsRadian());
+  // this->btSlider->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
 {
-  // this->btSlider->setLowerLinLimit(_angle.GetAsRadian());
+  // this->btSlider->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////

@@ -31,6 +31,11 @@ namespace gazebo
     /// models
     class ModelDatabase
     {
+
+      public: static std::string GetURI();
+
+      public: static std::map<std::string, std::string> GetModels();
+
       /// \brief Get the local path to a model.
       ///
       /// Get the path to a model based on a URI. If the model is on

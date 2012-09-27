@@ -37,6 +37,8 @@
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 #include "transport/Subscriber.hh"
+
+#include "common/Common.hh"
 #include "common/Color.hh"
 #include "common/Events.hh"
 #include "common/Exception.hh"
@@ -393,12 +395,23 @@ void RenderEngine::LoadPlugins()
 }
 
 /////////////////////////////////////////////////
-void RenderEngine::AddResourcePath(const std::string &_path)
+void RenderEngine::AddResourcePath(const std::string &_uri)
 {
+  if (_uri == "__default__" || _uri.empty())
+    return;
+
+  std::string path = common::find_file_path(_uri);
+
+  if (path.empty())
+  {
+    gzerr << "URI doesn't exist[" << _uri << "]\n";
+    return;
+  }
+
   try
   {
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-        _path, "FileSystem", "General");
+        path, "FileSystem", "General");
   }
   catch(Ogre::Exception)
   {

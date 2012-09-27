@@ -432,7 +432,7 @@ void Light::SetDirection(const math::Vector3 &_dir)
 //////////////////////////////////////////////////
 math::Vector3 Light::GetDirection() const
 {
-  return this->sdf->GetElement("direction")->GetValueVector3("xyz");
+  return this->sdf->GetValueVector3("direction");
 }
 
 //////////////////////////////////////////////////

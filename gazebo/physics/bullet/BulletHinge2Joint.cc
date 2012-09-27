@@ -162,13 +162,13 @@ double BulletHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetHighStop(int /*_index*/, math::Angle _angle)
 {
-  this->btHinge2->setUpperLimit(_angle.GetAsRadian());
+  this->btHinge2->setUpperLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetLowStop(int /*_index*/, math::Angle _angle)
 {
-  this->btHinge2->setLowerLimit(_angle.GetAsRadian());
+  this->btHinge2->setLowerLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////

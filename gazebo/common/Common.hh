@@ -33,6 +33,10 @@ namespace gazebo
     /// \brief search for file in common::SystemPaths
     std::string find_file(const std::string &_file);
 
+    /// \brief search for a file in common::SystemPaths
+    /// \return The path containing the file
+    std::string find_file_path(const std::string &_file);
+
     /// \}
   }
 }

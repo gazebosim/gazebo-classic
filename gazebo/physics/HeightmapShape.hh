@@ -60,7 +60,7 @@ namespace gazebo
       public: math::Vector3 GetSize() const;
 
       /// \brief Get the origin in world coordinate frame
-      public: math::Vector3 GetOrigin() const;
+      public: math::Vector3 GetPos() const;
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap

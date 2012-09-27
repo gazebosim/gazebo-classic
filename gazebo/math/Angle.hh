@@ -71,11 +71,19 @@ namespace gazebo
 
     /// \brief Get the angle in radians
     /// \return Double containing the angle's radian value
-    public: double GetAsRadian() const;
+    public: double GetAsRadian() const __attribute__((deprecated));
+
+    /// \brief Get the angle in radians
+    /// \return Double containing the angle's radian value
+    public: double Radian() const;
 
     /// \brief Get the angle in degrees
     /// \return Double containing the angle's degree value
-    public: double GetAsDegree() const;
+    public: double GetAsDegree() const __attribute__((deprecated));
+
+    /// \brief Get the angle in degrees
+    /// \return Double containing the angle's degree value
+    public: double Degree() const;
 
     /// \brief Normalize the angle
     public: void Normalize();
@@ -160,7 +168,7 @@ namespace gazebo
     public: friend std::ostream &operator<<(std::ostream &_out,
                                             const gazebo::math::Angle &_a)
     {
-      _out << _a.GetAsRadian();
+      _out << _a.Radian();
       return _out;
     }
 

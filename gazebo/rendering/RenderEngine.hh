@@ -95,7 +95,7 @@ namespace gazebo
       /// \brief Get the number of scene managers
       public: unsigned int GetSceneCount() const;
 
-      public: void AddResourcePath(const std::string &_path);
+      public: void AddResourcePath(const std::string &_uri);
 
       /// \brief Get the type of rendering path to use. This is
       /// automatically determined based on the computers capabilities

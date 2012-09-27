@@ -18,8 +18,15 @@
 #define BOOST_FILESYSTEM_VERSION 2
 
 #include <tinyxml.h>
+#include <libtar.h>
 #include <curl/curl.h>
+#include <fcntl.h>
+
+#include <iostream>
 #include <boost/filesystem.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
@@ -29,13 +36,139 @@ using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+  size_t written;
+  written = fwrite(ptr, size, nmemb, stream);
+  return written;
+}
+
+/////////////////////////////////////////////////
+size_t get_models_cb(void *_buffer, size_t _size, size_t _nmemb, void *_userp)
+{
+  std::string *str = static_cast<std::string*>(_userp);
+  _size *= _nmemb;
+
+  // Append the new character data to the string
+  str->append(static_cast<const char*>(_buffer), _size);
+  return _size;
+}
+
+/////////////////////////////////////////////////
+std::string ModelDatabase::GetURI()
+{
+  std::string result;
+  char *uriStr = getenv("GAZEBO_MODEL_DATABASE_URI");
+  if (uriStr)
+    result = uriStr;
+  else
+    gzerr << "GAZEBO_MODEL_DATABASE_URI not set\n";
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::map<std::string, std::string> ModelDatabase::GetModels()
+{
+  std::map<std::string, std::string> result;
+  std::string xmlString;
+
+  std::string uriStr = ModelDatabase::GetURI();
+  if (!uriStr.empty())
+  {
+    std::string manifestURI = uriStr + "/manifest.xml";
+
+    CURL *curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, manifestURI.c_str());
+
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_models_cb);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &xmlString);
+
+    CURLcode success = curl_easy_perform(curl);
+    if (success != CURLE_OK)
+    {
+      gzerr << "Unable to connect to model database using [" << uriStr << "]\n";
+      gzerr << "Error code[" << success << "]\n";
+    }
+
+    curl_easy_cleanup(curl);
+  }
+
+  if (!xmlString.empty())
+  {
+    TiXmlDocument xmlDoc;
+    xmlDoc.Parse(xmlString.c_str());
+
+    TiXmlElement *modelsElem = xmlDoc.FirstChildElement("models");
+    TiXmlElement *modelElem;
+    for (modelElem = modelsElem->FirstChildElement("model"); modelElem != NULL;
+         modelElem = modelElem->NextSiblingElement("model"))
+    {
+      TiXmlElement *nameElem = modelElem->FirstChildElement("name");
+      TiXmlElement *uriElem = modelElem->FirstChildElement("uri");
+      result[uriStr + "/" + uriElem->GetText()] =  nameElem->GetText();
+    }
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 std::string ModelDatabase::GetModelPath(const std::string &_uri)
 {
   std::string path = SystemPaths::Instance()->FindFileURI(_uri);
 
   if (path.empty())
   {
-    gzerr << "Path is not local[" << _uri << "]. Must download\n";
+    // Get the model name from the uri
+    int index = _uri.find_last_of("/");
+    std::string modelName = _uri.substr(index+1, _uri.size() - index - 1);
+
+    // store zip file in temp location
+    std::string filename = "/tmp/gz_model.tar.gz";
+
+    CURL *curl = curl_easy_init();
+    if (!curl)
+    {
+      gzerr << "Unable to initialize libcurl\n";
+      return std::string();
+    }
+
+    FILE *fp = fopen(filename.c_str(), "wb");
+    curl_easy_setopt(curl, CURLOPT_URL, (_uri + "/model.tar.gz").c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+    CURLcode success = curl_easy_perform(curl);
+
+    if (success != CURLE_OK)
+    {
+      gzerr << "Unable to connect to model database using [" << _uri << "]\n";
+      gzerr << "Error code[" << success << "]\n";
+    }
+
+    curl_easy_cleanup(curl);
+
+    fclose(fp);
+
+    // Unzip model tarball
+    std::ifstream file(filename.c_str(),
+        std::ios_base::in | std::ios_base::binary);
+    std::ofstream out("/tmp/gz_model.tar",
+        std::ios_base::out | std::ios_base::binary);
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+    in.push(boost::iostreams::gzip_decompressor());
+    in.push(file);
+    boost::iostreams::copy(in, out);
+
+    TAR *tar;
+    tar_open(&tar, const_cast<char*>("/tmp/gz_model.tar"),
+             NULL, O_RDONLY, 0644, TAR_GNU);
+
+    std::string outputPath = getenv("HOME");
+    outputPath += "/.gazebo/models";
+
+    tar_extract_all(tar, const_cast<char*>(outputPath.c_str()));
+    path = outputPath + "/" + modelName;
   }
 
   return path;

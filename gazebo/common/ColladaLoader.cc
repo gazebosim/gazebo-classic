@@ -61,6 +61,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
     this->path = _filename.substr(0, _filename.rfind('/'));
   }
 
+  this->filename = _filename;
   if (!xmlDoc.LoadFile(_filename))
     gzerr << "Unable to load collada file[" << _filename << "]\n";
 
@@ -82,7 +83,12 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   Mesh *mesh = new Mesh();
   mesh->SetPath(this->path);
+
   this->LoadScene(mesh);
+
+  // This will make the model the correct size, but cause the mdoel to
+  // rotate. The powerplant model is a good example.
+  mesh->Scale(this->meter);
 
   return mesh;
 }
@@ -768,7 +774,9 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
   {
     TiXmlElement *result = this->GetElementId(elem, _name, _id);
     if (result)
+    {
       return result;
+    }
 
     elem = elem->NextSiblingElement();
   }
@@ -1275,6 +1283,12 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
 
   TiXmlElement *pXml = _trianglesXml->FirstChildElement("p");
+  if (!pXml || !pXml->GetText())
+  {
+    gzerr << "Collada file[" << this->filename
+          << "] is invalid. Loading what we can...\n";
+    return;
+  }
   std::string pStr = pXml->GetText();
 
   std::vector<math::Vector3> vertNorms(verts.size());
@@ -1388,7 +1402,7 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
   const char *opaqueCStr = _elem->Attribute("opaque");
   if (!opaqueCStr)
   {
-    gzerr << "No Opaque set\n";
+    // gzerr << "No Opaque set\n";
     return;
   }
 

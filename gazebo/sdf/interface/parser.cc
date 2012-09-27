@@ -145,6 +145,7 @@ bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
   if (!xml)
   {
     gzerr << "Could not find the 'element' element in the xml file\n";
+    _sdf->PrintValues("  ");
     return false;
   }
 

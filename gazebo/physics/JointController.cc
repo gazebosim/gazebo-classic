@@ -77,7 +77,7 @@ void JointController::Update()
     for (iter = this->positions.begin(); iter != this->positions.end(); ++iter)
     {
       cmd = this->posPids[iter->first].Update(
-          this->joints[iter->first]->GetAngle(0).GetAsRadian() - iter->second,
+          this->joints[iter->first]->GetAngle(0).Radian() - iter->second,
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
@@ -105,7 +105,7 @@ void JointController::Update()
     for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
     {
       if (this->positions.find(iter->first) == this->positions.end())
-        this->positions[iter->first] = iter->second->GetAngle(0).GetAsRadian();
+        this->positions[iter->first] = iter->second->GetAngle(0).Radian();
     }
     this->SetJointPositions(this->positions);
     this->positions.clear();
@@ -198,8 +198,8 @@ void JointController::SetJointPositions(
 void JointController::SetJointPosition(JointPtr _joint, double _position)
 {
   // truncate position by joint limits
-  double lower = _joint->GetLowStop(0).GetAsRadian();
-  double upper = _joint->GetHighStop(0).GetAsRadian();
+  double lower = _joint->GetLowStop(0).Radian();
+  double upper = _joint->GetHighStop(0).Radian();
   _position = _position < lower? lower : (_position > upper? upper : _position);
 
   // keep track of updatd links, make sure each is upated only once
@@ -220,7 +220,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
       {
         // rotate child (childLink) about anchor point, by delta-angle
         // along axis
-        double dangle = _position - _joint->GetAngle(0).GetAsRadian();
+        double dangle = _position - _joint->GetAngle(0).Radian();
 
         math::Vector3 anchor;
         math::Vector3 axis;
@@ -241,7 +241,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
       }
       else if (_joint->HasType(Base::SLIDER_JOINT))
       {
-        double dposition = _position - _joint->GetAngle(0).GetAsRadian();
+        double dposition = _position - _joint->GetAngle(0).Radian();
 
         math::Vector3 anchor;
         math::Vector3 axis;

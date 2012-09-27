@@ -425,7 +425,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   dir.Normalize();
 
-  double scale = maxSize / tan((this->GetHFOV()/2.0).GetAsRadian());
+  double scale = maxSize / tan((this->GetHFOV()/2.0).Radian());
 
   end = mid + dir*(dist - scale);
 

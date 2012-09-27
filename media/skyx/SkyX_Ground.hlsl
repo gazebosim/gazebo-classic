@@ -65,9 +65,12 @@ void main_vp(
 	// Calculate vertex world position
 	float3 vertexWorldPos = mul(uWorld, iPosition);
 	
+	// Z-up
+	vertexWorldPos.xyz = vertexWorldPos.xzy;
+	
 	// Get the ray from the camera to the vertex, and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos;
-	v3Pos.xz = (vertexWorldPos.xz-uCameraPos_.xz) / uSkydomeRadius;
+	float3 v3Pos;                            // Z-up xz -> xy
+	v3Pos.xz = (vertexWorldPos.xz-uCameraPos_.xy) / uSkydomeRadius;
 	v3Pos.y = uCameraPos.y + vertexWorldPos.y / uSkydomeRadius;
 	
 	float3 v3Ray = v3Pos - uCameraPos;
