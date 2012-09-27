@@ -35,7 +35,9 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
-    /// \brief Generic double x, y, z vector
+    /// \brief The Vector3 class represents the generic vector containing 3
+    ///        elements.  Since it's commonly used to keep coordinate system
+    ///        related information, its elements are labeled by x, y, z.
     class Vector3
     {
       /// \brief Constructor

@@ -35,7 +35,6 @@
 #include "common/Plugin.hh"
 #include "common/Events.hh"
 
-
 namespace gazebo
 {
   class JointTrajectoryPlugin : public ModelPlugin

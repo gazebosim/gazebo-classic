@@ -332,7 +332,10 @@ math::Angle Joint::GetAngle(int _index) const
 //////////////////////////////////////////////////
 void Joint::SetAngle(int /*index*/, math::Angle _angle)
 {
-  this->staticAngle = _angle;
+  if (this->model->IsStatic())
+    this->staticAngle = _angle;
+  else
+    this->model->SetJointPosition(this->GetName(), _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////

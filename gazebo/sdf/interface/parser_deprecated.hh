@@ -127,6 +127,9 @@ namespace deprecated_sdf
   // Get the value of this node
   std::string getValue(xmlNodePtr node);
   void PreParser(const std::string &fname, std::string &output);
+  void ExpandIncludes(xmlNodePtr _xml);
+  std::string ToString(xmlNodePtr _xml);
+  std::string ToString(xmlDocPtr doc);
 }
 #endif
 

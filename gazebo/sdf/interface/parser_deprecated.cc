@@ -397,6 +397,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
   catch(boost::bad_lexical_cast& e)
   {
+    gzerr << "verticalRayCount not parsable\n";
   }
 
   double minAngle =
@@ -418,7 +419,8 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
 
-  try {
+  try
+  {
     double verticalMinAngle =
       boost::lexical_cast<double>(getNodeValue(_config, "verticalMinAngle"));
     double verticalMaxAngle =
@@ -437,7 +439,10 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
       gzerr << "Unable to parse vertical max_angle\n";
       return false;
     }
-  } catch(boost::bad_lexical_cast& e) {
+  }
+  catch(boost::bad_lexical_cast& e)
+  {
+    gzerr << "max_angle not parsable\n";
   }
 
   sdf::ElementPtr sdfRange = _sdf->AddElement("range");
@@ -1313,6 +1318,8 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
     return false;
   }
 
+  ExpandIncludes(xmlDocGetRootElement(_xmlDoc));
+
   bool model_initialized = false;
   xmlNodePtr modelXml = firstChildElement(_xmlDoc, "physical");
   while (modelXml)
@@ -1332,8 +1339,7 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initWorldFile(const std::string &_filename,
-    sdf::SDFPtr &_sdf)
+bool initWorldFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {
   std::ifstream fin;
   fin.open(_filename.c_str(), std::ios::in);
@@ -1370,6 +1376,8 @@ bool initWorldDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
     gzerr << "Could not parse the xml\n";
     return false;
   }
+
+  ExpandIncludes(xmlDocGetRootElement(_xmlDoc));
 
   // add or set version string if needed
   if (_sdf->root->GetAttribute("version"))
@@ -1577,20 +1585,97 @@ void PreParser(const std::string &fname, std::string &output)
   {
     std::getline(ifs, line);
     boost::trim(line);
-
-    if (boost::find_first(line, "<include"))
-    {
-      int start = line.find("filename =");
-      start += strlen("filename =") + 1;
-      int end = line.find_first_of("'\"", start);
-      std::string fname2 = line.substr(start, end-start);
-      PreParser(fname2, output);
-    }
-    else
-      output += line + "\n";
+    output += line + "\n";
   }
-
   ifs.close();
+}
+
+void ExpandIncludes(xmlNodePtr _xml)
+{
+  // walk through all children nodes
+  for (xmlNodePtr elemXml = xmlFirstElementChild(_xml);
+       elemXml != NULL; elemXml = xmlNextElementSibling(elemXml))
+  {
+    xmlNodePtr includeXml = firstChildElement(_xml, "include");
+    while (includeXml)
+    {
+      xmlNodePtr includeXiXml = firstChildElement(includeXml, "include");
+      if (includeXiXml)
+      {
+        std::string filename = getNodeValue(includeXiXml, "href");
+        std::ifstream fin;
+        fin.open(filename.c_str(), std::ios::in);
+        if (!fin.is_open())
+        {
+          gzerr << "The included file [" << filename
+                << "] cannot be opened, exists? permitted?\n";
+        }
+        else
+        {
+          std::string output;
+          PreParser(filename, output);
+          fin.close();
+          xmlDocPtr xmlHref =
+            xmlParseDoc(reinterpret_cast<const xmlChar*>(output.c_str()));
+
+          // only take first model in included .model file (potentially more?)
+          xmlNodePtr includePhysical = firstChildElement(xmlHref, "physical");
+
+          for (xmlNodePtr c = xmlFirstElementChild(includePhysical);
+               c != NULL; c = xmlNextElementSibling(c))
+            xmlAddChild(_xml, c);
+
+          // debug
+          // gzerr << "-------------------\n" << ToString(_xml)
+          //      << "\n======================\n";
+        }
+      }
+
+      // look for next include block and remove includeXml node
+      xmlNodePtr includeXml2 = nextSiblingElement(includeXml, "include");
+      xmlUnlinkNode(includeXml);
+      xmlFreeNode(includeXml);
+      includeXml = includeXml2;
+    }
+
+    // call recursively
+    ExpandIncludes(elemXml);
+  }
+}
+
+std::string ToString(xmlNodePtr _xml)
+{
+  xmlDocPtr doc = _xml->doc;
+  // this doesn't appear to work, do i need to allocate some memory here?
+  // or do something else?
+  xmlOutputBufferPtr output;
+  xmlNodeDumpOutput(output, doc, _xml, 0, 1, "UTF-8");
+
+  // somehow convert output to a string?
+  xmlChar *s;
+  int size;
+  xmlDocDumpMemory(doc, &s, &size);
+  std::string xmlString = (char *)s;
+  xmlFree(s);
+
+  return xmlString;
+}
+
+std::string ToString(xmlDocPtr doc)
+{
+  // this doesn't appear to work, do i need to allocate some memory here?
+  // or do something else?
+  xmlOutputBufferPtr output;
+  xmlNodeDumpOutput(output, doc, xmlDocGetRootElement(doc), 0, 1, "UTF-8");
+
+  // somehow convert output to a string?
+  xmlChar *s;
+  int size;
+  xmlDocDumpMemory(doc, &s, &size);
+  std::string xmlString = (char *)s;
+  xmlFree(s);
+
+  return xmlString;
 }
 }
 

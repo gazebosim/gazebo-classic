@@ -148,32 +148,69 @@ namespace gazebo
       /// \brief Get the rotation rate of an axis(index)
       public: virtual double GetVelocity(int index) const = 0;
 
-      /// \brief Set the force applied to an axis
+      /// \brief Set the force applied to this physics::Joint.
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.  E.g.  if you are using
+      /// metric units, the unit for force is Newtons.  If using
+      /// imperial units (sorry), then unit of force is lb-force
+      /// not (lb-mass), etc.
       public: virtual void SetForce(int /*index*/, double /*f*/) {}
 
-      /// \brief Get the force applied to an axis
+      /// \brief @todo: not yet implemented.
+      /// Get the internal forces at a this Joint.
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.  E.g.  if you are using
+      /// metric units, the unit for force is Newtons.  If using
+      /// imperial units (sorry), then unit of force is lb-force
+      /// not (lb-mass), etc.
       public: virtual double GetForce(int /*index*/) {return 0;}
 
       /// \brief Set the max allowed force of an axis(index).
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.  E.g.  if you are using
+      /// metric units, the unit for force is Newtons.  If using
+      /// imperial units (sorry), then unit of force is lb-force
+      /// not (lb-mass), etc.
       public: virtual void SetMaxForce(int index, double t) = 0;
 
       /// \brief Get the max allowed force of an axis(index).
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.  E.g.  if you are using
+      /// metric units, the unit for force is Newtons.  If using
+      /// imperial units (sorry), then unit of force is lb-force
+      /// not (lb-mass), etc.
       public: virtual double GetMaxForce(int index) = 0;
 
       /// \brief Get the angle of rotation of an axis(index)
       public: math::Angle GetAngle(int index) const;
 
-      /// \brief Set the angle of rotation. This will not move the
-      ///        joint. The purpose of this function is purely to support
-      ///        animation of static models.
+      /// If the Joint is static, Gazebo stores the state of
+      /// this Joint as a scalar inside the Joint class, so
+      /// this call will NOT move the joint dynamically for a static Model.
+      /// But if this Model is not static, then it is updated dynamically,
+      /// all the conencted children Link's are moved as a result of the
+      /// Joint angle setting.  Dynamic Joint angle update is accomplished
+      /// by calling JointController::SetJointPosition.
       public: void SetAngle(int _index, math::Angle _angle);
 
-      /// \brief Get the force the joint applies to the first link
+      /// Get the forces applied to the center of mass of a physics::Link
+      /// due to the existence of this Joint.
       /// \param index The index of the link(0 or 1)
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.  E.g.  if you are using
+      /// metric units, the unit for force is Newtons.  If using
+      /// imperial units (sorry), then unit of force is lb-force
+      /// not (lb-mass), etc.
       public: virtual math::Vector3 GetLinkForce(unsigned int index) const = 0;
 
-      /// \brief Get the torque the joint applies to the first link
+      /// \brief Get the torque applied to the center of mass of a physics::Link
+      /// due to the existence of this Joint.
       /// \param index The index of the link(0 or 1)
+      /// Note that the unit of torque should be consistent with the rest
+      /// of the simulation scales.  E.g.  if you are using
+      /// metric units, the unit for force is Newtons-Meters.  If using
+      /// imperial units (sorry), then unit of force is lb-force-inches
+      /// not (lb-mass-inches), etc.
       public: virtual math::Vector3 GetLinkTorque(unsigned int index) const = 0;
 
       /// \brief Set a parameter for the joint

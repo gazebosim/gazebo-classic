@@ -237,8 +237,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
-  // we need to move mutex lock after this?
-  // or make the OnNewLaserScan connection
+  // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->laserShape->Update();
 
