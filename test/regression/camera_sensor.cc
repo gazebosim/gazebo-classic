@@ -44,113 +44,14 @@ TEST_F(CameraSensor, EmptyWorld)
 {
 
   // spawn sensors of various sizes to test speed
-
-
   {
     Load("worlds/empty.world");
     std::string modelName = "camera_model";
     std::string cameraName = "camera_sensor";
-    unsigned int width = 320;
-    unsigned int height = 240;
-    math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-    SpawnCamera(modelName, cameraName, setPose.pos,
-        setPose.rot.GetAsEuler(), width, height, 100000);
-
-    sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-    sensors::CameraSensorPtr camSensor =
-      boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
-    img = new unsigned char[width * height*3];
-    event::ConnectionPtr c =
-      camSensor->GetCamera()->ConnectNewImageFrame(
-          boost::bind(&::OnNewCameraFrame,
-                      _1, _2, _3, _4, _5));
-    common::Timer timer;
-    timer.Start();
-    // time how long it takes to get N images
-    int total_images = 2500;
-    while (image_count < total_images)
-      common::Time::MSleep(10);
-    common::Time dt = timer.GetElapsed();
-    gzerr << "timer [" << dt.Double()
-          << "] seconds rate [" << (double)total_images/dt.Double()
-          << "] fps\n";
-    camSensor->GetCamera()->DisconnectNewImageFrame(c);
-    delete img;
-    Unload();
-  }
-  {
-    Load("worlds/empty.world");
-    std::string modelName = "camera_model";
-    std::string cameraName = "camera_sensor";
-    unsigned int width = 640;
-    unsigned int height = 480;
-    math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-    SpawnCamera(modelName, cameraName, setPose.pos,
-        setPose.rot.GetAsEuler(), width, height, 100000);
-
-    sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-    sensors::CameraSensorPtr camSensor =
-      boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
-    img = new unsigned char[width * height*3];
-    event::ConnectionPtr c =
-      camSensor->GetCamera()->ConnectNewImageFrame(
-          boost::bind(&::OnNewCameraFrame,
-                      _1, _2, _3, _4, _5));
-    common::Timer timer;
-    timer.Start();
-    // time how long it takes to get N images
-    int total_images = 2500;
-    while (image_count < total_images)
-      common::Time::MSleep(10);
-    common::Time dt = timer.GetElapsed();
-    gzerr << "timer [" << dt.Double()
-          << "] seconds rate [" << (double)total_images/dt.Double()
-          << "] fps\n";
-    camSensor->GetCamera()->DisconnectNewImageFrame(c);
-    delete img;
-    Unload();
-  }
-  {
-    Load("worlds/empty.world");
-    std::string modelName = "camera_model";
-    std::string cameraName = "camera_sensor";
-    unsigned int width = 1280;
-    unsigned int height = 480;
-    math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-    SpawnCamera(modelName, cameraName, setPose.pos,
-        setPose.rot.GetAsEuler(), width, height, 100000);
-
-    sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-    sensors::CameraSensorPtr camSensor =
-      boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
-    img = new unsigned char[width * height*3];
-    event::ConnectionPtr c =
-      camSensor->GetCamera()->ConnectNewImageFrame(
-          boost::bind(&::OnNewCameraFrame,
-                      _1, _2, _3, _4, _5));
-    common::Timer timer;
-    timer.Start();
-    // time how long it takes to get N images
-    int total_images = 2500;
-    while (image_count < total_images)
-      common::Time::MSleep(10);
-    common::Time dt = timer.GetElapsed();
-    gzerr << "timer [" << dt.Double()
-          << "] seconds rate [" << (double)total_images/dt.Double()
-          << "] fps\n";
-    camSensor->GetCamera()->DisconnectNewImageFrame(c);
-    delete img;
-    Unload();
-  }
-  {
-    Load("worlds/empty.world");
-    std::string modelName = "camera_model";
-    std::string cameraName = "camera_sensor";
-    unsigned int width = 1280;
-    unsigned int height = 960;
+    unsigned int width  = 320;
+    unsigned int height = 240; // 106 fps
+    width  = 640; height = 480; // 80.25 fps
+    width  = 1280; height = 960; // 41.19 fps
     math::Pose setPose, testPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
     SpawnCamera(modelName, cameraName, setPose.pos,
