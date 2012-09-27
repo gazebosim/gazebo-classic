@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef STATE_HH
-#define STATE_HH
+#ifndef __STATE_HH__
+#define __STATE_HH__
 
 #include <string>
 
@@ -34,13 +34,22 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief State of an object
+    /// \class State State.hh physics/State.hh
+    /// \brief State of an entity
+    ///
+    /// This is the base class for all State information.
     class State
     {
       /// \brief Default constructor
       public: State();
 
       /// \brief Constructor
+      ///
+      /// Construct a State object using some basic information.
+      /// \param _name Name associated with the State information. This is
+      /// typically the name of an Entity.
+      /// \pararm _realTime Clock time since simulation started.
+      /// \param _simTime Simulation time associated with this State info.
       public: State(const std::string &_name,
                     const common::Time &_realTime,
                     const common::Time &_simTime);
@@ -49,21 +58,32 @@ namespace gazebo
       public: virtual ~State();
 
       /// \brief Load state from SDF element
+      ///
+      /// Populates the State information from data stored in an SDF::Element
+      /// \param _elem Pointer to the SDF::Element
       public: virtual void Load(sdf::ElementPtr _elem) = 0;
 
-      /// \brief Get the name of the state
+      /// \brief Get the name associated with this State
+      /// \return Name associated with this state information. Typically
+      /// a name of an Entity.
       public: std::string GetName() const;
 
       /// \brief Get the wall time when this state was generated
+      /// \return The absolute clock time when the State data was recorded.
       public: common::Time GetWallTime() const;
 
       /// \brief Get the real time when this state was generated
+      /// \return Clock time since simulation was stated.
       public: common::Time GetRealTime() const;
 
       /// \brief Get the sim time when this state was generated
+      /// \return Simulation time when the data was recorded.
       public: common::Time GetSimTime() const;
 
+      /// Name associated with this State
       protected: std::string name;
+
+      /// Times for the state data
       protected: common::Time wallTime, realTime, simTime;
     };
     /// \}
