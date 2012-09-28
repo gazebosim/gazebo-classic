@@ -1230,7 +1230,6 @@ void Scene::OnSceneMsg(ConstScenePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
-  std::cout << _msg->DebugString();
 }
 
 //////////////////////////////////////////////////
@@ -2050,7 +2049,6 @@ SelectionObj *Scene::GetSelectionObj() const
 /////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
-  std::cout << "SetGrid[" << _enabled << "]\n";
   if (_enabled && this->grids.size() == 0)
   {
     Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
