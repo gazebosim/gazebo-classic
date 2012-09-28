@@ -22,7 +22,9 @@
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
 #include "gazebo/sdf/interface/parser_deprecated.hh"
-#include "gazebo/sdf/interface/parser_urdf.hh"
+#ifdef HAVE_URDFDOM
+  #include "gazebo/sdf/interface/parser_urdf.hh"
+#endif
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Vector3.hh"
@@ -292,6 +294,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
           << "You have been warned!\n\n";
         return true;
       }
+#ifdef HAVE_URDFDOM
       else
       {
         urdf2gazebo::URDF2Gazebo u2g;
@@ -307,6 +310,7 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
           return false;
         }
       }
+#endif
     }
   }
 }
@@ -338,6 +342,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
           << "You have been warned!\n\n";
         return true;
       }
+#ifdef HAVE_URDFDOM
       else
       {
         urdf2gazebo::URDF2Gazebo u2g;
@@ -353,6 +358,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
           return false;
         }
       }
+#endif
     }
   }
 }
