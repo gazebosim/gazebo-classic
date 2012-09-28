@@ -54,6 +54,9 @@ MainWindow::MainWindow()
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection", 1);
+  this->scenePub =
+    this->node->Advertise<msgs::Scene>("~/scene", 1);
+
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this);
@@ -447,6 +450,15 @@ void MainWindow::ViewReset()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewGrid()
+{
+  msgs::Scene msg;
+  msg.set_name("default");
+  msg.set_grid(this->viewGridAct->isChecked());
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
@@ -612,6 +624,13 @@ void MainWindow::CreateActions()
   connect(this->viewResetAct, SIGNAL(triggered()), this,
       SLOT(ViewReset()));
 
+  this->viewGridAct = new QAction(tr("Grid"), this);
+  this->viewGridAct->setStatusTip(tr("View Grid"));
+  this->viewGridAct->setCheckable(true);
+  this->viewGridAct->setChecked(true);
+  connect(this->viewGridAct, SIGNAL(triggered()), this,
+          SLOT(ViewGrid()));
+
   this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
   this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
   connect(this->viewFullScreenAct, SIGNAL(triggered()), this,
@@ -659,8 +678,11 @@ void MainWindow::CreateMenus()
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
+  this->viewMenu->addAction(this->viewGridAct);
+  this->viewMenu->addSeparator();
   this->viewMenu->addAction(this->viewResetAct);
   this->viewMenu->addAction(this->viewFullScreenAct);
+  this->viewMenu->addSeparator();
   this->viewMenu->addAction(this->viewFPSAct);
   this->viewMenu->addAction(this->viewOrbitAct);
 

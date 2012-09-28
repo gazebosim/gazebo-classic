@@ -69,6 +69,12 @@ namespace gazebo
       /// \brief Initialize the grid
       public: void Init();
 
+      /// \brief Enable or disable the grid.
+      ///
+      /// \param _enable Set to true to view the grid, false to make
+      /// invisible.
+      public: void Enable(bool _enable);
+
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
       public: Ogre::SceneNode *GetSceneNode() { return this->sceneNode; }

@@ -208,3 +208,8 @@ void Grid::SetUserData(const Ogre::Any &_data)
   this->manualObject->setUserAny(_data);
 }
 
+//////////////////////////////////////////////////
+void Grid::Enable(bool _enable)
+{
+  this->sceneNode->setVisible(_enable);
+}

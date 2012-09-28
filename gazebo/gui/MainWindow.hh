@@ -78,6 +78,7 @@ namespace gazebo
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
+      private slots: void ViewGrid();
       private slots: void ViewReset();
       private slots: void ViewFullScreen();
       private slots: void ViewFPS();
@@ -134,6 +135,7 @@ namespace gazebo
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;
 
+      private: QAction *viewGridAct;
       private: QAction *viewResetAct;
       private: QAction *viewFullScreenAct;
       private: QAction *viewFPSAct;
@@ -147,6 +149,7 @@ namespace gazebo
       private: transport::PublisherPtr serverControlPub;
       private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr requestPub;
+      private: transport::PublisherPtr scenePub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr guiSub;
       private: transport::SubscriberPtr newEntitySub, statsSub;
