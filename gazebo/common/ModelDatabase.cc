@@ -122,6 +122,9 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
 
   if (path.empty() || stat(path.c_str(), &st) != 0 )
   {
+    // DEBUG output
+    // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
+
     // Get the model name from the uri
     int index = _uri.find_last_of("/");
     std::string modelName = _uri.substr(index+1, _uri.size() - index - 1);
@@ -146,7 +149,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     if (success != CURLE_OK)
     {
       gzerr << "Unable to connect to model database using [" << _uri << "]\n";
-      gzerr << "Error code[" << success << "]\n";
+      return std::string();
     }
 
     curl_easy_cleanup(curl);

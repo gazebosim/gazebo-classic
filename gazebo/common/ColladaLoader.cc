@@ -86,8 +86,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   this->LoadScene(mesh);
 
-  // This will make the model the correct size, but cause the mdoel to
-  // rotate. The powerplant model is a good example.
+  // This will make the model the correct size.
   mesh->Scale(this->meter);
 
   return mesh;

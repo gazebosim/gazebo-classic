@@ -231,14 +231,21 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
   std::string filename;
 
+  // First try to find the file on the current system
+  filename = this->FindFile(suffix);
+
+  // If the file was found, then return the full path
+  if (!filename.empty())
+    return filename;
+
+  // If trying to find a model, return the path to the users home
+  // .gazebo/models
   if (prefix == "model")
   {
     std::string path = getenv("HOME");
     path += "/.gazebo/models/";
     filename = path + suffix;
   }
-  else if (prefix == "file")
-    filename = this->FindFile(suffix);
   else if (prefix != "http" && prefix != "https")
     gzerr << "Unknown URI prefix[" << prefix << "]\n";
 
@@ -307,8 +314,6 @@ std::string SystemPaths::FindFile(const std::string &_filename)
     if (!found)
     {
       result.clear();
-      gzerr << "cannot load file [" << _filename << "]in GAZEBO_RESOURCE_PATH["
-        << getenv("GAZEBO_RESOURCE_PATH") << "]\n";
       return std::string();
     }
   }
