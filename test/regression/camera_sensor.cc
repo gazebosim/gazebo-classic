@@ -36,22 +36,21 @@ void OnNewCameraFrame(const unsigned char *_image,
                   unsigned int _depth,
                   const std::string &/*_format*/)
 {
- memcpy(img, _image, _width * _height * _depth);
- image_count+= 1;
+  memcpy(img, _image, _width * _height * _depth);
+  image_count+= 1;
 }
 
 TEST_F(CameraSensor, EmptyWorld)
 {
-
   // spawn sensors of various sizes to test speed
   {
     Load("worlds/empty.world");
     std::string modelName = "camera_model";
     std::string cameraName = "camera_sensor";
     unsigned int width  = 320;
-    unsigned int height = 240; // 106 fps
-    width  = 640; height = 480; // 80.25 fps
-    width  = 1280; height = 960; // 41.19 fps
+    unsigned int height = 240;  // 106 fps
+    width  = 640; height = 480;  // 80.25 fps
+    width  = 1280; height = 960;  // 41.19 fps
     math::Pose setPose, testPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
     SpawnCamera(modelName, cameraName, setPose.pos,
@@ -73,7 +72,7 @@ TEST_F(CameraSensor, EmptyWorld)
       common::Time::MSleep(10);
     common::Time dt = timer.GetElapsed();
     gzerr << "timer [" << dt.Double()
-          << "] seconds rate [" << (double)total_images/dt.Double()
+          << "] seconds rate [" << static_cast<double>(total_images)/dt.Double()
           << "] fps\n";
     camSensor->GetCamera()->DisconnectNewImageFrame(c);
     delete img;
