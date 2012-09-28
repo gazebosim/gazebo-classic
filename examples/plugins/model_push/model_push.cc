@@ -30,7 +30,7 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateStart(
-          boost::bind(&BoxPush::OnUpdate, this));
+          boost::bind(&ModelPush::OnUpdate, this));
     }
 
     // Called by the world update start event

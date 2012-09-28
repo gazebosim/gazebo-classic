@@ -36,7 +36,18 @@ void gazebo::add_plugin(const std::string &_filename)
     return;
   gazebo::SystemPluginPtr plugin =
     gazebo::SystemPlugin::Create(_filename, _filename);
-  g_plugins.push_back(plugin);
+
+  if (plugin)
+  {
+    if (plugin->GetType() != SYSTEM_PLUGIN)
+    {
+      gzerr << "System is attempting to load "
+        << "a plugin, but detected an incorrect plugin type. "
+        << "Plugin filename[" << _filename << "].\n";
+      return;
+    }
+    g_plugins.push_back(plugin);
+  }
 }
 
 /////////////////////////////////////////////////

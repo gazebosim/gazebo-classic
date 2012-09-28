@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include "gazebo.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Events.hh"
@@ -201,6 +203,7 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
+  gazebo::stop();
   delete this->worldPropertiesWidget;
   delete this->renderWidget;
   delete this->timePanel;

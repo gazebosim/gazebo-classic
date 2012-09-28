@@ -645,6 +645,14 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
   gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
   if (plugin)
   {
+    if (plugin->GetType() != MODEL_PLUGIN)
+    {
+      gzerr << "Model[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+      return;
+    }
+
     ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
     plugin->Init();

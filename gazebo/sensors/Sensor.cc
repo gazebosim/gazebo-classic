@@ -151,6 +151,15 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 
   if (plugin)
   {
+    if (plugin->GetType() != MODEL_PLUGIN)
+    {
+      gzerr << "Sensor[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+      return;
+    }
+
+
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
     this->plugins.push_back(plugin);

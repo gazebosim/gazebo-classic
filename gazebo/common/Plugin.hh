@@ -47,10 +47,26 @@ namespace gazebo
   /// \addtogroup gazebo_common Common
   /// \{
 
+  /// \enum PluginType
+  /// \brief Used to specify the type of plugin.
+  enum PluginType
+  {
+    /// \brief A World plugin
+    WORLD_PLUGIN,
+    /// \brief A Model plugin
+    MODEL_PLUGIN,
+    /// \brief A Sensor plugin
+    SENSOR_PLUGIN,
+    /// \brief A System plugin
+    SYSTEM_PLUGIN
+  };
+
   /// \brief A class which all plugins must inherit from
   template<class T>
   class PluginT
   {
+
+
     public: typedef boost::shared_ptr<T> TPtr;
 
             /// \brief Get the name of the handler
@@ -166,6 +182,12 @@ namespace gazebo
               return result;
             }
 
+    public: PluginType GetType() const
+            {
+              return this->type;
+            }
+
+    protected: PluginType type;
     protected: std::string filename;
     protected: std::string handle;
 
@@ -181,6 +203,9 @@ namespace gazebo
   ///        reference</a>.
   class WorldPlugin : public PluginT<WorldPlugin>
   {
+    public: WorldPlugin()
+             {this->type = WORLD_PLUGIN;}
+
     /// \brief Load function
     public: virtual void Load(physics::WorldPtr _world,
                 sdf::ElementPtr _sdf) = 0;
@@ -193,6 +218,9 @@ namespace gazebo
   ///        reference</a>.
   class ModelPlugin : public PluginT<ModelPlugin>
   {
+    public: ModelPlugin()
+             {this->type = MODEL_PLUGIN;}
+
     /// \brief Load function
     public: virtual void Load(physics::ModelPtr _model,
                 sdf::ElementPtr _sdf) = 0;
@@ -205,6 +233,10 @@ namespace gazebo
   ///        reference</a>.
   class SensorPlugin : public PluginT<SensorPlugin>
   {
+    public: SensorPlugin()
+             {this->type = SENSOR_PLUGIN;}
+
+
     /// \brief Load function
     public: virtual void Load(sensors::SensorPtr _sensor,
                 sdf::ElementPtr _sdf) = 0;
@@ -218,6 +250,9 @@ namespace gazebo
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class SystemPlugin : public PluginT<SystemPlugin>
   {
+    public: SystemPlugin()
+             {this->type = SYSTEM_PLUGIN;}
+
     /// \brief Load function
     public: virtual void Load(int argc = 0, char**argv = NULL) = 0;
     public: virtual void Init() {}

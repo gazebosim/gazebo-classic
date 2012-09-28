@@ -914,8 +914,16 @@ void World::LoadPlugin(const std::string &_filename,
 {
   gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
                                                               _name);
+
   if (plugin)
   {
+    if (plugin->GetType() != WORLD_PLUGIN)
+    {
+      gzerr << "World[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
+      return;
+    }
     plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back(plugin);
 
