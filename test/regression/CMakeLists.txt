@@ -34,6 +34,7 @@ set (gtest_sources
   pioneer2dx.cc
   pr2.cc
   projector.cc
+  set_pose.cc
   speed.cc
   transport.cc)
 
