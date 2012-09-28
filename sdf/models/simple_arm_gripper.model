@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <gazebo version="1.2">
-    <model name="simple_arm">
+    <model name="simple_arm_gripper">
         <link name="arm_base">
             <inertial>
                 <pose>0 0 0.00099 0 0 0</pose>
@@ -392,5 +392,17 @@
     <include filename="pr2_gripper.model" model_pose="0.829 0.188 0.209325 0 1.57079633 0"/>
     <origin pose='-0.771000 0.188000 -0.790675 0.000000 -1.57079633 0.000000'/>
     -->
+        <include filename="pr2_gripper.model" model_pose="0.81 0.188 1.795 0 1.57079633 0" />
+        <joint name="arm_gripper_joint" type="revolute">
+            <parent>arm_wrist_roll</parent>
+            <child>pr2_gripper::r_wrist_roll_link</child>
+            <axis>
+                <limit>
+                  <lower>0</lower>
+                  <upper>0</upper>
+                </limit>
+                <xyz>0 0 1</xyz>
+            </axis>
+        </joint>
     </model>
 </gazebo>

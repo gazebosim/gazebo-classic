@@ -1382,7 +1382,6 @@
             <ode>
               <kp>1000000000000.000000</kp>
               <kd>10000.000000</kd>
-              <max_vel>100.000000</max_vel>
               <min_depth>0.000000</min_depth>
             </ode>
           </contact>
@@ -1451,7 +1450,6 @@
             <ode>
               <kp>1000000000000.000000</kp>
               <kd>10000.000000</kd>
-              <max_vel>100.000000</max_vel>
               <min_depth>0.000000</min_depth>
             </ode>
           </contact>
@@ -1501,7 +1499,6 @@
             <ode>
               <kp>1000000000000.000000</kp>
               <kd>10000.000000</kd>
-              <max_vel>100.000000</max_vel>
               <min_depth>0.000000</min_depth>
             </ode>
           </contact>

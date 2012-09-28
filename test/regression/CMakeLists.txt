@@ -22,6 +22,7 @@ link_directories(
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
+  camera_sensor.cc
   common.cc
   factory.cc
   file_handling.cc
@@ -33,6 +34,7 @@ set (gtest_sources
   pioneer2dx.cc
   pr2.cc
   projector.cc
+  set_pose.cc
   speed.cc
   transport.cc)
 

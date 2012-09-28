@@ -353,7 +353,9 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 unsigned int _width = 320, unsigned int _height = 240,
+                 double _rate = 25)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -370,15 +372,16 @@ class ServerFixture : public testing::Test
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
                  << "' type ='camera'>"
-                 << "  <always_on>1</always_on>"
-                 << "  <update_rate>25</update_rate>"
-                 << "  <visualize>true</visualize>"
+                 << "    <always_on>1</always_on>"
+                 << "    <update_rate>" << _rate << "</update_rate>"
+                 << "    <visualize>true</visualize>"
                  << "    <camera>"
                  << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
                  << "      <image>"
-                 << "        <width>320</width>"
-                 << "        <height>240</height>"
+                 << "        <width>" << _width << "</width>"
+                 << "        <height>" << _height << "</height>"
                  << "        <format>R8G8B8</format>"
+                 << "      </image>"
                  << "      <clip>"
                  << "        <near>0.1</near><far>100</far>"
                  << "      </clip>"
