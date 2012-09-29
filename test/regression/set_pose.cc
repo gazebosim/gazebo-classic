@@ -39,9 +39,139 @@ TEST_F(PhysicsTest, State)
   physics::LinkState linkState = modelState.GetLinkState(0);
 
 
+  {
+    msgs::Factory msg;
 
+    std::ostringstream newModelStr;
 
+    math::Pose pose(0, 0, 0, 0, 0, 0);
+    math::Vector3 size(1.0, 0.1, 0.1);
 
+    newModelStr
+      << "<gazebo version ='1.2'>\n"
+      << "  <model name='model_1'>\n"
+      << "    <pose>0 0 1 0 0 0</pose>\n"
+      << "    <link name='link_1'>\n"
+      << "      <pose>0 0 0 0 0 0</pose>\n"
+      << "      <inertial>\n"
+      << "        <mass>1</mass>\n"
+      << "        <inertia>\n"
+      << "          <ixx>1</ixx>\n"
+      << "          <ixy>0</ixy>\n"
+      << "          <ixz>0</ixz>\n"
+      << "          <iyy>1</iyy>\n"
+      << "          <iyz>0</iyz>\n"
+      << "          <izz>1</izz>\n"
+      << "        </inertia>\n"
+      << "      </inertial>\n"
+      << "      <collision name ='collision'>\n"
+      << "        <pose>0.5 0 0 0 0 0</pose>\n"
+      << "        <geometry>\n"
+      << "          <box>\n"
+      << "            <size>" << size.x << " " << size.y << " "
+                              << size.z << "</size>\n"
+      << "          </box>\n"
+      << "        </geometry>\n"
+      << "      </collision>\n"
+      << "      <visual name ='visual'>\n"
+      << "        <pose>0.5 0 0 0 0 0</pose>\n"
+      << "        <geometry>\n"
+      << "          <box>\n"
+      << "            <size>" << size.x << " " << size.y << " "
+                              << size.z << "</size>\n"
+      << "          </box>\n"
+      << "        </geometry>\n"
+      << "        <material><script>Gazebo/Grey</script></material>\n"
+      << "      </visual>\n"
+      << "    </link>\n"
+      << "    <link name='link_2'>\n"
+      << "      <pose>1 0 0 0 0 0</pose>\n"
+      << "      <inertial>\n"
+      << "        <mass>1</mass>\n"
+      << "        <inertia>\n"
+      << "          <ixx>1</ixx>\n"
+      << "          <ixy>0</ixy>\n"
+      << "          <ixz>0</ixz>\n"
+      << "          <iyy>1</iyy>\n"
+      << "          <iyz>0</iyz>\n"
+      << "          <izz>1</izz>\n"
+      << "        </inertia>\n"
+      << "      </inertial>\n"
+      << "      <collision name ='collision'>\n"
+      << "        <pose>0.5 0 0 0 0 0</pose>\n"
+      << "        <geometry>\n"
+      << "          <box>\n"
+      << "            <size>" << size.x << " " << size.y << " "
+                              << size.z << "</size>\n"
+      << "          </box>\n"
+      << "        </geometry>\n"
+      << "      </collision>\n"
+      << "      <visual name ='visual'>\n"
+      << "        <pose>0.5 0 0 0 0 0</pose>\n"
+      << "        <geometry>\n"
+      << "          <box>\n"
+      << "            <size>" << size.x << " " << size.y << " "
+                              << size.z << "</size>\n"
+      << "          </box>\n"
+      << "        </geometry>\n"
+      << "        <material><script>Gazebo/Grey</script></material>\n"
+      << "      </visual>\n"
+      << "    </link>\n"
+      << "    <joint name='joint_01' type='revolute'>\n"
+      << "      <parent>world</parent>\n"
+      << "      <child>link_1</child>\n"
+      << "      <axis>\n"
+      << "        <xyz>0 0 1</xyz>\n"
+      << "        <limit>\n"
+      << "          <upper>0</upper>\n"
+      << "          <lower>0</lower>\n"
+      << "        </limit>\n"
+      << "      </axis>\n"
+      << "    </joint>\n"
+      << "    <joint name='joint_12' type='revolute'>\n"
+      << "      <parent>link_1</parent>\n"
+      << "      <child>link_2</child>\n"
+      << "      <axis>\n"
+      << "        <xyz>0 0 1</xyz>\n"
+      << "      </axis>\n"
+      << "    </joint>\n"
+      << "  </model>\n"
+      << "</gazebo>\n";
+
+    msg.set_sdf(newModelStr.str());
+
+    transport::PublisherPtr factoryPub
+      = this->node->Advertise<msgs::Factory>("~/factory");
+    this->factoryPub->Publish(msg);
+  }
+
+  physics::ModelPtr model = world->GetModel("model_1");
+  while(!model)
+  {
+    model = world->GetModel("model_1");
+    gzdbg << "waiting for model_1 to spawn\n";
+    sleep(1);
+  }
+
+  physics::LinkPtr link_1 = model->GetLink("link_1");
+  physics::LinkPtr link_2 = model->GetLink("link_2");
+  double start_time = world->GetSimTime().Double();
+  while(world->GetSimTime().Double() < start_time + 30)
+  {
+    gzdbg << "setting link poses without violation\n";
+    link_1->SetWorldPose(math::Pose(0,    0, 1, 0, 0, 0));
+    link_2->SetWorldPose(math::Pose(1.00, 0, 1, 0, 0, 0));
+  }
+
+  // FIXME: below fails, but why?
+  start_time = world->GetSimTime().Double();
+  while(world->GetSimTime().Double() < start_time + 100)
+  {
+    gzdbg << "setting link poses with violation\n";
+    link_1->SetWorldPose(math::Pose(0,    0, 1, 0, 0, 0));
+    link_2->SetWorldPose(math::Pose(1.01, 0, 1, 0, 0, 1.57079));
+    sleep(1.0);
+  }
   Unload();
 }
 
