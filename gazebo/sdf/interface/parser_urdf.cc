@@ -440,7 +440,7 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
           addKeyValue(contact_ode, "kd", values2str(1, &(*ge)->kd));
         // max contact interpenetration correction velocity
         if ((*ge)->is_maxVel)
-          addKeyValue(contact_ode, "maxVel", values2str(1, &(*ge)->maxVel));
+          addKeyValue(contact_ode, "max_vel", values2str(1, &(*ge)->maxVel));
         // contact interpenetration margin tolerance
         if ((*ge)->is_minDepth)
           addKeyValue(contact_ode, "minDepth", values2str(1, &(*ge)->minDepth));
