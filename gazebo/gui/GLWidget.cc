@@ -175,7 +175,8 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 /////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
-  if (this->userCamera && this->userCamera->IsInitialized())
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (cam && cam->IsInitialized())
   {
     event::Events::preRender();
 

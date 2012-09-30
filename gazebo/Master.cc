@@ -64,9 +64,9 @@ void Master::Init(uint16_t _port)
   {
     this->connection->Listen(_port, boost::bind(&Master::OnAccept, this, _1));
   }
-  catch(std::exception &e)
+  catch(std::exception &_e)
   {
-    gzthrow("Unable to start server[" << e.what() << "]\n");
+    gzthrow("Unable to start server[" << _e.what() << "]\n");
   }
 }
 
