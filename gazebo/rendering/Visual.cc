@@ -397,12 +397,12 @@ void Visual::Load()
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
       std::string uri = scriptElem->GetValueString("uri");
-      std::string name = scriptElem->GetValueString("name");
+      std::string matName = scriptElem->GetValueString("name");
 
       if (!uri.empty())
         RenderEngine::Instance()->AddResourcePath(uri);
       if (!name.empty())
-        this->SetMaterial(name);
+        this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->GetValueColor("ambient"));

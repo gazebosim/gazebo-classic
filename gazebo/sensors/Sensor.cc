@@ -151,7 +151,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 
   if (plugin)
   {
-    if (plugin->GetType() != MODEL_PLUGIN)
+    if (plugin->GetType() != SENSOR_PLUGIN)
     {
       gzerr << "Sensor[" << this->GetName() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "

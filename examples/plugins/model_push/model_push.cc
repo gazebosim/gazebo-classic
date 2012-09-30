@@ -18,6 +18,9 @@
 #include "physics/physics.h"
 #include "gazebo.hh"
 
+/// \example examples/plugins/model_push.cc
+/// This example creates a ModelPlugin, and applies a force to a box to move
+/// it alone the ground plane.
 namespace gazebo
 {
   class ModelPush : public ModelPlugin

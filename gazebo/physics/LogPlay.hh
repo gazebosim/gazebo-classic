@@ -22,6 +22,9 @@
 #ifndef __LOGPLAY_HH__
 #define __LOGPLAY_HH__
 
+#include <list>
+#include <string>
+
 namespace gazebo
 {
   namespace physics

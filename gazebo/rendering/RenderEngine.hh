@@ -41,6 +41,8 @@ namespace Ogre
 
 namespace gazebo
 {
+  /// \ingroup gazebo_rendering
+  /// \brief Rendering namespace
   namespace rendering
   {
     /// \addtogroup gazebo_rendering

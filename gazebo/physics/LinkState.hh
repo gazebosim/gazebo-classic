@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include <list>
 
 #include "sdf/sdf.hh"
 #include "physics/State.hh"

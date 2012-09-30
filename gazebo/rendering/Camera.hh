@@ -537,7 +537,6 @@ namespace gazebo
       protected: Ogre::SceneNode *sceneNode;
       protected: Ogre::SceneNode *pitchNode;
 
-
       // Info for saving images
       protected: unsigned char *saveFrameBuffer;
       protected: unsigned char *bayerFrameBuffer;

@@ -65,8 +65,6 @@ namespace gazebo
   template<class T>
   class PluginT
   {
-
-
     public: typedef boost::shared_ptr<T> TPtr;
 
             /// \brief Get the name of the handler
@@ -207,8 +205,13 @@ namespace gazebo
              {this->type = WORLD_PLUGIN;}
 
     /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param _world Pointer the World
+    /// \param _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::WorldPtr _world,
-                sdf::ElementPtr _sdf) = 0;
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -222,8 +225,13 @@ namespace gazebo
              {this->type = MODEL_PLUGIN;}
 
     /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param _model Pointer the Model
+    /// \param _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::ModelPtr _model,
-                sdf::ElementPtr _sdf) = 0;
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -238,8 +246,13 @@ namespace gazebo
 
 
     /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param _sensor Pointer the Sensor
+    /// \param _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(sensors::SensorPtr _sensor,
-                sdf::ElementPtr _sdf) = 0;
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -254,7 +267,12 @@ namespace gazebo
              {this->type = SYSTEM_PLUGIN;}
 
     /// \brief Load function
-    public: virtual void Load(int argc = 0, char**argv = NULL) = 0;
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param _argc Number of command line arguments.
+    /// \param _argv Array of command line arguments.
+    public: virtual void Load(int _argc = 0, char **_argv = NULL) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };

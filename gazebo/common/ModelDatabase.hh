@@ -18,6 +18,7 @@
 #define __GAZEBO_MODELDATABSE_HH__
 
 #include <string>
+#include <map>
 
 namespace gazebo
 {
@@ -31,7 +32,6 @@ namespace gazebo
     /// models
     class ModelDatabase
     {
-
       public: static std::string GetURI();
 
       public: static std::map<std::string, std::string> GetModels();

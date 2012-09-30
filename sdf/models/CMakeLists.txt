@@ -28,4 +28,4 @@ set (models
   ragdoll.model
 )
 
-install(FILES ${models} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/models/)
+# install(FILES ${models} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/models/)

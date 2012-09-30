@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef RENDERING_DEPTHCAMERA_HH
-#define RENDERING_DEPTHCAMERA_HH
+#ifndef __RENDERING_DEPTHCAMERA_HH__
+#define __RENDERING_DEPTHCAMERA_HH__
 #include <string>
 
 #include "rendering/Camera.hh"
@@ -45,8 +45,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  /// \ingroup gazebo_rendering
-  /// \brief Rendering namespace
   namespace rendering
   {
     class MouseEvent;
@@ -56,6 +54,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
+    /// \class DepthCamera DepthCamera.hh rendering/DepthCamera.hh
     /// \brief depth camera sensor, depends on rendering::Camera class
     class DepthCamera : public Camera
     {

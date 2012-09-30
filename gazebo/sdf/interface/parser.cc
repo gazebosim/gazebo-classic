@@ -537,9 +537,6 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 
         if (elemXml->FirstChildElement("uri"))
         {
-          //modelPath = gazebo::common::find_file(
-          //    elemXml->FirstChildElement("uri")->GetText());
-
           modelPath = gazebo::common::ModelDatabase::GetModelPath(
               elemXml->FirstChildElement("uri")->GetText());
 
