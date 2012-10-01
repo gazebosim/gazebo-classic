@@ -158,10 +158,14 @@ TEST_F(PhysicsTest, State)
   double start_time = world->GetSimTime().Double();
   while(world->GetSimTime().Double() < start_time + 30)
   {
-    gzdbg << "setting link poses without violation\n";
+    // gzdbg << "setting link poses without violation\n";
+    // double cur_time = world->GetSimTime().Double();
     link_1->SetWorldPose(math::Pose(0,    0, 1, 0, 0, 0));
     link_2->SetWorldPose(math::Pose(1.00, 0, 1, 0, 0, 0));
+    sleep(0.5);
   }
+
+  // world->EnablePhysicsEngine(false);
 
   // FIXME: below fails, but why?
   start_time = world->GetSimTime().Double();
@@ -169,9 +173,10 @@ TEST_F(PhysicsTest, State)
   {
     gzdbg << "setting link poses with violation\n";
     link_1->SetWorldPose(math::Pose(0,    0, 1, 0, 0, 0));
-    link_2->SetWorldPose(math::Pose(1.01, 0, 1, 0, 0, 1.57079));
-    sleep(1.0);
+    link_2->SetWorldPose(math::Pose(2.00, 0, 1, 0, 0, 1.57079));
+    sleep(0.5);
   }
+
   Unload();
 }
 
