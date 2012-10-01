@@ -38,7 +38,7 @@ namespace gazebo
     class Hinge2Joint : public T
     {
       /// \brief Constructor
-      public: Hinge2Joint() : T()
+      public: Hinge2Joint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::HINGE2_JOINT); }
       /// \brief Destructor
       public: virtual ~Hinge2Joint()

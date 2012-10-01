@@ -33,8 +33,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODEJoint::ODEJoint()
-  : Joint()
+ODEJoint::ODEJoint(BasePtr _parent)
+  : Joint(_parent)
 {
   this->jointId = NULL;
 }

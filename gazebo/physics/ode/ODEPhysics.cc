@@ -621,22 +621,22 @@ void ODEPhysics::ConvertMass(void *_engineMass, InertialPtr _inertial)
 }
 
 //////////////////////////////////////////////////
-JointPtr ODEPhysics::CreateJoint(const std::string &_type)
+JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 {
   JointPtr joint;
 
   if (_type == "prismatic")
-    joint.reset(new ODESliderJoint(this->worldId));
+    joint.reset(new ODESliderJoint(this->worldId, _parent));
   else if (_type == "screw")
-    joint.reset(new ODEScrewJoint(this->worldId));
+    joint.reset(new ODEScrewJoint(this->worldId, _parent));
   else if (_type == "revolute")
-    joint.reset(new ODEHingeJoint(this->worldId));
+    joint.reset(new ODEHingeJoint(this->worldId, _parent));
   else if (_type == "revolute2")
-    joint.reset(new ODEHinge2Joint(this->worldId));
+    joint.reset(new ODEHinge2Joint(this->worldId, _parent));
   else if (_type == "ball")
-    joint.reset(new ODEBallJoint(this->worldId));
+    joint.reset(new ODEBallJoint(this->worldId, _parent));
   else if (_type == "universal")
-    joint.reset(new ODEUniversalJoint(this->worldId));
+    joint.reset(new ODEUniversalJoint(this->worldId, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 

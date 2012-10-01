@@ -35,8 +35,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODEScrewJoint::ODEScrewJoint(dWorldID _worldId)
-    : ScrewJoint<ODEJoint>()
+ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
+    : ScrewJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateScrew(_worldId, NULL);
 }
@@ -65,7 +65,9 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 //////////////////////////////////////////////////
 math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 {
-  math::Angle result = dJointGetScrewPosition(this->jointId);
+  math::Angle result;
+  if (this->jointId)
+    result = dJointGetScrewPosition(this->jointId);
 
   return result;
 }

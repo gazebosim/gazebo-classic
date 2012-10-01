@@ -37,7 +37,7 @@ namespace gazebo
     class ODEUniversalJoint : public UniversalJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEUniversalJoint(dWorldID worldId);
+      public: ODEUniversalJoint(dWorldID worldId, BasePtr _parent);
 
       /// \brief Destuctor
       public: virtual ~ODEUniversalJoint();

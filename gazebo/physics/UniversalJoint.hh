@@ -36,8 +36,9 @@ namespace gazebo
     class UniversalJoint : public T
     {
       /// \brief Constructor
-      public: UniversalJoint() : T()
+      public: UniversalJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::UNIVERSAL_JOINT); }
+
       /// \brief Destuctor
       public: virtual ~UniversalJoint()
               { }

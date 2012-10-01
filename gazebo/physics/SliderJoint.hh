@@ -37,7 +37,7 @@ namespace gazebo
     class SliderJoint : public T
     {
       /// \brief Constructor
-      public: SliderJoint() : T()
+      public: SliderJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::SLIDER_JOINT); }
 
       /// \brief Destructor

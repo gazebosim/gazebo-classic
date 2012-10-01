@@ -51,17 +51,17 @@ namespace gazebo
      /// \brief Update the controller
      private: void UpdateStates();
 
-     private: physics::WorldPtr world_;
-     private: physics::ModelPtr model_;
+     private: void FixLink(physics::LinkPtr link);
+     private: void UnfixLink();
+
+     private: physics::WorldPtr world;
+     private: physics::ModelPtr model;
+     private: physics::JointPtr joint;
 
      private: boost::mutex update_mutex;
 
      // Pointer to the update event connection
-     private: event::ConnectionPtr update_connection_;
-
-     void FixLink(physics::LinkPtr link);
-     void UnfixLink();
-     private: physics::JointPtr joint_;
+     private: event::ConnectionPtr updateConnection;
   };
 }
 #endif

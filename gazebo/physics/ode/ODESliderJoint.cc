@@ -31,8 +31,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODESliderJoint::ODESliderJoint(dWorldID _worldId)
-    : SliderJoint<ODEJoint>()
+ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
+    : SliderJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateSlider(_worldId, NULL);
 }
@@ -59,7 +59,9 @@ math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 //////////////////////////////////////////////////
 math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 {
-  math::Angle result = dJointGetSliderPosition(this->jointId);
+  math::Angle result;
+  if (this->jointId)
+    result = dJointGetSliderPosition(this->jointId);
   return result;
 }
 

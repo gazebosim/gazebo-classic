@@ -55,7 +55,7 @@ Gripper::~Gripper()
 /////////////////////////////////////////////////
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
-  this->fixedJoint = this->physics->CreateJoint("revolute");
+  this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
 
   sdf::ElementPtr grasp_check = _sdf->GetElement("grasp_check");
   this->min_contact_count = grasp_check->GetValueUInt("min_contact_count");

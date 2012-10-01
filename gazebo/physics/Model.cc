@@ -589,7 +589,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   std::string stype = _sdf->GetValueString("type");
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype);
+  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
+     boost::shared_static_cast<Model>(shared_from_this()));
   if (!joint)
     gzthrow("Unable to create joint of type[" + stype + "]\n");
 

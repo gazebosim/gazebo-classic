@@ -41,7 +41,7 @@ namespace gazebo
     class ScrewJoint : public T
     {
       /// \brief Constructor
-      public: ScrewJoint() : T()
+      public: ScrewJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::SCREW_JOINT); }
       /// \brief Destructor
       public: virtual ~ScrewJoint()

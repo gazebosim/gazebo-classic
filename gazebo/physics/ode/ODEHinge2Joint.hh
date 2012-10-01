@@ -40,7 +40,7 @@ namespace gazebo
     class ODEHinge2Joint : public Hinge2Joint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEHinge2Joint(dWorldID worldId);
+      public: ODEHinge2Joint(dWorldID worldId, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEHinge2Joint();

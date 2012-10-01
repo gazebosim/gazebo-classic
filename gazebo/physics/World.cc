@@ -1026,11 +1026,13 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_info")
     {
+      std::cout << "entity_info[" << (*iter).data() << "]\n";
       BasePtr entity = this->rootElement->GetByName((*iter).data());
       if (entity)
       {
         if (entity->HasType(Base::MODEL))
         {
+          printf("Is a model\n");
           msgs::Model modelMsg;
           ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
           model->FillModelMsg(modelMsg);
@@ -1041,6 +1043,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::LINK))
         {
+          printf("Is a link\n");
           msgs::Link linkMsg;
           LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
           link->FillLinkMsg(linkMsg);
@@ -1051,6 +1054,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::COLLISION))
         {
+          printf("Is a collision\n");
           msgs::Collision collisionMsg;
           CollisionPtr collision =
             boost::shared_dynamic_cast<Collision>(entity);
@@ -1062,6 +1066,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::JOINT))
         {
+          printf("Is a joint\n");
           msgs::Joint jointMsg;
           JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
           joint->FillJointMsg(jointMsg);

@@ -37,7 +37,7 @@ namespace gazebo
     class BallJoint : public T
     {
       /// \brief Constructor
-      public: BallJoint() : T()
+      public: BallJoint(BasePtr _parent) : T(_parent)
               {
                 this->AddType(Base::BALL_JOINT);
               }

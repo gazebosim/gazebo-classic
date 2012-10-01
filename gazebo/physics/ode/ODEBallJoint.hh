@@ -37,7 +37,7 @@ namespace gazebo
     class ODEBallJoint : public BallJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEBallJoint(dWorldID worldId);
+      public: ODEBallJoint(dWorldID worldId, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEBallJoint();

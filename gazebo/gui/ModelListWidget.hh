@@ -83,6 +83,10 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Collision &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Joint &_msg,
+                                     QtProperty *_parent);
+
+
       private: void FillMsgField(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Reflection *_reflection,
@@ -175,7 +179,11 @@ namespace gazebo
       private: ModelMsgs_L modelMsgs;
 
       private: msgs::Model modelMsg;
+      private: msgs::Link linkMsg;
+      private: msgs::Joint jointMsg;
+
       private: bool fillPropertyTree;
+      private: std::string fillType;
     };
 
     class ModelListSheetDelegate: public QItemDelegate

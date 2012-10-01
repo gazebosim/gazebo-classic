@@ -101,7 +101,8 @@ namespace gazebo
                   CollisionPtr _collision) = 0;
 
       /// \brief Create a new joint
-      public: virtual JointPtr CreateJoint(const std::string &_type) = 0;
+      public: virtual JointPtr CreateJoint(const std::string &_type,
+                                           ModelPtr _parent) = 0;
 
       /// \brief Return the gavity vector
       /// \return The gavity vector

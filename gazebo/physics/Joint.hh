@@ -57,7 +57,7 @@ namespace gazebo
                               LO_STOP};
 
       /// \brief Constructor
-      public: Joint();
+      public: Joint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~Joint();

@@ -37,7 +37,7 @@ namespace gazebo
     class ODEJoint : public Joint
     {
       /// \brief Constructor
-      public: ODEJoint();
+      public: ODEJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEJoint();

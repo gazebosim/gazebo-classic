@@ -36,8 +36,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Joint::Joint()
-  : Base(BasePtr())
+Joint::Joint(BasePtr _parent)
+  : Base(_parent)
 {
   this->AddType(Base::JOINT);
   this->showJoints = false;
@@ -289,17 +289,36 @@ void Joint::FillJointMsg(msgs::Joint &_msg)
 
 
   if (this->HasType(Base::HINGE_JOINT))
+  {
     _msg.set_type(msgs::Joint::REVOLUTE);
+    _msg.add_angle(this->GetAngle(0).Radian());
+  }
   else if (this->HasType(Base::HINGE2_JOINT))
+  {
     _msg.set_type(msgs::Joint::REVOLUTE2);
+    _msg.add_angle(this->GetAngle(0).Radian());
+    _msg.add_angle(this->GetAngle(1).Radian());
+  }
   else if (this->HasType(Base::BALL_JOINT))
+  {
     _msg.set_type(msgs::Joint::BALL);
+  }
   else if (this->HasType(Base::SLIDER_JOINT))
+  {
     _msg.set_type(msgs::Joint::PRISMATIC);
+    _msg.add_angle(this->GetAngle(0).Radian());
+  }
   else if (this->HasType(Base::SCREW_JOINT))
+  {
     _msg.set_type(msgs::Joint::SCREW);
+    _msg.add_angle(this->GetAngle(0).Radian());
+  }
   else if (this->HasType(Base::UNIVERSAL_JOINT))
+  {
     _msg.set_type(msgs::Joint::UNIVERSAL);
+    _msg.add_angle(this->GetAngle(0).Radian());
+    _msg.add_angle(this->GetAngle(1).Radian());
+  }
 
   msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetGlobalAxis(0));
   _msg.mutable_axis1()->set_limit_lower(0);

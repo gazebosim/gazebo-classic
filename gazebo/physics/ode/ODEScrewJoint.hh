@@ -41,7 +41,7 @@ namespace gazebo
     class ODEScrewJoint : public ScrewJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEScrewJoint(dWorldID worldId);
+      public: ODEScrewJoint(dWorldID worldId, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEScrewJoint();

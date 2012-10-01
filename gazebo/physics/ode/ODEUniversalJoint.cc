@@ -30,8 +30,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId)
-    : UniversalJoint<ODEJoint>()
+ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
+    : UniversalJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateUniversal(_worldId, NULL);
 }
@@ -95,10 +95,13 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;
 
-  if (_index == 0)
-    result = dJointGetUniversalAngle1(this->jointId);
-  else
-    result = dJointGetUniversalAngle2(this->jointId);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      result = dJointGetUniversalAngle1(this->jointId);
+    else
+      result = dJointGetUniversalAngle2(this->jointId);
+  }
 
   return result;
 }

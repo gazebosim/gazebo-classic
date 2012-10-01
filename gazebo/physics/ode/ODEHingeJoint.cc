@@ -31,8 +31,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODEHingeJoint::ODEHingeJoint(dWorldID _worldId)
-    : HingeJoint<ODEJoint>()
+ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
+    : HingeJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateHinge(_worldId, NULL);
 }
@@ -109,8 +109,9 @@ void ODEHingeJoint::ApplyDamping()
 //////////////////////////////////////////////////
 math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 {
-  math::Angle result = dJointGetHingeAngle(this->jointId);
-
+  math::Angle result;
+  if (this->jointId)
+    result = dJointGetHingeAngle(this->jointId);
   return result;
 }
 

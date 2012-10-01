@@ -37,7 +37,7 @@ namespace gazebo
     class ODESliderJoint : public SliderJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODESliderJoint(dWorldID worldId);
+      public: ODESliderJoint(dWorldID worldId, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODESliderJoint();
