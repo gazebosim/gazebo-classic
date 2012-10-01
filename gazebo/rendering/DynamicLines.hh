@@ -35,59 +35,64 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Class for drawing lines
+    /// \class DynamicLines DynamicLines.hh rendering/DynamicLines.hh
+    /// \brief Class for drawing lines that can change
     class DynamicLines : public DynamicRenderable
     {
-      /// Constructor
-      public: DynamicLines(RenderOpType opType = RENDERING_LINE_STRIP);
+      /// \brief Constructor
+      /// \param[in] _opType The type of Line
+      public: DynamicLines(RenderOpType _opType = RENDERING_LINE_STRIP);
 
-      /// Destructor
+      /// \brief Destructor
       public: virtual ~DynamicLines();
 
+      /// \brief Get type of movable
+      /// \return This returns "gazebo::dynamiclines"
       public: static std::string GetMovableType();
 
-      /// \brief Returns "gazebo::ogredynamicslines"
+      /// \brief Overridden function from Ogre's base class.
+      /// \return Returns "gazebo::ogredynamicslines"
       public: virtual const Ogre::String &getMovableType() const;
 
-      /// Add a point to the point list
-      /// \param pt math::Vector3 point
-      public: void AddPoint(const math::Vector3 &pt);
+      /// \brief Add a point to the point list
+      /// \param[in] pt math::Vector3 point
+      public: void AddPoint(const math::Vector3 &_pt);
 
-      /// Change the location of an existing point in the point list
-      /// \param index Index of the point to set
-      /// \param value math::Vector3 value to set the point to
-      public: void SetPoint(unsigned int index, const math::Vector3 &value);
+      /// \brief Change the location of an existing point in the point list
+      /// \param[in] _index Index of the point to set
+      /// \param[in] _value math::Vector3 value to set the point to
+      public: void SetPoint(unsigned int _index, const math::Vector3 &_value);
 
-      /// Return the location of an existing point in the point list
-      /// \param index Number of the point to return
+      /// \brief Return the location of an existing point in the point list
+      /// \param[in] _index Number of the point to return
       /// \return math::Vector3 value of the point
-      public: const math::Vector3& GetPoint(unsigned int index) const;
+      public: const math::Vector3& GetPoint(unsigned int _index) const;
 
-      /// Return the total number of points in the point list
+      /// \brief Return the total number of points in the point list
       /// \return Number of points
       public: unsigned int GetPointCount() const;
 
-      /// Remove all points from the point list
+      /// \brief Remove all points from the point list
       public: void Clear();
 
-      /// Call this to update the hardware buffer after making changes.
+      /// \brief Call this to update the hardware buffer after making changes.
       public: void Update();
 
       /// \brief Implementation DynamicRenderable,
-      ///        creates a simple vertex-only decl
+      /// creates a simple vertex-only decl
       protected: virtual void  CreateVertexDeclaration();
 
       /// \brief Implementation DynamicRenderable, pushes point
-      ///        list out to hardware memory
+      /// list out to hardware memory
       protected: virtual void FillHardwareBuffers();
 
+      /// \brief List of points for the line
       private: std::vector<math::Vector3> points;
+
+      /// \brief Used to indicate if the lines require an update
       private: bool dirty;
     };
-
     /// \}
   }
 }
 #endif
-
-

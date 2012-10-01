@@ -52,7 +52,7 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene,
   this->pcdTarget = NULL;
   this->pcdBuffer = NULL;
   this->pcdMaterial = NULL;
-  this->output_points = false;
+  this->outputPoints = false;
 }
 
 //////////////////////////////////////////////////
@@ -64,7 +64,7 @@ DepthCamera::~DepthCamera()
 void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
-  this->output_points =
+  this->outputPoints =
     (_sdf->GetElement("depth_camera")->GetValueString("output")
     == "points");
 }
@@ -127,7 +127,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 
   this->depthMaterial->load();
 
-  if (this->output_points)
+  if (this->outputPoints)
   {
     this->pcdTexture = Ogre::TextureManager::getSingleton().createManual(
         _textureName + "_pcd",
@@ -180,7 +180,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 void DepthCamera::PostRender()
 {
   this->depthTarget->swapBuffers();
-  if (this->output_points)
+  if (this->outputPoints)
     this->pcdTarget->swapBuffers();
 
   if (this->newData && this->captureData)
@@ -188,7 +188,7 @@ void DepthCamera::PostRender()
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
-    if (!this->output_points)
+    if (!this->outputPoints)
     {
       Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
@@ -242,8 +242,9 @@ void DepthCamera::PostRender()
   this->newData = false;
 }
 
-void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target,
-          Ogre::Material *material, std::string matName)
+//////////////////////////////////////////////////
+void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
+          Ogre::Material *_material, const std::string &_matName)
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
@@ -252,7 +253,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target,
 
   renderSys = this->scene->GetManager()->getDestinationRenderSystem();
   // Get pointer to the material pass
-  pass = material->getBestTechnique()->getPass(0);
+  pass = _material->getBestTechnique()->getPass(0);
 
   // Render the depth texture
   // OgreSceneManager::_render function automatically sets farClip to 0.
@@ -262,20 +263,20 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *target,
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  vp = target->getViewport(0);
+  vp = _target->getViewport(0);
 
   // return 0 in case no renderable object is inside frustrum
   vp->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
 
   Ogre::CompositorManager::getSingleton().setCompositorEnabled(
-                                                vp, matName, true);
+                                                vp, _matName, true);
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
   sceneMgr->_setPass(pass, true, false);
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(target);
+  autoParamDataSource.setCurrentRenderTarget(_target);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
   autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
 
@@ -345,7 +346,7 @@ void DepthCamera::RenderImpl()
   // for camera image
   Camera::RenderImpl();
 
-  if (this->output_points)
+  if (this->outputPoints)
   {
     sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
     sceneMgr->_suppressRenderStateChanges(true);
@@ -367,9 +368,9 @@ const float* DepthCamera::GetDepthData()
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::SetDepthTarget(Ogre::RenderTarget *target)
+void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
 {
-  this->depthTarget = target;
+  this->depthTarget = _target;
 
   if (this->depthTarget)
   {
@@ -391,7 +392,3 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *target)
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
 }
-
-
-
-

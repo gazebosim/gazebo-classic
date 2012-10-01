@@ -396,7 +396,7 @@ namespace gazebo
       /// \return Direction the camera is facing
       public: math::Vector3 GetDirection() const;
 
-      /// \brief Connect a to the add entity signal
+      /// \brief Connect a to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
       /// generated
       /// \return A pointer to the connection. This must be kept in scope.

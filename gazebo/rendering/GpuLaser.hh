@@ -19,8 +19,9 @@
  * Date: 29 March 2012
  */
 
-#ifndef RENDERING_GPULASER_HH
-#define RENDERING_GPULASER_HH
+#ifndef __GPULASER_HH__
+#define __GPULASER_HH__
+
 #include <string>
 #include <vector>
 
@@ -54,23 +55,23 @@ namespace gazebo
     class Mesh;
   }
 
-  /// \ingroup gazebo_rendering
-  /// \brief Rendering namespace
   namespace rendering
   {
-    class MouseEvent;
-    class ViewController;
     class Scene;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
+    /// \class GpuLaser GpuLaser.hh rendering/GpuLaser.hh
     /// \brief GPU based laser distance sensor
     ///
     /// This is the base class for all cameras.
     class GpuLaser : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
+      /// \param[in] _namePrefix Unique prefix name for the camera.
+      /// \param[in] _scene Scene that will contain the camera
+      /// \param[in] _autoRender Almost everyone should leave this as true.
       public: GpuLaser(const std::string &_namePrefix,
                           Scene *_scene, bool _autoRender = true);
 
@@ -78,7 +79,7 @@ namespace gazebo
       public: virtual ~GpuLaser();
 
       /// \brief Load the camera with a set of parmeters
-      /// \param _sdf The SDF camera info
+      /// \param[in] _sdf The SDF camera info
       public: void Load(sdf::ElementPtr &_sdf);
 
        /// \brief Load the camera with default parmeters
@@ -87,29 +88,44 @@ namespace gazebo
       /// \brief Initialize the camera
       public: void Init();
 
-      /// Finalize the camera
+      /// \brief Finalize the camera
       public: void Fini();
 
+      /// \brief Create the texture which is used to render laser data
+      /// \param[in] _textureName Name of the new texture
       public: void CreateLaserTexture(const std::string &_textureName);
 
       /// \brief Render the camera
       public: virtual void PostRender();
 
-      // All things needed to get back z buffer for laser data
-      public: virtual const float* GetLaserData();
+      /// \brief All things needed to get back z buffer for laser data
+      /// \return Array of laser data
+      public: virtual const float *GetLaserData();
 
-      /// \brief Connect a to the add entity signal
+      /// \brief Connect to a laser frame signal
+      /// \param[in] _subscriber Callback that is called when a new image is
+      /// generated
+      /// \return A pointer to the connection. This must be kept in scope.
       public: template<typename T>
-              event::ConnectionPtr ConnectNewLaserFrame(T subscriber)
-              { return newLaserFrame.Connect(subscriber); }
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &c)
-              { newLaserFrame.Disconnect(c); }
+              event::ConnectionPtr ConnectNewLaserFrame(T _subscriber)
+              { return newLaserFrame.Connect(_subscriber); }
 
+      /// \brief Disconnect from a laser frame signal
+      /// \param[in] _c The connection to disconnect
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_c)
+              { newLaserFrame.Disconnect(_c); }
+
+      /// \brief Set the number of laser samples in the width and height
+      /// \param[in] _w Number of samples in the horizontal sweep
+      /// \param[in] _h Number of samples in the vertical sweep
       public: void SetRangeCount(unsigned int _w, unsigned int _h = 1);
 
-      public: void SetParentSensor(sensors::GpuRaySensor *parent);
+      /// \brief Set the parent sensor
+      /// \param[in] _parent Pointer to a sensors::GpuRaySensor
+      public: void SetParentSensor(sensors::GpuRaySensor *_parent);
 
-      public: virtual void notifyRenderSingleObject(Ogre::Renderable *rend,
+      /// \brief Implementation of Ogre::RenderObjectListener
+      public: virtual void notifyRenderSingleObject(Ogre::Renderable *_rend,
               const Ogre::Pass* /*p*/, const Ogre::AutoParamDataSource* /*s*/,
               const Ogre::LightList* /*ll*/, bool /*supp*/);
 
