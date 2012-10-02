@@ -66,10 +66,7 @@ void Projector::Load(const std::string &_name,
   this->controlSub = this->node->Subscribe(topicName, &Projector::OnMsg, this);
 
   if (!this->visual)
-  {
-    gzerr << "Projector does not have a valid parent visual\n";
     return;
-  }
 
   int retryCount = 0;
 
@@ -92,9 +89,11 @@ void Projector::Load(const std::string &_name,
       ++retryCount;
     }
   }
-/*
+
+  this->projector.SetEnabled(true);
+
   // Start projector
-  this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
+  /*this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
     boost::bind(&Projector::ToggleProjector, this, true));
     */
 }
@@ -164,12 +163,13 @@ void Projector::SetTexture(const std::string &_textureName)
 void Projector::Toggle()
 {
   // if not headless
-  if (this->projector.initialized)
+  /*if (this->projector.initialized)
   {
     this->projector.SetEnabled(!this->projector.enabled);
   }
   else
     gzwarn << "could not start projector, toggle failed\n";
+    */
 }
 
 /////////////////////////////////////////////////
@@ -269,9 +269,10 @@ bool Projector::ProjectorFrameListener::frameStarted(
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetEnabled(bool _enabled)
 {
-  this->enabled = _enabled;
-  if (!this->enabled)
+  this->enabled = true;//_enabled;
+  /*if (!this->enabled)
     this->RemovePassFromMaterials();
+    */
   rendering::RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -457,7 +458,6 @@ void Projector::ProjectorFrameListener::AddPassToMaterial(
 {
   if (this->projectorTargets.find(_matName) != this->projectorTargets.end())
   {
-    gzwarn << "Adding a Material [" << _matName << "] that already exists.\n";
     return;
   }
 

@@ -110,6 +110,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->selectionSub = this->node->Subscribe("~/selection",
       &Scene::OnSelectionMsg, this);
   this->skySub = this->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
+  this->modelInfoSub = this->node->Subscribe("~/model/info",
+                                             &Scene::OnModelMsg, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
@@ -1090,68 +1092,13 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 /////////////////////////////////////////////////
 void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
-  std::string modelName, linkName;
   for (int i = 0; i < _msg->model_size(); i++)
   {
-    modelName = _msg->model(i).name() + "::";
     boost::shared_ptr<msgs::Pose> pm(new msgs::Pose(_msg->model(i).pose()));
     pm->set_name(_msg->model(i).name());
     this->poseMsgs.push_front(pm);
 
-    for (int j = 0; j < _msg->model(i).visual_size(); j++)
-    {
-      boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
-            _msg->model(i).visual(j)));
-      this->visualMsgs.push_back(vm);
-    }
-
-    for (int j = 0; j < _msg->model(i).joint_size(); j++)
-    {
-      boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
-            _msg->model(i).joint(j)));
-      this->jointMsgs.push_back(jm);
-    }
-
-    for (int j = 0; j < _msg->model(i).link_size(); j++)
-    {
-      linkName = modelName +_msg->model(i).link(j).name();
-      boost::shared_ptr<msgs::Pose> pm2(
-          new msgs::Pose(_msg->model(i).link(j).pose()));
-      pm2->set_name(linkName);
-      this->poseMsgs.push_front(pm2);
-
-      if (_msg->model(i).link(j).has_inertial())
-      {
-        boost::shared_ptr<msgs::Link> lm(
-            new msgs::Link(_msg->model(i).link(j)));
-        this->linkMsgs.push_back(lm);
-      }
-
-      for (int k = 0; k < _msg->model(i).link(j).visual_size(); k++)
-      {
-        boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
-              _msg->model(i).link(j).visual(k)));
-        this->visualMsgs.push_back(vm);
-      }
-
-      for (int k = 0; k < _msg->model(i).link(j).collision_size(); k++)
-      {
-        for (int l = 0;
-             l < _msg->model(i).link(j).collision(k).visual_size(); l++)
-        {
-          boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
-                _msg->model(i).link(j).collision(k).visual(l)));
-          this->visualMsgs.push_back(vm);
-        }
-      }
-
-      for (int k = 0; k < _msg->model(i).link(j).sensor_size(); k++)
-      {
-        boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
-              _msg->model(i).link(j).sensor(k)));
-        this->sensorMsgs.push_back(sm);
-      }
-    }
+    this->ProcessModelMsg(_msg->model(i));
   }
 
   for (int i = 0; i < _msg->light_size(); i++)
@@ -1216,6 +1163,70 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->GetValueDouble("start"),
                  elem->GetValueDouble("end"));
   }
+}
+
+//////////////////////////////////////////////////
+bool Scene::ProcessModelMsg(const msgs::Model &_msg)
+{
+  std::string modelName, linkName;
+
+  modelName = _msg.name() + "::";
+  for (int j = 0; j < _msg.visual_size(); j++)
+  {
+    boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+          _msg.visual(j)));
+    this->visualMsgs.push_back(vm);
+  }
+
+  for (int j = 0; j < _msg.joint_size(); j++)
+  {
+    boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
+          _msg.joint(j)));
+    this->jointMsgs.push_back(jm);
+  }
+
+  for (int j = 0; j < _msg.link_size(); j++)
+  {
+    linkName = modelName + _msg.link(j).name();
+    boost::shared_ptr<msgs::Pose> pm2(
+        new msgs::Pose(_msg.link(j).pose()));
+    pm2->set_name(linkName);
+    this->poseMsgs.push_front(pm2);
+
+    if (_msg.link(j).has_inertial())
+    {
+      boost::shared_ptr<msgs::Link> lm(
+          new msgs::Link(_msg.link(j)));
+      this->linkMsgs.push_back(lm);
+    }
+
+    for (int k = 0; k < _msg.link(j).visual_size(); k++)
+    {
+      boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+            _msg.link(j).visual(k)));
+      this->visualMsgs.push_back(vm);
+    }
+
+    for (int k = 0; k < _msg.link(j).collision_size(); k++)
+    {
+      for (int l = 0;
+          l < _msg.link(j).collision(k).visual_size(); l++)
+      {
+        boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+              _msg.link(j).collision(k).visual(l)));
+        this->visualMsgs.push_back(vm);
+      }
+    }
+
+    for (int k = 0; k < _msg.link(j).sensor_size(); k++)
+    {
+      boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
+            _msg.link(j).sensor(k)));
+      this->sensorMsgs.push_back(sm);
+    }
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -1287,6 +1298,7 @@ void Scene::PreRender()
 
   static RequestMsgs_L::iterator rIter;
   static SceneMsgs_L::iterator sIter;
+  static ModelMsgs_L::iterator modelIter;
   static VisualMsgs_L::iterator vIter;
   static LightMsgs_L::iterator lIter;
   static PoseMsgs_L::iterator pIter;
@@ -1302,6 +1314,15 @@ void Scene::PreRender()
     this->ProcessSceneMsg(*sIter);
   }
   this->sceneMsgs.clear();
+
+  modelIter = this->modelMsgs.begin();
+  while (modelIter != this->modelMsgs.end())
+  {
+    if (this->ProcessModelMsg(**modelIter))
+      this->modelMsgs.erase(modelIter++);
+    else
+      ++modelIter;
+  }
 
   sensorIter = this->sensorMsgs.begin();
   while (sensorIter != this->sensorMsgs.end())
@@ -1523,7 +1544,10 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
   VisualPtr linkVis = this->GetVisual(_msg->name());
 
   if (!linkVis)
+  {
+    gzerr << "No link visual\n";
     return false;
+  }
 
   if (this->visuals.find(_msg->name() + "_COM_VISUAL__") == this->visuals.end())
   {
@@ -1806,6 +1830,13 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   this->selectionMsg = _msg;
+}
+
+/////////////////////////////////////////////////
+void Scene::OnModelMsg(ConstModelPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->modelMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////

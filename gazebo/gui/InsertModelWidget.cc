@@ -162,10 +162,8 @@ InsertModelWidget::~InsertModelWidget()
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
-  std::cout << "OnModelSelection\n";
   if (_item)
   {
-    printf("_item valid\n");
     std::string path, manifest, filename;
 
     QApplication::setOverrideCursor(Qt::BusyCursor);

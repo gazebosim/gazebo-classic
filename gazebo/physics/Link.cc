@@ -644,7 +644,6 @@ void Link::ProcessMsg(const msgs::Link &_msg)
 {
   if (_msg.id() != this->GetId())
   {
-    gzerr << "Incorrect ID\n";
     return;
   }
 

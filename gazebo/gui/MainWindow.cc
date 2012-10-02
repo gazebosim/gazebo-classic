@@ -203,7 +203,6 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  printf("MainWindow::closeEvent\n");
   gazebo::stop();
   this->renderWidget->hide();
   this->timePanel->hide();
