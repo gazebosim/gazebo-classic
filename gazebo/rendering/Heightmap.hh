@@ -43,11 +43,13 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Height map geom
+    /// \class Heightmap Heightmap.hh rendering/Heightmap.hh
+    /// \brief Rendering a terrain using heightmap information
     class Heightmap
     {
       /// \brief Constructor
-      public: Heightmap(ScenePtr scene);
+      /// \param _scene Pointer to the scene that will contain the heightmap
+      public: Heightmap(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Heightmap();
@@ -56,10 +58,14 @@ namespace gazebo
       public: void Load();
 
       /// \brief Load the heightmap from a visual message
+      /// \param[in] _msg The visual message containing heightmap info
       public: void LoadFromMsg(ConstVisualPtr &_msg);
 
       /// \brief Get the height at a location
-      public: double GetHeight(double x, double y);
+      /// \param[in] _x X location
+      /// \param[in] _y Y location
+      /// \return The height at the specified location
+      public: double GetHeight(double _x, double _y);
 
       private: bool InitBlendMaps(Ogre::Terrain *_terrain);
       private: void ConfigureTerrainDefaults();

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef ORBITVIEWCONTROLLER_HH
-#define ORBITVIEWCONTROLLER_HH
+#ifndef _ORBITVIEWCONTROLLER_HH_
+#define _ORBITVIEWCONTROLLER_HH_
 
 #include <string>
 
@@ -26,59 +26,80 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Visual;
-
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class OrbitViewController OrbitVeiwController.hh rendering/OrbitViewController.hh
     /// \brief Orbit view controller
     class OrbitViewController : public ViewController
     {
-      /// \brief Constructor
-      public: OrbitViewController(UserCamera *camera);
+      /// \brief Constructor.
+      /// \param[in] _camera Pointer to the camera to control.
+      public: OrbitViewController(UserCamera *_camera);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~OrbitViewController();
 
+      /// \brief Initialize the controller.
       public: virtual void Init();
+
+      /// \brief Initialze the controller with a focal point.
+      /// \param[in] _focalPoint Point to look at.
       public: virtual void Init(const math::Vector3 &_focalPoint);
 
-      /// Set the min and max distance from the focal point
+      /// \brief Set the min and max distance from the focal point.
+      /// \param _minDist Min distance to the focal point.
+      /// \param _maxDist Max distance from the focal point.
       public: void SetDistanceRange(double _minDist, double _maxDist);
 
-      /// \brief Update
+      /// \brief Update.
       public: virtual void Update();
 
-      /// \brief Handle a mouse event
-      public: virtual void HandleMouseEvent(const common::MouseEvent &event);
+      /// \brief Handle a mouse event.
+      /// \param[in] _event The mouse event.
+      public: virtual void HandleMouseEvent(const common::MouseEvent &_event);
 
-      /// \brief Get the type name of this view controller
+      /// \brief Get the type name of this view controller.
+      /// \return The view controller name: "orbit".
       public: static std::string GetTypeString();
 
       /// \brief Set the distance to the focal point
+      /// \param[in] _d The distance from the focal point.
       public: void SetDistance(float _d);
 
       /// \brief Set the focal point
+      /// \param _fp The focal point
       public: void SetFocalPoint(const math::Vector3 &_fp);
 
       /// \brief Get the focal point
+      /// \return The focal point
       public: math::Vector3 GetFocalPoint() const;
 
+      /// \brief Set the yaw angle of the camera.
+      /// \param[in] Yaw angle in radians
       public: void SetYaw(double _yaw);
+
+      /// \brief Set the pitch angle of the camera.
+      /// \param[in] Pitch angle in radians.
       public: void SetPitch(double _pitch);
 
-      /// \brief Translate the focal point
-      private: void Translate(math::Vector3 vec);
+      /// \brief Translate the focal point.
+      /// \param[in] _vec Direction and amount to translate the camera.
+      private: void Translate(math::Vector3 _vec);
 
-      /// \brief Zoom the camera
+      /// \brief Zoom the camera.
+      /// \paramp[in] _amount Zoom quatity.
       private: void Zoom(float _amount);
 
-      /// \brief Normalize yaw value
-      private: void NormalizeYaw(float &v);
+      /// \brief Normalize yaw value.
+      /// \paramp[in] _v Normalize a yaw value.
+      private: void NormalizeYaw(float &_v);
 
-      /// \brief Normalize pitch value
-      private: void NormalizePitch(float &v);
+      /// \brief Normalize pitch value.
+      /// \paramp[in] _v Normalize a pitch value.
+      private: void NormalizePitch(float &_v);
 
+      /// \brief Update the camera's pose.
       private: void UpdatePose();
 
       private: float yaw, pitch;
@@ -92,5 +113,3 @@ namespace gazebo
   }
 }
 #endif
-
-

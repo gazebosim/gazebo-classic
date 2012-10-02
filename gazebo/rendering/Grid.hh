@@ -30,7 +30,6 @@
 
 namespace Ogre
 {
-  class SceneManager;
   class ManualObject;
   class SceneNode;
   class Any;
@@ -45,7 +44,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    ///  \class Grid
+    ///  \class Grid Grid.hh rendering/Grid.hh
     ///  \brief Displays a grid of cells, drawn with lines
     ///
     ///  Displays a grid of cells, drawn with lines.  A grid with an
@@ -54,12 +53,12 @@ namespace gazebo
     {
       /// \brief Constructor
       ///
-      /// \param Scene The scene this object is part of
-      /// \param cell_count The number of cells to draw
-      /// \param cell_length The size of each cell
-      /// \param r Red color component, in the range [0, 1]
-      /// \param g Green color component, in the range [0, 1]
-      /// \param b Blue color component, in the range [0, 1]
+      /// \param[in] Scene The scene this object is part of
+      /// \param[in] cell_count The number of cells to draw
+      /// \param[in] cell_length The size of each cell
+      /// \param[in] r Red color component, in the range [0, 1]
+      /// \param[in] g Green color component, in the range [0, 1]
+      /// \param[in] b Blue color component, in the range [0, 1]
       public: Grid(Scene *_scene, uint32_t _cellCount, float _cellLength,
                    float _lineWidth, const common::Color &_color);
 
@@ -71,7 +70,7 @@ namespace gazebo
 
       /// \brief Enable or disable the grid.
       ///
-      /// \param _enable Set to true to view the grid, false to make
+      /// \param[in] _enable Set to true to view the grid, false to make
       /// invisible.
       public: void Enable(bool _enable);
 
@@ -80,26 +79,46 @@ namespace gazebo
       public: Ogre::SceneNode *GetSceneNode() { return this->sceneNode; }
 
       /// \brief Sets user data on all ogre objects we own
+      /// \param[in] _data The user data
       public: void SetUserData(const Ogre::Any &_data);
 
+      /// \brief Sets the color of the grid
+      /// \param[in] _color The grid color
       public: void SetColor(const common::Color &_color);
 
-      public: common::Color GetColor() const {return this->colorP;}
+      /// \brief Return the grid color
+      /// \return The grid color
+      public: common::Color GetColor() const {return this->color;}
 
+      /// \brief Set the number of cells
+      /// \param[in] The number of cells
       public: void SetCellCount(uint32_t _count);
 
-      public: float GetCellCount() const {return this->cellCountP;}
+      /// \brief Get the numb
+      public: uint32_t GetCellCount() const {return this->cellCount;}
 
+      /// \brief Set the cell length
+      /// \param[in] The cell length
       public: void SetCellLength(float _len);
 
-      public: float GetCellLength() const {return this->cellLengthP;}
+      /// \brief Get the cell length
+      /// \return The cell length
+      public: float GetCellLength() const {return this->cellLength;}
 
+      /// \brief Set the line width
+      /// \param[in] _width The width of the grid
       public: void SetLineWidth(float _width);
 
-      public: float GetLineWidth() const {return this->lineWidthP;}
+      /// \brief Get the width of the grid line
+      /// \return The line width
+      public: float GetLineWidth() const {return this->lineWidth;}
 
+      /// \brief Set the height of the grid
+      /// \param[in] _count Grid height
       public: void SetHeight(uint32_t _count);
 
+      /// \brief Get the height of the grid
+      /// \return The height
       public: uint32_t GetHeight() const {return this->height;}
 
       private: void Create();
@@ -109,11 +128,11 @@ namespace gazebo
 
       private: Ogre::MaterialPtr material;
 
-      private: unsigned int cellCountP;
-      private: float cellLengthP;
-      private: float lineWidthP;
-      private: common::Color colorP;
-      private: float h_offsetP;
+      private: unsigned int cellCount;
+      private: float cellLength;
+      private: float lineWidth;
+      private: common::Color color;
+      private: float heightOffset;
 
       private: std::string name;
       private: unsigned int height;
