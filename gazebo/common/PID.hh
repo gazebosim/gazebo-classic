@@ -87,11 +87,14 @@ namespace gazebo
       public: void SetCmdMin(double _c);
 
       /// \brief Update the Pid loop with nonuniform time step size.
-      /// \param _error  Error since last call (p_state-p_target)
-      /// \param _dt Change in time since last call
+      /// \param _error  Error since last call (p_state - p_target).
+      /// \param _dt Change in time since last update call.
+      /// Normally, this is called at every time step,
+      /// The return value is an updated command to be passed
+      /// to the object being controlled.
       public: double Update(double _error, common::Time _dt);
 
-      /// \brief Set current command for this PID controller
+      /// \brief Set current target command for this PID controller
       /// \param _cmd New command
       public: void SetCmd(double _cmd);
 

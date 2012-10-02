@@ -70,11 +70,7 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
       this->kd = contactOdeElem->GetValueDouble("kd");
       this->cfm = contactOdeElem->GetValueDouble("soft_cfm");
       this->erp = contactOdeElem->GetValueDouble("soft_erp");
-      if (contactOdeElem->HasElement("max_vel"))
-        this->maxVel = contactOdeElem->GetValueDouble("max_vel");
-      else
-        this->maxVel = -1;
-
+      this->maxVel = contactOdeElem->GetValueDouble("max_vel");
       this->minDepth = contactOdeElem->GetValueDouble("min_depth");
     }
   }

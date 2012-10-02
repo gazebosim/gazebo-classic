@@ -8,6 +8,7 @@ include_directories(SYSTEM
   ${CMAKE_SOURCE_DIR}/deps/opende/include
   ${CMAKE_SOURCE_DIR}/deps/opende/ou/include
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
+  ${CMAKE_SOURCE_DIR}/deps/opende/GIMPACT/include
   ${CMAKE_SOURCE_DIR}/deps/threadpool
   ${CCD_INCLUDE_DIRS}
 )
@@ -17,6 +18,7 @@ link_directories(
 )
 
 add_subdirectory(OPCODE)
+add_subdirectory(GIMPACT)
 add_subdirectory(ou)
 
 CHECK_CXX_SOURCE_COMPILES("#include <alloca.h> 
@@ -241,9 +243,9 @@ endif()
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
 gz_add_library(gazebo_ode ${sources})
-target_link_libraries(gazebo_ode gazebo_opcode gazebo_opende_ou ${CCD_LIBRARIES})
+target_link_libraries(gazebo_ode gazebo_opcode gazebo_gimpact gazebo_opende_ou ${CCD_LIBRARIES})
 
-add_dependencies(gazebo_ode gazebo_opcode)
+add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)
 
 gz_install_library(gazebo_ode)

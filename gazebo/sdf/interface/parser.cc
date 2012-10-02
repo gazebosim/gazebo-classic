@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2011 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
 #include "gazebo/sdf/interface/parser_deprecated.hh"
-
+#include "gazebo_config.h"
 #ifdef HAVE_URDFDOM
   #include "gazebo/sdf/interface/parser_urdf.hh"
 #endif
