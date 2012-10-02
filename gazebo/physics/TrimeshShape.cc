@@ -50,6 +50,7 @@ void TrimeshShape::Init()
 {
   std::string filename;
 
+  this->mesh = NULL;
   common::MeshManager *meshManager = common::MeshManager::Instance();
   if (this->sdf->GetValueString("filename") != "__default__")
   {
@@ -64,7 +65,10 @@ void TrimeshShape::Init()
   {
     filename = common::find_file(this->sdf->GetValueString("uri"));
     if (filename == "__default__" || filename.empty())
+    {
       gzerr << "No mesh specified\n";
+      return;
+    }
   }
 
   this->mesh = meshManager->Load(filename);

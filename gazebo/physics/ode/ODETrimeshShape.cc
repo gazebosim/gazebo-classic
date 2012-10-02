@@ -35,6 +35,8 @@ using namespace physics;
 ODETrimeshShape::ODETrimeshShape(CollisionPtr _parent) : TrimeshShape(_parent)
 {
   this->odeData = NULL;
+  this->vertices = NULL;
+  this->indices = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -96,6 +98,8 @@ void ODETrimeshShape::Load(sdf::ElementPtr _sdf)
 void ODETrimeshShape::Init()
 {
   TrimeshShape::Init();
+  if (!this->mesh)
+    return;
 
   ODECollisionPtr pcollision =
     boost::shared_static_cast<ODECollision>(this->collisionParent);
