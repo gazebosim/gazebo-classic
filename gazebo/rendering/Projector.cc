@@ -328,8 +328,6 @@ void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
 
   offsetQuaternion = Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y);
   this->filterNode->setOrientation(offsetQuaternion + ogreQuaternion);
-
-  gzerr << _pose << "\n";
 }
 
 /////////////////////////////////////////////////
