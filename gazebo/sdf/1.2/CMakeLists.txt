@@ -24,6 +24,7 @@ set (sdfs
   sensor.sdf 
   state.sdf
   surface.sdf 
+  urdf.sdf 
   visual.sdf 
   world.sdf
 )

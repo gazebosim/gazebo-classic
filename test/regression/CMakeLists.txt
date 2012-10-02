@@ -64,6 +64,7 @@ target_link_libraries(${BINARY_NAME}
     gazebo_sensors
     gazebo_rendering
     gazebo_msgs
+    gazebo_gui
     pthread
     ${tinyxml_libraries}
     )

@@ -26,7 +26,7 @@
 using namespace gazebo;
 using namespace physics;
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 JointController::JointController(ModelPtr _model)
   : model(_model)
 {
@@ -112,7 +112,7 @@ void JointController::Update()
   }
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 {
   std::map<std::string, JointPtr>::iterator iter;
@@ -213,8 +213,9 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
     LinkPtr parentLink = _joint->GetParent();
     LinkPtr childLink = _joint->GetChild();
 
-    if (parentLink && childLink &&
-        parentLink->GetName() != childLink->GetName())
+    if ((!parentLink && childLink) ||
+        (parentLink && childLink &&
+         parentLink->GetName() != childLink->GetName()))
     {
       // transform about the current anchor, about the axis
       if (_joint->HasType(Base::HINGE_JOINT))
