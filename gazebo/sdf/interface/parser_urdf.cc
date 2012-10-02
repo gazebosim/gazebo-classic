@@ -1817,14 +1817,13 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
       }
       */
 
-      TiXmlNode* xyz_key = (*blob_it)->FirstChild("xyz");
-      /// @todo: FIXME:  we should read xyz, rpy and aggregate it to
-      /// reduction_transform instead of just throwing the info away.
-      if (xyz_key)
-        (*blob_it)->RemoveChild(xyz_key);
-      TiXmlNode* rpy_key = (*blob_it)->FirstChild("rpy");
-      if (rpy_key)
-        (*blob_it)->RemoveChild(rpy_key);
+      {
+        TiXmlNode* old_pose_key = (*blob_it)->FirstChild("pose");
+        /// @todo: FIXME:  we should read xyz, rpy and aggregate it to
+        /// reduction_transform instead of just throwing the info away.
+        if (old_pose_key)
+          (*blob_it)->RemoveChild(old_pose_key);
+      }
 
       // convert reduction_transform to values
       urdf::Vector3 reduction_xyz(reduction_transform.pos.x,
