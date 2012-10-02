@@ -281,9 +281,7 @@ void JointController::RotateLinkAndChildren(LinkPtr _link1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dangle, bool _updateChildren)
 {
-  if (this->FindLink( this->updated_links.begin(),
-                      this->updated_links.end(),
-                      _link1) == this->updated_links.end())
+  if (!this->ContainsLink( this->updated_links, _link1))
   {
     math::Pose linkWorldPose = _link1->GetWorldPose();
 
@@ -313,7 +311,7 @@ void JointController::RotateLinkAndChildren(LinkPtr _link1,
   if (_updateChildren)
   {
     std::vector<LinkPtr> links;
-    this->GetAllChildrenLinks(links, _link1);
+    this->AddConnectedLinks(links, _link1);
 
     for (std::vector<LinkPtr>::iterator biter = links.begin();
         biter != links.end(); ++biter)
@@ -328,9 +326,7 @@ void JointController::SlideLinkAndChildren(LinkPtr _link1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
-  if (this->FindLink( this->updated_links.begin(),
-                      this->updated_links.end(),
-                      _link1) == this->updated_links.end())
+  if (!this->ContainsLink(this->updated_links, _link1))
   {
     math::Pose linkWorldPose = _link1->GetWorldPose();
 
@@ -355,7 +351,7 @@ void JointController::SlideLinkAndChildren(LinkPtr _link1,
   if (_updateChildren)
   {
     std::vector<LinkPtr> links;
-    this->GetAllChildrenLinks(links, _link1);
+    this->AddConnectedLinks(links, _link1);
 
     for (std::vector<LinkPtr>::iterator biter = links.begin();
         biter != links.end(); ++biter)
@@ -366,36 +362,61 @@ void JointController::SlideLinkAndChildren(LinkPtr _link1,
 }
 
 //////////////////////////////////////////////////
-void JointController::GetAllChildrenLinks(std::vector<LinkPtr> &_links,
-                                           const LinkPtr &_link)
+void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
+                                           const LinkPtr &_current_link)
 {
   // strategy, for each child, recursively look for children
   //           for each child, also look for parents to catch multiple roots
-  std::map<std::string, JointPtr>::iterator iter;
-  for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
-  {
-    JointPtr joint = iter->second;
 
-    // recurse through children connected by joints
-    LinkPtr parentLink = joint->GetParent();
-    LinkPtr childLink = joint->GetChild();
-    if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && parentLink->GetName() == _link->GetName()
-        && this->FindLink(_links.begin(), _links.end(), childLink)
-                       == _links.end())
+
+  std::vector<LinkPtr> childLinks = _current_link->GetChildLinks();
+  for (std::vector<LinkPtr>::iterator childLink = childLinks.begin();
+                                      childLink != childLinks.end();
+                                      ++childLink)
+  {
+    // add this link to the list of links to be updated by SetJointPosition
+    if (!this->ContainsLink(_links_out, *childLink))
     {
-      _links.push_back(childLink);
-      this->GetAllChildrenLinks(_links, childLink);
-      this->GetAllParentLinks(_links, childLink, _link);
+      _links_out.push_back(*childLink);
+      this->AddConnectedLinks(_links_out, *childLink);
+    }
+
+    // loop through all parents of children, but make sure
+    // the parent link is not self (_current_link)
+    std::vector<LinkPtr> parentLinks = _current_link->GetParentLinks();
+    for (std::vector<LinkPtr>::iterator parentLink = parentLinks.begin();
+                                        parentLink != parentLinks.end();
+                                        ++parentLink)
+    {
+      if ((*parentLink)->GetName() != _current_link->GetName())
+      {
+        // add all childrend links of parentLinks, but
+        // stop the recursion if any of the child link is already added
+        this->AddChildLinks(_links_out, *parentLink, _current_link);
+      }
     }
   }
 }
 
 //////////////////////////////////////////////////
-void JointController::GetAllParentLinks(std::vector<LinkPtr> &_links,
-    const LinkPtr &_link, const LinkPtr &_origParentLink)
+/// Add child of 
+void JointController::AddChildLinks(std::vector<LinkPtr> &_links_out,
+    const LinkPtr &_current_link, const LinkPtr &_exclude_link)
 {
+  std::vector<LinkPtr> childLinks = _current_link->GetChildLinks();
+  for (std::vector<LinkPtr>::iterator childLink = childLinks.begin();
+                                      childLink != childLinks.end();
+                                      ++childLink)
+  {
+    // add this link to the list of links to be updated by SetJointPosition
+    if ((*childLink)->GetName() != _exclude_link->GetName() &&
+        !this->ContainsLink(_links_out, *childLink))
+    {
+      _links_out.push_back(*childLink);
+      this->AddConnectedLinks(_links_out, *childLink);
+    }
+  }
+/*
   std::map<std::string, JointPtr>::iterator iter;
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
@@ -405,15 +426,21 @@ void JointController::GetAllParentLinks(std::vector<LinkPtr> &_links,
     LinkPtr parentLink = joint->GetParent();
     LinkPtr childLink = joint->GetChild();
 
-    if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && childLink->GetName() == _link->GetName()
-        && parentLink->GetName() != _origParentLink->GetName()
-        && this->FindLink(_links.begin(), _links.end(), parentLink)
-                       == _links.end())
+    if (parentLink)
     {
-      _links.push_back(parentLink);
-      this->GetAllParentLinks(_links, childLink, _origParentLink);
+    if (childLink
+        && parentLink->GetName() != childLink->GetName()
+        && childLink->GetName() == _current_link->GetName()
+        && parentLink->GetName() != _exclude_link->GetName()
+        && !this->ContainsLink(_links_out, parentLink))
+    {
+      _links_out.push_back(parentLink);
+      this->AddParentLinks(_links_out, childLink, _exclude_link);
+    }
+    }
+    else // no parent, check child only
+    {
     }
   }
+*/
 }

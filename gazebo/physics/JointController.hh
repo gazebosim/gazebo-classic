@@ -77,23 +77,29 @@ namespace gazebo
                    double _dposition, bool _updateChildren);
 
       /// \brief Helper for SetJointPositions
-      private: void GetAllChildrenLinks(std::vector<LinkPtr> &_links,
-                                         const LinkPtr &_link);
+      private: void AddConnectedLinks(std::vector<LinkPtr> &_links_out,
+                                         const LinkPtr &_current_link);
 
       /// \brief Helper for SetJointPositions
-      private: void GetAllParentLinks(std::vector<LinkPtr> &_links,
-                   const LinkPtr &_link, const LinkPtr &_origParentLink);
+      private: void AddChildLinks(std::vector<LinkPtr> &_links_out,
+                   const LinkPtr &_current_link, const LinkPtr &_exclude_link);
 
       /// \brief Helper for SetJointPositions
-      private: template<class InputIterator, class T>
-                 InputIterator FindLink(InputIterator first,
-                                      InputIterator last,
-                                      const T& value)
+      private: template<class InputVector, class T>
+                 typename InputVector::iterator FindLink(InputVector vector,
+                   const T& value)
                  {
-                   for (; first != last; ++first)
-                     if ((*first)->GetName() == value->GetName())
-                       return first;
-                   return last;
+                   typename InputVector::iterator iter = vector.begin();
+                   for (; iter != vector.end(); ++iter)
+                     if ((*iter)->GetName() == value->GetName())
+                       return iter;
+                   return vector.end();
+                 }
+      /// \brief Helper for SetJointPositions, returns true of iterator contains element
+      private: template<class InputVector, class T>
+                 bool ContainsLink(InputVector vector, const T& value)
+                 {
+                   return (FindLink(vector, value) != vector.end());
                  }
 
       private: ModelPtr model;
