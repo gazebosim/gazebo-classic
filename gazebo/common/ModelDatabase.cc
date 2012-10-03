@@ -175,9 +175,43 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
 
     tar_extract_all(tar, const_cast<char*>(outputPath.c_str()));
     path = outputPath + "/" + modelName;
+
+    ModelDatabase::DownloadDependencies(path);
   }
 
   return path;
+}
+
+/////////////////////////////////////////////////
+void ModelDatabase::DownloadDependencies(const std::string &_path)
+{
+  std::string manifest = _path + "/manifest.xml";
+
+  TiXmlDocument xmlDoc;
+  if (xmlDoc.LoadFile(manifest))
+  {
+    TiXmlElement *dependXML = xmlDoc.FirstChildElement("depend");
+    if (!dependXML)
+      return;
+
+    for(TiXmlElement *modelXML = dependXML->FirstChildElement("model");
+        modelXML; modelXML = modelXML->NextSiblingElement())
+    {
+      TiXmlElement *uriXML = modelXML->FirstChildElement("uri");
+      if (uriXML)
+      {
+        // Download the model if it doesn't exist.
+        ModelDatabase::GetModelPath(uriXML->GetText());
+      }
+      else
+      {
+        gzerr << "Model depend is missing <uri> in manifest["
+              << manifest << "]\n";
+      }
+    }
+  }
+  else
+    gzerr << "Unable to load manifest file[" << manifest << "]\n";
 }
 
 /////////////////////////////////////////////////

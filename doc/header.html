@@ -7,13 +7,12 @@
     <title>Gazebo: $title</title>
     <link href="tabs.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="jquery.js"></script>
-    <!--<script type="text/javascript" src="dynsections.js"></script>-->
+    <script type="text/javascript" src="dynsections.js"></script>
     <link href="search/search.css" rel="stylesheet" type="text/css">
-    <!--<script type="text/javascript" src="search/search.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
     <script type="text/javascript">
         $(document).ready(function() { searchBox.OnSelectItem(0); });
     </script>
--->
 
     <link href="doxygen.css" rel="stylesheet" type="text/css">
     <!--<link href="style.css" rel="stylesheet" type="text/css">-->
@@ -25,18 +24,6 @@
       <a href="index.html"><img src="gazebo_logo.png"/></a>
     </h2>
 
-    <div id="MSearchBox" class="MSearchBoxInactive">
-      <span>
-        <img id="MSearchSelect" src="search/mag_sel.png"
-        onmouseover="return searchBox.OnSearchSelectShow()"
-        onmouseout="return searchBox.OnSearchSelectHide()"
-        alt=""/>
-        <input type="text" id="MSearchField" value="Search" accesskey="S"
-        onfocus="searchBox.OnSearchFieldFocus(true)" 
-        onblur="searchBox.OnSearchFieldFocus(false)" 
-        onkeyup="searchBox.OnSearchFieldChange(event)"/>
-      </span>
-    </div> <!-- End MSearchBox -->
     <div class="menu">
       <dl>
         <dt>Class</dt>
@@ -67,8 +54,24 @@
       </dl>
     </div>
     <div>
-      Hello
-      <div id="MSearchResultsWindow"></div>
+    <div id="MSearchBox" class="MSearchBoxInactive">
+      <span>
+        <img id="MSearchSelect" src="search/mag_sel.png"
+        onmouseover="return searchBox.OnSearchSelectShow()"
+        onmouseout="return searchBox.OnSearchSelectHide()"
+        alt=""/>
+        <input type="text" id="MSearchField" value="Search" accesskey="S"
+        onfocus="searchBox.OnSearchFieldFocus(true)" 
+        onblur="searchBox.OnSearchFieldFocus(false)" 
+        onkeyup="searchBox.OnSearchFieldChange(event)"/>
+      </span>
+    </div> <!-- End MSearchBox -->
+
+      <div id="MSearchResultsWindow" style="position: static; display: block; border: none; background-color: #ffffff; width: 18em;">
+        <iframe src="javascript:void(0)" frameborder="0" 
+                name="MSearchResults" style="height: 500px; width: 18em; display: block; text-wrap: unrestricted">
+        </iframe>
+      </div>
     </div>
   </div>
   <div id="top">

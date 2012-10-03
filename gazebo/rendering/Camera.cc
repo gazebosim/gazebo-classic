@@ -621,9 +621,8 @@ void Camera::EnableSaveFrame(bool enable)
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
 
-  /*if (!this->renderTexture)
+  if (!this->renderTexture)
     this->CreateRenderTexture("saveframes_render_texture");
-    */
 }
 
 //////////////////////////////////////////////////

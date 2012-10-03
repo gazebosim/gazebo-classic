@@ -184,7 +184,7 @@ body {
 
 div.contents {
 	margin-top: 10px;
-	margin-left: 18em;
+	margin-left: 20em;
 	margin-right: 10px;
 }
 
@@ -646,7 +646,7 @@ div.header
   background-repeat:repeat-x;
 	background-color: #F9FAFC;
 	margin:  0px;
-  margin-left: 18em;
+  margin-left: 20em;
 	border-bottom: 1px solid #C4CFE5;
 }
 
@@ -693,31 +693,26 @@ div.headertitle
   background:none;
 }
 
-
-iframe#MSearchResults
+/*iframe#MSearchResults
 {
-  clear: both;
-  height: 80px;
-  display: block;
+  height: 500px;
+  text-wrap: unrestricted;
+  border: none;
 }
-
+*/
+/*
 #MSearchResultsWindow
 {
-  clear: both;
   display: block;
   position: fixed;
-  width: 16em;
-  border: 1px solid #000;
-  background-color: #EEF1F7;
-  top: auto;
-}
+}*/
 
 div.leftbar
 {
   text-align:left;
   float: left;
   border-right: 1px solid #dddddd;
-  width: 16em;
+  width: 18em;
   margin: 5 5 5 5;
   padding: 4 4 4 4;
   background-color: #ffffff;

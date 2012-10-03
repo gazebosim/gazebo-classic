@@ -50,6 +50,14 @@ namespace gazebo
       /// \param _uri The URI of the model
       /// \return The full path and filename to the SDF file
       public: static std::string GetModelFile(const std::string &_uri);
+
+      /// \brief Download all dependencies for a give model path
+      ///
+      /// Look's in the model's manifest file (_path/manifest.xml) for all
+      /// models listed in the <depend> block, and downloads the models if
+      /// necessary.
+      /// \param[in] _path Path to a model.
+      public: static void DownloadDependencies(const std::string &_path);
     };
   }
 }

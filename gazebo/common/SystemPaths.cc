@@ -271,7 +271,7 @@ std::string SystemPaths::FindFile(const std::string &_filename)
   else
   {
     struct stat st;
-    result = std::string("./")+_filename;
+    result = std::string(getenv("PWD")) + "/" + _filename;
     bool found = false;
 
     std::list<std::string> paths = this->GetGazeboPaths();

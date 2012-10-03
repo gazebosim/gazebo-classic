@@ -18,6 +18,9 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
+#define BOOST_FILESYSTEM_VERSION 2
+
+#include <boost/filesystem.hpp>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -410,8 +413,64 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
 
   try
   {
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-        path, "FileSystem", "General");
+    if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
+          path, "General"))
+    {
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+          path, "FileSystem", "General", true);
+      Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
+          "General");
+
+
+      // Parse all material files in the path if any exist
+      boost::filesystem::path dir(path);
+      std::list<boost::filesystem::path> resultSet;
+
+      if (boost::filesystem::exists(dir) &&
+          boost::filesystem::is_directory(dir))
+      {
+        std::vector<boost::filesystem::path> paths;
+        std::copy(boost::filesystem::directory_iterator(dir),
+            boost::filesystem::directory_iterator(),
+            std::back_inserter(paths));
+        std::sort(paths.begin(), paths.end());
+
+        // Iterate over all the models in the current gazebo path
+        for (std::vector<boost::filesystem::path>::iterator dIter =
+            paths.begin(); dIter != paths.end(); ++dIter)
+        {
+          if (dIter->filename().find(".material") != std::string::npos)
+          {
+            std::string fullPath = path + "/" + dIter->filename();
+
+            Ogre::DataStreamPtr stream =
+              Ogre::ResourceGroupManager::getSingleton().openResource(
+                  fullPath, "General");
+
+            // There is a material file under there somewhere, read the thing in
+            try
+            {
+              Ogre::MaterialManager::getSingleton().parseScript(
+                  stream, "General");
+              Ogre::MaterialPtr matPtr =
+                Ogre::MaterialManager::getSingleton().getByName(fullPath);
+
+              if (!matPtr.isNull())
+              {
+                // is this necessary to do here? Someday try it without
+                matPtr->compile();
+                matPtr->load();
+              }
+            }
+            catch(Ogre::Exception& e)
+            {
+              gzerr << "Unable to parse material file[" << fullPath << "]\n";
+            }
+            stream->close();
+          }
+        }
+      }
+    }
   }
   catch(Ogre::Exception)
   {
