@@ -67,39 +67,24 @@ namespace gazebo
       public: void SetJointPosition(JointPtr _joint, double _position);
 
       /// \brief Helper for SetJointPositions
-      private: void RotateLinkAndChildren(LinkPtr _link1,
+      private: void MoveLinks(JointPtr _joint, LinkPtr _link1,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
-                   double _dangle, bool _updateChildren);
-
-      /// \brief Helper for SetJointPositions
-      private: void SlideLinkAndChildren(LinkPtr _link1,
-                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
-                   double _dposition, bool _updateChildren);
+                   double _dposition, bool _updateChildren = false);
 
       /// \brief Helper for SetJointPositions
       private: void AddConnectedLinks(std::vector<LinkPtr> &_links_out,
-                                         const LinkPtr &_current_link);
-
-      /// \brief Helper for SetJointPositions
-      private: void AddChildLinks(std::vector<LinkPtr> &_links_out,
-                   const LinkPtr &_current_link, const LinkPtr &_exclude_link);
+                                      const LinkPtr &_current_link,
+                                      bool _checkParent = false);
 
       /// \brief Helper for SetJointPositions
       private: template<class InputVector, class T>
-                 typename InputVector::iterator FindLink(InputVector vector,
-                   const T& value)
+                 bool ContainsLink(InputVector _vector, const T& value)
                  {
-                   typename InputVector::iterator iter = vector.begin();
-                   for (; iter != vector.end(); ++iter)
+                   typename InputVector::iterator iter = _vector.begin();
+                   for (; iter != _vector.end(); ++iter)
                      if ((*iter)->GetName() == value->GetName())
-                       return iter;
-                   return vector.end();
-                 }
-      /// \brief Helper for SetJointPositions, returns true of iterator contains element
-      private: template<class InputVector, class T>
-                 bool ContainsLink(InputVector vector, const T& value)
-                 {
-                   return (FindLink(vector, value) != vector.end());
+                       return true;
+                   return false;
                  }
 
       private: ModelPtr model;
