@@ -77,7 +77,7 @@ namespace gazebo
                    double _dposition, bool _updateChildren = false);
 
       /// @todo: Set Link Velocity based on old and new poses and dt
-      private: void SetLinkTwist(LinkPtr _link,
+      private: void ComputeAndSetLinkTwist(LinkPtr _link,
                     const math::Pose &_old, const math::Pose &_new, double dt);
 
       /// \brief Helper for SetJointPositions

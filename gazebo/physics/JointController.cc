@@ -285,7 +285,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       // set link velocities somehow?
       // ideally we want to set this according to Joint Trajectory velocity
       // double dt = 0;
-      // this->SetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
+      // this->ComputeAndSetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }
@@ -309,7 +309,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       // set link velocities somehow?
       // ideally we want to set this according to Joint Trajectory velocity
       // double dt = 0;
-      // this->SetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
+      // this->ComputeAndSetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }
@@ -333,7 +333,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 }
 
 //////////////////////////////////////////////////
-void JointController::SetLinkTwist(LinkPtr _link,
+void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
      const math::Pose &_old, const math::Pose &_new, double _dt)
 {
     math::Vector3 linear_vel(0, 0, 0);
