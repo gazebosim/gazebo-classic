@@ -124,7 +124,7 @@ namespace gazebo
 
         private: VisualPtr visual;
 
-        private: Ogre::SceneNode *node;
+        private: Ogre::SceneNode *scene_node;
         private: Ogre::SceneNode *filterNode;
         private: Ogre::SceneManager *sceneMgr;
         private: std::map<std::string, Ogre::Pass*> projectorTargets;

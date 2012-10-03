@@ -34,7 +34,9 @@ set (gtest_sources
   pioneer2dx.cc
   pr2.cc
   projector.cc
+  set_joint.cc
   set_pose.cc
+  set_pose_loop.cc
   speed.cc
   transport.cc)
 
@@ -63,6 +65,7 @@ target_link_libraries(${BINARY_NAME}
     gazebo_sensors
     gazebo_rendering
     gazebo_msgs
+    gazebo_gui
     pthread
     ${tinyxml_libraries}
     )

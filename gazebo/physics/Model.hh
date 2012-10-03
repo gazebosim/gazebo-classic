@@ -135,9 +135,19 @@ namespace gazebo
       /// \return The bounding box
       public: virtual math::Box GetBoundingBox() const;
 
-      /// \brief Get the number of joints
-      /// \return Get the number of joints
+      /// \brief Get the number of Joint's
+      /// \return Get the number of Joint's
       public: unsigned int GetJointCount() const;
+
+      /// \brief Get the number of Link's
+      /// Note this constructs the vector of Link's on the fly, could be costly
+      /// \return Get the number of Link's
+      public: unsigned int GetLinkCount() const;
+
+      /// \brief Construct and return a vector of Link's in this model
+      /// Note this constructs the vector of Link's on the fly, could be costly
+      /// \return a vector of Link's in this model
+      public: Link_V GetLinks() const;
 
       /// \brief Get a joing by index
       /// \param index Index of the joint
@@ -158,6 +168,7 @@ namespace gazebo
       public: LinkPtr GetLink(const std::string &name ="canonical") const;
 
       /// \brief Get a child link by index
+      /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return Point to the link
       public: LinkPtr GetLink(unsigned int _index) const;
 

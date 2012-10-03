@@ -193,6 +193,12 @@ namespace gazebo
       /// \brief accessor for collisions
       public: CollisionPtr GetCollision(unsigned int _index) const;
 
+      /// Returns a vector of children Links
+      public: std::vector<LinkPtr> GetChildLinks();
+
+      /// Returns a vector of parent Links
+      public: std::vector<LinkPtr> GetParentLinks();
+
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
 
