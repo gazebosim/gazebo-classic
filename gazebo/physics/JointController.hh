@@ -67,14 +67,14 @@ namespace gazebo
       public: void SetJointPosition(JointPtr _joint, double _position);
 
       /// \brief Helper for SetJointPositions
-      private: void MoveLinks(JointPtr _joint, LinkPtr _link1,
+      private: void MoveLinks(JointPtr _joint, LinkPtr _link,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
                    double _dposition, bool _updateChildren = false);
 
       /// \brief Helper for SetJointPositions
       private: void AddConnectedLinks(std::vector<LinkPtr> &_links_out,
-                                      const LinkPtr &_current_link,
-                                      bool _checkParent = false);
+                                      const LinkPtr &_link,
+                                      bool _checkParentTree = false);
 
       /// \brief Helper for SetJointPositions
       private: template<class InputVector, class T>

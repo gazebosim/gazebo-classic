@@ -237,7 +237,10 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
         axis = _joint->GetGlobalAxis(0);
       }
 
-      this->updated_links.push_back(parentLink);
+      // we don't want to move the parent link
+      if (parentLink)
+        this->updated_links.push_back(parentLink);
+
       this->MoveLinks(_joint, childLink, anchor, axis, dposition,
         true);
     }
@@ -249,15 +252,15 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
 
 //////////////////////////////////////////////////
-void JointController::MoveLinks(JointPtr _joint, LinkPtr _link1,
+void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
-  if (!this->ContainsLink( this->updated_links, _link1))
+  if (!this->ContainsLink( this->updated_links, _link))
   {
     if (_joint->HasType(Base::HINGE_JOINT))
     {
-      math::Pose linkWorldPose = _link1->GetWorldPose();
+      math::Pose linkWorldPose = _link->GetWorldPose();
 
       // relative to anchor point
       math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
@@ -274,15 +277,15 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link1,
       math::Pose newWorldPose(newRelativePose.pos + _anchor,
                               newRelativePose.rot);
 
-      _link1->SetWorldPose(newWorldPose);
-      _link1->SetLinearVel(math::Vector3(0, 0, 0));
-      _link1->SetAngularVel(math::Vector3(0, 0, 0));
+      _link->SetWorldPose(newWorldPose);
+      _link->SetLinearVel(math::Vector3(0, 0, 0));
+      _link->SetAngularVel(math::Vector3(0, 0, 0));
 
-      this->updated_links.push_back(_link1);
+      this->updated_links.push_back(_link);
     }
     else if (_joint->HasType(Base::SLIDER_JOINT))
     {
-      math::Pose linkWorldPose = _link1->GetWorldPose();
+      math::Pose linkWorldPose = _link->GetWorldPose();
 
       // relative to anchor point
       math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
@@ -295,41 +298,41 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link1,
       math::Pose newWorldPose(newRelativePose.pos + _anchor,
                               newRelativePose.rot);
 
-      _link1->SetWorldPose(newWorldPose);
-      _link1->SetLinearVel(math::Vector3(0, 0, 0));
-      _link1->SetAngularVel(math::Vector3(0, 0, 0));
+      _link->SetWorldPose(newWorldPose);
+      _link->SetLinearVel(math::Vector3(0, 0, 0));
+      _link->SetAngularVel(math::Vector3(0, 0, 0));
 
-      this->updated_links.push_back(_link1);
+      this->updated_links.push_back(_link);
     }
     else
       gzerr << "should not be here\n";
   }
 
 
-  // recurse through children links
+  // recurse through connected links
   if (_updateChildren)
   {
-    std::vector<LinkPtr> links;
-    this->AddConnectedLinks(links, _link1, true);
+    std::vector<LinkPtr> connected_links;
+    this->AddConnectedLinks(connected_links, _link, true);
 
-    for (std::vector<LinkPtr>::iterator biter = links.begin();
-        biter != links.end(); ++biter)
+    for (std::vector<LinkPtr>::iterator liter = connected_links.begin();
+        liter != connected_links.end(); ++liter)
     {
-      this->MoveLinks(_joint, (*biter), _anchor, _axis, _dposition);
+      this->MoveLinks(_joint, (*liter), _anchor, _axis, _dposition);
     }
   }
 }
 
 //////////////////////////////////////////////////
 void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
-                                        const LinkPtr &_current_link,
-                                        bool _checkParent)
+                                        const LinkPtr &_link,
+                                        bool _checkParentTree)
 {
   // strategy, for each child, recursively look for children
   //           for each child, also look for parents to catch multiple roots
 
 
-  std::vector<LinkPtr> childLinks = _current_link->GetChildLinks();
+  std::vector<LinkPtr> childLinks = _link->GetChildLinks();
   for (std::vector<LinkPtr>::iterator childLink = childLinks.begin();
                                       childLink != childLinks.end();
                                       ++childLink)
@@ -342,22 +345,23 @@ void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
       this->AddConnectedLinks(_links_out, *childLink);
     }
 
-    if (_checkParent)
+    if (_checkParentTree)
     {
-      // loop through all parents of childLink, but make sure
-      // the parent link is not self (_current_link)
+      // catch additional roots by looping
+      // through all parents of childLink,
+      // but skip parent link is self (_link)
       std::vector<LinkPtr> parentLinks = (*childLink)->GetParentLinks();
       for (std::vector<LinkPtr>::iterator parentLink = parentLinks.begin();
                                           parentLink != parentLinks.end();
                                           ++parentLink)
       {
-        if ((*parentLink)->GetName() != _current_link->GetName() &&
+        if ((*parentLink)->GetName() != _link->GetName() &&
             !this->ContainsLink(_links_out, (*parentLink)))
         {
           _links_out.push_back(*parentLink);
           // add all childrend links of parentLink, but
           // stop the recursion if any of the child link is already added
-          this->AddConnectedLinks(_links_out, *parentLink, _current_link);
+          this->AddConnectedLinks(_links_out, *parentLink, _link);
         }
       }
     }

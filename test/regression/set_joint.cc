@@ -569,10 +569,20 @@ TEST_F(PhysicsTest, State)
     physics::JointPtr joint_23 = model->GetJoint("joint_23");
     physics::JointPtr joint_34 = model->GetJoint("joint_34");
     physics::JointPtr joint_45 = model->GetJoint("joint_45");
+    physics::JointPtr joint_52 = model->GetJoint("joint_52");
+    physics::JointPtr joint_2a2 = model->GetJoint("joint_2a2");
+    physics::JointPtr joint_2a2b = model->GetJoint("joint_2a2b");
+    physics::JointPtr joint_2a3a = model->GetJoint("joint_2a3a");
+    physics::JointPtr joint_3a4a = model->GetJoint("joint_3a4a");
+    physics::JointPtr joint_4a5a = model->GetJoint("joint_4a5a");
+    physics::JointPtr joint_5a2b = model->GetJoint("joint_5a2b");
 
     sleep(5);
 
     joint_01->SetAngle(0, 0.7);
+    joint_12->SetAngle(0, -0.7);
+    joint_23->SetAngle(0, -0.7);
+    joint_2a2b->SetAngle(0, -0.7);
 
     sleep(5);
     world->EnablePhysicsEngine(true);
