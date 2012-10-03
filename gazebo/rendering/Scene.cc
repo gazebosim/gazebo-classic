@@ -1935,12 +1935,11 @@ void Scene::SetSky()
   // y = sun beta multiplier
   // z = ambient color multiplier
   // w = distance attenuation
-  vclouds->setLightResponse(Ogre::Vector4(0.25, 0.4, 0.5, 0.1));
+  vclouds->setLightResponse(Ogre::Vector4(1.25, 0.4, 0.5, 0.1));
   vclouds->setAmbientFactors(Ogre::Vector4(0.45, 0.3, 0.6, 0.1));
   vclouds->setWheater(.6, .6, false);
 
-  // Disable volumetric clouds for now
-  if (false)  // If using clouds
+  if (true)
   {
     // Create VClouds
     if (!this->skyx->getVCloudsManager()->isCreated())
@@ -1960,13 +1959,14 @@ void Scene::SetSky()
     }
   }
 
-  // vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
-  // vclouds->getLightningManager()->setAverageLightningApparitionTime(
-  //   preset.vcLightningsAT);
-  // vclouds->getLightningManager()->setLightningColor(
-  //   preset.vcLightningsColor);
-  // vclouds->getLightningManager()->setLightningTimeMultiplier(
-  //   preset.vcLightningsTM);
+  /*vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
+  vclouds->getLightningManager()->setAverageLightningApparitionTime(
+      preset.vcLightningsAT);
+  vclouds->getLightningManager()->setLightningColor(
+      preset.vcLightningsColor);
+  vclouds->getLightningManager()->setLightningTimeMultiplier(
+      preset.vcLightningsTM);
+      */
 
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 

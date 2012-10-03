@@ -268,12 +268,16 @@ namespace gazebo
 
     /// \brief Load function
     ///
-    /// Called when a Plugin is first created, and after the World has been
-    /// loaded. This function should not be blocking.
+    /// Called before Gazebo is loaded. Must not block.
     /// \param _argc Number of command line arguments.
     /// \param _argv Array of command line arguments.
     public: virtual void Load(int _argc = 0, char **_argv = NULL) = 0;
+
+    /// \brief Initialize the plugin
+    ///
+    /// Called after Gazebo has been loaded. Must not block.
     public: virtual void Init() {}
+
     public: virtual void Reset() {}
   };
 

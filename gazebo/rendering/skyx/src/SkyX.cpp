@@ -221,6 +221,7 @@ namespace SkyX
 		}
 
 		mMeshManager->getEntity()->setRenderQueueGroup(mRenderQueueGroups.skydome);
+		mMoonManager->getMoonBillboard()->setRenderQueueGroup(mRenderQueueGroups.skydome+1);
 	}
 
 	void SkyX::setLightingMode(const LightingMode& lm)

@@ -124,9 +124,9 @@ namespace SkyX { namespace VClouds
 
 		return Ogre::AxisAlignedBox(
 							  // Min x,y,z
-							  Min.x, -std::max<float>(fd,0),          Min.y,
+							  Min.x, Min.y, -std::max<float>(fd,0),
 							  // Max x,y,z
-			                  Max.x, mHeight - std::min<float>(fd,0), Max.y);
+			                  Max.x, Max.y, mHeight - std::min<float>(fd,0));
 	}
 
 	void GeometryBlock::_calculateDataSize()
@@ -285,7 +285,7 @@ namespace SkyX { namespace VClouds
 
 		mDisplacement = displacement;
 
-		float fallingDistance = mVClouds->getDistanceFallingParams().x*(mEntity->getParentSceneNode()->_getDerivedPosition().y-c->getDerivedPosition().y);
+		float fallingDistance = mVClouds->getDistanceFallingParams().x*(mEntity->getParentSceneNode()->_getDerivedPosition().z-c->getDerivedPosition().z);
 
 		if (mVClouds->getDistanceFallingParams().y > 0) // -1 means no max falling
 		{
@@ -486,7 +486,7 @@ namespace SkyX { namespace VClouds
 
 	void GeometryBlock::_setVertexData(const int& index, const Ogre::Vector3& p, const float& o)
 	{
-		float fallingDistance = mVClouds->getDistanceFallingParams().x*(mEntity->getParentSceneNode()->_getDerivedPosition().y-mCamera->getDerivedPosition().y)*(Ogre::Vector2(p.x,p.z).length()/mRadius);
+		float fallingDistance = mVClouds->getDistanceFallingParams().x*(mEntity->getParentSceneNode()->_getDerivedPosition().z-mCamera->getDerivedPosition().z)*(Ogre::Vector2(p.x,p.z).length()/mRadius);
 		
 		if (mVClouds->getDistanceFallingParams().y > 0) // -1 means no max falling
 		{
@@ -508,8 +508,9 @@ namespace SkyX { namespace VClouds
 		
 		// Position
 		mVertices[index].x = p.x;
-		mVertices[index].y = p.y - fallingDistance;
-		mVertices[index].z = p.z;
+		// Z-Up
+		mVertices[index].y = p.z;
+		mVertices[index].z = p.y - fallingDistance;
 
 		// 3D coords (Z-UP)
 		float scale = mVClouds->getCloudFieldScale()/mRadius;

@@ -130,14 +130,14 @@ namespace SkyX
 		Ogre::Vector3 SunDir = -mSkyX->getController()->getSunDirection();
 
 		// Moon
-		if (SunDir.y > 0.175f)
+		if (SunDir.z > 0.175f)
 		{
 			SunDir = -mSkyX->getController()->getMoonDirection();
 		}
 
 		mVClouds->setSunDirection(SunDir);
 
-		float point = (mSkyX->getController()->getSunDirection().y + 1.0f) / 2.0f;
+		float point = (mSkyX->getController()->getSunDirection().z + 1.0f) / 2.0f;
 
 		mVClouds->setAmbientColor(mAmbientGradient.getColor(point));
 		mVClouds->setSunColor(mSunGradient.getColor(point));

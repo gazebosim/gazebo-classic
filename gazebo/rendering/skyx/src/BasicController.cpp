@@ -105,7 +105,7 @@ namespace SkyX
 		}
 		else
 		{
-			if (X<A)
+			if (X<=A)
 			{
 				if (XB < (24-AB_)/2)
 				{

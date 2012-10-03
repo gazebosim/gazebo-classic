@@ -64,7 +64,7 @@ namespace SkyX
 		mMoonBillboard = mSkyX->getSceneManager()->createBillboardSet("SkyXMoonBillboardSet", 1);
         mMoonBillboard->setMaterialName(mSkyX->getGPUManager()->getMoonMaterialName());
 		mMoonBillboard->setBillboardType(Ogre::BBT_ORIENTED_COMMON);
-		mMoonBillboard->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_EARLY+1);
+		mMoonBillboard->setRenderQueueGroup(mSkyX->getRenderQueueGroups().skydome+1);
 		mMoonBillboard->setCastShadows(false);
 
 		mMoonBillboard->createBillboard(Ogre::Vector3(0,0,0));

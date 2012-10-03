@@ -264,6 +264,13 @@ void Camera::Update()
       this->animState = NULL;
       if (this->onAnimationComplete)
         this->onAnimationComplete();
+
+      if (this->moveToPositionQueue.size() > 0)
+      {
+        this->MoveToPosition(this->moveToPositionQueue[0].first,
+                             this->moveToPositionQueue[0].second);
+        this->moveToPositionQueue.pop_front();
+      }
     }
   }
 
@@ -1263,24 +1270,27 @@ bool Camera::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-bool Camera::MoveToPosition(const math::Vector3 &_end,
-                                 double _pitch, double _yaw, double _time)
+bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 {
   if (this->animState)
+  {
+    this->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
     return false;
+  }
 
   Ogre::TransformKeyFrame *key;
+  math::Vector3 rpy = _pose.rot.GetAsEuler();
   math::Vector3 start = this->GetWorldPose().pos;
 
-  double dyaw =  this->GetWorldRotation().GetAsEuler().z - _yaw;
+  double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
 
   if (dyaw > M_PI)
-    _yaw += 2*M_PI;
+    rpy.z += 2*M_PI;
   else if (dyaw < -M_PI)
-    _yaw -= 2*M_PI;
+    rpy.z -= 2*M_PI;
 
-  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0, 0, 1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0, 1, 0));
+  Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
 
   std::string trackName = "cameratrack";
   int i = 0;
@@ -1306,7 +1316,7 @@ bool Camera::MoveToPosition(const math::Vector3 &_end,
   key->setRotation(this->pitchNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
   key->setRotation(yawFinal);
 
   key = ptrack->createNodeKeyFrame(_time);
@@ -1325,8 +1335,7 @@ bool Camera::MoveToPosition(const math::Vector3 &_end,
 
 /////////////////////////////////////////////////
 bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
-                                 double _time,
-                                 boost::function<void()> _onComplete)
+                             double _time, boost::function<void()> _onComplete)
 {
   if (this->animState)
     return false;

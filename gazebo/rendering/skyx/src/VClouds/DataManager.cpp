@@ -498,7 +498,7 @@ namespace SkyX { namespace VClouds
 			case 3:
 			{
 				// Light scattering
-				Ogre::Vector3 SunDir = Ogre::Vector3(mVClouds->getSunDirection().x, mVClouds->getSunDirection().z, mVClouds->getSunDirection().y);
+				Ogre::Vector3 SunDir = Ogre::Vector3(mVClouds->getSunDirection().x, mVClouds->getSunDirection().y, mVClouds->getSunDirection().z);
 
 				for (u = xStart; u < xEnd; u++)
 				{

@@ -107,7 +107,7 @@ namespace SkyX { namespace VClouds
 			return;
 		}
 
-		mSceneNode->setPosition(mVClouds->getCamera()->getDerivedPosition().x, mHeight.x, mVClouds->getCamera()->getDerivedPosition().z);
+		mSceneNode->setPosition(mVClouds->getCamera()->getDerivedPosition().x, mVClouds->getCamera()->getDerivedPosition().y, mHeight.x);
 		mSceneNode->_update(false, false);
 
 		_updateGeometry(c, timeSinceLastCameraFrame);
@@ -162,11 +162,11 @@ namespace SkyX { namespace VClouds
 		std::vector<VClouds::CameraData>::reference currentCameraData = (*currentCameraDataIt);
 
 		// Calculate wind offset
-		Ogre::Vector2 CameraDirection = Ogre::Vector2(c->getDerivedDirection().x, c->getDerivedDirection().z);
+		Ogre::Vector2 CameraDirection = Ogre::Vector2(c->getDerivedDirection().x, c->getDerivedDirection().y);
 		float offset = - CameraDirection.dotProduct(mVClouds->getWindDirectionV2()) * mVClouds->getWindSpeed() * timeSinceLastFrame;
 
 		// Calculate camera offset
-		Ogre::Vector2 CameraOffset = Ogre::Vector2(c->getDerivedPosition().x - currentCameraData.lastPosition.x, c->getDerivedPosition().z - currentCameraData.lastPosition.z);
+		Ogre::Vector2 CameraOffset = Ogre::Vector2(c->getDerivedPosition().x - currentCameraData.lastPosition.x, c->getDerivedPosition().y - currentCameraData.lastPosition.y);
 		offset -= CameraOffset.dotProduct(CameraDirection);
 
 		// Update camera data

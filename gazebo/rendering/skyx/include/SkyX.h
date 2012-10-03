@@ -65,7 +65,7 @@ namespace SkyX
 		struct RenderQueueGroups
 		{
 			/** Constructor
-			    @param s Skydome render queue group
+			    @param s Skydome render queue group (Note: Moon = skydome_render_queue+1)
 				@param vc VClouds render queue group
 				@param vcl VClouds lightnings render queue group
 			 */
@@ -74,7 +74,7 @@ namespace SkyX
 			{
 			}
 
-			/// Skydome render queue group
+			/// Skydome render queue group (Note: Moon = skydome_render_queue+1)
 			Ogre::uint8 skydome;
 			/// VClouds render queue group
 			Ogre::uint8 vclouds;

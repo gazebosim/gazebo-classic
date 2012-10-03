@@ -128,9 +128,9 @@ namespace SkyX { namespace VClouds
 					{
 						addLightning(
 							// Ray position
-							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), c->getDerivedPosition().y + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y), 
 							// Ray direction
-							Ogre::Vector3(0,-1,0), 
+							Ogre::Vector3(0,0,-1), 
 							// Ray length
 							mVClouds->getGeometrySettings().Height.x + 0.1*mVClouds->getGeometrySettings().Height.y);
 					}
@@ -139,9 +139,9 @@ namespace SkyX { namespace VClouds
 					{
 						addLightning(
 							// Ray position
-							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), c->getDerivedPosition().y + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y), 
 							// Ray direction
-							Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1),Ogre::Math::RangeRandom(-1,1)).normalisedCopy(), 
+							Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1)).normalisedCopy(), 
 							// Ray length
 							Ogre::Math::RangeRandom(0.5,1.5f)*0.2*mVClouds->getGeometrySettings().Height.y);
 					}
@@ -150,17 +150,17 @@ namespace SkyX { namespace VClouds
 					{
 						addLightning(
 							// Ray position
-							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), c->getDerivedPosition().y + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y), 
 							// Ray direction
-							Ogre::Vector3(0,-1,0), 
+							Ogre::Vector3(0,0,-1), 
 							// Ray length
 							mVClouds->getGeometrySettings().Height.x + 0.1*mVClouds->getGeometrySettings().Height.y);
 
 						addLightning(
 							// Ray position
-							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y, c->getDerivedPosition().z + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5)), 
+							Ogre::Vector3(c->getDerivedPosition().x + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), c->getDerivedPosition().y + Ogre::Math::RangeRandom(-c->getFarClipDistance()*0.5,c->getFarClipDistance()*0.5)/Ogre::Math::RangeRandom(1,5), mVClouds->getGeometrySettings().Height.x + 0.2*mVClouds->getGeometrySettings().Height.y), 
 							// Ray direction
-							Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1),Ogre::Math::RangeRandom(-1,1)).normalisedCopy(), 
+							Ogre::Vector3(Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-1,1),Ogre::Math::RangeRandom(-0.1,0.1)).normalisedCopy(), 
 							// Ray length
 							Ogre::Math::RangeRandom(0.5,1.5f)*0.2*mVClouds->getGeometrySettings().Height.y);
 					}
