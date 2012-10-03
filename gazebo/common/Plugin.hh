@@ -182,6 +182,8 @@ namespace gazebo
   class WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Load function
+    /// Loads SDF and setups objects in the World used by this plugin.
+    /// This function cannot block.
     public: virtual void Load(physics::WorldPtr _world,
                 sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
@@ -194,6 +196,8 @@ namespace gazebo
   class ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Load function
+    /// Loads SDF and setups Model and related objects in the plugin.
+    /// This function cannot block.
     public: virtual void Load(physics::ModelPtr _model,
                 sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
@@ -203,9 +207,12 @@ namespace gazebo
   /// \brief A plugin with access to physics::Sensor.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
+  /// Loads SDF and setups Sensor and related objects in the plugin.
+  /// This function cannot block.
   class SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Load function
+    /// This function cannot block.
     public: virtual void Load(sensors::SensorPtr _sensor,
                 sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
@@ -216,6 +223,8 @@ namespace gazebo
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
+  /// Loads SDF and setups system related objects controlled by the plugin.
+  /// This function cannot block.
   class SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Load function
