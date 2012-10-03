@@ -175,7 +175,6 @@ TEST_F(CommonTest, Paths)
   EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
-  EXPECT_STREQ("/models", paths->GetModelPathExtension().c_str());
   EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
 
   paths->AddGazeboPaths("/gazebo/path:/other/gazebo");
@@ -530,7 +529,8 @@ TEST_F(CommonTest, Material)
   EXPECT_STREQ("texture_image", mat.GetTextureImage().c_str());
 
   mat.SetTextureImage("texture_image", "/path");
-  EXPECT_STREQ("/path/texture_image", mat.GetTextureImage().c_str());
+  EXPECT_STREQ("/path/../materials/textures/texture_image",
+               mat.GetTextureImage().c_str());
 
   mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
   EXPECT_TRUE(mat.GetAmbient() == common::Color(0.1, 0.2, 0.3, 0.4));

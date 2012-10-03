@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -282,7 +282,7 @@ BasePtr Base::GetByName(const std::string &_name)
   Base_V::const_iterator iterEnd = this->childrenEnd;
 
   for (iter =  this->children.begin();
-       iter != iterEnd && result == NULL; ++iter)
+      iter != iterEnd && result == NULL; ++iter)
     result = (*iter)->GetByName(_name);
 
   return result;

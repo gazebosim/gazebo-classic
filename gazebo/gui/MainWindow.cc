@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include "gazebo.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Events.hh"
@@ -54,9 +56,12 @@ MainWindow::MainWindow()
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection", 1);
+  this->scenePub =
+    this->node->Advertise<msgs::Scene>("~/scene", 1);
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this);
+
   this->statsSub =
     this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 
@@ -198,6 +203,13 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
+  gazebo::stop();
+  this->renderWidget->hide();
+  this->timePanel->hide();
+  this->treeWidget->hide();
+
+  this->connections.clear();
+
   delete this->worldPropertiesWidget;
   delete this->renderWidget;
   delete this->timePanel;
@@ -447,6 +459,15 @@ void MainWindow::ViewReset()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewGrid()
+{
+  msgs::Scene msg;
+  msg.set_name("default");
+  msg.set_grid(this->viewGridAct->isChecked());
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
@@ -612,6 +633,13 @@ void MainWindow::CreateActions()
   connect(this->viewResetAct, SIGNAL(triggered()), this,
       SLOT(ViewReset()));
 
+  this->viewGridAct = new QAction(tr("Grid"), this);
+  this->viewGridAct->setStatusTip(tr("View Grid"));
+  this->viewGridAct->setCheckable(true);
+  this->viewGridAct->setChecked(true);
+  connect(this->viewGridAct, SIGNAL(triggered()), this,
+          SLOT(ViewGrid()));
+
   this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
   this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
   connect(this->viewFullScreenAct, SIGNAL(triggered()), this,
@@ -659,8 +687,11 @@ void MainWindow::CreateMenus()
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
+  this->viewMenu->addAction(this->viewGridAct);
+  this->viewMenu->addSeparator();
   this->viewMenu->addAction(this->viewResetAct);
   this->viewMenu->addAction(this->viewFullScreenAct);
+  this->viewMenu->addSeparator();
   this->viewMenu->addAction(this->viewFPSAct);
   this->viewMenu->addAction(this->viewOrbitAct);
 

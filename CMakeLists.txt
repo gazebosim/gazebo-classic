@@ -6,19 +6,6 @@ if(COMMAND CMAKE_POLICY)
 endif(COMMAND CMAKE_POLICY)
 enable_testing()
 
-project (Gazebo)
-string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
-
-set (GAZEBO_VERSION_NAME "hydrogen")
-set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 2)
-set (GAZEBO_PATCH_VERSION 0)
-
-set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
-
-message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
-set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
-
 # with -fPIC
 if(UNIX AND NOT WIN32)
   set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
@@ -32,6 +19,19 @@ if(UNIX AND NOT WIN32)
    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
  endif(CMAKE_UNAME)
 endif()
+
+project (Gazebo)
+string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
+set (GAZEBO_VERSION_NAME "hydrogen")
+set (GAZEBO_MAJOR_VERSION 1)
+set (GAZEBO_MINOR_VERSION 2)
+set (GAZEBO_PATCH_VERSION 0)
+
+set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
+
+message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
+set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 
 set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
@@ -200,7 +200,7 @@ if (build_errors)
     message(STATUS ${msg})
   endforeach ()
   message(STATUS "END BUILD ERRORS\n")
-  message (FATAL_ERROR "Errors encountered in build.")
+  message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 
   ########################################

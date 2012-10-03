@@ -134,17 +134,17 @@ void VehiclePlugin::Init()
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
 
   // The total range the steering wheel can rotate
-  double steeringRange = this->steeringJoint->GetHighStop(0).GetAsRadian() -
-                         this->steeringJoint->GetLowStop(0).GetAsRadian();
+  double steeringRange = this->steeringJoint->GetHighStop(0).Radian() -
+                         this->steeringJoint->GetLowStop(0).Radian();
 
   // Compute the angle ratio between the steering wheel and the tires
   this->steeringRatio = steeringRange / this->tireAngleRange;
 
   // Maximum gas is the upper limit of the gas joint
-  this->maxGas = this->gasJoint->GetHighStop(0).GetAsRadian();
+  this->maxGas = this->gasJoint->GetHighStop(0).Radian();
 
   // Maximum brake is the upper limit of the gas joint
-  this->maxBrake = this->gasJoint->GetHighStop(0).GetAsRadian();
+  this->maxBrake = this->gasJoint->GetHighStop(0).Radian();
 
   printf("SteeringRation[%f] MaxGa[%f]\n", this->steeringRatio, this->maxGas);
 }
@@ -153,15 +153,15 @@ void VehiclePlugin::Init()
 void VehiclePlugin::OnUpdate()
 {
   // Get the normalized gas and brake amount
-  double gas = this->gasJoint->GetAngle(0).GetAsRadian() / this->maxGas;
-  double brake = this->brakeJoint->GetAngle(0).GetAsRadian() / this->maxBrake;
+  double gas = this->gasJoint->GetAngle(0).Radian() / this->maxGas;
+  double brake = this->brakeJoint->GetAngle(0).Radian() / this->maxBrake;
 
   // A little force to push back on the pedals
   this->gasJoint->SetForce(0, -0.1);
   this->brakeJoint->SetForce(0, -0.1);
 
   // Get the steering angle
-  double steeringAngle = this->steeringJoint->GetAngle(0).GetAsRadian();
+  double steeringAngle = this->steeringJoint->GetAngle(0).Radian();
 
   // Compute the angle of the front wheels.
   double wheelAngle = steeringAngle / this->steeringRatio;

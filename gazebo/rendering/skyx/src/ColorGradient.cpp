@@ -21,117 +21,111 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include <utility>
-#include "gazebo/math/Helpers.hh"
-#include "gazebo/rendering/skyx/include/ColorGradient.h"
+#include "ColorGradient.h"
 
 namespace SkyX
 {
-  ColorGradient::ColorGradient()
-    : mMalFormed(true)
-  {
-  }
+	ColorGradient::ColorGradient()
+		: mMalFormed(true)
+	{
+	}
 
-  ColorGradient::~ColorGradient()
-  {
-  }
+	ColorGradient::~ColorGradient()
+	{
+	}
 
-  const Ogre::Vector3 ColorGradient::getColor(const Ogre::Real& p) const
-  {
-    if (mMalFormed)
-    {
-      SkyXLOG("Mal-formed ColorGradient");
-      return Ogre::Vector3(0, 0, 0);
-    }
+	const Ogre::Vector3 ColorGradient::getColor(const Ogre::Real& p) const
+	{
+		if (mMalFormed)
+		{
+			SkyXLOG("Mal-formed ColorGradient");
+			return Ogre::Vector3(0,0,0);
+		}
 
-    if (CFrameVector.size() == 0)
-    {
-      return Ogre::Vector3(0, 0, 0);
-    }
-    else if (CFrameVector.size() == 1)
-    {
-      return CFrameVector.at(0).first;
-    }
+		if (CFrameVector.size() == 0)
+		{
+			return Ogre::Vector3(0,0,0);
+		}
+		else if (CFrameVector.size() == 1)
+		{
+			return CFrameVector.at(0).first;
+		}
 
-    std::pair<int, Ogre::Real> minBound, maxBound;
+		std::pair<int, Ogre::Real> minBound, maxBound;
 
-    // Min value
-    minBound.first = 0;
-    minBound.second = -1;
-    for (unsigned int k = 0; k < CFrameVector.size(); k++)
-    {
-      if (CFrameVector.at(k).second < p &&
-          CFrameVector.at(k).second > minBound.second)
-      {
-        minBound.first = k;
-        minBound.second = CFrameVector.at(k).second;
-      }
-    }
+		// Min value
+		minBound.first = 0;
+		minBound.second = -1;
+		for (unsigned int k = 0; k < CFrameVector.size(); k++)
+		{
+			if (CFrameVector.at(k).second < p && CFrameVector.at(k).second > minBound.second)
+			{
+				minBound.first = k;
+				minBound.second = CFrameVector.at(k).second;
+			}
+		}
 
-    // Max value
-    maxBound.first = 0;
-    maxBound.second = 2;
-    for (unsigned int k = 0; k < CFrameVector.size(); k++)
-    {
-      if (CFrameVector.at(k).second > p &&
-          CFrameVector.at(k).second < maxBound.second)
-      {
-        maxBound.first = k;
-        maxBound.second = CFrameVector.at(k).second;
-      }
-    }
+		// Max value
+		maxBound.first = 0;
+		maxBound.second = 2;
+		for (unsigned int k = 0; k < CFrameVector.size(); k++)
+		{
+			if (CFrameVector.at(k).second > p && CFrameVector.at(k).second < maxBound.second)
+			{
+				maxBound.first = k;
+				maxBound.second = CFrameVector.at(k).second;
+			}
+		}
 
-    float range = maxBound.second - minBound.second,
-          rangepoint = (p - minBound.second) / range;
+		float range = maxBound.second - minBound.second,
+		      rangepoint = (p - minBound.second) / range;
 
-    return CFrameVector.at(minBound.first).first*(1-rangepoint) +
-           CFrameVector.at(maxBound.first).first*rangepoint;
-  }
+		return CFrameVector.at(minBound.first).first*(1-rangepoint) + CFrameVector.at(maxBound.first).first*rangepoint;
+	}
 
-  bool ColorGradient::_checkBounds() const
-  {
-    std::pair<bool, bool> existbounds;
-    existbounds.first = false;
-    existbounds.second = false;
+	const bool ColorGradient::_checkBounds() const
+	{
+		std::pair<bool, bool> existbounds;
+		existbounds.first = false; existbounds.second = false;
 
-    for (unsigned int k = 0; k < CFrameVector.size(); k++)
-    {
-      if (gazebo::math::equal(CFrameVector.at(k).second, 0.0f))
-      {
-        // More than one min bound
-        if (existbounds.first)
-        {
-          return false;
-        }
+		for (unsigned int k = 0; k < CFrameVector.size(); k++)
+		{
+			if (CFrameVector.at(k).second == 0)
+			{
+				// More than one min bound
+				if (existbounds.first)
+				{
+					return false;
+				}
 
-        existbounds.first = true;
-      }
+				existbounds.first = true;
+			}
 
-      if (CFrameVector.at(k).second < 0 || CFrameVector.at(k).second > 1)
-      {
-        return false;
-      }
-    }
+			if (CFrameVector.at(k).second < 0 || CFrameVector.at(k).second > 1)
+			{
+				return false;
+			}
+		}
 
-    for (unsigned int k = 0; k < CFrameVector.size(); k++)
-    {
-      if (gazebo::math::equal(CFrameVector.at(k).second, 1.0f))
-      {
-        // More than one min bound
-        if (existbounds.second)
-        {
-          return false;
-        }
+		for (unsigned int k = 0; k < CFrameVector.size(); k++)
+		{
+			if (CFrameVector.at(k).second == 1)
+			{
+				// More than one min bound
+				if (existbounds.second)
+				{
+					return false;
+				}
 
-        existbounds.second = true;
-      }
-    }
+				existbounds.second = true;
+			}
+		}
 
-    if (!existbounds.first || !existbounds.second)
-    {
-      return false;
-    }
+		if (!existbounds.first || !existbounds.second)
+		{
+			return false;
+		}
 
-    return true;
-  }
+		return true;
+	}
 }

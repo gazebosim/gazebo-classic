@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace gazebo
     class ODEHingeJoint : public HingeJoint<ODEJoint>
     {
       ///  Constructor
-      public: ODEHingeJoint(dWorldID worldId);
+      public: ODEHingeJoint(dWorldID worldId, BasePtr _parent);
 
       /// Destructor
       public: virtual ~ODEHingeJoint();

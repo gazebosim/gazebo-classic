@@ -46,6 +46,12 @@ endif ()
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
+
+  pkg_check_modules(CURL libcurl)
+  if (NOT CURL_FOUND)
+    BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
+  endif()
+
   pkg_check_modules(PROFILER libprofiler)
   if (PROFILER_FOUND)
     set (CMAKE_LINK_FLAGS_PROFILE "-Wl,--no-as-needed -lprofiler -Wl,--as-needed ${CMAKE_LINK_FLAGS_PROFILE}" CACHE INTERNAL "Link flags for profile")
@@ -282,7 +288,7 @@ endif()
 ########################################
 # Find Boost, if not specified manually
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams)
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)

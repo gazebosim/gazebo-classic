@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: ODE Heightmap shape
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 12 Nov 2009
  */
 
@@ -79,8 +79,8 @@ void ODEHeightmapShape::Init()
   math::Quaternion quat;
   math::Pose pose = oParent->GetWorldPose();
 
-  // FIXME:  double check this, if Y is up,
-  //         rotating by roll of 90 deg will put Z-down.
+  // TODO: FIXME:  double check this, if Y is up,
+  // rotating by roll of 90 deg will put Z-down.
   quat.SetFromEuler(math::Vector3(GZ_DTOR(90), 0, 0));
 
   pose.rot = pose.rot * quat;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -425,7 +425,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   dir.Normalize();
 
-  double scale = maxSize / tan((this->GetHFOV()/2.0).GetAsRadian());
+  double scale = maxSize / tan((this->GetHFOV()/2.0).Radian());
 
   end = mid + dir*(dist - scale);
 

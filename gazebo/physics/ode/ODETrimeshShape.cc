@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: ODE Trimesh shape
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 16 Oct 2009
  */
 
@@ -35,6 +35,8 @@ using namespace physics;
 ODETrimeshShape::ODETrimeshShape(CollisionPtr _parent) : TrimeshShape(_parent)
 {
   this->odeData = NULL;
+  this->vertices = NULL;
+  this->indices = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -96,6 +98,8 @@ void ODETrimeshShape::Load(sdf::ElementPtr _sdf)
 void ODETrimeshShape::Init()
 {
   TrimeshShape::Init();
+  if (!this->mesh)
+    return;
 
   ODECollisionPtr pcollision =
     boost::shared_static_cast<ODECollision>(this->collisionParent);

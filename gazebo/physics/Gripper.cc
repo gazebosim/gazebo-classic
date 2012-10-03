@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ Gripper::~Gripper()
 /////////////////////////////////////////////////
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
-  this->fixedJoint = this->physics->CreateJoint("revolute");
+  this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
 
   sdf::ElementPtr grasp_check = _sdf->GetElement("grasp_check");
   this->min_contact_count = grasp_check->GetValueUInt("min_contact_count");

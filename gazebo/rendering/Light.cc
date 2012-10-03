@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -432,7 +432,7 @@ void Light::SetDirection(const math::Vector3 &_dir)
 //////////////////////////////////////////////////
 math::Vector3 Light::GetDirection() const
 {
-  return this->sdf->GetElement("direction")->GetValueVector3("xyz");
+  return this->sdf->GetValueVector3("direction");
 }
 
 //////////////////////////////////////////////////

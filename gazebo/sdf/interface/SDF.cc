@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -355,14 +355,22 @@ void Element::PrintDoc(std::string &_divs, std::string &_html,
   }
   int end = _index;
 
-  stream << "<a href=\"javascript:animatedcollapse.toggle('"
+  stream << "<a id='" << this->name
+    << "' href=\"javascript:animatedcollapse.toggle('"
             << start << "')\">+ &lt" << this->name << "&gt</a>";
   stream << "<a style='padding-left: 5px' "
-         << "href=\"javascript:animatedcollapse.toggle([";
+         << "href=\"javascript:animatedcollapse.show([";
   int i;
   for (i = start; i < end - 1; ++i)
     stream << "'" << i << "',";
-  stream << "'" << i << "'])\">all</a><br>";
+  stream << "'" << i << "'])\">all</a> | ";
+
+
+  stream << "<a style='padding-left: 5px' "
+         << "href=\"javascript:animatedcollapse.hide([";
+  for (i = start; i < end - 1; ++i)
+    stream << "'" << i << "',";
+  stream << "'" << i << "'])\">none</a><br>";
 
   stream << "<div id='" << start << "' style='padding-left:" << _spacing
          << "px; display:none; width: 404px;'>\n";

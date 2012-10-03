@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,10 @@ SphereMaker::SphereMaker()
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::SPHERE);
-  this->visualMsg->mutable_material()->set_script(
+
+  this->visualMsg->mutable_material()->mutable_script()->set_uri(
+      "gazebo://media/materials/scripts/gazebo.material");
+  this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
       math::Quaternion());

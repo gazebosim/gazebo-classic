@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,7 +175,8 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 /////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
-  if (this->userCamera && this->userCamera->IsInitialized())
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (cam && cam->IsInitialized())
   {
     event::Events::preRender();
 
@@ -604,7 +605,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   gui::Events::mouseRelease(this->mouseEvent);
   emit clicked();
 
-  this->scene->GetSelectionObj()->SetActive(false);
+  if (this->scene->GetSelectionObj())
+    this->scene->GetSelectionObj()->SetActive(false);
 
   if (this->state == "ring")
     this->OnMouseReleaseRing();

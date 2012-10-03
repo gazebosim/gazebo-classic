@@ -22,20 +22,21 @@ message Joint
   }
 
   required string name           = 1;
-  optional Type type             = 2;
-  optional string parent         = 3;
-  optional string child          = 4;
-  optional Pose pose             = 5;
-  optional Axis axis1            = 6;
-  optional Axis axis2            = 7;
+  repeated double angle          = 2;
+  optional Type type             = 3;
+  optional string parent         = 4;
+  optional string child          = 5;
+  optional Pose pose             = 6;
+  optional Axis axis1            = 7;
+  optional Axis axis2            = 8;
 
-  optional double cfm            = 8;
-  optional double bounce         = 9;
-  optional double velocity       = 10;
-  optional double fudge_factor   = 11;
-  optional double limit_cfm      = 12;
-  optional double limit_erp      = 13;
-  optional double suspension_cfm = 14;
-  optional double suspension_erp = 15;
+  optional double cfm            = 9;
+  optional double bounce         = 10;
+  optional double velocity       = 11;
+  optional double fudge_factor   = 12;
+  optional double limit_cfm      = 13;
+  optional double limit_erp      = 14;
+  optional double suspension_cfm = 15;
+  optional double suspension_erp = 16;
 }
 /// \endverbatim

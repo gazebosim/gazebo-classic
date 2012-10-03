@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ int main(int _argc, char **_argv)
     server->Run();
     server->Fini();
     delete server;
+    server = NULL;
   }
 
   return 0;

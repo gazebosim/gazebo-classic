@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A slider or primastic joint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 #include <boost/bind.hpp>
@@ -31,8 +31,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODESliderJoint::ODESliderJoint(dWorldID _worldId)
-    : SliderJoint<ODEJoint>()
+ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
+    : SliderJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateSlider(_worldId, NULL);
 }
@@ -59,7 +59,9 @@ math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 //////////////////////////////////////////////////
 math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 {
-  math::Angle result = dJointGetSliderPosition(this->jointId);
+  math::Angle result;
+  if (this->jointId)
+    result = dJointGetSliderPosition(this->jointId);
   return result;
 }
 

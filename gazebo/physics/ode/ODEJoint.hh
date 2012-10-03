@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: The ODE base joint class
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 12 Oct 2009
  */
 
@@ -37,7 +37,7 @@ namespace gazebo
     class ODEJoint : public Joint
     {
       /// \brief Constructor
-      public: ODEJoint();
+      public: ODEJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEJoint();

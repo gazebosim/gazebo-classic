@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef FPSVIEWCONTROLLER_HH
-#define FPSVIEWCONTROLLER_HH
+#ifndef __FPSVIEWCONTROLLER_HH__
+#define __FPSVIEWCONTROLLER_HH__
 
 #include <string>
 
@@ -28,25 +28,32 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class FPSViewController FPSViewController.hh rendering/FPSViewController.hh
     /// \brief First Person Shooter style view controller
     class FPSViewController : public ViewController
     {
       /// \brief Constructor
-      public: FPSViewController(UserCamera *camera);
+      /// \param[in] Camera to controll
+      public: FPSViewController(UserCamera *_camera);
 
       /// \brief Destructor
       public: virtual ~FPSViewController();
 
+      /// \brief Initialize the controller
       public: virtual void Init();
 
-      /// \brief Update
+      /// \brief Update the camera position
       public: virtual void Update();
 
       /// \brief Get the type name of this view controller
+      /// \return The name of the controller type: "fps"
       public: static std::string GetTypeString();
 
       /// \brief Handle a mouse event
-      public: virtual void HandleMouseEvent(const common::MouseEvent &event);
+      ///
+      /// This is ususally called from the graphical interface.
+      /// \param[in] _event The mouse event.
+      public: virtual void HandleMouseEvent(const common::MouseEvent &_event);
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ JointController::JointController(ModelPtr _model)
 /////////////////////////////////////////////////
 void JointController::AddJoint(JointPtr _joint)
 {
-  this->joints[_joint->GetName()] = _joint;
-  this->posPids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
-  this->velPids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
+  this->joints[_joint->GetScopedName()] = _joint;
+  this->posPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
+  this->velPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
 }
 
 /////////////////////////////////////////////////
@@ -77,7 +77,7 @@ void JointController::Update()
     for (iter = this->positions.begin(); iter != this->positions.end(); ++iter)
     {
       cmd = this->posPids[iter->first].Update(
-          this->joints[iter->first]->GetAngle(0).GetAsRadian() - iter->second,
+          this->joints[iter->first]->GetAngle(0).Radian() - iter->second,
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
@@ -105,7 +105,7 @@ void JointController::Update()
     for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
     {
       if (this->positions.find(iter->first) == this->positions.end())
-        this->positions[iter->first] = iter->second->GetAngle(0).GetAsRadian();
+        this->positions[iter->first] = iter->second->GetAngle(0).Radian();
     }
     this->SetJointPositions(this->positions);
     this->positions.clear();
@@ -188,7 +188,7 @@ void JointController::SetJointPositions(
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    jiter = _jointPositions.find(iter->second->GetName());
+    jiter = _jointPositions.find(iter->second->GetScopedName());
     if (jiter != _jointPositions.end())
       this->SetJointPosition(iter->second, jiter->second);
   }
@@ -198,10 +198,9 @@ void JointController::SetJointPositions(
 void JointController::SetJointPosition(JointPtr _joint, double _position)
 {
   // truncate position by joint limits
-  double lower = _joint->GetLowStop(0).GetAsRadian();
-  double upper = _joint->GetHighStop(0).GetAsRadian();
-  _position = _position < lower? lower :
-    (_position > upper? upper : _position);
+  double lower = _joint->GetLowStop(0).Radian();
+  double upper = _joint->GetHighStop(0).Radian();
+  _position = _position < lower? lower : (_position > upper? upper : _position);
 
   // keep track of updatd links, make sure each is upated only once
   this->updated_links.clear();
@@ -214,14 +213,14 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
     LinkPtr childLink = _joint->GetChild();
 
     if (parentLink && childLink &&
-        parentLink->GetName() != childLink->GetName())
+        parentLink->GetScopedName() != childLink->GetScopedName())
     {
       // transform about the current anchor, about the axis
       if (_joint->HasType(Base::HINGE_JOINT))
       {
         // rotate child (childLink) about anchor point, by delta-angle
         // along axis
-        double dangle = _position - _joint->GetAngle(0).GetAsRadian();
+        double dangle = _position - _joint->GetAngle(0).Radian();
 
         math::Vector3 anchor;
         math::Vector3 axis;
@@ -242,7 +241,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
       }
       else if (_joint->HasType(Base::SLIDER_JOINT))
       {
-        double dposition = _position - _joint->GetAngle(0).GetAsRadian();
+        double dposition = _position - _joint->GetAngle(0).Radian();
 
         math::Vector3 anchor;
         math::Vector3 axis;
@@ -265,7 +264,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
       else
       {
         gzwarn << "Setting non HINGE/SLIDER joint types not"
-          << "implemented [" << _joint->GetName() << "]\n";
+          << "implemented [" << _joint->GetScopedName() << "]\n";
       }
     }
   }
@@ -379,8 +378,8 @@ void JointController::GetAllChildrenLinks(std::vector<LinkPtr> &_links,
     LinkPtr parentLink = joint->GetParent();
     LinkPtr childLink = joint->GetChild();
     if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && parentLink->GetName() == _link->GetName()
+        && parentLink->GetScopedName() != childLink->GetScopedName()
+        && parentLink->GetScopedName() == _link->GetScopedName()
         && this->FindLink(_links.begin(), _links.end(), childLink)
                        == _links.end())
     {
@@ -405,9 +404,9 @@ void JointController::GetAllParentLinks(std::vector<LinkPtr> &_links,
     LinkPtr childLink = joint->GetChild();
 
     if (parentLink && childLink
-        && parentLink->GetName() != childLink->GetName()
-        && childLink->GetName() == _link->GetName()
-        && parentLink->GetName() != _origParentLink->GetName()
+        && parentLink->GetScopedName() != childLink->GetScopedName()
+        && childLink->GetScopedName() == _link->GetScopedName()
+        && parentLink->GetScopedName() != _origParentLink->GetScopedName()
         && this->FindLink(_links.begin(), _links.end(), parentLink)
                        == _links.end())
     {

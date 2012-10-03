@@ -17,6 +17,7 @@
 
 #include "ServerFixture.hh"
 #include "physics/physics.hh"
+#include "SimplePendulumIntegrator.hh"
 
 using namespace gazebo;
 class PhysicsTest : public ServerFixture

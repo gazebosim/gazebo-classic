@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  *
 */
 /* Desc: Trimesh shape
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 16 Oct 2009
  */
 
+#include "common/Common.hh"
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
 #include "common/Exception.hh"
@@ -47,8 +48,30 @@ TrimeshShape::~TrimeshShape()
 //////////////////////////////////////////////////
 void TrimeshShape::Init()
 {
+  std::string filename;
+
+  this->mesh = NULL;
   common::MeshManager *meshManager = common::MeshManager::Instance();
-  this->mesh = meshManager->Load(this->sdf->GetValueString("filename"));
+  if (this->sdf->GetValueString("filename") != "__default__")
+  {
+    filename = common::find_file(this->sdf->GetValueString("filename"));
+
+    gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
+          << " is deprecated.\n";
+    gzerr << "Use <mesh><uri>file://" << filename << "</uri></mesh>\n";
+    this->sdf->GetElement("uri")->Set(std::string("file://") + filename);
+  }
+  else
+  {
+    filename = common::find_file(this->sdf->GetValueString("uri"));
+    if (filename == "__default__" || filename.empty())
+    {
+      gzerr << "No mesh specified\n";
+      return;
+    }
+  }
+
+  this->mesh = meshManager->Load(filename);
 }
 
 //////////////////////////////////////////////////
@@ -66,13 +89,20 @@ math::Vector3 TrimeshShape::GetSize() const
 //////////////////////////////////////////////////
 std::string TrimeshShape::GetFilename() const
 {
-  return this->sdf->GetValueString("filename");
+  return this->sdf->GetValueString("uri");
 }
 
 //////////////////////////////////////////////////
 void TrimeshShape::SetFilename(const std::string &_filename)
 {
-  this->sdf->GetElement("filename")->Set(_filename);
+  if (_filename.find("://") == std::string::npos)
+  {
+    gzerr << "Invalid filename[" << _filename
+          << "]. Must use a URI, like file://" << _filename << "\n";
+    return;
+  }
+
+  this->sdf->GetElement("uri")->Set(_filename);
   this->Init();
 }
 
