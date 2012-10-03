@@ -407,7 +407,7 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr statPub, responsePub, modelPub;
-      private: transport::PublisherPtr guiPub, scenePub;
+      private: transport::PublisherPtr guiPub;
 
       private: transport::SubscriberPtr controlSub;
       private: transport::SubscriberPtr factorySub, jointSub;

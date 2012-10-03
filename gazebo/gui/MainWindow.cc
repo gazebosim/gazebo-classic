@@ -59,9 +59,9 @@ MainWindow::MainWindow()
   this->scenePub =
     this->node->Advertise<msgs::Scene>("~/scene", 1);
 
-
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this);
+
   this->statsSub =
     this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 

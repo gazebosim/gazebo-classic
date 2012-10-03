@@ -156,7 +156,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
-  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
     this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 1);

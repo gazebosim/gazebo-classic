@@ -109,8 +109,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   this->InitTransport();
 
-  this->fillingPropertyTree = false;
-  this->selectedProperty = NULL;
+  this->ResetTree();
 
   this->connections.push_back(
       gui::Events::ConnectModelUpdate(
@@ -144,7 +143,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   if (_item)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
-    std::cout << "OnModelSelection[" << name << "]\n";
     event::Events::setSelectedEntity(name);
   }
   else
@@ -154,7 +152,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 /////////////////////////////////////////////////
 void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
 {
-  std::cout << "OnSetSelectedEntity[" << _name << "]\n";
   this->selectedModelName = _name;
 
   this->propTreeBrowser->clear();
@@ -179,7 +176,6 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->modelMsg, NULL);
     else if (this->fillType == "link")
     {
-      printf("Update...fill link msg\n");
       this->FillPropertyTree(this->linkMsg, NULL);
     }
     else if (this->fillType == "joint")
@@ -194,6 +190,13 @@ void ModelListWidget::Update()
   this->ProcessPoseMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
+
+/////////////////////////////////////////////////
+/*void ModelListWidget::OnSceneUpdate(const msgs::Scene &_msg)
+{
+  printf("ScenePtr\n");
+}
+*/
 
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
@@ -215,18 +218,16 @@ void ModelListWidget::ProcessModelMsgs()
   {
     std::string name = (*iter).name();
 
-    QTreeWidgetItem *listItem = this->GetModelListItem((*iter).id());
+    QTreeWidgetItem *listItem = this->GetModelListItem((*iter).name());
 
     if (!listItem)
     {
       if (!(*iter).has_deleted() || !(*iter).deleted())
       {
-        // Create a top-level tree item for the path
-        QTreeWidgetItem *topItem = new QTreeWidgetItem(
-            static_cast<QTreeWidgetItem*>(0),
+        // Create an item for the model name
+        QTreeWidgetItem *topItem = new QTreeWidgetItem(this->modelsItem,
             QStringList(QString("%1").arg(QString::fromStdString(name))));
 
-        // topItem->setData(0, Qt::UserRole, QVariant((*iter).id()));
         topItem->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
         this->modelTreeWidget->addTopLevelItem(topItem);
 
@@ -288,6 +289,8 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
+  std::cout << "Response[" << _msg->DebugString() << "}\n\n";
+
   if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
     this->propMutex->lock();
@@ -299,7 +302,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   }
   else if (_msg->has_type() && _msg->type() == this->linkMsg.GetTypeName())
   {
-    printf("On response, link message\n");
     this->propMutex->lock();
     this->linkMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
@@ -334,8 +336,7 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
 {
   if (gui::has_entity_name(_name))
   {
-    QTreeWidgetItem *listItem =
-      this->GetModelListItem(gui::get_entity_id(_name));
+    QTreeWidgetItem *listItem = this->GetModelListItem(_name);
     if (listItem)
     {
       int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
@@ -350,17 +351,16 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
+QTreeWidgetItem *ModelListWidget::GetModelListItem(const std::string &_name)
 {
   QTreeWidgetItem *listItem = NULL;
 
   // Find an existing element with the name from the message
-  for (int i = 0; i < this->modelTreeWidget->topLevelItemCount()
-      && !listItem; ++i)
+  for (int i = 0; i < this->modelsItem->childCount() && !listItem; ++i)
   {
-    QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
-    unsigned int listData = item->data(0, Qt::UserRole).toUInt();
-    if (listData == _id)
+    QTreeWidgetItem *item = this->modelsItem->child(i);
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+    if (listData == _name)
     {
       listItem = item;
       break;
@@ -369,8 +369,8 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
     for (int j = 0; j < item->childCount(); j++)
     {
       QTreeWidgetItem *childItem = item->child(j);
-      listData = childItem->data(0, Qt::UserRole).toUInt();
-      if (listData == _id)
+      listData = childItem->data(0, Qt::UserRole).toString().toStdString();
+      if (listData == _name)
       {
         listItem = childItem;
         break;
@@ -1004,7 +1004,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   this->FillPoseProperty(_msg.pose(), topItem);
 
   // Angle
-  for (unsigned int i = 0; i < _msg.angle_size(); ++i)
+  for (int i = 0; i < _msg.angle_size(); ++i)
   {
     std::string angleName = "angle_" + boost::lexical_cast<std::string>(i);
     item = this->variantManager->addProperty(QVariant::String,
@@ -1802,7 +1802,7 @@ void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
   this->poseMsgs.clear();
-  this->modelTreeWidget->clear();
+  this->ResetTree();
   this->propTreeBrowser->clear();
   this->node->Fini();
   this->node.reset();
@@ -1817,11 +1817,14 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 /////////////////////////////////////////////////
 void ModelListWidget::OnCreateScene(const std::string &_name)
 {
-  this->poseMsgs.clear();
-  this->modelTreeWidget->clear();
-  this->propTreeBrowser->clear();
+  this->ResetTree();
 
+  this->poseMsgs.clear();
+  this->propTreeBrowser->clear();
   this->InitTransport(_name);
+
+  this->requestMsg = msgs::CreateRequest("scene_info");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
 /////////////////////////////////////////////////
@@ -1851,6 +1854,42 @@ void ModelListWidget::InitTransport(const std::string &_name)
 
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ResetTree()
+{
+  this->modelTreeWidget->clear();
+
+  // Create the top level of items in the tree widget
+  {
+    this->sceneItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("scene"))));
+    this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("scene")));
+    this->modelTreeWidget->addTopLevelItem(this->sceneItem);
+
+    this->physicsItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("physics"))));
+    this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("physics")));
+    this->modelTreeWidget->addTopLevelItem(this->physicsItem);
+
+    this->modelsItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("models"))));
+    this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("models")));
+    this->modelTreeWidget->addTopLevelItem(this->modelsItem);
+
+    this->lightsItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("lights"))));
+    this->lightsItem->setData(0, Qt::UserRole, QVariant(tr("lights")));
+    this->modelTreeWidget->addTopLevelItem(this->lightsItem);
+  }
+
+  this->fillingPropertyTree = false;
+  this->selectedProperty = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -1899,4 +1938,5 @@ QSize ModelListSheetDelegate::sizeHint(const QStyleOptionViewItem &opt,
   QSize sz = QItemDelegate::sizeHint(opt, index) + QSize(2, 2);
   return sz;
 }
+
 

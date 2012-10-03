@@ -107,8 +107,6 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { modelUpdate.Disconnect(_subscriber); }
 
-
-
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
 

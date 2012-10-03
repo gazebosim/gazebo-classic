@@ -98,7 +98,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
-  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
@@ -1234,13 +1233,6 @@ void Scene::OnSensorMsg(ConstSensorPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sensorMsgs.push_back(_msg);
-}
-
-//////////////////////////////////////////////////
-void Scene::OnSceneMsg(ConstScenePtr &_msg)
-{
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->sceneMsgs.push_back(_msg);
 }
 
 //////////////////////////////////////////////////

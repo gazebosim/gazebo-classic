@@ -302,7 +302,6 @@ namespace gazebo
       private: void ProcessSceneMsg(ConstScenePtr &_msg);
       private: bool ProcessModelMsg(const msgs::Model &_msg);
 
-      private: void OnSceneMsg(ConstScenePtr &_msg);
       private: void OnSensorMsg(ConstSensorPtr &_msg);
       private: void OnVisualMsg(ConstVisualPtr &_msg);
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
@@ -389,7 +388,6 @@ namespace gazebo
       private: boost::mutex *receiveMutex;
 
       private: transport::NodePtr node;
-      private: transport::SubscriberPtr sceneSub;
       private: transport::SubscriberPtr sensorSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
