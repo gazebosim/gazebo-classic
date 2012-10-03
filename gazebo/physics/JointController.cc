@@ -359,9 +359,9 @@ void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
                                           ++parentLink)
       {
         if ((*parentLink)->GetName() != _current_link->GetName() &&
-//            (*parentLink)->GetName() != (*childLink)->GetName() &&
             !this->ContainsLink(_links_out, (*parentLink)))
         {
+          _links_out.push_back(*parentLink);
           // add all childrend links of parentLink, but
           // stop the recursion if any of the child link is already added
           this->AddConnectedLinks(_links_out, *parentLink, _current_link);
