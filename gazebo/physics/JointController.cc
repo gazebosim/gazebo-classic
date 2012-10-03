@@ -218,36 +218,28 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
          parentLink->GetName() != childLink->GetName()))
     {
       // transform about the current anchor, about the axis
-      if (_joint->HasType(Base::HINGE_JOINT) ||
-          _joint->HasType(Base::SLIDER_JOINT))
+      // rotate child (childLink) about anchor point, by delta-angle
+      // along axis
+      double dposition = _position - _joint->GetAngle(0).GetAsRadian();
+
+      math::Vector3 anchor;
+      math::Vector3 axis;
+
+      if (this->model->IsStatic())
       {
-        // rotate child (childLink) about anchor point, by delta-angle
-        // along axis
-        double dposition = _position - _joint->GetAngle(0).GetAsRadian();
-
-        math::Vector3 anchor;
-        math::Vector3 axis;
-
-        if (this->model->IsStatic())
-        {
-          math::Pose linkWorldPose = childLink->GetWorldPose();
-          axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
-          anchor = linkWorldPose.pos;
-        }
-        else
-        {
-          anchor = _joint->GetAnchor(0);
-          axis = _joint->GetGlobalAxis(0);
-        }
-
-        this->MoveLinks(_joint, childLink, anchor, axis, dposition,
-          true);
+        math::Pose linkWorldPose = childLink->GetWorldPose();
+        axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
+        anchor = linkWorldPose.pos;
       }
       else
       {
-        gzwarn << "Setting non HINGE/SLIDER joint types not"
-          << "implemented [" << _joint->GetName() << "]\n";
+        anchor = _joint->GetAnchor(0);
+        axis = _joint->GetGlobalAxis(0);
       }
+
+      this->updated_links.push_back(parentLink);
+      this->MoveLinks(_joint, childLink, anchor, axis, dposition,
+        true);
     }
   }
 
@@ -300,7 +292,8 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link1,
       newRelativePose.pos = relativePose.pos + _axis * _dposition;
       newRelativePose.rot = relativePose.rot;
 
-      math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
+      math::Pose newWorldPose(newRelativePose.pos + _anchor,
+                              newRelativePose.rot);
 
       _link1->SetWorldPose(newWorldPose);
       _link1->SetLinearVel(math::Vector3(0, 0, 0));
