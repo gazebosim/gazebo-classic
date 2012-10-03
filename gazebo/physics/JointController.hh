@@ -64,12 +64,21 @@ namespace gazebo
       ///   this call must recursively crawl through all the connected
       ///   children Link's in this Model, and update each Link Pose
       ///   affected by this Joint angle update.
+      /// Warning:
+      ///   There is no constraint satisfaction being done here,
+      ///   traversal through the kinematic graph has unexpected behavior
+      ///   if you try to set the joint position of a link inside
+      ///   a loop structure.
       public: void SetJointPosition(JointPtr _joint, double _position);
 
       /// \brief Helper for SetJointPositions
       private: void MoveLinks(JointPtr _joint, LinkPtr _link,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
                    double _dposition, bool _updateChildren = false);
+
+      /// @todo: Set Link Velocity based on old and new poses and dt
+      private: void SetLinkTwist(LinkPtr _link,
+                    const math::Pose &_old, const math::Pose &_new, double dt);
 
       /// \brief Helper for SetJointPositions
       private: void AddConnectedLinks(std::vector<LinkPtr> &_links_out,

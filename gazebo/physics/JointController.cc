@@ -173,8 +173,11 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 void JointController::SetJointPosition(const std::string &_name,
                                        double _position)
 {
-  if (this->joints.find(_name) != this->joints.end())
-    this->SetJointPosition(this->joints[_name], _position);
+  std::map<std::string, JointPtr>::iterator jiter = this->joints.find(_name);
+  if (jiter != this->joints.end())
+    this->SetJointPosition(jiter->second, _position);
+  else
+    gzwarn << "SetJointPosition [" << _name << "] not found\n";
 }
 
 //////////////////////////////////////////////////
@@ -278,8 +281,11 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
                               newRelativePose.rot);
 
       _link->SetWorldPose(newWorldPose);
-      _link->SetLinearVel(math::Vector3(0, 0, 0));
-      _link->SetAngularVel(math::Vector3(0, 0, 0));
+
+      // set link velocities somehow?
+      // ideally we want to set this according to Joint Trajectory velocity
+      // double dt = 0;
+      // this->SetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }
@@ -299,8 +305,11 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
                               newRelativePose.rot);
 
       _link->SetWorldPose(newWorldPose);
-      _link->SetLinearVel(math::Vector3(0, 0, 0));
-      _link->SetAngularVel(math::Vector3(0, 0, 0));
+
+      // set link velocities somehow?
+      // ideally we want to set this according to Joint Trajectory velocity
+      // double dt = 0;
+      // this->SetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }
@@ -321,6 +330,25 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       this->MoveLinks(_joint, (*liter), _anchor, _axis, _dposition);
     }
   }
+}
+
+//////////////////////////////////////////////////
+void JointController::SetLinkTwist(LinkPtr _link,
+     const math::Pose &_old, const math::Pose &_new, double _dt)
+{
+    math::Vector3 linear_vel(0, 0, 0);
+    math::Vector3 angular_vel(0, 0, 0);
+    if (math::equal(_dt, 0.0))
+    {
+      gzwarn << "dt is 0, unable to compute velocity, set to 0s\n";
+    }
+    else
+    {
+      linear_vel = (_new.pos - _old.pos) / _dt;
+      angular_vel = (_new.rot.GetAsEuler() - _old.rot.GetAsEuler()) / _dt;
+    }
+    _link->SetLinearVel(linear_vel);
+    _link->SetAngularVel(angular_vel);
 }
 
 //////////////////////////////////////////////////

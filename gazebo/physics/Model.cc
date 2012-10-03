@@ -119,6 +119,7 @@ void Model::Load(sdf::ElementPtr _sdf)
       // Load the link using the config node. This also loads all of the
       // bodies collisionetries
       link->Load(linkElem);
+
       linkElem = linkElem->GetNextElement("link");
     }
   }
@@ -563,8 +564,41 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
+unsigned int Model::GetLinkCount() const
+{
+  return (this->GetLinks()).size();
+}
+
+//////////////////////////////////////////////////
+Link_V Model::GetLinks() const
+{
+  Link_V links;
+  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
+  {
+    LinkPtr link = boost::shared_static_cast<Link>(this->GetChild(i));
+    if (link)
+      links.push_back(link);
+  }
+  return links;
+}
+
+//////////////////////////////////////////////////
+LinkPtr Model::GetLink(unsigned int _index) const
+{
+  Link_V links = this->GetLinks();
+  LinkPtr link;
+  if (_index <= links.size())
+    link = links[_index];
+  else
+    gzerr << "Index is out of range\n";
+
+  return link;
+}
+
+//////////////////////////////////////////////////
 LinkPtr Model::GetLink(const std::string &_name) const
 {
+  /// @todo: replace by searching Model::links vector
   Base_V::const_iterator biter;
   LinkPtr result;
 
@@ -585,18 +619,6 @@ LinkPtr Model::GetLink(const std::string &_name) const
   }
 
   return result;
-}
-
-//////////////////////////////////////////////////
-LinkPtr Model::GetLink(unsigned int _index) const
-{
-  LinkPtr link;
-  if (_index <= this->GetChildCount())
-    link = boost::shared_static_cast<Link>(this->GetChild(_index));
-  else
-    gzerr << "Index is out of range\n";
-
-  return link;
 }
 
 //////////////////////////////////////////////////
