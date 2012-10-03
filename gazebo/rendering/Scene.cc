@@ -1935,7 +1935,7 @@ void Scene::SetSky()
   // y = sun beta multiplier
   // z = ambient color multiplier
   // w = distance attenuation
-  vclouds->setLightResponse(Ogre::Vector4(1.25, 0.4, 0.5, 0.1));
+  vclouds->setLightResponse(Ogre::Vector4(1.25, 0.9, 0.7, 0.3));
   vclouds->setAmbientFactors(Ogre::Vector4(0.45, 0.3, 0.6, 0.1));
   vclouds->setWheater(.6, .6, false);
 

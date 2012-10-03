@@ -27,9 +27,7 @@ int main(int _argc, char **_argv)
   if (pid)
   {
     gazebo::gui::run(_argc, _argv);
-    printf("gazebo::gui::run stopped\n");
     kill(pid, SIGINT);
-    printf("after kill");
   }
   else
   {
@@ -37,12 +35,10 @@ int main(int _argc, char **_argv)
     if (!server->ParseArgs(_argc, _argv))
       return -1;
     server->Run();
-    printf("gazebo::server stopped\n");
     server->Fini();
     delete server;
     server = NULL;
   }
-  printf("gazebo stopped\n");
 
   return 0;
 }

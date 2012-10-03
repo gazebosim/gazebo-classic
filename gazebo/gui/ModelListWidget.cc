@@ -289,8 +289,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  std::cout << "Response[" << _msg->DebugString() << "}\n\n";
-
   if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
     this->propMutex->lock();
