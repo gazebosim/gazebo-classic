@@ -190,7 +190,7 @@ material SkyX_VolClouds
 			fragment_program_ref SkyX_VolClouds_FP 
 			{ 
 				param_named uInterpolation float 0
-				param_named uSunDirection float3 0 0 1
+				param_named uSunDirection float3 0 1 0
 				param_named uSunColor float3 1 1 1
 				param_named uAmbientColor float3 0.63 0.63 0.7
 				param_named uLightResponse float4 0.25 0.2 1 0.1
@@ -305,7 +305,7 @@ material SkyX_VolClouds_Lightning
 			fragment_program_ref SkyX_VolClouds_Lightning_FP 
 			{ 
 				param_named uInterpolation float 0
-				param_named uSunDirection float3 0 0 1
+				param_named uSunDirection float3 0 1 0
 				param_named uSunColor float3 1 1 1
 				param_named uAmbientColor float3 0.63 0.63 0.7
 				param_named uLightResponse float4 0.25 0.2 1 0.1
@@ -384,7 +384,7 @@ fragment_program SkyX_Skydome_STARFIELD_LDR_FP_HLSL hlsl
 fragment_program SkyX_Skydome_STARFIELD_LDR_FP_GLSL glsl
 {
     source SkyX_Skydome.fragment
-	preprocessor_defines LDR,STARFIELD
+	preprocessor_defines LDR=1;STARFIELD=1
 
     default_params
     {
@@ -412,7 +412,7 @@ fragment_program SkyX_Skydome_STARFIELD_HDR_FP_HLSL hlsl
 fragment_program SkyX_Skydome_STARFIELD_HDR_FP_GLSL glsl
 {
     source SkyX_Skydome.fragment
-	preprocessor_defines STARFIELD
+	preprocessor_defines STARFIELD=1
 
     default_params
     {
@@ -440,7 +440,7 @@ fragment_program SkyX_Skydome_LDR_FP_HLSL hlsl
 fragment_program SkyX_Skydome_LDR_FP_GLSL glsl
 {
     source SkyX_Skydome.fragment
-	preprocessor_defines LDR
+	preprocessor_defines LDR=1
 
     default_params
     {
@@ -481,68 +481,70 @@ fragment_program SkyX_Skydome_HDR_FP unified
 
 material SkyX_Skydome_STARFIELD_LDR
 {
-  receive_shadows off
+    receive_shadows off
+    
+	technique
+	{
+		pass
+		{
+			lighting off 
 
-    technique
-    {
-      pass
-      {
-        lighting off 
+			depth_write off
+			depth_check off
+			
+			cull_hardware none 
+			cull_software none
+			
+		    scene_blend alpha_blend 
 
-          depth_write off
-          depth_check off
+			vertex_program_ref SkyX_Skydome_VP 
+			{
+			    // Must be the same as in the fragment program, normalized
+			    param_named uLightDir float3 0 0 1
+			    // Camera position
+			    param_named uCameraPos float3 0 1.0001 0
+			    
+			    // Inverse wave length (RGB: 570 nm, 540 nm and 440 nm, respectively) -> 1 / pow (0.57, 4); etc.
+			    param_named uInvWaveLength float3 9.473284438 11.76047764 26.6802131
 
-          scene_blend alpha_blend 
+                // Inner radius
+			    param_named uInnerRadius float 1 
+			    
+			    param_named uKrESun float 0.32299994
+			    param_named uKmESun float 0.350000002
+			    param_named uKr4PI float 0.0850
+			    param_named uKm4PI float 0.2008849557
+			    
+			    // 1 / (OuterRadius-InnerRadius)
+			    param_named uScale float 4
+			    // (OuterRadius - InnerRadius) / 2.0f
+			    param_named uScaleDepth float 0.125
+			    // Scale / ScaleDepth;
+			    param_named uScaleOverScaleDepth float 32
+			    
+			    param_named uNumberOfSamples int 6
+			    param_named uSamples float 6
+			}
 
-          vertex_program_ref SkyX_Skydome_VP 
-          {
-            // Must be the same as in the fragment program, normalized
-            param_named uLightDir float3 0 1 0
-
-            // Camera position
-            param_named uCameraPos float3 0 0 1.0001
-
-            // Inverse wave length (RGB: 570 nm, 540 nm and 440 nm, respectively) -> 1 / pow (0.57, 4); etc.
-            param_named uInvWaveLength float3 9.473284438 11.76047764 26.6802131
-
-            // Inner radius
-            param_named uInnerRadius float 1 
-
-            param_named uKrESun float 0.32299994
-            param_named uKmESun float 0.350000002
-            param_named uKr4PI float 0.0850
-            param_named uKm4PI float 0.2008849557
-
-            // 1 / (OuterRadius-InnerRadius)
-            param_named uScale float 4
-            // (OuterRadius - InnerRadius) / 2.0f
-            param_named uScaleDepth float 0.125
-            // Scale / ScaleDepth;
-            param_named uScaleOverScaleDepth float 32
-
-            param_named uNumberOfSamples int 6
-            param_named uSamples float 6
-          }
-
-        fragment_program_ref SkyX_Skydome_STARFIELD_LDR_FP 
-        { 
-          param_named uTime float 0
-          // Must be the same as in the vertex program, normalized
-          param_named uLightDir float3 0 1 0
-          param_named uG        float -0.991
-          param_named uG2       float  0.982081
-          param_named uExposure float  1.75
-        }
-
-        texture_unit Starfield
-        {
-          texture SkyX_Starfield.png
-          tex_address_mode wrap
-          filtering linear linear none
-          tex_coord_set 0
-        }
-    }		
-  }
+			fragment_program_ref SkyX_Skydome_STARFIELD_LDR_FP 
+			{ 
+			    param_named uTime float 0
+			    // Must be the same as in the vertex program, normalized
+			    param_named uLightDir float3 0 0 1
+			    param_named uG        float -0.991
+			    param_named uG2       float  0.982081
+			    param_named uExposure float  1.75
+			}
+			
+			texture_unit Starfield
+			{
+			    texture SkyX_Starfield.png
+			    tex_address_mode wrap
+			    filtering linear linear none
+			    tex_coord_set 0
+			}
+		}		
+	}
 }
 
 material SkyX_Skydome_STARFIELD_HDR
@@ -558,6 +560,9 @@ material SkyX_Skydome_STARFIELD_HDR
 			depth_write off
 			depth_check off
 			
+			cull_hardware none 
+			cull_software none
+			
 		    scene_blend alpha_blend 
 
 			vertex_program_ref SkyX_Skydome_VP 
@@ -565,7 +570,7 @@ material SkyX_Skydome_STARFIELD_HDR
 			    // Must be the same as in the fragment program, normalized
 			    param_named uLightDir float3 0 0 1
 			    // Camera position
-			    param_named uCameraPos float3 0 0 1.0001
+			    param_named uCameraPos float3 0 1.0001 0
 			    
 			    // Inverse wave length (RGB: 570 nm, 540 nm and 440 nm, respectively) -> 1 / pow (0.57, 4); etc.
 			    param_named uInvWaveLength float3 9.473284438 11.76047764 26.6802131
@@ -593,14 +598,15 @@ material SkyX_Skydome_STARFIELD_HDR
 			{ 
 			    param_named uTime float 0
 			    // Must be the same as in the vertex program, normalized
-			    param_named uLightDir float3 0 1 0
+			    param_named uLightDir float3 0 0 1
 			    param_named uG        float -0.991
 			    param_named uG2       float  0.982081
+				param_named uExposure float  1
 			}
 			
 			texture_unit Starfield
 			{
-			    texture SkyX_Starfield.png
+			    texture SkyX_Starfield.png gamma
 			    tex_address_mode wrap
 			    filtering linear linear none
 			    tex_coord_set 0
@@ -621,6 +627,9 @@ material SkyX_Skydome_LDR
 
 			depth_write off
 			depth_check off
+			
+			cull_hardware none 
+			cull_software none
 			
 		    scene_blend alpha_blend 
 
@@ -678,6 +687,9 @@ material SkyX_Skydome_HDR
 			depth_write off
 			depth_check off
 			
+			cull_hardware none 
+			cull_software none
+			
 		    scene_blend alpha_blend  
 
 			vertex_program_ref SkyX_Skydome_VP 
@@ -715,6 +727,7 @@ material SkyX_Skydome_HDR
 			    param_named uLightDir float3 0 0 1
 			    param_named uG        float -0.991
 			    param_named uG2       float  0.982081
+				param_named uExposure float  1
 			}
 		}		
 	}

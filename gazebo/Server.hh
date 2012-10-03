@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace gazebo
   class Master;
 
   /// \brief Base class for simulation server that handles commandline options,
-  ///        starts a Master, runs World update and sensor generation loops.
+  /// starts a Master, runs World update and sensor generation loops.
   class Server
   {
     public: Server();

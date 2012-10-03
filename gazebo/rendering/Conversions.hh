@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef CONVERSIONS_HH
-#define CONVERSIONS_HH
+#ifndef __CONVERSIONS_HH__
+#define __CONVERSIONS_HH__
 
 #include "rendering/ogre_gazebo.h"
 
@@ -30,24 +30,35 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \brief Conversions Conversions.hh rendering/Conversions.hh
     /// \brief A set of utility function to convert between Gazebo and Ogre
     /// data types
     class Conversions
     {
       /// \brief Return the equivalent ogre color
-      public: static Ogre::ColourValue Convert(const common::Color &clr);
+      /// \param _clr Gazebo color to convert
+      /// \return Ogre color value
+      public: static Ogre::ColourValue Convert(const common::Color &_clr);
 
-      /// \brief return Ogre Vector from gazebo Vector3
-      public: static Ogre::Vector3 Convert(const math::Vector3 &v);
+      /// \brief return Ogre Vector from Gazebo Vector3
+      /// \param _v Gazebo vector
+      /// \return Ogre vector
+      public: static Ogre::Vector3 Convert(const math::Vector3 &_v);
 
       /// \brief return gazebo Vector from ogre Vector3
-      public: static math::Vector3 Convert(const Ogre::Vector3 &v);
+      /// \param _v Ogre vector
+      /// \return Gazebo vector
+      public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
-      public: static Ogre::Quaternion Convert(const math::Quaternion &v);
+      /// \param _v Gazebo quaternion
+      /// \return Ogre quaternion
+      public: static Ogre::Quaternion Convert(const math::Quaternion &_v);
 
       /// \brief Ogre quaternion to Gazebo quaternion
-      public: static math::Quaternion Convert(const Ogre::Quaternion &v);
+      /// \param _v Ogre quaternion
+      /// return Gazebo quaternion
+      public: static math::Quaternion Convert(const Ogre::Quaternion &_v);
     };
     /// \}
   }

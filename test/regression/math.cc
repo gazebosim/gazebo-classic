@@ -707,12 +707,12 @@ TEST_F(MathTest, Quaternion)
     gzdbg << " x [" << q.GetInverse().GetXAxis() << "]\n";
     gzdbg << " y [" << q.GetInverse().GetYAxis() << "]\n";
     gzdbg << " z [" << q.GetInverse().GetZAxis() << "]\n";
-    EXPECT_TRUE(q.GetInverse().GetXAxis() == math::Vector3(0.617229, -0.589769,
-      0.520770));
-    EXPECT_TRUE(q.GetInverse().GetYAxis() == math::Vector3(0.707544, 0.705561,
-      -0.039555));
-    EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(-0.344106, 0.392882,
-      0.852780));
+    EXPECT_TRUE(q.GetInverse().GetXAxis() ==
+                math::Vector3(0.617229, -0.589769, 0.520770));
+    EXPECT_TRUE(q.GetInverse().GetYAxis() ==
+                math::Vector3(0.707544, 0.705561, -0.039555));
+    EXPECT_TRUE(q.GetInverse().GetZAxis() ==
+                math::Vector3(-0.344106, 0.392882, 0.852780));
 
     // rotate about the axis of rotation should not change axis
     math::Vector3 v = math::Vector3(1, 2, 3);
@@ -738,8 +738,8 @@ TEST_F(MathTest, Quaternion)
     EXPECT_TRUE(r1 == math::Vector3(0.61723, 0.70754, -0.34411));
     EXPECT_TRUE(r2 == math::Vector3(0.61723, -0.58977, 0.52077));
 
-    EXPECT_TRUE(-q == math::Quaternion(-0.891007, -0.121334, -0.242668,
-      -0.364002));
+    EXPECT_TRUE(-q == math::Quaternion(-0.891007, -0.121334,
+                                       -0.242668, -0.364002));
 
     EXPECT_TRUE(q.GetAsMatrix3() == math::Matrix3(
                 0.617229, -0.589769, 0.52077,
@@ -875,7 +875,7 @@ TEST_F(MathTest, Matrix3)
 TEST_F(MathTest, Angle)
 {
   math::Angle angle1;
-  EXPECT_TRUE(math::equal(0.0, angle1.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.0, angle1.Radian()));
 
   angle1.SetFromDegree(180.0);
   EXPECT_TRUE(angle1 == M_PI);
@@ -884,34 +884,34 @@ TEST_F(MathTest, Angle)
   EXPECT_TRUE(angle1 == -0.2);
 
   math::Angle angle(0.5);
-  EXPECT_TRUE(math::equal(0.5, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.5, angle.Radian()));
 
   angle.SetFromRadian(M_PI);
-  EXPECT_TRUE(math::equal(GZ_RTOD(M_PI), angle.GetAsDegree()));
+  EXPECT_TRUE(math::equal(GZ_RTOD(M_PI), angle.Degree()));
 
   angle.Normalize();
-  EXPECT_TRUE(math::equal(GZ_RTOD(M_PI), angle.GetAsDegree()));
+  EXPECT_TRUE(math::equal(GZ_RTOD(M_PI), angle.Degree()));
 
   angle = math::Angle(0.1) + math::Angle(0.2);
-  EXPECT_TRUE(math::equal(0.3, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.3, angle.Radian()));
 
   angle = math::Angle(0.1) * math::Angle(0.2);
-  EXPECT_TRUE(math::equal(0.02, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.02, angle.Radian()));
 
   angle = math::Angle(0.1) / math::Angle(0.2);
-  EXPECT_TRUE(math::equal(0.5, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.5, angle.Radian()));
 
   angle -= math::Angle(0.1);
-  EXPECT_TRUE(math::equal(0.4, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.4, angle.Radian()));
 
   angle += math::Angle(0.2);
-  EXPECT_TRUE(math::equal(0.6, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.6, angle.Radian()));
 
   angle *= math::Angle(0.5);
-  EXPECT_TRUE(math::equal(0.3, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(0.3, angle.Radian()));
 
   angle /= math::Angle(0.1);
-  EXPECT_TRUE(math::equal(3.0, angle.GetAsRadian()));
+  EXPECT_TRUE(math::equal(3.0, angle.Radian()));
   EXPECT_TRUE(angle == math::Angle(3));
   EXPECT_TRUE(angle != math::Angle(2));
   EXPECT_TRUE(angle < math::Angle(4));

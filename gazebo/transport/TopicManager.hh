@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,9 @@ namespace gazebo
 
       public: void RemoveNode(unsigned int _id);
 
-      public: void ProcessNodes();
+      /// \param _onlyOut True means only outbound messages on nodes will be
+      /// sent. False means nodes process both outbound and inbound messages
+      public: void ProcessNodes(bool _onlyOut = false);
 
       /// \brief Returns true if the topic has been advertised
       /// \param _topic The name of the topic to check

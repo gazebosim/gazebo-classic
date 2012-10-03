@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A BulletHingeJoint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 #include "common/Console.hh"
@@ -199,7 +199,7 @@ void BulletHingeJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
     // implement. Be warned that this function will reset them to default
     // settings
     // this->btHinge->setLimit(this->btHinge->getLowerLimit(),
-    //                         _angle.GetAsRadian());
+    //                         _angle.Radian());
   }
   else
   {
@@ -215,7 +215,7 @@ void BulletHingeJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    // this->btHinge->setLimit(-_angle.GetAsRadian(),
+    // this->btHinge->setLimit(-_angle.Radian(),
     //                         this->btHinge->getUpperLimit());
   }
   else

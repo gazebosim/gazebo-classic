@@ -54,7 +54,7 @@ void SpringTestPlugin::OnUpdate()
 
   physics::JointPtr joint = this->model->GetJoint("joint_0");
   {
-    double pos = joint->GetAngle(0).GetAsRadian();
+    double pos = joint->GetAngle(0).Radian();
     double force = -this->k * pos;
     gzdbg << "joint pos [" << pos << "] force [" << force << "]\n";
     joint->SetForce(0, force);

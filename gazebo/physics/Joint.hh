@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: The base joint class
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -57,7 +57,7 @@ namespace gazebo
                               LO_STOP};
 
       /// \brief Constructor
-      public: Joint();
+      public: Joint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~Joint();

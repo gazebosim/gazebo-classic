@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,4 +30,12 @@ void common::add_search_path_suffix(const std::string &_suffix)
 std::string common::find_file(const std::string &_file)
 {
   return common::SystemPaths::Instance()->FindFile(_file);
+}
+
+/////////////////////////////////////////////////
+std::string common::find_file_path(const std::string &_file)
+{
+  std::string filepath = common::find_file(_file);
+  int index = filepath.find_last_of("/");
+  return filepath.substr(0, index);
 }

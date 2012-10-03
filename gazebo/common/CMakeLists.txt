@@ -17,6 +17,7 @@ set (sources
   Mesh.cc
   MeshLoader.cc
   MeshManager.cc
+  ModelDatabase.cc
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
@@ -73,7 +74,9 @@ target_link_libraries(gazebo_common gazebo_math
                                     ${tinyxml_libraries}
                                     ${libavcodec_LIBRARIES}
                                     ${libavformat_LIBRARIES}
+                                    ${CURL_LIBRARIES}
                                     ${libswscale_LIBRARIES}
+                                    tar
                                     )
 
 gz_install_library(gazebo_common)

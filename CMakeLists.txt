@@ -37,8 +37,6 @@ endif()
 if(PKG_CONFIG_PATH)
   set (ENV{PKG_CONFIG_PATH} ${PKG_CONFIG_PATH}:$ENV{PKG_CONFIG_PATH})
 endif()
-message(status '$ENV{PKG_CONFIG_PATH}\n\n\n ${PKG_CONFIG_PATH}\n\n')
-
 if(LD_LIBRARY_PATH)
   set (ENV{LD_LIBRARY_PATH} ${LD_LIBRARY_PATH}:$ENV{LD_LIBRARY_PATH})
 endif()
@@ -209,7 +207,7 @@ if (build_errors)
     message(STATUS ${msg})
   endforeach ()
   message(STATUS "END BUILD ERRORS\n")
-  message (FATAL_ERROR "Errors encountered in build.")
+  message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 
   ########################################

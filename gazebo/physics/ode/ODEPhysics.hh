@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,8 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       /// \brief Create a new joint
-      public: virtual JointPtr CreateJoint(const std::string &type);
+      public: virtual JointPtr CreateJoint(const std::string &type,
+                                           ModelPtr _parent);
 
       /// \brief Return the space id
       public: dSpaceID GetSpaceId() const;

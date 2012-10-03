@@ -63,11 +63,11 @@ void main(void)
 	gl_Position = gl_ModelViewProjectionMatrix * vertex;
 	
 	// Calculate vertex world position
-	vec3 vertexWorldPos = (uWorld * vertex).xyz;
+	vec3 vertexWorldPos = (uWorld * vertex).xzy;
 	
 	// Get the ray from the camera to the vertex, and its length (which is the far point of the ray passing through the atmosphere)
 	vec3 v3Pos;
-	v3Pos.xz = (vertexWorldPos.xz-uCameraPos_.xz) / uSkydomeRadius;
+	v3Pos.xz = (vertexWorldPos.xz-uCameraPos_.xy) / uSkydomeRadius;
 	v3Pos.y = uCameraPos.y + vertexWorldPos.y / uSkydomeRadius;
 	
 	vec3 v3Ray = v3Pos - uCameraPos;

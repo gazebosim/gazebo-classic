@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -162,13 +162,13 @@ double BulletHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetHighStop(int /*_index*/, math::Angle _angle)
 {
-  this->btHinge2->setUpperLimit(_angle.GetAsRadian());
+  this->btHinge2->setUpperLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetLowStop(int /*_index*/, math::Angle _angle)
 {
-  this->btHinge2->setLowerLimit(_angle.GetAsRadian());
+  this->btHinge2->setLowerLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////

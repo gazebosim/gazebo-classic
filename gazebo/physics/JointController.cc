@@ -41,9 +41,9 @@ JointController::JointController(ModelPtr _model)
 /////////////////////////////////////////////////
 void JointController::AddJoint(JointPtr _joint)
 {
-  this->joints[_joint->GetName()] = _joint;
-  this->posPids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
-  this->velPids[_joint->GetName()].Init(1, 0.1, 0.01, 1, -1);
+  this->joints[_joint->GetScopedName()] = _joint;
+  this->posPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
+  this->velPids[_joint->GetScopedName()].Init(1, 0.1, 0.01, 1, -1);
 }
 
 /////////////////////////////////////////////////
@@ -77,7 +77,7 @@ void JointController::Update()
     for (iter = this->positions.begin(); iter != this->positions.end(); ++iter)
     {
       cmd = this->posPids[iter->first].Update(
-          this->joints[iter->first]->GetAngle(0).GetAsRadian() - iter->second,
+          this->joints[iter->first]->GetAngle(0).Radian() - iter->second,
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
@@ -105,7 +105,7 @@ void JointController::Update()
     for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
     {
       if (this->positions.find(iter->first) == this->positions.end())
-        this->positions[iter->first] = iter->second->GetAngle(0).GetAsRadian();
+        this->positions[iter->first] = iter->second->GetAngle(0).Radian();
     }
     this->SetJointPositions(this->positions);
     this->positions.clear();
@@ -191,7 +191,7 @@ void JointController::SetJointPositions(
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    jiter = _jointPositions.find(iter->second->GetName());
+    jiter = _jointPositions.find(iter->second->GetScopedName());
     if (jiter != _jointPositions.end())
       this->SetJointPosition(iter->second, jiter->second);
   }
@@ -201,8 +201,8 @@ void JointController::SetJointPositions(
 void JointController::SetJointPosition(JointPtr _joint, double _position)
 {
   // truncate position by joint limits
-  double lower = _joint->GetLowStop(0).GetAsRadian();
-  double upper = _joint->GetHighStop(0).GetAsRadian();
+  double lower = _joint->GetLowStop(0).Radian();
+  double upper = _joint->GetHighStop(0).Radian();
   _position = _position < lower? lower :
     (_position > upper? upper : _position);
 
@@ -218,12 +218,12 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
     if ((!parentLink && childLink) ||
         (parentLink && childLink &&
-         parentLink->GetName() != childLink->GetName()))
+         parentLink->GetScopedName() != childLink->GetScopedName()))
     {
       // transform about the current anchor, about the axis
       // rotate child (childLink) about anchor point, by delta-angle
       // along axis
-      double dposition = _position - _joint->GetAngle(0).GetAsRadian();
+      double dposition = _position - _joint->GetAngle(0).Radian();
 
       math::Vector3 anchor;
       math::Vector3 axis;
@@ -383,7 +383,7 @@ void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
                                           parentLink != parentLinks.end();
                                           ++parentLink)
       {
-        if ((*parentLink)->GetName() != _link->GetName() &&
+        if ((*parentLink)->GetScopedName() != _link->GetScopedName() &&
             !this->ContainsLink(_links_out, (*parentLink)))
         {
           _links_out.push_back(*parentLink);

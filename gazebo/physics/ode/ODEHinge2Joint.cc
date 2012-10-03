@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -30,8 +30,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId)
-    : Hinge2Joint<ODEJoint>()
+ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId, BasePtr _parent)
+    : Hinge2Joint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateHinge2(_worldId, NULL);
 }
@@ -102,10 +102,15 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(int _index) const
 //////////////////////////////////////////////////
 math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
 {
-  if (_index == 0)
-    return dJointGetHinge2Angle1(this->jointId);
-  else
-    gzerr << "ODE has not function to get the second angle in a hinge2 joint";
+  math::Angle result;
+
+  if (this->jointId)
+  {
+    if (_index == 0)
+      result = dJointGetHinge2Angle1(this->jointId);
+    else
+      gzerr << "ODE has not function to get the second angle in a hinge2 joint";
+  }
 
   return math::Angle(0);
 }

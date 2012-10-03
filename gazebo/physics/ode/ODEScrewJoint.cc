@@ -1,7 +1,7 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
  *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ *     Nate Koenig
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  */
 /* Desc: A screw or primastic joint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -35,8 +35,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODEScrewJoint::ODEScrewJoint(dWorldID _worldId)
-    : ScrewJoint<ODEJoint>()
+ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
+    : ScrewJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateScrew(_worldId, NULL);
 }
@@ -65,7 +65,9 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 //////////////////////////////////////////////////
 math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 {
-  math::Angle result = dJointGetScrewPosition(this->jointId);
+  math::Angle result;
+  if (this->jointId)
+    result = dJointGetScrewPosition(this->jointId);
 
   return result;
 }

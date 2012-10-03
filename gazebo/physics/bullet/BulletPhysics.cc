@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,9 @@ extern ContactProcessedCallback gContactProcessedCallback;
 
 //////////////////////////////////////////////////
 bool ContactCallback(btManifoldPoint &/*_cp*/,
-    const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/, int /*_index0*/,
-    const btCollisionObjectWrapper * /*_obj1*/, int /*_partId1*/, int /*_index1*/)
+    const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/,
+    int /*_index0*/, const btCollisionObjectWrapper * /*_obj1*/,
+    int /*_partId1*/, int /*_index1*/)
 {
   return true;
 }

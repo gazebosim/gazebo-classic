@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 using namespace gazebo;
 using namespace transport;
 
+/////////////////////////////////////////////////
 IOManager::IOManager()
   : count(0)
 {
@@ -29,6 +30,7 @@ IOManager::IOManager()
                                                 this->io_service));
 }
 
+/////////////////////////////////////////////////
 IOManager::~IOManager()
 {
   this->Stop();
@@ -40,6 +42,7 @@ IOManager::~IOManager()
   this->io_service = NULL;
 }
 
+/////////////////////////////////////////////////
 void IOManager::Stop()
 {
   this->io_service->reset();
@@ -52,24 +55,26 @@ void IOManager::Stop()
   }
 }
 
+/////////////////////////////////////////////////
 boost::asio::io_service &IOManager::GetIO()
 {
   return *this->io_service;
 }
 
+/////////////////////////////////////////////////
 void IOManager::IncCount()
 {
   this->count++;
 }
 
+/////////////////////////////////////////////////
 void IOManager::DecCount()
 {
   this->count--;
 }
 
+/////////////////////////////////////////////////
 unsigned int IOManager::GetCount() const
 {
   return this->count;
 }
-
-

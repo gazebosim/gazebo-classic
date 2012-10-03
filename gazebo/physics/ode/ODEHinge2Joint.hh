@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -40,7 +40,7 @@ namespace gazebo
     class ODEHinge2Joint : public Hinge2Joint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEHinge2Joint(dWorldID worldId);
+      public: ODEHinge2Joint(dWorldID worldId, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEHinge2Joint();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ namespace Ogre
 
 namespace gazebo
 {
+  /// \ingroup gazebo_rendering
+  /// \brief Rendering namespace
   namespace rendering
   {
     /// \addtogroup gazebo_rendering
@@ -95,7 +97,7 @@ namespace gazebo
       /// \brief Get the number of scene managers
       public: unsigned int GetSceneCount() const;
 
-      public: void AddResourcePath(const std::string &_path);
+      public: void AddResourcePath(const std::string &_uri);
 
       /// \brief Get the type of rendering path to use. This is
       /// automatically determined based on the computers capabilities

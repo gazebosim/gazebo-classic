@@ -1,7 +1,7 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
  *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ *     Nate Koenig
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  */
 /* Desc: A screw or primastic joint
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 24 May 2009
  */
 

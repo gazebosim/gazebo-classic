@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,17 +135,6 @@ void Model::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  // Load the plugins
-  if (_sdf->HasElement("plugin"))
-  {
-    sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
-    while (pluginElem)
-    {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
-    }
-  }
-
   if (_sdf->HasElement("gripper"))
   {
     sdf::ElementPtr gripperElem = _sdf->GetElement("gripper");
@@ -178,12 +167,6 @@ void Model::Init()
   // Initialize the joints last.
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -628,7 +611,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   std::string stype = _sdf->GetValueString("type");
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype);
+  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
+     boost::shared_static_cast<Model>(shared_from_this()));
   if (!joint)
     gzthrow("Unable to create joint of type[" + stype + "]\n");
 
@@ -662,6 +646,21 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+void Model::LoadPlugins()
+{
+  // Load the plugins
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");
@@ -669,8 +668,17 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
   gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
   if (plugin)
   {
+    if (plugin->GetType() != MODEL_PLUGIN)
+    {
+      gzerr << "Model[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+      return;
+    }
+
     ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
+    plugin->Init();
     this->plugins.push_back(plugin);
   }
 }

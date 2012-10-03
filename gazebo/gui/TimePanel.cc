@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,7 @@ void TimePanel::OnFullScreen(bool & /*_value*/)
 /////////////////////////////////////////////////
 TimePanel::~TimePanel()
 {
+  this->node.reset();
 }
 
 /////////////////////////////////////////////////

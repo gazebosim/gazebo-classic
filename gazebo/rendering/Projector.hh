@@ -1,7 +1,7 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
  *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ *     Nate Koenig
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@
  * Author: Jared Duke, (some maintainence by John Hsu)
  */
 
-#ifndef __PROJECTOR_HH__
-#define __PROJECTOR_HH__
+#ifndef _PROJECTOR_HH_
+#define _PROJECTOR_HH_
 
 #include <string>
 #include <map>
@@ -44,32 +44,44 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Projector simulation
+    /// \class Projector Projector.hh rendering/Projector.hh
+    /// \brief Projects a material onto surface, light a light projector.
     class Projector
     {
-      /// \brief Constructor
+      /// \brief Constructor.
+      /// \param[in] _parent Name of the parent visual.
       public: Projector(VisualPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~Projector();
 
-      /// \brief Load from an sdf pointer
+      /// \brief Load from an sdf pointer.
+      /// \param[in] _sdf Pointer to the SDF element.
       public: void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Load from a message
+      /// \brief Load from a message.
+      /// \param[in] _msg Load from a message.
       public: void Load(const msgs::Projector &_msg);
 
+      /// \brief Load the projector.
+      /// \param[in] _name Name of the projector.
+      /// \param[in] _pos Pose of the projector.
+      /// \param[in] _textureName Name of the texture to project.
+      /// \param[in] _nearClip Near clip distance.
+      /// \param[in] _farClip Far clip distance.
+      /// \param[in] _fov Field of view.
       public: void Load(const std::string &_name,
-                     const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
-                     const std::string &_textureName = "",
-                     double _nearClip = 0.25,
-                     double _farClip = 15.0,
-                     double _fov = M_PI * 0.25);
+                        const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
+                        const std::string &_textureName = "",
+                        double _nearClip = 0.25,
+                        double _farClip = 15.0,
+                        double _fov = M_PI * 0.25);
 
-      /// \brief Load a texture into the projector
+      /// \brief Load a texture into the projector.
+      /// \param[in] _textureName Name of the texture to project.
       public: void SetTexture(const std::string &_textureName);
 
-      /// \brief Toggle the activation of the projector
+      /// \brief Toggle the activation of the projector.
       public: void Toggle();
 
       private: void OnMsg(ConstProjectorPtr &_msg);
@@ -99,8 +111,7 @@ namespace gazebo
 
         private: void SetSceneNode();
 
-        private: void SetFrustumClipDistance(double _near,
-                                             double _far);
+        private: void SetFrustumClipDistance(double _near, double _far);
         private: void SetFrustumFOV(double _fov);
         private: void AddPassToAllMaterials();
         private: void AddPassToVisibleMaterials();
@@ -135,5 +146,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif

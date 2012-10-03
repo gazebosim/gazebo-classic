@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A universal joint
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 24 May 2009
  */
 
@@ -154,10 +154,10 @@ void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
   {
     if (_index == 0)
       this->btUniversal->setUpperLimit(
-        _angle.GetAsRadian(), this->GetHighStop(1).GetAsRadian());
+        _angle.Radian(), this->GetHighStop(1).Radian());
     else
       this->btUniversal->setUpperLimit(
-        this->GetHighStop(0).GetAsRadian(), _angle.GetAsRadian());
+        this->GetHighStop(0).Radian(), _angle.Radian());
   }
   else
     gzthrow("Joint must be created first");
@@ -170,10 +170,10 @@ void BulletUniversalJoint::SetLowStop(int _index, math::Angle _angle)
   {
     if (_index == 0)
       this->btUniversal->setLowerLimit(
-        _angle.GetAsRadian(), this->GetLowStop(1).GetAsRadian());
+        _angle.Radian(), this->GetLowStop(1).Radian());
     else
       this->btUniversal->setUpperLimit(
-        this->GetLowStop(0).GetAsRadian(), _angle.GetAsRadian());
+        this->GetLowStop(0).Radian(), _angle.Radian());
   }
   else
     gzthrow("Joint must be created first");
