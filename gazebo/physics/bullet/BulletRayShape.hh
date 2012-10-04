@@ -19,8 +19,8 @@
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETRAYGEOM_HH__
-#define __BULLETRAYGEOM_HH__
+#ifndef _BULLETRAYGEOM_HH_
+#define _BULLETRAYGEOM_HH_
 
 #include <string>
 #include "physics/RayShape.hh"

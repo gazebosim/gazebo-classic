@@ -787,31 +787,3 @@ double Link::GetAngularDamping() const
   else
     return 0.0;
 }
-
-/////////////////////////////////////////////////
-/// Returns a vector of children Links
-std::vector<LinkPtr> Link::GetChildLinks()
-{
-  std::vector<LinkPtr> links;
-  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
-                                       iter != this->childJoints.end(); ++iter)
-  {
-    if ((*iter)->GetChild())
-      links.push_back((*iter)->GetChild());
-  }
-  return links;
-}
-
-/////////////////////////////////////////////////
-/// Returns a vector of parent Links
-std::vector<LinkPtr> Link::GetParentLinks()
-{
-  std::vector<LinkPtr> links;
-  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
-                                       iter != this->parentJoints.end(); ++iter)
-  {
-    if ((*iter)->GetParent())
-      links.push_back((*iter)->GetParent());
-  }
-  return links;
-}

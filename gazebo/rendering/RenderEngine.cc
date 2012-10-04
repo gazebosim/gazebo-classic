@@ -380,17 +380,16 @@ void RenderEngine::LoadPlugins()
       {
         if ((*piter).find("RenderSystem") != std::string::npos)
         {
-          std::string description("Unable to load Ogre Plugin[");
-          description.append(*piter);
-          description.append("]...This won't end well.");
-          gzerr << description << "\n";
+          gzerr << "Unable to load Ogre Plugin[" << *piter
+                << "]. Rendering will not be possible."
+                << "Make sure you have installed OGRE and Gazebo properly.\n";
         }
         else if ((*piter).find("CgProgramManager") != std::string::npos)
         {
-          std::string description("Unable to load Ogre Plugin[");
-          description.append(*piter);
-          description.append("]Heightmaps(Terrain) will not display properly.");
-          gzerr << description << "\n";
+          gzwarn << "Unable to load Ogre Plugin[" << *piter
+                 << "]Heightmaps(Terrain) will not display properly."
+                 << "You'll need to install Ogre3d from source."
+                 << "Please visit www.ogre3d.org.\n";
         }
       }
     }
@@ -591,9 +590,9 @@ void RenderEngine::SetupRenderSystem()
 
   if (renderSys == NULL)
   {
-    gzthrow("unable to find OpenGL rendering system. OGRE is probably\
-        installed incorrectly. Double check the OGRE cmake output, and make\
-        sure OpenGL is enabled.");
+    gzthrow("unable to find OpenGL rendering system. OGRE is probably "
+            "installed incorrectly. Double check the OGRE cmake output, "
+            "and make sure OpenGL is enabled.");
   }
 
   // We operate in windowed mode

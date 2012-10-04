@@ -179,7 +179,7 @@ Projector::ProjectorFrameListener::ProjectorFrameListener()
   this->initialized = false;
   this->usingShaders = false;
 
-  this->scene_node = NULL;
+  this->node = NULL;
   this->filterNode = NULL;
   this->projectorQuery = NULL;
   this->frustum = NULL;
@@ -194,11 +194,11 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 {
   this->RemovePassFromMaterials();
 
-  if (this->scene_node)
+  if (this->node)
   {
-    this->scene_node->detachObject(this->frustum);
+    this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
-    this->scene_node = NULL;
+    this->node = NULL;
   }
 
   if (this->filterNode)
@@ -269,7 +269,7 @@ bool Projector::ProjectorFrameListener::frameStarted(
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetEnabled(bool _enabled)
 {
-  this->enabled = true;  // _enabled;
+  this->enabled = true;//_enabled;
   /*if (!this->enabled)
     this->RemovePassFromMaterials();
     */
@@ -285,11 +285,11 @@ void Projector::ProjectorFrameListener::SetUsingShaders(bool _usingShaders)
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetSceneNode()
 {
-  if (this->scene_node)
+  if (this->node)
   {
-    this->scene_node->detachObject(this->frustum);
+    this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
-    this->scene_node = NULL;
+    this->node = NULL;
   }
 
   if (this->filterNode)
@@ -299,14 +299,14 @@ void Projector::ProjectorFrameListener::SetSceneNode()
     this->filterNode = NULL;
   }
 
-  this->scene_node = this->visual->GetSceneNode()->createChildSceneNode(
+  this->node = this->visual->GetSceneNode()->createChildSceneNode(
       this->nodeName);
 
   this->filterNode = this->visual->GetSceneNode()->createChildSceneNode(
       this->filterNodeName);
 
-  if (this->scene_node)
-    this->scene_node->attachObject(this->frustum);
+  if (this->node)
+    this->node->attachObject(this->frustum);
 
   if (this->filterNode)
   {
@@ -323,14 +323,12 @@ void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
   Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);
   Ogre::Quaternion offsetQuaternion;
 
-  this->scene_node->setPosition(ogreVec);
-  this->scene_node->setOrientation(ogreQuaternion);
+  this->node->setPosition(ogreVec);
+  this->node->setOrientation(ogreQuaternion);
   this->filterNode->setPosition(ogreVec);
 
   offsetQuaternion = Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y);
   this->filterNode->setOrientation(offsetQuaternion + ogreQuaternion);
-
-  gzerr << _pose << "\n";
 }
 
 /////////////////////////////////////////////////

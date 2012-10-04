@@ -86,11 +86,11 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   google::protobuf::Message *msg = _message.New();
   msg->CopyFrom(_message);
 
-  this->mutex->lock();
   if (this->prevMsg == NULL)
     this->prevMsg = _message.New();
   this->prevMsg->CopyFrom(_message);
 
+  this->mutex->lock();
   this->messages.push_back(msg);
 
   if (this->messages.size() > this->queueLimit)

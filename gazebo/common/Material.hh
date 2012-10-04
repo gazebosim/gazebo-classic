@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __MATERIAL_HH__
-#define __MATERIAL_HH__
+#ifndef _MATERIAL_HH_
+#define _MATERIAL_HH_
 
 #include <string>
 #include <iostream>

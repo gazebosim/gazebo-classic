@@ -35,7 +35,7 @@ void help()
   std::cout << " debugging and as a conversion tool.\n\n";
 }
 
-bool file_exists(const std::string &_filename)
+bool file_exists(const std::string _filename)
 {
   struct stat st;
   return stat(_filename.c_str(), &st) == 0;

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __DYNAMICRENDERABLE_HH__
-#define __DYNAMICRENDERABLE_HH__
+#ifndef _DYNAMICRENDERABLE_HH_
+#define _DYNAMICRENDERABLE_HH_
 
 #include "rendering/ogre_gazebo.h"
 #include "rendering/RenderTypes.hh"

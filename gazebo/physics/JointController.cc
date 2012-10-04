@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 using namespace gazebo;
 using namespace physics;
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 JointController::JointController(ModelPtr _model)
   : model(_model)
 {
@@ -112,7 +112,7 @@ void JointController::Update()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 {
   std::map<std::string, JointPtr>::iterator iter;
@@ -173,11 +173,8 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 void JointController::SetJointPosition(const std::string &_name,
                                        double _position)
 {
-  std::map<std::string, JointPtr>::iterator jiter = this->joints.find(_name);
-  if (jiter != this->joints.end())
-    this->SetJointPosition(jiter->second, _position);
-  else
-    gzwarn << "SetJointPosition [" << _name << "] not found\n";
+  if (this->joints.find(_name) != this->joints.end())
+    this->SetJointPosition(this->joints[_name], _position);
 }
 
 //////////////////////////////////////////////////
@@ -203,8 +200,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
   // truncate position by joint limits
   double lower = _joint->GetLowStop(0).Radian();
   double upper = _joint->GetHighStop(0).Radian();
-  _position = _position < lower? lower :
-    (_position > upper? upper : _position);
+  _position = _position < lower? lower : (_position > upper? upper : _position);
 
   // keep track of updatd links, make sure each is upated only once
   this->updated_links.clear();
@@ -216,36 +212,60 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
     LinkPtr parentLink = _joint->GetParent();
     LinkPtr childLink = _joint->GetChild();
 
-    if ((!parentLink && childLink) ||
-        (parentLink && childLink &&
-         parentLink->GetScopedName() != childLink->GetScopedName()))
+    if (parentLink && childLink &&
+        parentLink->GetScopedName() != childLink->GetScopedName())
     {
       // transform about the current anchor, about the axis
-      // rotate child (childLink) about anchor point, by delta-angle
-      // along axis
-      double dposition = _position - _joint->GetAngle(0).Radian();
-
-      math::Vector3 anchor;
-      math::Vector3 axis;
-
-      if (this->model->IsStatic())
+      if (_joint->HasType(Base::HINGE_JOINT))
       {
-        math::Pose linkWorldPose = childLink->GetWorldPose();
-        axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
-        anchor = linkWorldPose.pos;
+        // rotate child (childLink) about anchor point, by delta-angle
+        // along axis
+        double dangle = _position - _joint->GetAngle(0).Radian();
+
+        math::Vector3 anchor;
+        math::Vector3 axis;
+
+        if (this->model->IsStatic())
+        {
+          math::Pose linkWorldPose = childLink->GetWorldPose();
+          axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
+          anchor = linkWorldPose.pos;
+        }
+        else
+        {
+          anchor = _joint->GetAnchor(0);
+          axis = _joint->GetGlobalAxis(0);
+        }
+
+        this->RotateLinkAndChildren(childLink, anchor, axis, dangle, true);
+      }
+      else if (_joint->HasType(Base::SLIDER_JOINT))
+      {
+        double dposition = _position - _joint->GetAngle(0).Radian();
+
+        math::Vector3 anchor;
+        math::Vector3 axis;
+
+        if (this->model->IsStatic())
+        {
+          math::Pose linkWorldPose = childLink->GetWorldPose();
+          axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(0));
+          anchor = linkWorldPose.pos;
+        }
+        else
+        {
+          anchor = _joint->GetAnchor(0);
+          axis = _joint->GetGlobalAxis(0);
+        }
+
+        this->SlideLinkAndChildren(childLink, anchor,
+            axis, dposition, true);
       }
       else
       {
-        anchor = _joint->GetAnchor(0);
-        axis = _joint->GetGlobalAxis(0);
+        gzwarn << "Setting non HINGE/SLIDER joint types not"
+          << "implemented [" << _joint->GetScopedName() << "]\n";
       }
-
-      // we don't want to move the parent link
-      if (parentLink)
-        this->updated_links.push_back(parentLink);
-
-      this->MoveLinks(_joint, childLink, anchor, axis, dposition,
-        true);
     }
   }
 
@@ -255,143 +275,143 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
 
 //////////////////////////////////////////////////
-void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
+void JointController::RotateLinkAndChildren(LinkPtr _link1,
+    const math::Vector3 &_anchor, const math::Vector3 &_axis,
+    double _dangle, bool _updateChildren)
+{
+  if (this->FindLink( this->updated_links.begin(),
+                      this->updated_links.end(),
+                      _link1) == this->updated_links.end())
+  {
+    math::Pose linkWorldPose = _link1->GetWorldPose();
+
+    // relative to anchor point
+    math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+
+    // take axis rotation and turn it int a quaternion
+    math::Quaternion rotation(_axis, _dangle);
+
+    // rotate relative pose by rotation
+    math::Pose newRelativePose;
+
+    newRelativePose.pos = rotation.RotateVector(relativePose.pos);
+    newRelativePose.rot = rotation * relativePose.rot;
+
+    math::Pose newWorldPose(newRelativePose.pos + _anchor,
+                            newRelativePose.rot);
+
+    _link1->SetWorldPose(newWorldPose);
+    _link1->SetLinearVel(math::Vector3(0, 0, 0));
+    _link1->SetAngularVel(math::Vector3(0, 0, 0));
+
+    this->updated_links.push_back(_link1);
+  }
+
+  // recurse through children links
+  if (_updateChildren)
+  {
+    std::vector<LinkPtr> links;
+    this->GetAllChildrenLinks(links, _link1);
+
+    for (std::vector<LinkPtr>::iterator biter = links.begin();
+        biter != links.end(); ++biter)
+    {
+      this->RotateLinkAndChildren((*biter), _anchor, _axis, _dangle, false);
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void JointController::SlideLinkAndChildren(LinkPtr _link1,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
-  if (!this->ContainsLink( this->updated_links, _link))
+  if (this->FindLink( this->updated_links.begin(),
+                      this->updated_links.end(),
+                      _link1) == this->updated_links.end())
   {
-    if (_joint->HasType(Base::HINGE_JOINT))
-    {
-      math::Pose linkWorldPose = _link->GetWorldPose();
+    math::Pose linkWorldPose = _link1->GetWorldPose();
 
-      // relative to anchor point
-      math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+    // relative to anchor point
+    math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
 
-      // take axis rotation and turn it int a quaternion
-      math::Quaternion rotation(_axis, _dposition);
+    // slide relative pose by dposition along axis
+    math::Pose newRelativePose;
+    newRelativePose.pos = relativePose.pos + _axis * _dposition;
+    newRelativePose.rot = relativePose.rot;
 
-      // rotate relative pose by rotation
-      math::Pose newRelativePose;
+    math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
 
-      newRelativePose.pos = rotation.RotateVector(relativePose.pos);
-      newRelativePose.rot = rotation * relativePose.rot;
+    _link1->SetWorldPose(newWorldPose);
+    _link1->SetLinearVel(math::Vector3(0, 0, 0));
+    _link1->SetAngularVel(math::Vector3(0, 0, 0));
 
-      math::Pose newWorldPose(newRelativePose.pos + _anchor,
-                              newRelativePose.rot);
-
-      _link->SetWorldPose(newWorldPose);
-
-      // set link velocities somehow?
-      // ideally we want to set this according to Joint Trajectory velocity
-      // double dt = 0;
-      // this->ComputeAndSetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
-
-      this->updated_links.push_back(_link);
-    }
-    else if (_joint->HasType(Base::SLIDER_JOINT))
-    {
-      math::Pose linkWorldPose = _link->GetWorldPose();
-
-      // relative to anchor point
-      math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
-
-      // slide relative pose by dposition along axis
-      math::Pose newRelativePose;
-      newRelativePose.pos = relativePose.pos + _axis * _dposition;
-      newRelativePose.rot = relativePose.rot;
-
-      math::Pose newWorldPose(newRelativePose.pos + _anchor,
-                              newRelativePose.rot);
-
-      _link->SetWorldPose(newWorldPose);
-
-      // set link velocities somehow?
-      // ideally we want to set this according to Joint Trajectory velocity
-      // double dt = 0;
-      // this->ComputeAndSetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
-
-      this->updated_links.push_back(_link);
-    }
-    else
-      gzerr << "should not be here\n";
+    this->updated_links.push_back(_link1);
   }
 
-
-  // recurse through connected links
+  // recurse through children links
   if (_updateChildren)
   {
-    std::vector<LinkPtr> connected_links;
-    this->AddConnectedLinks(connected_links, _link, true);
+    std::vector<LinkPtr> links;
+    this->GetAllChildrenLinks(links, _link1);
 
-    for (std::vector<LinkPtr>::iterator liter = connected_links.begin();
-        liter != connected_links.end(); ++liter)
+    for (std::vector<LinkPtr>::iterator biter = links.begin();
+        biter != links.end(); ++biter)
     {
-      this->MoveLinks(_joint, (*liter), _anchor, _axis, _dposition);
+      this->SlideLinkAndChildren((*biter), _anchor, _axis, _dposition, false);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
-     const math::Pose &_old, const math::Pose &_new, double _dt)
-{
-    math::Vector3 linear_vel(0, 0, 0);
-    math::Vector3 angular_vel(0, 0, 0);
-    if (math::equal(_dt, 0.0))
-    {
-      gzwarn << "dt is 0, unable to compute velocity, set to 0s\n";
-    }
-    else
-    {
-      linear_vel = (_new.pos - _old.pos) / _dt;
-      angular_vel = (_new.rot.GetAsEuler() - _old.rot.GetAsEuler()) / _dt;
-    }
-    _link->SetLinearVel(linear_vel);
-    _link->SetAngularVel(angular_vel);
-}
-
-//////////////////////////////////////////////////
-void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
-                                        const LinkPtr &_link,
-                                        bool _checkParentTree)
+void JointController::GetAllChildrenLinks(std::vector<LinkPtr> &_links,
+                                           const LinkPtr &_link)
 {
   // strategy, for each child, recursively look for children
   //           for each child, also look for parents to catch multiple roots
-
-
-  std::vector<LinkPtr> childLinks = _link->GetChildLinks();
-  for (std::vector<LinkPtr>::iterator childLink = childLinks.begin();
-                                      childLink != childLinks.end();
-                                      ++childLink)
+  std::map<std::string, JointPtr>::iterator iter;
+  for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    // add this link to the list of links to be updated by SetJointPosition
-    if (!this->ContainsLink(_links_out, *childLink))
-    {
-      _links_out.push_back(*childLink);
-      // recurse into children, but not parents
-      this->AddConnectedLinks(_links_out, *childLink);
-    }
+    JointPtr joint = iter->second;
 
-    if (_checkParentTree)
+    // recurse through children connected by joints
+    LinkPtr parentLink = joint->GetParent();
+    LinkPtr childLink = joint->GetChild();
+    if (parentLink && childLink
+        && parentLink->GetScopedName() != childLink->GetScopedName()
+        && parentLink->GetScopedName() == _link->GetScopedName()
+        && this->FindLink(_links.begin(), _links.end(), childLink)
+                       == _links.end())
     {
-      // catch additional roots by looping
-      // through all parents of childLink,
-      // but skip parent link is self (_link)
-      std::vector<LinkPtr> parentLinks = (*childLink)->GetParentLinks();
-      for (std::vector<LinkPtr>::iterator parentLink = parentLinks.begin();
-                                          parentLink != parentLinks.end();
-                                          ++parentLink)
-      {
-        if ((*parentLink)->GetScopedName() != _link->GetScopedName() &&
-            !this->ContainsLink(_links_out, (*parentLink)))
-        {
-          _links_out.push_back(*parentLink);
-          // add all childrend links of parentLink, but
-          // stop the recursion if any of the child link is already added
-          this->AddConnectedLinks(_links_out, *parentLink, _link);
-        }
-      }
+      _links.push_back(childLink);
+      this->GetAllChildrenLinks(_links, childLink);
+      this->GetAllParentLinks(_links, childLink, _link);
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void JointController::GetAllParentLinks(std::vector<LinkPtr> &_links,
+    const LinkPtr &_link, const LinkPtr &_origParentLink)
+{
+  std::map<std::string, JointPtr>::iterator iter;
+  for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
+  {
+    JointPtr joint = iter->second;
+
+    // recurse through children connected by joints
+    LinkPtr parentLink = joint->GetParent();
+    LinkPtr childLink = joint->GetChild();
+
+    if (parentLink && childLink
+        && parentLink->GetScopedName() != childLink->GetScopedName()
+        && childLink->GetScopedName() == _link->GetScopedName()
+        && parentLink->GetScopedName() != _origParentLink->GetScopedName()
+        && this->FindLink(_links.begin(), _links.end(), parentLink)
+                       == _links.end())
+    {
+      _links.push_back(parentLink);
+      this->GetAllParentLinks(_links, childLink, _origParentLink);
     }
   }
 }

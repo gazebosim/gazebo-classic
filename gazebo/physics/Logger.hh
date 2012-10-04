@@ -19,8 +19,8 @@
  * Date: 1 Jun 2010
  */
 
-#ifndef __LOGGER_HH__
-#define __LOGGER_HH__
+#ifndef _LOGGER_HH_
+#define _LOGGER_HH_
 
 #include <vector>
 #include <fstream>

@@ -19,8 +19,8 @@
  * Date: 15 May 2009
  */
 
-#ifndef __BULLETLINK_HH__
-#define __BULLETLINK_HH__
+#ifndef _BULLETLINK_HH_
+#define _BULLETLINK_HH_
 
 #include "physics/bullet/bullet_inc.h"
 #include "physics/bullet/BulletTypes.hh"

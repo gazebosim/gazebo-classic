@@ -29,8 +29,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world,
-  BasePtr _parent) : UniversalJoint<BulletJoint>(_parent)
+BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world)
+    : UniversalJoint<BulletJoint>()
 {
   this->world = _world;
 }

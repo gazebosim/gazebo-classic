@@ -1421,7 +1421,8 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
     std::string colorStr = colorCStr;
     Color color = boost::lexical_cast<Color>(colorStr);
 
-    double srcFactor, dstFactor;
+    double srcFactor = 0;
+    double dstFactor = 0;
 
     if (opaqueStr == "RGB_ZERO")
     {

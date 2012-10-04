@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __MODEL_STATE_HH__
-#define __MODEL_STATE_HH__
+#ifndef _MODEL_STATE_HH_
+#define _MODEL_STATE_HH_
 
 #include <vector>
 #include <string>

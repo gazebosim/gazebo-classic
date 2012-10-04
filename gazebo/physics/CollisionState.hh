@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __COLLISION_STATE_HH__
-#define __COLLISION_STATE_HH__
+#ifndef _COLLISION_STATE_HH_
+#define _COLLISION_STATE_HH_
 
 #include "physics/State.hh"
 #include "math/Pose.hh"

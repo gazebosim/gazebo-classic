@@ -31,8 +31,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
-    : SliderJoint<BulletJoint>(_parent)
+BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world)
+    : SliderJoint<BulletJoint>()
 {
   this->world = _world;
 }

@@ -19,8 +19,8 @@
  * Date: 21 May 2009
  */
 
-#ifndef __BULLETTRIMESHSHAPE_HH__
-#define __BULLETTRIMESHSHAPE_HH__
+#ifndef _BULLETTRIMESHSHAPE_HH_
+#define _BULLETTRIMESHSHAPE_HH_
 
 #include "physics/TrimeshShape.hh"
 

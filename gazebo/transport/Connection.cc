@@ -87,7 +87,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 
   int httpIndex = _host.find("http://");
   std::string host = _host;
-  if (httpIndex != std::string::npos)
+  if (httpIndex != static_cast<int>(std::string::npos))
     host = _host.substr(7, _host.size() - 7);
 
   // Resolve the host name into an IP address

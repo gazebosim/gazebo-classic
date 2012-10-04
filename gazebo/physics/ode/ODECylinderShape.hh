@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __ODECYLINDERSHAPE_HH__
-#define __ODECYLINDERSHAPE_HH__
+#ifndef _ODECYLINDERSHAPE_HH_
+#define _ODECYLINDERSHAPE_HH_
 
 #include "physics/CylinderShape.hh"
 #include "physics/ode/ODEPhysics.hh"

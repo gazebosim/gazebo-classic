@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __KEYFRAME_HH__
-#define __KEYFRAME_HH__
+#ifndef _KEYFRAME_HH_
+#define _KEYFRAME_HH_
 
 #include "math/Vector3.hh"
 #include "math/Quaternion.hh"

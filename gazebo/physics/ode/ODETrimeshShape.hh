@@ -19,8 +19,8 @@
  * Date: 16 Oct 2009
  */
 
-#ifndef __ODETRIMESHSHAPE_HH__
-#define __ODETRIMESHSHAPE_HH__
+#ifndef _ODETRIMESHSHAPE_HH_
+#define _ODETRIMESHSHAPE_HH_
 
 #include "physics/TrimeshShape.hh"
 

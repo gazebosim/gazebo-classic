@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __WORLD_STATE_HH__
-#define __WORLD_STATE_HH__
+#ifndef _WORLD_STATE_HH_
+#define _WORLD_STATE_HH_
 
 #include <string>
 #include <vector>

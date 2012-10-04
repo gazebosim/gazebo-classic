@@ -354,7 +354,7 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
   if (this->model->IsStatic())
     this->staticAngle = _angle;
   else
-    this->model->SetJointPosition(this->GetScopedName(), _angle.Radian());
+    this->model->SetJointPosition(this->GetName(), _angle.Radian());
 }
 
 //////////////////////////////////////////////////

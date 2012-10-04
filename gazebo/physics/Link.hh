@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __LINK_HH__
-#define __LINK_HH__
+#ifndef _LINK_HH_
+#define _LINK_HH_
 
 #include <map>
 #include <vector>
@@ -193,12 +193,6 @@ namespace gazebo
       /// \brief accessor for collisions
       public: CollisionPtr GetCollision(unsigned int _index) const;
 
-      /// Returns a vector of children Links
-      public: std::vector<LinkPtr> GetChildLinks();
-
-      /// Returns a vector of parent Links
-      public: std::vector<LinkPtr> GetParentLinks();
-
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
 
@@ -221,10 +215,25 @@ namespace gazebo
       public: virtual bool GetKinematic() const {return false;}
 
       /// \brief Get sensor count
+      ///
+      /// This will return the number of sensors created by the link when it
+      /// was loaded. This function is commonly used with
+      /// Link::GetSensorName.
+      /// \return The number of sensors created by the link.
       public: unsigned int GetSensorCount() const;
 
       /// \brief Get sensor name
-      public: std::string GetSensorName(unsigned int _i) const;
+      ///
+      /// Get the name of a sensor based on an index. The index should be in
+      /// the range of 0...Link::GetSensorCount().
+      /// \note A Link does not manage or maintain a pointer to a
+      /// sensors::Sensor. Access to a Sensor object
+      /// is accomplished through the sensors::SensorManager. This was done to
+      /// separate the physics engine from the sensor engine.
+      /// \param[in] _index Index of the sensor name.
+      /// \return The name of the sensor, or empty string if the index is out of
+      /// bounds.
+      public: std::string GetSensorName(unsigned int _index) const;
 
       /// \brief Connect to the add entity signal
       public: template<typename T>

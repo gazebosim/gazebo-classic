@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __ARROWVISUAL_HH__
-#define __ARROWVISUAL_HH__
+#ifndef _ARROWVISUAL_HH_
+#define _ARROWVISUAL_HH_
 
 #include <string>
 #include "rendering/Visual.hh"

@@ -23,8 +23,8 @@
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETSCREWJOINT_HH__
-#define __BULLETSCREWJOINT_HH__
+#ifndef _BULLETSCREWJOINT_HH_
+#define _BULLETSCREWJOINT_HH_
 
 #include "physics/bullet/BulletJoint.hh"
 #include "physics/ScrewJoint.hh"
@@ -43,7 +43,7 @@ namespace gazebo
     class BulletScrewJoint : public ScrewJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletScrewJoint(btDynamicsWorld *world, BasePtr _parent);
+      public: BulletScrewJoint(btDynamicsWorld *world);
 
       /// \brief Destructor
       public: virtual ~BulletScrewJoint();

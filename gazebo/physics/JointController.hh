@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __JOINTCONTROLLER_HH__
-#define __JOINTCONTROLLER_HH__
+#ifndef _JOINTCONTROLLER_HH_
+#define _JOINTCONTROLLER_HH_
 
 #include <map>
 #include <string>
@@ -64,36 +64,36 @@ namespace gazebo
       ///   this call must recursively crawl through all the connected
       ///   children Link's in this Model, and update each Link Pose
       ///   affected by this Joint angle update.
-      /// Warning:
-      ///   There is no constraint satisfaction being done here,
-      ///   traversal through the kinematic graph has unexpected behavior
-      ///   if you try to set the joint position of a link inside
-      ///   a loop structure.
       public: void SetJointPosition(JointPtr _joint, double _position);
 
       /// \brief Helper for SetJointPositions
-      private: void MoveLinks(JointPtr _joint, LinkPtr _link,
+      private: void RotateLinkAndChildren(LinkPtr _link1,
                    const math::Vector3 &_anchor, const math::Vector3 &_axis,
-                   double _dposition, bool _updateChildren = false);
-
-      /// @todo: Set Link Velocity based on old and new poses and dt
-      private: void ComputeAndSetLinkTwist(LinkPtr _link,
-                    const math::Pose &_old, const math::Pose &_new, double dt);
+                   double _dangle, bool _updateChildren);
 
       /// \brief Helper for SetJointPositions
-      private: void AddConnectedLinks(std::vector<LinkPtr> &_links_out,
-                                      const LinkPtr &_link,
-                                      bool _checkParentTree = false);
+      private: void SlideLinkAndChildren(LinkPtr _link1,
+                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
+                   double _dposition, bool _updateChildren);
 
       /// \brief Helper for SetJointPositions
-      private: template<class InputVector, class T>
-                 bool ContainsLink(InputVector _vector, const T& value)
+      private: void GetAllChildrenLinks(std::vector<LinkPtr> &_links,
+                                         const LinkPtr &_link);
+
+      /// \brief Helper for SetJointPositions
+      private: void GetAllParentLinks(std::vector<LinkPtr> &_links,
+                   const LinkPtr &_link, const LinkPtr &_origParentLink);
+
+      /// \brief Helper for SetJointPositions
+      private: template<class InputIterator, class T>
+                 InputIterator FindLink(InputIterator first,
+                                      InputIterator last,
+                                      const T& value)
                  {
-                   typename InputVector::iterator iter = _vector.begin();
-                   for (; iter != _vector.end(); ++iter)
-                     if ((*iter)->GetScopedName() == value->GetScopedName())
-                       return true;
-                   return false;
+                   for (; first != last; ++first)
+                     if ((*first)->GetName() == value->GetName())
+                       return first;
+                   return last;
                  }
 
       private: ModelPtr model;

@@ -787,22 +787,25 @@ std::string Camera::GetFrameFilename()
       gzerr << "Error making directory\n";
   }
 
+  std::string friendlyName = this->GetName();
+  boost::replace_all(friendlyName, "::", "_");
+
+
   char tmp[1024];
   if (!path.empty())
   {
-    double wallTime = common::Time::GetWallTime().Double();
-    int min = static_cast<int>((wallTime / 60.0));
-    int sec = static_cast<int>((wallTime - min*60));
-    int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
+    // double wallTime = common::Time::GetWallTime().Double();
+    // int min = static_cast<int>((wallTime / 60.0));
+    // int sec = static_cast<int>((wallTime - min*60));
+    // int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
 
-    snprintf(tmp, sizeof(tmp), "%s/%s-%04d-%03dm_%02ds_%03dms.jpg",
-        path.c_str(), this->GetName().c_str(),
-        this->saveCount, min, sec, msec);
+    snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
+             friendlyName.c_str(), this->saveCount);
   }
   else
   {
-    snprintf(tmp, sizeof(tmp),
-        "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
+    snprintf(tmp, sizeof(tmp), "%s-%04d.jpg", friendlyName.c_str(),
+             this->saveCount);
   }
 
   this->saveCount++;

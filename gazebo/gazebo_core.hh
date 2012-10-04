@@ -18,8 +18,8 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifndef __GAZEBO_CORE_HH__
-#define __GAZEBO_CORE_HH__
+#ifndef _GAZEBO_CORE_HH_
+#define _GAZEBO_CORE_HH_
 #include <gazebo/common/common.hh>
 #include <gazebo/math/gzmath.hh>
 #include <gazebo/msgs/msgs.hh>

@@ -440,7 +440,7 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
           addKeyValue(contact_ode, "kd", values2str(1, &(*ge)->kd));
         // max contact interpenetration correction velocity
         if ((*ge)->is_maxVel)
-          addKeyValue(contact_ode, "max_vel", values2str(1, &(*ge)->maxVel));
+          addKeyValue(contact_ode, "maxVel", values2str(1, &(*ge)->maxVel));
         // contact interpenetration margin tolerance
         if ((*ge)->is_minDepth)
           addKeyValue(contact_ode, "minDepth", values2str(1, &(*ge)->minDepth));
@@ -1817,13 +1817,14 @@ void URDF2Gazebo::reduceGazeboExtensionSensorTransformReduction(
       }
       */
 
-      {
-        TiXmlNode* old_pose_key = (*blob_it)->FirstChild("pose");
-        /// @todo: FIXME:  we should read xyz, rpy and aggregate it to
-        /// reduction_transform instead of just throwing the info away.
-        if (old_pose_key)
-          (*blob_it)->RemoveChild(old_pose_key);
-      }
+      TiXmlNode* xyz_key = (*blob_it)->FirstChild("xyz");
+      /// @todo: FIXME:  we should read xyz, rpy and aggregate it to
+      /// reduction_transform instead of just throwing the info away.
+      if (xyz_key)
+        (*blob_it)->RemoveChild(xyz_key);
+      TiXmlNode* rpy_key = (*blob_it)->FirstChild("rpy");
+      if (rpy_key)
+        (*blob_it)->RemoveChild(rpy_key);
 
       // convert reduction_transform to values
       urdf::Vector3 reduction_xyz(reduction_transform.pos.x,

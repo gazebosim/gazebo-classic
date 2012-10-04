@@ -19,8 +19,8 @@
  * Date: 21 May 2003
  */
 
-#ifndef __ODEHINGEJOINT_HH__
-#define __ODEHINGEJOINT_HH__
+#ifndef _ODEHINGEJOINT_HH_
+#define _ODEHINGEJOINT_HH_
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"

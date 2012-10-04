@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_COMMON_TYPES_HH__
-#define __GAZEBO_COMMON_TYPES_HH__
+#ifndef _GAZEBO_COMMON_TYPES_HH_
+#define _GAZEBO_COMMON_TYPES_HH_
 
 #include <vector>
 #include <map>

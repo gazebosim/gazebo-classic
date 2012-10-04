@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef __BULLET_COLLISION_HH__
-#define __BULLET_COLLISION_HH__
+#ifndef _BULLET_COLLISION_HH_
+#define _BULLET_COLLISION_HH_
 
 #include <string>
 

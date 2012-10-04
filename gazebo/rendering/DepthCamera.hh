@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef __RENDERING_DEPTHCAMERA_HH__
-#define __RENDERING_DEPTHCAMERA_HH__
+#ifndef _RENDERING_DEPTHCAMERA_HH_
+#define _RENDERING_DEPTHCAMERA_HH_
 #include <string>
 
 #include "common/Event.hh"

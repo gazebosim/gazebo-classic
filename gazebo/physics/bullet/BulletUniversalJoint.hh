@@ -19,8 +19,8 @@
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETUNIVERSALJOINT_HH__
-#define __BULLETUNIVERSALJOINT_HH__
+#ifndef _BULLETUNIVERSALJOINT_HH_
+#define _BULLETUNIVERSALJOINT_HH_
 
 #include "physics/UniversalJoint.hh"
 #include "physics/bullet/BulletJoint.hh"
@@ -40,7 +40,7 @@ namespace gazebo
     class BulletUniversalJoint : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletUniversalJoint(btDynamicsWorld *world, BasePtr _parent);
+      public: BulletUniversalJoint(btDynamicsWorld *world);
 
       /// \brief Destuctor
       public: virtual ~BulletUniversalJoint();

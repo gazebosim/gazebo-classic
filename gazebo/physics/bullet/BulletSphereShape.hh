@@ -19,8 +19,8 @@
  * Date: 21 May 2009
  */
 
-#ifndef __BULLETSPHERESHAPE_HH__
-#define __BULLETSPHERESHAPE_HH__
+#ifndef _BULLETSPHERESHAPE_HH_
+#define _BULLETSPHERESHAPE_HH_
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/SphereShape.hh"

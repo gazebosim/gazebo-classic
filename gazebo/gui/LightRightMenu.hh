@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __LIGHTRIGHTMENU_HH__
-#define __LIGHTRIGHTMENU_HH__
+#ifndef _LIGHTRIGHTMENU_HH_
+#define _LIGHTRIGHTMENU_HH_
 
 #include <map>
 #include <string>

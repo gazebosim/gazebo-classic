@@ -19,8 +19,8 @@
  * Date: 29 March 2012
  */
 
-#ifndef __GPULASER_HH__
-#define __GPULASER_HH__
+#ifndef _GPULASER_HH_
+#define _GPULASER_HH_
 
 #include <string>
 #include <vector>

@@ -19,8 +19,8 @@
  * Date: 8 May 2003
  */
 
-#ifndef __BULLETHEIGHTMAPGEOM_HH__
-#define __BULLETHEIGHTMAPGEOM_HH__
+#ifndef _BULLETHEIGHTMAPGEOM_HH_
+#define _BULLETHEIGHTMAPGEOM_HH_
 #include <string>
 
 #include "physics/HeightmapShape.hh"

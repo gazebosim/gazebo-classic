@@ -30,8 +30,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
-    : BallJoint<BulletJoint>(_parent)
+BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world)
+    : BallJoint<BulletJoint>()
 {
   this->world = _world;
 }
