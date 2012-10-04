@@ -88,8 +88,8 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     CURLcode success = curl_easy_perform(curl);
     if (success != CURLE_OK)
     {
-      gzerr << "Unable to connect to model database using [" << uriStr << "]\n";
-      gzerr << "Error code[" << success << "]\n";
+      gzwarn << "Unable to connect to model database using [" << uriStr
+             << "]. Only locally installed models will be available.";
     }
 
     curl_easy_cleanup(curl);

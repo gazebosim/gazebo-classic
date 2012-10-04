@@ -28,224 +28,228 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX { namespace VClouds{
 
-	class VClouds;
+  class VClouds;
 
-	class DllExport GeometryBlock
-	{
-	public:
-		/** Vertex struct
-		 */
-		struct VERTEX
-		{	      // Position
-			float x,y,z,
-				  // 3D Coords
-				  xc, yc, zc,
-				  // Noise coords
-				  u, v,
-				  // Opacity
-				  o;
-		};
+  class DllExport GeometryBlock
+  {
+    public:
+      /** Vertex struct
+      */
+      struct VERTEX
+      {        // Position
+        float x,y,z,
+              // 3D Coords
+              xc, yc, zc,
+              // Noise coords
+              u, v,
+              // Opacity
+              o;
+      };
 
-		/** Constructor
-			@param vc VClouds pointer
-			@param Height Field height (in woorld coordinates)
-			@param Alpha Alpha angle
-			@param Beta Beta angle
-			@param Radius Total radius
-			@param Phi Actimutal angle
-			@param Na Number of slices in A zone
-			@param Nb Number of slices in B zone
-			@param Nc Number of slices in C zone
-			@param A A radius
-			@param B B radius
-			@param C C radius
-		 */
-		GeometryBlock(VClouds *vc,
-			const float& Height, const Ogre::Radian& Alpha, const Ogre::Radian& Beta, 
-			const float& Radius, const Ogre::Radian& Phi, const int& Na, 
-			const int& Nb, const int& Nc, const int& A, 
-			const int& B, const int& C, const int& Position);
+      /** Constructor
+        @param vc VClouds pointer
+        @param Height Field height (in woorld coordinates)
+        @param Alpha Alpha angle
+        @param Beta Beta angle
+        @param Radius Total radius
+        @param Phi Actimutal angle
+        @param Na Number of slices in A zone
+        @param Nb Number of slices in B zone
+        @param Nc Number of slices in C zone
+        @param A A radius
+        @param B B radius
+        @param C C radius
+        */
+      GeometryBlock(VClouds *vc,
+          const float& Height, const Ogre::Radian& Alpha,
+          const Ogre::Radian& Beta,
+          const float& Radius, const Ogre::Radian& Phi, const int& Na,
+          const int& Nb, const int& Nc, const int& A,
+          const int& B, const int& C, const int& Position);
 
-		/** Destructor
-		 */
-		~GeometryBlock();
+      /** Destructor
+      */
+      ~GeometryBlock();
 
-		/** Create
-		 */
-		void create();
+      /** Create
+      */
+      void create();
 
-		/** Remove
-		 */
-		void remove();
+      /** Remove
+      */
+      void remove();
 
-		/** Update geometry
-		    @param c Camera
-		    @param displacement Current offset in world units per zone
-         */
-		void updateGeometry(Ogre::Camera* c, const Ogre::Vector3& displacement);
+      /** Update geometry
+        @param c Camera
+        @param displacement Current offset in world units per zone
+        */
+      void updateGeometry(Ogre::Camera* c, const Ogre::Vector3& displacement);
 
-		/** Has been create() already called?
-		    @return true if created() have been already called, false if not
-		 */
-		inline const bool& isCreated() const
-		{
-			return mCreated;
-		}
+      /** Has been create() already called?
+        @return true if created() have been already called, false if not
+        */
+      inline const bool& isCreated() const
+      {
+        return mCreated;
+      }
 
-		/** Get mesh
-            @return Mesh
-         */
-        inline Ogre::MeshPtr getMesh()
-        {
-            return mMesh;
-        }
+      /** Get mesh
+        @return Mesh
+        */
+      inline Ogre::MeshPtr getMesh()
+      {
+        return mMesh;
+      }
 
-        /** Get sub mesh
-            @return Sub mesh
-         */
-        inline Ogre::SubMesh* getSubMesh()
-        {
-            return mSubMesh;
-        }
+      /** Get sub mesh
+        @return Sub mesh
+        */
+      inline Ogre::SubMesh* getSubMesh()
+      {
+        return mSubMesh;
+      }
 
-        /** Get entity
-            @return Entity
-         */
-        inline Ogre::Entity* getEntity()
-        {
-            return mEntity;
-        }
+      /** Get entity
+        @return Entity
+        */
+      inline Ogre::Entity* getEntity()
+      {
+        return mEntity;
+      }
 
-		/** Get hardware vertex buffer reference
-            @return Ogre::HardwareVertexBufferSharedPtr reference
-         */
-        inline Ogre::HardwareVertexBufferSharedPtr &getHardwareVertexBuffer()
-        {
-            return mVertexBuffer;
-        }
+      /** Get hardware vertex buffer reference
+        @return Ogre::HardwareVertexBufferSharedPtr reference
+        */
+      inline Ogre::HardwareVertexBufferSharedPtr &getHardwareVertexBuffer()
+      {
+        return mVertexBuffer;
+      }
 
-		/** Get hardware index buffer reference
-		    @return Ogre::HardwareIndexBufferSharedPtr reference
-		 */
-		inline Ogre::HardwareIndexBufferSharedPtr &getHardwareIndexBuffer()
-		{
-			return mIndexBuffer;
-		}
+      /** Get hardware index buffer reference
+        @return Ogre::HardwareIndexBufferSharedPtr reference
+        */
+      inline Ogre::HardwareIndexBufferSharedPtr &getHardwareIndexBuffer()
+      {
+        return mIndexBuffer;
+      }
 
-		/** Set world offset
-		    @param WorldOffset World offset
-		 */
-		inline void setWorldOffset(const Ogre::Vector2& WorldOffset)
-		{
-			mWorldOffset = WorldOffset;
-		}
+      /** Set world offset
+        @param WorldOffset World offset
+        */
+      inline void setWorldOffset(const Ogre::Vector2& WorldOffset)
+      {
+        mWorldOffset = WorldOffset;
+      }
 
-		/** Is the geometry block inside the camera frustum?
-		    @param c Camera
-			@return true if yes, false if not
-		 */
-		const bool isInFrustum(Ogre::Camera *c) const;
+      /** Is the geometry block inside the camera frustum?
+        @param c Camera
+        @return true if yes, false if not
+        */
+      bool isInFrustum(Ogre::Camera *c) const;
 
-	private:
-		/** Build axis aligned box
-		    @param fd Falling distance (Positive values for falling geometry, negative for reverse falling geometry)
-		 */
-		const Ogre::AxisAlignedBox _buildAABox(const float& fd) const;
+    private:
+      /** Build axis aligned box
+        @param fd Falling distance (Positive values for falling geometry,
+        negative for reverse falling geometry)
+        */
+      const Ogre::AxisAlignedBox _buildAABox(const float& fd) const;
 
-		/** Calculate data size
-		 */
-		void _calculateDataSize();
+      /** Calculate data size
+      */
+      void _calculateDataSize();
 
-		/** Create geometry
-		 */
-		void _createGeometry();
+      /** Create geometry
+      */
+      void _createGeometry();
 
-		/** Update geometry
-		 */
-		void _updateGeometry();
+      /** Update geometry
+      */
+      void _updateGeometry();
 
-		/** Update zone C slice
-		    @param n Number of slice
-		 */
-		void _updateZoneCSlice(const int& n);
-		
-		/** Update zone B slice
-		    @param n Number of slice
-		 */
-		void _updateZoneBSlice(const int& n);
+      /** Update zone C slice
+        @param n Number of slice
+        */
+      void _updateZoneCSlice(const int& n);
 
-		/** Update zone A slice
-		    @param n Number of slice
-		 */
-		void _updateZoneASlice(const int& n);
+      /** Update zone B slice
+        @param n Number of slice
+        */
+      void _updateZoneBSlice(const int& n);
 
-		/** Set vertex data
-			@param index Vertex index
-			@param o Slice opacity
-			@param p Position
-		 */
-		void _setVertexData(const int& index, const Ogre::Vector3& p, const float& o);
+      /** Update zone A slice
+        @param n Number of slice
+        */
+      void _updateZoneASlice(const int& n);
 
-		/// Has been create() already called?
-		bool mCreated;
+      /** Set vertex data
+        @param index Vertex index
+        @param o Slice opacity
+        @param p Position
+        */
+      void _setVertexData(const int& index, const Ogre::Vector3& p,
+                          const float& o);
 
-		/// Ogre::MeshPtr
-        Ogre::MeshPtr mMesh;
-        /// Ogre::Submesh pointer
-        Ogre::SubMesh *mSubMesh;
-        /// Ogre::Entity pointer
-        Ogre::Entity *mEntity;
+      /// VClouds pointer
+      VClouds *mVClouds;
 
-        /// Vertex buffer
-        Ogre::HardwareVertexBufferSharedPtr mVertexBuffer;
-        /// Index buffer
-        Ogre::HardwareIndexBufferSharedPtr  mIndexBuffer;
+      /// Has been create() already called?
+      bool mCreated;
 
-		/// Vertices pointer
-		VERTEX *mVertices;
+      /// Ogre::Submesh pointer
+      Ogre::SubMesh *mSubMesh;
 
-		/// Current number of triangles
-		int mNumberOfTriangles;
-		/// Vertex count
-		int mVertexCount;
+      /// Ogre::Entity pointer
+      Ogre::Entity *mEntity;
 
-		/// Height
-		float mHeight;
-		/// Angles
-		Ogre::Radian mAlpha, mBeta;
-		/// Radius
-		float mRadius;
-		/// Acimutal angle
-		Ogre::Radian mPhi;
-		/// Number of slices per geometry zone
-		int mNa, mNb, mNc;
-		/// A, B and C radius
-		float mA, mB, mC;
-		/// Number of block(Position)
-		int mPosition;
+      /// Vertices pointer
+      VERTEX *mVertices;
 
-		/// Precomputed Cos/Sin vectors
-		Ogre::Vector2 mV2Cos;
-		Ogre::Vector2 mV2Sin;
-		/// PI - Beta, PI - Alpha Sin
-		float mBetaSin;
-		float mAlphaSin;
+      /// Current number of triangles
+      int mNumberOfTriangles;
+      /// Vertex count
+      int mVertexCount;
 
-		/// Displacement
-		Ogre::Vector3 mDisplacement;
-		/// World coords offset
-		Ogre::Vector2 mWorldOffset;
+      /// Height
+      float mHeight;
+      /// Angles
+      Ogre::Radian mAlpha, mBeta;
 
-		/// VClouds pointer
-		VClouds *mVClouds;
-		/// Current rendering camera
-		Ogre::Camera* mCamera;
+      /// Acimutal angle
+      Ogre::Radian mPhi;
+      /// Number of slices per geometry zone
+      int mNa, mNb, mNc;
+      /// A, B and C radius
+      float mA, mB, mC;
 
-		/// Last falling distance
-		float mLastFallingDistance;
-	};
+      /// Number of block(Position)
+      int mPosition;
 
+      /// Displacement
+      Ogre::Vector3 mDisplacement;
+      /// World coords offset
+      Ogre::Vector2 mWorldOffset;
 
+      /// Current rendering camera
+      Ogre::Camera* mCamera;
+
+      /// Last falling distance
+      float mLastFallingDistance;
+
+      /// Ogre::MeshPtr
+      Ogre::MeshPtr mMesh;
+      /// Vertex buffer
+      Ogre::HardwareVertexBufferSharedPtr mVertexBuffer;
+      /// Index buffer
+      Ogre::HardwareIndexBufferSharedPtr  mIndexBuffer;
+
+      /// Radius
+      float mRadius;
+      /// Precomputed Cos/Sin vectors
+      Ogre::Vector2 mV2Cos;
+      Ogre::Vector2 mV2Sin;
+      /// PI - Beta, PI - Alpha Sin
+      float mBetaSin;
+      float mAlphaSin;
+  };
 }}
-
 #endif
