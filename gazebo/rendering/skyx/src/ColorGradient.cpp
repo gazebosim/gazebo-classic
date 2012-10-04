@@ -38,17 +38,17 @@ namespace SkyX
   {
     if (mMalFormed)
     {
-    	SkyXLOG("Mal-formed ColorGradient");
-    	return Ogre::Vector3(0,0,0);
+      SkyXLOG("Mal-formed ColorGradient");
+      return Ogre::Vector3(0,0,0);
     }
 
     if (CFrameVector.size() == 0)
     {
-    	return Ogre::Vector3(0,0,0);
+      return Ogre::Vector3(0,0,0);
     }
     else if (CFrameVector.size() == 1)
     {
-    	return CFrameVector.at(0).first;
+      return CFrameVector.at(0).first;
     }
 
     std::pair<int, Ogre::Real> minBound, maxBound;
@@ -58,11 +58,11 @@ namespace SkyX
     minBound.second = -1;
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-    	if (CFrameVector.at(k).second < p && CFrameVector.at(k).second > minBound.second)
-    	{
-    		minBound.first = k;
-    		minBound.second = CFrameVector.at(k).second;
-    	}
+      if (CFrameVector.at(k).second < p && CFrameVector.at(k).second > minBound.second)
+      {
+        minBound.first = k;
+        minBound.second = CFrameVector.at(k).second;
+      }
     }
 
     // Max value
@@ -70,11 +70,11 @@ namespace SkyX
     maxBound.second = 2;
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-    	if (CFrameVector.at(k).second > p && CFrameVector.at(k).second < maxBound.second)
-    	{
-    		maxBound.first = k;
-    		maxBound.second = CFrameVector.at(k).second;
-    	}
+      if (CFrameVector.at(k).second > p && CFrameVector.at(k).second < maxBound.second)
+      {
+        maxBound.first = k;
+        maxBound.second = CFrameVector.at(k).second;
+      }
     }
 
     float range = maxBound.second - minBound.second,
@@ -90,40 +90,40 @@ namespace SkyX
 
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-    	if (CFrameVector.at(k).second == 0)
-    	{
-    		// More than one min bound
-    		if (existbounds.first)
-    		{
-    			return false;
-    		}
+      if (equal(CFrameVector.at(k).second, 0.0f))
+      {
+        // More than one min bound
+        if (existbounds.first)
+        {
+          return false;
+        }
 
-    		existbounds.first = true;
-    	}
+        existbounds.first = true;
+      }
 
-    	if (CFrameVector.at(k).second < 0 || CFrameVector.at(k).second > 1)
-    	{
-    		return false;
-    	}
+      if (CFrameVector.at(k).second < 0 || CFrameVector.at(k).second > 1)
+      {
+        return false;
+      }
     }
 
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-    	if (CFrameVector.at(k).second == 1)
-    	{
-    		// More than one min bound
-    		if (existbounds.second)
-    		{
-    			return false;
-    		}
+      if (equal(CFrameVector.at(k).second, 1.0f))
+      {
+        // More than one min bound
+        if (existbounds.second)
+        {
+          return false;
+        }
 
-    		existbounds.second = true;
-    	}
+        existbounds.second = true;
+      }
     }
 
     if (!existbounds.first || !existbounds.second)
     {
-    	return false;
+      return false;
     }
 
     return true;

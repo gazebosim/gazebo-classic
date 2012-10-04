@@ -218,7 +218,7 @@ namespace SkyX { namespace VClouds{
         @param r Radius
         @param sgtrength Strength
         */
-      const float _getDensityAt(Cell ***c, const int& nx, const int& ny,
+      float _getDensityAt(Cell ***c, const int& nx, const int& ny,
           const int& nz, const int& x, const int& y, const int& z,
           const int& r, const float& strength) const;
 
@@ -228,7 +228,7 @@ namespace SkyX { namespace VClouds{
         @param y y Coord
         @param z z Coord
         */
-      const float _getDensityAt(Cell ***c, const int& x, const int& y,
+      float _getDensityAt(Cell ***c, const int& x, const int& y,
           const int& z) const;
 
       /** Fact funtion
@@ -240,7 +240,7 @@ namespace SkyX { namespace VClouds{
         @param y y Coord
         @param z z Coord
         */
-      const bool _fact(Cell ***c, const int& nx, const int& ny,
+      bool _fact(Cell ***c, const int& nx, const int& ny,
           const int& nz, const int& x, const int& y, const int& z) const;
 
       /** Clear probabilities
@@ -275,7 +275,7 @@ namespace SkyX { namespace VClouds{
         @param d Light direction
         @param att Attenuation factor
         */
-      const Ogre::Real _getLightAbsorcionAt(Cell*** c, const int& nx,
+      Ogre::Real _getLightAbsorcionAt(Cell*** c, const int& nx,
           const int& ny, const int& nz,
           const int& x, const int& y,
           const int& z, const Ogre::Vector3& d,

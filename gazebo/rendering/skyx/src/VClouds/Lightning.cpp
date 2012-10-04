@@ -61,22 +61,24 @@ namespace SkyX { namespace VClouds
   {
     remove();
 
-    Ogre::Vector3 end = mOrigin + mDirection*mLength;
+    // Ogre::Vector3 end = mOrigin + mDirection*mLength;
     Ogre::Vector3 current, last = mOrigin;
 
     // Create ray segments
     for(Ogre::uint32 k = 1; k < mDivisions+1; k++)
     {
-      Ogre::Vector3 current = mOrigin + mDirection*mLength*(static_cast<Ogre::Real>(k)/mDivisions);
+      Ogre::Vector3 curr = mOrigin +
+        mDirection*mLength*(static_cast<Ogre::Real>(k)/mDivisions);
 
-      current += (mLength/(mDivisions*3))*Ogre::Vector3(
-          Ogre::Math::RangeRandom(-1, 1), Ogre::Math::RangeRandom(-1, 1), Ogre::Math::RangeRandom(-1, 1));
+      curr += (mLength/(mDivisions*3))*Ogre::Vector3(
+          Ogre::Math::RangeRandom(-1, 1), Ogre::Math::RangeRandom(-1, 1),
+          Ogre::Math::RangeRandom(-1, 1));
 
-      mSegments.push_back(Segment(last, current));
+      mSegments.push_back(Segment(last, curr));
 
-      mRealLength += (current-last).length();
+      mRealLength += (curr - last).length();
 
-      last = current;
+      last = curr;
     }
 
     // Create the associated billboard set

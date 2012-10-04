@@ -27,298 +27,298 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX { namespace VClouds
 {
-	VClouds::VClouds(Ogre::SceneManager *sm)
-		: mSceneManager(sm)
-		, mCamera(0)
-		, mCreated(false)
-		, mGeometrySettings(GeometrySettings())
-		, mDistanceFallingParams(Ogre::Vector2(1,-1))
-		, mRenderQueueGroups(RenderQueueGroups(Ogre::RENDER_QUEUE_MAIN, Ogre::RENDER_QUEUE_9))
-		, mWindDirection(Ogre::Degree(0))
-		, mWindSpeed(80.0f)
-		, mWheater(Ogre::Vector2(0.5f, 1.0f))
-		, mDelayedResponse(false)
-		, mSunDirection(Ogre::Vector3(0,-1,0))
-		, mSunColor(Ogre::Vector3(1,1,1))
-		, mAmbientColor(Ogre::Vector3(0.63f,0.63f,0.7f))
-		, mLightResponse(Ogre::Vector4(0.25f,0.2f,1.0f,0.1f))
-		, mAmbientFactors(Ogre::Vector4(0.45f,0.3f,0.6f,1))
-		, mGlobalOpacity(1.0f)
-		, mCloudFieldScale(1.0f)
-		, mNoiseScale(4.2f)
-		, mVisible(true)
-		, mDataManager(new DataManager(this))
-		, mGeometryManager(new GeometryManager(this))
-		, mLightningManager(new LightningManager(this))
-		, mCamerasData(std::vector<CameraData>())
-		, mVolCloudsMaterial(Ogre::MeshPtr())
-		, mVolCloudsLightningMaterial(Ogre::MeshPtr())
-	{
-	}
+  VClouds::VClouds(Ogre::SceneManager *sm)
+    : mSceneManager(sm)
+    , mCamera(0)
+    , mCreated(false)
+    , mGeometrySettings(GeometrySettings())
+    , mDistanceFallingParams(Ogre::Vector2(1,-1))
+    , mRenderQueueGroups(RenderQueueGroups(Ogre::RENDER_QUEUE_MAIN, Ogre::RENDER_QUEUE_9))
+    , mWindDirection(Ogre::Degree(0))
+    , mWindSpeed(80.0f)
+    , mWheater(Ogre::Vector2(0.5f, 1.0f))
+    , mDelayedResponse(false)
+    , mSunDirection(Ogre::Vector3(0,-1,0))
+    , mSunColor(Ogre::Vector3(1,1,1))
+    , mAmbientColor(Ogre::Vector3(0.63f,0.63f,0.7f))
+    , mLightResponse(Ogre::Vector4(0.25f,0.2f,1.0f,0.1f))
+    , mAmbientFactors(Ogre::Vector4(0.45f,0.3f,0.6f,1))
+    , mGlobalOpacity(1.0f)
+    , mCloudFieldScale(1.0f)
+    , mNoiseScale(4.2f)
+    , mVisible(true)
+    , mDataManager(new DataManager(this))
+    , mGeometryManager(new GeometryManager(this))
+    , mLightningManager(new LightningManager(this))
+    , mCamerasData(std::vector<CameraData>())
+    , mVolCloudsMaterial(Ogre::MeshPtr())
+    , mVolCloudsLightningMaterial(Ogre::MeshPtr())
+  {
+  }
 
-	VClouds::~VClouds()
-	{
-		remove();
-	}
+  VClouds::~VClouds()
+  {
+    remove();
+  }
 
-	void VClouds::create()
-	{
-		remove();
+  void VClouds::create()
+  {
+    remove();
 
-		mVolCloudsMaterial = static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName("SkyX_VolClouds"));
-		mVolCloudsLightningMaterial = static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName("SkyX_VolClouds_Lightning"));
+    mVolCloudsMaterial = static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName("SkyX_VolClouds"));
+    mVolCloudsLightningMaterial = static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName("SkyX_VolClouds_Lightning"));
 
-		if (mVolCloudsMaterial.isNull() || mVolCloudsLightningMaterial.isNull())
-		{
-			SkyXLOG("Error while creating SkyX::VClouds::VClouds, materials are not found");
-			return;
-		}
+    if (mVolCloudsMaterial.isNull() || mVolCloudsLightningMaterial.isNull())
+    {
+    	SkyXLOG("Error while creating SkyX::VClouds::VClouds, materials are not found");
+    	return;
+    }
 
-		// Data manager
-		mDataManager->create(128,128,20);
+    // Data manager
+    mDataManager->create(128,128,20);
 
-		// Geometry manager
-		mGeometryManager->create(mGeometrySettings.Height, mGeometrySettings.Radius, mGeometrySettings.Alpha, 
-			mGeometrySettings.Beta, mGeometrySettings.NumberOfBlocks, mGeometrySettings.Na, mGeometrySettings.Nb, mGeometrySettings.Nc);
+    // Geometry manager
+    mGeometryManager->create(mGeometrySettings.Height, mGeometrySettings.Radius, mGeometrySettings.Alpha,
+    	mGeometrySettings.Beta, mGeometrySettings.NumberOfBlocks, mGeometrySettings.Na, mGeometrySettings.Nb, mGeometrySettings.Nc);
 
-		mGeometryManager->getSceneNode()->setVisible(mVisible);
+    mGeometryManager->getSceneNode()->setVisible(mVisible);
 
-		mVolCloudsMaterial
-			->getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
-		mVolCloudsLightningMaterial->
-			getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
+    mVolCloudsMaterial
+    	->getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
+    mVolCloudsLightningMaterial->
+    	getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
 
-		// Lightning manager
-		mLightningManager->create();
+    // Lightning manager
+    mLightningManager->create();
 
-		mCreated = true;
+    mCreated = true;
 
-		// Update material parameters
-		setSunColor(mSunColor);
-		setAmbientColor(mAmbientColor);
-		setLightResponse(mLightResponse);
-		setAmbientFactors(mAmbientFactors);
+    // Update material parameters
+    setSunColor(mSunColor);
+    setAmbientColor(mAmbientColor);
+    setLightResponse(mLightResponse);
+    setAmbientFactors(mAmbientFactors);
 
-		// Set current wheater
-		setWheater(mWheater.x, mWheater.y, mDelayedResponse);
-	}
+    // Set current wheater
+    setWheater(mWheater.x, mWheater.y, mDelayedResponse);
+  }
 
-	void VClouds::create(const GeometrySettings& gs)
-	{
-		// Update geometry settings
-		mGeometrySettings = gs;
+  void VClouds::create(const GeometrySettings& gs)
+  {
+    // Update geometry settings
+    mGeometrySettings = gs;
 
-		create();
-	}
+    create();
+  }
 
-	void VClouds::create(const Ogre::Vector2& Height, const float& Radius)
-	{
-		// Update geometry params
-		mGeometrySettings.Height = Height;
-		mGeometrySettings.Radius = Radius;
+  void VClouds::create(const Ogre::Vector2& Height, const float& Radius)
+  {
+    // Update geometry params
+    mGeometrySettings.Height = Height;
+    mGeometrySettings.Radius = Radius;
 
-		create();
-	}
+    create();
+  }
 
-	void VClouds::remove()
-	{
-		if (!mCreated)
-		{
-			return;
-		}
+  void VClouds::remove()
+  {
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mDataManager->remove();
-		mGeometryManager->remove();
-		mLightningManager->remove();
+    mDataManager->remove();
+    mGeometryManager->remove();
+    mLightningManager->remove();
 
-		mCamera = 0;
-		mCamerasData.clear();
+    mCamera = 0;
+    mCamerasData.clear();
 
-		mVolCloudsMaterial.setNull();
-		mVolCloudsLightningMaterial.setNull();
+    mVolCloudsMaterial.setNull();
+    mVolCloudsLightningMaterial.setNull();
 
-		mCreated = false;
-	}
+    mCreated = false;
+  }
 
-	void VClouds::update(const Ogre::Real& timeSinceLastFrame)
-	{
-		if (!mCreated)
-		{
-			return;
-		}
+  void VClouds::update(const Ogre::Real& timeSinceLastFrame)
+  {
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mDataManager->update(timeSinceLastFrame);
-		mGeometryManager->update(timeSinceLastFrame);
-		mLightningManager->update(timeSinceLastFrame);
+    mDataManager->update(timeSinceLastFrame);
+    mGeometryManager->update(timeSinceLastFrame);
+    mLightningManager->update(timeSinceLastFrame);
 
-		if (mLightningManager->isEnabled())
-		{
-			mVolCloudsLightningMaterial->
-				getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
-			mVolCloudsLightningMaterial->
-				getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
-		}
-		else
-		{
-			mVolCloudsMaterial->
-				getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
-			mVolCloudsMaterial->
-				getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
-		}
-	}
+    if (mLightningManager->isEnabled())
+    {
+    	mVolCloudsLightningMaterial->
+    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
+    	mVolCloudsLightningMaterial->
+    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
+    }
+    else
+    {
+    	mVolCloudsMaterial->
+    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
+    	mVolCloudsMaterial->
+    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
+    }
+  }
 
-	void VClouds::notifyCameraRender(Ogre::Camera* c, const Ogre::Real& timeSinceLastCameraFrame)
-	{
-		if (!mCreated)
-		{
-			return;
-		}
+  void VClouds::notifyCameraRender(Ogre::Camera* c, const Ogre::Real& timeSinceLastCameraFrame)
+  {
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mCamera = c;
+    mCamera = c;
 
-		// Check if the camera is registered
-		bool isRegistered = false;
-		for (Ogre::uint32 k = 0; k < mCamerasData.size(); k++)
-		{
-			if (mCamerasData.at(k).camera == c)
-			{
-				isRegistered = true;
-				break;
-			}
-		}
+    // Check if the camera is registered
+    bool isRegistered = false;
+    for (Ogre::uint32 k = 0; k < mCamerasData.size(); k++)
+    {
+    	if (mCamerasData.at(k).camera == c)
+    	{
+    		isRegistered = true;
+    		break;
+    	}
+    }
 
-		if (!isRegistered)
-		{
-			mCamerasData.push_back(CameraData(c));
-			SkyXLOG("VClouds warning: unregistered camera registered, manual unregistering is needed before camera destruction");
-		}
+    if (!isRegistered)
+    {
+    	mCamerasData.push_back(CameraData(c));
+    	SkyXLOG("VClouds warning: unregistered camera registered, manual unregistering is needed before camera destruction");
+    }
 
-		mGeometryManager->updateGeometry(c, timeSinceLastCameraFrame);
-		mLightningManager->updateMaterial();
-	}
+    mGeometryManager->updateGeometry(c, timeSinceLastCameraFrame);
+    mLightningManager->updateMaterial();
+  }
 
-	void VClouds::registerCamera(Ogre::Camera* c)
-	{
-		for (Ogre::uint32 k = 0; k < mCamerasData.size(); k++)
-		{
-			if (mCamerasData.at(k).camera == c)
-			{
-				return;
-			}
-		}
+  void VClouds::registerCamera(Ogre::Camera* c)
+  {
+    for (Ogre::uint32 k = 0; k < mCamerasData.size(); k++)
+    {
+    	if (mCamerasData.at(k).camera == c)
+    	{
+    		return;
+    	}
+    }
 
-		mCamerasData.push_back(CameraData(c));
-	}
+    mCamerasData.push_back(CameraData(c));
+  }
 
-	void VClouds::unregisterCamera(Ogre::Camera* c)
-	{
-		for (std::vector<CameraData>::iterator it = mCamerasData.begin(); it != mCamerasData.end(); it++)
-		{
-			if ((*it).camera == c)
-			{
-				mCamerasData.erase(it);
-				return;
-			}
-		}
-	}
+  void VClouds::unregisterCamera(Ogre::Camera* c)
+  {
+    for (std::vector<CameraData>::iterator it = mCamerasData.begin(); it != mCamerasData.end(); it++)
+    {
+    	if ((*it).camera == c)
+    	{
+    		mCamerasData.erase(it);
+    		return;
+    	}
+    }
+  }
 
-	void VClouds::setVisible(const bool& visible)
-	{
-		mVisible = visible;
+  void VClouds::setVisible(const bool& visible)
+  {
+    mVisible = visible;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mGeometryManager->getSceneNode()->setVisible(mVisible);
-		mLightningManager->_setVisible(mVisible);
-	}
+    mGeometryManager->getSceneNode()->setVisible(mVisible);
+    mLightningManager->_setVisible(mVisible);
+  }
 
-	void VClouds::setRenderQueueGroups(const RenderQueueGroups& rqg)
-	{
-		mRenderQueueGroups = rqg;
+  void VClouds::setRenderQueueGroups(const RenderQueueGroups& rqg)
+  {
+    mRenderQueueGroups = rqg;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mGeometryManager->_updateRenderQueueGroup(rqg.vclouds);
-		mLightningManager->_updateRenderQueueGroup(rqg.vcloudsLightnings);
-	}
+    mGeometryManager->_updateRenderQueueGroup(rqg.vclouds);
+    mLightningManager->_updateRenderQueueGroup(rqg.vcloudsLightnings);
+  }
 
-	void VClouds::setSunColor(const Ogre::Vector3& SunColor)
-	{
-		mSunColor = SunColor;
+  void VClouds::setSunColor(const Ogre::Vector3& SunColor)
+  {
+    mSunColor = SunColor;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uSunColor", mSunColor);
-		mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uSunColor", mSunColor);
-	}
+    mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uSunColor", mSunColor);
+    mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uSunColor", mSunColor);
+  }
 
-	void VClouds::setAmbientColor(const Ogre::Vector3& AmbientColor)
-	{
-		mAmbientColor = AmbientColor;
+  void VClouds::setAmbientColor(const Ogre::Vector3& AmbientColor)
+  {
+    mAmbientColor = AmbientColor;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uAmbientColor", mAmbientColor);
-		mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uAmbientColor", mAmbientColor);
-	}
+    mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uAmbientColor", mAmbientColor);
+    mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uAmbientColor", mAmbientColor);
+  }
 
-	void VClouds::setLightResponse(const Ogre::Vector4& LightResponse)
-	{
-		mLightResponse = LightResponse;
+  void VClouds::setLightResponse(const Ogre::Vector4& LightResponse)
+  {
+    mLightResponse = LightResponse;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uLightResponse", mLightResponse);
-		mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uLightResponse", mLightResponse);
-	}
+    mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uLightResponse", mLightResponse);
+    mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uLightResponse", mLightResponse);
+  }
 
-	void VClouds::setAmbientFactors(const Ogre::Vector4& AmbientFactors)
-	{
-		mAmbientFactors = AmbientFactors;
+  void VClouds::setAmbientFactors(const Ogre::Vector4& AmbientFactors)
+  {
+    mAmbientFactors = AmbientFactors;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uAmbientFactors", mAmbientFactors);
-		mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-			->setNamedConstant("uAmbientFactors", mAmbientFactors);
-	}
+    mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uAmbientFactors", mAmbientFactors);
+    mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
+    	->setNamedConstant("uAmbientFactors", mAmbientFactors);
+  }
 
-	void VClouds::setWheater(const float& Humidity, const float& AverageCloudsSize, const bool& DelayedResponse)
-	{
-		mWheater = Ogre::Vector2(Humidity, AverageCloudsSize);
-		mDelayedResponse = DelayedResponse;
+  void VClouds::setWheater(const float& Humidity, const float& AverageCloudsSize, const bool& DelayedResponse)
+  {
+    mWheater = Ogre::Vector2(Humidity, AverageCloudsSize);
+    mDelayedResponse = DelayedResponse;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    if (!mCreated)
+    {
+    	return;
+    }
 
-		mDataManager->setWheater(mWheater.x, mWheater.y, mDelayedResponse);
-	}
+    mDataManager->setWheater(mWheater.x, mWheater.y, mDelayedResponse);
+  }
 
 }}

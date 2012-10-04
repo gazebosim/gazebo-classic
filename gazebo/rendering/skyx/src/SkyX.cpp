@@ -137,7 +137,7 @@ namespace SkyX
       return;
     }
 
-    if (mTimeMultiplier != 0)
+    if (!equal(mTimeMultiplier, 0.0f))
     {
       float timemultiplied = timeSinceLastFrame * mTimeMultiplier;
 
@@ -147,7 +147,8 @@ namespace SkyX
 
       if (mStarfield)
       {
-        mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
+        mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+            "uTime", mTimeOffset*0.5f, false);
       }
     }
 
@@ -182,7 +183,7 @@ namespace SkyX
       mLastCameraPosition = mCamera->getDerivedPosition();
     }
 
-    if (mLastCameraFarClipDistance != c->getFarClipDistance())
+    if (!equal(mLastCameraFarClipDistance, c->getFarClipDistance()))
     {
       mMeshManager->updateGeometry(c);
 

@@ -39,70 +39,70 @@ namespace SkyX { namespace VClouds{
      */
     struct RenderQueueGroups
     {
-    	/** Constructor
-    		@param vc VClouds render queue group
-    		@param vcl VClouds lightnings render queue group
-    	 */
-    	inline RenderQueueGroups(const Ogre::uint8& vc, const Ogre::uint8& vcl)
-    		: vclouds(vc), vcloudsLightnings(vcl)
-    	{
-    	}
+      /** Constructor
+        @param vc VClouds render queue group
+        @param vcl VClouds lightnings render queue group
+       */
+      inline RenderQueueGroups(const Ogre::uint8& vc, const Ogre::uint8& vcl)
+        : vclouds(vc), vcloudsLightnings(vcl)
+      {
+      }
 
-    	/// VClouds render queue group
-    	Ogre::uint8 vclouds;
-    	/// VClouds lightnings render queue group
-    	Ogre::uint8 vcloudsLightnings;
+      /// VClouds render queue group
+      Ogre::uint8 vclouds;
+      /// VClouds lightnings render queue group
+      Ogre::uint8 vcloudsLightnings;
     };
 
     /** Geometry settings
      */
     struct GeometrySettings
     {
-    	/// Height: x = Altitude over the camera, y: Field height (both in world coordinates)
-    	Ogre::Vector2 Height;
-    	/// Angles
-    	Ogre::Radian Alpha, Beta;
-    	/// Radius
-    	float Radius;
-    	/// Number of blocks
-    	int NumberOfBlocks;
-    	/// Number of slices per geometry zone
-    	int Na, Nb, Nc;
+      /// Height: x = Altitude over the camera, y: Field height (both in world coordinates)
+      Ogre::Vector2 Height;
+      /// Angles
+      Ogre::Radian Alpha, Beta;
+      /// Radius
+      float Radius;
+      /// Number of blocks
+      int NumberOfBlocks;
+      /// Number of slices per geometry zone
+      int Na, Nb, Nc;
 
-    	/** Default constructor
-    	 */
-    	GeometrySettings()
-    		: Height(Ogre::Vector2(10,50))
-    		, Alpha(Ogre::Degree(12)), Beta(Ogre::Degree(40))
-    		, Radius(100)
-    		, NumberOfBlocks(12)
-    		, Na(10), Nb(8), Nc(6)
-    	{
-    	}
+      /** Default constructor
+       */
+      GeometrySettings()
+        : Height(Ogre::Vector2(10,50))
+        , Alpha(Ogre::Degree(12)), Beta(Ogre::Degree(40))
+        , Radius(100)
+        , NumberOfBlocks(12)
+        , Na(10), Nb(8), Nc(6)
+      {
+      }
 
-    	/** Constructor
-    	    @param _Height x = Cloud field y-coord start,
+      /** Constructor
+          @param _Height x = Cloud field y-coord start,
                          y: Field height (both in world coordinates)
-    		@param _Radius Radius
-    		@param _Alpha Alpha angle
-    		@param _Beta Beta angle
-    		@param _NumberOfBlocks Number of geometry blocks
-    		@param _Na Number of slices in A zone
-    		@param _Nb Number of slices in B zone
-    		@param _Nc Number of slices in C zone
-    	 */
-    	GeometrySettings(const Ogre::Vector2& _Height, const float& _Radius,
-    			const Ogre::Radian& _Alpha = Ogre::Degree(12),
+        @param _Radius Radius
+        @param _Alpha Alpha angle
+        @param _Beta Beta angle
+        @param _NumberOfBlocks Number of geometry blocks
+        @param _Na Number of slices in A zone
+        @param _Nb Number of slices in B zone
+        @param _Nc Number of slices in C zone
+       */
+      GeometrySettings(const Ogre::Vector2& _Height, const float& _Radius,
+          const Ogre::Radian& _Alpha = Ogre::Degree(12),
           const Ogre::Radian& _Beta = Ogre::Degree(40),
-    			const int& _NumberOfBlocks = 12, const int& _Na = 10,
+          const int& _NumberOfBlocks = 12, const int& _Na = 10,
           const int& _Nb = 8, const int& _Nc = 6)
-    		: Height(_Height)
-    		, Alpha(_Alpha), Beta(_Beta)
-    		, Radius(_Radius)
-    		, NumberOfBlocks(_NumberOfBlocks)
-    		, Na(_Na), Nb(_Nb), Nc(_Nc)
-    	{
-    	}
+        : Height(_Height)
+        , Alpha(_Alpha), Beta(_Beta)
+        , Radius(_Radius)
+        , NumberOfBlocks(_NumberOfBlocks)
+        , Na(_Na), Nb(_Nb), Nc(_Nc)
+      {
+      }
     };
 
     /** Camera data struct
@@ -110,39 +110,39 @@ namespace SkyX { namespace VClouds{
     struct CameraData
     {
     public:
-    	/** Default constructor
-    	 */
-    	inline CameraData()
-    		: camera(0)
-    		, lastPosition(Ogre::Vector3(0,0,0))
-    		, cameraOffset(Ogre::Vector2(0,0))
-    		, geometryDisplacement(Ogre::Vector3(0,0,0))
-    	{
-    	}
+      /** Default constructor
+       */
+      inline CameraData()
+        : camera(0)
+        , lastPosition(Ogre::Vector3(0,0,0))
+        , cameraOffset(Ogre::Vector2(0,0))
+        , geometryDisplacement(Ogre::Vector3(0,0,0))
+      {
+      }
 
-    	/** Constructor
-    	    @param c Camera
-    	 */
-    	inline CameraData(Ogre::Camera* c)
-    		: camera(c)
-    		, lastPosition(c->getDerivedPosition())
-    		, cameraOffset(Ogre::Vector2(0,0))
-    		, geometryDisplacement(Ogre::Vector3(0,0,0))
-    	{
-    	}
+      /** Constructor
+          @param c Camera
+       */
+      inline CameraData(Ogre::Camera* c)
+        : camera(c)
+        , lastPosition(c->getDerivedPosition())
+        , cameraOffset(Ogre::Vector2(0,0))
+        , geometryDisplacement(Ogre::Vector3(0,0,0))
+      {
+      }
 
-    	/// Camera
-    	Ogre::Camera* camera;
-    	/// Last camera position
-    	Ogre::Vector3 lastPosition;
-    	/// Camera offset
-    	Ogre::Vector2 cameraOffset;
-    	/// Geometry displacement
-    	Ogre::Vector3 geometryDisplacement;
+      /// Camera
+      Ogre::Camera* camera;
+      /// Last camera position
+      Ogre::Vector3 lastPosition;
+      /// Camera offset
+      Ogre::Vector2 cameraOffset;
+      /// Geometry displacement
+      Ogre::Vector3 geometryDisplacement;
     };
 
     /** Simple constructor
-    	@param sm Scene manager
+      @param sm Scene manager
      */
     VClouds(Ogre::SceneManager *sm);
 
@@ -155,13 +155,13 @@ namespace SkyX { namespace VClouds{
     void create();
 
     /** Create
-    	@param gs Geometry settings
+      @param gs Geometry settings
      */
     void create(const GeometrySettings& gs);
 
     /** Create
-    	@param Height x = Cloud field y-coord start, y: Field height (both in world coordinates)
-    	@param Radius Radius
+      @param Height x = Cloud field y-coord start, y: Field height (both in world coordinates)
+      @param Radius Radius
      */
     void create(const Ogre::Vector2& Height, const float& Radius);
 
@@ -175,22 +175,22 @@ namespace SkyX { namespace VClouds{
         void update(const Ogre::Real& timeSinceLastFrame);
 
     /** Notify camera render, to be invoked per-camera and per-frame
-    	@param c Rendering camera
+      @param c Rendering camera
         @param timeSinceLastCameraFrame Time since last CAMERA frame
          */
         void notifyCameraRender(Ogre::Camera* c, const Ogre::Real& timeSinceLastCameraFrame);
 
     /** Register camera
         @param c Camera
-    	@remarks If a rendering camera is used(in notifyCameraRender(...)) without having registered it before,
-    	         all will work as expected but a warning will be logged since the user should manually unregister
-    			 the camera one time it'll be remove
+      @remarks If a rendering camera is used(in notifyCameraRender(...)) without having registered it before,
+               all will work as expected but a warning will be logged since the user should manually unregister
+           the camera one time it'll be remove
      */
     void registerCamera(Ogre::Camera* c);
 
     /** Unregister camera
         @param c Camera
-    	@remarks After having used a camera (i.e. before removing the camera), the user should manually unregister it
+      @remarks After having used a camera (i.e. before removing the camera), the user should manually unregister it
      */
     void unregisterCamera(Ogre::Camera* c);
 
@@ -199,16 +199,16 @@ namespace SkyX { namespace VClouds{
      */
     inline const bool& isCreated() const
     {
-    	return mCreated;
+      return mCreated;
     }
 
     /** Set geometry settings
         @param GeometrySettings Geometry settings
-    	@remarks Set geometry settings before call create(...)
+      @remarks Set geometry settings before call create(...)
      */
     inline void setGeometrySettings(const GeometrySettings& gs)
     {
-    	mGeometrySettings = gs;
+      mGeometrySettings = gs;
     }
 
     /** Get geometry settings
@@ -216,37 +216,42 @@ namespace SkyX { namespace VClouds{
      */
     inline const GeometrySettings& getGeometrySettings() const
     {
-    	return mGeometrySettings;
+      return mGeometrySettings;
     }
 
     /** Set distance falling params
         @param DistanceFallingParams
-    		   DistanceFallingParams.x = Distance falling factor (How much the cloud field geometry falls with the distance)
-    							         Remember that the geometry falling is relative to the distance(height) between the camera
-    									 and the cloud field. Typical range is [0, ~2] 0 = no falling
-    		   DistanceFallingParams.y = Max falling (in world coords), useful when , i.e., you've water and you want to go in.
-    							  	     That param will allow you to avoid the cloud field geometry falls into the ocean.
-    									 -1 means not max falling. (default)
-    	@remarks See GoemetryBlock::_setVertexData(...) for more info
+        DistanceFallingParams.x = Distance falling factor (How much the cloud field geometry falls with the distance)
+        Remember that the geometry falling is relative to the distance(height) between the camera
+        and the cloud field. Typical range is [0, ~2] 0 = no falling
+        DistanceFallingParams.y = Max falling (in world coords), useful when , i.e., you've water and you want to go in.
+        That param will allow you to avoid the cloud field geometry falls into the ocean.
+        -1 means not max falling. (default)
+      @remarks See GoemetryBlock::_setVertexData(...) for more info
     */
-    inline void setDistanceFallingParams(const Ogre::Vector2& DistanceFallingParams)
+    inline void setDistanceFallingParams(
+        const Ogre::Vector2& DistanceFallingParams)
     {
-    	mDistanceFallingParams = DistanceFallingParams;
+      mDistanceFallingParams = DistanceFallingParams;
     }
 
     /** Get distance falling params
-        @return DistanceFallingParams.x = Distance falling factor (How much the cloud field geometry falls with the distance)
-    							          Remember that the geometry falling is relative to the distance(height) between the camera
-    									  and the cloud field.
-    									  Typical range is [0, ~2] 0 = no falling
-    		    DistanceFallingParams.y = Max falling (in world coords), useful when , i.e., you've water and you want to go in.
-    							  	      That param will allow you to avoid the cloud field geometry falls into the ocean.
-    									  -1 means not max falling. (default)
-    	@remarks See GoemetryBlock::_setVertexData(...) for more info
+      @return DistanceFallingParams.x = Distance falling factor
+      (How much the cloud field geometry falls with the distance)
+      Remember that the geometry falling is relative to the distance(height)
+      between the camera
+      and the cloud field.
+      Typical range is [0, ~2] 0 = no falling
+      DistanceFallingParams.y = Max falling (in world coords),
+      useful when , i.e., you've water and you want to go in.
+      That param will allow you to avoid the cloud field geometry falls
+      into the ocean.
+      -1 means not max falling. (default)
+      @remarks See GoemetryBlock::_setVertexData(...) for more info
      */
     inline const Ogre::Vector2& getDistanceFallingParams() const
     {
-    	return mDistanceFallingParams;
+      return mDistanceFallingParams;
     }
 
     /** Set render queue groups
@@ -259,7 +264,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const RenderQueueGroups& getRenderQueueGroups() const
     {
-    	return mRenderQueueGroups;
+      return mRenderQueueGroups;
     }
 
     /** Set wind direction
@@ -267,7 +272,7 @@ namespace SkyX { namespace VClouds{
      */
     inline void setWindDirection(const Ogre::Radian& WindDirection)
     {
-    	mWindDirection = WindDirection;
+      mWindDirection = WindDirection;
     }
 
     /** Get wind direction
@@ -275,7 +280,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Radian& getWindDirection() const
     {
-    	return mWindDirection;
+      return mWindDirection;
     }
 
     /** Get wind direction as a Vector2
@@ -283,7 +288,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector2 getWindDirectionV2() const
     {
-    	return Ogre::Vector2(Ogre::Math::Cos(mWindDirection), Ogre::Math::Sin(mWindDirection));
+      return Ogre::Vector2(Ogre::Math::Cos(mWindDirection), Ogre::Math::Sin(mWindDirection));
     }
 
     /** Set wind speed
@@ -291,7 +296,7 @@ namespace SkyX { namespace VClouds{
      */
     inline void setWindSpeed(const float& WindSpeed)
     {
-    	mWindSpeed = WindSpeed;
+      mWindSpeed = WindSpeed;
     }
 
     /** Get wind speed
@@ -299,7 +304,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const float& getWindSpeed() const
     {
-    	return mWindSpeed;
+      return mWindSpeed;
     }
 
     /** Set sun direction
@@ -307,7 +312,7 @@ namespace SkyX { namespace VClouds{
      */
     inline void setSunDirection(const Ogre::Vector3& SunDirection)
     {
-    	mSunDirection = SunDirection;
+      mSunDirection = SunDirection;
     }
 
     /** Get sun direction
@@ -315,7 +320,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector3& getSunDirection() const
     {
-    	return mSunDirection;
+      return mSunDirection;
     }
 
     /** Set sun color
@@ -328,7 +333,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector3& getSunColor() const
     {
-    	return mSunColor;
+      return mSunColor;
     }
 
     /** Set ambient color
@@ -341,15 +346,15 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector3& getAmbientColor() const
     {
-    	return mAmbientColor;
+      return mAmbientColor;
     }
 
     /** Set light response
         @param LightResponse
-    		   x - Sun light power
-    		   y - Sun beta multiplier
-    		   z - Ambient color multiplier
-    		   w - Distance attenuation
+           x - Sun light power
+           y - Sun beta multiplier
+           z - Ambient color multiplier
+           w - Distance attenuation
        */
     void setLightResponse(const Ogre::Vector4& LightResponse);
 
@@ -358,7 +363,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector4& getLightResponse() const
     {
-    	return mLightResponse;
+      return mLightResponse;
     }
 
     /** Set ambient factors
@@ -371,7 +376,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector4& getAmbientFactors() const
     {
-    	return mAmbientFactors;
+      return mAmbientFactors;
     }
 
     /** Set global opacity
@@ -379,7 +384,7 @@ namespace SkyX { namespace VClouds{
      */
     inline void setGlobalOpacity(const Ogre::Real& GlobalOpacity)
     {
-    	mGlobalOpacity = GlobalOpacity;
+      mGlobalOpacity = GlobalOpacity;
     }
 
     /** Get global opacity
@@ -387,7 +392,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Real& getGlobalOpacity() const
     {
-    	return mGlobalOpacity;
+      return mGlobalOpacity;
     }
 
     /** Set cloud field scale
@@ -395,7 +400,7 @@ namespace SkyX { namespace VClouds{
      */
     inline void setCloudFieldScale(const Ogre::Real& CloudFieldScale)
     {
-    	mCloudFieldScale = CloudFieldScale;
+      mCloudFieldScale = CloudFieldScale;
     }
 
     /** Get cloud field scale
@@ -403,7 +408,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Real& getCloudFieldScale() const
     {
-    	return mCloudFieldScale;
+      return mCloudFieldScale;
     }
 
     /** Set noise scale
@@ -411,7 +416,7 @@ namespace SkyX { namespace VClouds{
      */
     inline void setNoiseScale(const Ogre::Real& NoiseScale)
     {
-    	mNoiseScale = NoiseScale;
+      mNoiseScale = NoiseScale;
     }
 
     /** Get noise scale
@@ -419,15 +424,15 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Real& getNoiseScale() const
     {
-    	return mNoiseScale;
+      return mNoiseScale;
     }
 
     /** Set wheater parameters
         Use this funtion to update the cloud field parameters, you'll get a smart and smooth transition from your old
-    	setting to your new ones.
-    	@param Humidity Humidity, in other words: the percentage of clouds in [0,1] range.
-    	@param AverageCloudsSize Average clouds size, for example: if previous wheater clouds size parameter was very different from new one(i.e: more little)
-    	       only the old biggest clouds are going to be keept and the little ones are going to be replaced
+      setting to your new ones.
+      @param Humidity Humidity, in other words: the percentage of clouds in [0,1] range.
+      @param AverageCloudsSize Average clouds size, for example: if previous wheater clouds size parameter was very different from new one(i.e: more little)
+             only the old biggest clouds are going to be keept and the little ones are going to be replaced
         @param DelayedResponse false to change wheather conditions over several updates, true to change it at the moment
      */
     void setWheater(const float& Humidity, const float& AverageCloudsSize, const bool& DelayedResponse);
@@ -437,7 +442,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector2& getWheater() const
     {
-    	return mWheater;
+      return mWheater;
     }
 
     /** Set visible
@@ -450,7 +455,7 @@ namespace SkyX { namespace VClouds{
      */
     inline const bool& isVisible() const
     {
-    	return mVisible;
+      return mVisible;
     }
 
     /** Get scene manager
@@ -458,7 +463,7 @@ namespace SkyX { namespace VClouds{
      */
     inline Ogre::SceneManager* getSceneManager()
     {
-    	return mSceneManager;
+      return mSceneManager;
     }
 
     /** Get current rendering camera
@@ -474,7 +479,7 @@ namespace SkyX { namespace VClouds{
      */
     inline DataManager* getDataManager()
     {
-    	return mDataManager;
+      return mDataManager;
     }
 
     /** Get geometry manager
@@ -482,7 +487,7 @@ namespace SkyX { namespace VClouds{
      */
     inline GeometryManager* getGeometryManager()
     {
-    	return mGeometryManager;
+      return mGeometryManager;
     }
 
     /** Get lightning manager
@@ -490,19 +495,25 @@ namespace SkyX { namespace VClouds{
      */
     inline LightningManager* getLightningManager()
     {
-    	return mLightningManager;
+      return mLightningManager;
     }
 
     /** Get cameras data
         @return Cameras data
-    	@remarks Only for internal use
+      @remarks Only for internal use
      */
     inline std::vector<CameraData>& _getCamerasData()
     {
-    	return mCamerasData;
+      return mCamerasData;
     }
 
   private:
+    /// Ogre::SceneManager pointer
+    Ogre::SceneManager *mSceneManager;
+
+    /// Current rendering camera
+    Ogre::Camera* mCamera;
+
     /// Has been create(...) already called?
     bool mCreated;
 
@@ -535,7 +546,7 @@ namespace SkyX { namespace VClouds{
 
     /** Light response:
         x - Sun light power
-    	y - Sun beta multiplier
+      y - Sun beta multiplier
         z - Ambient color multiplier
         w - Distance attenuation
        */
@@ -563,20 +574,16 @@ namespace SkyX { namespace VClouds{
     /// Lightning manager
     LightningManager *mLightningManager;
 
-    /// Ogre::SceneManager pointer
-        Ogre::SceneManager *mSceneManager;
-    /// Current rendering camera
-    Ogre::Camera* mCamera;
+    /// Cameras data
+    std::vector<CameraData> mCamerasData;
 
     /// Vol. clouds material
     Ogre::MaterialPtr mVolCloudsMaterial;
+
     /// Vol. clouds + lightning material
     Ogre::MaterialPtr mVolCloudsLightningMaterial;
 
-    /// Cameras data
-    std::vector<CameraData> mCamerasData;
   };
-
 }}
 
 #endif

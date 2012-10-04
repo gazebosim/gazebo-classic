@@ -325,7 +325,7 @@ namespace SkyX { namespace VClouds
       }
     }
 
-    if (fallingDistance != mLastFallingDistance)
+    if (!equal(fallingDistance, mLastFallingDistance))
     {
       mLastFallingDistance = fallingDistance;
       mMesh->_setBounds(_buildAABox(mLastFallingDistance));

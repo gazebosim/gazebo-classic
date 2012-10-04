@@ -167,22 +167,25 @@ namespace SkyX { namespace VClouds{
       Ogre::uint32 mDivisions;
       /// Recursivity level
       Ogre::uint32 mRecursivity;
+      /// Current elapsed time
+      Ogre::Real mTime;
+      /// Global time multiplier
+      Ogre::Real mTimeMultiplier;
+
+      /// Lightning intensity
+      Ogre::Real mIntensity;
+
       /// Width multiplier
       Ogre::Real mWidthMultiplier;
+
       /// Ray bounds (for internal visual calculations)
       Ogre::Vector2 mBounds;
       /// Angle range (Little values -> Less derivations, bigger values -> More derivations)
       Ogre::Vector2 mAngleRange;
 
-      /// Current elapsed time
-      Ogre::Real mTime;
-      /// Global time multiplier
-      Ogre::Real mTimeMultiplier;
+
       /// Per step time multipliers
       Ogre::Vector3 mTimeMultipliers;
-
-      /// Lightning intensity
-      Ogre::Real mIntensity;
 
       /// Segments
       std::vector<Segment> mSegments;

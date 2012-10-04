@@ -214,6 +214,9 @@ namespace SkyX { namespace VClouds{
       /// Angles
       Ogre::Radian mAlpha, mBeta;
 
+      /// Radius
+      float mRadius;
+
       /// Acimutal angle
       Ogre::Radian mPhi;
       /// Number of slices per geometry zone
@@ -242,8 +245,6 @@ namespace SkyX { namespace VClouds{
       /// Index buffer
       Ogre::HardwareIndexBufferSharedPtr  mIndexBuffer;
 
-      /// Radius
-      float mRadius;
       /// Precomputed Cos/Sin vectors
       Ogre::Vector2 mV2Cos;
       Ogre::Vector2 mV2Sin;

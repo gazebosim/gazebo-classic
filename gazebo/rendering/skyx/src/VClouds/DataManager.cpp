@@ -437,7 +437,7 @@ namespace SkyX { namespace VClouds
     }
   }
 
-  const Ogre::Real DataManager::_getLightAbsorcionAt(Cell*** c, const int& nx,
+  Ogre::Real DataManager::_getLightAbsorcionAt(Cell*** c, const int& nx,
       const int& ny, const int& nz, const int& x, const int& y, const int& z,
       const Ogre::Vector3& d, const float& att) const
   {
@@ -566,7 +566,7 @@ namespace SkyX { namespace VClouds
     }
   }
 
-  const bool DataManager::_fact(Cell ***c, const int& nx, const int& ny,
+  bool DataManager::_fact(Cell ***c, const int& nx, const int& ny,
       const int& nz, const int& x, const int& y, const int& z) const
   {
     bool i1m, j1m, k1m,
@@ -592,7 +592,7 @@ namespace SkyX { namespace VClouds
            i2m || j2r || j2m || k2r;
   }
 
-  const float DataManager::_getDensityAt(Cell ***c, const int& nx,
+  float DataManager::_getDensityAt(Cell ***c, const int& nx,
       const int& ny, const int& nz, const int& x, const int& y, const int& z,
       const int& r, const float& strength) const
   {
@@ -620,7 +620,7 @@ namespace SkyX { namespace VClouds
     return Ogre::Math::Clamp<float>(strength*((float)clouds)/div, 0, 1);
   }
 
-  const float DataManager::_getDensityAt(Cell ***c, const int& x,
+  float DataManager::_getDensityAt(Cell ***c, const int& x,
       const int& y, const int& z) const
   {
     return c[x][y][z].cld ? 1.0f : 0.0f;
@@ -655,7 +655,7 @@ namespace SkyX { namespace VClouds
   }
 
   void DataManager::_updateVolTextureData(Cell ***c, const VolTextureId& TexId,
-      const int& nx, const int& ny, const int& nz)
+      const int& /*nx*/, const int& /*ny*/, const int& /*nz*/)
   {
     Ogre::HardwarePixelBufferSharedPtr buffer =
       mVolTextures[TexId]->getBuffer(0,0);

@@ -117,6 +117,17 @@ if (PKG_CONFIG_FOUND)
     set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
   endif ()
 
+  #################################################
+  # Find libtar. 
+  find_path (libtar_include_dir libtar.h /usr/include /usr/local/include ENV CPATH)
+  if (NOT libtar_include_dir)
+    message (STATUS "Looking for libtar.h - not found") 
+    BUILD_ERROR("Missing: libtar")
+  else ()
+    message (STATUS "Looking for libtar.h - found")
+    set (libtar_libraries "tar" CACHE INTERNAL "tinyxml libraries")
+  endif ()
+
   ################################################# 
   # Find CCD 
   pkg_check_modules(CCD ccd) 

@@ -43,9 +43,9 @@ namespace SkyX
   {
     GPUManager *mGPUManager = mSkyX->getGPUManager();
 
-    if (NewOptions.InnerRadius != mOptions.InnerRadius ||
-      NewOptions.OuterRadius != mOptions.OuterRadius ||
-      ForceToUpdateAll)
+    if (!equal(NewOptions.InnerRadius, mOptions.InnerRadius) ||
+        !equal(NewOptions.OuterRadius, mOptions.OuterRadius) ||
+        ForceToUpdateAll)
     {
       mOptions.InnerRadius = NewOptions.InnerRadius;
       mOptions.OuterRadius = NewOptions.OuterRadius;
@@ -62,17 +62,17 @@ namespace SkyX
       mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uScaleOverScaleDepth", ScaleOverScaleDepth);
     }
 
-    if (NewOptions.HeightPosition != mOptions.HeightPosition ||
-      ForceToUpdateAll)
+    if (!equal(NewOptions.HeightPosition, mOptions.HeightPosition) ||
+        ForceToUpdateAll)
     {
       mOptions.HeightPosition = NewOptions.HeightPosition;
 
       mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uCameraPos", Ogre::Vector3(0, mOptions.InnerRadius + (mOptions.OuterRadius-mOptions.InnerRadius)*mOptions.HeightPosition, 0));
     }
 
-    if (NewOptions.RayleighMultiplier != mOptions.RayleighMultiplier ||
-      NewOptions.SunIntensity       != mOptions.SunIntensity       ||
-      ForceToUpdateAll)
+    if (!equal(NewOptions.RayleighMultiplier, mOptions.RayleighMultiplier) ||
+        !equal(NewOptions.SunIntensity, mOptions.SunIntensity) ||
+        ForceToUpdateAll)
     {
       mOptions.RayleighMultiplier = NewOptions.RayleighMultiplier;
 
@@ -83,9 +83,9 @@ namespace SkyX
       mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uKrESun", KrESun);
     }
 
-    if (NewOptions.MieMultiplier != mOptions.MieMultiplier ||
-      NewOptions.SunIntensity  != mOptions.SunIntensity  ||
-      ForceToUpdateAll)
+    if (!equal(NewOptions.MieMultiplier, mOptions.MieMultiplier) ||
+        !equal(NewOptions.SunIntensity, mOptions.SunIntensity)  ||
+        ForceToUpdateAll)
     {
       mOptions.MieMultiplier = NewOptions.MieMultiplier;
 
@@ -116,21 +116,22 @@ namespace SkyX
                       1.0f / Ogre::Math::Pow(mOptions.WaveLength.z, 4.0f)));
     }
 
-    if (NewOptions.G != mOptions.G ||
-      ForceToUpdateAll)
+    if (!equal(NewOptions.G, mOptions.G) || ForceToUpdateAll)
     {
       mOptions.G = NewOptions.G;
 
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uG", mOptions.G, false);
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uG2", mOptions.G*mOptions.G, false);
+      mGPUManager->setGpuProgramParameter(
+          GPUManager::GPUP_FRAGMENT, "uG", mOptions.G, false);
+      mGPUManager->setGpuProgramParameter(
+          GPUManager::GPUP_FRAGMENT, "uG2", mOptions.G*mOptions.G, false);
     }
 
-    if (NewOptions.Exposure != mOptions.Exposure ||
-      ForceToUpdateAll)
+    if (!equal(NewOptions.Exposure, mOptions.Exposure) || ForceToUpdateAll)
     {
       mOptions.Exposure = NewOptions.Exposure;
 
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uExposure", mOptions.Exposure);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+          "uExposure", mOptions.Exposure);
     }
 
     mSkyX->getCloudsManager()->update();
