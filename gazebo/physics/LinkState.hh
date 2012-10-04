@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __LINK_STATE_HH__
-#define __LINK_STATE_HH__
+#ifndef _LINK_STATE_HH_
+#define _LINK_STATE_HH_
 
 #include <vector>
 #include <string>

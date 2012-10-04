@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef __COLLISION_HH__
-#define __COLLISION_HH__
+#ifndef _COLLISION_HH_
+#define _COLLISION_HH_
 
 #include <string>
 #include <vector>

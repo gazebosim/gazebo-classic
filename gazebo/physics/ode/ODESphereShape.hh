@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __ODESPHERESHAPE_HH__
-#define __ODESPHERESHAPE_HH__
+#ifndef _ODESPHERESHAPE_HH_
+#define _ODESPHERESHAPE_HH_
 
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODECollision.hh"

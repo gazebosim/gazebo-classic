@@ -19,8 +19,8 @@
  * Date: 25 May 2009
  */
 
-#ifndef __BULLETMOTIONSTATE_HH__
-#define __BULLETMOTIONSTATE_HH__
+#ifndef _BULLETMOTIONSTATE_HH_
+#define _BULLETMOTIONSTATE_HH_
 
 #include "physics/bullet/bullet_inc.h"
 #include "math/MathTypes.hh"

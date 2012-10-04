@@ -19,8 +19,8 @@
  * Date: 21 May 2003
  */
 
-#ifndef __BULLETJOINT_HH__
-#define __BULLETJOINT_HH__
+#ifndef _BULLETJOINT_HH_
+#define _BULLETJOINT_HH_
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/Joint.hh"

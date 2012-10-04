@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GRIPPER_HH__
-#define __GRIPPER_HH__
+#ifndef _GRIPPER_HH_
+#define _GRIPPER_HH_
 
 #include <map>
 #include <vector>

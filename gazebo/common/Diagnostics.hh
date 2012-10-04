@@ -19,8 +19,8 @@
  * Date: 2 Feb 2011
  */
 
-#ifndef __DIAGNOSTICMANAGER_HH__
-#define __DIAGNOSTICMANAGER_HH__
+#ifndef _DIAGNOSTICMANAGER_HH_
+#define _DIAGNOSTICMANAGER_HH_
 
 #include <map>
 #include <string>

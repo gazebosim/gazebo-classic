@@ -19,8 +19,8 @@
  * Date: 21 May 2003
  */
 
-#ifndef __BULLETHINGEJOINT_HH__
-#define __BULLETHINGEJOINT_HH__
+#ifndef _BULLETHINGEJOINT_HH_
+#define _BULLETHINGEJOINT_HH_
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"

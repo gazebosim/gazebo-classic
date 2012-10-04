@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __BULLETMULTIRAYSHAPE_HH__
-#define __BULLETMULTIRAYSHAPE_HH__
+#ifndef _BULLETMULTIRAYSHAPE_HH_
+#define _BULLETMULTIRAYSHAPE_HH_
 
 #include "physics/MultiRayShape.hh"
 

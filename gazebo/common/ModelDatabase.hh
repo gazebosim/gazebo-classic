@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_MODELDATABSE_HH__
-#define __GAZEBO_MODELDATABSE_HH__
+#ifndef _GAZEBO_MODELDATABSE_HH_
+#define _GAZEBO_MODELDATABSE_HH_
 
 #include <string>
 #include <map>

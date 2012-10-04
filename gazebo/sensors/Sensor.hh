@@ -43,6 +43,7 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
+    /// \class Sensor Sensor.hh sensors/Sensor.hh
     /// \brief Base class for sensors
     class Sensor : public boost::enable_shared_from_this<Sensor>
     {

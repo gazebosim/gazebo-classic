@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __STATE_HH__
-#define __STATE_HH__
+#ifndef _STATE_HH_
+#define _STATE_HH_
 
 #include <string>
 

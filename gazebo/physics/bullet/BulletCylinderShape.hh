@@ -19,8 +19,8 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef __BULLETCYLINDERSHAPE_HH__
-#define __BULLETCYLINDERSHAPE_HH__
+#ifndef _BULLETCYLINDERSHAPE_HH_
+#define _BULLETCYLINDERSHAPE_HH_
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/CylinderShape.hh"

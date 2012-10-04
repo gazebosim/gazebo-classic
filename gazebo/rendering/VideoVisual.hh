@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __VIDEO_VISUAL_HH__
-#define __VIDEO_VISUAL_HH__
+#ifndef _VIDEO_VISUAL_HH_
+#define _VIDEO_VISUAL_HH_
 
 #include <string>
 #include <vector>

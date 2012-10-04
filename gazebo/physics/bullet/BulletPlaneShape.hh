@@ -19,8 +19,8 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef __BULLETPLANESHAPE_HH__
-#define __BULLETPLANESHAPE_HH__
+#ifndef _BULLETPLANESHAPE_HH_
+#define _BULLETPLANESHAPE_HH_
 
 #include <iostream>
 

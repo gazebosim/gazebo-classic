@@ -23,8 +23,8 @@
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETSCREWJOINT_HH__
-#define __BULLETSCREWJOINT_HH__
+#ifndef _BULLETSCREWJOINT_HH_
+#define _BULLETSCREWJOINT_HH_
 
 #include "physics/bullet/BulletJoint.hh"
 #include "physics/ScrewJoint.hh"

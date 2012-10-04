@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __GAZEBO_PID_HH__
-#define __GAZEBO_PID_HH__
+#ifndef _GAZEBO_PID_HH_
+#define _GAZEBO_PID_HH_
 
 #include "common/Time.hh"
 

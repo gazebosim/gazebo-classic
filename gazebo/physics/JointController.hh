@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __JOINTCONTROLLER_HH__
-#define __JOINTCONTROLLER_HH__
+#ifndef _JOINTCONTROLLER_HH_
+#define _JOINTCONTROLLER_HH_
 
 #include <map>
 #include <string>

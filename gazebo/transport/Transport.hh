@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_TRANSPORT_HH__
-#define __GAZEBO_TRANSPORT_HH__
+#ifndef _GAZEBO_TRANSPORT_HH_
+#define _GAZEBO_TRANSPORT_HH_
 
 #include <boost/bind.hpp>
 #include <string>

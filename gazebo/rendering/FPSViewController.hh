@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __FPSVIEWCONTROLLER_HH__
-#define __FPSVIEWCONTROLLER_HH__
+#ifndef _FPSVIEWCONTROLLER_HH_
+#define _FPSVIEWCONTROLLER_HH_
 
 #include <string>
 

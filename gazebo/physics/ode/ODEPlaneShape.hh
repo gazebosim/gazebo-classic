@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __ODEPLANESHAPE_HH__
-#define __ODEPLANESHAPE_HH__
+#ifndef _ODEPLANESHAPE_HH_
+#define _ODEPLANESHAPE_HH_
 
 #include "physics/PlaneShape.hh"
 #include "physics/ode/ODEPhysics.hh"

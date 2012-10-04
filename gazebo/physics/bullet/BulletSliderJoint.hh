@@ -19,8 +19,8 @@
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETSLIDERJOINT_HH__
-#define __BULLETSLIDERJOINT_HH__
+#ifndef _BULLETSLIDERJOINT_HH_
+#define _BULLETSLIDERJOINT_HH_
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
 #include "physics/bullet/BulletJoint.hh"

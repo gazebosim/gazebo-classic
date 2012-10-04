@@ -47,6 +47,12 @@ set (VCLOUDS_SOURCE_FILES
   src/VClouds/VClouds.cpp
 )
 
+set_source_files_properties(${SKYX_SOURCE_FILES} ${SKYX_HEADER_FILES}
+                      ${VCLOUDS_SOURCE_FILES} ${VCLOUDS_HEADER_FILES}
+                      PROPERTIES
+  C_FLAGS ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}_CLEAN
+  CXX_FLAGS ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}_CLEAN)
+
 # Add include directory
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 

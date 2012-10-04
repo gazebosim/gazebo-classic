@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __ANIMATION_HH__
-#define __ANIMATION_HH__
+#ifndef _ANIMATION_HH_
+#define _ANIMATION_HH_
 
 #include <string>
 #include <vector>

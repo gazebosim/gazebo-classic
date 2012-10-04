@@ -19,8 +19,8 @@
  * Date: 1 Jun 2010
  */
 
-#ifndef __LOGPLAY_HH__
-#define __LOGPLAY_HH__
+#ifndef _LOGPLAY_HH_
+#define _LOGPLAY_HH_
 
 #include <list>
 #include <string>

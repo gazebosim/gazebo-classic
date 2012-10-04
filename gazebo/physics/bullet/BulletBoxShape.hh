@@ -19,8 +19,8 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef __BULLETBOXSHAPE_HH__
-#define __BULLETBOXSHAPE_HH__
+#ifndef _BULLETBOXSHAPE_HH_
+#define _BULLETBOXSHAPE_HH_
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/BoxShape.hh"

@@ -20,8 +20,8 @@
  * Date: 09 June 2007
  */
 
-#ifndef __GAZEBO_CONSOLE_HH__
-#define __GAZEBO_CONSOLE_HH__
+#ifndef _GAZEBO_CONSOLE_HH_
+#define _GAZEBO_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>

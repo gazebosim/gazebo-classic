@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __CONVERSIONS_HH__
-#define __CONVERSIONS_HH__
+#ifndef _CONVERSIONS_HH_
+#define _CONVERSIONS_HH_
 
 #include "rendering/ogre_gazebo.h"
 

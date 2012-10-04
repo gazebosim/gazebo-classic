@@ -19,8 +19,8 @@
  * Date: 27 Jan 2010
  */
 
-#ifndef RTSHADERSYSTEM_HH
-#define RTSHADERSYSTEM_HH
+#ifndef _RTSHADERSYSTEM_HH_
+#define _RTSHADERSYSTEM_HH_
 
 #include <list>
 #include <string>

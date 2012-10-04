@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __VIDEO_HH__
-#define __VIDEO_HH__
+#ifndef _VIDEO_HH_
+#define _VIDEO_HH_
 
 #include <string>
 

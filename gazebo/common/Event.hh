@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __EVENT_HH__
-#define __EVENT_HH__
+#ifndef _EVENT_HH_
+#define _EVENT_HH_
 
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>

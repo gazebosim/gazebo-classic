@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef __LIGHT_LIST_WIDGET_HH__
-#define __LIGHT_LIST_WIDGET_HH__
+#ifndef _LIGHT_LIST_WIDGET_HH_
+#define _LIGHT_LIST_WIDGET_HH_
 
 #include <string>
 #include <list>
