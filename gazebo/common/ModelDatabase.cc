@@ -140,6 +140,13 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     }
 
     FILE *fp = fopen(filename.c_str(), "wb");
+    if (!fp)
+    {
+      gzerr << "Unable to write to file["
+            << filename << "]. Please fix permissions.";
+      return std::string();
+    }
+
     curl_easy_setopt(curl, CURLOPT_URL,
         (ModelDatabase::GetURI() + "/" + modelName + "/model.tar.gz").c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
