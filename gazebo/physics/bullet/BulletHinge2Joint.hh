@@ -42,7 +42,7 @@ namespace gazebo
     class BulletHinge2Joint : public Hinge2Joint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletHinge2Joint(btDynamicsWorld *world);
+      public: BulletHinge2Joint(btDynamicsWorld *world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletHinge2Joint();

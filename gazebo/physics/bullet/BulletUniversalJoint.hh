@@ -40,7 +40,7 @@ namespace gazebo
     class BulletUniversalJoint : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletUniversalJoint(btDynamicsWorld *world);
+      public: BulletUniversalJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// \brief Destuctor
       public: virtual ~BulletUniversalJoint();

@@ -40,7 +40,7 @@ namespace gazebo
     class BulletBallJoint : public BallJoint<BulletJoint>
     {
       /// \brief Bullet Ball Joint Constructor
-      public: BulletBallJoint(btDynamicsWorld *_world);
+      public: BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletBallJoint();

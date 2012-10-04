@@ -41,7 +41,7 @@ namespace gazebo
     class BulletSliderJoint : public SliderJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletSliderJoint(btDynamicsWorld *world);
+      public: BulletSliderJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletSliderJoint();
