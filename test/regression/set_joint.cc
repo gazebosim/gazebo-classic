@@ -29,14 +29,14 @@ class PhysicsTest : public ServerFixture
 
 TEST_F(PhysicsTest, State)
 {
-  pid_t pid = fork();
-  if (pid)
-  {
-    sleep(2);
-    gazebo::gui::run(0, NULL);
-    kill(pid, SIGINT);
-  }
-  else
+// pid_t pid = fork();
+// if (pid)
+// {
+//   sleep(2);
+//   gazebo::gui::run(0, NULL);
+//   kill(pid, SIGINT);
+// }
+// else
   {
     // intentionally break the joint using Link::SetWorldPose
     // let it conflict with Physics pose updates and make sure
@@ -567,18 +567,18 @@ TEST_F(PhysicsTest, State)
     }
     world->SetPaused(false);
 
-    physics::JointPtr joint_01 = model->GetJoint("joint_01");
-    physics::JointPtr joint_12 = model->GetJoint("joint_12");
-    physics::JointPtr joint_23 = model->GetJoint("joint_23");
-    physics::JointPtr joint_34 = model->GetJoint("joint_34");
-    physics::JointPtr joint_45 = model->GetJoint("joint_45");
-    physics::JointPtr joint_52 = model->GetJoint("joint_52");
-    physics::JointPtr joint_2a2 = model->GetJoint("joint_2a2");
-    physics::JointPtr joint_2a2b = model->GetJoint("joint_2a2b");
-    physics::JointPtr joint_2a3a = model->GetJoint("joint_2a3a");
-    physics::JointPtr joint_3a4a = model->GetJoint("joint_3a4a");
-    physics::JointPtr joint_4a5a = model->GetJoint("joint_4a5a");
-    physics::JointPtr joint_5a2b = model->GetJoint("joint_5a2b");
+    physics::JointPtr joint_01 = model->GetJoint("model_1::joint_01");
+    physics::JointPtr joint_12 = model->GetJoint("model_1::joint_12");
+    physics::JointPtr joint_23 = model->GetJoint("model_1::joint_23");
+    physics::JointPtr joint_34 = model->GetJoint("model_1::joint_34");
+    physics::JointPtr joint_45 = model->GetJoint("model_1::joint_45");
+    physics::JointPtr joint_52 = model->GetJoint("model_1::joint_52");
+    physics::JointPtr joint_2a2 = model->GetJoint("model_1::joint_2a2");
+    physics::JointPtr joint_2a2b = model->GetJoint("model_1::joint_2a2b");
+    physics::JointPtr joint_2a3a = model->GetJoint("model_1::joint_2a3a");
+    physics::JointPtr joint_3a4a = model->GetJoint("model_1::joint_3a4a");
+    physics::JointPtr joint_4a5a = model->GetJoint("model_1::joint_4a5a");
+    physics::JointPtr joint_5a2b = model->GetJoint("model_1::joint_5a2b");
 
 
     double start_time;

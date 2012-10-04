@@ -216,9 +216,9 @@ TEST_F(PhysicsTest, State)
     }
     world->SetPaused(false);
 
-    physics::LinkPtr link_1 = model->GetLink("link_1");
-    physics::LinkPtr link_2 = model->GetLink("link_2");
-    physics::LinkPtr link_3 = model->GetLink("link_3");
+    physics::LinkPtr link_1 = model->GetLink("model_1::link_1");
+    physics::LinkPtr link_2 = model->GetLink("model_1::link_2");
+    physics::LinkPtr link_3 = model->GetLink("model_1::link_3");
 
 
 
@@ -234,9 +234,9 @@ TEST_F(PhysicsTest, State)
 
     srand(time(NULL));
 
-    physics::JointPtr joint_01 = model->GetJoint("joint_01");
-    physics::JointPtr joint_12 = model->GetJoint("joint_12");
-    physics::JointPtr joint_23 = model->GetJoint("joint_23");
+    physics::JointPtr joint_01 = model->GetJoint("model_1::joint_01");
+    physics::JointPtr joint_12 = model->GetJoint("model_1::joint_12");
+    physics::JointPtr joint_23 = model->GetJoint("model_1::joint_23");
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
