@@ -97,7 +97,7 @@ namespace SkyX { namespace VClouds{
           const int& _NumberOfBlocks = 12, const int& _Na = 10,
           const int& _Nb = 8, const int& _Nc = 6)
         : Height(_Height)
-        , Alpha(_Alpha), Beta(_Beta)
+        , Alpha(_Radius), Beta(_Beta)
         , Radius(_Radius)
         , NumberOfBlocks(_NumberOfBlocks)
         , Na(_Na), Nb(_Nb), Nc(_Nc)

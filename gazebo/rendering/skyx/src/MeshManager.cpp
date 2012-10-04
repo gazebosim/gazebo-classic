@@ -361,7 +361,7 @@ namespace SkyX
   {
     float cameraFarClipDistance = c->getFarClipDistance();
 
-    if (!equal(cameraFarClipDistance, 0.0f))
+    if (equal(cameraFarClipDistance, 0.0f))
     {
       cameraFarClipDistance = mSkyX->getInfiniteCameraFarClipDistance();
     }

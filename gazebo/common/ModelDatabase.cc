@@ -142,8 +142,9 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     FILE *fp = fopen(filename.c_str(), "wb");
     if (!fp)
     {
-      gzerr << "Unable to write to file["
-            << filename << "]. Please fix permissions.";
+      gzerr << "Could not download model[" << _uri << "] because we were"
+            << "unable to write to file[" << filename << "]."
+            << "Please fix file permissions.";
       return std::string();
     }
 
