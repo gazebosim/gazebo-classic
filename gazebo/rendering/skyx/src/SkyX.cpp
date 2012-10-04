@@ -21,272 +21,277 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#ifdef _MSC_VER
 #pragma warning(disable:4355)
+#endif
 
 #include "SkyX.h"
 
 namespace SkyX
 {
-	SkyX::SkyX(Ogre::SceneManager* sm, Controller* c)
-		: Ogre::FrameListener()
-		, Ogre::RenderTargetListener()
-		, mSceneManager(sm)
-		, mController(c)
-		, mCamera(0)
-		, mMeshManager(new MeshManager(this))
-		, mAtmosphereManager(new AtmosphereManager(this))
-		, mGPUManager(new GPUManager(this))
-		, mMoonManager(new MoonManager(this))
-		, mCloudsManager(new CloudsManager(this))
-		, mRenderQueueGroups(RenderQueueGroups(Ogre::RENDER_QUEUE_SKIES_EARLY, Ogre::RENDER_QUEUE_3, Ogre::RENDER_QUEUE_4))
-		, mCreated(false)
-		, mLastCameraPosition(Ogre::Vector3(0,0,0))
-		, mLastCameraFarClipDistance(-1)
-		, mInfiniteCameraFarClipDistance(100000)
-		, mVisible(true)
-		, mLightingMode(LM_LDR)
-		, mStarfield(true)
-		, mTimeMultiplier(0.1f)
-		, mTimeOffset(0.0f)
-	{
-		// Need to be instanced here, when SkyX::mSceneManager is valid
-		mVCloudsManager = new VCloudsManager(this);
-	}
+  SkyX::SkyX(Ogre::SceneManager* sm, Controller* c)
+    : Ogre::FrameListener()
+    , Ogre::RenderTargetListener()
+    , mSceneManager(sm)
+    , mController(c)
+    , mCamera(0)
+    , mMeshManager(new MeshManager(this))
+    , mAtmosphereManager(new AtmosphereManager(this))
+    , mGPUManager(new GPUManager(this))
+    , mMoonManager(new MoonManager(this))
+    , mCloudsManager(new CloudsManager(this))
+    , mRenderQueueGroups(RenderQueueGroups(Ogre::RENDER_QUEUE_SKIES_EARLY,
+                                           Ogre::RENDER_QUEUE_3,
+                                           Ogre::RENDER_QUEUE_4))
+    , mCreated(false)
+    , mLastCameraPosition(Ogre::Vector3(0,0,0))
+    , mLastCameraFarClipDistance(-1)
+    , mInfiniteCameraFarClipDistance(100000)
+    , mVisible(true)
+    , mLightingMode(LM_LDR)
+    , mStarfield(true)
+    , mTimeMultiplier(0.1f)
+    , mTimeOffset(0.0f)
+  {
+    // Need to be instanced here, when SkyX::mSceneManager is valid
+    mVCloudsManager = new VCloudsManager(this);
+  }
 
-	SkyX::~SkyX()
-	{
-		remove();
+  SkyX::~SkyX()
+  {
+    remove();
 
-		delete mMeshManager;
-		delete mAtmosphereManager;
-		delete mGPUManager;
-		delete mMoonManager;
-		delete mCloudsManager;
-		delete mVCloudsManager;
+    delete mMeshManager;
+    delete mAtmosphereManager;
+    delete mGPUManager;
+    delete mMoonManager;
+    delete mCloudsManager;
+    delete mVCloudsManager;
 
-		if (mController->getDeleteBySkyX())
-		{
-			delete mController;
-		}
-	}
+    if (mController->getDeleteBySkyX())
+    {
+      delete mController;
+    }
+  }
 
-	void SkyX::create()
-	{
-		if (mCreated)
-		{
-			return;
-		}
+  void SkyX::create()
+  {
+    if (mCreated)
+    {
+      return;
+    }
 
-		mGPUManager->_notifySkydomeMaterialChanged();
+    mGPUManager->_notifySkydomeMaterialChanged();
 
-		mMeshManager->create();
-		mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
+    mMeshManager->create();
+    mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
 
-		mAtmosphereManager->_update(mAtmosphereManager->getOptions(), true);
+    mAtmosphereManager->_update(mAtmosphereManager->getOptions(), true);
 
-		if (mStarfield)
-		{
-			mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
-		}
+    if (mStarfield)
+    {
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
+    }
 
-		Ogre::Vector3 sunDir = mController->getSunDirection();
+    Ogre::Vector3 sunDir = mController->getSunDirection();
 
-		// Z-up conversion
-		Ogre::Real ydir = sunDir.y;
-		sunDir.y = sunDir.z;
-		sunDir.z = ydir;
+    // Z-up conversion
+    Ogre::Real ydir = sunDir.y;
+    sunDir.y = sunDir.z;
+    sunDir.z = ydir;
 
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
 
-		mMoonManager->create();
+    mMoonManager->create();
 
-		setVisible(mVisible);
+    setVisible(mVisible);
 
-		mLastCameraPosition = Ogre::Vector3(0,0,0);
-		mLastCameraFarClipDistance = -1;
+    mLastCameraPosition = Ogre::Vector3(0,0,0);
+    mLastCameraFarClipDistance = -1;
 
-		mCreated = true;
-	}
+    mCreated = true;
+  }
 
-	void SkyX::remove()
-	{
-		if (!mCreated)
-		{
-			return;
-		}
+  void SkyX::remove()
+  {
+    if (!mCreated)
+    {
+      return;
+    }
 
-		mCloudsManager->removeAll();
-		mMeshManager->remove();
-		mMoonManager->remove();
-		mVCloudsManager->remove();
+    mCloudsManager->removeAll();
+    mMeshManager->remove();
+    mMoonManager->remove();
+    mVCloudsManager->remove();
 
-		mCamera = 0;
+    mCamera = 0;
 
-		mCreated = false;
-	}
+    mCreated = false;
+  }
 
-	void SkyX::update(const Ogre::Real& timeSinceLastFrame)
-	{
-		if (!mCreated)
-		{
-			return;
-		}
+  void SkyX::update(const Ogre::Real& timeSinceLastFrame)
+  {
+    if (!mCreated)
+    {
+      return;
+    }
 
-		if (mTimeMultiplier != 0)
-		{
-			float timemultiplied = timeSinceLastFrame * mTimeMultiplier;
+    if (!equal(mTimeMultiplier, 0.0f))
+    {
+      float timemultiplied = timeSinceLastFrame * mTimeMultiplier;
 
-			mTimeOffset += timemultiplied;
+      mTimeOffset += timemultiplied;
 
-			mController->update(timemultiplied);
+      mController->update(timemultiplied);
 
-			if (mStarfield)
-			{
-				mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
-			}
-		}
+      if (mStarfield)
+      {
+        mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
+            "uTime", mTimeOffset*0.5f, false);
+      }
+    }
 
-		Ogre::Vector3 sunDir = mController->getSunDirection();
+    Ogre::Vector3 sunDir = mController->getSunDirection();
 
-		// Z-up conversion
-		Ogre::Real ydir = sunDir.y;
-		sunDir.y = sunDir.z;
-		sunDir.z = ydir;
+    // Z-up conversion
+    Ogre::Real ydir = sunDir.y;
+    sunDir.y = sunDir.z;
+    sunDir.z = ydir;
 
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
 
-		mMoonManager->updateMoonPhase(mController->getMoonPhase());
-		mCloudsManager->update();
-		mVCloudsManager->update(timeSinceLastFrame);
-	}
+    mMoonManager->updateMoonPhase(mController->getMoonPhase());
+    mCloudsManager->update();
+    mVCloudsManager->update(timeSinceLastFrame);
+  }
 
-	void SkyX::notifyCameraRender(Ogre::Camera* c)
-	{
-		if (!mCreated)
-		{
-			return;
-		}
+  void SkyX::notifyCameraRender(Ogre::Camera* c)
+  {
+    if (!mCreated)
+    {
+      return;
+    }
 
-		mCamera = c;
-		
-		if (mLastCameraPosition != c->getDerivedPosition())
-		{
-			mMeshManager->getSceneNode()->setPosition(mCamera->getDerivedPosition());
+    mCamera = c;
 
-			mLastCameraPosition = mCamera->getDerivedPosition();
-		}
+    if (mLastCameraPosition != c->getDerivedPosition())
+    {
+      mMeshManager->getSceneNode()->setPosition(mCamera->getDerivedPosition());
 
-		if (mLastCameraFarClipDistance != c->getFarClipDistance())
-		{
-			mMeshManager->updateGeometry(c);
+      mLastCameraPosition = mCamera->getDerivedPosition();
+    }
 
-			mLastCameraFarClipDistance = mCamera->getFarClipDistance();
-		}
+    if (!equal(mLastCameraFarClipDistance, c->getFarClipDistance()))
+    {
+      mMeshManager->updateGeometry(c);
 
-		mMoonManager->updateGeometry(c);
+      mLastCameraFarClipDistance = mCamera->getFarClipDistance();
+    }
 
-		mVCloudsManager->notifyCameraRender(c);
-	}
+    mMoonManager->updateGeometry(c);
 
-	void SkyX::setVisible(const bool& visible)
-	{
-		mVisible = visible;
+    mVCloudsManager->notifyCameraRender(c);
+  }
 
-		if (!mCreated)
-		{
-			return;
-		}
+  void SkyX::setVisible(const bool& visible)
+  {
+    mVisible = visible;
 
-		mMeshManager->getSceneNode()->setVisible(mVisible);
-		mMoonManager->getMoonSceneNode()->setVisible(mVisible);
+    if (!mCreated)
+    {
+      return;
+    }
 
-		if (mVCloudsManager->isCreated())
-		{
-			mVCloudsManager->getVClouds()->setVisible(mVisible);
-		}
-	}
+    mMeshManager->getSceneNode()->setVisible(mVisible);
+    mMoonManager->getMoonSceneNode()->setVisible(mVisible);
 
-	void SkyX::setRenderQueueGroups(const RenderQueueGroups& rqg)
-	{
-		mRenderQueueGroups = rqg;
+    if (mVCloudsManager->isCreated())
+    {
+      mVCloudsManager->getVClouds()->setVisible(mVisible);
+    }
+  }
 
-		mVCloudsManager->getVClouds()->setRenderQueueGroups(
-			VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds, mRenderQueueGroups.vcloudsLightnings));
+  void SkyX::setRenderQueueGroups(const RenderQueueGroups& rqg)
+  {
+    mRenderQueueGroups = rqg;
 
-		if (!mCreated)
-		{
-			return;
-		}
+    mVCloudsManager->getVClouds()->setRenderQueueGroups(
+      VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds, mRenderQueueGroups.vcloudsLightnings));
 
-		mMeshManager->getEntity()->setRenderQueueGroup(mRenderQueueGroups.skydome);
-		mMoonManager->getMoonBillboard()->setRenderQueueGroup(mRenderQueueGroups.skydome+1);
-	}
+    if (!mCreated)
+    {
+      return;
+    }
 
-	void SkyX::setLightingMode(const LightingMode& lm)
-	{
-		mLightingMode = lm;
+    mMeshManager->getEntity()->setRenderQueueGroup(mRenderQueueGroups.skydome);
+    mMoonManager->getMoonBillboard()->setRenderQueueGroup(mRenderQueueGroups.skydome+1);
+  }
 
-		if (!mCreated)
-		{
-			return;
-		}
+  void SkyX::setLightingMode(const LightingMode& lm)
+  {
+    mLightingMode = lm;
 
-		mGPUManager->_notifySkydomeMaterialChanged();
+    if (!mCreated)
+    {
+      return;
+    }
 
-		// Update skydome material
-		mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
-		// Update layered clouds material
-		mCloudsManager->registerAll();
-		// Update ground passes materials and update textures gamma correction
-		mGPUManager->_updateFP();
+    mGPUManager->_notifySkydomeMaterialChanged();
 
-		// Update parameters
-		mAtmosphereManager->_update(mAtmosphereManager->getOptions(), true);
-	}
+    // Update skydome material
+    mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
+    // Update layered clouds material
+    mCloudsManager->registerAll();
+    // Update ground passes materials and update textures gamma correction
+    mGPUManager->_updateFP();
 
-	void SkyX::setStarfieldEnabled(const bool& Enabled)
-	{
-		mStarfield = Enabled;
+    // Update parameters
+    mAtmosphereManager->_update(mAtmosphereManager->getOptions(), true);
+  }
 
-		if (!mCreated)
-		{
-			return;
-		}
+  void SkyX::setStarfieldEnabled(const bool& Enabled)
+  {
+    mStarfield = Enabled;
 
-		mGPUManager->_notifySkydomeMaterialChanged();
+    if (!mCreated)
+    {
+      return;
+    }
 
-		// Update skydome material
-		mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
+    mGPUManager->_notifySkydomeMaterialChanged();
 
-		// Update parameters
-		mAtmosphereManager->_update(mAtmosphereManager->getOptions(), true);
+    // Update skydome material
+    mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
 
-		if (mStarfield)
-		{
-			mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
-		}
+    // Update parameters
+    mAtmosphereManager->_update(mAtmosphereManager->getOptions(), true);
 
-		Ogre::Vector3 sunDir = mController->getSunDirection();
+    if (mStarfield)
+    {
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
+    }
 
-		// Z-up conversion
-		Ogre::Real ydir = sunDir.y;
-		sunDir.y = sunDir.z;
-		sunDir.z = ydir;
+    Ogre::Vector3 sunDir = mController->getSunDirection();
 
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
-		mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
-	}
+    // Z-up conversion
+    Ogre::Real ydir = sunDir.y;
+    sunDir.y = sunDir.z;
+    sunDir.z = ydir;
 
-	bool SkyX::frameStarted(const Ogre::FrameEvent& e)
-	{
-		update(e.timeSinceLastFrame);
-		return true;
-	}
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
+  }
 
-	void SkyX::preViewportUpdate(const Ogre::RenderTargetViewportEvent& evt)
-	{
-		notifyCameraRender(evt.source->getCamera());
-	}
+  bool SkyX::frameStarted(const Ogre::FrameEvent& e)
+  {
+    update(e.timeSinceLastFrame);
+    return true;
+  }
+
+  void SkyX::preViewportUpdate(const Ogre::RenderTargetViewportEvent& evt)
+  {
+    notifyCameraRender(evt.source->getCamera());
+  }
 }
