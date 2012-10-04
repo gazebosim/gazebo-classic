@@ -269,7 +269,7 @@ bool Projector::ProjectorFrameListener::frameStarted(
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetEnabled(bool _enabled)
 {
-  this->enabled = true;//_enabled;
+  this->enabled = true;  // _enabled;
   /*if (!this->enabled)
     this->RemovePassFromMaterials();
     */
