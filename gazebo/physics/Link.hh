@@ -287,10 +287,10 @@ namespace gazebo
       public: virtual void SetAutoDisable(bool _disable) = 0;
 
       /// Returns a vector of children Links connected by joints
-      public: std::vector<LinkPtr> GetChildLinks();
+      public: Link_V GetChildJointsLinks() const;
 
       /// Returns a vector of parent Links connected by joints
-      public: std::vector<LinkPtr> GetParentLinks();
+      public: Link_V GetParentJointsLinks() const;
 
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision

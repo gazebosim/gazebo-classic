@@ -359,7 +359,7 @@ void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
   //           for each child, also look for parents to catch multiple roots
 
 
-  std::vector<LinkPtr> childLinks = _link->GetChildLinks();
+  std::vector<LinkPtr> childLinks = _link->GetChildJointsLinks();
   for (std::vector<LinkPtr>::iterator childLink = childLinks.begin();
                                       childLink != childLinks.end();
                                       ++childLink)
@@ -377,7 +377,7 @@ void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
       // catch additional roots by looping
       // through all parents of childLink,
       // but skip parent link is self (_link)
-      std::vector<LinkPtr> parentLinks = (*childLink)->GetParentLinks();
+      std::vector<LinkPtr> parentLinks = (*childLink)->GetParentJointsLinks();
       for (std::vector<LinkPtr>::iterator parentLink = parentLinks.begin();
                                           parentLink != parentLinks.end();
                                           ++parentLink)

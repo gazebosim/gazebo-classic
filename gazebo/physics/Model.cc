@@ -551,9 +551,15 @@ Link_V Model::GetAllLinks() const
   Link_V links;
   for (unsigned int i = 0; i < this->GetChildCount(); ++i)
   {
-    LinkPtr link = boost::shared_static_cast<Link>(this->GetChild(i));
-    if (link)
-      links.push_back(link);
+    if (this->GetChild(i)->HasType(Base::LINK))
+    {
+      LinkPtr link = boost::shared_static_cast<Link>(this->GetChild(i));
+      if (link)
+        links.push_back(link);
+      else
+        gzerr << "Child [" << this->GetChild(i)->GetName()
+              << "] has type Base::LINK, but cannot be dynamically casted\n";
+    }
   }
   return links;
 }

@@ -400,11 +400,12 @@ void Link::Update()
 }
 
 /////////////////////////////////////////////////
-std::vector<LinkPtr> Link::GetChildLinks()
+Link_V Link::GetChildJointsLinks() const
 {
-  std::vector<LinkPtr> links;
-  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
-                                       iter != this->childJoints.end(); ++iter)
+  Link_V links;
+  for (std::vector<JointPtr>::const_iterator iter = this->childJoints.begin();
+                                             iter != this->childJoints.end();
+                                             ++iter)
   {
     if ((*iter)->GetChild())
       links.push_back((*iter)->GetChild());
@@ -413,11 +414,12 @@ std::vector<LinkPtr> Link::GetChildLinks()
 }
 
 /////////////////////////////////////////////////
-std::vector<LinkPtr> Link::GetParentLinks()
+Link_V Link::GetParentJointsLinks() const
 {
-  std::vector<LinkPtr> links;
-  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
-                                       iter != this->parentJoints.end(); ++iter)
+  Link_V links;
+  for (std::vector<JointPtr>::const_iterator iter = this->parentJoints.begin();
+                                             iter != this->parentJoints.end();
+                                             ++iter)
   {
     if ((*iter)->GetParent())
       links.push_back((*iter)->GetParent());
