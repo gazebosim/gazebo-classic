@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
-
       private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void OnPose(ConstPosePtr &_msg);
@@ -82,6 +81,10 @@ namespace gazebo
 
       private: void FillPropertyTree(const msgs::Collision &_msg,
                                      QtProperty *_parent);
+
+      private: void FillPropertyTree(const msgs::Joint &_msg,
+                                     QtProperty *_parent);
+
 
       private: void FillMsgField(QtProperty *_item,
                    google::protobuf::Message *_message,
@@ -125,7 +128,7 @@ namespace gazebo
 
       private: void RemoveEntity(const std::string &_name);
 
-      private: QTreeWidgetItem *GetModelListItem(unsigned int _id);
+      private: QTreeWidgetItem *GetModelListItem(const std::string &_name);
 
       private: void FillVector3dProperty(const msgs::Vector3d &_msg,
                                          QtProperty *_parent);
@@ -146,6 +149,7 @@ namespace gazebo
       private: void ProcessModelMsgs();
 
       private: void InitTransport(const std::string &_name ="");
+      private: void ResetTree();
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -155,6 +159,11 @@ namespace gazebo
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
       private: transport::SubscriberPtr poseSub;
+
+      private: QTreeWidgetItem *sceneItem;
+      private: QTreeWidgetItem *physicsItem;
+      private: QTreeWidgetItem *modelsItem;
+      private: QTreeWidgetItem *lightsItem;
 
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
@@ -175,7 +184,11 @@ namespace gazebo
       private: ModelMsgs_L modelMsgs;
 
       private: msgs::Model modelMsg;
+      private: msgs::Link linkMsg;
+      private: msgs::Joint jointMsg;
+
       private: bool fillPropertyTree;
+      private: std::string fillType;
     };
 
     class ModelListSheetDelegate: public QItemDelegate

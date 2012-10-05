@@ -98,8 +98,8 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
 
     // msg.set_frame(this->link->GetScopedName());
     // msgs::Set(msg.mutable_offset(), this->GetPose());
-    // msg.set_angle_min( this->GetAngleMin().GetAsRadian() );
-    // msg.set_angle_max( this->GetAngleMax().GetAsRadian() );
+    // msg.set_angle_min( this->GetAngleMin().Radian() );
+    // msg.set_angle_max( this->GetAngleMax().Radian() );
     // msg.set_angle_step( this->GetAngleResolution() );
 
     // msg.set_range_min( this->GetRangeMin() );

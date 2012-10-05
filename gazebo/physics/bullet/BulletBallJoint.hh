@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: A ball joint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
-#ifndef __BULLETBALLJOINT_HH__
-#define __BULLETBALLJOINT_HH__
+#ifndef _BULLETBALLJOINT_HH_
+#define _BULLETBALLJOINT_HH_
 
 #include "physics/BallJoint.hh"
 #include "physics/bullet/BulletJoint.hh"
@@ -40,7 +40,7 @@ namespace gazebo
     class BulletBallJoint : public BallJoint<BulletJoint>
     {
       /// \brief Bullet Ball Joint Constructor
-      public: BulletBallJoint(btDynamicsWorld *_world);
+      public: BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletBallJoint();

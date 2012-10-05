@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 21 May 2003
  */
 
-#ifndef __ODEHINGEJOINT_HH__
-#define __ODEHINGEJOINT_HH__
+#ifndef _ODEHINGEJOINT_HH_
+#define _ODEHINGEJOINT_HH_
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
@@ -40,7 +40,7 @@ namespace gazebo
     class ODEHingeJoint : public HingeJoint<ODEJoint>
     {
       ///  Constructor
-      public: ODEHingeJoint(dWorldID worldId);
+      public: ODEHingeJoint(dWorldID worldId, BasePtr _parent);
 
       /// Destructor
       public: virtual ~ODEHingeJoint();

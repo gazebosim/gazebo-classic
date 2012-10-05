@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,9 +64,9 @@ void Master::Init(uint16_t _port)
   {
     this->connection->Listen(_port, boost::bind(&Master::OnAccept, this, _1));
   }
-  catch(std::exception &e)
+  catch(std::exception &_e)
   {
-    gzthrow("Unable to start server[" << e.what() << "]\n");
+    gzthrow("Unable to start server[" << _e.what() << "]\n");
   }
 }
 

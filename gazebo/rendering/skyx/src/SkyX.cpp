@@ -21,7 +21,10 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include "gazebo/math/Helpers.hh"
+#ifdef _MSC_VER
+#pragma warning(disable:4355)
+#endif
+
 #include "SkyX.h"
 
 namespace SkyX
@@ -37,11 +40,11 @@ namespace SkyX
     , mGPUManager(new GPUManager(this))
     , mMoonManager(new MoonManager(this))
     , mCloudsManager(new CloudsManager(this))
-    , mRenderQueueGroups(RenderQueueGroups(
-          Ogre::RENDER_QUEUE_SKIES_EARLY,
-          Ogre::RENDER_QUEUE_3, Ogre::RENDER_QUEUE_4))
+    , mRenderQueueGroups(RenderQueueGroups(Ogre::RENDER_QUEUE_SKIES_EARLY,
+                                           Ogre::RENDER_QUEUE_3,
+                                           Ogre::RENDER_QUEUE_4))
     , mCreated(false)
-    , mLastCameraPosition(Ogre::Vector3(0, 0, 0))
+    , mLastCameraPosition(Ogre::Vector3(0,0,0))
     , mLastCameraFarClipDistance(-1)
     , mInfiniteCameraFarClipDistance(100000)
     , mVisible(true)
@@ -87,20 +90,24 @@ namespace SkyX
 
     if (mStarfield)
     {
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
-          "uTime", mTimeOffset*0.5f, false);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
     }
 
-    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
-        "uLightDir", mController->getSunDirection());
-    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
-        "uLightDir", mController->getSunDirection());
+    Ogre::Vector3 sunDir = mController->getSunDirection();
+
+    // Z-up conversion
+    Ogre::Real ydir = sunDir.y;
+    sunDir.y = sunDir.z;
+    sunDir.z = ydir;
+
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
 
     mMoonManager->create();
 
     setVisible(mVisible);
 
-    mLastCameraPosition = Ogre::Vector3(0, 0, 0);
+    mLastCameraPosition = Ogre::Vector3(0,0,0);
     mLastCameraFarClipDistance = -1;
 
     mCreated = true;
@@ -130,7 +137,7 @@ namespace SkyX
       return;
     }
 
-    if (!gazebo::math::equal(static_cast<double>(mTimeMultiplier), 0.0))
+    if (!equal(mTimeMultiplier, 0.0f))
     {
       float timemultiplied = timeSinceLastFrame * mTimeMultiplier;
 
@@ -145,10 +152,15 @@ namespace SkyX
       }
     }
 
-    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
-        "uLightDir", mController->getSunDirection());
-    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
-        "uLightDir", mController->getSunDirection());
+    Ogre::Vector3 sunDir = mController->getSunDirection();
+
+    // Z-up conversion
+    Ogre::Real ydir = sunDir.y;
+    sunDir.y = sunDir.z;
+    sunDir.z = ydir;
+
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
 
     mMoonManager->updateMoonPhase(mController->getMoonPhase());
     mCloudsManager->update();
@@ -171,8 +183,7 @@ namespace SkyX
       mLastCameraPosition = mCamera->getDerivedPosition();
     }
 
-    if (!gazebo::math::equal(mLastCameraFarClipDistance,
-                             c->getFarClipDistance()))
+    if (!equal(mLastCameraFarClipDistance, c->getFarClipDistance()))
     {
       mMeshManager->updateGeometry(c);
 
@@ -207,8 +218,7 @@ namespace SkyX
     mRenderQueueGroups = rqg;
 
     mVCloudsManager->getVClouds()->setRenderQueueGroups(
-      VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds,
-        mRenderQueueGroups.vcloudsLightnings));
+      VClouds::VClouds::RenderQueueGroups(mRenderQueueGroups.vclouds, mRenderQueueGroups.vcloudsLightnings));
 
     if (!mCreated)
     {
@@ -216,6 +226,7 @@ namespace SkyX
     }
 
     mMeshManager->getEntity()->setRenderQueueGroup(mRenderQueueGroups.skydome);
+    mMoonManager->getMoonBillboard()->setRenderQueueGroup(mRenderQueueGroups.skydome+1);
   }
 
   void SkyX::setLightingMode(const LightingMode& lm)
@@ -233,7 +244,7 @@ namespace SkyX
     mMeshManager->setMaterialName(mGPUManager->getSkydomeMaterialName());
     // Update layered clouds material
     mCloudsManager->registerAll();
-    // Update ground passes materials
+    // Update ground passes materials and update textures gamma correction
     mGPUManager->_updateFP();
 
     // Update parameters
@@ -259,14 +270,18 @@ namespace SkyX
 
     if (mStarfield)
     {
-      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
-          "uTime", mTimeOffset*0.5f, false);
+      mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uTime", mTimeOffset*0.5f, false);
     }
 
-    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX,
-        "uLightDir", mController->getSunDirection());
-    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT,
-        "uLightDir", mController->getSunDirection());
+    Ogre::Vector3 sunDir = mController->getSunDirection();
+
+    // Z-up conversion
+    Ogre::Real ydir = sunDir.y;
+    sunDir.y = sunDir.z;
+    sunDir.z = ydir;
+
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_VERTEX, "uLightDir", sunDir);
+    mGPUManager->setGpuProgramParameter(GPUManager::GPUP_FRAGMENT, "uLightDir", sunDir);
   }
 
   bool SkyX::frameStarted(const Ogre::FrameEvent& e)

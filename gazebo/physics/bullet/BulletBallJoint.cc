@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world)
-    : BallJoint<BulletJoint>()
+BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
+    : BallJoint<BulletJoint>(_parent)
 {
   this->world = _world;
 }

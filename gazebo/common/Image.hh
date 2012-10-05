@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 14 July 2008
  */
 
-#ifndef __IMAGE_HH__
-#define __IMAGE_HH__
+#ifndef _IMAGE_HH_
+#define _IMAGE_HH_
 
 #ifdef BOOL
 #undef BOOL

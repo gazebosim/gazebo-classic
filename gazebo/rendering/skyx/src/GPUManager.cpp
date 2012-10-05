@@ -21,15 +21,15 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include <vector>
-
 #include "GPUManager.h"
+
 #include "SkyX.h"
 
 namespace SkyX
 {
   GPUManager::GPUManager(SkyX *s)
-    : mSkyX(s), mGroundPasses(std::vector<Ogre::Pass*>())
+    : mSkyX(s)
+    , mGroundPasses(std::vector<Ogre::Pass*>())
   {
     _notifySkydomeMaterialChanged();
   }
@@ -38,8 +38,7 @@ namespace SkyX
   {
   }
 
-  void GPUManager::addGroundPass(Ogre::Pass* GroundPass,
-      const Ogre::Real& AtmosphereRadius, const Ogre::SceneBlendType& SBT)
+  void GPUManager::addGroundPass(Ogre::Pass* GroundPass, const Ogre::Real& AtmosphereRadius, const Ogre::SceneBlendType& SBT)
   {
     GroundPass->setVertexProgram("SkyX_Ground_VP");
     if (mSkyX->getLightingMode() == SkyX::LM_LDR)
@@ -51,21 +50,21 @@ namespace SkyX
       GroundPass->setFragmentProgram("SkyX_Ground_HDR_FP");
     }
 
-    GroundPass->getVertexProgramParameters()->setNamedConstant(
-        "uSkydomeRadius", AtmosphereRadius*10);
+    GroundPass->getVertexProgramParameters()->setNamedConstant("uSkydomeRadius", AtmosphereRadius*10);
 
     GroundPass->setLightingEnabled(false);
 
     GroundPass->setDepthCheckEnabled(true);
     GroundPass->setDepthWriteEnabled(false);
 
+    GroundPass->setCullingMode(Ogre::CULL_NONE);
+
     GroundPass->setSceneBlending(SBT);
 
     /// TODO
-    mGroundPasses.push_back(GroundPass);
+        mGroundPasses.push_back(GroundPass);
 
-    mSkyX->getAtmosphereManager()->_update(
-        mSkyX->getAtmosphereManager()->getOptions(), true);
+    mSkyX->getAtmosphereManager()->_update(mSkyX->getAtmosphereManager()->getOptions(), true);
   }
 
   void GPUManager::_updateFP()
@@ -77,15 +76,29 @@ namespace SkyX
       fp_name = "SkyX_Ground_LDR_FP";
     }
 
-    for (unsigned int k = 0; k < mGroundPasses.size(); k++)
+    for(unsigned int k = 0; k < mGroundPasses.size(); k++)
     {
       mGroundPasses.at(k)->setFragmentProgram(fp_name);
     }
+
+    bool gammaCorrection = mSkyX->getLightingMode() == SkyX::LM_HDR;
+
+    // SkyX_Starfield.png
+    static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName(getSkydomeMaterialName()))
+      ->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setHardwareGammaEnabled(gammaCorrection);
+
+    // SkyX_Moon.png and SkyX_MoonHalo.png
+    static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName(getMoonMaterialName()))
+      ->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setHardwareGammaEnabled(gammaCorrection);
+    static_cast<Ogre::MaterialPtr>(Ogre::MaterialManager::getSingleton().getByName(getMoonMaterialName()))
+      ->getTechnique(0)->getPass(0)->getTextureUnitState(1)->setHardwareGammaEnabled(gammaCorrection);
+
+    _setTextureHWGammaCorrection("SkyX_Starfield.png", gammaCorrection);
+    _setTextureHWGammaCorrection("SkyX_Moon.png", gammaCorrection);
+    _setTextureHWGammaCorrection("SkyX_MoonHalo.png", gammaCorrection);
   }
 
-  void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,
-      const Ogre::String &Name, const int &Value,
-      const bool& UpdateGroundPasses)
+  void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,  const Ogre::String &Name, const int &Value, const bool& UpdateGroundPasses)
   {
     if (!mSkyX->getMeshManager()->isCreated())
     {
@@ -98,15 +111,13 @@ namespace SkyX
     {
       case GPUP_VERTEX:
         {
-          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
-            getVertexProgramParameters();
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
         }
         break;
 
       case GPUP_FRAGMENT:
         {
-          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
-            getFragmentProgramParameters();
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
         }
         break;
       default:
@@ -122,8 +133,7 @@ namespace SkyX
 
     std::vector<Ogre::Pass*>::iterator PassIt;
 
-    for (PassIt = mGroundPasses.begin();
-         PassIt != mGroundPasses.end(); PassIt++)
+    for(PassIt = mGroundPasses.begin(); PassIt != mGroundPasses.end(); PassIt++)
     {
       if (!(*PassIt))
       {
@@ -152,9 +162,7 @@ namespace SkyX
     }
   }
 
-  void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,
-      const Ogre::String &Name, const Ogre::Real &Value,
-      const bool& UpdateGroundPasses)
+  void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,  const Ogre::String &Name, const Ogre::Real &Value, const bool& UpdateGroundPasses)
   {
     if (!mSkyX->getMeshManager()->isCreated())
     {
@@ -167,15 +175,13 @@ namespace SkyX
     {
       case GPUP_VERTEX:
         {
-          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
-            getVertexProgramParameters();
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
         }
         break;
 
       case GPUP_FRAGMENT:
         {
-          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
-            getFragmentProgramParameters();
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
         }
         break;
       default:
@@ -191,8 +197,7 @@ namespace SkyX
 
     std::vector<Ogre::Pass*>::iterator PassIt;
 
-    for (PassIt = mGroundPasses.begin();
-         PassIt != mGroundPasses.end(); PassIt++)
+    for(PassIt = mGroundPasses.begin(); PassIt != mGroundPasses.end(); PassIt++)
     {
       if (!(*PassIt))
       {
@@ -213,6 +218,7 @@ namespace SkyX
             Parameters = (*PassIt)->getFragmentProgramParameters();
           }
           break;
+
         default:
           break;
       }
@@ -262,8 +268,7 @@ namespace SkyX
 
     std::vector<Ogre::Pass*>::iterator PassIt;
 
-    for (PassIt = mGroundPasses.begin();
-         PassIt != mGroundPasses.end(); PassIt++)
+    for(PassIt = mGroundPasses.begin(); PassIt != mGroundPasses.end(); PassIt++)
     {
       if (!(*PassIt))
       {
@@ -292,9 +297,7 @@ namespace SkyX
     }
   }
 
-  void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,
-      const Ogre::String &Name, const Ogre::Vector3 &Value,
-      const bool& UpdateGroundPasses)
+  void GPUManager::setGpuProgramParameter(const GpuProgram &GpuP,  const Ogre::String &Name, const Ogre::Vector3 &Value, const bool& UpdateGroundPasses)
   {
     if (!mSkyX->getMeshManager()->isCreated())
     {
@@ -307,15 +310,13 @@ namespace SkyX
     {
       case GPUP_VERTEX:
         {
-          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
-            getVertexProgramParameters();
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
         }
         break;
 
       case GPUP_FRAGMENT:
         {
-          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->
-            getFragmentProgramParameters();
+          Parameters = mSkydomeMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
         }
         break;
       default:
@@ -331,8 +332,7 @@ namespace SkyX
 
     std::vector<Ogre::Pass*>::iterator PassIt;
 
-    for (PassIt = mGroundPasses.begin();
-         PassIt != mGroundPasses.end(); PassIt++)
+    for(PassIt = mGroundPasses.begin(); PassIt != mGroundPasses.end(); PassIt++)
     {
       if (!(*PassIt))
       {
@@ -367,5 +367,31 @@ namespace SkyX
 
     return (mSkyX->getLightingMode() == SkyX::LM_LDR) ?
       "SkyX_Skydome_" + starfield + "LDR" : "SkyX_Skydome_" + starfield + "HDR";
+  }
+
+  void GPUManager::_setTextureHWGammaCorrection(const Ogre::String& n,
+                                                const bool& g)
+  {
+    Ogre::TexturePtr tex = Ogre::TextureManager::getSingleton().getByName(n);
+
+    if (!tex.isNull())
+    {
+      if (g)
+      {
+        if (!tex->isHardwareGammaEnabled())
+        {
+          tex->setHardwareGammaEnabled(true);
+          tex->reload();
+        }
+      }
+      else
+      {
+        if (tex->isHardwareGammaEnabled())
+        {
+          tex->setHardwareGammaEnabled(false);
+          tex->reload();
+        }
+      }
+    }
   }
 }

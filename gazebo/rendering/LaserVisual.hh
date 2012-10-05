@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 14 Dec 2007
  */
 
-#ifndef LASERVISUAL_HH
-#define LASERVISUAL_HH
+#ifndef _LASERVISUAL_HH_
+#define _LASERVISUAL_HH_
 
 #include <string>
 
@@ -37,19 +37,30 @@ namespace gazebo
 
     class DynamicLines;
 
-    /// \brief Visualization for lasers
+    /// \class LaserVisual LaserVisual.hh rendering/LaserVisual.hh
+    /// \brief Visualization for laser data.
     class LaserVisual : public Visual
     {
+      /// \brief Constructor.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _vis Pointer to the parent Visual.
+      /// \param[in] _topicName Name of the topic that has laser data.
       public: LaserVisual(const std::string &_name, VisualPtr _vis,
                           const std::string &_topicName);
 
+      /// \brief Destructor.
       public: virtual ~LaserVisual();
 
+      /// \brief Callback when laser data is received.
       private: void OnScan(ConstLaserScanPtr &_msg);
 
+      /// \brief Pointer to a node that handles communication.
       private: transport::NodePtr node;
+
+      /// \brief Subscription to the laser data.
       private: transport::SubscriberPtr laserScanSub;
 
+      /// \brief Renders the laser data.
       private: DynamicLines *rayFan;
     };
     /// \}

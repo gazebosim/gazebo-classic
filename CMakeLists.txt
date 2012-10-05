@@ -6,19 +6,6 @@ if(COMMAND CMAKE_POLICY)
 endif(COMMAND CMAKE_POLICY)
 enable_testing()
 
-project (Gazebo)
-string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
-
-set (GAZEBO_VERSION_NAME "hydrogen")
-set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 2)
-set (GAZEBO_PATCH_VERSION 0)
-
-set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
-
-message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
-set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
-
 # with -fPIC
 if(UNIX AND NOT WIN32)
   set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
@@ -33,15 +20,28 @@ if(UNIX AND NOT WIN32)
  endif(CMAKE_UNAME)
 endif()
 
+project (Gazebo)
+string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
+set (GAZEBO_VERSION_NAME "hydrogen")
+set (GAZEBO_MAJOR_VERSION 1)
+set (GAZEBO_MINOR_VERSION 2)
+set (GAZEBO_PATCH_VERSION 0)
+
+set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
+
+message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
+set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
+
+
 # developer's option ot cache PKG_CONFIG_PATH and LD_LIBRARY_PATH for local installs
 if(PKG_CONFIG_PATH)
   set (ENV{PKG_CONFIG_PATH} ${PKG_CONFIG_PATH}:$ENV{PKG_CONFIG_PATH})
 endif()
-message(status '$ENV{PKG_CONFIG_PATH}\n\n\n ${PKG_CONFIG_PATH}\n\n')
-
 if(LD_LIBRARY_PATH)
   set (ENV{LD_LIBRARY_PATH} ${LD_LIBRARY_PATH}:$ENV{LD_LIBRARY_PATH})
 endif()
+
 
 set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
 set (LIB_INSTALL_DIR "lib" CACHE STRING "Installation directory for libraries (relative to CMAKE_INSTALL_PREFIX)") 
@@ -159,7 +159,7 @@ else()
   set (BUILD_TYPE_PROFILE FALSE)
 endif()
 
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
   set (BUILD_TYPE_RELEASE TRUE)
 else()
   set (BUILD_TYPE_RELEASE FALSE)
@@ -209,7 +209,7 @@ if (build_errors)
     message(STATUS ${msg})
   endforeach ()
   message(STATUS "END BUILD ERRORS\n")
-  message (FATAL_ERROR "Errors encountered in build.")
+  message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 
   ########################################

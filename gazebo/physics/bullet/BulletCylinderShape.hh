@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: Cylinder shape
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 14 Oct 2009
  */
 
-#ifndef __BULLETCYLINDERSHAPE_HH__
-#define __BULLETCYLINDERSHAPE_HH__
+#ifndef _BULLETCYLINDERSHAPE_HH_
+#define _BULLETCYLINDERSHAPE_HH_
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/CylinderShape.hh"

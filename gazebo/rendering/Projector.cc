@@ -1,7 +1,7 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
  *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ *     Nate Koenig
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -66,10 +66,7 @@ void Projector::Load(const std::string &_name,
   this->controlSub = this->node->Subscribe(topicName, &Projector::OnMsg, this);
 
   if (!this->visual)
-  {
-    gzerr << "Projector does not have a valid parent visual\n";
     return;
-  }
 
   int retryCount = 0;
 
@@ -92,9 +89,11 @@ void Projector::Load(const std::string &_name,
       ++retryCount;
     }
   }
-/*
+
+  this->projector.SetEnabled(true);
+
   // Start projector
-  this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
+  /*this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
     boost::bind(&Projector::ToggleProjector, this, true));
     */
 }
@@ -164,12 +163,13 @@ void Projector::SetTexture(const std::string &_textureName)
 void Projector::Toggle()
 {
   // if not headless
-  if (this->projector.initialized)
+  /*if (this->projector.initialized)
   {
     this->projector.SetEnabled(!this->projector.enabled);
   }
   else
     gzwarn << "could not start projector, toggle failed\n";
+    */
 }
 
 /////////////////////////////////////////////////
@@ -179,7 +179,7 @@ Projector::ProjectorFrameListener::ProjectorFrameListener()
   this->initialized = false;
   this->usingShaders = false;
 
-  this->scene_node = NULL;
+  this->node = NULL;
   this->filterNode = NULL;
   this->projectorQuery = NULL;
   this->frustum = NULL;
@@ -194,11 +194,11 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 {
   this->RemovePassFromMaterials();
 
-  if (this->scene_node)
+  if (this->node)
   {
-    this->scene_node->detachObject(this->frustum);
+    this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
-    this->scene_node = NULL;
+    this->node = NULL;
   }
 
   if (this->filterNode)
@@ -269,9 +269,10 @@ bool Projector::ProjectorFrameListener::frameStarted(
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetEnabled(bool _enabled)
 {
-  this->enabled = _enabled;
-  if (!this->enabled)
+  this->enabled = true;//_enabled;
+  /*if (!this->enabled)
     this->RemovePassFromMaterials();
+    */
   rendering::RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -284,11 +285,11 @@ void Projector::ProjectorFrameListener::SetUsingShaders(bool _usingShaders)
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetSceneNode()
 {
-  if (this->scene_node)
+  if (this->node)
   {
-    this->scene_node->detachObject(this->frustum);
+    this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
-    this->scene_node = NULL;
+    this->node = NULL;
   }
 
   if (this->filterNode)
@@ -298,14 +299,14 @@ void Projector::ProjectorFrameListener::SetSceneNode()
     this->filterNode = NULL;
   }
 
-  this->scene_node = this->visual->GetSceneNode()->createChildSceneNode(
+  this->node = this->visual->GetSceneNode()->createChildSceneNode(
       this->nodeName);
 
   this->filterNode = this->visual->GetSceneNode()->createChildSceneNode(
       this->filterNodeName);
 
-  if (this->scene_node)
-    this->scene_node->attachObject(this->frustum);
+  if (this->node)
+    this->node->attachObject(this->frustum);
 
   if (this->filterNode)
   {
@@ -322,14 +323,12 @@ void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
   Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);
   Ogre::Quaternion offsetQuaternion;
 
-  this->scene_node->setPosition(ogreVec);
-  this->scene_node->setOrientation(ogreQuaternion);
+  this->node->setPosition(ogreVec);
+  this->node->setOrientation(ogreQuaternion);
   this->filterNode->setPosition(ogreVec);
 
   offsetQuaternion = Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y);
   this->filterNode->setOrientation(offsetQuaternion + ogreQuaternion);
-
-  gzerr << _pose << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -459,7 +458,6 @@ void Projector::ProjectorFrameListener::AddPassToMaterial(
 {
   if (this->projectorTargets.find(_matName) != this->projectorTargets.end())
   {
-    gzwarn << "Adding a Material [" << _matName << "] that already exists.\n";
     return;
   }
 

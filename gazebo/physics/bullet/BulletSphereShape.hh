@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: Sphere collisionetry
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 21 May 2009
  */
 
-#ifndef __BULLETSPHERESHAPE_HH__
-#define __BULLETSPHERESHAPE_HH__
+#ifndef _BULLETSPHERESHAPE_HH_
+#define _BULLETSPHERESHAPE_HH_
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/SphereShape.hh"

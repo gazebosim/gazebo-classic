@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A ODEHingeJoint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -31,8 +31,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODEHingeJoint::ODEHingeJoint(dWorldID _worldId)
-    : HingeJoint<ODEJoint>()
+ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
+    : HingeJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateHinge(_worldId, NULL);
 }
@@ -109,8 +109,9 @@ void ODEHingeJoint::ApplyDamping()
 //////////////////////////////////////////////////
 math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 {
-  math::Angle result = dJointGetHingeAngle(this->jointId);
-
+  math::Angle result;
+  if (this->jointId)
+    result = dJointGetHingeAngle(this->jointId);
   return result;
 }
 

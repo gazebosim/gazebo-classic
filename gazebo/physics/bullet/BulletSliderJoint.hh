@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: A slider or primastic joint
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETSLIDERJOINT_HH__
-#define __BULLETSLIDERJOINT_HH__
+#ifndef _BULLETSLIDERJOINT_HH_
+#define _BULLETSLIDERJOINT_HH_
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
 #include "physics/bullet/BulletJoint.hh"
@@ -41,7 +41,7 @@ namespace gazebo
     class BulletSliderJoint : public SliderJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletSliderJoint(btDynamicsWorld *world);
+      public: BulletSliderJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletSliderJoint();

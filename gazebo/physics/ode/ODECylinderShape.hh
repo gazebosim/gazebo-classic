@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __ODECYLINDERSHAPE_HH__
-#define __ODECYLINDERSHAPE_HH__
+#ifndef _ODECYLINDERSHAPE_HH_
+#define _ODECYLINDERSHAPE_HH_
 
 #include "physics/CylinderShape.hh"
 #include "physics/ode/ODEPhysics.hh"

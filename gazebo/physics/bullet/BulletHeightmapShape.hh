@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: Heightmap collision
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 8 May 2003
  */
 
-#ifndef __BULLETHEIGHTMAPGEOM_HH__
-#define __BULLETHEIGHTMAPGEOM_HH__
+#ifndef _BULLETHEIGHTMAPGEOM_HH_
+#define _BULLETHEIGHTMAPGEOM_HH_
 #include <string>
 
 #include "physics/HeightmapShape.hh"

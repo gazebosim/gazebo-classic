@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ void TopicManager::Init()
 void TopicManager::Fini()
 {
   // These two lines make sure that pending messages get sent out
-  this->ProcessNodes();
+  this->ProcessNodes(true);
   ConnectionManager::Instance()->RunUpdate();
 
   PublicationPtr_M::iterator iter;
@@ -93,7 +93,7 @@ void TopicManager::RemoveNode(unsigned int _id)
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ProcessNodes()
+void TopicManager::ProcessNodes(bool _onlyOut)
 {
   std::vector<NodePtr>::iterator iter;
 
@@ -106,7 +106,7 @@ void TopicManager::ProcessNodes()
     this->nodes[i]->ProcessPublishers();
   }
 
-  if (!this->pauseIncoming)
+  if (!this->pauseIncoming && !_onlyOut)
   {
     this->nodeMutex->lock();
     s = this->nodes.size();

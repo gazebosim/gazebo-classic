@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,20 +32,39 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
+    /// \class AxisVisual AxisVisual.hh rendering/AxisVisual.hh
     /// \brief Basic axis visualization
     class AxisVisual : public Visual
     {
+      /// \brief Constructor
+      /// \param _name Name of the AxisVisual
+      /// \param _vis Parent visual
       public: AxisVisual(const std::string &_name, VisualPtr _vis);
+
+      /// \brief Destructor
       public: virtual ~AxisVisual();
 
+      /// \brief Load the axis visual
       public: virtual void Load();
 
+      /// \brief Load the rotation tube
       public: void ShowRotation(unsigned int _axis);
 
+      /// \brief Scale the X axis
+      /// \param _scale Scaling factor
       public: void ScaleXAxis(const math::Vector3 &_scale);
+
+      /// \brief Scale the Y axis
+      /// \param _scale Scaling factor
       public: void ScaleYAxis(const math::Vector3 &_scale);
+
+      /// \brief Scale the Z axis
+      /// \param _scale Scaling factor
       public: void ScaleZAxis(const math::Vector3 &_scale);
 
+      /// \brief Set the material used to render and axis
+      /// \param _axis The number of the axis (0, 1, 2 = x,y,z)
+      /// \param _material The name of the material to apply to the axis
       public: void SetAxisMaterial(unsigned int _axis,
                                    const std::string &_material);
 

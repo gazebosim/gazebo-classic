@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,11 @@
  * Author: Nate Koenig
  */
 
-#ifndef JOINTVISUAL_HH
-#define JOINTVISUAL_HH
+#ifndef _JOINTVISUAL_HH_
+#define _JOINTVISUAL_HH_
 
 #include <string>
 #include "rendering/Visual.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {
@@ -36,13 +31,23 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class JointVisual JointVisual.hh rendering/JointVisual.hh
     /// \brief Visualization for joints
     class JointVisual : public Visual
     {
+      /// \brief Constructor
+      /// \param[in] _name Name of the visual
+      /// \param[in] _vis Pointer to the parent visual
       public: JointVisual(const std::string &_name, VisualPtr _vis);
+
+      /// \brief Destructor
       public: virtual ~JointVisual();
 
+      /// \brief Load the visual based on a message
+      /// \param[in] _msg Joint message
       public: void Load(ConstJointPtr &_msg);
+
+      /// \brief The visual used to draw the joint.
       private: AxisVisualPtr axisVisual;
     };
     /// \}

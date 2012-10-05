@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,20 @@ namespace gazebo
 
   /// \addtogroup gazebo_common Common
   /// \{
+
+  /// \enum PluginType
+  /// \brief Used to specify the type of plugin.
+  enum PluginType
+  {
+    /// \brief A World plugin
+    WORLD_PLUGIN,
+    /// \brief A Model plugin
+    MODEL_PLUGIN,
+    /// \brief A Sensor plugin
+    SENSOR_PLUGIN,
+    /// \brief A System plugin
+    SYSTEM_PLUGIN
+  };
 
   /// \brief A class which all plugins must inherit from
   template<class T>
@@ -166,6 +180,12 @@ namespace gazebo
               return result;
             }
 
+    public: PluginType GetType() const
+            {
+              return this->type;
+            }
+
+    protected: PluginType type;
     protected: std::string filename;
     protected: std::string handle;
 
@@ -181,11 +201,17 @@ namespace gazebo
   ///        reference</a>.
   class WorldPlugin : public PluginT<WorldPlugin>
   {
+    public: WorldPlugin()
+             {this->type = WORLD_PLUGIN;}
+
     /// \brief Load function
-    /// Loads SDF and setups objects in the World used by this plugin.
-    /// This function cannot block.
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param _world Pointer the World
+    /// \param _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::WorldPtr _world,
-                sdf::ElementPtr _sdf) = 0;
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -195,11 +221,17 @@ namespace gazebo
   ///        reference</a>.
   class ModelPlugin : public PluginT<ModelPlugin>
   {
+    public: ModelPlugin()
+             {this->type = MODEL_PLUGIN;}
+
     /// \brief Load function
-    /// Loads SDF and setups Model and related objects in the plugin.
-    /// This function cannot block.
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param _model Pointer the Model
+    /// \param _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::ModelPtr _model,
-                sdf::ElementPtr _sdf) = 0;
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -207,14 +239,20 @@ namespace gazebo
   /// \brief A plugin with access to physics::Sensor.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  /// Loads SDF and setups Sensor and related objects in the plugin.
-  /// This function cannot block.
   class SensorPlugin : public PluginT<SensorPlugin>
   {
+    public: SensorPlugin()
+             {this->type = SENSOR_PLUGIN;}
+
+
     /// \brief Load function
-    /// This function cannot block.
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param _sensor Pointer the Sensor
+    /// \param _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(sensors::SensorPtr _sensor,
-                sdf::ElementPtr _sdf) = 0;
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -223,13 +261,23 @@ namespace gazebo
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
-  /// Loads SDF and setups system related objects controlled by the plugin.
-  /// This function cannot block.
   class SystemPlugin : public PluginT<SystemPlugin>
   {
+    public: SystemPlugin()
+             {this->type = SYSTEM_PLUGIN;}
+
     /// \brief Load function
-    public: virtual void Load(int argc = 0, char**argv = NULL) = 0;
+    ///
+    /// Called before Gazebo is loaded. Must not block.
+    /// \param _argc Number of command line arguments.
+    /// \param _argv Array of command line arguments.
+    public: virtual void Load(int _argc = 0, char **_argv = NULL) = 0;
+
+    /// \brief Initialize the plugin
+    ///
+    /// Called after Gazebo has been loaded. Must not block.
     public: virtual void Init() {}
+
     public: virtual void Reset() {}
   };
 

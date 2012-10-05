@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: The base Bullet joint class
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 15 May 2009
  */
 
@@ -30,8 +30,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletJoint::BulletJoint()
-  : Joint()
+BulletJoint::BulletJoint(BasePtr _parent)
+  : Joint(_parent)
 {
   this->constraint = NULL;
   this->world = NULL;

@@ -21,9 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
-#include <utility>
-#include "gazebo/math/Helpers.hh"
-#include "gazebo/rendering/skyx/include/ColorGradient.h"
+#include "ColorGradient.h"
 
 namespace SkyX
 {
@@ -41,12 +39,12 @@ namespace SkyX
     if (mMalFormed)
     {
       SkyXLOG("Mal-formed ColorGradient");
-      return Ogre::Vector3(0, 0, 0);
+      return Ogre::Vector3(0,0,0);
     }
 
     if (CFrameVector.size() == 0)
     {
-      return Ogre::Vector3(0, 0, 0);
+      return Ogre::Vector3(0,0,0);
     }
     else if (CFrameVector.size() == 1)
     {
@@ -60,8 +58,7 @@ namespace SkyX
     minBound.second = -1;
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-      if (CFrameVector.at(k).second < p &&
-          CFrameVector.at(k).second > minBound.second)
+      if (CFrameVector.at(k).second < p && CFrameVector.at(k).second > minBound.second)
       {
         minBound.first = k;
         minBound.second = CFrameVector.at(k).second;
@@ -73,8 +70,7 @@ namespace SkyX
     maxBound.second = 2;
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-      if (CFrameVector.at(k).second > p &&
-          CFrameVector.at(k).second < maxBound.second)
+      if (CFrameVector.at(k).second > p && CFrameVector.at(k).second < maxBound.second)
       {
         maxBound.first = k;
         maxBound.second = CFrameVector.at(k).second;
@@ -84,19 +80,17 @@ namespace SkyX
     float range = maxBound.second - minBound.second,
           rangepoint = (p - minBound.second) / range;
 
-    return CFrameVector.at(minBound.first).first*(1-rangepoint) +
-           CFrameVector.at(maxBound.first).first*rangepoint;
+    return CFrameVector.at(minBound.first).first*(1-rangepoint) + CFrameVector.at(maxBound.first).first*rangepoint;
   }
 
   bool ColorGradient::_checkBounds() const
   {
     std::pair<bool, bool> existbounds;
-    existbounds.first = false;
-    existbounds.second = false;
+    existbounds.first = false; existbounds.second = false;
 
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-      if (gazebo::math::equal(CFrameVector.at(k).second, 0.0f))
+      if (equal(CFrameVector.at(k).second, 0.0f))
       {
         // More than one min bound
         if (existbounds.first)
@@ -115,7 +109,7 @@ namespace SkyX
 
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {
-      if (gazebo::math::equal(CFrameVector.at(k).second, 1.0f))
+      if (equal(CFrameVector.at(k).second, 1.0f))
       {
         // More than one min bound
         if (existbounds.second)

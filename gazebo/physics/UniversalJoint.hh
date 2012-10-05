@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A universal joint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -36,8 +36,9 @@ namespace gazebo
     class UniversalJoint : public T
     {
       /// \brief Constructor
-      public: UniversalJoint() : T()
+      public: UniversalJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::UNIVERSAL_JOINT); }
+
       /// \brief Destuctor
       public: virtual ~UniversalJoint()
               { }

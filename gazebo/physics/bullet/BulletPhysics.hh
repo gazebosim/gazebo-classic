@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,8 @@ namespace gazebo
                                                    LinkPtr _body);
 
       /// \brief Create a new joint
-      public: virtual JointPtr CreateJoint(const std::string &_type);
+      public: virtual JointPtr CreateJoint(const std::string &_type,
+                                           ModelPtr _parent);
 
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);

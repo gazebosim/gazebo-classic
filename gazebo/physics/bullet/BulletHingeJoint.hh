@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: A body that has a box shape
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
-#ifndef __BULLETHINGEJOINT_HH__
-#define __BULLETHINGEJOINT_HH__
+#ifndef _BULLETHINGEJOINT_HH_
+#define _BULLETHINGEJOINT_HH_
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
@@ -42,7 +42,7 @@ namespace gazebo
     class BulletHingeJoint : public HingeJoint<BulletJoint>
     {
       ///  Constructor
-      public: BulletHingeJoint(btDynamicsWorld *world);
+      public: BulletHingeJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// Destructor
       public: virtual ~BulletHingeJoint();

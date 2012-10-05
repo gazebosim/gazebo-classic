@@ -24,29 +24,39 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_Prerequisites_H_
 #define _SkyX_Prerequisites_H_
 
+#ifdef _MSC_VER
+#pragma warning (disable:4244) // conversion from 'xxx' to 'yyy', possible loss of data
+#pragma warning (disable:4355) // 'this' : used in base member initializer list
+#endif
+
 /// Include external headers
 #include <OGRE/Ogre.h>
 
 /// Define the dll export qualifier if compiling for Windows
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-  #ifdef SKYX_LIB
-    #define DllExport __declspec (dllexport)
-  #else
-    #define DllExport __declspec (dllimport)
-  #endif
+   #ifdef SKYX_LIB
+     #define DllExport __declspec (dllexport)
+   #else
+     #define DllExport __declspec (dllimport)
+   #endif
 #else
-  #define DllExport
+   #define DllExport
 #endif
 
 /// Log macro
-#define SkyXLOG(msg) Ogre::LogManager::getSingleton().logMessage("[SkyX] " +\
-    Ogre::String(msg));
+#define SkyXLOG(msg) Ogre::LogManager::getSingleton().logMessage("[SkyX] " + Ogre::String(msg));
 
 /// SkyX defines
 #define SKYX_VERSION_MAJOR 0
 #define SKYX_VERSION_MINOR 3
-#define SKYX_VERSION_PATCH 0
+#define SKYX_VERSION_PATCH 1
 
 #define SKYX_RESOURCE_GROUP "SkyX"
+
+template<typename T>
+inline bool equal(const T &_a, const T &_b, const T &_epsilon = 1e-6)
+{
+  return std::fabs(_a - _b) <= _epsilon;
+}
 
 #endif

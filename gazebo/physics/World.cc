@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
+#include "gazebo/common/ModelDatabase.hh"
+#include "gazebo/common/Common.hh"
 #include "gazebo/common/Diagnostics.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -154,7 +156,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
-  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
     this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 1);
@@ -232,12 +233,6 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
-  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
   // Initialize all the entities
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Init();
@@ -366,6 +361,19 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
+  static bool first = true;
+
+
+  /// Plugins that manipulate joints (and probably other properties) require
+  /// one iteration of the physics engine. Do not remove this.
+  if (first)
+  {
+    this->physicsEngine->UpdatePhysics();
+    this->LoadPlugins();
+    first = false;
+    return;
+  }
+
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -438,23 +446,6 @@ void World::Clear()
 std::string World::GetName() const
 {
   return this->name;
-}
-
-//////////////////////////////////////////////////
-unsigned int World::GetParamCount() const
-{
-  return this->parameters.size();
-}
-
-//////////////////////////////////////////////////
-common::Param *World::GetParam(unsigned int index) const
-{
-  if (index < this->parameters.size())
-    return this->parameters[index];
-  else
-    gzerr << "World::GetParam - Invalid param index\n";
-
-  return NULL;
 }
 
 //////////////////////////////////////////////////
@@ -592,17 +583,6 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
       childElem = childElem->GetNextElement("road");
     }
   }
-
-  // Load the plugins
-  if (_sdf->HasElement("plugin"))
-  {
-    sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
-    while (pluginElem)
-    {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -612,7 +592,7 @@ unsigned int World::GetModelCount() const
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::GetModel(unsigned int _index)
+ModelPtr World::GetModel(unsigned int _index) const
 {
   ModelPtr model;
 
@@ -628,6 +608,18 @@ ModelPtr World::GetModel(unsigned int _index)
   }
 
   return model;
+}
+
+//////////////////////////////////////////////////
+std::list<ModelPtr> World::GetModels() const
+{
+  std::list<ModelPtr> models;
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+  {
+    models.push_back(this->GetModel(i));
+  }
+
+  return models;
 }
 
 //////////////////////////////////////////////////
@@ -884,14 +876,53 @@ void World::ModelUpdateSingleLoop()
 
 
 //////////////////////////////////////////////////
+void World::LoadPlugins()
+{
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+  {
+    if (boost::shared_dynamic_cast<Model>(this->rootElement->GetChild(i)))
+    {
+      boost::shared_dynamic_cast<Model>(
+          this->rootElement->GetChild(i))->LoadPlugins();
+    }
+  }
+
+  // Load the plugins
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+
+
+  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+}
+
+//////////////////////////////////////////////////
 void World::LoadPlugin(const std::string &_filename,
                        const std::string &_name,
                        sdf::ElementPtr _sdf)
 {
   gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
                                                               _name);
+
   if (plugin)
   {
+    if (plugin->GetType() != WORLD_PLUGIN)
+    {
+      gzerr << "World[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
+      return;
+    }
     plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back(plugin);
 
@@ -994,11 +1025,13 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_info")
     {
+      std::cout << "entity_info[" << (*iter).data() << "]\n";
       BasePtr entity = this->rootElement->GetByName((*iter).data());
       if (entity)
       {
         if (entity->HasType(Base::MODEL))
         {
+          printf("Is a model\n");
           msgs::Model modelMsg;
           ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
           model->FillModelMsg(modelMsg);
@@ -1009,6 +1042,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::LINK))
         {
+          printf("Is a link\n");
           msgs::Link linkMsg;
           LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
           link->FillLinkMsg(linkMsg);
@@ -1019,6 +1053,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::COLLISION))
         {
+          printf("Is a collision\n");
           msgs::Collision collisionMsg;
           CollisionPtr collision =
             boost::shared_dynamic_cast<Collision>(entity);
@@ -1030,6 +1065,7 @@ void World::ProcessRequestMsgs()
         }
         else if (entity->HasType(Base::JOINT))
         {
+          printf("Is a joint\n");
           msgs::Joint jointMsg;
           JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
           joint->FillJointMsg(jointMsg);
@@ -1136,7 +1172,10 @@ void World::ProcessFactoryMsgs()
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
-      if (!sdf::readFile((*iter).sdf_filename(), factorySDF))
+      std::string filename = common::ModelDatabase::GetModelFile(
+          (*iter).sdf_filename());
+
+      if (!sdf::readFile(filename, factorySDF))
       {
         gzerr << "Unable to read sdf file.\n";
         continue;

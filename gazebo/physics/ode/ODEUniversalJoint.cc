@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A universal joint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -30,8 +30,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId)
-    : UniversalJoint<ODEJoint>()
+ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
+    : UniversalJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateUniversal(_worldId, NULL);
 }
@@ -95,10 +95,13 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;
 
-  if (_index == 0)
-    result = dJointGetUniversalAngle1(this->jointId);
-  else
-    result = dJointGetUniversalAngle2(this->jointId);
+  if (this->jointId)
+  {
+    if (_index == 0)
+      result = dJointGetUniversalAngle1(this->jointId);
+    else
+      result = dJointGetUniversalAngle2(this->jointId);
+  }
 
   return result;
 }

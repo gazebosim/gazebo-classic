@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 15 May 2009
  */
 
-#ifndef __BULLETLINK_HH__
-#define __BULLETLINK_HH__
+#ifndef _BULLETLINK_HH_
+#define _BULLETLINK_HH_
 
 #include "physics/bullet/bullet_inc.h"
 #include "physics/bullet/BulletTypes.hh"

@@ -45,9 +45,7 @@ void main_fp(
 	// OUT 
 	out float4 oColor		: COLOR,
 	// UNIFORM
-#ifdef LDR
 	uniform float     uExposure,
-#endif // LDR
 	// Sun information
 	uniform float3    uSunColor,
 	// Main cloud layer parameters
@@ -103,5 +101,7 @@ void main_fp(
     
 #ifdef LDR
     oColor.xyz = float3(1 - exp(-uExposure * oColor.xyz));
-#endif // LDR
+#else // HDR
+    oColor.xyz *= pow(uExposure, 0.5);
+#endif
 }

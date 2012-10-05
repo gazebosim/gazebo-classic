@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef __GAZEBO_HH__
-#define __GAZEBO_HH__
+#ifndef _GAZEBO_HH_
+#define _GAZEBO_HH_
 
 #include <gazebo/gazebo_core.hh>
 #include <string>

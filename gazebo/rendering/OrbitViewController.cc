@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,14 +44,8 @@ OrbitViewController::OrbitViewController(UserCamera *_camera)
   this->refVisual.reset(new Visual("OrbitViewController",
                         this->camera->GetScene()->GetWorldVisual()));
   this->refVisual->Init();
-  this->refVisual->AttachMesh("unit_sphere");
-  this->refVisual->SetScale(math::Vector3(0.2, 0.2, 0.1));
-  this->refVisual->SetCastShadows(false);
-  this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
   this->refVisual->SetWorldPosition(this->focalPoint);
-  this->refVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI &
-                                      GZ_VISIBILITY_NOT_SELECTABLE);
 }
 
 //////////////////////////////////////////////////
@@ -72,7 +66,6 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
   if (this->distance <= 1.0)
     std::cout << "Distance[" << this->distance << "]\n";
 
-  this->refVisual->SetVisible(false);
   this->refVisual->SetWorldPosition(this->focalPoint);
 }
 
@@ -155,9 +148,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector3 directionVec(0, 0, 0);
 
-  if (_event.buttons & common::MouseEvent::LEFT)
+  if (_event.buttons & common::MouseEvent::MIDDLE)
   {
-    this->refVisual->SetVisible(true);
     this->yaw += drag.x * _event.moveScale * -0.2;
     this->pitch += drag.y * _event.moveScale * 0.2;
 
@@ -166,8 +158,6 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   }
   else if (_event.type == common::MouseEvent::SCROLL)
   {
-    this->refVisual->SetVisible(false);
-
     // This assumes that _event.scroll.y is -1 or +1
     if (_event.shift)
     {
@@ -181,37 +171,6 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
           -(_event.scroll.y*20) * _event.moveScale * (this->distance / 10.0));
     }
   }
-  else if (_event.buttons & common::MouseEvent::RIGHT)
-  {
-    this->refVisual->SetVisible(true);
-    if (_event.shift)
-    {
-      this->Translate(math::Vector3(
-          -drag.y * _event.moveScale * (this->distance / 10.0), 0, 0));
-    }
-    else
-    {
-      this->Zoom(-drag.y * _event.moveScale * (this->distance / 10.0));
-    }
-  }
-  else if (_event.buttons & common::MouseEvent::MIDDLE)
-  {
-    this->refVisual->SetVisible(true);
-    double fovY = this->camera->GetVFOV().GetAsRadian();
-    double fovX = 2.0f * atan(tan(fovY / 2.0f) *
-                  this->camera->GetAspectRatio());
-
-    int width = this->camera->GetViewportWidth();
-    int height = this->camera->GetViewportHeight();
-
-    this->Translate(math::Vector3(0.0,
-          (drag.x / static_cast<float>(width)) *
-          this->distance * tan(fovX / 2.0) * 2.0,
-          (drag.y / static_cast<float>(height)) *
-          this->distance * tan(fovY / 2.0) * 2.0));
-  }
-  else
-    this->refVisual->SetVisible(false);
 
   this->UpdatePose();
 }

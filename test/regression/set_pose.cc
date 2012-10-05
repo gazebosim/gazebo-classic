@@ -15,11 +15,10 @@
  *
 */
 
-#include <signal.h>
-
+// #include <signal.h>
+// #include "gui/Gui.hh"
 #include "ServerFixture.hh"
 #include "physics/physics.hh"
-#include "gui/Gui.hh"
 
 using namespace gazebo;
 class PhysicsTest : public ServerFixture
@@ -29,13 +28,13 @@ class PhysicsTest : public ServerFixture
 
 TEST_F(PhysicsTest, State)
 {
-  pid_t pid = fork();
-  if (pid)
-  {
-    gazebo::gui::run(0, NULL);
-    kill(pid, SIGINT);
-  }
-  else
+  // pid_t pid = fork();
+  // if (pid)
+  // {
+  //   gazebo::gui::run(0, NULL);
+  //   kill(pid, SIGINT);
+  // }
+  // else
   {
     // intentionally break the joint using Link::SetWorldPose
     // let it conflict with Physics pose updates and make sure
@@ -45,12 +44,10 @@ TEST_F(PhysicsTest, State)
     physics::WorldPtr world = physics::get_world("default");
     world->SetPaused(true);
     EXPECT_TRUE(world != NULL);
-
-
+ 
     physics::WorldState worldState = world->GetState();
     physics::ModelState modelState = worldState.GetModelState(0);
     physics::LinkState linkState = modelState.GetLinkState(0);
-
 
     {
       msgs::Factory msg;
@@ -216,9 +213,9 @@ TEST_F(PhysicsTest, State)
     }
     world->SetPaused(false);
 
-    physics::LinkPtr link_1 = model->GetLink("link_1");
-    physics::LinkPtr link_2 = model->GetLink("link_2");
-    physics::LinkPtr link_3 = model->GetLink("link_3");
+    physics::LinkPtr link_1 = model->GetLink("model_1::link_1");
+    physics::LinkPtr link_2 = model->GetLink("model_1::link_2");
+    physics::LinkPtr link_3 = model->GetLink("model_1::link_3");
 
 
 
@@ -234,9 +231,9 @@ TEST_F(PhysicsTest, State)
 
     srand(time(NULL));
 
-    physics::JointPtr joint_01 = model->GetJoint("joint_01");
-    physics::JointPtr joint_12 = model->GetJoint("joint_12");
-    physics::JointPtr joint_23 = model->GetJoint("joint_23");
+    physics::JointPtr joint_01 = model->GetJoint("model_1::joint_01");
+    physics::JointPtr joint_12 = model->GetJoint("model_1::joint_12");
+    physics::JointPtr joint_23 = model->GetJoint("model_1::joint_23");
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,36 +65,64 @@ namespace gazebo
       "trimesh"
     };
 
+    /// \class Base Base.hh physics/Base.hh
     /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {
+      /// \enum EntityType
+      /// \brief Unique identifiers for all entity types.
       public: enum EntityType {
+                /// \brief Base type
                 BASE            = 0x00000000,
+                /// \brief Entity type
                 ENTITY          = 0x00000001,
+                /// \brief Model type
                 MODEL           = 0x00000002,
+                /// \brief Link type
                 LINK            = 0x00000004,
+                /// \brief Collision type
                 COLLISION       = 0x00000008,
+                /// \brief Actor type
                 ACTOR           = 0x00000016,
+                /// \brief Light type
                 LIGHT           = 0x00000010,
+                /// \brief Visual type
                 VISUAL          = 0x00000020,
 
+                /// \brief Joint type
                 JOINT           = 0x00000040,
+                /// \brief BallJoint type
                 BALL_JOINT      = 0x00000080,
+                /// \brief Hing2Joint type
                 HINGE2_JOINT    = 0x00000100,
+                /// \brief HingeJoint type
                 HINGE_JOINT     = 0x00000200,
+                /// \brief SliderJoint type
                 SLIDER_JOINT    = 0x00000400,
+                /// \brief ScrewJoint type
                 SCREW_JOINT     = 0x00000800,
+                /// \brief UniversalJoint type
                 UNIVERSAL_JOINT = 0x00001000,
 
+                /// \brief Shape type
                 SHAPE           = 0x00002000,
+                /// \brief BoxShape type
                 BOX_SHAPE       = 0x00004000,
+                /// \brief CylinderShape type
                 CYLINDER_SHAPE  = 0x00008000,
+                /// \brief HeightmapShape type
                 HEIGHTMAP_SHAPE = 0x00010000,
+                /// \brief MapShape type
                 MAP_SHAPE       = 0x00020000,
+                /// \brief MultiRayShape type
                 MULTIRAY_SHAPE  = 0x00040000,
+                /// \brief RayShape type
                 RAY_SHAPE       = 0x00080000,
+                /// \brief PlaneShape type
                 PLANE_SHAPE     = 0x00100000,
+                /// \brief SphereShape type
                 SPHERE_SHAPE    = 0x00200000,
+                /// \brief TrimeshShape type
                 TRIMESH_SHAPE   = 0x00400000
               };
 

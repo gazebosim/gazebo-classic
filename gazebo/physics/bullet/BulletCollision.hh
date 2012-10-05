@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef __BULLET_COLLISION_HH__
-#define __BULLET_COLLISION_HH__
+#ifndef _BULLET_COLLISION_HH_
+#define _BULLET_COLLISION_HH_
 
 #include <string>
 

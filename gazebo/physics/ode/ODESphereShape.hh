@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __ODESPHERESHAPE_HH__
-#define __ODESPHERESHAPE_HH__
+#ifndef _ODESPHERESHAPE_HH_
+#define _ODESPHERESHAPE_HH_
 
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODECollision.hh"

@@ -34,24 +34,22 @@ namespace SkyX
   {
   public:
       /** Constructor
-        @param deleteBySkyX true to automatically destroy the controller by
-        SkyX, false otherwise
+        @param deleteBySkyX true to automatically destroy the controller by SkyX, false otherwise
      */
-    inline explicit Controller(const bool& deleteBySkyX)
-      : mDeleteBySkyX(deleteBySkyX)
+    inline Controller(const bool& deleteBySkyX)
+    	: mDeleteBySkyX(deleteBySkyX)
     {
     }
 
     /** Destructor
      */
-    inline virtual ~Controller() {}
+    inline virtual ~Controller(){}
 
     /** Update controller
-        @param simDeltaTime Simulation delta time (It's not the time since
-        last frame, it's the delta simulation time, one time the time since
-        last frame has been multiplied by the time multiplier)
+        @param simDeltaTime Simulation delta time (It's not the time since last frame, it's the delta simulation time, one
+    						time the time since last frame has been multiplied by the time multiplier)
      */
-    inline virtual void update(const Ogre::Real &/*simDeltaTime*/) {}
+    inline virtual void update(const Ogre::Real& /*simDeltaTime*/){}
 
     /** Get sun direction
         @return Sun direction, the Earth-to-Sun direction
@@ -73,7 +71,7 @@ namespace SkyX
      */
     inline const bool& getDeleteBySkyX() const
     {
-      return mDeleteBySkyX;
+    	return mDeleteBySkyX;
     }
 
   private:

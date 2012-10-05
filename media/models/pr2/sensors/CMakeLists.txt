@@ -1,1 +1,0 @@
-add_subdirectory(kinect_prosilica_v0)

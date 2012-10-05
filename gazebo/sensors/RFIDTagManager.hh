@@ -18,8 +18,8 @@
  * Date: 6th December 2011
  */
 
-#ifndef __RFID_TAG_MANAGER__
-#define __RFID_TAG_MANAGER__
+#ifndef _RFID_TAG_MANAGER__
+#define _RFID_TAG_MANAGER__
 
 #include <vector>
 #include "common/SingletonT.hh"

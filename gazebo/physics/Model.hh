@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class Model Model.hh physics/Model.hh
     /// \brief A model object
     class Model : public Entity
     {
@@ -135,21 +136,16 @@ namespace gazebo
       /// \return The bounding box
       public: virtual math::Box GetBoundingBox() const;
 
-      /// \brief Get the number of Joint's
-      /// \return Get the number of Joint's
+      /// \brief Get the number of joints
+      /// \return Get the number of joints
       public: unsigned int GetJointCount() const;
-
-      /// \brief Get the number of Link's
-      /// Note this constructs the vector of Link's on the fly, could be costly
-      /// \return Get the number of Link's
-      public: unsigned int GetLinkCount() const;
 
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
-      public: Link_V GetLinks() const;
+      public: Link_V GetAllLinks() const;
 
-      /// \brief Get a joing by index
+      /// \brief Get a joint by index
       /// \param index Index of the joint
       /// \return A pointer to the joint
       public: JointPtr GetJoint(unsigned int index) const;
@@ -168,7 +164,6 @@ namespace gazebo
       public: LinkPtr GetLink(const std::string &name ="canonical") const;
 
       /// \brief Get a child link by index
-      /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return Point to the link
       public: LinkPtr GetLink(unsigned int _index) const;
 
@@ -208,6 +203,19 @@ namespace gazebo
       public: virtual void StopAnimation();
 
       /// \brief Attach a static model to this model
+      ///
+      /// This function takes as input a static Model, which is a Model that
+      /// has been marked as static (no physics simulation), and attaches it
+      /// to this Model with a given offset.
+      ///
+      /// This function is useful when you want to simulate a grasp of a
+      /// static object, or move a static object around using a dynamic
+      /// model.
+      ///
+      /// If you are in doubt, do not use this function.
+      ///
+      /// \param _model Pointer to the static model.
+      /// \param _offset Offset, relative to this Model, to place _model.
       public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
 
       /// \brief Detach a static model from this model
@@ -241,11 +249,17 @@ namespace gazebo
       /// \param _disable If true, the model is allowed to auto disable.
       public: void SetAutoDisable(bool _disable);
 
+      /// \brief Load all plugins
+      ///
+      /// Load all plugins specified in the SDF for the model.
+      public: void LoadPlugins();
+
       protected: virtual void OnPoseChange();
 
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint(sdf::ElementPtr _sdf);
+
 
       /// \brief Load a plugin helper function
       /// \param _sdf SDF parameter

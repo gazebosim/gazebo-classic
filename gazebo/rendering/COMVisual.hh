@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,18 +40,34 @@ namespace gazebo
 
     class DynamicLines;
 
+    /// \class COMVisual COMVisual.hh rendering/COMVisual.hh
     /// \brief Basic Center of Mass visualization
     class COMVisual : public Visual
     {
+      /// \brief Constructor
+      /// \param[in] _name Name of the Visual
+      /// \param[int] _vis Parent Visual
       public: COMVisual(const std::string &_name, VisualPtr _vis);
+
+      /// \brief Destructor
       public: virtual ~COMVisual();
 
+      /// \brief Load the Visual from an SDF pointer
+      /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
+
+      /// \brief Load from a message
+      /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
+      /// \brief Load based on a math::Pose
+      /// \param[in] _pose Pose of the COM visual
       private: void Load(const math::Pose &_pose);
 
+      /// \brief Lines that make the cross marking the center of mass
       private: DynamicLines *crossLines;
+
+      /// \brief Box that make the cross marking the center of mass
       private: Ogre::SceneNode *boxNode;
     };
     /// \}

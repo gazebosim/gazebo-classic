@@ -24,310 +24,306 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_DataManager_H_
 #define _SkyX_VClouds_DataManager_H_
 
-#include <vector>
 #include "Prerequisites.h"
 
 #include "VClouds/FastFakeRandom.h"
 
-namespace SkyX
-{
-  namespace VClouds
+namespace SkyX { namespace VClouds{
+
+  class VClouds;
+  class Ellipsoid;
+
+  class DllExport DataManager
   {
-    class VClouds;
-    class Ellipsoid;
+    public:
+      /** Cell struct
+      */
+      struct Cell
+      {
+        /// Humidity, phase and cloud
+        bool hum, act, cld;
 
-    class DllExport DataManager
-    {
-      public:
-        /** Cell struct
+        /// Probabilities
+        float phum, pext, pact;
+
+        /// Continous density
+        float dens;
+
+        /// Light absorcion
+        float light;
+      };
+
+      /** Volumetric textures enumeration
+      */
+      enum VolTextureId
+      {
+        VOL_TEX0 = 0,
+        VOL_TEX1 = 1
+      };
+
+      /** Constructor
+        @param vc VClouds parent pointer
         */
-        struct Cell
-        {
-          /// Humidity, phase and cloud
-          bool hum, act, cld;
+      DataManager(VClouds *vc);
 
-          /// Probabilities
-          float phum, pext, pact;
+      /** Destructor
+      */
+      ~DataManager();
 
-          /// Continous density
-          float dens;
-
-          /// Light absorcion
-          float light;
-        };
-
-        /** Volumetric textures enumeration
+      /** Create
+        @param nx X complexity
+        @param ny Y complexity
+        @param nz Z complexity
         */
-        enum VolTextureId
-        {
-          VOL_TEX0 = 0,
-          VOL_TEX1 = 1
-        };
+      void create(const int& nx, const int& ny, const int& nz);
 
-        /** Constructor
-          @param vc VClouds parent pointer
-          */
-        DataManager(VClouds *vc);
-
-        /** Destructor
+      /** Update
+        @param timeSinceLastFrame Time elapsed since last frame
         */
-        ~DataManager();
+      void update(const Ogre::Real &timeSinceLastFrame);
 
-        /** Create
-          @param nx X complexity
-          @param ny Y complexity
-          @param nz Z complexity
-          */
-        void create(const int& nx, const int& ny, const int& nz);
+      /** Remove
+      */
+      void remove();
 
-        /** Update
-          @param timeSinceLastFrame Time elapsed since last frame
-          */
-        void update(const Ogre::Real &timeSinceLastFrame);
-
-        /** Remove
+      /** Has been create(...) already called?
+        @return true if created() have been already called
         */
-        void remove();
+      inline const bool& isCreated() const
+      {
+        return mCreated;
+      }
 
-        /** Has been create(...) already called?
-          @return true if created() have been already called
-          */
-        inline const bool& isCreated() const
-        {
-          return mCreated;
-        }
-
-        /** Set update time
-          @param UpdateTime Time elapsed between data calculations, a little
-          freeze could be experimented during these calculations on old
-          CPU's
-          */
-        inline void setUpdateTime(const float& UpdateTime)
-        {
-          mUpdateTime = UpdateTime;
-        }
-
-        /** Get update time
-          @return Update time
-          */
-        inline const Ogre::Real& getUpdateTime() const
-        {
-          return mUpdateTime;
-        }
-
-        /** Get current interpolation factor
-          @return Interpolation factor
-          @remarks Only for internal use
-          */
-        inline const Ogre::Real _getInterpolation() const
-        {
-          return mCurrentTransition/mUpdateTime;
-        }
-
-        /** Set wheater parameters
-          Use this funtion to update the cloud field parameters, you'll get
-          a smart and smooth transition from your old
-          setting to your new ones.
-          @param Humidity Humidity, in other words: the percentage of clouds
-          in [0,1] range.
-          @param AverageCloudsSize Average clouds size, for example: if
-          previous wheater clouds size parameter was very different from new
-          one(i.e: more little) only the old biggest clouds are going to be
-          keept and the little ones are going to be replaced
-          @param delayedResponse false to change wheather conditions over
-          several updates, true to change it at the moment
-          */
-        void setWheater(const float& Humidity, const float& AverageCloudsSize,
-            const bool& delayedResponse = true);
-
-        /** Add ellipsoid: clouds are modelled as ellipsoids in our
-          simulation approach, so.. different kind of clouds
-          can be modelled with ellipsoids compositions.
-          @param e Ellipsoid
-          @param UpdateProbabilities Update probabilities?
-          */
-        void addEllipsoid(Ellipsoid *e, const bool& UpdateProbabilities = true);
-
-        /** Forces the data manager to calculate the next step right now
+      /** Set update time
+        @param UpdateTime Time elapsed between data calculations, a little
+        freeze could be experimented during these calculations on old CPU's
         */
-        void forceToUpdateData();
+      inline void setUpdateTime(const float& UpdateTime)
+      {
+        mUpdateTime = UpdateTime;
+      }
 
-      private:
+      /** Get update time
+        @return Update time
+        */
+      inline const Ogre::Real& getUpdateTime() const
+      {
+        return mUpdateTime;
+      }
 
-        /** Initialize data
-          @param nx X complexity
-          @param ny Y complexity
-          @param nz Z complexity
-          */
-        void _initData(const int& nx, const int& ny, const int& nz);
+      /** Get current interpolation factor
+        @return Interpolation factor
+        @remarks Only for internal use
+        */
+      inline const Ogre::Real _getInterpolation() const
+      {
+        return mCurrentTransition/mUpdateTime;
+      }
 
-        /** Create tridimensional cell array
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          @param init Initialize values
-          @return Cell 3d pointer
-          */
-        Cell *** _create3DCellArray(const int& nx, const int& ny,
-            const int& nz, const bool& init = true);
+      /** Set wheater parameters
+        Use this funtion to update the cloud field parameters, you'll get a
+        smart and smooth transition from your old
+        setting to your new ones.
+        @param Humidity Humidity, in other words: the percentage of clouds
+        in [0,1] range.
+        @param AverageCloudsSize Average clouds size, for example:
+        if previous wheater clouds size parameter was very different from
+        new one(i.e: more little)
+        only the old biggest clouds are going to be keept and the little ones
+        are going to be replaced
+        @param delayedResponse false to change wheather conditions over
+        several updates, true to change it at the moment
+        */
+      void setWheater(const float& Humidity, const float& AverageCloudsSize,
+          const bool& delayedResponse = true);
 
-        /** Delete tridimensional cell array
-          @param c Cell pointer to be deleted
-          @param nx X size
-          @param ny Y size
-          */
-        void _delete3DCellArray(Cell ***c, const int& nx, const int& ny);
+      /** Add ellipsoid: clouds are modelled as ellipsoids in our simulation
+        approach, so.. different kind of clouds
+        can be modelled with ellipsoids compositions.
+        @param e Ellipsoid
+        @param UpdateProbabilities Update probabilities?
+        */
+      void addEllipsoid(Ellipsoid *e, const bool& UpdateProbabilities = true);
 
-        /** Copy 3d cells arrays data
-          @param src Source
-          @param dest Dest
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          */
-        void _copy3DCellArraysData(Cell ***src, Cell ***dest, const int& nx,
-            const int& ny, const int& nz);
+      /** Forces the data manager to calculate the next step right now
+      */
+      void forceToUpdateData();
 
-        /** Perform celullar automata simulation
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          @param step Calculation step. Valid steps are 0,1,2,3.
-          @param xStart x start cell (included)
-          @param xEnd x end cell (not included, until xEnd-1)
-          */
-        void _performCalculations(const int& nx, const int& ny, const int& nz,
-            const int& step, const int& xStart, const int& xEnd);
+    private:
 
-        /** Update volumetric texture data
-          @param c Cells data
-          @param TexId Texture Id
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          */
-        void _updateVolTextureData(Cell ***c, const VolTextureId& TexId,
-                                   const int& nx, const int& ny, const int& nz);
+      /** Initialize data
+        @param nx X complexity
+        @param ny Y complexity
+        @param nz Z complexity
+        */
+      void _initData(const int& nx, const int& ny, const int& nz);
 
-        /** Get continous density at a point
-          @param c Cells data
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          @param x x Coord
-          @param y y Coord
-          @param z z Coord
-          @param r Radius
-          @param sgtrength Strength
-          */
-        float _getDensityAt(Cell ***c, const int& nx, const int& ny,
-                            const int& nz, const int& x, const int& y,
-                            const int& z, const int& r,
-                            const float& strength) const;
+      /** Create tridimensional cell array
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        @param init Initialize values
+        @return Cell 3d pointer
+        */
+      Cell *** _create3DCellArray(const int& nx, const int& ny, const int& nz,
+                                  const bool& init = true);
 
-        /** Get discrete density at a point
-          @param c Cells data
-          @param x x Coord
-          @param y y Coord
-          @param z z Coord
-          */
-        float _getDensityAt(Cell ***c, const int& x, const int& y,
-                            const int& z) const;
+      /** Delete tridimensional cell array
+        @param c Cell pointer to be deleted
+        @param nx X size
+        @param ny Y size
+        */
+      void _delete3DCellArray(Cell ***c, const int& nx, const int& ny);
 
-        /** Fact funtion
-          @param c Cells data
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          @param x x Coord
-          @param y y Coord
-          @param z z Coord
-          */
-        bool _fact(Cell ***c, const int& nx, const int& ny, const int& nz,
-                   const int& x, const int& y, const int& z) const;
+      /** Copy 3d cells arrays data
+        @param src Source
+        @param dest Dest
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        */
+      void _copy3DCellArraysData(Cell ***src, Cell ***dest, const int& nx,
+                                 const int& ny, const int& nz);
 
-        /** Clear probabilities
-          @param c Cells data
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          @param clearData Clear data?
-          */
-        void _clearProbabilities(Cell*** c, const int& nx, const int& ny,
-            const int& nz, const bool& clearData);
+      /** Perform celullar automata simulation
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        @param step Calculation step. Valid steps are 0,1,2,3.
+        @param xStart x start cell (included)
+        @param xEnd x end cell (not included, until xEnd-1)
+        */
+      void _performCalculations(const int& nx, const int& ny, const int& nz,
+                                const int& step, const int& xStart,
+                                const int& xEnd);
 
-        /** Update probabilities based from the Ellipsoid vector
-          @param c Cells data
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          @param delayedResponse false to change wheather conditions over
-          several updates, true to change it at the moment
-          */
-        void _updateProbabilities(Cell*** c, const int& nx, const int& ny,
-            const int& nz, const bool& delayedResponse);
+      /** Update volumetric texture data
+        @param c Cells data
+        @param TexId Texture Id
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        */
+      void _updateVolTextureData(Cell ***c, const VolTextureId& TexId,
+          const int& nx, const int& ny, const int& nz);
 
-        /** Get light absorcion factor at a point
-          @param c Cells data
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          @param x x Coord
-          @param y y Coord
-          @param z z Coord
-          @param d Light direction
-          @param att Attenuation factor
-          */
-        Ogre::Real _getLightAbsorcionAt(Cell*** c, const int& nx,
-            const int& ny, const int& nz, const int& x, const int& y,
-            const int& z, const Ogre::Vector3& d, const float& att) const;
+      /** Get continous density at a point
+        @param c Cells data
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        @param x x Coord
+        @param y y Coord
+        @param z z Coord
+        @param r Radius
+        @param sgtrength Strength
+        */
+      float _getDensityAt(Cell ***c, const int& nx, const int& ny,
+          const int& nz, const int& x, const int& y, const int& z,
+          const int& r, const float& strength) const;
 
-        /** Create volumetric texture
-          @param TexId Texture Id
-          @param nx X size
-          @param ny Y size
-          @param nz Z size
-          */
-        void _createVolTexture(const VolTextureId& TexId, const int& nx,
-                               const int& ny, const int& nz);
+      /** Get discrete density at a point
+        @param c Cells data
+        @param x x Coord
+        @param y y Coord
+        @param z z Coord
+        */
+      float _getDensityAt(Cell ***c, const int& x, const int& y,
+          const int& z) const;
 
-        /// SkyX parent pointer
-        VClouds *mVClouds;
+      /** Fact funtion
+        @param c Cells data
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        @param x x Coord
+        @param y y Coord
+        @param z z Coord
+        */
+      bool _fact(Cell ***c, const int& nx, const int& ny,
+          const int& nz, const int& x, const int& y, const int& z) const;
 
-        /// Simulation data
-        Cell ***mCellsCurrent,
-             ***mCellsTmp;
+      /** Clear probabilities
+        @param c Cells data
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        @param clearData Clear data?
+        */
+      void _clearProbabilities(Cell*** c, const int& nx, const int& ny,
+          const int& nz, const bool& clearData);
 
-        /// Fast fake random
-        FastFakeRandom *mFFRandom;
+      /** Update probabilities based from the Ellipsoid vector
+        @param c Cells data
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        @param delayedResponse false to change wheather conditions over
+        several updates, true to change it at the moment
+        */
+      void _updateProbabilities(Cell*** c, const int& nx, const int& ny,
+          const int& nz, const bool& delayedResponse);
 
-        /// Complexities
-        int mNx, mNy, mNz;
+      /** Get light absorcion factor at a point
+        @param c Cells data
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        @param x x Coord
+        @param y y Coord
+        @param z z Coord
+        @param d Light direction
+        @param att Attenuation factor
+        */
+      Ogre::Real _getLightAbsorcionAt(Cell*** c, const int& nx,
+          const int& ny, const int& nz,
+          const int& x, const int& y,
+          const int& z, const Ogre::Vector3& d,
+          const float& att) const;
 
-        /// Current transition
-        float mCurrentTransition;
+      /** Create volumetric texture
+        @param TexId Texture Id
+        @param nx X size
+        @param ny Y size
+        @param nz Z size
+        */
+      void _createVolTexture(const VolTextureId& TexId, const int& nx,
+          const int& ny, const int& nz);
 
-        /// Update time
-        float mUpdateTime;
+      /// SkyX parent pointer
+      VClouds *mVClouds;
 
-        /// Current calculation state
-        int mStep, mXStart, mXEnd;
+      /// Simulation data
+      Cell ***mCellsCurrent, ***mCellsTmp;
 
-        /// Max number of clouds(Ellipsoids)
-        int mMaxNumberOfClouds;
+      /// Fast fake random
+      FastFakeRandom *mFFRandom;
 
-        /// Current texture
-        bool mVolTexToUpdate;
+      /// Complexities
+      int mNx, mNy, mNz;
 
-        /// Has been create(...) already called?
-        bool mCreated;
+      /// Current transition
+      float mCurrentTransition;
+      /// Update time
+      float mUpdateTime;
+      /// Current calculation state
+      int mStep, mXStart, mXEnd;
 
-        /// Volumetric textures array
-        Ogre::TexturePtr mVolTextures[2];
+      /// Max number of clouds(Ellipsoids)
+      int mMaxNumberOfClouds;
 
-        /// Ellipsoids
-        std::vector<Ellipsoid*> mEllipsoids;
-    };
-  }
-}
+      /// Volumetric textures array
+      Ogre::TexturePtr mVolTextures[2];
+
+      /// Current texture
+      bool mVolTexToUpdate;
+
+      /// Has been create(...) already called?
+      bool mCreated;
+
+      /// Ellipsoids
+      std::vector<Ellipsoid*> mEllipsoids;
+  };
+}}
+
 #endif

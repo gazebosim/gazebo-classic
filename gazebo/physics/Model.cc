@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,6 @@ void Model::Load(sdf::ElementPtr _sdf)
       // Load the link using the config node. This also loads all of the
       // bodies collisionetries
       link->Load(linkElem);
-
       linkElem = linkElem->GetNextElement("link");
     }
   }
@@ -132,17 +131,6 @@ void Model::Load(sdf::ElementPtr _sdf)
     {
       this->LoadJoint(jointElem);
       jointElem = jointElem->GetNextElement("joint");
-    }
-  }
-
-  // Load the plugins
-  if (_sdf->HasElement("plugin"))
-  {
-    sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
-    while (pluginElem)
-    {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
 
@@ -178,12 +166,6 @@ void Model::Init()
   // Initialize the joints last.
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -564,13 +546,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-unsigned int Model::GetLinkCount() const
-{
-  return (this->GetLinks()).size();
-}
-
-//////////////////////////////////////////////////
-Link_V Model::GetLinks() const
+Link_V Model::GetAllLinks() const
 {
   Link_V links;
   for (unsigned int i = 0; i < this->GetChildCount(); ++i)
@@ -583,22 +559,8 @@ Link_V Model::GetLinks() const
 }
 
 //////////////////////////////////////////////////
-LinkPtr Model::GetLink(unsigned int _index) const
-{
-  Link_V links = this->GetLinks();
-  LinkPtr link;
-  if (_index <= links.size())
-    link = links[_index];
-  else
-    gzerr << "Index is out of range\n";
-
-  return link;
-}
-
-//////////////////////////////////////////////////
 LinkPtr Model::GetLink(const std::string &_name) const
 {
-  /// @todo: replace by searching Model::links vector
   Base_V::const_iterator biter;
   LinkPtr result;
 
@@ -622,13 +584,26 @@ LinkPtr Model::GetLink(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+LinkPtr Model::GetLink(unsigned int _index) const
+{
+  LinkPtr link;
+  if (_index <= this->GetChildCount())
+    link = boost::shared_static_cast<Link>(this->GetChild(_index));
+  else
+    gzerr << "Index is out of range\n";
+
+  return link;
+}
+
+//////////////////////////////////////////////////
 void Model::LoadJoint(sdf::ElementPtr _sdf)
 {
   JointPtr joint;
 
   std::string stype = _sdf->GetValueString("type");
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype);
+  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
+     boost::shared_static_cast<Model>(shared_from_this()));
   if (!joint)
     gzthrow("Unable to create joint of type[" + stype + "]\n");
 
@@ -662,6 +637,21 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+void Model::LoadPlugins()
+{
+  // Load the plugins
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");
@@ -669,8 +659,17 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
   gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
   if (plugin)
   {
+    if (plugin->GetType() != MODEL_PLUGIN)
+    {
+      gzerr << "Model[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+      return;
+    }
+
     ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
+    plugin->Init();
     this->plugins.push_back(plugin);
   }
 }

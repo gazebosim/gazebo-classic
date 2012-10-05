@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 16 Oct 2009
  */
 
-#ifndef __ODETRIMESHSHAPE_HH__
-#define __ODETRIMESHSHAPE_HH__
+#ifndef _ODETRIMESHSHAPE_HH_
+#define _ODETRIMESHSHAPE_HH_
 
 #include "physics/TrimeshShape.hh"
 

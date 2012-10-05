@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 25 May 2009
  */
 
-#ifndef __BULLETMOTIONSTATE_HH__
-#define __BULLETMOTIONSTATE_HH__
+#ifndef _BULLETMOTIONSTATE_HH_
+#define _BULLETMOTIONSTATE_HH_
 
 #include "physics/bullet/bullet_inc.h"
 #include "math/MathTypes.hh"
