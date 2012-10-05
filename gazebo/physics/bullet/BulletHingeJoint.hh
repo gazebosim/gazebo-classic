@@ -42,7 +42,7 @@ namespace gazebo
     class BulletHingeJoint : public HingeJoint<BulletJoint>
     {
       ///  Constructor
-      public: BulletHingeJoint(btDynamicsWorld *world);
+      public: BulletHingeJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// Destructor
       public: virtual ~BulletHingeJoint();

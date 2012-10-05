@@ -35,8 +35,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world)
-    : ScrewJoint<BulletJoint>()
+BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
+    : ScrewJoint<BulletJoint>(_parent)
 {
   this->world = _world;
 }

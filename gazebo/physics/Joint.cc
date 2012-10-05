@@ -187,7 +187,7 @@ void Joint::Init()
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
       if (this->sdf->GetValueString("parent") != "world")
       {
-        gzwarn << "joint [" << this->GetName()
+        gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
           << this->sdf->GetValueString("parent")
           << "], loading axis from SDF ["
@@ -201,7 +201,7 @@ void Joint::Init()
 
       if (this->sdf->GetValueString("parent") != "world")
       {
-        gzwarn << "joint [" << this->GetName()
+        gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
           << this->sdf->GetValueString("parent")
           << "], loading axis2 from SDF ["
@@ -354,7 +354,7 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
   if (this->model->IsStatic())
     this->staticAngle = _angle;
   else
-    this->model->SetJointPosition(this->GetName(), _angle.Radian());
+    this->model->SetJointPosition(this->GetScopedName(), _angle.Radian());
 }
 
 //////////////////////////////////////////////////

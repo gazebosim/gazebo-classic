@@ -39,29 +39,29 @@ namespace gazebo
 {
   class JointTrajectoryPlugin : public ModelPlugin
   {
-     /// \brief Constructor
-     public: JointTrajectoryPlugin();
+    /// \brief Constructor
+    public: JointTrajectoryPlugin();
 
-     /// \brief Destructor
-     public: virtual ~JointTrajectoryPlugin();
+    /// \brief Destructor
+    public: virtual ~JointTrajectoryPlugin();
 
-     /// \brief Load the controller
-     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
+    /// \brief Load the controller
+    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
-     /// \brief Update the controller
-     private: void UpdateStates();
+    /// \brief Update the controller
+    private: void UpdateStates();
 
-     private: void FixLink(physics::LinkPtr link);
-     private: void UnfixLink();
+    private: void FixLink(physics::LinkPtr link);
+    private: void UnfixLink();
 
-     private: physics::WorldPtr world;
-     private: physics::ModelPtr model;
-     private: physics::JointPtr joint;
+    private: physics::WorldPtr world;
+    private: physics::ModelPtr model;
+    private: physics::JointPtr joint;
 
-     private: boost::mutex update_mutex;
+    private: boost::mutex update_mutex;
 
-     // Pointer to the update event connection
-     private: event::ConnectionPtr updateConnection;
+    // Pointer to the update event connection
+    private: event::ConnectionPtr updateConnection;
   };
 }
 #endif
