@@ -529,7 +529,7 @@ JointPtr Model::GetJoint(const std::string &_name)
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name)
     {
       result = (*iter);
       break;
@@ -612,7 +612,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   // Load the joint
   joint->Load(_sdf);
 
-  if (this->GetJoint(joint->GetName()) != NULL)
+  if (this->GetJoint(joint->GetScopedName()) != NULL)
     gzthrow("can't have two joint with the same name");
 
   msgs::Joint msg;

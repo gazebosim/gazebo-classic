@@ -91,7 +91,7 @@ namespace gazebo
                  {
                    typename InputVector::iterator iter = _vector.begin();
                    for (; iter != _vector.end(); ++iter)
-                     if ((*iter)->GetName() == value->GetName())
+                     if ((*iter)->GetScopedName() == value->GetScopedName())
                        return true;
                    return false;
                  }
