@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: Heightmap shape
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 8 May 2003
  */
 
@@ -60,7 +60,7 @@ namespace gazebo
       public: math::Vector3 GetSize() const;
 
       /// \brief Get the origin in world coordinate frame
-      public: math::Vector3 GetOrigin() const;
+      public: math::Vector3 GetPos() const;
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap

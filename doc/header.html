@@ -1,75 +1,77 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <!-- $Id:-->
   <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
     <meta name="keywords" content="Gazebo">
-    <link href="doxygen.css" rel="stylesheet" type="text/css">
-    <link href="style.css" rel="stylesheet" type="text/css">
-    <link href="search/search.css" rel="stylesheet" type="text/css">
+    <title>Gazebo: $title</title>
     <link href="tabs.css" rel="stylesheet" type="text/css">
-    <title>Gazebo $title</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="search/search.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() { searchBox.OnSelectItem(0); });
+    </script>
+
+    <link href="doxygen.css" rel="stylesheet" type="text/css">
+    <!--<link href="style.css" rel="stylesheet" type="text/css">-->
   </head>
 
-  <body>
+<body>
+  <div class="leftbar"> 
+    <h2 style="text-align:center;">
+      <a href="index.html"><img src="gazebo_logo.png"/></a>
+    </h2>
 
-    <table border="0"><tr><td valign="top" bgcolor="#dddddd">
-    <div class="leftbar"> 
-
-      <h2 style="text-align:center;">
-        <a href="index.html"><img src="gazebo_logo.png"/></a>
-      </h2>
-
-      <div class="menu">
-        <dl>
-          <dt>Class</dt>
-          <dd><a href="classes.html">List</a></dd>
-          <dd><a href="hierarchy.html">Heirarchy</a></dd>
-          <!--dd><a href="functions.html">Members</a></dd-->
-        </dl>
-      </div>
-
-      <div class="menu">
-        <dl>
-          <dt><a href="modules.html" style="font-weight:bold">Modules</a></dt>
-          <dd><a href="group__gazebo__common.html">Common</a></dd>
-          <dd><a href="group__gazebo__event.html">Events</a></dd>
-          <dd><a href="group__gazebo__math.html">Math</a></dd>
-          <dd><a href="group__gazebo__msgs.html">Messages</a></dd>
-          <dd><a href="group__gazebo__physics.html">Physics</a></dd>
-          <dd><a href="group__gazebo__rendering.html">Rendering</a></dd>
-          <dd><a href="group__gazebo__sensors.html">Sensors</a></dd>
-          <dd><a href="group__gazebo__transport.html">Transport</a></dd>
-       </dl>
-      </div>
-      <div class="menu">
-        <dl>
-          <dt>Links</dt>
-          <dd><a href="http://gazebosim.org">Gazebo Website</a></dd>
-          <dd><a href="http://gazebosim.org/wiki">Wiki</a></dd>
-          <dd><a href="http://gazebosim.org/wiki/Tutorials">Tutorials</a></dd>
-          <dd><a href="http://gazebosim.org/downloads.html">Download</a></dd>
-        </dl>
-      </div>
-
+    <div class="menu">
+      <dl>
+        <dt>Class</dt>
+        <dd><a href="classes.html">List</a></dd>
+        <dd><a href="hierarchy.html">Heirarchy</a></dd>
+      </dl>
     </div>
-    </td><td valign="top">
-        <div class="menu">
-          <!-- Put the following javascript before the closing </head> tag. -->
-          <script>
-            (function() {
-              // var cx = '013094344954742340416:jiph0bygp2w';
-                 var cx = '017173884380197735561:p_b7smdoxhs';
-              var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
-              gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
-                  '//www.google.com/cse/cse.js?cx=' + cx;
-              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
-            })();
-          </script>
-          <!--script src="//www.gmodules.com/ig/ifr?url=http://www.google.com/cse/api/017173884380197735561/cse/p_b7smdoxhs/gadget&amp;synd=open&amp;w=320&amp;h=75&amp;title=Gazebo+Search&amp;border=%23ffffff%7C3px%2C1px+solid+%23999999&amp;output=js"></script-->
-          <!-- Place this tag where you want both of the search box and the search results to render -->
-          <gcse:search></gcse:search>
-        </div>
-    </br>
+    <div class="menu">
+      <dl>
+        <dt><a href="modules.html" style="font-weight:bold">Modules</a></dt>
+        <dd><a href="group__gazebo__common.html">Common</a></dd>
+        <dd><a href="group__gazebo__event.html">Events</a></dd>
+        <dd><a href="group__gazebo__math.html">Math</a></dd>
+        <dd><a href="group__gazebo__msgs.html">Messages</a></dd>
+        <dd><a href="group__gazebo__physics.html">Physics</a></dd>
+        <dd><a href="group__gazebo__rendering.html">Rendering</a></dd>
+        <dd><a href="group__gazebo__sensors.html">Sensors</a></dd>
+        <dd><a href="group__gazebo__transport.html">Transport</a></dd>
+      </dl>
+    </div>
+    <div class="menu">
+      <dl>
+        <dt>Links</dt>
+        <dd><a href="http://gazebosim.org">Gazebo Website</a></dd>
+        <dd><a href="http://gazebosim.org/wiki">Wiki</a></dd>
+        <dd><a href="http://gazebosim.org/wiki/Tutorials">Tutorials</a></dd>
+        <dd><a href="http://gazebosim.org/downloads.html">Download</a></dd>
+      </dl>
+    </div>
+    <div>
+    <div id="MSearchBox" class="MSearchBoxInactive">
+      <span>
+        <img id="MSearchSelect" src="search/mag_sel.png"
+        onmouseover="return searchBox.OnSearchSelectShow()"
+        onmouseout="return searchBox.OnSearchSelectHide()"
+        alt=""/>
+        <input type="text" id="MSearchField" value="Search" accesskey="S"
+        onfocus="searchBox.OnSearchFieldFocus(true)" 
+        onblur="searchBox.OnSearchFieldFocus(false)" 
+        onkeyup="searchBox.OnSearchFieldChange(event)"/>
+      </span>
+    </div> <!-- End MSearchBox -->
 
-    <script src="./search/search.js">script</script>
+      <div id="MSearchResultsWindow" style="position: static; display: block; border: none; background-color: #ffffff; width: 18em;">
+        <iframe src="javascript:void(0)" frameborder="0" 
+                name="MSearchResults" style="height: 500px; width: 18em; display: block; text-wrap: unrestricted">
+        </iframe>
+      </div>
+    </div>
+  </div>
+  <div id="top">

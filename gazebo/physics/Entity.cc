@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
-  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
+  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 200);
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
   this->visualMsg->set_name(this->GetScopedName());

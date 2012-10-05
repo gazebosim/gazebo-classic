@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -340,7 +340,10 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());
-  msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
+  msg.mutable_material()->mutable_script()->set_uri(
+      "file://media/materials/scripts/gazebo.material");
+  msg.mutable_material()->mutable_script()->set_name(
+      "Gazebo/OrangeTransparent");
   msgs::Geometry *geom = msg.mutable_geometry();
 
   if (this->shape->HasType(BOX_SHAPE))
@@ -373,7 +376,7 @@ msgs::Visual Collision::CreateCollisionVisual()
     msgs::Set(geom->mutable_heightmap()->mutable_image(),
               common::Image(hgt->GetFilename()));
     msgs::Set(geom->mutable_heightmap()->mutable_size(), hgt->GetSize());
-    msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetOrigin());
+    msgs::Set(geom->mutable_heightmap()->mutable_origin(), hgt->GetPos());
   }
 
   else if (this->shape->HasType(MAP_SHAPE))

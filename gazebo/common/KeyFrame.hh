@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef __KEYFRAME_HH__
-#define __KEYFRAME_HH__
+#ifndef _KEYFRAME_HH_
+#define _KEYFRAME_HH_
 
 #include "math/Vector3.hh"
 #include "math/Quaternion.hh"

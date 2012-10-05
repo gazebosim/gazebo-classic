@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __VIDEO_VISUAL_HH__
-#define __VIDEO_VISUAL_HH__
+#ifndef _VIDEO_VISUAL_HH_
+#define _VIDEO_VISUAL_HH_
 
 #include <string>
 #include <vector>

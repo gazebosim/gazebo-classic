@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,9 @@ extern ContactProcessedCallback gContactProcessedCallback;
 
 //////////////////////////////////////////////////
 bool ContactCallback(btManifoldPoint &/*_cp*/,
-    const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/, int /*_index0*/,
-    const btCollisionObjectWrapper * /*_obj1*/, int /*_partId1*/, int /*_index1*/)
+    const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/,
+    int /*_index0*/, const btCollisionObjectWrapper * /*_obj1*/,
+    int /*_partId1*/, int /*_index1*/)
 {
   return true;
 }
@@ -254,22 +255,22 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-JointPtr BulletPhysics::CreateJoint(const std::string &_type)
+JointPtr BulletPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 {
   JointPtr joint;
 
   if (_type == "revolute")
-    joint.reset(new BulletHingeJoint(this->dynamicsWorld));
+    joint.reset(new BulletHingeJoint(this->dynamicsWorld, _parent));
   else if (_type == "universal")
-    joint.reset(new BulletUniversalJoint(this->dynamicsWorld));
+    joint.reset(new BulletUniversalJoint(this->dynamicsWorld, _parent));
   else if (_type == "ball")
-    joint.reset(new BulletBallJoint(this->dynamicsWorld));
+    joint.reset(new BulletBallJoint(this->dynamicsWorld, _parent));
   else if (_type == "prismatic")
-    joint.reset(new BulletSliderJoint(this->dynamicsWorld));
+    joint.reset(new BulletSliderJoint(this->dynamicsWorld, _parent));
   else if (_type == "revolute2")
-    joint.reset(new BulletHinge2Joint(this->dynamicsWorld));
+    joint.reset(new BulletHinge2Joint(this->dynamicsWorld, _parent));
   else if (_type == "screw")
-    joint.reset(new BulletScrewJoint(this->dynamicsWorld));
+    joint.reset(new BulletScrewJoint(this->dynamicsWorld, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 

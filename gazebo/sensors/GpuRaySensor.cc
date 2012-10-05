@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,13 +98,13 @@ void GpuRaySensor::Load(const std::string &_worldName)
   near = this->GetRangeMin();
   far = this->GetRangeMax();
 
-  hfov = (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian();
+  hfov = (this->GetAngleMax() - this->GetAngleMin()).Radian();
   vfov = (this->GetVerticalAngleMax()
-          - this->GetVerticalAngleMin()).GetAsRadian();
+          - this->GetVerticalAngleMin()).Radian();
 
-  hang = (this->GetAngleMax() + this->GetAngleMin()).GetAsRadian() / 2.0;
+  hang = (this->GetAngleMax() + this->GetAngleMin()).Radian() / 2.0;
   vang = (this->GetVerticalAngleMax()
-          + this->GetVerticalAngleMin()).GetAsRadian() / 2.0;
+          + this->GetVerticalAngleMin()).Radian() / 2.0;
 
   if (hfov > 2 * M_PI)
     hfov = 2*M_PI;
@@ -351,7 +351,7 @@ double GpuRaySensor::GetRangeMax() const
 /////////////////////////////////////////////////
 double GpuRaySensor::GetAngleResolution() const
 {
-  return (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian() /
+  return (this->GetAngleMax() - this->GetAngleMin()).Radian() /
     (this->GetRangeCount()-1);
 }
 

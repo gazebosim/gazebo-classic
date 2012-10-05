@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: The base joint class
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -36,8 +36,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Joint::Joint()
-  : Base(BasePtr())
+Joint::Joint(BasePtr _parent)
+  : Base(_parent)
 {
   this->AddType(Base::JOINT);
   this->showJoints = false;
@@ -187,7 +187,7 @@ void Joint::Init()
       this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
       if (this->sdf->GetValueString("parent") != "world")
       {
-        gzwarn << "joint [" << this->GetName()
+        gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
           << this->sdf->GetValueString("parent")
           << "], loading axis from SDF ["
@@ -201,7 +201,7 @@ void Joint::Init()
 
       if (this->sdf->GetValueString("parent") != "world")
       {
-        gzwarn << "joint [" << this->GetName()
+        gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
           << this->sdf->GetValueString("parent")
           << "], loading axis2 from SDF ["
@@ -289,17 +289,36 @@ void Joint::FillJointMsg(msgs::Joint &_msg)
 
 
   if (this->HasType(Base::HINGE_JOINT))
+  {
     _msg.set_type(msgs::Joint::REVOLUTE);
+    _msg.add_angle(this->GetAngle(0).Radian());
+  }
   else if (this->HasType(Base::HINGE2_JOINT))
+  {
     _msg.set_type(msgs::Joint::REVOLUTE2);
+    _msg.add_angle(this->GetAngle(0).Radian());
+    _msg.add_angle(this->GetAngle(1).Radian());
+  }
   else if (this->HasType(Base::BALL_JOINT))
+  {
     _msg.set_type(msgs::Joint::BALL);
+  }
   else if (this->HasType(Base::SLIDER_JOINT))
+  {
     _msg.set_type(msgs::Joint::PRISMATIC);
+    _msg.add_angle(this->GetAngle(0).Radian());
+  }
   else if (this->HasType(Base::SCREW_JOINT))
+  {
     _msg.set_type(msgs::Joint::SCREW);
+    _msg.add_angle(this->GetAngle(0).Radian());
+  }
   else if (this->HasType(Base::UNIVERSAL_JOINT))
+  {
     _msg.set_type(msgs::Joint::UNIVERSAL);
+    _msg.add_angle(this->GetAngle(0).Radian());
+    _msg.add_angle(this->GetAngle(1).Radian());
+  }
 
   msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetGlobalAxis(0));
   _msg.mutable_axis1()->set_limit_lower(0);
@@ -335,7 +354,7 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
   if (this->model->IsStatic())
     this->staticAngle = _angle;
   else
-    this->model->SetJointPosition(this->GetName(), _angle.GetAsRadian());
+    this->model->SetJointPosition(this->GetScopedName(), _angle.Radian());
 }
 
 //////////////////////////////////////////////////

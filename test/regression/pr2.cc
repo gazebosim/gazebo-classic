@@ -25,7 +25,7 @@ class PR2Test : public ServerFixture
 TEST_F(PR2Test, Load)
 {
   Load("worlds/empty.world");
-  SpawnModel("models/pr2.model");
+  SpawnModel("models://pr2");
 
   int i;
   for (i = 0; i < 40 && !this->HasEntity("pr2"); ++i)

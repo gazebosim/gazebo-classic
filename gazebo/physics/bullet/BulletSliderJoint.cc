@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /* Desc: A bullet slider or primastic joint
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 13 Oct 2009
  */
 
@@ -31,8 +31,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world)
-    : SliderJoint<BulletJoint>()
+BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
+    : SliderJoint<BulletJoint>(_parent)
 {
   this->world = _world;
 }
@@ -152,13 +152,13 @@ void BulletSliderJoint::SetForce(int /*_index*/, double _force)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
 {
-  // this->btSlider->setUpperLinLimit(_angle.GetAsRadian());
+  // this->btSlider->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
 {
-  // this->btSlider->setLowerLinLimit(_angle.GetAsRadian());
+  // this->btSlider->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ namespace gazebo
       /// \brief Get the plugin paths
       public: const std::list<std::string> &GetPluginPaths();
 
-      /// \brief Get the model path extension
-      public: std::string GetModelPathExtension();
+      /// \brief Get the model paths
+      public: const std::list<std::string> &GetModelPaths();
 
       /// Returns the world path extension.
       /// Right now, it just returns "/worlds"
@@ -80,6 +80,9 @@ namespace gazebo
       /// \brief deprecated
       public: std::string FindFileWithGazeboPaths(const std::string &_filename)
               GAZEBO_DEPRECATED;
+
+      /// \brief Find a file or path using a URI
+      public: std::string FindFileURI(const std::string &_uri);
 
       /// \brief Find a file in the gazebo paths
       public: std::string FindFile(const std::string &_filename);
@@ -123,6 +126,8 @@ namespace gazebo
       private: std::list<std::string> pluginPaths;
 
       private: std::list<std::string> suffixPaths;
+
+      private: std::list<std::string> modelPaths;
 
       private: std::string logPath;
 

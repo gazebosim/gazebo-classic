@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: The base Bullet joint class
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
-#ifndef __BULLETJOINT_HH__
-#define __BULLETJOINT_HH__
+#ifndef _BULLETJOINT_HH_
+#define _BULLETJOINT_HH_
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/Joint.hh"
@@ -37,7 +37,7 @@ namespace gazebo
     class BulletJoint : public Joint
     {
       /// \brief Constructor
-      public: BulletJoint();
+      public: BulletJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletJoint();

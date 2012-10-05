@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,6 +204,7 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
+  printf("gui::stop\n");
   g_active_camera.reset();
   g_app->quit();
 }

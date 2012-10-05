@@ -333,7 +333,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
         double integ_theta = (
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).GetAsRadian();
+        double actual_theta = joint->GetAngle(0).Radian();
         // gzdbg << "time [" << world->GetSimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
@@ -384,7 +384,7 @@ TEST_F(PhysicsTest, SimplePendulumTest)
         double integ_theta = (
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).GetAsRadian();
+        double actual_theta = joint->GetAngle(0).Radian();
         // gzdbg << "time [" << world->GetSimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta

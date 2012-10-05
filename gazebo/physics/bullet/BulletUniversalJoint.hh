@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: A universal joint
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETUNIVERSALJOINT_HH__
-#define __BULLETUNIVERSALJOINT_HH__
+#ifndef _BULLETUNIVERSALJOINT_HH_
+#define _BULLETUNIVERSALJOINT_HH_
 
 #include "physics/UniversalJoint.hh"
 #include "physics/bullet/BulletJoint.hh"
@@ -40,7 +40,7 @@ namespace gazebo
     class BulletUniversalJoint : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletUniversalJoint(btDynamicsWorld *world);
+      public: BulletUniversalJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// \brief Destuctor
       public: virtual ~BulletUniversalJoint();

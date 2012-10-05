@@ -5,17 +5,28 @@ set (headers SDF.hh Param.hh parser.hh parser_deprecated.hh Converter.hh)
 
 if (HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
   include_directories(SYSTEM ${XML_INCLUDE_DIRS}
-                             ${urdfdom_INCLUDE_DIRS} ${urdfdom_headers_INCLUDE_DIRS} ${console_bridge_INCLUDE_DIRS}
+                             ${urdfdom_INCLUDE_DIRS}
+                             ${urdfdom_headers_INCLUDE_DIRS}
+                             ${console_bridge_INCLUDE_DIRS}
                              ${CMAKE_SOURCE_DIR}/deps/opende/include)
-  link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${console_bridge_LIBRARY_DIRS} ${XML_LIBRARY_DIRS})
+
+  link_directories(${urdfdom_LIBRARY_DIRS}
+                   ${urdfdom_headers_LIBRARY_DIRS}
+                   ${console_bridge_LIBRARY_DIRS}
+                   ${XML_LIBRARY_DIRS})
+
   set (sources ${sources} parser_urdf.cc)
   set (headers ${headers} parser_urdf.hh)
-  # add_definitions(${XML_CFLAGS} ${urdfdom_LDFLAGS} ${urdfdom_headers_LDFLAGS} ${console_bridge_LDFLAGS})
+
+  # add_definitions(${XML_CFLAGS} ${urdfdom_LDFLAGS}
+  # ${urdfdom_headers_LDFLAGS} ${console_bridge_LDFLAGS})
+
 else(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
   include_directories(SYSTEM ${XML_INCLUDE_DIRS})
   link_directories(${XML_LIBRARY_DIRS})
   # add_definitions(${XML_CFLAGS})
 endif(HAVE_URDFDOM AND HAVE_URDFDOM_HEADERS)
+
 add_definitions(${XML_CFLAGS})
 
 gz_add_library(gazebo_sdf_interface ${sources})

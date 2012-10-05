@@ -1,7 +1,7 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
  *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ *     Nate Koenig
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
  *
  */
 /* Desc: A screw or primastic joint
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETSCREWJOINT_HH__
-#define __BULLETSCREWJOINT_HH__
+#ifndef _BULLETSCREWJOINT_HH_
+#define _BULLETSCREWJOINT_HH_
 
 #include "physics/bullet/BulletJoint.hh"
 #include "physics/ScrewJoint.hh"
@@ -43,7 +43,7 @@ namespace gazebo
     class BulletScrewJoint : public ScrewJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletScrewJoint(btDynamicsWorld *world);
+      public: BulletScrewJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletScrewJoint();

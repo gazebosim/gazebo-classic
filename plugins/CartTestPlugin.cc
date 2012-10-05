@@ -124,7 +124,7 @@ void CartTestPlugin::OnUpdate()
   {
     // first joint, set position
     double pos_target = this->jointPositions[i];
-    double pos_curr = this->joints[i]->GetAngle(0).GetAsRadian();
+    double pos_curr = this->joints[i]->GetAngle(0).Radian();
     double max_cmd = this->jointMaxEfforts[i];
 
     double pos_err = pos_curr - pos_target;
@@ -163,7 +163,7 @@ void CartTestPlugin::OnUpdate()
     {
       // hold wheel positions
       double pos_target = this->jointPositions[i];
-      double pos_curr = this->joints[i]->GetAngle(0).GetAsRadian();
+      double pos_curr = this->joints[i]->GetAngle(0).Radian();
       double max_cmd = 100;  // this->jointMaxEfforts[i];
 
       double pos_err = pos_curr - pos_target;
@@ -175,7 +175,7 @@ void CartTestPlugin::OnUpdate()
     }
 
     gzdbg << " wheel pos ["
-          << this->joints[i]->GetAngle(0).GetAsRadian()
+          << this->joints[i]->GetAngle(0).Radian()
           << "] vel ["
           << this->joints[i]->GetVelocity(0)
           << "] effort [" << eff << "]";

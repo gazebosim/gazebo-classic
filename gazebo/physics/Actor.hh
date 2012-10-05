@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class Actor Actor.hh physics/Actor.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
     ///              scriptable animation.
     class Actor : public Model

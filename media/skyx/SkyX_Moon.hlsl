@@ -44,8 +44,8 @@ void main_vp(
 
     // UV
     oUVYLength.xy = iUV;
-    // Y
-    oUVYLength.z  = ObjectSpacePosition.y;
+    // Z
+    oUVYLength.z  = ObjectSpacePosition.z;
     // Length
     oUVYLength.w  = length(ObjectSpacePosition);
 }

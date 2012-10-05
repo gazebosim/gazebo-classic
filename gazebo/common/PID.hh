@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __GAZEBO_PID_HH__
-#define __GAZEBO_PID_HH__
+#ifndef _GAZEBO_PID_HH_
+#define _GAZEBO_PID_HH_
 
 #include "common/Time.hh"
 
@@ -87,11 +87,14 @@ namespace gazebo
       public: void SetCmdMin(double _c);
 
       /// \brief Update the Pid loop with nonuniform time step size.
-      /// \param _error  Error since last call (p_state-p_target)
-      /// \param _dt Change in time since last call
+      /// \param _error  Error since last call (p_state - p_target).
+      /// \param _dt Change in time since last update call.
+      /// Normally, this is called at every time step,
+      /// The return value is an updated command to be passed
+      /// to the object being controlled.
       public: double Update(double _error, common::Time _dt);
 
-      /// \brief Set current command for this PID controller
+      /// \brief Set current target command for this PID controller
       /// \param _cmd New command
       public: void SetCmd(double _cmd);
 

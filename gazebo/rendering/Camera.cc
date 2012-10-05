@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,6 +264,13 @@ void Camera::Update()
       this->animState = NULL;
       if (this->onAnimationComplete)
         this->onAnimationComplete();
+
+      if (this->moveToPositionQueue.size() > 0)
+      {
+        this->MoveToPosition(this->moveToPositionQueue[0].first,
+                             this->moveToPositionQueue[0].second);
+        this->moveToPositionQueue.pop_front();
+      }
     }
   }
 
@@ -425,15 +432,15 @@ void Camera::Translate(const math::Vector3 &direction)
 }
 
 //////////////////////////////////////////////////
-void Camera::RotateYaw(float angle)
+void Camera::RotateYaw(math::Angle _angle)
 {
-  this->sceneNode->roll(Ogre::Radian(angle), Ogre::Node::TS_WORLD);
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
 }
 
 //////////////////////////////////////////////////
-void Camera::RotatePitch(float angle)
+void Camera::RotatePitch(math::Angle _angle)
 {
-  this->pitchNode->yaw(Ogre::Radian(angle));
+  this->pitchNode->yaw(Ogre::Radian(_angle.Radian()));
 }
 
 
@@ -466,9 +473,9 @@ void Camera::SetClipDist(float _near, float _far)
 }
 
 //////////////////////////////////////////////////
-void Camera::SetHFOV(float _radians)
+void Camera::SetHFOV(math::Angle _angle)
 {
-  this->sdf->GetElement("horizontal_fov")->Set(_radians);
+  this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
@@ -621,9 +628,8 @@ void Camera::EnableSaveFrame(bool enable)
   elem->GetAttribute("enabled")->Set(enable);
   this->captureData = true;
 
-  /*if (!this->renderTexture)
+  if (!this->renderTexture)
     this->CreateRenderTexture("saveframes_render_texture");
-    */
 }
 
 //////////////////////////////////////////////////
@@ -781,22 +787,25 @@ std::string Camera::GetFrameFilename()
       gzerr << "Error making directory\n";
   }
 
+  std::string friendlyName = this->GetName();
+  boost::replace_all(friendlyName, "::", "_");
+
+
   char tmp[1024];
   if (!path.empty())
   {
-    double wallTime = common::Time::GetWallTime().Double();
-    int min = static_cast<int>((wallTime / 60.0));
-    int sec = static_cast<int>((wallTime - min*60));
-    int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
+    // double wallTime = common::Time::GetWallTime().Double();
+    // int min = static_cast<int>((wallTime / 60.0));
+    // int sec = static_cast<int>((wallTime - min*60));
+    // int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
 
-    snprintf(tmp, sizeof(tmp), "%s/%s-%04d-%03dm_%02ds_%03dms.jpg",
-        path.c_str(), this->GetName().c_str(),
-        this->saveCount, min, sec, msec);
+    snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
+             friendlyName.c_str(), this->saveCount);
   }
   else
   {
-    snprintf(tmp, sizeof(tmp),
-        "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
+    snprintf(tmp, sizeof(tmp), "%s-%04d.jpg", friendlyName.c_str(),
+             this->saveCount);
   }
 
   this->saveCount++;
@@ -1086,7 +1095,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->GetHFOV().GetAsRadian();
+    double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
@@ -1264,24 +1273,27 @@ bool Camera::GetInitialized() const
 }
 
 /////////////////////////////////////////////////
-bool Camera::MoveToPosition(const math::Vector3 &_end,
-                                 double _pitch, double _yaw, double _time)
+bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 {
   if (this->animState)
+  {
+    this->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
     return false;
+  }
 
   Ogre::TransformKeyFrame *key;
+  math::Vector3 rpy = _pose.rot.GetAsEuler();
   math::Vector3 start = this->GetWorldPose().pos;
 
-  double dyaw =  this->GetWorldRotation().GetAsEuler().z - _yaw;
+  double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
 
   if (dyaw > M_PI)
-    _yaw += 2*M_PI;
+    rpy.z += 2*M_PI;
   else if (dyaw < -M_PI)
-    _yaw -= 2*M_PI;
+    rpy.z -= 2*M_PI;
 
-  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0, 0, 1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0, 1, 0));
+  Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
 
   std::string trackName = "cameratrack";
   int i = 0;
@@ -1307,7 +1319,7 @@ bool Camera::MoveToPosition(const math::Vector3 &_end,
   key->setRotation(this->pitchNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
   key->setRotation(yawFinal);
 
   key = ptrack->createNodeKeyFrame(_time);
@@ -1326,8 +1338,7 @@ bool Camera::MoveToPosition(const math::Vector3 &_end,
 
 /////////////////////////////////////////////////
 bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
-                                 double _time,
-                                 boost::function<void()> _onComplete)
+                             double _time, boost::function<void()> _onComplete)
 {
   if (this->animState)
     return false;

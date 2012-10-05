@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __EVENT_HH__
-#define __EVENT_HH__
+#ifndef _EVENT_HH_
+#define _EVENT_HH_
 
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>

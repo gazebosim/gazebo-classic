@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef RENDERING_MATERIAL_HH
-#define RENDERING_MATERIAL_HH
+#ifndef _RENDERING_MATERIAL_HH_
+#define _RENDERING_MATERIAL_HH_
 
 #include "common/Material.hh"
 
+/// \cond
 namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering
-    /// \{
-
-    /// \brief Rendering material. Just a helper function for now
     class Material
     {
       public: static void CreateMaterials();
       public: static void Update(const gazebo::common::Material *_mat);
     };
-    /// \}
   }
 }
+/// \endcond
 #endif

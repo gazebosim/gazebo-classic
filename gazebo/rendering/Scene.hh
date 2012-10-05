@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SCENE_HH
-#define SCENE_HH
+#ifndef _SCENE_HH_
+#define _SCENE_HH_
 
 #include <vector>
 #include <map>
@@ -71,13 +71,20 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Representation of an entire scene graph
+    /// \class Scene Scene.hh rendering/Scene.hh
+    /// \brief Representation of an entire scene graph.
+    ///
+    /// Maintains all the Visuals, Lights, and Cameras for a World.
     class Scene : public boost::enable_shared_from_this<Scene>
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       private: Scene() {}
 
-      /// \brief Constructor
+      /// \brief Constructor.
+      /// \param[in] _name Name of the scene.
+      /// \param[in] _enableVisualizations True to enable visualizations,
+      /// this should be set to true for user interfaces, and false for
+      /// sensor generation.
       public: Scene(const std::string &_name,
                     bool _enableVisualizations = false);
 
@@ -293,8 +300,8 @@ namespace gazebo
       private: bool ProcessLinkMsg(ConstLinkPtr &_msg);
 
       private: void ProcessSceneMsg(ConstScenePtr &_msg);
+      private: bool ProcessModelMsg(const msgs::Model &_msg);
 
-      private: void OnSceneMsg(ConstScenePtr &_msg);
       private: void OnSensorMsg(ConstSensorPtr &_msg);
       private: void OnVisualMsg(ConstVisualPtr &_msg);
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
@@ -306,6 +313,7 @@ namespace gazebo
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: void OnSkyMsg(ConstSkyPtr &_msg);
+      private: void OnModelMsg(ConstModelPtr &_msg);
 
       private: void OnPoseMsg(ConstPosePtr &_msg);
 
@@ -356,6 +364,9 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Link const> > LinkMsgs_L;
       private: LinkMsgs_L linkMsgs;
 
+      typedef std::list<boost::shared_ptr<msgs::Model const> > ModelMsgs_L;
+      private: ModelMsgs_L modelMsgs;
+
       typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
       private: SensorMsgs_L sensorMsgs;
 
@@ -377,7 +388,6 @@ namespace gazebo
       private: boost::mutex *receiveMutex;
 
       private: transport::NodePtr node;
-      private: transport::SubscriberPtr sceneSub;
       private: transport::SubscriberPtr sensorSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
@@ -387,6 +397,7 @@ namespace gazebo
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr skeletonPoseSub;
       private: transport::SubscriberPtr skySub;
+      private: transport::SubscriberPtr modelInfoSub;
       private: transport::PublisherPtr lightPub;
       private: transport::PublisherPtr requestPub;
 

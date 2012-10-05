@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,12 +195,18 @@ void ConnectionManager::RunUpdate()
   std::list<ConnectionPtr>::iterator endIter;
 
   this->masterMessagesMutex->lock();
-  while (this->masterMessages.size() > 0)
+  unsigned int msize = this->masterMessages.size();
+  this->masterMessagesMutex->unlock();
+
+  while (msize > 0)
   {
     this->ProcessMessage(this->masterMessages.front());
+
+    this->masterMessagesMutex->lock();
     this->masterMessages.pop_front();
+    msize = this->masterMessages.size();
+    this->masterMessagesMutex->unlock();
   }
-  this->masterMessagesMutex->unlock();
 
   this->masterConn->ProcessWriteQueue();
   TopicManager::Instance()->ProcessNodes();

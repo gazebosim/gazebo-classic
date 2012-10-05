@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,17 +42,30 @@ namespace gazebo
 
     class DynamicLines;
 
-    /// \brief baseic contact visualization
+    /// \class ContactVisual ContactVisual.hh rendering/ContactVisual.hh
+    /// \brief Contact visualization
+    ///
+    /// This class visualizes contact points by drawing arrows in the 3D
+    /// environment.
     class ContactVisual : public Visual
     {
+      /// \brief Constructor
+      /// \param _name Name of the ContactVisual
+      /// \param _vis Pointer the parent Visual
+      /// \arapm _topicName Name of the topic which publishes the contact
+      /// information.
       public: ContactVisual(const std::string &_name, VisualPtr _vis,
                             const std::string &_topicName);
 
+      /// \brief Destructor
       public: virtual ~ContactVisual();
 
+      /// \brief Update the Visual
       private: void Update();
-      private: void OnContact(
-                   ConstContactsPtr &_msg);
+
+      /// \brief Callback when a Contact message is received
+      /// \param _msg The Contact message
+      private: void OnContact(ConstContactsPtr &_msg);
 
       private: void SetupInstancedMaterialToEntity(Ogre::Entity *_ent);
 

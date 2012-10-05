@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,8 +258,11 @@ namespace gazebo
 
       private: std::deque<std::string> writeQueue;
       private: std::deque<unsigned int> writeCounts;
+      private: boost::mutex *connectMutex;
       private: boost::recursive_mutex *writeMutex;
       private: boost::recursive_mutex *readMutex;
+
+      private: boost::condition_variable connectCondition;
 
       // Called when a new connection is received
       private: AcceptCallback acceptCB;

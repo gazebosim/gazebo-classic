@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include "msgs/msgs.hh"
 #include "common/Events.hh"
+#include "common/Common.hh"
 
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
@@ -264,7 +265,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       sdf::ElementPtr elem = geomElem->AddElement("mesh");
-      elem->GetElement("filename")->Set(_msg->geometry().mesh().filename());
+      elem->GetElement("uri")->Set(_msg->geometry().mesh().filename());
     }
   }
 
@@ -281,8 +282,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   {
     if (_msg->material().has_script())
     {
-      sdf::ElementPtr elem = this->sdf->GetElement("material");
-      elem->GetElement("script")->Set(_msg->material().script());
+      sdf::ElementPtr elem =
+        this->sdf->GetElement("material")->GetElement("script");
+      elem->GetElement("name")->Set(_msg->material().script().name());
+      elem->GetElement("uri")->Set(_msg->material().script().uri());
     }
 
     if (_msg->material().has_ambient())
@@ -390,9 +393,17 @@ void Visual::Load()
   if (this->sdf->HasElement("material"))
   {
     sdf::ElementPtr matElem = this->sdf->GetElement("material");
-    std::string script = matElem->GetValueString("script");
-    if (!script.empty())
-      this->SetMaterial(script);
+    if (matElem->HasElement("script"))
+    {
+      sdf::ElementPtr scriptElem = matElem->GetElement("script");
+      std::string uri = scriptElem->GetValueString("uri");
+      std::string matName = scriptElem->GetValueString("name");
+
+      if (!uri.empty())
+        RenderEngine::Instance()->AddResourcePath(uri);
+      if (!name.empty())
+        this->SetMaterial(matName);
+    }
     else if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->GetValueColor("ambient"));
     else if (matElem->HasElement("diffuse"))
@@ -631,13 +642,13 @@ math::Vector3 Visual::GetScale()
     else if (geomElem->HasElement("sphere"))
     {
       double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
-      result.Set(r, r, r);
+      result.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
       double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
       double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
-      result.Set(r, r, l);
+      result.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {
@@ -1691,8 +1702,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    if (_msg->material().has_script() && !_msg->material().script().empty())
-      this->SetMaterial(_msg->material().script());
+    if (_msg->material().has_script())
+    {
+      RenderEngine::Instance()->AddResourcePath(
+          _msg->material().script().uri());
+      this->SetMaterial(_msg->material().script().name());
+    }
 
     if (_msg->material().has_ambient())
       this->SetAmbient(msgs::Convert(_msg->material().ambient()));
@@ -1817,7 +1832,27 @@ std::string Visual::GetMeshName() const
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
-      return geomElem->GetElement("mesh")->GetValueString("filename");
+    {
+      sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
+      std::string filename;
+
+      if (tmpElem->GetValueString("filename") != "__default__")
+      {
+        filename = tmpElem->GetValueString("filename");
+
+        gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
+          << " is deprecated.\n";
+        gzerr << "Use <mesh><uri>file://" << filename << "</uri></mesh>\n";
+      }
+      else
+      {
+        filename = common::find_file(tmpElem->GetValueString("uri"));
+        if (filename == "__default__" || filename.empty())
+          gzerr << "No mesh specified\n";
+      }
+
+      return filename;
+    }
   }
 
   return std::string();

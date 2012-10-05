@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 2 Feb 2011
  */
 
-#ifndef __DIAGNOSTICMANAGER_HH__
-#define __DIAGNOSTICMANAGER_HH__
+#ifndef _DIAGNOSTICMANAGER_HH_
+#define _DIAGNOSTICMANAGER_HH_
 
 #include <map>
 #include <string>

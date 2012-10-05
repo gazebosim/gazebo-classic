@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
  * Date: 09 June 2007
  */
 
-#ifndef __GAZEBO_CONSOLE_HH__
-#define __GAZEBO_CONSOLE_HH__
+#ifndef _GAZEBO_CONSOLE_HH_
+#define _GAZEBO_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>

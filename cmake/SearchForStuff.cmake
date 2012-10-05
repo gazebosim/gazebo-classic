@@ -2,8 +2,6 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (${gazebo_cmake_dir}/FindSSE.cmake)
 include (CheckCXXSourceCompiles)
 
-set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
-
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
@@ -46,6 +44,12 @@ endif ()
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
+
+  pkg_check_modules(CURL libcurl)
+  if (NOT CURL_FOUND)
+    BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
+  endif()
+
   pkg_check_modules(PROFILER libprofiler)
   if (PROFILER_FOUND)
     set (CMAKE_LINK_FLAGS_PROFILE "-Wl,--no-as-needed -lprofiler -Wl,--as-needed ${CMAKE_LINK_FLAGS_PROFILE}" CACHE INTERNAL "Link flags for profile")
@@ -113,6 +117,17 @@ if (PKG_CONFIG_FOUND)
     set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
   endif ()
 
+  #################################################
+  # Find libtar. 
+  find_path (libtar_include_dir libtar.h /usr/include /usr/local/include ENV CPATH)
+  if (NOT libtar_include_dir)
+    message (STATUS "Looking for libtar.h - not found") 
+    BUILD_ERROR("Missing: libtar")
+  else ()
+    message (STATUS "Looking for libtar.h - found")
+    set (libtar_libraries "tar" CACHE INTERNAL "tinyxml libraries")
+  endif ()
+
   ################################################# 
   # Find CCD 
   pkg_check_modules(CCD ccd) 
@@ -140,13 +155,24 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find OGRE 
   execute_process(COMMAND pkg-config --modversion OGRE 
-    OUTPUT_VARIABLE OGRE_VERSION)
+                  OUTPUT_VARIABLE OGRE_VERSION)
+  string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
-  pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
+  # There is a major problem with OGRE and Ubuntu. Ubuntu has instituted
+  # a multi-arch install policy (https://wiki.ubuntu.com/MultiarchSpec).
+  # But OGRE and cmake do not handle it very well. The FindOGRE.cmake file
+  # is not installed in a default search path, even if we forcibly find the 
+  # FindOGRE.cmake file does not return correct paths. So, we are forced to
+  # use find_path to find where OGRE and its plugins are installed.
+  find_path(OGRE_LIBRARY_PATH libOgreMain.so /usr/lib /usr/local/lib
+            /usr/lib/x86_64-linux-gnu /usr/lib/i386-linux-gnu)
+
+  pkg_check_modules(OGRE-RTShaderSystem
+                    OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
+
   if (OGRE-RTShaderSystem_FOUND)
     set(ogre_ldflags ${OGRE-RTShaderSystem_LDFLAGS})
     set(ogre_include_dirs ${OGRE-RTShaderSystem_INCLUDE_DIRS})
-    set(ogre_library_dirs ${OGRE-RTShaderSystem_LIBRARY_DIRS})
     set(ogre_libraries "OgreRTShaderSystem")
     set(ogre_cflags ${OGRE-RTShaderSystem_CFLAGS})
 
@@ -160,19 +186,12 @@ if (PKG_CONFIG_FOUND)
     else (NOT OGRE_FOUND)
       set(ogre_ldflags ${OGRE_LDFLAGS})
       set(ogre_include_dirs ${OGRE_INCLUDE_DIRS})
-      set(ogre_library_dirs ${OGRE_LIBRARY_DIRS})
       set(ogre_cflags ${OGRE_CFLAGS})
     endif ()
   endif ()
 
-  # Bug in libogre-dev ubuntu install package which cause ogre_library_dirs to 
-  # be empty
-  if ("${ogre_library_dirs}" STREQUAL "")
-    set (ogre_library_dirs "/usr/lib")
-  endif()
-
-  set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
-  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
+  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
+       CACHE INTERNAL "Ogre include path")
 
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
   if (OGRE-Terrain_FOUND)
@@ -184,6 +203,10 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   set(ogre_libraries "${ogre_libraries};OgreMain")
+
+  # this is used by gazebo/CMakeLists.txt:13
+  set (OGRE_LIBRARY_PATH ${ogre_library_dirs}
+       CACHE INTERNAL "Ogre library path")
 
   #################################################
   # Find XML
@@ -282,7 +305,7 @@ endif()
 ########################################
 # Find Boost, if not specified manually
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams)
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)

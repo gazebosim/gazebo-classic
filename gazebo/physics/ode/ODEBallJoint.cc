@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODEBallJoint::ODEBallJoint(dWorldID _worldId)
-: BallJoint<ODEJoint>()
+ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
+: BallJoint<ODEJoint>(_parent)
 {
   this->jointId = dJointCreateBall(_worldId, NULL);
 }

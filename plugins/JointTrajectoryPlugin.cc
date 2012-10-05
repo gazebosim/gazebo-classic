@@ -22,75 +22,70 @@
  * Desc: 3D position interface for ground truth.
  * Author: Sachin Chitta and John Hsu
  * Date: 1 June 2008
- * SVN info: $Id$
  */
 
 #include <plugins/JointTrajectoryPlugin.hh>
 
 namespace gazebo
 {
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 JointTrajectoryPlugin::JointTrajectoryPlugin()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 JointTrajectoryPlugin::~JointTrajectoryPlugin()
 {
-  event::Events::DisconnectWorldUpdateStart(this->update_connection_);
+  event::Events::DisconnectWorldUpdateStart(this->updateConnection);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the controller
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
                                  sdf::ElementPtr /*_sdf*/)
 {
   // Get the world name.
-  this->world_ = _parent->GetWorld();
-  this->model_ = _parent;
-  this->world_->EnablePhysicsEngine(true);
+  this->world = _parent->GetWorld();
+  this->model = _parent;
 
-  // this->world_->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  // this->world->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  this->update_connection_ = event::Events::ConnectWorldUpdateStart(
+  this->updateConnection = event::Events::ConnectWorldUpdateStart(
       boost::bind(&JointTrajectoryPlugin::UpdateStates, this));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// glue a link to the world by creating a fixed joint
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::FixLink(physics::LinkPtr link)
 {
-  this->joint_ = this->world_->GetPhysicsEngine()->CreateJoint("revolute");
-  this->joint_->SetModel(this->model_);
+  this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
+      this->model);
+
+  this->joint->SetModel(this->model);
   math::Pose pose = link->GetWorldPose();
   // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
-  this->joint_->Load(physics::LinkPtr(), link, pose);
-  this->joint_->SetAxis(0, math::Vector3(0, 0, 0));
-  this->joint_->SetHighStop(0, 0);
-  this->joint_->SetLowStop(0, 0);
-  this->joint_->SetAnchor(0, pose.pos);
-  this->joint_->Init();
+  this->joint->Load(physics::LinkPtr(), link, pose);
+  this->joint->SetAxis(0, math::Vector3(0, 0, 0));
+  this->joint->SetHighStop(0, 0);
+  this->joint->SetLowStop(0, 0);
+  this->joint->SetAnchor(0, pose.pos);
+  this->joint->Init();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// unglue a link to the world by destroying the fixed joint
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::UnfixLink()
 {
-  this->joint_.reset();
+  this->joint.reset();
 }
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Play the trajectory, update states
+/////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates()
 {
-  common::Time cur_time = this->world_->GetSimTime();
+  common::Time cur_time = this->world->GetSimTime();
+
+  bool is_paused = this->world->IsPaused();
+  if (!is_paused) this->world->SetPaused(true);
 
   std::map<std::string, double> joint_position_map;
   joint_position_map["arm_shoulder_pan_joint"] = cos(cur_time.Double());
@@ -99,7 +94,10 @@ void JointTrajectoryPlugin::UpdateStates()
     + 0.45*cos(0.5*cur_time.Double());
   joint_position_map["arm_wrist_roll_joint"] = -2.9*cos(3.0*cur_time.Double());
 
-  this->model_->SetJointPositions(joint_position_map);
+  this->model->SetJointPositions(joint_position_map);
+
+  // resume original pause-state
+  this->world->SetPaused(is_paused);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(JointTrajectoryPlugin)

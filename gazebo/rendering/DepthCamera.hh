@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,9 @@
  * Date: 15 July 2003
  */
 
-#ifndef RENDERING_DEPTHCAMERA_HH
-#define RENDERING_DEPTHCAMERA_HH
+#ifndef _RENDERING_DEPTHCAMERA_HH_
+#define _RENDERING_DEPTHCAMERA_HH_
 #include <string>
-
-#include "rendering/Camera.hh"
 
 #include "common/Event.hh"
 #include "common/Time.hh"
@@ -34,32 +32,33 @@
 
 #include "sdf/sdf.hh"
 
+#include "rendering/Camera.hh"
+
 namespace Ogre
 {
   class Material;
-  class RenderObjectListener;
-  class Renderable;
-  class Pass;
-  class AutoParamDataSource;
+  class RenderTarget;
+  class Texture;
+  class Viewport;
 }
 
 namespace gazebo
 {
-  /// \ingroup gazebo_rendering
-  /// \brief Rendering namespace
   namespace rendering
   {
-    class MouseEvent;
-    class ViewController;
     class Scene;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \brief depth camera sensor, depends on rendering::Camera class
+    /// \class DepthCamera DepthCamera.hh rendering/DepthCamera.hh
+    /// \brief Depth camera used to render depth data into an image buffer
     class DepthCamera : public Camera
     {
       /// \brief Constructor
+      /// \param[in] _namePrefix Unique prefix name for the camera.
+      /// \param[in] _scene Scene that will contain the camera
+      /// \param[in] _autoRender Almost everyone should leave this as true.
       public: DepthCamera(const std::string &_namePrefix,
                           Scene *_scene, bool _autoRender = true);
 
@@ -67,7 +66,7 @@ namespace gazebo
       public: virtual ~DepthCamera();
 
       /// \brief Load the camera with a set of parmeters
-      /// \param _sdf The SDF camera info
+      /// \param[in] _sdf The SDF camera info
       public: void Load(sdf::ElementPtr &_sdf);
 
        /// \brief Load the camera with default parmeters
@@ -79,62 +78,99 @@ namespace gazebo
       /// Finalize the camera
       public: void Fini();
 
+      /// \brief Create a texture which will hold the depth data
+      /// \param[in] _textureName Name of the texture to create
       public: void CreateDepthTexture(const std::string &_textureName);
 
       /// \brief Render the camera
       public: virtual void PostRender();
 
-      // All things needed to get back z buffer for depth data
-      public: virtual const float* GetDepthData();
+      /// \brief All things needed to get back z buffer for depth data
+      /// \return The z-buffer as a float array
+      public: virtual const float *GetDepthData();
 
-      /// \brief Connect a to the add entity signal
+      /// \brief Set the render target, which renders the depth data
+      /// \param[in] _target Pointer to the render target
+      public: virtual void SetDepthTarget(Ogre::RenderTarget *_target);
+
+      /// \brief Connect a to the new depth image signal
+      /// \param[in] _subscriber Subscriber callback function
+      /// \return Pointer to the new Connection. This must be kept in scope
       public: template<typename T>
-              event::ConnectionPtr ConnectNewDepthFrame(T subscriber)
-              { return newDepthFrame.Connect(subscriber); }
-      public: void DisconnectNewDepthFrame(event::ConnectionPtr &c)
-              { newDepthFrame.Disconnect(c); }
-      private: virtual void RenderImpl();
+              event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
+              { return newDepthFrame.Connect(_subscriber); }
 
-      private: void UpdateRenderTarget(Ogre::RenderTarget *target,
-               Ogre::Material *material, std::string matName);
+      /// \brief Disconnect from an depth image singal
+      /// \param[in] _c The connection to disconnect
+      public: void DisconnectNewDepthFrame(event::ConnectionPtr &_c)
+              { newDepthFrame.Disconnect(_c); }
 
-      private: float *depthBuffer;
-
-      private: Ogre::Material *depthMaterial;
-
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newDepthFrame;
-
-      protected: Ogre::Texture *depthTexture;
-      protected: Ogre::RenderTarget *depthTarget;
-      public: virtual void SetDepthTarget(Ogre::RenderTarget *target);
-      protected: Ogre::Viewport *depthViewport;
-
-      private: bool output_points;
-
-      /// \brief Connect a to the add entity signal
+      /// \brief Connect a to the new rgb point cloud signal
+      /// \param[in] _subscriber Subscriber callback function
+      /// \return Pointer to the new Connection. This must be kept in scope
       public: template<typename T>
               event::ConnectionPtr ConnectNewRGBPointCloud(T subscriber)
               { return newRGBPointCloud.Connect(subscriber); }
+
+      /// \brief Disconnect from an rgb point cloud singal
+      /// \param[in] _c The connection to disconnect
       public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &c)
               { newRGBPointCloud.Disconnect(c); }
 
-      private: float *pcdBuffer;
-      protected: Ogre::Viewport *pcdViewport;
 
+      /// \brief Implementation of the render call
+      private: virtual void RenderImpl();
+
+      /// \brief Update a render target
+      /// \param[in] _target Render target to update
+      /// \param[in] _material Material to use
+      /// \param[in] _matName Material name
+      private: void UpdateRenderTarget(Ogre::RenderTarget *_target,
+                                       Ogre::Material *_material,
+                                       const std::string &_matName);
+
+      /// \brief Pointer to the depth texture
+      protected: Ogre::Texture *depthTexture;
+
+      /// \brief Pointer to the depth target
+      protected: Ogre::RenderTarget *depthTarget;
+
+      /// \brief Pointer to the depth viewport
+      protected: Ogre::Viewport *depthViewport;
+
+      /// \brief The depth buffer
+      private: float *depthBuffer;
+
+      /// \brief The depth material
+      private: Ogre::Material *depthMaterial;
+
+      /// \brief True to generate point clouds
+      private: bool outputPoints;
+
+      /// \brief Point cloud data buffer
+      private: float *pcdBuffer;
+
+      /// \brief Point cloud view port
+      private: Ogre::Viewport *pcdViewport;
+
+      /// \brief Point cloud material
+      private: Ogre::Material *pcdMaterial;
+
+      /// \brief Point cloud texture
+      private: Ogre::Texture *pcdTexture;
+
+      /// \brief Point cloud texture
+      private: Ogre::RenderTarget *pcdTarget;
+
+      /// \brief Event used to signal rgb point cloud data
       private: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newRGBPointCloud;
 
-      private: Ogre::Material *pcdMaterial;
-
-      protected: Ogre::Texture *pcdTexture;
-      protected: Ogre::RenderTarget *pcdTarget;
+      /// \brief Event used to signal depth data
+      private: event::EventT<void(const float *, unsigned int, unsigned int,
+                   unsigned int, const std::string &)> newDepthFrame;
     };
-
     /// \}
   }
 }
 #endif
-
-
-

@@ -1,7 +1,7 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
  *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
+ *     Nate Koenig
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  */
 /* Desc: A screw or primastic/rotational joint
- * Author: Nate Keonig, Andrew Howard
+ * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
 
@@ -41,7 +41,7 @@ namespace gazebo
     class ScrewJoint : public T
     {
       /// \brief Constructor
-      public: ScrewJoint() : T()
+      public: ScrewJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::SCREW_JOINT); }
       /// \brief Destructor
       public: virtual ~ScrewJoint()

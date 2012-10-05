@@ -40,7 +40,7 @@ TEST_F(HeightmapTest, Heights)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetOrigin() == math::Vector3(0, 0, 0));
+  EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
   EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
 
   float diffMax, diffSum, diffAvg;

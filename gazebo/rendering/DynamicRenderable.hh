@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef OGREDYNAMICRENDERABLE_HH
-#define OGREDYNAMICRENDERABLE_HH
+#ifndef _DYNAMICRENDERABLE_HH_
+#define _DYNAMICRENDERABLE_HH_
 
 #include "rendering/ogre_gazebo.h"
 #include "rendering/RenderTypes.hh"
@@ -27,8 +27,9 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class DynamicRenderable DynamicRenderable.hh rendering/DynamicRenderable.hh
     /// \brief Abstract base class providing mechanisms for dynamically
-    ///        growing hardware buffers.
+    /// growing hardware buffers.
     class DynamicRenderable : public Ogre::SimpleRenderable
     {
       /// \brief Constructor
@@ -41,23 +42,29 @@ namespace gazebo
       /// \remarks This function should only be called once. It initializes the
       /// render operation, and calls the abstract function
       /// CreateVertexDeclaration().
-      /// \param operationType The type of render operation to perform.
-      /// \param useIndices Specifies whether to use indices to determine the
-      /// vertices to use as input.
-      public: void Init(RenderOpType operationType, bool useIndices = false);
+      /// \param[in] _opType The type of render operation to perform.
+      /// \param[in] _useIndices Specifies whether to use indices to
+      /// determine the vertices to use as input.
+      public: void Init(RenderOpType _opType, bool _useIndices = false);
 
       /// \brief Set the render operation type
-      public: void SetOperationType(RenderOpType opType);
+      /// \param[in] _opType The type of render operation to perform.
+      public: void SetOperationType(RenderOpType _opType);
 
       /// \brief Get the render operation type
+      /// \return The render operation type.
       public: RenderOpType GetOperationType() const;
 
       /// \brief Implementation of Ogre::SimpleRenderable
-      public: virtual Ogre::Real getBoundingRadius(void) const;
+      /// \return The bounding radius
+      public: virtual Ogre::Real getBoundingRadius() const;
 
       /// \brief Implementation of Ogre::SimpleRenderable
+      /// \param[in] _cam Pointer to the Ogre camera that views the
+      /// renderable.
+      /// \return The squared depth in the Camera's view
       public: virtual Ogre::Real getSquaredViewDepth(
-                  const Ogre::Camera* cam) const;
+                  const Ogre::Camera *_cam) const;
 
       /// \brief Creates the vertex declaration.  @remarks Override and set
       /// mRenderOp.vertexData->vertexDeclaration here.  mRenderOp.vertexData
@@ -74,11 +81,11 @@ namespace gazebo
        ///    possibly reallocated to achieve this.
        /// \par The vertex and index count in the render operation are set to
        ///      the values of vertexCount and indexCount respectively.
-       /// \param vertexCount The number of vertices the buffer must hold.
-       /// \param indexCount The number of indices the buffer must hold.
+       /// \param[in] _vertexCount The number of vertices the buffer must hold.
+       /// \param[in] _indexCount The number of indices the buffer must hold.
        ///        This parameter is ignored if not using indices.
-      protected: void PrepareHardwareBuffers(size_t vertexCount,
-                                             size_t indexCount);
+      protected: void PrepareHardwareBuffers(size_t _vertexCount,
+                                             size_t _indexCount);
 
        /// \brief Fills the hardware vertex and index buffers with data.
        /// @remarks

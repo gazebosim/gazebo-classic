@@ -7,8 +7,8 @@ package gazebo.msgs;
 
 message Request
 {
-  required string request   = 1;
-  required int32 id         = 2;
+  required int32 id         = 1;
+  required string request   = 2;
   optional string data      = 3;
   optional double dbl_data  = 4;
 }

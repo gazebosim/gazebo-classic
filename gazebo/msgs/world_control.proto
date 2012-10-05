@@ -1,6 +1,8 @@
 package gazebo.msgs;
 
-/// \ingroup gazebo_msgs
+/// \addtogroup gazebo_msgs
+/// \{
+///
 /// \interface WorldControl
 /// \brief A message that allows for control of world functions
 /// \verbatim
@@ -15,4 +17,5 @@ message WorldControl
   optional WorldReset reset     = 3;
 }
 
-/// \endverbatim
+/// \verbatim
+/// \}

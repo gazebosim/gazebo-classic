@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef __ARROWVISUAL_HH__
-#define __ARROWVISUAL_HH__
+#ifndef _ARROWVISUAL_HH_
+#define _ARROWVISUAL_HH_
 
 #include <string>
 #include "rendering/Visual.hh"
@@ -36,15 +36,22 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
+    /// \class ArrowVisual ArrowVisual.hh rendering/ArrowVisual.hh
     /// \brief Basic arrow visualization
     class ArrowVisual : public Visual
     {
+      /// \brief Constructor
+      /// \param _name Name of the arrow visual
+      /// \param _vis Pointer to the parent visual
       public: ArrowVisual(const std::string &_name, VisualPtr _vis);
+
+      /// \brief Destructor
       public: virtual ~ArrowVisual();
 
       /// \brief Load the visual with default parameters
       public: virtual void Load();
 
+      /// \brief Show the rotation of the visual
       public: void ShowRotation();
 
       private: Ogre::SceneNode *headNode;

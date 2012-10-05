@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "math/Plane.hh"
 #include "math/Rand.hh"
 
+#include "common/Common.hh"
 #include "common/Image.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -493,8 +494,20 @@ namespace gazebo
           geomMsg->set_type(msgs::Geometry::MESH);
           msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
               geomElem->GetValueVector3("scale"));
-          geomMsg->mutable_mesh()->set_filename(
-              geomElem->GetValueString("filename"));
+
+          // The if clause is used to detect instances of "filename" with
+          // the sdf. Eventually this code will be deprecated as people
+          // switch to using uris.
+          if (geomElem->GetValueString("filename") != "__default__")
+          {
+            geomMsg->mutable_mesh()->set_filename(
+                common::find_file(geomElem->GetValueString("filename")));
+          }
+          else
+          {
+            geomMsg->mutable_mesh()->set_filename(
+                geomElem->GetValueString("uri"));
+          }
         }
         else
           gzthrow("Unknown geometry type\n");
@@ -505,7 +518,15 @@ namespace gazebo
       {
         sdf::ElementPtr elem = _sdf->GetElement("material");
         msgs::Material *matMsg = result.mutable_material();
-        matMsg->set_script(elem->GetValueString("script"));
+
+        if (elem->HasElement("script"))
+        {
+          sdf::ElementPtr scriptElem = elem->GetElement("script");
+          matMsg->mutable_script()->set_name(
+              scriptElem->GetValueString("name"));
+          matMsg->mutable_script()->set_uri(
+              scriptElem->GetValueString("uri"));
+        }
 
         if (elem->HasElement("shader"))
         {

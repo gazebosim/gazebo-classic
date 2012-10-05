@@ -14,8 +14,8 @@
  * limitations under the License.
 *
  */
-/* Desc: 
- * Author: Jonas Mellin & Zakiruz Zaman 
+/* Desc:
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
@@ -36,17 +36,28 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Visualization for RFID sensor
+    /// \class RFIDVisual RFIDVisual.hh rendering/RFIDVisual.hh
+    /// \brief Visualization for RFID sensor.
     class RFIDVisual : public Visual
     {
+      /// \brief Constructor.
+      /// \param[in] _name Name of the Visual.
+      /// \param[in] _vis Parent Visual.
+      /// \param[in] _topicName Name of the topic which publishes RFID data.
       public: RFIDVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName);
 
+      /// \brief Destructor
       public: virtual ~RFIDVisual();
 
+      /// \brief Callback for the RFID sensor data.
+      /// \param[in] _msg Message containing RFID data
       private: void OnScan(ConstPosePtr &_msg);
 
+      /// \brief Pointer to the transport::Node for communication
       private: transport::NodePtr node;
+
+      /// \brief Pointer to the transport::Subscriber for recieving data
       private: transport::SubscriberPtr rfidSub;
     };
     /// \}

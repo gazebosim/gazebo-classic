@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 /* Desc: A ray
- * Author: Nate Keonig
+ * Author: Nate Koenig
  * Date: 24 May 2009
  */
 
-#ifndef __BULLETRAYGEOM_HH__
-#define __BULLETRAYGEOM_HH__
+#ifndef _BULLETRAYGEOM_HH_
+#define _BULLETRAYGEOM_HH_
 
 #include <string>
 #include "physics/RayShape.hh"

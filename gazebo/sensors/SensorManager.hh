@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,15 @@ namespace gazebo
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
     {
-      /// \brief Constructor
-      public: SensorManager();
+      /// \brief This is a singletone class. Use SensorManager::Instance()
+      /// to get a pointer to this class.
+      private: SensorManager();
 
       /// \brief Destructor
-      public: virtual ~SensorManager();
+      private: virtual ~SensorManager();
 
       /// \brief Update all the sensors
+      ///
       /// Checks to see if any sensor need to be initialized first,
       /// then updates all sensors once.
       public: void Update(bool force = false);
@@ -66,13 +68,14 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Get all the sensor types
+      /// \param[out] All the sensor types.
       public: void GetSensorTypes(std::vector<std::string> &_types) const;
 
       /// \brief Add a sensor from an SDF element. This function will also Load
       /// and Init the sensor.
-      /// \param _elem The SDF element that describes the sensor
-      /// \param _worldName Name of the world in which to create the sensor
-      /// \param _parentName The name of the parent link which the sensor is
+      /// \param[in] _elem The SDF element that describes the sensor
+      /// \param[in] _worldName Name of the world in which to create the sensor
+      /// \param[in] _parentName The name of the parent link which the sensor is
       /// attached to.
       /// \return The name of the sensor
       public: std::string CreateSensor(sdf::ElementPtr _elem,
@@ -80,9 +83,12 @@ namespace gazebo
                                        const std::string &_parentName);
 
       /// \brief Get a sensor
+      /// \param[in] _name The name of a sensor to find.
+      /// \return A pointer to the sensor. NULL if not found.
       public: SensorPtr GetSensor(const std::string &_name);
 
       /// \brief Remove a sensor
+      /// \param[in] _name The name of the sensor to remove.
       public: void RemoveSensor(const std::string &_name);
 
       /// \brief Remove all sensors
@@ -91,16 +97,26 @@ namespace gazebo
       /// \brief Update loop
       private: void RunLoop();
 
+      /// \brief If True the sensor manager stop processing sensors.
       private: bool stop;
+
+      /// \brief True if initialized.
       private: bool initialized;
+
+      /// \brief The thread to run sensor updates in.
       private: boost::thread *runThread;
+
+      /// \brief Mutex used when adding and removing sensors.
       private: boost::recursive_mutex *mutex;
 
+      /// \brief The list of initialized sensors.
       private: std::list<SensorPtr> sensors;
 
-      private: friend class SingletonT<SensorManager>;
-
+      /// \brief List of sensors that require initialization.
       private: std::list<SensorPtr> initSensors;
+
+      /// \brief This is a singleton class.
+      private: friend class SingletonT<SensorManager>;
     };
     /// \}
   }

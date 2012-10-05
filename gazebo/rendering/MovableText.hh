@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef MOVABLETEXT_HH
-#define MOVABLETEXT_HH
+#ifndef _MOVABLETEXT_HH_
+#define _MOVABLETEXT_HH_
 
 #include <string>
 
@@ -43,13 +43,28 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class MovableText MovableText.hh rendering/MovableText.hh
     /// \brief Movable text
     class MovableText : public Ogre::MovableObject, public Ogre::Renderable
     {
+      /// \enum HorizAlign
       /// \brief Horizontal alignment
-      public: enum HorizAlign {H_LEFT, H_CENTER};
+      public: enum HorizAlign {
+                /// \brief Left alignment
+                H_LEFT,
+                /// \brief Center alignment
+                H_CENTER
+              };
+
+      /// \enum VertAlign
       /// \brief vertical alignment
-      public: enum VertAlign  {V_BELOW, V_ABOVE};
+      public: enum VertAlign {
+                /// \brief Align below
+                V_BELOW,
+                /// \brief Align above
+                V_ABOVE
+              };
+
       /// \brief Constructor
       public: MovableText();
 
@@ -57,6 +72,11 @@ namespace gazebo
       public: virtual ~MovableText();
 
       /// \brief Loads text and font info
+      /// \param[in] _name Name of the text object
+      /// \param[in] _text Text to render
+      /// \param[in] _fontName Font to use
+      /// \param[in] _charHeight Height of the characters
+      /// \param[in] _color Text color
       public: void Load(const std::string &_name,
                         const std::string &_text,
                         const std::string &_fontName = "Arial",
@@ -64,76 +84,127 @@ namespace gazebo
                         const common::Color &_color = common::Color::White);
 
       /// \brief Set the font
-      public: void SetFontName(const std::string &font);
+      /// \param[in] _font Name of the font
+      public: void SetFontName(const std::string &_font);
 
       /// \brief Get the font
+      /// \return The font name
       public: const std::string &GetFont() const;
 
-      /// \brief Set the text to display
-      public: void SetText(const std::string & caption);
+      /// \brief Set the text to display.
+      /// \param[in] The text to display.
+      public: void SetText(const std::string &_text);
 
-      /// \brief Get the displayed text
+      /// \brief Get the displayed text.
+      /// \return The displayed text.
       public: const std::string &GetText() const;
 
-      /// \brief Set the text color
+      /// \brief Set the text color.
+      /// \param[in] _color Text color.
       public: void SetColor(const common::Color &_color);
 
-      /// \brief Get the text color
+      /// \brief Get the text color.
+      /// \return Textuer color.
       public: const common::Color &GetColor() const;
 
-      /// \brief Set the height of a character
-      public: void SetCharHeight(float height);
+      /// \brief Set the height of a character.
+      /// \param[in] _height Height of the characters.
+      public: void SetCharHeight(float _height);
 
       /// \brief Set the height of a characters
+      /// return Height of the characters.
       public: float GetCharHeight() const;
 
-      /// \brief Set the width of a space
-      public:void SetSpaceWidth(float width);
+      /// \brief Set the width of a space.
+      /// \param _width space width
+      public:void SetSpaceWidth(float _width);
 
       /// \brief Get the width of a space
+      /// \return Space width
       public: float GetSpaceWidth() const;
 
       /// \brief Set the alignment of the text
-      public: void SetTextAlignment(const HorizAlign &hAlign,
-                                    const VertAlign &vAlign);
+      /// \param _hAlign Horizontal alignment
+      /// \param _vAlign Vertical alignment
+      public: void SetTextAlignment(const HorizAlign &_hAlign,
+                                    const VertAlign &_vAlign);
 
       /// \brief Set the baseline height of the text
-      public: void SetBaseline(float height);
+      /// \param _height Baseline height
+      public: void SetBaseline(float _height);
 
       /// \brief Get the baseline height
+      /// \return Baseline height
       public: float GetBaseline() const;
 
-      /// \brief True = text always is displayed ontop
-      public: void SetShowOnTop(bool show);
+      /// \brief True = text always is displayed ontop.
+      /// \param[in] _show Set to true to render the text on top of
+      /// all other drawables.
+      public: void SetShowOnTop(bool _show);
 
-      /// \brief True = text is displayed on top
+      /// \brief True = text is displayed on top.
+      /// \return True if MovableText::SetShownOnTop(true) was called.
       public: bool GetShowOnTop() const;
 
-      /// \brief Get the axis aligned bounding box of the text
+      /// \brief Get the axis aligned bounding box of the text.
+      /// \return The axis aligned bounding box.
       public: math::Box GetAABB();
 
-      /// \brief Update the text
+      /// \brief Update the text.
       public: void Update();
 
+      /// \internal
       /// \brief Method to allow a caller to abstractly iterate over the
-      //         Renderable instances
+      /// renderable instances.
       public: virtual void visitRenderables(Ogre::Renderable::Visitor* visitor,
                   bool debug = false);
 
+      /// \internal
       /// \brief setup the geometry (from MovableText)
       protected: void _setupGeometry();
 
+      /// \internal
       /// \brief update the color(from MovableText)
       protected: void _updateColors();
 
+      /// \internal
       /// \brief Get the world transform (from MovableObject)
       protected: void getWorldTransforms(Ogre::Matrix4 *xform) const;
 
+      /// \internal
       /// \brief Get the bounding radiu (from MovableObject)
       protected: float getBoundingRadius() const;
 
+      /// \internal
       /// \brief Get the squared view depth (from MovableObject)
       protected: float getSquaredViewDepth(const Ogre::Camera *cam) const;
+
+      /// \internal
+      private: const Ogre::Quaternion &getWorldOrientation(void) const;
+      /// \internal
+      private: const Ogre::Vector3 &getWorldPosition(void) const;
+      /// \internal
+      private: const Ogre::AxisAlignedBox &getBoundingBox(void) const;
+      /// \internal
+      private: const Ogre::String &getMovableType() const;
+
+      /// \internal
+      private: void _notifyCurrentCamera(Ogre::Camera *cam);
+
+      /// \internal
+      private: void _updateRenderQueue(Ogre::RenderQueue* queue);
+
+      /// \internal
+      /// \brief Get the render operation
+      protected: void getRenderOperation(Ogre::RenderOperation &op);
+
+      /// \internal
+      /// \brief Get the material
+      protected: const Ogre::MaterialPtr &getMaterial(void) const;
+
+      /// \internal
+      /// \brief Get the lights
+      protected: const Ogre::LightList &getLights(void) const;
 
       private: std::string fontName;
       private: std::string text;
@@ -162,23 +233,6 @@ namespace gazebo
       private: HorizAlign horizAlign;
       private: bool onTop;
       private: float baseline;
-
-      private: const Ogre::Quaternion &getWorldOrientation(void) const;
-      private: const Ogre::Vector3 &getWorldPosition(void) const;
-      private: const Ogre::AxisAlignedBox &getBoundingBox(void) const;
-      private: const Ogre::String &getMovableType() const;
-
-      private: void _notifyCurrentCamera(Ogre::Camera *cam);
-      private: void _updateRenderQueue(Ogre::RenderQueue* queue);
-
-      /// \brief Get the render operation
-      protected: void getRenderOperation(Ogre::RenderOperation &op);
-
-      /// \brief Get the material
-      protected: const Ogre::MaterialPtr &getMaterial(void) const;
-
-      /// \brief Get the lights
-      protected: const Ogre::LightList &getLights(void) const;
 
       private: bool dirty;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
+    /// \class Sensor Sensor.hh sensors/Sensor.hh
     /// \brief Base class for sensors
     class Sensor : public boost::enable_shared_from_this<Sensor>
     {

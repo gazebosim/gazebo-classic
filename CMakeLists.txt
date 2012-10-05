@@ -6,6 +6,20 @@ if(COMMAND CMAKE_POLICY)
 endif(COMMAND CMAKE_POLICY)
 enable_testing()
 
+# with -fPIC
+if(UNIX AND NOT WIN32)
+  set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
+ find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
+ if(CMAKE_UNAME)
+   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
+   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
+     "processor type (i386 and x86_64)")
+   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+     ADD_DEFINITIONS(-fPIC)
+   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+ endif(CMAKE_UNAME)
+endif()
+
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
@@ -19,18 +33,13 @@ set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PAT
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
-# with -fPIC
-if(UNIX AND NOT WIN32)
-  set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
- find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
- if(CMAKE_UNAME)
-   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
-   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
-     "processor type (i386 and x86_64)")
-   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-     ADD_DEFINITIONS(-fPIC)
-   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
- endif(CMAKE_UNAME)
+
+# developer's option ot cache PKG_CONFIG_PATH and LD_LIBRARY_PATH for local installs
+if(PKG_CONFIG_PATH)
+  set (ENV{PKG_CONFIG_PATH} ${PKG_CONFIG_PATH}:$ENV{PKG_CONFIG_PATH})
+endif()
+if(LD_LIBRARY_PATH)
+  set (ENV{LD_LIBRARY_PATH} ${LD_LIBRARY_PATH}:$ENV{LD_LIBRARY_PATH})
 endif()
 
 
@@ -150,7 +159,7 @@ else()
   set (BUILD_TYPE_PROFILE FALSE)
 endif()
 
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
   set (BUILD_TYPE_RELEASE TRUE)
 else()
   set (BUILD_TYPE_RELEASE FALSE)
@@ -200,7 +209,7 @@ if (build_errors)
     message(STATUS ${msg})
   endforeach ()
   message(STATUS "END BUILD ERRORS\n")
-  message (FATAL_ERROR "Errors encountered in build.")
+  message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 
   ########################################
