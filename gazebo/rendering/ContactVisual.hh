@@ -42,7 +42,7 @@ namespace gazebo
 
     class DynamicLines;
 
-    /// \class ContactVisual ContactVisual.hh rendering/ContactVisual.hh
+    /// \class ContactVisual ContactVisual.hh rendering/rendering.hh
     /// \brief Contact visualization
     ///
     /// This class visualizes contact points by drawing arrows in the 3D

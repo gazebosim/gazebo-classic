@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class DynamicLines DynamicLines.hh rendering/DynamicLines.hh
+    /// \class DynamicLines DynamicLines.hh rendering/rendering.hh
     /// \brief Class for drawing lines that can change
     class DynamicLines : public DynamicRenderable
     {

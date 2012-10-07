@@ -46,7 +46,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Light Light.hh rendering/Light.hh
+    /// \class Light Light.hh rendering/rendering.hh
     /// \brief A light source.
     ///
     /// There are three types of lights: Point, Spot, and Directional. This

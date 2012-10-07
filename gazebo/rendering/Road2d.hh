@@ -38,7 +38,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Road Road.hh rendering/Road.hh
+    /// \class Road Road.hh rendering/rendering.hh
     /// \brief Used to render a strip of road.
     class Road2d
     {

@@ -36,7 +36,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class RFIDVisual RFIDVisual.hh rendering/RFIDVisual.hh
+    /// \class RFIDVisual RFIDVisual.hh rendering/rendering.hh
     /// \brief Visualization for RFID sensor.
     class RFIDVisual : public Visual
     {

@@ -51,7 +51,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \class DepthCamera DepthCamera.hh rendering/DepthCamera.hh
+    /// \class DepthCamera DepthCamera.hh rendering/rendering.hh
     /// \brief Depth camera used to render depth data into an image buffer
     class DepthCamera : public Camera
     {

@@ -44,7 +44,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Projector Projector.hh rendering/Projector.hh
+    /// \class Projector Projector.hh rendering/rendering.hh
     /// \brief Projects a material onto surface, light a light projector.
     class Projector
     {

@@ -34,7 +34,7 @@ namespace gazebo
 
     class Camera;
 
-    /// \class CameraVisual CameraVisual.hh rendering/CameraVisual.hh
+    /// \class CameraVisual CameraVisual.hh rendering/rendering.hh
     /// \brief Basic camera visualization
     ///
     /// This class is used to visualize a camera image generated from

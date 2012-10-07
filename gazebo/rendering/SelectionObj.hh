@@ -31,7 +31,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class SelectionObj SelectionObj.hh rendering/SelectionObj.hh
+    /// \class SelectionObj SelectionObj.hh rendering/rendering.hh
     /// \brief A graphical selection object
     ///
     /// Used to draw a visual around a selected object.

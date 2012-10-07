@@ -32,7 +32,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \class AxisVisual AxisVisual.hh rendering/AxisVisual.hh
+    /// \class AxisVisual AxisVisual.hh rendering/rendering.hh
     /// \brief Basic axis visualization
     class AxisVisual : public Visual
     {

@@ -42,7 +42,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class UserCamera UserCamera.hh rendering/UserCamera.hh
+    /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
     class UserCamera : public Camera
     {

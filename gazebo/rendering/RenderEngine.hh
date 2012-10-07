@@ -46,7 +46,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class RenderEngine RenderEngine.hh rendering/RenderEngine.hh
+    /// \class RenderEngine RenderEngine.hh rendering/rendering.hh
     /// \brief Adaptor to Ogre3d
     ///
     /// Provides the interface to load, initialize the rendering engine.

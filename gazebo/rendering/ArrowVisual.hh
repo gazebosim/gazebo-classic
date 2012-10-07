@@ -36,7 +36,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \class ArrowVisual ArrowVisual.hh rendering/ArrowVisual.hh
+    /// \class ArrowVisual ArrowVisual.hh rendering/rendering.hh
     /// \brief Basic arrow visualization
     class ArrowVisual : public Visual
     {

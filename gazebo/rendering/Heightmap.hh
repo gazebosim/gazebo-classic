@@ -44,7 +44,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Heightmap Heightmap.hh rendering/Heightmap.hh
+    /// \class Heightmap Heightmap.hh rendering/rendering.hh
     /// \brief Rendering a terrain using heightmap information
     class Heightmap
     {

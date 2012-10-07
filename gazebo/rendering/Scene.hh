@@ -69,7 +69,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Scene Scene.hh rendering/Scene.hh
+    /// \class Scene Scene.hh rendering/rendering.hh
     /// \brief Representation of an entire scene graph.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.

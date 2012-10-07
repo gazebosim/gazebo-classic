@@ -43,7 +43,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class MovableText MovableText.hh rendering/MovableText.hh
+    /// \class MovableText MovableText.hh rendering/rendering.hh
     /// \brief Movable text
     class MovableText : public Ogre::MovableObject, public Ogre::Renderable
     {

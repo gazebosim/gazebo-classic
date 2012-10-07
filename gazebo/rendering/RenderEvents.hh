@@ -28,7 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Events Events.hh rendering/Events.hh
+    /// \class Events Events.hh rendering/rendering.hh
     /// \brief Base class for rendering events
     class Events
     {
