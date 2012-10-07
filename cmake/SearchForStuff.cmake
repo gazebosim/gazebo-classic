@@ -204,6 +204,10 @@ if (PKG_CONFIG_FOUND)
 
   set(ogre_libraries "${ogre_libraries};OgreMain")
 
+  # this is used by gazebo/CMakeLists.txt:13
+  set (OGRE_LIBRARY_PATH ${ogre_library_dirs}
+       CACHE INTERNAL "Ogre library path")
+
   #################################################
   # Find XML
   pkg_check_modules(XML libxml-2.0)

@@ -140,7 +140,12 @@ namespace gazebo
       /// \return Get the number of joints
       public: unsigned int GetJointCount() const;
 
-      /// \brief Get a joing by index
+      /// \brief Construct and return a vector of Link's in this model
+      /// Note this constructs the vector of Link's on the fly, could be costly
+      /// \return a vector of Link's in this model
+      public: Link_V GetAllLinks() const;
+
+      /// \brief Get a joint by index
       /// \param index Index of the joint
       /// \return A pointer to the joint
       public: JointPtr GetJoint(unsigned int index) const;

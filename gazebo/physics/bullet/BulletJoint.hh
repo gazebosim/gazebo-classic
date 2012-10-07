@@ -37,7 +37,7 @@ namespace gazebo
     class BulletJoint : public Joint
     {
       /// \brief Constructor
-      public: BulletJoint();
+      public: BulletJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletJoint();

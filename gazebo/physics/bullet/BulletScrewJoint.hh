@@ -43,7 +43,7 @@ namespace gazebo
     class BulletScrewJoint : public ScrewJoint<BulletJoint>
     {
       /// \brief Constructor
-      public: BulletScrewJoint(btDynamicsWorld *world);
+      public: BulletScrewJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletScrewJoint();

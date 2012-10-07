@@ -286,6 +286,12 @@ namespace gazebo
       /// \param _disable If true, the link is allowed to auto disable.
       public: virtual void SetAutoDisable(bool _disable) = 0;
 
+      /// Returns a vector of children Links connected by joints
+      public: Link_V GetChildJointsLinks() const;
+
+      /// Returns a vector of parent Links connected by joints
+      public: Link_V GetParentJointsLinks() const;
+
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision
       private: void LoadCollision(sdf::ElementPtr _sdf);

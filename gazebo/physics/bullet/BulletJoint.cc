@@ -30,8 +30,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletJoint::BulletJoint()
-  : Joint()
+BulletJoint::BulletJoint(BasePtr _parent)
+  : Joint(_parent)
 {
   this->constraint = NULL;
   this->world = NULL;
