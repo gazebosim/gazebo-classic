@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef COMVISUAL_HH
-#define COMVISUAL_HH
+#ifndef _COMVISUAL_HH_
+#define _COMVISUAL_HH_
 
 #include <string>
 
@@ -46,7 +46,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
-      /// \param[int] _vis Parent Visual
+      /// \param[in] _vis Parent Visual
       public: COMVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor

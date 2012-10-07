@@ -48,8 +48,8 @@ namespace gazebo
       public: virtual void Init(const math::Vector3 &_focalPoint);
 
       /// \brief Set the min and max distance from the focal point.
-      /// \param _minDist Min distance to the focal point.
-      /// \param _maxDist Max distance from the focal point.
+      /// \param[in] _minDist Min distance to the focal point.
+      /// \param[in] _maxDist Max distance from the focal point.
       public: void SetDistanceRange(double _minDist, double _maxDist);
 
       /// \brief Update.
@@ -68,7 +68,7 @@ namespace gazebo
       public: void SetDistance(float _d);
 
       /// \brief Set the focal point
-      /// \param _fp The focal point
+      /// \param[in] _fp The focal point
       public: void SetFocalPoint(const math::Vector3 &_fp);
 
       /// \brief Get the focal point

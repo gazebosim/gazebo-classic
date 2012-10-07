@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef WINDOWMANAGER_HH
-#define WINDOWMANAGER_HH
+#ifndef _WINDOWMANAGER_HH_
+#define _WINDOWMANAGER_HH_
 
 #include <string>
 #include <vector>
@@ -35,43 +35,64 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Class to mangage render windows
+    /// \class WindowManager WindowManager.hh rendering/rendering.hh
+    /// \brief Class to mangage render windows.
     class WindowManager : public SingletonT<WindowManager>
     {
-      public: WindowManager();
-      public: virtual ~WindowManager();
+      /// \brief Constructor
+      private: WindowManager();
+
+      /// \brief Destructor
+      private: virtual ~WindowManager();
 
       /// \brief Shutdown all the windows
       public: void Fini();
 
+      /// \brief Create a window.
+      /// \param[in] _ogreHandle String representing the ogre window handle.
+      /// \param[in] _width With of the window in pixels.
+      /// \param[in] _height Height of the window in pixels.
       public: int CreateWindow(const std::string &_ogreHandle,
-                               unsigned int _width,
-                               unsigned int _height);
+                               uint32_t _width,
+                               uint32_t _height);
 
-      public: void GetAttribute(unsigned int _id,
-                  const std::string &_attr, void *_data);
-
-      /// \brief Attach a camera to a window
+      /// \brief Attach a camera to a window.
+      /// \param[in] _windowId Id of the window to add the camera to.
+      /// \param[in] _camera Pointer to the camera to attach.
       public: void SetCamera(int _windowId, CameraPtr _camera);
 
-      /// \brief Resize a window
-      public: void Resize(unsigned int _id, int _width, int _height);
+      /// \brief Resize a window.
+      /// \param[in] _id Id of the window to resize.
+      /// \param[in] _width New width of the window.
+      /// \param[in] _height New height of the window.
+      public: void Resize(uint32_t _id, int _width, int _height);
 
-      public: void Moved(unsigned int _id);
+      /// \brief Tells Ogre the window has moved, and needs updating.
+      /// \param[in] _id ID of the window.
+      public: void Moved(uint32_t _id);
 
-      /// \brief Get the average FPS
-      public: float GetAvgFPS(unsigned int _windowId);
+      /// \brief Get the average FPS.
+      /// \param[in] _id ID of the window.
+      /// \return The frames per second.
+      public: float GetAvgFPS(uint32_t _id);
 
-      /// \brief Get the triangle count
-      public: unsigned int GetTriangleCount(unsigned int _windotId);
+      /// \brief Get the triangle count.
+      /// \param[in] _id ID of the window.
+      /// \return The triangle count.
+      public: uint32_t GetTriangleCount(uint32_t _id);
 
-      /// \brief Get the render window associated with _id
-      public: Ogre::RenderWindow *GetWindow(unsigned int _id);
+      /// \brief Get the render window associated with the given id.
+      /// \param[in] _id ID of the window.
+      /// \return Pointer to the render window, NULL if the id is invalid.
+      public: Ogre::RenderWindow *GetWindow(uint32_t _id);
 
+      /// \brief All the render windows.
       private: std::vector<Ogre::RenderWindow *> windows;
 
-      private: static unsigned int windowCounter;
+      /// \brief Used to create unique names for the windows.
+      private: static uint32_t windowCounter;
 
+      /// \brief This is a singleton class.
       private: friend class SingletonT<WindowManager>;
     };
     /// \}

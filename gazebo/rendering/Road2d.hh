@@ -34,6 +34,12 @@ namespace gazebo
 {
   namespace rendering
   {
+
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \class Road Road.hh rendering/Road.hh
+    /// \brief Used to render a strip of road.
     class Road2d
     {
       /// \brief Constructor
@@ -42,42 +48,67 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Road2d();
 
+      /// \brief Load the visual using a parent visual.
+      /// \param[in] _parent Pointer to the parent visual.
       public: void Load(VisualPtr _parent);
 
       /// \brief Process all received messages
       private: void PreRender();
 
-
       /// \brief Recieve a road msg
       private: void OnRoadMsg(ConstRoadPtr &_msg);
 
+      /// \brief A road segment
       private: class Segment : public Ogre::SimpleRenderable
                {
+                 /// \brief Load the road segment from message data.
+                 /// \param[in] _msg The robot data.
                  public: void Load(msgs::Road _msg);
 
-                 /// \brief Implementation of Ogre::SimpleRenderable
-                 public: virtual Ogre::Real getBoundingRadius(void) const;
 
+                 /// \internal
+                 /// \brief Implementation of Ogre::SimpleRenderable
+                 public: virtual Ogre::Real getBoundingRadius() const;
+
+                 /// \internal
                  /// \brief Implementation of Ogre::SimpleRenderable
                  public: virtual Ogre::Real getSquaredViewDepth(
                              const Ogre::Camera* cam) const;
 
+                 /// \brief Name of the road.
                  public: std::string name;
+
+                 /// \brief Point that make up the middle of the road.
                  public: std::vector<math::Vector3> points;
+
+                 /// \brief Width of the road.
                  public: double width;
                };
 
 
+      /// \def RoadMsgs_L
+      /// \brief List of road messages
       typedef std::list<boost::shared_ptr<msgs::Road const> > RoadMsgs_L;
+
+      /// \brief List of messages to process.
       private: RoadMsgs_L msgs;
+
+      /// \brief All the road segments.
       private: std::vector<Road2d::Segment*> segments;
+
+      /// \brief The parent visual.
       private: VisualPtr parent;
 
+      /// \brief Handles communication.
       private: transport::NodePtr node;
+
+      /// \brief Subscribes to the road message topic.
       private: transport::SubscriberPtr sub;
 
+      /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
     };
+    /// \}
   }
 }
 #endif

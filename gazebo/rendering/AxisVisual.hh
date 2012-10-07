@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef AXISVISUAL_HH
-#define AXISVISUAL_HH
+#ifndef _AXISVISUAL_HH_
+#define _AXISVISUAL_HH_
 
 #include <string>
 
@@ -37,8 +37,8 @@ namespace gazebo
     class AxisVisual : public Visual
     {
       /// \brief Constructor
-      /// \param _name Name of the AxisVisual
-      /// \param _vis Parent visual
+      /// \param[in] _name Name of the AxisVisual
+      /// \param[in] _vis Parent visual
       public: AxisVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
@@ -51,20 +51,20 @@ namespace gazebo
       public: void ShowRotation(unsigned int _axis);
 
       /// \brief Scale the X axis
-      /// \param _scale Scaling factor
+      /// \param[in] _scale Scaling factor
       public: void ScaleXAxis(const math::Vector3 &_scale);
 
       /// \brief Scale the Y axis
-      /// \param _scale Scaling factor
+      /// \param[in] _scale Scaling factor
       public: void ScaleYAxis(const math::Vector3 &_scale);
 
       /// \brief Scale the Z axis
-      /// \param _scale Scaling factor
+      /// \param[in] _scale Scaling factor
       public: void ScaleZAxis(const math::Vector3 &_scale);
 
       /// \brief Set the material used to render and axis
-      /// \param _axis The number of the axis (0, 1, 2 = x,y,z)
-      /// \param _material The name of the material to apply to the axis
+      /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
+      /// \param[in] _material The name of the material to apply to the axis
       public: void SetAxisMaterial(unsigned int _axis,
                                    const std::string &_material);
 

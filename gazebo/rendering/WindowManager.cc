@@ -34,7 +34,7 @@ using namespace gazebo;
 using namespace rendering;
 
 
-unsigned int WindowManager::windowCounter = 0;
+uint32_t WindowManager::windowCounter = 0;
 
 //////////////////////////////////////////////////
 WindowManager::WindowManager()
@@ -69,8 +69,8 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 
 //////////////////////////////////////////////////
 int WindowManager::CreateWindow(const std::string &_ogreHandle,
-                                unsigned int _width,
-                                unsigned int _height)
+                                uint32_t _width,
+                                uint32_t _height)
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
@@ -116,17 +116,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 }
 
 /////////////////////////////////////////////////
-void WindowManager::GetAttribute(unsigned int _id,
-    const std::string &_attr, void *_data)
-{
-  if (_id >= this->windows.size())
-    gzerr << "Invalid window id[" << _id << "]\n";
-  else
-    this->windows[_id]->getCustomAttribute(_attr, _data);
-}
-
-/////////////////////////////////////////////////
-void WindowManager::Resize(unsigned int _id, int _width, int _height)
+void WindowManager::Resize(uint32_t _id, int _width, int _height)
 {
   if (_id >= this->windows.size())
   {
@@ -140,7 +130,7 @@ void WindowManager::Resize(unsigned int _id, int _width, int _height)
 }
 
 /////////////////////////////////////////////////
-void WindowManager::Moved(unsigned int _id)
+void WindowManager::Moved(uint32_t _id)
 {
   if (_id >= this->windows.size())
   {
@@ -153,7 +143,7 @@ void WindowManager::Moved(unsigned int _id)
 }
 
 //////////////////////////////////////////////////
-float WindowManager::GetAvgFPS(unsigned int _windowId)
+float WindowManager::GetAvgFPS(uint32_t _windowId)
 {
   float avgFPS = 0;
 
@@ -167,7 +157,7 @@ float WindowManager::GetAvgFPS(unsigned int _windowId)
 }
 
 //////////////////////////////////////////////////
-unsigned int WindowManager::GetTriangleCount(unsigned int _windowId)
+uint32_t WindowManager::GetTriangleCount(uint32_t _windowId)
 {
   if (_windowId < this->windows.size())
     return this->windows[_windowId]->getTriangleCount();
@@ -176,7 +166,7 @@ unsigned int WindowManager::GetTriangleCount(unsigned int _windowId)
 }
 
 //////////////////////////////////////////////////
-Ogre::RenderWindow *WindowManager::GetWindow(unsigned int _id)
+Ogre::RenderWindow *WindowManager::GetWindow(uint32_t _id)
 {
   if (_id < this->windows.size())
     return this->windows[_id];

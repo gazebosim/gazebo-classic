@@ -43,16 +43,16 @@ namespace gazebo
     class CameraVisual : public Visual
     {
       /// \brief Constructor
-      /// \param _name Name of the Visual
-      /// \param _vis Pointer to the parent Visual
+      /// \param[in] _name Name of the Visual
+      /// \param[in] _vis Pointer to the parent Visual
       public: CameraVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
       public: virtual ~CameraVisual();
 
       /// \brief Load the Visual
-      /// \param _width Width of the Camera image
-      /// \param _height Height of the Camera image
+      /// \param[in] _width Width of the Camera image
+      /// \param[in] _height Height of the Camera image
       public: void Load(unsigned int _width, unsigned int _height);
 
       private: CameraPtr camera;

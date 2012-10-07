@@ -19,8 +19,8 @@
  * Date: 6th December 2011
  */
 
-#ifndef RFIDVISUAL_HH
-#define RFIDVISUAL_HH
+#ifndef _RFIDVISUAL_HH_
+#define _RFIDVISUAL_HH_
 
 #include <string>
 

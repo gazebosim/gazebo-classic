@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef RENDERENGINE_HH
-#define RENDERENGINE_HH
+#ifndef _RENDERENGINE_HH_
+#define _RENDERENGINE_HH_
 
 #include <vector>
 #include <string>
@@ -34,10 +34,8 @@
 namespace Ogre
 {
   class Root;
-  class Node;
   class LogManager;
 }
-
 
 namespace gazebo
 {
@@ -48,55 +46,74 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class RenderEngine RenderEngine.hh rendering/RenderEngine.hh
     /// \brief Adaptor to Ogre3d
+    ///
+    /// Provides the interface to load, initialize the rendering engine.
     class RenderEngine : public SingletonT<RenderEngine>
     {
+      /// \enum RenderPathType
+      /// \brief The type of rendering path used by the rendering engine.
       public: enum RenderPathType
               {
-                NONE,      // No rendering.
-                VERTEX,    // Most basic rendering, with least fidelity.
-                FORWARD,   // Utilizes the RTT shader system.
-                DEFERRED,  // Utilizes deferred rendering. Best fidelity.
+                /// \brief No rendering is done.
+                NONE,
+                /// \brief Most basic rendering, with least fidelity.
+                VERTEX,
+                /// \brief Utilizes the RTT shader system.
+                FORWARD,
+                /// \brief Utilizes deferred rendering. Best fidelity.
+                DEFERRED,
+                /// \brief Count of the rendering path enums.
                 RENDER_PATH_COUNT
               };
 
-      /// \brief Constructor
+      /// \brief Constructor. This is a singleton, use
+      /// RenderEngine::Instance() to access the render engine.
       private: RenderEngine();
 
       /// \brief Destructor
       private: virtual ~RenderEngine();
 
-      /// \brief Load the parameters for Ogre
+      /// \brief Load the parameters for Ogre. Load must happen before Init.
       public: void Load();
 
-      /// \brief Initialize ogre
+      /// \brief Initialize Ogre. Load must happen before Init.
       public: void Init();
 
-      /// \brief Finalize
+      /// \brief Tears down the rendering engine
       public: void Fini();
 
-      /// \brief Save Ogre settings
-      public: void Save(std::string &prefix, std::ostream &stream);
-
-      /// \brief Get the desired update rate
-      public: double GetUpdateRate();
-
       /// \brief Create a scene
-      public: ScenePtr CreateScene(const std::string &name,
+      /// \param[in] _name The name of the scene.
+      /// \param[in] _enableVisualizations True enables visualization
+      /// elements such as laser lines.
+      public: ScenePtr CreateScene(const std::string &_name,
                                    bool _enableVisualizations);
 
       /// \brief Remove a scene
-      public: void RemoveScene(const std::string &name);
+      /// \param[in] _name The name of the scene to remove.
+      public: void RemoveScene(const std::string &_name);
 
-      /// \brief Get a scene
+      /// \brief Get a scene by name
+      /// \param[in] _name Name of the scene to retreive.
+      /// \return A pointer to the Scene, or NULL if the scene doesn't
+      /// exist.
       public: ScenePtr GetScene(const std::string &_name);
 
-      /// \brief Get a scene manager
-      public: ScenePtr GetScene(unsigned int index);
+      /// \brief Get a scene by index. The index should be between 0 and
+      /// GetSceneCount().
+      /// \param[in] _index The index of the scene.
+      /// \return A pointer to a Scene, or NULL if the index was invalid.
+      public: ScenePtr GetScene(unsigned int _index);
 
-      /// \brief Get the number of scene managers
+      /// \brief Get the number of scenes.
+      /// \return The number of scenes created by the RenderEngine.
       public: unsigned int GetSceneCount() const;
 
+      /// \brief Add a new path for Ogre to search for resources.
+      /// \param[in] _uri URI of the path. The uri should be of the form
+      /// file:// or model://
       public: void AddResourcePath(const std::string &_uri);
 
       /// \brief Get the type of rendering path to use. This is
@@ -104,54 +121,69 @@ namespace gazebo
       /// \return The RenderPathType
       public: RenderPathType GetRenderPathType() const;
 
+      /// \brief Create a render context.
+      /// \return True if the context was created.
       private: bool CreateContext();
 
+      /// \brief Load all OGRE plugins.
       private: void LoadPlugins();
 
+      /// \brief Setup initial resource paths.
       private: void SetupResources();
+
+      /// \brief Setup the render system.
       private: void SetupRenderSystem();
 
+      /// \brief Execute prerender on all scenes
       private: void PreRender();
+
+      /// \brief Execute render on all scenes
       private: void Render();
+
+      /// \brief Execute post-render on all scenes
       private: void PostRender();
 
+      /// \brief Check the rendering capabilities of the system.
       private: void CheckSystemCapabilities();
 
-      /// Pointer to the root scene node
+      /// \brief Pointer to the root scene node
       public: Ogre::Root *root;
 
-      /// All of the scenes
+      /// \brief All of the scenes
       private: std::vector< ScenePtr > scenes;
 
+      /// \brief Pointer the log manager
       private: Ogre::LogManager *logManager;
 
-      /// ID for a dummy window. Used for gui-less operation
+      /// \brief ID for a dummy window. Used for gui-less operation
       protected: uint64_t dummyWindowId;
 
-      /// Pointer to the dummy display.Used for gui-less operation
+      /// \brief Pointer to the dummy display.Used for gui-less operation
       protected: void *dummyDisplay;
 
-      /// GLX context used to render the scenes.Used for gui-less operation
+      /// \brief GLX context used to render the scenes.Used for gui-less
+      /// operation.
       protected: void* dummyContext;
 
-      /// True if the GUI is enabled
+      /// \brief True if the GUI is enabled.
       private: bool headless;
 
+      /// \brief True if initialized.
       private: bool initialized;
 
+      /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
-      private: friend class SingletonT<RenderEngine>;
 
+      /// \brief Node for communications.
       private: transport::NodePtr node;
 
-      private: bool removeScene;
-      private: std::string removeSceneName;
-
+      /// \brief The type of render path used.
       private: RenderPathType renderPathType;
+
+      /// \brief Makes this class a singleton.
+      private: friend class SingletonT<RenderEngine>;
     };
     /// \}
   }
 }
 #endif
-
-
