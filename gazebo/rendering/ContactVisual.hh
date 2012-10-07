@@ -18,13 +18,14 @@
  * Author: Nate Koenig
  */
 
-#ifndef CONTACTVISUAL_HH
-#define CONTACTVISUAL_HH
+#ifndef _CONTACTVISUAL_HH_
+#define _CONTACTVISUAL_HH_
 
 #include <string>
 #include <vector>
 
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace Ogre
@@ -78,7 +79,7 @@ namespace gazebo
       private: transport::SubscriberPtr contactsSub;
 
       /// \brief The current contact message.
-      private: ConstContactPtr contactsMsg;
+      private: boost::shared_ptr<msgs::Contacts const> contactsMsg;
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
