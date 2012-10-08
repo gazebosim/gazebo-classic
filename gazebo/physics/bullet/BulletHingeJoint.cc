@@ -29,8 +29,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world)
-    : HingeJoint<BulletJoint>()
+BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
+    : HingeJoint<BulletJoint>(_parent)
 {
   this->world = _world;
 }

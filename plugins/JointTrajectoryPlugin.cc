@@ -87,14 +87,14 @@ void JointTrajectoryPlugin::UpdateStates()
   bool is_paused = this->world->IsPaused();
   if (!is_paused) this->world->SetPaused(true);
 
-  std::map<std::string, double> jointposition_map;
-  jointposition_map["arm_shoulder_pan_joint"] = cos(cur_time.Double());
-  jointposition_map["arm_elbow_pan_joint"] = -cos(cur_time.Double());
-  jointposition_map["arm_wrist_lift_joint"] = -0.35
+  std::map<std::string, double> joint_position_map;
+  joint_position_map["arm_shoulder_pan_joint"] = cos(cur_time.Double());
+  joint_position_map["arm_elbow_pan_joint"] = -cos(cur_time.Double());
+  joint_position_map["arm_wrist_lift_joint"] = -0.35
     + 0.45*cos(0.5*cur_time.Double());
-  jointposition_map["arm_wrist_roll_joint"] = -2.9*cos(3.0*cur_time.Double());
+  joint_position_map["arm_wrist_roll_joint"] = -2.9*cos(3.0*cur_time.Double());
 
-  this->model->SetJointPositions(jointposition_map);
+  this->model->SetJointPositions(joint_position_map);
 
   // resume original pause-state
   this->world->SetPaused(is_paused);

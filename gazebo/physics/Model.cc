@@ -529,7 +529,7 @@ JointPtr Model::GetJoint(const std::string &_name)
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name)
     {
       result = (*iter);
       break;
@@ -543,6 +543,25 @@ JointPtr Model::GetJoint(const std::string &_name)
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
   return boost::shared_dynamic_cast<Link>(this->GetById(_id));
+}
+
+//////////////////////////////////////////////////
+Link_V Model::GetAllLinks() const
+{
+  Link_V links;
+  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
+  {
+    if (this->GetChild(i)->HasType(Base::LINK))
+    {
+      LinkPtr link = boost::shared_static_cast<Link>(this->GetChild(i));
+      if (link)
+        links.push_back(link);
+      else
+        gzerr << "Child [" << this->GetChild(i)->GetName()
+              << "] has type Base::LINK, but cannot be dynamically casted\n";
+    }
+  }
+  return links;
 }
 
 //////////////////////////////////////////////////
@@ -599,7 +618,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   // Load the joint
   joint->Load(_sdf);
 
-  if (this->GetJoint(joint->GetName()) != NULL)
+  if (this->GetJoint(joint->GetScopedName()) != NULL)
     gzthrow("can't have two joint with the same name");
 
   msgs::Joint msg;
