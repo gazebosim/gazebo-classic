@@ -36,27 +36,27 @@ namespace gazebo
     class Conversions
     {
       /// \brief Return the equivalent ogre color
-      /// \param _clr Gazebo color to convert
+      /// \param[in] _clr Gazebo color to convert
       /// \return Ogre color value
       public: static Ogre::ColourValue Convert(const common::Color &_clr);
 
       /// \brief return Ogre Vector from Gazebo Vector3
-      /// \param _v Gazebo vector
+      /// \param[in] _v Gazebo vector
       /// \return Ogre vector
       public: static Ogre::Vector3 Convert(const math::Vector3 &_v);
 
       /// \brief return gazebo Vector from ogre Vector3
-      /// \param _v Ogre vector
+      /// \param[in] _v Ogre vector
       /// \return Gazebo vector
       public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
-      /// \param _v Gazebo quaternion
+      /// \param[in] _v Gazebo quaternion
       /// \return Ogre quaternion
       public: static Ogre::Quaternion Convert(const math::Quaternion &_v);
 
       /// \brief Ogre quaternion to Gazebo quaternion
-      /// \param _v Ogre quaternion
+      /// \param[in] _v Ogre quaternion
       /// return Gazebo quaternion
       public: static math::Quaternion Convert(const Ogre::Quaternion &_v);
     };

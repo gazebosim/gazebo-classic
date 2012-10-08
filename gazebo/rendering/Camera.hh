@@ -66,7 +66,7 @@ namespace gazebo
     /// \brief A set of rendering related class, functions, and definitions
     /// \{
 
-    /// \class Camera Camera.hh rendering/Camera.hh
+    /// \class Camera Camera.hh rendering/rendering.hh
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.

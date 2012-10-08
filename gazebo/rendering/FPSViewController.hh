@@ -28,7 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class FPSViewController FPSViewController.hh rendering/FPSViewController.hh
+    /// \class FPSViewController FPSViewController.hh rendering/rendering.hh
     /// \brief First Person Shooter style view controller
     class FPSViewController : public ViewController
     {

@@ -19,8 +19,8 @@
  * Date: 6th December 2011
  */
 
-#ifndef RFIDVISUAL_HH
-#define RFIDVISUAL_HH
+#ifndef _RFIDVISUAL_HH_
+#define _RFIDVISUAL_HH_
 
 #include <string>
 
@@ -36,7 +36,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class RFIDVisual RFIDVisual.hh rendering/RFIDVisual.hh
+    /// \class RFIDVisual RFIDVisual.hh rendering/rendering.hh
     /// \brief Visualization for RFID sensor.
     class RFIDVisual : public Visual
     {

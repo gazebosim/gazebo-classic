@@ -15,7 +15,7 @@
  *
 */
 /* Desc: RFID Visualization Class
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
@@ -36,7 +36,7 @@ RFIDTagVisual::RFIDTagVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName,
+  this->rfidSub = this->node->Subscribe(_topicName,
       &RFIDTagVisual::OnScan, this);
 
   common::MeshManager::Instance()->CreateSphere("contact_sphere", .2, 10, 10);

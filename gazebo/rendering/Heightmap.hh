@@ -19,8 +19,9 @@
  * Date: 12 May 2009
  */
 
-#ifndef HEIGHTMAP_HH
-#define HEIGHTMAP_HH
+#ifndef _HEIGHTMAP_HH_
+#define _HEIGHTMAP_HH_
+
 #include <string>
 #include <vector>
 
@@ -43,12 +44,12 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Heightmap Heightmap.hh rendering/Heightmap.hh
+    /// \class Heightmap Heightmap.hh rendering/rendering.hh
     /// \brief Rendering a terrain using heightmap information
     class Heightmap
     {
       /// \brief Constructor
-      /// \param _scene Pointer to the scene that will contain the heightmap
+      /// \param[in] _scene Pointer to the scene that will contain the heightmap
       public: Heightmap(ScenePtr _scene);
 
       /// \brief Destructor
@@ -67,26 +68,58 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y);
 
+      /// \brief Initialize all the blend material maps.
+      /// \param[in] _terrain The terrain to initialize the blend maps.
       private: bool InitBlendMaps(Ogre::Terrain *_terrain);
-      private: void ConfigureTerrainDefaults();
-      private: void DefineTerrain(int x, int y);
 
+      /// \brief Configure the terrain default values.
+      private: void ConfigureTerrainDefaults();
+
+      /// \brief Define a section of the terrain.
+      /// \param[in] _x X coordinate of the terrain.
+      /// \param[in] _y Y coordinate of the terrain.
+      private: void DefineTerrain(int _x, int _y);
+
+      /// \brief The scene.
       private: ScenePtr scene;
+
+      /// \brief Image used to generate the heightmap.
       private: common::Image heightImage;
+
+      /// \brief Size of the terrain.
       private: math::Vector3 terrainSize;
+
+      /// \brief Size of the image.
       private: unsigned int imageSize;
+
+      /// \brief Max pixel value.
       private: double maxPixel;
+
+      /// \brief Origin of the terrain.
       private: math::Vector3 terrainOrigin;
 
+      /// \brief Global options.
       private: Ogre::TerrainGlobalOptions *terrainGlobals;
+
+      /// \brief Group of terrains.
       private: Ogre::TerrainGroup *terrainGroup;
+
+      /// \brief True if the terrain was imported.
       private: bool terrainsImported;
 
+      /// \brief The diffuse textures.
       private: std::vector<std::string> diffuseTextures;
+
+      /// \brief The normal textures.
       private: std::vector<std::string> normalTextures;
+
+      /// \brief The size of the world sections.
       private: std::vector<double> worldSizes;
 
+      /// \brief The material blending heights.
       private: std::vector<double> blendHeight;
+
+      /// \brief Material blend fade distances.
       private: std::vector<double> blendFade;
     };
     /// \}

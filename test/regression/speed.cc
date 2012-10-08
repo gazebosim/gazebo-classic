@@ -98,7 +98,7 @@ TEST_F(SpeedTest, PR2World)
   emptySpeed = GetPercentRealTime();
 
   // Load the pr2into the world
-  SpawnModel("models/pr2.model");
+  SpawnModel("model://pr2");
   common::Time::MSleep(2000);
   double loadedSpeed = GetPercentRealTime();
 

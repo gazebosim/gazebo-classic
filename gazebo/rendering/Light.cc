@@ -116,7 +116,7 @@ void Light::Load()
   this->visual.reset(new Visual(this->GetName(),
                      this->scene->GetWorldVisual()));
   this->visual->AttachObject(this->light);
-  this->scene->RegisterVisual(this->visual);
+  this->scene->AddVisual(this->visual);
 
   this->CreateVisual();
 }
