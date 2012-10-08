@@ -534,23 +534,16 @@ JointPtr Model::GetJoint(const std::string &_name)
       result = (*iter);
       break;
     }
-  }
-
-  if (!result)
-  {
-    // check again without scoped names
-    for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
+    else if ((*iter)->GetName() == _name)
     {
-      if ((*iter)->GetName() == _name)
-      {
-        result = (*iter);
-        break;
-      }
-    }
-    if (result)
+      // check again without scoped names, deprecated, warn
+      result = (*iter);
       gzwarn << "Calling Model::GetJoint(" << _name
              << ") with un-scoped joint name is deprecated, please scope\n";
+      break;
+    }
   }
+
   return result;
 }
 
