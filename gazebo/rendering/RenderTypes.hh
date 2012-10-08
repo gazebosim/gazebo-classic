@@ -14,18 +14,23 @@
  * limitations under the License.
  *
 */
-#ifndef RENDERTYPES_HH
-#define RENDERTYPES_HH
+#ifndef _RENDERTYPES_HH_
+#define _RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
 
+/// \def GZ_VISIBILITY_ALL
+/// \brief Render everything visibility mask.
 #define GZ_VISIBILITY_ALL             0xFFFFFFFF
+
+/// \def GZ_VISIBILITY_GUI
+/// \brief Render GUI visuals mask.
 #define GZ_VISIBILITY_GUI             0x00000001
+
+/// \def GZ_VISIBILITY_NOT_SELECTABLE
+/// \brief Render visuals that are not selectable mask.
 #define GZ_VISIBILITY_NOT_SELECTABLE  0x00000002
 
-/// \file
-/// \ingroup gazebo_rendering
-/// \brief Forward declarations and type defs for rendering
 namespace gazebo
 {
   namespace rendering
@@ -49,6 +54,8 @@ namespace gazebo
     class RFIDVisual;
     class RFIDTagVisual;
 
+    /// \def ScenePtr
+    /// \brief Shared pointer to Scene
     typedef boost::shared_ptr<Scene> ScenePtr;
     typedef boost::shared_ptr<Light> LightPtr;
     typedef boost::shared_ptr<Camera> CameraPtr;
@@ -92,5 +99,3 @@ namespace gazebo
   }
 }
 #endif
-
-

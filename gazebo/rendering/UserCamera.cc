@@ -45,9 +45,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-
-int UserCamera::count = 0;
-
 //////////////////////////////////////////////////
 UserCamera::UserCamera(const std::string &_name, Scene *_scene)
   : Camera(_name, _scene)
@@ -513,7 +510,8 @@ void UserCamera::EnableViewController(bool _value) const
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(math::Vector2i _mousePos, std::string &_mod)
+VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
+                                std::string &_mod)
 {
   VisualPtr result;
 
@@ -542,7 +540,7 @@ VisualPtr UserCamera::GetVisual(math::Vector2i _mousePos, std::string &_mod)
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(math::Vector2i _mousePos)
+VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 {
   VisualPtr result;
 

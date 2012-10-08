@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef VIEWCONTROLLER_HH
-#define VIEWCONTROLLER_HH
+#ifndef _VIEWCONTROLLER_HH_
+#define _VIEWCONTROLLER_HH_
+
 #include <string>
 #include "common/CommonTypes.hh"
 
@@ -28,35 +29,51 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Base class for view controllers
+    /// \class ViewController ViewController.hh rendering/rendering.hh
+    /// \brief Base class for view controllers.
     class ViewController
     {
       /// \brief Constructor
-      public: ViewController(UserCamera *camera);
+      /// \param[in] _camera The user camera to controll.
+      public: ViewController(UserCamera *_camera);
 
       /// \brief Destructor
       public: virtual ~ViewController();
 
+      /// \brief Initialize the view controller.
       public: virtual void Init() = 0;
-      public: virtual void Init(const math::Vector3 & /*_focalPoint*/) {}
+
+      /// \brief Initialize with a focus point.
+      /// \param[in] _focalPoint The point to look at.
+      public: virtual void Init(const math::Vector3 &_focalPoint);
+
+      /// \brief Update the controller, which should update the position
+      /// of the Camera.
       public: virtual void Update() = 0;
 
-      /// \brief Set whether the controller is enabled
+      /// \brief Set whether the controller is enabled.
+      /// \param[in] _value True if the controller is enabled.
       public: void SetEnabled(bool _value);
 
-      /// \brief Handle a mouse event
+      /// \brief Handle a mouse event.
+      /// \param[in] _event The mouse position.
       public: virtual void HandleMouseEvent(
                   const common::MouseEvent &_event) = 0;
 
+      /// \brief Get the type of view controller.
+      /// \return The view controller type string.
       public: std::string GetTypeString() const;
 
+      /// \brief Pointer to the camera to control.
       protected: UserCamera *camera;
+
+      /// \brief True if enabled.
       protected: bool enabled;
+
+      /// \brief Type of view controller.
       protected: std::string typeString;
     };
     /// \}
   }
 }
 #endif
-
-

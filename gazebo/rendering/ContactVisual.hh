@@ -42,7 +42,7 @@ namespace gazebo
 
     class DynamicLines;
 
-    /// \class ContactVisual ContactVisual.hh rendering/ContactVisual.hh
+    /// \class ContactVisual ContactVisual.hh rendering/rendering.hh
     /// \brief Contact visualization
     ///
     /// This class visualizes contact points by drawing arrows in the 3D
@@ -50,9 +50,9 @@ namespace gazebo
     class ContactVisual : public Visual
     {
       /// \brief Constructor
-      /// \param _name Name of the ContactVisual
-      /// \param _vis Pointer the parent Visual
-      /// \arapm _topicName Name of the topic which publishes the contact
+      /// \param[in] _name Name of the ContactVisual
+      /// \param[in] _vis Pointer the parent Visual
+      /// \param[in] _topicName Name of the topic which publishes the contact
       /// information.
       public: ContactVisual(const std::string &_name, VisualPtr _vis,
                             const std::string &_topicName);
@@ -64,26 +64,38 @@ namespace gazebo
       private: void Update();
 
       /// \brief Callback when a Contact message is received
-      /// \param _msg The Contact message
+      /// \param[in] _msg The Contact message
       private: void OnContact(ConstContactsPtr &_msg);
 
+      /// \brief Create an instanced material to a given entity.
+      /// \param[in] _ent Pointer to the entity.
       private: void SetupInstancedMaterialToEntity(Ogre::Entity *_ent);
 
+      /// \brief Node for communication.
       private: transport::NodePtr node;
+
+      /// \brief Subscription to the contact data.
       private: transport::SubscriberPtr contactsSub;
-      private: boost::shared_ptr<msgs::Contacts const> contactsMsg;
+
+      /// \brief The current contact message.
+      private: ConstContactPtr contactsMsg;
+
+      /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
+      /// \brief A contact point visualization.
       private: class ContactPoint
                {
+                 /// \brief The scene node for the contact visualization.
                  public: Ogre::SceneNode *sceneNode;
+                 /// \brief Normal and depth for the contact point.
                  public: DynamicLines *normal, *depth;
                };
+
+      /// \brief All the contact points.
       private: std::vector<ContactVisual::ContactPoint*> points;
     };
     /// \}
   }
 }
 #endif
-
-

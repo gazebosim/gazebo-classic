@@ -52,7 +52,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class GUIOverlay GUIOverlay.hh rendering/GUIOverlay.hh
+    /// \class GUIOverlay GUIOverlay.hh rendering/rendering.hh
     /// \brief A class that creates a CEGUI overlay on a render window
     class GUIOverlay
     {

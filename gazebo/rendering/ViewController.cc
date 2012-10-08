@@ -34,6 +34,11 @@ ViewController::~ViewController()
 }
 
 //////////////////////////////////////////////////
+void ViewController::Init(const math::Vector3 &/*_focalPoint*/)
+{
+}
+
+//////////////////////////////////////////////////
 std::string ViewController::GetTypeString() const
 {
   return this->typeString;
