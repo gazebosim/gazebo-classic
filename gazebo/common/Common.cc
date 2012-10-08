@@ -27,9 +27,9 @@ void common::add_search_path_suffix(const std::string &_suffix)
 }
 
 /////////////////////////////////////////////////
-std::string common::find_file(const std::string &_file)
+std::string common::find_file(const std::string &_file, bool _searchLocalPath)
 {
-  return common::SystemPaths::Instance()->FindFile(_file);
+  return common::SystemPaths::Instance()->FindFile(_file, _searchLocalPath);
 }
 
 /////////////////////////////////////////////////

@@ -18,8 +18,8 @@
  * Date: 3 May 2008
  */
 
-#ifndef GAZEBO_SYSTEMPATHS_HH
-#define GAZEBO_SYSTEMPATHS_HH
+#ifndef _GAZEBO_SYSTEMPATHS_HH_
+#define _GAZEBO_SYSTEMPATHS_HH_
 
 #include <stdio.h>
 
@@ -78,14 +78,20 @@ namespace gazebo
       public: std::string GetWorldPathExtension();
 
       /// \brief deprecated
-      public: std::string FindFileWithGazeboPaths(const std::string &_filename)
-              GAZEBO_DEPRECATED;
+      /// \param[in] _searchLocalPath True to search in the current working
+      /// directory.
+      public: std::string FindFileWithGazeboPaths(const std::string &_filename,
+                  bool _searchLocalPath=true) GAZEBO_DEPRECATED;
 
       /// \brief Find a file or path using a URI
       public: std::string FindFileURI(const std::string &_uri);
 
       /// \brief Find a file in the gazebo paths
-      public: std::string FindFile(const std::string &_filename);
+      /// \param[in] _filename Name of the file to find.
+      /// \param[in] _searchLocalPath True to search in the current working
+      /// directory.
+      public: std::string FindFile(const std::string &_filename,
+                                   bool _searchLocalPath=true);
 
       /// \brief Add colon delimited paths to Gazebo install
       public: void AddGazeboPaths(const std::string &_path);

@@ -46,11 +46,11 @@ std::string find_file(const std::string &_filename)
   if (!test)
   {
     if (_filename[0] == '/')
-      result = gazebo::common::find_file(_filename);
+      result = gazebo::common::find_file(_filename, false);
     else
     {
       std::string tmp = std::string("sdf/") + SDF::version + "/" + _filename;
-      result = gazebo::common::find_file(tmp);
+      result = gazebo::common::find_file(tmp, false);
     }
   }
   else
@@ -274,7 +274,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
 bool readFile(const std::string &_filename, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
-  std::string filename = gazebo::common::find_file(_filename);
+  std::string filename = gazebo::common::find_file(_filename, false);
 
   if (filename.empty())
     return false;
@@ -588,7 +588,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
                   << "<include><uri>...</uri></include\n";
 
             filename = gazebo::common::find_file(
-                elemXml->Attribute("filename"));
+                elemXml->Attribute("filename"), false);
           }
           else
           {
