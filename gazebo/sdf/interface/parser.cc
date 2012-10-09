@@ -40,21 +40,15 @@ namespace sdf
 {
 std::string find_file(const std::string &_filename)
 {
-  FILE *test = fopen(_filename.c_str(), "r");
   std::string result = _filename;
 
-  if (!test)
-  {
-    if (_filename[0] == '/')
-      result = gazebo::common::find_file(_filename, false);
-    else
-    {
-      std::string tmp = std::string("sdf/") + SDF::version + "/" + _filename;
-      result = gazebo::common::find_file(tmp, false);
-    }
-  }
+  if (_filename[0] == '/')
+    result = gazebo::common::find_file(_filename, false);
   else
-    fclose(test);
+  {
+    std::string tmp = std::string("sdf/") + SDF::version + "/" + _filename;
+    result = gazebo::common::find_file(tmp, false);
+  }
 
   return result;
 }
@@ -274,7 +268,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
 bool readFile(const std::string &_filename, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
-  std::string filename = gazebo::common::find_file(_filename, false);
+  std::string filename = gazebo::common::find_file(_filename, true);
 
   if (filename.empty())
     return false;
