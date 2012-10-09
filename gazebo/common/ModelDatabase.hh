@@ -36,9 +36,16 @@ namespace gazebo
 
       public: static std::map<std::string, std::string> GetModels();
 
+      /// \brief Get the name of a model based on a URI.
+      ///
+      /// The URI must be fully qualified:
+      /// http://gazebosim.org/gazebo_models/ground_plane or
+      /// models://gazebo_models
+      public: static std::string GetModelName(const std::string &_uri);
+
       /// \brief Return the manifest.xml file as a string.
       /// \return The manifest file from the model database.
-      public: static std::string GetManifest();
+      public: static std::string GetManifest(const std::string &_uri);
 
       /// \brief Get the local path to a model.
       ///
@@ -69,6 +76,8 @@ namespace gazebo
       /// model://my_model_name).
       /// \return True if the model was found.
       public: static bool HasModel(const std::string &_modelName);
+
+      private: static std::map<std::string, std::string> modelCache;
     };
   }
 }
