@@ -71,8 +71,16 @@ std::string ModelDatabase::GetURI()
 /////////////////////////////////////////////////
 bool ModelDatabase::HasModel(const std::string &_modelURI)
 {
-
   std::string xmlString = ModelDatabase::GetManifest();
+
+  // Get the model name from the uri
+  size_t index = _modelURI.find_last_of("/");
+  if (index == std::string::npos)
+    index = 0;
+
+  std::string modelName = _modelURI.substr(index + 1,
+      _modelURI.size() - index - 1);
+
   if (!xmlString.empty())
   {
     TiXmlDocument xmlDoc;
@@ -87,7 +95,12 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
       std::string uri = uriElem->GetText();
       uri = "model:/" + uri;
 
-      if (uri == _modelURI)
+      index = uri.find_last_of("/");
+      if (index == std::string::npos)
+        index = 0;
+      std::string testName = uri.substr(index + 1, uri.size() - index - 1);
+
+      if (testName == modelName)
         return true;
     }
   }
