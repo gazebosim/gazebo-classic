@@ -258,6 +258,12 @@ namespace gazebo
       /// \brief Joints that have this Link as a child Link
       public: void AddParentJoint(JointPtr joint);
 
+      /// \brief Remove Joints that have this Link as a parent Link
+      public: void RemoveChildJoint(JointPtr joint);
+
+      /// \brief Remove Joints that have this Link as a child Link
+      public: void RemoveParentJoint(JointPtr joint);
+
       /// \brief Attach a static model to this link
       public: void AttachStaticModel(ModelPtr &_model,
                                      const math::Pose &_offset);
