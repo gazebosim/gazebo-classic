@@ -669,12 +669,14 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
         }
 
         // give some warning if file does not exist.
-        std::ifstream fin;
-        fin.open(mesh->filename.c_str(), std::ios::in);
-        fin.close();
-        if (fin.fail())
-          gzwarn << "filename referred by mesh ["
-                 << mesh->filename << "] does not appear to exist.\n";
+        // disabled while switching to uri
+        // @todo: re-enable check
+        // std::ifstream fin;
+        // fin.open(mesh->filename.c_str(), std::ios::in);
+        // fin.close();
+        // if (fin.fail())
+        //   gzwarn << "filename referred by mesh ["
+        //          << mesh->filename << "] does not appear to exist.\n";
 
         // add mesh filename
         addKeyValue(geometry_type, "uri", mesh->filename);
