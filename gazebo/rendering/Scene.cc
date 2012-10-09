@@ -1949,7 +1949,7 @@ void Scene::SetSky()
     {
       // SkyX::MeshManager::getSkydomeRadius(...) works for both finite and
       // infinite(=0) camera far clip distances
-      this->skyx->getVCloudsManager()->create(120.0);
+      this->skyx->getVCloudsManager()->create(2000.0);
       // this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
     }
   }
