@@ -36,6 +36,10 @@ namespace gazebo
 
       public: static std::map<std::string, std::string> GetModels();
 
+      /// \brief Return the manifest.xml file as a string.
+      /// \return The manifest file from the model database.
+      public: static std::string GetManifest();
+
       /// \brief Get the local path to a model.
       ///
       /// Get the path to a model based on a URI. If the model is on
@@ -58,6 +62,13 @@ namespace gazebo
       /// necessary.
       /// \param[in] _path Path to a model.
       public: static void DownloadDependencies(const std::string &_path);
+
+      /// \brief Returns true if the model exists on the database.
+      ///
+      /// \param[in] _modelName URI of the model (eg:
+      /// model://my_model_name).
+      /// \return True if the model was found.
+      public: static bool HasModel(const std::string &_modelName);
     };
   }
 }

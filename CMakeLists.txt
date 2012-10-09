@@ -206,6 +206,11 @@ add_custom_target(uninstall
 add_subdirectory(doc)
 
 if (build_errors)
+
+  # Create a Makefile that allows doxygen to run
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Makefile
+       "doc: gazebo.dox\n\tdoxygen $<\n\n")
+
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
