@@ -607,7 +607,10 @@ void Link::RemoveParentJoint(JointPtr _joint)
   {
     /// @todo: can we assume there are no repeats?
     if ((*iter)->GetName() == _joint->GetName())
+    {
       this->parentJoints.erase(iter);
+      break;
+    }
   }
 }
 
@@ -620,7 +623,10 @@ void Link::RemoveChildJoint(JointPtr _joint)
   {
     /// @todo: can we assume there are no repeats?
     if ((*iter)->GetName() == _joint->GetName())
+    {
       this->childJoints.erase(iter);
+      break;
+    }
   }
 }
 
