@@ -87,7 +87,6 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
       std::string uri = uriElem->GetText();
       uri = "model:/" + uri;
 
-      std::cout << "Compare[" << _modelURI << "][" << uri << "]\n";
       if (uri == _modelURI)
         return true;
     }
@@ -166,7 +165,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     }
 
     // DEBUG output
-    std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
+    // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
 
     // Get the model name from the uri
     int index = _uri.find_last_of("/");
