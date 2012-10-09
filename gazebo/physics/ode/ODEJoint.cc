@@ -42,6 +42,7 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  this->Detach();
   dJointDestroy(this->jointId);
 }
 
