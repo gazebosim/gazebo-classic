@@ -44,7 +44,7 @@ TEST_F(PhysicsTest, State)
     physics::WorldPtr world = physics::get_world("default");
     world->SetPaused(true);
     EXPECT_TRUE(world != NULL);
- 
+
     physics::WorldState worldState = world->GetState();
     physics::ModelState modelState = worldState.GetModelState(0);
     physics::LinkState linkState = modelState.GetLinkState(0);

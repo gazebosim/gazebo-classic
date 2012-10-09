@@ -44,9 +44,6 @@ using namespace gazebo;
 using namespace rendering;
 
 
-SelectionObj *Visual::selectionObj = 0;
-unsigned int Visual::visualCounter = 0;
-
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
@@ -332,7 +329,7 @@ void Visual::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
   this->Load();
-  this->scene->RegisterVisual(shared_from_this());
+  this->scene->AddVisual(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -1111,7 +1108,7 @@ float Visual::GetTransparency()
 }
 
 //////////////////////////////////////////////////
-void Visual::SetCastShadows(const bool &shadows)
+void Visual::SetCastShadows(bool shadows)
 {
   for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
   {
@@ -1228,7 +1225,6 @@ math::Pose Visual::GetWorldPose() const
   pose.rot.y = vquatern.y;
   pose.rot.z = vquatern.z;
 
-
   return pose;
 }
 
@@ -1247,9 +1243,9 @@ bool Visual::IsStatic() const
 }
 
 //////////////////////////////////////////////////
-void Visual::EnableTrackVisual(Visual *vis)
+void Visual::EnableTrackVisual(VisualPtr _vis)
 {
-  this->sceneNode->setAutoTracking(true, vis->GetSceneNode());
+  this->sceneNode->setAutoTracking(true, _vis->GetSceneNode());
 }
 
 //////////////////////////////////////////////////
@@ -1906,13 +1902,13 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPosition(const math::Vector3 &_end,
-                             double _pitch, double _yaw, double _time)
+void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 {
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;
+  math::Vector3 rpy = _pose.rot.GetAsEuler();
 
-  math::Quaternion rotFinal(0, _pitch, _yaw);
+  math::Quaternion rotFinal(0, rpy.y, rpy.z);
 
   std::string animName = this->GetName() + "_animation";
 
@@ -1927,7 +1923,7 @@ void Visual::MoveToPosition(const math::Vector3 &_end,
   key->setRotation(this->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
   key->setRotation(Conversions::Convert(rotFinal));
 
   this->animState =

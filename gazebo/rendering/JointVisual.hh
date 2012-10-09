@@ -31,7 +31,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class JointVisual JointVisual.hh rendering/JointVisual.hh
+    /// \class JointVisual JointVisual.hh rendering/rendering.hh
     /// \brief Visualization for joints
     class JointVisual : public Visual
     {

@@ -36,22 +36,35 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
+    /// \class VideoVisual VideoVisual.hh rendering/rendering.hh
     /// \brief A visual element that displays a video as a texture
     class VideoVisual : public Visual
     {
       /// \brief Constructor
+      /// \param[in] _name Name of the video visual.
+      /// \param[in] _parent Parent of the video visual.
       public: VideoVisual(const std::string &_name, VisualPtr _parent);
 
       /// \brief Destructor
       public: virtual ~VideoVisual();
 
+      /// \brief PreRender event callback.
       private: void PreRender();
 
+      /// \brief Load a video
       private: common::Video *video;
 
+      /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Texture to draw the video onto.
       private: Ogre::TexturePtr texture;
+
+      /// \brief One frame of the viedeo.
       private: unsigned char *imageBuffer;
+
+      /// \brief Width and height of the video.
       private: int width, height;
     };
     /// \}

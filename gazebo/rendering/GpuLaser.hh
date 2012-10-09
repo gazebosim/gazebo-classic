@@ -62,7 +62,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \class GpuLaser GpuLaser.hh rendering/GpuLaser.hh
+    /// \class GpuLaser GpuLaser.hh rendering/rendering.hh
     /// \brief GPU based laser distance sensor
     ///
     /// This is the base class for all cameras.

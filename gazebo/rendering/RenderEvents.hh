@@ -28,23 +28,40 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class Events Events.hh rendering/rendering.hh
     /// \brief Base class for rendering events
     class Events
     {
+      /// \brief Connect to a scene created event.
+      /// \param[in] _subscriber Callback to trigger when event occurs.
+      /// \return Pointer the connection. This must stay in scope.
       public: template<typename T>
-              static event::ConnectionPtr ConnectCreateScene(T subscriber)
-              { return createScene.Connect(subscriber); }
-      public: static void DisconnectCreateScene(
-                  event::ConnectionPtr subscriber)
-              { createScene.Disconnect(subscriber); }
-    public: template<typename T>
-              static event::ConnectionPtr ConnectRemoveScene(T subscriber)
-              { return removeScene.Connect(subscriber); }
-      public: static void DisconnectRemoveScene(
-                  event::ConnectionPtr subscriber)
-              { removeScene.Disconnect(subscriber); }
+              static event::ConnectionPtr ConnectCreateScene(T _subscriber)
+              { return createScene.Connect(_subscriber); }
 
+      /// \brief Disconnect from a scene created event.
+      /// \param[in] _connection The connection to disconnect.
+      public: static void DisconnectCreateScene(
+                  event::ConnectionPtr _connection)
+              { createScene.Disconnect(_connection); }
+
+      /// \brief Connect to a scene removed event.
+      /// \param[in] _subscriber Callback to trigger when event occurs.
+      /// \return Pointer the connection. This must stay in scope.
+      public: template<typename T>
+              static event::ConnectionPtr ConnectRemoveScene(T _subscriber)
+              { return removeScene.Connect(_subscriber); }
+
+      /// \brief Disconnect from a scene removed event.
+      /// \param[in] _connection The connection to disconnect.
+      public: static void DisconnectRemoveScene(
+                  event::ConnectionPtr _connection)
+              { removeScene.Disconnect(_connection); }
+
+      /// \brief The event used to trigger a create scene event.
       public: static event::EventT<void (const std::string &)> createScene;
+
+      /// \brief The event used to trigger a remve scene event.
       public: static event::EventT<void (const std::string &)> removeScene;
     };
     /// \}

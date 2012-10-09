@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef COMVISUAL_HH
-#define COMVISUAL_HH
+#ifndef _COMVISUAL_HH_
+#define _COMVISUAL_HH_
 
 #include <string>
 
@@ -40,13 +40,13 @@ namespace gazebo
 
     class DynamicLines;
 
-    /// \class COMVisual COMVisual.hh rendering/COMVisual.hh
+    /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
     class COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
-      /// \param[int] _vis Parent Visual
+      /// \param[in] _vis Parent Visual
       public: COMVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor

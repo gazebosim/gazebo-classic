@@ -529,7 +529,8 @@ JointPtr Model::GetJoint(const std::string &_name)
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    if ((*iter)->GetScopedName() == _name)
+    if ((*iter)->GetScopedName() == _name ||
+        (*iter)->GetName() == _name)
     {
       result = (*iter);
       break;

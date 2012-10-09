@@ -36,13 +36,13 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \class ArrowVisual ArrowVisual.hh rendering/ArrowVisual.hh
+    /// \class ArrowVisual ArrowVisual.hh rendering/rendering.hh
     /// \brief Basic arrow visualization
     class ArrowVisual : public Visual
     {
       /// \brief Constructor
-      /// \param _name Name of the arrow visual
-      /// \param _vis Pointer to the parent visual
+      /// \param[in] _name Name of the arrow visual
+      /// \param[in] _vis Pointer to the parent visual
       public: ArrowVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor

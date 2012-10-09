@@ -218,9 +218,10 @@ std::string SystemPaths::GetWorldPathExtension()
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename)
+std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename,
+                                                 bool _searchLocalPath)
 {
-  return this->FindFile(_filename);
+  return this->FindFile(_filename, _searchLocalPath);
 }
 
 //////////////////////////////////////////////////
@@ -253,7 +254,8 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFile(const std::string &_filename)
+std::string SystemPaths::FindFile(const std::string &_filename,
+                                  bool _searchLocalPath)
 {
   std::string result;
 
@@ -276,11 +278,12 @@ std::string SystemPaths::FindFile(const std::string &_filename)
 
     std::list<std::string> paths = this->GetGazeboPaths();
 
-    if (stat(result.c_str(), &st) == 0)
+    if (_searchLocalPath && stat(result.c_str(), &st) == 0)
     {
       found = true;
     }
-    else if (stat(_filename.c_str(), &st) == 0)
+    else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
+             && stat(_filename.c_str(), &st) == 0)
     {
       result = _filename;
       found = true;

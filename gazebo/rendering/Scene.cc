@@ -81,7 +81,6 @@ struct VisualMessageLess {
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
   this->requestMsg = NULL;
-  this->iterations = 0;
   this->enableVisualizations = _enableVisualizations;
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_name);
@@ -123,7 +122,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
-  this->clearAll = false;
   this->heightmap = NULL;
 }
 
@@ -430,6 +428,12 @@ Grid *Scene::GetGrid(uint32_t index) const
 }
 
 //////////////////////////////////////////////////
+uint32_t Scene::GetGridCount() const
+{
+  return this->grids.size();
+}
+
+//////////////////////////////////////////////////
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
   CameraPtr camera(new Camera(this->name + "::" + _name, this, _autoRender));
@@ -530,13 +534,13 @@ LightPtr Scene::GetLight(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-unsigned int Scene::GetLightCount() const
+uint32_t Scene::GetLightCount() const
 {
   return this->lights.size();
 }
 
 //////////////////////////////////////////////////
-LightPtr Scene::GetLight(unsigned int _index) const
+LightPtr Scene::GetLight(uint32_t _index) const
 {
   LightPtr result;
   if (_index < this->lights.size())
@@ -582,10 +586,11 @@ void Scene::SelectVisual(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
+VisualPtr Scene::SelectVisualAt(CameraPtr _camera,
+                                const math::Vector2i &_mousePos)
 {
   std::string mod;
-  VisualPtr vis = this->GetVisualAt(camera, mousePos, mod);
+  VisualPtr vis = this->GetVisualAt(_camera, _mousePos, mod);
   if (vis)
     this->selectionObj->Attach(vis);
   else
@@ -596,11 +601,13 @@ VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
 
 
 //////////////////////////////////////////////////
-VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
+VisualPtr Scene::GetVisualAt(CameraPtr _camera,
+                             const math::Vector2i &_mousePos,
                              std::string &_mod)
 {
   VisualPtr visual;
-  Ogre::Entity *closestEntity = this->GetOgreEntityAt(camera, mousePos, false);
+  Ogre::Entity *closestEntity = this->GetOgreEntityAt(_camera, _mousePos,
+                                                       false);
 
   _mod = "";
   if (closestEntity)
@@ -618,7 +625,8 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
 }
 
 //////////////////////////////////////////////////
-VisualPtr Scene::GetModelVisualAt(CameraPtr _camera, math::Vector2i _mousePos)
+VisualPtr Scene::GetModelVisualAt(CameraPtr _camera,
+                                  const math::Vector2i &_mousePos)
 {
   VisualPtr vis = this->GetVisualAt(_camera, _mousePos);
   if (vis)
@@ -655,7 +663,7 @@ VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
 
     double maxZ = -10000;
 
-    for (unsigned int i = 0; i < below.size(); ++i)
+    for (uint32_t i = 0; i < below.size(); ++i)
     {
       if (below[i]->GetName().find(vis->GetName()) != 0
           && below[i]->GetBoundingBox().max.z > maxZ)
@@ -709,11 +717,13 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
 }
 
 //////////////////////////////////////////////////
-VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
+VisualPtr Scene::GetVisualAt(CameraPtr _camera,
+                             const math::Vector2i &_mousePos)
 {
   VisualPtr visual;
 
-  Ogre::Entity *closestEntity = this->GetOgreEntityAt(camera, mousePos, true);
+  Ogre::Entity *closestEntity = this->GetOgreEntityAt(_camera,
+                                                      _mousePos, true);
   if (closestEntity)
   {
     visual = this->GetVisual(Ogre::any_cast<std::string>(
@@ -725,7 +735,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
 
 /////////////////////////////////////////////////
 Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
-                                     math::Vector2i _mousePos,
+                                     const math::Vector2i &_mousePos,
                                      bool _ignoreSelectionObj)
 {
   Ogre::Camera *ogreCam = _camera->GetOgreCamera();
@@ -813,14 +823,16 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Scene::GetFirstContact(CameraPtr camera, math::Vector2i mousePos)
+math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
+                                     const math::Vector2i &_mousePos)
 {
-  Ogre::Camera *ogreCam = camera->GetOgreCamera();
+  Ogre::Camera *ogreCam = _camera->GetOgreCamera();
+
   // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(mousePos.x) /
+      static_cast<float>(_mousePos.x) /
       ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(mousePos.y) /
+      static_cast<float>(_mousePos.y) /
       ogreCam->getViewport()->getActualHeight());
 
   this->raySceneQuery->setRay(mouseRay);
@@ -1522,15 +1534,6 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::RegisterVisual(VisualPtr _vis)
-{
-  if (this->visuals.find(_vis->GetName()) != this->visuals.end())
-    gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
-
-  this->visuals[_vis->GetName()] = _vis;
-}
-
-/////////////////////////////////////////////////
 bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 {
   VisualPtr linkVis = this->GetVisual(_msg->name());
@@ -1946,7 +1949,7 @@ void Scene::SetSky()
     {
       // SkyX::MeshManager::getSkydomeRadius(...) works for both finite and
       // infinite(=0) camera far clip distances
-      this->skyx->getVCloudsManager()->create(120.0);
+      this->skyx->getVCloudsManager()->create(2000.0);
       // this->skyx->getMeshManager()->getSkydomeRadius(mRenderingCamera));
     }
   }
@@ -2025,8 +2028,11 @@ bool Scene::GetShadowsEnabled() const
 }
 
 /////////////////////////////////////////////////
-void Scene::AddVisual(VisualPtr &_vis)
+void Scene::AddVisual(VisualPtr _vis)
 {
+  if (this->visuals.find(_vis->GetName()) != this->visuals.end())
+    gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+
   this->visuals[_vis->GetName()] = _vis;
 }
 
@@ -2048,28 +2054,6 @@ void Scene::RemoveVisual(VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-std::string Scene::GetUniqueName(const std::string &_prefix)
-{
-  std::ostringstream test;
-  bool exists = true;
-  int index = 0;
-  while (exists)
-  {
-    test.str("");
-    test << _prefix << "_" << index++;
-    exists = this->manager->hasSceneNode(test.str());
-  }
-
-  return test.str();
-}
-
-/////////////////////////////////////////////////
-SelectionObj *Scene::GetSelectionObj() const
-{
-  return this->selectionObj;
-}
-
-/////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
   if (_enabled && this->grids.size() == 0)
@@ -2084,25 +2068,11 @@ void Scene::SetGrid(bool _enabled)
   }
   else
   {
-    for (unsigned int i = 0; i < this->grids.size(); ++i)
+    for (uint32_t i = 0; i < this->grids.size(); ++i)
     {
       this->grids[i]->Enable(_enabled);
     }
   }
-}
-
-/////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string &_visualName,
-                             const std::string &_newName)
-{
-  VisualPtr result;
-  VisualPtr vis = this->GetVisual(_visualName);
-  if (vis)
-  {
-    result = vis->Clone(_newName, this->worldVisual);
-    this->visuals[_newName] = result;
-  }
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -2139,3 +2109,24 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
   comVis->SetVisible(false);
   this->visuals[comVis->GetName()] = comVis;
 }
+
+/////////////////////////////////////////////////
+SelectionObj *Scene::GetSelectionObj() const
+{
+  return this->selectionObj;
+}
+
+/////////////////////////////////////////////////
+VisualPtr Scene::CloneVisual(const std::string &_visualName,
+                             const std::string &_newName)
+{
+  VisualPtr result;
+  VisualPtr vis = this->GetVisual(_visualName);
+  if (vis)
+  {
+    result = vis->Clone(_newName, this->worldVisual);
+    this->visuals[_newName] = result;
+  }
+  return result;
+}
+
