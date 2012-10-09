@@ -25,16 +25,17 @@ class PR2Test : public ServerFixture
 TEST_F(PR2Test, Load)
 {
   Load("worlds/empty.world");
-  SpawnModel("models://pr2");
+  SpawnModel("model://pr2");
 
   int i;
-  for (i = 0; i < 40 && !this->HasEntity("pr2"); ++i)
-    common::Time::MSleep(100);
-  EXPECT_LT(i, 40);
+  for (i = 0; i < 200 && !this->HasEntity("pr2"); ++i)
+    common::Time::MSleep(200);
+  EXPECT_LT(i, 200);
 
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
     return;
+
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");

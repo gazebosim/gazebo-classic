@@ -54,7 +54,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #define SKYX_RESOURCE_GROUP "SkyX"
 
 template<typename T>
-inline bool equal(const T &_a, const T &_b, const T &_epsilon = 1e-6)
+inline bool equal(const T &_a, const T &_b, const T &_epsilon = 1e-3)
 {
   return std::fabs(_a - _b) <= _epsilon;
 }

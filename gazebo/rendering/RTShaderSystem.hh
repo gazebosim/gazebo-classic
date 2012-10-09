@@ -42,7 +42,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class RTShaderSystem RTShaderSystem.hh rendering/RTShaderSystem.hh
+    /// \class RTShaderSystem RTShaderSystem.hh rendering/rendering.hh
     /// \brief Implements Ogre's Run-Time Shader system.
     ///
     /// This class allows Gazebo to generate per-pixel shaders for every

@@ -330,14 +330,6 @@ void RenderEngine::Fini()
 }
 
 //////////////////////////////////////////////////
-void RenderEngine::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << "<rendering:ogre>\n";
-  // this->scenes[0]->Save(prefix, stream);
-  stream << prefix << "</rendering:ogre>\n";
-}
-
-//////////////////////////////////////////////////
 void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;

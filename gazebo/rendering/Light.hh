@@ -46,7 +46,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class Light Light.hh rendering/Light.hh
+    /// \class Light Light.hh rendering/rendering.hh
     /// \brief A light source.
     ///
     /// There are three types of lights: Point, Spot, and Directional. This
@@ -119,7 +119,7 @@ namespace gazebo
       public: void SetSpecularColor(const common::Color &_color);
 
       /// \brief Set the direction
-      /// \param _dir Set the light's direction. Only applicable to spot and
+      /// \param[in] _dir Set the light's direction. Only applicable to spot and
       /// directional lights.
       public: void SetDirection(const math::Vector3 &_dir);
 
@@ -135,23 +135,23 @@ namespace gazebo
                                   double _quadratic);
 
       /// \brief Set the spot light inner angle
-      /// \param _angle Inner angle in radians
+      /// \param[in] _angle Inner angle in radians
       public: void SetSpotInnerAngle(const double &_angle);
 
       /// \brief Set the spot light outer angle
-      /// \param _angle Outer angle in radians
+      /// \param[in] _angle Outer angle in radians
       public: void SetSpotOuterAngle(const double &_angle);
 
       /// \brief Set the spot light falloff
-      /// \param _value Falloff value
+      /// \param[in] _value Falloff value
       public: void SetSpotFalloff(const double &_value);
 
       /// \brief Set the range
-      /// \param _range Rage of the light in meters.
+      /// \param[in] _range Rage of the light in meters.
       public: void SetRange(const double &_range);
 
       /// \brief Set cast shadows
-      /// \param _cast Set to true to cast shadows.
+      /// \param[in] _cast Set to true to cast shadows.
       public: void SetCastShadows(const bool &_cast);
 
       /// \private Helper node to create a visual representation of the light
@@ -160,16 +160,25 @@ namespace gazebo
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}
 
-      /// The OGRE light source
+      /// \brief The ogre light source
       private: Ogre::Light *light;
 
+      /// \brief The visual used to visualize the light.
       private: VisualPtr visual;
+
+      /// \brief The lines used to visualize the light.
       private: DynamicLines *line;
 
+      /// \brief SDF element data for the light.
       private: sdf::ElementPtr sdf;
 
+      /// \brief Event connection to toggle visualization on/off.
       private: event::ConnectionPtr showLightsConnection;
+
+      /// \brief Counter used to generate unique light names.
       private: static unsigned int lightCounter;
+
+      /// \brief Pointer to the scene.
       private: Scene *scene;
     };
     /// \}

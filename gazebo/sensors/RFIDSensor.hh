@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 /* Desc: Gazebo RFID Sensor
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
-#ifndef RFIDSENSOR_HH
-#define RFIDSENSOR_HH
+#ifndef _RFIDSENSOR_HH_
+#define _RFIDSENSOR_HH_
 
 #include <vector>
 #include <string>

@@ -43,7 +43,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class MovableText MovableText.hh rendering/MovableText.hh
+    /// \class MovableText MovableText.hh rendering/rendering.hh
     /// \brief Movable text
     class MovableText : public Ogre::MovableObject, public Ogre::Renderable
     {
@@ -116,7 +116,7 @@ namespace gazebo
       public: float GetCharHeight() const;
 
       /// \brief Set the width of a space.
-      /// \param _width space width
+      /// \param[in] _width space width
       public:void SetSpaceWidth(float _width);
 
       /// \brief Get the width of a space
@@ -124,13 +124,13 @@ namespace gazebo
       public: float GetSpaceWidth() const;
 
       /// \brief Set the alignment of the text
-      /// \param _hAlign Horizontal alignment
-      /// \param _vAlign Vertical alignment
+      /// \param[in] _hAlign Horizontal alignment
+      /// \param[in] _vAlign Vertical alignment
       public: void SetTextAlignment(const HorizAlign &_hAlign,
                                     const VertAlign &_vAlign);
 
       /// \brief Set the baseline height of the text
-      /// \param _height Baseline height
+      /// \param[in] _height Baseline height
       public: void SetBaseline(float _height);
 
       /// \brief Get the baseline height

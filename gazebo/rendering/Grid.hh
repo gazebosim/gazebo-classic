@@ -44,7 +44,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    ///  \class Grid Grid.hh rendering/Grid.hh
+    ///  \class Grid Grid.hh rendering/rendering.hh
     ///  \brief Displays a grid of cells, drawn with lines
     ///
     ///  Displays a grid of cells, drawn with lines.  A grid with an

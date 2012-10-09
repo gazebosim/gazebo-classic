@@ -13,13 +13,13 @@
  * limitations under the License.
  *
  */
-/* Desc: 
- * Author: Jonas Mellin & Zakiruz Zaman 
+/* Desc:
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
-#ifndef RFIDTAGVISUAL_HH
-#define RFIDTAGVISUAL_HH
+#ifndef _RFIDTAGVISUAL_HH_
+#define _RFIDTAGVISUAL_HH_
 
 #include <string>
 
@@ -37,15 +37,25 @@ namespace gazebo
     /// \brief Visualization for RFID tags sensor
     class RFIDTagVisual : public Visual
     {
+      /// \brief Constructor
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _vis Parent visual.
+      /// \param[in] _topicName Name of the topic that publishes RFID data.
+      /// \sa sensors::RFIDSensor
       public: RFIDTagVisual(const std::string &_name, VisualPtr _vis,
                             const std::string &_topicName);
 
+      /// \brief Destructor
       public: virtual ~RFIDTagVisual();
 
+      /// \brief Callback triggered when new RFID data is received.
       private: void OnScan(ConstPosePtr &_msg);
 
+      /// \brief Node that handles communication.
       private: transport::NodePtr node;
-      private: transport::SubscriberPtr laserScanSub;
+
+      /// \brief Subscriber that receives RFID data.
+      private: transport::SubscriberPtr rfidSub;
     };
     /// \}
   }
