@@ -275,9 +275,20 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   // .gazebo/models
   if (prefix == "model")
   {
-    std::string path = getenv("HOME");
-    path += "/.gazebo/models/";
-    filename = path + suffix;
+    /// \TODO look at the boost::filesytem::path has convenience functions
+    /// for constructing path names.
+    std::string fullFilepath;
+    for (std::list<std::string>::iterator iter = this->modelPaths.begin();
+         iter != this->modelPaths.end(); ++iter)
+    {
+      fullFilepath =  (*iter) + "/" + suffix;
+      boost::filesystem::path dir(fullFilepath);
+      if (boost::filesystem::exists(dir))
+      {
+        break;
+      }
+    }
+    filename = fullFilepath;
   }
   else if (prefix != "http" && prefix != "https")
     gzerr << "Unknown URI prefix[" << prefix << "]\n";
