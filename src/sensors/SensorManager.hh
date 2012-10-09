@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
+    /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
     {
@@ -48,7 +49,8 @@ namespace gazebo
       public: virtual ~SensorManager();
 
       /// \brief Update all the sensors
-      public: void Update(bool force = false);
+      /// \param[in] _force True force update, false if not
+      public: void Update(bool _force = false);
 
       /// \brief Init all the sensors
       public: void Init();
@@ -77,9 +79,12 @@ namespace gazebo
                                        const std::string &_parentName);
 
       /// \brief Get a sensor
+      /// \param[in] _name Name of sensor
+      /// \return Pointer to Sensor
       public: SensorPtr GetSensor(const std::string &_name);
 
       /// \brief Remove a sensor
+      /// \param[in] _name Name of sensor
       public: void RemoveSensor(const std::string &_name);
 
       /// \brief Remove all sensors

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,13 +35,15 @@
 #include "common/Time.hh"
 #include "math/Pose.hh"
 #include "transport/TransportTypes.hh"
-
+/// \TODO Nate check this base class and I can propogate changes to subclasses
 namespace gazebo
 {
   namespace sensors
   {
+    
     /// \addtogroup gazebo_sensors
     /// \{
+    /// class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
     class Sensor : public boost::enable_shared_from_this<Sensor>
     {
@@ -52,11 +54,13 @@ namespace gazebo
       public: virtual ~Sensor();
 
       /// \brief Load the sensor with SDF parameters
-      /// \param _sdf SDF Sensor parameteres
+      /// \param[in] _sdf SDF Sensor parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
       /// \brief Load the sensor with default parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName);
 
       /// \brief  Initialize the sensor
@@ -65,40 +69,63 @@ namespace gazebo
       /// \brief Set the parent of the sensor
       public: virtual void SetParent(const std::string &_name);
 
+      /// \brief Return the parent name
+      /// \return Name of Parent
       public: std::string GetParentName() const;
 
-      /// \brief  Update the sensor
+      /// \brief Update the sensor
+      /// \param[in] _force True to force update, false otherwise
       public: void Update(bool _force);
+
+      /// \brief Update the sensor information
+      /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool /*_force*/) {}
+
       /// \brief Set the update rate of the sensor
+      /// \param[in] _hz update rate of sensor
       public: void SetUpdateRate(double _hz);
 
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
       /// \brief Get name
+      /// \return name of sensor
       public: std::string GetName() const;
 
       /// \brief Get the current pose
+      /// \return Current pose of the sensor
       public: virtual math::Pose GetPose() const;
 
       /// \brief Set whether the sensor is active or not
-      public: virtual void SetActive(bool value);
+      /// \param[in] value True if active, false if not
+      public: virtual void SetActive(bool _value);
 
+      /// \brief Gets active status sensor
+      /// \return True if active, false if not
       public: bool IsActive();
 
       /// \brief Get sensor type
+      /// \return Type of sensor
       public: std::string GetType() const;
 
       /// \brief return last update time
+      /// \return Time of last update
       public: common::Time GetLastUpdateTime();
 
+      /// \brief Gets the sensors visualize status
+      /// \return True if visualized, false if not
       public: bool GetVisualize() const;
 
+      /// \brief Gets the topic name of the sensor
+      /// \return Topic name
       public: virtual std::string GetTopic() const;
 
+      /// \brief Fills sensor message with data
+      /// \param _msg Message to fill
       public: void FillMsg(msgs::Sensor &_msg);
 
+      /// \brief Gets the world name the sensor is attached to
+      /// \return Name of the world
       public: std::string GetWorldName() const;
 
       /// \brief Load a plugin for this sensor

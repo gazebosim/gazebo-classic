@@ -27,6 +27,10 @@ namespace gazebo
 {
   namespace sensors
   {
+    /// \TODO This class inherits from Sensor, but looks like it specifically 
+    ///       doesn't override any methods, is this intentional? i.e. LoadChild 
+    ///       instead of Load, InitChild instead of Init
+    /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
     /// \brief An IMU sensor
@@ -34,27 +38,34 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param body The IMU sensor must be attached to a body.
-      public: ImuSensor(Body *body);
+      public: ImuSensor(Body *_body);
 
       /// \brief Destructor
       public: virtual ~ImuSensor();
 
+      /// \brief Load the ImuSensor from XMLConfigNode
       /// \param node The XMLConfig node
-      protected: virtual void LoadChild(XMLConfigNode *node);
+      protected: virtual void LoadChild(XMLConfigNode *_node);
 
       /// \brief Save the sensor info in XML format
-      protected: virtual void SaveChild(std::string &prefix,
-                                        std::ostream &stream);
+      /// \param _prefix 
+      /// \param _stream
+      /// \TODO Nate fill in
+      protected: virtual void SaveChild(std::string &_prefix,
+                                        std::ostream &_stream);
 
-      /// Initialize the ray
+      /// \brief Initialize the ray
       protected: virtual void InitChild();
 
-      ///  Update sensed values
+      /// \brief Update sensed values
       protected: virtual void UpdateChild();
 
-      /// Finalize the ray
+      /// \brief Finalize the ray
       protected: virtual void FiniChild();
 
+      /// \brief Get velocity from sensor
+      /// \return velocity data stored in Pose
+      /// \TODO Nate check
       public: Pose GetVelocity();
 
       private: Pose prevPose;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,10 +36,24 @@ namespace gazebo
     class RFIDSensor;
     class RFIDTag;
 
+    /// \def SensorPtr
+    /// \brief Pointer to Sensor
     typedef boost::shared_ptr<Sensor> SensorPtr;
+
+    /// \def RaySensorPtr
+    /// \brief Pointer to Ray Sensor
     typedef boost::shared_ptr<RaySensor> RaySensorPtr;
+
+    /// \def CameraSensorPtr
+    /// \brief Pointer to Camera Sensor
     typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
+
+    /// \def DepthCameraSensorPtr
+    /// \brief Pointer to Depth Camera Sensor
     typedef boost::shared_ptr<DepthCameraSensor> DepthCameraSensorPtr;
+
+    /// \def ContactSensorPtr
+    /// \brief Pointer to Contact Sensor
     typedef boost::shared_ptr<ContactSensor> ContactSensorPtr;
     typedef boost::shared_ptr<GpuRaySensor> GpuRaySensorPtr;
     typedef boost::shared_ptr<RFIDSensor> RFIDSensorPtr;
