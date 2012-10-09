@@ -78,6 +78,7 @@ SystemPaths::SystemPaths()
 
   this->logPath = fullPath;
 
+  this->UpdateModelPaths();
   this->UpdateGazeboPaths();
   this->UpdatePluginPaths();
   this->UpdateOgrePaths();
@@ -90,6 +91,7 @@ SystemPaths::SystemPaths()
 
   this->pluginPathsFromEnv = true;
   this->gazeboPathsFromEnv = true;
+  this->modelPathsFromEnv = true;
   this->ogrePathsFromEnv = true;
 }
 
@@ -118,6 +120,8 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
 /////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetModelPaths()
 {
+  if (this->modelPathsFromEnv)
+    this->UpdateModelPaths();
   return this->modelPaths;
 }
 
@@ -127,6 +131,34 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
   if (this->ogrePathsFromEnv)
     this->UpdateOgrePaths();
   return this->ogrePaths;
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::UpdateModelPaths()
+{
+  std::string delim(":");
+  std::string path;
+
+  char *pathCStr = getenv("GAZEBO_MODEL_PATH");
+  if (!pathCStr || *pathCStr == '\0')
+  {
+    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
+    //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
+    //  << "...or are you using SystemPlugins?\n";
+    return;
+  }
+  path = pathCStr;
+
+  /// \TODO: Use boost to split string.
+  size_t pos1 = 0;
+  size_t pos2 = path.find(delim);
+  while (pos2 != std::string::npos)
+  {
+    this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
+    pos1 = pos2+1;
+    pos2 = path.find(delim, pos2+1);
+  }
+  this->InsertUnique(path.substr(pos1, path.size()-pos1), this->modelPaths);
 }
 
 /////////////////////////////////////////////////
@@ -243,9 +275,20 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   // .gazebo/models
   if (prefix == "model")
   {
-    std::string path = getenv("HOME");
-    path += "/.gazebo/models/";
-    filename = path + suffix;
+    /// \TODO look at the boost::filesytem::path has convenience functions
+    /// for constructing path names.
+    std::string fullFilepath;
+    for (std::list<std::string>::iterator iter = this->modelPaths.begin();
+         iter != this->modelPaths.end(); ++iter)
+    {
+      fullFilepath =  (*iter) + "/" + suffix;
+      boost::filesystem::path dir(fullFilepath);
+      if (boost::filesystem::exists(dir))
+      {
+        break;
+      }
+    }
+    filename = fullFilepath;
   }
   else if (prefix != "http" && prefix != "https")
     gzerr << "Unknown URI prefix[" << prefix << "]\n";

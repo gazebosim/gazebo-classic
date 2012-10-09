@@ -113,6 +113,8 @@ namespace gazebo
       public: void AddSearchPathSuffix(const std::string &_suffix);
 
       /// \brief re-read SystemPaths#gazeboPaths from environment variable
+      private: void UpdateModelPaths();
+      /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateGazeboPaths();
       /// \brief re-read SystemPaths#pluginPaths from environment variable
       private: void UpdatePluginPaths();
@@ -120,7 +122,7 @@ namespace gazebo
       private: void UpdateOgrePaths();
 
       private: void InsertUnique(const std::string &_path,
-                               std::list<std::string> &_list);
+                                 std::list<std::string> &_list);
 
       /// \brief Paths to installed gazebo media files
       private: std::list<std::string> gazeboPaths;
@@ -136,6 +138,9 @@ namespace gazebo
       private: std::list<std::string> modelPaths;
 
       private: std::string logPath;
+
+      /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
+      public: bool modelPathsFromEnv;
 
       /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
       public: bool gazeboPathsFromEnv;
