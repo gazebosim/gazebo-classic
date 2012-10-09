@@ -1,8 +1,9 @@
 QMainWindow
 {
-  background-color: #5d5d5d;
+  background-color: #9d9d9d;
   background-image: url(:/images/mainwindow_bg.png);
   background-repeat: repeat-xy;
+  margin: 22px;
 }
 
 QMenuBar
@@ -61,17 +62,19 @@ QDockWidget::title
 
 QToolBar
 {
-  background-color: #202020;
-  margin: 4px;
-  padding: 2px;
-  border: 1px solid #404040;
-  border-radius: 10px;
+  /*background-color: #202020;*/
+  padding: 0px;
+  margin: 0px;
+  margin-left: 20px;
+  border: 0px solid #404040;
+  border-radius: 0px;
 }
 
 QToolButton
 {
   padding: 2px;
   margin: 2px;
+  width: 20px;
           
   border-radius: 8px;
   border: 1px solid #202020;
@@ -260,21 +263,29 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 
 QPushButton#collapseButton
 {
-  border:0px;
-  border-radius: 0px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+
+  border: 0px solid #202020;
+
+  /*border-radius: 0px;*/
   padding: 0px;
   margin: 0px;
   background: #202020;
   font-size: 20px;
   font-weight: 100;
   text-align: center;
+  margin-right: 22px;
 }
 
 QTreeView#mainTree
 {
   background: #202020;
-  border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -347,15 +358,16 @@ QWidget#jointControl > QFrame
 
 QWidget#renderWidget > QWidget
 {
+  padding: 0px;
+  margin: 0px;
   border: 1px solid #202020;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 
   background-color: #202020;
   margin-right: 10px;
-  padding: 4px;
 }
 
 QWidget#timePanel 
@@ -364,11 +376,12 @@ QWidget#timePanel
 
 QWidget#timePanel > QFrame
 {
-  border: 1px solid #404040;
+/*  border: 1px solid #404040;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   background-color: #202020;
   padding-left: 4px;
   padding-top: 4px;
   padding-right: 4px;
+  */
 }
