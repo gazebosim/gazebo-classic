@@ -287,7 +287,7 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  this->pauseAct->setChecked(false);
+  g_pauseAct->setChecked(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -297,7 +297,7 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
-  this->playAct->setChecked(false);
+  g_playAct->setChecked(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -446,7 +446,7 @@ void MainWindow::ViewGrid()
 {
   msgs::Scene msg;
   msg.set_name("default");
-  msg.set_grid(this->viewGridAct->isChecked());
+  msg.set_grid(g_viewGridAct->isChecked());
   this->scenePub->Publish(msg);
 }
 
@@ -472,80 +472,80 @@ void MainWindow::ViewOrbit()
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
-  this->newAct = new QAction(tr("&New"), this);
-  this->newAct->setShortcut(tr("Ctrl+N"));
-  this->newAct->setStatusTip(tr("Create a new world"));
-  connect(this->newAct, SIGNAL(triggered()), this, SLOT(New()));
+  g_newAct = new QAction(tr("&New"), this);
+  g_newAct->setShortcut(tr("Ctrl+N"));
+  g_newAct->setStatusTip(tr("Create a new world"));
+  connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
 
-  this->openAct = new QAction(tr("&Open"), this);
-  this->openAct->setShortcut(tr("Ctrl+O"));
-  this->openAct->setStatusTip(tr("Open an world file"));
-  connect(this->openAct, SIGNAL(triggered()), this, SLOT(Open()));
+  g_openAct = new QAction(tr("&Open"), this);
+  g_openAct->setShortcut(tr("Ctrl+O"));
+  g_openAct->setStatusTip(tr("Open an world file"));
+  connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
-  this->importAct = new QAction(tr("&Import Mesh"), this);
-  this->importAct->setShortcut(tr("Ctrl+I"));
-  this->importAct->setStatusTip(tr("Import a Collada mesh"));
-  connect(this->importAct, SIGNAL(triggered()), this, SLOT(Import()));
-
-
-  this->saveAct = new QAction(tr("&Save"), this);
-  this->saveAct->setShortcut(tr("Ctrl+S"));
-  this->saveAct->setStatusTip(tr("Save world"));
-  connect(this->saveAct, SIGNAL(triggered()), this, SLOT(Save()));
-
-  this->saveAsAct = new QAction(tr("Save &As"), this);
-  this->saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
-  this->saveAsAct->setStatusTip(tr("Save world to new file"));
-  connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
+  g_importAct = new QAction(tr("&Import Mesh"), this);
+  g_importAct->setShortcut(tr("Ctrl+I"));
+  g_importAct->setStatusTip(tr("Import a Collada mesh"));
+  connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
 
 
-  this->aboutAct = new QAction(tr("&About"), this);
-  this->aboutAct->setStatusTip(tr("Show the about info"));
-  connect(this->aboutAct, SIGNAL(triggered()), this, SLOT(About()));
+  g_saveAct = new QAction(tr("&Save"), this);
+  g_saveAct->setShortcut(tr("Ctrl+S"));
+  g_saveAct->setStatusTip(tr("Save world"));
+  connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
 
-  this->quitAct = new QAction(tr("&Quit"), this);
-  this->quitAct->setStatusTip(tr("Quit"));
-  connect(this->quitAct, SIGNAL(triggered()), this, SLOT(close()));
+  g_saveAsAct = new QAction(tr("Save &As"), this);
+  g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
+  g_saveAsAct->setStatusTip(tr("Save world to new file"));
+  connect(g_saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
 
-  this->newModelAct = new QAction(tr("New &Model"), this);
-  this->newModelAct->setShortcut(tr("Ctrl+M"));
-  this->newModelAct->setStatusTip(tr("Create a new model"));
-  connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
-  this->resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
-  this->resetModelsAct->setShortcut(tr("Ctrl+Shift-R"));
-  this->resetModelsAct->setStatusTip(tr("Reset model poses"));
-  connect(this->resetModelsAct, SIGNAL(triggered()), this,
+  g_aboutAct = new QAction(tr("&About"), this);
+  g_aboutAct->setStatusTip(tr("Show the about info"));
+  connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
+
+  g_quitAct = new QAction(tr("&Quit"), this);
+  g_quitAct->setStatusTip(tr("Quit"));
+  connect(g_quitAct, SIGNAL(triggered()), this, SLOT(close()));
+
+  g_newModelAct = new QAction(tr("New &Model"), this);
+  g_newModelAct->setShortcut(tr("Ctrl+M"));
+  g_newModelAct->setStatusTip(tr("Create a new model"));
+  connect(g_newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
+
+  g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
+  g_resetModelsAct->setShortcut(tr("Ctrl+Shift-R"));
+  g_resetModelsAct->setStatusTip(tr("Reset model poses"));
+  connect(g_resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelOnly()));
 
-  this->resetWorldAct = new QAction(tr("&Reset World"), this);
-  this->resetWorldAct->setShortcut(tr("Ctrl+R"));
-  this->resetWorldAct->setStatusTip(tr("Reset the world"));
-  connect(this->resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
+  g_resetWorldAct = new QAction(tr("&Reset World"), this);
+  g_resetWorldAct->setShortcut(tr("Ctrl+R"));
+  g_resetWorldAct->setStatusTip(tr("Reset the world"));
+  connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
 
-  this->editWorldPropertiesAct = new QAction(tr("&World"), this);
-  this->editWorldPropertiesAct->setShortcut(tr("Ctrl+W"));
-  this->editWorldPropertiesAct->setStatusTip(tr("Edit World Properties"));
-  connect(this->editWorldPropertiesAct, SIGNAL(triggered()), this,
+  g_editWorldPropertiesAct = new QAction(tr("&World"), this);
+  g_editWorldPropertiesAct->setShortcut(tr("Ctrl+W"));
+  g_editWorldPropertiesAct->setStatusTip(tr("Edit World Properties"));
+  connect(g_editWorldPropertiesAct, SIGNAL(triggered()), this,
           SLOT(EditWorldProperties()));
 
 
-  this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
-  this->playAct->setStatusTip(tr("Run the world"));
-  this->playAct->setCheckable(true);
-  this->playAct->setChecked(true);
-  connect(this->playAct, SIGNAL(triggered()), this, SLOT(Play()));
+  g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
+  g_playAct->setStatusTip(tr("Run the world"));
+  g_playAct->setCheckable(true);
+  g_playAct->setChecked(true);
+  connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
 
-  this->pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
-  this->pauseAct->setStatusTip(tr("Pause the world"));
-  this->pauseAct->setCheckable(true);
-  this->pauseAct->setChecked(false);
-  connect(this->pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
+  g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
+  g_pauseAct->setStatusTip(tr("Pause the world"));
+  g_pauseAct->setCheckable(true);
+  g_pauseAct->setChecked(false);
+  connect(g_pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
-  this->stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
-  this->stepAct->setStatusTip(tr("Step the world"));
-  connect(this->stepAct, SIGNAL(triggered()), this, SLOT(Step()));
+  g_stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
+  g_stepAct->setStatusTip(tr("Step the world"));
+  connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
 
 
   g_arrowAct = new QAction(QIcon(":/images/arrow.png"),
@@ -563,78 +563,78 @@ void MainWindow::CreateActions()
   connect(g_ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
 
 
-  this->boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
-  this->boxCreateAct->setStatusTip(tr("Create a box"));
-  this->boxCreateAct->setCheckable(true);
-  connect(this->boxCreateAct, SIGNAL(triggered()), this, SLOT(CreateBox()));
+  g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
+  g_boxCreateAct->setStatusTip(tr("Create a box"));
+  g_boxCreateAct->setCheckable(true);
+  connect(g_boxCreateAct, SIGNAL(triggered()), this, SLOT(CreateBox()));
 
-  this->sphereCreateAct = new QAction(QIcon(":/images/sphere.png"),
+  g_sphereCreateAct = new QAction(QIcon(":/images/sphere.png"),
       tr("Sphere"), this);
-  this->sphereCreateAct->setStatusTip(tr("Create a sphere"));
-  this->sphereCreateAct->setCheckable(true);
-  connect(this->sphereCreateAct, SIGNAL(triggered()), this,
+  g_sphereCreateAct->setStatusTip(tr("Create a sphere"));
+  g_sphereCreateAct->setCheckable(true);
+  connect(g_sphereCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateSphere()));
 
-  this->cylinderCreateAct = new QAction(QIcon(":/images/cylinder.png"),
+  g_cylinderCreateAct = new QAction(QIcon(":/images/cylinder.png"),
       tr("Cylinder"), this);
-  this->cylinderCreateAct->setStatusTip(tr("Create a sphere"));
-  this->cylinderCreateAct->setCheckable(true);
-  connect(this->cylinderCreateAct, SIGNAL(triggered()), this,
+  g_cylinderCreateAct->setStatusTip(tr("Create a sphere"));
+  g_cylinderCreateAct->setCheckable(true);
+  connect(g_cylinderCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateCylinder()));
 
-  this->meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
+  g_meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
       tr("Mesh"), this);
-  this->meshCreateAct->setStatusTip(tr("Create a mesh"));
-  this->meshCreateAct->setCheckable(true);
-  connect(this->meshCreateAct, SIGNAL(triggered()), this,
+  g_meshCreateAct->setStatusTip(tr("Create a mesh"));
+  g_meshCreateAct->setCheckable(true);
+  connect(g_meshCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateMesh()));
 
 
-  this->pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
+  g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
-  this->pointLghtCreateAct->setStatusTip(tr("Create a point light"));
-  this->pointLghtCreateAct->setCheckable(true);
-  connect(this->pointLghtCreateAct, SIGNAL(triggered()), this,
+  g_pointLghtCreateAct->setStatusTip(tr("Create a point light"));
+  g_pointLghtCreateAct->setCheckable(true);
+  connect(g_pointLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreatePointLight()));
 
-  this->spotLghtCreateAct = new QAction(QIcon(":/images/spotlight.png"),
+  g_spotLghtCreateAct = new QAction(QIcon(":/images/spotlight.png"),
       tr("Spot Light"), this);
-  this->spotLghtCreateAct->setStatusTip(tr("Create a spot light"));
-  this->spotLghtCreateAct->setCheckable(true);
-  connect(this->spotLghtCreateAct, SIGNAL(triggered()), this,
+  g_spotLghtCreateAct->setStatusTip(tr("Create a spot light"));
+  g_spotLghtCreateAct->setCheckable(true);
+  connect(g_spotLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateSpotLight()));
 
-  this->dirLghtCreateAct = new QAction(QIcon(":/images/directionallight.png"),
+  g_dirLghtCreateAct = new QAction(QIcon(":/images/directionallight.png"),
       tr("Directional Light"), this);
-  this->dirLghtCreateAct->setStatusTip(tr("Create a directional light"));
-  this->dirLghtCreateAct->setCheckable(true);
-  connect(this->dirLghtCreateAct, SIGNAL(triggered()), this,
+  g_dirLghtCreateAct->setStatusTip(tr("Create a directional light"));
+  g_dirLghtCreateAct->setCheckable(true);
+  connect(g_dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
 
-  this->viewResetAct = new QAction(tr("Reset View"), this);
-  this->viewResetAct->setStatusTip(tr("Move camera to origin"));
-  connect(this->viewResetAct, SIGNAL(triggered()), this,
+  g_viewResetAct = new QAction(tr("Reset View"), this);
+  g_viewResetAct->setStatusTip(tr("Move camera to origin"));
+  connect(g_viewResetAct, SIGNAL(triggered()), this,
       SLOT(ViewReset()));
 
-  this->viewGridAct = new QAction(tr("Grid"), this);
-  this->viewGridAct->setStatusTip(tr("View Grid"));
-  this->viewGridAct->setCheckable(true);
-  this->viewGridAct->setChecked(true);
-  connect(this->viewGridAct, SIGNAL(triggered()), this,
+  g_viewGridAct = new QAction(tr("Grid"), this);
+  g_viewGridAct->setStatusTip(tr("View Grid"));
+  g_viewGridAct->setCheckable(true);
+  g_viewGridAct->setChecked(true);
+  connect(g_viewGridAct, SIGNAL(triggered()), this,
           SLOT(ViewGrid()));
 
-  this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
-  this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
-  connect(this->viewFullScreenAct, SIGNAL(triggered()), this,
+  g_viewFullScreenAct = new QAction(tr("Full Screen"), this);
+  g_viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
+  connect(g_viewFullScreenAct, SIGNAL(triggered()), this,
       SLOT(ViewFullScreen()));
 
-  this->viewFPSAct = new QAction(tr("FPS View Control"), this);
-  this->viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
-  connect(this->viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
+  g_viewFPSAct = new QAction(tr("FPS View Control"), this);
+  g_viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
+  connect(g_viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
 
-  this->viewOrbitAct = new QAction(tr("Orbit View Control"), this);
-  this->viewOrbitAct->setStatusTip(tr("Orbit View Style"));
-  connect(this->viewOrbitAct, SIGNAL(triggered()), this, SLOT(ViewOrbit()));
+  g_viewOrbitAct = new QAction(tr("Orbit View Control"), this);
+  g_viewOrbitAct->setStatusTip(tr("Orbit View Style"));
+  connect(g_viewOrbitAct, SIGNAL(triggered()), this, SLOT(ViewOrbit()));
 }
 
 /////////////////////////////////////////////////
@@ -656,60 +656,41 @@ void MainWindow::CreateMenus()
   this->setMenuWidget(frame);
 
   this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  this->fileMenu->addAction(this->openAct);
-  this->fileMenu->addAction(this->importAct);
-  this->fileMenu->addAction(this->newAct);
-  this->fileMenu->addAction(this->saveAct);
-  this->fileMenu->addAction(this->saveAsAct);
+  this->fileMenu->addAction(g_openAct);
+  this->fileMenu->addAction(g_importAct);
+  this->fileMenu->addAction(g_newAct);
+  this->fileMenu->addAction(g_saveAct);
+  this->fileMenu->addAction(g_saveAsAct);
   this->fileMenu->addSeparator();
-  this->fileMenu->addAction(this->quitAct);
+  this->fileMenu->addAction(g_quitAct);
 
   this->editMenu = this->menuBar->addMenu(tr("&Edit"));
-  this->editMenu->addAction(this->resetModelsAct);
-  this->editMenu->addAction(this->resetWorldAct);
-  this->editMenu->addAction(this->editWorldPropertiesAct);
+  this->editMenu->addAction(g_resetModelsAct);
+  this->editMenu->addAction(g_resetWorldAct);
+  this->editMenu->addAction(g_editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
-  this->viewMenu->addAction(this->viewGridAct);
+  this->viewMenu->addAction(g_viewGridAct);
   this->viewMenu->addSeparator();
-  this->viewMenu->addAction(this->viewResetAct);
-  this->viewMenu->addAction(this->viewFullScreenAct);
+  this->viewMenu->addAction(g_viewResetAct);
+  this->viewMenu->addAction(g_viewFullScreenAct);
   this->viewMenu->addSeparator();
-  this->viewMenu->addAction(this->viewFPSAct);
-  this->viewMenu->addAction(this->viewOrbitAct);
+  this->viewMenu->addAction(g_viewFPSAct);
+  this->viewMenu->addAction(g_viewOrbitAct);
 
   this->menuBar->addSeparator();
 
   this->helpMenu = this->menuBar->addMenu(tr("&Help"));
-  this->helpMenu->addAction(this->aboutAct);
+  this->helpMenu->addAction(g_aboutAct);
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateToolbars()
 {
   this->playToolbar = this->addToolBar(tr("Play"));
-  this->playToolbar->addAction(this->playAct);
-  this->playToolbar->addAction(this->pauseAct);
-  this->playToolbar->addAction(this->stepAct);
-
-  /*QActionGroup *actionGroup = new QActionGroup(this);
-  this->mouseToolbar = this->addToolBar(tr("Mouse"));
-  actionGroup->addAction(g_arrowAct);
-  actionGroup->addAction(g_ringPoseAct);
-  this->mouseToolbar->addAction(g_arrowAct);
-  this->mouseToolbar->addAction(g_ringPoseAct);
-  */
-
-  /*this->editToolbar = this->addToolBar(tr("Edit"));
-  this->editToolbar->addAction(this->boxCreateAct);
-  this->editToolbar->addAction(this->sphereCreateAct);
-  this->editToolbar->addAction(this->cylinderCreateAct);
-  // this->editToolbar->addAction(this->meshCreateAct);
-  this->editToolbar->addSeparator();
-  this->editToolbar->addAction(this->pointLghtCreateAct);
-  this->editToolbar->addAction(this->spotLghtCreateAct);
-  this->editToolbar->addAction(this->dirLghtCreateAct);
-  */
+  this->playToolbar->addAction(g_playAct);
+  this->playToolbar->addAction(g_pauseAct);
+  this->playToolbar->addAction(g_stepAct);
 }
 
 /////////////////////////////////////////////////
@@ -717,13 +698,13 @@ void MainWindow::OnMoveMode(bool _mode)
 {
   if (_mode)
   {
-    this->boxCreateAct->setChecked(false);
-    this->sphereCreateAct->setChecked(false);
-    this->cylinderCreateAct->setChecked(false);
-    this->meshCreateAct->setChecked(false);
-    this->pointLghtCreateAct->setChecked(false);
-    this->spotLghtCreateAct->setChecked(false);
-    this->dirLghtCreateAct->setChecked(false);
+    g_boxCreateAct->setChecked(false);
+    g_sphereCreateAct->setChecked(false);
+    g_cylinderCreateAct->setChecked(false);
+    g_meshCreateAct->setChecked(false);
+    g_pointLghtCreateAct->setChecked(false);
+    g_spotLghtCreateAct->setChecked(false);
+    g_dirLghtCreateAct->setChecked(false);
   }
 }
 
@@ -899,15 +880,15 @@ void MainWindow::OnManipMode(const std::string &_mode)
 /////////////////////////////////////////////////
 void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  if (_msg->paused() && this->playAct->isChecked())
+  if (_msg->paused() && g_playAct->isChecked())
   {
-    this->playAct->setChecked(false);
-    this->pauseAct->setChecked(true);
+    g_playAct->setChecked(false);
+    g_pauseAct->setChecked(true);
   }
-  else if (!_msg->paused() && !this->playAct->isChecked())
+  else if (!_msg->paused() && !g_playAct->isChecked())
   {
-    this->playAct->setChecked(true);
-    this->pauseAct->setChecked(false);
+    g_playAct->setChecked(true);
+    g_pauseAct->setChecked(false);
   }
 }
 

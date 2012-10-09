@@ -62,17 +62,19 @@ QDockWidget::title
 
 QToolBar
 {
-  background-color: #202020;
-  margin: 4px;
-  padding: 2px;
-  border: 1px solid #404040;
-  border-radius: 10px;
+  /*background-color: #202020;*/
+  padding: 0px;
+  margin: 0px;
+  margin-left: 20px;
+  border: 0px solid #404040;
+  border-radius: 0px;
 }
 
 QToolButton
 {
   padding: 2px;
   margin: 2px;
+  width: 20px;
           
   border-radius: 8px;
   border: 1px solid #202020;
@@ -356,6 +358,8 @@ QWidget#jointControl > QFrame
 
 QWidget#renderWidget > QWidget
 {
+  padding: 0px;
+  margin: 0px;
   border: 1px solid #202020;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -364,7 +368,6 @@ QWidget#renderWidget > QWidget
 
   background-color: #202020;
   margin-right: 10px;
-  padding: 0px;
 }
 
 QWidget#timePanel 

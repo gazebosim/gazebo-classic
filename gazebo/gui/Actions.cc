@@ -19,3 +19,33 @@
 
 QAction *gazebo::gui::g_arrowAct = 0;
 QAction *gazebo::gui::g_ringPoseAct = 0;
+QAction *gazebo::gui::g_newAct = 0;
+QAction *gazebo::gui::g_openAct = 0;
+QAction *gazebo::gui::g_importAct = 0;
+QAction *gazebo::gui::g_saveAct = 0;
+QAction *gazebo::gui::g_saveAsAct = 0;
+QAction *gazebo::gui::g_aboutAct = 0;
+QAction *gazebo::gui::g_quitAct = 0;
+
+QAction *gazebo::gui::g_newModelAct = 0;
+QAction *gazebo::gui::g_resetModelsAct = 0;
+QAction *gazebo::gui::g_resetWorldAct = 0;
+QAction *gazebo::gui::g_editWorldPropertiesAct = 0;
+
+QAction *gazebo::gui::g_playAct = 0;
+QAction *gazebo::gui::g_pauseAct = 0;
+QAction *gazebo::gui::g_stepAct = 0;
+
+QAction *gazebo::gui::g_boxCreateAct = 0;
+QAction *gazebo::gui::g_sphereCreateAct = 0;
+QAction *gazebo::gui::g_cylinderCreateAct = 0;
+QAction *gazebo::gui::g_meshCreateAct = 0;
+QAction *gazebo::gui::g_pointLghtCreateAct = 0;
+QAction *gazebo::gui::g_spotLghtCreateAct = 0;
+QAction *gazebo::gui::g_dirLghtCreateAct = 0;
+
+QAction *gazebo::gui::g_viewGridAct = 0;
+QAction *gazebo::gui::g_viewResetAct = 0;
+QAction *gazebo::gui::g_viewFullScreenAct = 0;
+QAction *gazebo::gui::g_viewFPSAct = 0;
+QAction *gazebo::gui::g_viewOrbitAct = 0;

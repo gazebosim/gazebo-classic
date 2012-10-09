@@ -24,6 +24,37 @@ namespace gazebo
 {
   namespace gui
   {
+    extern QAction *g_newAct;
+    extern QAction *g_openAct;
+    extern QAction *g_importAct;
+    extern QAction *g_saveAct;
+    extern QAction *g_saveAsAct;
+    extern QAction *g_aboutAct;
+    extern QAction *g_quitAct;
+
+    extern QAction *g_newModelAct;
+    extern QAction *g_resetModelsAct;
+    extern QAction *g_resetWorldAct;
+    extern QAction *g_editWorldPropertiesAct;
+
+    extern QAction *g_playAct;
+    extern QAction *g_pauseAct;
+    extern QAction *g_stepAct;
+
+    extern QAction *g_boxCreateAct;
+    extern QAction *g_sphereCreateAct;
+    extern QAction *g_cylinderCreateAct;
+    extern QAction *g_meshCreateAct;
+    extern QAction *g_pointLghtCreateAct;
+    extern QAction *g_spotLghtCreateAct;
+    extern QAction *g_dirLghtCreateAct;
+
+    extern QAction *g_viewGridAct;
+    extern QAction *g_viewResetAct;
+    extern QAction *g_viewFullScreenAct;
+    extern QAction *g_viewFPSAct;
+    extern QAction *g_viewOrbitAct;
+
     extern QAction *g_arrowAct;
     extern QAction *g_ringPoseAct;
   }

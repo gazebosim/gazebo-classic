@@ -104,37 +104,6 @@ namespace gazebo
       private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
 
-      private: QAction *newAct;
-      private: QAction *openAct;
-      private: QAction *importAct;
-      private: QAction *saveAct;
-      private: QAction *saveAsAct;
-      private: QAction *aboutAct;
-      private: QAction *quitAct;
-
-      private: QAction *newModelAct;
-      private: QAction *resetModelsAct;
-      private: QAction *resetWorldAct;
-      private: QAction *editWorldPropertiesAct;
-
-      private: QAction *playAct;
-      private: QAction *pauseAct;
-      private: QAction *stepAct;
-
-      private: QAction *boxCreateAct;
-      private: QAction *sphereCreateAct;
-      private: QAction *cylinderCreateAct;
-      private: QAction *meshCreateAct;
-      private: QAction *pointLghtCreateAct;
-      private: QAction *spotLghtCreateAct;
-      private: QAction *dirLghtCreateAct;
-
-      private: QAction *viewGridAct;
-      private: QAction *viewResetAct;
-      private: QAction *viewFullScreenAct;
-      private: QAction *viewFPSAct;
-      private: QAction *viewOrbitAct;
-
       private: RenderWidget *renderWidget;
 
       private: transport::NodePtr node;

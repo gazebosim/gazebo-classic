@@ -158,6 +158,8 @@ if (PKG_CONFIG_FOUND)
                   OUTPUT_VARIABLE OGRE_VERSION)
   string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
+  message (STATUS "VERSION||${OGRE_VERSION}||")
+
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
 
