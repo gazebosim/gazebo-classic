@@ -203,7 +203,14 @@ configure_file(
 add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
+add_subdirectory(doc)
+
 if (build_errors)
+
+  # Create a Makefile that allows doxygen to run
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Makefile
+       "doc: gazebo.dox\n\tdoxygen $<\n\n")
+
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
@@ -226,7 +233,6 @@ else (build_errors)
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
-  add_subdirectory(doc)
 
   if (BUILD_GAZEBO)
     add_subdirectory(gazebo)
