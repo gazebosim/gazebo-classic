@@ -94,7 +94,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 
       // Iterate over all the models in the current gazebo path
       for (std::vector<boost::filesystem::path>::iterator dIter = paths.begin();
-          dIter != paths.end(); ++dIter)
+           dIter != paths.end(); ++dIter)
       {
         // This is for boost::filesystem version 3+
         std::string modelName;
@@ -166,17 +166,19 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
   {
     std::string path, manifest, filename;
 
-    QApplication::setOverrideCursor(Qt::BusyCursor);
-
     if (_item->parent())
       path = _item->parent()->text(0).toStdString() + "/";
 
     path = _item->data(0, Qt::UserRole).toString().toStdString();
 
-    filename = common::ModelDatabase::GetModelFile(path);
-    gui::Events::createEntity("model", filename);
+    if (!path.empty())
+    {
+      QApplication::setOverrideCursor(Qt::BusyCursor);
+      filename = common::ModelDatabase::GetModelFile(path);
+      gui::Events::createEntity("model", filename);
 
-    this->fileTreeWidget->clearSelection();
-    QApplication::setOverrideCursor(Qt::ArrowCursor);
+      this->fileTreeWidget->clearSelection();
+      QApplication::setOverrideCursor(Qt::ArrowCursor);
+    }
   }
 }
