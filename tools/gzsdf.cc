@@ -29,6 +29,8 @@ void help()
   std::cout << "gzsdf <command>\n\n";
   std::cout << "Commands:\n";
   std::cout << "    describe [SDF version]     Print the SDF format.\n";
+  std::cout << "    convert [file]             "
+            << "In place conversion to the latest format.\n";
   std::cout << "    doc [SDF version]          Print HTML SDF.\n";
   std::cout << "    check [file] [SDF version] Check the SDF format for the";
   std::cout << " given file.\n";
