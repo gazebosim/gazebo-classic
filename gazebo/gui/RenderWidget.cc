@@ -20,9 +20,11 @@
 #include "rendering/Rendering.hh"
 #include "rendering/Scene.hh"
 
+#include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/GLWidget.hh"
 #include "gui/GuiEvents.hh"
+#include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 
 using namespace gazebo;
@@ -44,12 +46,67 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->mainFrame->show();
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->setContentsMargins(0, 0, 0, 0);
+
+  QFrame *toolFrame = new QFrame;
+  QToolBar *toolbar = new QToolBar;
+  QHBoxLayout *toolLayout = new QHBoxLayout;
+  toolLayout->setContentsMargins(0, 0, 0, 0);
+  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+  QActionGroup *actionGroup = new QActionGroup(toolFrame);
+  actionGroup->addAction(g_arrowAct);
+  actionGroup->addAction(g_ringPoseAct);
+  toolbar->addAction(g_arrowAct);
+  toolbar->addAction(g_ringPoseAct);
+
+  toolbar->addSeparator();
+  toolbar->addAction(g_boxCreateAct);
+  toolbar->addAction(g_sphereCreateAct);
+  toolbar->addAction(g_cylinderCreateAct);
+  toolbar->addSeparator();
+  toolbar->addAction(g_pointLghtCreateAct);
+  toolbar->addAction(g_spotLghtCreateAct);
+  toolbar->addAction(g_dirLghtCreateAct);
+
+  toolLayout->addSpacing(10);
+  toolLayout->addWidget(toolbar);
+  toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
+
+  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
+
+  TimePanel *timePanel = new TimePanel(this);
+
+  QHBoxLayout *playControlLayout = new QHBoxLayout;
+  playControlLayout->setContentsMargins(0, 0, 0, 0);
+  QFrame *playFrame = new QFrame;
+  QToolBar *playToolbar = new QToolBar;
+  playFrame->setFrameShape(QFrame::NoFrame);
+  playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+  playToolbar->addAction(g_playAct);
+  playToolbar->addAction(g_pauseAct);
+  playToolbar->addAction(g_stepAct);
+  playControlLayout->addWidget(playToolbar);
+  playFrame->setLayout(playControlLayout);
+
+  bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
+                             QSizePolicy::Minimum));
+  bottomPanelLayout->addWidget(playFrame, 0);
+  bottomPanelLayout->addWidget(timePanel, 0);
+  bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
+                             QSizePolicy::Minimum));
+  bottomPanelLayout->setSpacing(0);
+
+  frameLayout->addSpacing(4);
+  frameLayout->addWidget(toolFrame);
+  frameLayout->addSpacing(4);
   frameLayout->addWidget(this->glWidget);
+  frameLayout->addLayout(bottomPanelLayout);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frameLayout->setSpacing(0);
 
   this->mainFrame->setLayout(frameLayout);
   this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);

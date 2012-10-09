@@ -1,22 +1,23 @@
 QMainWindow
 {
-  background-color: #5d5d5d;
-  background-image: url(:/images/mainwindow_bg.png);
-  background-repeat: repeat-xy;
+  background-color: #dddddd;
+  /*background-image: url(:/images/mainwindow_bg.png);*/
+  /*background-repeat: repeat-xy;*/
+  margin: 22px;
 }
 
 QMenuBar
 {
-  background-color: #202020;
+  background-color: #dddddd;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 10px;
-  border: 1px solid #404040;
+  border: 0px solid #404040;
 }
 
 QMenuBar::item
 {
   color: #808080;
-  background: #202020;
+  background-color: #dddddd;
   margin-top: 2px;
   margin-bottom: 2px;
   margin-left: 4px;
@@ -36,7 +37,8 @@ QMenuBar::item:selected
 QMenu
 {
   color: #808080;
-  background-color: #202020;
+  background-color: #dddddd;
+  border: 1px solid #adadad;
 }
 
 QMenu::item:selected
@@ -61,21 +63,21 @@ QDockWidget::title
 
 QToolBar
 {
-  background-color: #202020;
-  margin: 4px;
-  padding: 2px;
-  border: 1px solid #404040;
-  border-radius: 10px;
+  padding: 0px;
+  margin: 0px;
+  margin-left: 20px;
+  border: 0px solid #404040;
+  border-radius: 0px;
 }
 
 QToolButton
 {
   padding: 2px;
   margin: 2px;
+  width: 20px;
           
   border-radius: 8px;
-  border: 1px solid #202020;
-  background-color: #202020;
+  border: 0px solid #909090;
 }
 
 
@@ -99,7 +101,8 @@ QToolButton:checked
 
 QLabel
 {
-  color: #808080;
+  /*color: #808080;*/
+  color: #f0f0f0;
 }
 
 QListView
@@ -216,7 +219,7 @@ QScrollBar:vertical
 {
   border: 1px solid #909090;
   border-radius: 5px;
-  background: #202020;
+  background: #9d9d9d;
   width: 10px;
   margin: 22px 0 22px 0;
 }
@@ -260,21 +263,29 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 
 QPushButton#collapseButton
 {
-  border:0px;
-  border-radius: 0px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+
+  border: 0px solid #9d9d9d;
+
+  /*border-radius: 0px;*/
   padding: 0px;
   margin: 0px;
-  background: #202020;
+  background: #9d9d9d;
   font-size: 20px;
   font-weight: 100;
   text-align: center;
+  margin-right: 12px;
 }
 
 QTreeView#mainTree
 {
-  background: #202020;
-  border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
+  background: #9d9d9d;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -282,7 +293,7 @@ QTreeView#mainTree
 
   margin-left: 10px;
   padding: 0px;
-  color: #808080;
+  color: #f0f0f0;
   font-size: 20px;
   font-weight: 100;
   text-align: center;
@@ -296,7 +307,7 @@ QTreeView#mainTree::item
   padding-bottom: 0px;
   margin: 0px;
   text-align: center;
-  background: #202020;
+  background: #9d9d9d;
 }
 
 QTreeView#mainTree::item:hover
@@ -304,14 +315,14 @@ QTreeView#mainTree::item:hover
   color: #f58113;
   font-weight: 900;
   text-align: center;
-  background: #202020;
+  background: #9d9d9d;
 }
 
 QTreeView#mainTree::item:selected
 {
   color: #f58113;
   font-weight: bold;
-  background: #202020;
+  background: #9d9d9d;
 }
 
 QTreeView#mainTree::branch:has-children:!has-siblings:closed,
@@ -329,7 +340,7 @@ QWidget#insertModel,
 QWidget#sky,
 QWidget#jointControl
 {
-  background: #202020;
+  background: #9d9d9d;
 }
 
 
@@ -342,20 +353,21 @@ QWidget#jointControl > QFrame
   margin-left: 8px;
   padding: 4px;
   border-left: 1px solid #4763b7;
-  background: #202020;
+  background: #9d9d9d;
 }
 
 QWidget#renderWidget > QWidget
 {
-  border: 1px solid #202020;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
+  padding: 0px;
+  margin: 0px;
+  border: 1px solid #9d9d9d;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 
-  background-color: #202020;
+  background-color: #9d9d9d;
   margin-right: 10px;
-  padding: 4px;
 }
 
 QWidget#timePanel 
@@ -364,11 +376,12 @@ QWidget#timePanel
 
 QWidget#timePanel > QFrame
 {
-  border: 1px solid #404040;
+/*  border: 1px solid #404040;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  background-color: #202020;
+  background-color: #9d9d9d;
   padding-left: 4px;
   padding-top: 4px;
   padding-right: 4px;
+  */
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MAINWINDOW_HH
-#define MAINWINDOW_HH
+#ifndef _MAINWINDOW_HH_
+#define _MAINWINDOW_HH_
 
 #include <map>
 #include <string>
@@ -31,7 +31,6 @@ namespace gazebo
   namespace gui
   {
     class RenderWidget;
-    class TimePanel;
     class GLWidget;
 
     class WorldPropertiesWidget;
@@ -104,44 +103,7 @@ namespace gazebo
       private: QMenu *viewMenu;
       private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
-      private: QToolBar *mouseToolbar;
-      private: QToolBar *editToolbar;
 
-      private: QAction *newAct;
-      private: QAction *openAct;
-      private: QAction *importAct;
-      private: QAction *saveAct;
-      private: QAction *saveAsAct;
-      private: QAction *aboutAct;
-      private: QAction *quitAct;
-
-      private: QAction *newModelAct;
-      private: QAction *resetModelsAct;
-      private: QAction *resetWorldAct;
-      private: QAction *editWorldPropertiesAct;
-
-      private: QAction *playAct;
-      private: QAction *pauseAct;
-      private: QAction *stepAct;
-
-      private: QAction *arrowAct;
-      private: QAction *ringPoseAct;
-
-      private: QAction *boxCreateAct;
-      private: QAction *sphereCreateAct;
-      private: QAction *cylinderCreateAct;
-      private: QAction *meshCreateAct;
-      private: QAction *pointLghtCreateAct;
-      private: QAction *spotLghtCreateAct;
-      private: QAction *dirLghtCreateAct;
-
-      private: QAction *viewGridAct;
-      private: QAction *viewResetAct;
-      private: QAction *viewFullScreenAct;
-      private: QAction *viewFPSAct;
-      private: QAction *viewOrbitAct;
-
-      private: TimePanel *timePanel;
       private: RenderWidget *renderWidget;
 
       private: transport::NodePtr node;

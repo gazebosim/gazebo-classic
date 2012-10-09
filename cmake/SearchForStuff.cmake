@@ -158,14 +158,7 @@ if (PKG_CONFIG_FOUND)
                   OUTPUT_VARIABLE OGRE_VERSION)
   string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
-  # There is a major problem with OGRE and Ubuntu. Ubuntu has instituted
-  # a multi-arch install policy (https://wiki.ubuntu.com/MultiarchSpec).
-  # But OGRE and cmake do not handle it very well. The FindOGRE.cmake file
-  # is not installed in a default search path, even if we forcibly find the 
-  # FindOGRE.cmake file does not return correct paths. So, we are forced to
-  # use find_path to find where OGRE and its plugins are installed.
-  find_path(OGRE_LIBRARY_PATH libOgreMain.so /usr/lib /usr/local/lib
-            /usr/lib/x86_64-linux-gnu /usr/lib/i386-linux-gnu)
+  message (STATUS "VERSION||${OGRE_VERSION}||")
 
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
@@ -201,6 +194,16 @@ if (PKG_CONFIG_FOUND)
     set(ogre_libraries "${ogre_libraries};OgreTerrain;OgrePaging")
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
+
+  # There is a major problem with OGRE and Ubuntu. Ubuntu has instituted
+  # a multi-arch install policy (https://wiki.ubuntu.com/MultiarchSpec).
+  # But OGRE and cmake do not handle it very well. The FindOGRE.cmake file
+  # is not installed in a default search path, even if we forcibly find the 
+  # FindOGRE.cmake file does not return correct paths. So, we are forced to
+  # use find_path to find where OGRE and its plugins are installed.
+  find_path(OGRE_LIBRARY_PATH libOgreMain.so /usr/lib /usr/local/lib
+            /usr/lib/x86_64-linux-gnu /usr/lib/i386-linux-gnu
+            ${ogre_library_dirs})
 
   set(ogre_libraries "${ogre_libraries};OgreMain")
 
