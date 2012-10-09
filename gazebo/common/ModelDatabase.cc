@@ -69,9 +69,35 @@ std::string ModelDatabase::GetURI()
 }
 
 /////////////////////////////////////////////////
-std::map<std::string, std::string> ModelDatabase::GetModels()
+bool ModelDatabase::HasModel(const std::string &_modelURI)
 {
-  std::map<std::string, std::string> result;
+
+  std::string xmlString = ModelDatabase::GetManifest();
+  if (!xmlString.empty())
+  {
+    TiXmlDocument xmlDoc;
+    xmlDoc.Parse(xmlString.c_str());
+
+    TiXmlElement *modelsElem = xmlDoc.FirstChildElement("models");
+    TiXmlElement *modelElem;
+    for (modelElem = modelsElem->FirstChildElement("model"); modelElem != NULL;
+         modelElem = modelElem->NextSiblingElement("model"))
+    {
+      TiXmlElement *uriElem = modelElem->FirstChildElement("uri");
+      std::string uri = uriElem->GetText();
+      uri = "model:/" + uri;
+
+      if (uri == _modelURI)
+        return true;
+    }
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+std::string ModelDatabase::GetManifest()
+{
   std::string xmlString;
 
   std::string uriStr = ModelDatabase::GetURI();
@@ -89,11 +115,21 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     if (success != CURLE_OK)
     {
       gzwarn << "Unable to connect to model database using [" << uriStr
-             << "]. Only locally installed models will be available.";
+        << "]. Only locally installed models will be available.";
     }
 
     curl_easy_cleanup(curl);
   }
+
+  return xmlString;
+}
+
+/////////////////////////////////////////////////
+std::map<std::string, std::string> ModelDatabase::GetModels()
+{
+  std::map<std::string, std::string> result;
+  std::string xmlString = ModelDatabase::GetManifest();
+  std::string uriStr = ModelDatabase::GetURI();
 
   if (!xmlString.empty())
   {
@@ -122,6 +158,12 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
 
   if (path.empty() || stat(path.c_str(), &st) != 0 )
   {
+    if (!ModelDatabase::HasModel(_uri))
+    {
+      gzerr << "Unable to download model[" << _uri << "]\n";
+      return std::string();
+    }
+
     // DEBUG output
     // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
 
