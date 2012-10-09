@@ -611,7 +611,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
   TiXmlElement *gazebo_geometry = new TiXmlElement("geometry");
 
   std::string type;
-  TiXmlElement *geometry_type;
+  TiXmlElement *geometry_type = NULL;
 
   switch (geometry->type)
   {
@@ -690,9 +690,11 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
     break;
   }
 
-  gazebo_geometry->LinkEndChild(geometry_type);
-
-  elem->LinkEndChild(gazebo_geometry);
+  if(geometry_type)
+  {
+    gazebo_geometry->LinkEndChild(geometry_type);
+    elem->LinkEndChild(gazebo_geometry);
+  }
 }
 
 
