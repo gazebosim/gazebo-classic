@@ -36,6 +36,8 @@ namespace gazebo
   class Collision;
   class MultiRayShape;
 
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     /// \class RaySensor RaySensor.hh sensors/sensors.hh

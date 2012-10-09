@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,12 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
-  // \brief Prototype for sensor factory functions
+  /// \def Sensor 
+  /// \brief Prototype for sensor factory functions
   typedef Sensor* (*SensorFactoryFn) ();
 
   /// \addtogroup gazebo_sensors

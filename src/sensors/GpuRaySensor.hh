@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
@@ -61,7 +63,7 @@ namespace gazebo
       /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName);
 
-      /// Initialize the ray
+      /// \brief Initialize the ray
       public: virtual void Init();
 
       /// \brief Update the sensor information
@@ -81,16 +83,16 @@ namespace gazebo
       public: math::Angle GetAngleMin() const;
 
       /// \brief Set the scan minimum angle
-      /// \param The minimum angle
-      public: void SetAngleMin(double angle);
+      /// \param[in] _angle The minimum angle
+      public: void SetAngleMin(double _angle);
 
       /// \brief Get the maximum angle
       /// \return the maximum angle
       public: math::Angle GetAngleMax() const;
 
       /// \brief Set the scan maximum angle
-      /// \param The maximum angle
-      public: void SetAngleMax(double angle);
+      /// \param[in] _angle The maximum angle
+      public: void SetAngleMax(double _angle);
 
       /// \brief Get radians between each range
       public: double GetAngleResolution() const;
@@ -128,22 +130,22 @@ namespace gazebo
       public: math::Angle GetVerticalAngleMin() const;
 
       /// \brief Set the vertical scan bottom angle
-      /// \param[in] The minimum angle of the scan block
-      public: void SetVerticalAngleMin(double angle);
+      /// \param[in] _angle The minimum angle of the scan block
+      public: void SetVerticalAngleMin(double _angle);
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
       public: math::Angle GetVerticalAngleMax() const;
 
       /// \brief Set the vertical scan line top angle
-      /// \param The Maximum angle of the scan block
-      public: void SetVerticalAngleMax(double angle);
+      /// \param[in] _angle The Maximum angle of the scan block
+      public: void SetVerticalAngleMax(double _angle);
 
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of
-      ///         your aceess loop. This means some data will come from one
+      ///         your access loop. This means some data will come from one
       ///         scan, and some from another scan. You can solve this
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).

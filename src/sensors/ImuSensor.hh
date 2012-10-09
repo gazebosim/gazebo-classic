@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     /// \TODO This class inherits from Sensor, but looks like it specifically 
@@ -37,14 +39,14 @@ namespace gazebo
     class ImuSensor: public Sensor
     {
       /// \brief Constructor
-      /// \param body The IMU sensor must be attached to a body.
+      /// \param _body The IMU sensor must be attached to a body.
       public: ImuSensor(Body *_body);
 
       /// \brief Destructor
       public: virtual ~ImuSensor();
 
       /// \brief Load the ImuSensor from XMLConfigNode
-      /// \param node The XMLConfig node
+      /// \param _node The XMLConfig node
       protected: virtual void LoadChild(XMLConfigNode *_node);
 
       /// \brief Save the sensor info in XML format

@@ -1,4 +1,4 @@
-/* Copyright (C)
+/* Copyright (C) 2012
  *     Jonas Mellin & Zakiruz Zaman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,12 +27,27 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
+
+    /// \addtogroup gazebo_sensors
+    /// \{
+    /// \class RFIDTagManager RFIDTagManager.hh sensors/sensors.hh
+    /// \brief 
+    /// \TODO Nate fill in
     class RFIDTagManager : public SingletonT<RFIDTagManager>
     {
+
+      /// \brief Adds tag model
+      /// \param _model Tagged model to add
+      /// \TODO Nate check
       public: void AddTaggedModel(RFIDTag *_model);
 
+      /// \brief Gets vector of tagged models
+      /// \return vector of RFIDTag, the tagged models
+      /// \TODO Nate check
       public: std::vector<RFIDTag*> GetTags()
               {return this->taggedModels;}
 

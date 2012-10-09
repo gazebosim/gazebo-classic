@@ -38,6 +38,8 @@
 /// \TODO Nate check this base class and I can propogate changes to subclasses
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     
@@ -129,7 +131,7 @@ namespace gazebo
       public: std::string GetWorldName() const;
 
       /// \brief Load a plugin for this sensor
-      /// \param _sdf SDF parameters
+      /// \param[in] _sdf SDF parameters
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       /// \brief True if active

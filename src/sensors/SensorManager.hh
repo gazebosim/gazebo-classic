@@ -34,6 +34,8 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
@@ -69,9 +71,9 @@ namespace gazebo
 
       /// \brief Add a sensor from an SDF element. This function will also Load
       /// and Init the sensor.
-      /// \param _elem The SDF element that describes the sensor
-      /// \param _worldName Name of the world in which to create the sensor
-      /// \param _parentName The name of the parent link which the sensor is
+      /// \param[in] _elem The SDF element that describes the sensor
+      /// \param[in] _worldName Name of the world in which to create the sensor
+      /// \param[in] _parentName The name of the parent link which the sensor is
       /// attached to.
       /// \return The name of the sensor
       public: std::string CreateSensor(sdf::ElementPtr _elem,

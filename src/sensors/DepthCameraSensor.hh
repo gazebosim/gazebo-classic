@@ -49,7 +49,7 @@ namespace gazebo
       public: virtual ~DepthCameraSensor();
 
       /// \brief Set the parent of the sensor
-      /// \param[in] Name of parent
+      /// \param[in] _name Name of parent
       public: virtual void SetParent(const std::string &_name);
 
       /// \brief Load the sensor with SDF parameters
@@ -73,8 +73,8 @@ namespace gazebo
       protected: virtual void Fini();
 
       /// \brief Set whether the sensor is active or not
-      /// \param[in] value True if active, false if not
-      public: virtual void SetActive(bool value);
+      /// \param[in] _value True if active, false if not
+      public: virtual void SetActive(bool _value);
 
       /// \brief Returns Depth Camera Pointer
       /// \return Depth Camera pointer
@@ -87,6 +87,7 @@ namespace gazebo
       public: bool SaveFrame(const std::string &_filename);
 
       /// \brief 
+      /// \param[in] _msg
       /// \TODO nate fill in
       private: void OnPose(ConstPosePtr &_msg);
 

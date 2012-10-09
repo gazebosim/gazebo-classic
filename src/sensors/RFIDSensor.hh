@@ -1,4 +1,4 @@
-/* Copyright (C)
+/* Copyright (C) 2012
  *     Jonas Mellin & Zakiruz Zaman
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     
