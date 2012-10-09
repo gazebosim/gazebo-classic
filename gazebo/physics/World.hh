@@ -427,8 +427,21 @@ namespace gazebo
       private: boost::mutex *loadModelMutex;
 
       /// TODO: Add an accessor for this, and make it private
-      /// lock all pose updates when worldPose is being updated for a model
-      public: boost::recursive_mutex *setWorldPoseMutex;
+      /// Used in Entity.cc.
+      ///   Entity::Reset to call Entity::SetWorldPose and
+      ///     Entity::SetRelativePose
+      ///   Entity::SetWorldPose to call Entity::setWorldPoseFunc
+      private: boost::mutex *setWorldPoseMutex;
+
+      public: boost::mutex *GetSetWorldPoseMutex() const
+        { return this->setWorldPoseMutex; };
+
+      /// Used by World classs in following calls:
+      ///   World::Step for then entire function
+      ///   World::StepWorld for changing World::stepInc,
+      ///     and waits on setpInc on World::stepIhc as it's decremented.
+      ///   World::Reset while World::ResetTime, entities, World::physicsEngine
+      ///   World::SetPuased to assign world::pause
       private: boost::recursive_mutex *worldUpdateMutex;
 
       private: sdf::ElementPtr sdf;
