@@ -12,6 +12,7 @@ add_subdirectory(qtpropertybrowser)
 set (sources
   main.cc 
   ../gazebo.cc
+  Actions.cc
   Gui.cc 
   MainWindow.cc 
   RenderWidget.cc 
@@ -52,17 +53,19 @@ set (qt_headers
   SkyWidget.hh
 )
 
-set (headers Gui.hh
-             EntityMaker.hh
-             BoxMaker.hh
-             SphereMaker.hh
-             CylinderMaker.hh
-             MeshMaker.hh
-             ModelMaker.hh
-             GuiEvents.hh
-             LightMaker.hh
-             qt.h
-)
+set (headers
+  Actions.hh
+  Gui.hh
+  EntityMaker.hh
+  BoxMaker.hh
+  SphereMaker.hh
+  CylinderMaker.hh
+  MeshMaker.hh
+  ModelMaker.hh
+  GuiEvents.hh
+  LightMaker.hh
+  qt.h
+  )
 
 set (resources resources.qrc)
 

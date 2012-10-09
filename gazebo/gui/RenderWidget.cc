@@ -20,9 +20,11 @@
 #include "rendering/Rendering.hh"
 #include "rendering/Scene.hh"
 
+#include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/GLWidget.hh"
 #include "gui/GuiEvents.hh"
+#include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 
 using namespace gazebo;
@@ -46,10 +48,35 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QVBoxLayout *frameLayout = new QVBoxLayout;
   frameLayout->setContentsMargins(0, 0, 0, 0);
 
+  QFrame *toolFrame = new QFrame;
+  QToolBar *toolbar = new QToolBar;
+  QHBoxLayout *toolLayout = new QHBoxLayout;
+  toolLayout->setContentsMargins(0, 0, 0, 0);
+  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+  QActionGroup *actionGroup = new QActionGroup(toolFrame);
+  actionGroup->addAction(g_arrowAct);
+  actionGroup->addAction(g_ringPoseAct);
+  toolbar->addAction(g_arrowAct);
+  toolbar->addAction(g_ringPoseAct);
+
+
+  toolLayout->addWidget(toolbar);
+  toolFrame->setLayout(toolLayout);
+  frameLayout->addWidget(toolFrame);
+
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   frameLayout->addWidget(this->glWidget);
+
+  QHBoxLayout *timePanelLayout = new QHBoxLayout;
+  TimePanel *timePanel = new TimePanel(this);
+  timePanelLayout->addSpacing(5);
+  timePanelLayout->addWidget(timePanel);
+  timePanelLayout->addSpacing(5);
+
+ frameLayout->addLayout(timePanelLayout);
 
   this->mainFrame->setLayout(frameLayout);
   this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);

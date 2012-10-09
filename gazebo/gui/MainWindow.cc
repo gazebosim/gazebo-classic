@@ -25,13 +25,13 @@
 
 #include "rendering/UserCamera.hh"
 
+#include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
 #include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/LightListWidget.hh"
 #include "gui/WorldPropertiesWidget.hh"
-#include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
 #include "gui/MainWindow.hh"
@@ -75,13 +75,12 @@ MainWindow::MainWindow()
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
   this->CreateMenus();
-  this->CreateToolbars();
+  //this->CreateToolbars();
 
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
   this->setCentralWidget(mainWidget);
-  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
@@ -133,7 +132,6 @@ MainWindow::MainWindow()
   this->treeWidget->setItemWidget(subItem, 0, skyWidget);
 
   this->renderWidget = new RenderWidget(mainWidget);
-  this->timePanel = new TimePanel(mainWidget);
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -141,6 +139,7 @@ MainWindow::MainWindow()
   this->collapseButton->setObjectName("collapseButton");
   this->collapseButton->setSizePolicy(QSizePolicy::Fixed,
                                       QSizePolicy::Expanding);
+
   this->collapseButton->setFocusPolicy(Qt::NoFocus);
   connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
 
@@ -150,13 +149,7 @@ MainWindow::MainWindow()
   centerLayout->setContentsMargins(0, 0, 0, 0);
   centerLayout->setSpacing(0);
 
-  QHBoxLayout *timePanelLayout = new QHBoxLayout;
-  timePanelLayout->addSpacing(5);
-  timePanelLayout->addWidget(this->timePanel);
-  timePanelLayout->addSpacing(5);
-
   mainLayout->addLayout(centerLayout);
-  mainLayout->addLayout(timePanelLayout);
   mainWidget->setLayout(mainLayout);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
@@ -205,14 +198,12 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
   gazebo::stop();
   this->renderWidget->hide();
-  this->timePanel->hide();
   this->treeWidget->hide();
 
   this->connections.clear();
 
   delete this->worldPropertiesWidget;
   delete this->renderWidget;
-  delete this->timePanel;
 }
 
 /////////////////////////////////////////////////
@@ -371,49 +362,49 @@ void MainWindow::RingPose()
 /////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
-  this->arrowAct->setChecked(true);
+  g_arrowAct->setChecked(true);
   gui::Events::createEntity("box", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSphere()
 {
-  this->arrowAct->setChecked(true);
+  g_arrowAct->setChecked(true);
   gui::Events::createEntity("sphere", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateCylinder()
 {
-  this->arrowAct->setChecked(true);
+  g_arrowAct->setChecked(true);
   gui::Events::createEntity("cylinder", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateMesh()
 {
-  this->arrowAct->setChecked(true);
+  g_arrowAct->setChecked(true);
   gui::Events::createEntity("mesh", "mesh");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreatePointLight()
 {
-  this->arrowAct->setChecked(true);
+  g_arrowAct->setChecked(true);
   gui::Events::createEntity("pointlight", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateSpotLight()
 {
-  this->arrowAct->setChecked(true);
+  g_arrowAct->setChecked(true);
   gui::Events::createEntity("spotlight", "");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::CreateDirectionalLight()
 {
-  this->arrowAct->setChecked(true);
+  g_arrowAct->setChecked(true);
   gui::Events::createEntity("directionallight", "");
 }
 
@@ -431,10 +422,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->renderWidget->showFullScreen();
     this->treeWidget->hide();
     this->menuBar->hide();
-    this->playToolbar->hide();
-    this->editToolbar->hide();
-    this->mouseToolbar->hide();
-    this->timePanel->hide();
     this->collapseButton->hide();
   }
   else
@@ -443,10 +430,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->renderWidget->showNormal();
     this->treeWidget->show();
     this->menuBar->show();
-    this->playToolbar->show();
-    this->editToolbar->show();
-    this->mouseToolbar->show();
-    this->timePanel->show();
     this->collapseButton->show();
   }
 }
@@ -565,19 +548,19 @@ void MainWindow::CreateActions()
   connect(this->stepAct, SIGNAL(triggered()), this, SLOT(Step()));
 
 
-  this->arrowAct = new QAction(QIcon(":/images/arrow.png"),
+  g_arrowAct = new QAction(QIcon(":/images/arrow.png"),
       tr("Position object"), this);
-  this->arrowAct->setStatusTip(tr("Move camera"));
-  this->arrowAct->setCheckable(true);
-  this->arrowAct->setChecked(true);
-  connect(this->arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
+  g_arrowAct->setStatusTip(tr("Move camera"));
+  g_arrowAct->setCheckable(true);
+  g_arrowAct->setChecked(true);
+  connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
-  this->ringPoseAct = new QAction(QIcon(":/images/translate.png"),
+  g_ringPoseAct = new QAction(QIcon(":/images/translate.png"),
       tr("Position object"), this);
-  this->ringPoseAct->setStatusTip(tr("Position object"));
-  this->ringPoseAct->setCheckable(true);
-  this->ringPoseAct->setChecked(false);
-  connect(this->ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
+  g_ringPoseAct->setStatusTip(tr("Position object"));
+  g_ringPoseAct->setCheckable(true);
+  g_ringPoseAct->setChecked(false);
+  connect(g_ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
 
 
   this->boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
@@ -709,14 +692,15 @@ void MainWindow::CreateToolbars()
   this->playToolbar->addAction(this->pauseAct);
   this->playToolbar->addAction(this->stepAct);
 
-  QActionGroup *actionGroup = new QActionGroup(this);
+  /*QActionGroup *actionGroup = new QActionGroup(this);
   this->mouseToolbar = this->addToolBar(tr("Mouse"));
-  actionGroup->addAction(this->arrowAct);
-  actionGroup->addAction(this->ringPoseAct);
-  this->mouseToolbar->addAction(this->arrowAct);
-  this->mouseToolbar->addAction(this->ringPoseAct);
+  actionGroup->addAction(g_arrowAct);
+  actionGroup->addAction(g_ringPoseAct);
+  this->mouseToolbar->addAction(g_arrowAct);
+  this->mouseToolbar->addAction(g_ringPoseAct);
+  */
 
-  this->editToolbar = this->addToolBar(tr("Edit"));
+  /*this->editToolbar = this->addToolBar(tr("Edit"));
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);
@@ -725,6 +709,7 @@ void MainWindow::CreateToolbars()
   this->editToolbar->addAction(this->pointLghtCreateAct);
   this->editToolbar->addAction(this->spotLghtCreateAct);
   this->editToolbar->addAction(this->dirLghtCreateAct);
+  */
 }
 
 /////////////////////////////////////////////////
@@ -906,9 +891,9 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 void MainWindow::OnManipMode(const std::string &_mode)
 {
   if (_mode != "ring")
-    this->arrowAct->setChecked(true);
+    g_arrowAct->setChecked(true);
   else if (_mode == "ring")
-    this->ringPoseAct->setChecked(true);
+    g_ringPoseAct->setChecked(true);
 }
 
 /////////////////////////////////////////////////

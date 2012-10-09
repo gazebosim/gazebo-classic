@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef RENDER_WIDGET_HH
-#define RENDER_WIDGET_HH
+#ifndef _RENDER_WIDGET_HH_
+#define _RENDER_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -61,6 +61,9 @@ namespace gazebo
       private: QLineEdit *yawEdit;
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
+
+      private: QToolBar *mouseToolbar;
+      private: QToolBar *editToolbar;
 
       private: std::vector<event::ConnectionPtr> connections;
 
