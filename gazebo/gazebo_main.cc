@@ -67,12 +67,16 @@ int main(int _argc, char **_argv)
     if (pid2)
     {
       wait(&status1);
+      // kill both processes
+      sig_handler(SIGINT);
     }
     else
     {
       gazebo::gui::run(_argc, _argv);
     }
     wait(&status2);
+    // kill both processes
+    sig_handler(SIGINT);
   }
   else
   {
