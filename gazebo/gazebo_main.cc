@@ -22,15 +22,29 @@
 
 int main(int _argc, char **_argv)
 {
-  pid_t pid = fork();
+  pid_t pid1 = fork();
 
-  if (pid)
+  if (pid1)
   {
-    gazebo::gui::run(_argc, _argv);
-    kill(pid, SIGINT);
+    // this is parent
+    pid_t pid2 = fork();
+    if (pid2)
+    {
+      // this is parent
+      while(1)
+        sleep(1000);
+      wait();
+    }
+    else
+    {
+      // this is child2
+      gazebo::gui::run(_argc, _argv);
+    }
+    wait();
   }
   else
   {
+    // this is child
     gazebo::Server *server = new gazebo::Server();
     if (!server->ParseArgs(_argc, _argv))
       return -1;
