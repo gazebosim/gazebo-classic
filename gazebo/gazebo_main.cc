@@ -14,20 +14,69 @@
  * limitations under the License.
  *
 */
+#include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
 #include "Server.hh"
 #include "gui/Gui.hh"
 
+int status1, status2;
+pid_t  pid1, pid2;
+
+void sig_handler(int /*signo*/)
+{
+  kill(pid1, SIGINT);
+  kill(pid2, SIGINT);
+  // wait some time and if not dead, escalate to SIGKILL
+  bool killed = false;
+  for(unsigned int i = 0; i < 5; ++i)
+  {
+    /// @todo: fix hardcoded timeout
+    sleep(1);
+    int p1 = waitpid(pid1, &status1, WNOHANG);
+    int p2 = waitpid(pid2, &status2, WNOHANG);
+    if (p1 != 0 && p1 != -1 && p2 != 0 && p2 != -1)
+    {
+      killed = true;
+      break;
+    }
+  }
+  if (!killed)
+  {
+    gzwarn << "escalating to SIGKILL\n";
+    kill(pid1, SIGKILL);
+    kill(pid2, SIGKILL);
+  }
+}
+
 int main(int _argc, char **_argv)
 {
-  pid_t pid = fork();
-
-  if (pid)
+  if (signal(SIGINT, sig_handler) == SIG_ERR)
   {
-    gazebo::gui::run(_argc, _argv);
-    kill(pid, SIGINT);
+    gzerr << "Stopping. Unable to catch SIGINT.\n"
+          << " Please visit http://gazebosim.org/support.html for help.\n";
+    return 0;
+  }
+
+  pid1 = fork();
+
+  if (pid1)
+  {
+    pid2 = fork();
+    if (pid2)
+    {
+      wait(&status1);
+      // kill both processes
+      sig_handler(SIGINT);
+    }
+    else
+    {
+      gazebo::gui::run(_argc, _argv);
+    }
+    wait(&status2);
+    // kill both processes
+    sig_handler(SIGINT);
   }
   else
   {
