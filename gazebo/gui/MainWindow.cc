@@ -46,6 +46,8 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : renderWidget(0)
 {
+  this->setObjectName("mainWindow");
+
   this->requestMsg = NULL;
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -85,12 +87,18 @@ MainWindow::MainWindow()
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
   ModelListWidget *modelListWidget = new ModelListWidget(this);
-  LightListWidget *lightListWidget = new LightListWidget(this);
+  //LightListWidget *lightListWidget = new LightListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
-  SkyWidget *skyWidget = new SkyWidget(this);
+  //SkyWidget *skyWidget = new SkyWidget(this);
 
 
-  this->treeWidget = new QTreeWidget();
+  this->tabWidget = new QTabWidget();
+  this->tabWidget->setObjectName("mainTab");
+  this->tabWidget->addTab(modelListWidget, "World");
+  this->tabWidget->addTab(insertModel, "Insert");
+  this->tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+  /*this->treeWidget = new QTreeWidget();
   this->treeWidget->setColumnCount(1);
   this->treeWidget->setIndentation(0);
   this->treeWidget->setRootIsDecorated(true);
@@ -130,6 +138,7 @@ MainWindow::MainWindow()
   this->treeWidget->addTopLevelItem(topItem);
   subItem = new QTreeWidgetItem(topItem);
   this->treeWidget->setItemWidget(subItem, 0, skyWidget);
+  */
 
   this->renderWidget = new RenderWidget(mainWidget);
 
@@ -143,7 +152,8 @@ MainWindow::MainWindow()
   this->collapseButton->setFocusPolicy(Qt::NoFocus);
   connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
 
-  centerLayout->addWidget(this->treeWidget, 0);
+  // centerLayout->addWidget(this->treeWidget, 0);
+  centerLayout->addWidget(this->tabWidget, 0);
   centerLayout->addWidget(collapseButton, 0);
   centerLayout->addWidget(this->renderWidget, 1);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -198,7 +208,7 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
   gazebo::stop();
   this->renderWidget->hide();
-  this->treeWidget->hide();
+  this->tabWidget->hide();
 
   this->connections.clear();
 
@@ -420,7 +430,7 @@ void MainWindow::OnFullScreen(bool _value)
   {
     this->showFullScreen();
     this->renderWidget->showFullScreen();
-    this->treeWidget->hide();
+    this->tabWidget->hide();
     this->menuBar->hide();
     this->collapseButton->hide();
   }
@@ -428,7 +438,7 @@ void MainWindow::OnFullScreen(bool _value)
   {
     this->showNormal();
     this->renderWidget->showNormal();
-    this->treeWidget->show();
+    this->tabWidget->show();
     this->menuBar->show();
     this->collapseButton->show();
   }
@@ -901,6 +911,7 @@ void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 /////////////////////////////////////////////////
 void MainWindow::OnCollapse()
 {
+  /*
   if (this->treeWidget->isVisible())
   {
     this->treeWidget->close();
@@ -913,6 +924,7 @@ void MainWindow::OnCollapse()
     this->collapseButton->setText("<");
     this->collapseButton->setStyleSheet("QPushButton{margin-left:0px;}");
   }
+  */
 }
 
 /////////////////////////////////////////////////

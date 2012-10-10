@@ -1,6 +1,6 @@
-QMainWindow
+QMainWindow#mainWindow
 {
-  background-color: #dddddd;
+  background-color: #393939;
   /*background-image: url(:/images/mainwindow_bg.png);*/
   /*background-repeat: repeat-xy;*/
   margin: 22px;
@@ -8,7 +8,7 @@ QMainWindow
 
 QMenuBar
 {
-  background-color: #dddddd;
+  background-color: #393939;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 10px;
   border: 0px solid #404040;
@@ -16,8 +16,8 @@ QMenuBar
 
 QMenuBar::item
 {
-  color: #808080;
-  background-color: #dddddd;
+  color: #d0d0d0;
+  background-color: #393939;
   margin-top: 2px;
   margin-bottom: 2px;
   margin-left: 4px;
@@ -36,30 +36,15 @@ QMenuBar::item:selected
 
 QMenu
 {
-  color: #808080;
-  background-color: #dddddd;
-  border: 1px solid #adadad;
+  color: #d0d0d0;
+  background-color: #393939;
+  border: 1px solid #424242;
 }
 
 QMenu::item:selected
 {
   color: #f58113;
 }
-
-/*
-QDockWidget
-{
-  color: #c8c8c8;
-}
-
-QDockWidget::title
-{
-  margin: 0px;
-  padding: 0px;
-  text-align: left;
-  color: #c8c8c8;
-}
-*/
 
 QToolBar
 {
@@ -101,14 +86,13 @@ QToolButton:checked
 
 QLabel
 {
-  /*color: #808080;*/
-  color: #f0f0f0;
+  color: #353535;
 }
 
 QListView
 {
-  color: #c8c8c8;
-  background: #737373;
+  color: #d0d0d0;
+  background: #707070;
   alternate-background-color: #909090;
 
   selection-color: #f58113;
@@ -120,7 +104,7 @@ QListView
 
 QTreeView
 {
-  color: #c8c8c8;
+  color: #d0d0d0;
   background: #737373;
   alternate-background-color: #909090;
 
@@ -154,7 +138,7 @@ QTreeView QHeaderView:section
 QDoubleSpinBox,
 QLineEdit
 {
-  color: #c8c8c8;
+  color: #353535;
   background: #737373;
   border-radius: 4;
 }
@@ -197,7 +181,7 @@ QDoubleSpinBox::down-button:pressed
 
 QPushButton
 {
-  color: #c8c8c8;
+  color: #d0d0d0;
   padding: 2px;
   margin: 2px;
   border: 2px outset #727272;
@@ -219,7 +203,7 @@ QScrollBar:vertical
 {
   border: 1px solid #909090;
   border-radius: 5px;
-  background: #9d9d9d;
+  background: #909090;
   width: 10px;
   margin: 22px 0 22px 0;
 }
@@ -263,10 +247,10 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 
 QPushButton#collapseButton
 {
-  border-right: 1px solid #5d5d5d;
-  border-top: 1px solid #5d5d5d;
-  border-bottom: 1px solid #5d5d5d;
-  border-left: 0px solid #5d5d5d;
+  border-right: 1px solid #101010;
+  border-top: 1px solid #101010;
+  border-bottom: 1px solid #101010;
+  border-left: 0px solid #101010;
 
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -276,67 +260,68 @@ QPushButton#collapseButton
 
   padding: 0px;
   margin: 0px;
-  background: #9d9d9d;
+  background: #909090;
   font-size: 20px;
   font-weight: 100;
   text-align: center;
   margin-right: 12px;
+  margin-top: 9px;
+  position: absolute;
 }
 
-QTreeView#mainTree
+QTabBar
 {
-  border-left: 1px solid #5d5d5d;
-  border-top: 1px solid #5d5d5d;
-  border-bottom: 1px solid #5d5d5d;
-  background: #9d9d9d;
+  /*background-color: #909090;*/
+}
+
+QTabBar::tab
+{
+  background-color: #909090;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border: 1px solid  #404040;
+  padding: 4px;
+  min-width: 8ex;
+}
+
+QTabBar::tab:selected
+{
+  background-color: #909090;
+}
+
+QTabBar::tab:!selected
+{
+  background-color: #707070;
+}
+
+QTabWidget#mainTab::pane
+{
+  border-left: 1px solid #101010;
+  border-bottom: 1px solid #101010;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
-
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
-  show-decoration-selected: 1;
 
-  margin-left: 10px;
-  padding: 0px;
-  color: #f0f0f0;
-  font-size: 20px;
-  font-weight: 100;
-  text-align: center;
-}
+  background-color: #909090;
+  padding: 2px;
+  padding-left: 10px;
 
-QTreeView#mainTree::item
-{
-  padding-top: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-bottom: 0px;
   margin: 0px;
-  text-align: center;
-  background: #9d9d9d;
+  color: #f0f0f0;
+  top: -1em;
+  padding-top: 1em;
 }
 
-QTreeView#mainTree::item:hover
+QTabWidget::tab
 {
-  color: #f58113;
-  font-weight: 900;
-  text-align: center;
-  background: #9d9d9d;
+  border-top: 1px solid #101010;
+  background-color: #909090;
 }
 
-QTreeView#mainTree::item:selected
+QTabWidget::tab-bar
 {
-  color: #f58113;
-  font-weight: bold;
-  background: #9d9d9d;
-}
-
-QTreeView#mainTree::branch:has-children:!has-siblings:closed,
-QTreeView#mainTree::branch:closed:has-children:has-siblings,
-QTreeView#mainTree::branch:open:has-children:!has-siblings,
-QTreeView#mainTree::branch:open:has-children:has-siblings
-{
-  border-image: none;
-  image: none;
+  alignment:center;
 }
 
 QWidget#modelList,
@@ -345,7 +330,7 @@ QWidget#insertModel,
 QWidget#sky,
 QWidget#jointControl
 {
-  background: #9d9d9d;
+  background: #909090;
 }
 
 
@@ -355,50 +340,46 @@ QWidget#insertModel > QFrame,
 QWidget#sky > QFrame,
 QWidget#jointControl > QFrame
 {
-  margin-left: 8px;
   padding: 4px;
-  border-left: 1px solid #4763b7;
-  background: #9d9d9d;
+  background-color: #909090;
 }
 
 QWidget#renderWidget > QWidget
 {
   padding: 0px;
   margin: 0px;
-  border: 1px solid #5d5d5d;
+  border: 1px solid #101010;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
 
-  background-color: #9d9d9d;
+  background-color: #909090;
   margin-right: 10px;
 }
 
 QWidget#toolFrame 
 {
-  border: 0px solid #5d5d5d;
-  border-bottom: 1px solid #5d5d5d;
+  border-bottom: 1px solid #101010;
+  background-color: #909090;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 QWidget#renderBottomFrame 
 {
-  border: 0px solid #5d5d5d;
-  border-top: 1px solid #5d5d5d;
+  border-top: 1px solid #101010;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background-color: #909090;
 }
 
 QWidget#timePanel 
 {
+  background-color: #909090;
 }
 
 QWidget#timePanel > QFrame
 {
-/*  border: 1px solid #404040;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  background-color: #9d9d9d;
-  padding-left: 4px;
-  padding-top: 4px;
-  padding-right: 4px;
-  */
+  background-color: #909090;
 }

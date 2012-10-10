@@ -128,7 +128,8 @@ namespace gazebo
 
       private: msgs::Request *requestMsg;
 
-      private: QTreeWidget *treeWidget;
+      // private: QTreeWidget *treeWidget;
+      private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
     };
 
