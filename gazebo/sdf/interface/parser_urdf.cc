@@ -678,8 +678,29 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
         //   gzwarn << "filename referred by mesh ["
         //          << mesh->filename << "] does not appear to exist.\n";
 
+        // Convert package:// to model://,
+        // in ROS, this will work if
+        // the model package is in ROS_PACKAGE_PATH and has a manifest.xml
+        // as a typical ros package does.
+        std::string model_filename = mesh->filename;
+        std::string package_prefix("package://");
+        std::string model_prefix("model://");
+        size_t pos1 = model_filename.find(package_prefix,0);
+        if (pos1 != std::string::npos)
+        {
+          size_t rep_len = package_prefix.size();
+          model_filename.replace(pos1, rep_len, model_prefix);
+          gzwarn << "ros style uri [package://] is"
+            << "automatically converted: [" << model_filename
+            << "], make sure your ros package is in GAZEBO_MODEL_PATH"
+            << " and switch your manifest to conform to gazebo's"
+            << " model database format.  See ["
+            << "http://gazebosim.org/wiki/Model_database#Model_Manifest_XML"
+            << "] for more info.\n";
+        }
+
         // add mesh filename
-        addKeyValue(geometry_type, "uri", mesh->filename);
+        addKeyValue(geometry_type, "uri", model_filename);
       }
     }
     break;
