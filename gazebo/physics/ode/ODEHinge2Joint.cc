@@ -108,8 +108,6 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
   {
     if (_index == 0)
       result = dJointGetHinge2Angle1(this->jointId);
-    else
-      gzerr << "ODE has not function to get the second angle in a hinge2 joint";
   }
 
   return math::Angle(0);
