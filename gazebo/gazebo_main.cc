@@ -24,18 +24,19 @@
 int status1, status2;
 pid_t  pid1, pid2;
 
-void sig_handler(int signo)
+void sig_handler(int /*signo*/)
 {
   kill(pid1, SIGINT);
   kill(pid2, SIGINT);
   // wait some time and if not dead, escalate to SIGKILL
   bool killed = false;
-  for(unsigned int i = 0; i < 200; ++i)
+  for(unsigned int i = 0; i < 20; ++i)
   {
-    /// @todo: fix hardcoded 10 second.
-    sleep(0.1);
-    if (waitpid(pid1, &status1, WNOHANG) == -1 &&
-        waitpid(pid2, &status2, WNOHANG) == -1)
+    /// @todo: fix hardcoded timeout
+    sleep(1);
+    int p1 = waitpid(pid1, &status1, WNOHANG);
+    int p2 = waitpid(pid2, &status2, WNOHANG);
+    if (p1 != 0 && p1 != -1 && p2 != 0 && p2 != -1)
     {
       killed = true;
       break;
@@ -43,6 +44,7 @@ void sig_handler(int signo)
   }
   if (!killed)
   {
+    gzwarn << "escalating to SIGKILL\n";
     kill(pid1, SIGKILL);
     kill(pid2, SIGKILL);
   }
