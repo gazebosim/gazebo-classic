@@ -30,8 +30,9 @@ void sig_handler(int signo)
   kill(pid2, SIGINT);
   // wait some time and if not dead, escalate to SIGKILL
   bool killed = false;
-  for(unsigned int i = 0; i < 100; ++i)
+  for(unsigned int i = 0; i < 200; ++i)
   {
+    /// @todo: fix hardcoded 10 second.
     sleep(0.1);
     if (waitpid(pid1, &status1, WNOHANG) == -1 &&
         waitpid(pid2, &status2, WNOHANG) == -1)
