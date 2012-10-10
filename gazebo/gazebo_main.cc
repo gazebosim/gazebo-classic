@@ -30,7 +30,7 @@ void sig_handler(int /*signo*/)
   kill(pid2, SIGINT);
   // wait some time and if not dead, escalate to SIGKILL
   bool killed = false;
-  for(unsigned int i = 0; i < 20; ++i)
+  for(unsigned int i = 0; i < 5; ++i)
   {
     /// @todo: fix hardcoded timeout
     sleep(1);
