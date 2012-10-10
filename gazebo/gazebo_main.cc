@@ -53,7 +53,11 @@ void sig_handler(int /*signo*/)
 int main(int _argc, char **_argv)
 {
   if (signal(SIGINT, sig_handler) == SIG_ERR)
-    gzerr << "somethings funny, can't catch SIGINT\n";
+  {
+    gzerr << "Stopping. Unable to catch SIGINT.\n"
+          << " Please visit http://gazebosim.org/support.html for help.\n";
+    return 0;
+  }
 
   pid1 = fork();
 
