@@ -14,37 +14,61 @@
  * limitations under the License.
  *
 */
+#include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
 #include "Server.hh"
 #include "gui/Gui.hh"
 
+int status1, status2;
+pid_t  pid1, pid2;
+
+void sig_handler(int signo)
+{
+  kill(pid1, SIGINT);
+  kill(pid2, SIGINT);
+  // wait some time and if not dead, escalate to SIGKILL
+  bool killed = false;
+  for(unsigned int i = 0; i < 100; ++i)
+  {
+    sleep(0.1);
+    if (waitpid(pid1, &status1, WNOHANG) == -1 &&
+        waitpid(pid2, &status2, WNOHANG) == -1)
+    {
+      killed = true;
+      break;
+    }
+  }
+  if (!killed)
+  {
+    kill(pid1, SIGKILL);
+    kill(pid2, SIGKILL);
+  }
+}
+
 int main(int _argc, char **_argv)
 {
-  pid_t pid1 = fork();
+  if (signal(SIGINT, sig_handler) == SIG_ERR)
+    gzerr << "somethings funny, can't catch SIGINT\n";
+
+  pid1 = fork();
 
   if (pid1)
   {
-    // this is parent
-    pid_t pid2 = fork();
+    pid2 = fork();
     if (pid2)
     {
-      // this is parent
-      while(1)
-        sleep(1000);
-      wait();
+      wait(&status1);
     }
     else
     {
-      // this is child2
       gazebo::gui::run(_argc, _argv);
     }
-    wait();
+    wait(&status2);
   }
   else
   {
-    // this is child
     gazebo::Server *server = new gazebo::Server();
     if (!server->ParseArgs(_argc, _argv))
       return -1;
