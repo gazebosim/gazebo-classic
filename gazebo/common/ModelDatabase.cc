@@ -309,7 +309,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
     {
       gzerr << "Could not download model[" << _uri << "]."
         << "The model may be corrupt.\n";
-      path = std::string();
+      path.clear();
     }
   }
 

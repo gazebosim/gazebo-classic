@@ -313,9 +313,8 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   {
     bool found = false;
 
-    path = boost::filesystem::path(getenv("PWD"));
-    path = boost::filesystem::operator/(path, _filename);
-
+    path = boost::filesystem::operator/(boost::filesystem::current_path(),
+                                        _filename);
 
     if (_searchLocalPath && boost::filesystem::exists(path))
     {
