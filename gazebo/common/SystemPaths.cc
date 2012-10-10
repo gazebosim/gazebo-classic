@@ -275,20 +275,16 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   // .gazebo/models
   if (prefix == "model")
   {
-    /// \TODO look at the boost::filesytem::path has convenience functions
-    /// for constructing path names.
-    std::string fullFilepath;
+    boost::filesystem::path path;
     for (std::list<std::string>::iterator iter = this->modelPaths.begin();
          iter != this->modelPaths.end(); ++iter)
     {
-      fullFilepath =  (*iter) + "/" + suffix;
-      boost::filesystem::path dir(fullFilepath);
-      if (boost::filesystem::exists(dir))
-      {
+      path = boost::filesystem::path(*iter);
+      path = boost::filesystem::operator/(path, suffix);
+      if (boost::filesystem::exists(path))
         break;
-      }
     }
-    filename = fullFilepath;
+    filename = path.string();
   }
   else if (prefix != "http" && prefix != "https")
     gzerr << "Unknown URI prefix[" << prefix << "]\n";
@@ -300,44 +296,47 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
 std::string SystemPaths::FindFile(const std::string &_filename,
                                   bool _searchLocalPath)
 {
-  std::string result;
+  boost::filesystem::path path;
 
   if (_filename.empty())
-    return result;
+    return path.string();
 
   if (_filename.find("://") != std::string::npos)
   {
-    result = this->FindFileURI(_filename);
+    path = boost::filesystem::path(this->FindFileURI(_filename));
   }
   else if (_filename[0] == '/')
   {
-    result = _filename;
+    path = boost::filesystem::path(_filename);
   }
   else
   {
-    struct stat st;
-    result = std::string(getenv("PWD")) + "/" + _filename;
     bool found = false;
 
-    std::list<std::string> paths = this->GetGazeboPaths();
+    path = boost::filesystem::path(getenv("PWD"));
+    path = boost::filesystem::operator/(path, _filename);
 
-    if (_searchLocalPath && stat(result.c_str(), &st) == 0)
+
+    if (_searchLocalPath && boost::filesystem::exists(path))
     {
       found = true;
     }
     else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
-             && stat(_filename.c_str(), &st) == 0)
+             && boost::filesystem::exists(boost::filesystem::path(_filename)))
     {
-      result = _filename;
+      path = boost::filesystem::path(_filename);
       found = true;
     }
     else
     {
+      std::list<std::string> paths = this->GetGazeboPaths();
+
       for (std::list<std::string>::const_iterator iter = paths.begin();
           iter != paths.end() && !found; ++iter)
       {
-        result = (*iter) + "/" + _filename;
-        if (stat(result.c_str(), &st) == 0)
+        path = boost::filesystem::path((*iter));
+        path = boost::filesystem::operator/(path, _filename);
+        if (boost::filesystem::exists(path))
         {
           found = true;
           break;
@@ -347,8 +346,10 @@ std::string SystemPaths::FindFile(const std::string &_filename,
         for (suffixIter = this->suffixPaths.begin();
             suffixIter != this->suffixPaths.end(); ++suffixIter)
         {
-          result = (*iter) + *suffixIter + _filename;
-          if (stat(result.c_str(), &st) == 0)
+          path = boost::filesystem::path(*iter);
+          path = boost::filesystem::operator/(path, *suffixIter);
+          path = boost::filesystem::operator/(path, _filename);
+          if (boost::filesystem::exists(path))
           {
             found = true;
             break;
@@ -358,20 +359,16 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     }
 
     if (!found)
-    {
-      result.clear();
       return std::string();
-    }
   }
 
-  boost::filesystem::path dir(result);
-  if (!boost::filesystem::exists(dir))
+  if (!boost::filesystem::exists(path))
   {
-    gzerr << "File or path does not exist[" << result << "]\n";
-    result.clear();
+    gzerr << "File or path does not exist[" << path << "]\n";
+    return std::string();
   }
 
-  return result;
+  return path.string();
 }
 
 /////////////////////////////////////////////////

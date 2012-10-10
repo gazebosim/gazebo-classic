@@ -238,53 +238,79 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
       gzerr << "Unable to initialize libcurl\n";
       return std::string();
     }
-
-    FILE *fp = fopen(filename.c_str(), "wb");
-    if (!fp)
-    {
-      gzerr << "Could not download model[" << _uri << "] because we were"
-            << "unable to write to file[" << filename << "]."
-            << "Please fix file permissions.";
-      return std::string();
-    }
-
     curl_easy_setopt(curl, CURLOPT_URL,
-        (ModelDatabase::GetURI() + "/" + modelName + "/model.tar.gz").c_str());
+        (ModelDatabase::GetURI() + "/" +
+         modelName + "/model.tar.gz").c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-    CURLcode success = curl_easy_perform(curl);
 
-    if (success != CURLE_OK)
+    bool retry = true;
+    int iterations = 0;
+    while (retry && iterations < 4)
     {
-      gzerr << "Unable to connect to model database using [" << _uri << "]\n";
-      return std::string();
+      retry = false;
+      iterations++;
+
+      FILE *fp = fopen(filename.c_str(), "wb");
+      if (!fp)
+      {
+        gzerr << "Could not download model[" << _uri << "] because we were"
+          << "unable to write to file[" << filename << "]."
+          << "Please fix file permissions.";
+        return std::string();
+      }
+
+      /// Download the model tarball
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+      CURLcode success = curl_easy_perform(curl);
+
+      if (success != CURLE_OK)
+      {
+        gzerr << "Unable to connect to model database using [" << _uri << "]\n";
+        retry = true;
+        continue;
+      }
+
+      fclose(fp);
+
+      try
+      {
+        // Unzip model tarball
+        std::ifstream file(filename.c_str(),
+            std::ios_base::in | std::ios_base::binary);
+        std::ofstream out("/tmp/gz_model.tar",
+            std::ios_base::out | std::ios_base::binary);
+        boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+        in.push(boost::iostreams::gzip_decompressor());
+        in.push(file);
+        boost::iostreams::copy(in, out);
+      }
+      catch(...)
+      {
+        gzerr << "Failed to unzip model tarball. Trying again...\n";
+        retry = true;
+        continue;
+      }
+
+      TAR *tar;
+      tar_open(&tar, const_cast<char*>("/tmp/gz_model.tar"),
+          NULL, O_RDONLY, 0644, TAR_GNU);
+
+      std::string outputPath = getenv("HOME");
+      outputPath += "/.gazebo/models";
+
+      tar_extract_all(tar, const_cast<char*>(outputPath.c_str()));
+      path = outputPath + "/" + modelName;
+
+      ModelDatabase::DownloadDependencies(path);
     }
 
     curl_easy_cleanup(curl);
-
-    fclose(fp);
-
-    // Unzip model tarball
-    std::ifstream file(filename.c_str(),
-        std::ios_base::in | std::ios_base::binary);
-    std::ofstream out("/tmp/gz_model.tar",
-        std::ios_base::out | std::ios_base::binary);
-    boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
-    in.push(boost::iostreams::gzip_decompressor());
-    in.push(file);
-    boost::iostreams::copy(in, out);
-
-    TAR *tar;
-    tar_open(&tar, const_cast<char*>("/tmp/gz_model.tar"),
-             NULL, O_RDONLY, 0644, TAR_GNU);
-
-    std::string outputPath = getenv("HOME");
-    outputPath += "/.gazebo/models";
-
-    tar_extract_all(tar, const_cast<char*>(outputPath.c_str()));
-    path = outputPath + "/" + modelName;
-
-    ModelDatabase::DownloadDependencies(path);
+    if (retry)
+    {
+      gzerr << "Could not download model[" << _uri << "]."
+        << "The model may be corrupt.\n";
+      path = std::string();
+    }
   }
 
   return path;
