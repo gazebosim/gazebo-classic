@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 
 #include <iostream>
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -35,6 +36,8 @@
 
 using namespace gazebo;
 using namespace common;
+
+std::map<std::string, std::string> ModelDatabase::modelCache;
 
 /////////////////////////////////////////////////
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
@@ -65,58 +68,38 @@ std::string ModelDatabase::GetURI()
   else
     gzerr << "GAZEBO_MODEL_DATABASE_URI not set\n";
 
+  if (result[result.size()-1] != '/')
+    result += '/';
+
   return result;
 }
 
 /////////////////////////////////////////////////
 bool ModelDatabase::HasModel(const std::string &_modelURI)
 {
-  std::string xmlString = ModelDatabase::GetManifest();
+  std::string uri = _modelURI;
+  boost::replace_first(uri, "model://", ModelDatabase::GetURI());
 
-  // Get the model name from the uri
-  size_t index = _modelURI.find_last_of("/");
-  if (index == std::string::npos)
-    index = 0;
-
-  std::string modelName = _modelURI.substr(index + 1,
-      _modelURI.size() - index - 1);
-
-  if (!xmlString.empty())
+  std::map<std::string, std::string> models = ModelDatabase::GetModels();
+  for (std::map<std::string, std::string>::iterator iter = models.begin();
+       iter != models.end(); ++iter)
   {
-    TiXmlDocument xmlDoc;
-    xmlDoc.Parse(xmlString.c_str());
-
-    TiXmlElement *modelsElem = xmlDoc.FirstChildElement("models");
-    TiXmlElement *modelElem;
-    for (modelElem = modelsElem->FirstChildElement("model"); modelElem != NULL;
-         modelElem = modelElem->NextSiblingElement("model"))
-    {
-      TiXmlElement *uriElem = modelElem->FirstChildElement("uri");
-      std::string uri = uriElem->GetText();
-      uri = "model:/" + uri;
-
-      index = uri.find_last_of("/");
-      if (index == std::string::npos)
-        index = 0;
-      std::string testName = uri.substr(index + 1, uri.size() - index - 1);
-
-      if (testName == modelName)
-        return true;
-    }
+    if (iter->first == uri)
+      return true;
   }
-
   return false;
 }
 
 /////////////////////////////////////////////////
-std::string ModelDatabase::GetManifest()
+std::string ModelDatabase::GetManifest(const std::string &_uri)
 {
   std::string xmlString;
+  std::string uri = _uri;
+  boost::replace_first(uri, "model://", ModelDatabase::GetURI());
 
-  std::string uriStr = ModelDatabase::GetURI();
-  if (!uriStr.empty())
+  if (!uri.empty())
   {
-    std::string manifestURI = uriStr + "/manifest.xml";
+    std::string manifestURI = uri + "/manifest.xml";
 
     CURL *curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, manifestURI.c_str());
@@ -127,7 +110,7 @@ std::string ModelDatabase::GetManifest()
     CURLcode success = curl_easy_perform(curl);
     if (success != CURLE_OK)
     {
-      gzwarn << "Unable to connect to model database using [" << uriStr
+      gzwarn << "Unable to connect to model database using [" << _uri
         << "]. Only locally installed models will be available.";
     }
 
@@ -140,8 +123,10 @@ std::string ModelDatabase::GetManifest()
 /////////////////////////////////////////////////
 std::map<std::string, std::string> ModelDatabase::GetModels()
 {
-  std::map<std::string, std::string> result;
-  std::string xmlString = ModelDatabase::GetManifest();
+  if (modelCache.size() != 0)
+    return modelCache;
+
+  std::string xmlString = ModelDatabase::GetManifest(ModelDatabase::GetURI());
   std::string uriStr = ModelDatabase::GetURI();
 
   if (!xmlString.empty())
@@ -149,16 +134,76 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     TiXmlDocument xmlDoc;
     xmlDoc.Parse(xmlString.c_str());
 
-    TiXmlElement *modelsElem = xmlDoc.FirstChildElement("models");
-    TiXmlElement *modelElem;
-    for (modelElem = modelsElem->FirstChildElement("model"); modelElem != NULL;
-         modelElem = modelElem->NextSiblingElement("model"))
+    TiXmlElement *databaseElem = xmlDoc.FirstChildElement("database");
+    if (!databaseElem)
     {
-      TiXmlElement *nameElem = modelElem->FirstChildElement("name");
-      TiXmlElement *uriElem = modelElem->FirstChildElement("uri");
-      result[uriStr + "/" + uriElem->GetText()] =  nameElem->GetText();
+      gzerr << "No <database> tag in the model database manifest.xml found"
+            << " here[" << ModelDatabase::GetURI() << "]\n";
+      return modelCache;
+    }
+
+    TiXmlElement *modelsElem = databaseElem->FirstChildElement("models");
+    if (!modelsElem)
+    {
+      gzerr << "No <models> tag in the model database manifest.xml found"
+            << " here[" << ModelDatabase::GetURI() << "]\n";
+      return modelCache;
+    }
+
+    TiXmlElement *uriElem;
+    for (uriElem = modelsElem->FirstChildElement("uri"); uriElem != NULL;
+         uriElem = uriElem->NextSiblingElement("uri"))
+    {
+      std::string uri = uriElem->GetText();
+
+      size_t index = uri.find("://");
+      std::string suffix = uri;
+      if (index != std::string::npos)
+      {
+        std::string prefix = uri.substr(0, index);
+        suffix = uri.substr(index + 3, uri.size() - index - 3);
+      }
+
+      std::string fullURI = ModelDatabase::GetURI() + suffix;
+      std::string modelName = ModelDatabase::GetModelName(fullURI);
+
+      modelCache[fullURI] = modelName;
     }
   }
+
+  return modelCache;
+}
+
+/////////////////////////////////////////////////
+std::string ModelDatabase::GetModelName(const std::string &_uri)
+{
+  std::string result;
+  std::string xmlStr = ModelDatabase::GetManifest(_uri);
+
+  if (!xmlStr.empty())
+  {
+    TiXmlDocument xmlDoc;
+    if (xmlDoc.Parse(xmlStr.c_str()))
+    {
+      TiXmlElement *modelElem = xmlDoc.FirstChildElement("model");
+      if (modelElem)
+      {
+        TiXmlElement *nameElem = modelElem->FirstChildElement("name");
+        if (nameElem)
+          result = nameElem->GetText();
+        else
+          gzerr << "No <name> element in manifest.xml for model["
+                << _uri << "]\n";
+      }
+      else
+        gzerr << "No <model> element in manifest.xml for model["
+              << _uri << "]\n";
+    }
+    else
+      gzerr << "Unable to parse manifest.xml for model[" << _uri << "]\n";
+  }
+  else
+    gzerr << "Unable to get model name[" << _uri << "]\n";
 
   return result;
 }
@@ -193,53 +238,79 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
       gzerr << "Unable to initialize libcurl\n";
       return std::string();
     }
-
-    FILE *fp = fopen(filename.c_str(), "wb");
-    if (!fp)
-    {
-      gzerr << "Could not download model[" << _uri << "] because we were"
-            << "unable to write to file[" << filename << "]."
-            << "Please fix file permissions.";
-      return std::string();
-    }
-
     curl_easy_setopt(curl, CURLOPT_URL,
-        (ModelDatabase::GetURI() + "/" + modelName + "/model.tar.gz").c_str());
+        (ModelDatabase::GetURI() + "/" +
+         modelName + "/model.tar.gz").c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-    CURLcode success = curl_easy_perform(curl);
 
-    if (success != CURLE_OK)
+    bool retry = true;
+    int iterations = 0;
+    while (retry && iterations < 4)
     {
-      gzerr << "Unable to connect to model database using [" << _uri << "]\n";
-      return std::string();
+      retry = false;
+      iterations++;
+
+      FILE *fp = fopen(filename.c_str(), "wb");
+      if (!fp)
+      {
+        gzerr << "Could not download model[" << _uri << "] because we were"
+          << "unable to write to file[" << filename << "]."
+          << "Please fix file permissions.";
+        return std::string();
+      }
+
+      /// Download the model tarball
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+      CURLcode success = curl_easy_perform(curl);
+
+      if (success != CURLE_OK)
+      {
+        gzerr << "Unable to connect to model database using [" << _uri << "]\n";
+        retry = true;
+        continue;
+      }
+
+      fclose(fp);
+
+      try
+      {
+        // Unzip model tarball
+        std::ifstream file(filename.c_str(),
+            std::ios_base::in | std::ios_base::binary);
+        std::ofstream out("/tmp/gz_model.tar",
+            std::ios_base::out | std::ios_base::binary);
+        boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+        in.push(boost::iostreams::gzip_decompressor());
+        in.push(file);
+        boost::iostreams::copy(in, out);
+      }
+      catch(...)
+      {
+        gzerr << "Failed to unzip model tarball. Trying again...\n";
+        retry = true;
+        continue;
+      }
+
+      TAR *tar;
+      tar_open(&tar, const_cast<char*>("/tmp/gz_model.tar"),
+          NULL, O_RDONLY, 0644, TAR_GNU);
+
+      std::string outputPath = getenv("HOME");
+      outputPath += "/.gazebo/models";
+
+      tar_extract_all(tar, const_cast<char*>(outputPath.c_str()));
+      path = outputPath + "/" + modelName;
+
+      ModelDatabase::DownloadDependencies(path);
     }
 
     curl_easy_cleanup(curl);
-
-    fclose(fp);
-
-    // Unzip model tarball
-    std::ifstream file(filename.c_str(),
-        std::ios_base::in | std::ios_base::binary);
-    std::ofstream out("/tmp/gz_model.tar",
-        std::ios_base::out | std::ios_base::binary);
-    boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
-    in.push(boost::iostreams::gzip_decompressor());
-    in.push(file);
-    boost::iostreams::copy(in, out);
-
-    TAR *tar;
-    tar_open(&tar, const_cast<char*>("/tmp/gz_model.tar"),
-             NULL, O_RDONLY, 0644, TAR_GNU);
-
-    std::string outputPath = getenv("HOME");
-    outputPath += "/.gazebo/models";
-
-    tar_extract_all(tar, const_cast<char*>(outputPath.c_str()));
-    path = outputPath + "/" + modelName;
-
-    ModelDatabase::DownloadDependencies(path);
+    if (retry)
+    {
+      gzerr << "Could not download model[" << _uri << "]."
+        << "The model may be corrupt.\n";
+      path.clear();
+    }
   }
 
   return path;
@@ -253,14 +324,21 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(manifest))
   {
-    TiXmlElement *dependXML = xmlDoc.FirstChildElement("depend");
+    TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
+    if (!modelXML)
+    {
+      gzerr << "No <model> element in manifest file[" << _path << "]\n";
+      return;
+    }
+
+    TiXmlElement *dependXML = modelXML->FirstChildElement("depend");
     if (!dependXML)
       return;
 
-    for(TiXmlElement *modelXML = dependXML->FirstChildElement("model");
-        modelXML; modelXML = modelXML->NextSiblingElement())
+    for(TiXmlElement *depXML = dependXML->FirstChildElement("model");
+        depXML; depXML = depXML->NextSiblingElement())
     {
-      TiXmlElement *uriXML = modelXML->FirstChildElement("uri");
+      TiXmlElement *uriXML = depXML->FirstChildElement("uri");
       if (uriXML)
       {
         // Download the model if it doesn't exist.
