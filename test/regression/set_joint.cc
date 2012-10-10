@@ -569,6 +569,19 @@ TEST_F(PhysicsTest, State)
     physics::JointPtr joint_4a5a = model->GetJoint("model_1::joint_4a5a");
     physics::JointPtr joint_5a2b = model->GetJoint("model_1::joint_5a2b");
 
+    EXPECT_TRUE(joint_01   != NULL);
+    EXPECT_TRUE(joint_12   != NULL);
+    EXPECT_TRUE(joint_23   != NULL);
+    EXPECT_TRUE(joint_34   != NULL);
+    EXPECT_TRUE(joint_45   != NULL);
+    EXPECT_TRUE(joint_52   != NULL);
+    EXPECT_TRUE(joint_2a2  != NULL);
+    EXPECT_TRUE(joint_2a2b != NULL);
+    EXPECT_TRUE(joint_2a3a != NULL);
+    EXPECT_TRUE(joint_3a4a != NULL);
+    EXPECT_TRUE(joint_4a5a != NULL);
+    EXPECT_TRUE(joint_5a2b != NULL);
+
 
     double start_time;
     double start_wall_time;
@@ -627,13 +640,18 @@ TEST_F(PhysicsTest, State)
     world->EnablePhysicsEngine(true);
 
 
-
-
+    /* set all link velocities to 0
+    std::vector<physics::LinkPtr> links = model->GetAllLinks();
+    for (unsigned i = 0; i < links.size(); ++i)
+    {
+      links[i]->SetLinearVel(math::Vector3(0, 0, 0));
+      links[i]->SetAngularVel(math::Vector3(0, 0, 0));
+    } */
 
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 50;
+    test_duration = 20;
     pub_rate = 0.5;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Joint::SetAngle at ["
@@ -642,20 +660,13 @@ TEST_F(PhysicsTest, State)
     while(world->GetSimTime().Double() < start_time + test_duration)
     if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
     {
+
       last_update_time = world->GetSimTime().Double();
-      double a = 0.70*(2.0*double(rand())/double(RAND_MAX) - 1.0);
+      double a = 0.50*(2.0*double(rand())/double(RAND_MAX) - 1.0);
       joint_01->SetAngle(0, a);
-      joint_12->SetAngle(0, a);
-      joint_23->SetAngle(0, a);
-      joint_2a2->SetAngle(0, a);
-
-      /// set all link velocities to 0
-      std::vector<physics::LinkPtr> links = model->GetAllLinks();
-      for (unsigned i = 0; i < links.size(); ++i)
-      {
-        links[i]->SetLinearVel(math::Vector3(0, 0, 0));
-        links[i]->SetAngularVel(math::Vector3(0, 0, 0));
-      }
+      // joint_12->SetAngle(0, a);
+      // joint_23->SetAngle(0, a);
+      // joint_2a2->SetAngle(0, a);
     }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
@@ -663,49 +674,7 @@ TEST_F(PhysicsTest, State)
           << "] sim performance [" << test_duration / elapsed_wall_time
           << "]\n";
 
-
-
-
-
-
-
-
-
-
-
-
-    start_time = world->GetSimTime().Double();
-    start_wall_time = world->GetRealTime().Double();
-    test_duration = 20;
-    pub_rate = 10.0;
-    gzdbg << " -------------------------------------------------------------\n";
-    gzdbg << " Publishing Joint::SetAngle at ["
-          << pub_rate << "] Hz to all joints, test robustness.\n";
-    last_update_time = start_wall_time;
-    while(world->GetRealTime().Double() < start_wall_time + test_duration)
-    if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetRealTime().Double();
-      int n = model->GetJointCount();
-      for (int i = 0; i < n; ++i)
-      {
-        double a = 0.7070*(2.0*double(rand())/double(RAND_MAX) - 1.0);
-        model->GetJoint(i)->SetAngle(0, a);
-        gzdbg << "Set Joint[" << model->GetJoint(i)->GetName()
-              << "] to [" << a << "] rad\n";
-      }
-    }
-    test_duration = world->GetSimTime().Double() - start_time;
-    elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-    gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
-
-
-
-    while(1)
-     sleep(1);
+    // EXPECT_EQ(joint_5a2b->GetAngle(0).Radian(), 0.0);
     Unload();
   }
 }

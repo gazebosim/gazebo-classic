@@ -90,7 +90,7 @@ World::World(const std::string &_name)
   this->resetModelOnly = false;
   this->enablePhysicsEngine = true;
 
-  this->setWorldPoseMutex = new boost::recursive_mutex();
+  this->setWorldPoseMutex = new boost::mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
 
   this->connections.push_back(

@@ -100,8 +100,8 @@ namespace gazebo
       /// \brief Attach the two bodies with this joint
       public: virtual void Attach(LinkPtr parent, LinkPtr child);
 
-      /// \brief Detach this joint from all bodies
-      public: virtual void Detach() = 0;
+      /// \brief Detach this joint from all links
+      public: virtual void Detach();
 
       /// \brief Set the axis of rotation
       public: virtual void SetAxis(int index, const math::Vector3 &axis) = 0;

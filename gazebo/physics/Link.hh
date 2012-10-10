@@ -253,10 +253,16 @@ namespace gazebo
       public: void ProcessMsg(const msgs::Link &_msg);
 
       /// \brief Joints that have this Link as a parent Link
-      public: void AddChildJoint(JointPtr joint);
+      public: void AddChildJoint(JointPtr _joint);
 
       /// \brief Joints that have this Link as a child Link
-      public: void AddParentJoint(JointPtr joint);
+      public: void AddParentJoint(JointPtr _joint);
+
+      /// \brief Remove Joints that have this Link as a parent Link
+      public: void RemoveChildJoint(JointPtr _joint);
+
+      /// \brief Remove Joints that have this Link as a child Link
+      public: void RemoveParentJoint(JointPtr _joint);
 
       /// \brief Attach a static model to this link
       public: void AttachStaticModel(ModelPtr &_model,
