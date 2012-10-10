@@ -48,10 +48,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   QFrame *toolFrame = new QFrame;
+  toolFrame->setObjectName("toolFrame");
+  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
   QToolBar *toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
-  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
   QActionGroup *actionGroup = new QActionGroup(toolFrame);
   actionGroup->addAction(g_arrowAct);
@@ -82,6 +84,11 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QHBoxLayout *playControlLayout = new QHBoxLayout;
   playControlLayout->setContentsMargins(0, 0, 0, 0);
+
+  QFrame *bottomFrame = new QFrame;
+  bottomFrame->setObjectName("renderBottomFrame");
+  bottomFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
   QFrame *playFrame = new QFrame;
   QToolBar *playToolbar = new QToolBar;
   playFrame->setFrameShape(QFrame::NoFrame);
@@ -90,6 +97,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   playToolbar->addAction(g_pauseAct);
   playToolbar->addAction(g_stepAct);
   playControlLayout->addWidget(playToolbar);
+  playControlLayout->setContentsMargins(0, 0, 0, 0);
   playFrame->setLayout(playControlLayout);
 
   bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
@@ -99,12 +107,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
                              QSizePolicy::Minimum));
   bottomPanelLayout->setSpacing(0);
+  bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
+  bottomFrame->setLayout(bottomPanelLayout);
 
-  frameLayout->addSpacing(4);
   frameLayout->addWidget(toolFrame);
-  frameLayout->addSpacing(4);
   frameLayout->addWidget(this->glWidget);
-  frameLayout->addLayout(bottomPanelLayout);
+  frameLayout->addWidget(bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
 

@@ -263,15 +263,17 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 
 QPushButton#collapseButton
 {
+  border-right: 1px solid #5d5d5d;
+  border-top: 1px solid #5d5d5d;
+  border-bottom: 1px solid #5d5d5d;
+  border-left: 0px solid #5d5d5d;
+
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
 
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
 
-  border: 0px solid #9d9d9d;
-
-  /*border-radius: 0px;*/
   padding: 0px;
   margin: 0px;
   background: #9d9d9d;
@@ -283,6 +285,9 @@ QPushButton#collapseButton
 
 QTreeView#mainTree
 {
+  border-left: 1px solid #5d5d5d;
+  border-top: 1px solid #5d5d5d;
+  border-bottom: 1px solid #5d5d5d;
   background: #9d9d9d;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -360,7 +365,7 @@ QWidget#renderWidget > QWidget
 {
   padding: 0px;
   margin: 0px;
-  border: 1px solid #9d9d9d;
+  border: 1px solid #5d5d5d;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   border-top-left-radius: 10px;
@@ -368,6 +373,18 @@ QWidget#renderWidget > QWidget
 
   background-color: #9d9d9d;
   margin-right: 10px;
+}
+
+QWidget#toolFrame 
+{
+  border: 0px solid #5d5d5d;
+  border-bottom: 1px solid #5d5d5d;
+}
+
+QWidget#renderBottomFrame 
+{
+  border: 0px solid #5d5d5d;
+  border-top: 1px solid #5d5d5d;
 }
 
 QWidget#timePanel 
