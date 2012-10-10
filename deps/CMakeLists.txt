@@ -1,4 +1,6 @@
-add_subdirectory(libccd)
+if (NOT CCD_FOUND)
+  add_subdirectory(libccd)
+endif()
 add_subdirectory(opende)
 # add_subdirectory(ann)
 # add_subdirectory(fcl)

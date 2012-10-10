@@ -55,7 +55,7 @@ class CameraInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: void OnImage(ConstImagePtr &_msg);
+  private: void OnImage(ConstImageStampedPtr &_msg);
 
   /// Save a camera frame
   private: void SaveFrame(const char *filename) const;

@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "common/common.h"
+#include "common/common.hh"
 
 using namespace gazebo;
 class CommonTest : public ServerFixture
@@ -116,9 +116,9 @@ TEST_F(CommonTest, Image)
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
   EXPECT_EQ(0, img.Load("wood.jpg"));
-  EXPECT_EQ(496, img.GetWidth());
-  EXPECT_EQ(329, img.GetHeight());
-  EXPECT_EQ(24, img.GetBPP());
+  EXPECT_EQ(static_cast<unsigned int>(496), img.GetWidth());
+  EXPECT_EQ(static_cast<unsigned int>(329), img.GetHeight());
+  EXPECT_EQ(static_cast<unsigned int>(24), img.GetBPP());
   EXPECT_TRUE(img.GetPixel(10, 10) ==
       common::Color(0.133333, 0.376471, 0.654902, 1));
   EXPECT_TRUE(img.GetAvgColor() ==
@@ -132,10 +132,10 @@ TEST_F(CommonTest, Image)
   unsigned char *data = NULL;
   unsigned int size = 0;
   img.GetData(&data, size);
-  EXPECT_EQ(489552, size);
+  EXPECT_EQ(static_cast<unsigned int>(489552), size);
 
   img.SetFromData(data, img.GetWidth(), img.GetHeight(),
-                  3*img.GetWidth(), img.GetBPP());
+                  common::Image::RGB_INT8);
 }
 
 TEST_F(CommonTest, Paths)
@@ -159,56 +159,55 @@ TEST_F(CommonTest, Paths)
 
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
   const std::list<std::string> pathList1 = paths->GetGazeboPaths();
-  EXPECT_EQ(2, pathList1.size());
+  EXPECT_EQ(static_cast<unsigned int>(2), pathList1.size());
   EXPECT_STREQ("/tmp/resource", pathList1.front().c_str());
   EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
 
   putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
   const std::list<std::string> pathList2 = paths->GetOgrePaths();
-  EXPECT_EQ(2, pathList2.size());
+  EXPECT_EQ(static_cast<unsigned int>(2), pathList2.size());
   EXPECT_STREQ("/tmp/ogre", pathList2.front().c_str());
   EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
 
   putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
   const std::list<std::string> pathList3 = paths->GetPluginPaths();
-  EXPECT_EQ(2, pathList3.size());
+  EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
-  EXPECT_STREQ("/models", paths->GetModelPathExtension().c_str());
   EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
 
   paths->AddGazeboPaths("/gazebo/path:/other/gazebo");
-  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetGazeboPaths().size());
   EXPECT_STREQ("/other/gazebo", paths->GetGazeboPaths().back().c_str());
 
   paths->AddPluginPaths("/plugin/path:/other/plugin");
-  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetGazeboPaths().size());
   EXPECT_STREQ("/other/plugin", paths->GetPluginPaths().back().c_str());
 
   paths->AddOgrePaths("/ogre/path:/other/ogre");
-  EXPECT_EQ(4, paths->GetOgrePaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(4), paths->GetOgrePaths().size());
   EXPECT_STREQ("/other/ogre", paths->GetOgrePaths().back().c_str());
 
   paths->ClearGazeboPaths();
   paths->ClearOgrePaths();
   paths->ClearPluginPaths();
 
-  EXPECT_EQ(2, paths->GetGazeboPaths().size());
-  EXPECT_EQ(2, paths->GetOgrePaths().size());
-  EXPECT_EQ(2, paths->GetPluginPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths->GetOgrePaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(2), paths->GetPluginPaths().size());
 
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH="));
   paths->ClearGazeboPaths();
-  EXPECT_EQ(0, paths->GetGazeboPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetGazeboPaths().size());
 
   putenv(const_cast<char*>("OGRE_RESOURCE_PATH="));
   paths->ClearOgrePaths();
-  EXPECT_EQ(0, paths->GetOgrePaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetOgrePaths().size());
 
   putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH="));
   paths->ClearPluginPaths();
-  EXPECT_EQ(0, paths->GetPluginPaths().size());
+  EXPECT_EQ(static_cast<unsigned int>(0), paths->GetPluginPaths().size());
 
   std::cout << "GAZEBO_RESOURCE_BACKUP[" << gazeboResourcePathBackup << "]\n";
   std::cout << "OGRE_RESOURCE_BACKUP[" << ogreResourcePathBackup << "]\n";
@@ -297,48 +296,48 @@ TEST_F(CommonTest, NumericAnimation)
 TEST_F(CommonTest, Color)
 {
   common::Color clr(.1, .2, .3, 1.0);
-  EXPECT_EQ(0.1f, clr.R());
-  EXPECT_EQ(0.2f, clr.G());
-  EXPECT_EQ(0.3f, clr.B());
-  EXPECT_EQ(1.0f, clr.A());
+  EXPECT_EQ(0.1f, clr.r);
+  EXPECT_EQ(0.2f, clr.g);
+  EXPECT_EQ(0.3f, clr.b);
+  EXPECT_EQ(1.0f, clr.a);
 
   clr.Reset();
-  EXPECT_EQ(0.0f, clr.R());
-  EXPECT_EQ(0.0f, clr.G());
-  EXPECT_EQ(0.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.0f, clr.r);
+  EXPECT_EQ(0.0f, clr.g);
+  EXPECT_EQ(0.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(0, 0.5, 1.0);
-  EXPECT_EQ(1.0f, clr.R());
-  EXPECT_EQ(0.5f, clr.G());
-  EXPECT_EQ(0.5f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(1.0f, clr.r);
+  EXPECT_EQ(0.5f, clr.g);
+  EXPECT_EQ(0.5f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   EXPECT_TRUE(clr.GetAsHSV() == math::Vector3(6, 0.5, 1));
 
   clr.SetFromHSV(60, 0.0, 1.0);
-  EXPECT_EQ(1.0f, clr.R());
-  EXPECT_EQ(1.0f, clr.G());
-  EXPECT_EQ(1.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(1.0f, clr.r);
+  EXPECT_EQ(1.0f, clr.g);
+  EXPECT_EQ(1.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(120, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.R());
-  EXPECT_EQ(1.0f, clr.G());
-  EXPECT_EQ(0.5f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.5f, clr.r);
+  EXPECT_EQ(1.0f, clr.g);
+  EXPECT_EQ(0.5f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(180, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.R());
-  EXPECT_EQ(1.0f, clr.G());
-  EXPECT_EQ(1.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.5f, clr.r);
+  EXPECT_EQ(1.0f, clr.g);
+  EXPECT_EQ(1.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(240, 0.5, 1.0);
-  EXPECT_EQ(0.5f, clr.R());
-  EXPECT_EQ(0.5f, clr.G());
-  EXPECT_EQ(1.0f, clr.B());
-  EXPECT_EQ(0.0f, clr.A());
+  EXPECT_EQ(0.5f, clr.r);
+  EXPECT_EQ(0.5f, clr.g);
+  EXPECT_EQ(1.0f, clr.b);
+  EXPECT_EQ(0.0f, clr.a);
 
   clr.SetFromHSV(300, 0.5, 1.0);
   EXPECT_EQ(1.0f, clr[0]);
@@ -347,10 +346,10 @@ TEST_F(CommonTest, Color)
   EXPECT_EQ(0.0f, clr[3]);
   EXPECT_EQ(0.0f, clr[4]);
 
-  clr.R(0.1);
-  clr.G(0.2);
-  clr.B(0.3);
-  clr.A(0.4);
+  clr.r = 0.1;
+  clr.g = 0.2;
+  clr.b = 0.3;
+  clr.a = 0.4;
   EXPECT_EQ(0.1f, clr[0]);
   EXPECT_EQ(0.2f, clr[1]);
   EXPECT_EQ(0.3f, clr[2]);
@@ -393,30 +392,30 @@ TEST_F(CommonTest, Color)
 
 
   clr.SetFromYUV(0.5, 0.2, 0.8);
-  EXPECT_TRUE(math::equal(0.00553f, clr.R(), 1e-3f));
-  EXPECT_TRUE(math::equal(0.0f, clr.G()));
-  EXPECT_TRUE(math::equal(0.9064f, clr.B(), 1e-3f));
-  EXPECT_TRUE(math::equal(0.04f, clr.A()));
+  EXPECT_TRUE(math::equal(0.00553f, clr.r, 1e-3f));
+  EXPECT_TRUE(math::equal(0.0f, clr.g));
+  EXPECT_TRUE(math::equal(0.9064f, clr.b, 1e-3f));
+  EXPECT_TRUE(math::equal(0.04f, clr.a));
 
   EXPECT_TRUE(clr.GetAsYUV() == math::Vector3(0.104985, 0.95227, 0.429305));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
-  EXPECT_TRUE(math::equal(0.00431373f, clr.R()));
-  EXPECT_TRUE(math::equal(0.3f, clr.G()));
-  EXPECT_TRUE(math::equal(0.9f, clr.B()));
-  EXPECT_TRUE(math::equal(2.0f, clr.A()));
+  EXPECT_TRUE(math::equal(0.00431373f, clr.r));
+  EXPECT_TRUE(math::equal(0.3f, clr.g));
+  EXPECT_TRUE(math::equal(0.9f, clr.b));
+  EXPECT_TRUE(math::equal(2.0f, clr.a));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) - common::Color(0.1, 0.3, 0.4, 1.0);
-  EXPECT_TRUE(math::equal(0.9f, clr.R()));
-  EXPECT_TRUE(math::equal(0.0f, clr.G()));
-  EXPECT_TRUE(math::equal(0.1f, clr.B()));
-  EXPECT_TRUE(math::equal(0.0f, clr.A()));
+  EXPECT_TRUE(math::equal(0.9f, clr.r));
+  EXPECT_TRUE(math::equal(0.0f, clr.g));
+  EXPECT_TRUE(math::equal(0.1f, clr.b));
+  EXPECT_TRUE(math::equal(0.0f, clr.a));
 
   clr = common::Color(0.5, 0.2, 0.4, 0.6) / 2.0;
-  EXPECT_TRUE(math::equal(0.25f, clr.R()));
-  EXPECT_TRUE(math::equal(0.1f, clr.G()));
-  EXPECT_TRUE(math::equal(0.2f, clr.B()));
-  EXPECT_TRUE(math::equal(0.3f, clr.A()));
+  EXPECT_TRUE(math::equal(0.25f, clr.r));
+  EXPECT_TRUE(math::equal(0.1f, clr.g));
+  EXPECT_TRUE(math::equal(0.2f, clr.b));
+  EXPECT_TRUE(math::equal(0.3f, clr.a));
 }
 
 TEST_F(CommonTest, Time)
@@ -530,7 +529,8 @@ TEST_F(CommonTest, Material)
   EXPECT_STREQ("texture_image", mat.GetTextureImage().c_str());
 
   mat.SetTextureImage("texture_image", "/path");
-  EXPECT_STREQ("/path/texture_image", mat.GetTextureImage().c_str());
+  EXPECT_STREQ("/path/../materials/textures/texture_image",
+               mat.GetTextureImage().c_str());
 
   mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
   EXPECT_TRUE(mat.GetAmbient() == common::Color(0.1, 0.2, 0.3, 0.4));
@@ -621,11 +621,11 @@ TEST_F(CommonTest, Mesh)
 
   const common::Mesh *mesh =
     common::MeshManager::Instance()->GetMesh("unit_box");
-  EXPECT_EQ(24, mesh->GetVertexCount());
-  EXPECT_EQ(24, mesh->GetNormalCount());
-  EXPECT_EQ(36, mesh->GetIndexCount());
-  EXPECT_EQ(24, mesh->GetTexCoordCount());
-  EXPECT_EQ(0, mesh->GetMaterialCount());
+  EXPECT_EQ(static_cast<unsigned int>(24), mesh->GetVertexCount());
+  EXPECT_EQ(static_cast<unsigned int>(24), mesh->GetNormalCount());
+  EXPECT_EQ(static_cast<unsigned int>(36), mesh->GetIndexCount());
+  EXPECT_EQ(static_cast<unsigned int>(24), mesh->GetTexCoordCount());
+  EXPECT_EQ(static_cast<unsigned int>(0), mesh->GetMaterialCount());
 
   math::Vector3 center, min, max;
   mesh->GetAABB(center, min, max);
@@ -702,10 +702,10 @@ TEST_F(CommonTest, Mesh)
   subMesh->SetNormalCount(1);
   subMesh->SetTexCoordCount(1);
 
-  EXPECT_EQ(1, subMesh->GetVertexCount());
-  EXPECT_EQ(1, subMesh->GetIndexCount());
-  EXPECT_EQ(1, subMesh->GetNormalCount());
-  EXPECT_EQ(1, subMesh->GetTexCoordCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetVertexCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetIndexCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetNormalCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetTexCoordCount());
 
   subMesh->SetVertex(0, math::Vector3(1, 2, 3));
   EXPECT_TRUE(subMesh->GetVertex(0) == math::Vector3(1, 2, 3));

@@ -15,12 +15,12 @@
  *
 */
 #include <map>
-#include "gazebo.h"
+#include "gazebo.hh"
 #include "common/common.h"
 #include "physics/physics.h"
 
 namespace gazebo
-{   
+{
   class AnimateJoints : public ModelPlugin
   {
     public: void Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/)
@@ -36,7 +36,7 @@ namespace gazebo
       common::NumericKeyFrame *key = anim["my_joint"]->CreateKeyFrame(0.0);
       key->SetValue(0.1);
 
-      // Create a key frame half-way through the animation 
+      // Create a key frame half-way through the animation
       key = anim["my_joint"]->CreateKeyFrame(2.5);
       key->SetValue(2.0);
 
@@ -47,9 +47,9 @@ namespace gazebo
 
      // Attach the animation to the model
       _model->SetJointAnimation(anim);
-    } 
+    }
   };
-    
+
   // Register this plugin with the simulator
   GZ_REGISTER_MODEL_PLUGIN(AnimateJoints)
 }

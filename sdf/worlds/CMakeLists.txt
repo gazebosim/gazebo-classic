@@ -1,22 +1,26 @@
 set (files 
   actor.world
+  actor_demo.world
+  actor_circle.world
+  two_actors.world
   camera.world
   depth_camera.world
   empty.world
   joints.world
-  kitchen.world
+  heightmap.world
   lights.world
   model_nesting.world
   pioneer2dx.world
   drop_test.world
+  trimesh_test.world
   collision_test.world
   simple_pendulums.world
-  set_world_pose_test.world
+  cart_test.world
   double_pendulums.world
   plugin.world
   pr2.world
   presentation.world
-  projector_test.world
+  projector.world
   shapes.world
   weshare2012.world
   willowgarage.world)

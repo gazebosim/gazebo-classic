@@ -1,0 +1,89 @@
+// Post processors
+
+// Deferred Shading: Ambient light
+material DeferredShading/AmbientLight
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+
+      depth_write on
+      depth_check on
+
+      texture_unit tex0
+      {
+        texture_alias tex0
+        content_type compositor DeferredShading/GBuffer mrt_output 0
+        tex_address_mode clamp
+        filtering none
+      }
+
+      texture_unit tex0
+      {
+        texture_alias tex0
+        content_type compositor DeferredShading/GBuffer mrt_output 1
+        tex_address_mode clamp
+        filtering none
+      }
+
+      vertex_program_ref DeferredShading/vs
+      {
+      }
+
+      fragment_program_ref DeferredShading/Ambient_ps
+      {
+      }
+    }
+  }
+}
+
+// Deferred Lighting: Ambient light
+material DeferredLighting/AmbientLight
+{
+  technique
+  {
+		pass
+		{
+			lighting off
+			
+			depth_write on
+			depth_check on
+			
+			vertex_program_ref DeferredShading/vs
+			{
+			}
+
+			fragment_program_ref DeferredLighting/Ambient_ps
+			{
+			}
+			
+			texture_unit
+			{
+				content_type compositor DeferredLighting/GBuffer mrt_output 0
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material DeferredShading/Post/SimpleQuad
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      depth_write off
+      depth_check off
+
+      texture_unit
+      {
+        texture white.bmp
+        filtering none
+      }
+    }
+  }
+}

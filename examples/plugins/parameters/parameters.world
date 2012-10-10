@@ -1,0 +1,27 @@
+<?xml version="1.0"?> 
+<gazebo version="1.2">
+  <world name="default">
+    <!-- A ground plane -->
+    <include filename="ground_plane.model"/>
+
+    <!-- A global light source -->
+    <include filename="sun.light"/>
+
+    <plugin name="parameters" filename="libparameters.so">
+      <param_list>
+        <param>value1</param>
+
+        <param_list_two>
+          <param>list_1_value_1</param>
+        </param_list_two>
+
+        <param_list_two>
+          <param>list_1_value_1</param>
+        </param_list_two>
+      </param_list>
+
+      <param_list>
+        <param>value2</param>
+      </param_list>
+    </plugin>
+</gazebo>

@@ -29,7 +29,7 @@
 #include "common/Plugin.hh"
 #include "sensors/SensorTypes.hh"
 #include "sensors/RaySensor.hh"
-#include "gazebo.h"
+#include "gazebo.hh"
 
 namespace gazebo
 {

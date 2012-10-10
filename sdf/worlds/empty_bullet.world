@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+  <world name="default">
+    <scene>
+      <ambient>.1 .1 .1 1</ambient>
+      <shadows>false</shadows>
+    </scene>
+    <physics type="bullet">
+      <gravity>0 0 -9.8</gravity>
+      <bullet>
+        <dt>0.001</dt>
+      </bullet>
+    </physics>
+
+    <!-- A ground plane -->
+    <include><uri>model://ground_plane</uri></include>
+
+    <include filename="hokuyo.model" />
+
+    <!-- A global light source -->
+    <include><uri>model://sun</uri></include>
+
+  </world>
+</gazebo>

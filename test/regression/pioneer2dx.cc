@@ -15,7 +15,7 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.h"
+#include "physics/physics.hh"
 #include "common/Time.hh"
 
 using namespace gazebo;
@@ -24,18 +24,18 @@ class Pioneer2dx : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-TEST_F(PR2Test, StraightLine)
+TEST_F(Pioneer2dx, StraightLine)
 {
-  Load("world/pioneer2dx.world");
-  transport::PublisherPtr velPub = this->node->Publish<gazebo::msgs::Pose>(
+  Load("worlds/pioneer2dx.world");
+  transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
-      gazebo::math::Vector3(cmd->vel.px, cmd->vel.py, 0));
+      gazebo::math::Vector3(0.2, 0, 0));
   gazebo::msgs::Set(msg.mutable_orientation(),
-      gazebo::math::Quaternion(0, 0, cmd->vel.pa));
-  this->velPub->Publish(msg);
+      gazebo::math::Quaternion(0, 0, 0));
+  velPub->Publish(msg);
 
   math::Pose startPose, endPose;
   startPose = this->poses["pioneer2dx"];
@@ -43,20 +43,26 @@ TEST_F(PR2Test, StraightLine)
   common::Time startTime = this->simTime;
   common::Time currTime = this->simTime;
 
-  struct timespec interval;
+  /*struct timespec interval;
   struct timespec remainder;
   interval.tv_sec = 1 / 1000;
   interval.tv_nsec = (1 % 1000) * 1000000;
+  */
 
-  while (currTime - startTime < common::Time(10, 0))
+  while (currTime - startTime < common::Time(100, 0))
   {
-    nanosleep(&interval, &remainder);
-    common::Time::MSleep(1000);
+    // nanosleep(&interval, &remainder);
+    common::Time::MSleep(100);
     currTime = this->simTime;
   }
+  endPose = this->poses["pioneer2dx"];
 
-  std::cout << "Start[" << startTime << "] Curr[" << currTime << "]\n";
-  std::cout << "StartPose[" << startPose << "] EndPose[" << endPose << "]\n";
+  double dist = (currTime - startTime).Double() * 0.2;
+  std::cout << "DIst[" << dist << "]\n";
+  std::cout << "EnPose.x[" << endPose.pos.x << "]\n";
+  EXPECT_LT(fabs(endPose.pos.x - dist), 0.1);
+  EXPECT_LT(fabs(endPose.pos.y), 0.5);
+  EXPECT_LT(fabs(endPose.pos.z), 0.01);
 }
 
 /////////////////////////////////////////////////

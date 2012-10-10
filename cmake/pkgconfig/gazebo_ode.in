@@ -7,4 +7,4 @@ Description: Gazebo Exported ODE Libraries
 Version: @GAZEBO_VERSION@
 Requires:
 Libs: -Wl,-rpath,${libdir},-rpath,${prefix}/lib -L${prefix}/lib -lgazebo_ode
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo/ode
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo

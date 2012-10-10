@@ -14,8 +14,11 @@
  * limitations under the License.
  *
 */
-#include "gazebo.h"
+#include "gazebo.hh"
 
+/// \example examples/plugins/world_edit.cc
+/// This example creates a WorldPlugin, initializes the Transport system by
+/// creating a new Node, and publishes messages to alter gravity.
 namespace gazebo
 {
   class WorldEdit : public WorldPlugin

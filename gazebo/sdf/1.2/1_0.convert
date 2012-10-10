@@ -1,0 +1,1462 @@
+<convert name="gazebo">
+  <convert name="world">
+    <convert name="state">
+      <rename>
+        <from attribute="time"/>
+        <to element="time"/>
+      </rename>
+    </convert>
+
+    <convert name="physics">
+      <rename>
+        <from attribute="update_rate"/>
+        <to element="update_rate"/>
+      </rename>
+      <rename>
+        <from element="gravity" attribute="xyz"/>
+        <to element="gravity"/>
+      </rename>
+
+      <convert name="ode">
+        <convert name="solver">
+          <rename>
+            <from attribute="type"/>
+            <to element="type"/>
+          </rename>
+          <rename>
+            <from attribute="dt"/>
+            <to element="dt"/>
+          </rename>
+          <rename>
+            <from attribute="iters"/>
+            <to element="iters"/>
+          </rename>
+          <rename>
+            <from attribute="precon_iters"/>
+            <to element="precon_iters"/>
+          </rename>
+          <rename>
+            <from attribute="sor"/>
+            <to element="sor"/>
+          </rename>
+        </convert> <!-- End solver -->
+
+        <convert name="constraints">
+          <rename>
+            <from attribute="cfm"/>
+            <to element="cfm"/>
+          </rename>
+          <rename>
+            <from attribute="erp"/>
+            <to element="erp"/>
+          </rename>
+          <rename>
+            <from attribute="contact_max_correcting_vel"/>
+            <to element="contact_max_correcting_vel"/>
+          </rename>
+          <rename>
+            <from attribute="contact_surface_layer"/>
+            <to element="contact_surface_layer"/>
+          </rename>
+        </convert> <!-- End constraints -->
+      </convert> <!-- End ode -->
+    </convert> <!-- End physics -->
+
+    <convert name="gui">
+      <convert name="camera">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+      </convert> <!-- End camera -->
+    </convert> <!-- End gui -->
+
+    <convert name="scene">
+      <rename>
+        <from element="ambient" attribute="rgba"/>
+        <to element="ambient"/>
+      </rename>
+
+      <rename>
+        <from element="background" attribute="rgba"/>
+        <to element="background"/>
+      </rename>
+
+      <rename>
+        <from element="shadows" attribute="enabled"/>
+        <to element="shadows"/>
+      </rename>
+
+      <rename>
+        <from element="grid" attribute="enabled"/>
+        <to element="grid"/>
+      </rename>
+
+      <convert name="fog">
+        <rename>
+          <from attribute="rgba"/>
+          <to element="color"/>
+        </rename>
+
+        <rename>
+          <from attribute="type"/>
+          <to element="type"/>
+        </rename>
+
+        <rename>
+          <from attribute="start"/>
+          <to element="start"/>
+        </rename>
+
+        <rename>
+          <from attribute="end"/>
+          <to element="end"/>
+        </rename>
+
+        <rename>
+          <from attribute="density"/>
+          <to element="density"/>
+        </rename>
+      </convert>
+   
+      <deprecated>background/sky/rgba</deprecated>
+      <deprecated>background/sky/material</deprecated>
+    </convert>
+
+    <convert name="actor">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="pose"/>
+      </rename>
+
+      <convert name="skin">
+        <rename>
+          <from attribute="filename"/>
+          <to element="filename"/>
+        </rename>
+
+        <rename>
+          <from attribute="scale"/>
+          <to element="scale"/>
+        </rename>
+      </convert> <!-- End skin -->
+
+      <convert name="animation">
+        <rename>
+          <from attribute="filename"/>
+          <to element="filename"/>
+        </rename>
+
+        <rename>
+          <from attribute="scale"/>
+          <to element="scale"/>
+        </rename>
+
+        <rename>
+          <from attribute="interpolate_x"/>
+          <to element="interpolate_x"/>
+        </rename>
+      </convert> <!-- End animation -->
+
+      <convert name="script">
+        <rename>
+          <from attribute="loop"/>
+          <to element="loop"/>
+        </rename>
+        <rename>
+          <from attribute="delay_start"/>
+          <to element="delay_start"/>
+        </rename>
+        <rename>
+          <from attribute="auto_start"/>
+          <to element="auto_start"/>
+        </rename>
+
+        <convert name="trajectory">
+          <convert name="waypoint">
+            <rename>
+              <from attribute="time"/>
+              <to element="time"/>
+            </rename>
+            <rename>
+              <from attribute="pose"/>
+              <to element="pose"/>
+            </rename>
+          </convert> <!-- End waypoint -->
+        </convert> <!-- End trajectory -->
+      </convert> <!-- End script-->
+    </convert> <!-- End actor -->
+
+    <convert name="light">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="pose"/>
+      </rename>
+
+      <rename>
+        <from attribute="cast_shadows"/>
+        <to element="cast_shadows"/>
+      </rename>
+
+      <rename>
+        <from element="diffuse" attribute="rgba"/>
+        <to element="diffuse"/>
+      </rename>
+      <rename>
+        <from element="specular" attribute="rgba"/>
+        <to element="specular"/>
+      </rename>
+      <rename>
+        <from element="direction" attribute="xyz"/>
+        <to element="direction"/>
+      </rename>
+
+      <convert name="spot">
+        <rename>
+          <from attribute="inner_angle"/>
+          <to element="inner_angle"/>
+        </rename>
+        <rename>
+          <from attribute="outer_angle"/>
+          <to element="outer_angle"/>
+        </rename>
+        <rename>
+          <from attribute="falloff"/>
+          <to element="falloff"/>
+        </rename>
+      </convert> <!-- End spot -->
+
+      <convert name="attenuation">
+        <rename>
+          <from attribute="range"/>
+          <to element="range"/>
+        </rename>
+        <rename>
+          <from attribute="linear"/>
+          <to element="linear"/>
+        </rename>
+        <rename>
+          <from attribute="constant"/>
+          <to element="constant"/>
+        </rename>
+        <rename>
+          <from attribute="quadratic"/>
+          <to element="quadratic"/>
+        </rename>
+      </convert> <!-- End attenuation -->
+    </convert> <!-- End light -->
+
+    <convert name="model">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="pose"/>
+      </rename>
+      <rename>
+        <from attribute="static"/>
+        <to element="static"/>
+      </rename>
+
+
+      <convert name="gripper">
+        <convert name="grasp_check">
+          <rename>
+            <from attribute="detach_steps"/>
+            <to element="detach_steps"/>
+          </rename>
+          <rename>
+            <from attribute="attach_steps"/>
+            <to element="attach_steps"/>
+          </rename>
+          <rename>
+            <from attribute="min_contact_count"/>
+            <to element="min_contact_count"/>
+          </rename>
+        </convert> <!-- End grasp_check -->
+      </convert> <!-- End gripper -->
+
+
+      <convert name="link">
+        <rename>
+          <from attribute="gravity"/>
+          <to element="gravity"/>
+        </rename>
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+        <rename>
+          <from attribute="self_collide"/>
+          <to element="self_collide"/>
+        </rename>
+        <rename>
+          <from attribute="kinematic"/>
+          <to element="kinematic"/>
+        </rename>
+
+        <convert name="inertial">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="pose"/>
+          </rename>
+          <rename>
+            <from attribute="mass"/>
+            <to element="mass"/>
+          </rename>
+          <rename>
+            <from attribute="density"/>
+            <to element="density"/>
+          </rename>
+          <convert name="inertia">
+            <rename>
+              <from attribute="ixx"/>
+              <to element="ixx"/>
+            </rename>
+            <rename>
+              <from attribute="ixy"/>
+              <to element="ixy"/>
+            </rename>
+            <rename>
+              <from attribute="ixz"/>
+              <to element="ixz"/>
+            </rename>
+            <rename>
+              <from attribute="iyy"/>
+              <to element="iyy"/>
+            </rename>
+            <rename>
+              <from attribute="iyz"/>
+              <to element="iyz"/>
+            </rename>
+            <rename>
+              <from attribute="izz"/>
+              <to element="izz"/>
+            </rename>
+          </convert> <!-- End inertia -->
+        </convert> <!-- End inertial -->
+
+        <convert name="sensor">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="pose"/>
+          </rename>
+
+          <rename>
+            <from attribute="always_on"/>
+            <to element="always_on"/>
+          </rename>
+          <rename>
+            <from attribute="update_rate"/>
+            <to element="update_rate"/>
+          </rename>
+          <rename>
+            <from attribute="visualize"/>
+            <to element="visualize"/>
+          </rename>
+
+          <convert name="ray">
+            <convert name="scan">
+              <convert name="horizontal">
+                <rename>
+                  <from attribute="samples"/>
+                  <to element="samples"/>
+                </rename>
+                <rename>
+                  <from attribute="resolution"/>
+                  <to element="resolution"/>
+                </rename>
+                <rename>
+                  <from attribute="min_angle"/>
+                  <to element="min_angle"/>
+                </rename>
+                <rename>
+                  <from attribute="max_angle"/>
+                  <to element="max_angle"/>
+                </rename>
+              </convert> <!-- End horizontal -->
+              <convert name="vertical">
+                <rename>
+                  <from attribute="samples"/>
+                  <to element="samples"/>
+                </rename>
+                <rename>
+                  <from attribute="resolution"/>
+                  <to element="resolution"/>
+                </rename>
+                <rename>
+                  <from attribute="min_angle"/>
+                  <to element="min_angle"/>
+                </rename>
+                <rename>
+                  <from attribute="max_angle"/>
+                  <to element="max_angle"/>
+                </rename>
+              </convert> <!-- End vertical -->
+            </convert> <!-- End scan -->
+            <convert name="range">
+              <rename>
+                <from attribute="min"/>
+                <to element="min"/>
+              </rename>
+              <rename>
+                <from attribute="max"/>
+                <to element="max"/>
+              </rename>
+              <rename>
+                <from attribute="resolution"/>
+                <to element="resolution"/>
+              </rename>
+            </convert> <!-- End range -->
+          </convert> <!-- End ray -->
+          <convert name="camera">
+            <rename>
+              <from element="horizontal_fov" attribute="angle"/>
+              <to element="horizontal_fov"/>
+            </rename>
+            <convert name="image">
+              <rename>
+                <from attribute="width"/>
+                <to element="width"/>
+              </rename>
+              <rename>
+                <from attribute="height"/>
+                <to element="height"/>
+              </rename>
+              <rename>
+                <from attribute="format"/>
+                <to element="format"/>
+              </rename>
+            </convert> <!-- End image -->
+          </convert> <!-- End camera -->
+
+          <convert name="clip">
+            <rename>
+              <from attribute="near"/>
+              <to element="near"/>
+            </rename>
+            <rename>
+              <from attribute="far"/>
+              <to element="far"/>
+            </rename>
+          </convert> <!-- End clip -->
+
+          <convert name="save">
+            <rename>
+              <rename>
+                <from attribute="path"/>
+                <to element="path"/>
+              </rename>
+            </rename>
+          </convert> <!-- End save -->
+          <convert name="depth_camera">
+            <rename>
+              <from attribute="output"/>
+              <to element="output"/>
+            </rename>
+          </convert> <!-- End depth_camera -->
+        </convert> <!-- End sensor -->
+
+        <convert name="collision">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="pose"/>
+          </rename>
+
+          <rename>
+            <from attribute="laser_retro"/>
+            <to element="laser_retro"/>
+          </rename>
+
+
+          <convert name="surface">
+            <convert name="bounce">
+              <rename>
+                <from attribute="restitution_coefficient"/>
+                <to element="restitution_coefficient"/>
+              </rename>
+              <rename>
+                <from attribute="threshold"/>
+                <to element="threshold"/>
+              </rename>
+            </convert> <!-- End bounce -->
+            <convert name="friction">
+              <convert name="ode">
+                <rename>
+                  <from attribute="mu"/>
+                  <to element="mu"/>
+                </rename>
+                <rename>
+                  <from attribute="mu2"/>
+                  <to element="mu2"/>
+                </rename>
+                <rename>
+                  <from attribute="fdir1"/>
+                  <to element="fdir1"/>
+                </rename>
+                <rename>
+                  <from attribute="slip1"/>
+                  <to element="slip1"/>
+                </rename>
+                <rename>
+                  <from attribute="slip2"/>
+                  <to element="slip2"/>
+                </rename>
+              </convert> <!-- End ode -->
+            </convert> <!-- End friction -->
+
+            <convert name="contact">
+              <convert name="ode">
+                <rename>
+                  <from attribute="soft_cfm"/>
+                  <to element="soft_cfm"/>
+                </rename>
+                <rename>
+                  <from attribute="soft_erp"/>
+                  <to element="soft_erp"/>
+                </rename>
+                <rename>
+                  <from attribute="kp"/>
+                  <to element="kp"/>
+                </rename>
+                <rename>
+                  <from attribute="kd"/>
+                  <to element="kd"/>
+                </rename>
+                <rename>
+                  <from attribute="max_vel"/>
+                  <to element="max_vel"/>
+                </rename>
+                <rename>
+                  <from attribute="min_depth"/>
+                  <to element="min_depth"/>
+                </rename>
+              </convert> <!-- End ode -->
+            </convert> <!-- End contact -->
+          </convert> <!-- End surface -->
+
+          <convert name="geometry">
+            <convert name="box">
+              <rename>
+                <from attribute="size"/>
+                <to element="size"/>
+              </rename>
+            </convert> <!-- End box -->
+            <convert name="sphere">
+              <rename>
+                <from attribute="radius"/>
+                <to element="radius"/>
+              </rename>
+            </convert> <!-- End sphere -->
+            <convert name="cylinder">
+              <rename>
+                <from attribute="radius"/>
+                <to element="radius"/>
+              </rename>
+              <rename>
+                <from attribute="length"/>
+                <to element="length"/>
+              </rename>
+            </convert> <!-- End cylinder -->
+            <convert name="mesh">
+              <rename>
+                <from attribute="filename"/>
+                <to element="filename"/>
+              </rename>
+              <rename>
+                <from attribute="scale"/>
+                <to element="scale"/>
+              </rename>
+            </convert> <!-- End mesh -->
+            <convert name="image">
+              <rename>
+                <from attribute="filename"/>
+                <to element="filename"/>
+              </rename>
+              <rename>
+                <from attribute="scale"/>
+                <to element="scale"/>
+              </rename>
+              <rename>
+                <from attribute="threshold"/>
+                <to element="threshold"/>
+              </rename>
+              <rename>
+                <from attribute="height"/>
+                <to element="height"/>
+              </rename>
+              <rename>
+                <from attribute="granularity"/>
+                <to element="granularity"/>
+              </rename>
+            </convert> <!-- End image -->
+
+            <convert name="heightmap">
+              <rename>
+                <from attribute="filename"/>
+                <to element="filename"/>
+              </rename>
+              <rename>
+                <from attribute="size"/>
+                <to element="size"/>
+              </rename>
+              <rename>
+                <from attribute="origin"/>
+                <to element="pos"/>
+              </rename>
+            </convert> <!-- End heightmap -->
+
+
+            <convert name="plane">
+              <rename>
+                <from attribute="normal"/>
+                <to element="normal"/>
+              </rename>
+            </convert>
+          </convert> <!-- End geometry -->
+        </convert> <!-- End collision -->
+
+        <convert name="visual">
+          <rename>
+            <from element="origin" attribute="pose"/>
+            <to element="pose"/>
+          </rename>
+          <rename>
+            <from attribute="cast_shadows"/>
+            <to element="cast_shadows"/>
+          </rename>
+          <rename>
+            <from attribute="laser_retro"/>
+            <to element="laser_retro"/>
+          </rename>
+          <rename>
+            <from attribute="transparency"/>
+            <to element="transparency"/>
+          </rename>
+
+          <convert name="geometry">
+            <convert name="box">
+              <rename>
+                <from attribute="size"/>
+                <to element="size"/>
+              </rename>
+            </convert> <!-- End box -->
+            <convert name="sphere">
+              <rename>
+                <from attribute="radius"/>
+                <to element="radius"/>
+              </rename>
+            </convert> <!-- End sphere -->
+            <convert name="cylinder">
+              <rename>
+                <from attribute="radius"/>
+                <to element="radius"/>
+              </rename>
+              <rename>
+                <from attribute="length"/>
+                <to element="length"/>
+              </rename>
+            </convert> <!-- End cylinder -->
+            <convert name="mesh">
+              <rename>
+                <from attribute="filename"/>
+                <to element="filename"/>
+              </rename>
+              <rename>
+                <from attribute="scale"/>
+                <to element="scale"/>
+              </rename>
+            </convert> <!-- End mesh -->
+            <convert name="image">
+              <rename>
+                <from attribute="filename"/>
+                <to element="filename"/>
+              </rename>
+              <rename>
+                <from attribute="scale"/>
+                <to element="scale"/>
+              </rename>
+              <rename>
+                <from attribute="threshold"/>
+                <to element="threshold"/>
+              </rename>
+              <rename>
+                <from attribute="height"/>
+                <to element="height"/>
+              </rename>
+              <rename>
+                <from attribute="granularity"/>
+                <to element="granularity"/>
+              </rename>
+            </convert> <!-- End image -->
+
+            <convert name="heightmap">
+              <rename>
+                <from attribute="filename"/>
+                <to element="filename"/>
+              </rename>
+              <rename>
+                <from attribute="size"/>
+                <to element="size"/>
+              </rename>
+              <rename>
+                <from attribute="origin"/>
+                <to element="pos"/>
+              </rename>
+            </convert> <!-- End heightmap -->
+
+            <convert name="plane">
+              <rename>
+                <from attribute="normal"/>
+                <to element="normal"/>
+              </rename>
+            </convert>
+          </convert> <!-- End geometry -->
+
+          <convert name="material">
+            <rename>
+              <from attribute="script"/>
+              <to element="script"/>
+            </rename>
+            <rename>
+              <from element="ambient" attribute="rgba"/>
+              <to element="ambient"/>
+            </rename>
+            <rename>
+              <from element="specular" attribute="rgba"/>
+              <to element="specular"/>
+            </rename>
+            <rename>
+              <from element="diffuse" attribute="rgba"/>
+              <to element="diffuse"/>
+            </rename>
+            <rename>
+              <from element="emissive" attribute="rgba"/>
+              <to element="emissive"/>
+            </rename>
+          </convert> <!-- End material -->
+        </convert> <!-- End visual -->
+      </convert> <!-- End link -->
+
+      <convert name="joint">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+        <rename>
+          <from element="parent" attribute="link"/>
+          <to element="parent"/>
+        </rename>
+        <rename>
+          <from element="child" attribute="link"/>
+          <to element="child"/>
+        </rename>
+        <convert name="axis">
+          <rename>
+            <from attribute="xyz"/>
+            <to element="xyz"/>
+          </rename>
+
+          <convert name="dynamics">
+            <rename>
+              <from attribute="damping"/>
+              <to element="damping"/>
+            </rename>
+            <rename>
+              <from attribute="friction"/>
+              <to element="friction"/>
+            </rename>
+          </convert> <!-- End dynamics -->
+          <convert name="limit">
+            <rename>
+              <from attribute="lower"/>
+              <to element="lower"/>
+            </rename>
+            <rename>
+              <from attribute="upper"/>
+              <to element="upper"/>
+            </rename>
+            <rename>
+              <from attribute="effort"/>
+              <to element="effort"/>
+            </rename>
+            <rename>
+              <from attribute="velocity"/>
+              <to element="velocity"/>
+            </rename>
+          </convert> <!-- End limit -->
+        </convert> <!-- End axis -->
+
+        <convert name="axis2">
+          <rename>
+            <from attribute="xyz"/>
+            <to element="xyz"/>
+          </rename>
+
+          <convert name="dynamics">
+            <rename>
+              <from attribute="damping"/>
+              <to element="damping"/>
+            </rename>
+            <rename>
+              <from attribute="friction"/>
+              <to element="friction"/>
+            </rename>
+          </convert> <!-- End dynamics -->
+          <convert name="limit">
+            <rename>
+              <from attribute="lower"/>
+              <to element="lower"/>
+            </rename>
+            <rename>
+              <from attribute="upper"/>
+              <to element="upper"/>
+            </rename>
+            <rename>
+              <from attribute="effort"/>
+              <to element="effort"/>
+            </rename>
+            <rename>
+              <from attribute="velocity"/>
+              <to element="velocity"/>
+            </rename>
+          </convert> <!-- End limit -->
+        </convert> <!-- End axis2 -->
+
+        <convert name="physics">
+          <convert name="limit">
+            <rename>
+              <from attribute="cfm"/>
+              <to element="cfm"/>
+            </rename>
+            <rename>
+              <from attribute="erp"/>
+              <to element="erp"/>
+            </rename>
+          </convert> <!-- End limit -->
+          <convert name="suspension">
+            <rename>
+              <from attribute="cfm"/>
+              <to element="cfm"/>
+            </rename>
+            <rename>
+              <from attribute="erp"/>
+              <to element="erp"/>
+            </rename>
+          </convert> <!-- End suspension -->
+        </convert> <!-- End physics -->
+      </convert> <!-- End joint -->
+    </convert> <!-- End model -->
+  </convert> <!-- End world -->
+
+
+
+  <convert name="model">
+    <rename>
+      <from element="origin" attribute="pose"/>
+      <to element="pose"/>
+    </rename>
+    <rename>
+      <from attribute="static"/>
+      <to element="static"/>
+    </rename>
+
+
+    <convert name="gripper">
+      <convert name="grasp_check">
+        <rename>
+          <from attribute="detach_steps"/>
+          <to element="detach_steps"/>
+        </rename>
+        <rename>
+          <from attribute="attach_steps"/>
+          <to element="attach_steps"/>
+        </rename>
+        <rename>
+          <from attribute="min_contact_count"/>
+          <to element="min_contact_count"/>
+        </rename>
+      </convert> <!-- End grasp_check -->
+    </convert> <!-- End gripper -->
+
+
+    <convert name="link">
+      <rename>
+        <from attribute="gravity"/>
+        <to element="gravity"/>
+      </rename>
+      <rename>
+        <from attribute="self_collide"/>
+        <to element="self_collide"/>
+      </rename>
+      <rename>
+        <from attribute="kinematic"/>
+        <to element="kinematic"/>
+      </rename>
+
+      <rename>
+        <from element="damping"/>
+        <to element="velocity_decay"/>
+      </rename>
+
+      <convert name="inertial">
+        <rename>
+          <from attribute="mass"/>
+          <to element="mass"/>
+        </rename>
+        <rename>
+          <from attribute="density"/>
+          <to element="density"/>
+        </rename>
+        <convert name="inertia">
+          <rename>
+            <from attribute="ixx"/>
+            <to element="ixx"/>
+          </rename>
+          <rename>
+            <from attribute="ixy"/>
+            <to element="ixy"/>
+          </rename>
+          <rename>
+            <from attribute="ixz"/>
+            <to element="ixz"/>
+          </rename>
+          <rename>
+            <from attribute="iyy"/>
+            <to element="iyy"/>
+          </rename>
+          <rename>
+            <from attribute="iyz"/>
+            <to element="iyz"/>
+          </rename>
+          <rename>
+            <from attribute="izz"/>
+            <to element="izz"/>
+          </rename>
+        </convert> <!-- End inertia -->
+      </convert> <!-- End inertial -->
+
+      <convert name="sensor">
+        <rename>
+          <from attribute="always_on"/>
+          <to element="always_on"/>
+        </rename>
+        <rename>
+          <from attribute="update_rate"/>
+          <to element="update_rate"/>
+        </rename>
+        <rename>
+          <from attribute="visualize"/>
+          <to element="visualize"/>
+        </rename>
+
+        <convert name="ray">
+          <convert name="scan">
+            <convert name="horizontal">
+              <rename>
+                <from attribute="samples"/>
+                <to element="samples"/>
+              </rename>
+              <rename>
+                <from attribute="resolution"/>
+                <to element="resolution"/>
+              </rename>
+              <rename>
+                <from attribute="min_angle"/>
+                <to element="min_angle"/>
+              </rename>
+              <rename>
+                <from attribute="max_angle"/>
+                <to element="max_angle"/>
+              </rename>
+            </convert> <!-- End horizontal -->
+            <convert name="vertical">
+              <rename>
+                <from attribute="samples"/>
+                <to element="samples"/>
+              </rename>
+              <rename>
+                <from attribute="resolution"/>
+                <to element="resolution"/>
+              </rename>
+              <rename>
+                <from attribute="min_angle"/>
+                <to element="min_angle"/>
+              </rename>
+              <rename>
+                <from attribute="max_angle"/>
+                <to element="max_angle"/>
+              </rename>
+            </convert> <!-- End vertical -->
+          </convert> <!-- End scan -->
+          <convert name="range">
+            <rename>
+              <from attribute="min"/>
+              <to element="min"/>
+            </rename>
+            <rename>
+              <from attribute="max"/>
+              <to element="max"/>
+            </rename>
+            <rename>
+              <from attribute="resolution"/>
+              <to element="resolution"/>
+            </rename>
+          </convert> <!-- End range -->
+        </convert> <!-- End ray -->
+        <convert name="camera">
+          <rename>
+            <from element="horizontal_fov" attribute="angle"/>
+            <to element="horizontal_fov"/>
+          </rename>
+          <convert name="image">
+            <rename>
+              <from attribute="width"/>
+              <to element="width"/>
+            </rename>
+            <rename>
+              <from attribute="height"/>
+              <to element="height"/>
+            </rename>
+            <rename>
+              <from attribute="format"/>
+              <to element="format"/>
+            </rename>
+          </convert> <!-- End image -->
+        </convert> <!-- End camera -->
+
+        <convert name="clip">
+          <rename>
+            <from attribute="near"/>
+            <to element="near"/>
+          </rename>
+          <rename>
+            <from attribute="far"/>
+            <to element="far"/>
+          </rename>
+        </convert> <!-- End clip -->
+
+        <convert name="save">
+          <rename>
+            <rename>
+              <from attribute="path"/>
+              <to element="path"/>
+            </rename>
+          </rename>
+        </convert> <!-- End save -->
+        <convert name="depth_camera">
+          <rename>
+            <from attribute="output"/>
+            <to element="output"/>
+          </rename>
+        </convert> <!-- End depth_camera -->
+      </convert> <!-- End sensor -->
+
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="pose"/>
+      </rename>
+
+      <convert name="sensor">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+      </convert>
+
+      <convert name="inertial">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+      </convert> <!-- End inertial-->
+
+      <convert name="collision">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+
+        <rename>
+          <from attribute="laser_retro"/>
+          <to element="laser_retro"/>
+        </rename>
+
+
+        <convert name="surface">
+          <convert name="bounce">
+            <rename>
+              <from attribute="restitution_coefficient"/>
+              <to element="restitution_coefficient"/>
+            </rename>
+            <rename>
+              <from attribute="threshold"/>
+              <to element="threshold"/>
+            </rename>
+          </convert> <!-- End bounce -->
+          <convert name="friction">
+            <convert name="ode">
+              <rename>
+                <from attribute="mu"/>
+                <to element="mu"/>
+              </rename>
+              <rename>
+                <from attribute="mu2"/>
+                <to element="mu2"/>
+              </rename>
+              <rename>
+                <from attribute="fdir1"/>
+                <to element="fdir1"/>
+              </rename>
+              <rename>
+                <from attribute="slip1"/>
+                <to element="slip1"/>
+              </rename>
+              <rename>
+                <from attribute="slip2"/>
+                <to element="slip2"/>
+              </rename>
+            </convert> <!-- End ode -->
+          </convert> <!-- End friction -->
+
+          <convert name="contact">
+            <convert name="ode">
+              <rename>
+                <from attribute="soft_cfm"/>
+                <to element="soft_cfm"/>
+              </rename>
+              <rename>
+                <from attribute="soft_erp"/>
+                <to element="soft_erp"/>
+              </rename>
+              <rename>
+                <from attribute="kp"/>
+                <to element="kp"/>
+              </rename>
+              <rename>
+                <from attribute="kd"/>
+                <to element="kd"/>
+              </rename>
+              <rename>
+                <from attribute="max_vel"/>
+                <to element="max_vel"/>
+              </rename>
+              <rename>
+                <from attribute="min_depth"/>
+                <to element="min_depth"/>
+              </rename>
+            </convert> <!-- End ode -->
+          </convert> <!-- End contact -->
+        </convert> <!-- End surface -->
+
+        <convert name="geometry">
+          <convert name="box">
+            <rename>
+              <from attribute="size"/>
+              <to element="size"/>
+            </rename>
+          </convert> <!-- End box -->
+          <convert name="sphere">
+            <rename>
+              <from attribute="radius"/>
+              <to element="radius"/>
+            </rename>
+          </convert> <!-- End sphere -->
+          <convert name="cylinder">
+            <rename>
+              <from attribute="radius"/>
+              <to element="radius"/>
+            </rename>
+            <rename>
+              <from attribute="length"/>
+              <to element="length"/>
+            </rename>
+          </convert> <!-- End cylinder -->
+          <convert name="mesh">
+            <rename>
+              <from attribute="filename"/>
+              <to element="filename"/>
+            </rename>
+            <rename>
+              <from attribute="scale"/>
+              <to element="scale"/>
+            </rename>
+          </convert> <!-- End mesh -->
+          <convert name="image">
+            <rename>
+              <from attribute="filename"/>
+              <to element="filename"/>
+            </rename>
+            <rename>
+              <from attribute="scale"/>
+              <to element="scale"/>
+            </rename>
+            <rename>
+              <from attribute="threshold"/>
+              <to element="threshold"/>
+            </rename>
+            <rename>
+              <from attribute="height"/>
+              <to element="height"/>
+            </rename>
+            <rename>
+              <from attribute="granularity"/>
+              <to element="granularity"/>
+            </rename>
+          </convert> <!-- End image -->
+
+          <convert name="heightmap">
+            <rename>
+              <from attribute="filename"/>
+              <to element="filename"/>
+            </rename>
+            <rename>
+              <from attribute="size"/>
+              <to element="size"/>
+            </rename>
+            <rename>
+              <from attribute="origin"/>
+              <to element="pos"/>
+            </rename>
+          </convert> <!-- End heightmap -->
+
+
+          <convert name="plane">
+            <rename>
+              <from attribute="normal"/>
+              <to element="normal"/>
+            </rename>
+          </convert>
+        </convert> <!-- End geometry -->
+      </convert> <!-- End collision -->
+
+      <convert name="visual">
+        <rename>
+          <from element="origin" attribute="pose"/>
+          <to element="pose"/>
+        </rename>
+        <rename>
+          <from attribute="cast_shadows"/>
+          <to element="cast_shadows"/>
+        </rename>
+        <rename>
+          <from attribute="laser_retro"/>
+          <to element="laser_retro"/>
+        </rename>
+        <rename>
+          <from attribute="transparency"/>
+          <to element="transparency"/>
+        </rename>
+
+        <convert name="geometry">
+          <convert name="box">
+            <rename>
+              <from attribute="size"/>
+              <to element="size"/>
+            </rename>
+          </convert> <!-- End box -->
+          <convert name="sphere">
+            <rename>
+              <from attribute="radius"/>
+              <to element="radius"/>
+            </rename>
+          </convert> <!-- End sphere -->
+          <convert name="cylinder">
+            <rename>
+              <from attribute="radius"/>
+              <to element="radius"/>
+            </rename>
+            <rename>
+              <from attribute="length"/>
+              <to element="length"/>
+            </rename>
+          </convert> <!-- End cylinder -->
+          <convert name="mesh">
+            <rename>
+              <from attribute="filename"/>
+              <to element="filename"/>
+            </rename>
+            <rename>
+              <from attribute="scale"/>
+              <to element="scale"/>
+            </rename>
+          </convert> <!-- End mesh -->
+          <convert name="image">
+            <rename>
+              <from attribute="filename"/>
+              <to element="filename"/>
+            </rename>
+            <rename>
+              <from attribute="scale"/>
+              <to element="scale"/>
+            </rename>
+            <rename>
+              <from attribute="threshold"/>
+              <to element="threshold"/>
+            </rename>
+            <rename>
+              <from attribute="height"/>
+              <to element="height"/>
+            </rename>
+            <rename>
+              <from attribute="granularity"/>
+              <to element="granularity"/>
+            </rename>
+          </convert> <!-- End image -->
+
+          <convert name="heightmap">
+            <rename>
+              <from attribute="filename"/>
+              <to element="filename"/>
+            </rename>
+            <rename>
+              <from attribute="size"/>
+              <to element="size"/>
+            </rename>
+            <rename>
+              <from attribute="origin"/>
+              <to element="pos"/>
+            </rename>
+          </convert> <!-- End heightmap -->
+
+          <convert name="plane">
+            <rename>
+              <from attribute="normal"/>
+              <to element="normal"/>
+            </rename>
+          </convert>
+        </convert> <!-- End geometry -->
+
+        <convert name="material">
+          <rename>
+            <from attribute="script"/>
+            <to element="script"/>
+          </rename>
+          <rename>
+            <from element="ambient" attribute="rgba"/>
+            <to element="ambient"/>
+          </rename>
+          <rename>
+            <from element="specular" attribute="rgba"/>
+            <to element="specular"/>
+          </rename>
+          <rename>
+            <from element="diffuse" attribute="rgba"/>
+            <to element="diffuse"/>
+          </rename>
+          <rename>
+            <from element="emissive" attribute="rgba"/>
+            <to element="emissive"/>
+          </rename>
+        </convert> <!-- End material -->
+      </convert> <!-- End visual -->
+    </convert> <!-- End link -->
+
+    <convert name="joint">
+      <rename>
+        <from element="origin" attribute="pose"/>
+        <to element="pose"/>
+      </rename>
+      <rename>
+        <from element="parent" attribute="link"/>
+        <to element="parent"/>
+      </rename>
+      <rename>
+        <from element="child" attribute="link"/>
+        <to element="child"/>
+      </rename>
+      <convert name="axis">
+        <rename>
+          <from attribute="xyz"/>
+          <to element="xyz"/>
+        </rename>
+
+        <convert name="dynamics">
+          <rename>
+            <from attribute="damping"/>
+            <to element="damping"/>
+          </rename>
+          <rename>
+            <from attribute="friction"/>
+            <to element="friction"/>
+          </rename>
+        </convert> <!-- End dynamics -->
+        <convert name="limit">
+          <rename>
+            <from attribute="lower"/>
+            <to element="lower"/>
+          </rename>
+          <rename>
+            <from attribute="upper"/>
+            <to element="upper"/>
+          </rename>
+          <rename>
+            <from attribute="effort"/>
+            <to element="effort"/>
+          </rename>
+          <rename>
+            <from attribute="velocity"/>
+            <to element="velocity"/>
+          </rename>
+        </convert> <!-- End limit -->
+      </convert> <!-- End axis -->
+      <convert name="axis2">
+        <rename>
+          <from attribute="xyz"/>
+          <to element="xyz"/>
+        </rename>
+
+        <convert name="dynamics">
+          <rename>
+            <from attribute="damping"/>
+            <to element="damping"/>
+          </rename>
+          <rename>
+            <from attribute="friction"/>
+            <to element="friction"/>
+          </rename>
+        </convert> <!-- End dynamics -->
+        <convert name="limit">
+          <rename>
+            <from attribute="lower"/>
+            <to element="lower"/>
+          </rename>
+          <rename>
+            <from attribute="upper"/>
+            <to element="upper"/>
+          </rename>
+          <rename>
+            <from attribute="effort"/>
+            <to element="effort"/>
+          </rename>
+          <rename>
+            <from attribute="velocity"/>
+            <to element="velocity"/>
+          </rename>
+        </convert> <!-- End limit -->
+      </convert> <!-- End axis2 -->
+
+      <convert name="physics">
+        <convert name="limit">
+          <rename>
+            <from attribute="cfm"/>
+            <to element="cfm"/>
+          </rename>
+          <rename>
+            <from attribute="erp"/>
+            <to element="erp"/>
+          </rename>
+        </convert> <!-- End limit -->
+        <convert name="suspension">
+          <rename>
+            <from attribute="cfm"/>
+            <to element="cfm"/>
+          </rename>
+          <rename>
+            <from attribute="erp"/>
+            <to element="erp"/>
+          </rename>
+        </convert> <!-- End suspension -->
+      </convert> <!-- End physics -->
+    </convert> <!-- End joint -->
+  </convert> <!-- End model -->
+
+</convert> <!-- End gazebo -->

@@ -18,21 +18,29 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
+#define BOOST_FILESYSTEM_VERSION 2
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
 
 #include <map>
 #include <string>
 
-#include "transport/transport.h"
+#include "transport/transport.hh"
+
+#include "common/SystemPaths.hh"
+#include "physics/World.hh"
+#include "physics/PhysicsTypes.hh"
 #include "physics/Physics.hh"
-#include "sensors/sensors.h"
-#include "rendering/rendering.h"
-#include "msgs/msgs.h"
+#include "sensors/sensors.hh"
+#include "rendering/rendering.hh"
+#include "msgs/msgs.hh"
 
 #include "gazebo_config.h"
-#include "src/Server.hh"
+#include "gazebo/Server.hh"
+
+#include "test_config.h"
 
 using namespace gazebo;
 
@@ -48,6 +56,26 @@ class ServerFixture : public testing::Test
                this->gotImage = 0;
                this->imgData = NULL;
                this->serverThread = NULL;
+
+               common::SystemPaths::Instance()->AddGazeboPaths(
+                   TEST_REGRESSION_PATH);
+
+               // Add local search paths
+               std::string path = TEST_REGRESSION_PATH;
+               path += "/../..";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../sdf";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../gazebo";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../build/plugins";
+               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
              }
 
   protected: virtual void TearDown()
@@ -80,6 +108,7 @@ class ServerFixture : public testing::Test
              {
                this->Load(_worldFilename, false);
              }
+
   protected: virtual void Load(const std::string &_worldFilename, bool _paused)
              {
                delete this->server;
@@ -113,7 +142,7 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
-               printf("Load world[%s]\n", _worldFilename.c_str());
+
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);
@@ -211,7 +240,28 @@ class ServerFixture : public testing::Test
                    _name.c_str());
              }
 
-  protected: void ScanCompare(double *_scanA, double *_scanB,
+  protected: void FloatCompare(float *_scanA, float *_scanB,
+                 unsigned int _sampleCount, float &_diffMax,
+                 float &_diffSum, float &_diffAvg)
+             {
+               float diff;
+               _diffMax = 0;
+               _diffSum = 0;
+               _diffAvg = 0;
+               for (unsigned int i = 0; i < _sampleCount; ++i)
+               {
+                 diff = fabs(math::precision(_scanA[i], 10) -
+                             math::precision(_scanB[i], 10));
+                 _diffSum += diff;
+                 if (diff > _diffMax)
+                 {
+                   _diffMax = diff;
+                 }
+               }
+               _diffAvg = _diffSum / _sampleCount;
+             }
+
+  protected: void DoubleCompare(double *_scanA, double *_scanB,
                  unsigned int _sampleCount, double &_diffMax,
                  double &_diffSum, double &_diffAvg)
              {
@@ -303,27 +353,38 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 unsigned int _width = 320, unsigned int _height = 240,
+                 double _rate = 25)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
-                 << "<model name ='" << _modelName << "' static ='true'>"
-                 << "<origin pose ='" << _pos.x << " "
+               newModelStr << "<gazebo version ='1.2'>"
+                 << "<model name ='" << _modelName << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
-                 << "' type ='camera' always_on ='1' update_rate ='25' "
-                 << "visualize ='true'>"
+                 << "' type ='camera'>"
+                 << "    <always_on>1</always_on>"
+                 << "    <update_rate>" << _rate << "</update_rate>"
+                 << "    <visualize>true</visualize>"
                  << "    <camera>"
-                 << "      <horizontal_fov angle ='0.78539816339744828'/>"
-                 << "      <image width ='320' height ='240' format ='R8G8B8'/>"
-                 << "      <clip near ='0.10000000000000001' far ='100'/>"
+                 << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+                 << "      <image>"
+                 << "        <width>" << _width << "</width>"
+                 << "        <height>" << _height << "</height>"
+                 << "        <format>R8G8B8</format>"
+                 << "      </image>"
+                 << "      <clip>"
+                 << "        <near>0.1</near><far>100</far>"
+                 << "      </clip>"
                  // << "      <save enabled ='true' path ='/tmp/camera/'/>"
                  << "    </camera>"
                  << "  </sensor>"
@@ -345,27 +406,27 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
-                 << "  <inertial mass ='1.0'>"
-                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
-                 << " iyz ='0' izz ='1'/>"
-                 << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <cylinder radius ='.5' length ='1.0'/>"
+                 << "      <cylinder>"
+                 << "        <radius>.5</radius><length>1.0</length>"
+                 << "      </cylinder>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
-                 << "      <cylinder radius ='.5' length ='1.0'/>"
+                 << "      <cylinder>"
+                 << "        <radius>.5</radius><length>1.0</length>"
+                 << "      </cylinder>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -380,33 +441,30 @@ class ServerFixture : public testing::Test
                  common::Time::MSleep(10);
              }
 
+
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
-                 << "  <inertial mass ='1.0'>"
-                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
-                 << " iyz ='0' izz ='1'/>"
-                 << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <sphere radius ='.5'/>"
+                 << "      <sphere><radius>.5</radius></sphere>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
-                 << "      <sphere radius ='.5'/>"
+                 << "      <sphere><radius>.5</radius></sphere>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -428,27 +486,23 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
-                 << "  <inertial mass ='1.0'>"
-                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
-                 << " iyz ='0' izz ='1'/>"
-                 << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <box size ='" << _size << "'/>"
+                 << "      <box><size>" << _size << "</size></box>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name ='visual' cast_shadows ='true'>"
+                 << "  <visual name ='visual'>"
                  << "    <geometry>"
-                 << "      <box size ='" << _size << "'/>"
+                 << "      <box><size>" << _size << "</size></box>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -477,6 +531,29 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
              }
 
+  protected: void LoadPlugin(const std::string &_filename,
+                             const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->LoadPlugin(_filename, _name, sdf::ElementPtr());
+             }
+
+  protected: physics::ModelPtr GetModel(const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               return world->GetModel(_name);
+             }
+
+
+  protected: void RemovePlugin(const std::string &_name)
+             {
+               // Get the first world...we assume it the only one running
+               physics::WorldPtr world = physics::get_world();
+               world->RemovePlugin(_name);
+             }
+
   protected: Server *server;
   protected: boost::thread *serverThread;
 
@@ -491,7 +568,7 @@ class ServerFixture : public testing::Test
   private: unsigned char **imgData;
   private: int gotImage;
 
-  private: common::Time simTime, realTime, pauseTime;
+  protected: common::Time simTime, realTime, pauseTime;
   private: double percentRealTime;
   private: bool paused;
   private: bool serverRunning;

@@ -3340,7 +3340,8 @@ def main():
 
   _cpplint_state.ResetErrorCounts()
   for filename in filenames:
-    ProcessFile(filename, _cpplint_state.verbose_level)
+    if filename != "./gazebo/rendering/cegui.h":
+      ProcessFile(filename, _cpplint_state.verbose_level)
   _cpplint_state.PrintErrorCounts()
 
   sys.exit(_cpplint_state.error_count > 0)

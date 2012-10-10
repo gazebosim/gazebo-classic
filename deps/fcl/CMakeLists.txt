@@ -36,4 +36,4 @@ include_directories(SYSTEM
 
 gz_add_library(gazebo_fcl ${sources})
 target_link_libraries(gazebo_fcl gazebo_ccd gazebo_ann)
-INSTALL_LIBRARY(gazebo_fcl)
+gz_install_library(gazebo_fcl)

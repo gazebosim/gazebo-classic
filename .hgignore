@@ -1,4 +1,5 @@
 syntax: glob
 
 build
+build_*
 Ogre.log

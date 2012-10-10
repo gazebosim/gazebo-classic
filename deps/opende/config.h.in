@@ -99,6 +99,7 @@ typedef uintptr_t intP;
 
 #define dDOUBLE 1
 #define dTRIMESH_ENABLED 1
+#define dTRIMESH_GIMPACT 0
 #define dTRIMESH_OPCODE 1
 #define __ODE__ 1
 #define STD_HEADERS 1

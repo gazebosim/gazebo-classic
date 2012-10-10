@@ -27,13 +27,12 @@
 
         <inertial mass="10.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
                    izz="1.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_cylinder" laser_retro="100.0">
+        <visual name="visual_cylinder" laser_retro="100.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
           <geometry>
             <cylinder radius="0.1" length="1.0"/>
@@ -66,13 +65,12 @@
 
         <inertial mass="10.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
                    izz="1.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
+        <visual name="visual_box" laser_retro="100.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
           <geometry>
             <box size="0.1 0.1 1.0"/>
@@ -155,13 +153,12 @@
 
         <inertial mass="10.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
                    izz="1.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_cylinder" laser_retro="100.0">
+        <visual name="visual_cylinder" laser_retro="100.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
           <geometry>
             <cylinder radius="0.1" length="1.0"/>
@@ -194,13 +191,12 @@
 
         <inertial mass="10.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
                    izz="1.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
+        <visual name="visual_box" laser_retro="100.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
           <geometry>
             <box size="0.1 0.1 1.0"/>
@@ -281,13 +277,12 @@
 
         <inertial mass="10.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
                    izz="1.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_cylinder" laser_retro="100.0">
+        <visual name="visual_cylinder" laser_retro="100.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
           <geometry>
             <cylinder radius="0.1" length="1.0"/>
@@ -320,13 +315,12 @@
 
         <inertial mass="10.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
-          <damping linear="0.0" angular="0.0" />
           <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                    iyy="1.0" iyz="0.0"
                    izz="1.0"/>
         </inertial>
 
-        <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
+        <visual name="visual_box" laser_retro="100.0">
           <origin pose="0.0 0.0 -0.5 0.0 0.0 0.0"/>
           <geometry>
             <box size="0.1 0.1 1.0"/>

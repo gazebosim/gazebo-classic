@@ -1,0 +1,63 @@
+<!-- Joint -->
+<element name="joint" required="*">
+  <attribute name="name" type="string" default="__default__" required="1"/>
+  <attribute name="type" type="string" default="__default__" required="1"/>
+  <element name="parent" required="1">
+    <attribute name="link" type="string" default="__default__" required="1"/>
+  </element> <!-- End Parent -->
+  <element name="child" required="1">
+    <attribute name="link" type="string" default="__default__" required="1"/>
+  </element> <!-- End Child -->
+  <element name="origin" required="0">
+    <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+  </element> <!-- End Origin -->
+
+  <element name="thread_pitch" type="double" default="1.0" required="0"/>
+
+  <element name="axis" required="1">
+    <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+    <element name="dynamics" required="0">
+      <attribute name="damping" type="double" default="0" required="0"/>
+      <attribute name="friction" type="double" default="0" required="0"/>
+    </element> <!-- End Dynamics -->
+    <element name="limit" required="1">
+      <attribute name="lower" type="double" default="-1e16" required="1"/>
+      <attribute name="upper" type="double" default="1e16" required="1"/>
+      <attribute name="effort" type="double" default="0" required="0"/>
+      <attribute name="velocity" type="double" default="0" required="0"/>
+    </element> <!-- End Limit -->
+  </element> <!-- End Axis -->
+
+  <element name="axis2" required="0">
+    <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+    <element name="dynamics" required="0">
+      <attribute name="damping" type="double" default="0" required="0"/>
+      <attribute name="friction" type="double" default="0" required="0"/>
+    </element> <!-- End Dynamics -->
+    <element name="limit" required="0">
+      <attribute name="lower" type="double" default="-1e16" required="0"/>
+      <attribute name="upper" type="double" default="1e16" required="0"/>
+      <attribute name="effort" type="double" default="0" required="0"/>
+      <attribute name="velocity" type="double" default="0" required="0"/>
+    </element> <!-- End Limit -->
+  </element> <!-- End Axis2 -->
+
+  <element name="physics" required="0">
+    <element name="ode" required="0">
+      <element name="fudge_factor" type="double" default="0" required="0"/>
+      <element name="cfm" type="double" default="0" required="0"/>
+      <element name="bounce" type="double" default="0" required="0"/>
+      <element name="max_force" type="double" default="0" required="0"/>
+      <element name="velocity" type="double" default="0" required="0"/>
+
+      <element name="limit" required="0">
+        <attribute name="cfm" type="double" default="0.0" required="1"/>
+        <attribute name="erp" type="double" default="0.2" required="1"/>
+      </element>
+      <element name="suspension" required="0">
+        <attribute name="cfm" type="double" default="0.0" required="1"/>
+        <attribute name="erp" type="double" default="0.2" required="1"/>
+      </element>
+    </element>
+  </element> <!-- End Physics -->
+</element> <!-- End Joint -->

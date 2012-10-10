@@ -1,0 +1,6 @@
+add_subdirectory(audio)
+add_subdirectory(fonts)
+add_subdirectory(materials)
+add_subdirectory(rtshaderlib)
+add_subdirectory(gui)
+add_subdirectory(skyx)

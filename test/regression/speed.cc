@@ -21,61 +21,97 @@ class SpeedTest : public ServerFixture
 {
 };
 
-TEST_F(SpeedTest, EmptyWorld)
+TEST_F(SpeedTest, BallTest)
 {
   Load("worlds/empty.world");
-  double speed = 0;
-  while ((speed = GetPercentRealTime()) == 0)
+  double emptySpeed;
+  while ((emptySpeed = GetPercentRealTime()) == 0)
     common::Time::MSleep(100);
+  common::Time::MSleep(2000);
+  emptySpeed = GetPercentRealTime();
+
+  // Load 500 spheres into the world
+  std::string name = "sphere";
+  math::Vector3 pos(0, 0, 5);
+  for (int i = 0; i < 500; ++i)
+  {
+    pos.z += i;
+    SpawnSphere(name + boost::lexical_cast<std::string>(i),
+        pos, math::Vector3(0, 0, 0));
+  }
+
+  common::Time::MSleep(2000);
+  double loadedSpeed = GetPercentRealTime();
+
+  double speedRatio = loadedSpeed / emptySpeed;
+
+  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
+            << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
-  // EXPECT_GT(speed, 3800.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 3800.0 << "]\n";
+  EXPECT_GT(speedRatio, 0.02);
+#else
+  EXPECT_GT(speedRatio, 0.01);
 #endif
-#ifdef BUILD_TYPE_DEBUG
-  // EXPECT_GT(speed, 800.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 800.0 << "]\n";
-#endif
-  // EXPECT_GT(speed, 340.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 340.0 << "]\n";
 }
 
 TEST_F(SpeedTest, ShapesWorld)
 {
   Load("worlds/shapes.world");
-  double speed = 0;
-  while ((speed = GetPercentRealTime()) == 0)
+  double emptySpeed;
+  while ((emptySpeed = GetPercentRealTime()) == 0)
     common::Time::MSleep(100);
+  common::Time::MSleep(2000);
+  emptySpeed = GetPercentRealTime();
+
+  // Load 500 spheres into the world
+  std::string name = "sphere";
+  math::Vector3 pos(0, 0, 5);
+  for (int i = 0; i < 500; ++i)
+  {
+    pos.z += i;
+    SpawnSphere(name + boost::lexical_cast<std::string>(i),
+        pos, math::Vector3(0, 0, 0));
+  }
+  common::Time::MSleep(2000);
+
+  double loadedSpeed = GetPercentRealTime();
+  double speedRatio = loadedSpeed / emptySpeed;
+
+  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
+            << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
-  // EXPECT_GT(speed, 110.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 110.0 << "]\n";
+  EXPECT_GT(speedRatio, 0.08);
+#else
+  EXPECT_GT(speedRatio, 0.01);
 #endif
-#ifdef BUILD_TYPE_DEBUG
-  // EXPECT_GT(speed, 25.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 25.0 << "]\n";
-#endif
-  // EXPECT_GT(speed, 18.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 18.0 << "]\n";
 }
 
 TEST_F(SpeedTest, PR2World)
 {
-  Load("worlds/pr2.world");
-  double speed = 0;
-  while ((speed = GetPercentRealTime()) == 0)
+  Load("worlds/empty.world");
+  double emptySpeed;
+  while ((emptySpeed = GetPercentRealTime()) == 0)
     common::Time::MSleep(100);
+  common::Time::MSleep(2000);
+  emptySpeed = GetPercentRealTime();
+
+  // Load the pr2into the world
+  SpawnModel("model://pr2");
+  common::Time::MSleep(2000);
+  double loadedSpeed = GetPercentRealTime();
+
+  double speedRatio = loadedSpeed / emptySpeed;
+
+  std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
+            << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
 #ifdef BUILD_TYPE_RELEASE
-  // EXPECT_GT(speed, 4.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 4.0 << "]\n";
+  EXPECT_GT(speedRatio, 0.5);
+#else
+  EXPECT_GT(speedRatio, 0.3);
 #endif
-#ifdef BUILD_TYPE_DEBUG
-  // EXPECT_GT(speed, 1.0);
-  std::cout << "Actual[" << speed << "] Expected[" << 1.0 << "]\n";
-#endif
-  // EXPECT_GT(speed, 0.4);
-  std::cout << "Actual[" << speed << "] Expected[" << 0.4 << "]\n";
 }
 
 int main(int argc, char **argv)

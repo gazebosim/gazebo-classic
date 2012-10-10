@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo.h"
+#include <gazebo/gazebo.hh>
 
 namespace gazebo
 {
