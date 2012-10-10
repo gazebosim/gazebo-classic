@@ -238,6 +238,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     this->keyModifiers & Qt::ControlModifier ? true : false;
   this->mouseEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
+  this->mouseEvent.alt =
+    this->keyModifiers & Qt::AltModifier ? true : false;
+
 
   this->userCamera->HandleKeyPressEvent(keyText);
 }
@@ -266,6 +269,10 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     this->keyModifiers & Qt::ControlModifier ? true : false;
   this->mouseEvent.shift =
     this->keyModifiers & Qt::ShiftModifier ? true : false;
+  this->mouseEvent.alt =
+    this->keyModifiers & Qt::AltModifier ? true : false;
+
+
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
 }
 

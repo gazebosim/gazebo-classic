@@ -34,24 +34,17 @@ static const float PITCH_LIMIT_LOW = -M_PI*0.5 + 0.001;
 static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 
 //////////////////////////////////////////////////
-OrbitViewController::OrbitViewController(UserCamera *_camera)
+OrbitViewController::OrbitViewController(UserCameraPtr _camera)
   : ViewController(_camera), distance(5.0f)
 {
   this->minDist = MIN_DISTANCE;
   this->maxDist = 0;
   this->typeString = TYPE_STRING;
-
-  this->refVisual.reset(new Visual("OrbitViewController",
-                        this->camera->GetScene()->GetWorldVisual()));
-  this->refVisual->Init();
-  this->refVisual->SetVisible(false);
-  this->refVisual->SetWorldPosition(this->focalPoint);
 }
 
 //////////////////////////////////////////////////
 OrbitViewController::~OrbitViewController()
 {
-  this->refVisual.reset();
 }
 
 //////////////////////////////////////////////////
@@ -65,8 +58,6 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
   if (this->distance <= 1.0)
     std::cout << "Distance[" << this->distance << "]\n";
-
-  this->refVisual->SetWorldPosition(this->focalPoint);
 }
 
 //////////////////////////////////////////////////
@@ -148,37 +139,61 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector3 directionVec(0, 0, 0);
 
+  int width = this->camera->GetViewportWidth();
+  int height = this->camera->GetViewportHeight();
+
   if (_event.buttons & common::MouseEvent::MIDDLE)
   {
-    if (_event.shift)
+    if (_event.pressPos == _event.pos)
     {
-      double fovY = this->camera->GetVFOV().Radian();
-      double fovX = 2.0f * atan(tan(fovY / 2.0f) *
-          this->camera->GetAspectRatio());
-
-      int width = this->camera->GetViewportWidth();
-      int height = this->camera->GetViewportHeight();
-
-      this->Translate(math::Vector3(0.0,
-            (drag.x / static_cast<float>(width)) *
-            this->distance * tan(fovX / 2.0) * 2.0,
-            (drag.y / static_cast<float>(height)) *
-            this->distance * tan(fovY / 2.0) * 2.0));
+      this->focalPoint = this->camera->GetScene()->GetFirstContact(this->camera,
+          math::Vector2i(width*0.5, height *0.5));
+      this->distance = this->camera->GetWorldPose().pos.Distance(
+          this->focalPoint);
     }
-    else
-    {
-      this->yaw += drag.x * _event.moveScale * -0.2;
-      this->pitch += drag.y * _event.moveScale * 0.2;
 
-      this->NormalizeYaw(this->yaw);
-      this->NormalizePitch(this->pitch);
-    }
+    this->yaw += drag.x * _event.moveScale * -0.2;
+    this->pitch += drag.y * _event.moveScale * 0.2;
+
+    this->NormalizeYaw(this->yaw);
+    this->NormalizePitch(this->pitch);
+  }
+  else if (_event.buttons & common::MouseEvent::LEFT)
+  {
+    double fovY = this->camera->GetVFOV().Radian();
+    double fovX = 2.0f * atan(tan(fovY / 2.0f) *
+        this->camera->GetAspectRatio());
+
+    this->Translate(math::Vector3(0.0,
+          (drag.x / static_cast<float>(width)) *
+          this->distance * tan(fovX / 2.0) * 2.0,
+          (drag.y / static_cast<float>(height)) *
+          this->distance * tan(fovY / 2.0) * 2.0));
   }
   else if (_event.type == common::MouseEvent::SCROLL)
   {
+    int factor = 40;
+
+    if (this->posCache.x != _event.pos.x ||
+        this->posCache.y != _event.pos.y )
+    {
+      this->worldFocal = this->camera->GetScene()->GetFirstContact(this->camera,
+          _event.pos);
+      this->distance = this->camera->GetWorldPose().pos.Distance(
+                       this->focalPoint);
+    }
+    this->posCache = _event.pos;
+
+    // This is not perfect, but it does a decent enough job.
+    if (_event.scroll.y < 0)
+      this->focalPoint += (this->worldFocal - this->focalPoint) * 0.04;
+    else
+      this->focalPoint += (this->focalPoint - this->worldFocal) * 0.04;
+
     // This assumes that _event.scroll.y is -1 or +1
     this->Zoom(
-        -(_event.scroll.y*40) * _event.moveScale * (this->distance / 10.0));
+        -(_event.scroll.y * factor) * _event.moveScale *
+         (this->distance / 10.0));
   }
 
   this->UpdatePose();
@@ -188,7 +203,6 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 void OrbitViewController::Translate(math::Vector3 vec)
 {
   this->focalPoint += this->camera->GetWorldPose().rot * vec;
-  this->refVisual->SetWorldPosition(this->focalPoint);
 }
 
 //////////////////////////////////////////////////
@@ -201,7 +215,6 @@ void OrbitViewController::SetDistance(float _d)
 void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 {
   this->focalPoint = _fp;
-  this->refVisual->SetWorldPosition(this->focalPoint);
 }
 
 //////////////////////////////////////////////////

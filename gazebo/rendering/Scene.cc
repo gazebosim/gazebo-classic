@@ -835,11 +835,14 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
       static_cast<float>(_mousePos.y) /
       ogreCam->getViewport()->getActualHeight());
 
+  this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setRay(mouseRay);
 
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+  for (;iter != result.end() && iter->distance == 0; ++iter);
 
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 

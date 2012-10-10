@@ -1979,8 +1979,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
-  std::cout << _msg.DebugString() << "\n";
-
   item = this->variantManager->addProperty(QVariant::Color, tr("ambient"));
   this->propTreeBrowser->addProperty(item);
 
