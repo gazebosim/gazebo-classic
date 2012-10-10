@@ -539,18 +539,21 @@ void GLWidget::OnMouseMoveRing()
 
     if (newHoverVis && !newHoverVis->IsPlane())
     {
-      if (this->hoverVis)
+      /*if (this->hoverVis)
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+        */
 
       this->hoverVis = this->scene->GetVisual(newHoverVis->GetName().substr(0,
             newHoverVis->GetName().find("::")));
 
       this->setCursor(Qt::PointingHandCursor);
-      this->hoverVis->SetEmissive(common::Color(0.8, 0.8, 0.8));
+      //this->hoverVis->SetEmissive(common::Color(0.8, 0.8, 0.8));
     }
     else if (this->hoverVis)
     {
-      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+      this->setCursor(Qt::ArrowCursor);
+      this->setCursor(Qt::PointingHandCursor);
+      //this->hoverVis->SetEmissive(common::Color(0, 0, 0));
       this->hoverVis.reset();
     }
   }
@@ -567,8 +570,8 @@ void GLWidget::OnMouseMoveRing()
   }
   else
   {
-    if (this->hoverVis)
-      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+    //if (this->hoverVis)
+    //  this->hoverVis->SetEmissive(common::Color(0, 0, 0));
     this->hoverVis.reset();
   }
 }
