@@ -587,7 +587,8 @@ LinkPtr Model::GetLink(const std::string &_name) const
   {
     for (biter = this->children.begin(); biter != this->children.end(); ++biter)
     {
-      if ((*biter)->GetName() == _name)
+      if (((*biter)->GetScopedName() == _name) ||
+          ((*biter)->GetName() == _name))
       {
         result = boost::shared_dynamic_cast<Link>(*biter);
         break;
