@@ -569,7 +569,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *granularityProp = this->GetChildItem(_item, "granularity");
 
     msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
-    imageMessage->set_filename(
+    imageMessage->set_uri(
         this->variantManager->value(fileProp).toString().toStdString());
     imageMessage->set_scale(
         this->variantManager->value(scaleProp).toDouble());
@@ -1482,9 +1482,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
   {
     item->setValue(5);
 
-    item = this->variantManager->addProperty(QVariant::String,
-        tr("filename"));
-    item->setValue(_msg.image().filename().c_str());
+    item = this->variantManager->addProperty(QVariant::String, tr("uri"));
+    item->setValue(_msg.image().uri().c_str());
     _parent->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Double,
@@ -1511,9 +1510,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
   {
     item->setValue(6);
 
-    item = this->variantManager->addProperty(QVariant::String,
-        tr("filename"));
-    item->setValue(_msg.image().filename().c_str());
+    item = this->variantManager->addProperty(QVariant::String, tr("uri"));
+    item->setValue(_msg.image().uri().c_str());
     _parent->addSubProperty(item);
 
     QtProperty *sizeItem = this->variantManager->addProperty(

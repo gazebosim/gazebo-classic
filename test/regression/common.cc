@@ -115,7 +115,7 @@ TEST_F(CommonTest, Image)
 {
   common::Image img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
-  EXPECT_EQ(0, img.Load("wood.jpg"));
+  EXPECT_EQ(0, img.Load("file://media/materials/textures/wood.jpg"));
   EXPECT_EQ(static_cast<unsigned int>(496), img.GetWidth());
   EXPECT_EQ(static_cast<unsigned int>(329), img.GetHeight());
   EXPECT_EQ(static_cast<unsigned int>(24), img.GetBPP());

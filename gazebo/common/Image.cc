@@ -19,8 +19,6 @@
  * Date: 14 July 2008
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
@@ -29,6 +27,7 @@
 #include <boost/filesystem.hpp>
 
 #include "math/Vector3.hh"
+#include "common/Common.hh"
 #include "common/Console.hh"
 #include "common/Image.hh"
 #include "common/SystemPaths.hh"
@@ -49,7 +48,15 @@ Image::Image(const std::string &_filename)
 
   this->bitmap = NULL;
   if (!_filename.empty())
-    this->Load(_filename);
+  {
+    std::string filename = common::find_file(_filename);
+    if (!filename.empty())
+      this->Load(filename);
+    else
+      gzerr << "Unable to find image[" << _filename << "]\n";
+  }
+  else
+      gzerr << "Image filename is empty.\n";
 }
 
 //////////////////////////////////////////////////
@@ -68,61 +75,11 @@ Image::~Image()
 //////////////////////////////////////////////////
 int Image::Load(const std::string &_filename)
 {
-  struct stat st;
-  DIR *dir = NULL;
-  this->fullName = boost::filesystem::current_path().string();
-  this->fullName += "/" + _filename;
+  this->fullName = _filename;
+  if (!boost::filesystem::exists(boost::filesystem::path(this->fullName)))
+    this->fullName = common::find_file(_filename);
 
-  if (stat(this->fullName.c_str(), &st) != 0)
-  {
-    // @todo: fix path search. for now repeat similar path search in simulator
-    std::list<std::string> gazeboPaths =
-      SystemPaths::Instance()->GetGazeboPaths();
-
-    bool found = false;
-    for (std::list<std::string>::iterator iter = gazeboPaths.begin();
-         iter != gazeboPaths.end() && !found; ++iter)
-    {
-      std::vector<std::string> pathNames;
-      pathNames.push_back((*iter)+"/media");
-      pathNames.push_back((*iter)+"/media/fonts");
-      pathNames.push_back((*iter)+"/media/materials/programs");
-      pathNames.push_back((*iter)+"/media/materials/scripts");
-      pathNames.push_back((*iter)+"/media/materials/textures");
-      pathNames.push_back((*iter)+"/media/models");
-      pathNames.push_back((*iter)+"/media/sets");
-      pathNames.push_back((*iter)+"/media/maps");
-
-      pathNames.push_back((*iter)+"/Media");
-      pathNames.push_back((*iter)+"/Media/fonts");
-      pathNames.push_back((*iter)+"/Media/materials/programs");
-      pathNames.push_back((*iter)+"/Media/materials/scripts");
-      pathNames.push_back((*iter)+"/Media/materials/textures");
-      pathNames.push_back((*iter)+"/Media/models");
-      pathNames.push_back((*iter)+"/Media/sets");
-      pathNames.push_back((*iter)+"/Media/maps");
-
-      for (std::vector<std::string>::iterator piter = pathNames.begin();
-          piter!= pathNames.end() && !found; ++piter)
-      {
-        // if directory exist
-        if ((dir = opendir((*piter).c_str())) != NULL)
-        {
-          closedir(dir);
-
-          this->fullName = (((*piter)+"/")+_filename);
-
-          // if file exist
-          if (stat(this->fullName.c_str(), &st) == 0)
-          {
-            found = true;
-          }
-        }
-      }
-    }
-  }
-
-  if (stat(this->fullName.c_str(), &st) == 0)
+  if (boost::filesystem::exists(boost::filesystem::path(this->fullName)))
   {
     FREE_IMAGE_FORMAT fifmt =
       FreeImage_GetFIFFromFilename(this->fullName.c_str());
@@ -147,7 +104,7 @@ int Image::Load(const std::string &_filename)
     return 0;
   }
 
-  gzerr << "Unable to open image file[" << _filename
+  gzerr << "Unable to open image file[" << this->fullName
         << "], check your GAZEBO_RESOURCE_PATH settings.\n";
   return -1;
 }
