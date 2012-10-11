@@ -115,6 +115,9 @@ void UserCamera::Init()
     this->SetClipDist(0.1, 5000);
   }
 
+  // Removing for now because the axis doesn't not move properly when the
+  // window is resized
+  /*
   this->axisNode =
     this->pitchNode->createChildSceneNode(this->name + "AxisNode");
 
@@ -156,6 +159,7 @@ void UserCamera::Init()
   this->axisNode->attachObject(x);
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
+  */
 }
 
 //////////////////////////////////////////////////

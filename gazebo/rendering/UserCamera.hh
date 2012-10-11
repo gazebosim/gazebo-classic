@@ -218,7 +218,7 @@ namespace gazebo
       private: GUIOverlay *gui;
 
       /// \brief Draws a 3D axis in the viewport.
-      private: Ogre::SceneNode *axisNode;
+      // private: Ogre::SceneNode *axisNode;
 
       /// \brief Used to select objects from mouse clicks.
       private: SelectionBuffer *selectionBuffer;

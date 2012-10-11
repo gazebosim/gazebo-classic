@@ -159,6 +159,7 @@ void MainWindow::Init()
   this->renderWidget->show();
   this->requestMsg = msgs::CreateRequest("entity_list");
   this->requestPub->Publish(*this->requestMsg);
+  this->resize(QApplication::desktop()->size() * 0.5);
 }
 
 /////////////////////////////////////////////////

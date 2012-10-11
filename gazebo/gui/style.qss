@@ -115,10 +115,16 @@ QTreeView
 }
 
 QTreeView::branch:selected,
-QTreeView::branch:selected:active,
+QTreeView::branch:selected:active
 QTreeView::branch:selected:!active
 {
   color: #f58113;
+}
+
+QTreeView::item:!selected,
+QTreeView::branch:!selected
+{
+  color: #d0d0d0;
 }
 
 QTreeView::item:selected

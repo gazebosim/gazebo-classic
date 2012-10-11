@@ -180,6 +180,10 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
     if (listItem)
       this->modelTreeWidget->setCurrentItem(listItem);
   }
+  else if (this->modelTreeWidget->currentItem())
+  {
+    this->modelTreeWidget->currentItem()->setSelected(false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -187,7 +191,7 @@ void ModelListWidget::Update()
 {
   if (this->fillPropertyTree)
   {
-    this->receiveMutex->lock();
+    boost::mutex::scoped_lock lock(*this->propMutex);
     this->poseMsgs.clear();
     this->fillingPropertyTree = true;
 
@@ -200,10 +204,14 @@ void ModelListWidget::Update()
     else if (this->fillType == "scene")
       this->FillPropertyTree(this->sceneMsg, NULL);
 
-
     this->fillingPropertyTree = false;
     this->fillPropertyTree = false;
-    this->receiveMutex->unlock();
+  }
+
+  if (!this->modelTreeWidget->currentItem())
+  {
+    boost::mutex::scoped_lock lock(*this->propMutex);
+    this->propTreeBrowser->clear();
   }
 
   this->ProcessModelMsgs();

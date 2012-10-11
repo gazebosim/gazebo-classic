@@ -224,7 +224,6 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   if (_event->key() == Qt::Key_Escape)
   {
-    this->PopHistory();
     event::Events::setSelectedEntity("");
   }
 
@@ -625,12 +624,13 @@ void GLWidget::OnMouseReleaseNormal()
       }
       else if (this->mouseEvent.button == common::MouseEvent::LEFT)
       {
-        std::string name = vis->GetName();
-        this->selectedVis = vis;
-        size_t index = name.find("::");
-        event::Events::setSelectedEntity(name.substr(0,index));
+        vis = vis->GetRootVisual();
+        this->SetSelectedVisual(vis);
+        event::Events::setSelectedEntity(vis->GetName());
       }
     }
+    else
+      this->SetSelectedVisual(rendering::VisualPtr());
   }
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -668,7 +668,7 @@ void GLWidget::Clear()
   gui::clear_active_camera();
   this->userCamera.reset();
   this->scene.reset();
-  this->selectedVis.reset();
+  this->SetSelectedVisual(rendering::VisualPtr());
   this->mouseMoveVis.reset();
   this->hoverVis.reset();
   this->keyModifiers = 0;
@@ -718,7 +718,7 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 void GLWidget::OnCreateScene(const std::string &_name)
 {
   this->hoverVis.reset();
-  this->selectedVis.reset();
+  this->SetSelectedVisual(rendering::VisualPtr());
   this->mouseMoveVis.reset();
 
   this->ViewScene(rendering::get_scene(_name));
@@ -923,13 +923,30 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
   {
     if (_msg->selected())
     {
-      this->selectedVis = this->scene->GetVisual(_msg->name());
+      this->SetSelectedVisual(this->scene->GetVisual(_msg->name()));
     }
     else
     {
-      this->selectedVis.reset();
+      this->SetSelectedVisual(rendering::VisualPtr());
       this->mouseMoveVis.reset();
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
+{
+  if (this->selectedVis)
+    this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+
+  this->selectedVis = _vis;
+
+  if (this->selectedVis && !this->selectedVis->IsPlane())
+  {
+    std::cout << "Set Selected...\n";
+    std::cout << "Selected Vis[" << this->selectedVis->GetName() << "]\n";
+    std::cout << "PLANE[" << this->selectedVis->IsPlane() << "]\n";
+    this->selectedVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
   }
 }
 
@@ -975,13 +992,7 @@ void GLWidget::ClearSelection()
     this->hoverVis.reset();
   }
 
-  std::cout << "ClearSelection\n";
-  /*Fix: if (this->selectedVis)
-  {
-    this->PublishVisualPose(this->mouseMoveVis);
-    this->mouseMoveVis->SetEmissive(common::Color(0, 0, 0));
-    this->mouseMoveVis.reset();
-  }*/
+  this->SetSelectedVisual(rendering::VisualPtr());
 
   this->scene->SelectVisual("");
 }
@@ -996,11 +1007,12 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name)
     std::string name = _name;
     boost::replace_first(name, gui::get_world()+"::", "");
 
-    this->selectedVis = this->scene->GetVisual(name);
+    this->SetSelectedVisual(this->scene->GetVisual(name));
     this->scene->SelectVisual(name);
   }
   else
   {
+    this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("");
     gui::Events::manipMode("select");
   }
@@ -1044,7 +1056,9 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
   if (_msg->request() == "entity_delete")
   {
     if (this->selectedVis && this->selectedVis->GetName() == _msg->data())
-      this->selectedVis.reset();
+    {
+      this->SetSelectedVisual(rendering::VisualPtr());
+    }
     if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
       this->mouseMoveVis.reset();
   }

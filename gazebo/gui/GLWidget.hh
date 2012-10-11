@@ -121,6 +121,8 @@ namespace gazebo
                                 const math::Pose &_pose);
       private: void PopHistory();
 
+      private: void SetSelectedVisual(rendering::VisualPtr _vis);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
