@@ -51,6 +51,9 @@ namespace gazebo
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
+      /// \brief Internal init function.
+      private: void Init();
+
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;
