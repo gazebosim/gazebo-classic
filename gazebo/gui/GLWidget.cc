@@ -282,7 +282,6 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent * /*_event*/)
                                               this->mouseEvent.pos);
       this->userCamera->SetFocalPoint(pose.pos);
 
-      double dist = camPose.pos.Distance(pose.pos);
       math::Vector3 dir = pose.pos - camPose.pos;
       pose.pos = camPose.pos + (dir * 0.8);
 
@@ -568,7 +567,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
     this->OnMouseReleaseMakeEntity();
   else if (this->state == "select")
     this->OnMouseReleaseNormal();
-  else if (this->state == "translate")
+  else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseReleaseTranslate();
 }
 
@@ -591,6 +590,7 @@ void GLWidget::OnMouseReleaseTranslate()
       this->PublishVisualPose(this->mouseMoveVis);
       this->mouseMoveVis.reset();
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
+      printf("Sending pose\n");
     }
   }
 }
@@ -792,83 +792,26 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 
   math::Pose pose = _vis->GetPose();
 
-  // Figure out which axis to rotate around
-  /*if (this->selectionMod == "rotx")
-    ray.x = 1.0;
-  else if (this->selectionMod == "roty")
-    ray.y = 1.0;
-  else if (this->selectionMod == "rotz")
-  */
-
-  if (this->keyText == "r")
-    ray.x = 1.0;
-  else if (this->keyText == "p")
-    ray.y = 1.0;
-  else
-    ray.z = 1.0;
-
-  math::Vector2i diff = this->mouseEvent.pressPos - this->mouseEvent.pos;
+  math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
   math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
 
-  rpy += ray * (diff.y * 0.1);
+  math::Vector3 rpyAmt;
 
-  /*if (this->mouseEvent.shift)
-  {
-    double deg = GZ_RTOD(rpy.z);
-    double flt = (deg / 15.0);
-    flt = ((int)(flt * 10)) - (flt * 10.0);
+  if (this->keyText == "x" || this->keyText == "X")
+    rpyAmt.x = 1.0;
+  else if (this->keyText == "y" || this->keyText == "Y")
+    rpyAmt.y = 1.0;
+  else
+    rpyAmt.z = 1.0;
 
-    if (flt <= 0.1)
-      rpy.z = GZ_DTOR(flt * 15.0);
-    else if (flt  >= .4)
-      rpy.z = floor(rpy.z);
-  }*/
+  double amt = diff.y * 0.04;
+
+  if (this->mouseEvent.shift)
+    amt = rint(amt / (M_PI * 0.25)) * (M_PI * 0.25);
+
+  rpy += rpyAmt * amt;
 
   _vis->SetRotation(math::Quaternion(rpy));
-
-  // Compute the normal to the plane on which to rotate
-  /*planeNorm = pose.rot.RotateVector(ray);
-  double d = -pose.pos.Dot(planeNorm);
-
-  if (!this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pos.x,
-        this->mouseEvent.pos.y, math::Plane(planeNorm, d), p1))
-  {
-    gzerr << "Invalid mouse point\n";
-  }
-
-  if (!this->userCamera->GetWorldPointOnPlane(this->mouseEvent.prevPos.x,
-        this->mouseEvent.prevPos.y, math::Plane(planeNorm, d), p2))
-  {
-    gzerr << "Invalid mouse point\n";
-  }
-
-  // Get point vectors relative to the entity's pose
-  a = p1 - _vis->GetWorldPose().pos;
-  b = p2 - _vis->GetWorldPose().pos;
-
-  a.Normalize();
-  b.Normalize();
-
-  // Get the angle between the two vectors. This is the amount to
-  // rotate the entity
-  float angle = acos(a.Dot(b));
-  if (math::isnan(angle))
-    angle = 0;
-
-  // Compute the normal to the plane which is defined by the
-  // direction of rotation
-  planeNorm2 = a.Cross(b);
-  planeNorm2.Normalize();
-
-  // Switch rotation direction if the two normals don't line up
-  if (planeNorm.Dot(planeNorm2) > 0)
-    angle *= -1;
-
-  math::Quaternion delta;
-  delta.SetFromAxis(ray.x, ray.y, ray.z, angle);
-
-  _vis->SetRotation(pose.rot * delta);
-  */
 }
 
 /////////////////////////////////////////////////
@@ -1027,7 +970,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name)
     std::string name = _name;
     boost::replace_first(name, gui::get_world()+"::", "");
 
-    std::cout << "OnSetSelectedEntity[" << _name << "]\n";
     this->selectedVis = this->scene->GetVisual(name);
     this->scene->SelectVisual(name);
   }
@@ -1073,13 +1015,11 @@ void GLWidget::PopHistory()
 /////////////////////////////////////////////////
 void GLWidget::OnRequest(ConstRequestPtr &_msg)
 {
-  //TODO: Fix
-  /*
   if (_msg->request() == "entity_delete")
   {
-    if (this->hoverVis && this->hoverVis->GetName() == _msg->data())
-      this->hoverVis.reset();
+    if (this->selectedVis && this->selectedVis->GetName() == _msg->data())
+      this->selectedVis.reset();
     if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
       this->mouseMoveVis.reset();
-  }*/
+  }
 }
