@@ -599,6 +599,38 @@ void Link::AddChildJoint(JointPtr _joint)
 }
 
 //////////////////////////////////////////////////
+void Link::RemoveParentJoint(JointPtr _joint)
+{
+  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
+                                       iter != this->parentJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _joint->GetName())
+    {
+      this->parentJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::RemoveChildJoint(JointPtr _joint)
+{
+  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
+                                       iter != this->childJoints.end();
+                                       ++iter)
+  {
+    /// @todo: can we assume there are no repeats?
+    if ((*iter)->GetName() == _joint->GetName())
+    {
+      this->childJoints.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void Link::FillLinkMsg(msgs::Link &_msg)
 {
   _msg.set_id(this->GetId());

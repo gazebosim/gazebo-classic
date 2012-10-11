@@ -43,28 +43,48 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~STLLoader();
 
-      /// \brief Load a mesh
+      /// \brief Creates a new mesh and loads the data from a file
+      /// \param[in] filename the mesh file
       public: virtual Mesh *Load(const std::string &filename);
 
-      /// Reads an ASCII STL (stereolithography) file.
+      /// \brief Reads an ASCII STL (stereolithography) file.
+      /// \param[in] _filein the file pointer
+      /// \param[out] _mesh the mesh where to load the data
       private: bool ReadAscii(FILE *_filein, Mesh *_mesh);
 
-      /// Reads a binary STL (stereolithography) file.
+      /// \brief Reads a binary STL (stereolithography) file.
+      /// \param[in] _filein the file pointer
+      /// \param[out] the mesh where to load the data
       private: bool ReadBinary(FILE *_filein, Mesh *_mesh);
 
-      /// Compares two strings for equality, disregarding case.
+      /// \brief Compares two strings for equality, disregarding case.
+      /// \param[in] _string1 the first string
+      /// \param[in] _string2 the seconf string
+      /// \return true if the strings are equal (same content)
       private: bool Leqi(char* _string1, char* _string2);
 
-      /// Finds if a vector occurs in a table.
+      /// \brief Finds if a vector occurs in a table. This is done using
+      /// floating point comparison with the default tolerance of 1e-6
+      /// \param[in] _a the vector data
+      /// \param[in] _m the number of columns in the table
+      /// \param[in] _n the number of rows in the table
       private: int RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[]);
 
-      /// Reads a long int from a binary file.
+      /// \brief Reads a long int from a binary file.
+      /// \param[in] _filein the file pointer
+      /// \return the value
       private: uint32_t LongIntRead(FILE *_filein);
 
-      /// Reads a short int from a binary file.
+      /// \brief Reads a short int from a binary file.
+      /// \param[in] _filein the file pointer
+      /// \param[out] _value the value read
+      /// \return true
       private: bool ShortIntRead(FILE *_filein, uint16_t &_value);
 
-      /// Read 1 float from a binary file.
+      /// \brief Read 1 double precision float from a binary file.
+      /// \param[in] _filein the file pointer
+      /// \param[out] the value
+      /// \return true
       private: bool FloatRead(FILE *_filein, double &_value);
     };
     /// \}

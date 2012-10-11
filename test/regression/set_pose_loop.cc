@@ -325,7 +325,7 @@ TEST_F(PhysicsTest, State)
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 50;
+    test_duration = 10;
     pub_rate = 10.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Joint::SetAngle at ["
@@ -364,7 +364,7 @@ TEST_F(PhysicsTest, State)
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 50;
+    test_duration = 20;
     pub_rate = 10.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Joint::SetAngle at ["
@@ -407,11 +407,13 @@ TEST_F(PhysicsTest, State)
 
 
 
-    physics::LinkPtr link_1 = model->GetLink("model_1::link_1");
-    physics::LinkPtr link_2 = model->GetLink("model_1::link_2");
-    physics::LinkPtr link_3 = model->GetLink("model_1::link_3");
-    physics::LinkPtr link_4 = model->GetLink("model_1::link_4");
-    physics::LinkPtr link_5 = model->GetLink("model_1::link_5");
+    physics::LinkPtr link_1 = model->GetLink("link_1");
+    physics::LinkPtr link_2 = model->GetLink("link_2");
+    physics::LinkPtr link_3 = model->GetLink("link_3");
+    physics::LinkPtr link_4 = model->GetLink("link_4");
+    physics::LinkPtr link_5 = model->GetLink("link_5");
+
+    EXPECT_TRUE(link_1 != NULL);
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
@@ -441,7 +443,7 @@ TEST_F(PhysicsTest, State)
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 30;
+    test_duration = 10;
     pub_rate = 1.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing SetWorld Pose at ["
@@ -471,7 +473,7 @@ TEST_F(PhysicsTest, State)
     // set random pose within joint limit
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 30;
+    test_duration = 20;
     pub_rate = 2.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing SetWorld Pose at ["
@@ -571,14 +573,14 @@ TEST_F(PhysicsTest, State)
     // set random pose outside of joint limit
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 30;
-    pub_rate = 2.0;
+    test_duration = 20;
+    pub_rate = 1000.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing SetWorld Pose at ["
           << pub_rate << "] Hz with more random constraint violation.\n";
     last_update_time = start_time;
     while(world->GetSimTime().Double() < start_time + test_duration)
-    //if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
     {
       last_update_time = world->GetSimTime().Double();
       math::Pose p;
@@ -670,7 +672,7 @@ TEST_F(PhysicsTest, State)
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 30;
+    test_duration = 10;
     pub_rate = 1000.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Set*Vel at ["
@@ -731,7 +733,7 @@ TEST_F(PhysicsTest, State)
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 1000;
+    test_duration = 20;
     pub_rate = 500.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Set*Vel at ["
@@ -759,6 +761,7 @@ TEST_F(PhysicsTest, State)
           << "] sim performance [" << test_duration / elapsed_wall_time
           << "]\n";
 
+    EXPECT_EQ(link_3->GetWorldPose(), math::Pose(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
     Unload();
   }
 }

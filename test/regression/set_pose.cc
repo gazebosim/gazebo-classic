@@ -213,11 +213,14 @@ TEST_F(PhysicsTest, State)
     }
     world->SetPaused(false);
 
-    physics::LinkPtr link_1 = model->GetLink("model_1::link_1");
-    physics::LinkPtr link_2 = model->GetLink("model_1::link_2");
-    physics::LinkPtr link_3 = model->GetLink("model_1::link_3");
+    physics::LinkPtr link_1 = model->GetLink("link_1");
+    physics::LinkPtr link_2 = model->GetLink("link_2");
+    physics::LinkPtr link_3 = model->GetLink("link_3");
 
 
+    EXPECT_TRUE(link_1 != NULL);
+    EXPECT_TRUE(link_2 != NULL);
+    EXPECT_TRUE(link_3 != NULL);
 
 
 
@@ -247,9 +250,10 @@ TEST_F(PhysicsTest, State)
     if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
     {
       last_update_time = world->GetSimTime().Double();
-      joint_01->SetAngle(0, double(rand())/double(RAND_MAX));
-      joint_12->SetAngle(0, double(rand())/double(RAND_MAX));
-      joint_23->SetAngle(0, double(rand())/double(RAND_MAX));
+      joint_01->SetAngle(0, 0.707*(2*double(rand())/double(RAND_MAX)-1));
+      joint_12->SetAngle(0, 0.707*(2*double(rand())/double(RAND_MAX)-1));
+      joint_23->SetAngle(0, 0.707*(2*double(rand())/double(RAND_MAX)-1));
+      sleep(1);
     }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
@@ -264,11 +268,10 @@ TEST_F(PhysicsTest, State)
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 20;
+    test_duration = 10;
     pub_rate = 10.0;
     gzdbg << " -------------------------------------------------------------\n";
-    gzdbg << " Publishing Joint::SetAngle at ["
-          << pub_rate << "] Hz in real time, unthrottled.\n";
+    gzdbg << " Publishing Joint::SetAngle as fast as possible, unthrottled.\n";
     last_update_time = start_wall_time;
     while(world->GetRealTime().Double() < start_wall_time + test_duration)
     //if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
@@ -556,7 +559,7 @@ TEST_F(PhysicsTest, State)
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
-    test_duration = 1000;
+    test_duration = 20;
     pub_rate = 500.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Set*Vel at ["
@@ -580,6 +583,7 @@ TEST_F(PhysicsTest, State)
           << "] sim performance [" << test_duration / elapsed_wall_time
           << "]\n";
 
+    EXPECT_EQ(link_3->GetWorldPose(), math::Pose(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
     Unload();
   }
 }

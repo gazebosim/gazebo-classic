@@ -44,7 +44,7 @@ namespace gazebo
       /// \brief Start the timer
       public: void Start();
 
-      /// \brief Get the elapsed itme
+      /// \brief Get the elapsed time
       public: Time GetElapsed() const;
 
       /// \brief stream operator friendly
@@ -55,7 +55,7 @@ namespace gazebo
                 return out;
               }
 
-      private: Time start;
+      private: Time start; /// \brief the time of the last call to Start
     };
     /// \}
   }

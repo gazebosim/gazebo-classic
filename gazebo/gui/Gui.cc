@@ -204,7 +204,6 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  printf("gui::stop\n");
   g_active_camera.reset();
   g_app->quit();
 }

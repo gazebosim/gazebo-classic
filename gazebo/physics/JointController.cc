@@ -22,6 +22,7 @@
 #include "physics/Joint.hh"
 #include "physics/Link.hh"
 #include "physics/JointController.hh"
+#include "physics/PhysicsEngine.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -281,10 +282,10 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 
       _link->SetWorldPose(newWorldPose);
 
-      // set link velocities somehow?
-      // ideally we want to set this according to Joint Trajectory velocity
-      // double dt = 0;
-      // this->ComputeAndSetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
+      // @todo: ideally we want to set this according to Joint Trajectory velocity
+      //        and use time step since last update.
+      // double dt = this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
+      // this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }
@@ -305,10 +306,10 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 
       _link->SetWorldPose(newWorldPose);
 
-      // set link velocities somehow?
-      // ideally we want to set this according to Joint Trajectory velocity
-      // double dt = 0;
-      // this->ComputeAndSetLinkTwist(_link, linkWorldPose, newWorldPose, dt);
+      // @todo: ideally we want to set this according to Joint Trajectory velocity
+      //        and use time step since last update.
+      // double dt = this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
+      // this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }

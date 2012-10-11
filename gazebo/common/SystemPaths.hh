@@ -59,31 +59,38 @@ namespace gazebo
       private: SystemPaths();
 
       /// \brief Get the log path
+      /// \return the path
       public: std::string GetLogPath() const;
 
       /// \brief Get the gazebo install paths
+      /// \return a list of paths
       public: const std::list<std::string> &GetGazeboPaths();
 
       /// \brief Get the ogre install paths
+      /// \return a list of paths
       public: const std::list<std::string> &GetOgrePaths();
 
       /// \brief Get the plugin paths
+      /// \return a list of paths
       public: const std::list<std::string> &GetPluginPaths();
 
       /// \brief Get the model paths
+      /// \return a list of paths
       public: const std::list<std::string> &GetModelPaths();
 
       /// Returns the world path extension.
-      /// Right now, it just returns "/worlds"
+      /// \return Right now, it just returns "/worlds"
       public: std::string GetWorldPathExtension();
 
       /// \brief deprecated
+      /// \param[in] filename the path to the file to search
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
       public: std::string FindFileWithGazeboPaths(const std::string &_filename,
                   bool _searchLocalPath=true) GAZEBO_DEPRECATED;
 
       /// \brief Find a file or path using a URI
+      /// \param[in] _uri the uniform resource identifier
       public: std::string FindFileURI(const std::string &_uri);
 
       /// \brief Find a file in the gazebo paths
@@ -94,12 +101,15 @@ namespace gazebo
                                    bool _searchLocalPath=true);
 
       /// \brief Add colon delimited paths to Gazebo install
+      /// \param[in] _path the directory to add
       public: void AddGazeboPaths(const std::string &_path);
 
       /// \brief Add colon delimited paths to ogre install
+      /// \param[in] _path the directory to add
       public: void AddOgrePaths(const std::string &_path);
 
       /// \brief Add colon delimited paths to plugins
+      /// \param[in] _path the directory to add
       public: void AddPluginPaths(const std::string &_path);
 
       /// \brief clear out SystemPaths#gazeboPaths
@@ -121,6 +131,9 @@ namespace gazebo
       /// \brief re-read SystemPaths#ogrePaths from environment variable
       private: void UpdateOgrePaths();
 
+      /// \brief adds a path to the list if not already present
+      /// \param[in]_path the path
+      /// \param[in]_list the list
       private: void InsertUnique(const std::string &_path,
                                  std::list<std::string> &_list);
 

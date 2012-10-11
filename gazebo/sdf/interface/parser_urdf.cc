@@ -108,8 +108,8 @@ void URDF2Gazebo::reduceVisualToParent(boost::shared_ptr<urdf::Link> link,
     // new group name, create vector, add vector to map and
     //   add Visual to the vector
     link->visual_groups.insert(make_pair(group_name, viss));
-    gzdbg << "successfully added a new visual group name ["
-          << group_name << "]\n";
+    // gzdbg << "successfully added a new visual group name ["
+    //       << group_name << "]\n";
   }
 
   // group exists, add Visual to the vector in the map if it's not there
@@ -184,10 +184,10 @@ void URDF2Gazebo::addKeyValue(TiXmlElement *elem, const std::string& key,
              << "> exists due to fixed joint reduction"
              << " overwriting previous value [" << old_value
              << "] with [" << value << "].\n";
-    else
-      gzdbg << "multiple consistent <" << key
-             << "> exists with [" << value
-             << "] due to fixed joint reduction.\n";
+    // else
+    //   gzdbg << "multiple consistent <" << key
+    //          << "> exists with [" << value
+    //          << "] due to fixed joint reduction.\n";
     elem->RemoveChild(child_elem);  // remove old elem
   }
 
@@ -486,8 +486,8 @@ void URDF2Gazebo::insertGazeboExtensionLink(TiXmlElement *elem,
     {
       if (gazebo_it->first == link_name)
       {
-        gzdbg << "inserting extension with reference ["
-              << link_name << "] into link.\n";
+        // gzdbg << "inserting extension with reference ["
+        //       << link_name << "] into link.\n";
         for (std::vector<GazeboExtension*>::iterator ge =
              gazebo_it->second.begin(); ge != gazebo_it->second.end(); ++ge)
         {
@@ -611,7 +611,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
   TiXmlElement *gazebo_geometry = new TiXmlElement("geometry");
 
   std::string type;
-  TiXmlElement *geometry_type;
+  TiXmlElement *geometry_type = NULL;
 
   switch (geometry->type)
   {
@@ -669,15 +669,38 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
         }
 
         // give some warning if file does not exist.
-        std::ifstream fin;
-        fin.open(mesh->filename.c_str(), std::ios::in);
-        fin.close();
-        if (fin.fail())
-          gzwarn << "filename referred by mesh ["
-                 << mesh->filename << "] does not appear to exist.\n";
+        // disabled while switching to uri
+        // @todo: re-enable check
+        // std::ifstream fin;
+        // fin.open(mesh->filename.c_str(), std::ios::in);
+        // fin.close();
+        // if (fin.fail())
+        //   gzwarn << "filename referred by mesh ["
+        //          << mesh->filename << "] does not appear to exist.\n";
+
+        // Convert package:// to model://,
+        // in ROS, this will work if
+        // the model package is in ROS_PACKAGE_PATH and has a manifest.xml
+        // as a typical ros package does.
+        std::string model_filename = mesh->filename;
+        std::string package_prefix("package://");
+        std::string model_prefix("model://");
+        size_t pos1 = model_filename.find(package_prefix,0);
+        if (pos1 != std::string::npos)
+        {
+          size_t rep_len = package_prefix.size();
+          model_filename.replace(pos1, rep_len, model_prefix);
+          gzwarn << "ros style uri [package://] is"
+            << "automatically converted: [" << model_filename
+            << "], make sure your ros package is in GAZEBO_MODEL_PATH"
+            << " and switch your manifest to conform to gazebo's"
+            << " model database format.  See ["
+            << "http://gazebosim.org/wiki/Model_database#Model_Manifest_XML"
+            << "] for more info.\n";
+        }
 
         // add mesh filename
-        addKeyValue(geometry_type, "filename", mesh->filename);
+        addKeyValue(geometry_type, "uri", model_filename);
       }
     }
     break;
@@ -688,9 +711,11 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
     break;
   }
 
-  gazebo_geometry->LinkEndChild(geometry_type);
-
-  elem->LinkEndChild(gazebo_geometry);
+  if(geometry_type)
+  {
+    gazebo_geometry->LinkEndChild(geometry_type);
+    elem->LinkEndChild(gazebo_geometry);
+  }
 }
 
 
@@ -795,8 +820,8 @@ void URDF2Gazebo::reduceFixedJoints(TiXmlElement *root,
   if (link->getParent() && link->getParent()->name != "world" &&
       link->parent_joint && link->parent_joint->type == urdf::Joint::FIXED)
   {
-    gzdbg << "Fixed Joint Reduction: extension lumping from ["
-          << link->name << "] to [" << link->getParent()->name << "]\n";
+    // gzdbg << "Fixed Joint Reduction: extension lumping from ["
+    //       << link->name << "] to [" << link->getParent()->name << "]\n";
 
     // lump gazebo extensions to parent, (give them new reference link names)
     reduceGazeboExtensionToParent(link);
@@ -907,8 +932,8 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
     this->gazebo_extensions_.find(link_name);
   if (ext != this->gazebo_extensions_.end())
   {
-    gzdbg << "  REDUCE EXTENSION: moving reference from ["
-          << link_name << "] to [" << link->getParent()->name << "]\n";
+    // gzdbg << "  REDUCE EXTENSION: moving reference from ["
+    //       << link_name << "] to [" << link->getParent()->name << "]\n";
 
     // update reduction transform (for rays, cameras for now).
     //   FIXME: contact frames too?
@@ -973,17 +998,17 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
   //         <collision>base_link_collision</collision>
   //         and it needs to be reparented to
   //         <collision>base_footprint_collision</collision>
-  gzdbg << "  STRING REPLACE: instances of link name ["
-        << link_name << "] with [" << new_link_name << "]\n";
+  // gzdbg << "  STRING REPLACE: instances of link name ["
+  //       << link_name << "] with [" << new_link_name << "]\n";
   for (std::vector<TiXmlElement*>::iterator blob_it = blobs.begin();
        blob_it != blobs.end(); ++blob_it)
   {
     std::ostringstream debug_stream_in;
     debug_stream_in << *(*blob_it);
     std::string debug_blob = debug_stream_in.str();
-    gzdbg << "        INITIAL STRING link ["
-          << link_name << "]-->[" << new_link_name << "]: ["
-          << debug_blob << "]\n";
+    // gzdbg << "        INITIAL STRING link ["
+    //       << link_name << "]-->[" << new_link_name << "]: ["
+    //       << debug_blob << "]\n";
 
     this->reduceGazeboExtensionContactSensorFrameReplace(blob_it, link);
     this->reduceGazeboExtensionPluginFrameReplace(blob_it, link,
@@ -1201,8 +1226,8 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
 
     if (collisions_it->first == "default")
     {
-      gzdbg << "creating default collision for link [" << link->name
-            << "]";
+      // gzdbg << "creating default collision for link [" << link->name
+      //       << "]";
 
       /* make a <collision> block */
       createCollision(elem, link, collision, link->name);
@@ -1211,9 +1236,8 @@ void URDF2Gazebo::createCollisions(TiXmlElement* elem,
     {
       // if collision name starts with "lump::", pass through
       //   original parent link name
-      gzdbg << "creating lump collision [" << collisions_it->first
-            << "] for link [" << link->name
-            << "].\n";
+      // gzdbg << "creating lump collision [" << collisions_it->first
+      //       << "] for link [" << link->name << "].\n";
       /// old_link_name is the original name before lumping
       std::string old_link_name = collisions_it->first.substr(6);
       createCollision(elem, link, collision, old_link_name);
@@ -1427,8 +1451,8 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
     /* add geometry block */
     if (!collision || !collision->geometry)
     {
-      gzdbg << "urdf2gazebo: collision of link [" << link->name
-            << "] has no <geometry>.\n";
+      // gzdbg << "urdf2gazebo: collision of link [" << link->name
+      //       << "] has no <geometry>.\n";
     }
     else
     {
@@ -1450,9 +1474,8 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem,
     TiXmlElement *gazebo_visual = new TiXmlElement("visual");
 
     /* set its name */
-    gzdbg << "original link name [" << old_link_name
-          << "] new link name [" << link->name
-          << "]\n";
+    // gzdbg << "original link name [" << old_link_name
+    //       << "] new link name [" << link->name << "]\n";
     if (old_link_name == link->name)
       gazebo_visual->SetAttribute("name", link->name + std::string("_vis"));
     else
@@ -1470,8 +1493,8 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem,
     /* insert geometry */
     if (!visual || !visual->geometry)
     {
-      gzdbg << "urdf2gazebo: visual of link [" << link->name
-            << "] has no <geometry>\n.";
+      // gzdbg << "urdf2gazebo: visual of link [" << link->name
+      //       << "] has no <geometry>\n.";
     }
     else
       createGeometry(gazebo_visual, visual->geometry);
@@ -1555,7 +1578,7 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     gazebo_xml_out.LinkEndChild(gazebo_sdf);
 
     // debug
-    gazebo_xml_out.Print();
+    // gazebo_xml_out.Print();
 
     return gazebo_xml_out;
 }
@@ -1583,9 +1606,8 @@ TiXmlDocument URDF2Gazebo::initModelFile(std::string filename)
 
 void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
 {
-    gzdbg << "TREE:   mass lumping from [" << link->name
-          << "] to [" << link->getParent()->name
-          << "]\n.";
+    // gzdbg << "TREE:   mass lumping from [" << link->name
+    //      << "] to [" << link->getParent()->name << "]\n.";
     /* now lump all contents of this link to parent */
     if (link->inertial)
     {
@@ -1600,8 +1622,8 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
         link->getParent()->inertial->ixx, link->getParent()->inertial->iyy,
         link->getParent()->inertial->izz, link->getParent()->inertial->ixy,
          link->getParent()->inertial->ixz, link->getParent()->inertial->iyz);
-      printMass(link->getParent()->name, parent_mass);
-      printMass(link->getParent());
+      // printMass(link->getParent()->name, parent_mass);
+      // printMass(link->getParent());
       // set link mass (in link frame)
       dMass link_mass;
       dMassSetParameters(&link_mass, link->inertial->mass,
@@ -1610,8 +1632,8 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
         link->inertial->origin.position.z,
         link->inertial->ixx, link->inertial->iyy, link->inertial->izz,
         link->inertial->ixy, link->inertial->ixz, link->inertial->iyz);
-      printMass(link->name, link_mass);
-      printMass(link);
+      // printMass(link->name, link_mass);
+      // printMass(link);
       // un-rotate link mass into parent link frame
       dMatrix3 R;
       double phi, theta, psi;
@@ -1619,16 +1641,16 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
         phi, theta, psi);
       dRFromEulerAngles(R, phi, theta, psi);
       dMassRotate(&link_mass, R);
-      printMass(link->name, link_mass);
+      // printMass(link->name, link_mass);
       // un-translate link mass into parent link frame
       dMassTranslate(&link_mass,
         link->parent_joint->parent_to_joint_origin_transform.position.x,
         link->parent_joint->parent_to_joint_origin_transform.position.y,
         link->parent_joint->parent_to_joint_origin_transform.position.z);
-      printMass(link->name, link_mass);
+      // printMass(link->name, link_mass);
       // now link_mass is in the parent frame, add link_mass to parent_mass
       dMassAdd(&parent_mass, &link_mass);
-      printMass(link->getParent()->name, parent_mass);
+      // printMass(link->getParent()->name, parent_mass);
       // update parent mass
       link->getParent()->inertial->mass = parent_mass.mass;
       link->getParent()->inertial->ixx  = parent_mass.I[0+4*0];
@@ -1640,7 +1662,7 @@ void URDF2Gazebo::reduceInertialToParent(boost::shared_ptr<urdf::Link> link)
       link->getParent()->inertial->origin.position.x  = parent_mass.c[0];
       link->getParent()->inertial->origin.position.y  = parent_mass.c[1];
       link->getParent()->inertial->origin.position.z  = parent_mass.c[2];
-      printMass(link->getParent());
+      // printMass(link->getParent());
     }
 }
 
@@ -1661,9 +1683,8 @@ void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
     if (visuals_it->first == "default")
     {
       std::string lump_group_name = std::string("lump::")+link->name;
-      gzdbg << "adding modified lump group name [" << lump_group_name
-            << "] to link [" << link->getParent()->name
-            << "]\n.";
+      // gzdbg << "adding modified lump group name [" << lump_group_name
+      //       << "] to link [" << link->getParent()->name << "]\n.";
       for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator
         visual_it = visuals_it->second->begin();
         visual_it != visuals_it->second->end(); ++visual_it)
@@ -1681,9 +1702,8 @@ void URDF2Gazebo::reduceVisualsToParent(boost::shared_ptr<urdf::Link> link)
     {
       // it's a previously lumped mesh, re-lump under same group_name
       std::string lump_group_name = visuals_it->first;
-      gzdbg << "re-lumping group name [" << lump_group_name
-            << "] to link [" << link->getParent()->name
-            << "]\n";
+      // gzdbg << "re-lumping group name [" << lump_group_name
+      //       << "] to link [" << link->getParent()->name << "]\n";
       for (std::vector<boost::shared_ptr<urdf::Visual> >::iterator
            visual_it = visuals_it->second->begin();
            visual_it != visuals_it->second->end(); ++visual_it)
@@ -1716,11 +1736,10 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
       {
         // if it's a "default" mesh, it will be added under "lump::"+link name
         std::string lump_group_name = std::string("lump::")+link->name;
-        gzdbg << "lumping collision [" << collisions_it->first
-              << "] for link [" << link->name
-              << "] to parent [" << link->getParent()->name
-              << "] with group name [" << lump_group_name
-              << "]\n";
+        // gzdbg << "lumping collision [" << collisions_it->first
+        //       << "] for link [" << link->name
+        //       << "] to parent [" << link->getParent()->name
+        //       << "] with group name [" << lump_group_name << "]\n";
         for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator
           collision_it = collisions_it->second->begin();
           collision_it != collisions_it->second->end(); ++collision_it)
@@ -1740,11 +1759,10 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
       {
         // if it's a previously lumped mesh, relump under same group_name
         std::string lump_group_name = collisions_it->first;
-        gzdbg << "re-lumping collision [" << collisions_it->first
-              << "] for link [" << link->name
-              << "] to parent [" << link->getParent()->name
-              << "] with group name [" << lump_group_name
-              << "]\n";
+        // gzdbg << "re-lumping collision [" << collisions_it->first
+        //       << "] for link [" << link->name
+        //       << "] to parent [" << link->getParent()->name
+        //       << "] with group name [" << lump_group_name << "]\n";
         for (std::vector<boost::shared_ptr<urdf::Collision> >::iterator
           collision_it = collisions_it->second->begin();
           collision_it != collisions_it->second->end(); ++collision_it)
@@ -1760,7 +1778,7 @@ void URDF2Gazebo::reduceCollisionsToParent(boost::shared_ptr<urdf::Link> link)
         }
       }
     }
-    printCollisionGroups(link->getParent());
+    // printCollisionGroups(link->getParent());
 }
 
 void URDF2Gazebo::reduceJointsToParent(boost::shared_ptr<urdf::Link> link)

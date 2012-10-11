@@ -307,18 +307,18 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
   else
   {
 #ifdef HAVE_URDFDOM
-      urdf2gazebo::URDF2Gazebo u2g;
-      TiXmlDocument doc = u2g.initModelString(_xmlString);
-      if (sdf::readDoc(&doc, _sdf, "urdf string"))
-      {
+    urdf2gazebo::URDF2Gazebo u2g;
+    TiXmlDocument doc = u2g.initModelString(_xmlString);
+    if (sdf::readDoc(&doc, _sdf, "urdf string"))
+    {
       gzwarn << "parse from urdf.\n";
       return true;
-      }
-      else
-      {
+    }
+    else
+    {
       gzerr << "parse as old deprecated model file failed.\n";
       return false;
-      }
+    }
 #endif
   }
 
