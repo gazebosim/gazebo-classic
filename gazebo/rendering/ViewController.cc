@@ -22,15 +22,14 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-ViewController::ViewController(UserCamera *cam)
-  : camera(cam), enabled(true)
+ViewController::ViewController(UserCameraPtr _cam)
+  : camera(_cam), enabled(true)
 {
 }
 
 //////////////////////////////////////////////////
 ViewController::~ViewController()
 {
-  this->camera = NULL;
 }
 
 //////////////////////////////////////////////////

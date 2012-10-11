@@ -48,16 +48,21 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   QFrame *toolFrame = new QFrame;
+  toolFrame->setObjectName("toolFrame");
+  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
   QToolBar *toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
-  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
   QActionGroup *actionGroup = new QActionGroup(toolFrame);
   actionGroup->addAction(g_arrowAct);
-  actionGroup->addAction(g_ringPoseAct);
+  actionGroup->addAction(g_translateAct);
+  actionGroup->addAction(g_rotateAct);
+
   toolbar->addAction(g_arrowAct);
-  toolbar->addAction(g_ringPoseAct);
+  toolbar->addAction(g_translateAct);
+  toolbar->addAction(g_rotateAct);
 
   toolbar->addSeparator();
   toolbar->addAction(g_boxCreateAct);
@@ -75,21 +80,27 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
-
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
   TimePanel *timePanel = new TimePanel(this);
 
   QHBoxLayout *playControlLayout = new QHBoxLayout;
   playControlLayout->setContentsMargins(0, 0, 0, 0);
+
+  QFrame *bottomFrame = new QFrame;
+  bottomFrame->setObjectName("renderBottomFrame");
+  bottomFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
   QFrame *playFrame = new QFrame;
   QToolBar *playToolbar = new QToolBar;
   playFrame->setFrameShape(QFrame::NoFrame);
-  playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+  playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  playFrame->setFixedHeight(25);
   playToolbar->addAction(g_playAct);
   playToolbar->addAction(g_pauseAct);
   playToolbar->addAction(g_stepAct);
   playControlLayout->addWidget(playToolbar);
+  playControlLayout->setContentsMargins(0, 0, 0, 0);
   playFrame->setLayout(playControlLayout);
 
   bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
@@ -99,12 +110,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
                              QSizePolicy::Minimum));
   bottomPanelLayout->setSpacing(0);
+  bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
+  bottomFrame->setLayout(bottomPanelLayout);
 
-  frameLayout->addSpacing(4);
   frameLayout->addWidget(toolFrame);
-  frameLayout->addSpacing(4);
   frameLayout->addWidget(this->glWidget);
-  frameLayout->addLayout(bottomPanelLayout);
+  frameLayout->addWidget(bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
 
