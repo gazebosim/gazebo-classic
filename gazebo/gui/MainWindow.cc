@@ -842,11 +842,8 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnManipMode(const std::string &_mode)
 {
-  /*if (_mode == "translate")
+  if (_mode == "select" || _mode == "make_entity")
     g_arrowAct->setChecked(true);
-  else if (_mode == "ring")
-    g_translateAct->setChecked(true);
-    */
 }
 
 /////////////////////////////////////////////////

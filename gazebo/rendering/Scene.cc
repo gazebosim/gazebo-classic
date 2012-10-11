@@ -42,7 +42,6 @@
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
-#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
@@ -117,12 +116,11 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  this->selectionObj = new SelectionObj(this);
-
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
   this->heightmap = NULL;
+  this->selectedVis.reset();
 }
 
 //////////////////////////////////////////////////
@@ -155,7 +153,6 @@ void Scene::Clear()
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
-  delete this->selectionObj;
   delete this->requestMsg;
   delete this->receiveMutex;
   delete this->raySceneQuery;
@@ -266,10 +263,6 @@ void Scene::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
-
-  // Register this scene the the real time shaders system
-  this->selectionObj->Init();
-
 
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
@@ -576,29 +569,10 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Scene::SelectVisual(const std::string &_name) const
+void Scene::SelectVisual(const std::string &_name)
 {
-  VisualPtr vis = this->GetVisual(_name);
-  if (vis)
-    this->selectionObj->Attach(vis);
-  else
-    this->selectionObj->Clear();
+  this->selectedVis = this->GetVisual(_name);
 }
-
-//////////////////////////////////////////////////
-VisualPtr Scene::SelectVisualAt(CameraPtr _camera,
-                                const math::Vector2i &_mousePos)
-{
-  std::string mod;
-  VisualPtr vis = this->GetVisualAt(_camera, _mousePos, mod);
-  if (vis)
-    this->selectionObj->Attach(vis);
-  else
-    this->selectionObj->Clear();
-
-  return vis;
-}
-
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisualAt(CameraPtr _camera,
@@ -1369,10 +1343,13 @@ void Scene::PreRender()
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      if (this->selectionObj->GetVisualName().empty() ||
+      /*if (this->selectionObj->GetVisualName().empty() ||
           !this->selectionObj->IsActive() ||
           iter->first.find(this->selectionObj->GetVisualName()) ==
           std::string::npos)
+          */
+      if (!this->selectedVis ||
+          iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
         iter->second->SetPose(pose);
@@ -1396,10 +1373,8 @@ void Scene::PreRender()
       if (iter2 != this->visuals.end())
       {
         // If an object is selected, don't let the physics engine move it.
-        if (this->selectionObj->GetVisualName().empty() ||
-           !this->selectionObj->IsActive() ||
-           iter->first.find(this->selectionObj->GetVisualName()) ==
-            std::string::npos)
+        if (!this->selectedVis ||
+          iter->first.find(this->selectedVis->GetName()) == std::string::npos)
         {
           math::Pose pose = msgs::Convert(pose_msg);
           iter2->second->SetPose(pose);
@@ -2051,8 +2026,8 @@ void Scene::RemoveVisual(VisualPtr _vis)
       this->visuals.erase(iter);
     }
 
-    if (this->selectionObj->GetVisualName() == _vis->GetName())
-      this->selectionObj->Clear();
+    if (this->selectedVis && this->selectedVis->GetName() == _vis->GetName())
+      this->selectedVis.reset();
   }
 }
 
@@ -2114,12 +2089,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-SelectionObj *Scene::GetSelectionObj() const
-{
-  return this->selectionObj;
-}
-
-/////////////////////////////////////////////////
 VisualPtr Scene::CloneVisual(const std::string &_visualName,
                              const std::string &_newName)
 {
@@ -2132,4 +2101,3 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
   }
   return result;
 }
-

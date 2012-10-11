@@ -29,7 +29,6 @@
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
-#include "rendering/SelectionObj.hh"
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/RenderEngine.hh"
 #include "common/MeshManager.hh"

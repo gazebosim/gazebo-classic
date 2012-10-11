@@ -27,7 +27,6 @@
 #include "rendering/WindowManager.hh"
 #include "rendering/Scene.hh"
 #include "rendering/UserCamera.hh"
-#include "rendering/SelectionObj.hh"
 #include "rendering/OrbitViewController.hh"
 #include "rendering/FPSViewController.hh"
 
@@ -116,7 +115,6 @@ GLWidget::GLWidget(QWidget *_parent)
   this->installEventFilter(this);
   this->keyModifiers = 0;
 
-  this->selectionObj = NULL;
   this->selectedVis.reset();
   this->mouseMoveVis.reset();
 }
@@ -344,6 +342,7 @@ void GLWidget::OnMousePressTranslate()
     vis = vis->GetRootVisual();
     this->mouseMoveVisStartPose = vis->GetWorldPose();
     this->mouseMoveVis = vis;
+    this->scene->SelectVisual(this->mouseMoveVis->GetName());
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
   }
 }
@@ -590,9 +589,10 @@ void GLWidget::OnMouseReleaseTranslate()
       this->PublishVisualPose(this->mouseMoveVis);
       this->mouseMoveVis.reset();
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
-      printf("Sending pose\n");
     }
   }
+
+  this->scene->SelectVisual("");
 }
 
 //////////////////////////////////////////////////
@@ -656,8 +656,6 @@ void GLWidget::Clear()
   this->selectedVis.reset();
   this->mouseMoveVis.reset();
   this->hoverVis.reset();
-  this->selectionMod.clear();
-  this->selectionId = 0;
   this->keyModifiers = 0;
 }
 
@@ -908,7 +906,6 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void GLWidget::OnManipMode(const std::string &_mode)
 {
-  std::cout << "SetManipMode[" << _mode << "]\n";
   this->state = _mode;
 }
 
@@ -957,7 +954,6 @@ void GLWidget::ClearSelection()
   }*/
 
   this->scene->SelectVisual("");
-  this->selectionObj = NULL;
 }
 
 /////////////////////////////////////////////////

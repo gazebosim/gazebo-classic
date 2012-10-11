@@ -141,10 +141,6 @@ namespace gazebo
       private: DirectionalLightMaker directionalLightMaker;
 
       private: rendering::VisualPtr hoverVis, selectedVis, mouseMoveVis;
-      private: rendering::SelectionObj *selectionObj;
-      private: unsigned int selectionId;
-      private: std::string selectionMod;
-      private: math::Pose selectionPoseOrig;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
