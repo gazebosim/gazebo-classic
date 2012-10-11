@@ -55,7 +55,8 @@ namespace gazebo
       public: int GetHeight() const;
 
       /// \brief Get the next frame of the video.
-      /// \param _img Image in which the frame is stored
+      /// \param[out] _img Image in which the frame is stored
+      /// \return false if HAVE_FFMPEG is not defined, true otherwise
       public: bool GetNextFrame(unsigned char **_buffer);
 
       /// \brief free up open Video object, close files, streams
