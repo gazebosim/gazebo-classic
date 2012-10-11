@@ -95,7 +95,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QFrame *playFrame = new QFrame;
   QToolBar *playToolbar = new QToolBar;
   playFrame->setFrameShape(QFrame::NoFrame);
-  playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+  playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  playFrame->setFixedHeight(25);
   playToolbar->addAction(g_playAct);
   playToolbar->addAction(g_pauseAct);
   playToolbar->addAction(g_stepAct);

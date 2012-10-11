@@ -799,12 +799,30 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
     ray.y = 1.0;
   else if (this->selectionMod == "rotz")
   */
-  ray.z = 1.0;
+
+  if (this->keyText == "r")
+    ray.x = 1.0;
+  else if (this->keyText == "p")
+    ray.y = 1.0;
+  else
+    ray.z = 1.0;
 
   math::Vector2i diff = this->mouseEvent.pressPos - this->mouseEvent.pos;
   math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
 
-  rpy.z += diff.y * 0.1;
+  rpy += ray * (diff.y * 0.1);
+
+  /*if (this->mouseEvent.shift)
+  {
+    double deg = GZ_RTOD(rpy.z);
+    double flt = (deg / 15.0);
+    flt = ((int)(flt * 10)) - (flt * 10.0);
+
+    if (flt <= 0.1)
+      rpy.z = GZ_DTOR(flt * 15.0);
+    else if (flt  >= .4)
+      rpy.z = floor(rpy.z);
+  }*/
 
   _vis->SetRotation(math::Quaternion(rpy));
 
@@ -902,7 +920,7 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
   moveVector *= p1 - p2;
   pose.pos = this->mouseMoveVisStartPose.pos + moveVector;
 
-  if (!this->mouseEvent.shift)
+  if (this->mouseEvent.shift)
   {
     if (ceil(pose.pos.x) - pose.pos.x <= .4)
         pose.pos.x = ceil(pose.pos.x);

@@ -107,9 +107,9 @@ MainWindow::MainWindow()
   this->collapseButton->setFocusPolicy(Qt::NoFocus);
   connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
 
-  centerLayout->addWidget(this->tabWidget, 0);
+  centerLayout->addWidget(this->tabWidget, .5);
   centerLayout->addWidget(collapseButton, 0);
-  centerLayout->addWidget(this->renderWidget, 1);
+  centerLayout->addWidget(this->renderWidget, 2);
   centerLayout->setContentsMargins(0, 0, 0, 0);
   centerLayout->setSpacing(0);
 
