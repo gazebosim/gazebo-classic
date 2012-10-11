@@ -95,7 +95,8 @@ namespace gazebo
       /// \param[in] _x the value along x. You must ensure that _x is within a valid range.
       public: double GetTimeAtX(const double _x) const;
 
-      protected: std::string name; /// \brief the name of the animation
+      /// \brief the name of the animation
+      protected: std::string name;
 
       /// \brief the dictionary of key frames, indexed by time
       protected: std::map<double, math::Matrix4> keyFrames;
@@ -177,9 +178,11 @@ namespace gazebo
       /// \return the duration in seconds
       public: double GetLength() const;
 
-      protected: std::string name; /// \brief the node name
+      /// \brief the node name
+      protected: std::string name;
 
-      protected: double length; /// \brief the duration of the longest animation
+      /// \brief the duration of the longest animation
+      protected: double length;
 
       /// \brief a dictionary of node animations
       protected: std::map<std::string, NodeAnimation*> animations;

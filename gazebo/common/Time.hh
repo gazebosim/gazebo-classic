@@ -88,12 +88,12 @@ namespace gazebo
       /// \param[in] _ms milliseconds
       public: static Time MSleep(unsigned int _ms);
 
-      /// \brief Assignement operator
+      /// \brief Assignment operator
       /// \param[in] tv the new time
       /// \return a reference to this instance
       public: Time &operator =(const struct timeval &tv);
 
-      /// \brief Assignement operator
+      /// \brief Assignment operator
       /// \param[in] time the new time
       /// \return a reference to this instance
       public: Time &operator =(const Time &time);
@@ -103,7 +103,7 @@ namespace gazebo
       /// \return a Time instance
       public: Time operator +(const struct timeval &tv) const;
 
-      /// \brief Addition assignement operator
+      /// \brief Addition assignment operator
       /// \param[in] tv
       /// \return a reference to this instance
       public: const Time &operator +=(const struct timeval &tv);
@@ -120,7 +120,7 @@ namespace gazebo
       /// \return a Time instance
       public: Time operator -(const struct timeval &tv) const;
 
-      /// \brief Subtraction assignement operator
+      /// \brief Subtraction assignment operator
       /// \return a Time instance
       public: const Time &operator -=(const struct timeval &tv);
 
@@ -128,7 +128,7 @@ namespace gazebo
       /// \return a Time instance
       public: Time operator -(const Time &time) const;
 
-      /// \brief Subtraction assignement operator
+      /// \brief Subtraction assignment operator
       /// \return a reference to this instance
       public: const Time &operator -=(const Time &time);
 
@@ -136,7 +136,7 @@ namespace gazebo
       /// \return Time instance
       public: Time operator *(const struct timeval &tv) const;
 
-      /// \brief Multiplication assignement operator
+      /// \brief Multiplication assignment operator
       /// \param[in] tv the scaling duration
       /// \return a reference to this instance
       public: const Time &operator *=(const struct timeval &tv);
@@ -156,7 +156,7 @@ namespace gazebo
       /// \return a Time instance
       public: Time operator /(const struct timeval &tv) const;
 
-      /// \brief Division assignement operator
+      /// \brief Division assignment operator
       /// \param[in] tv a divisor
       /// \return a Time instance
       public: const Time &operator /=(const struct timeval &tv);
@@ -166,7 +166,7 @@ namespace gazebo
       /// \return a Time instance
       public: Time operator /(const Time &time) const;
 
-      /// \brief Division assignement operator
+      /// \brief Division assignment operator
       /// \param[in] time the divisor
       /// \return a Time instance
       public: const Time &operator /=(const Time &time);
@@ -310,7 +310,8 @@ namespace gazebo
       /// \brief Microseconds
       public: int32_t nsec;
 
-      private: static Time wallTime; /// \brief a singleton value of the last GetWallTime() value
+      /// \brief a singleton value of the last GetWallTime() value
+      private: static Time wallTime;
 
       /// \brief Correct the time so that small additions/substractions preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
