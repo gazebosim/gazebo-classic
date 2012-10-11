@@ -361,7 +361,7 @@ QWidget#renderWidget > QWidget
 QWidget#toolFrame 
 {
   border-bottom: 1px solid #101010;
-  background-color: #555555;
+  background-color: #909090;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
@@ -371,19 +371,19 @@ QWidget#renderBottomFrame
   border-top: 1px solid #101010;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  background-color: #555555;
+  background-color: #909090;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
 
 QWidget#timePanel 
 {
-  background-color: #555555;
+  background-color: #909090;
   border-bottom-right-radius: 10px;
 }
 
 QWidget#timePanel > QFrame
 {
-  background-color: #555555;
+  background-color: #909090;
   border-bottom-right-radius: 10px;
 }
