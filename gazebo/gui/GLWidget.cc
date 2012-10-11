@@ -943,9 +943,6 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 
   if (this->selectedVis && !this->selectedVis->IsPlane())
   {
-    std::cout << "Set Selected...\n";
-    std::cout << "Selected Vis[" << this->selectedVis->GetName() << "]\n";
-    std::cout << "PLANE[" << this->selectedVis->IsPlane() << "]\n";
     this->selectedVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
   }
 }
