@@ -209,6 +209,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
+  if (_event->isAutoRepeat())
+    return;
+
   this->keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
@@ -232,7 +235,6 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
-
   this->userCamera->HandleKeyPressEvent(this->keyText);
 }
 
@@ -240,6 +242,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 void GLWidget::keyReleaseEvent(QKeyEvent *_event)
 {
   if (!this->scene)
+    return;
+
+  if (_event->isAutoRepeat())
     return;
 
   this->keyText = "";
@@ -262,6 +267,16 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->mouseEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
+  // Reset the mouse move info when the user hits keys.
+  if (this->state == "translate" || this->state == "rotate")
+  {
+    if (this->keyText == "x" || this->keyText == "y" || this->keyText == "z")
+    {
+      this->mouseEvent.pressPos = this->mouseEvent.pos;
+      if (this->mouseMoveVis)
+        this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+    }
+  }
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
 }
@@ -729,18 +744,32 @@ void GLWidget::OnCreateEntity(const std::string &_type,
     this->entityMaker->Stop();
 
   if (_type == "box")
-    this->entityMaker = &this->boxMaker;
+  {
+    this->boxMaker.Start(this->userCamera);
+    this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString());
+    this->entityMaker = &this->modelMaker;
+  }
   else if (_type == "sphere")
-    this->entityMaker = &this->sphereMaker;
+  {
+    this->sphereMaker.Start(this->userCamera);
+    this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString());
+    this->entityMaker = &this->modelMaker;
+  }
   else if (_type == "cylinder")
-    this->entityMaker = &this->cylinderMaker;
+  {
+    this->cylinderMaker.Start(this->userCamera);
+    this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString());
+    this->entityMaker = &this->modelMaker;
+  }
   else if (_type == "mesh" && !_data.empty())
   {
+    std::cout << "MeshMaker[" << _data << "]\n";
     this->meshMaker.Init(_data);
     this->entityMaker = &this->meshMaker;
   }
   else if (_type == "model" && !_data.empty())
   {
+    std::cout << "ModelMake[" << _data << "]\n";
     this->modelMaker.InitFromFile(_data);
     this->entityMaker = &this->modelMaker;
   }
@@ -831,8 +860,10 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
 
   if (this->keyText == "z")
   {
-    moveVector.z = 1;
-    planeNorm.Set(.1, 0, 0);
+    math::Vector2i diff = this->mouseEvent.pos - this->mouseEvent.pressPos;
+    pose.pos.z = this->mouseMoveVisStartPose.pos.z + diff.y * -0.01;
+    _vis->SetPose(pose);
+    return;
   }
   else if (this->keyText == "x")
   {
@@ -846,9 +877,7 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
     moveVector.Set(1, 1, 0);
 
   // Compute the distance from the camera to plane of translation
-  double d = -pose.pos.Dot(planeNorm);
-  if (moveVector == math::Vector3(.1, 0, 0))
-    d *= -1;
+  double d = pose.pos.Dot(planeNorm);
   math::Plane plane(planeNorm, d);
   double dist1 = plane.Distance(origin1, dir1);
   double dist2 = plane.Distance(origin2, dir2);
@@ -882,13 +911,14 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
     }
   }
 
+  pose.pos.z = _vis->GetPose().pos.z;
+
   _vis->SetPose(pose);
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
-  std::cout << "On Selection Msg\n";
   if (_msg->has_selected())
   {
     if (_msg->selected())

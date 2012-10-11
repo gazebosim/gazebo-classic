@@ -63,14 +63,97 @@ void ModelMaker::InitFromModel(const std::string &_modelName)
     this->visuals.clear();
   }
 
-  // this->modelSDF.reset(new sdf::SDF);
-  // sdf::initFile("gazebo.sdf", this->modelSDF);
   this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
 
   if (!this->modelVisual)
     std::cout << "Unable to clone\n";
 
   this->clone = true;
+}
+
+/////////////////////////////////////////////////
+void ModelMaker::InitFromSDFString(const std::string &_data)
+{
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+
+  if (this->modelVisual)
+  {
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+    this->visuals.clear();
+  }
+
+  this->modelSDF.reset(new sdf::SDF);
+  sdf::initFile("gazebo.sdf", this->modelSDF);
+  sdf::readString(_data, this->modelSDF);
+
+  // Load the world file
+  std::string modelName;
+  math::Pose modelPose, linkPose, visualPose;
+
+  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  if (modelElem->HasElement("pose"))
+    modelPose = modelElem->GetValuePose("pose");
+
+  modelName = this->node->GetTopicNamespace() + "::" +
+              modelElem->GetValueString("name");
+
+  this->modelVisual.reset(new rendering::Visual(modelName,
+                          scene->GetWorldVisual()));
+  this->modelVisual->Load();
+  this->modelVisual->SetPose(modelPose);
+
+  modelName = this->modelVisual->GetName();
+  modelElem->GetAttribute("name")->Set(modelName);
+
+  scene->AddVisual(this->modelVisual);
+
+  sdf::ElementPtr linkElem = modelElem->GetElement("link");
+
+  try
+  {
+    while (linkElem)
+    {
+      std::string linkName = linkElem->GetValueString("name");
+      if (linkElem->HasElement("pose"))
+        linkPose = linkElem->GetValuePose("pose");
+
+      rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
+            linkName, this->modelVisual));
+      linkVisual->Load();
+      linkVisual->SetPose(linkPose);
+      this->visuals.push_back(linkVisual);
+
+      int visualIndex = 0;
+      sdf::ElementPtr visualElem;
+
+      if (linkElem->HasElement("visual"))
+        visualElem = linkElem->GetElement("visual");
+
+      while (visualElem)
+      {
+        if (visualElem->HasElement("pose"))
+          visualPose = visualElem->GetValuePose("pose");
+
+        std::ostringstream visualName;
+        visualName << modelName << "::" << linkName << "::Visual_"
+          << visualIndex++;
+        rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+              linkVisual));
+
+        visVisual->Load(visualElem);
+        this->visuals.push_back(visVisual);
+
+        visualElem = visualElem->GetNextElement("visual");
+      }
+
+      linkElem = linkElem->GetNextElement("link");
+    }
+  }
+  catch(common::Exception &_e)
+  {
+    this->visuals.clear();
+  }
 }
 
 /////////////////////////////////////////////////

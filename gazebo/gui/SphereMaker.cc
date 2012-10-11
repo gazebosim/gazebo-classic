@@ -154,39 +154,38 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
+std::string SphereMaker::GetSDFString()
+{
+  std::ostringstream newModelStr;
+
+  newModelStr << "<gazebo version='1.2'>"
+    << "<model name='unit_sphere_" << counter << "'>"
+    << "  <pose>0 0 0.5 0 0 0</pose>"
+    << "  <link name='link'>"
+    << "    <inertial><mass>1.0</mass></inertial>"
+    << "    <collision name='collision'>"
+    << "      <geometry>"
+    << "        <sphere><radius>0.5</radius></sphere>"
+    << "      </geometry>"
+    << "    </collision>"
+    << "    <visual name ='visual'>"
+    << "      <geometry>"
+    << "        <sphere><radius>0.5</radius></sphere>"
+    << "      </geometry>"
+    << "    </visual>"
+    << "  </link>"
+    << "  </model>"
+    << "</gazebo>";
+
+  return newModelStr.str();
+}
+
+
+/////////////////////////////////////////////////
 void SphereMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  std::ostringstream newModelStr;
-
-  newModelStr << "<gazebo version ='1.0'>\
-    <model name ='custom_user_sphere" << counter << "_model'>\
-    <pose>" << this->visualMsg->pose().position().x() << " "
-                     << this->visualMsg->pose().position().y() << " "
-                     << this->visualMsg->geometry().sphere().radius()
-                     << " 0 0 0</pose>\
-    <link name ='body'>\
-      <inertial mass ='1.0'>\
-          <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
-      </inertial>\
-      <collision name ='geom'>\
-        <geometry>\
-          <sphere radius ='" << this->visualMsg->geometry().sphere().radius()
-          << "'/>\
-        </geometry>\
-      </collision>\
-      <visual name ='visual' cast_shadows ='true'>\
-        <geometry>\
-          <sphere radius ='" << this->visualMsg->geometry().sphere().radius()
-          << "'/>\
-        </geometry>\
-        <material script ='Gazebo/Grey'/>\
-      </visual>\
-    </link>\
-  </model>\
-  </gazebo>";
-
-  msg.set_sdf(newModelStr.str());
+  msg.set_sdf(this->GetSDFString());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());

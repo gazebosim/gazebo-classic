@@ -173,41 +173,44 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   this->visPub->Publish(*this->visualMsg);
 }
 
-void BoxMaker::CreateTheEntity()
+/////////////////////////////////////////////////
+std::string BoxMaker::GetSDFString()
 {
-  msgs::Factory msg;
-
   std::ostringstream newModelStr;
-
-  math::Vector3 p = msgs::Convert(this->visualMsg->pose().position());
-  math::Vector3 size = msgs::Convert(this->visualMsg->geometry().box().size());
-
-
   newModelStr << "<gazebo version ='1.2'>"
-    << "<model name='custom_user_box" << counter << "_model'>"
-    << "<pose>" << p.x << " " << p.y << " " << size.z * 0.5 << " 0 0 0</pose>"
+    << "<model name='unit_box_" << counter << "'>"
+    << "<pose>0 0 0.5 0 0 0</pose>"
     << "<link name ='link'>"
     <<   "<inertial><mass>1.0</mass></inertial>"
     <<   "<collision name ='collision'>"
     <<     "<geometry>"
     <<       "<box>"
-    <<         "<size>" << size.x << " " << size.y << " " << size.z << "</size>"
+    <<         "<size>1.0 1.0 1.0</size>"
     <<       "</box>"
     <<     "</geometry>"
     << "</collision>"
     << "<visual name ='visual'>"
     <<     "<geometry>"
     <<       "<box>"
-    <<         "<size>" << size.x << " " << size.y << " " << size.z << "</size>"
+    <<         "<size>1.0 1.0 1.0</size>"
     <<       "</box>"
     <<     "</geometry>"
-    <<   "<material><script>Gazebo/Grey</script></material>"
     << "</visual>"
     << "</link>"
-  << "</model>"
-  << "</gazebo>";
+    << "</model>"
+    << "</gazebo>";
 
-  msg.set_sdf(newModelStr.str());
+  return newModelStr.str();
+}
+
+void BoxMaker::CreateTheEntity()
+{
+  msgs::Factory msg;
+
+  math::Vector3 p = msgs::Convert(this->visualMsg->pose().position());
+  math::Vector3 size = msgs::Convert(this->visualMsg->geometry().box().size());
+
+  msg.set_sdf(this->GetSDFString());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());

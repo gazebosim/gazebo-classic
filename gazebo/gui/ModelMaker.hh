@@ -38,7 +38,9 @@ namespace gazebo
       public: virtual ~ModelMaker();
 
       public: void InitFromModel(const std::string &_modelName);
+      public: void InitFromSDFString(const std::string &_data);
       public: void InitFromFile(const std::string &_filename);
+
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       public: virtual void Stop();
