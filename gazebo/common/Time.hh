@@ -214,7 +214,7 @@ namespace gazebo
       /// \brief Less than operator
       /// \param[in] time the time to compare with
       /// \return true if time is shorter than this, false otherwise
-     public: bool operator<(double time) const;
+      public: bool operator<(double time) const;
 
       /// \brief Less than or equal to operator
       /// \param[in] tv the time to compare with
