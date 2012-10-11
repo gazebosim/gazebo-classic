@@ -57,9 +57,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QActionGroup *actionGroup = new QActionGroup(toolFrame);
   actionGroup->addAction(g_arrowAct);
-  actionGroup->addAction(g_ringPoseAct);
+  actionGroup->addAction(g_translateAct);
+  actionGroup->addAction(g_rotateAct);
+
   toolbar->addAction(g_arrowAct);
-  toolbar->addAction(g_ringPoseAct);
+  toolbar->addAction(g_translateAct);
+  toolbar->addAction(g_rotateAct);
 
   toolbar->addSeparator();
   toolbar->addAction(g_boxCreateAct);

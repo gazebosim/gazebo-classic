@@ -67,7 +67,8 @@ namespace gazebo
       private slots: void NewModel();
       private slots: void EditWorldProperties();
       private slots: void Arrow();
-      private slots: void RingPose();
+      private slots: void Translate();
+      private slots: void Rotate();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -96,6 +97,7 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
       private: void OnManipMode(const std::string &_mode);
+      private: void OnSetSelectedEntity(const std::string &_name);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       private: QMenu *fileMenu;

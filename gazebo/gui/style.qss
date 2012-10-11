@@ -1,6 +1,6 @@
 QMainWindow#mainWindow
 {
-  background-color: #393939;
+  background-color: #303030;
   /*background-image: url(:/images/mainwindow_bg.png);*/
   /*background-repeat: repeat-xy;*/
   margin: 22px;
@@ -8,7 +8,7 @@ QMainWindow#mainWindow
 
 QMenuBar
 {
-  background-color: #393939;
+  background-color: #303030;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 10px;
   border: 0px solid #404040;
@@ -17,7 +17,7 @@ QMenuBar
 QMenuBar::item
 {
   color: #d0d0d0;
-  background-color: #393939;
+  background-color: #303030;
   margin-top: 2px;
   margin-bottom: 2px;
   margin-left: 4px;
@@ -37,7 +37,7 @@ QMenuBar::item:selected
 QMenu
 {
   color: #d0d0d0;
-  background-color: #393939;
+  background-color: #303030;
   border: 1px solid #424242;
 }
 
@@ -68,20 +68,20 @@ QToolButton
 
 QToolButton:hover
 {
-  border: 1px outset #b05908;
-  background-color: #f58113;
+  border: 1px outset #252525;
+  background-color: #454545;
 }
 
 QToolButton:pressed
 {
-  border: 1px inset #b05908;
-  background-color: #f58113;
+  border: 1px outset #252525;
+  background-color: #454545;
 }
 
 QToolButton:checked
 {
-  border: 1px inset #b05908;
-  background-color: #f58113;
+  border: 1px outset #252525;
+  background-color: #454545;
 }
 
 QLabel
@@ -361,7 +361,7 @@ QWidget#renderWidget > QWidget
 QWidget#toolFrame 
 {
   border-bottom: 1px solid #101010;
-  background-color: #909090;
+  background-color: #555555;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
@@ -371,15 +371,19 @@ QWidget#renderBottomFrame
   border-top: 1px solid #101010;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  background-color: #909090;
+  background-color: #555555;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 QWidget#timePanel 
 {
-  background-color: #909090;
+  background-color: #555555;
+  border-bottom-right-radius: 10px;
 }
 
 QWidget#timePanel > QFrame
 {
-  background-color: #909090;
+  background-color: #555555;
+  border-bottom-right-radius: 10px;
 }

@@ -176,6 +176,9 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
     this->requestMsg = msgs::CreateRequest("entity_info",
         this->selectedModelName);
     this->requestPub->Publish(*this->requestMsg);
+    QTreeWidgetItem *listItem = this->GetModelListItem(this->selectedModelName);
+    if (listItem)
+      this->modelTreeWidget->setCurrentItem(listItem);
   }
 }
 

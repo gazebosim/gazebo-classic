@@ -205,7 +205,7 @@ void ODECollision::OnPoseChangeGlobal()
   q[3] = localPose.rot.z;
 
   dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
-      localPose.pos.z);
+                   localPose.pos.z);
   dGeomSetQuaternion(this->collisionId, q);
 }
 

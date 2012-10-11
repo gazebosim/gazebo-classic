@@ -77,7 +77,6 @@ MainWindow::MainWindow()
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
   this->CreateMenus();
-  //this->CreateToolbars();
 
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -87,58 +86,14 @@ MainWindow::MainWindow()
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
   ModelListWidget *modelListWidget = new ModelListWidget(this);
-  //LightListWidget *lightListWidget = new LightListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
-  //SkyWidget *skyWidget = new SkyWidget(this);
-
 
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
-  this->tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-  /*this->treeWidget = new QTreeWidget();
-  this->treeWidget->setColumnCount(1);
-  this->treeWidget->setIndentation(0);
-  this->treeWidget->setRootIsDecorated(true);
-  this->treeWidget->setExpandsOnDoubleClick(true);
-  this->treeWidget->setFocusPolicy(Qt::NoFocus);
-  this->treeWidget->setAnimated(true);
-  this->treeWidget->setObjectName("mainTree");
-
-  this->treeWidget->header()->hide();
-  this->treeWidget->header()->setResizeMode(QHeaderView::Stretch);
-  this->treeWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-
-  this->treeWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  this->treeWidget->setItemDelegate(
-      new TreeViewDelegate(this->treeWidget, this->treeWidget));
-
-  connect(this->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-          this, SLOT(ItemSelected(QTreeWidgetItem *, int)));
-
-  QTreeWidgetItem *topItem = new QTreeWidgetItem(this->treeWidget,
-      QStringList("Models"));
-  this->treeWidget->addTopLevelItem(topItem);
-  QTreeWidgetItem *subItem = new QTreeWidgetItem(topItem);
-  this->treeWidget->setItemWidget(subItem, 0, modelListWidget);
-
-  topItem = new QTreeWidgetItem(this->treeWidget, QStringList("Lights"));
-  this->treeWidget->addTopLevelItem(topItem);
-  subItem = new QTreeWidgetItem(topItem);
-  this->treeWidget->setItemWidget(subItem, 0, lightListWidget);
-
-  topItem = new QTreeWidgetItem(this->treeWidget, QStringList("InsertModel"));
-  this->treeWidget->addTopLevelItem(topItem);
-  subItem = new QTreeWidgetItem(topItem);
-  this->treeWidget->setItemWidget(subItem, 0, insertModel);
-
-  topItem = new QTreeWidgetItem(this->treeWidget, QStringList("Sky"));
-  this->treeWidget->addTopLevelItem(topItem);
-  subItem = new QTreeWidgetItem(topItem);
-  this->treeWidget->setItemWidget(subItem, 0, skyWidget);
-  */
+  this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
+                                 QSizePolicy::Expanding);
 
   this->renderWidget = new RenderWidget(mainWidget);
 
@@ -152,7 +107,6 @@ MainWindow::MainWindow()
   this->collapseButton->setFocusPolicy(Qt::NoFocus);
   connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
 
-  // centerLayout->addWidget(this->treeWidget, 0);
   centerLayout->addWidget(this->tabWidget, 0);
   centerLayout->addWidget(collapseButton, 0);
   centerLayout->addWidget(this->renderWidget, 1);
@@ -182,6 +136,10 @@ MainWindow::MainWindow()
   this->connections.push_back(
       gui::Events::ConnectManipMode(
         boost::bind(&MainWindow::OnManipMode, this, _1)));
+
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -360,13 +318,19 @@ void MainWindow::EditWorldProperties()
 /////////////////////////////////////////////////
 void MainWindow::Arrow()
 {
-  gui::Events::manipMode("normal");
+  gui::Events::manipMode("select");
 }
 
 /////////////////////////////////////////////////
-void MainWindow::RingPose()
+void MainWindow::Translate()
 {
-  gui::Events::manipMode("ring");
+  gui::Events::manipMode("translate");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Rotate()
+{
+  gui::Events::manipMode("rotate");
 }
 
 /////////////////////////////////////////////////
@@ -533,14 +497,6 @@ void MainWindow::CreateActions()
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
-
-  g_editWorldPropertiesAct = new QAction(tr("&World"), this);
-  g_editWorldPropertiesAct->setShortcut(tr("Ctrl+W"));
-  g_editWorldPropertiesAct->setStatusTip(tr("Edit World Properties"));
-  connect(g_editWorldPropertiesAct, SIGNAL(triggered()), this,
-          SLOT(EditWorldProperties()));
-
-
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setCheckable(true);
@@ -559,19 +515,25 @@ void MainWindow::CreateActions()
 
 
   g_arrowAct = new QAction(QIcon(":/images/arrow.png"),
-      tr("Position object"), this);
+      tr("Selection Mode"), this);
   g_arrowAct->setStatusTip(tr("Move camera"));
   g_arrowAct->setCheckable(true);
   g_arrowAct->setChecked(true);
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
-  g_ringPoseAct = new QAction(QIcon(":/images/translate.png"),
-      tr("Position object"), this);
-  g_ringPoseAct->setStatusTip(tr("Position object"));
-  g_ringPoseAct->setCheckable(true);
-  g_ringPoseAct->setChecked(false);
-  connect(g_ringPoseAct, SIGNAL(triggered()), this, SLOT(RingPose()));
+  g_translateAct = new QAction(QIcon(":/images/translate.png"),
+      tr("Translation Mode"), this);
+  g_translateAct->setStatusTip(tr("Translate an object"));
+  g_translateAct->setCheckable(true);
+  g_translateAct->setChecked(false);
+  connect(g_translateAct, SIGNAL(triggered()), this, SLOT(Translate()));
 
+  g_rotateAct = new QAction(QIcon(":/images/rotate.png"),
+      tr("Rotation Mode"), this);
+  g_rotateAct->setStatusTip(tr("Rotate an object"));
+  g_rotateAct->setCheckable(true);
+  g_rotateAct->setChecked(false);
+  connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(Rotate()));
 
   g_boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   g_boxCreateAct->setStatusTip(tr("Create a box"));
@@ -677,7 +639,6 @@ void MainWindow::CreateMenus()
   this->editMenu = this->menuBar->addMenu(tr("&Edit"));
   this->editMenu->addAction(g_resetModelsAct);
   this->editMenu->addAction(g_resetWorldAct);
-  this->editMenu->addAction(g_editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(g_viewGridAct);
@@ -881,10 +842,20 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnManipMode(const std::string &_mode)
 {
-  if (_mode != "ring")
+  /*if (_mode == "translate")
     g_arrowAct->setChecked(true);
   else if (_mode == "ring")
-    g_ringPoseAct->setChecked(true);
+    g_translateAct->setChecked(true);
+    */
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnSetSelectedEntity(const std::string &_name)
+{
+  if (!_name.empty())
+  {
+    this->tabWidget->setCurrentIndex(0);
+  }
 }
 
 /////////////////////////////////////////////////

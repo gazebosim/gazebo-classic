@@ -1803,6 +1803,16 @@ VisualPtr Visual::GetParent() const
 }
 
 //////////////////////////////////////////////////
+VisualPtr Visual::GetRootVisual()
+{
+  VisualPtr p = shared_from_this();
+  while (p->GetParent()->GetName() != "__world_node__")
+    p = p->GetParent();
+
+  return p;
+}
+
+//////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
   if (this->sdf->HasElement("geometry"))

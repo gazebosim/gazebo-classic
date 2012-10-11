@@ -160,6 +160,9 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   }
   else if (_event.buttons & common::MouseEvent::LEFT)
   {
+    this->distance =
+      this->camera->GetWorldPose().pos.Distance(this->focalPoint);
+
     double fovY = this->camera->GetVFOV().Radian();
     double fovX = 2.0f * atan(tan(fovY / 2.0f) *
         this->camera->GetAspectRatio());

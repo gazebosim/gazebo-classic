@@ -379,6 +379,13 @@ void UserCamera::ShowVisual(bool /*_s*/)
 }
 
 //////////////////////////////////////////////////
+bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
+{
+  this->orbitViewController->SetFocalPoint(_pose.pos);
+  return Camera::MoveToPosition(_pose, _time);
+}
+
+//////////////////////////////////////////////////
 void UserCamera::MoveToVisual(const std::string &_name)
 {
   VisualPtr visualPtr = this->scene->GetVisual(_name);
@@ -435,7 +442,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   dist = start.Distance(end);
   double vel = 5.0;
-  double time = dist / vel;
+  double time = 0.5;//dist / vel;
 
   Ogre::Animation *anim =
     this->scene->GetManager()->createAnimation("cameratrack", time);
@@ -544,6 +551,12 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
+{
+  this->orbitViewController->SetFocalPoint(_pt);
 }
 
 //////////////////////////////////////////////////
