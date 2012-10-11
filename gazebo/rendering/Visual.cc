@@ -1814,11 +1814,20 @@ VisualPtr Visual::GetRootVisual()
 //////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-  if (this->sdf->HasElement("geometry"))
+   if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
-    return geomElem->HasElement("plane");
+    if (geomElem->HasElement("plane"))
+      return true;
   }
+
+  std::vector<VisualPtr>::const_iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->IsPlane())
+      return true;
+  }
+
   return false;
 }
 

@@ -942,9 +942,7 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   this->selectedVis = _vis;
 
   if (this->selectedVis && !this->selectedVis->IsPlane())
-  {
     this->selectedVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
-  }
 }
 
 /////////////////////////////////////////////////
