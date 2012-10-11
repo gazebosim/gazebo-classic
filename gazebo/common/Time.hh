@@ -207,14 +207,14 @@ namespace gazebo
       public: bool operator<(const struct timeval &tv) const;
 
       /// \brief Less than operator
-	  /// \param[in] time the time to compare with
-	  /// \return true if time is shorter than this, false otherwise
+      /// \param[in] time the time to compare with
+      /// \return true if time is shorter than this, false otherwise
       public: bool operator<(const Time &time) const;
 
       /// \brief Less than operator
       /// \param[in] time the time to compare with
-	  /// \return true if time is shorter than this, false otherwise
- 	  public: bool operator<(double time) const;
+      /// \return true if time is shorter than this, false otherwise
+     public: bool operator<(double time) const;
 
       /// \brief Less than or equal to operator
       /// \param[in] tv the time to compare with
@@ -310,9 +310,11 @@ namespace gazebo
       /// \brief Microseconds
       public: int32_t nsec;
 
-      private: static Time wallTime; /// \brief a singleton value of the last GetWallTime() value
+      /// \brief a singleton value of the last GetWallTime() value
+      private: static Time wallTime;
 
-      /// \brief Correct the time so that small additions/substractions preserve the internal seconds and nanoseconds separation
+      /// \brief Correct the time so that small additions/substractions
+      /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
                  // Make any corrections
@@ -332,6 +334,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-
