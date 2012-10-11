@@ -264,13 +264,6 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
   std::string filename;
 
-  // First try to find the file on the current system
-  filename = this->FindFile(suffix);
-
-  // If the file was found, then return the full path
-  if (!filename.empty())
-    return filename;
-
   // If trying to find a model, return the path to the users home
   // .gazebo/models
   if (prefix == "model")
@@ -285,6 +278,11 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
         break;
     }
     filename = path.string();
+  }
+  else if (prefix.empty() || prefix == "file")
+  {
+    // First try to find the file on the current system
+    filename = this->FindFile(suffix);
   }
   else if (prefix != "http" && prefix != "https")
     gzerr << "Unknown URI prefix[" << prefix << "]\n";
