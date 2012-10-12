@@ -69,7 +69,7 @@ namespace gazebo
       /// \brief libav main external API structure
       private: AVCodecContext *codecCtx;
 
-      /// \brief audio video framw
+      /// \brief audio video frame
       private: AVFrame *avFrame;
 
       /// \brief audi video picture

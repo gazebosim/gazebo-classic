@@ -40,6 +40,10 @@ namespace gazebo
     class SelectionBuffer
     {
       /// \brief Constructor
+      /// \param[in] _camera Name of the camera to generate a selection
+      /// buffer for.
+      /// \param[in] _mgr Pointer to the scene manager.
+      /// \param[in] _renderTarget Pointer to the render target.
       public: SelectionBuffer(const std::string &_cameraName,
                   Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget);
 
@@ -47,20 +51,27 @@ namespace gazebo
       public: ~SelectionBuffer();
 
       /// \brief Handle on mouse click
+      /// \param[in] _x X coordinate in pixels.
+      /// \param[in] _y Y coordinate in pixels.
+      /// \return Returns the Ogre entity at the coordinate.
       public: Ogre::Entity *OnSelectionClick(int _x, int _y);
 
       /// \brief Debug show overlay
+      /// \param[in] _show True to show the selection buffer in an overlay.
       public: void ShowOverlay(bool _show);
 
       /// \brief Call this to update the selection buffer contents
       public: void Update();
 
+      /// \brief Create the selection buffer offscreen render texture.
       private: void CreateRTTOverlays();
 
+      /// \brief Update the size of the offscreen render texture.
       private: void UpdateBufferSize();
 
-      // This is the material listener - Note: it is controlled by a separate
-      // RenderTargetListener, not applied globally to all targets
+      /// \brief This is the material listener - Note: it is controlled by a
+      /// separate RenderTargetListener, not applied globally to all
+      /// targets.
       private: MaterialSwitcher *materialSwitchListener;
 
       private: SelectionRenderListener *selectionTargetListener;

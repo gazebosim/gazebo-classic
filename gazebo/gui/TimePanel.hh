@@ -49,7 +49,6 @@ namespace gazebo
       private: QLineEdit *percentRealTimeEdit;
       private: QLineEdit *simTimeEdit;
       private: QLineEdit *realTimeEdit;
-      private: QLabel *pauseLabel;
 
       private: common::Time lastUpdateTime, statusUpdatePeriod;
       private: common::Time simTime, realTime, pauseTime;

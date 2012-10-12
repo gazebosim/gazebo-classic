@@ -36,14 +36,20 @@ namespace gazebo
       /// \brief Mouse event types enumeration.
       public: enum EventType {NO_EVENT, MOVE, PRESS, RELEASE, SCROLL};
 
+<<<<<<< local
       /// \brief Constructor.
+=======
+>>>>>>> other
       public: MouseEvent()
               : pos(0, 0), prevPos(0, 0), pressPos(0, 0), scroll(0, 0),
                 moveScale(0.01), dragging(false), type(NO_EVENT), button(0),
-                buttons(NO_BUTTON), shift(false), control(false)
+                buttons(NO_BUTTON), shift(false), alt(false), control(false)
               {}
 
+<<<<<<< local
       /// \brief Mouse pointer position on the screen.
+=======
+>>>>>>> other
       public: math::Vector2i pos;
 
       /// \brief Previous position.
@@ -72,8 +78,12 @@ namespace gazebo
 
       /// \brief Shift key press flag.
       public: bool shift;
+<<<<<<< local
 
       /// \brief Control key press flag.
+=======
+      public: bool alt;
+>>>>>>> other
       public: bool control;
     };
     /// \}

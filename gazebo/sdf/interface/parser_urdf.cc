@@ -690,13 +690,13 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
         {
           size_t rep_len = package_prefix.size();
           model_filename.replace(pos1, rep_len, model_prefix);
-          gzwarn << "ros style uri [package://] is"
-            << "automatically converted: [" << model_filename
-            << "], make sure your ros package is in GAZEBO_MODEL_PATH"
-            << " and switch your manifest to conform to gazebo's"
-            << " model database format.  See ["
-            << "http://gazebosim.org/wiki/Model_database#Model_Manifest_XML"
-            << "] for more info.\n";
+          // gzwarn << "ros style uri [package://] is"
+          //   << "automatically converted: [" << model_filename
+          //   << "], make sure your ros package is in GAZEBO_MODEL_PATH"
+          //   << " and switch your manifest to conform to gazebo's"
+          //   << " model database format.  See ["
+          //   << "http://gazebosim.org/wiki/Model_database#Model_Manifest_XML"
+          //   << "] for more info.\n";
         }
 
         // add mesh filename

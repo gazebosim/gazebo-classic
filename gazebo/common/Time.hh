@@ -313,7 +313,8 @@ namespace gazebo
       /// \brief a singleton value of the last GetWallTime() value
       private: static Time wallTime;
 
-      /// \brief Correct the time so that small additions/substractions preserve the internal seconds and nanoseconds separation
+      /// \brief Correct the time so that small additions/substractions
+      /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
                  // Make any corrections
@@ -333,6 +334,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-

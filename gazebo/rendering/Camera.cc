@@ -404,12 +404,17 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
+  if (this->animState)
+    return;
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
 //////////////////////////////////////////////////
 void Camera::SetWorldRotation(const math::Quaternion &_quant)
 {
+  if (this->animState)
+    return;
+
   math::Quaternion p, s;
   math::Vector3 rpy = _quant.GetAsEuler();
   p.SetFromEuler(math::Vector3(0, rpy.y, 0));
