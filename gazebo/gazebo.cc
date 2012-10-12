@@ -95,8 +95,6 @@ void gazebo::stop()
 void gazebo::fini()
 {
   boost::mutex::scoped_lock lock(fini_mutex);
-  printf("\n\ncalling %d\n\n\n",g_plugins.size());
-  fflush(stdout);
   g_plugins.clear();
   gazebo::transport::fini();
 }
