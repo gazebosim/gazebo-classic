@@ -159,7 +159,14 @@ void MainWindow::Init()
   this->renderWidget->show();
   this->requestMsg = msgs::CreateRequest("entity_list");
   this->requestPub->Publish(*this->requestMsg);
-  this->resize(QApplication::desktop()->size() * 0.5);
+
+  // Set the initial size of the window to 0.75 the desktop size,
+  // with a minimum value of 1024x768.
+  QSize winSize = QApplication::desktop()->size() * 0.75;
+  winSize.setWidth(std::max(1024, winSize.width()));
+  winSize.setHeight(std::max(768, winSize.height()));
+
+  this->resize(winSize);
 }
 
 /////////////////////////////////////////////////

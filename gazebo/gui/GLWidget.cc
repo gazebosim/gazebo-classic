@@ -355,7 +355,9 @@ void GLWidget::OnMousePressTranslate()
   {
     vis = vis->GetRootVisual();
     this->mouseMoveVisStartPose = vis->GetWorldPose();
-    this->mouseMoveVis = vis;
+
+    this->SetMouseMoveVisual(vis);
+
     this->scene->SelectVisual(this->mouseMoveVis->GetName());
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
   }
@@ -366,7 +368,7 @@ void GLWidget::OnMousePressNormal()
 {
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
-  this->mouseMoveVis.reset();
+  this->SetMouseMoveVisual(rendering::VisualPtr());
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
@@ -601,7 +603,7 @@ void GLWidget::OnMouseReleaseTranslate()
     if (this->mouseMoveVis)
     {
       this->PublishVisualPose(this->mouseMoveVis);
-      this->mouseMoveVis.reset();
+      this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
   }
@@ -669,7 +671,7 @@ void GLWidget::Clear()
   this->userCamera.reset();
   this->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
-  this->mouseMoveVis.reset();
+  this->SetMouseMoveVisual(rendering::VisualPtr());
   this->hoverVis.reset();
   this->keyModifiers = 0;
 }
@@ -719,7 +721,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
 {
   this->hoverVis.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
-  this->mouseMoveVis.reset();
+  this->SetMouseMoveVisual(rendering::VisualPtr());
 
   this->ViewScene(rendering::get_scene(_name));
 }
@@ -928,7 +930,7 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
     else
     {
       this->SetSelectedVisual(rendering::VisualPtr());
-      this->mouseMoveVis.reset();
+      this->SetMouseMoveVisual(rendering::VisualPtr());
     }
   }
 }
@@ -943,6 +945,18 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 
   if (this->selectedVis && !this->selectedVis->IsPlane())
     this->selectedVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
+}
+
+/////////////////////////////////////////////////
+void GLWidget::SetMouseMoveVisual(rendering::VisualPtr _vis)
+{
+  if (this->mouseMoveVis)
+    this->mouseMoveVis->SetEmissive(common::Color(0, 0, 0));
+
+  this->mouseMoveVis = _vis;
+
+  if (this->mouseMoveVis)
+    this->mouseMoveVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
 }
 
 /////////////////////////////////////////////////
@@ -1055,6 +1069,6 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       this->SetSelectedVisual(rendering::VisualPtr());
     }
     if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
-      this->mouseMoveVis.reset();
+      this->SetMouseMoveVisual(rendering::VisualPtr());
   }
 }

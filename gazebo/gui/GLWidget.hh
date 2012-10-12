@@ -102,6 +102,7 @@ namespace gazebo
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
+
       private: void OnSetSelectedEntity(const std::string &_name);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
@@ -121,7 +122,13 @@ namespace gazebo
                                 const math::Pose &_pose);
       private: void PopHistory();
 
+      /// \brief Set the selected visual, which will highlight the
+      /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
+
+      /// \brief Set the visual being moved, which will highlight the
+      /// visual
+      private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       private: int windowId;
 

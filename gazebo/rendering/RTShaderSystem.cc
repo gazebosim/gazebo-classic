@@ -439,6 +439,8 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
 
   Ogre::SceneManager *sceneMgr = _scene->GetManager();
 
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
+
   // Grab the scheme render state.
   Ogre::RTShader::RenderState* schemRenderState =
     this->shaderGenerator->getRenderState(_scene->GetName() +
@@ -499,6 +501,9 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
 
   pssm3SubRenderState->setSplitPoints(dstSplitPoints);
   schemRenderState->addTemplateSubRenderState(this->shadowRenderState);
+#else
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+#endif
 
   this->shaderGenerator->invalidateScheme(_scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
