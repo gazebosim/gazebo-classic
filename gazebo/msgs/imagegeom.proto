@@ -7,7 +7,7 @@ package gazebo.msgs;
 
 message ImageGeom
 {
-  required string filename    = 1;
+  required string uri         = 1;
   optional double scale       = 2;
   optional int32 threshold    = 3 [default = 255];
   optional double height      = 4;

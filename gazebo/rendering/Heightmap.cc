@@ -25,6 +25,7 @@
 #include <Terrain/OgreTerrain.h>
 #include <Terrain/OgreTerrainGroup.h>
 
+#include "common/Common.hh"
 #include "math/Helpers.hh"
 #include "rendering/ogre_gazebo.h"
 #include "common/Exception.hh"
@@ -58,10 +59,10 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
-    this->diffuseTextures.push_back(
-        _msg->geometry().heightmap().texture(i).diffuse());
-    this->normalTextures.push_back(
-        _msg->geometry().heightmap().texture(i).normal());
+    this->diffuseTextures.push_back(common::find_file(
+        _msg->geometry().heightmap().texture(i).diffuse()));
+    this->normalTextures.push_back(common::find_file(
+        _msg->geometry().heightmap().texture(i).normal()));
     this->worldSizes.push_back(
         _msg->geometry().heightmap().texture(i).size());
   }
