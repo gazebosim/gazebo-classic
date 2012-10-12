@@ -66,7 +66,7 @@ void ModelMaker::InitFromModel(const std::string &_modelName)
   this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
 
   if (!this->modelVisual)
-    std::cout << "Unable to clone\n";
+    gzerr << "Unable to clone\n";
 
   this->clone = true;
 }

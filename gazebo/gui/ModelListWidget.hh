@@ -92,6 +92,10 @@ namespace gazebo
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor);
 
+      private: void FillColorMsg(QtProperty *_item, msgs::Color *_msg);
+
+      private: void FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg);
+
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
 
@@ -129,12 +133,6 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Joint &_msg,
                                      QtProperty *_parent);
 
-      private: void FillVector3dProperty(const msgs::Vector3d &_msg,
-                                         QtProperty *_parent);
-
-      private: void FillPoseProperty(const msgs::Pose &_msg,
-                                     QtProperty *_parent);
-
       private: void FillPropertyTree(const msgs::Surface &_msg,
                                        QtProperty *_parent);
 
@@ -147,6 +145,16 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Scene &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Physics &_msg,
+                                     QtProperty *_parent);
+
+      private: void FillVector3dProperty(const msgs::Vector3d &_msg,
+                                         QtProperty *_parent);
+
+      private: void FillPoseProperty(const msgs::Pose &_msg,
+                                     QtProperty *_parent);
+
+
       private: void ProcessPoseMsgs();
       private: void ProcessModelMsgs();
 
@@ -154,11 +162,24 @@ namespace gazebo
       private: void ResetTree();
       private: void ResetScene();
 
+      /// \brief Called when a model property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void ModelPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a scene property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void ScenePropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a physics property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void PhysicsPropertyChanged(QtProperty *_item);
+
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr requestPub, modelPub;
+      private: transport::PublisherPtr requestPub, modelPub, scenePub;
+      private: transport::PublisherPtr physicsPub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
       private: transport::SubscriberPtr poseSub;
@@ -190,6 +211,7 @@ namespace gazebo
       private: msgs::Link linkMsg;
       private: msgs::Scene sceneMsg;
       private: msgs::Joint jointMsg;
+      private: msgs::Physics physicsMsg;
 
       private: bool fillPropertyTree;
       private: std::string fillType;

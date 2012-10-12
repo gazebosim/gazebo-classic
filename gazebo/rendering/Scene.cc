@@ -116,6 +116,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       &Scene::OnRequest, this);
   this->responseSub = this->node->Subscribe("~/response",
       &Scene::OnResponse, this);
+  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
@@ -1566,6 +1567,13 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 
   this->visuals[jointVis->GetName()] = jointVis;
   return true;
+}
+
+/////////////////////////////////////////////////
+void Scene::OnScene(ConstScenePtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sceneMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////

@@ -229,6 +229,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::ODE);
+    physicsMsg.set_update_rate(this->GetUpdateRate());
     physicsMsg.set_solver_type(this->stepType);
     physicsMsg.set_dt(this->stepTimeDouble);
     physicsMsg.set_iters(this->GetSORPGSIters());
@@ -253,6 +254,9 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   {
     this->SetStepTime(_msg->dt());
   }
+
+  if (_msg->has_update_rate())
+    this->SetUpdateRate(_msg->update_rate());
 
   if (_msg->has_solver_type())
   {
@@ -290,6 +294,9 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  /// Make sure all models get at least on update cycle.
+  this->world->EnableAllModels();
 }
 
 

@@ -155,11 +155,18 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       this->requestMsg = msgs::CreateRequest("scene_info",
           this->selectedModelName);
       this->requestPub->Publish(*this->requestMsg);
-      // this->FillScenePropertyTree();
     }
-    else if (name == "model")
+    else if (name == "models")
     {
-      printf("Expand model list");
+      this->modelsItem->setSelected(false);
+      this->modelsItem->setExpanded(!this->modelsItem->isExpanded());
+    }
+    else if (name == "physics")
+    {
+      this->propTreeBrowser->clear();
+      this->requestMsg = msgs::CreateRequest("physics_info",
+                                             this->selectedModelName);
+      this->requestPub->Publish(*this->requestMsg);
     }
     else
     {
@@ -208,6 +215,8 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->jointMsg, NULL);
     else if (this->fillType == "scene")
       this->FillPropertyTree(this->sceneMsg, NULL);
+    else if (this->fillType == "physics")
+      this->FillPropertyTree(this->physicsMsg, NULL);
 
     this->fillingPropertyTree = false;
     this->fillPropertyTree = false;
@@ -223,13 +232,6 @@ void ModelListWidget::Update()
   this->ProcessPoseMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
-
-/////////////////////////////////////////////////
-/*void ModelListWidget::OnSceneUpdate(const msgs::Scene &_msg)
-{
-  printf("ScenePtr\n");
-}
-*/
 
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
@@ -358,6 +360,15 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->fillType = "scene";
     this->propMutex->unlock();
   }
+  else if (_msg->has_type() && _msg->type() == this->physicsMsg.GetTypeName())
+  {
+    this->propMutex->lock();
+    this->physicsMsg.ParseFromString(_msg->serialized_data());
+    this->propTreeBrowser->clear();
+    this->fillPropertyTree = true;
+    this->fillType = "physics";
+    this->propMutex->unlock();
+  }
   else if (_msg->has_type() && _msg->type() == "error")
   {
     if (_msg->response() == "nonexistant")
@@ -375,8 +386,6 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
 {
   if (gui::has_entity_name(_name))
   {
-    std::cout << "Has Entity[" << _name << "]\n";
-
     QTreeWidgetItem *listItem = this->GetModelListItem(_name);
     if (listItem)
     {
@@ -456,6 +465,79 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     return;
   }
 
+  if (this->modelTreeWidget->currentItem() == this->modelsItem)
+    this->ModelPropertyChanged(_item);
+  else if (this->modelTreeWidget->currentItem() == this->sceneItem)
+    this->ScenePropertyChanged(_item);
+  else if (this->modelTreeWidget->currentItem() == this->physicsItem)
+    this->PhysicsPropertyChanged(_item);
+
+  this->propMutex->unlock();
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
+{
+  msgs::Physics msg;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin();
+       iter != properties.end(); ++iter)
+  {
+    if ((*iter)->propertyName().toStdString() == "gravity")
+      this->FillVector3Msg((*iter), msg.mutable_gravity());
+    else if ((*iter)->propertyName().toStdString() == "update rate")
+      msg.set_update_rate(this->variantManager->value((*iter)).toDouble());
+    else if ((*iter)->propertyName().toStdString() == "solver")
+    {
+      msg.set_dt(this->variantManager->value(
+            this->GetChildItem((*iter), "step size")).toDouble());
+      msg.set_iters(this->variantManager->value(
+            this->GetChildItem((*iter), "iterations")).toInt());
+      msg.set_sor(this->variantManager->value(
+            this->GetChildItem((*iter), "SOR")).toDouble());
+    }
+    else if ((*iter)->propertyName().toStdString() == "constraints")
+    {
+      msg.set_cfm(this->variantManager->value(
+            this->GetChildItem((*iter), "CFM")).toDouble());
+      msg.set_erp(this->variantManager->value(
+            this->GetChildItem((*iter), "ERP")).toDouble());
+      msg.set_contact_max_correcting_vel(this->variantManager->value(
+            this->GetChildItem((*iter), "max velocity")).toDouble());
+      msg.set_contact_surface_layer(this->variantManager->value(
+            this->GetChildItem((*iter), "surface layer")).toDouble());
+    }
+  }
+
+  msg.set_type(msgs::Physics::ODE);
+  this->physicsPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
+{
+  msgs::Scene msg;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin();
+       iter != properties.end(); ++iter)
+  {
+    if ((*iter)->propertyName().toStdString() == "ambient")
+      this->FillColorMsg((*iter), msg.mutable_ambient());
+    else if ((*iter)->propertyName().toStdString() == "background")
+      this->FillColorMsg((*iter), msg.mutable_background());
+    else if ((*iter)->propertyName().toStdString() == "shadows")
+      msg.set_shadows(this->variantManager->value((*iter)).toBool());
+  }
+
+  msg.set_name(gui::get_world());
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
+{
   msgs::Model msg;
 
   msg.set_id(this->modelMsg.id());
@@ -503,8 +585,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
   }
 
   this->modelPub->Publish(msg);
-
-  this->propMutex->unlock();
 }
 
 /////////////////////////////////////////////////
@@ -533,6 +613,30 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
         this->variantManager->value(_item).toUInt());
   else
     gzerr << "Unable to fill message field[" << _field->type() << "]\n";
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillColorMsg(QtProperty *_item, msgs::Color *_msg)
+{
+  _msg->set_r(this->variantManager->value(
+      this->GetChildItem(_item, "Red")).toDouble());
+  _msg->set_g(this->variantManager->value(
+      this->GetChildItem(_item, "Green")).toDouble());
+  _msg->set_b(this->variantManager->value(
+      this->GetChildItem(_item, "Blue")).toDouble());
+  _msg->set_a(this->variantManager->value(
+      this->GetChildItem(_item, "Alpha")).toDouble());
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg)
+{
+  _msg->set_x(this->variantManager->value(
+      this->GetChildItem(_item, "x")).toDouble());
+  _msg->set_y(this->variantManager->value(
+      this->GetChildItem(_item, "y")).toDouble());
+  _msg->set_z(this->variantManager->value(
+      this->GetChildItem(_item, "z")).toDouble());
 }
 
 /////////////////////////////////////////////////
@@ -1850,6 +1954,8 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 
   this->requestPub.reset();
   this->modelPub.reset();
+  this->scenePub.reset();
+  this->physicsPub.reset();
   this->responseSub.reset();
   this->requestSub.reset();
   this->poseSub.reset();
@@ -1877,6 +1983,8 @@ void ModelListWidget::InitTransport(const std::string &_name)
     this->node.reset();
     this->requestPub.reset();
     this->modelPub.reset();
+    this->scenePub.reset();
+    this->physicsPub.reset();
     this->responseSub.reset();
     this->requestSub.reset();
     this->poseSub.reset();
@@ -1886,6 +1994,9 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->node->Init(_name);
 
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
+  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
+  this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
+
   this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
   this->responseSub = this->node->Subscribe("~/response",
       &ModelListWidget::OnResponse, this, false);
@@ -1984,20 +2095,14 @@ void ModelListWidget::ResetScene()
       QStringList(QString("%1").arg(tr("scene"))));
   this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("scene")));
   this->modelTreeWidget->addTopLevelItem(this->sceneItem);
-
-  QTreeWidgetItem *skyItem = new QTreeWidgetItem(this->sceneItem,
-      QStringList(QString("%1").arg(tr("sky"))));
-  skyItem->setData(0, Qt::UserRole, QVariant(tr("sky")));
-  this->modelTreeWidget->addTopLevelItem(skyItem);
 }
 
 /////////////////////////////////////////////////
 void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
-                                       QtProperty *_parent)
+                                       QtProperty * /*_parent*/)
 {
-  QtProperty *topItem = NULL;
+  // QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
-
 
   // Create and set the ambient color property
   item = this->variantManager->addProperty(QVariant::Color, tr("ambient"));
@@ -2025,7 +2130,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
     item->setValue(_msg.shadows());
   this->propTreeBrowser->addProperty(item);
 
-  topItem = this->variantManager->addProperty(
+  /// \TODO: Put fog back in
+  /*topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("fog"));
   QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
   this->propTreeBrowser->setExpanded(bItem, false);
@@ -2041,9 +2147,105 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
 
   item = this->variantManager->addProperty(QVariant::Double, tr("density"));
   topItem->addSubProperty(item);
+  */
 
+  /// \TODO: Put sky modification back in GUI
+  /*
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("sky"));
   bItem = this->propTreeBrowser->addProperty(topItem);
   this->propTreeBrowser->setExpanded(bItem, false);
+  */
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
+                                       QtProperty * /*_parent*/)
+{
+  QtVariantProperty *item = NULL;
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("update rate"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_update_rate())
+    item->setValue(_msg.update_rate());
+  this->propTreeBrowser->addProperty(item);
+
+  QtProperty *gravityItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("gravity"));
+  this->propTreeBrowser->addProperty(gravityItem);
+  if (_msg.has_gravity())
+    this->FillVector3dProperty(_msg.gravity(), gravityItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0);
+    xyz.set_y(0);
+    xyz.set_z(-9.8);
+    this->FillVector3dProperty(xyz, gravityItem);
+  }
+
+  QtProperty *solverItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("solver"));
+  this->propTreeBrowser->addProperty(solverItem);
+  item = this->variantManager->addProperty(QVariant::Double, tr("step size"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_dt())
+    item->setValue(_msg.dt());
+  solverItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Int, tr("iterations"));
+  if (_msg.has_iters())
+    item->setValue(_msg.iters());
+  solverItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("SOR"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_sor())
+    item->setValue(_msg.sor());
+  solverItem->addSubProperty(item);
+
+
+  QtProperty *constraintsItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("constraints"));
+  this->propTreeBrowser->addProperty(constraintsItem);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("CFM"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_cfm())
+    item->setValue(_msg.cfm());
+  constraintsItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("ERP"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_erp())
+    item->setValue(_msg.erp());
+  constraintsItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("max velocity"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_contact_max_correcting_vel())
+    item->setValue(_msg.contact_max_correcting_vel());
+  constraintsItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("surface layer"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_contact_surface_layer())
+    item->setValue(_msg.contact_surface_layer());
+  constraintsItem->addSubProperty(item);
 }
