@@ -665,14 +665,19 @@ math::Vector3 Visual::GetScale()
 //////////////////////////////////////////////////
 void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 {
-  if (_materialName.empty() || _materialName == "__default__")
+  if (_materialName.empty())// || _materialName == "__default__")
     return;
+
+  std::string materialName = _materialName;
+
+  if (materialName == "__default__")
+    materialName == "Gazebo/White";
 
   if (_unique)
   {
     // Create a custom material name
     std::string newMaterialName;
-    newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
+    newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
 
     if (this->GetMaterialName() == newMaterialName)
       return;
@@ -682,10 +687,10 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     Ogre::MaterialPtr origMaterial;
     try
     {
-      this->origMaterialName = _materialName;
+      this->origMaterialName = materialName;
       // Get the original material
       origMaterial =
-        Ogre::MaterialManager::getSingleton().getByName(_materialName);
+        Ogre::MaterialManager::getSingleton().getByName(materialName);
     }
     catch(Ogre::Exception &e)
     {
@@ -719,7 +724,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
   else
   {
-    this->myMaterialName = _materialName;
+    this->myMaterialName = materialName;
   }
 
 
@@ -761,7 +766,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   for (std::vector<VisualPtr>::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
-    (*iter)->SetMaterial(_materialName, _unique);
+    (*iter)->SetMaterial(materialName, _unique);
   }
 
   if (this->useRTShader)
@@ -1058,6 +1063,7 @@ void Visual::SetTransparency(float _trans)
 //////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
+  std::cout << "SetEmissive[" << this->origMaterialName << "] My[" << this->myMaterialNamea << "]\m";
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
