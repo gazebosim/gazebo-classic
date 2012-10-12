@@ -57,7 +57,7 @@
     <element name="color" type="color" default="1 1 1 1" required="0">
       <description>Fog color</description>
     </element>
-    <element name="type" type="string" default="linear" required="0">
+    <element name="type" type="string" default="none" required="0">
       <description>Fog type: constant, linear, quadratic</description>
     </element>
     <element name="start" type="double" default="1.0" min="0.0" required="0">

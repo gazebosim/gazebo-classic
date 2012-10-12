@@ -250,9 +250,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
 
   this->keyModifiers = _event->modifiers();
 
-  // if (!(this->keyModifiers & Qt::ControlModifier))
-  //  this->setCursor(Qt::ArrowCursor);
-
   if (this->keyModifiers & Qt::ControlModifier &&
       _event->key() == Qt::Key_Z)
   {

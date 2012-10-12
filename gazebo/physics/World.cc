@@ -1021,7 +1021,6 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_delete")
     {
-      std::cout << "ENTITY_DELETE[" << (*iter).data() << "]\n";
       this->deleteEntity.push_back((*iter).data());
     }
     else if ((*iter).request() == "entity_info")

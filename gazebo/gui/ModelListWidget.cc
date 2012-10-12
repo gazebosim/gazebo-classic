@@ -370,10 +370,13 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
 {
   if (gui::has_entity_name(_name))
   {
+    std::cout << "Has Entity[" << _name << "]\n";
+
     QTreeWidgetItem *listItem = this->GetModelListItem(_name);
     if (listItem)
     {
       int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
+      std::cout << "Model list item exists. Index[" << i << "]\n";
       this->modelTreeWidget->takeTopLevelItem(i);
 
       this->propTreeBrowser->clear();
@@ -394,6 +397,9 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(const std::string &_name)
   {
     QTreeWidgetItem *item = this->modelsItem->child(i);
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    std::cout << "Compare[" << listData << "] Name[" << _name << "]\n";
+
     if (listData == _name)
     {
       listItem = item;
@@ -1990,17 +1996,33 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
+
+  // Create and set the ambient color property
   item = this->variantManager->addProperty(QVariant::Color, tr("ambient"));
+  if (_msg.has_ambient())
+  {
+    std::cout << _msg.ambient().DebugString();
+    QColor clr(_msg.ambient().r()*255, _msg.ambient().g()*255,
+               _msg.ambient().b()*255, _msg.ambient().a()*255);
+    item->setValue(clr);
+  }
   this->propTreeBrowser->addProperty(item);
 
+  // Create and set the background color property
   item = this->variantManager->addProperty(QVariant::Color, tr("background"));
+  if (_msg.has_background())
+  {
+    std::cout << _msg.background().DebugString();
+    QColor clr(_msg.background().r()*255, _msg.background().g()*255,
+               _msg.background().b()*255, _msg.background().a()*255);
+    item->setValue(clr);
+  }
   this->propTreeBrowser->addProperty(item);
 
+  // Create and set the shadows property
   item = this->variantManager->addProperty(QVariant::Bool, tr("shadows"));
   if (_msg.has_shadows())
-  {
     item->setValue(_msg.shadows());
-  }
   this->propTreeBrowser->addProperty(item);
 
   topItem = this->variantManager->addProperty(
@@ -2019,4 +2041,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
 
   item = this->variantManager->addProperty(QVariant::Double, tr("density"));
   topItem->addSubProperty(item);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("sky"));
+  bItem = this->propTreeBrowser->addProperty(topItem);
+  this->propTreeBrowser->setExpanded(bItem, false);
+
+
 }

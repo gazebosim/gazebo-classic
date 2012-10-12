@@ -75,7 +75,6 @@ Model::Model(BasePtr _parent)
 //////////////////////////////////////////////////
 Model::~Model()
 {
-  std::cout << "Model::Destructor[" << this->GetName() << "]\n";
   delete this->updateMutex;
   delete this->jointController;
 }

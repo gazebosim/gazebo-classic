@@ -1586,7 +1586,6 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  std::cout << "Request[" << _msg->DebugString() << "]\n";
   this->requestMsgs.push_back(_msg);
 }
 
@@ -1595,7 +1594,6 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    std::cout << "Scene::REmve Visual[" << _msg->DebugString() << "]\n";
     Visual_M::iterator iter;
     iter = this->visuals.find(_msg->data());
     if (iter != this->visuals.end())
