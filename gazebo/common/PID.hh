@@ -58,48 +58,48 @@ namespace gazebo
                         double _imax = 0.0, double _imin = 0.0,
                         double _cmdMax = 0.0, double _cmdMin = 0.0);
 
-      /// \brief Set the proportional Gain
+      /// \brief Set the proportional Gain.
       /// \param[in] _p proportional gain value
       public: void SetPGain(double _p);
 
-      /// \brief Set the integral Gain
+      /// \brief Set the integral Gain.
       /// \param[in] _p integral gain value
       public: void SetIGain(double _i);
 
-      /// \brief Set the derivtive Gain
+      /// \brief Set the derivtive Gain.
       /// \param[in] _p dertivative gain value
       public: void SetDGain(double _d);
 
-      /// \brief Set the integral upper limit
+      /// \brief Set the integral upper limit.
       /// \param[in] _p integral upper limit value
       public: void SetIMax(double _i);
 
-      /// \brief Set the integral lower limit
+      /// \brief Set the integral lower limit.
       /// \param[in] _p integral lower limit value
       public: void SetIMin(double _i);
 
-      /// \brief Set the maximum value for the command
+      /// \brief Set the maximum value for the command.
       /// \param[in] _c The maximum value
       public: void SetCmdMax(double _c);
 
-      /// \brief Set the maximum value for the command
+      /// \brief Set the maximum value for the command.
       /// \param[in] _c The maximum value
       public: void SetCmdMin(double _c);
 
       /// \brief Update the Pid loop with nonuniform time step size.
-      /// \param _error  Error since last call (p_state - p_target).
-      /// \param _dt Change in time since last update call.
+      /// \param[_in] _error  Error since last call (p_state - p_target).
+      /// \param[_in] _dt Change in time since last update call.
       /// Normally, this is called at every time step,
       /// The return value is an updated command to be passed
       /// to the object being controlled.
       /// \return the command value
       public: double Update(double _error, common::Time _dt);
 
-      /// \brief Set current target command for this PID controller
+      /// \brief Set current target command for this PID controller.
       /// \param[in] _cmd New command
       public: void SetCmd(double _cmd);
 
-      /// \brief Return current command for this PID controller
+      /// \brief Return current command for this PID controller.
       /// \return the command value
       public: double GetCmd();
 
@@ -128,43 +128,43 @@ namespace gazebo
                 return *this;
               }
 
-      /// \brief Reset the errors and command
+      /// \brief Reset the errors and command.
       public: void Reset();
 
-      /// \brief Error at a previous step
+      /// \brief Error at a previous step.
       private: double pErrLast;
 
-      /// \brief Current error
+      /// \brief Current error.
       private: double pErr;
 
-      /// \brief Integral error
+      /// \brief Integral error.
       private: double iErr;
 
-      /// \brief Derivative error
+      /// \brief Derivative error.
       private: double dErr;
 
-      /// \brief Gain for proportional control
+      /// \brief Gain for proportional control.
       private: double pGain;
 
-      /// \brief Gain for integral control
+      /// \brief Gain for integral control.
       private: double iGain;
 
-      /// \brief Gain for derivative control
+      /// \brief Gain for derivative control.
       private: double dGain;
 
-      /// \brief Maximum clamping value for integral term
+      /// \brief Maximum clamping value for integral term.
       private: double iMax;
 
-      /// \brief Minim clamping value for integral term
+      /// \brief Minim clamping value for integral term.
       private: double iMin;
 
-      /// \brief Command value
+      /// \brief Command value.
       private: double cmd;
 
-      /// \brief Max command clamping value
+      /// \brief Max command clamping value.
       private: double cmdMax;
 
-      /// \brief Min command clamping value
+      /// \brief Min command clamping value.
       private: double cmdMin;
 
     };

@@ -40,6 +40,8 @@ namespace gazebo
       public: virtual ~MeshLoader();
 
       /// \brief Load a 3D mesh
+      /// \param[in] the path to the mesh
+      /// \return a pointer to the created mesh
       public: virtual Mesh *Load(const std::string &filename) = 0;
     };
     /// \}

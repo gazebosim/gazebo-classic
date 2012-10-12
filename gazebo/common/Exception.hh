@@ -33,7 +33,8 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    /// Throws an error
+    /// \brief Throws an error macro that an exception with the file name and
+    /// line number
     #define gzthrow(msg) {std::ostringstream throwStream;\
       throwStream << msg << std::endl << std::flush;\
       throw gazebo::common::Exception(__FILE__, __LINE__, throwStream.str()); }
@@ -45,9 +46,9 @@ namespace gazebo
       public: Exception();
 
       /// \brief Default constructor
-      /// \param file File name
-      /// \param line Line number where the error occurred
-      /// \param msg Error message
+      /// \param[in] file File name
+      /// \param[in] line Line number where the error occurred
+      /// \param[in] msg Error message
       public: Exception(const char *file,
                           int line,
                           std::string msg);
@@ -72,11 +73,13 @@ namespace gazebo
       /// \brief The error string
       private: std::string str;
 
-      /// \brief Ostream operator for Gazebo Error
-      public: friend std::ostream &operator<<(std::ostream& out,
-                  const gazebo::common::Exception &err)
+      /// \brief stream insertion operator for Gazebo Error
+      /// \param[in] _out the output stream
+      /// \param[in] _err the exception
+      public: friend std::ostream &operator<<(std::ostream& _out,
+                  const gazebo::common::Exception &_err)
               {
-                return out << err.GetErrorStr();
+                return _out << _err.GetErrorStr();
               }
     };
     /// \}

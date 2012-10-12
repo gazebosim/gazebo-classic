@@ -32,8 +32,12 @@ namespace gazebo
     /// models
     class ModelDatabase
     {
+      /// \brief Returns the the global model database URI.
+      /// \return the URI.
       public: static std::string GetURI();
 
+      /// \brief Returns the dictionary of all the model names
+      /// \return a map of model names, indexed by their full URI.
       public: static std::map<std::string, std::string> GetModels();
 
       /// \brief Get the name of a model based on a URI.
@@ -41,24 +45,27 @@ namespace gazebo
       /// The URI must be fully qualified:
       /// http://gazebosim.org/gazebo_models/ground_plane or
       /// models://gazebo_models
+      /// \param[in] _uri the model uri
+      /// \return the model's name.
       public: static std::string GetModelName(const std::string &_uri);
 
       /// \brief Return the manifest.xml file as a string.
-      /// \return The manifest file from the model database.
+      /// \return the manifest file from the model database.
       public: static std::string GetManifest(const std::string &_uri);
 
       /// \brief Get the local path to a model.
       ///
       /// Get the path to a model based on a URI. If the model is on
       /// a remote server, then the model fetched and installed locally.
-      /// \return Path to a model directory
+      /// param[in] _uri the model uri
+      /// \return path to a model directory
       public: static std::string GetModelPath(const std::string &_uri);
 
-      /// \brief Get a model's SDF file based on a URI
+      /// \brief Get a model's SDF file based on a URI.
       ///
       /// Get a model file based on a URI. If the model is on
       /// a remote server, then the model fetched and installed locally.
-      /// \param _uri The URI of the model
+      /// \param[in] _uri The URI of the model
       /// \return The full path and filename to the SDF file
       public: static std::string GetModelFile(const std::string &_uri);
 
@@ -77,6 +84,7 @@ namespace gazebo
       /// \return True if the model was found.
       public: static bool HasModel(const std::string &_modelName);
 
+      /// \brief A dictionary of all model names indexed by their uri.
       private: static std::map<std::string, std::string> modelCache;
     };
   }

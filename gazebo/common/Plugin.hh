@@ -266,7 +266,7 @@ namespace gazebo
     ///
     /// Called when a Plugin is first created, and after the World has been
     /// loaded. This function should not be blocking.
-    /// \param[in] _sensor Pointer the Sensor
+    /// \param[in] _sensor Pointer the Sensor.
     /// \param[in] _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr _sdf) = 0;
@@ -305,7 +305,9 @@ namespace gazebo
 
   /// \}
 
-/// \brief Plugin registration function for model plugin. Part of the shared object interface. This function is called when loading the shared library to add the plugin to the registered list.
+/// \brief Plugin registration function for model plugin. Part of the shared
+/// object interface. This function is called when loading the shared library
+/// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
   extern "C" gazebo::ModelPlugin *RegisterPlugin(); \
@@ -314,7 +316,9 @@ namespace gazebo
     return new classname();\
   }
 
-/// \brief Plugin registration function for world plugin. Part of the shared object interface. This function is called when loading the shared library to add the plugin to the registered list.
+/// \brief Plugin registration function for world plugin. Part of the shared
+/// object interface. This function is called when loading the shared library
+/// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
   extern "C" gazebo::WorldPlugin *RegisterPlugin(); \
@@ -323,7 +327,9 @@ namespace gazebo
     return new classname();\
   }
 
-/// \brief Plugin registration function for sensors. Part of the shared object interface. This function is called when loading the shared library to add the plugin to the registered list.
+/// \brief Plugin registration function for sensors. Part of the shared object
+/// interface. This function is called when loading the shared library to add
+/// the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
   extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
@@ -332,7 +338,9 @@ namespace gazebo
     return new classname();\
   }
 
-/// \brief Plugin registration function for system plugin. Part of the shared object interface. This function is called when loading the shared library to add the plugin to the registered list.
+/// \brief Plugin registration function for system plugin. Part of the
+/// shared object interface. This function is called when loading the shared
+/// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
   extern "C" gazebo::SystemPlugin *RegisterPlugin(); \

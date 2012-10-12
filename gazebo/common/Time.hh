@@ -207,14 +207,14 @@ namespace gazebo
       public: bool operator<(const struct timeval &tv) const;
 
       /// \brief Less than operator
-	  /// \param[in] time the time to compare with
-	  /// \return true if time is shorter than this, false otherwise
+      /// \param[in] time the time to compare with
+      /// \return true if time is shorter than this, false otherwise
       public: bool operator<(const Time &time) const;
 
       /// \brief Less than operator
       /// \param[in] time the time to compare with
-	  /// \return true if time is shorter than this, false otherwise
- 	  public: bool operator<(double time) const;
+      /// \return true if time is shorter than this, false otherwise
+      public: bool operator<(double time) const;
 
       /// \brief Less than or equal to operator
       /// \param[in] tv the time to compare with

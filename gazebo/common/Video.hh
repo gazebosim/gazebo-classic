@@ -43,7 +43,8 @@ namespace gazebo
 
       /// \brief Load a video file
       /// \param[in] _filename Full path of the video file
-      /// \return false if HAVE_FFMPEG is not defined or if a video stream can't be found
+      /// \return false if HAVE_FFMPEG is not defined or if a video stream
+      /// can't be found
       public: bool Load(const std::string &_filename);
 
       /// \brief Get the width of the video in pixels
