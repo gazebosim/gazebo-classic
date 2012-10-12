@@ -23,6 +23,7 @@
 #include <math.h>
 
 #include "common/Image.hh"
+#include "common/Common.hh"
 #include "common/Exception.hh"
 
 #include "physics/HeightmapShape.hh"
@@ -48,8 +49,15 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
+  std::string filename = common::find_file(this->sdf->GetValueString("uri"));
+  if (filename.empty())
+  {
+    gzthrow("Unable to find heightmap[" +
+            this->sdf->GetValueString("uri") + "]\n");
+  }
+
   // Use the image to get the size of the heightmap
-  this->img.Load(this->sdf->GetValueString("filename"));
+  this->img.Load(filename);
 
   if (this->img.GetWidth() != this->img.GetHeight() ||
       !math::isPowerOfTwo(this->img.GetWidth()-1))
@@ -153,9 +161,9 @@ void HeightmapShape::FillHeightMap()
 }
 
 //////////////////////////////////////////////////
-std::string HeightmapShape::GetFilename() const
+std::string HeightmapShape::GetURI() const
 {
-  return this->sdf->GetValueString("filename");
+  return this->sdf->GetValueString("uri");
 }
 
 //////////////////////////////////////////////////
@@ -175,7 +183,7 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
   msgs::Set(_msg.mutable_heightmap()->mutable_image(),
-            common::Image(this->GetFilename()));
+            common::Image(this->GetURI()));
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
 }
