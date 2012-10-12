@@ -937,13 +937,15 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
   if (this->selectedVis)
-    this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+  {
+    this->selectedVis->SetHighlighted(false);
+  }
 
   this->selectedVis = _vis;
 
   if (this->selectedVis && !this->selectedVis->IsPlane())
   {
-    this->selectedVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
+    this->selectedVis->SetHighlighted(true);
   }
 }
 
@@ -951,14 +953,12 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 void GLWidget::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
   if (this->mouseMoveVis)
-    this->mouseMoveVis->SetEmissive(common::Color(0, 0, 0));
+    this->mouseMoveVis->SetHighlighted(false);
 
   this->mouseMoveVis = _vis;
 
   if (this->mouseMoveVis)
-  {
-    this->mouseMoveVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
-  }
+    this->mouseMoveVis->SetHighlighted(true);
 }
 
 /////////////////////////////////////////////////

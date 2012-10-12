@@ -392,12 +392,12 @@ void Visual::Load()
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
-      std::string uri = scriptElem->GetValueString("uri");
+      std::string matUri = scriptElem->GetValueString("uri");
       std::string matName = scriptElem->GetValueString("name");
 
-      if (!uri.empty())
-        RenderEngine::Instance()->AddResourcePath(uri);
-      if (!name.empty())
+      if (!matUri.empty())
+        RenderEngine::Instance()->AddResourcePath(matUri);
+      if (!matName.empty())
         this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
@@ -1061,15 +1061,70 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color)
+void Visual::SetHighlighted(bool _highlighted)
 {
-  if (this->myMaterialName.empty() && this->GetAttachedObjectCount() > 0)
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
   {
-    std::string matName = this->GetName() + "_MATERIAL_";
-    Ogre::MaterialManager::getSingleton().create(matName, "General");
-    this->SetMaterial(matName);
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+          techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+        if (_highlighted)
+        {
+          pass = technique->createPass();
+          pass->setName("highlight");
+          pass->setDiffuse(
+              Conversions::Convert(common::Color(0.8, 0.8, 0.8, 0.8)));
+          pass->setSelfIllumination(
+              Conversions::Convert(common::Color(0.8, 0.8, 0.8)));
+          pass->setDepthBias(0.2, 0.1);
+
+          pass->setDepthWriteEnabled(false);
+          pass->setDepthCheckEnabled(true);
+          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+        }
+        else
+        {
+          for (unsigned int k = 0; k < technique->getNumPasses(); ++k)
+          {
+            if (technique->getPass(k)->getName() == "highlight")
+            {
+              technique->removePass(k);
+            }
+          }
+        }
+      }
+    }
   }
 
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetHighlighted(_highlighted);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::SetEmissive(const common::Color &_color)
+{
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
@@ -1099,6 +1154,7 @@ void Visual::SetEmissive(const common::Color &_color)
         for (passCount = 0; passCount < technique->getNumPasses();
             passCount++)
         {
+          std::cout << "Set emmissive\n";
           pass = technique->getPass(passCount);
           pass->setSelfIllumination(Conversions::Convert(_color));
         }

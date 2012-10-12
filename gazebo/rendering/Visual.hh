@@ -198,6 +198,8 @@ namespace gazebo
       /// \return The transparency.
       public: float GetTransparency();
 
+      public: void SetHighlighted(bool _highlighted);
+
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       public: virtual void SetEmissive(const common::Color &_color);
