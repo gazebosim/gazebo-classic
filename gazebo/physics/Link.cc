@@ -57,6 +57,7 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
+  std::cout << "Link::Destructor[" << this->GetName() << "]\n";
   std::vector<Entity*>::iterator iter;
 
   this->attachedModels.clear();

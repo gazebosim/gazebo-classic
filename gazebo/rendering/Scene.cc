@@ -111,6 +111,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
                                              &Scene::OnModelMsg, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+
+  this->requestSub = this->node->Subscribe("~/request",
+      &Scene::OnRequest, this);
   this->responseSub = this->node->Subscribe("~/response",
       &Scene::OnResponse, this);
 
@@ -1583,6 +1586,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  std::cout << "Request[" << _msg->DebugString() << "]\n";
   this->requestMsgs.push_back(_msg);
 }
 
@@ -1591,6 +1595,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
+    std::cout << "Scene::REmve Visual[" << _msg->DebugString() << "]\n";
     Visual_M::iterator iter;
     iter = this->visuals.find(_msg->data());
     if (iter != this->visuals.end())

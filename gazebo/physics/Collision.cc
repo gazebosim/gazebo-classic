@@ -61,6 +61,7 @@ Collision::Collision(LinkPtr _link)
 //////////////////////////////////////////////////
 Collision::~Collision()
 {
+  std::cout << "Collision::Destructor[" << this->GetName() << "]\n";
 }
 
 //////////////////////////////////////////////////

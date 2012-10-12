@@ -596,6 +596,9 @@ namespace gazebo
       /// \brief Subscribe to sensor topic
       private: transport::SubscriberPtr sensorSub;
 
+      /// \brief Subscribe to the request topic
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Subscribe to visual topic
       private: transport::SubscriberPtr visSub;
 

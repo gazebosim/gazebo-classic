@@ -89,6 +89,7 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
+  std::cout << "Base::Fini[" << this->GetName() << "]\n";
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
@@ -230,8 +231,9 @@ void Base::RemoveChild(const std::string &_name)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin();
-       iter != this->childrenEnd; ++iter)
+  std::cout << "Base::remove_child[" << _name << "]\n";
+
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->GetScopedName() == _name)
       break;
