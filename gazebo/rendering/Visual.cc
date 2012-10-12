@@ -399,6 +399,8 @@ void Visual::Load()
         RenderEngine::Instance()->AddResourcePath(uri);
       if (!name.empty())
         this->SetMaterial(matName);
+      else
+        this->SetMaterial("__default__");
     }
     else if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->GetValueColor("ambient"));
@@ -543,6 +545,12 @@ bool Visual::HasAttachedObject(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+unsigned int Visual::GetAttachedObjectCount() const
+{
+  return this->sceneNode->numAttachedObjects();
+}
+
+//////////////////////////////////////////////////
 void Visual::DetachObjects()
 {
   this->sceneNode->detachAllObjects();
@@ -668,16 +676,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   if (_materialName.empty())// || _materialName == "__default__")
     return;
 
-  std::string materialName = _materialName;
-
-  if (materialName == "__default__")
-    materialName == "Gazebo/White";
-
   if (_unique)
   {
     // Create a custom material name
     std::string newMaterialName;
-    newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
+    newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + _materialName;
 
     if (this->GetMaterialName() == newMaterialName)
       return;
@@ -687,10 +690,10 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     Ogre::MaterialPtr origMaterial;
     try
     {
-      this->origMaterialName = materialName;
+      this->origMaterialName = _materialName;
       // Get the original material
       origMaterial =
-        Ogre::MaterialManager::getSingleton().getByName(materialName);
+        Ogre::MaterialManager::getSingleton().getByName(_materialName);
     }
     catch(Ogre::Exception &e)
     {
@@ -724,9 +727,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
   else
   {
-    this->myMaterialName = materialName;
+    this->myMaterialName = _materialName;
   }
-
 
   try
   {
@@ -766,7 +768,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   for (std::vector<VisualPtr>::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
-    (*iter)->SetMaterial(materialName, _unique);
+    (*iter)->SetMaterial(_materialName, _unique);
   }
 
   if (this->useRTShader)
@@ -1063,7 +1065,13 @@ void Visual::SetTransparency(float _trans)
 //////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
-  std::cout << "SetEmissive[" << this->origMaterialName << "] My[" << this->myMaterialNamea << "]\m";
+  if (this->myMaterialName.empty() && this->GetAttachedObjectCount() > 0)
+  {
+    std::string matName = this->GetName() + "_MATERIAL_";
+    Ogre::MaterialManager::getSingleton().create(matName, "General");
+    this->SetMaterial(matName);
+  }
+
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
@@ -1086,11 +1094,12 @@ void Visual::SetEmissive(const common::Color &_color)
       Ogre::ColourValue dc;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+          techniqueCount++)
       {
         technique = material->getTechnique(techniqueCount);
 
-        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        for (passCount = 0; passCount < technique->getNumPasses();
+            passCount++)
         {
           pass = technique->getPass(passCount);
           pass->setSelfIllumination(Conversions::Convert(_color));
@@ -1104,7 +1113,6 @@ void Visual::SetEmissive(const common::Color &_color)
     this->children[i]->SetEmissive(_color);
   }
 }
-
 
 //////////////////////////////////////////////////
 float Visual::GetTransparency()
@@ -1130,6 +1138,17 @@ void Visual::SetVisible(bool _visible, bool _cascade)
 {
   this->sceneNode->setVisible(_visible, _cascade);
   this->visible = _visible;
+}
+
+//////////////////////////////////////////////////
+uint32_t Visual::GetVisibilityFlags()
+{
+  if (this->sceneNode->numAttachedObjects() > 0)
+  {
+    return this->sceneNode->getAttachedObject(0)->getVisibilityFlags();
+  }
+
+  return GZ_VISIBILITY_ALL;
 }
 
 //////////////////////////////////////////////////

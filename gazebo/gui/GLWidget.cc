@@ -765,13 +765,11 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   }
   else if (_type == "mesh" && !_data.empty())
   {
-    std::cout << "MeshMaker[" << _data << "]\n";
     this->meshMaker.Init(_data);
     this->entityMaker = &this->meshMaker;
   }
   else if (_type == "model" && !_data.empty())
   {
-    std::cout << "ModelMake[" << _data << "]\n";
     this->modelMaker.InitFromFile(_data);
     this->entityMaker = &this->modelMaker;
   }
@@ -944,7 +942,9 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   this->selectedVis = _vis;
 
   if (this->selectedVis && !this->selectedVis->IsPlane())
+  {
     this->selectedVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -956,7 +956,9 @@ void GLWidget::SetMouseMoveVisual(rendering::VisualPtr _vis)
   this->mouseMoveVis = _vis;
 
   if (this->mouseMoveVis)
+  {
     this->mouseMoveVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
+  }
 }
 
 /////////////////////////////////////////////////

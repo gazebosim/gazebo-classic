@@ -444,9 +444,8 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
     this->shaderGenerator->getRenderState(_scene->GetName() +
         Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
-
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+
   // 3 textures per directional light
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
@@ -500,10 +499,6 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
 
   pssm3SubRenderState->setSplitPoints(dstSplitPoints);
   schemRenderState->addTemplateSubRenderState(this->shadowRenderState);
-
-#else
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
-#endif
 
   this->shaderGenerator->invalidateScheme(_scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
