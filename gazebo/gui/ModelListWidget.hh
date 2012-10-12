@@ -73,19 +73,6 @@ namespace gazebo
 
       private: void AddModelToList(const msgs::Model &_msg);
 
-      private: void FillPropertyTree(const msgs::Model &_msg,
-                                     QtProperty *_parentItem);
-
-      private: void FillPropertyTree(const msgs::Link &_msg,
-                                     QtProperty *_parentItem);
-
-      private: void FillPropertyTree(const msgs::Collision &_msg,
-                                     QtProperty *_parent);
-
-      private: void FillPropertyTree(const msgs::Joint &_msg,
-                                     QtProperty *_parent);
-
-
       private: void FillMsgField(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Reflection *_reflection,
@@ -130,6 +117,18 @@ namespace gazebo
 
       private: QTreeWidgetItem *GetModelListItem(const std::string &_name);
 
+      private: void FillPropertyTree(const msgs::Model &_msg,
+                                     QtProperty *_parentItem);
+
+      private: void FillPropertyTree(const msgs::Link &_msg,
+                                     QtProperty *_parent);
+
+      private: void FillPropertyTree(const msgs::Collision &_msg,
+                                     QtProperty *_parent);
+
+      private: void FillPropertyTree(const msgs::Joint &_msg,
+                                     QtProperty *_parent);
+
       private: void FillVector3dProperty(const msgs::Vector3d &_msg,
                                          QtProperty *_parent);
 
@@ -145,11 +144,15 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Geometry &_msg,
                                        QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Scene &_msg,
+                                     QtProperty *_parent);
+
       private: void ProcessPoseMsgs();
       private: void ProcessModelMsgs();
 
       private: void InitTransport(const std::string &_name ="");
       private: void ResetTree();
+      private: void ResetScene();
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -185,6 +188,7 @@ namespace gazebo
 
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;
+      private: msgs::Scene sceneMsg;
       private: msgs::Joint jointMsg;
 
       private: bool fillPropertyTree;

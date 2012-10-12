@@ -44,6 +44,11 @@ namespace gazebo
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
+      /// \brief Get the SDF information for the cylinder.
+      /// \return The SDF as a string.
+      public: std::string GetSDFString();
+
+
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;

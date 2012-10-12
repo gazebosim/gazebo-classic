@@ -447,7 +447,8 @@ namespace gazebo
       /// \brief Move the camera to a position. This is an animated motion
       /// \param[in] _pose End position of the camera
       /// \param[in] _time Duration of the camera's movement
-      public: bool MoveToPosition(const math::Pose &_pose, double _time);
+      public: virtual bool MoveToPosition(const math::Pose &_pose,
+                                          double _time);
 
       /// \brief Move the camera to a series of positions
       /// \param[in] _pts Vector of poses to move to

@@ -46,9 +46,6 @@ TimePanel::TimePanel(QWidget *_parent)
   this->realTimeEdit->setReadOnly(true);
   this->realTimeEdit->setFixedWidth(110);
 
-  this->pauseLabel =
-    new QLabel(tr("<font style ='color:'#c8c8c8'>Paused</font>"));
-
   QLabel *percentRealTimeLabel = new QLabel(tr("Real Time Factor:"));
   QLabel *simTimeLabel = new QLabel(tr("Sim Time:"));
   QLabel *realTimeLabel = new QLabel(tr("Real Time:"));
@@ -68,7 +65,6 @@ TimePanel::TimePanel(QWidget *_parent)
   frameLayout->addWidget(this->realTimeEdit);
 
   frameLayout->addWidget(timeResetButton);
-  frameLayout->addWidget(this->pauseLabel);
 
   frame->setLayout(frameLayout);
   frame->layout()->setContentsMargins(0, 0, 0, 0);
@@ -128,12 +124,6 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 
   this->simTime = msgs::Convert(_msg->sim_time());
   this->realTime = msgs::Convert(_msg->real_time());
-  if (_msg->paused())
-    this->pauseLabel->setText(
-        "<font style ='color:#c8c8c8;'>Paused</font>");
-  else
-    this->pauseLabel->setText(
-        "<font style ='color:#c8c8c8;'>      </font>");
 }
 
 /////////////////////////////////////////////////

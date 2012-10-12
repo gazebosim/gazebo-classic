@@ -35,7 +35,6 @@ namespace gazebo
     extern QAction *g_newModelAct;
     extern QAction *g_resetModelsAct;
     extern QAction *g_resetWorldAct;
-    extern QAction *g_editWorldPropertiesAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
@@ -56,7 +55,8 @@ namespace gazebo
     extern QAction *g_viewOrbitAct;
 
     extern QAction *g_arrowAct;
-    extern QAction *g_ringPoseAct;
+    extern QAction *g_translateAct;
+    extern QAction *g_rotateAct;
   }
 }
 #endif

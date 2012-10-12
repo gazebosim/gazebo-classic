@@ -21,6 +21,7 @@
 
 #include "rendering/ViewController.hh"
 #include "math/Vector3.hh"
+#include "math/Vector2i.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _camera Pointer to the camera to control.
-      public: OrbitViewController(UserCamera *_camera);
+      public: OrbitViewController(UserCameraPtr _camera);
 
       /// \brief Destructor.
       public: virtual ~OrbitViewController();
@@ -108,6 +109,8 @@ namespace gazebo
       private: math::Vector3 focalPoint;
 
       private: VisualPtr refVisual;
+      private: math::Vector2i posCache;
+      private: math::Vector3 worldFocal;
     };
     /// \}
   }
