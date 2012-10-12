@@ -21,51 +21,14 @@
 #include "Server.hh"
 #include "gui/Gui.hh"
 
-int status1, status2;
+int status;
 pid_t  pid1, pid2;
 
 void sig_handler(int /*signo*/)
 {
-  bool killed1 = false;
-  bool killed2 = false;
-  int p1 = -1;
-  int p2 = -1;
-
-  // wait some time and if not dead, escalate to SIGKILL
-  for(unsigned int i = 0; i < 5; ++i)
-  {
-    p1 = waitpid(pid1, &status1, WNOHANG);
-    if (p1 == 0)
-      kill(pid1, SIGINT);
-    else
-      killed1 = true;
-
-    p2 = waitpid(pid2, &status2, WNOHANG);
-    if (p2 == 0)
-      kill(pid2, SIGINT);
-    else
-      killed2 = true;
-
-    /// @todo: fix hardcoded timeout
-    sleep(1);
-
-    if (killed1 && killed2)
-    {
-      break;
-    }
-  }
-
-  if (!killed1)
-  {
-    gzwarn << "escalating gui to SIGKILL\n";
-    kill(pid1, SIGKILL);
-  }
-
-  if (!killed2)
-  {
-    gzwarn << "escalating server to SIGKILL\n";
-    kill(pid2, SIGKILL);
-  }
+  //kill(pid1, SIGINT);
+  //kill(pid2, SIGINT);
+  gzerr << "main siging\n";
 }
 
 int main(int _argc, char **_argv)
@@ -84,20 +47,47 @@ int main(int _argc, char **_argv)
     pid2 = fork();
     if (pid2)
     {
-      wait(&status1);
-      // kill both processes
-      sig_handler(SIGINT);
+      // if anyone child dies
+      wait(&status);
+
+      // signal to kill both children
+      //kill(pid1, SIGINT);
+      //kill(pid2, SIGINT);
+
+      // wait 5 seconds
+      for (unsigned int i = 0; i < 5; ++i)
+      {
+        gzerr << waitpid(pid1, &status, WNOHANG) << "\n";
+        gzerr << waitpid(pid2, &status, WNOHANG) << "\n";
+        if (waitpid(pid1, &status, WNOHANG) == -1 &&
+            waitpid(pid2, &status, WNOHANG) == -1)
+          break;
+        sleep(1);
+      }
+
+      // escalate to sigkill if needed
+      if (waitpid(pid1, &status, WNOHANG) == 0)
+      {
+        gzwarn << "SIGKILL server\n";
+        kill(pid1, SIGKILL);
+      }
+      if (waitpid(pid2, &status, WNOHANG) == 0)
+      {
+        gzwarn << "SIGKILL gui\n";
+        kill(pid2, SIGKILL);
+      }
+      gzerr << "done main process\n";
     }
     else
     {
+      // pid2 in parent process
       gazebo::gui::run(_argc, _argv);
+      gzerr << "done gui\n";
     }
-    wait(&status2);
-    // kill both processes
-    sig_handler(SIGINT);
   }
   else
   {
+    // pid1 in parent process
     gazebo::Server *server = new gazebo::Server();
     if (!server->ParseArgs(_argc, _argv))
       return -1;
@@ -105,7 +95,8 @@ int main(int _argc, char **_argv)
     server->Fini();
     delete server;
     server = NULL;
+    gzerr << "done server\n";
   }
 
-  return 0;
+  return 1;
 }
