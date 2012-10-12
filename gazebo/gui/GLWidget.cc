@@ -360,6 +360,7 @@ void GLWidget::OnMousePressTranslate()
     this->SetMouseMoveVisual(vis);
 
     this->scene->SelectVisual(this->mouseMoveVis->GetName());
+    event::Events::setSelectedEntity(vis->GetName());
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
   }
 }
@@ -377,7 +378,6 @@ void GLWidget::OnMousePressNormal()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressMakeEntity()
 {
-  // this->setCursor(Qt::ArrowCursor);
   if (this->entityMaker)
     this->entityMaker->OnMousePush(this->mouseEvent);
 }
@@ -605,6 +605,7 @@ void GLWidget::OnMouseReleaseTranslate()
     {
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
+      event::Events::setSelectedEntity("");
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
   }
@@ -953,13 +954,7 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void GLWidget::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
-  if (this->mouseMoveVis)
-    this->mouseMoveVis->SetHighlighted(false);
-
   this->mouseMoveVis = _vis;
-
-  if (this->mouseMoveVis)
-    this->mouseMoveVis->SetHighlighted(true);
 }
 
 /////////////////////////////////////////////////

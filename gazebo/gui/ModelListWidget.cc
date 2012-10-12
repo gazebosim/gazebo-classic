@@ -97,8 +97,15 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  frameLayout->addWidget(this->modelTreeWidget, 0);
-  frameLayout->addWidget(this->propTreeBrowser, 1);
+  QSplitter *splitter = new QSplitter(Qt::Vertical, this);
+  splitter->addWidget(this->modelTreeWidget);
+  splitter->addWidget(this->propTreeBrowser);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setCollapsible(0, false);
+  splitter->setCollapsible(1, false);
+
+  frameLayout->addWidget(splitter);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
