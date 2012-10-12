@@ -150,7 +150,7 @@ namespace gazebo
       private: void ProcessPoseMsgs();
       private: void ProcessModelMsgs();
 
-      private: void InitTransport(const std::string &_name ="");
+      public: void InitTransport(const std::string &_name ="");
       private: void ResetTree();
       private: void ResetScene();
 

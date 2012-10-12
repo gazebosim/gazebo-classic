@@ -107,8 +107,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->InitTransport();
-
   this->ResetTree();
 
   this->connections.push_back(
@@ -296,8 +294,8 @@ void ModelListWidget::ProcessModelMsgs()
     {
       if ((*iter).has_deleted() && (*iter).deleted())
       {
-        int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
-        this->modelTreeWidget->takeTopLevelItem(i);
+        int i = this->modelsItem->indexOfChild(listItem);
+        this->modelsItem->takeChild(i);
       }
       else
       {
@@ -375,9 +373,8 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
     QTreeWidgetItem *listItem = this->GetModelListItem(_name);
     if (listItem)
     {
-      int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
-      std::cout << "Model list item exists. Index[" << i << "]\n";
-      this->modelTreeWidget->takeTopLevelItem(i);
+      int i = this->modelsItem->indexOfChild(listItem);
+      this->modelsItem->takeChild(i);
 
       this->propTreeBrowser->clear();
       this->selectedModelName.clear();
@@ -397,8 +394,6 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(const std::string &_name)
   {
     QTreeWidgetItem *item = this->modelsItem->child(i);
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
-
-    std::cout << "Compare[" << listData << "] Name[" << _name << "]\n";
 
     if (listData == _name)
     {
@@ -1886,13 +1881,13 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
   this->responseSub = this->node->Subscribe("~/response",
-      &ModelListWidget::OnResponse, this);
+      &ModelListWidget::OnResponse, this, false);
 
   this->poseSub = this->node->Subscribe("~/pose/info",
       &ModelListWidget::OnPose, this);
 
   this->requestSub = this->node->Subscribe("~/request",
-      &ModelListWidget::OnRequest, this);
+      &ModelListWidget::OnRequest, this, false);
 }
 
 /////////////////////////////////////////////////
@@ -2001,7 +1996,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   item = this->variantManager->addProperty(QVariant::Color, tr("ambient"));
   if (_msg.has_ambient())
   {
-    std::cout << _msg.ambient().DebugString();
     QColor clr(_msg.ambient().r()*255, _msg.ambient().g()*255,
                _msg.ambient().b()*255, _msg.ambient().a()*255);
     item->setValue(clr);
@@ -2012,7 +2006,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   item = this->variantManager->addProperty(QVariant::Color, tr("background"));
   if (_msg.has_background())
   {
-    std::cout << _msg.background().DebugString();
     QColor clr(_msg.background().r()*255, _msg.background().g()*255,
                _msg.background().b()*255, _msg.background().a()*255);
     item->setValue(clr);
@@ -2046,6 +2039,4 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
       QtVariantPropertyManager::groupTypeId(), tr("sky"));
   bItem = this->propTreeBrowser->addProperty(topItem);
   this->propTreeBrowser->setExpanded(bItem, false);
-
-
 }

@@ -33,7 +33,7 @@ namespace gazebo
     class RenderWidget;
     class GLWidget;
 
-    class WorldPropertiesWidget;
+    class ModelListWidget;
 
     class MainWindow : public QMainWindow
     {
@@ -64,7 +64,6 @@ namespace gazebo
       private slots: void Step();
 
       private slots: void NewModel();
-      private slots: void EditWorldProperties();
       private slots: void Arrow();
       private slots: void Translate();
       private slots: void Rotate();
@@ -106,6 +105,7 @@ namespace gazebo
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
+      private: ModelListWidget *modelListWidget;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
@@ -118,7 +118,6 @@ namespace gazebo
       private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
 
-      private: WorldPropertiesWidget *worldPropertiesWidget;
       private: QDockWidget *toolsDock;
 
       private: std::vector<event::ConnectionPtr> connections;

@@ -127,6 +127,16 @@ namespace gazebo
       public: bool HandleData(const std::string &_topic,
                               const std::string &_msg);
 
+      /// \brief Add a latched message to the node for publication.
+      ///
+      /// This is called when a subscription is connected to a
+      /// publication.
+      /// \param[in] _topic Name of the topic to publish data on.
+      /// \param[in] _msg The message to publish.
+      public: void InsertLatchedMsg(const std::string &_topic,
+                                    const std::string &_msg);
+
+
       /// \brief Get the message type for a topic
       public: std::string GetMsgType(const std::string &_topic) const;
 

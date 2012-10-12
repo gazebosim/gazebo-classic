@@ -30,6 +30,7 @@
 #include "rendering/OrbitViewController.hh"
 #include "rendering/FPSViewController.hh"
 
+#include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/ModelRightMenu.hh"
 #include "gui/GuiEvents.hh"
@@ -222,10 +223,13 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     gui::Events::fullScreen(g_fullscreen);
   }
 
+  // Trigger a model delete if the Delete key was pressed, and a model
+  // is currently selected.
+  if (_event->key() == Qt::Key_Delete && this->selectedVis)
+    g_deleteAct->Signal(this->selectedVis->GetName());
+
   if (_event->key() == Qt::Key_Escape)
-  {
     event::Events::setSelectedEntity("");
-  }
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;

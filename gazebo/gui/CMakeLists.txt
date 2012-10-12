@@ -22,7 +22,6 @@ set (sources
   LightListWidget.cc
   LightRightMenu.cc
   ModelListWidget.cc
-  WorldPropertiesWidget.cc
   EntityMaker.cc
   BoxMaker.cc
   SphereMaker.cc
@@ -38,6 +37,7 @@ set (sources
 )
 
 set (qt_headers
+  Actions.hh
   MainWindow.hh 
   RenderWidget.hh 
   GLWidget.hh 
@@ -45,7 +45,6 @@ set (qt_headers
   InsertModelWidget.hh
   LightListWidget.hh
   ModelListWidget.hh
-  WorldPropertiesWidget.hh
   ModelEditWidget.hh
   LightRightMenu.hh
   ModelRightMenu.hh
@@ -54,7 +53,6 @@ set (qt_headers
 )
 
 set (headers
-  Actions.hh
   Gui.hh
   EntityMaker.hh
   BoxMaker.hh

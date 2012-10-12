@@ -19,6 +19,8 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Visual.hh"
+
+#include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/JointControlWidget.hh"
 #include "gui/ModelRightMenu.hh"
@@ -45,9 +47,13 @@ ModelRightMenu::ModelRightMenu()
   this->moveToAction->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAction, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
 
-  this->deleteAction = new QAction(tr("Delete"), this);
-  this->deleteAction->setStatusTip(tr("Delete the selection"));
-  connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
+  // Create the delete action
+  g_deleteAct = new DeleteAction(tr("Delete"), this);
+  g_deleteAct->setStatusTip(tr("Delete a model"));
+  connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
+          SLOT(OnDelete(const std::string &)));
+  connect(g_deleteAct, SIGNAL(triggered()), this,
+          SLOT(OnDelete()));
 
   // this->showCollisionAction = new QAction(tr("Show Collision"), this);
   // this->showCollisionAction->setStatusTip(tr("Show Collision Entity"));
@@ -106,7 +112,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   // menu.addAction(this->showCOMAction);
   // menu.addAction(this->transparentAction);
   // menu.addAction(this->skeletonAction);
-  menu.addAction(this->deleteAction);
+  menu.addAction(g_deleteAct);
   menu.addAction(this->jointControlAction);
 
   // if (this->transparentActionState[this->modelName])
@@ -231,10 +237,17 @@ void ModelRightMenu::OnFollow()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::OnDelete()
+void ModelRightMenu::OnDelete(const std::string &_name)
 {
-  this->requestMsg = msgs::CreateRequest("entity_delete", this->modelName);
-  this->requestPub->Publish(*this->requestMsg);
+  std::string name = _name;
+  if (name.empty())
+    name = this->modelName;
+
+  if (!name.empty())
+  {
+    this->requestMsg = msgs::CreateRequest("entity_delete", name);
+    this->requestPub->Publish(*this->requestMsg);
+  }
 }
 
 /////////////////////////////////////////////////

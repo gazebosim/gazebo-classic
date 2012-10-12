@@ -31,7 +31,6 @@
 #include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/LightListWidget.hh"
-#include "gui/WorldPropertiesWidget.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
 #include "gui/MainWindow.hh"
@@ -62,7 +61,7 @@ MainWindow::MainWindow()
     this->node->Advertise<msgs::Scene>("~/scene", 1);
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
-      &MainWindow::OnModel, this);
+      &MainWindow::OnModel, this, false);
 
   this->statsSub =
     this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
@@ -85,12 +84,12 @@ MainWindow::MainWindow()
 
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
-  ModelListWidget *modelListWidget = new ModelListWidget(this);
+  this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
 
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
-  this->tabWidget->addTab(modelListWidget, "World");
+  this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
@@ -124,8 +123,6 @@ MainWindow::MainWindow()
   title += gui::get_world();
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
-
-  this->worldPropertiesWidget = NULL;
 
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
@@ -169,6 +166,7 @@ void MainWindow::Init()
   winSize.setHeight(std::max(768, winSize.height()));
 
   this->resize(winSize);
+  this->modelListWidget->InitTransport();
 }
 
 /////////////////////////////////////////////////
@@ -180,7 +178,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   this->connections.clear();
 
-  delete this->worldPropertiesWidget;
   delete this->renderWidget;
 }
 
@@ -314,15 +311,6 @@ void MainWindow::OnResetWorld()
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
   this->worldControlPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::EditWorldProperties()
-{
-  if (!this->worldPropertiesWidget)
-    this->worldPropertiesWidget = new WorldPropertiesWidget();
-
-  this->worldPropertiesWidget->show();
 }
 
 /////////////////////////////////////////////////
