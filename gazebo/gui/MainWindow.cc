@@ -114,7 +114,11 @@ MainWindow::MainWindow()
   centerLayout->setContentsMargins(0, 0, 0, 0);
   centerLayout->setSpacing(0);
 
-  mainLayout->addLayout(centerLayout);
+  mainLayout->setSpacing(0);
+  mainLayout->addLayout(centerLayout, 1);
+  mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
+                        Qt::AlignBottom | Qt::AlignRight);
+
   mainWidget->setLayout(mainLayout);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));

@@ -1,9 +1,10 @@
 QMainWindow#mainWindow
 {
+  margin: 0px;
+  padding: 0px;
   background-color: #303030;
   /*background-image: url(:/images/mainwindow_bg.png);*/
   /*background-repeat: repeat-xy;*/
-  margin: 22px;
 }
 
 QMenuBar
