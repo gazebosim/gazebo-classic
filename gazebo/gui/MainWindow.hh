@@ -52,7 +52,6 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
-      private slots: void OnCollapse();
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
@@ -121,7 +120,6 @@ namespace gazebo
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
       private: QDockWidget *toolsDock;
-      private: QPushButton *collapseButton;
 
       private: std::vector<event::ConnectionPtr> connections;
 

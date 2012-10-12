@@ -399,8 +399,6 @@ void Visual::Load()
         RenderEngine::Instance()->AddResourcePath(uri);
       if (!name.empty())
         this->SetMaterial(matName);
-      else
-        this->SetMaterial("__default__");
     }
     else if (matElem->HasElement("ambient"))
       this->SetAmbient(matElem->GetValueColor("ambient"));
@@ -673,7 +671,7 @@ math::Vector3 Visual::GetScale()
 //////////////////////////////////////////////////
 void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 {
-  if (_materialName.empty())// || _materialName == "__default__")
+  if (_materialName.empty() || _materialName == "__default__")
     return;
 
   if (_unique)

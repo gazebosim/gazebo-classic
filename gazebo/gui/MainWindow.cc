@@ -94,22 +94,24 @@ MainWindow::MainWindow()
   this->tabWidget->addTab(insertModel, "Insert");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
+  this->tabWidget->setMinimumWidth(250);
 
   this->renderWidget = new RenderWidget(mainWidget);
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
-  this->collapseButton = new QPushButton("<");
-  this->collapseButton->setObjectName("collapseButton");
-  this->collapseButton->setSizePolicy(QSizePolicy::Fixed,
-                                      QSizePolicy::Expanding);
+  QSplitter *splitter = new QSplitter(this);
+  splitter->addWidget(this->tabWidget);
+  splitter->addWidget(this->renderWidget);
+  QList<int> sizes;
+  sizes.push_back(300);
+  sizes.push_back(1000);
+  splitter->setSizes(sizes);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setCollapsible(1, false);
 
-  this->collapseButton->setFocusPolicy(Qt::NoFocus);
-  connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
-
-  centerLayout->addWidget(this->tabWidget, .5);
-  centerLayout->addWidget(collapseButton, 0);
-  centerLayout->addWidget(this->renderWidget, 2);
+  centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
   centerLayout->setSpacing(0);
 
@@ -404,7 +406,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->renderWidget->showFullScreen();
     this->tabWidget->hide();
     this->menuBar->hide();
-    this->collapseButton->hide();
   }
   else
   {
@@ -412,7 +413,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->renderWidget->showNormal();
     this->tabWidget->show();
     this->menuBar->show();
-    this->collapseButton->show();
   }
 }
 
@@ -882,25 +882,6 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnCollapse()
-{
-  /*
-  if (this->treeWidget->isVisible())
-  {
-    this->treeWidget->close();
-    this->collapseButton->setText(">");
-    this->collapseButton->setStyleSheet(tr("QPushButton{margin-left: 10px;}"));
-  }
-  else
-  {
-    this->treeWidget->show();
-    this->collapseButton->setText("<");
-    this->collapseButton->setStyleSheet("QPushButton{margin-left:0px;}");
-  }
-  */
 }
 
 /////////////////////////////////////////////////
