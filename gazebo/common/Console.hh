@@ -50,7 +50,7 @@ namespace gazebo
     #define gzerr (gazebo::common::Console::Instance()->ColorErr("Error", \
           __FILE__, __LINE__, 31))
 
-    /// Log a message
+    /// \brief Log a message
     #define gzlog (gazebo::common::Console::Instance()->Log() << "[" <<\
         __FILE__ << ":" << __LINE__ << "] ")
 
@@ -75,20 +75,20 @@ namespace gazebo
       public: void Load();
 
       /// \brief Set quiet output
-      /// \param q True to prevent warning
+      /// \param[in] q True to prevent warning
       public: void SetQuiet(bool _q);
 
       /// \brief Use this to output a colored message to the terminal
-      /// \param _lbl Text label
-      /// \param _color Color to make the label
+      /// \param[in] _lbl Text label
+      /// \param[in] _color Color to make the label
       /// \return Reference to an output stream
       public: std::ostream &ColorMsg(const std::string &_lbl, int _color);
 
       /// \brief Use this to output an error to the terminal
-      /// \param _lbl Text label
-      /// \param _file File containing the error
-      /// \param _line Line containing the error
-      /// \param _color Color to make the label
+      /// \param[in] _lbl Text label
+      /// \param[in] _file File containing the error
+      /// \param[in] _line Line containing the error
+      /// \param[in] _color Color to make the label
       /// \return Reference to an output stream
       public: std::ostream &ColorErr(const std::string &_lbl,
                   const std::string &_file, unsigned int _line, int _color);
@@ -100,14 +100,23 @@ namespace gazebo
       /// \brief True if logging data
       private: bool logData;
 
+      /// \brief A stream that does not output anywhere
       private: class NullStream : public std::ostream
                {
+                 /// \brief constructor
                  public: NullStream() : std::ios(0), std::ostream(0) {}
                };
 
+      /// \brief null stream
       private: NullStream nullStream;
+
+      /// \brief message stream
       private: std::ostream *msgStream;
+
+      /// \brief error stream
       private: std::ostream *errStream;
+
+      /// \brief log stream
       private: std::ofstream logStream;
 
       /// Pointer to myself
