@@ -115,7 +115,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->requestSub = this->node->Subscribe("~/request",
       &Scene::OnRequest, this);
 
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  // \TODO: This causes the Scene to occasionally miss the response to
+  // scene_info
+  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->responseSub = this->node->Subscribe("~/response",
       &Scene::OnResponse, this);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
@@ -268,7 +270,6 @@ void Scene::Init()
   this->SetShadowsEnabled(true);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
-  std::cout << "Request Scene[" << this->requestMsg->id() << "]\n";
   this->requestPub->Publish(*this->requestMsg);
 
   // TODO: Add GUI option to view all contacts
@@ -1582,12 +1583,6 @@ void Scene::OnScene(ConstScenePtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
-  std::cout << "Response[" << _msg->id() << "]\n";
-  if (!this->requestMsg)
-    std::cout << "Invalid\n";
-  else
-    std::cout << "My ID[" << this->requestMsg->id() << "]\n";
-
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
@@ -1597,7 +1592,6 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   this->sceneMsgs.push_back(sm);
   this->requestMsg = NULL;
 }
-
 
 /////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)
@@ -1631,7 +1625,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     else
       response.set_response("failure");
 
-    this->responsePub->Publish(response);
+    // this->responsePub->Publish(response);
   }
   else if (_msg->request() == "entity_delete")
   {

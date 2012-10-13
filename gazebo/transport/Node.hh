@@ -73,7 +73,7 @@ namespace gazebo
       /// \brief Adverise a topic
       template<typename M>
       transport::PublisherPtr Advertise(const std::string &topic,
-                                        unsigned int _queueLimit = 10,
+                                        unsigned int _queueLimit = 1000,
                                         bool _latch = false)
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
@@ -158,5 +158,3 @@ namespace gazebo
   }
 }
 #endif
-
-

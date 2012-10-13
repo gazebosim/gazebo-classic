@@ -26,6 +26,8 @@
 #include <string>
 #include <iostream>
 
+#include "msgs/msgs.hh"
+#include "rendering/RenderTypes.hh"
 #include "common/Event.hh"
 #include "common/Color.hh"
 

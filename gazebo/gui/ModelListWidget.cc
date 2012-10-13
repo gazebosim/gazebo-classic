@@ -27,6 +27,7 @@
 #include "common/Console.hh"
 #include "common/Events.hh"
 
+#include "rendering/Light.hh"
 #include "rendering/RenderEvents.hh"
 #include "rendering/Rendering.hh"
 #include "rendering/Scene.hh"
@@ -153,7 +154,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       this->propTreeBrowser->clear();
       this->requestMsg = msgs::CreateRequest("scene_info",
                          this->selectedEntityName);
-      std::cout << "ML Request[" << this->requestMsg->id() << "]\n";
       this->requestPub->Publish(*this->requestMsg);
     }
     else if (name == "models")
@@ -175,7 +175,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     }
     else
     {
-      std::cout << "Set Selecte Entity[" << name << "]\n";
       event::Events::setSelectedEntity(name);
     }
   }
@@ -191,21 +190,30 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
   this->propTreeBrowser->clear();
   if (!this->selectedEntityName.empty())
   {
-    std::cout << "OnSetSelected[" << this->selectedEntityName << "]\n";
-
-    this->requestMsg = msgs::CreateRequest("entity_info",
-                                           this->selectedEntityName);
-    this->requestPub->Publish(*this->requestMsg);
-
     QTreeWidgetItem *mItem = this->GetListItem(this->selectedEntityName,
                                                this->modelsItem);
     QTreeWidgetItem *lItem = this->GetListItem(this->selectedEntityName,
                                                this->lightsItem);
 
     if (mItem)
+    {
+      this->requestMsg = msgs::CreateRequest("entity_info",
+          this->selectedEntityName);
+      this->requestPub->Publish(*this->requestMsg);
       this->modelTreeWidget->setCurrentItem(mItem);
+    }
     else if (lItem)
+    {
+      rendering::LightPtr light =
+        gui::get_active_camera()->GetScene()->GetLight(
+            this->selectedEntityName);
+
+      light->FillMsg(this->lightMsg);
+      this->propTreeBrowser->clear();
+      this->fillTypes.push_back("light");
+
       this->modelTreeWidget->setCurrentItem(lItem);
+    }
   }
   else if (this->modelTreeWidget->currentItem())
   {
@@ -245,7 +253,7 @@ void ModelListWidget::Update()
   }
 
   this->ProcessModelMsgs();
-  // this->ProcessLightMsgs();
+  this->ProcessLightMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
@@ -337,12 +345,6 @@ void ModelListWidget::ProcessModelMsgs()
 /////////////////////////////////////////////////
 void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
 {
-  std::cout << "ML: Response[" << _msg->id() << "]\n";
-  if (!this->requestMsg)
-    std::cout << "ML: Invalid\n";
-  else
-    std::cout << "ML: My ID[" << this->requestMsg->id() << "]\n";
-
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
@@ -372,7 +374,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   }
   else if (_msg->has_type() && _msg->type() == this->sceneMsg.GetTypeName())
   {
-    std::cout << "Got Scene in modellist\n";
     this->propMutex->lock();
     this->sceneMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
@@ -2036,8 +2037,8 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this, false);
 
-  // this->lightSub = this->node->Subscribe("~/light",
-   //   &ModelListWidget::OnLightMsg, this);
+  this->lightSub = this->node->Subscribe("~/light",
+      &ModelListWidget::OnLightMsg, this);
 }
 
 /////////////////////////////////////////////////

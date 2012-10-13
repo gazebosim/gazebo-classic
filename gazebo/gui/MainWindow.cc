@@ -154,9 +154,9 @@ void MainWindow::Init()
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
   this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection", 1);
+    this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
-    this->node->Advertise<msgs::Scene>("~/scene", 1);
+    this->node->Advertise<msgs::Scene>("~/scene");
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
@@ -448,10 +448,11 @@ void MainWindow::ViewOrbit()
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
-  g_newAct = new QAction(tr("&New World"), this);
+  /*g_newAct = new QAction(tr("&New World"), this);
   g_newAct->setShortcut(tr("Ctrl+N"));
   g_newAct->setStatusTip(tr("Create a new world"));
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
+  */
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
@@ -631,9 +632,9 @@ void MainWindow::CreateMenus()
   this->setMenuWidget(frame);
 
   this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  this->fileMenu->addAction(g_openAct);
+  // this->fileMenu->addAction(g_openAct);
   // this->fileMenu->addAction(g_importAct);
-  this->fileMenu->addAction(g_newAct);
+  // this->fileMenu->addAction(g_newAct);
   // this->fileMenu->addAction(g_saveAct);
   this->fileMenu->addAction(g_saveAsAct);
   this->fileMenu->addSeparator();
@@ -744,7 +745,6 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnModel(ConstModelPtr &_msg)
 {
-  printf("OnModel\n");
   this->entities[_msg->name()] = _msg->id();
   for (int i = 0; i < _msg->link_size(); i++)
   {
@@ -770,7 +770,6 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
 
   if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
   {
-    std::cout << "Got List\n";
     modelVMsg.ParseFromString(_msg->serialized_data());
 
     for (int i = 0; i < modelVMsg.models_size(); i++)

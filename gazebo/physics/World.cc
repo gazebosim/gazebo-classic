@@ -1002,7 +1002,6 @@ void World::ProcessRequestMsgs()
 
     if ((*iter).request() == "entity_list")
     {
-      std::cout << "GET LIST\n";
       msgs::Model_V modelVMsg;
 
       for (unsigned int i = 0; i < this->rootElement->GetChildCount(); ++i)
@@ -1094,7 +1093,6 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "scene_info")
     {
-      std::cout << "GET SCENE[" << (*iter).id() << "]\n";
       this->sceneMsg.clear_model();
       this->BuildSceneMsg(this->sceneMsg, this->rootElement);
 
@@ -1107,7 +1105,6 @@ void World::ProcessRequestMsgs()
 
     if (send)
     {
-      std::cout << "Sending\n";
       this->responsePub->Publish(response);
     }
   }
