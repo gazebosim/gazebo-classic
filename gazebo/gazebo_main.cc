@@ -21,49 +21,45 @@
 #include "Server.hh"
 #include "gui/Gui.hh"
 
+bool sig_killed = false;
 int status1, status2;
 pid_t  pid1, pid2;
+bool killed1 = false;
+bool killed2 = false;
 
 void sig_handler(int /*signo*/)
 {
-  bool killed1 = false;
-  bool killed2 = false;
-  int p1 = -1;
-  int p2 = -1;
-
+  sig_killed = true;
+  kill(pid1, SIGINT);
+  kill(pid2, SIGINT);
   // wait some time and if not dead, escalate to SIGKILL
   for(unsigned int i = 0; i < 5; ++i)
   {
-    p1 = waitpid(pid1, &status1, WNOHANG);
-    if (p1 == 0)
-      kill(pid1, SIGINT);
-    else
-      killed1 = true;
-
-    p2 = waitpid(pid2, &status2, WNOHANG);
-    if (p2 == 0)
-      kill(pid2, SIGINT);
-    else
-      killed2 = true;
-
+    if(!killed1)
+    {
+      int p1 = waitpid(pid1, &status1, WNOHANG);
+      if (p1 == pid1)
+        killed1 = true;
+    }
+    if(!killed2)
+    {
+      int p2 = waitpid(pid2, &status2, WNOHANG);
+      if (p2 == pid2)
+        killed2 = true;
+    }
+    if(killed1 && killed2)
+      break;
     /// @todo: fix hardcoded timeout
     sleep(1);
-
-    if (killed1 && killed2)
-    {
-      break;
-    }
   }
-
   if (!killed1)
   {
-    gzwarn << "escalating gui to SIGKILL\n";
+    gzwarn << "escalating to SIGKILL on server\n";
     kill(pid1, SIGKILL);
   }
-
   if (!killed2)
   {
-    gzwarn << "escalating server to SIGKILL\n";
+    gzwarn << "escalating to SIGKILL on client\n";
     kill(pid2, SIGKILL);
   }
 }
@@ -79,33 +75,45 @@ int main(int _argc, char **_argv)
 
   pid1 = fork();
 
+  char** myargv = new char*[_argc+1];
+  for(int i=0;i<_argc;i++)
+    myargv[i] = _argv[i];
+  myargv[_argc] = (char*)NULL;
+
   if (pid1)
   {
     pid2 = fork();
     if (pid2)
     {
-      wait(&status1);
-      // kill both processes
-      sig_handler(SIGINT);
+      pid_t dead_child = wait(&status1);
+      if(dead_child == pid1)
+        killed1 = true;
+      else if(dead_child == pid2)
+        killed2 = true;
+      // one of the children died
+      if (!sig_killed)
+        sig_handler(SIGINT);
     }
     else
     {
-      gazebo::gui::run(_argc, _argv);
+      //gazebo::gui::run(_argc, _argv);
+      // gzclient argv
+      execvp("gzclient", myargv);
     }
-    wait(&status2);
-    // kill both processes
-    sig_handler(SIGINT);
   }
   else
   {
-    gazebo::Server *server = new gazebo::Server();
-    if (!server->ParseArgs(_argc, _argv))
-      return -1;
-    server->Run();
-    server->Fini();
-    delete server;
-    server = NULL;
+    //gazebo::Server *server = new gazebo::Server();
+    //if (!server->ParseArgs(_argc, _argv))
+      //return -1;
+    //server->Run();
+    //server->Fini();
+    //delete server;
+    //server = NULL;
+    execvp("gzserver", myargv);
   }
+  
+  delete[] myargv;
 
   return 0;
 }

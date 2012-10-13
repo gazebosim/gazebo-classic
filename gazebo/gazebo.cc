@@ -20,7 +20,9 @@
 #include "math/gzmath.hh"
 #include "gazebo_config.h"
 #include "gazebo.hh"
+#include <boost/thread/mutex.hpp>
 
+boost::mutex fini_mutex;
 std::vector<gazebo::SystemPluginPtr> g_plugins;
 
 /////////////////////////////////////////////////
@@ -92,6 +94,8 @@ void gazebo::stop()
 /////////////////////////////////////////////////
 void gazebo::fini()
 {
+  boost::mutex::scoped_lock lock(fini_mutex);
+  g_plugins.clear();
   gazebo::transport::fini();
 }
 
