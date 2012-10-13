@@ -177,26 +177,32 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   {
     int factor = 40;
 
-    if (this->posCache.x != _event.pos.x ||
-        this->posCache.y != _event.pos.y )
+    if (!_event.alt)
     {
-      this->worldFocal = this->camera->GetScene()->GetFirstContact(this->camera,
-          _event.pos);
-      this->distance = this->camera->GetWorldPose().pos.Distance(
-                       this->focalPoint);
-    }
-    this->posCache = _event.pos;
+      if (this->posCache.x != _event.pos.x ||
+          this->posCache.y != _event.pos.y )
+      {
+        this->worldFocal =
+          this->camera->GetScene()->GetFirstContact(this->camera,
+                                                    _event.pos);
+        this->distance = this->camera->GetWorldPose().pos.Distance(
+            this->focalPoint);
+      }
+      this->posCache = _event.pos;
 
-    // This is not perfect, but it does a decent enough job.
-    if (_event.scroll.y < 0)
-      this->focalPoint += (this->worldFocal - this->focalPoint) * 0.04;
+      // This is not perfect, but it does a decent enough job.
+      if (_event.scroll.y < 0)
+        this->focalPoint += (this->worldFocal - this->focalPoint) * 0.04;
+      else
+        this->focalPoint += (this->focalPoint - this->worldFocal) * 0.04;
+
+    }
     else
-      this->focalPoint += (this->focalPoint - this->worldFocal) * 0.04;
+      factor = 80;
 
     // This assumes that _event.scroll.y is -1 or +1
-    this->Zoom(
-        -(_event.scroll.y * factor) * _event.moveScale *
-         (this->distance / 10.0));
+    this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
+               (this->distance / 10.0));
   }
 
   this->UpdatePose();

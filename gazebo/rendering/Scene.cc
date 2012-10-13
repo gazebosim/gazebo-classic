@@ -111,8 +111,16 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
                                              &Scene::OnModelMsg, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+
+  this->requestSub = this->node->Subscribe("~/request",
+      &Scene::OnRequest, this);
+
+  // \TODO: This causes the Scene to occasionally miss the response to
+  // scene_info
+  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->responseSub = this->node->Subscribe("~/response",
       &Scene::OnResponse, this);
+  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
@@ -1566,6 +1574,13 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnScene(ConstScenePtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sceneMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
@@ -1578,7 +1593,6 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   this->requestMsg = NULL;
 }
 
-
 /////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
@@ -1589,7 +1603,31 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 {
-  if (_msg->request() == "entity_delete")
+  if (_msg->request() == "entity_info")
+  {
+    msgs::Response response;
+    response.set_id(_msg->id());
+    response.set_request(_msg->request());
+
+    Light_M::iterator iter;
+    iter = this->lights.find(_msg->data());
+    if (iter != this->lights.end())
+    {
+      msgs::Light lightMsg;
+      iter->second->FillMsg(lightMsg);
+
+      std::string *serializedData = response.mutable_serialized_data();
+      lightMsg.SerializeToString(serializedData);
+      response.set_type(lightMsg.GetTypeName());
+
+      response.set_response("success");
+    }
+    else
+      response.set_response("failure");
+
+    // this->responsePub->Publish(response);
+  }
+  else if (_msg->request() == "entity_delete")
   {
     Visual_M::iterator iter;
     iter = this->visuals.find(_msg->data());
@@ -1795,6 +1833,11 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
     light->LoadFromMsg(_msg);
     this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
+    RTShaderSystem::Instance()->UpdateShaders();
+  }
+  else
+  {
+    iter->second->UpdateFromMsg(_msg);
     RTShaderSystem::Instance()->UpdateShaders();
   }
 }

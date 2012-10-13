@@ -385,6 +385,11 @@ namespace gazebo
       private: void PrintSceneGraphHelper(const std::string &_prefix,
                                           Ogre::Node *_node);
 
+      /// \brief Called when a scene message is received on the
+      /// ~/scene topic
+      /// \param[in] _msg The message.
+      private: void OnScene(ConstScenePtr &_msg);
+
       /// \brief Response callback
       /// \param[in] _msg The message data.
       private: void OnResponse(ConstResponsePtr &_msg);
@@ -596,6 +601,12 @@ namespace gazebo
       /// \brief Subscribe to sensor topic
       private: transport::SubscriberPtr sensorSub;
 
+      /// \brief Subscribe to scene topic
+      private: transport::SubscriberPtr sceneSub;
+
+      /// \brief Subscribe to the request topic
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Subscribe to visual topic
       private: transport::SubscriberPtr visSub;
 
@@ -625,6 +636,9 @@ namespace gazebo
 
       /// \brief Publish light updates.
       private: transport::PublisherPtr lightPub;
+
+      /// \brief Respond to requests.
+      private: transport::PublisherPtr responsePub;
 
       /// \brief Publish requests
       private: transport::PublisherPtr requestPub;

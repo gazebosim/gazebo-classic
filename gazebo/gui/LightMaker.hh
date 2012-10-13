@@ -24,6 +24,11 @@
 
 namespace gazebo
 {
+  namespace rendering
+  {
+    class Light;
+  }
+
   namespace gui
   {
     class LightMaker : public EntityMaker
@@ -36,6 +41,7 @@ namespace gazebo
 
       public: void OnMousePush(const common::MouseEvent &_event);
 
+      public: virtual void OnMouseMove(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &) {}
       protected: virtual void CreateTheEntity();
@@ -45,6 +51,7 @@ namespace gazebo
       protected: transport::PublisherPtr lightPub;
       private: static unsigned int counter;
       protected: std::string lightTypename;
+      private: rendering::Light *light;
     };
 
     class PointLightMaker : public LightMaker
