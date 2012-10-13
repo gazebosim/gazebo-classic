@@ -63,8 +63,6 @@ void ModelMaker::InitFromModel(const std::string &_modelName)
     this->visuals.clear();
   }
 
-  // this->modelSDF.reset(new sdf::SDF);
-  // sdf::initFile("gazebo.sdf", this->modelSDF);
   this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
 
   if (!this->modelVisual)
@@ -72,6 +70,26 @@ void ModelMaker::InitFromModel(const std::string &_modelName)
 
   this->clone = true;
 }
+
+/////////////////////////////////////////////////
+void ModelMaker::InitFromSDFString(const std::string &_data)
+{
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+
+  if (this->modelVisual)
+  {
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+    this->visuals.clear();
+  }
+
+  this->modelSDF.reset(new sdf::SDF);
+  sdf::initFile("gazebo.sdf", this->modelSDF);
+  sdf::readString(_data, this->modelSDF);
+
+  this->Init();
+}
+
 
 /////////////////////////////////////////////////
 void ModelMaker::InitFromFile(const std::string &_filename)
@@ -89,6 +107,14 @@ void ModelMaker::InitFromFile(const std::string &_filename)
   this->modelSDF.reset(new sdf::SDF);
   sdf::initFile("gazebo.sdf", this->modelSDF);
   sdf::readFile(_filename, this->modelSDF);
+
+  this->Init();
+}
+
+/////////////////////////////////////////////////
+void ModelMaker::Init()
+{
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
   // Load the world file
   std::string modelName;
@@ -145,6 +171,7 @@ void ModelMaker::InitFromFile(const std::string &_filename)
               linkVisual));
 
         visVisual->Load(visualElem);
+        visVisual->SetPose(visualPose);
         this->visuals.push_back(visVisual);
 
         visualElem = visualElem->GetNextElement("visual");
@@ -158,7 +185,6 @@ void ModelMaker::InitFromFile(const std::string &_filename)
     this->visuals.clear();
   }
 }
-
 /////////////////////////////////////////////////
 void ModelMaker::Start(const rendering::UserCameraPtr _camera)
 {

@@ -97,6 +97,8 @@ void COMVisual::Load(const math::Pose &_pose)
   this->crossLines->AddPoint(p5);
   this->crossLines->AddPoint(p6);
 
+  this->InsertMesh("unit_box");
+
   Ogre::MovableObject *boxObj =
     (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
           this->GetName()+"__BOX__", "unit_box"));

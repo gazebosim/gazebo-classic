@@ -12,4 +12,4 @@ echo "*:gazebo/common/STLLoader.cc:149" >> /tmp/gazebo_cpp_check.suppress
 find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -name "*.cc" -print0 | xargs -0 cppcheck --enable=all -q --suppressions-list=/tmp/gazebo_cpp_check.suppress
 
 # cpplint
-find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -print0 -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | xargs -0 python tools/cpplint.py
+find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -print0 -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | xargs -0 python tools/cpplint.py 2>&1 | grep -v skyx

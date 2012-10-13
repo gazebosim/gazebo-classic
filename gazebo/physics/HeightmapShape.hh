@@ -54,7 +54,9 @@ namespace gazebo
       /// \brief Initialize the heightmap
       public: virtual void Init();
 
-      public: std::string GetFilename() const;
+      /// \brief Get the URI of the heightmap image.
+      /// \return The heightmap image URI.
+      public: std::string GetURI() const;
 
       /// \brief Get the size in meters
       public: math::Vector3 GetSize() const;

@@ -8,7 +8,6 @@ include_directories(SYSTEM
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)
-  message (STATUS "STUFF||${OGRE_VERSION}||")
   add_subdirectory(deferred_shading)
 endif()
 add_subdirectory(skyx)
@@ -45,7 +44,6 @@ set (sources
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
-  SelectionObj.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
@@ -85,7 +83,6 @@ set (headers
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
-  SelectionObj.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh

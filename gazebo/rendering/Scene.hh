@@ -218,16 +218,9 @@ namespace gazebo
       /// \brief Get a visual by name
       public: VisualPtr GetVisual(const std::string &_name) const;
 
-      /// \brief Select a visual element at a screen location
-      /// \param[in] _camera The camera through which to project the mouse pos
-      /// \param[in] _mousePos Screen position
-      /// \return Pointer the a visual. NULL if none found
-      public: VisualPtr SelectVisualAt(CameraPtr _camera,
-                                       const math::Vector2i &_mousePos);
-
       /// \brief Select a visual by name.
       /// \param[in] _name Name of the visual to select.
-      public: void SelectVisual(const std::string &_name) const;
+      public: void SelectVisual(const std::string &_name);
 
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking.
@@ -351,10 +344,6 @@ namespace gazebo
 
       /// \brief Clear rendering::Scene
       public: void Clear();
-
-      /// \brief Get a pointer to the selection object.
-      /// \return Pointer to the selection object.
-      public: SelectionObj *GetSelectionObj() const;
 
       /// \brief Clone a visual.
       /// \param[in] _visualName Name of the visual to clone.
@@ -643,11 +632,11 @@ namespace gazebo
       /// \brief Event connections
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief The selection visual
-      private: SelectionObj *selectionObj;
-
       /// \brief The top level in our tree of visuals
       private: VisualPtr worldVisual;
+
+      /// \brief Pointer to a visual selected by a user via the GUI.
+      private: VisualPtr selectedVis;
 
       /// \brief Keep around our request message.
       private: msgs::Request *requestMsg;

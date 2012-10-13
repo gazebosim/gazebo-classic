@@ -143,7 +143,23 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   if (_item)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
-    event::Events::setSelectedEntity(name);
+
+    if (name == "scene")
+    {
+      this->propTreeBrowser->clear();
+      this->requestMsg = msgs::CreateRequest("scene_info",
+          this->selectedModelName);
+      this->requestPub->Publish(*this->requestMsg);
+      // this->FillScenePropertyTree();
+    }
+    else if (name == "model")
+    {
+      printf("Expand model list");
+    }
+    else
+    {
+      event::Events::setSelectedEntity(name);
+    }
   }
   else
     this->selectedModelName.clear();
@@ -158,8 +174,15 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
   if (!this->selectedModelName.empty())
   {
     this->requestMsg = msgs::CreateRequest("entity_info",
-                                           this->selectedModelName);
+        this->selectedModelName);
     this->requestPub->Publish(*this->requestMsg);
+    QTreeWidgetItem *listItem = this->GetModelListItem(this->selectedModelName);
+    if (listItem)
+      this->modelTreeWidget->setCurrentItem(listItem);
+  }
+  else if (this->modelTreeWidget->currentItem())
+  {
+    this->modelTreeWidget->currentItem()->setSelected(false);
   }
 }
 
@@ -168,22 +191,27 @@ void ModelListWidget::Update()
 {
   if (this->fillPropertyTree)
   {
-    this->receiveMutex->lock();
+    boost::mutex::scoped_lock lock(*this->propMutex);
     this->poseMsgs.clear();
     this->fillingPropertyTree = true;
 
     if (this->fillType == "model")
       this->FillPropertyTree(this->modelMsg, NULL);
     else if (this->fillType == "link")
-    {
       this->FillPropertyTree(this->linkMsg, NULL);
-    }
     else if (this->fillType == "joint")
       this->FillPropertyTree(this->jointMsg, NULL);
+    else if (this->fillType == "scene")
+      this->FillPropertyTree(this->sceneMsg, NULL);
 
     this->fillingPropertyTree = false;
     this->fillPropertyTree = false;
-    this->receiveMutex->unlock();
+  }
+
+  if (!this->modelTreeWidget->currentItem())
+  {
+    boost::mutex::scoped_lock lock(*this->propMutex);
+    this->propTreeBrowser->clear();
   }
 
   this->ProcessModelMsgs();
@@ -316,7 +344,15 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->fillType = "joint";
     this->propMutex->unlock();
   }
-
+  else if (_msg->has_type() && _msg->type() == this->sceneMsg.GetTypeName())
+  {
+    this->propMutex->lock();
+    this->sceneMsg.ParseFromString(_msg->serialized_data());
+    this->propTreeBrowser->clear();
+    this->fillPropertyTree = true;
+    this->fillType = "scene";
+    this->propMutex->unlock();
+  }
   else if (_msg->has_type() && _msg->type() == "error")
   {
     if (_msg->response() == "nonexistant")
@@ -569,7 +605,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *granularityProp = this->GetChildItem(_item, "granularity");
 
     msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
-    imageMessage->set_filename(
+    imageMessage->set_uri(
         this->variantManager->value(fileProp).toString().toStdString());
     imageMessage->set_scale(
         this->variantManager->value(scaleProp).toDouble());
@@ -980,7 +1016,6 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
 void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
                                        QtProperty *_parent)
 {
-  printf("FillPropertyTree Joint\n");
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
@@ -1482,9 +1517,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
   {
     item->setValue(5);
 
-    item = this->variantManager->addProperty(QVariant::String,
-        tr("filename"));
-    item->setValue(_msg.image().filename().c_str());
+    item = this->variantManager->addProperty(QVariant::String, tr("uri"));
+    item->setValue(_msg.image().uri().c_str());
     _parent->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Double,
@@ -1511,9 +1545,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
   {
     item->setValue(6);
 
-    item = this->variantManager->addProperty(QVariant::String,
-        tr("filename"));
-    item->setValue(_msg.image().filename().c_str());
+    item = this->variantManager->addProperty(QVariant::String, tr("uri"));
+    item->setValue(_msg.image().uri().c_str());
     _parent->addSubProperty(item);
 
     QtProperty *sizeItem = this->variantManager->addProperty(
@@ -1861,11 +1894,7 @@ void ModelListWidget::ResetTree()
 
   // Create the top level of items in the tree widget
   {
-    this->sceneItem = new QTreeWidgetItem(
-        static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("scene"))));
-    this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("scene")));
-    this->modelTreeWidget->addTopLevelItem(this->sceneItem);
+    this->ResetScene();
 
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
@@ -1937,4 +1966,55 @@ QSize ModelListSheetDelegate::sizeHint(const QStyleOptionViewItem &opt,
   return sz;
 }
 
+/////////////////////////////////////////////////
+void ModelListWidget::ResetScene()
+{
+  this->sceneItem = new QTreeWidgetItem(
+      static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("scene"))));
+  this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("scene")));
+  this->modelTreeWidget->addTopLevelItem(this->sceneItem);
 
+  QTreeWidgetItem *skyItem = new QTreeWidgetItem(this->sceneItem,
+      QStringList(QString("%1").arg(tr("sky"))));
+  skyItem->setData(0, Qt::UserRole, QVariant(tr("sky")));
+  this->modelTreeWidget->addTopLevelItem(skyItem);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
+                                       QtProperty *_parent)
+{
+  QtProperty *topItem = NULL;
+  QtVariantProperty *item = NULL;
+
+  item = this->variantManager->addProperty(QVariant::Color, tr("ambient"));
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Color, tr("background"));
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Bool, tr("shadows"));
+  if (_msg.has_shadows())
+  {
+    item->setValue(_msg.shadows());
+  }
+  this->propTreeBrowser->addProperty(item);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("fog"));
+  QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
+  this->propTreeBrowser->setExpanded(bItem, false);
+
+  item = this->variantManager->addProperty(QVariant::Color, tr("color"));
+  topItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("start"));
+  topItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("end"));
+  topItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("density"));
+  topItem->addSubProperty(item);
+}

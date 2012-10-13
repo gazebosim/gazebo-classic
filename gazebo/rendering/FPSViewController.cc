@@ -26,8 +26,8 @@ using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-FPSViewController::FPSViewController(UserCamera *camera_)
-  : ViewController(camera_)
+FPSViewController::FPSViewController(UserCameraPtr _camera)
+  : ViewController(_camera)
 {
   this->typeString = TYPE_STRING;
 }

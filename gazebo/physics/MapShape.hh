@@ -65,8 +65,8 @@ namespace gazebo
       /// \brief Not yet implemented.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      /// \brief Returns the image filename givne for this geometry.
-      public: std::string GetFilename() const;
+      /// \brief Returns the image URI givne for this geometry.
+      public: std::string GetURI() const;
 
       /// \brief Returns scaling factor for this geometry.
       public: double GetScale() const;

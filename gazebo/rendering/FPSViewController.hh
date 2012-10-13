@@ -34,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] Camera to controll
-      public: FPSViewController(UserCamera *_camera);
+      public: FPSViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~FPSViewController();

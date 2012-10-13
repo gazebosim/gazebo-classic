@@ -124,6 +124,10 @@ namespace gazebo
       /// \param[in] _visual Visual to move the camera to.
       public: void MoveToVisual(VisualPtr _visual);
 
+      // Doxygen automatically pulls in the correct documentation.
+      public: virtual bool MoveToPosition(const math::Pose &_pose,
+                                          double _time);
+
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visualName Name of the visual to move the camera to.
       public: void MoveToVisual(const std::string &_visualName);
@@ -158,6 +162,10 @@ namespace gazebo
       /// \brief Get a visual at a mouse position
       /// \param[in] _mousePos 2D position of the mouse in pixels.
       public: VisualPtr GetVisual(const math::Vector2i &_mousePos) const;
+
+      /// \brief Set the point the camera should orbit around.
+      /// \param[in] _pt The focal point
+      public: void SetFocalPoint(const math::Vector3 &_pt);
 
       /// \brief Set the camera to be attached to a visual.
       ///
@@ -210,7 +218,7 @@ namespace gazebo
       private: GUIOverlay *gui;
 
       /// \brief Draws a 3D axis in the viewport.
-      private: Ogre::SceneNode *axisNode;
+      // private: Ogre::SceneNode *axisNode;
 
       /// \brief Used to select objects from mouse clicks.
       private: SelectionBuffer *selectionBuffer;

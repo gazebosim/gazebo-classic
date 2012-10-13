@@ -29,7 +29,6 @@
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
-#include "rendering/SelectionObj.hh"
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/RenderEngine.hh"
 #include "common/MeshManager.hh"
@@ -1800,6 +1799,16 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 VisualPtr Visual::GetParent() const
 {
   return this->parent;
+}
+
+//////////////////////////////////////////////////
+VisualPtr Visual::GetRootVisual()
+{
+  VisualPtr p = shared_from_this();
+  while (p->GetParent()->GetName() != "__world_node__")
+    p = p->GetParent();
+
+  return p;
 }
 
 //////////////////////////////////////////////////

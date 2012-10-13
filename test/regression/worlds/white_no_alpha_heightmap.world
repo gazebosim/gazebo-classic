@@ -1,11 +1,15 @@
 <?xml version="1.0"?> 
-<gazebo version="1.0">
+<gazebo version="1.2">
   <world name="default">
-    <model name="heightmap" static="true">
+    <model name="heightmap">
+      <static>true</static>
       <link name="link">
         <collision name="collision">
           <geometry>
-            <heightmap filename="white_no_alpha.png" size="129 129 10"/>
+            <heightmap>
+              <uri>file://media/materials/textures/white_no_alpha.png</uri>
+              <size>129 129 10</size>
+            </heightmap>
           </geometry>
         </collision>
       </link>

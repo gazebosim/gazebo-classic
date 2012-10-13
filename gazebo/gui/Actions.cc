@@ -18,7 +18,8 @@
 #include "gui/Actions.hh"
 
 QAction *gazebo::gui::g_arrowAct = 0;
-QAction *gazebo::gui::g_ringPoseAct = 0;
+QAction *gazebo::gui::g_translateAct = 0;
+QAction *gazebo::gui::g_rotateAct = 0;
 QAction *gazebo::gui::g_newAct = 0;
 QAction *gazebo::gui::g_openAct = 0;
 QAction *gazebo::gui::g_importAct = 0;
@@ -30,7 +31,6 @@ QAction *gazebo::gui::g_quitAct = 0;
 QAction *gazebo::gui::g_newModelAct = 0;
 QAction *gazebo::gui::g_resetModelsAct = 0;
 QAction *gazebo::gui::g_resetWorldAct = 0;
-QAction *gazebo::gui::g_editWorldPropertiesAct = 0;
 
 QAction *gazebo::gui::g_playAct = 0;
 QAction *gazebo::gui::g_pauseAct = 0;
