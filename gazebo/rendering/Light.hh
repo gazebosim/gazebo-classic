@@ -90,6 +90,10 @@ namespace gazebo
       /// \param[in] _p New position for the light
       public: void SetPosition(const math::Vector3 &_p);
 
+      /// \brief Get the position of the light
+      /// \return The position of the light
+      public: math::Vector3 GetPosition() const;
+
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
       /// \param[in] _s Set to True when the light is selected by the user.
@@ -117,6 +121,10 @@ namespace gazebo
       /// \brief Set the specular color
       /// \param[in] _color The specular color
       public: void SetSpecularColor(const common::Color &_color);
+
+      /// \brief Get the specular color
+      /// \return  The specular color
+      public: common::Color GetSpecularColor() const;
 
       /// \brief Set the direction
       /// \param[in] _dir Set the light's direction. Only applicable to spot and
@@ -154,11 +162,26 @@ namespace gazebo
       /// \param[in] _cast Set to true to cast shadows.
       public: void SetCastShadows(const bool &_cast);
 
-      /// \private Helper node to create a visual representation of the light
-      private: void CreateVisual();
+      /// \brief Fill the contents of a light message.
+      /// \param[out] _msg Message to fill.
+      public: void FillMsg(msgs::Light &_msg) const;
+
+      /// \brief Update a light source from a message.
+      /// \param[in] _msg Light message to update from
+      public: void UpdateFromMsg(ConstLightPtr &_msg);
 
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}
+
+      /// \private Helper node to create a visual representation of the light
+      private: void CreateVisual();
+
+      /// \brief Update the ogre light source based on SDF values
+      private: void Update();
+
+      /// \brief Update SDF value based on a message.
+      /// \param[in] _msg The light message to update from.
+      private: void UpdateSDFFromMsg(ConstLightPtr &_msg);
 
       /// \brief The ogre light source
       private: Ogre::Light *light;

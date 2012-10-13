@@ -637,6 +637,9 @@ namespace gazebo
       /// \brief Publish light updates.
       private: transport::PublisherPtr lightPub;
 
+      /// \brief Respond to requests.
+      private: transport::PublisherPtr responsePub;
+
       /// \brief Publish requests
       private: transport::PublisherPtr requestPub;
 

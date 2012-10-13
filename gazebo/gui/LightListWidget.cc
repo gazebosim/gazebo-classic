@@ -198,11 +198,11 @@ void LightListWidget::ProcessLightMsgs()
     if (!listItem)
     {
       // Create a top-level tree item for the path
-      QListWidgetItem *item = new QListWidgetItem(
+      QListWidgetItem *item = new QTreeWidgetItem(this->lightsItem,
           QString::fromStdString(name));
 
-      item->setData(Qt::UserRole, QVariant((*iter)->name().c_str()));
-      this->lightListWidget->addItem(item);
+      item->setData(0, Qt::UserRole, QVariant((*iter)->name().c_str()));
+      this->modelTreeWidget->addTopLevelItem(item);
     }
     else
     {

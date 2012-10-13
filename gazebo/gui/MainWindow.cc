@@ -51,27 +51,6 @@ MainWindow::MainWindow()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
-  this->worldControlPub =
-    this->node->Advertise<msgs::WorldControl>("~/world_control");
-  this->serverControlPub =
-    this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection", 1);
-  this->scenePub =
-    this->node->Advertise<msgs::Scene>("~/scene", 1);
-
-  this->newEntitySub = this->node->Subscribe("~/model/info",
-      &MainWindow::OnModel, this, false);
-
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
-
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response",
-      &MainWindow::OnResponse, this, true);
-
-  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
-                                            &MainWindow::OnWorldModify, this);
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -160,8 +139,6 @@ void MainWindow::Load()
 void MainWindow::Init()
 {
   this->renderWidget->show();
-  this->requestMsg = msgs::CreateRequest("entity_list");
-  this->requestPub->Publish(*this->requestMsg);
 
   // Set the initial size of the window to 0.75 the desktop size,
   // with a minimum value of 1024x768.
@@ -171,6 +148,31 @@ void MainWindow::Init()
 
   this->resize(winSize);
   this->modelListWidget->InitTransport();
+
+  this->worldControlPub =
+    this->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->serverControlPub =
+    this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+  this->selectionPub =
+    this->node->Advertise<msgs::Selection>("~/selection", 1);
+  this->scenePub =
+    this->node->Advertise<msgs::Scene>("~/scene", 1);
+
+  this->newEntitySub = this->node->Subscribe("~/model/info",
+      &MainWindow::OnModel, this, true);
+
+  this->statsSub =
+    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
+
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->responseSub = this->node->Subscribe("~/response",
+      &MainWindow::OnResponse, this);
+
+  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
+                                            &MainWindow::OnWorldModify, this);
+
+  this->requestMsg = msgs::CreateRequest("entity_list");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
 /////////////////////////////////////////////////
@@ -446,32 +448,33 @@ void MainWindow::ViewOrbit()
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
-  g_newAct = new QAction(tr("&New"), this);
+  g_newAct = new QAction(tr("&New World"), this);
   g_newAct->setShortcut(tr("Ctrl+N"));
   g_newAct->setStatusTip(tr("Create a new world"));
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
 
-  g_openAct = new QAction(tr("&Open"), this);
+  g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
-  g_importAct = new QAction(tr("&Import Mesh"), this);
+  /*g_importAct = new QAction(tr("&Import Mesh"), this);
   g_importAct->setShortcut(tr("Ctrl+I"));
   g_importAct->setStatusTip(tr("Import a Collada mesh"));
   connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
+  */
 
-
-  g_saveAct = new QAction(tr("&Save"), this);
+  /*
+  g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+  */
 
-  g_saveAsAct = new QAction(tr("Save &As"), this);
+  g_saveAsAct = new QAction(tr("Save World &As"), this);
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
   g_saveAsAct->setStatusTip(tr("Save world to new file"));
   connect(g_saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
-
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -600,9 +603,9 @@ void MainWindow::CreateActions()
   connect(g_viewFullScreenAct, SIGNAL(triggered()), this,
       SLOT(ViewFullScreen()));
 
-  g_viewFPSAct = new QAction(tr("FPS View Control"), this);
-  g_viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
-  connect(g_viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
+  // g_viewFPSAct = new QAction(tr("FPS View Control"), this);
+  // g_viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
+  // connect(g_viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
 
   g_viewOrbitAct = new QAction(tr("Orbit View Control"), this);
   g_viewOrbitAct->setStatusTip(tr("Orbit View Style"));
@@ -629,9 +632,9 @@ void MainWindow::CreateMenus()
 
   this->fileMenu = this->menuBar->addMenu(tr("&File"));
   this->fileMenu->addAction(g_openAct);
-  this->fileMenu->addAction(g_importAct);
+  // this->fileMenu->addAction(g_importAct);
   this->fileMenu->addAction(g_newAct);
-  this->fileMenu->addAction(g_saveAct);
+  // this->fileMenu->addAction(g_saveAct);
   this->fileMenu->addAction(g_saveAsAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(g_quitAct);
@@ -646,7 +649,7 @@ void MainWindow::CreateMenus()
   this->viewMenu->addAction(g_viewResetAct);
   this->viewMenu->addAction(g_viewFullScreenAct);
   this->viewMenu->addSeparator();
-  this->viewMenu->addAction(g_viewFPSAct);
+  // this->viewMenu->addAction(g_viewFPSAct);
   this->viewMenu->addAction(g_viewOrbitAct);
 
   this->menuBar->addSeparator();
@@ -741,6 +744,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnModel(ConstModelPtr &_msg)
 {
+  printf("OnModel\n");
   this->entities[_msg->name()] = _msg->id();
   for (int i = 0; i < _msg->link_size(); i++)
   {
@@ -766,6 +770,7 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
 
   if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
   {
+    std::cout << "Got List\n";
     modelVMsg.ParseFromString(_msg->serialized_data());
 
     for (int i = 0; i < modelVMsg.models_size(); i++)

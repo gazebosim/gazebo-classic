@@ -185,6 +185,7 @@ void ModelMaker::Init()
     this->visuals.clear();
   }
 }
+
 /////////////////////////////////////////////////
 void ModelMaker::Start(const rendering::UserCameraPtr _camera)
 {

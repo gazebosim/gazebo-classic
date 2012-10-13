@@ -114,6 +114,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->requestSub = this->node->Subscribe("~/request",
       &Scene::OnRequest, this);
+
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->responseSub = this->node->Subscribe("~/response",
       &Scene::OnResponse, this);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
@@ -266,6 +268,7 @@ void Scene::Init()
   this->SetShadowsEnabled(true);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
+  std::cout << "Request Scene[" << this->requestMsg->id() << "]\n";
   this->requestPub->Publish(*this->requestMsg);
 
   // TODO: Add GUI option to view all contacts
@@ -1579,6 +1582,12 @@ void Scene::OnScene(ConstScenePtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
+  std::cout << "Response[" << _msg->id() << "]\n";
+  if (!this->requestMsg)
+    std::cout << "Invalid\n";
+  else
+    std::cout << "My ID[" << this->requestMsg->id() << "]\n";
+
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
@@ -1600,7 +1609,31 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 {
-  if (_msg->request() == "entity_delete")
+  if (_msg->request() == "entity_info")
+  {
+    msgs::Response response;
+    response.set_id(_msg->id());
+    response.set_request(_msg->request());
+
+    Light_M::iterator iter;
+    iter = this->lights.find(_msg->data());
+    if (iter != this->lights.end())
+    {
+      msgs::Light lightMsg;
+      iter->second->FillMsg(lightMsg);
+
+      std::string *serializedData = response.mutable_serialized_data();
+      lightMsg.SerializeToString(serializedData);
+      response.set_type(lightMsg.GetTypeName());
+
+      response.set_response("success");
+    }
+    else
+      response.set_response("failure");
+
+    this->responsePub->Publish(response);
+  }
+  else if (_msg->request() == "entity_delete")
   {
     Visual_M::iterator iter;
     iter = this->visuals.find(_msg->data());
@@ -1806,6 +1839,11 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
     light->LoadFromMsg(_msg);
     this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
+    RTShaderSystem::Instance()->UpdateShaders();
+  }
+  else
+  {
+    iter->second->UpdateFromMsg(_msg);
     RTShaderSystem::Instance()->UpdateShaders();
   }
 }

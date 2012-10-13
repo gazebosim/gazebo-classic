@@ -60,7 +60,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->requestMsg = NULL;
   this->propMutex = new boost::mutex();
   this->receiveMutex = new boost::mutex();
-  this->fillPropertyTree = false;
 
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -153,7 +152,8 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     {
       this->propTreeBrowser->clear();
       this->requestMsg = msgs::CreateRequest("scene_info",
-          this->selectedModelName);
+                         this->selectedEntityName);
+      std::cout << "ML Request[" << this->requestMsg->id() << "]\n";
       this->requestPub->Publish(*this->requestMsg);
     }
     else if (name == "models")
@@ -161,36 +161,51 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       this->modelsItem->setSelected(false);
       this->modelsItem->setExpanded(!this->modelsItem->isExpanded());
     }
+    else if (name == "lights")
+    {
+      this->lightsItem->setSelected(false);
+      this->lightsItem->setExpanded(!this->lightsItem->isExpanded());
+    }
     else if (name == "physics")
     {
       this->propTreeBrowser->clear();
       this->requestMsg = msgs::CreateRequest("physics_info",
-                                             this->selectedModelName);
+                                             this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
     else
     {
+      std::cout << "Set Selecte Entity[" << name << "]\n";
       event::Events::setSelectedEntity(name);
     }
   }
   else
-    this->selectedModelName.clear();
+    this->selectedEntityName.clear();
 }
 
 /////////////////////////////////////////////////
 void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
 {
-  this->selectedModelName = _name;
+  this->selectedEntityName = _name;
 
   this->propTreeBrowser->clear();
-  if (!this->selectedModelName.empty())
+  if (!this->selectedEntityName.empty())
   {
+    std::cout << "OnSetSelected[" << this->selectedEntityName << "]\n";
+
     this->requestMsg = msgs::CreateRequest("entity_info",
-        this->selectedModelName);
+                                           this->selectedEntityName);
     this->requestPub->Publish(*this->requestMsg);
-    QTreeWidgetItem *listItem = this->GetModelListItem(this->selectedModelName);
-    if (listItem)
-      this->modelTreeWidget->setCurrentItem(listItem);
+
+    QTreeWidgetItem *mItem = this->GetListItem(this->selectedEntityName,
+                                               this->modelsItem);
+    QTreeWidgetItem *lItem = this->GetListItem(this->selectedEntityName,
+                                               this->lightsItem);
+
+    if (mItem)
+      this->modelTreeWidget->setCurrentItem(mItem);
+    else if (lItem)
+      this->modelTreeWidget->setCurrentItem(lItem);
   }
   else if (this->modelTreeWidget->currentItem())
   {
@@ -201,25 +216,26 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
 /////////////////////////////////////////////////
 void ModelListWidget::Update()
 {
-  if (this->fillPropertyTree)
+  if (this->fillTypes.size() > 0)
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
-    this->poseMsgs.clear();
     this->fillingPropertyTree = true;
 
-    if (this->fillType == "model")
+    if (this->fillTypes[0] == "model")
       this->FillPropertyTree(this->modelMsg, NULL);
-    else if (this->fillType == "link")
+    else if (this->fillTypes[0] == "link")
       this->FillPropertyTree(this->linkMsg, NULL);
-    else if (this->fillType == "joint")
+    else if (this->fillTypes[0] == "joint")
       this->FillPropertyTree(this->jointMsg, NULL);
-    else if (this->fillType == "scene")
+    else if (this->fillTypes[0] == "scene")
       this->FillPropertyTree(this->sceneMsg, NULL);
-    else if (this->fillType == "physics")
+    else if (this->fillTypes[0] == "physics")
       this->FillPropertyTree(this->physicsMsg, NULL);
+    else if (this->fillTypes[0] == "light")
+      this->FillPropertyTree(this->lightMsg, NULL);
 
     this->fillingPropertyTree = false;
-    this->fillPropertyTree = false;
+    this->fillTypes.pop_front();
   }
 
   if (!this->modelTreeWidget->currentItem())
@@ -229,31 +245,31 @@ void ModelListWidget::Update()
   }
 
   this->ProcessModelMsgs();
-  this->ProcessPoseMsgs();
+  // this->ProcessLightMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 {
-  this->receiveMutex->lock();
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Model msg;
   msg.CopyFrom(_msg);
   this->modelMsgs.push_back(msg);
-  this->receiveMutex->unlock();
 }
 
 /////////////////////////////////////////////////
 void ModelListWidget::ProcessModelMsgs()
 {
-  this->receiveMutex->lock();
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
 
   for (ModelMsgs_L::iterator iter = this->modelMsgs.begin();
        iter != this->modelMsgs.end(); ++iter)
   {
     std::string name = (*iter).name();
 
-    QTreeWidgetItem *listItem = this->GetModelListItem((*iter).name());
+    QTreeWidgetItem *listItem = this->GetListItem((*iter).name(),
+                                                  this->modelsItem);
 
     if (!listItem)
     {
@@ -321,6 +337,12 @@ void ModelListWidget::ProcessModelMsgs()
 /////////////////////////////////////////////////
 void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
 {
+  std::cout << "ML: Response[" << _msg->id() << "]\n";
+  if (!this->requestMsg)
+    std::cout << "ML: Invalid\n";
+  else
+    std::cout << "ML: My ID[" << this->requestMsg->id() << "]\n";
+
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
@@ -329,8 +351,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->propMutex->lock();
     this->modelMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
-    this->fillPropertyTree = true;
-    this->fillType = "model";
+    this->fillTypes.push_back("model");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->linkMsg.GetTypeName())
@@ -338,8 +359,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->propMutex->lock();
     this->linkMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
-    this->fillPropertyTree = true;
-    this->fillType = "link";
+    this->fillTypes.push_back("link");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->jointMsg.GetTypeName())
@@ -347,17 +367,16 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->propMutex->lock();
     this->jointMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
-    this->fillPropertyTree = true;
-    this->fillType = "joint";
+    this->fillTypes.push_back("joint");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->sceneMsg.GetTypeName())
   {
+    std::cout << "Got Scene in modellist\n";
     this->propMutex->lock();
     this->sceneMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
-    this->fillPropertyTree = true;
-    this->fillType = "scene";
+    this->fillTypes.push_back("scene");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->physicsMsg.GetTypeName())
@@ -365,15 +384,22 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->propMutex->lock();
     this->physicsMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
-    this->fillPropertyTree = true;
-    this->fillType = "physics";
+    this->fillTypes.push_back("physics");
+    this->propMutex->unlock();
+  }
+  else if (_msg->has_type() && _msg->type() == this->lightMsg.GetTypeName())
+  {
+    this->propMutex->lock();
+    this->lightMsg.ParseFromString(_msg->serialized_data());
+    this->propTreeBrowser->clear();
+    this->fillTypes.push_back("light");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
     if (_msg->response() == "nonexistant")
     {
-      this->RemoveEntity(this->selectedModelName);
+      this->RemoveEntity(this->selectedEntityName);
     }
   }
 
@@ -386,29 +412,30 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
 {
   if (gui::has_entity_name(_name))
   {
-    QTreeWidgetItem *listItem = this->GetModelListItem(_name);
+    QTreeWidgetItem *listItem = this->GetListItem(_name, this->modelsItem);
     if (listItem)
     {
       int i = this->modelsItem->indexOfChild(listItem);
       this->modelsItem->takeChild(i);
 
       this->propTreeBrowser->clear();
-      this->selectedModelName.clear();
+      this->selectedEntityName.clear();
       this->sdfElement.reset();
-      this->fillPropertyTree = false;
+      this->fillTypes.clear();
     }
   }
 }
 
 /////////////////////////////////////////////////
-QTreeWidgetItem *ModelListWidget::GetModelListItem(const std::string &_name)
+QTreeWidgetItem *ModelListWidget::GetListItem(const std::string &_name,
+                                              QTreeWidgetItem *_parent)
 {
   QTreeWidgetItem *listItem = NULL;
 
   // Find an existing element with the name from the message
-  for (int i = 0; i < this->modelsItem->childCount() && !listItem; ++i)
+  for (int i = 0; i < _parent->childCount() && !listItem; ++i)
   {
-    QTreeWidgetItem *item = this->modelsItem->child(i);
+    QTreeWidgetItem *item = _parent->child(i);
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
     if (listData == _name)
@@ -437,7 +464,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
 
-  if (item)
+  int i = this->modelsItem->indexOfChild(item);
+  if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
                           this->modelTreeWidget->mapToGlobal(_pt));
@@ -465,14 +493,62 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     return;
   }
 
-  if (this->modelTreeWidget->currentItem() == this->modelsItem)
+  if (this->modelsItem->indexOfChild(
+        this->modelTreeWidget->currentItem()) != -1)
     this->ModelPropertyChanged(_item);
+  else if (this->lightsItem->indexOfChild(
+        this->modelTreeWidget->currentItem()) != -1)
+    this->LightPropertyChanged(_item);
   else if (this->modelTreeWidget->currentItem() == this->sceneItem)
     this->ScenePropertyChanged(_item);
   else if (this->modelTreeWidget->currentItem() == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
 
   this->propMutex->unlock();
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
+{
+  msgs::Light msg;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin();
+       iter != properties.end(); ++iter)
+  {
+    if ((*iter)->propertyName().toStdString() == "name")
+      msg.set_name(this->variantManager->value(
+            (*iter)).toString().toStdString());
+    else if ((*iter)->propertyName().toStdString() == "range")
+      msg.set_range(this->variantManager->value((*iter)).toDouble());
+    else if ((*iter)->propertyName().toStdString() == "diffuse")
+      this->FillColorMsg((*iter), msg.mutable_diffuse());
+    else if ((*iter)->propertyName().toStdString() == "specular")
+      this->FillColorMsg((*iter), msg.mutable_specular());
+    else if ((*iter)->propertyName().toStdString() == "attenuation")
+    {
+      msg.set_attenuation_constant(this->variantManager->value(
+            this->GetChildItem((*iter), "constant")).toDouble());
+      msg.set_attenuation_linear(this->variantManager->value(
+            this->GetChildItem((*iter), "linear")).toDouble());
+      msg.set_attenuation_quadratic(this->variantManager->value(
+            this->GetChildItem((*iter), "quadratic")).toDouble());
+    }
+    else if ((*iter)->propertyName().toStdString() == "spot light")
+    {
+      msg.set_spot_inner_angle(this->variantManager->value(
+            this->GetChildItem((*iter), "inner angle")).toDouble());
+      msg.set_spot_outer_angle(this->variantManager->value(
+            this->GetChildItem((*iter), "outer angle")).toDouble());
+      msg.set_spot_falloff(this->variantManager->value(
+            this->GetChildItem((*iter), "falloff")).toDouble());
+    }
+  }
+
+  /// \TODO: Allow users to change light type
+  msg.set_type(this->lightType);
+
+  this->lightPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -619,13 +695,13 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
 void ModelListWidget::FillColorMsg(QtProperty *_item, msgs::Color *_msg)
 {
   _msg->set_r(this->variantManager->value(
-      this->GetChildItem(_item, "Red")).toDouble());
+      this->GetChildItem(_item, "Red")).toDouble() / 255.0);
   _msg->set_g(this->variantManager->value(
-      this->GetChildItem(_item, "Green")).toDouble());
+      this->GetChildItem(_item, "Green")).toDouble() / 255.0);
   _msg->set_b(this->variantManager->value(
-      this->GetChildItem(_item, "Blue")).toDouble());
+      this->GetChildItem(_item, "Blue")).toDouble() / 255.0);
   _msg->set_a(this->variantManager->value(
-      this->GetChildItem(_item, "Alpha")).toDouble());
+      this->GetChildItem(_item, "Alpha")).toDouble() / 255.0);
 }
 
 /////////////////////////////////////////////////
@@ -1883,55 +1959,12 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::ProcessPoseMsgs()
+void ModelListWidget::OnLightMsg(ConstLightPtr &_msg)
 {
-  this->receiveMutex->lock();
-  this->propMutex->lock();
-  this->fillingPropertyTree = true;
-
-  PoseMsgs_L::iterator iter;
-  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
-  {
-    if ((*iter)->name().find(this->selectedModelName) != std::string::npos)
-    {
-      QtProperty *poseItem;
-      QtProperty *nameItem = this->GetParentItemValue((*iter)->name());
-      if (!nameItem)
-        poseItem = this->GetChildItem("pose");
-      else
-        poseItem = this->GetChildItem(nameItem, "pose");
-      this->FillPoseProperty(**iter, poseItem);
-    }
-  }
-  this->poseMsgs.clear();
-
-  this->fillingPropertyTree = false;
-  this->propMutex->unlock();
-  this->receiveMutex->unlock();
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnPose(ConstPosePtr &/*_msg*/)
-{
-  /*this->receiveMutex->lock();
-  if (!this->selectedModelName.empty() &&
-      _msg->name().find(this->selectedModelName) != std::string::npos)
-  {
-    PoseMsgs_L::iterator iter;
-
-    // Find an old model message, and remove them
-    for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
-    {
-      if ((*iter)->name() == _msg->name())
-      {
-        this->poseMsgs.erase(iter);
-        break;
-      }
-    }
-    this->poseMsgs.push_back(_msg);
-  }
-  this->receiveMutex->unlock();
-  */
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Light msg;
+  msg.CopyFrom(*_msg);
+  this->lightMsgs.push_back(msg);
 }
 
 /////////////////////////////////////////////////
@@ -1946,7 +1979,6 @@ void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
-  this->poseMsgs.clear();
   this->ResetTree();
   this->propTreeBrowser->clear();
   this->node->Fini();
@@ -1956,9 +1988,9 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
   this->modelPub.reset();
   this->scenePub.reset();
   this->physicsPub.reset();
+  this->lightPub.reset();
   this->responseSub.reset();
   this->requestSub.reset();
-  this->poseSub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -1966,12 +1998,11 @@ void ModelListWidget::OnCreateScene(const std::string &_name)
 {
   this->ResetTree();
 
-  this->poseMsgs.clear();
   this->propTreeBrowser->clear();
   this->InitTransport(_name);
 
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
+  // this->requestMsg = msgs::CreateRequest("scene_info");
+  // this->requestPub->Publish(*this->requestMsg);
 }
 
 /////////////////////////////////////////////////
@@ -1985,9 +2016,9 @@ void ModelListWidget::InitTransport(const std::string &_name)
     this->modelPub.reset();
     this->scenePub.reset();
     this->physicsPub.reset();
+    this->lightPub.reset();
     this->responseSub.reset();
     this->requestSub.reset();
-    this->poseSub.reset();
   }
 
   this->node = transport::NodePtr(new transport::Node());
@@ -1996,16 +2027,17 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
-      &ModelListWidget::OnResponse, this, false);
-
-  this->poseSub = this->node->Subscribe("~/pose/info",
-      &ModelListWidget::OnPose, this);
+                                            &ModelListWidget::OnResponse, this);
 
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this, false);
+
+  // this->lightSub = this->node->Subscribe("~/light",
+   //   &ModelListWidget::OnLightMsg, this);
 }
 
 /////////////////////////////////////////////////
@@ -2248,4 +2280,118 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   if (_msg.has_contact_surface_layer())
     item->setValue(_msg.contact_surface_layer());
   constraintsItem->addSubProperty(item);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
+                                       QtProperty * /*_parent*/)
+{
+  QtVariantProperty *item = NULL;
+
+  this->lightType = _msg.type();
+
+  item = this->variantManager->addProperty(QVariant::String, tr("name"));
+  if (_msg.has_name())
+    item->setValue(_msg.name().c_str());
+  this->propTreeBrowser->addProperty(item);
+
+  // Create and set the diffuse color property
+  item = this->variantManager->addProperty(QVariant::Color, tr("diffuse"));
+  if (_msg.has_diffuse())
+  {
+    QColor clr(_msg.diffuse().r()*255, _msg.diffuse().g()*255,
+               _msg.diffuse().b()*255, _msg.diffuse().a()*255);
+    item->setValue(clr);
+  }
+  this->propTreeBrowser->addProperty(item);
+
+  // Create and set the specular color property
+  item = this->variantManager->addProperty(QVariant::Color, tr("specular"));
+  if (_msg.has_specular())
+  {
+    QColor clr(_msg.specular().r()*255, _msg.specular().g()*255,
+               _msg.specular().b()*255, _msg.specular().a()*255);
+    item->setValue(clr);
+  }
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("range"));
+  if (_msg.has_range())
+    item->setValue(_msg.range());
+  this->propTreeBrowser->addProperty(item);
+
+  QtProperty *attenuationItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("attenuation"));
+  this->propTreeBrowser->addProperty(attenuationItem);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("constant"));
+  if (_msg.has_attenuation_constant())
+    item->setValue(_msg.attenuation_constant());
+  attenuationItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("linear"));
+  if (_msg.has_attenuation_linear())
+    item->setValue(_msg.attenuation_linear());
+  attenuationItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("quadratic"));
+  if (_msg.has_attenuation_quadratic())
+    item->setValue(_msg.attenuation_quadratic());
+  attenuationItem->addSubProperty(item);
+
+  if (_msg.has_spot_inner_angle() || _msg.has_spot_outer_angle() ||
+      _msg.has_spot_falloff())
+  {
+    QtProperty *spotItem = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("spot light"));
+    this->propTreeBrowser->addProperty(spotItem);
+
+    item = this->variantManager->addProperty(QVariant::Double,
+                                             tr("inner angle"));
+    if (_msg.has_spot_inner_angle())
+      item->setValue(_msg.spot_inner_angle());
+    spotItem->addSubProperty(item);
+
+    item = this->variantManager->addProperty(QVariant::Double,
+                                             tr("outer angle"));
+    if (_msg.has_spot_outer_angle())
+      item->setValue(_msg.spot_outer_angle());
+    spotItem->addSubProperty(item);
+
+    item = this->variantManager->addProperty(QVariant::Double,
+                                             tr("falloff"));
+    if (_msg.has_spot_falloff())
+      item->setValue(_msg.spot_falloff());
+    spotItem->addSubProperty(item);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ProcessLightMsgs()
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+  for (LightMsgs_L::iterator iter = this->lightMsgs.begin();
+       iter != this->lightMsgs.end(); ++iter)
+  {
+    std::string name = (*iter).name();
+
+    QTreeWidgetItem *listItem = this->GetListItem((*iter).name(),
+                                                  this->lightsItem);
+
+    if (!listItem)
+    {
+      // Create a top-level tree item for the path
+      QTreeWidgetItem *item = new QTreeWidgetItem(this->lightsItem,
+          QStringList(QString("%1").arg(QString::fromStdString(name))));
+
+      item->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
+      this->modelTreeWidget->addTopLevelItem(item);
+    }
+    else
+    {
+      listItem->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
+    }
+  }
+  this->lightMsgs.clear();
 }
