@@ -336,8 +336,8 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
     if (!dependXML)
       return;
 
-    for(TiXmlElement *depXML = dependXML->FirstChildElement("model");
-        depXML; depXML = depXML->NextSiblingElement())
+    for (TiXmlElement *depXML = dependXML->FirstChildElement("model");
+         depXML; depXML = depXML->NextSiblingElement())
     {
       TiXmlElement *uriXML = depXML->FirstChildElement("uri");
       if (uriXML)

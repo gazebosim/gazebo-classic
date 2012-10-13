@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #include "ServerFixture.hh"
 #include "physics/physics.hh"
@@ -73,7 +73,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -82,7 +82,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -107,7 +107,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -116,7 +116,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -164,7 +164,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -173,7 +173,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -210,7 +210,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -219,7 +219,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -256,7 +256,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -265,7 +265,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -302,7 +302,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -311,7 +311,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -348,7 +348,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -357,7 +357,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -374,7 +374,7 @@ TEST_F(PhysicsTest, State)
         << "        </limit>\n"
         << "      </axis>\n"
         << "    </joint>\n"
-        << "    <joint name='joint_5a2b' type='revolute'>\n" // loop closer
+        << "    <joint name='joint_5a2b' type='revolute'>\n"  // loop closer
         << "      <parent>link_5a</parent>\n"
         << "      <child>link_2b</child>\n"
         << "      <axis>\n"
@@ -405,7 +405,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -414,7 +414,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -451,7 +451,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -460,7 +460,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -496,7 +496,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -505,7 +505,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -548,7 +548,7 @@ TEST_F(PhysicsTest, State)
     world->EnablePhysicsEngine(false);
 
     physics::ModelPtr model = world->GetModel("model_1");
-    while(!model)
+    while (!model)
     {
       model = world->GetModel("model_1");
       gzdbg << "waiting for model_1 to spawn\n";
@@ -590,7 +590,8 @@ TEST_F(PhysicsTest, State)
     double last_update_time;
     double elapsed_wall_time;
 
-    srand(time(NULL));
+    srand_r(seed)(time(NULL));
+    int seed = time(NULL);
 
 
 
@@ -611,23 +612,25 @@ TEST_F(PhysicsTest, State)
     pub_rate = 1.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Joint::SetAngle at ["
-          << pub_rate << "] Hz in real time, to all joint, should diverge.\n";
+      << pub_rate << "] Hz in real time, to all joint, should diverge.\n";
     last_update_time = start_wall_time;
-    while(world->GetRealTime().Double() < start_wall_time + test_duration)
-    if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetRealTime().Double();
+    while (world->GetRealTime().Double() < start_wall_time + test_duration)
+      if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
+      {
+        last_update_time = world->GetRealTime().Double();
 
-      int n = model->GetJointCount();
-      for (int i = 0; i < n; ++i)
-        model->GetJoint(i)->SetAngle(0, 0.1*double(rand())/double(RAND_MAX));
-    }
+        int n = model->GetJointCount();
+        for (int i = 0; i < n; ++i)
+          model->GetJoint(i)->SetAngle(0,
+              0.1*static_cast<double>(rand_r(seed)())/
+              static_cast<double>(RAND_MAX));
+      }
     test_duration = world->GetSimTime().Double() - start_time;
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
 
 
@@ -641,12 +644,12 @@ TEST_F(PhysicsTest, State)
 
 
     /* set all link velocities to 0
-    std::vector<physics::LinkPtr> links = model->GetAllLinks();
-    for (unsigned i = 0; i < links.size(); ++i)
-    {
-      links[i]->SetLinearVel(math::Vector3(0, 0, 0));
-      links[i]->SetAngularVel(math::Vector3(0, 0, 0));
-    } */
+       std::vector<physics::LinkPtr> links = model->GetAllLinks();
+       for (unsigned i = 0; i < links.size(); ++i)
+       {
+       links[i]->SetLinearVel(math::Vector3(0, 0, 0));
+       links[i]->SetAngularVel(math::Vector3(0, 0, 0));
+       } */
 
 
     start_time = world->GetSimTime().Double();
@@ -655,24 +658,25 @@ TEST_F(PhysicsTest, State)
     pub_rate = 0.5;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Joint::SetAngle at ["
-          << pub_rate << "] Hz to non-loop joints, should have no violation.\n";
+      << pub_rate << "] Hz to non-loop joints, should have no violation.\n";
     last_update_time = start_time;
-    while(world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-
-      last_update_time = world->GetSimTime().Double();
-      double a = 0.50*(2.0*double(rand())/double(RAND_MAX) - 1.0);
-      joint_01->SetAngle(0, a);
-      // joint_12->SetAngle(0, a);
-      // joint_23->SetAngle(0, a);
-      // joint_2a2->SetAngle(0, a);
-    }
+    while (world->GetSimTime().Double() < start_time + test_duration)
+      if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+      {
+        last_update_time = world->GetSimTime().Double();
+        double a = 0.50*(2.0*
+            static_cast<double>(rand_r(seed)())/
+            static_cast<double>(RAND_MAX) - 1.0);
+        joint_01->SetAngle(0, a);
+        // joint_12->SetAngle(0, a);
+        // joint_23->SetAngle(0, a);
+        // joint_2a2->SetAngle(0, a);
+      }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
     // EXPECT_EQ(joint_5a2b->GetAngle(0).Radian(), 0.0);
     Unload();
