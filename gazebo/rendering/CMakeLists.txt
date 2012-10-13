@@ -8,7 +8,6 @@ include_directories(SYSTEM
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)
-  message (STATUS "STUFF||${OGRE_VERSION}||")
   add_subdirectory(deferred_shading)
 endif()
 add_subdirectory(skyx)

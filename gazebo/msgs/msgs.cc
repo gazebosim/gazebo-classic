@@ -453,8 +453,8 @@ namespace gazebo
               geomElem->GetValueDouble("scale"));
           geomMsg->mutable_image()->set_height(
               geomElem->GetValueDouble("height"));
-          geomMsg->mutable_image()->set_filename(
-              geomElem->GetValueString("filename"));
+          geomMsg->mutable_image()->set_uri(
+              geomElem->GetValueString("uri"));
         }
         else if (geomElem->GetName() == "heightmap")
         {
@@ -464,7 +464,7 @@ namespace gazebo
           msgs::Set(geomMsg->mutable_heightmap()->mutable_origin(),
               geomElem->GetValueVector3("pos"));
 
-          common::Image img(geomElem->GetValueString("filename"));
+          common::Image img(geomElem->GetValueString("uri"));
           msgs::Set(geomMsg->mutable_heightmap()->mutable_image(), img);
 
           sdf::ElementPtr textureElem = geomElem->GetElement("texture");
