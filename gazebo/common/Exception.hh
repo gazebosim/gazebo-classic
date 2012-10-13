@@ -33,8 +33,8 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    /// \brief Throws an error macro that an exception with the file name and
-    /// line number
+    /// \brief This macro logs an error to the throw stream and throws an exception 
+    ///  that contains  the file name and line number.
     #define gzthrow(msg) {std::ostringstream throwStream;\
       throwStream << msg << std::endl << std::flush;\
       throw gazebo::common::Exception(__FILE__, __LINE__, throwStream.str()); }
