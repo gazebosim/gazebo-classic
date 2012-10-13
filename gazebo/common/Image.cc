@@ -56,7 +56,13 @@ Image::Image(const std::string &_filename)
       gzerr << "Unable to find image[" << _filename << "]\n";
   }
   else
+  {
+      /// @todo: fixme: this error shows for any
+      /// regular constructor without a filename
+      /// a parameter, since it defaults to empty.
+      /// is this error really needed?
       gzerr << "Image filename is empty.\n";
+  }
 }
 
 //////////////////////////////////////////////////
