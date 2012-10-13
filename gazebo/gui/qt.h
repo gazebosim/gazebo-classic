@@ -33,5 +33,6 @@
 #include <QGroupBox>
 #include <QApplication>
 #include <qmainwindow.h>
+#include <QAction>
 
 #endif

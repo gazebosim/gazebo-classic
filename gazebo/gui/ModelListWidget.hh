@@ -66,7 +66,7 @@ namespace gazebo
       private: void OnModelUpdate(const msgs::Model &_msg);
       private: void OnRequest(ConstRequestPtr &_msg);
 
-      private: void OnPose(ConstPosePtr &_msg);
+      private: void OnLightMsg(ConstLightPtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);
@@ -92,6 +92,10 @@ namespace gazebo
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor);
 
+      private: void FillColorMsg(QtProperty *_item, msgs::Color *_msg);
+
+      private: void FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg);
+
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
 
@@ -115,7 +119,8 @@ namespace gazebo
 
       private: void RemoveEntity(const std::string &_name);
 
-      private: QTreeWidgetItem *GetModelListItem(const std::string &_name);
+      private: QTreeWidgetItem *GetListItem(const std::string &_name,
+                                            QTreeWidgetItem *_parent);
 
       private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parentItem);
@@ -127,12 +132,6 @@ namespace gazebo
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Joint &_msg,
-                                     QtProperty *_parent);
-
-      private: void FillVector3dProperty(const msgs::Vector3d &_msg,
-                                         QtProperty *_parent);
-
-      private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Surface &_msg,
@@ -147,21 +146,53 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Scene &_msg,
                                      QtProperty *_parent);
 
-      private: void ProcessPoseMsgs();
-      private: void ProcessModelMsgs();
+      private: void FillPropertyTree(const msgs::Physics &_msg,
+                                     QtProperty *_parent);
 
-      private: void InitTransport(const std::string &_name ="");
+      private: void FillPropertyTree(const msgs::Light &_msg,
+                                       QtProperty * /*_parent*/);
+
+      private: void FillVector3dProperty(const msgs::Vector3d &_msg,
+                                         QtProperty *_parent);
+
+      private: void FillPoseProperty(const msgs::Pose &_msg,
+                                     QtProperty *_parent);
+
+
+      private: void ProcessModelMsgs();
+      private: void ProcessLightMsgs();
+
+      public: void InitTransport(const std::string &_name ="");
       private: void ResetTree();
       private: void ResetScene();
+
+      /// \brief Called when a model property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void ModelPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a scene property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void ScenePropertyChanged(QtProperty *_item);
+
+      private: void LightPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a physics property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void PhysicsPropertyChanged(QtProperty *_item);
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr requestPub, modelPub;
+      private: transport::PublisherPtr requestPub;
+      private: transport::PublisherPtr modelPub;
+      private: transport::PublisherPtr scenePub;
+      private: transport::PublisherPtr physicsPub;
+      private: transport::PublisherPtr lightPub;
+
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
-      private: transport::SubscriberPtr poseSub;
+      private: transport::SubscriberPtr lightSub;
 
       private: QTreeWidgetItem *sceneItem;
       private: QTreeWidgetItem *physicsItem;
@@ -172,7 +203,7 @@ namespace gazebo
       private: QtVariantEditorFactory *variantFactory;
       private: boost::mutex *propMutex, *receiveMutex;
       private: sdf::ElementPtr sdfElement;
-      private: std::string selectedModelName;
+      private: std::string selectedEntityName;
       private: bool fillingPropertyTree;
       private: QtProperty *selectedProperty;
 
@@ -180,19 +211,23 @@ namespace gazebo
 
       private: std::vector<event::ConnectionPtr> connections;
 
-      typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
-      private: PoseMsgs_L poseMsgs;
-
       typedef std::list<msgs::Model> ModelMsgs_L;
       private: ModelMsgs_L modelMsgs;
+
+      typedef std::list<msgs::Light> LightMsgs_L;
+      private: LightMsgs_L lightMsgs;
 
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;
       private: msgs::Scene sceneMsg;
       private: msgs::Joint jointMsg;
+      private: msgs::Physics physicsMsg;
+      private: msgs::Light lightMsg;
 
       private: bool fillPropertyTree;
-      private: std::string fillType;
+      private: std::deque<std::string> fillTypes;
+
+      private: msgs::Light::LightType lightType;
     };
 
     class ModelListSheetDelegate: public QItemDelegate

@@ -230,8 +230,7 @@ void Base::RemoveChild(const std::string &_name)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin();
-       iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->GetScopedName() == _name)
       break;

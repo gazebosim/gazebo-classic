@@ -30,6 +30,7 @@
 #include "rendering/OrbitViewController.hh"
 #include "rendering/FPSViewController.hh"
 
+#include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/ModelRightMenu.hh"
 #include "gui/GuiEvents.hh"
@@ -222,10 +223,13 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     gui::Events::fullScreen(g_fullscreen);
   }
 
+  // Trigger a model delete if the Delete key was pressed, and a model
+  // is currently selected.
+  if (_event->key() == Qt::Key_Delete && this->selectedVis)
+    g_deleteAct->Signal(this->selectedVis->GetName());
+
   if (_event->key() == Qt::Key_Escape)
-  {
     event::Events::setSelectedEntity("");
-  }
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
@@ -249,9 +253,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->keyText = "";
 
   this->keyModifiers = _event->modifiers();
-
-  // if (!(this->keyModifiers & Qt::ControlModifier))
-  //  this->setCursor(Qt::ArrowCursor);
 
   if (this->keyModifiers & Qt::ControlModifier &&
       _event->key() == Qt::Key_Z)
@@ -355,8 +356,11 @@ void GLWidget::OnMousePressTranslate()
   {
     vis = vis->GetRootVisual();
     this->mouseMoveVisStartPose = vis->GetWorldPose();
-    this->mouseMoveVis = vis;
+
+    this->SetMouseMoveVisual(vis);
+
     this->scene->SelectVisual(this->mouseMoveVis->GetName());
+    event::Events::setSelectedEntity(vis->GetName());
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
   }
 }
@@ -366,7 +370,7 @@ void GLWidget::OnMousePressNormal()
 {
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
-  this->mouseMoveVis.reset();
+  this->SetMouseMoveVisual(rendering::VisualPtr());
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
@@ -374,7 +378,6 @@ void GLWidget::OnMousePressNormal()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressMakeEntity()
 {
-  // this->setCursor(Qt::ArrowCursor);
   if (this->entityMaker)
     this->entityMaker->OnMousePush(this->mouseEvent);
 }
@@ -601,7 +604,8 @@ void GLWidget::OnMouseReleaseTranslate()
     if (this->mouseMoveVis)
     {
       this->PublishVisualPose(this->mouseMoveVis);
-      this->mouseMoveVis.reset();
+      this->SetMouseMoveVisual(rendering::VisualPtr());
+      event::Events::setSelectedEntity("");
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
   }
@@ -669,7 +673,7 @@ void GLWidget::Clear()
   this->userCamera.reset();
   this->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
-  this->mouseMoveVis.reset();
+  this->SetMouseMoveVisual(rendering::VisualPtr());
   this->hoverVis.reset();
   this->keyModifiers = 0;
 }
@@ -719,7 +723,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
 {
   this->hoverVis.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
-  this->mouseMoveVis.reset();
+  this->SetMouseMoveVisual(rendering::VisualPtr());
 
   this->ViewScene(rendering::get_scene(_name));
 }
@@ -763,13 +767,11 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   }
   else if (_type == "mesh" && !_data.empty())
   {
-    std::cout << "MeshMaker[" << _data << "]\n";
     this->meshMaker.Init(_data);
     this->entityMaker = &this->meshMaker;
   }
   else if (_type == "model" && !_data.empty())
   {
-    std::cout << "ModelMake[" << _data << "]\n";
     this->modelMaker.InitFromFile(_data);
     this->entityMaker = &this->modelMaker;
   }
@@ -928,7 +930,7 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
     else
     {
       this->SetSelectedVisual(rendering::VisualPtr());
-      this->mouseMoveVis.reset();
+      this->SetMouseMoveVisual(rendering::VisualPtr());
     }
   }
 }
@@ -937,14 +939,22 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
   if (this->selectedVis)
-    this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+  {
+    this->selectedVis->SetHighlighted(false);
+  }
 
   this->selectedVis = _vis;
 
   if (this->selectedVis && !this->selectedVis->IsPlane())
   {
-    this->selectedVis->SetEmissive(common::Color(0.4, 0.4, 0.4));
+    this->selectedVis->SetHighlighted(true);
   }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::SetMouseMoveVisual(rendering::VisualPtr _vis)
+{
+  this->mouseMoveVis = _vis;
 }
 
 /////////////////////////////////////////////////
@@ -1057,6 +1067,6 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       this->SetSelectedVisual(rendering::VisualPtr());
     }
     if (this->mouseMoveVis && this->mouseMoveVis->GetName() == _msg->data())
-      this->mouseMoveVis.reset();
+      this->SetMouseMoveVisual(rendering::VisualPtr());
   }
 }

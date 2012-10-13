@@ -50,10 +50,8 @@ void Publication::AddSubscription(const NodePtr &_node)
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
          ++pubIter)
     {
-      if ((*pubIter)->GetLatching() && !(*pubIter)->GetPrevMsg().empty())
-      {
-        _node->HandleData(this->topic, (*pubIter)->GetPrevMsg());
-      }
+      if (!(*pubIter)->GetPrevMsg().empty())
+        _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsg());
     }
   }
 }
@@ -68,13 +66,14 @@ void Publication::AddSubscription(const CallbackHelperPtr &_callback)
   {
     this->callbacks.push_back(_callback);
 
-    std::vector<PublisherPtr>::iterator pubIter;
-    for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
-         ++pubIter)
+    if (_callback->GetLatching())
     {
-      if ((*pubIter)->GetLatching() || _callback->GetLatching())
+      std::vector<PublisherPtr>::iterator pubIter;
+      for (pubIter = this->publishers.begin();
+           pubIter != this->publishers.end(); ++pubIter)
       {
-        _callback->HandleData((*pubIter)->GetPrevMsg());
+        if (!(*pubIter)->GetPrevMsg().empty())
+          _callback->HandleData((*pubIter)->GetPrevMsg());
       }
     }
   }
