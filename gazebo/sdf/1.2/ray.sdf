@@ -6,11 +6,11 @@
     <element name="horizontal" required="1">
       <description></description>
 
-      <element name="samples" type="unsigned int" default="1" required="1">
+      <element name="samples" type="unsigned int" default="640" required="1">
         <description>The number of simulated rays to generate per complete laser sweep cycle.</description>
       </element>
 
-      <element name="resolution" type="double" default="1" required="0">
+      <element name="resolution" type="double" default="1" required="1">
         <description>This number is multiplied by samples to determine the number of range data points returned. If resolution is less than one, range data is interpolated. If resolution is greater than one, range data is averaged.</description>
       </element>
 

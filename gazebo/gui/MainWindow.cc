@@ -31,7 +31,6 @@
 #include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/LightListWidget.hh"
-#include "gui/WorldPropertiesWidget.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
 #include "gui/MainWindow.hh"
@@ -52,27 +51,6 @@ MainWindow::MainWindow()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
-  this->worldControlPub =
-    this->node->Advertise<msgs::WorldControl>("~/world_control");
-  this->serverControlPub =
-    this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection", 1);
-  this->scenePub =
-    this->node->Advertise<msgs::Scene>("~/scene", 1);
-
-  this->newEntitySub = this->node->Subscribe("~/model/info",
-      &MainWindow::OnModel, this);
-
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
-
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response",
-      &MainWindow::OnResponse, this, true);
-
-  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
-                                            &MainWindow::OnWorldModify, this);
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -85,35 +63,41 @@ MainWindow::MainWindow()
 
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
-  ModelListWidget *modelListWidget = new ModelListWidget(this);
+  this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
 
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
-  this->tabWidget->addTab(modelListWidget, "World");
+  this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
+  this->tabWidget->setMinimumWidth(250);
 
   this->renderWidget = new RenderWidget(mainWidget);
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
-  this->collapseButton = new QPushButton("<");
-  this->collapseButton->setObjectName("collapseButton");
-  this->collapseButton->setSizePolicy(QSizePolicy::Fixed,
-                                      QSizePolicy::Expanding);
+  QSplitter *splitter = new QSplitter(this);
+  splitter->addWidget(this->tabWidget);
+  splitter->addWidget(this->renderWidget);
+  QList<int> sizes;
+  sizes.push_back(300);
+  sizes.push_back(1000);
+  splitter->setSizes(sizes);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setCollapsible(1, false);
 
-  this->collapseButton->setFocusPolicy(Qt::NoFocus);
-  connect(this->collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
-
-  centerLayout->addWidget(this->tabWidget, .5);
-  centerLayout->addWidget(collapseButton, 0);
-  centerLayout->addWidget(this->renderWidget, 2);
+  centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
   centerLayout->setSpacing(0);
 
-  mainLayout->addLayout(centerLayout);
+  mainLayout->setSpacing(0);
+  mainLayout->addLayout(centerLayout, 1);
+  mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
+                        Qt::AlignBottom | Qt::AlignRight);
+
   mainWidget->setLayout(mainLayout);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
@@ -122,8 +106,6 @@ MainWindow::MainWindow()
   title += gui::get_world();
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
-
-  this->worldPropertiesWidget = NULL;
 
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
@@ -157,9 +139,40 @@ void MainWindow::Load()
 void MainWindow::Init()
 {
   this->renderWidget->show();
+
+  // Set the initial size of the window to 0.75 the desktop size,
+  // with a minimum value of 1024x768.
+  QSize winSize = QApplication::desktop()->size() * 0.75;
+  winSize.setWidth(std::max(1024, winSize.width()));
+  winSize.setHeight(std::max(768, winSize.height()));
+
+  this->resize(winSize);
+  this->modelListWidget->InitTransport();
+
+  this->worldControlPub =
+    this->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->serverControlPub =
+    this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+  this->selectionPub =
+    this->node->Advertise<msgs::Selection>("~/selection");
+  this->scenePub =
+    this->node->Advertise<msgs::Scene>("~/scene");
+
+  this->newEntitySub = this->node->Subscribe("~/model/info",
+      &MainWindow::OnModel, this, true);
+
+  this->statsSub =
+    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
+
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->responseSub = this->node->Subscribe("~/response",
+      &MainWindow::OnResponse, this);
+
+  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
+                                            &MainWindow::OnWorldModify, this);
+
   this->requestMsg = msgs::CreateRequest("entity_list");
   this->requestPub->Publish(*this->requestMsg);
-  this->resize(QApplication::desktop()->size() * 0.5);
 }
 
 /////////////////////////////////////////////////
@@ -171,7 +184,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   this->connections.clear();
 
-  delete this->worldPropertiesWidget;
   delete this->renderWidget;
 }
 
@@ -308,15 +320,6 @@ void MainWindow::OnResetWorld()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::EditWorldProperties()
-{
-  if (!this->worldPropertiesWidget)
-    this->worldPropertiesWidget = new WorldPropertiesWidget();
-
-  this->worldPropertiesWidget->show();
-}
-
-/////////////////////////////////////////////////
 void MainWindow::Arrow()
 {
   gui::Events::manipMode("select");
@@ -397,7 +400,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->renderWidget->showFullScreen();
     this->tabWidget->hide();
     this->menuBar->hide();
-    this->collapseButton->hide();
   }
   else
   {
@@ -405,7 +407,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->renderWidget->showNormal();
     this->tabWidget->show();
     this->menuBar->show();
-    this->collapseButton->show();
   }
 }
 
@@ -447,32 +448,34 @@ void MainWindow::ViewOrbit()
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
-  g_newAct = new QAction(tr("&New"), this);
+  /*g_newAct = new QAction(tr("&New World"), this);
   g_newAct->setShortcut(tr("Ctrl+N"));
   g_newAct->setStatusTip(tr("Create a new world"));
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
+  */
 
-  g_openAct = new QAction(tr("&Open"), this);
+  g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
-  g_importAct = new QAction(tr("&Import Mesh"), this);
+  /*g_importAct = new QAction(tr("&Import Mesh"), this);
   g_importAct->setShortcut(tr("Ctrl+I"));
   g_importAct->setStatusTip(tr("Import a Collada mesh"));
   connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
+  */
 
-
-  g_saveAct = new QAction(tr("&Save"), this);
+  /*
+  g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+  */
 
-  g_saveAsAct = new QAction(tr("Save &As"), this);
+  g_saveAsAct = new QAction(tr("Save World &As"), this);
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
   g_saveAsAct->setStatusTip(tr("Save world to new file"));
   connect(g_saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
-
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -601,9 +604,9 @@ void MainWindow::CreateActions()
   connect(g_viewFullScreenAct, SIGNAL(triggered()), this,
       SLOT(ViewFullScreen()));
 
-  g_viewFPSAct = new QAction(tr("FPS View Control"), this);
-  g_viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
-  connect(g_viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
+  // g_viewFPSAct = new QAction(tr("FPS View Control"), this);
+  // g_viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
+  // connect(g_viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
 
   g_viewOrbitAct = new QAction(tr("Orbit View Control"), this);
   g_viewOrbitAct->setStatusTip(tr("Orbit View Style"));
@@ -629,10 +632,10 @@ void MainWindow::CreateMenus()
   this->setMenuWidget(frame);
 
   this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  this->fileMenu->addAction(g_openAct);
-  this->fileMenu->addAction(g_importAct);
-  this->fileMenu->addAction(g_newAct);
-  this->fileMenu->addAction(g_saveAct);
+  // this->fileMenu->addAction(g_openAct);
+  // this->fileMenu->addAction(g_importAct);
+  // this->fileMenu->addAction(g_newAct);
+  // this->fileMenu->addAction(g_saveAct);
   this->fileMenu->addAction(g_saveAsAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(g_quitAct);
@@ -647,7 +650,7 @@ void MainWindow::CreateMenus()
   this->viewMenu->addAction(g_viewResetAct);
   this->viewMenu->addAction(g_viewFullScreenAct);
   this->viewMenu->addSeparator();
-  this->viewMenu->addAction(g_viewFPSAct);
+  // this->viewMenu->addAction(g_viewFPSAct);
   this->viewMenu->addAction(g_viewOrbitAct);
 
   this->menuBar->addSeparator();
@@ -875,25 +878,6 @@ void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnCollapse()
-{
-  /*
-  if (this->treeWidget->isVisible())
-  {
-    this->treeWidget->close();
-    this->collapseButton->setText(">");
-    this->collapseButton->setStyleSheet(tr("QPushButton{margin-left: 10px;}"));
-  }
-  else
-  {
-    this->treeWidget->show();
-    this->collapseButton->setText("<");
-    this->collapseButton->setStyleSheet("QPushButton{margin-left:0px;}");
-  }
-  */
 }
 
 /////////////////////////////////////////////////

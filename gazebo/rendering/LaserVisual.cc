@@ -77,3 +77,8 @@ void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
     angle += _msg->angle_step();
   }
 }
+
+/////////////////////////////////////////////////
+void LaserVisual::SetEmissive(const common::Color &/*_color*/)
+{
+}

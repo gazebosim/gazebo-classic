@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 // #include <signal.h>
 // #include "gui/Gui.hh"
@@ -79,7 +79,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -88,7 +88,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -113,7 +113,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -122,7 +122,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -169,7 +169,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -178,7 +178,7 @@ TEST_F(PhysicsTest, State)
         << "        <geometry>\n"
         << "          <box>\n"
         << "            <size>" << size.x << " " << size.y << " "
-                                << size.z << "</size>\n"
+        << size.z << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -244,22 +244,25 @@ TEST_F(PhysicsTest, State)
     pub_rate = 10.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Joint::SetAngle at ["
-          << pub_rate << "] Hz.\n";
+      << pub_rate << "] Hz.\n";
     last_update_time = start_time;
-    while(world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      joint_01->SetAngle(0, 0.707*(2*double(rand())/double(RAND_MAX)-1));
-      joint_12->SetAngle(0, 0.707*(2*double(rand())/double(RAND_MAX)-1));
-      joint_23->SetAngle(0, 0.707*(2*double(rand())/double(RAND_MAX)-1));
-      sleep(1);
-    }
+    while (world->GetSimTime().Double() < start_time + test_duration)
+      if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+      {
+        last_update_time = world->GetSimTime().Double();
+        joint_01->SetAngle(0, 0.707*(2*
+              static_cast<double>(rand())/static_cast<double>(RAND_MAX)-1));
+        joint_12->SetAngle(0, 0.707*(2*
+              static_cast<double>(rand())/static_cast<double>(RAND_MAX)-1));
+        joint_23->SetAngle(0, 0.707*(2*
+              static_cast<double>(rand())/static_cast<double>(RAND_MAX)-1));
+        sleep(1);
+      }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
 
 
@@ -274,19 +277,22 @@ TEST_F(PhysicsTest, State)
     gzdbg << " Publishing Joint::SetAngle as fast as possible, unthrottled.\n";
     last_update_time = start_wall_time;
     while(world->GetRealTime().Double() < start_wall_time + test_duration)
-    //if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
+      //if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
     {
       last_update_time = world->GetRealTime().Double();
-      joint_01->SetAngle(0, double(rand())/double(RAND_MAX));
-      joint_12->SetAngle(0, double(rand())/double(RAND_MAX));
-      joint_23->SetAngle(0, double(rand())/double(RAND_MAX));
+      joint_01->SetAngle(0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+      joint_12->SetAngle(0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+      joint_23->SetAngle(0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
     }
     test_duration = world->GetSimTime().Double() - start_time;
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
 
     world->EnablePhysicsEngine(true);
@@ -329,23 +335,23 @@ TEST_F(PhysicsTest, State)
     pub_rate = 2.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing SetWorld Pose at ["
-          << pub_rate << "] Hz without constraint violation.\n";
+      << pub_rate << "] Hz without constraint violation.\n";
     last_update_time = start_time;
-    while(world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      // gzdbg << "setting link poses without violation\n";
-      // double cur_time = world->GetSimTime().Double();
-      last_update_time = world->GetSimTime().Double();
-      link_1->SetWorldPose(math::Pose(0,    0, 3, 0, 0, 0));
-      link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0, 0, 0));
-      link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0, 0));
-    }
+    while (world->GetSimTime().Double() < start_time + test_duration)
+      if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+      {
+        // gzdbg << "setting link poses without violation\n";
+        // double cur_time = world->GetSimTime().Double();
+        last_update_time = world->GetSimTime().Double();
+        link_1->SetWorldPose(math::Pose(0,    0, 3, 0, 0, 0));
+        link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0, 0, 0));
+        link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0, 0));
+      }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
@@ -353,23 +359,23 @@ TEST_F(PhysicsTest, State)
     pub_rate = 1.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing SetWorld Pose at ["
-          << pub_rate << "] Hz without constraint violation.\n";
+      << pub_rate << "] Hz without constraint violation.\n";
     last_update_time = start_time;
-    while(world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      // gzdbg << "setting link poses without violation\n";
-      // double cur_time = world->GetSimTime().Double();
-      link_1->SetWorldPose(math::Pose(0,    0, 3, 0, 0, 0));
-      link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0, 0, 0));
-      link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0, 0));
-    }
+    while (world->GetSimTime().Double() < start_time + test_duration)
+      if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+      {
+        last_update_time = world->GetSimTime().Double();
+        // gzdbg << "setting link poses without violation\n";
+        // double cur_time = world->GetSimTime().Double();
+        link_1->SetWorldPose(math::Pose(0,    0, 3, 0, 0, 0));
+        link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0, 0, 0));
+        link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0, 0));
+      }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
 
     // set random pose within joint limit
@@ -379,66 +385,75 @@ TEST_F(PhysicsTest, State)
     pub_rate = 2.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing SetWorld Pose at ["
-          << pub_rate << "] Hz with small constraint violation.\n";
+      << pub_rate << "] Hz with small constraint violation.\n";
     last_update_time = start_time;
-    while(world->GetSimTime().Double() < start_time + test_duration)
-    //if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+    while (world->GetSimTime().Double() < start_time + test_duration)
+      // if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
     {
       last_update_time = world->GetSimTime().Double();
       math::Pose p;
-      p = math::Pose(double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 3.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX));
+      p = math::Pose(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_1->SetWorldPose(p);
-      p = math::Pose(double(rand())/double(RAND_MAX) + 1.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 3.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX));
+      p = math::Pose(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_2->SetWorldPose(p);
-      p = math::Pose(double(rand())/double(RAND_MAX) + 2.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 3.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX));
+      p = math::Pose(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 2.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_3->SetWorldPose(p);
 
       math::Vector3 v;
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_1->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_1->SetLinearVel( v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_2->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_2->SetLinearVel( v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_3->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_3->SetLinearVel( v);
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+      link_3->SetLinearVel(v);
     }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
 
 
@@ -449,66 +464,75 @@ TEST_F(PhysicsTest, State)
     pub_rate = 2.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing SetWorld Pose at ["
-          << pub_rate << "] Hz with more constraint violation.\n";
+      << pub_rate << "] Hz with more constraint violation.\n";
     last_update_time = start_time;
     while(world->GetSimTime().Double() < start_time + test_duration)
-    //if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+      //if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
     {
       last_update_time = world->GetSimTime().Double();
       math::Pose p;
-      p = math::Pose(double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 3.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 1.57079,
-                     double(rand())/double(RAND_MAX));
+      p = math::Pose(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 3.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.57079,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_1->SetWorldPose(p);
-      p = math::Pose(double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 2.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 1.57079,
-                     double(rand())/double(RAND_MAX));
+      p = math::Pose(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 2.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.57079,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_2->SetWorldPose(p);
-      p = math::Pose(double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 1.0,
-                     double(rand())/double(RAND_MAX),
-                     double(rand())/double(RAND_MAX) + 1.57079,
-                     double(rand())/double(RAND_MAX));
+      p = math::Pose(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.57079,
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_3->SetWorldPose(p);
 
       math::Vector3 v;
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_1->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_1->SetLinearVel( v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_2->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_2->SetLinearVel( v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
       link_3->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_3->SetLinearVel( v);
+      v = math::Vector3(
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+          static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+      link_3->SetLinearVel(v);
     }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
 
 
@@ -518,44 +542,50 @@ TEST_F(PhysicsTest, State)
     pub_rate = 1000.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Set*Vel at ["
-          << pub_rate << "] Hz with random values.\n";
+      << pub_rate << "] Hz with random values.\n";
     last_update_time = start_time;
     while(world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      // gzdbg << "setting link poses with violation\n";
-      math::Vector3 v;
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_1->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_1->SetLinearVel( v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_2->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_2->SetLinearVel( v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_3->SetAngularVel(v);
-      v = math::Vector3(double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX),
-                        double(rand())/double(RAND_MAX));
-      link_3->SetLinearVel( v);
-    }
+      if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+      {
+        last_update_time = world->GetSimTime().Double();
+        // gzdbg << "setting link poses with violation\n";
+        math::Vector3 v;
+        v = math::Vector3(
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+        link_1->SetAngularVel(v);
+        v = math::Vector3(
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+        link_1->SetLinearVel( v);
+        v = math::Vector3(
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+        link_2->SetAngularVel(v);
+        v = math::Vector3(
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+        link_2->SetLinearVel( v);
+        v = math::Vector3(
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+        link_3->SetAngularVel(v);
+        v = math::Vector3(
+            stastic_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX),
+            static_cast<double>(rand())/static_cast<double>(RAND_MAX));
+        link_3->SetLinearVel(v);
+      }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
@@ -563,27 +593,28 @@ TEST_F(PhysicsTest, State)
     pub_rate = 500.0;
     gzdbg << " -------------------------------------------------------------\n";
     gzdbg << " Publishing Set*Vel at ["
-          << pub_rate << "] Hz with velocity decay.\n";
+      << pub_rate << "] Hz with velocity decay.\n";
     last_update_time = start_time;
-    while(world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      // gzdbg << "setting link poses with violation\n";
-      link_1->SetAngularVel(link_1->GetWorldAngularVel() * 0.999);
-      link_1->SetLinearVel( link_1->GetWorldLinearVel()  * 0.999);
-      link_2->SetAngularVel(link_2->GetWorldAngularVel() * 0.999);
-      link_2->SetLinearVel( link_2->GetWorldLinearVel()  * 0.999);
-      link_3->SetAngularVel(link_3->GetWorldAngularVel() * 0.999);
-      link_3->SetLinearVel( link_3->GetWorldLinearVel()  * 0.999);
-    }
+    while (world->GetSimTime().Double() < start_time + test_duration)
+      if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+      {
+        last_update_time = world->GetSimTime().Double();
+        // gzdbg << "setting link poses with violation\n";
+        link_1->SetAngularVel(link_1->GetWorldAngularVel() * 0.999);
+        link_1->SetLinearVel(link_1->GetWorldLinearVel()  * 0.999);
+        link_2->SetAngularVel(link_2->GetWorldAngularVel() * 0.999);
+        link_2->SetLinearVel(link_2->GetWorldLinearVel()  * 0.999);
+        link_3->SetAngularVel(link_3->GetWorldAngularVel() * 0.999);
+        link_3->SetLinearVel(link_3->GetWorldLinearVel()  * 0.999);
+      }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
-          << "] elapsed wall time [" << elapsed_wall_time
-          << "] sim performance [" << test_duration / elapsed_wall_time
-          << "]\n";
+      << "] elapsed wall time [" << elapsed_wall_time
+      << "] sim performance [" << test_duration / elapsed_wall_time
+      << "]\n";
 
-    EXPECT_EQ(link_3->GetWorldPose(), math::Pose(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
+    EXPECT_EQ(link_3->GetWorldPose(),
+        math::Pose(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
     Unload();
   }
 }

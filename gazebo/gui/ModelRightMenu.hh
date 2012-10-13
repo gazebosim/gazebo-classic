@@ -37,7 +37,7 @@ namespace gazebo
 
       private slots: void OnSnapBelow();
       private slots: void OnMoveTo();
-      private slots: void OnDelete();
+      private slots: void OnDelete(const std::string &_name="");
       private slots: void OnFollow();
       private slots: void OnShowCollision();
       private slots: void OnShowJoints();
@@ -50,7 +50,6 @@ namespace gazebo
 
       private: QAction *snapBelowAction;
       private: QAction *moveToAction;
-      private: QAction *deleteAction;
       private: QAction *followAction;
       private: QAction *showCollisionAction;
       private: QAction *transparentAction;

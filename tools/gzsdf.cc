@@ -150,6 +150,7 @@ int main(int argc, char** argv)
     std::cerr << "Error: Unknown option[" << params[0] << "]\n";
   }
 
-  std::cout << "Success\n";
+  if (params[0] != "print" && params[0] != "doc")
+    std::cout << "Success\n";
   return 0;
 }

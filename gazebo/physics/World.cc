@@ -1104,7 +1104,9 @@ void World::ProcessRequestMsgs()
       send = false;
 
     if (send)
+    {
       this->responsePub->Publish(response);
+    }
   }
 
   this->requestMsgs.clear();
