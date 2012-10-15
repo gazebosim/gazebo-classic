@@ -217,9 +217,9 @@ const SubMesh *Mesh::GetSubMesh(unsigned int i) const
 }
 
 //////////////////////////////////////////////////
-unsigned int Mesh::AddMaterial(Material *_mat)
+int Mesh::AddMaterial(Material *_mat)
 {
-  int result = 0;
+  int result = -1;
 
   if (_mat)
   {

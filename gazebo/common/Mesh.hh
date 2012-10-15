@@ -80,8 +80,8 @@ namespace gazebo
       public: unsigned int GetSubMeshCount() const;
 
       /// \brief Add a material to the mesh
-      /// \return Index of this material
-      public: unsigned int AddMaterial(Material *_mat);
+      /// \return Index of this material, -1 when _mat is NULL.
+      public: int AddMaterial(Material *_mat);
 
       /// \brief Get the number of materials
       public: unsigned int GetMaterialCount() const;

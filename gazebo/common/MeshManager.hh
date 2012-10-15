@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <boost/thread/mutex.hpp>
 
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
@@ -120,6 +121,8 @@ namespace gazebo
       private: std::map<std::string, Mesh*> meshes;
 
       private: std::vector<std::string> fileExtensions;
+
+      private: boost::mutex mutex;
 
       // Singleton implementation
       private: friend class SingletonT<MeshManager>;

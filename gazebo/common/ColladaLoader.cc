@@ -110,7 +110,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
   TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
   while (nodeXml)
   {
-    this->LoadNode(nodeXml , _mesh, math::Matrix4::IDENTITY);
+    this->LoadNode(nodeXml, _mesh, math::Matrix4::IDENTITY);
     nodeXml = nodeXml->NextSiblingElement("node");
   }
 }
@@ -795,9 +795,6 @@ void ColladaLoader::LoadVertices(const std::string &_id,
   TiXmlElement *verticesXml = this->GetElementId(this->colladaXml,
                                                  "vertices", _id);
 
-  _verts.clear();
-  _norms.clear();
-
   if (!verticesXml)
   {
     gzerr << "Unable to find vertices[" << _id << "] in collada file\n";
@@ -855,8 +852,6 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     const math::Matrix4 &_transform,
     std::vector<math::Vector3> &_values)
 {
-  _values.clear();
-
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
   {
@@ -1092,8 +1087,11 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     if (iter != this->materialMap.end())
       matStr = iter->second;
 
-    unsigned int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
-    subMesh->SetMaterialIndex(matIndex);
+    int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
+    if (matIndex < 0)
+      gzwarn << "Unable to add material[" << matStr << "]\n";
+    else
+      subMesh->SetMaterialIndex(matIndex);
   }
 
   TiXmlElement *polylistInputXml = _polylistXml->FirstChildElement("input");
@@ -1259,8 +1257,11 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     if (iter != this->materialMap.end())
       matStr = iter->second;
 
-    unsigned int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
-    subMesh->SetMaterialIndex(matIndex);
+    int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
+    if (matIndex < 0)
+      gzwarn << "Unable to add material[" << matStr << "]\n";
+    else
+      subMesh->SetMaterialIndex(matIndex);
   }
 
   TiXmlElement *trianglesInputXml = _trianglesXml->FirstChildElement("input");
@@ -1315,7 +1316,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
 
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
-  for (unsigned int j = 0; j < strs.size(); j+= inputs.size())
+  for (unsigned int j = 0; j < strs.size(); j += inputs.size())
   {
     for (unsigned int i = 0; i < inputs.size(); i++)
       values[i] = math::parseInt(strs[j+i]);
