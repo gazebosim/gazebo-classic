@@ -108,7 +108,7 @@ namespace SkyX { namespace VClouds
 
             if (!delayedResponse)
             {
-              c[uu][vv][w].cld = Ogre::Math::RangeRandom(0,1) > length ? true : false;
+              c[uu][vv][w].cld = Ogre::Math::RangeRandom(0, 1) > length ? true : false;
             }
           }
         }

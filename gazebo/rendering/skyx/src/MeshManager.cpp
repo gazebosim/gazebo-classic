@@ -135,7 +135,7 @@ namespace SkyX
     int x, y;
 
     // Above-horizon
-    for(y=0;y<mCircles-mUnderHorizonCircles;y++)
+    for (y=0;y<mCircles-mUnderHorizonCircles;y++)
     {
       currentTethaAngle = Ogre::Math::PI/2 - AngleStep*(y+1);
 
@@ -144,7 +144,7 @@ namespace SkyX
 
       uvr = static_cast<float>(y+1)/(mCircles-mUnderHorizonCircles);
 
-      for(x=0;x<mSteps;x++)
+      for (x=0;x<mSteps;x++)
       {
         currentPhiAngle = Ogre::Math::TWO_PI * x / mSteps;
 
@@ -169,7 +169,7 @@ namespace SkyX
     float op; // Opacity
 
     // Under-horizon
-    for(y=mCircles-mUnderHorizonCircles;y<mCircles;y++)
+    for (y=mCircles-mUnderHorizonCircles;y<mCircles;y++)
     {
       currentTethaAngle = Ogre::Math::PI/2 - AngleStep*(y+1);
 
@@ -180,7 +180,7 @@ namespace SkyX
 
       op = Ogre::Math::Clamp<Ogre::Real>(Ogre::Math::Pow(static_cast<Ogre::Real>(mCircles-y-1) / mUnderHorizonCircles, mUnderHorizonFadingExponent)*mUnderHorizonFadingMultiplier, 0, 1);
 
-      for(x=0;x<mSteps;x++)
+      for (x=0;x<mSteps;x++)
       {
         currentPhiAngle = Ogre::Math::TWO_PI * x / mSteps;
 
@@ -266,9 +266,9 @@ namespace SkyX
 
     unsigned short *twoface;
 
-    for(int y=0; y<mCircles-1; y++)
+    for (int y=0; y<mCircles-1; y++)
     {
-        for(int x=0; x<mSteps; x++)
+        for (int x=0; x<mSteps; x++)
       {
           twoface = indexbuffer + (y*mSteps+x)*6 + 3 * mSteps;
 

@@ -25,7 +25,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX { namespace VClouds
 {
-    FastFakeRandom::FastFakeRandom(const int &n, const Ogre::Real &min, const Ogre::Real &max)
+    FastFakeRandom::FastFakeRandom(const int &n, const Ogre::Real &min,
+        const Ogre::Real &max)
         : mCapacity(n)
         , mIndex(-1)
     {
@@ -42,11 +43,14 @@ namespace SkyX { namespace VClouds
         delete [] mData;
     }
 
-    float& FastFakeRandom::get() 
+    float& FastFakeRandom::get()
     {
-        mIndex ++; if (mIndex >= mCapacity) {mIndex = 0;}
+      mIndex ++;
+      if (mIndex >= mCapacity)
+      {
+        mIndex = 0;
+      }
 
-        return mData[mIndex];
+      return mData[mIndex];
     }
-
 }}

@@ -27,7 +27,6 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX { namespace VClouds
 {
-
     GeometryManager::GeometryManager(VClouds* vc)
         : mVClouds(vc)
         , mCreated(false)
@@ -39,7 +38,7 @@ namespace SkyX { namespace VClouds
         , mNumberOfBlocks(0)
         , mNa(0), mNb(0), mNc(0)
         , mA(0), mB(0), mC(0)
-        , mWorldOffset(Ogre::Vector2(0,0))
+        , mWorldOffset(Ogre::Vector2(0, 0))
     {
     }
 
@@ -48,9 +47,11 @@ namespace SkyX { namespace VClouds
         remove();
     }
 
-    void GeometryManager::create(const Ogre::Vector2& Height, const float& Radius,
-            const Ogre::Radian& Alpha, const Ogre::Radian& Beta, 
-            const int& NumberOfBlocks, const int& Na, const int& Nb, const int& Nc)
+    void GeometryManager::create(const Ogre::Vector2& Height,
+            const float& Radius,
+            const Ogre::Radian& Alpha, const Ogre::Radian& Beta,
+            const int& NumberOfBlocks, const int& Na, const int& Nb,
+            const int& Nc)
     {
         remove();
 
@@ -62,7 +63,8 @@ namespace SkyX { namespace VClouds
         mNumberOfBlocks = NumberOfBlocks;
         mNa = Na; mNb = Nb; mNc = Nc;
 
-        mSceneNode = mVClouds->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+        mSceneNode = mVClouds->getSceneManager()->getRootSceneNode()->
+          createChildSceneNode();
         _createGeometry();
 
         mCreated = true;
@@ -76,7 +78,8 @@ namespace SkyX { namespace VClouds
         }
 
         mSceneNode->detachAllObjects();
-        mSceneNode->getParentSceneNode()->removeAndDestroyChild(mSceneNode->getName());
+        mSceneNode->getParentSceneNode()->removeAndDestroyChild(
+            mSceneNode->getName());
         mSceneNode = 0;
 
         for (int k = 0; k < mNumberOfBlocks; k++)
@@ -97,17 +100,20 @@ namespace SkyX { namespace VClouds
             return;
         }
 
-        mWorldOffset += mVClouds->getWindDirectionV2() * mVClouds->getWindSpeed() * timeSinceLastFrame;
+        mWorldOffset += mVClouds->getWindDirectionV2() *
+          mVClouds->getWindSpeed() * timeSinceLastFrame;
     }
 
-    void GeometryManager::updateGeometry(Ogre::Camera* c, const Ogre::Real& timeSinceLastCameraFrame)
+    void GeometryManager::updateGeometry(Ogre::Camera* c,
+        const Ogre::Real& timeSinceLastCameraFrame)
     {
         if (!mCreated)
         {
             return;
         }
 
-        mSceneNode->setPosition(mVClouds->getCamera()->getDerivedPosition().x, mVClouds->getCamera()->getDerivedPosition().y, mHeight.x);
+        mSceneNode->setPosition(mVClouds->getCamera()->getDerivedPosition().x,
+            mVClouds->getCamera()->getDerivedPosition().y, mHeight.x);
         mSceneNode->_update(false, false);
 
         _updateGeometry(c, timeSinceLastCameraFrame);
@@ -115,7 +121,7 @@ namespace SkyX { namespace VClouds
 
     void GeometryManager::_setMaterialName(const Ogre::String& mn)
     {
-        for(Ogre::uint32 k = 0; k < mGeometryBlocks.size(); k++)
+        for (Ogre::uint32 k = 0; k < mGeometryBlocks.size(); k++)
         {
             mGeometryBlocks.at(k)->getEntity()->setMaterialName(mn);
         }
@@ -123,7 +129,7 @@ namespace SkyX { namespace VClouds
 
     void GeometryManager::_updateRenderQueueGroup(const Ogre::uint8& rqg)
     {
-        for(Ogre::uint32 k = 0; k < mGeometryBlocks.size(); k++)
+        for (Ogre::uint32 k = 0; k < mGeometryBlocks.size(); k++)
         {
             mGeometryBlocks.at(k)->getEntity()->setRenderQueueGroup(rqg);
         }
@@ -131,27 +137,35 @@ namespace SkyX { namespace VClouds
 
     void GeometryManager::_createGeometry()
     {
-        mA = mHeight.y / Ogre::Math::Cos(Ogre::Math::PI/2-mBeta.valueRadians());
-        mB = mHeight.y / Ogre::Math::Cos(Ogre::Math::PI/2-mAlpha.valueRadians());
+        mA = mHeight.y /
+          Ogre::Math::Cos(Ogre::Math::PI/2-mBeta.valueRadians());
+        mB = mHeight.y /
+          Ogre::Math::Cos(Ogre::Math::PI/2-mAlpha.valueRadians());
         mC = mRadius;
 
         for (int k = 0; k < mNumberOfBlocks; k++)
         {
-            mGeometryBlocks.push_back(new GeometryBlock(mVClouds, mHeight.y, mAlpha, mBeta, mRadius, mPhi, mNa, mNb, mNc, mA, mB, mC, k));
+            mGeometryBlocks.push_back(new GeometryBlock(mVClouds,
+                  mHeight.y, mAlpha, mBeta, mRadius, mPhi, mNa, mNb, mNc,
+                  mA, mB, mC, k));
             mGeometryBlocks.at(k)->create();
-            // Each geometry block must be in a different scene node, See: GeometryBlock::isInFrustum(Ogre::Camera *c)
+            // Each geometry block must be in a different scene node,
+            // See: GeometryBlock::isInFrustum(Ogre::Camera *c)
             Ogre::SceneNode *sn = mSceneNode->createChildSceneNode();
             sn->attachObject(mGeometryBlocks.at(k)->getEntity());
         }
     }
 
-    void GeometryManager::_updateGeometry(Ogre::Camera* c, const Ogre::Real& timeSinceLastFrame)
+    void GeometryManager::_updateGeometry(Ogre::Camera* c,
+        const Ogre::Real& timeSinceLastFrame)
     {
         // Look for current camera data
-        std::vector<VClouds::CameraData>& camerasData = mVClouds->_getCamerasData();
+        std::vector<VClouds::CameraData>& camerasData =
+          mVClouds->_getCamerasData();
         std::vector<VClouds::CameraData>::iterator currentCameraDataIt;
 
-        for (currentCameraDataIt = camerasData.begin(); currentCameraDataIt != camerasData.end(); currentCameraDataIt++)
+        for (currentCameraDataIt = camerasData.begin();
+            currentCameraDataIt != camerasData.end(); currentCameraDataIt++)
         {
             if ((*currentCameraDataIt).camera == c)
             {
@@ -159,14 +173,20 @@ namespace SkyX { namespace VClouds
             }
         }
 
-        std::vector<VClouds::CameraData>::reference currentCameraData = (*currentCameraDataIt);
+        std::vector<VClouds::CameraData>::reference currentCameraData =
+          (*currentCameraDataIt);
 
         // Calculate wind offset
-        Ogre::Vector2 CameraDirection = Ogre::Vector2(c->getDerivedDirection().x, c->getDerivedDirection().y);
-        float offset = - CameraDirection.dotProduct(mVClouds->getWindDirectionV2()) * mVClouds->getWindSpeed() * timeSinceLastFrame;
+        Ogre::Vector2 CameraDirection =
+          Ogre::Vector2(c->getDerivedDirection().x, c->getDerivedDirection().y);
+        float offset = -CameraDirection.dotProduct(
+            mVClouds->getWindDirectionV2()) * mVClouds->getWindSpeed() *
+          timeSinceLastFrame;
 
         // Calculate camera offset
-        Ogre::Vector2 CameraOffset = Ogre::Vector2(c->getDerivedPosition().x - currentCameraData.lastPosition.x, c->getDerivedPosition().y - currentCameraData.lastPosition.y);
+        Ogre::Vector2 CameraOffset = Ogre::Vector2(
+            c->getDerivedPosition().x - currentCameraData.lastPosition.x,
+            c->getDerivedPosition().y - currentCameraData.lastPosition.y);
         offset -= CameraOffset.dotProduct(CameraDirection);
 
         // Update camera data
@@ -176,25 +196,36 @@ namespace SkyX { namespace VClouds
         // Update geometry displacement
         currentCameraData.geometryDisplacement += Ogre::Vector3(offset);
 
-        if (currentCameraData.geometryDisplacement.z < 0 || currentCameraData.geometryDisplacement.z > (mC-mB)/mNc)
+        if (currentCameraData.geometryDisplacement.z < 0 ||
+            currentCameraData.geometryDisplacement.z > (mC-mB)/mNc)
         {
-            currentCameraData.geometryDisplacement.z -= ((mC-mB)/mNc)*Ogre::Math::IFloor((currentCameraData.geometryDisplacement.z)/((mC-mB)/mNc));
+            currentCameraData.geometryDisplacement.z -=
+              ((mC-mB)/mNc)*Ogre::Math::IFloor(
+                (currentCameraData.geometryDisplacement.z)/((mC-mB)/mNc));
         }
 
-        if (currentCameraData.geometryDisplacement.y < 0 || currentCameraData.geometryDisplacement.y > (mB-mA)/mNb)
+        if (currentCameraData.geometryDisplacement.y < 0 ||
+            currentCameraData.geometryDisplacement.y > (mB-mA)/mNb)
         {
-            currentCameraData.geometryDisplacement.y -= ((mB-mA)/mNb)*Ogre::Math::IFloor((currentCameraData.geometryDisplacement.y)/((mB-mA)/mNb));
+            currentCameraData.geometryDisplacement.y -=
+              ((mB-mA)/mNb)*Ogre::Math::IFloor(
+                (currentCameraData.geometryDisplacement.y)/((mB-mA)/mNb));
         }
 
-        if (currentCameraData.geometryDisplacement.x < 0 || currentCameraData.geometryDisplacement.x > mA/mNa)
+        if (currentCameraData.geometryDisplacement.x < 0 ||
+            currentCameraData.geometryDisplacement.x > mA/mNa)
         {
-            currentCameraData.geometryDisplacement.x -= (mA/mNa)*Ogre::Math::IFloor((currentCameraData.geometryDisplacement.x)/(mA/mNa));
+            currentCameraData.geometryDisplacement.x -=
+              (mA/mNa)*Ogre::Math::IFloor(
+                  (currentCameraData.geometryDisplacement.x)/(mA/mNa));
         }
 
         for (int k = 0; k < mNumberOfBlocks; k++)
         {
-            mGeometryBlocks.at(k)->setWorldOffset(mWorldOffset + currentCameraData.cameraOffset);
-            mGeometryBlocks.at(k)->updateGeometry(c, currentCameraData.geometryDisplacement);
+            mGeometryBlocks.at(k)->setWorldOffset(
+                mWorldOffset + currentCameraData.cameraOffset);
+            mGeometryBlocks.at(k)->updateGeometry(c,
+                currentCameraData.geometryDisplacement);
         }
     }
 }}
