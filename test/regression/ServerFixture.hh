@@ -18,9 +18,11 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
+#define BOOST_FILESYSTEM_VERSION 2
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
 
 #include <map>
 #include <string>
@@ -36,7 +38,7 @@
 #include "msgs/msgs.hh"
 
 #include "gazebo_config.h"
-#include "src/Server.hh"
+#include "gazebo/Server.hh"
 
 #include "test_config.h"
 
@@ -54,6 +56,26 @@ class ServerFixture : public testing::Test
                this->gotImage = 0;
                this->imgData = NULL;
                this->serverThread = NULL;
+
+               common::SystemPaths::Instance()->AddGazeboPaths(
+                   TEST_REGRESSION_PATH);
+
+               // Add local search paths
+               std::string path = TEST_REGRESSION_PATH;
+               path += "/../..";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../sdf";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../gazebo";
+               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+
+               path = TEST_REGRESSION_PATH;
+               path += "/../../build/plugins";
+               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
              }
 
   protected: virtual void TearDown()
@@ -92,9 +114,6 @@ class ServerFixture : public testing::Test
                delete this->server;
                this->server = NULL;
 
-               common::SystemPaths::Instance()->AddGazeboPaths(
-                   TEST_REGRESSION_PATH);
-
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
                   boost::bind(&ServerFixture::RunServer, this, _worldFilename,
@@ -123,6 +142,7 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
+
                ASSERT_NO_THROW(this->server->Load(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);
@@ -333,27 +353,38 @@ class ServerFixture : public testing::Test
 
   protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 unsigned int _width = 320, unsigned int _height = 240,
+                 double _rate = 25)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
-                 << "<model name ='" << _modelName << "' static ='true'>"
-                 << "<origin pose ='" << _pos.x << " "
+               newModelStr << "<gazebo version ='1.2'>"
+                 << "<model name ='" << _modelName << "'>"
+                 << "<static>true</static>"
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
-                 << "' type ='camera' always_on ='1' update_rate ='25' "
-                 << "visualize ='true'>"
+                 << "' type ='camera'>"
+                 << "    <always_on>1</always_on>"
+                 << "    <update_rate>" << _rate << "</update_rate>"
+                 << "    <visualize>true</visualize>"
                  << "    <camera>"
-                 << "      <horizontal_fov angle ='0.78539816339744828'/>"
-                 << "      <image width ='320' height ='240' format ='R8G8B8'/>"
-                 << "      <clip near ='0.10000000000000001' far ='100'/>"
+                 << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+                 << "      <image>"
+                 << "        <width>" << _width << "</width>"
+                 << "        <height>" << _height << "</height>"
+                 << "        <format>R8G8B8</format>"
+                 << "      </image>"
+                 << "      <clip>"
+                 << "        <near>0.1</near><far>100</far>"
+                 << "      </clip>"
                  // << "      <save enabled ='true' path ='/tmp/camera/'/>"
                  << "    </camera>"
                  << "  </sensor>"
@@ -375,27 +406,27 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
-                 << "  <inertial mass ='1.0'>"
-                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
-                 << " iyz ='0' izz ='1'/>"
-                 << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <cylinder radius ='.5' length ='1.0'/>"
+                 << "      <cylinder>"
+                 << "        <radius>.5</radius><length>1.0</length>"
+                 << "      </cylinder>"
                  << "    </geometry>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
-                 << "      <cylinder radius ='.5' length ='1.0'/>"
+                 << "      <cylinder>"
+                 << "        <radius>.5</radius><length>1.0</length>"
+                 << "      </cylinder>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -417,27 +448,23 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
-                 << "  <inertial mass ='1.0'>"
-                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
-                 << " iyz ='0' izz ='1'/>"
-                 << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <sphere radius ='.5'/>"
+                 << "      <sphere><radius>.5</radius></sphere>"
                  << "    </geometry>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
-                 << "      <sphere radius ='.5'/>"
+                 << "      <sphere><radius>.5</radius></sphere>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -459,27 +486,23 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.0'>"
+               newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
-                 << "<origin pose ='" << _pos.x << " "
+                 << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
                                      << _rpy.y << " "
-                                     << _rpy.z << "'/>"
+                                     << _rpy.z << "</pose>"
                  << "<link name ='body'>"
-                 << "  <inertial mass ='1.0'>"
-                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
-                 << " iyz ='0' izz ='1'/>"
-                 << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <box size ='" << _size << "'/>"
+                 << "      <box><size>" << _size << "</size></box>"
                  << "    </geometry>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
-                 << "      <box size ='" << _size << "'/>"
+                 << "      <box><size>" << _size << "</size></box>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"

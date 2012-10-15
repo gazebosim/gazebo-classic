@@ -1,116 +1,24 @@
-<?xml version="1.0"?> 
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
-
     <scene>
-      <ambient rgba=".1 .1 .1 1"/>
-      <shadows enabled="false"/>
+      <ambient>.1 .1 .1 1</ambient>
+      <shadows>false</shadows>
     </scene>
-
     <physics type="bullet">
-      <gravity xyz="0 0 -9.8"/>
+      <gravity>0 0 -9.8</gravity>
       <bullet>
         <dt>0.001</dt>
       </bullet>
     </physics>
 
     <!-- A ground plane -->
-    <include filename="ground_plane.model"/>
-    <include filename="hokuyo.model"/>
+    <include><uri>model://ground_plane</uri></include>
+
+    <include filename="hokuyo.model" />
 
     <!-- A global light source -->
-    <include filename="sun.light"/>
-
-    <!--
-    <model name="box1">
-      <origin pose="0 0 2.5 0 0 0"/>
-      <link name="link">
-        <inertial mass="1.0"/>
-
-        <collision name="collision">
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-
-    <model name="box">
-      <origin pose="0 0 0.5 0 0 0"/>
-      <link name="link">
-        <inertial mass="1.0">
-          <origin pose="0 0 -0.5 0 0 0"/>
-        </inertial>
-
-        <collision name="collision">
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-    -->
-
-
-    <!--
-    <model name="sphere">
-      <origin pose="0 1.5 2.5 0 0 0"/>
-      <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="collision">
-          <geometry>
-            <sphere radius="0.5"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <sphere radius="0.5"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-
-    <model name="cylinder">
-      <origin pose="0 -1.5 2.5 0 0 0"/>
-      <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="collision">
-          <geometry>
-            <cylinder radius="0.5" length="1.0"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <cylinder radius="0.5" length="1.0"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-    -->
+    <include><uri>model://sun</uri></include>
 
   </world>
 </gazebo>

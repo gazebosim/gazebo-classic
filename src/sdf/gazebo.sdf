@@ -1,8 +1,0 @@
-<element name="gazebo" required="1">
-  <attribute name="version" type="string" default="1.0" required="1"/>
-
-  <include filename="world.sdf" required="*"/>
-  <include filename="model.sdf" required="*"/>
-  <include filename="light.sdf" required="*"/>
-
-</element> <!-- End Gazebo -->

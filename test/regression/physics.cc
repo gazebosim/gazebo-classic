@@ -37,9 +37,9 @@ TEST_F(PhysicsTest, State)
   physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
   math::Pose pose;
-  EXPECT_EQ(1, worldState.GetModelStateCount());
-  EXPECT_EQ(1, modelState.GetLinkStateCount());
-  EXPECT_EQ(1, linkState.GetCollisionStateCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), worldState.GetModelStateCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), modelState.GetLinkStateCount());
+  EXPECT_EQ(static_cast<unsigned int>(1), linkState.GetCollisionStateCount());
   EXPECT_EQ(pose, modelState.GetPose());
   EXPECT_EQ(pose, linkState.GetPose());
   EXPECT_EQ(pose, collisionState.GetPose());
@@ -68,6 +68,8 @@ TEST_F(PhysicsTest, State)
   // Move the box
   world->GetModel("box")->SetWorldPose(
       math::Pose(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0)));
+
+  gazebo::common::Time::MSleep(10);
 
   // Make sure the box has been moved
   physics::ModelState modelState2 = world->GetState().GetModelState("box");
@@ -103,7 +105,6 @@ TEST_F(PhysicsTest, CollisionTest)
     for (int i = 0; i < steps; i++)
     {
       double t = world->GetSimTime().Double();
-      // gzdbg << "debug v[" << v << "] x[" << z << "]\n";
 
       world->StepWorld(1);  // theoretical contact, but
       {
@@ -112,12 +113,12 @@ TEST_F(PhysicsTest, CollisionTest)
         {
           math::Vector3 vel = box_model->GetWorldLinearVel();
           math::Pose pose = box_model->GetWorldPose();
-          gzdbg << "box time [" << t
-                << "] sim x [" << pose.pos.x
-                << "] ideal x [" << x
-                << "] sim vx [" << vel.x
-                << "] ideal vx [" << v
-                << "]\n";
+          // gzdbg << "box time [" << t
+          //      << "] sim x [" << pose.pos.x
+          //      << "] ideal x [" << x
+          //      << "] sim vx [" << vel.x
+          //      << "] ideal vx [" << v
+          //      << "]\n";
 
           if (i == 0)
             box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
@@ -130,12 +131,12 @@ TEST_F(PhysicsTest, CollisionTest)
         {
           math::Vector3 vel = sphere_model->GetWorldLinearVel();
           math::Pose pose = sphere_model->GetWorldPose();
-          gzdbg << "sphere time [" << world->GetSimTime().Double()
-                << "] sim x [" << pose.pos.x
-                << "] ideal x [" << x
-                << "] sim vx [" << vel.x
-                << "] ideal vx [" << v
-                << "]\n";
+          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          //      << "] sim x [" << pose.pos.x
+          //      << "] ideal x [" << x
+          //      << "] sim vx [" << vel.x
+          //      << "] ideal vx [" << v
+          //      << "]\n";
           if (t < 1.001)
           {
             EXPECT_EQ(pose.pos.x, 2);
@@ -185,7 +186,6 @@ TEST_F(PhysicsTest, DropStuff)
       // integrate here to see when the collision should happen
       v = v + dt * g;
       z = z + dt * v;
-      // gzdbg << "debug v[" << v << "] x[" << z << "]\n";
 
       world->StepWorld(1);  // theoretical contact, but
       {
@@ -194,11 +194,11 @@ TEST_F(PhysicsTest, DropStuff)
         {
           math::Vector3 vel = box_model->GetWorldLinearVel();
           math::Pose pose = box_model->GetWorldPose();
-          gzdbg << "box time [" << world->GetSimTime().Double()
-                << "] sim z [" << pose.pos.z
-                << "] exact z [" << z
-                << "] sim vz [" << vel.z
-                << "] exact vz [" << v << "]\n";
+          // gzdbg << "box time [" << world->GetSimTime().Double()
+          //      << "] sim z [" << pose.pos.z
+          //      << "] exact z [" << z
+          //      << "] sim vz [" << vel.z
+          //      << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
             EXPECT_LT(fabs(vel.z - v) , 0.0001);
@@ -216,11 +216,11 @@ TEST_F(PhysicsTest, DropStuff)
         {
           math::Vector3 vel = sphere_model->GetWorldLinearVel();
           math::Pose pose = sphere_model->GetWorldPose();
-          gzdbg << "sphere time [" << world->GetSimTime().Double()
-                << "] sim z [" << pose.pos.z
-                << "] exact z [" << z
-                << "] sim vz [" << vel.z
-                << "] exact vz [" << v << "]\n";
+          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          //       << "] sim z [" << pose.pos.z
+          //       << "] exact z [" << z
+          //       << "] sim vz [" << vel.z
+          //       << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
             EXPECT_LT(fabs(vel.z - v), 0.0001);
@@ -238,11 +238,11 @@ TEST_F(PhysicsTest, DropStuff)
         {
           math::Vector3 vel = cylinder_model->GetWorldLinearVel();
           math::Pose pose = cylinder_model->GetWorldPose();
-          gzdbg << "cylinder time [" << world->GetSimTime().Double()
-                << "] sim z [" << pose.pos.z
-                << "] exact z [" << z
-                << "] sim vz [" << vel.z
-                << "] exact vz [" << v << "]\n";
+          // gzdbg << "cylinder time [" << world->GetSimTime().Double()
+          //       << "] sim z [" << pose.pos.z
+          //       << "] exact z [" << z
+          //       << "] sim vz [" << vel.z
+          //       << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
             EXPECT_LT(fabs(vel.z - v), 0.0001);
@@ -251,7 +251,7 @@ TEST_F(PhysicsTest, DropStuff)
           else
           {
             EXPECT_LT(fabs(vel.z), 0.011);
-            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.00001);
+            EXPECT_LT(fabs(pose.pos.z - 0.5), 0.0001);
           }
         }
       }
@@ -287,12 +287,12 @@ TEST_F(PhysicsTest, SimplePendulumTest)
     double pe = 9.81 * m * pos.pos.z;
     double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
     e_start = pe + ke;
-    gzdbg << "total energy [" << e_start
-          << "] pe[" << pe
-          << "] ke[" << ke
-          << "] p[" << pos.pos.z
-          << "] v[" << vel
-          << "]\n";
+    // gzdbg << "total energy [" << e_start
+    //       << "] pe[" << pe
+    //       << "] ke[" << ke
+    //       << "] p[" << pos.pos.z
+    //       << "] v[" << vel
+    //       << "]\n";
   }
   physicsEngine->SetStepTime(0.0001);
   physicsEngine->SetSORPGSIters(1000);
@@ -315,14 +315,14 @@ TEST_F(PhysicsTest, SimplePendulumTest)
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
-        gzdbg << "total energy [" << e
-              << "] pe[" << pe
-              << "] ke[" << ke
-              << "] p[" << pos.pos.z
-              << "] v[" << vel
-              << "] error[" << e - e_start
-              << "] tol[" << e_tol
-              << "]\n";
+        // gzdbg << "total energy [" << e
+        //       << "] pe[" << pe
+        //       << "] ke[" << ke
+        //       << "] p[" << pos.pos.z
+        //       << "] v[" << vel
+        //       << "] error[" << e - e_start
+        //       << "] tol[" << e_tol
+        //       << "]\n";
 
         EXPECT_LT(fabs(e - e_start), e_tol);
       }
@@ -333,12 +333,12 @@ TEST_F(PhysicsTest, SimplePendulumTest)
         double integ_theta = (
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).GetAsRadian();
-        gzdbg << "time [" << world->GetSimTime().Double()
-              << "] exact [" << integ_theta
-              << "] actual [" << actual_theta
-              << "] pose [" << model->GetWorldPose()
-              << "]\n";
+        double actual_theta = joint->GetAngle(0).Radian();
+        // gzdbg << "time [" << world->GetSimTime().Double()
+        //       << "] exact [" << integ_theta
+        //       << "] actual [" << actual_theta
+        //       << "] pose [" << model->GetWorldPose()
+        //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
     }
@@ -366,14 +366,14 @@ TEST_F(PhysicsTest, SimplePendulumTest)
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
-        gzdbg << "total energy [" << e
-              << "] pe[" << pe
-              << "] ke[" << ke
-              << "] p[" << pos.pos.z
-              << "] v[" << vel
-              << "] error[" << e - e_start
-              << "] tol[" << e_tol
-              << "]\n";
+        // gzdbg << "total energy [" << e
+        //       << "] pe[" << pe
+        //       << "] ke[" << ke
+        //       << "] p[" << pos.pos.z
+        //       << "] v[" << vel
+        //       << "] error[" << e - e_start
+        //       << "] tol[" << e_tol
+        //       << "]\n";
 
         EXPECT_LT(fabs(e - e_start), e_tol);
       }
@@ -384,12 +384,12 @@ TEST_F(PhysicsTest, SimplePendulumTest)
         double integ_theta = (
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).GetAsRadian();
-        gzdbg << "time [" << world->GetSimTime().Double()
-              << "] exact [" << integ_theta
-              << "] actual [" << actual_theta
-              << "] pose [" << model->GetWorldPose()
-              << "]\n";
+        double actual_theta = joint->GetAngle(0).Radian();
+        // gzdbg << "time [" << world->GetSimTime().Double()
+        //       << "] exact [" << integ_theta
+        //       << "] actual [" << actual_theta
+        //       << "] pose [" << model->GetWorldPose()
+        //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
     }
