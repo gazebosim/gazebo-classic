@@ -70,7 +70,7 @@ Model::Model(BasePtr _parent)
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
   this->jointController = NULL;
-  this->plugins_loaded_ = false;
+  this->plugins_loaded = false;
 }
 
 //////////////////////////////////////////////////
@@ -186,11 +186,10 @@ void Model::Update()
 
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
-  if (!this->plugins_loaded_)
+  if (!this->plugins_loaded)
   {
     this->LoadPlugins();
-    this->plugins_loaded_ = true;
-    return;
+    this->plugins_loaded = true;
   }
 
   if (this->jointController)
