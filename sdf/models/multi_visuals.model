@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+    <model name="box_model" static="false">
+        <link name="body">
+            <origin pose="0 0 0.5 0 0 0" />
+            <inertial mass="1.0">
+                <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
+            </inertial>
+            <collision name="geom1">
+                <geometry>
+                    <box size="1 1 1" />
+                </geometry>
+            </collision>
+            <visual name="visual1">
+                <geometry>
+                    <box size="1 1 1" />
+                </geometry>
+                <material script="Gazebo/WoodPallet" />
+            </visual>
+            <collision name="geom2">
+                <origin pose="0 0 1.0 0 0 0" />
+                <geometry>
+                    <box size="1 1 1" />
+                </geometry>
+            </collision>
+            <visual name="visual2">
+                <origin pose="0 0 1.0 0 0 0" />
+                <geometry>
+                    <box size="1 1 1" />
+                </geometry>
+                <material script="Gazebo/WoodPallet" />
+            </visual>
+            <sensor name="cam" type="depth" always_on="1" update_rate="30" visualize="false">
+                <origin pose="0.0232 0.06 0.098 0 -0 0" />
+                <camera>
+                    <horizontal_fov angle="0.78539816339744828" />
+                    <image width="320" height="240" format="L8" />
+                    <clip near="0.10000000000000001" far="100" />
+                </camera>
+            </sensor>
+        </link>
+    </model>
+</gazebo>

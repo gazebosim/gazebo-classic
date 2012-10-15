@@ -1,9 +1,0 @@
-<!-- Projector -->
-<element name="projector" required="0">
-  <attribute name="name" type="string" default="__default__" required="1"/>
-  <element name="texture" type="string" default="__default__" required="1"/>
-  <element name="pose" type="pose" default="0 0 0 0 0 0" required="0"/>
-  <element name="fov" type="double" default="0.785" required="0"/>
-  <element name="near_clip" type="double" default="0.1" required="0"/>
-  <element name="far_clip" type="double" default="10.0" required="0"/>
-</element>

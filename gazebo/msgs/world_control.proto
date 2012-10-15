@@ -1,0 +1,21 @@
+package gazebo.msgs;
+
+/// \addtogroup gazebo_msgs
+/// \{
+///
+/// \interface WorldControl
+/// \brief A message that allows for control of world functions
+/// \verbatim
+
+import "header.proto";
+import "world_reset.proto";
+
+message WorldControl
+{
+  optional bool pause           = 1;
+  optional bool step            = 2;
+  optional WorldReset reset     = 3;
+}
+
+/// \verbatim
+/// \}

@@ -43,20 +43,23 @@ TEST_F(Pioneer2dx, StraightLine)
   common::Time startTime = this->simTime;
   common::Time currTime = this->simTime;
 
-  struct timespec interval;
+  /*struct timespec interval;
   struct timespec remainder;
   interval.tv_sec = 1 / 1000;
   interval.tv_nsec = (1 % 1000) * 1000000;
+  */
 
   while (currTime - startTime < common::Time(100, 0))
   {
-    nanosleep(&interval, &remainder);
+    // nanosleep(&interval, &remainder);
     common::Time::MSleep(100);
     currTime = this->simTime;
   }
   endPose = this->poses["pioneer2dx"];
 
   double dist = (currTime - startTime).Double() * 0.2;
+  std::cout << "DIst[" << dist << "]\n";
+  std::cout << "EnPose.x[" << endPose.pos.x << "]\n";
   EXPECT_LT(fabs(endPose.pos.x - dist), 0.1);
   EXPECT_LT(fabs(endPose.pos.y), 0.5);
   EXPECT_LT(fabs(endPose.pos.z), 0.01);

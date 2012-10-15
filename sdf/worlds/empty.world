@@ -1,10 +1,15 @@
-<?xml version="1.0"?> 
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<gazebo version="1.2">
   <world name="default">
+
     <!-- A ground plane -->
-    <include filename="ground_plane.model"/>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
 
     <!-- A global light source -->
-    <include filename="sun.light"/>
+    <include>
+      <uri>model://sun</uri>
+    </include>
   </world>
 </gazebo>

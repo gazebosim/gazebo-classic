@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="214.60471"
+   height="64.000114"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="gazebo_light_icons.svg">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleOutL"
+       style="overflow:visible">
+      <path
+         id="path3905"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective3624"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3646"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3668"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3690"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3712"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3741"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4217"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleOutL-0"
+       style="overflow:visible">
+      <path
+         id="path3905-9"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <inkscape:perspective
+       id="perspective4217-3"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <marker
+       inkscape:stockid="TriangleOutL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleOutL-8"
+       style="overflow:visible">
+      <path
+         id="path3905-5"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.8,0.8)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <inkscape:perspective
+       id="perspective4282"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4312"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4340"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4368"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4396"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4424"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4452"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4480"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4523"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4577"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4698"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4726"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4754"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4855"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4877"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4899"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4921"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4948"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4970"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4992"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5014"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5036"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5036-3"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5136"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5158"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5251"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5279"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5307"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5335"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5363"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5391"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5419"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5501"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5547"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5602"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5630"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5698"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5720"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5742"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective5764"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.511839"
+     inkscape:cx="98.743768"
+     inkscape:cy="28.351285"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1918"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3602"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       originx="-3.7010865px"
+       originy="-985.57091px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-3.7010865,-2.7911626)">
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffff00;fill-opacity:1;stroke:#4866bc;stroke-width:8.82116794999999954;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3592"
+       sodipodi:cx="230"
+       sodipodi:cy="185.21933"
+       sodipodi:rx="55.714287"
+       sodipodi:ry="55.714287"
+       d="m 285.71429,185.21933 a 55.714287,55.714287 0 1 1 -111.42858,0 55.714287,55.714287 0 1 1 111.42858,0 z"
+       transform="matrix(0.23495859,0,0,0.23495859,56.962921,-8.7296534)"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3757-5-1-6-0"
+       d="m 102.09864,25.336166 -8.491509,-8.6281 -0.610829,0.609524 8.485118,8.638542 0.61722,-0.620011 z"
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.89637768000000007;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4256-9-8-4-3"
+       d="m 89.336582,13.093311 6.07946,1.04514 -5.079996,5.050834 -0.999464,-6.095977 z"
+       style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.67301105999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003" />
+    <g
+       id="g5235-7"
+       transform="matrix(0,-1.0363046,1.0363046,0,48.215008,418.31703)"
+       inkscape:transform-center-x="21.24483"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003">
+      <path
+         inkscape:connector-curvature="0"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 370.46533,48.0612 0.0932,-11.681307 -0.83269,-8.91e-4 -0.10469,11.684067 0.84421,-0.0019 z"
+         id="path3757-5-1-6-0-5" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 370.11106,30.999477 3.43509,4.861361 -6.91262,-0.0199 3.47753,-4.841466 z"
+         id="path4256-9-8-4-3-6" />
+    </g>
+    <g
+       id="g5235-7-9"
+       transform="matrix(-0.73277801,-0.73277801,0.73277801,-0.73277801,337.799,350.38302)"
+       inkscape:transform-center-x="14.919032"
+       inkscape:transform-center-y="14.937645"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003">
+      <path
+         inkscape:connector-curvature="0"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 370.46533,48.0612 0.0932,-11.681307 -0.83269,-8.91e-4 -0.10469,11.684067 0.84421,-0.0019 z"
+         id="path3757-5-1-6-0-5-9" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 370.11106,30.999477 3.43509,4.861361 -6.91262,-0.0199 3.47753,-4.841466 z"
+         id="path4256-9-8-4-3-6-6" />
+    </g>
+    <g
+       id="g5235-7-9-2"
+       transform="matrix(-1.0363046,0,0,-1.0363046,494.52921,97.579616)"
+       inkscape:transform-center-y="21.244826"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003">
+      <path
+         inkscape:connector-curvature="0"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 370.46533,48.0612 0.0932,-11.681307 -0.83269,-8.91e-4 -0.10469,11.684067 0.84421,-0.0019 z"
+         id="path3757-5-1-6-0-5-9-7" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 370.11106,30.999477 3.43509,4.861361 -6.91262,-0.0199 3.47753,-4.841466 z"
+         id="path4256-9-8-4-3-6-6-6" />
+    </g>
+    <g
+       id="g5235-7-9-2-3"
+       transform="matrix(-0.73277801,0.73277801,-0.73277801,-0.73277801,426.5952,-192.00438)"
+       inkscape:transform-center-y="14.919028"
+       inkscape:transform-center-x="-14.937635"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003">
+      <path
+         inkscape:connector-curvature="0"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 370.46533,48.0612 0.0932,-11.681307 -0.83269,-8.91e-4 -0.10469,11.684067 0.84421,-0.0019 z"
+         id="path3757-5-1-6-0-5-9-7-2" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 370.11106,30.999477 3.43509,4.861361 -6.91262,-0.0199 3.47753,-4.841466 z"
+         id="path4256-9-8-4-3-6-6-6-1" />
+    </g>
+    <g
+       id="g5235-7-9-2-3-5"
+       transform="matrix(0,1.0363046,-1.0363046,0,173.79179,-348.73458)"
+       inkscape:transform-center-x="-21.244816"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003">
+      <path
+         inkscape:connector-curvature="0"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 370.46533,48.0612 0.0932,-11.681307 -0.83269,-8.91e-4 -0.10469,11.684067 0.84421,-0.0019 z"
+         id="path3757-5-1-6-0-5-9-7-2-9" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 370.11106,30.999477 3.43509,4.861361 -6.91262,-0.0199 3.47753,-4.841466 z"
+         id="path4256-9-8-4-3-6-6-6-1-9" />
+    </g>
+    <g
+       id="g5235-7-9-2-3-5-1"
+       transform="matrix(0.73277801,0.73277801,-0.73277801,0.73277801,-115.7922,-280.80056)"
+       inkscape:transform-center-x="-14.919028"
+       inkscape:transform-center-y="-14.937635"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003">
+      <path
+         inkscape:connector-curvature="0"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 370.46533,48.0612 0.0932,-11.681307 -0.83269,-8.91e-4 -0.10469,11.684067 0.84421,-0.0019 z"
+         id="path3757-5-1-6-0-5-9-7-2-9-4" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 370.11106,30.999477 3.43509,4.861361 -6.91262,-0.0199 3.47753,-4.841466 z"
+         id="path4256-9-8-4-3-6-6-6-1-9-9" />
+    </g>
+    <g
+       id="g5235-7-9-2-3-5-1-1"
+       transform="matrix(1.0363046,0,0,1.0363046,-272.52239,-27.997177)"
+       inkscape:transform-center-y="-21.244821"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1;stroke-linecap:butt"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/pointlight.png"
+       inkscape:export-xdpi="87.370003"
+       inkscape:export-ydpi="87.370003">
+      <path
+         inkscape:connector-curvature="0"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono;stroke-linecap:butt"
+         d="m 370.46533,48.0612 0.0932,-11.681307 -0.83269,-8.91e-4 -0.10469,11.684067 0.84421,-0.0019 z"
+         id="path3757-5-1-6-0-5-9-7-2-9-4-0" />
+      <path
+         inkscape:connector-curvature="0"
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;stroke-linecap:butt"
+         d="m 370.11106,30.999477 3.43509,4.861361 -6.91262,-0.0199 3.47753,-4.841466 z"
+         id="path4256-9-8-4-3-6-6-6-1-9-9-7" />
+    </g>
+    <path
+       style="fill:none;stroke:#4866bc;stroke-width:2.86100005999999984;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="M 66.270486,23.842046 44.444524,23.726461 C 43.501854,12.325483 35.483371,4.2215567 23.773285,4.2215567 13.385092,4.7463966 5.1314806,13.328833 5.1314806,23.813151 c 0,10.668024 8.5484904,19.346054 19.1926464,19.591592 l -0.115973,21.95614"
+       id="path3592-9-4"
+       sodipodi:nodetypes="cccscc"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/spotlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffff00;fill-opacity:1;stroke:#4866bc;stroke-width:8.82116794999999954;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3592-2"
+       sodipodi:cx="230"
+       sodipodi:cy="185.21933"
+       sodipodi:rx="55.714287"
+       sodipodi:ry="55.714287"
+       d="m 285.71429,185.21933 a 55.714287,55.714287 0 1 1 -111.42858,0 55.714287,55.714287 0 1 1 111.42858,0 z"
+       transform="matrix(0.23737647,0,0,0.23659236,-30.192643,-20.20052)"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/spotlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g5590"
+       inkscape:transform-center-x="-18.125"
+       inkscape:transform-center-y="17.375"
+       transform="matrix(1.0469689,0,0,1.0435105,-285.50042,-55.151265)"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/spotlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         sodipodi:nodetypes="cccccc"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 304.8443,85.113466 14.44403,15.200834 0.58943,-0.588171 -14.43785,-15.21091 -0.59561,0.59829 0,-4.3e-5 z"
+         id="path3757-5-1-6-0-5-9-7-2-90"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 322.90927,103.17742 -5.86648,-1.00853 4.90203,-4.873885 0.96445,5.882415 z"
+         id="path4256-9-8-4-3-6-6-6-1-2"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="matrix(0.94887607,-0.44100659,0.44246817,0.9457417,-290.38993,82.854691)"
+       id="g5590-9"
+       inkscape:transform-center-x="-23.834611"
+       inkscape:transform-center-y="8.8406487"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/spotlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         sodipodi:nodetypes="cccccc"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 304.8443,85.113466 14.44403,15.200834 0.58943,-0.588171 -14.43785,-15.21091 -0.59561,0.59829 0,-4.3e-5 z"
+         id="path3757-5-1-6-0-5-9-7-2-90-6"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 322.90927,103.17742 -5.86648,-1.00853 4.90203,-4.873885 0.96445,5.882415 z"
+         id="path4256-9-8-4-3-6-6-6-1-2-2"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="matrix(0.94887607,0.44100659,-0.44246817,0.9457417,-222.55188,-178.16754)"
+       id="g5590-4"
+       inkscape:transform-center-x="-9.8601115"
+       inkscape:transform-center-y="23.471285"
+       style="fill:#4866bc;fill-opacity:1;stroke:#4866bc;stroke-opacity:1"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/spotlight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         sodipodi:nodetypes="cccccc"
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#4866bc;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:1.82994235000000005;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+         d="m 304.8443,85.113466 14.44403,15.200834 0.58943,-0.588171 -14.43785,-15.21091 -0.59561,0.59829 0,-4.3e-5 z"
+         id="path3757-5-1-6-0-5-9-7-2-90-9"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#4866bc;fill-opacity:1;fill-rule:evenodd;stroke:#4866bc;stroke-width:2.57936810999999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
+         d="m 322.90927,103.17742 -5.86648,-1.00853 4.90203,-4.873885 0.96445,5.882415 z"
+         id="path4256-9-8-4-3-6-6-6-1-2-9"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:2.14823699000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+       d="m 161.76445,33.565443 -6.38448,-3.35817 0.89258,18.607744 18.07013,-8.633544 -6.40766,-3.370374 L 185.2534,9.4832079 179.08283,6.2375511 161.76445,33.565443 z"
+       id="path3757-4-3-5"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/directionallight.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       inkscape:connector-curvature="0"
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:2.14823699000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+       d="m 184.74003,31.193216 -6.38449,-3.358169 0.89258,18.607744 18.07014,-8.633544 -6.40767,-3.370374 17.31838,-27.3278915 -6.17056,-3.2456568 -17.31838,27.3278913 z"
+       id="path3757-4-3-5-1"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/directionallight.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       inkscape:connector-curvature="0"
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:#4866bc;stroke-width:2.14823699000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Andale Mono;-inkscape-font-specification:Andale Mono"
+       d="m 193.74273,50.46754 -6.38448,-3.358169 0.89258,18.607744 18.07013,-8.633544 -6.40766,-3.370374 17.31838,-27.327891 -6.17057,-3.245657 -17.31838,27.327891 z"
+       id="path3757-4-3-5-1-7"
+       sodipodi:nodetypes="cccccccc"
+       inkscape:export-filename="/home/nkoenig/work/gazebo/gazebo/gui/images/directionallight.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+  </g>
+</svg>
