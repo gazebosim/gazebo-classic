@@ -49,8 +49,8 @@ namespace gazebo
       public: ~BVHLoader();
 
       /// \brief Load a BVH file
-      /// \param _filename BVH file to load
-      /// \param _scale Scaling factor to apply to the skeleton
+      /// \param[in] _filename BVH file to load
+      /// \param[in] _scale Scaling factor to apply to the skeleton
       /// \return A pointer to a new Skeleton
       public: Skeleton* Load(const std::string &_filename, double _scale);
     };

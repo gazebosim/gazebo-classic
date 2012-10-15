@@ -45,9 +45,9 @@ namespace gazebo
     class Animation
     {
       /// \brief Constructor
-      /// \param _name Name of the animation, should be unique
-      /// \param _length Duration of the animation in seconds
-      /// \param _loop Set to true if the animation should repeat
+      /// \param[in] _name Name of the animation, should be unique
+      /// \param[in] _length Duration of the animation in seconds
+      /// \param[in] _loop Set to true if the animation should repeat
       public: Animation(const std::string &_name, double _length, bool _loop);
 
       /// \brief Destructor
@@ -58,15 +58,15 @@ namespace gazebo
       public: double GetLength() const;
 
       /// \brief Set the duration of the animation
-      /// \param _len The length of the animation in seconds
+      /// \param[in] _len The length of the animation in seconds
       public: void SetLength(double _len);
 
       /// \brief Set the current time position of the animation
-      /// \param _time The time position in seconds
+      /// \param[in] _time The time position in seconds
       public: void SetTime(double _time);
 
       /// \brief Add time to the animation
-      /// \param _time The amount of time to add in seconds
+      /// \param[in] _time The amount of time to add in seconds
       public: void AddTime(double _time);
 
       /// \brief Return the current time position
@@ -78,28 +78,40 @@ namespace gazebo
       public: unsigned int GetKeyFrameCount() const;
 
       /// \brief Get a key frame using an index value
-      /// \param _index The index of the key frame
+      /// \param[in] _index The index of the key frame
       /// \return A pointer the keyframe, NULL if the _index is invalid
       public: KeyFrame* GetKeyFrame(unsigned int _index) const;
 
       /// \brief Get the two key frames that bound a time value
-      /// \param _time The time in seconds
-      /// \param _kf1 Lower bound keyframe that is returned
-      /// \param _kf2 Upper bound keyframe that is returned
-      /// \param _firstKeyIndex Index of the lower bound key frame
+      /// \param[in] _time The time in seconds
+      /// \param[out] _kf1 Lower bound keyframe that is returned
+      /// \param[out] _kf2 Upper bound keyframe that is returned
+      /// \param[out] _firstKeyIndex Index of the lower bound key frame
       /// \return The time between the two keyframe
       protected: double GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
                                            KeyFrame **_kf2,
                                            unsigned int &_firstKeyIndex) const;
 
 
+      /// \brief animation name
       protected: std::string name;
+
+      /// \brief animation duration
       protected: double length;
+
+      /// \brief current time position
       protected: double timePos;
+
+      /// \brief determines if the interpolation splines need building
       protected: mutable bool build;
+
+      /// \brief true if animation repeats
       protected: bool loop;
 
+      /// \brief array of keyframe type alias
       protected: typedef std::vector<KeyFrame*> KeyFrame_V;
+
+      /// \brief array of key frames
       protected: KeyFrame_V keyFrames;
     };
     /// \}
@@ -111,9 +123,9 @@ namespace gazebo
     class PoseAnimation : public Animation
     {
       /// \brief Constructor
-      /// \param _name String name of the animation. This should be unique.
-      /// \param _length Length of the animation in seconds
-      /// \param _loop True == loop the animation
+      /// \param[in] _name String name of the animation. This should be unique.
+      /// \param[in] _length Length of the animation in seconds
+      /// \param[in] _loop True == loop the animation
       public: PoseAnimation(const std::string &_name,
                             double _length, bool _loop);
 
@@ -121,24 +133,27 @@ namespace gazebo
       public: virtual ~PoseAnimation();
 
       /// \brief Create a pose keyframe at the given time
-      /// \param _time Time at which to create the keyframe
+      /// \param[in] _time Time at which to create the keyframe
       /// \return Pointer to the new keyframe
       public: PoseKeyFrame *CreateKeyFrame(double _time);
 
       /// \brief Get a keyframe using the animation's current time.
-      /// \param _kf PoseKeyFrame reference to hold the interpolated result
+      /// \param[out] _kf PoseKeyFrame reference to hold the interpolated result
       public: void GetInterpolatedKeyFrame(PoseKeyFrame &_kf) const;
 
       /// \brief Get a keyframe using a passed in time.
-      /// \param _time Time in seconds
-      /// \param _kf PoseKeyFrame reference to hold the interpolated result
+      /// \param[in] _time Time in seconds
+      /// \param[out] _kf PoseKeyFrame reference to hold the interpolated result
       protected: void GetInterpolatedKeyFrame(double _time,
                                               PoseKeyFrame &_kf) const;
 
       /// \brief Update the pose splines
       protected: void BuildInterpolationSplines() const;
 
+      /// \brief smooth interpolation for position
       private: mutable math::Spline *positionSpline;
+
+      /// \brief smooth interpolation for rotation
       private: mutable math::RotationSpline *rotationSpline;
     };
     /// \}
@@ -150,9 +165,9 @@ namespace gazebo
     class NumericAnimation : public Animation
     {
       /// \brief Constructor
-      /// \param _name String name of the animation. This should be unique.
-      /// \param _length Length of the animation in seconds
-      /// \param _loop True == loop the animation
+      /// \param[in] _name String name of the animation. This should be unique.
+      /// \param[in] _length Length of the animation in seconds
+      /// \param[in] _loop True == loop the animation
       public: NumericAnimation(const std::string &_name,
                                double _length, bool _loop);
 
@@ -160,12 +175,12 @@ namespace gazebo
       public: virtual ~NumericAnimation();
 
       /// \brief Create a numeric keyframe at the given time
-      /// \param _time Time at which to create the keyframe
+      /// \param[in] _time Time at which to create the keyframe
       /// \return Pointer to the new keyframe
       public: NumericKeyFrame *CreateKeyFrame(double _time);
 
       /// \brief Get a keyframe using the animation's current time.
-      /// \param _kf NumericKeyFrame reference to hold the interpolated result
+      /// \param[out] _kf NumericKeyFrame reference to hold the interpolated result
       public: void GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const;
     };
     /// \}
