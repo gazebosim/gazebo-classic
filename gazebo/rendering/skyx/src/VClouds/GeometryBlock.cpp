@@ -189,7 +189,7 @@ namespace SkyX { namespace VClouds
 
     vbind->setBinding(0, mVertexBuffer);
 
-    unsigned short *indexbuffer = new unsigned short[mNumberOfTriangles*3];
+    uint16_t *indexbuffer = new uint16_t[mNumberOfTriangles*3];
 
     int IndexOffset = 0;
     int VertexOffset = 0;

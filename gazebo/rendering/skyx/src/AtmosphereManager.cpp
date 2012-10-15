@@ -280,7 +280,7 @@ namespace SkyX
             std::max(oColor.x, std::max(oColor.y, oColor.z))*10)), 0, 1)
       * (Ogre::Vector3(0.05, 0.05, 0.1)
           * (2-0.75f*Ogre::Math::Clamp<Ogre::Real>(-uLightDir.y, 0, 1)) *
-          * Ogre::Math::Pow(1-Direction.y, 3));
+          Ogre::Math::Pow(1-Direction.y, 3));
 
     // --- End fragment program simulation ---
 

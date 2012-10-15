@@ -36,18 +36,22 @@ namespace SkyX
   {
   public:
       /** Constructor
-          @param deleteBySkyX true to automatically destroy the controller by SkyX, false otherwise
+          @param deleteBySkyX true to automatically destroy the controller by
+          SkyX, false otherwise
        */
       BasicController(const bool& deleteBySkyX = true);
 
       /** Update controller
-          @param simDeltaTime Simulation delta time (It's not the time since last frame, it's the delta simulation time, one
-                              time the time since last frame has been multiplied by the time multiplier)
+          @param simDeltaTime Simulation delta time (It's not the time since
+          last frame, it's the delta simulation time, one
+          time the time since last frame has been multiplied by the time
+          multiplier)
        */
       void update(const Ogre::Real& simDeltaTime);
 
       /** Set time
-          @param t Time, where x = time in [0, 24]h range, y = sunrise hour in [0, 24]h range, z = sunset hour in [0, 24] range
+          @param t Time, where x = time in [0, 24]h range,
+          y = sunrise hour in [0, 24]h range, z = sunset hour in [0, 24] range
        */
       inline void setTime(const Ogre::Vector3& t)
       {
@@ -56,7 +60,8 @@ namespace SkyX
       }
 
       /** Get time
-          @return Current time, where x = time in [0, 24]h range, y = sunrise hour in [0, 24]h range, z = sunset hour in [0, 24] range
+          @return Current time, where x = time in [0, 24]h range,
+          y = sunrise hour in [0, 24]h range, z = sunset hour in [0, 24] range
        */
       inline const Ogre::Vector3& getTime() const
       {
@@ -97,7 +102,8 @@ namespace SkyX
       }
 
       /** Set moon phase
-          @param mp Moon phase in [-1,1] range, where -1 means fully covered Moon, 0 clear Moon and 1 fully covered Moon
+          @param mp Moon phase in [-1,1] range, where -1 means fully
+          covered Moon, 0 clear Moon and 1 fully covered Moon
        */
       inline void setMoonPhase(const Ogre::Real& mp)
       {
@@ -105,7 +111,8 @@ namespace SkyX
       }
 
       /** Get moon phase
-          @return Moon phase in [-1,1] range, where -1 means fully covered Moon, 0 clear Moon and 1 fully covered Moon
+          @return Moon phase in [-1,1] range, where -1 means
+          fully covered Moon, 0 clear Moon and 1 fully covered Moon
        */
       inline Ogre::Real getMoonPhase()
       {
@@ -113,7 +120,8 @@ namespace SkyX
       }
 
   private:
-      /// Time information: x = time in [0, 24]h range, y = sunrise hour in [0, 24]h range, z = sunset hour in [0, 24] range
+      /// Time information: x = time in [0, 24]h range, y = sunrise
+      /// hour in [0, 24]h range, z = sunset hour in [0, 24] range
       Ogre::Vector3 mTime;
 
       /// Sun direction

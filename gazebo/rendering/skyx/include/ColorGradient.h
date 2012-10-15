@@ -24,6 +24,9 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_ColorGradient_H_
 #define _SkyX_ColorGradient_H_
 
+#include <vector>
+#include <utility>
+
 #include "Prerequisites.h"
 
 namespace SkyX

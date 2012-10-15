@@ -45,7 +45,7 @@ namespace SkyX { namespace VClouds
 
     float& FastFakeRandom::get()
     {
-      mIndex ++;
+      mIndex++;
       if (mIndex >= mCapacity)
       {
         mIndex = 0;

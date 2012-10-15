@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <vector>
 #include "VClouds/DataManager.h"
 
 #include "VClouds/VClouds.h"
@@ -79,7 +80,7 @@ namespace SkyX { namespace VClouds
   {
     if (mVolTexToUpdate)
     {
-      mCurrentTransition + = timeSinceLastFrame;
+      mCurrentTransition += timeSinceLastFrame;
 
       mXEnd = static_cast < int>((mCurrentTransition / mUpdateTime)*4*mNx);
       if (mXEnd > 4*mNx)
@@ -89,7 +90,7 @@ namespace SkyX { namespace VClouds
 
       if (mXEnd/mNx != mXStart/mNx)
       {
-        for (int k = mStep; k < = mXEnd/mNx; k++)
+        for (int k = mStep; k <= mXEnd/mNx; k++)
         {
           _performCalculations(mNx, mNy, mNz, k, mXStart%mNx,
               (mXEnd/mNx != k) ? mNx : mXEnd%mNx);
@@ -108,7 +109,7 @@ namespace SkyX { namespace VClouds
       mStep = mXEnd/mNx;
       mXStart = mXEnd;
 
-      if (mCurrentTransition > = mUpdateTime)
+      if (mCurrentTransition >= mUpdateTime)
       {
         _updateVolTextureData(mCellsCurrent, VOL_TEX0, mNx, mNy, mNz);
 
@@ -119,7 +120,7 @@ namespace SkyX { namespace VClouds
     }
     else
     {
-      mCurrentTransition - = timeSinceLastFrame;
+      mCurrentTransition -= timeSinceLastFrame;
 
       mXEnd = static_cast < int>(((mUpdateTime-mCurrentTransition) /
             mUpdateTime)*4*mNx);
@@ -130,7 +131,7 @@ namespace SkyX { namespace VClouds
 
       if (mXEnd/mNx != mXStart/mNx)
       {
-        for (int k = mStep; k < = mXEnd/mNx; k++)
+        for (int k = mStep; k <= mXEnd/mNx; k++)
         {
           _performCalculations(mNx, mNy, mNz, k, mXStart%mNx,
               (mXEnd/mNx != k) ? mNx : mXEnd%mNx);
@@ -149,7 +150,7 @@ namespace SkyX { namespace VClouds
       mStep = mXEnd/mNx;
       mXStart = mXEnd;
 
-      if (mCurrentTransition < = 0)
+      if (mCurrentTransition <= 0)
       {
         _updateVolTextureData(mCellsCurrent, VOL_TEX1, mNx, mNy, mNz);
 
@@ -164,7 +165,9 @@ namespace SkyX { namespace VClouds
   {
     remove();
 
-    mNx = nx; mNy = ny; mNz = nz;
+    mNx = nx;
+    mNy = ny;
+    mNz = nz;
 
     mFFRandom = new FastFakeRandom(1024, 0, 1);
 
@@ -341,7 +344,7 @@ namespace SkyX { namespace VClouds
       // Update position
       currentPosition = (*mEllipsoidsIt)->getPosition();
       (*mEllipsoidsIt)->setPosition(
-          Ogre::Vector3(currentPosition.x,currentPosition.y,
+          Ogre::Vector3(currentPosition.x, currentPosition.y,
             static_cast < int>(Ogre::Math::RangeRandom(currentdimensions.z+2,
                 mNz-currentdimensions.z-2))));
     }
@@ -365,8 +368,8 @@ namespace SkyX { namespace VClouds
             (int)Ogre::Math::RangeRandom(0, mNx),
             (int)Ogre::Math::RangeRandom(0, mNy),
             static_cast < int>(Ogre::Math::RangeRandom(
-                newclouddimensions.z+2,mNz-newclouddimensions.z-2)),
-            Ogre::Math::RangeRandom(1,5.0f)), false);
+                newclouddimensions.z+2, mNz-newclouddimensions.z-2)),
+            Ogre::Math::RangeRandom(1, 5.0f)), false);
     }
 
     _updateProbabilities(mCellsCurrent, mNx, mNy, mNz, delayedResponse);
@@ -390,7 +393,7 @@ namespace SkyX { namespace VClouds
 
     if (UpdateProbabilities)
     {
-      e->updateProbabilities(mCellsCurrent,mNx,mNy,mNz);
+      e->updateProbabilities(mCellsCurrent, mNx, mNy, mNz);
     }
   }
 
@@ -426,14 +429,14 @@ namespace SkyX { namespace VClouds
   void DataManager::_updateProbabilities(Cell*** c, const int& nx,
       const int& ny, const int& nz, const bool& delayedResponse)
   {
-    _clearProbabilities(c,nx,ny,nz,!delayedResponse);
+    _clearProbabilities(c, nx, ny, nz, !delayedResponse);
 
     std::vector < Ellipsoid*>::const_iterator mEllipsoidsIt;
 
     for (mEllipsoidsIt = mEllipsoids.begin();
         mEllipsoidsIt != mEllipsoids.end(); mEllipsoidsIt++)
     {
-      (*mEllipsoidsIt)->updateProbabilities(c,nx,ny,nz,delayedResponse);
+      (*mEllipsoidsIt)->updateProbabilities(c, nx, ny, nz, delayedResponse);
     }
   }
 
@@ -447,23 +450,27 @@ namespace SkyX { namespace VClouds
     int u, v, uu, vv,
         current_iteration = 0, max_iterations = 8;
 
-    while(!outOfBounds)
+    while (!outOfBounds)
     {
-      if ((int)pos.z > = nz || (int)pos.z < 0 || factor < = 0 ||
-          current_iteration > = max_iterations)
+      if (static_cast<int>(pos.z) >= nz ||
+          static_cast<int>(pos.z) < 0 || factor <= 0 ||
+          current_iteration >= max_iterations)
       {
         outOfBounds = true;
       }
       else
       {
-        u = (int)pos.x; v = (int)pos.y;
+        u = static_cast<int>(pos.x);
+        v = static_cast<int>(pos.y);
 
-        uu = (u < 0) ? (u + nx) : u; if (u> = nx) { uu- = nx; }
-        vv = (v < 0) ? (v + ny) : v; if (v> = ny) { vv- = ny; }
+        uu = (u < 0) ? (u + nx) : u;
+        if (u >= nx) { uu -= nx; }
+        vv = (v < 0) ? (v + ny) : v;
+        if (v >= ny) { vv -= ny; }
 
-        factor - = c[uu][vv][(int)pos.z].dens*att*(1 -
-            static_cast < float>(current_iteration)/max_iterations);
-        pos + = step*(-d);
+        factor -= c[uu][vv][static_cast<int>(pos.z)].dens*att*(1 -
+            static_cast<float>(current_iteration)/max_iterations);
+        pos += step*(-d);
 
         current_iteration++;
       }
@@ -573,9 +580,9 @@ namespace SkyX { namespace VClouds
     i1r, j1r, k1r,
     i2r, i2m, j2r, j2m, k2r;
 
-    i1m = ((x+1)> = nx) ? c[0][y][z].act : c[x+1][y][z].act;
-    j1m = ((y+1)> = ny) ? c[x][0][z].act : c[x][y+1][z].act;
-    k1m = ((z+1)> = nz) ? false : c[x][y][z+1].act;
+    i1m = ((x+1) >= nx) ? c[0][y][z].act : c[x+1][y][z].act;
+    j1m = ((y+1) >= ny) ? c[x][0][z].act : c[x][y+1][z].act;
+    k1m = ((z+1) >= nz) ? false : c[x][y][z+1].act;
 
     i1r = ((x-1) < 0) ? c[nx-1][y][z].act : c[x-1][y][z].act;
     j1r = ((y-1) < 0) ? c[x][ny-1][z].act : c[x][y-1][z].act;
@@ -585,35 +592,35 @@ namespace SkyX { namespace VClouds
     j2r = ((y-2) < 0) ? c[x][ny-2][z].act : c[x][y-2][z].act;
     k2r = ((z-2) < 0) ? false : c[x][y][z-2].act;
 
-    i2m = ((x+2)> = nx) ? c[1][y][z].act : c[x+2][y][z].act;
-    j2m = ((y+2)> = ny) ? c[x][1][z].act : c[x][y+2][z].act;
+    i2m = ((x+2) >= nx) ? c[1][y][z].act : c[x+2][y][z].act;
+    j2m = ((y+2) >= ny) ? c[x][1][z].act : c[x][y+2][z].act;
 
     return i1m || j1m || k1m || i1r || j1r || k1r || i2r ||
-      i2m || j2r || j2m || k2r;
+           i2m || j2r || j2m || k2r;
   }
 
   float DataManager::_getDensityAt(Cell ***c, const int& nx,
       const int& ny, const int& nz, const int& x, const int& y, const int& z,
       const int& r, const float& strength) const
   {
-    int zr = ((z-r) < 0) ? 0 : z-r,
-    zm = ((z+r)> = nz) ? nz : z+r,
-    u, uu, v, vv, w,
-    clouds = 0, div = 0;
+    int zr = ((z-r) < 0) ? 0 : z-r;
+    int zm = ((z+r) >= nz) ? nz : z+r;
+    int u, uu, v, vv, w;
+    int clouds = 0, div = 0;
 
-    for (u = x-r; u < = x+r; u++)
+    for (u = x-r; u <= x+r; u++)
     {
-      for (v = y-r; v < = y+r; v++)
+      for (v = y-r; v <= y+r; v++)
       {
         for (w = zr; w < zm; w++)
         {
           // x/y Seamless!
           uu = (u < 0) ? (u + nx) : u;
-          if (u> = nx) { uu- = nx; }
+          if (u >= nx) { uu -= nx; }
           vv = (v < 0) ? (v + ny) : v;
-          if (v> = ny) { vv- = ny; }
+          if (v >= ny) { vv -= ny; }
 
-          clouds + = c[uu][vv][w].cld ? 1 : 0;
+          clouds += c[uu][vv][w].cld ? 1 : 0;
           div++;
         }
       }
@@ -677,10 +684,11 @@ namespace SkyX { namespace VClouds
           Ogre::PixelUtil::packColour(c[x][y][z].dens/* TODO!!!! */,
               c[x][y][z].light, 0, 0, pb.format, &pbptr[x]);
         }
-        pbptr + = pb.rowPitch;
+        pbptr += pb.rowPitch;
       }
-      pbptr + = pb.getSliceSkip();
+      pbptr += pb.getSliceSkip();
     }
     buffer->unlock();
   }
-}}
+}
+}

@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <vector>
 #include "VClouds/Lightning.h"
 
 namespace SkyX { namespace VClouds

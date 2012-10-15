@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <vector>
 #include "VClouds/VClouds.h"
 
 #include "SkyX.h"
@@ -32,14 +33,14 @@ VClouds::VClouds(Ogre::SceneManager *sm)
     , mCamera(0)
     , mCreated(false)
     , mGeometrySettings(GeometrySettings())
-    , mDistanceFallingParams(Ogre::Vector2(1,-1))
+    , mDistanceFallingParams(Ogre::Vector2(1, -1))
     , mRenderQueueGroups(RenderQueueGroups(
           Ogre::RENDER_QUEUE_MAIN, Ogre::RENDER_QUEUE_9))
     , mWindDirection(Ogre::Degree(0))
     , mWindSpeed(80.0f)
     , mWheater(Ogre::Vector2(0.5f, 1.0f))
     , mDelayedResponse(false)
-    , mSunDirection(Ogre::Vector3(0,-1, 0))
+    , mSunDirection(Ogre::Vector3(0, -1, 0))
     , mSunColor(Ogre::Vector3(1, 1, 1))
     , mAmbientColor(Ogre::Vector3(0.63f, 0.63f, 0.7f))
     , mLightResponse(Ogre::Vector4(0.25f, 0.2f, 1.0f, 0.1f))
@@ -80,7 +81,7 @@ void VClouds::create()
   }
 
   // Data manager
-  mDataManager->create(128, 128,20);
+  mDataManager->create(128, 128, 20);
 
   // Geometry manager
   mGeometryManager->create(mGeometrySettings.Height,
@@ -346,5 +347,4 @@ void VClouds::setWheater(const float& Humidity,
 
   mDataManager->setWheater(mWheater.x, mWheater.y, mDelayedResponse);
 }
-
 }}

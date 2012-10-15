@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <vector>
 #include "VClouds/GeometryManager.h"
 
 #include "VClouds/VClouds.h"
@@ -61,7 +62,9 @@ namespace SkyX { namespace VClouds
         mBeta = Beta;
         mPhi = Ogre::Math::TWO_PI / NumberOfBlocks;
         mNumberOfBlocks = NumberOfBlocks;
-        mNa = Na; mNb = Nb; mNc = Nc;
+        mNa = Na;
+        mNb = Nb;
+        mNc = Nc;
 
         mSceneNode = mVClouds->getSceneManager()->getRootSceneNode()->
           createChildSceneNode();

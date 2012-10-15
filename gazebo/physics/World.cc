@@ -363,7 +363,6 @@ void World::Update()
 {
   static bool first = true;
 
-
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
   if (first)

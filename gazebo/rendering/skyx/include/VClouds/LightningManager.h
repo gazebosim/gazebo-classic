@@ -24,11 +24,13 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_LightningManager_H_
 #define _SkyX_VClouds_LightningManager_H_
 
+#include <vector>
+
 #include "Prerequisites.h"
 
 #include "Lightning.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
   class VClouds;
 
@@ -41,19 +43,22 @@ namespace SkyX { namespace VClouds{
     {
     public:
       /** Lightning added
-          @param l Lightning that has been added
-        @remarks Useful when, for example, the app needs to known when a Lightning has been created (by manually
-             invoking LightningManager::addLightning(...) or automatically based on the lightning creation
-             probabilities) in order to play a sound, etc.
-             The lightning position is accessible through Lightning::getSceneNode()->getPosition().
+        @param l Lightning that has been added
+        @remarks Useful when, for example, the app needs to known when a
+        Lightning has been created (by manually invoking
+        LightningManager::addLightning(...) or automatically based on the
+        lightning creation probabilities) in order to play a sound, etc.
+        The lightning position is accessible through
+        Lightning::getSceneNode()->getPosition().
        */
-      inline virtual void lightningAdded(Lightning* l){}
+      inline virtual void lightningAdded(Lightning* l) {}
+      virtual ~Listener() {}
     };
 
     /** Constructor
       @param vc VClouds pointer
      */
-    LightningManager(VClouds* vc);
+    explicit LightningManager(VClouds* vc);
 
     /** Destructor
      */
@@ -73,14 +78,19 @@ namespace SkyX { namespace VClouds{
         void update(const Ogre::Real& timeSinceLastFrame);
 
     /** Add lightning
-        @param p Lightning position
+      @param p Lightning position
       @param d Lightning direction
       @param l Lightning length
-      @return The lightning or null in error case (the max number of simultaneous lightnings is 3)
-      @remarks The lightning will be automatically destroyed one time it'll be finished, so the returned ptr will not
-           be available one time the lightning will have disappeared
+      @return The lightning or null in error case (the max number of
+      simultaneous lightnings is 3)
+      @remarks The lightning will be automatically destroyed one time
+      it'll be finished, so the returned ptr will not
+      be available one time the lightning will have disappeared
      */
-    Lightning* addLightning(const Ogre::Vector3& p, const Ogre::Vector3& d, const Ogre::Real l, const Ogre::uint32& div = static_cast<Ogre::uint32>(Ogre::Math::RangeRandom(12, 30)));
+    Lightning* addLightning(const Ogre::Vector3& p, const Ogre::Vector3& d,
+        const Ogre::Real l,
+        const Ogre::uint32& div = static_cast<Ogre::uint32>(
+          Ogre::Math::RangeRandom(12, 30)));
 
     /** Update material
         @remarks To be invoked before each camera rendering process
@@ -186,7 +196,8 @@ namespace SkyX { namespace VClouds{
 
     /** Update render queue group
         @param rqg Render queue group
-        @remarks Only for internal use. Use VClouds::setRenderQueueGroups(...) instead.
+        @remarks Only for internal use.
+        Use VClouds::setRenderQueueGroups(...) instead.
      */
     void _updateRenderQueueGroup(const Ogre::uint8& rqg);
 

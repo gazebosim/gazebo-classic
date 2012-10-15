@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <utility>
 #include "ColorGradient.h"
 
 namespace SkyX
@@ -89,7 +90,8 @@ namespace SkyX
   bool ColorGradient::_checkBounds() const
   {
     std::pair<bool, bool> existbounds;
-    existbounds.first = false; existbounds.second = false;
+    existbounds.first = false;
+    existbounds.second = false;
 
     for (unsigned int k = 0; k < CFrameVector.size(); k++)
     {

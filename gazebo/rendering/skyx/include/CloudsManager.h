@@ -24,6 +24,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_CloudsManager_H_
 #define _SkyX_CloudsManager_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
 #include "ColorGradient.h"
@@ -63,7 +64,7 @@ namespace SkyX
         Options()
             : Height(100)
             , Scale(0.001f)
-            , WindDirection(Ogre::Vector2(1,1))
+            , WindDirection(Ogre::Vector2(1, 1))
             , TimeMultiplier(0.125f)
             , DistanceAttenuation(0.05f)
             , DetailAttenuation(1)
