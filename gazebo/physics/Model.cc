@@ -184,8 +184,9 @@ void Model::Update()
 {
   this->updateMutex->lock();
 
-  /// Plugins that manipulate joints (and probably other properties) require
-  /// one iteration of the physics engine. Do not remove this.
+  /// Load plugins for this model once
+  /// @todo: john: this works fine, but we should add a regression test
+  /// to make sure there is no race condition.
   if (!this->pluginsLoaded)
   {
     this->LoadPlugins();

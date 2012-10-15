@@ -389,6 +389,8 @@ void World::Update()
 
     this->physicsEngine->UpdatePhysics();
 
+    /// need this because ODE does not call dxReallocateWorldProcessContext()
+    /// until dWorld.*Step
     /// Plugins that manipulate joints (and probably other properties) require
     /// one iteration of the physics engine. Do not remove this.
     if (!this->pluginsLoaded)
