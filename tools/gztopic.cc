@@ -105,7 +105,7 @@ transport::ConnectionPtr connect_to_master(const std::string &host,
   {
     msgs::GzString msg;
     msg.ParseFromString(packet.serialized_data());
-    if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
+    if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION_FULL)
       std::cerr << "Conflicting gazebo versions\n";
   }
 

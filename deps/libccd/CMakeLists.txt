@@ -14,4 +14,5 @@ include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/libccd/include )
 
 
 gz_add_library(gazebo_ccd ${sources})
+target_link_libraries(gazebo_ccd m)
 gz_install_library(gazebo_ccd)
