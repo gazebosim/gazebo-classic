@@ -82,8 +82,6 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
 
-  this->plugins_loaded_ = false;
-
   this->name = _name;
 
   this->needsReset = false;
@@ -363,13 +361,16 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
+  static bool first = true;
+
+
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
-  if (!this->plugins_loaded_)
+  if (first)
   {
     this->physicsEngine->UpdatePhysics();
     this->LoadPlugins();
-    this->plugins_loaded_ = true;
+    first = false;
     return;
   }
 
@@ -877,6 +878,15 @@ void World::ModelUpdateSingleLoop()
 //////////////////////////////////////////////////
 void World::LoadPlugins()
 {
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+  {
+    if (boost::shared_dynamic_cast<Model>(this->rootElement->GetChild(i)))
+    {
+      boost::shared_dynamic_cast<Model>(
+          this->rootElement->GetChild(i))->LoadPlugins();
+    }
+  }
+
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {

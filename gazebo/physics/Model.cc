@@ -70,7 +70,6 @@ Model::Model(BasePtr _parent)
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
   this->jointController = NULL;
-  this->plugins_loaded_ = false;
 }
 
 //////////////////////////////////////////////////
@@ -100,7 +99,7 @@ void Model::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
-    bool canonical_link_initialized = false;
+    bool first = true;
     while (linkElem)
     {
       // Create a new link
@@ -110,11 +109,11 @@ void Model::Load(sdf::ElementPtr _sdf)
       // FIXME: canonical link is hardcoded to the first link.
       //        warn users for now, need  to add parsing of
       //        the canonical tag in sdf
-      if (!canonical_link_initialized)
+      if (first)
       {
         link->SetCanonicalLink(true);
         this->canonicalLink = link;
-        canonical_link_initialized = true;
+        first = false;
       }
 
       // Load the link using the config node. This also loads all of the
@@ -183,15 +182,6 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
-
-  /// Plugins that manipulate joints (and probably other properties) require
-  /// one iteration of the physics engine. Do not remove this.
-  if (!this->plugins_loaded_)
-  {
-    this->LoadPlugins();
-    this->plugins_loaded_ = true;
-    return;
-  }
 
   if (this->jointController)
     this->jointController->Update();
@@ -665,7 +655,6 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
-  gzerr << "\n";
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {
