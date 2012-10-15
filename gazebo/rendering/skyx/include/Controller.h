@@ -37,7 +37,7 @@ namespace SkyX
         @param deleteBySkyX true to automatically destroy the controller by SkyX, false otherwise
      */
     inline Controller(const bool& deleteBySkyX)
-    	: mDeleteBySkyX(deleteBySkyX)
+        : mDeleteBySkyX(deleteBySkyX)
     {
     }
 
@@ -47,7 +47,7 @@ namespace SkyX
 
     /** Update controller
         @param simDeltaTime Simulation delta time (It's not the time since last frame, it's the delta simulation time, one
-    						time the time since last frame has been multiplied by the time multiplier)
+                            time the time since last frame has been multiplied by the time multiplier)
      */
     inline virtual void update(const Ogre::Real& /*simDeltaTime*/){}
 
@@ -71,7 +71,7 @@ namespace SkyX
      */
     inline const bool& getDeleteBySkyX() const
     {
-    	return mDeleteBySkyX;
+        return mDeleteBySkyX;
     }
 
   private:

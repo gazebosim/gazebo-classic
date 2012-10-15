@@ -70,8 +70,8 @@ namespace SkyX { namespace VClouds
 
     if (mVolCloudsMaterial.isNull() || mVolCloudsLightningMaterial.isNull())
     {
-    	SkyXLOG("Error while creating SkyX::VClouds::VClouds, materials are not found");
-    	return;
+        SkyXLOG("Error while creating SkyX::VClouds::VClouds, materials are not found");
+        return;
     }
 
     // Data manager
@@ -79,14 +79,14 @@ namespace SkyX { namespace VClouds
 
     // Geometry manager
     mGeometryManager->create(mGeometrySettings.Height, mGeometrySettings.Radius, mGeometrySettings.Alpha,
-    	mGeometrySettings.Beta, mGeometrySettings.NumberOfBlocks, mGeometrySettings.Na, mGeometrySettings.Nb, mGeometrySettings.Nc);
+        mGeometrySettings.Beta, mGeometrySettings.NumberOfBlocks, mGeometrySettings.Na, mGeometrySettings.Nb, mGeometrySettings.Nc);
 
     mGeometryManager->getSceneNode()->setVisible(mVisible);
 
     mVolCloudsMaterial
-    	->getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
+        ->getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
     mVolCloudsLightningMaterial->
-    	getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
+        getTechnique(0)->getPass(0)->getVertexProgramParameters()->setNamedConstant("uRadius", mGeometrySettings.Radius);
 
     // Lightning manager
     mLightningManager->create();
@@ -124,7 +124,7 @@ namespace SkyX { namespace VClouds
   {
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mDataManager->remove();
@@ -144,7 +144,7 @@ namespace SkyX { namespace VClouds
   {
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mDataManager->update(timeSinceLastFrame);
@@ -153,17 +153,17 @@ namespace SkyX { namespace VClouds
 
     if (mLightningManager->isEnabled())
     {
-    	mVolCloudsLightningMaterial->
-    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
-    	mVolCloudsLightningMaterial->
-    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
+        mVolCloudsLightningMaterial->
+            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
+        mVolCloudsLightningMaterial->
+            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
     }
     else
     {
-    	mVolCloudsMaterial->
-    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
-    	mVolCloudsMaterial->
-    		getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
+        mVolCloudsMaterial->
+            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
+        mVolCloudsMaterial->
+            getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("uSunDirection", -mSunDirection);
     }
   }
 
@@ -171,7 +171,7 @@ namespace SkyX { namespace VClouds
   {
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mCamera = c;
@@ -180,17 +180,17 @@ namespace SkyX { namespace VClouds
     bool isRegistered = false;
     for (Ogre::uint32 k = 0; k < mCamerasData.size(); k++)
     {
-    	if (mCamerasData.at(k).camera == c)
-    	{
-    		isRegistered = true;
-    		break;
-    	}
+        if (mCamerasData.at(k).camera == c)
+        {
+            isRegistered = true;
+            break;
+        }
     }
 
     if (!isRegistered)
     {
-    	mCamerasData.push_back(CameraData(c));
-    	SkyXLOG("VClouds warning: unregistered camera registered, manual unregistering is needed before camera destruction");
+        mCamerasData.push_back(CameraData(c));
+        SkyXLOG("VClouds warning: unregistered camera registered, manual unregistering is needed before camera destruction");
     }
 
     mGeometryManager->updateGeometry(c, timeSinceLastCameraFrame);
@@ -201,10 +201,10 @@ namespace SkyX { namespace VClouds
   {
     for (Ogre::uint32 k = 0; k < mCamerasData.size(); k++)
     {
-    	if (mCamerasData.at(k).camera == c)
-    	{
-    		return;
-    	}
+        if (mCamerasData.at(k).camera == c)
+        {
+            return;
+        }
     }
 
     mCamerasData.push_back(CameraData(c));
@@ -214,11 +214,11 @@ namespace SkyX { namespace VClouds
   {
     for (std::vector<CameraData>::iterator it = mCamerasData.begin(); it != mCamerasData.end(); it++)
     {
-    	if ((*it).camera == c)
-    	{
-    		mCamerasData.erase(it);
-    		return;
-    	}
+        if ((*it).camera == c)
+        {
+            mCamerasData.erase(it);
+            return;
+        }
     }
   }
 
@@ -228,7 +228,7 @@ namespace SkyX { namespace VClouds
 
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mGeometryManager->getSceneNode()->setVisible(mVisible);
@@ -241,7 +241,7 @@ namespace SkyX { namespace VClouds
 
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mGeometryManager->_updateRenderQueueGroup(rqg.vclouds);
@@ -254,13 +254,13 @@ namespace SkyX { namespace VClouds
 
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uSunColor", mSunColor);
+        ->setNamedConstant("uSunColor", mSunColor);
     mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uSunColor", mSunColor);
+        ->setNamedConstant("uSunColor", mSunColor);
   }
 
   void VClouds::setAmbientColor(const Ogre::Vector3& AmbientColor)
@@ -269,13 +269,13 @@ namespace SkyX { namespace VClouds
 
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uAmbientColor", mAmbientColor);
+        ->setNamedConstant("uAmbientColor", mAmbientColor);
     mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uAmbientColor", mAmbientColor);
+        ->setNamedConstant("uAmbientColor", mAmbientColor);
   }
 
   void VClouds::setLightResponse(const Ogre::Vector4& LightResponse)
@@ -284,13 +284,13 @@ namespace SkyX { namespace VClouds
 
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uLightResponse", mLightResponse);
+        ->setNamedConstant("uLightResponse", mLightResponse);
     mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uLightResponse", mLightResponse);
+        ->setNamedConstant("uLightResponse", mLightResponse);
   }
 
   void VClouds::setAmbientFactors(const Ogre::Vector4& AmbientFactors)
@@ -299,13 +299,13 @@ namespace SkyX { namespace VClouds
 
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mVolCloudsMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uAmbientFactors", mAmbientFactors);
+        ->setNamedConstant("uAmbientFactors", mAmbientFactors);
     mVolCloudsLightningMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters()
-    	->setNamedConstant("uAmbientFactors", mAmbientFactors);
+        ->setNamedConstant("uAmbientFactors", mAmbientFactors);
   }
 
   void VClouds::setWheater(const float& Humidity, const float& AverageCloudsSize, const bool& DelayedResponse)
@@ -315,7 +315,7 @@ namespace SkyX { namespace VClouds
 
     if (!mCreated)
     {
-    	return;
+        return;
     }
 
     mDataManager->setWheater(mWheater.x, mWheater.y, mDelayedResponse);
