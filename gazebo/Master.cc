@@ -75,7 +75,7 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 {
   // Send the gazebo version string
   msgs::GzString versionMsg;
-  versionMsg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
+  versionMsg.set_data(std::string("gazebo ") + GAZEBO_VERSION_FULL);
   new_connection->EnqueueMsg(msgs::Package("version_init", versionMsg), true);
 
   // Send all the current topic namespaces

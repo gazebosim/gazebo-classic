@@ -6,6 +6,7 @@
 #define GAZEBO_PATCH_VERSION ${GAZEBO_PATCH_VERSION}
 
 #define GAZEBO_VERSION "${GAZEBO_VERSION}"
+#define GAZEBO_VERSION_FULL "${GAZEBO_VERSION_FULL}"
 #define GAZEBO_VERSION_NAME ${GAZEBO_VERSION_NAME}
 
 #define GAZEBO_VERSION_HEADER "Gazebo multi-robot simulator, version ${GAZEBO_VERSION}\nCopyright (C) 2011 Nate Koenig, John Hsu, and contributors.\nReleased under the Apache 2 License.\nhttp://gazebosim.org\n\n"
