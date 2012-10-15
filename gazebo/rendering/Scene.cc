@@ -583,6 +583,12 @@ void Scene::SelectVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+VisualPtr Scene::GetSelectedVisual() const
+{
+  return this->selectedVis;
+}
+
+//////////////////////////////////////////////////
 VisualPtr Scene::GetVisualAt(CameraPtr _camera,
                              const math::Vector2i &_mousePos,
                              std::string &_mod)
@@ -1351,11 +1357,6 @@ void Scene::PreRender()
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      /*if (this->selectionObj->GetVisualName().empty() ||
-          !this->selectionObj->IsActive() ||
-          iter->first.find(this->selectionObj->GetVisualName()) ==
-          std::string::npos)
-          */
       if (!this->selectedVis ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
