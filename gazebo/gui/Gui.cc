@@ -25,7 +25,6 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/LightRightMenu.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/Gui.hh"
 
@@ -41,7 +40,6 @@ po::variables_map vm;
 using namespace gazebo;
 
 gui::ModelRightMenu *g_modelRightMenu = NULL;
-gui::LightRightMenu *g_lightRightMenu = NULL;
 
 std::string g_worldname = "default";
 
@@ -133,7 +131,6 @@ namespace gazebo
     void load()
     {
       g_modelRightMenu = new gui::ModelRightMenu();
-      g_lightRightMenu = new gui::LightRightMenu();
 
       rendering::load();
       rendering::init();

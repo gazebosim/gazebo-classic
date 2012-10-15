@@ -71,7 +71,8 @@ void TrimeshShape::Init()
     }
   }
 
-  this->mesh = meshManager->Load(filename);
+  if ((this->mesh = meshManager->Load(filename)) == NULL)
+    gzerr << "Unable to load mesh from file[" << filename << "]\n";
 }
 
 //////////////////////////////////////////////////

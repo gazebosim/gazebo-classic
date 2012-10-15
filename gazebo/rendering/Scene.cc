@@ -99,6 +99,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
@@ -122,7 +123,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       &Scene::OnResponse, this);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
@@ -528,7 +528,8 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 LightPtr Scene::GetLight(const std::string &_name) const
 {
   LightPtr result;
-  Light_M::const_iterator iter = this->lights.find(_name);
+  std::string n = this->StripSceneName(_name);
+  Light_M::const_iterator iter = this->lights.find(n);
   if (iter != this->lights.end())
     result = iter->second;
   return result;
@@ -1827,6 +1828,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
   iter = this->lights.find(_msg->name());
+
 
   if (iter == this->lights.end())
   {
