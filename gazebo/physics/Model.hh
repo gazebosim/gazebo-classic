@@ -286,7 +286,7 @@ namespace gazebo
       private: boost::recursive_mutex *updateMutex;
       private: JointController *jointController;
 
-      private: bool plugins_loaded;
+      private: bool pluginsLoaded;
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;

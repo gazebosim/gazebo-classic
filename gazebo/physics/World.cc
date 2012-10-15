@@ -82,7 +82,7 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
 
-  this->plugins_loaded = false;
+  this->pluginsLoaded = false;
 
   this->name = _name;
 
@@ -391,10 +391,10 @@ void World::Update()
 
     /// Plugins that manipulate joints (and probably other properties) require
     /// one iteration of the physics engine. Do not remove this.
-    if (!this->plugins_loaded)
+    if (!this->pluginsLoaded)
     {
       this->LoadPlugins();
-      this->plugins_loaded = true;
+      this->pluginsLoaded = true;
     }
 
     // do this after physics update as
