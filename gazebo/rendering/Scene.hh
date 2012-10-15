@@ -352,6 +352,11 @@ namespace gazebo
       public: VisualPtr CloneVisual(const std::string &_visualName,
                                     const std::string &_newName);
 
+      /// \brief Get the currently selected visual.
+      /// \return Pointer to the currently selected visual, or NULL if
+      /// nothing is selected.
+      public: VisualPtr GetSelectedVisual() const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
