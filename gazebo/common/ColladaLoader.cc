@@ -723,6 +723,9 @@ void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
   TiXmlElement *meshXml = _xml->FirstChildElement("mesh");
   TiXmlElement *childXml;
 
+  if (!meshXml)
+    return;
+
   childXml = meshXml->FirstChildElement("triangles");
   while (childXml)
   {
@@ -791,6 +794,10 @@ void ColladaLoader::LoadVertices(const std::string &_id,
 {
   TiXmlElement *verticesXml = this->GetElementId(this->colladaXml,
                                                  "vertices", _id);
+
+  _verts.clear();
+  _norms.clear();
+
   if (!verticesXml)
   {
     gzerr << "Unable to find vertices[" << _id << "] in collada file\n";
@@ -848,6 +855,8 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     const math::Matrix4 &_transform,
     std::vector<math::Vector3> &_values)
 {
+  _values.clear();
+
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
   {
@@ -858,7 +867,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
   TiXmlElement *floatArrayXml = normalsXml->FirstChildElement("float_array");
   if (!floatArrayXml)
   {
-    gzerr << "Normal source missing float_array element\n";
+    gzwarn << "Normal source missing float_array element\n";
     return;
   }
 
@@ -912,9 +921,12 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 /////////////////////////////////////////////////
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
 {
-  Material *mat = new Material();
 
   TiXmlElement *matXml = this->GetElementId("material", _name);
+  if (!matXml || !matXml->FirstChildElement("instance_effect"))
+    return NULL;
+
+  Material *mat = new Material();
   std::string effectName =
     matXml->FirstChildElement("instance_effect")->Attribute("url");
   TiXmlElement *effectXml = this->GetElementId("effect", effectName);
