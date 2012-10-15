@@ -121,6 +121,10 @@ namespace gazebo
       /// \param _sdf SDF parameters
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
+      /// \brief Callback when a world control message is received.
+      /// \param[in] _data The world control message.
+      private: void OnControl(ConstWorldControlPtr &_data);
+
       /// \brief True if active
       protected: bool active;
       protected: sdf::ElementPtr sdf;
@@ -128,6 +132,7 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
       protected: transport::NodePtr node;
       protected: transport::SubscriberPtr poseSub;
+      private: transport::SubscriberPtr controlSub;
       private: transport::PublisherPtr sensorPub;
 
       protected: std::string parentName;
