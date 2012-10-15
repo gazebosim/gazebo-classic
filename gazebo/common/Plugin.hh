@@ -65,6 +65,7 @@ namespace gazebo
   template<class T>
   class PluginT
   {
+	/// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
             /// \brief Get the name of the handler
@@ -79,6 +80,9 @@ namespace gazebo
               return this->handle;
             }
 
+    /// \brief a class method that creates a plugin from a file name. It locates the shared library and loads it dynamically.
+    /// \param[in] _filename the path to the shared library.
+    /// \param[in] _handle short name of the handler
     public: static TPtr Create(const std::string &_filename,
                 const std::string &_handle)
             {
@@ -180,15 +184,22 @@ namespace gazebo
               return result;
             }
 
+    /// \brief Returns the type of the plugin
     public: PluginType GetType() const
             {
               return this->type;
             }
 
+    /// \brief Type of plugin
     protected: PluginType type;
+
+    /// \brief Path to the shared library file
     protected: std::string filename;
+
+    /// \brief Short name
     protected: std::string handle;
 
+    /// \brief Pointer to shared library registration function definition
     private: typedef union
              {
                T *(*func)();
@@ -208,10 +219,11 @@ namespace gazebo
     ///
     /// Called when a Plugin is first created, and after the World has been
     /// loaded. This function should not be blocking.
-    /// \param _world Pointer the World
-    /// \param _sdf Pointer the the SDF element of the plugin.
+    /// \param[in] _world Pointer the World
+    /// \param[in] _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::WorldPtr _world,
                               sdf::ElementPtr _sdf) = 0;
+
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -221,6 +233,7 @@ namespace gazebo
   ///        reference</a>.
   class ModelPlugin : public PluginT<ModelPlugin>
   {
+	/// \brief Constructor
     public: ModelPlugin()
              {this->type = MODEL_PLUGIN;}
 
@@ -232,7 +245,11 @@ namespace gazebo
     /// \param _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::ModelPtr _model,
                               sdf::ElementPtr _sdf) = 0;
+
+    /// \brief Override this method for custom plugin initialization behavior.
     public: virtual void Init() {}
+
+    /// \brief Override this method for custom plugin reset behavior.
     public: virtual void Reset() {}
   };
 
@@ -249,11 +266,15 @@ namespace gazebo
     ///
     /// Called when a Plugin is first created, and after the World has been
     /// loaded. This function should not be blocking.
-    /// \param _sensor Pointer the Sensor
-    /// \param _sdf Pointer the the SDF element of the plugin.
+    /// \param[in] _sensor Pointer the Sensor.
+    /// \param[in] _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr _sdf) = 0;
+
+    /// \brief Override this method for custom plugin initialization behavior.
     public: virtual void Init() {}
+
+    /// \brief Override this method for custom plugin reset behavior.
     public: virtual void Reset() {}
   };
 
@@ -278,11 +299,16 @@ namespace gazebo
     /// Called after Gazebo has been loaded. Must not block.
     public: virtual void Init() {}
 
+    /// \brief Override this method for custom plugin reset behavior.
     public: virtual void Reset() {}
   };
 
   /// \}
 
+/// \brief Plugin registration function for model plugin. Part of the shared
+/// object interface. This function is called when loading the shared library
+/// to add the plugin to the registered list.
+/// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
   extern "C" gazebo::ModelPlugin *RegisterPlugin(); \
   gazebo::ModelPlugin *RegisterPlugin() \
@@ -290,6 +316,10 @@ namespace gazebo
     return new classname();\
   }
 
+/// \brief Plugin registration function for world plugin. Part of the shared
+/// object interface. This function is called when loading the shared library
+/// to add the plugin to the registered list.
+/// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
   extern "C" gazebo::WorldPlugin *RegisterPlugin(); \
   gazebo::WorldPlugin *RegisterPlugin() \
@@ -297,6 +327,10 @@ namespace gazebo
     return new classname();\
   }
 
+/// \brief Plugin registration function for sensors. Part of the shared object
+/// interface. This function is called when loading the shared library to add
+/// the plugin to the registered list.
+/// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
   extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
   gazebo::SensorPlugin *RegisterPlugin() \
@@ -304,6 +338,10 @@ namespace gazebo
     return new classname();\
   }
 
+/// \brief Plugin registration function for system plugin. Part of the
+/// shared object interface. This function is called when loading the shared
+/// library to add the plugin to the registered list.
+/// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
   extern "C" gazebo::SystemPlugin *RegisterPlugin(); \
   gazebo::SystemPlugin *RegisterPlugin() \
