@@ -1,5 +1,0 @@
-<!-- Gripper -->
-<element name="gripper" required="*">
-  <attribute name="name" type="string" default="__default__" required="1"/>
-  <element name="joint" type="string" default="__default__" required="+"/>
-</element>

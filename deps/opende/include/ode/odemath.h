@@ -191,7 +191,7 @@ PURE_INLINE dReal dCalcVectorDot3_44 (const dReal *a, const dReal *b) { return _
 /*
  * cross product, set res = a x b. _dCalcVectorCross3 means that elements of `res', `a'
  * and `b' are spaced step_res, step_a and step_b indexes apart respectively.
- * dCalcVectorCross3() means dCross3111. 
+ * dCalcVectorCross3() means dCross3111.
  */
 
 PURE_INLINE void _dCalcVectorCross3(dReal *res, const dReal *a, const dReal *b, unsigned step_res, unsigned step_a, unsigned step_b)
@@ -313,8 +313,8 @@ PURE_INLINE void dMultiplyHelper1_133(dReal *res, const dReal *a, const dReal *b
   res[0] = res_0; res[1] = res_1; res[2] = res_2;
 }
 
-/* 
-Note: NEVER call any of these functions/macros with the same variable for A and C, 
+/*
+Note: NEVER call any of these functions/macros with the same variable for A and C,
 it is not equivalent to A*=B.
 */
 

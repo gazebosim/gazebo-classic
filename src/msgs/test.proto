@@ -1,8 +1,0 @@
-package gazebo.msgs;
-
-import "header.proto";
-
-message Test
-{
-  required Header header = 1;
-}

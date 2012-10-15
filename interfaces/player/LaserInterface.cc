@@ -180,7 +180,8 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
     this->data.scan.intensity_count = _msg->ranges_size();
   this->data.scan.id = this->scanId++;
 
-  if (!gazebo::math::equal(oldCount, this->data.scan.ranges_count))
+  if (!gazebo::math::equal(oldCount,
+        static_cast<double>(this->data.scan.ranges_count)))
   {
     delete [] this->data.scan.ranges;
     delete [] this->data.scan.intensity;

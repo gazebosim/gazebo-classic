@@ -1,0 +1,23 @@
+<!-- Link -->
+<element name="link" required="+">
+  <attribute name="name" type="string" default="__default__" required="1"/>
+  <attribute name="gravity" type="bool" default="true" required="0"/>
+  <attribute name="self_collide" type="bool" default="false" required="0"/>
+  <attribute name="kinematic" type="bool" default="false" required="0"/>
+
+  <element name="origin" required="0">
+    <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+  </element> <!-- End Origin -->
+
+  <element name="damping" required="1">
+    <element name="linear" type="double" default="0.0" required="1"/>
+    <element name="angular" type="double" default="0.0" required="1"/>
+  </element> <!-- End damping -->
+
+  <include filename="inertial.sdf" required="0"/>
+  <include filename="collision.sdf" required="*"/>
+  <include filename="visual.sdf" required="*"/>
+  <include filename="sensor.sdf" required="*"/>
+  <include filename="projector.sdf" required="*"/>
+
+</element> <!-- End Link -->
