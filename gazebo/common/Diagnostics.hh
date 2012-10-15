@@ -51,16 +51,16 @@ namespace gazebo
       private: virtual ~DiagnosticManager();
 
       /// \brief Create a new timer instance
-      /// \param _name Name of the timer.
+      /// \param[in] _name Name of the timer.
       /// \return A pointer to the new diagnostic timer
       public: DiagnosticTimerPtr CreateTimer(const std::string &_name);
 
       /// \brief A diagnostic timer has started
-      /// \param _timer The timer to start
+      /// \param[in] _timer The timer to start
       public: void TimerStart(DiagnosticTimer *_timer);
 
-      /// \brief A diagnostic timer has stoped
-      /// \param _time The timer to stop
+      /// \brief A diagnostic timer has stopped
+      /// \param[in] _time The timer to stop
       public: void TimerStop(DiagnosticTimer *_timer);
 
       /// \brief Get the number of timers
@@ -68,30 +68,32 @@ namespace gazebo
       public: int GetTimerCount() const;
 
       /// \brief Get the time of a timer instance
-      /// \param _index The index of a timer instance
-      /// \param Time of the specified timer
+      /// \param[in] _index The index of a timer instance
+      /// \return Time of the specified timer
       public: Time GetTime(int _index) const;
 
       /// \brief Get a time based on a label
-      /// \param _label Name of the timer instance
-      /// \param Time of the specified timer
+      /// \param[in] _label Name of the timer instance
+      /// \return Time of the specified timer
       public: Time GetTime(const std::string &_label) const;
 
       /// \brief Get a label for a timer
-      /// \param _index Index of a timer instance
-      /// \return Lable of the specified timer
+      /// \param[in] _index Index of a timer instance
+      /// \return Label of the specified timer
       public: std::string GetLabel(int _index) const;
 
       /// \brief Set whether timers are enabled
-      /// \param _e True = timers are enabled
+      /// \param[in] _e True = timers are enabled
       public: void SetEnabled(bool _e) {this->enabled = _e;}
 
       /// \brief Get whether the timers are enabled
       /// \return TRue if the timers are enabled
       public: inline bool GetEnabled() const {return this->enabled;}
 
+      /// \brief always false, has not effect
       private: bool enabled;
 
+      /// \brief dictionary of timers index by name
       private: std::map<std::string, Time> timers;
 
       // Singleton implementation
@@ -102,7 +104,7 @@ namespace gazebo
     class DiagnosticTimer : public Timer
     {
       /// \brief Constructor
-      /// \param _name Name of the timer
+      /// \param[in] _name Name of the timer
       public: DiagnosticTimer(const std::string &_name) : Timer()
               {
                 this->Start();
@@ -121,7 +123,10 @@ namespace gazebo
       public: inline const std::string GetName() const
               { return this->name; }
 
+      /// \brief not used
       private: std::string name;
+
+      /// \brief singleton instance
       private: static DiagnosticManager *diagManager;
     };
     /// \}
