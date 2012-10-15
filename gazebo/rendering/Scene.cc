@@ -42,7 +42,6 @@
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
-#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
@@ -112,17 +111,24 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
                                              &Scene::OnModelMsg, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+
+  this->requestSub = this->node->Subscribe("~/request",
+      &Scene::OnRequest, this);
+
+  // \TODO: This causes the Scene to occasionally miss the response to
+  // scene_info
+  // this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->responseSub = this->node->Subscribe("~/response",
       &Scene::OnResponse, this);
+  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
-
-  this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
   this->heightmap = NULL;
+  this->selectedVis.reset();
 }
 
 //////////////////////////////////////////////////
@@ -155,7 +161,6 @@ void Scene::Clear()
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
-  delete this->selectionObj;
   delete this->requestMsg;
   delete this->receiveMutex;
   delete this->raySceneQuery;
@@ -266,10 +271,6 @@ void Scene::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
-
-  // Register this scene the the real time shaders system
-  this->selectionObj->Init();
-
 
   // TODO: Add GUI option to view all contacts
   /*ContactVisualPtr contactVis(new ContactVisual(
@@ -576,29 +577,10 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Scene::SelectVisual(const std::string &_name) const
+void Scene::SelectVisual(const std::string &_name)
 {
-  VisualPtr vis = this->GetVisual(_name);
-  if (vis)
-    this->selectionObj->Attach(vis);
-  else
-    this->selectionObj->Clear();
+  this->selectedVis = this->GetVisual(_name);
 }
-
-//////////////////////////////////////////////////
-VisualPtr Scene::SelectVisualAt(CameraPtr _camera,
-                                const math::Vector2i &_mousePos)
-{
-  std::string mod;
-  VisualPtr vis = this->GetVisualAt(_camera, _mousePos, mod);
-  if (vis)
-    this->selectionObj->Attach(vis);
-  else
-    this->selectionObj->Clear();
-
-  return vis;
-}
-
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisualAt(CameraPtr _camera,
@@ -835,11 +817,14 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
       static_cast<float>(_mousePos.y) /
       ogreCam->getViewport()->getActualHeight());
 
+  this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setRay(mouseRay);
 
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+  for (;iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
 
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 
@@ -1366,10 +1351,13 @@ void Scene::PreRender()
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      if (this->selectionObj->GetVisualName().empty() ||
+      /*if (this->selectionObj->GetVisualName().empty() ||
           !this->selectionObj->IsActive() ||
           iter->first.find(this->selectionObj->GetVisualName()) ==
           std::string::npos)
+          */
+      if (!this->selectedVis ||
+          iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
         iter->second->SetPose(pose);
@@ -1393,10 +1381,8 @@ void Scene::PreRender()
       if (iter2 != this->visuals.end())
       {
         // If an object is selected, don't let the physics engine move it.
-        if (this->selectionObj->GetVisualName().empty() ||
-           !this->selectionObj->IsActive() ||
-           iter->first.find(this->selectionObj->GetVisualName()) ==
-            std::string::npos)
+        if (!this->selectedVis ||
+          iter->first.find(this->selectedVis->GetName()) == std::string::npos)
         {
           math::Pose pose = msgs::Convert(pose_msg);
           iter2->second->SetPose(pose);
@@ -1588,6 +1574,13 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void Scene::OnScene(ConstScenePtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sceneMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
 void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
@@ -1600,7 +1593,6 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   this->requestMsg = NULL;
 }
 
-
 /////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
@@ -1611,7 +1603,31 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 {
-  if (_msg->request() == "entity_delete")
+  if (_msg->request() == "entity_info")
+  {
+    msgs::Response response;
+    response.set_id(_msg->id());
+    response.set_request(_msg->request());
+
+    Light_M::iterator iter;
+    iter = this->lights.find(_msg->data());
+    if (iter != this->lights.end())
+    {
+      msgs::Light lightMsg;
+      iter->second->FillMsg(lightMsg);
+
+      std::string *serializedData = response.mutable_serialized_data();
+      lightMsg.SerializeToString(serializedData);
+      response.set_type(lightMsg.GetTypeName());
+
+      response.set_response("success");
+    }
+    else
+      response.set_response("failure");
+
+    // this->responsePub->Publish(response);
+  }
+  else if (_msg->request() == "entity_delete")
   {
     Visual_M::iterator iter;
     iter = this->visuals.find(_msg->data());
@@ -1817,6 +1833,11 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
     light->LoadFromMsg(_msg);
     this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
+    RTShaderSystem::Instance()->UpdateShaders();
+  }
+  else
+  {
+    iter->second->UpdateFromMsg(_msg);
     RTShaderSystem::Instance()->UpdateShaders();
   }
 }
@@ -2048,8 +2069,8 @@ void Scene::RemoveVisual(VisualPtr _vis)
       this->visuals.erase(iter);
     }
 
-    if (this->selectionObj->GetVisualName() == _vis->GetName())
-      this->selectionObj->Clear();
+    if (this->selectedVis && this->selectedVis->GetName() == _vis->GetName())
+      this->selectedVis.reset();
   }
 }
 
@@ -2111,12 +2132,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-SelectionObj *Scene::GetSelectionObj() const
-{
-  return this->selectionObj;
-}
-
-/////////////////////////////////////////////////
 VisualPtr Scene::CloneVisual(const std::string &_visualName,
                              const std::string &_newName)
 {
@@ -2129,4 +2144,3 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
   }
   return result;
 }
-

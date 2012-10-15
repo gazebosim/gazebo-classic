@@ -48,7 +48,7 @@ void SelectionObj::Init()
 
   Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("unit_box"));
 
-  Ogre::SceneNode *transNode =
+ /* Ogre::SceneNode *transNode =
     this->node->GetSceneNode()->createChildSceneNode("trans_node");
 
   transNode->setInheritOrientation(false);
@@ -158,6 +158,7 @@ void SelectionObj::Init()
   zBox[1]->setInheritOrientation(false);
   zBox[1]->setScale(this->boxSize, this->boxSize, this->boxSize);
   zBox[1]->setPosition(0, 0, -1.5);
+  */
 
   this->node->SetVisible(false);
 }
@@ -168,7 +169,7 @@ void SelectionObj::Attach(VisualPtr _visual)
   this->Clear();
   if (_visual)
   {
-    Ogre::Node *transNode;
+  /*  Ogre::Node *transNode;
 
     math::Box box = _visual->GetBoundingBox();
     _visual->AttachVisual(this->node);
@@ -194,22 +195,25 @@ void SelectionObj::Attach(VisualPtr _visual)
         box.min.z - this->boxSize);
     transNode->getChild("selection_transZ1")->setPosition(0, 0,
         box.max.z + this->boxSize);
-
     this->node->SetVisible(true);
+*/
     this->visualName = _visual->GetName();
   }
+  else
+    this->visualName.clear();
 }
 
 //////////////////////////////////////////////////
 void SelectionObj::Clear()
 {
-  if (this->node->GetSceneNode()->getParentSceneNode())
+  /*if (this->node->GetSceneNode()->getParentSceneNode())
   {
     this->node->GetSceneNode()->getParentSceneNode()->removeChild(
         this->node->GetSceneNode());
   }
 
   this->node->SetVisible(false);
+  */
 }
 
 //////////////////////////////////////////////////

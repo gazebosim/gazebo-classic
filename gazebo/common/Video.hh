@@ -43,7 +43,8 @@ namespace gazebo
 
       /// \brief Load a video file
       /// \param[in] _filename Full path of the video file
-      /// \return false if HAVE_FFMPEG is not defined or if a video stream can't be found
+      /// \return false if HAVE_FFMPEG is not defined or if a video stream
+      /// can't be found
       public: bool Load(const std::string &_filename);
 
       /// \brief Get the width of the video in pixels
@@ -62,12 +63,23 @@ namespace gazebo
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
-      private: AVFormatContext *formatCtx; /// \brief libav Format I/O context
-      private: AVCodecContext *codecCtx;   /// \brief libav main external API structure
-      private: AVFrame *avFrame;		   /// \brief audio video framw
-      private: AVPicture *pic;			   /// \brief audi video picture
-      private: SwsContext *swsCtx;		   /// \brief software scaling context
-      private: int videoStream;			   /// \brief index of first video stream or -1
+      /// \brief libav Format I/O context
+      private: AVFormatContext *formatCtx;
+
+      /// \brief libav main external API structure
+      private: AVCodecContext *codecCtx;
+
+      /// \brief audio video frame
+      private: AVFrame *avFrame;
+
+      /// \brief audi video picture
+      private: AVPicture *pic;
+
+      /// \brief software scaling context
+      private: SwsContext *swsCtx;
+
+      /// \brief index of first video stream or -1
+      private: int videoStream;
     };
     /// \}
   }

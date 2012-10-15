@@ -65,7 +65,7 @@ void ODEHeightmapShape::Init()
       this->vertSize,  // width sampling size
       this->vertSize,  // depth sampling size (along height of image)
       1.0,  // vertical (z-axis) scaling
-      0.0,  // vertical (z-axis) offset
+      this->GetPos().z,  // vertical (z-axis) offset
       1.0,  // vertical thickness for closing the height map mesh
       0);  // wrap mode
 

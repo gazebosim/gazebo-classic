@@ -42,7 +42,6 @@ namespace gazebo
     class DepthCamera;
     class GpuLaser;
     class DynamicLines;
-    class SelectionObj;
     class Visual;
     class LaserVisual;
     class CameraVisual;

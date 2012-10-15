@@ -29,7 +29,6 @@
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
-#include "rendering/SelectionObj.hh"
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/RenderEngine.hh"
 #include "common/MeshManager.hh"
@@ -393,12 +392,12 @@ void Visual::Load()
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
-      std::string uri = scriptElem->GetValueString("uri");
+      std::string matUri = scriptElem->GetValueString("uri");
       std::string matName = scriptElem->GetValueString("name");
 
-      if (!uri.empty())
-        RenderEngine::Instance()->AddResourcePath(uri);
-      if (!name.empty())
+      if (!matUri.empty())
+        RenderEngine::Instance()->AddResourcePath(matUri);
+      if (!matName.empty())
         this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
@@ -541,6 +540,12 @@ bool Visual::HasAttachedObject(const std::string &_name)
   }
 
   return false;
+}
+
+//////////////////////////////////////////////////
+unsigned int Visual::GetAttachedObjectCount() const
+{
+  return this->sceneNode->numAttachedObjects();
 }
 
 //////////////////////////////////////////////////
@@ -722,7 +727,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   {
     this->myMaterialName = _materialName;
   }
-
 
   try
   {
@@ -1057,6 +1061,68 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
+void Visual::SetHighlighted(bool _highlighted)
+{
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+          techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+        if (_highlighted)
+        {
+          pass = technique->createPass();
+          pass->setName("highlight");
+          pass->setDiffuse(
+              Conversions::Convert(common::Color(0.8, 0.8, 0.8, 0.8)));
+          pass->setSelfIllumination(
+              Conversions::Convert(common::Color(0.8, 0.8, 0.8)));
+          pass->setDepthBias(0.2, 0.1);
+
+          pass->setDepthWriteEnabled(false);
+          pass->setDepthCheckEnabled(true);
+          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+        }
+        else
+        {
+          for (unsigned int k = 0; k < technique->getNumPasses(); ++k)
+          {
+            if (technique->getPass(k)->getName() == "highlight")
+            {
+              technique->removePass(k);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetHighlighted(_highlighted);
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
@@ -1081,12 +1147,14 @@ void Visual::SetEmissive(const common::Color &_color)
       Ogre::ColourValue dc;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+          techniqueCount++)
       {
         technique = material->getTechnique(techniqueCount);
 
-        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        for (passCount = 0; passCount < technique->getNumPasses();
+            passCount++)
         {
+          std::cout << "Set emmissive\n";
           pass = technique->getPass(passCount);
           pass->setSelfIllumination(Conversions::Convert(_color));
         }
@@ -1099,7 +1167,6 @@ void Visual::SetEmissive(const common::Color &_color)
     this->children[i]->SetEmissive(_color);
   }
 }
-
 
 //////////////////////////////////////////////////
 float Visual::GetTransparency()
@@ -1125,6 +1192,17 @@ void Visual::SetVisible(bool _visible, bool _cascade)
 {
   this->sceneNode->setVisible(_visible, _cascade);
   this->visible = _visible;
+}
+
+//////////////////////////////////////////////////
+uint32_t Visual::GetVisibilityFlags()
+{
+  if (this->sceneNode->numAttachedObjects() > 0)
+  {
+    return this->sceneNode->getAttachedObject(0)->getVisibilityFlags();
+  }
+
+  return GZ_VISIBILITY_ALL;
 }
 
 //////////////////////////////////////////////////
@@ -1803,13 +1881,32 @@ VisualPtr Visual::GetParent() const
 }
 
 //////////////////////////////////////////////////
+VisualPtr Visual::GetRootVisual()
+{
+  VisualPtr p = shared_from_this();
+  while (p->GetParent()->GetName() != "__world_node__")
+    p = p->GetParent();
+
+  return p;
+}
+
+//////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-  if (this->sdf->HasElement("geometry"))
+   if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
-    return geomElem->HasElement("plane");
+    if (geomElem->HasElement("plane"))
+      return true;
   }
+
+  std::vector<VisualPtr>::const_iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->IsPlane())
+      return true;
+  }
+
   return false;
 }
 

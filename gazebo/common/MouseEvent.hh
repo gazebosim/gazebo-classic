@@ -32,11 +32,13 @@ namespace gazebo
       public: enum Buttons {NO_BUTTON = 0x0, LEFT = 0x1, MIDDLE = 0x2,
                             RIGHT = 0x4};
       public: enum EventType {NO_EVENT, MOVE, PRESS, RELEASE, SCROLL};
+
       public: MouseEvent()
               : pos(0, 0), prevPos(0, 0), pressPos(0, 0), scroll(0, 0),
                 moveScale(0.01), dragging(false), type(NO_EVENT), button(0),
-                buttons(NO_BUTTON), shift(false), control(false)
+                buttons(NO_BUTTON), shift(false), alt(false), control(false)
               {}
+
       public: math::Vector2i pos;
       public: math::Vector2i prevPos;
       public: math::Vector2i pressPos;
@@ -54,6 +56,7 @@ namespace gazebo
       public: unsigned int buttons;
 
       public: bool shift;
+      public: bool alt;
       public: bool control;
     };
     /// \}

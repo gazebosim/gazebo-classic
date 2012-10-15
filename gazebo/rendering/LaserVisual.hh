@@ -51,6 +51,9 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~LaserVisual();
 
+      /// Documentation inherited from parent.
+      public: virtual void SetEmissive(const common::Color &_color);
+
       /// \brief Callback when laser data is received.
       private: void OnScan(ConstLaserScanPtr &_msg);
 

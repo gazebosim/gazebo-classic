@@ -19,13 +19,12 @@
 
 #include <string>
 #include "common/CommonTypes.hh"
+#include "rendering/RenderTypes.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class UserCamera;
-
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -35,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _camera The user camera to controll.
-      public: ViewController(UserCamera *_camera);
+      public: ViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~ViewController();
@@ -65,7 +64,7 @@ namespace gazebo
       public: std::string GetTypeString() const;
 
       /// \brief Pointer to the camera to control.
-      protected: UserCamera *camera;
+      protected: UserCameraPtr camera;
 
       /// \brief True if enabled.
       protected: bool enabled;

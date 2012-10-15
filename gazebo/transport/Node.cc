@@ -172,6 +172,24 @@ void Node::ProcessIncoming()
   this->incomingMutex->unlock();
 }
 
+//////////////////////////////////////////////////
+void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
+{
+  // Find the callbacks for the topic
+  Callback_M::iterator cbIter = this->callbacks.find(_topic);
+
+  if (cbIter != this->callbacks.end())
+  {
+    // Send the message to all callbacks
+    for (Callback_L::iterator liter = cbIter->second.begin();
+         liter != cbIter->second.end(); ++liter)
+    {
+      if ((*liter)->GetLatching())
+        (*liter)->HandleData(_msg);
+    }
+  }
+}
+
 /////////////////////////////////////////////////
 std::string Node::GetMsgType(const std::string &_topic) const
 {

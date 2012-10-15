@@ -585,6 +585,8 @@ namespace gazebo
         result.set_type(msgs::Fog::EXPONENTIAL);
       else if (type == "exp2")
         result.set_type(msgs::Fog::EXPONENTIAL2);
+      else if (type == "none")
+        result.set_type(msgs::Fog::NONE);
       else
         gzthrow(std::string("Unknown fog type[") + type + "]");
 

@@ -719,7 +719,7 @@ bool Element::HasElementDescription(const std::string &_name)
 /////////////////////////////////////////////////
 ElementPtr Element::AddElement(const std::string &_name)
 {
-  ElementPtr_V::const_iterator iter;
+  ElementPtr_V::const_iterator iter, iter2;
   for (iter = this->elementDescriptions.begin();
       iter != this->elementDescriptions.end(); ++iter)
   {
@@ -728,6 +728,14 @@ ElementPtr Element::AddElement(const std::string &_name)
       ElementPtr elem = (*iter)->Clone();
       elem->SetParent(shared_from_this());
       this->elements.push_back(elem);
+
+      // Add all child elements.
+      for (iter2 = elem->elementDescriptions.begin();
+           iter2 != elem->elementDescriptions.end(); ++iter2)
+      {
+        elem->AddElement((*iter2)->name);
+      }
+
       return this->elements.back();
     }
   }
