@@ -82,7 +82,7 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
 
-  this->plugins_loaded_ = false;
+  this->plugins_loaded = false;
 
   this->name = _name;
 
@@ -363,16 +363,6 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
-  /// Plugins that manipulate joints (and probably other properties) require
-  /// one iteration of the physics engine. Do not remove this.
-  if (!this->plugins_loaded_)
-  {
-    this->physicsEngine->UpdatePhysics();
-    this->LoadPlugins();
-    this->plugins_loaded_ = true;
-    return;
-  }
-
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -398,6 +388,14 @@ void World::Update()
     this->physicsEngine->UpdateCollision();
 
     this->physicsEngine->UpdatePhysics();
+
+    /// Plugins that manipulate joints (and probably other properties) require
+    /// one iteration of the physics engine. Do not remove this.
+    if (!this->plugins_loaded)
+    {
+      this->LoadPlugins();
+      this->plugins_loaded = true;
+    }
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
