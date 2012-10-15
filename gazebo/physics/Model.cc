@@ -665,7 +665,6 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
-  gzerr << "\n";
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {
