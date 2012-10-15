@@ -44,7 +44,7 @@ namespace gazebo
       public: virtual ~Material();
 
       /// \brief Create a material with a default color
-      /// \param _clr Color of the material
+      /// \param[in] _clr Color of the material
       public: Material(const Color &_clr);
 
       /// \brief Get the name of the material
@@ -52,22 +52,23 @@ namespace gazebo
       public: std::string GetName() const;
 
       /// \brief Set a texture image
-      /// \param _tex The name of the texture, which must be in Gazebo's
+      /// \param[i] _tex The name of the texture, which must be in Gazebo's
       ///             resource path
       public: void SetTextureImage(const std::string &_tex);
 
       /// \brief Set a texture image
-      /// \param _tex The name of the texture
-      /// \param _resourcePath Path which contains _tex
+      /// \param[i] _tex The name of the texture
+      /// \param[_resourcePath] _resourcePath Path which contains _tex
       public: void SetTextureImage(const std::string &_tex,
                                    const std::string &_resourcePath);
 
-      /// \brief Get a thie texture image
-      /// \return The name of the texture image, if one exists
+      /// \brief Get a texture image
+      /// \return The name of the texture image (if one exists) or an empty
+      /// string
       public: std::string GetTextureImage() const;
 
       /// \brief Set the ambient color
-      /// \param _clr The ambient color
+      /// \param[in] _clr The ambient color
       public: void SetAmbient(const Color &_clr);
 
       /// \brief Get the ambient color
@@ -75,7 +76,7 @@ namespace gazebo
       public: Color GetAmbient() const;
 
       /// \brief Set the diffuse color
-      /// \param _clr The diffuse color
+      /// \param[in] _clr The diffuse color
       public: void SetDiffuse(const Color &_clr);
 
       /// \brief Get the diffuse color
@@ -83,7 +84,7 @@ namespace gazebo
       public: Color GetDiffuse() const;
 
       /// \brief Set the specular color
-      /// \param _clr The specular color
+      /// \param[in] _clr The specular color
       public: void SetSpecular(const Color &_clr);
 
       /// \brief Get the specular color
@@ -91,7 +92,7 @@ namespace gazebo
       public: Color GetSpecular() const;
 
       /// \brief Set the emissive color
-      /// \param _clr The emissive color
+      /// \param[in] _clr The emissive color
       public: void SetEmissive(const Color &_clr);
 
       /// \brief Get the emissive color
@@ -99,7 +100,7 @@ namespace gazebo
       public: Color GetEmissive() const;
 
       /// \brief Set the transparency percentage (0..1)
-      /// \param _t The amount of transparency (0..1)
+      /// \param[in] _t The amount of transparency (0..1)
       public: void SetTransparency(double _t);
 
       /// \brief Get the transparency percentage (0..1)
@@ -107,7 +108,7 @@ namespace gazebo
       public: double GetTransparency() const;
 
       /// \brief Set the shininess
-      /// \param _t The shininess value
+      /// \param[in] _t The shininess value
       public: void SetShininess(double _t);
 
       /// \brief Get the shininess
@@ -116,46 +117,58 @@ namespace gazebo
 
       /// \brief Set the blende factors. Will be interpreted as:
       ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
-      /// \param _srcFactor The source factor
-      /// \param _dstFactor The destination factor
+      /// \param[in] _srcFactor The source factor
+      /// \param[in] _dstFactor The destination factor
       public: void SetBlendFactors(double _srcFactor, double _dstFactor);
 
       /// \brief Get the blend factors
-      /// \param _srcFactor Source factor is returned in this variable
-      /// \param _dstFactor Destination factor is returned in this variable
+      /// \param[in] _srcFactor Source factor is returned in this variable
+      /// \param[in] _dstFactor Destination factor is returned in this variable
       public: void GetBlendFactors(double &_srcFactor, double &_dstFactor);
 
       /// \brief Set the blending mode
+      /// \param[in] _b the blend mode
       public: void SetBlendMode(BlendMode _b);
 
       /// \brief Get the blending mode
+      /// \return the blend mode
       public: BlendMode GetBlendMode() const;
 
       /// \brief Set the shading mode
+      /// param[in] the shading mode
       public: void SetShadeMode(ShadeMode _b);
 
       /// \brief Get the shading mode
+      /// \return the shading mode
       public: ShadeMode GetShadeMode() const;
 
       /// \brief Set the point size
+      /// \param[in] _size the size
       public: void SetPointSize(double _size);
 
       /// \brief Get the point size
+      /// \return the point size
       public: double GetPointSize() const;
 
       /// \brief Set depth write
+      /// \param[in] _value the depth write enabled state
       public: void SetDepthWrite(bool _value);
 
       /// \brief Get depth write
+      /// \return the depth write enabled state
       public: bool GetDepthWrite() const;
 
       /// \brief Set lighting enabled
+      /// \param[in] _value the lighting enabled state
       public: void SetLighting(bool _value);
 
       /// \brief Get lighting enabled
+      /// \return the lighting enabled state
       public: bool GetLighting() const;
 
-      /// \brief Ostream operator
+      /// \brief Stream insertion operator
+      /// param[in] _out the output stream to extract from
+      /// param[out] _m the material information
       public: friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::common::Material &_m)
               {
@@ -174,25 +187,52 @@ namespace gazebo
                 return _out;
               }
 
+      /// \brief the name of the material
       protected: std::string name;
+
+      /// \brief the texture image file name
       protected: std::string texImage;
+
+      /// \brief the ambient light color
       protected: Color ambient;
+
+      /// \brief the diffuse ligth color
       protected: Color diffuse;
+
+      /// \brief the specular light color
       protected: Color specular;
+
+      /// \brief the emissive light color
       protected: Color emissive;
+
+      /// \brief transparency value in the range 0 to 1
       protected: double transparency;
+
+      /// \brief shininess value (0 to 1)
       protected: double shininess;
+
+      /// \brief point size
       protected: double pointSize;
 
+      /// \brief blend mode
       protected: BlendMode blendMode;
+
+      /// \brief the shade mode
       protected: ShadeMode shadeMode;
 
+      /// \brief the total number of instanciated Material instances
       private: static unsigned int counter;
 
+      /// \brief flag to perform depth buffer write
       private: bool depthWrite;
+
       private: bool lighting;
 
-      private: double srcBlendFactor, dstBlendFactor;
+      /// \brief source blend factor
+      private: double srcBlendFactor;
+
+      /// \brief destination blend factor
+      private: double dstBlendFactor;
     };
     /// \}
   }
