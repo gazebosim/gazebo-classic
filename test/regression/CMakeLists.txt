@@ -67,3 +67,15 @@ target_link_libraries(${BINARY_NAME}
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 endforeach()
+
+
+set (regression_test_plugins
+  test_physics_plugin.cc
+)
+
+foreach (src ${regression_test_plugins})
+  add_library(${src} SHARED ${src}.cc)
+  target_link_libraries(${src} libgazebo gazebo_sensors)
+  install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/regression_test_plugins/)
+endforeach (src ${regression_test_plugins})
+

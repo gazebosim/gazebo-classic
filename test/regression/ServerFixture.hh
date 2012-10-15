@@ -364,11 +364,11 @@ class ServerFixture : public testing::Test
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
                  << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <sensor name ='" << _cameraName
                  << "' type ='camera'>"
@@ -409,11 +409,11 @@ class ServerFixture : public testing::Test
                newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -489,11 +489,11 @@ class ServerFixture : public testing::Test
                newModelStr << "<gazebo version ='1.2'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
                  << "<link name ='body'>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
@@ -506,6 +506,58 @@ class ServerFixture : public testing::Test
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
+                 << "</model>"
+                 << "</gazebo>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_name))
+                 common::Time::MSleep(10);
+             }
+
+  protected: void SpawnJointWithPlugin(const std::string &_name,
+                 const math::Vector3 &_size, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<gazebo version ='1.2'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<pose>" << _pos.x << " "
+                             << _pos.y << " "
+                             << _pos.z << " "
+                             << _rpy.x << " "
+                             << _rpy.y << " "
+                             << _rpy.z << "</pose>"
+                 << "<link name ='body1'>"
+                 << "  <collision name ='collision'>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "<link name ='body2'>"
+                 << "  <collision name ='collision'>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <box><size>" << _size << "</size></box>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "<plugin name=\"test_physics_plugin\" "
+                 << "        filename=\"libtest_physics_plugin.so\"/>"
                  << "</model>"
                  << "</gazebo>";
 
