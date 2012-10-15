@@ -601,6 +601,7 @@ void GLWidget::OnMouseReleaseTranslate()
   {
     // If we were dragging a visual around, then publish its new pose to the
     // server
+    gzerr << "publishing visual pose " << this->mouseMoveVis->GetName() << "\n";
     if (this->mouseMoveVis)
     {
       this->PublishVisualPose(this->mouseMoveVis);

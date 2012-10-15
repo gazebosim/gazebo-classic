@@ -213,6 +213,10 @@ namespace gazebo
       protected: virtual void OnPoseChange() = 0;
 
       /// \brief Handle a change of pose
+      /// \param[in] update_children if set to true, will call OnPoseChange
+      ///            for all children (1 level, non-recursive).
+      ///            But if the Object is static, we force children
+      ///            OnPoseChange call
       private: void UpdatePhysicsPose(bool update_children = true);
 
       /// \brief Update an animation

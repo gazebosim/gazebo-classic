@@ -20,8 +20,8 @@
           <pose>0 0 0.5 0 0 0</pose>
           <geometry>
             <cylinder>
-            <radius>0.5</radius>
-            <length>1.0</length>
+              <radius>0.5</radius>
+              <length>1.0</length>
             </cylinder>
           </geometry>
         </visual>
@@ -29,15 +29,42 @@
           <pose>0 0 0.5 0 0 0</pose>
           <geometry>
             <cylinder>
-            <radius>0.5</radius>
-            <length>1.0</length>
+              <radius>0.5</radius>
+              <length>1.0</length>
             </cylinder>
           </geometry>
         </collision>
       </link>
     </model>
 
+    <!-- a non-static object -->
+    <model name="box_model">
+      <static>false</static>
+      <pose>0 0.8 0 0 0 0</pose>
+      <link name="box_link">
+        <visual name="box_visual">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+            <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name="box_collision">
+          <pose>0 0 0.5 0 0 0</pose>
+          <geometry>
+            <box>
+            <size>1.0 1.0 1.0</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
     <!-- a ray sensor -->
-    <include filename="hokuyo.model" model_pose="-1.0 0 0.5 0 0 0"/>
+    <include>
+      <uri>model://hokuyo</uri>
+      <pose>-1.0 0 0.5 0 0 0</pose>
+    </include>
   </world>
 </gazebo>

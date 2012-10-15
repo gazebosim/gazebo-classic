@@ -415,39 +415,56 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 {
   this->OnPoseChange();
 
-  /// @todo: this bit is quite complex, figure out documentation for it
-  if (!this->HasType(COLLISION) && (_updateChildren || this->IsStatic()))
+  // gzerr << "UpdatePhysicsPose " << this->GetName()
+  //       << " " << _updateChildren
+  //       << " " << this->IsStatic()
+  //       << "\n";
+
+  /// if children update is requested
+  if (_updateChildren)
   {
     for (Base_V::iterator iter = this->children.begin();
          iter != this->childrenEnd; ++iter)
     {
+      // gzerr << " updating non-static model's child "
+      //       << (*iter)->GetName() << "\n";
       if ((*iter)->HasType(LINK))
-        boost::shared_static_cast<Link>(*iter)->OnPoseChange();
-      else if ((*iter)->HasType(COLLISION))
       {
-        CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
+        // call child Link::OnPoseChange()
+        boost::shared_static_cast<Link>(*iter)->OnPoseChange();
+      }
+    }
+  }
 
-        if (this->IsStatic())
-        {
-          coll->worldPose.pos = this->worldPose.pos +
-            this->worldPose.rot.RotateVector(coll->GetRelativePose().pos);
-          coll->worldPose.rot = this->worldPose.rot *
-            coll->GetRelativePose().rot;
-        }
-        else
-        {
-          coll->worldPose.pos = this->worldPose.pos +
-            this->worldPose.rot.RotateVector(coll->initialRelativePose.pos);
-          coll->worldPose.rot = this->worldPose.rot *
-            coll->initialRelativePose.rot;
-        }
+  /// Static Collision objects have no corresponding ODE body
+  /// So if one calls MyStaticModel.SetWorldPose(p),
+  /// we should force children update
+  if (this->IsStatic())
+  {
+    for (Base_V::iterator iter = this->children.begin();
+         iter != this->childrenEnd; ++iter)
+    {
+      CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
+      if (coll && (*iter)->HasType(COLLISION))
+      {
+        // gzerr << "static Collision, update pose"
+        //       << " pose " << this->worldPose
+        //       << " coll: " << coll
+        //       << " relative pose: " << coll->GetRelativePose()
+        //       << " init relative pose: " << coll->initialRelativePose
+        //       << "\n";
+
+        // update collision pose
+        //   to model's world pose + it's intial relative pose
+        coll->worldPose.pos = this->worldPose.pos +
+          this->worldPose.rot.RotateVector(coll->initialRelativePose.pos);
+        coll->worldPose.rot = this->worldPose.rot *
+          coll->initialRelativePose.rot;
         coll->OnPoseChange();
       }
       else
       {
-        // Should never get here.
-        gzthrow(std::string("Invalid type[") +
-                boost::lexical_cast<std::string>((*iter)->GetType()) + "]");
+        // gzerr << "not static or not a Collision type, do nothing\n";
       }
     }
   }
