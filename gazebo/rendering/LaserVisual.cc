@@ -55,6 +55,14 @@ LaserVisual::~LaserVisual()
 /////////////////////////////////////////////////
 void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
 {
+  // Skip the update if the user is moving the laser.
+  if (this->GetScene()->GetSelectedVisual() &&
+      this->GetRootVisual()->GetName() ==
+      this->GetScene()->GetSelectedVisual()->GetName())
+  {
+    return;
+  }
+
   double angle = _msg->angle_min();
   double r;
   math::Vector3 pt;
