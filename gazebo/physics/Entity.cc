@@ -415,19 +415,12 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 {
   this->OnPoseChange();
 
-  // gzerr << "UpdatePhysicsPose " << this->GetName()
-  //       << " " << _updateChildren
-  //       << " " << this->IsStatic()
-  //       << "\n";
-
   /// if children update is requested
   if (_updateChildren)
   {
     for (Base_V::iterator iter = this->children.begin();
          iter != this->childrenEnd; ++iter)
     {
-      // gzerr << " updating non-static model's child "
-      //       << (*iter)->GetName() << "\n";
       if ((*iter)->HasType(LINK))
       {
         // call child Link::OnPoseChange()
@@ -447,13 +440,6 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
       CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
       {
-        // gzerr << "static Collision, update pose"
-        //       << " pose " << this->worldPose
-        //       << " coll: " << coll
-        //       << " relative pose: " << coll->GetRelativePose()
-        //       << " init relative pose: " << coll->initialRelativePose
-        //       << "\n";
-
         // update collision pose
         //   to model's world pose + it's intial relative pose
         coll->worldPose.pos = this->worldPose.pos +
@@ -464,7 +450,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
       }
       else
       {
-        // gzerr << "not static or not a Collision type, do nothing\n";
+        // not static or not a Collision type, do nothing
       }
     }
   }

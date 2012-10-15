@@ -190,10 +190,6 @@ void ODECollision::SetSpaceId(dSpaceID _spaceid)
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeGlobal()
 {
-  // gzerr << "in OnPoseChangeGlobal()"
-  //       << " pose " << this->GetWorldPose()
-  //       << " this: " << this
-  //       << "\n";
   dQuaternion q;
 
   // Transform into global pose since a static collision does not have a link
