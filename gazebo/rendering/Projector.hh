@@ -84,6 +84,14 @@ namespace gazebo
       /// \brief Toggle the activation of the projector.
       public: void Toggle();
 
+      /// \brief Get the parent visual.
+      /// \return Pointer ot the parent visual.
+      public: VisualPtr GetParent();
+
+      /// \brief Set whether the projector is enabled or disabled.
+      /// \param[in] _enabled True to enable the projector.
+      public: void SetEnabled(bool _enabled);
+
       private: void OnMsg(ConstProjectorPtr &_msg);
 
       private: VisualPtr visual;

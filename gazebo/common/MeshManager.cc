@@ -123,6 +123,9 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 
     try
     {
+      // This mutex prevents two threads from loading the same mesh at the
+      // same time.
+      boost::mutex::scoped_lock lock(this->mutex);
       if (!this->HasMesh(_filename))
       {
         if ((mesh = loader->Load(fullname)) != NULL)

@@ -1021,7 +1021,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name)
   {
     this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("");
-    gui::Events::manipMode("select");
   }
 
   this->hoverVis.reset();
