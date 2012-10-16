@@ -28,6 +28,7 @@ Node::Node()
 {
   this->id = idCounter++;
   this->topicNamespace = "";
+  this->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -76,6 +77,8 @@ void Node::Init(const std::string &_space)
     TopicManager::Instance()->RegisterTopicNamespace(_space);
 
   TopicManager::Instance()->AddNode(shared_from_this());
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////

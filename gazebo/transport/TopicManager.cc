@@ -191,7 +191,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 
   // Use this to find other remote publishers
   ConnectionManager::Instance()->Subscribe(_ops.GetTopic(), _ops.GetMsgType(),
-      _ops.GetLatching());
+                                           _ops.GetLatching());
   return sub;
 }
 
