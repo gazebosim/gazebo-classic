@@ -82,6 +82,8 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
 
+  this->pluginsLoaded = false;
+
   this->name = _name;
 
   this->needsReset = false;
@@ -362,19 +364,6 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
-  static bool first = true;
-
-
-  /// Plugins that manipulate joints (and probably other properties) require
-  /// one iteration of the physics engine. Do not remove this.
-  if (first)
-  {
-    this->physicsEngine->UpdatePhysics();
-    this->LoadPlugins();
-    first = false;
-    return;
-  }
-
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -400,6 +389,16 @@ void World::Update()
     this->physicsEngine->UpdateCollision();
 
     this->physicsEngine->UpdatePhysics();
+
+    /// need this because ODE does not call dxReallocateWorldProcessContext()
+    /// until dWorld.*Step
+    /// Plugins that manipulate joints (and probably other properties) require
+    /// one iteration of the physics engine. Do not remove this.
+    if (!this->pluginsLoaded)
+    {
+      this->LoadPlugins();
+      this->pluginsLoaded = true;
+    }
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -889,15 +888,6 @@ void World::ModelUpdateSingleLoop()
 //////////////////////////////////////////////////
 void World::LoadPlugins()
 {
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-  {
-    if (boost::shared_dynamic_cast<Model>(this->rootElement->GetChild(i)))
-    {
-      boost::shared_dynamic_cast<Model>(
-          this->rootElement->GetChild(i))->LoadPlugins();
-    }
-  }
-
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {

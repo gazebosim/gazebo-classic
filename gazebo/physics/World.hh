@@ -478,6 +478,7 @@ namespace gazebo
               { this->enablePhysicsEngine = _enable; }
 
       private: RayShapePtr testRay;
+      private: bool pluginsLoaded;
     };
 
     /// \}

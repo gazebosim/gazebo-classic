@@ -70,6 +70,7 @@ Model::Model(BasePtr _parent)
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
   this->jointController = NULL;
+  this->pluginsLoaded = false;
 }
 
 //////////////////////////////////////////////////
@@ -99,7 +100,7 @@ void Model::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
-    bool first = true;
+    bool canonical_link_initialized = false;
     while (linkElem)
     {
       // Create a new link
@@ -109,11 +110,11 @@ void Model::Load(sdf::ElementPtr _sdf)
       // FIXME: canonical link is hardcoded to the first link.
       //        warn users for now, need  to add parsing of
       //        the canonical tag in sdf
-      if (first)
+      if (!canonical_link_initialized)
       {
         link->SetCanonicalLink(true);
         this->canonicalLink = link;
-        first = false;
+        canonical_link_initialized = true;
       }
 
       // Load the link using the config node. This also loads all of the
@@ -182,6 +183,15 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
+
+  /// Load plugins for this model once
+  /// @todo: john: this works fine, but we should add a regression test
+  /// to make sure there is no race condition.
+  if (!this->pluginsLoaded)
+  {
+    this->LoadPlugins();
+    this->pluginsLoaded = true;
+  }
 
   if (this->jointController)
     this->jointController->Update();
