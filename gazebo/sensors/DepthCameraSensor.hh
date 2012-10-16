@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef DEPTHCAMERASENSOR_HH
-#define DEPTHCAMERASENSOR_HH
+#ifndef _DEPTHCAMERASENSOR_HH_
+#define _DEPTHCAMERASENSOR_HH_
 
 #include <string>
 
@@ -38,7 +38,7 @@ namespace gazebo
     /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
     /// \{
-    /// \brief Basic camera sensor
+    /// \brief Basic Depth camera sensor
     /// This sensor is used for simulating standard monocular cameras
     class DepthCameraSensor : public Sensor
     {
