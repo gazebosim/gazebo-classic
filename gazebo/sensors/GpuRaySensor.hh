@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,15 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
+    /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
-
-    /// \brief GPU based laser sensor
+    /// \brief Sensor with one or more rays.
+    ///
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
@@ -50,23 +53,28 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GpuRaySensor();
 
-      /// Load the ray using parameter from an SDF
-      /// \param node The XMLConfig node
+      /// \brief Load the sensor with SDF parameters
+      /// \param[in] _sdf SDF Sensor parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr &_sdf);
 
+      /// \brief Load the sensor with default parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName);
 
-      /// Initialize the ray
+      /// \brief Initialize the ray
       public: virtual void Init();
 
       /// \brief Update the sensor information
+      /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool _force);
 
-      /// Finalize the ray
+      /// \brief Finalize the ray
       protected: virtual void Fini();
 
-      /// Returns a pointer to the internally kept rendering::GpuLaser
+      /// \brief Returns a pointer to the internally kept rendering::GpuLaser
+      /// \return Pointer to GpuLaser
       public: rendering::GpuLaserPtr GetLaserCamera() const
               {return this->laserCam;}
 
@@ -75,16 +83,16 @@ namespace gazebo
       public: math::Angle GetAngleMin() const;
 
       /// \brief Set the scan minimum angle
-      /// \param The minimum angle
-      public: void SetAngleMin(double angle);
+      /// \param[in] _angle The minimum angle
+      public: void SetAngleMin(double _angle);
 
       /// \brief Get the maximum angle
       /// \return the maximum angle
       public: math::Angle GetAngleMax() const;
 
       /// \brief Set the scan maximum angle
-      /// \param The maximum angle
-      public: void SetAngleMax(double angle);
+      /// \param[in] _angle The maximum angle
+      public: void SetAngleMax(double _angle);
 
       /// \brief Get radians between each range
       public: double GetAngleResolution() const;
@@ -98,6 +106,7 @@ namespace gazebo
       public: double GetRangeMax() const;
 
       /// \brief Get the range resolution
+      /// \return The Range Resolution
       public: double GetRangeResolution() const;
 
       /// \brief Get the ray count
@@ -121,27 +130,28 @@ namespace gazebo
       public: math::Angle GetVerticalAngleMin() const;
 
       /// \brief Set the vertical scan bottom angle
-      /// \param The minimum angle of the scan block
-      public: void SetVerticalAngleMin(double angle);
+      /// \param[in] _angle The minimum angle of the scan block
+      public: void SetVerticalAngleMin(double _angle);
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
       public: math::Angle GetVerticalAngleMax() const;
 
       /// \brief Set the vertical scan line top angle
-      /// \param The Maximum angle of the scan block
-      public: void SetVerticalAngleMax(double angle);
+      /// \param[in] _angle The Maximum angle of the scan block
+      public: void SetVerticalAngleMax(double _angle);
 
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of
-      ///         your aceess loop. This means some data will come from one
+      ///         your access loop. This means some data will come from one
       ///         scan, and some from another scan. You can solve this
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
+      /// \param[in] _index Index of specific ray
       /// \return Returns DBL_MAX for no detection.
-      public: double GetRange(int index);
+      public: double GetRange(int _index);
 
       /// \brief Get all the ranges
       /// \param _range A vector that will contain all the range data
@@ -150,60 +160,77 @@ namespace gazebo
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of
-      ///         your aceess loop. This means some data will come from one
+      ///         your access loop. This means some data will come from one
       ///         scan, and some from another scan. You can solve this
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
-      public: double GetRetro(int index);
+      /// \param[in] _index Index of specific ray
+      /// \return Intensity value of ray
+      public: double GetRetro(int _index);
 
       /// \brief Get detected fiducial value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of
-      ///         your aceess loop. This means some data will come from one
+      ///         your access loop. This means some data will come from one
       ///         scan, and some from another scan. You can solve this
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
-      public: int GetFiducial(int index);
+      /// \param[in] _index Index of specific ray
+      /// \return Fiducial value of ray
+      public: int GetFiducial(int _index);
 
-      /// @todo Document me
+      /// \brief Gets the camera count
+      /// \return Number of cameras
       public: unsigned int GetCameraCount();
 
-      /// @todo Document me
+      /// \brief Gets if sensor is horizontal
+      /// \return True if horizontal, false if not
       public: bool IsHorizontal();
 
-      /// @todo Document me
+      /// \brief 
+      /// \TODO Nate fill in. I'm not sure what these what these sensor parameters refer to
       public: double Get1stRatio();
 
+      /// \brief 
       /// @todo Document me
       public: double Get2ndRatio();
 
+      /// \brief 
       /// @todo Document me
       public: double GetHFOV();
 
+      /// \brief 
       /// @todo Document me
       public: double GetCHFOV();
 
+      /// \brief 
       /// @todo Document me
       public: double GetVFOV();
 
+      /// \brief 
       /// @todo Document me
       public: double GetCVFOV();
 
+      /// \brief 
       /// @todo Document me
       public: double GetHAngle();
 
+      /// \brief 
       /// @todo Document me
       public: double GetVAngle();
-
+  
+      /// \brief 
       /// @todo Document me
       private: void OnPose(ConstPosePtr &_msg);
 
       /// \brief Connect a to the add entity signal
+      /// \TODO Nate do these parameters need to be specified here?
       public: event::ConnectionPtr ConnectNewLaserFrame(
         boost::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> subscriber);
 
-      /// @todo Document me
+      /// \brief Disconnect Laser Frame
+      /// \param Connection pointer to disconnect
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &c);
 
       protected: math::Vector3 offset;
