@@ -2027,7 +2027,6 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
 
-  std::cout << "GUI Advertise light\n";
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
@@ -2037,7 +2036,6 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this, false);
 
-  std::cout << "GUI subscribe light\n";
   this->lightSub = this->node->Subscribe("~/light",
                                          &ModelListWidget::OnLightMsg, this);
 }

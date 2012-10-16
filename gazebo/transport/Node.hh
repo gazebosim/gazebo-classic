@@ -153,6 +153,8 @@ namespace gazebo
       private: std::map<std::string, std::list<std::string> > incomingMsgs;
       private: boost::recursive_mutex *publisherMutex;
       private: boost::recursive_mutex *incomingMutex;
+
+      private: bool initialized;
     };
     /// \}
   }
