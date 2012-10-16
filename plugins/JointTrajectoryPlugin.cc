@@ -41,13 +41,28 @@ JointTrajectoryPlugin::~JointTrajectoryPlugin()
 
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
-                                 sdf::ElementPtr /*_sdf*/)
+                                 sdf::ElementPtr _sdf)
 {
   // Get the world name.
   this->world = _parent->GetWorld();
   this->model = _parent;
 
   // this->world->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  // Get Joints
+  sdf::ElementPtr jointElem = _sdf->GetElement("joint");
+  while (jointElem)
+  {
+    physics::JointPtr j = this->model->GetJoint(jointElem->GetValueString());
+    if (j)
+    {
+      this->joints.push_back(j);
+    }
+    else
+    {
+      j.reset();
+    }
+    jointElem = _sdf->GetNextElement("joint");
+  }
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
@@ -57,47 +72,13 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::FixLink(physics::LinkPtr link)
-{
-  this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
-      this->model);
-
-  this->joint->SetModel(this->model);
-  math::Pose pose = link->GetWorldPose();
-  // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
-  this->joint->Load(physics::LinkPtr(), link, pose);
-  this->joint->SetAxis(0, math::Vector3(0, 0, 0));
-  this->joint->SetHighStop(0, 0);
-  this->joint->SetLowStop(0, 0);
-  this->joint->SetAnchor(0, pose.pos);
-  this->joint->Init();
-}
-
-/////////////////////////////////////////////////
-void JointTrajectoryPlugin::UnfixLink()
-{
-  this->joint.reset();
-}
-
-/////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates()
 {
   common::Time cur_time = this->world->GetSimTime();
 
-  bool is_paused = this->world->IsPaused();
-  if (!is_paused) this->world->SetPaused(true);
-
   std::map<std::string, double> joint_position_map;
-  joint_position_map["arm_shoulder_pan_joint"] = cos(cur_time.Double());
-  joint_position_map["arm_elbow_pan_joint"] = -cos(cur_time.Double());
-  joint_position_map["arm_wrist_lift_joint"] = -0.35
-    + 0.45*cos(0.5*cur_time.Double());
-  joint_position_map["arm_wrist_roll_joint"] = -2.9*cos(3.0*cur_time.Double());
-
-  this->model->SetJointPositions(joint_position_map);
-
-  // resume original pause-state
-  this->world->SetPaused(is_paused);
+  for (unsigned int i = 0; i < this->joints.size(); ++i)
+    this->joints[i]->SetAngle(0, cos(cur_time.Double()));
 }
 
 GZ_REGISTER_MODEL_PLUGIN(JointTrajectoryPlugin)
