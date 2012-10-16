@@ -99,8 +99,13 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+
+  std::cout << "Scene Advertise Light\n";
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
+  std::cout << "Scene Subscribe Light\n";
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
