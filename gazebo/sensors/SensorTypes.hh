@@ -96,12 +96,13 @@ namespace gazebo
     typedef std::vector<GpuRaySensorPtr> GpuRaySensor_V;
 
     /// \def RFIDSensor_V
-    /// \brief Vector of RFIDSensor shared pointers
+    /// \brief Vector of RFIDSensors 
     typedef std::vector<RFIDSensor> RFIDSensor_V;
 
     /// \def RFIDTag_V
-    /// \brief Vector of RFIDTag shared pointers
+    /// \brief Vector of RFIDTags
     typedef std::vector<RFIDTag> RFIDTag_V;
+    /// \}
   }
 }
 #endif

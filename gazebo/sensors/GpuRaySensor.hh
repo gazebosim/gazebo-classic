@@ -19,8 +19,8 @@
  * Date: 29 March 2012
 */
 
-#ifndef GPURAYSENSOR_HH
-#define GPURAYSENSOR_HH
+#ifndef _GPURAYSENSOR_HH_
+#define _GPURAYSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -40,7 +40,7 @@ namespace gazebo
     /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
-    /// \brief Sensor with one or more rays.
+    /// \brief GPU based laser sensor
     ///
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
@@ -106,6 +106,11 @@ namespace gazebo
       public: double GetRangeMax() const;
 
       /// \brief Get the range resolution
+      ///      If RangeResolution is 1, the number of simulated rays is equal
+      ///      to the number of returned range readings. If it's less than 1,
+      ///      fewer simulated rays than actual returned range readings are 
+      ///      used, the results are interpolated from two nearest neighbors,
+      ///      and vice versa.
       /// \return The Range Resolution
       public: double GetRangeResolution() const;
 
