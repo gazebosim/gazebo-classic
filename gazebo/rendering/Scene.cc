@@ -2065,6 +2065,24 @@ void Scene::RemoveVisual(VisualPtr _vis)
 {
   if (_vis)
   {
+    // Remove all projectors attached to the visual
+    std::map<std::string, Projector *>::iterator piter =
+      this->projectors.begin();
+    while (piter != this->projectors.end())
+    {
+      // Check to see if the projector is a child of the visual that is
+      // being removed.
+      if (piter->second->GetParent()->GetRootVisual()->GetName() ==
+          _vis->GetRootVisual()->GetName())
+      {
+        delete piter->second;
+        this->projectors.erase(piter++);
+      }
+      else
+        ++piter;
+    }
+
+    // Delete the visual
     Visual_M::iterator iter = this->visuals.find(_vis->GetName());
     if (iter != this->visuals.end())
     {
