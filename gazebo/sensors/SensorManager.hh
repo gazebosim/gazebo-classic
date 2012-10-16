@@ -100,8 +100,13 @@ namespace gazebo
       /// \brief If True the sensor manager stop processing sensors.
       private: bool stop;
 
-      /// \brief True if initialized.
+      /// \brief True if SensorManager::Init has been called
+      ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
+
+      /// \brief True if SensorManager::initSensors queue is empty
+      /// i.e. all sensors managed by SensorManager have been initialized
+      public: bool SensorsInitialized();
 
       /// \brief The thread to run sensor updates in.
       private: boost::thread *runThread;

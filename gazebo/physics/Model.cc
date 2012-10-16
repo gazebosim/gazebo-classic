@@ -43,6 +43,8 @@
 #include "physics/Model.hh"
 #include "physics/Contact.hh"
 
+#include "sensors/SensorManager.hh"
+
 #include "transport/Node.hh"
 
 using namespace gazebo;
@@ -187,7 +189,8 @@ void Model::Update()
   /// Load plugins for this model once
   /// @todo: john: this works fine, but we should add a regression test
   /// to make sure there is no race condition.
-  if (!this->pluginsLoaded)
+  if (!this->pluginsLoaded &&
+      sensors::SensorManager::Instance()->SensorsInitialized())
   {
     this->LoadPlugins();
     this->pluginsLoaded = true;
