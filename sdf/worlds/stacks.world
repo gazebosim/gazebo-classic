@@ -2,6 +2,8 @@
 <gazebo version="1.2">
   <world name="default">
     <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+
     <model name="box_1">
       <pose>0 0 .5 0 0 0</pose>
       <link name="link">
@@ -492,18 +494,5 @@
         </visual>
       </link>
     </model>
-    <light type="directional" name="sun">
-      <cast_shadows>true</cast_shadows>
-      <pose>0 0 10 0 0 0</pose>
-      <diffuse>.8 .8 .8 1</diffuse>
-      <specular>.1 .1 .1 1</specular>
-      <attenuation>
-        <range>10</range>
-        <constant>0.8</constant>
-        <linear>0.01</linear>
-        <quadratic>0.0</quadratic>
-        <direction>0 .5 -.5</direction>
-      </attenuation>
-    </light>
   </world>
 </gazebo>
