@@ -52,6 +52,9 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   sdf::ElementPtr jointElem = _sdf->GetElement("joint");
   while (jointElem)
   {
+    // FIXME: below segfaults on second <joint></joint> entry, SDF problem?
+    gzerr << jointElem->GetValueString() << "\n";
+
     physics::JointPtr j = this->model->GetJoint(jointElem->GetValueString());
     if (j)
     {
@@ -76,7 +79,6 @@ void JointTrajectoryPlugin::UpdateStates()
 {
   common::Time cur_time = this->world->GetSimTime();
 
-  std::map<std::string, double> joint_position_map;
   for (unsigned int i = 0; i < this->joints.size(); ++i)
     this->joints[i]->SetAngle(0, cos(cur_time.Double()));
 }
