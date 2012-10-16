@@ -108,7 +108,8 @@ namespace gazebo
       /// \brief Remove all entities from the world
       public: void Clear();
 
-      /// \brief Get the name of the world
+      /// \brief Get the name of the world.
+      /// \return The name of the world.
       public: std::string GetName() const;
 
       /// \brief Return the physics engine
@@ -125,7 +126,7 @@ namespace gazebo
       ///
       /// Get a Model using an index, where index must be greater than zero
       /// and less than World::GetModelCount()
-      /// \param _index The index of the model [0..GetModelCount)
+      /// \param[in] _index The index of the model [0..GetModelCount)
       /// \return A pointer to the Model. NULL if _index is invalid.
       public: ModelPtr GetModel(unsigned int _index) const;
 
@@ -137,7 +138,7 @@ namespace gazebo
       ///
       /// The _type parameter specifies which type of eneities to reset. See
       /// Base::EntityType.
-      /// \param _type The type of reset.
+      /// \param[in] _type The type of reset.
       public: void ResetEntities(Base::EntityType _type = Base::BASE);
 
       /// \brief Reset simulation time back to zero
@@ -163,7 +164,7 @@ namespace gazebo
       public: common::Time GetSimTime() const;
 
       /// \brief Set the sim time
-      /// \param _t The new simulation time
+      /// \param[in] _t The new simulation time
       public: void SetSimTime(common::Time _t);
 
       /// \brief Get the amount of time simulation has been paused
@@ -183,14 +184,14 @@ namespace gazebo
       public: bool IsPaused() const;
 
       /// \brief Set whether the simulation is paused
-      /// \param _p True pauses the simulation. False runs the simulation.
+      /// \param[in] _p True pauses the simulation. False runs the simulation.
       public: void SetPaused(bool _p);
 
       /// \brief Get an element by name
       ///
       /// Searches the list of entities, and return a pointer to the model
       /// with a matching _name.
-      /// \param _name The name of the Model to find.
+      /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the entity, or NULL if no entity was found.
       public: BasePtr GetByName(const std::string &_name);
 
@@ -201,11 +202,12 @@ namespace gazebo
       ///
       /// This function is the same as GetByName, but limits the search to
       /// only models.
-      /// \param _name The name of the Model to find.
+      /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
 
-      /// \brief Get a pointer to a entity based on a name
+      /// \brief Get a pointer to a entity based on a name.
+      /// \param[in] _name Name of the entity.
       public: EntityPtr GetEntityByName(
                   const std::string &_name) GAZEBO_DEPRECATED;
 
@@ -213,14 +215,14 @@ namespace gazebo
       ///
       /// This function is the same as GetByName, but limits the search to
       /// only Entities.
-      /// \param _name The name of the Entity to find.
+      /// \param[in[ _name The name of the Entity to find.
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
       /// \brief Get the nearest model below a point
       ///
       /// This function makes use of World::GetEntityBelowPoint.
-      /// \param _pt The 3D point to search below
+      /// \param[in] _pt The 3D point to search below
       /// \return A pointer to nearest Model, NULL if none is found.
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
 
@@ -228,7 +230,7 @@ namespace gazebo
       ///
       /// Projects a Ray down (-Z axis) starting at the given point. The
       /// first entity hit by the Ray is returned.
-      /// \param _pt The 3D point to search below
+      /// \param[in] _pt The 3D point to search below
       /// \return A pointer to nearest Entity, NULL if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
@@ -243,23 +245,23 @@ namespace gazebo
       /// \brief Insert a model from an SDF file
       ///
       /// Spawns a model into the world base on and SDF file
-      /// \param _sdfFilename The name of the SDF file (including path).
+      /// \param[in] _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
       /// \brief Insert a model from an SDF string
       ///
       /// Spawns a model into the world base on and SDF string
-      /// \param _sdfString A string containing valid SDF markup.
+      /// \param[in] _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF
       ///
       /// Spawns a model into the world base on and SDF object
-      /// \param _sdf A reference to an SDF object
+      /// \param[in] _sdf A reference to an SDF object
       public: void InsertModelSDF(const sdf::SDF &_sdf);
 
       /// \brief Return a version of the name with "<world_name>::" removed
-      /// \param _name Usually the name of an entity.
+      /// \param[in] _name Usually the name of an entity.
       /// \return The stripped world name
       public: std::string StripWorldName(const std::string &_name) const;
 
@@ -276,26 +278,41 @@ namespace gazebo
       public: void DisableAllModels();
 
       /// \brief Step callback
-      /// \param _steps The number of steps the World should take
+      /// \param[in] _steps The number of steps the World should take
       public: void StepWorld(int _steps);
 
       /// \brief Load a plugin
-      /// \param _filename The filename of the plugin
-      /// \param _name A unique name for the plugin
-      /// \param _sdf The SDF to pass into the plugin.
+      /// \param[in] _filename The filename of the plugin
+      /// \param[in] _name A unique name for the plugin
+      /// \param[in] _sdf The SDF to pass into the plugin.
       public: void LoadPlugin(const std::string &_filename,
-                               const std::string &_name,
-                               sdf::ElementPtr _sdf);
+                              const std::string &_name,
+                              sdf::ElementPtr _sdf);
 
       /// \brief Remove a running plugin
-      /// \param _name The unique name of the plugin to remove
+      /// \param[in] _name The unique name of the plugin to remove
       public: void RemovePlugin(const std::string &_name);
+
+      /// \brief Get the set world pose mutex.
+      /// \return Pointer to the mutex.
+      public: boost::mutex *GetSetWorldPoseMutex() const
+        { return this->setWorldPoseMutex; };
+
+      /// \brief check if physics engine is enabled/disabled.
+      /// \param True if the physics engine is enabled.
+      public: bool GetEnablePhysicsEngine()
+              { return this->enablePhysicsEngine; }
+
+      /// \brief enable/disable physics engine during World::Update
+      /// \param[in] _enable True to enable the physics engine.
+      public: void EnablePhysicsEngine(bool _enable)
+              { this->enablePhysicsEngine = _enable; }
 
       /// \brief Get a model by id
       ///
       /// Each Entity has a unique ID, this function finds a Model with
       /// a passed in _id.
-      /// \param _id The id of the Model
+      /// \param[in] _id The id of the Model
       /// \return A pointer to the model, or NULL if no Model was found.
       private: ModelPtr GetModelById(unsigned int _id);
 
@@ -305,25 +322,25 @@ namespace gazebo
       private: void LoadPlugins();
 
       /// \brief Create and load all entities
-      /// \param _sdf SDF element
-      /// \param _parent Parent of the model to load
+      /// \param[in] _sdf SDF element
+      /// \param[in] _parent Parent of the model to load
       private: void LoadEntities(sdf::ElementPtr _sdf , BasePtr _parent);
 
       /// \brief Load a model
-      /// \param _sdf SDF element containing the Model description
-      /// \param _parent Parent of the model
+      /// \param[in] _sdf SDF element containing the Model description
+      /// \param[in] _parent Parent of the model
       /// \return Pointer to the newly created Model
       private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Load an actor
-      /// \param _sdf SDF element containing the Actor description
-      /// \param _parent Parent of the Actor
+      /// \param[in] _sdf SDF element containing the Actor description
+      /// \param[in] _parent Parent of the Actor
       /// \return Pointer to the newly created Actor
       private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr _parent);
 
       /// \brief Load a road
-      /// \param _sdf SDF element containing the Road description
-      /// \param _parent Parent of the Road
+      /// \param[in] _sdf SDF element containing the Road description
+      /// \param[in] _parent Parent of the Road
       /// \return Pointer to the newly created Road
       private: RoadPtr LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent);
 
@@ -337,107 +354,189 @@ namespace gazebo
       private: void Update();
 
       /// \brief Pause callback
-      private: void OnPause(bool p);
+      /// \param[in] _p True if paused.
+      private: void OnPause(bool _p);
 
-      /// \brief Step callback
+      /// \brief Step callback.
       private: void OnStep();
 
-      private: void OnControl(ConstWorldControlPtr &data);
+      /// \brief Called when a world control message is received.
+      /// \param[in] _data The world control message.
+      private: void OnControl(ConstWorldControlPtr &_data);
 
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
-      /// \brief Set the selected entity
-      private: void SetSelectedEntityCB(const std::string &name);
-
-      private: void OnEntitiesRequest(ConstRequestPtr &_data);
+      /// \brief Set the selected entity.
+      /// \param[in] _name Name of the entity to select.
+      private: void SetSelectedEntityCB(const std::string &_name);
 
       /// \brief Construct a scene message from the known world state
-      private: void BuildSceneMsg(msgs::Scene &scene, BasePtr entity);
+      /// \param[out] _scene Scene message to build.
+      /// \param[in] _entity Pointer to entity from which to build the scene
+      /// message.
+      private: void BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity);
 
-      private: void JointLog(ConstJointPtr &msg);
+      /// \brief Logs joint information.
+      /// \param[in] _msg Incoming joint message.
+      private: void JointLog(ConstJointPtr &_msg);
 
+      /// \brief Called when a factory message is received.
+      /// \param[in] _data The factory message.
       private: void OnFactoryMsg(ConstFactoryPtr &_data);
+
+      /// \brief Called when a model message is received.
+      /// \param[in] _msg The model message.
       private: void OnModelMsg(ConstModelPtr &_msg);
 
-      /// \brief TBB version of model updating
+      /// \brief TBB version of model updating.
       private: void ModelUpdateTBB();
 
-      /// \brief Single loop verison of model updating
+      /// \brief Single loop verison of model updating.
       private: void ModelUpdateSingleLoop();
 
+      /// \brief Helper function to load a plugin from SDF.
+      /// \param[in] _sdf SDF plugin description.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
-      private: void FillModelMsg(msgs::Model &_msg, ModelPtr &_model);
+      /// \brief Fills a model message with data from a model
+      /// \param[out] _msg Model message to fill.
+      /// \param[int] _model Pointer to the model to get the data from.
+      private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
+      /// \brief Process all recieved entity messages.
       private: void ProcessEntityMsgs();
+
+      /// \brief Process all recieved request messages.
       private: void ProcessRequestMsgs();
+
+      /// \brief Process all recieved factory messages.
       private: void ProcessFactoryMsgs();
+
+      /// \brief Process all recieved model messages.
       private: void ProcessModelMsgs();
 
+      /// \brief Update the state SDF values from the current state.
       private: void UpdateStateSDF();
+
+      /// \brief Update the state SDF from a given state.
+      /// \param[in] _state State to update from.
       private: void UpdateSDFFromState(const WorldState &_state);
 
       /// \brief For keeping track of time step throttling
       private: common::Time prevStepWallTime;
 
-      /// Pointer the physics engine
+      /// \brief Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
 
+      /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
 
-      /// thread in which the world is updated
+      /// \brief thread in which the world is updated
       private: boost::thread *thread;
 
+      /// \brief True to stop the world from running.
       private: bool stop;
 
-      /// The entity currently selected by the user
+      /// \brief The entity currently selected by the user
       private: EntityPtr selectedEntity;
 
+      /// \brief Incoming message buffer.
       private: std::vector<google::protobuf::Message> messages;
 
+      /// \brief Name of the world.
       private: std::string name;
 
-      /// Current simulation time
-      private: common::Time simTime, pauseTime, startTime;
+      /// \brief Current simulation time
+      private: common::Time simTime;
+
+      /// \brief Amount of time simulation has been paused.
+      private: common::Time pauseTime;
+
+      /// \brief Clock time when simulation was started.
+      private: common::Time startTime;
+
+      /// \brief True if simulation is paused.
       private: bool pause;
+
+      /// \brief Number of steps in increment by.
       private: int stepInc;
 
+      /// \brief All the event connections.
       private: event::Connection_V connections;
 
+      /// \brief Transportation node.
       private: transport::NodePtr node;
+
+      /// \brief Publisher for selection messages.
       private: transport::PublisherPtr selectionPub;
-      private: transport::PublisherPtr statPub, responsePub, modelPub;
+
+      /// \brief Publisher for world statistics messages.
+      private: transport::PublisherPtr statPub;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
+
+      /// \brief Publisher for model messages.
+      private: transport::PublisherPtr modelPub;
+
+      /// \brief Publisher for gui messages.
       private: transport::PublisherPtr guiPub;
+
+      /// \brief Publisher for light messages.
       private: transport::PublisherPtr lightPub;
 
+      /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
-      private: transport::SubscriberPtr factorySub, jointSub;
-      private: transport::SubscriberPtr modelSub, requestSub;
 
+      /// \brief Subscriber to factory messages.
+      private: transport::SubscriberPtr factorySub;
+
+      /// \brief Subscriber to joint messages.
+      private: transport::SubscriberPtr jointSub;
+
+      /// \brief Subscriber to model messages.
+      private: transport::SubscriberPtr modelSub;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
+      /// \brief Outgoing world statistics message.
       private: msgs::WorldStatistics worldStatsMsg;
+
+      /// \brief Outgoing scene message.
       private: msgs::Scene sceneMsg;
 
+      /// \brief Function pointer to the model update function.
       private: void (World::*modelUpdateFunc)();
 
+      /// \brief Period used to send out world statistics
       private: common::Time statPeriod;
+
+      /// \brief Last time a world statistics message was sent
       private: common::Time prevStatTime;
+
+      /// \brief Time at which pause started.
       private: common::Time pauseStartTime;
+
+      /// \brief Used to compute a more accurate real time value.
       private: common::Time realTimeOffset;
 
+      /// \brief Mutext to protect incoming message buffers.
       private: boost::mutex *receiveMutex;
+
+      /// \brief Mutex to protext loading of models.
       private: boost::mutex *loadModelMutex;
 
-      /// TODO: Add an accessor for this, and make it private
+      /// \TODO: Add an accessor for this, and make it private
       /// Used in Entity.cc.
       ///   Entity::Reset to call Entity::SetWorldPose and
       ///     Entity::SetRelativePose
       ///   Entity::SetWorldPose to call Entity::setWorldPoseFunc
       private: boost::mutex *setWorldPoseMutex;
 
-      public: boost::mutex *GetSetWorldPoseMutex() const
-        { return this->setWorldPoseMutex; };
-
-      /// Used by World classs in following calls:
+      /// \brief Used by World classs in following calls:
       ///   World::Step for then entire function
       ///   World::StepWorld for changing World::stepInc,
       ///     and waits on setpInc on World::stepIhc as it's decremented.
@@ -445,9 +544,13 @@ namespace gazebo
       ///   World::SetPuased to assign world::pause
       private: boost::recursive_mutex *worldUpdateMutex;
 
+      /// \brief THe world's SDF values.
       private: sdf::ElementPtr sdf;
 
+      /// \brief All the plugins.
       private: std::vector<WorldPluginPtr> plugins;
+
+      /// \brief List of entities to delete.
       private: std::list<std::string> deleteEntity;
 
       /// \brief when physics engine makes an update and changes a link pose,
@@ -455,35 +558,40 @@ namespace gazebo
       ///        physics::Link in World::Update.
       public: std::list<Entity*> dirtyPoses;
 
+      /// \brief Request message buffer.
       private: std::list<msgs::Request> requestMsgs;
+
+      /// \brief Factory message buffer.
       private: std::list<msgs::Factory> factoryMsgs;
+
+      /// \brief Model message buffer.
       private: std::list<msgs::Model> modelMsgs;
 
+      /// \brief True to reset the world on next update.
       private: bool needsReset;
-      // Options to reset All, Time Only, or Model Only
-      // reset All overrides Time Only and Model Only
+
+      /// \brief True to reset everything.
       private: bool resetAll;
+
+      /// \brief True to reset only the time.
       private: bool resetTimeOnly;
+
+      /// \brief True to reset only model poses.
       private: bool resetModelOnly;
 
+      /// \brief True if the world has been initialized.
       private: bool initialized;
+
+      /// \brief True to enable the physics engine.
       private: bool enablePhysicsEngine;
 
-      /// \brief check if physics engine is enabled/disabled
-      public: bool GetEnablePhysicsEngine()
-              { return this->enablePhysicsEngine; }
-
-      /// \brief enable/disable physics engine during World::Update
-      public: void EnablePhysicsEngine(bool _enable)
-              { this->enablePhysicsEngine = _enable; }
-
+      /// \brief Ray used to test for collisions when placing entities.
       private: RayShapePtr testRay;
+
+      /// \brief True if the plugins have been loaded.
       private: bool pluginsLoaded;
     };
-
     /// \}
   }
 }
 #endif
-
-
