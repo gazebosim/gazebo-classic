@@ -187,6 +187,9 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
 
+    if (pub.topic() == "/gazebo/default/light")
+      std::cout << "master::advertise[" << pub.topic() << "] URI[" << pub.host() << ":" << pub.port() << "]\n";
+
     Connection_M::iterator iter2;
     for (iter2 = this->connections.begin();
          iter2 != this->connections.end(); ++iter2)
@@ -200,10 +203,12 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
     // Find all subscribers of the topic
     for (iter = this->subscribers.begin();
-        iter != this->subscribers.end(); ++iter)
+         iter != this->subscribers.end(); ++iter)
     {
       if (iter->first.topic() == pub.topic())
       {
+        if (pub.topic() == "/gazebo/default/light")
+          std::cout << "master::advertise subscriber on topic[" << pub.topic() << "]\n";
         iter->second->EnqueueMsg(msgs::Package("publisher_update", pub));
       }
     }
@@ -337,7 +342,7 @@ void Master::RunOnce()
     while (this->msgs.size() > 0)
     {
       this->ProcessMessage(this->msgs.front().first,
-          this->msgs.front().second);
+                           this->msgs.front().second);
       this->msgs.pop_front();
     }
   }

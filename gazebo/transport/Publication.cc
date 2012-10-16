@@ -40,10 +40,16 @@ Publication::~Publication()
 //////////////////////////////////////////////////
 void Publication::AddSubscription(const NodePtr &_node)
 {
+  if (this->topic == "/gazebo/default/light")
+    std::cout << "Publication::AddSubscription\n";
+
   std::list<NodePtr>::iterator iter;
   iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
   if (iter == this->nodes.end())
   {
+    if (this->topic == "/gazebo/default/light")
+      std::cout << "Adding Subscription NOde[" << _node << "]\n";
+
     this->nodes.push_back(_node);
 
     std::vector<PublisherPtr>::iterator pubIter;
@@ -54,6 +60,8 @@ void Publication::AddSubscription(const NodePtr &_node)
         _node->InsertLatchedMsg(this->topic, (*pubIter)->GetPrevMsg());
     }
   }
+  else if (this->topic == "/gazebo/default/light")
+    gzerr << "Node already subscribed to publications[" << _node << "]\n";
 }
 
 //////////////////////////////////////////////////

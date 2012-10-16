@@ -55,6 +55,10 @@ void Node::Fini()
 /////////////////////////////////////////////////
 void Node::Init(const std::string &_space)
 {
+  // Cleanup first. This handles the case of calling Init twice on the same
+  // node.
+  this->Fini();
+
   this->topicNamespace = _space;
 
   if (_space.empty())
