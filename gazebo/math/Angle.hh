@@ -76,19 +76,19 @@ namespace gazebo
     public: void SetFromDegree(double _degree);
 
     /// \brief Get the angle in radians
-    /// \return Double containing the angle's radian value
+    /// \return double containing the angle's radian value
     public: double GetAsRadian() const __attribute__((deprecated));
 
     /// \brief Get the angle in radians
-    /// \return Double containing the angle's radian value
+    /// \return double containing the angle's radian value
     public: double Radian() const;
 
     /// \brief Get the angle in degrees
-    /// \return Double containing the angle's degree value
+    /// \return double containing the angle's degree value
     public: double GetAsDegree() const __attribute__((deprecated));
 
     /// \brief Get the angle in degrees
-    /// \return Double containing the angle's degree value
+    /// \return double containing the angle's degree value
     public: double Degree() const;
 
     /// \brief Normalize the angle in the range -Pi to Pi
@@ -99,78 +99,78 @@ namespace gazebo
     public: inline double operator*() const { return value; }
     /// \brief Substraction, result = this - _angle
     /// \param[in] _angle Angle for substraction
-    /// \return The new angle
+    /// \return the new angle
     public: Angle operator-(const Angle &_angle) const;
 
     /// \brief Addition operator, result = this + _angle
     /// \param[in] _angle Angle for addition
-    /// \return The new angle
+    /// \return the new angle
     public: Angle operator+(const Angle &_angle) const;
 
     /// \brief Multiplication operator, result = this * _angle
     /// \param[in] _angle Angle for multiplication
-    /// \return The new angle
+    /// \return the new angle
     public: Angle operator*(const Angle &_angle) const;
 
     /// \brief Division, result = this / _angle
     /// \param[in] _angle Angle for division
-    /// \return The new angle
+    /// \return the new angle
     public: Angle operator/(const Angle &_angle) const;
 
     /// \brief Subtraction set, this = this - _angle
     /// \param[in] _angle Angle for subtraction
-    /// \return This angle
+    /// \return angle
     public: Angle operator-=(const Angle &_angle);
 
     /// \brief Addition set, this = this + _angle
     /// \param[in] _angle Angle for addition
-    /// \return This angle
+    /// \return angle
     public: Angle operator+=(const Angle &_angle);
 
     /// \brief Multiplication set, this = this * _angle
     /// \param[in] _angle Angle for multiplication
-    /// \return This angle
+    /// \return angle
     public: Angle operator*=(const Angle &_angle);
 
     /// \brief Division set, this = this / _angle
     /// \param[in] _angle Angle for division
-    /// \return This angle
+    /// \return angle
     public: Angle operator/=(const Angle &_angle);
 
     /// \brief Equality operator, result = this == _angle
     /// \param[in] _angle Angle to check for equality
-    /// \return True if this == _angle
+    /// \return true if this == _angle
     public: bool operator ==(const Angle &_angle) const;
 
     /// \brief Inequality
     /// \param[in] _angle Angle to check for inequality
-    /// \return True if this != _angle
+    /// \return true if this != _angle
     public: bool operator!=(const Angle &_angle) const;
 
     /// \brief Less than operator
     /// \param[in] _angle Angle to check
-    /// \return True if this < _angle
+    /// \return true if this < _angle
     public: bool operator<(const Angle &_angle) const;
 
     /// \brief Less or equal operator
     /// \param[in] _angle Angle to check
-    /// \return True if this <= _angle
+    /// \return true if this <= _angle
     public: bool operator<=(const Angle &_angle) const;
 
     /// \brief Greater than operator
     /// \param[in] _angle Angle to check
-    /// \return True if this > _angle
+    /// \return true if this > _angle
     public: bool operator>(const Angle &_angle) const;
 
     /// \brief Greater or equal operator
     /// \param[in] _angle Angle to check
-    /// \return True if this >= _angle
+    /// \return true if this >= _angle
     public: bool operator>=(const Angle &_angle) const;
 
     /// \brief Stream insertion operator. Outputs in degrees
     /// \param[in] _out output stream
     /// \param[in] _a angle to output
-    /// \return The Ostream
+    /// \return The output stream
     public: friend std::ostream &operator<<(std::ostream &_out,
                                             const gazebo::math::Angle &_a)
     {
