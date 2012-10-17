@@ -129,13 +129,10 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ################################################# 
-  # Find CCD 
-  pkg_check_modules(CCD ccd) 
-  if (NOT CCD_FOUND) 
-    message(STATUS "External CCD not found, using internal copy") 
-    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-    set(CCD_LIBRARIES gazebo_ccd) 
-  endif () 
+  # Use internal CCD (built as libgazebo_ccd.so)
+  #
+  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+  set(CCD_LIBRARIES gazebo_ccd) 
 
   #################################################
   # Find TBB

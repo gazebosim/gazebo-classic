@@ -94,6 +94,10 @@ namespace gazebo
       /// \brief Remove all sensors
       public: void RemoveSensors();
 
+      /// \brief True if SensorManager::initSensors queue is empty
+      /// i.e. all sensors managed by SensorManager have been initialized
+      public: bool SensorsInitialized();
+
       /// \brief Update loop
       private: void RunLoop();
 
