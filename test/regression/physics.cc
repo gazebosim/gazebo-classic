@@ -122,8 +122,12 @@ TEST_F(PhysicsTest, CollisionTest)
 
           if (i == 0)
             box_model->GetLink("link")->SetForce(math::Vector3(1000, 0, 0));
-          EXPECT_LT(fabs(pose.pos.x - x), 0.00001);
-          EXPECT_LT(fabs(vel.x - v), 0.00001);
+
+          EXPECT_LT(pose.pos.x , x + 0.00001);
+          EXPECT_GT(pose.pos.x , x - 0.00001);
+
+          EXPECT_LT(vel.x , v + 0.00001);
+          EXPECT_GT(vel.x , v - 0.00001);
         }
 
         physics::ModelPtr sphere_model = world->GetModel("sphere");
@@ -144,8 +148,11 @@ TEST_F(PhysicsTest, CollisionTest)
           }
           else
           {
-            EXPECT_LT(fabs(pose.pos.x - x - 1.0), 0.00001);
-            EXPECT_LT(fabs(vel.x - v), 0.00001);
+            EXPECT_LT(pose.pos.x , x + 0.00001);
+            EXPECT_GT(pose.pos.x , x - 0.00001);
+
+            EXPECT_LT(vel.x , v + 0.00001);
+            EXPECT_GT(vel.x , v - 0.00001);
           }
         }
       }
