@@ -66,7 +66,7 @@ std::string ModelDatabase::GetURI()
   if (uriStr)
     result = uriStr;
   else
-    gzerr << "GAZEBO_MODEL_DATABASE_URI not set\n";
+    gzwarn << "GAZEBO_MODEL_DATABASE_URI not set\n";
 
   if (result[result.size()-1] != '/')
     result += '/';
@@ -265,7 +265,8 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri)
 
       if (success != CURLE_OK)
       {
-        gzerr << "Unable to connect to model database using [" << _uri << "]\n";
+        gzwarn << "Unable to connect to model database using ["
+               << _uri << "]\n";
         retry = true;
         continue;
       }

@@ -134,6 +134,10 @@ namespace gazebo
       /// \param[in] _name Name of an object to find.
       public: bool HasAttachedObject(const std::string &_name);
 
+      /// \brief Return the number of attached movable objects.
+      /// \return The number of attached movable objects.
+      public: unsigned int GetAttachedObjectCount() const;
+
       /// \brief Detach all objects.
       public: void DetachObjects();
 
@@ -194,9 +198,11 @@ namespace gazebo
       /// \return The transparency.
       public: float GetTransparency();
 
+      public: void SetHighlighted(bool _highlighted);
+
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
-      public: void SetEmissive(const common::Color &_color);
+      public: virtual void SetEmissive(const common::Color &_color);
 
       /// \brief Set whether the visual should cast shadows.
       /// \param[in] _shadows True to enable shadows.
@@ -332,6 +338,11 @@ namespace gazebo
       /// \return Pointer to the parent visual, NULL if no parent.
       public: VisualPtr GetParent() const;
 
+      /// \brief Get the root visual
+      /// \return The root visual, which is one level below the world
+      /// visual.
+      public: VisualPtr GetRootVisual();
+
       /// \brief Get the shader type.
       /// \return String of the shader type: "vertex", "pixel",
       /// "normal_map_object_space", "normal_map_tangent_space".
@@ -361,6 +372,13 @@ namespace gazebo
       /// \sa GZ_VISIBILITY_GUI
       /// \sa GZ_VISIBILITY_NOT_SELECTABLE
       public: void SetVisibilityFlags(uint32_t _flags);
+
+      /// \brief Get visibility flags for this visual and all children.
+      /// \return The visiblity flags.
+      /// \sa GZ_VISIBILITY_ALL
+      /// \sa GZ_VISIBILITY_GUI
+      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      public: uint32_t GetVisibilityFlags();
 
       /// \brief Display the bounding box visual.
       public: void ShowBoundingBox();
@@ -413,6 +431,9 @@ namespace gazebo
       /// \brief Pointer to the visual's scene node in Ogre.
       protected: Ogre::SceneNode *sceneNode;
 
+      /// \brief Parent visual.
+      protected: VisualPtr parent;
+
       /// \brief Destroy all the movable objects attached to a scene node.
       /// \param[in] _sceneNode Pointer to the scene node to process.
       private: void DestroyAllAttachedMovableObjects(
@@ -457,9 +478,6 @@ namespace gazebo
 
       /// \brief Name of the visual.
       private: std::string name;
-
-      /// \brief Parent visual.
-      private: VisualPtr parent;
 
       /// \brief Children visuals.
       private: std::vector<VisualPtr> children;

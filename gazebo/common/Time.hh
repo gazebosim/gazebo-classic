@@ -41,155 +41,249 @@ namespace gazebo
       public: Time();
 
       /// \brief Copy constructor
-      /// \param time Time to copy
+      /// \param[in] time Time to copy
       public: Time(const Time &_time);
 
       /// \brief Constructor
-      /// \param tv Time to initialize to
+      /// \param[in] tv Time to initialize to
       public: Time(const struct timeval &_tv);
 
       /// \brief Constructor
-      /// \param sec Seconds
-      /// \param nsec Microseconds
+      /// \param[in] sec Seconds
+      /// \param[in] nsec Microseconds
       public: Time(int32_t _sec, int32_t _nsec);
 
       /// \brief Constuctor
-      /// \param time Time in double format sec.nsec
+      /// \param[in] time Time in double format sec.nsec
       public: Time(double _time);
 
       /// \brief Destructor
       public: virtual ~Time();
 
       /// \brief Get the wall time
+      /// \return the current time
       public: static const Time &GetWallTime();
 
       /// \brief Set the time to the wall time
       public: void SetToWallTime();
 
       /// \brief Set to sec and nsec
-      /// \param sec Seconds
-      /// \param nsec micro seconds
+      /// \param[in] sec Seconds
+      /// \param[in] nsec micro seconds
       public: void Set(int32_t _sec, int32_t _nsec);
 
       /// \brief Set to seconds
-      /// \param seconds Number of seconds
+      /// \param[in] seconds Number of seconds
       public: void Set(double _seconds);
 
       /// \brief Get the time as a double
-      /// \return Time as a double
+      /// \return Time as a double in seconds
       public: double Double() const;
 
       /// \brief Get the time as a float
-      /// \return Time as a float
+      /// \return Time as a float in seconds
       public: float Float() const;
 
       /// \brief Millisecond sleep
+      /// \param[in] _ms milliseconds
       public: static Time MSleep(unsigned int _ms);
 
-      /// \brief Equal opeator
+      /// \brief Assignment operator
+      /// \param[in] tv the new time
+      /// \return a reference to this instance
       public: Time &operator =(const struct timeval &tv);
 
-      /// \brief Equal opeator
+      /// \brief Assignment operator
+      /// \param[in] time the new time
+      /// \return a reference to this instance
       public: Time &operator =(const Time &time);
 
       /// \brief Addition operators
+      /// \param[in] tv the time to add
+      /// \return a Time instance
       public: Time operator +(const struct timeval &tv) const;
 
-      /// \brief Addition operators
+      /// \brief Addition assignment operator
+      /// \param[in] tv
+      /// \return a reference to this instance
       public: const Time &operator +=(const struct timeval &tv);
 
       /// \brief Addition operators
+      /// \return a Time instance
       public: Time operator +(const Time &time) const;
 
-      /// \brief Addition operators
+      /// \brief Addition assignemtn operator
+      /// \return a Time instance
       public: const Time &operator +=(const Time &time);
 
       /// \brief Subtraction operator
+      /// \return a Time instance
       public: Time operator -(const struct timeval &tv) const;
 
-      /// \brief Subtraction operator
+      /// \brief Subtraction assignment operator
+      /// \return a Time instance
       public: const Time &operator -=(const struct timeval &tv);
 
       /// \brief Subtraction operator
+      /// \return a Time instance
       public: Time operator -(const Time &time) const;
 
-      /// \brief Subtraction operator
+      /// \brief Subtraction assignment operator
+      /// \return a reference to this instance
       public: const Time &operator -=(const Time &time);
 
-      /// \brief Multiplication operators
+      /// \brief Multiplication operator
+      /// \return Time instance
       public: Time operator *(const struct timeval &tv) const;
 
-      /// \brief Multiplication operators
+      /// \brief Multiplication assignment operator
+      /// \param[in] tv the scaling duration
+      /// \return a reference to this instance
       public: const Time &operator *=(const struct timeval &tv);
 
       /// \brief Multiplication operators
+      /// \param[in] time the scaling factor
+      /// \return a scaled Time instance
       public: Time operator *(const Time &time) const;
 
       /// \brief Multiplication operators
+      /// \param[in] time scale factor
+      /// \return a scaled Time instance
       public: const Time &operator *=(const Time &time);
 
-      /// \brief Division operators
+      /// \brief Division operator
+      /// \param[in] tv a timeval divisor
+      /// \return a Time instance
       public: Time operator /(const struct timeval &tv) const;
 
-      /// \brief Division operators
+      /// \brief Division assignment operator
+      /// \param[in] tv a divisor
+      /// \return a Time instance
       public: const Time &operator /=(const struct timeval &tv);
 
-      /// \brief Division operators
+      /// \brief Division operator
+      /// \param[in] time the divisor
+      /// \return a Time instance
       public: Time operator /(const Time &time) const;
 
-      /// \brief Division operators
+      /// \brief Division assignment operator
+      /// \param[in] time the divisor
+      /// \return a Time instance
       public: const Time &operator /=(const Time &time);
 
-      /// \brief Equality operators
+      /// \brief Equal to operator
+      /// \param[in] tv the time to compare to
+      /// \return true if values are the same, false otherwise
       public: bool operator ==(const struct timeval &tv) const;
-      /// \brief Equality operators
+
+      /// \brief Equal to operator
+      /// \param[in] tv the time to compare to
+      /// \return true if values are the same, false otherwise
       public: bool operator ==(const Time &time) const;
-      /// \brief Equality operators
+
+      /// \brief Equal to operator
+      /// \param[in] time the time to compare to
+      /// \return true if values are the same, false otherwise
       public: bool operator ==(double time) const;
-      /// \brief Equality operators
+
+      /// \brief Equal to operator
+      /// \param[in] tv the time to compare to
+      /// \return true if values are the same, false otherwise
       public: bool operator!=(const struct timeval &tv) const;
-      /// \brief Equality operators
+
+      /// \brief Equal to operator
+      /// \param[in] time the time to compare to
+      /// \return true if values are the same, false otherwise
       public: bool operator!=(const Time &time) const;
-      /// \brief Equality operators
+
+      /// \brief Equal to operator
+      /// \param[in] time the time to compare to
+      /// \return true if values are the same, false otherwise
       public: bool operator!=(double time) const;
-      /// \brief Equality operators
+
+      /// \brief Less than operator
+      /// \param[in] tv the time to compare with
+      /// \return true if tv is shorter than this, false otherwise
       public: bool operator<(const struct timeval &tv) const;
-      /// \brief Equality operators
+
+      /// \brief Less than operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is shorter than this, false otherwise
       public: bool operator<(const Time &time) const;
-      /// \brief Equality operators
+
+      /// \brief Less than operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is shorter than this, false otherwise
       public: bool operator<(double time) const;
-      /// \brief Equality operators
+
+      /// \brief Less than or equal to operator
+      /// \param[in] tv the time to compare with
+      /// \return true if tv is shorter than or equal to this, false otherwise
       public: bool operator<=(const struct timeval &tv) const;
-      /// \brief Equality operators
+
+
+      /// \brief Less than or equal to operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is shorter than or equal to this, false otherwise
       public: bool operator<=(const Time &time) const;
-      /// \brief Equality operators
+
+      /// \brief Less than or equal to operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is shorter than or equal to this, false otherwise
       public: bool operator<=(double time) const;
-      /// \brief Equality operators
+
+      /// \brief Greater than operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is greater than this, false otherwise
       public: bool operator>(const struct timeval &tv) const;
-      /// \brief Equality operators
+
+      /// \brief Greater than operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is greater than this, false otherwise
       public: bool operator>(const Time &time) const;
-      /// \brief Equality operators
+
+      /// \brief Greater than operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is greater than this, false otherwise
       public: bool operator>(double time) const;
-      /// \brief Equality operators
+
+      /// \brief Greater than or equal operator
+      /// \param[in] tv the time to compare with
+      /// \return true if tv is greater than or equal to this, false otherwise
       public: bool operator>=(const struct timeval &tv) const;
-      /// \brief Equality operators
+
+      /// \brief Greater than or equal operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is greater than or equal to this, false otherwise
       public: bool operator>=(const Time &time) const;
-      /// \brief Equality operators
+
+      /// \brief Greater than or equal operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is greater than or equal to this, false otherwise
       public: bool operator>=(double time) const;
 
       /// \brief Convert seconds to nanoseconds
+      /// \param[in] _sec duration in seconds
+      /// \return nanoseconds
       public: static inline double SecToNano(double _sec)
               { return _sec * 1e-9;}
 
       /// \brief Convert milliseconds to nanoseconds
+      /// \param[in] _ms milliseconds
+      /// \return nanoseconds
       public: static inline double MilToNano(double _ms)
               { return _ms * 1e-6;}
 
       /// \brief Convert microseconds to nanoseconds
+      /// \param _ms microseconds
+      /// \return nanoseconds
       public: static inline double MicToNano(double _ms)
               { return _ms * 1e-3;}
 
-      /// Stream operators
+      /// \brief Stream insertion operator
+      /// \param[in] _out the output stream
+      /// \param[in] _time time to write to the stream
+      /// \return the output stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::common::Time &_time)
               {
@@ -197,6 +291,10 @@ namespace gazebo
                 return _out;
               }
 
+      /// \brief Stream extraction operator
+      /// \param[in] _in the input stream
+      /// \param[in] _time time to read from to the stream
+      /// \return the input stream
       public: friend std::istream &operator>>(std::istream &_in,
                                               gazebo::common::Time &_time)
               {
@@ -206,15 +304,17 @@ namespace gazebo
                 return _in;
               }
 
-      /// Seconds
+      /// \brief Seconds
       public: int32_t sec;
 
-      /// Microseconds
+      /// \brief Microseconds
       public: int32_t nsec;
 
+      /// \brief a singleton value of the last GetWallTime() value
       private: static Time wallTime;
 
-      /// Correct the time
+      /// \brief Correct the time so that small additions/substractions
+      /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
                  // Make any corrections
@@ -234,6 +334,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-

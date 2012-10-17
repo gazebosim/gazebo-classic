@@ -218,16 +218,9 @@ namespace gazebo
       /// \brief Get a visual by name
       public: VisualPtr GetVisual(const std::string &_name) const;
 
-      /// \brief Select a visual element at a screen location
-      /// \param[in] _camera The camera through which to project the mouse pos
-      /// \param[in] _mousePos Screen position
-      /// \return Pointer the a visual. NULL if none found
-      public: VisualPtr SelectVisualAt(CameraPtr _camera,
-                                       const math::Vector2i &_mousePos);
-
       /// \brief Select a visual by name.
       /// \param[in] _name Name of the visual to select.
-      public: void SelectVisual(const std::string &_name) const;
+      public: void SelectVisual(const std::string &_name);
 
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking.
@@ -352,16 +345,17 @@ namespace gazebo
       /// \brief Clear rendering::Scene
       public: void Clear();
 
-      /// \brief Get a pointer to the selection object.
-      /// \return Pointer to the selection object.
-      public: SelectionObj *GetSelectionObj() const;
-
       /// \brief Clone a visual.
       /// \param[in] _visualName Name of the visual to clone.
       /// \param[in] _newName New name of the visual.
       /// \return Pointer to the cloned visual.
       public: VisualPtr CloneVisual(const std::string &_visualName,
                                     const std::string &_newName);
+
+      /// \brief Get the currently selected visual.
+      /// \return Pointer to the currently selected visual, or NULL if
+      /// nothing is selected.
+      public: VisualPtr GetSelectedVisual() const;
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -395,6 +389,11 @@ namespace gazebo
       /// \param[in] _node The Ogre Node to print.
       private: void PrintSceneGraphHelper(const std::string &_prefix,
                                           Ogre::Node *_node);
+
+      /// \brief Called when a scene message is received on the
+      /// ~/scene topic
+      /// \param[in] _msg The message.
+      private: void OnScene(ConstScenePtr &_msg);
 
       /// \brief Response callback
       /// \param[in] _msg The message data.
@@ -607,6 +606,12 @@ namespace gazebo
       /// \brief Subscribe to sensor topic
       private: transport::SubscriberPtr sensorSub;
 
+      /// \brief Subscribe to scene topic
+      private: transport::SubscriberPtr sceneSub;
+
+      /// \brief Subscribe to the request topic
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Subscribe to visual topic
       private: transport::SubscriberPtr visSub;
 
@@ -637,17 +642,20 @@ namespace gazebo
       /// \brief Publish light updates.
       private: transport::PublisherPtr lightPub;
 
+      /// \brief Respond to requests.
+      private: transport::PublisherPtr responsePub;
+
       /// \brief Publish requests
       private: transport::PublisherPtr requestPub;
 
       /// \brief Event connections
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief The selection visual
-      private: SelectionObj *selectionObj;
-
       /// \brief The top level in our tree of visuals
       private: VisualPtr worldVisual;
+
+      /// \brief Pointer to a visual selected by a user via the GUI.
+      private: VisualPtr selectedVis;
 
       /// \brief Keep around our request message.
       private: msgs::Request *requestMsg;

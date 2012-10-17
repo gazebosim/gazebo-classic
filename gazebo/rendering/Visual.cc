@@ -29,7 +29,6 @@
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
-#include "rendering/SelectionObj.hh"
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/RenderEngine.hh"
 #include "common/MeshManager.hh"
@@ -393,12 +392,12 @@ void Visual::Load()
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
-      std::string uri = scriptElem->GetValueString("uri");
+      std::string matUri = scriptElem->GetValueString("uri");
       std::string matName = scriptElem->GetValueString("name");
 
-      if (!uri.empty())
-        RenderEngine::Instance()->AddResourcePath(uri);
-      if (!name.empty())
+      if (!matUri.empty())
+        RenderEngine::Instance()->AddResourcePath(matUri);
+      if (!matName.empty())
         this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
@@ -541,6 +540,12 @@ bool Visual::HasAttachedObject(const std::string &_name)
   }
 
   return false;
+}
+
+//////////////////////////////////////////////////
+unsigned int Visual::GetAttachedObjectCount() const
+{
+  return this->sceneNode->numAttachedObjects();
 }
 
 //////////////////////////////////////////////////
@@ -722,7 +727,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   {
     this->myMaterialName = _materialName;
   }
-
 
   try
   {
@@ -1057,6 +1061,78 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
+void Visual::SetHighlighted(bool _highlighted)
+{
+  /*
+  if (this->GetAttachedObjectCount() > 0)
+    this->sceneNode->showBoundingBox(_highlighted);
+    */
+
+/* TODO: This code will cause objects that use the same mesh to be
+ * highlighted. Using the same mesh is good for performance. We need to come
+ * up with a better way to highlight objects, possibly by attaching
+ * a special visual to selected objects.
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+
+      unsigned int techniqueCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+          techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+        if (_highlighted)
+        {
+          pass = technique->createPass();
+          pass->setName("highlight");
+          pass->setDiffuse(
+              Conversions::Convert(common::Color(0.8, 0.8, 0.8, 0.8)));
+          pass->setSelfIllumination(
+              Conversions::Convert(common::Color(0.8, 0.8, 0.8)));
+          pass->setDepthBias(0.2, 0.1);
+
+          pass->setDepthWriteEnabled(false);
+          pass->setDepthCheckEnabled(true);
+          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+        }
+        else
+        {
+          for (unsigned int k = 0; k < technique->getNumPasses(); ++k)
+          {
+            if (technique->getPass(k)->getName() == "highlight")
+            {
+              technique->removePass(k);
+            }
+          }
+        }
+      }
+    }
+  }
+  */
+
+  /*for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetHighlighted(_highlighted);
+  }*/
+}
+
+//////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
@@ -1081,11 +1157,12 @@ void Visual::SetEmissive(const common::Color &_color)
       Ogre::ColourValue dc;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+          techniqueCount++)
       {
         technique = material->getTechnique(techniqueCount);
 
-        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        for (passCount = 0; passCount < technique->getNumPasses();
+            passCount++)
         {
           pass = technique->getPass(passCount);
           pass->setSelfIllumination(Conversions::Convert(_color));
@@ -1099,7 +1176,6 @@ void Visual::SetEmissive(const common::Color &_color)
     this->children[i]->SetEmissive(_color);
   }
 }
-
 
 //////////////////////////////////////////////////
 float Visual::GetTransparency()
@@ -1125,6 +1201,17 @@ void Visual::SetVisible(bool _visible, bool _cascade)
 {
   this->sceneNode->setVisible(_visible, _cascade);
   this->visible = _visible;
+}
+
+//////////////////////////////////////////////////
+uint32_t Visual::GetVisibilityFlags()
+{
+  if (this->sceneNode->numAttachedObjects() > 0)
+  {
+    return this->sceneNode->getAttachedObject(0)->getVisibilityFlags();
+  }
+
+  return GZ_VISIBILITY_ALL;
 }
 
 //////////////////////////////////////////////////
@@ -1443,7 +1530,6 @@ void Visual::InsertMesh(const std::string &_meshName)
 
   this->InsertMesh(mesh);
 
-
   // Add the mesh into OGRE
   /*if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
       common::MeshManager::Instance()->HasMesh(_meshName))
@@ -1455,33 +1541,35 @@ void Visual::InsertMesh(const std::string &_meshName)
 }
 
 //////////////////////////////////////////////////
-void Visual::InsertMesh(const common::Mesh *mesh)
+void Visual::InsertMesh(const common::Mesh *_mesh)
 {
   Ogre::MeshPtr ogreMesh;
 
-  if (mesh->GetSubMeshCount() == 0)
+  if (_mesh->GetSubMeshCount() == 0)
   {
     gzerr << "Visual::InsertMesh no submeshes, this is an invalid mesh\n";
     return;
   }
 
   // Don't re-add existing meshes
-  if (Ogre::MeshManager::getSingleton().resourceExists(mesh->GetName()))
+  if (Ogre::MeshManager::getSingleton().resourceExists(_mesh->GetName()))
+  {
     return;
+  }
 
   try
   {
     // Create a new mesh specifically for manual definition.
-    ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
+    ogreMesh = Ogre::MeshManager::getSingleton().createManual(_mesh->GetName(),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     Ogre::SkeletonPtr ogreSkeleton;
 
-    if (mesh->HasSkeleton())
+    if (_mesh->HasSkeleton())
     {
-      common::Skeleton *skel = mesh->GetSkeleton();
+      common::Skeleton *skel = _mesh->GetSkeleton();
       ogreSkeleton = Ogre::SkeletonManager::getSingleton().create(
-        mesh->GetName() + "_skeleton",
+        _mesh->GetName() + "_skeleton",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         true);
 
@@ -1502,9 +1590,9 @@ void Visual::InsertMesh(const common::Mesh *mesh)
         bone->setManuallyControlled(true);
         bone->setInitialState();
       }
-      ogreMesh->setSkeletonName(mesh->GetName() + "_skeleton");
+      ogreMesh->setSkeletonName(_mesh->GetName() + "_skeleton");
     }
-    for (unsigned int i = 0; i < mesh->GetSubMeshCount(); i++)
+    for (unsigned int i = 0; i < _mesh->GetSubMeshCount(); i++)
     {
       Ogre::SubMesh *ogreSubMesh;
       Ogre::VertexData *vertexData;
@@ -1516,7 +1604,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
 
       size_t currOffset = 0;
 
-      const common::SubMesh *subMesh = mesh->GetSubMesh(i);
+      const common::SubMesh *subMesh = _mesh->GetSubMesh(i);
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
@@ -1581,9 +1669,9 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       vertices = static_cast<float*>(vBuf->lock(
                       Ogre::HardwareBuffer::HBL_DISCARD));
 
-      if (mesh->HasSkeleton())
+      if (_mesh->HasSkeleton())
       {
-        common::Skeleton *skel = mesh->GetSkeleton();
+        common::Skeleton *skel = _mesh->GetSkeleton();
         for (unsigned int j = 0; j < subMesh->GetNodeAssignmentsCount(); j++)
         {
           common::NodeAssignment na = subMesh->GetNodeAssignment(j);
@@ -1638,7 +1726,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
         *indices++ = subMesh->GetIndex(j);
 
       const common::Material *material;
-      material = mesh->GetMaterial(subMesh->GetMaterialIndex());
+      material = _mesh->GetMaterial(subMesh->GetMaterialIndex());
       if (material)
       {
         rendering::Material::Update(material);
@@ -1650,10 +1738,10 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       iBuf->unlock();
     }
 
-    math::Vector3 max = mesh->GetMax();
-    math::Vector3 min = mesh->GetMin();
+    math::Vector3 max = _mesh->GetMax();
+    math::Vector3 min = _mesh->GetMin();
 
-    if (mesh->HasSkeleton())
+    if (_mesh->HasSkeleton())
     {
       min = math::Vector3(-1, -1, -1);
       max = math::Vector3(1, 1, 1);
@@ -1803,13 +1891,32 @@ VisualPtr Visual::GetParent() const
 }
 
 //////////////////////////////////////////////////
+VisualPtr Visual::GetRootVisual()
+{
+  VisualPtr p = shared_from_this();
+  while (p->GetParent()->GetName() != "__world_node__")
+    p = p->GetParent();
+
+  return p;
+}
+
+//////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-  if (this->sdf->HasElement("geometry"))
+   if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
-    return geomElem->HasElement("plane");
+    if (geomElem->HasElement("plane"))
+      return true;
   }
+
+  std::vector<VisualPtr>::const_iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->IsPlane())
+      return true;
+  }
+
   return false;
 }
 

@@ -33,7 +33,7 @@ namespace gazebo
     class RenderWidget;
     class GLWidget;
 
-    class WorldPropertiesWidget;
+    class ModelListWidget;
 
     class MainWindow : public QMainWindow
     {
@@ -52,7 +52,6 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
-      private slots: void OnCollapse();
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
@@ -65,9 +64,9 @@ namespace gazebo
       private slots: void Step();
 
       private slots: void NewModel();
-      private slots: void EditWorldProperties();
       private slots: void Arrow();
-      private slots: void RingPose();
+      private slots: void Translate();
+      private slots: void Rotate();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -96,6 +95,7 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
       private: void OnManipMode(const std::string &_mode);
+      private: void OnSetSelectedEntity(const std::string &_name);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       private: QMenu *fileMenu;
@@ -105,6 +105,7 @@ namespace gazebo
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
+      private: ModelListWidget *modelListWidget;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
@@ -117,9 +118,7 @@ namespace gazebo
       private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
 
-      private: WorldPropertiesWidget *worldPropertiesWidget;
       private: QDockWidget *toolsDock;
-      private: QPushButton *collapseButton;
 
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -128,7 +127,8 @@ namespace gazebo
 
       private: msgs::Request *requestMsg;
 
-      private: QTreeWidget *treeWidget;
+      // private: QTreeWidget *treeWidget;
+      private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
     };
 

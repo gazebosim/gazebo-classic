@@ -72,23 +72,22 @@ namespace gazebo
       protected: void keyReleaseEvent(QKeyEvent *_event);
       protected: void wheelEvent(QWheelEvent *_event);
       protected: void mousePressEvent(QMouseEvent *_event);
+      protected: void mouseDoubleClickEvent(QMouseEvent *_event);
       protected: void mouseMoveEvent(QMouseEvent *_event);
       protected: void mouseReleaseEvent(QMouseEvent *_event);
 
       private: std::string GetOgreHandle() const;
 
-      private: void OnKeyReleaseRing(QKeyEvent *_event);
-
-      private: void OnMouseMoveRing();
       private: void OnMouseMoveNormal();
+      private: void OnMouseMoveTranslate();
       private: void OnMouseMoveMakeEntity();
 
-      private: void OnMouseReleaseRing();
       private: void OnMouseReleaseNormal();
+      private: void OnMouseReleaseTranslate();
       private: void OnMouseReleaseMakeEntity();
 
-      private: void OnMousePressRing();
       private: void OnMousePressNormal();
+      private: void OnMousePressTranslate();
       private: void OnMousePressMakeEntity();
 
       private: void OnRequest(ConstRequestPtr &_msg);
@@ -103,6 +102,7 @@ namespace gazebo
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
+
       private: void OnSetSelectedEntity(const std::string &_name);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
@@ -121,6 +121,14 @@ namespace gazebo
       private: void PushHistory(const std::string &_visName,
                                 const math::Pose &_pose);
       private: void PopHistory();
+
+      /// \brief Set the selected visual, which will highlight the
+      /// visual
+      private: void SetSelectedVisual(rendering::VisualPtr _vis);
+
+      /// \brief Set the visual being moved, which will highlight the
+      /// visual
+      private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       private: int windowId;
 
@@ -141,16 +149,13 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr hoverVis, mouseMoveVis;
-      private: rendering::SelectionObj *selectionObj;
-      private: unsigned int selectionId;
-      private: std::string selectionMod;
-      private: math::Pose selectionPoseOrig;
+      private: rendering::VisualPtr hoverVis, selectedVis, mouseMoveVis;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
+      private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
       private: math::Pose mouseMoveVisStartPose;

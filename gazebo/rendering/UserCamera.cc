@@ -53,9 +53,10 @@ UserCamera::UserCamera(const std::string &_name, Scene *_scene)
 
   this->gui = new GUIOverlay();
 
-  this->orbitViewController = new OrbitViewController(this);
-  this->fpsViewController = new FPSViewController(this);
-  this->viewController = this->orbitViewController;
+  this->orbitViewController = NULL;
+  this->fpsViewController = NULL;
+  this->viewController = NULL;
+
   this->selectionBuffer = NULL;
 }
 
@@ -86,6 +87,12 @@ void UserCamera::Load()
 //////////////////////////////////////////////////
 void UserCamera::Init()
 {
+  this->orbitViewController = new OrbitViewController(
+      boost::shared_dynamic_cast<UserCamera>(shared_from_this()));
+  this->fpsViewController = new FPSViewController(
+      boost::shared_dynamic_cast<UserCamera>(shared_from_this()));
+  this->viewController = this->orbitViewController;
+
   Camera::Init();
   this->SetHFOV(GZ_DTOR(60));
 
@@ -108,6 +115,9 @@ void UserCamera::Init()
     this->SetClipDist(0.1, 5000);
   }
 
+  // Removing for now because the axis doesn't not move properly when the
+  // window is resized
+  /*
   this->axisNode =
     this->pitchNode->createChildSceneNode(this->name + "AxisNode");
 
@@ -149,6 +159,7 @@ void UserCamera::Init()
   this->axisNode->attachObject(x);
   this->axisNode->attachObject(y);
   this->axisNode->attachObject(z);
+  */
 }
 
 //////////////////////////////////////////////////
@@ -372,6 +383,13 @@ void UserCamera::ShowVisual(bool /*_s*/)
 }
 
 //////////////////////////////////////////////////
+bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
+{
+  this->orbitViewController->SetFocalPoint(_pose.pos);
+  return Camera::MoveToPosition(_pose, _time);
+}
+
+//////////////////////////////////////////////////
 void UserCamera::MoveToVisual(const std::string &_name)
 {
   VisualPtr visualPtr = this->scene->GetVisual(_name);
@@ -427,8 +445,8 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   end = mid + dir*(dist - scale);
 
   dist = start.Distance(end);
-  double vel = 5.0;
-  double time = dist / vel;
+  // double vel = 5.0;
+  double time = 0.5;  // dist / vel;
 
   Ogre::Animation *anim =
     this->scene->GetManager()->createAnimation("cameratrack", time);
@@ -537,6 +555,12 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
+{
+  this->orbitViewController->SetFocalPoint(_pt);
 }
 
 //////////////////////////////////////////////////

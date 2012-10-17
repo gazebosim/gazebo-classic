@@ -172,8 +172,6 @@ void SelectionBuffer::CreateRTTOverlays()
   this->selectionDebugOverlay->hide();
 }
 
-
-
 /////////////////////////////////////////////////
 void SelectionBuffer::ShowOverlay(bool _show)
 {

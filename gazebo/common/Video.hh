@@ -42,27 +42,43 @@ namespace gazebo
       public: virtual ~Video();
 
       /// \brief Load a video file
-      /// \param _filename Full path of the video file
+      /// \param[in] _filename Full path of the video file
+      /// \return false if HAVE_FFMPEG is not defined or if a video stream
+      /// can't be found
       public: bool Load(const std::string &_filename);
 
       /// \brief Get the width of the video in pixels
+      /// \return the width
       public: int GetWidth() const;
 
       /// \brief Get the height of the video in pixels
+      /// \return the height
       public: int GetHeight() const;
 
       /// \brief Get the next frame of the video.
-      /// \param _img Image in which the frame is stored
+      /// \param[out] _img Image in which the frame is stored
+      /// \return false if HAVE_FFMPEG is not defined, true otherwise
       public: bool GetNextFrame(unsigned char **_buffer);
 
       /// \brief free up open Video object, close files, streams
       private: void Cleanup();
 
+      /// \brief libav Format I/O context
       private: AVFormatContext *formatCtx;
+
+      /// \brief libav main external API structure
       private: AVCodecContext *codecCtx;
+
+      /// \brief audio video frame
       private: AVFrame *avFrame;
+
+      /// \brief audi video picture
       private: AVPicture *pic;
+
+      /// \brief software scaling context
       private: SwsContext *swsCtx;
+
+      /// \brief index of first video stream or -1
       private: int videoStream;
     };
     /// \}

@@ -18,7 +18,7 @@
 #ifndef _GUI_ACTIONS_HH_
 #define _GUI_ACTIONS_HH_
 
-class QAction;
+#include "gui/qt.h"
 
 namespace gazebo
 {
@@ -35,7 +35,6 @@ namespace gazebo
     extern QAction *g_newModelAct;
     extern QAction *g_resetModelsAct;
     extern QAction *g_resetWorldAct;
-    extern QAction *g_editWorldPropertiesAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
@@ -56,7 +55,31 @@ namespace gazebo
     extern QAction *g_viewOrbitAct;
 
     extern QAction *g_arrowAct;
-    extern QAction *g_ringPoseAct;
+    extern QAction *g_translateAct;
+    extern QAction *g_rotateAct;
+
+    /// \brief Custom delete action.
+    class DeleteAction : public QAction
+    {
+      Q_OBJECT
+      /// \brief Constructor
+      /// \param[in] _text Name of the action.
+      /// \param[in] _parent Action parent object.
+      public: DeleteAction(const QString &_text, QObject *_parent)
+              : QAction(_text, _parent) {}
+
+      /// \brief Emit the delete signal. This triggers the action.
+      /// \param[in] _modelName Name of the model to delete.
+      public: void Signal(const std::string &_modelName)
+               { emit DeleteSignal(_modelName); }
+
+      /// \brief The custom signal which a SLOT can connect to.
+      /// \param[in] _modelName The name of the model to delete.
+      Q_SIGNALS: void DeleteSignal(const std::string &_modelName);
+    };
+
+    /// \brief Action used to delete a model.
+    extern DeleteAction *g_deleteAct;
   }
 }
 #endif

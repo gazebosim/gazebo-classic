@@ -180,44 +180,52 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   this->visPub->Publish(*this->visualMsg);
 }
 
+/////////////////////////////////////////////////
+std::string CylinderMaker::GetSDFString()
+{
+  std::ostringstream newModelStr;
+
+  newModelStr
+    << "<gazebo version ='1.2'>"
+    << "  <model name ='unit_cylinder_" << counter << "'>"
+    << "    <pose>0 0 0.5 0 0 0</pose>"
+    << "    <link name='link'>"
+    << "      <inertial><mass>1.0</mass></inertial>"
+    << "      <collision name='collision'>"
+    << "        <geometry>"
+    << "          <cylinder>"
+    << "            <radius>0.5</radius>"
+    << "            <length>1.0</length>"
+    << "          </cylinder>"
+    << "        </geometry>"
+    << "      </collision>"
+    << "      <visual name='visual'>"
+    << "        <geometry>"
+    << "          <cylinder>"
+    << "            <radius>0.5</radius>"
+    << "            <length>1.0</length>"
+    << "          </cylinder>"
+    << "        </geometry>"
+    << "      <material>"
+    << "        <script>"
+    << "          <uri>file://media/materials/scripts/gazebo.material</uri>"
+    << "          <name>Gazebo/Grey</name>"
+    << "        </script>"
+    << "      </material>"
+    << "      </visual>"
+    << "    </link>"
+    << "  </model>"
+    << "</gazebo>";
+
+  return newModelStr.str();
+}
+
+/////////////////////////////////////////////////
 void CylinderMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  std::ostringstream newModelStr;
 
-
-  newModelStr << "<gazebo version ='1.0'>\
-    <model name ='custom_user_cylinder" << counter << "_model'>\
-      <pose>" << this->visualMsg->pose().position().x() << " "
-                << this->visualMsg->pose().position().y() << " "
-                << this->visualMsg->pose().position().z()
-                << " 0 0 0</pose>\
-      <link name ='body'>\
-        <inertial mass ='1.0'>\
-            <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
-        </inertial>\
-        <collision name ='geom'>\
-          <geometry>\
-            <cylinder radius ='" <<
-            this->visualMsg->geometry().cylinder().radius() << "'\
-                      length ='" <<
-                      this->visualMsg->geometry().cylinder().length() << "'/>\
-          </geometry>\
-        </collision>\
-        <visual name ='visual' cast_shadows ='true'>\
-          <geometry>\
-            <cylinder radius ='" <<
-            this->visualMsg->geometry().cylinder().radius() << "'\
-                      length ='" <<
-                      this->visualMsg->geometry().cylinder().length() << "'/>\
-          </geometry>\
-          <material script ='Gazebo/Grey'/>\
-        </visual>\
-      </link>\
-    </model>\
-    </gazebo>";
-
-  msg.set_sdf(newModelStr.str());
+  msg.set_sdf(this->GetSDFString());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());

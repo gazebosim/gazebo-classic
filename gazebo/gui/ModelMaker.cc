@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 #include <sstream>
 
 #include "msgs/msgs.hh"
@@ -39,7 +39,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelMaker::ModelMaker()
+  ModelMaker::ModelMaker()
 : EntityMaker()
 {
   this->state = 0;
@@ -63,15 +63,33 @@ void ModelMaker::InitFromModel(const std::string &_modelName)
     this->visuals.clear();
   }
 
-  // this->modelSDF.reset(new sdf::SDF);
-  // sdf::initFile("gazebo.sdf", this->modelSDF);
   this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
 
   if (!this->modelVisual)
-    std::cout << "Unable to clone\n";
+    gzerr << "Unable to clone\n";
 
   this->clone = true;
 }
+
+/////////////////////////////////////////////////
+void ModelMaker::InitFromSDFString(const std::string &_data)
+{
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+
+  if (this->modelVisual)
+  {
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+    this->visuals.clear();
+  }
+
+  this->modelSDF.reset(new sdf::SDF);
+  sdf::initFile("gazebo.sdf", this->modelSDF);
+  sdf::readString(_data, this->modelSDF);
+
+  this->Init();
+}
+
 
 /////////////////////////////////////////////////
 void ModelMaker::InitFromFile(const std::string &_filename)
@@ -90,19 +108,32 @@ void ModelMaker::InitFromFile(const std::string &_filename)
   sdf::initFile("gazebo.sdf", this->modelSDF);
   sdf::readFile(_filename, this->modelSDF);
 
+  this->Init();
+}
+
+/////////////////////////////////////////////////
+void ModelMaker::Init()
+{
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+
   // Load the world file
   std::string modelName;
   math::Pose modelPose, linkPose, visualPose;
+  sdf::ElementPtr modelElem;
 
-  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  if (this->modelSDF->root->HasElement("model"))
+    modelElem = this->modelSDF->root->GetElement("model");
+  else if (this->modelSDF->root->HasElement("light"))
+    modelElem = this->modelSDF->root->GetElement("light");
+
   if (modelElem->HasElement("pose"))
     modelPose = modelElem->GetValuePose("pose");
 
   modelName = this->node->GetTopicNamespace() + "::" +
-              modelElem->GetValueString("name");
+    modelElem->GetValueString("name");
 
   this->modelVisual.reset(new rendering::Visual(modelName,
-                          scene->GetWorldVisual()));
+        scene->GetWorldVisual()));
   this->modelVisual->Load();
   this->modelVisual->SetPose(modelPose);
 
@@ -111,51 +142,63 @@ void ModelMaker::InitFromFile(const std::string &_filename)
 
   scene->AddVisual(this->modelVisual);
 
-  sdf::ElementPtr linkElem = modelElem->GetElement("link");
-
-  try
+  if (modelElem->GetName() == "model")
   {
-    while (linkElem)
+    sdf::ElementPtr linkElem = modelElem->GetElement("link");
+
+    try
     {
-      std::string linkName = linkElem->GetValueString("name");
-      if (linkElem->HasElement("pose"))
-        linkPose = linkElem->GetValuePose("pose");
-
-      rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
-            linkName, this->modelVisual));
-      linkVisual->Load();
-      linkVisual->SetPose(linkPose);
-      this->visuals.push_back(linkVisual);
-
-      int visualIndex = 0;
-      sdf::ElementPtr visualElem;
-
-      if (linkElem->HasElement("visual"))
-        visualElem = linkElem->GetElement("visual");
-
-      while (visualElem)
+      while (linkElem)
       {
-        if (visualElem->HasElement("pose"))
-          visualPose = visualElem->GetValuePose("pose");
+        std::string linkName = linkElem->GetValueString("name");
+        if (linkElem->HasElement("pose"))
+          linkPose = linkElem->GetValuePose("pose");
+        else
+          linkPose.Set(0, 0, 0, 0, 0, 0);
 
-        std::ostringstream visualName;
-        visualName << modelName << "::" << linkName << "::Visual_"
-          << visualIndex++;
-        rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-              linkVisual));
+        rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
+              linkName, this->modelVisual));
+        linkVisual->Load();
+        linkVisual->SetPose(linkPose);
+        this->visuals.push_back(linkVisual);
 
-        visVisual->Load(visualElem);
-        this->visuals.push_back(visVisual);
+        int visualIndex = 0;
+        sdf::ElementPtr visualElem;
 
-        visualElem = visualElem->GetNextElement("visual");
+        if (linkElem->HasElement("visual"))
+          visualElem = linkElem->GetElement("visual");
+
+        while (visualElem)
+        {
+          if (visualElem->HasElement("pose"))
+            visualPose = visualElem->GetValuePose("pose");
+          else
+            visualPose.Set(0, 0, 0, 0, 0, 0);
+
+          std::ostringstream visualName;
+          visualName << modelName << "::" << linkName << "::Visual_"
+            << visualIndex++;
+          rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+                linkVisual));
+
+          visVisual->Load(visualElem);
+          visVisual->SetPose(visualPose);
+          this->visuals.push_back(visVisual);
+
+          visualElem = visualElem->GetNextElement("visual");
+        }
+
+        linkElem = linkElem->GetNextElement("link");
       }
-
-      linkElem = linkElem->GetNextElement("link");
+    }
+    catch(common::Exception &_e)
+    {
+      this->visuals.clear();
     }
   }
-  catch(common::Exception &_e)
+  else
   {
-    this->visuals.clear();
+    this->modelVisual->AttachMesh("unit_sphere");
   }
 }
 
@@ -211,7 +254,7 @@ void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
 
   // Cast two rays from the camera into the world
   this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
-                                       origin1, dir1);
+      origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
   math::Plane plane(math::Vector3(0, 0, 1), 0);
@@ -235,11 +278,11 @@ void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
     else if (pose.pos.y - floor(pose.pos.y) <= .4)
       pose.pos.y = floor(pose.pos.y);
 
-  /*  if (ceil(pose.pos.z) - pose.pos.z <= .4)
-      pose.pos.z = ceil(pose.pos.z);
-    else if (pose.pos.z - floor(pose.pos.z) <= .4)
-      pose.pos.z = floor(pose.pos.z);
-      */
+    /*  if (ceil(pose.pos.z) - pose.pos.z <= .4)
+        pose.pos.z = ceil(pose.pos.z);
+        else if (pose.pos.z - floor(pose.pos.z) <= .4)
+        pose.pos.z = floor(pose.pos.z);
+        */
   }
   pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
 
@@ -257,12 +300,27 @@ void ModelMaker::CreateTheEntity()
   msgs::Factory msg;
   if (!this->clone)
   {
-    sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+    rendering::Scene *scene = gui::get_active_camera()->GetScene();
+    sdf::ElementPtr modelElem;
+    bool isModel = false;
+    bool isLight = false;
+    if (this->modelSDF->root->HasElement("model"))
+    {
+      modelElem = this->modelSDF->root->GetElement("model");
+      isModel = true;
+    }
+    else if (this->modelSDF->root->HasElement("light"))
+    {
+      modelElem = this->modelSDF->root->GetElement("light");
+      isLight = true;
+    }
+
     std::string modelName = modelElem->GetValueString("name");
 
     // Automatically create a new name if the model exists
     int i = 0;
-    while (has_entity_name(modelName))
+    while ((isModel && has_entity_name(modelName)) ||
+        (isLight && scene->GetLight(modelName)))
     {
       modelName = modelElem->GetValueString("name") + "_" +
         boost::lexical_cast<std::string>(i++);
@@ -284,7 +342,7 @@ void ModelMaker::CreateTheEntity()
   {
     msgs::Set(msg.mutable_pose(), this->modelVisual->GetWorldPose());
     msg.set_clone_model_name(this->modelVisual->GetName().substr(0,
-                             this->modelVisual->GetName().find("_clone_tmp")));
+          this->modelVisual->GetName().find("_clone_tmp")));
   }
 
   this->makerPub->Publish(msg);

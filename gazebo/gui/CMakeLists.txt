@@ -19,10 +19,7 @@ set (sources
   GLWidget.cc 
   TimePanel.cc
   InsertModelWidget.cc
-  LightListWidget.cc
-  LightRightMenu.cc
   ModelListWidget.cc
-  WorldPropertiesWidget.cc
   EntityMaker.cc
   BoxMaker.cc
   SphereMaker.cc
@@ -34,27 +31,22 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   JointControlWidget.cc
-  SkyWidget.cc
 )
 
 set (qt_headers
+  Actions.hh
   MainWindow.hh 
   RenderWidget.hh 
   GLWidget.hh 
   TimePanel.hh
   InsertModelWidget.hh
-  LightListWidget.hh
   ModelListWidget.hh
-  WorldPropertiesWidget.hh
   ModelEditWidget.hh
-  LightRightMenu.hh
   ModelRightMenu.hh
   JointControlWidget.hh
-  SkyWidget.hh
 )
 
 set (headers
-  Actions.hh
   Gui.hh
   EntityMaker.hh
   BoxMaker.hh

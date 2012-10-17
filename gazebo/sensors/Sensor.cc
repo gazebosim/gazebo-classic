@@ -83,6 +83,8 @@ void Sensor::Load(const std::string &_worldName)
 
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
+  this->controlSub = this->node->Subscribe("~/world_control",
+                                           &Sensor::OnControl, this);
 }
 
 //////////////////////////////////////////////////
@@ -243,4 +245,17 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
 std::string Sensor::GetWorldName() const
 {
   return this->world->GetName();
+}
+
+//////////////////////////////////////////////////
+void Sensor::OnControl(ConstWorldControlPtr &_data)
+{
+  if (_data->has_reset())
+  {
+    if ((_data->reset().has_all() && _data->reset().all()) ||
+        (_data->reset().has_time_only() && _data->reset().time_only()))
+    {
+      this->lastUpdateTime = 0.0;
+    }
+  }
 }

@@ -38,7 +38,9 @@ namespace gazebo
       public: virtual ~ModelMaker();
 
       public: void InitFromModel(const std::string &_modelName);
+      public: void InitFromSDFString(const std::string &_data);
       public: void InitFromFile(const std::string &_filename);
+
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       public: virtual void Stop();
@@ -48,6 +50,9 @@ namespace gazebo
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Internal init function.
+      private: void Init();
 
       private: virtual void CreateTheEntity();
       private: int state;

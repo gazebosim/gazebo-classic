@@ -73,7 +73,7 @@ namespace gazebo
       /// \brief Adverise a topic
       template<typename M>
       transport::PublisherPtr Advertise(const std::string &topic,
-                                        unsigned int _queueLimit = 10,
+                                        unsigned int _queueLimit = 1000,
                                         bool _latch = false)
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
@@ -127,6 +127,16 @@ namespace gazebo
       public: bool HandleData(const std::string &_topic,
                               const std::string &_msg);
 
+      /// \brief Add a latched message to the node for publication.
+      ///
+      /// This is called when a subscription is connected to a
+      /// publication.
+      /// \param[in] _topic Name of the topic to publish data on.
+      /// \param[in] _msg The message to publish.
+      public: void InsertLatchedMsg(const std::string &_topic,
+                                    const std::string &_msg);
+
+
       /// \brief Get the message type for a topic
       public: std::string GetMsgType(const std::string &_topic) const;
 
@@ -148,5 +158,3 @@ namespace gazebo
   }
 }
 #endif
-
-

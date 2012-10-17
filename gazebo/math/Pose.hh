@@ -56,7 +56,20 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Pose();
 
+      /// \brief Set the pose from a Vector3 and a Quaternion
+      /// \param[in] _pos The position.
+      /// \param[in] _rot The rotation.
       public: void Set(const Vector3 &_pos, const Quaternion &_rot);
+
+      /// \brief Set the pose from a six tuple.
+      /// \param[in] _x x position in meters.
+      /// \param[in] _y y position in meters.
+      /// \param[in] _z z position in meters.
+      /// \param[in] _roll Roll (rotation about X-axis) in radians.
+      /// \param[in] _pitch Pitch (rotation about y-axis) in radians.
+      /// \param[in] _yaw Pitch (rotation about z-axis) in radians.
+      public: void Set(double _x, double _y, double _z,
+                       double _roll, double _pitch, double _yaw);
 
       /// \brief See if a pose is finite (e.g., not nan)
       public: bool IsFinite() const;

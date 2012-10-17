@@ -68,6 +68,10 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     boost::shared_static_cast<sensors::RaySensor>(
         sensors::SensorManager::Instance()->GetSensor("laser"));
   EXPECT_TRUE(laser);
+  laser->Update(true);
+  while (laser->GetRange(0) == 0)
+    common::Time::MSleep(100);
+
 
   EXPECT_EQ(640, laser->GetRayCount());
   EXPECT_EQ(640, laser->GetRangeCount());

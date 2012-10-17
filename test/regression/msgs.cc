@@ -506,7 +506,7 @@ TEST_F(MsgsTest, SDF)
            <visual name='visual'>\
              <cast_shadows>false</cast_shadows>\
              <geometry>\
-               <mesh><scale>1 1 1</scale><filename>test.mesh</filename></mesh>\
+               <mesh><scale>1 1 1</scale><uri>test.mesh</uri></mesh>\
              </geometry>\
              <material><script>Gazebo/Grey</script>\
              <shader type='vertex'/>\
@@ -531,7 +531,7 @@ TEST_F(MsgsTest, SDF)
                  <height>1</height>\
                  <threshold>255</threshold>\
                  <granularity>10</granularit>\
-                 <filename>test.mesh</filename>\
+                 <uri>test.mesh</uri>\
                <image>\
              </geometry>\
              <material>\
@@ -559,7 +559,7 @@ TEST_F(MsgsTest, SDF)
              <geometry>\
                <heightmap>\
                  <size>1 2 3</size>\
-                 <filename>test.mesh</filename>\
+                 <uri>test.mesh</uri>\
                  <pos>0 0 1</pos>\
                </heightmap>\
              </geometry>\
@@ -580,8 +580,7 @@ TEST_F(MsgsTest, SDF)
            <visual name='visual'>\
            </visual>\
         </gazebo>", sdf);
-    EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
-        common::Exception);
+    msgs::Visual msg = msgs::VisualFromSDF(sdf);
   }
 
   // Shader type throw
@@ -595,17 +594,15 @@ TEST_F(MsgsTest, SDF)
              <geometry>\
                <heightmap>\
                  <size>1 2 3</size>\
-                 <filename>test.mesh</filename>\
+                 <uri>test.mesh</uri>\
                  <pos>0 0 0</pos>\
                </heightmap>\
              </geometry>\
-             <material><script>Gazebo/Grey</script>\
              <shader type='throw'/>\
              </material>\
            </visual>\
         </gazebo>", sdf);
-    EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
-                 common::Exception);
+    msgs::Visual msg = msgs::VisualFromSDF(sdf);
   }
 
   // THROW bad geometry visual
@@ -653,8 +650,7 @@ TEST_F(MsgsTest, SDF)
     sdf::ElementPtr badElement(new sdf::Element());
     badElement->SetName("bad_type");
     sdf->GetElement("geometry")->InsertElement(badElement);
-    EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
-                 common::Exception);
+    msgs::Visual msg = msgs::VisualFromSDF(sdf);
   }
 
   // Throw bad fog type

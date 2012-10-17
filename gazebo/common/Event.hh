@@ -46,11 +46,11 @@ namespace gazebo
       public: virtual ~Event() {}
 
       /// \brief Disconnect
-      /// \param _c A pointer to a connection
+      /// \param[in] _c A pointer to a connection
       public: virtual void Disconnect(ConnectionPtr _c) = 0;
 
       /// \brief Disconnect
-      /// \param _id Integer ID of a connection
+      /// \param[in] _id Integer ID of a connection
       public: virtual void Disconnect(int _id) = 0;
     };
 
@@ -61,8 +61,8 @@ namespace gazebo
       public: Connection() :event(NULL), id(-1) {}
 
       /// \brief Constructor
-      /// \param _e Event pointer to connect with
-      /// \param _i Unique id
+      /// \param[in] _e Event pointer to connect with
+      /// \param[in] _i Unique id
       public: Connection(Event *_e, int _i);
 
       /// \brief Destructor
@@ -72,16 +72,22 @@ namespace gazebo
       /// \return The id of this connection
       public: int GetId() const;
 
+      /// \brief the event for this connection
       private: Event *event;
+
+      /// \brief the id set in the constructor
       private: int id;
 
+      /// \brief not used. set to 0
       private: static int counter;
 
+      /// \brief set during the constructor
       private: common::Time creationTime;
+
       public: template<typename T> friend class EventT;
     };
 
-    /// \brief An class for event processing
+    /// \brief A class for event processing
     template< typename T>
     class EventT : public Event
     {
@@ -89,24 +95,24 @@ namespace gazebo
       public: virtual ~EventT();
 
       /// \brief Connect a callback to this event
-      /// \param _subscriber Pointer to a callback function
+      /// \param[in] _subscriber Pointer to a callback function
       /// \return A Connection object, which will automatically call
       ///         Disconnect when it goes out of scope
       public: ConnectionPtr Connect(const boost::function<T> &_subscriber);
 
       /// \brief Disconnect a callback to this event
-      /// \param _c The connection to disconnect
+      /// \param[in] _c The connection to disconnect
       public: virtual void Disconnect(ConnectionPtr _c);
 
       /// \brief Disconnect a callback to this event
-      /// \param _id The id of the connection to disconnect
+      /// \param[in] _id The id of the connection to disconnect
       public: virtual void Disconnect(int _id);
 
       /// \brief Access the signal
       public: void operator()()
               {this->Signal();}
 
-      /// \brief Signal the event
+      /// \brief Signal the event for all subscribers
       public: void Signal()
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
@@ -116,200 +122,316 @@ namespace gazebo
               }
 
       /// \brief Signal the event with one parameter
+      /// \param[in] _p the parameter
       public: template< typename P >
-              void operator()(const P &p)
-              { this->Signal(p); }
+              void operator()(const P &_p)
+              { this->Signal(_p); }
 
       /// \brief Signal the event with two parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
       public: template< typename P1, typename P2 >
-              void operator()(const P1 &p1, const P2 &p2)
-              { this->Signal(p1, p2); }
+              void operator()(const P1 &_p1, const P2 &_p2)
+              { this->Signal(_p1, _p2); }
 
       /// \brief Signal the event with three parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
       public: template< typename P1, typename P2, typename P3 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3)
-              { this->Signal(p1, p2, p3); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3)
+              { this->Signal(_p1, _p2, _p3); }
 
       /// \brief Signal the event with four parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
       public: template< typename P1, typename P2, typename P3, typename P4 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3,
-                              const P4 &p4)
-              { this->Signal(p1, p2, p3, p4); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                              const P4 &_p4)
+              { this->Signal(_p1, _p2, _p3, _p4); }
 
       /// \brief Signal the event with five parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fift parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3,
-                              const P4 &p4, const P5 &p5)
-              { this->Signal(p1, p2, p3, p4, p5); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                              const P4 &_p4, const P5 &_p5)
+              { this->Signal(_p1, _p2, _p3, _p4, _p5); }
 
       /// \brief Signal the event with six parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fift parameter
+      /// \param[in] _p6 the sixt parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3,
-                              const P4 &p4, const P5 &p5, const P6 &p6)
-              { this->Signal(p1, p2, p3, p4, p5, p6); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                              const P4 &_p4, const P5 &_p5, const P6 &_p6)
+              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6); }
 
       /// \brief Signal the event with seven parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3,
-                              const P4 &p4, const P5 &p5, const P6 &p6,
-                              const P7 &p7)
-              { this->Signal(p1, p2, p3, p4, p5, p6, p7); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                              const P4 &_p4, const P5 &_p5, const P6 &_p6,
+                              const P7 &_p7)
+              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7); }
 
       /// \brief Signal the event with eight parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
+      /// \param[in] _p8 the eighth parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3,
-                              const P4 &p4, const P5 &p5, const P6 &p6,
-                              const P7 &p7, const P8 &p8)
-              { this->Signal(p1, p2, p3, p4, p5, p6, p7, p8); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                              const P4 &_p4, const P5 &_p5, const P6 &_p6,
+                              const P7 &_p7, const P8 &_p8)
+              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8); }
 
       /// \brief Signal the event with nine parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
+      /// \param[in] _p8 the eighth parameter
+      /// \param[in] _p9 the ninth parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3,
-                              const P4 &p4, const P5 &p5, const P6 &p6,
-                              const P7 &p7, const P8 &p8, const P9 &p9)
-              { this->Signal(p1, p2, p3, p4, p5, p6, p7, p8, p9); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                              const P4 &_p4, const P5 &_p5, const P6 &_p6,
+                              const P7 &_p7, const P8 &_p8, const P9 &_p9)
+              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9); }
 
       /// \brief Signal the event with ten parameters
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
+      /// \param[in] _p8 the eighth parameter
+      /// \param[in] _p9 the ninth parameter
+      /// \param[in] _p10 the tenth parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9, typename P10 >
-              void operator()(const P1 &p1, const P2 &p2, const P3 &p3,
-                              const P4 &p4, const P5 &p5, const P6 &p6,
-                              const P7 &p7, const P8 &p8, const P9 &p9,
-                              const P10 &p10)
-              { this->Signal(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); }
+              void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                              const P4 &_p4, const P5 &_p5, const P6 &_p6,
+                              const P7 &_p7, const P8 &_p8, const P9 &_p9,
+                              const P10 &_p10)
+              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10); }
 
       /// \brief Signal the event with one parameter
+      /// \param[in] _p parameter
       public: template< typename P >
-              void Signal(const P &p)
+              void Signal(const P &_p)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p);
+                  (*this->connections[i])(_p);
                 }
               }
 
       /// \brief Signal the event with two parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
       public: template< typename P1, typename P2 >
-              void Signal(const P1 &p1, const P2 &p2)
+              void Signal(const P1 &_p1, const P2 &_p2)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2);
+                  (*this->connections[i])(_p1,_p2);
                 }
               }
 
       /// \brief Signal the event with three parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
       public: template< typename P1, typename P2, typename P3 >
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3)
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2, p3);
+                  (*this->connections[i])(_p1, _p2, _p3);
                 }
               }
 
       /// \brief Signal the event with four parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
       public: template<typename P1, typename P2, typename P3, typename P4>
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
-                          const P4 &p4)
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                          const P4 &_p4)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2, p3, p4);
+                  (*this->connections[i])(_p1, _p2, _p3, _p4);
                 }
               }
 
       /// \brief Signal the event with five parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5>
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
-                          const P4 &p4, const P5 &p5)
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                          const P4 &_p4, const P5 &_p5)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2, p3, p4, p5);
+                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5);
                 }
               }
 
 
       /// \brief Signal the event with six parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5, typename P6>
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
-                  const P4 &p4, const P5 &p5, const P6 &p6)
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                  const P4 &_p4, const P5 &_p5, const P6 &_p6)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2, p3, p4, p5, p6);
+                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6);
                 }
               }
 
       /// \brief Signal the event with seven parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5, typename P6, typename P7>
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
-                  const P4 &p4, const P5 &p5, const P6 &p6, const P7 &p7)
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                  const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7);
+                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
                 }
               }
 
       /// \brief Signal the event with eight parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
+      /// \param[in] _p8 the eighth parameter
       public: template<typename P1, typename P2, typename P3, typename P4,
                        typename P5, typename P6, typename P7, typename P8>
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
-                  const P4 &p4, const P5 &p5, const P6 &p6, const P7 &p7,
-                  const P8 &p8)
-              {
-                for (unsigned int i = 0; i < connections.size(); i++)
-                {
-                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7, p8);
-                }
-              }
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                  const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
+                  const P8 &_p8)
+           {
+             for (unsigned int i = 0; i < connections.size(); i++)
+             {
+               (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+             }
+           }
 
       /// \brief Signal the event with nine parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
+      /// \param[in] _p8 the eighth parameter
+      /// \param[in] _p9 the ninth parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9 >
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
-                  const P4 &p4, const P5 &p5, const P6 &p6, const P7 &p7,
-                  const P8 &p8, const P9 &p9)
-              {
-                for (unsigned int i = 0; i < connections.size(); i++)
-                {
-                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7, p8, p9);
-                }
-              }
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                  const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
+                  const P8 &_p8, const P9 &_p9)
+          {
+            for (unsigned int i = 0; i < connections.size(); i++)
+            {
+          (*this->connections[i])(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+            }
+          }
 
       /// \brief Signal the event with ten parameter
+      /// \param[in] _p1 the first parameter
+      /// \param[in] _p2 the second parameter
+      /// \param[in] _p3 the second parameter
+      /// \param[in] _p4 the first parameter
+      /// \param[in] _p5 the fifth parameter
+      /// \param[in] _p6 the sixth parameter
+      /// \param[in] _p7 the seventh parameter
+      /// \param[in] _p8 the eighth parameter
+      /// \param[in] _p9 the ninth parameter
+      /// \param[in] _p10 the tenth parameter
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9, typename P10 >
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
-                  const P4 &p4, const P5 &p5, const P6 &p6, const P7 &p7,
-                  const P8 &p8, const P9 &p9, const P10 &p10)
+              void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
+                  const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
+                  const P8 &_p8, const P9 &_p9, const P10 &_p10)
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2, p3, p4, p5,
-                      p6, p7, p8, p9, p10);
+                  (*this->connections[i])(_p1, _p2, _p3, _p4, _p5,
+                      _p6, _p7, _p8, _p9, _p10);
                 }
               }
 
+      /// \brief array of connection callbacks
       private: std::vector<boost::function<T> *> connections;
+
+      /// \brief array of connection indexes
       private: std::vector<int> connectionIds;
+
+      /// \brief a thread lock
       private: boost::mutex lock;
     };
 
+    /// \brief Destructor. Deletes all the associated connections.
     template<typename T>
     EventT<T>::~EventT()
     {
@@ -319,6 +441,8 @@ namespace gazebo
       this->connectionIds.clear();
     }
 
+    /// \brief Adds a connection
+    /// \param[in] _subscriber the subscriber to connect
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
@@ -328,14 +452,18 @@ namespace gazebo
       return ConnectionPtr(new Connection(this, index));
     }
 
+    /// \brief Removes a connection
+    /// \param[in] _c the connection
     template<typename T>
-    void EventT<T>::Disconnect(ConnectionPtr c)
+    void EventT<T>::Disconnect(ConnectionPtr _c)
     {
-      this->Disconnect(c->GetId());
-      c->event = NULL;
-      c->id = -1;
+      this->Disconnect(_c->GetId());
+      _c->event = NULL;
+      _c->id = -1;
     }
 
+    /// \brief Removes a connection
+    /// \param[_id] the connection index
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
