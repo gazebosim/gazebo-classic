@@ -24,6 +24,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
+#include <utility>
 #include <list>
 #include <vector>
 #include <deque>

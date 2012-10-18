@@ -25,28 +25,32 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX { namespace VClouds
 {
-	FastFakeRandom::FastFakeRandom(const int &n, const Ogre::Real &min, const Ogre::Real &max)
-		: mCapacity(n)
-		, mIndex(-1)
-	{
-		mData = new float[n];
+    FastFakeRandom::FastFakeRandom(const int &n, const Ogre::Real &min,
+        const Ogre::Real &max)
+        : mCapacity(n)
+        , mIndex(-1)
+    {
+        mData = new float[n];
 
-		for (int k = 0; k < n; k++)
-		{
-			mData[k] = Ogre::Math::RangeRandom(min, max);
-		}
-	}
+        for (int k = 0; k < n; k++)
+        {
+            mData[k] = Ogre::Math::RangeRandom(min, max);
+        }
+    }
 
-	FastFakeRandom::~FastFakeRandom()
-	{
-		delete [] mData;
-	}
+    FastFakeRandom::~FastFakeRandom()
+    {
+        delete [] mData;
+    }
 
-	float& FastFakeRandom::get() 
-	{
-		mIndex ++; if (mIndex >= mCapacity) {mIndex = 0;}
+    float& FastFakeRandom::get()
+    {
+      mIndex++;
+      if (mIndex >= mCapacity)
+      {
+        mIndex = 0;
+      }
 
-		return mData[mIndex];
-	}
-
+      return mData[mIndex];
+    }
 }}

@@ -24,11 +24,12 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_GeometryManager_H_
 #define _SkyX_VClouds_GeometryManager_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
 #include "VClouds/GeometryBlock.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
   class VClouds;
 
@@ -56,7 +57,8 @@ namespace SkyX { namespace VClouds{
      */
     void create(const Ogre::Vector2& Height, const float& Radius,
         const Ogre::Radian& Alpha, const Ogre::Radian& Beta,
-            const int& NumberOfBlocks, const int& Na, const int& Nb, const int& Nc);
+            const int& NumberOfBlocks, const int& Na, const int& Nb,
+            const int& Nc);
 
     /** Remove
      */
@@ -71,7 +73,8 @@ namespace SkyX { namespace VClouds{
         @param c Camera
         @param timeSinceLastCameraFrame Time since last CAMERA frame
          */
-    void updateGeometry(Ogre::Camera* c, const Ogre::Real& timeSinceLastCameraFrame);
+    void updateGeometry(Ogre::Camera* c,
+        const Ogre::Real& timeSinceLastCameraFrame);
 
     /** Has been create() already called?
         @return true if created() have been already called, false if not
@@ -118,7 +121,8 @@ namespace SkyX { namespace VClouds{
     /// Has been create() already called?
     bool mCreated;
 
-    /// Height: x = Altitude over the camera, y: Field height (both in world coordinates)
+    /// Height: x = Altitude over the camera,
+    /// y: Field height (both in world coordinates)
     Ogre::Vector2 mHeight;
 
     /// Radius

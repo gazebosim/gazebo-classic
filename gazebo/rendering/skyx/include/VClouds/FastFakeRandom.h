@@ -26,36 +26,35 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "Prerequisites.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
-	class DllExport FastFakeRandom 
-	{
-	public:
-		/** Constructor 
-		    @param n Capacity
-			@param min Min value
-			@param max Max value
-		 */
-		FastFakeRandom(const int& n, const Ogre::Real& min, const Ogre::Real& max);
+    class DllExport FastFakeRandom
+    {
+    public:
+        /** Constructor
+            @param n Capacity
+            @param min Min value
+            @param max Max value
+         */
+        FastFakeRandom(const int& n, const Ogre::Real& min,
+                       const Ogre::Real& max);
 
-		/** Destructor
-	     */
-		~FastFakeRandom();
+        /** Destructor
+         */
+        ~FastFakeRandom();
 
-		/** Get random number
-		 */
-		float& get();
+        /** Get random number
+         */
+        float& get();
 
-	private:
-		/// Data pointer
-		float *mData;
-		/// Capacity
-		int mCapacity;
-		/// Index
-		int mIndex;
-
-	};
-
+    private:
+        /// Data pointer
+        float *mData;
+        /// Capacity
+        int mCapacity;
+        /// Index
+        int mIndex;
+    };
 }}
 
 #endif

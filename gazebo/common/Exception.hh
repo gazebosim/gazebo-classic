@@ -19,8 +19,8 @@
  * Date: 07 May 2007
  */
 
-#ifndef GAZEBO_EXCEPTION_HH
-#define GAZEBO_EXCEPTION_HH
+#ifndef _GAZEBO_EXCEPTION_HH_
+#define _GAZEBO_EXCEPTION_HH_
 
 #include <iostream>
 #include <sstream>
@@ -33,8 +33,8 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    /// \brief This macro logs an error to the throw stream and throws an exception 
-    ///  that contains  the file name and line number.
+    /// \brief This macro logs an error to the throw stream and throws
+    /// an exception that contains the file name and line number.
     #define gzthrow(msg) {std::ostringstream throwStream;\
       throwStream << msg << std::endl << std::flush;\
       throw gazebo::common::Exception(__FILE__, __LINE__, throwStream.str()); }

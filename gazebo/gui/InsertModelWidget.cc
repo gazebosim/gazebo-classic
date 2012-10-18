@@ -167,7 +167,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 {
   if (_item)
   {
-    std::string path, manifest, filename;
+    std::string path, filename;
 
     if (_item->parent())
       path = _item->parent()->text(0).toStdString() + "/";
