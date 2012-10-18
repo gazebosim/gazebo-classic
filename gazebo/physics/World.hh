@@ -435,7 +435,7 @@ namespace gazebo
       private: boost::mutex *setWorldPoseMutex;
 
       public: boost::mutex *GetSetWorldPoseMutex() const
-        { return this->setWorldPoseMutex; };
+        { return this->setWorldPoseMutex; }
 
       /// Used by World classs in following calls:
       ///   World::Step for then entire function

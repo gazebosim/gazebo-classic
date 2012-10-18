@@ -34,7 +34,6 @@ namespace gazebo
 {
   namespace rendering
   {
-
     /// \addtogroup gazebo_rendering
     /// \{
 

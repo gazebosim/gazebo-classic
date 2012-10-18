@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef SPHEREMAKER_HH
-#define SPHEREMAKER_HH
+#ifndef _SPHEREMAKER_HH_
+#define _SPHEREMAKER_HH_
+
+#include <string>
 
 #include "math/Vector2i.hh"
 #include "gui/EntityMaker.hh"

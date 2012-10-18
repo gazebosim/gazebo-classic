@@ -244,7 +244,9 @@ namespace gazebo
                               const P4 &_p4, const P5 &_p5, const P6 &_p6,
                               const P7 &_p7, const P8 &_p8, const P9 &_p9,
                               const P10 &_p10)
-              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10); }
+              {
+                this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+              }
 
       /// \brief Signal the event with one parameter
       /// \param[in] _p parameter
@@ -265,7 +267,7 @@ namespace gazebo
               {
                 for (unsigned int i = 0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(_p1,_p2);
+                  (*this->connections[i])(_p1, _p2);
                 }
               }
 

@@ -685,7 +685,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
         std::string model_filename = mesh->filename;
         std::string package_prefix("package://");
         std::string model_prefix("model://");
-        size_t pos1 = model_filename.find(package_prefix,0);
+        size_t pos1 = model_filename.find(package_prefix, 0);
         if (pos1 != std::string::npos)
         {
           size_t rep_len = package_prefix.size();
@@ -711,7 +711,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
     break;
   }
 
-  if(geometry_type)
+  if (geometry_type)
   {
     gazebo_geometry->LinkEndChild(geometry_type);
     elem->LinkEndChild(gazebo_geometry);
@@ -987,8 +987,8 @@ void URDF2Gazebo::reduceGazeboExtensionToParent(
 void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
   boost::shared_ptr<urdf::Link> link)
 {
-  std::string link_name = link->name;
-  std::string new_link_name = link->getParent()->name;
+  // std::string link_name = link->name;
+  // std::string new_link_name = link->getParent()->name;
   std::vector<TiXmlElement*> blobs = ge->blobs;
   gazebo::math::Pose reduction_transform = ge->reduction_transform;
 
@@ -1005,7 +1005,7 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
   {
     std::ostringstream debug_stream_in;
     debug_stream_in << *(*blob_it);
-    std::string debug_blob = debug_stream_in.str();
+    // std::string debug_blob = debug_stream_in.str();
     // gzdbg << "        INITIAL STRING link ["
     //       << link_name << "]-->[" << new_link_name << "]: ["
     //       << debug_blob << "]\n";

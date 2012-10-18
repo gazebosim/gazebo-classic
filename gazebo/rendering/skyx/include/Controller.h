@@ -34,22 +34,25 @@ namespace SkyX
   {
   public:
       /** Constructor
-        @param deleteBySkyX true to automatically destroy the controller by SkyX, false otherwise
+        @param deleteBySkyX true to automatically destroy the
+        controller by SkyX, false otherwise
      */
-    inline Controller(const bool& deleteBySkyX)
-    	: mDeleteBySkyX(deleteBySkyX)
+    explicit inline Controller(const bool& deleteBySkyX)
+        : mDeleteBySkyX(deleteBySkyX)
     {
     }
 
     /** Destructor
      */
-    inline virtual ~Controller(){}
+    inline virtual ~Controller() {}
 
     /** Update controller
-        @param simDeltaTime Simulation delta time (It's not the time since last frame, it's the delta simulation time, one
-    						time the time since last frame has been multiplied by the time multiplier)
+        @param simDeltaTime Simulation delta time (It's not the time
+        since last frame, it's the delta simulation time, one
+        time the time since last frame has been multiplied by the
+        time multiplier)
      */
-    inline virtual void update(const Ogre::Real& /*simDeltaTime*/){}
+    inline virtual void update(const Ogre::Real& /*simDeltaTime*/) {}
 
     /** Get sun direction
         @return Sun direction, the Earth-to-Sun direction
@@ -62,7 +65,8 @@ namespace SkyX
     virtual Ogre::Vector3 getMoonDirection() = 0;
 
     /** Get moon phase
-        @return Moon phase in [-1,1] range, where -1 means fully covered Moon, 0 clear Moon and 1 fully covered Moon
+        @return Moon phase in [-1,1] range, where -1 means fully covered
+        Moon, 0 clear Moon and 1 fully covered Moon
      */
     virtual Ogre::Real getMoonPhase() = 0;
 
@@ -71,7 +75,7 @@ namespace SkyX
      */
     inline const bool& getDeleteBySkyX() const
     {
-    	return mDeleteBySkyX;
+        return mDeleteBySkyX;
     }
 
   private:

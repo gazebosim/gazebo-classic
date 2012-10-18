@@ -66,7 +66,7 @@ namespace gazebo
       /// \param[out] _min_xyz the bounding box minimum
       /// \param[out] _max_xyz the bounding box maximum
       public: void GetMeshAABB(const Mesh *_mesh,
-    		  	  	  	  	   math::Vector3 &_center,
+                               math::Vector3 &_center,
                                math::Vector3 &_min_xyz,
                                math::Vector3 &_max_xyz);
 
@@ -114,7 +114,7 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateCylinder(const std::string &_name,
-    		  	  	  	  	  	  float _radius,
+                              float _radius,
                                   float _height,
                                   int _rings,
                                   int _segments);
@@ -126,7 +126,7 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateCone(const std::string &_name,
-    		  	  	  	  	  float _radius,
+                          float _radius,
                               float _height,
                               int _rings,
                               int _segments);
@@ -142,7 +142,7 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateTube(const std::string &_name,
-    		  	  	  	  	  float _innerRadius,
+                              float _innerRadius,
                               float _outterRadius,
                               float _height,
                               int _rings,
@@ -180,8 +180,8 @@ namespace gazebo
       /// \param[in] _meshHeight the mesh height
       /// \param[in] _doubleSided flag to specify single or double sided
       private: void Tesselate2DMesh(SubMesh *_sm,
-    		  	  	  	  	  	    int _meshWidth,
-    		  	  	  	  	  	    int _meshHeight,
+                                    int _meshWidth,
+                                    int _meshHeight,
                                     bool _doubleSided);
 
       /// \brief Create a Camera mesh
