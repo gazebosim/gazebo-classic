@@ -180,7 +180,8 @@ namespace gazebo
       public: NumericKeyFrame *CreateKeyFrame(double _time);
 
       /// \brief Get a keyframe using the animation's current time.
-      /// \param[out] _kf NumericKeyFrame reference to hold the interpolated result
+      /// \param[out] _kf NumericKeyFrame reference to hold the
+      /// interpolated result
       public: void GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const;
     };
     /// \}

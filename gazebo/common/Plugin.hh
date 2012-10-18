@@ -65,7 +65,7 @@ namespace gazebo
   template<class T>
   class PluginT
   {
-	/// \brief plugin pointer type definition
+    /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
             /// \brief Get the name of the handler
@@ -80,7 +80,8 @@ namespace gazebo
               return this->handle;
             }
 
-    /// \brief a class method that creates a plugin from a file name. It locates the shared library and loads it dynamically.
+    /// \brief a class method that creates a plugin from a file name.
+    /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
     /// \param[in] _handle short name of the handler
     public: static TPtr Create(const std::string &_filename,
@@ -233,7 +234,7 @@ namespace gazebo
   ///        reference</a>.
   class ModelPlugin : public PluginT<ModelPlugin>
   {
-	/// \brief Constructor
+    /// \brief Constructor
     public: ModelPlugin()
              {this->type = MODEL_PLUGIN;}
 
