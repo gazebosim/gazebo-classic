@@ -201,6 +201,7 @@ void RaySensor::GetRanges(std::vector<double> &_ranges)
 //////////////////////////////////////////////////
 double RaySensor::GetRange(int _index)
 {
+  boost::mutex::scoped_lock(*this->mutex);
   if (this->laserMsg.ranges_size() == 0)
   {
     gzwarn << "ranges not constructed yet (zero sized)\n";
@@ -212,7 +213,6 @@ double RaySensor::GetRange(int _index)
     return 0.0;
   }
 
-  boost::mutex::scoped_lock(*this->mutex);
   return this->laserMsg.ranges(_index);
 }
 
