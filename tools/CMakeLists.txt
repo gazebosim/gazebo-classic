@@ -1,10 +1,9 @@
-link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${console_bridge_LIBRARY_DIRS} ${XML_LIBRARY_DIRS})
+link_directories(${urdfdom_LIBRARY_DIRS} ${urdfdom_headers_LIBRARY_DIRS} ${console_bridge_LIBRARY_DIRS})
 
 include_directories( 
   ${PROJECT_BINARY_DIR}/gazebo 
   ${PROJECT_SOURCE_DIR}/gazebo 
   ${tinyxml_include_dirs}
-  ${XML_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
 )
 
