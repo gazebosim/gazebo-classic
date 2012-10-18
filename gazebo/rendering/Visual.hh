@@ -431,6 +431,9 @@ namespace gazebo
       /// \brief Pointer to the visual's scene node in Ogre.
       protected: Ogre::SceneNode *sceneNode;
 
+      /// \brief Parent visual.
+      protected: VisualPtr parent;
+
       /// \brief Destroy all the movable objects attached to a scene node.
       /// \param[in] _sceneNode Pointer to the scene node to process.
       private: void DestroyAllAttachedMovableObjects(
@@ -475,9 +478,6 @@ namespace gazebo
 
       /// \brief Name of the visual.
       private: std::string name;
-
-      /// \brief Parent visual.
-      private: VisualPtr parent;
 
       /// \brief Children visuals.
       private: std::vector<VisualPtr> children;

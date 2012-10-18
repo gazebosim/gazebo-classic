@@ -4,7 +4,7 @@ includedir=${prefix}/include
 
 Name: gazebo_transport
 Description: Gazebo Transport Library
-Version: @GAZEBO_VERSION@
+Version: @GAZEBO_VERSION_FULL@
 Requires:
 Libs: -Wl,-rpath,${libdir} -L${libdir} -lgazebo_transport  -lgazebo_msgs 
 CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo

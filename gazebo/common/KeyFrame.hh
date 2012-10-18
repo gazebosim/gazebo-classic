@@ -31,15 +31,17 @@ namespace gazebo
     class KeyFrame
     {
       /// \brief Constructor
-      /// \param _time Time of the keyframe in seconds
+      /// \param[in] _time Time of the keyframe in seconds
       public: KeyFrame(double _time);
 
       /// \brief Destructor
       public: virtual ~KeyFrame();
 
       /// \brief Get the time of the keyframe
+      /// \return the time
       public: double GetTime() const;
 
+      /// \brief time of key frame
       protected: double time;
     };
 
@@ -47,14 +49,14 @@ namespace gazebo
     class PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
-      /// \param Time of the keyframe
+      /// \param[in] _time of the keyframe
       public: PoseKeyFrame(double _time);
 
       /// \brief Destructor
       public: virtual ~PoseKeyFrame();
 
       /// \brief Set the translation for the keyframe
-      /// \param _trans Translation amount
+      /// \param[in] _trans Translation amount
       public: void SetTranslation(const math::Vector3 &_trans);
 
       /// \brief Get the translation of the keyframe
@@ -62,14 +64,17 @@ namespace gazebo
       public: const math::Vector3 &GetTranslation() const;
 
       /// \brief Set the rotation for the keyframe
-      /// \param _trans Rotation amount
+      /// \param[in] _trans Rotation amount
       public: void SetRotation(const math::Quaternion &_rot);
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount
       public: const math::Quaternion &GetRotation() const;
 
+      /// \brief the translation vector
       protected: math::Vector3 translate;
+
+      /// \brief the rotation quaternion
       protected: math::Quaternion rotate;
     };
 
@@ -77,20 +82,21 @@ namespace gazebo
     class NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
-      /// \param Time of the keyframe
+      /// \param[in] Time of the keyframe
       public: NumericKeyFrame(double _time);
 
       /// \brief Destructor
       public: virtual ~NumericKeyFrame();
 
       /// \brief Set the value of the keyframe
-      /// \param _value The new value
+      /// \param[in] _value The new value
       public: void SetValue(const double &_value);
 
       /// \brief Get the value of the keyframe
       /// \return the value of the keyframe
       public: const double &GetValue() const;
 
+      /// \brief numeric value
       protected: double value;
     };
     /// \}

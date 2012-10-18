@@ -63,20 +63,20 @@ namespace gazebo
       /// \return the count
       public: unsigned int GetFrameCount() const;
 
-      /// \brief Finds a key frame using the index. Note the index of a
-      /// key frame can change as frames are added.
+      /// \brief Finds a key frame using the index. Note the index of a key
+      /// frame can change as frames are added.
       /// \param[in] _i the index
-      /// \param[out] _time the time of the frame, or -1 if the
-      /// index id is out of bounds
+      /// \param[out] _time the time of the frame, or -1 if the index id is out
+      /// of bounds
       /// \param[out] _trans the transformation for this key frame
       public: void GetKeyFrame(const unsigned int _i, double& _time,
                       math::Matrix4& _trans) const;
 
-      /// \brief Returns a key frame using the index. Note the index of a
-      /// key frame can change as frames are added.
+      /// \brief Returns a key frame using the index. Note the index of a key
+      /// frame can change as frames are added.
       /// \param[in] _i the index
-      /// \return a pair that contains the time and transformation.
-      /// Time is -1 if the index is out of bounds
+      /// \return a pair that contains the time and transformation. Time is -1
+      /// if the index is out of bounds
       public: std::pair<double, math::Matrix4> GetKeyFrame(
                       const unsigned int _i) const;
 
@@ -92,17 +92,17 @@ namespace gazebo
       /// (see GetLength)
       public: math::Matrix4 GetFrameAt(double _time, bool _loop = true) const;
 
-      /// \brief Scales each transformation in the key frames.
-      /// This only affects the translational values.
+      /// \brief Scales each transformation in the key frames. This only affects
+      /// the translational values.
       /// \param[in] _scale the scaling factor
       public: void Scale(const double _scale);
 
-      /// \brief Returns the time where a transformation's translational
-      /// value along the X axis is equal to _x.
-      /// When no transformation is found (within a tolerance of 1e-6),
-      /// the time is interpolated.
-      /// \param[in] _x the value along x. You must ensure that _x
-      /// is within a valid range.
+      /// \brief Returns the time where a transformation's translational value
+      /// along the X axis is equal to _x.
+      /// When no transformation is found (within a tolerance of 1e-6), the time
+      /// is interpolated.
+      /// \param[in] _x the value along x. You must ensure that _x is within a
+      /// valid range.
       public: double GetTimeAtX(const double _x) const;
 
       /// \brief the name of the animation
@@ -157,9 +157,10 @@ namespace gazebo
       public: void AddKeyFrame(const std::string& _node, const double _time,
                       const math::Pose _pose);
 
-      /// \brief Returns the key frame transformation for a named animation
-      /// at a specific time if a node does not exist at that time
-      /// (with tolerance of 1e-6 sec), the transformation is interpolated.
+      /// \brief Returns the key frame transformation for a named animation at
+      /// a specific time
+      /// if a node does not exist at that time (with tolerance of 1e-6 sec),
+      /// the transformation is interpolated.
       /// \param[in] _node the name of the animation node
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
@@ -169,7 +170,8 @@ namespace gazebo
                       const double _time, const bool _loop = true);
 
       /// \brief Returns a dictionary of transformations indexed by name at
-      /// a specific time if a nodes do not exist at that time
+      /// a specific time
+      /// if a node does not exist at that specific time
       /// (with tolerance of 1e-6 sec), the transformation is interpolated.
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
@@ -178,11 +180,11 @@ namespace gazebo
       public: std::map<std::string, math::Matrix4> GetPoseAt(const double _time,
                       const bool _loop = true) const;
 
-      /// \brief Returns a dictionary of transformations indexed by name
-      /// where a named node transformation's translational value along the
-      /// X axis is equal to _x.
-      /// \param[in] _x the value along x. You must ensure that _x is within
-      /// a valid range.
+      /// \brief Returns a dictionary of transformations indexed by name where
+      /// a named node transformation's translational value along the X axis is
+      /// equal to _x.
+      /// \param[in] _x the value along x. You must ensure that _x is within a
+      /// valid range.
       /// \param[in] _node the name of the animation node
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see GetLength)

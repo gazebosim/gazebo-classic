@@ -82,6 +82,8 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
 
+  this->pluginsLoaded = false;
+
   this->name = _name;
 
   this->needsReset = false;
@@ -161,6 +163,7 @@ void World::Load(sdf::ElementPtr _sdf)
     this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 1);
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   std::string type = this->sdf->GetElement("physics")->GetValueString("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
@@ -217,7 +220,9 @@ void World::Save(const std::string &_filename)
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
-  data += "<gazebo version ='1.0'>\n";
+  data += "<gazebo version ='";
+  data += SDF_VERSION;
+  data += "'>\n";
   data += this->sdf->ToString("");
   data += "</gazebo>\n";
 
@@ -361,18 +366,6 @@ void World::StepWorld(int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
-  static bool first = true;
-
-  /// Plugins that manipulate joints (and probably other properties) require
-  /// one iteration of the physics engine. Do not remove this.
-  if (first)
-  {
-    this->physicsEngine->UpdatePhysics();
-    this->LoadPlugins();
-    first = false;
-    return;
-  }
-
   if (this->needsReset)
   {
     if (this->resetAll)
@@ -398,6 +391,16 @@ void World::Update()
     this->physicsEngine->UpdateCollision();
 
     this->physicsEngine->UpdatePhysics();
+
+    /// need this because ODE does not call dxReallocateWorldProcessContext()
+    /// until dWorld.*Step
+    /// Plugins that manipulate joints (and probably other properties) require
+    /// one iteration of the physics engine. Do not remove this.
+    if (!this->pluginsLoaded)
+    {
+      this->LoadPlugins();
+      this->pluginsLoaded = true;
+    }
 
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
@@ -494,15 +497,25 @@ EntityPtr World::GetEntity(const std::string &_name)
 ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   boost::mutex::scoped_lock lock(*this->loadModelMutex);
-  ModelPtr model(new Model(_parent));
-  model->SetWorld(shared_from_this());
-  model->Load(_sdf);
+  ModelPtr model;
 
-  event::Events::addEntity(model->GetScopedName());
+  if (_sdf->GetName() == "model")
+  {
+    model.reset(new Model(_parent));
+    model->SetWorld(shared_from_this());
+    model->Load(_sdf);
 
-  msgs::Model msg;
-  model->FillModelMsg(msg);
-  this->modelPub->Publish(msg);
+    event::Events::addEntity(model->GetScopedName());
+
+    msgs::Model msg;
+    model->FillModelMsg(msg);
+    this->modelPub->Publish(msg);
+  }
+  else
+  {
+    gzerr << "SDF is missing the <model> tag:\n";
+    _sdf->PrintValues("  ");
+  }
 
   return model;
 }
@@ -877,15 +890,6 @@ void World::ModelUpdateSingleLoop()
 //////////////////////////////////////////////////
 void World::LoadPlugins()
 {
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-  {
-    if (boost::shared_dynamic_cast<Model>(this->rootElement->GetChild(i)))
-    {
-      boost::shared_dynamic_cast<Model>(
-          this->rootElement->GetChild(i))->LoadPlugins();
-    }
-  }
-
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {
@@ -1224,49 +1228,40 @@ void World::ProcessFactoryMsgs()
     else
     {
       bool isActor = false;
-      sdf::ElementPtr elem = factorySDF->root->GetElement("model");
-      if (!elem)
+      bool isModel = false;
+      bool isLight = false;
+
+      sdf::ElementPtr elem = factorySDF->root;
+
+      if (elem->HasElement("world"))
+        elem = elem->GetElement("world");
+
+      if (elem->HasElement("model"))
       {
-        elem = factorySDF->root->GetElement("actor");
-        if (elem)
-          isActor = true;
+        elem = elem->GetElement("model");
+        isModel = true;
       }
-      if (!elem && factorySDF->root->GetElement("world"))
+      else if (elem->HasElement("light"))
       {
-        elem = factorySDF->root->GetElement("world")->GetElement("model");
-        if (!elem)
-        {
-          elem = factorySDF->root->GetElement("world")->GetElement("actor");
-          if (elem)
-            isActor = true;
-        }
+        elem = elem->GetElement("light");
+        isLight = true;
       }
-      if (!elem && factorySDF->root->GetElement("gazebo"))
+      else if (elem->HasElement("actor"))
       {
-        elem = factorySDF->root->GetElement("gazebo")->GetElement("model");
-        if (!elem)
-        {
-          elem = factorySDF->root->GetElement("gazebo")->GetElement("actor");
-          if (elem)
-            isActor = true;
-        }
+        elem = elem->GetElement("actor");
+        isActor = true;
       }
-      if (!elem && factorySDF->root->GetElement("gazebo")->GetElement("world"))
+      else
       {
-        elem = factorySDF->root->GetElement("gazebo")->GetElement(
-            "world")->GetElement("model");
-        if (!elem)
-        {
-          elem = factorySDF->root->GetElement("gazebo")->GetElement(
-              "world")->GetElement("actor");
-          if (elem)
-            isActor = true;
-        }
+        gzerr << "Unable to find a model, light, or actor in:\n";
+        factorySDF->root->PrintValues("");
+        continue;
       }
 
       if (!elem)
       {
-        gzerr << "Invalid SDF\n";
+        gzerr << "Invalid SDF:";
+        factorySDF->root->PrintValues("");
         continue;
       }
 
@@ -1280,10 +1275,18 @@ void World::ProcessFactoryMsgs()
         ActorPtr actor = this->LoadActor(elem, this->rootElement);
         actor->Init();
       }
-      else
+      else if (isModel)
       {
         ModelPtr model = this->LoadModel(elem, this->rootElement);
         model->Init();
+      }
+      else if (isLight)
+      {
+        /// \TODO: Current broken. See Issue #67.
+        msgs::Light *lm = this->sceneMsg.add_light();
+        lm->CopyFrom(msgs::LightFromSDF(elem));
+
+        this->lightPub->Publish(*lm);
       }
     }
   }

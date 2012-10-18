@@ -48,6 +48,7 @@ Projector::Projector(rendering::VisualPtr _parent)
 /////////////////////////////////////////////////
 Projector::~Projector()
 {
+  this->SetEnabled(false);
   // Ogre cleanup
   Ogre::Root::getSingletonPtr()->removeFrameListener(&this->projector);
 }
@@ -154,6 +155,12 @@ void Projector::Load(const msgs::Projector &_msg)
 }
 
 /////////////////////////////////////////////////
+void Projector::SetEnabled(bool _enabled)
+{
+  this->projector.SetEnabled(_enabled);
+}
+
+/////////////////////////////////////////////////
 void Projector::SetTexture(const std::string &_textureName)
 {
   this->projector.SetTexture(_textureName);
@@ -170,6 +177,12 @@ void Projector::Toggle()
   else
     gzwarn << "could not start projector, toggle failed\n";
     */
+}
+
+/////////////////////////////////////////////////
+VisualPtr Projector::GetParent()
+{
+  return this->visual;
 }
 
 /////////////////////////////////////////////////

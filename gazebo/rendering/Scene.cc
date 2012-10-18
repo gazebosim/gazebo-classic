@@ -99,6 +99,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
@@ -122,7 +123,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       &Scene::OnResponse, this);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
@@ -528,7 +528,8 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 LightPtr Scene::GetLight(const std::string &_name) const
 {
   LightPtr result;
-  Light_M::const_iterator iter = this->lights.find(_name);
+  std::string n = this->StripSceneName(_name);
+  Light_M::const_iterator iter = this->lights.find(n);
   if (iter != this->lights.end())
     result = iter->second;
   return result;
@@ -580,6 +581,12 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 void Scene::SelectVisual(const std::string &_name)
 {
   this->selectedVis = this->GetVisual(_name);
+}
+
+//////////////////////////////////////////////////
+VisualPtr Scene::GetSelectedVisual() const
+{
+  return this->selectedVis;
 }
 
 //////////////////////////////////////////////////
@@ -1351,11 +1358,6 @@ void Scene::PreRender()
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      /*if (this->selectionObj->GetVisualName().empty() ||
-          !this->selectionObj->IsActive() ||
-          iter->first.find(this->selectionObj->GetVisualName()) ==
-          std::string::npos)
-          */
       if (!this->selectedVis ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
@@ -1827,6 +1829,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
   Light_M::iterator iter;
   iter = this->lights.find(_msg->name());
 
+
   if (iter == this->lights.end())
   {
     LightPtr light(new Light(this));
@@ -2062,6 +2065,24 @@ void Scene::RemoveVisual(VisualPtr _vis)
 {
   if (_vis)
   {
+    // Remove all projectors attached to the visual
+    std::map<std::string, Projector *>::iterator piter =
+      this->projectors.begin();
+    while (piter != this->projectors.end())
+    {
+      // Check to see if the projector is a child of the visual that is
+      // being removed.
+      if (piter->second->GetParent()->GetRootVisual()->GetName() ==
+          _vis->GetRootVisual()->GetName())
+      {
+        delete piter->second;
+        this->projectors.erase(piter++);
+      }
+      else
+        ++piter;
+    }
+
+    // Delete the visual
     Visual_M::iterator iter = this->visuals.find(_vis->GetName());
     if (iter != this->visuals.end())
     {
