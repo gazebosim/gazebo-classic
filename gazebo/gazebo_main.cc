@@ -33,21 +33,21 @@ void sig_handler(int /*signo*/)
   kill(pid1, SIGINT);
   kill(pid2, SIGINT);
   // wait some time and if not dead, escalate to SIGKILL
-  for(unsigned int i = 0; i < 5; ++i)
+  for (unsigned int i = 0; i < 5; ++i)
   {
-    if(!killed1)
+    if (!killed1)
     {
       int p1 = waitpid(pid1, &status1, WNOHANG);
       if (p1 == pid1)
         killed1 = true;
     }
-    if(!killed2)
+    if (!killed2)
     {
       int p2 = waitpid(pid2, &status2, WNOHANG);
       if (p2 == pid2)
         killed2 = true;
     }
-    if(killed1 && killed2)
+    if (killed1 && killed2)
       break;
     /// @todo: fix hardcoded timeout
     sleep(1);
@@ -76,9 +76,9 @@ int main(int _argc, char **_argv)
   pid1 = fork();
 
   char** myargv = new char*[_argc+1];
-  for(int i=0;i<_argc;i++)
+  for (int i = 0; i < _argc; ++i)
     myargv[i] = _argv[i];
-  myargv[_argc] = (char*)NULL;
+  myargv[_argc] = static_cast<char*>(NULL);
 
   if (pid1)
   {
@@ -86,9 +86,9 @@ int main(int _argc, char **_argv)
     if (pid2)
     {
       pid_t dead_child = wait(&status1);
-      if(dead_child == pid1)
+      if (dead_child == pid1)
         killed1 = true;
-      else if(dead_child == pid2)
+      else if (dead_child == pid2)
         killed2 = true;
       // one of the children died
       if (!sig_killed)
@@ -96,23 +96,23 @@ int main(int _argc, char **_argv)
     }
     else
     {
-      //gazebo::gui::run(_argc, _argv);
+      // gazebo::gui::run(_argc, _argv);
       // gzclient argv
       execvp("gzclient", myargv);
     }
   }
   else
   {
-    //gazebo::Server *server = new gazebo::Server();
-    //if (!server->ParseArgs(_argc, _argv))
-      //return -1;
-    //server->Run();
-    //server->Fini();
-    //delete server;
-    //server = NULL;
+    // gazebo::Server *server = new gazebo::Server();
+    // if (!server->ParseArgs(_argc, _argv))
+      // return -1;
+    // server->Run();
+    // server->Fini();
+    // delete server;
+    // server = NULL;
     execvp("gzserver", myargv);
   }
-  
+
   delete[] myargv;
 
   return 0;

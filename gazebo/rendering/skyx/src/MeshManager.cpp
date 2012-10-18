@@ -29,22 +29,22 @@ namespace SkyX
 {
   MeshManager::MeshManager(SkyX *s)
     : mSkyX(s)
-    , mCreated(false)
-    , mMesh(0)
-        , mSubMesh(0)
-        , mEntity(0)
-        , mVertexBuffer(0)
-    , mVertices(0)
-        , mIndexBuffer(0)
+      , mCreated(false)
+      , mMesh(0)
+      , mSubMesh(0)
+      , mEntity(0)
+      , mVertexBuffer(0)
+      , mVertices(0)
+      , mIndexBuffer(0)
       , mSceneNode(0)
-    , mSteps(70)
-    , mCircles(95)
-    , mUnderHorizonCircles(12)
-    , mUnderHorizonFading(true)
-    , mUnderHorizonFadingExponent(0.75)
-    , mUnderHorizonFadingMultiplier(2)
-    , mRadiusMultiplier(0.95f)
-        , mMaterialName("_NULL_")
+      , mSteps(70)
+      , mCircles(95)
+      , mUnderHorizonCircles(12)
+      , mUnderHorizonFading(true)
+      , mUnderHorizonFadingExponent(0.75)
+      , mUnderHorizonFadingMultiplier(2)
+      , mRadiusMultiplier(0.95f)
+      , mMaterialName("_NULL_")
   {
   }
 
@@ -61,7 +61,8 @@ namespace SkyX
     }
 
     mSceneNode->detachAllObjects();
-    mSceneNode->getParentSceneNode()->removeAndDestroyChild(mSceneNode->getName());
+    mSceneNode->getParentSceneNode()->removeAndDestroyChild(
+        mSceneNode->getName());
     mSceneNode = 0;
 
     Ogre::MeshManager::getSingleton().remove("SkyXMesh");
@@ -102,14 +103,16 @@ namespace SkyX
         mMesh->load();
         mMesh->touch();
 
-        mEntity = mSkyX->getSceneManager()->createEntity("SkyXMeshEnt", "SkyXMesh");
+        mEntity = mSkyX->getSceneManager()->createEntity("SkyXMeshEnt",
+            "SkyXMesh");
         mEntity->setMaterialName(mMaterialName);
     mEntity->setCastShadows(false);
     mEntity->setRenderQueueGroup(mSkyX->getRenderQueueGroups().skydome);
 
-    mSceneNode = mSkyX->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+    mSceneNode = mSkyX->getSceneManager()->getRootSceneNode()->
+      createChildSceneNode();
     mSceneNode->showBoundingBox(false);
-        mSceneNode->attachObject(mEntity);
+    mSceneNode->attachObject(mEntity);
 
     mCreated = true;
   }
@@ -123,9 +126,14 @@ namespace SkyX
 
     float Radius = getSkydomeRadius(cam);
 
-    mVertices[0].x = 0; mVertices[0].z = Radius; mVertices[0].y = 0;
-    mVertices[0].nx = 0; mVertices[0].nz = 0; mVertices[0].ny = 1;
-    mVertices[0].u = 4; mVertices[0].v = 4;
+    mVertices[0].x = 0;
+    mVertices[0].z = Radius;
+    mVertices[0].y = 0;
+    mVertices[0].nx = 0;
+    mVertices[0].nz = 0;
+    mVertices[0].ny = 1;
+    mVertices[0].u = 4;
+    mVertices[0].v = 4;
     mVertices[0].o = 1;
 
     float AngleStep = (Ogre::Math::PI/2) / (mCircles-mUnderHorizonCircles);
@@ -135,7 +143,7 @@ namespace SkyX
     int x, y;
 
     // Above-horizon
-    for(y=0;y<mCircles-mUnderHorizonCircles;y++)
+    for (y = 0; y < mCircles-mUnderHorizonCircles; y++)
     {
       currentTethaAngle = Ogre::Math::PI/2 - AngleStep*(y+1);
 
@@ -144,7 +152,7 @@ namespace SkyX
 
       uvr = static_cast<float>(y+1)/(mCircles-mUnderHorizonCircles);
 
-      for(x=0;x<mSteps;x++)
+      for (x = 0; x < mSteps; x++)
       {
         currentPhiAngle = Ogre::Math::TWO_PI * x / mSteps;
 
@@ -166,10 +174,10 @@ namespace SkyX
       }
     }
 
-    float op; // Opacity
+    float op;  // Opacity
 
     // Under-horizon
-    for(y=mCircles-mUnderHorizonCircles;y<mCircles;y++)
+    for (y = mCircles-mUnderHorizonCircles; y < mCircles; y++)
     {
       currentTethaAngle = Ogre::Math::PI/2 - AngleStep*(y+1);
 
@@ -178,9 +186,12 @@ namespace SkyX
 
       uvr = static_cast<float>(y+1)/(mCircles-mUnderHorizonCircles);
 
-      op = Ogre::Math::Clamp<Ogre::Real>(Ogre::Math::Pow(static_cast<Ogre::Real>(mCircles-y-1) / mUnderHorizonCircles, mUnderHorizonFadingExponent)*mUnderHorizonFadingMultiplier, 0, 1);
+      op = Ogre::Math::Clamp<Ogre::Real>(
+          Ogre::Math::Pow(static_cast<Ogre::Real>(mCircles-y-1) /
+            mUnderHorizonCircles, mUnderHorizonFadingExponent)*
+          mUnderHorizonFadingMultiplier, 0, 1);
 
-      for(x=0;x<mSteps;x++)
+      for (x = 0; x < mSteps; x++)
       {
         currentPhiAngle = Ogre::Math::TWO_PI * x / mSteps;
 
@@ -211,7 +222,7 @@ namespace SkyX
 
     // Update bounds
       Ogre::AxisAlignedBox meshBounds =
-      Ogre::AxisAlignedBox(-Radius,-Radius, 0,
+      Ogre::AxisAlignedBox(-Radius, -Radius, 0,
                             Radius, Radius, Radius);
 
     mMesh->_setBounds(meshBounds);
@@ -229,16 +240,20 @@ namespace SkyX
     mSubMesh->vertexData->vertexCount = numVertices;
 
     Ogre::VertexDeclaration* vdecl = mSubMesh->vertexData->vertexDeclaration;
-    Ogre::VertexBufferBinding* vbind = mSubMesh->vertexData->vertexBufferBinding;
+    Ogre::VertexBufferBinding* vbind =
+      mSubMesh->vertexData->vertexBufferBinding;
 
     size_t offset = 0;
     vdecl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
     offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
-    vdecl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_TEXTURE_COORDINATES, 0);
+    vdecl->addElement(0, offset,
+        Ogre::VET_FLOAT3, Ogre::VES_TEXTURE_COORDINATES, 0);
     offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
-    vdecl->addElement(0, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES, 1);
+    vdecl->addElement(0, offset,
+        Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES, 1);
     offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
-    vdecl->addElement(0, offset, Ogre::VET_FLOAT1, Ogre::VES_TEXTURE_COORDINATES, 2);
+    vdecl->addElement(0, offset, Ogre::VET_FLOAT1,
+                      Ogre::VES_TEXTURE_COORDINATES, 2);
 
     mVertexBuffer = Ogre::HardwareBufferManager::getSingleton().
       createVertexBuffer(sizeof(VERTEX),
@@ -247,7 +262,7 @@ namespace SkyX
 
     vbind->setBinding(0, mVertexBuffer);
 
-    unsigned short *indexbuffer = new unsigned short[numEle];
+    uint16_t *indexbuffer = new uint16_t[numEle];
 
     for (int k = 0; k < mSteps; k++)
     {
@@ -264,18 +279,18 @@ namespace SkyX
       }
     }
 
-    unsigned short *twoface;
+    uint16_t *twoface;
 
-    for(int y=0; y<mCircles-1; y++)
+    for (int y = 0; y < mCircles-1; y++)
     {
-        for(int x=0; x<mSteps; x++)
+        for (int x = 0; x < mSteps; x++)
       {
           twoface = indexbuffer + (y*mSteps+x)*6 + 3 * mSteps;
 
-          int p0 = 1+y * mSteps + x ;
-          int p1 = 1+y * mSteps + x + 1 ;
-          int p2 = 1+(y+1)* mSteps + x ;
-          int p3 = 1+(y+1)* mSteps + x + 1 ;
+          int p0 = 1+y * mSteps + x;
+          int p1 = 1+y * mSteps + x + 1;
+          int p2 = 1+(y+1)* mSteps + x;
+          int p3 = 1+(y+1)* mSteps + x + 1;
 
         if (x == mSteps-1)
         {
@@ -331,7 +346,10 @@ namespace SkyX
     }
   }
 
-  void MeshManager::setUnderHorizonParams(const int& UnderHorizonCircles, const bool& UnderHorizonFading, const Ogre::Real& UnderHorizonFadingExponent, const Ogre::Real& UnderHorizonFadingMultiplier)
+  void MeshManager::setUnderHorizonParams(const int& UnderHorizonCircles,
+      const bool& UnderHorizonFading,
+      const Ogre::Real& UnderHorizonFadingExponent,
+      const Ogre::Real& UnderHorizonFadingMultiplier)
   {
     bool needToRecreate = (mUnderHorizonCircles != UnderHorizonCircles);
 

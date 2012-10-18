@@ -220,8 +220,9 @@ void World::Save(const std::string &_filename)
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
-  data += "<gazebo version='" +
-          boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
+  data += "<gazebo version ='";
+  data += SDF_VERSION;
+  data += "'>\n";
   data += this->sdf->ToString("");
   data += "</gazebo>\n";
 

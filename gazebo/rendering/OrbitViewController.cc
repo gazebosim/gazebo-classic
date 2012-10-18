@@ -195,7 +195,6 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
         this->focalPoint += (this->worldFocal - this->focalPoint) * 0.04;
       else
         this->focalPoint += (this->focalPoint - this->worldFocal) * 0.04;
-
     }
     else
       factor = 80;

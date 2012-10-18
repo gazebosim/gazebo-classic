@@ -576,15 +576,11 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
 
   std::list<ConnectionPtr>::iterator iter;
 
-  std::string uri = "http://" + _host + ":" +
-    boost::lexical_cast<std::string>(_port);
-
   // Check to see if we are already connected to the remote publisher
   this->connectionMutex->lock();
   for (iter = this->connections.begin();
        iter != this->connections.end(); ++iter)
   {
-    // if ((*iter)->IsOpen() && (*iter)->GetRemoteURI() == uri)
     if ((*iter)->IsOpen() && (*iter)->GetRemoteAddress() == _host &&
         (*iter)->GetRemotePort() == _port)
       conn = *iter;

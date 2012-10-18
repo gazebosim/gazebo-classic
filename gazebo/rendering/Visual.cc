@@ -1063,8 +1063,10 @@ void Visual::SetTransparency(float _trans)
 //////////////////////////////////////////////////
 void Visual::SetHighlighted(bool _highlighted)
 {
+  /*
   if (this->GetAttachedObjectCount() > 0)
     this->sceneNode->showBoundingBox(_highlighted);
+    */
 
 /* TODO: This code will cause objects that use the same mesh to be
  * highlighted. Using the same mesh is good for performance. We need to come
@@ -1124,10 +1126,10 @@ void Visual::SetHighlighted(bool _highlighted)
   }
   */
 
-  for (unsigned int i = 0; i < this->children.size(); ++i)
+  /*for (unsigned int i = 0; i < this->children.size(); ++i)
   {
     this->children[i]->SetHighlighted(_highlighted);
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
@@ -1901,7 +1903,7 @@ VisualPtr Visual::GetRootVisual()
 //////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-   if (this->sdf->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("plane"))
