@@ -136,22 +136,31 @@ namespace gazebo
       public: const Vector2i &operator*=(const Vector2i &_v);
 
       /// \brief Multiplication operator
-      /// \param[in] _v the scaling facto
+      /// \param[in] _v the scaling factor
+      /// \return the result
       public: const Vector2i operator*(int _v) const;
 
-      /// \brief Multiplication operators
+      /// \brief Multiplication operator
+      /// \param[in] _v scaling factor
+      /// \return this
       public: const Vector2i &operator*=(int _v);
 
-      /// \brief Equality operators
+      /// \brief Equality operator
+      /// \param _v the vector to compare with
+      /// \return true if component have the same values, false otherwise
       public: bool operator ==(const Vector2i &_v) const;
 
       /// \brief Equality operators
+      /// \param _v the vector to compare with
+      /// \return true if component have different values, false otherwise
       public: bool operator!=(const Vector2i &_v) const;
 
       /// \brief See if a point is finite (e.g., not nan)
+      /// \return the result
       public: bool IsFinite() const;
 
-      /// \brief [] operator
+      /// \brief Array subscript operator
+      /// \param[in] _index the array index
       public: int operator[](unsigned int _index) const;
 
       /// \brief x data
@@ -160,10 +169,10 @@ namespace gazebo
       /// \brief y data
       public: int y;
 
-      /// \brief Ostream operator
-      /// \param out Ostream
-      /// \param pt Vector2i to output
-      /// \return The Ostream
+      /// \brief Stream insertion operator
+      /// \param[in] _out output stream
+      /// \param[in] pt Vector2i to output
+      /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::math::Vector2i &_pt)
       {
@@ -171,10 +180,10 @@ namespace gazebo
         return _out;
       }
 
-      /// \brief Istream operator
-      /// \param in Ostream
-      /// \param pt Vector3 to read values into
-      /// \return The istream
+      /// \brief Stream extraction operator
+      /// \param[in] _in input stream
+      /// \param[in] _pt Vector3 to read values into
+      /// \return The stream
       public: friend std::istream &operator>>(std::istream &_in,
                   gazebo::math::Vector2i &_pt)
       {
