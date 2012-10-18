@@ -50,5 +50,14 @@ math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
   return math::Quaternion(_v.w, _v.x, _v.y, _v.z);
 }
 
+//////////////////////////////////////////////////
+Ogre::Vector4 Conversions::Convert(const math::Vector4 &_v)
+{
+  return Ogre::Vector4(v.x, v.y, v.z, v.w);
+}
 
-
+//////////////////////////////////////////////////
+math::Vector4 Conversions::Convert(const Ogre::Vector4 &v)
+{
+  return math::Vector4(v.x, v.y, v.z, v.w);
+}

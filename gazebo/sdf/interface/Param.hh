@@ -35,6 +35,7 @@
 #include "common/Color.hh"
 #include "common/Time.hh"
 #include "math/Vector3.hh"
+#include "math/Vector4.hh"
 #include "math/Vector2i.hh"
 #include "math/Vector2d.hh"
 #include "math/Pose.hh"
@@ -87,6 +88,7 @@ namespace sdf
     public: bool IsChar() const;
     public: bool IsStr() const;
     public: bool IsVector3() const;
+    public: bool IsVector4() const;
     public: bool IsVector2i() const;
     public: bool IsVector2d() const;
     public: bool IsQuaternion() const;
@@ -103,6 +105,7 @@ namespace sdf
     public: bool Set(const std::string &_value);
     public: bool Set(const char *_value);
     public: bool Set(const gazebo::math::Vector3 &_value);
+    public: bool Set(const gazebo::math::Vector4 &_value);
     public: bool Set(const gazebo::math::Vector2i &_value);
     public: bool Set(const gazebo::math::Vector2d &_value);
     public: bool Set(const gazebo::math::Quaternion &_value);

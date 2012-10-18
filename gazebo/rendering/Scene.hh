@@ -427,6 +427,10 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: bool ProcessModelMsg(const msgs::Model &_msg);
 
+      /// \brief Process a sky message.
+      /// \param[in] _msg The message data.
+      private: void ProcessSkyMsg(const msgs::Sky &_msg);
+
       /// \brief Scene message callback.
       /// \param[in] _msg The message data.
       private: void OnSensorMsg(ConstSensorPtr &_msg);

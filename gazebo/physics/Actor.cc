@@ -667,7 +667,7 @@ void Actor::AddBoxVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
     const std::string &_material, const common::Color &_ambient)
 {
   sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
-  visualSdf->GetAttribute("name")->Set(name);
+  visualSdf->GetAttribute("name")->Set(_name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
   visualPoseSdf->Set(_pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");

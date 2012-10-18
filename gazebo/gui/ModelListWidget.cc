@@ -606,9 +606,35 @@ void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
       this->FillColorMsg((*iter), msg.mutable_background());
     else if ((*iter)->propertyName().toStdString() == "shadows")
       msg.set_shadows(this->variantManager->value((*iter)).toBool());
+    else if ((*iter)->propertyName().toStdString() == "sky")
+    {
+      msgs::Sky *sky = msg.mutable_sky();
+
+      sky->set_time(this->variantManager->value(
+            this->GetChildItem((*iter), "time")).toDouble());
+      sky->set_sunrise(this->variantManager->value(
+            this->GetChildItem((*iter), "sunrise")).toDouble());
+      sky->set_sunset(this->variantManager->value(
+            this->GetChildItem((*iter), "sunset")).toDouble());
+
+      QtProperty *windItem = this->GetChildItem((*iter), "wind");
+      sky->set_wind_speed(this->variantManager->value(
+            this->GetChildItem(windItem, "speed")).toDouble());
+      sky->set_wind_direction(this->variantManager->value(
+            this->GetChildItem(windItem, "direction")).toDouble());
+
+      QtProperty *cloudItem = this->GetChildItem((*iter), "clouds");
+      this->FillColorMsg(this->GetChildItem(cloudItem, "color"),
+                         sky->mutable_cloud_ambient());
+      sky->set_humidity(this->variantManager->value(
+            this->GetChildItem(cloudItem, "humidity")).toDouble());
+      sky->set_mean_cloud_size(this->variantManager->value(
+            this->GetChildItem(cloudItem, "size")).toDouble());
+    }
   }
 
   msg.set_name(gui::get_world());
+  std::cout << msg.DebugString() << "\n";
   this->scenePub->Publish(msg);
 }
 
@@ -2133,7 +2159,7 @@ void ModelListWidget::ResetScene()
 void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
                                        QtProperty * /*_parent*/)
 {
-  // QtProperty *topItem = NULL;
+  QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
   // Create and set the ambient color property
@@ -2181,13 +2207,45 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   topItem->addSubProperty(item);
   */
 
-  /// \TODO: Put sky modification back in GUI
-  /*
+
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("sky"));
-  bItem = this->propTreeBrowser->addProperty(topItem);
+  QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
   this->propTreeBrowser->setExpanded(bItem, false);
-  */
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("time"));
+  topItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("sunrise"));
+  topItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("sunset"));
+  topItem->addSubProperty(item);
+
+  // Add Wind group item
+  QtProperty *windItem = this->variantManager->addProperty(
+             QtVariantPropertyManager::groupTypeId(), tr("wind"));
+  topItem->addSubProperty(windItem);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("speed"));
+  windItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("direction"));
+  windItem->addSubProperty(item);
+
+  // Add Cloud group item
+  QtProperty *cloudItem = this->variantManager->addProperty(
+             QtVariantPropertyManager::groupTypeId(), tr("clouds"));
+  topItem->addSubProperty(cloudItem);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("color"));
+  cloudItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("humidity"));
+  cloudItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("size"));
+  cloudItem->addSubProperty(item);
 }
 
 /////////////////////////////////////////////////

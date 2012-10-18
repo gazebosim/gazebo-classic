@@ -177,6 +177,13 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
                                           _type, _description));
     return param;
   }
+  else if (_type == "vector4")
+  {
+    boost::shared_ptr<ParamT<gazebo::math::Vector4> > param(
+        new ParamT<gazebo::math::Vector4>(_key, _defaultValue, _required,
+                                          _type, _description));
+    return param;
+  }
   else if (_type == "vector2i")
   {
     boost::shared_ptr<ParamT<gazebo::math::Vector2i> > param(
@@ -921,6 +928,27 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
       result = this->GetElementImpl(_key)->GetValueVector3();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueVector3();
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+gazebo::math::Vector4 Element::GetValueVector4(const std::string &_key)
+{
+  gazebo::math::Vector4 result;
+  if (_key.empty())
+    this->value->Get(result);
+  else
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElementImpl(_key)->GetValueVector4();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueVector4();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }

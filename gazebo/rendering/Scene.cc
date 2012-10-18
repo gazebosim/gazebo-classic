@@ -251,7 +251,9 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
-  this->SetSky();
+  /// Only enable the sky if the SDF contains a <sky> element.
+  if (this->sdf->HasElement("sky"))
+    this->SetSky();
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
@@ -1131,6 +1133,9 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
 
+  if (_msg->has_sky())
+    this->ProcessSkyMsg(_msg->sky());
+
   if (_msg->has_fog())
   {
     sdf::ElementPtr elem = this->sdf->GetElement("fog");
@@ -1169,6 +1174,66 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->GetValueDouble("start"),
                  elem->GetValueDouble("end"));
   }
+}
+
+//////////////////////////////////////////////////
+void Scene::ProcessSkyMsg(const msgs::Sky &_msg)
+{
+  SkyX::VClouds::VClouds *vclouds =
+    this->skyx->getVCloudsManager()->getVClouds();
+
+  if (_msg.has_time())
+  {
+    Ogre::Vector3 t = this->skyxController->getTime();
+    t.x = math::clamp(_msg.time(), 0.0, 24.0);
+    this->skyxController->setTime(t);
+  }
+
+  if (_msg.has_sunrise())
+  {
+    Ogre::Vector3 t = this->skyxController->getTime();
+    t.y = math::clamp(_msg.sunrise(), 0.0, 24.0);
+    this->skyxController->setTime(t);
+  }
+
+  if (_msg.has_sunset())
+  {
+    Ogre::Vector3 t = this->skyxController->getTime();
+    t.z = math::clamp(_msg.sunset(), 0.0, 24.0);
+    this->skyxController->setTime(t);
+  }
+
+  if (_msg.has_wind_speed())
+    vclouds->setWindSpeed(_msg.wind_speed());
+
+  if (_msg.has_wind_direction())
+    vclouds->setWindDirection(Ogre::Radian(_msg.wind_direction()));
+
+  if (_msg.has_cloud_ambient())
+  {
+    vclouds->setAmbientFactors(Ogre::Vector4(
+          _msg.cloud_ambient().r(),
+          _msg.cloud_ambient().g(),
+          _msg.cloud_ambient().b(),
+          _msg.cloud_ambient().a()));
+  }
+
+  if (_msg.has_humidity())
+  {
+    Ogre::Vector2 wheater = vclouds->getWheater();
+    vclouds->setWheater(math::clamp(_msg.humidity(), 0.0, 1.0),
+                        wheater.y, true);
+  }
+
+  if (_msg.has_mean_cloud_size())
+  {
+    Ogre::Vector2 wheater = vclouds->getWheater();
+    vclouds->setWheater(wheater.x,
+                        math::clamp(_msg.mean_cloud_size(), 0.0, 1.0), true);
+  }
+
+  this->skyx->update(0);
+
 }
 
 //////////////////////////////////////////////////
@@ -1864,79 +1929,35 @@ void Scene::OnModelMsg(ConstModelPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
-  SkyX::VClouds::VClouds *vclouds =
-    this->skyx->getVCloudsManager()->getVClouds();
-
-  if (_msg->has_time())
-  {
-    Ogre::Vector3 t = this->skyxController->getTime();
-    t.x = math::clamp(_msg->time(), 0.0, 24.0);
-    this->skyxController->setTime(t);
-  }
-
-  if (_msg->has_sunrise())
-  {
-    Ogre::Vector3 t = this->skyxController->getTime();
-    t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
-    this->skyxController->setTime(t);
-  }
-
-  if (_msg->has_sunset())
-  {
-    Ogre::Vector3 t = this->skyxController->getTime();
-    t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
-    this->skyxController->setTime(t);
-  }
-
-  if (_msg->has_wind_speed())
-    vclouds->setWindSpeed(_msg->wind_speed());
-
-  if (_msg->has_wind_direction())
-    vclouds->setWindDirection(Ogre::Radian(_msg->wind_direction()));
-
-  if (_msg->has_cloud_ambient())
-  {
-    vclouds->setAmbientFactors(Ogre::Vector4(
-          _msg->cloud_ambient().r(),
-          _msg->cloud_ambient().g(),
-          _msg->cloud_ambient().b(),
-          _msg->cloud_ambient().a()));
-  }
-
-  if (_msg->has_humidity())
-  {
-    Ogre::Vector2 wheater = vclouds->getWheater();
-    vclouds->setWheater(math::clamp(_msg->humidity(), 0.0, 1.0),
-                        wheater.y, true);
-  }
-
-  if (_msg->has_mean_cloud_size())
-  {
-    Ogre::Vector2 wheater = vclouds->getWheater();
-    vclouds->setWheater(wheater.x,
-                        math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
-  }
-
-  this->skyx->update(0);
+  this->ProcessSkyMsg(*_msg);
 }
 
 /////////////////////////////////////////////////
 void Scene::SetSky()
 {
   // Create SkyX
-  this->skyxController = new SkyX::BasicController();
-  this->skyx = new SkyX::SkyX(this->manager, this->skyxController);
-  this->skyx->create();
+  if (!this->skyController)
+  {
+    this->skyxController = new SkyX::BasicController();
+    this->skyx = new SkyX::SkyX(this->manager, this->skyxController);
+    this->skyx->create();
+    this->skyx->setTimeMultiplier(0);
+  }
 
-  this->skyx->setTimeMultiplier(0);
+  sdf::Element skyElem = this->sdf->GetElement("sky");
 
-  // Set the time: x = current time[0-24], y = sunrise time[0-24],
+  // Set the time:
+  // x = current time[0-24],
+  // y = sunrise time[0-24],
   // z = sunset time[0-24]
-  this->skyxController->setTime(Ogre::Vector3(10.0, 6.0, 20.0f));
+  this->skyxController->setTime(Ogre::Vector3(
+        skyElem->GetValueDouble("time"),
+        skyElem->GetValueDouble("sunrise"),
+        skyElem->GetValueDouble("sunset")));
 
   // Moon phase in [-1,1] range, where -1 means fully covered Moon,
   // 0 clear Moon and 1 fully covered Moon
-  this->skyxController->setMoonPhase(0);
+  this->skyxController->setMoonPhase(skyElem->GetValueDouble("moon_phase"));
 
   this->skyx->getAtmosphereManager()->setOptions(
       SkyX::AtmosphereManager::Options(
@@ -1949,28 +1970,42 @@ void Scene::SetSky()
         Ogre::Vector3(0.57f, 0.54f, 0.44f),  // Wavelength
         -0.991f, 2.5f, 4));
 
-  this->skyx->getVCloudsManager()->setWindSpeed(0.6);
-
-  // Use true to update volumetric clouds based on the time multiplier
-  this->skyx->getVCloudsManager()->setAutoupdate(false);
-
-  SkyX::VClouds::VClouds *vclouds =
-    this->skyx->getVCloudsManager()->getVClouds();
-
-  // Set wind direction in radians
-  vclouds->setWindDirection(Ogre::Radian(0.0));
-  vclouds->setAmbientColor(Ogre::Vector3(0.9, 0.9, 1.0));
-
-  // x = sun light power
-  // y = sun beta multiplier
-  // z = ambient color multiplier
-  // w = distance attenuation
-  vclouds->setLightResponse(Ogre::Vector4(0.9, 0.6, 0.5, 0.3));
-  vclouds->setAmbientFactors(Ogre::Vector4(0.45, 0.3, 0.6, 0.1));
-  vclouds->setWheater(.6, .6, false);
-
-  if (true)
+  // Set the cloud parameters
+  if (skyElem->HasElement("clouds"))
   {
+    sdf::Element cloudElem = skyElem->GetElement("clouds");
+    this->skyx->getVCloudsManager()->setWindSpeed(
+        cloudElem->GetValueDouble("speed"));
+
+    // Use true to update volumetric clouds based on the time multiplier
+    this->skyx->getVCloudsManager()->setAutoupdate(false);
+
+    SkyX::VClouds::VClouds *vclouds =
+      this->skyx->getVCloudsManager()->getVClouds();
+
+    // Set wind direction in radians
+    vclouds->setWindDirection(Ogre::Radian(
+          cloudElem->GetValueDouble("direction")));
+
+    // Set the ambient color of the clouds
+    vclouds->setAmbientColor(converter::Convert(
+          cloudElem->GetValueColor("ambient")));
+
+    // x = sun light power
+    // y = sun beta multiplier
+    // z = ambient color multiplier
+    // w = distance attenuation
+    vclouds->setLightResponse(
+        converter::Convert(cloudElem->GetValueVector4("light_response")));
+
+    vclouds->setAmbientFactors(
+        converter::Convert(cloudElem->GetValueVector4("ambient_factors")));
+
+    /// Set the density (humidity) and mean size of the clouds.
+    vclouds->setWheater(
+        math::clamp(cloudElem->GetValueDouble("humidity", 0.0, 1.0)),
+        math::clamp(cloudElem->GetValueDouble("mean_size", 0.0, 1.0)), true);
+
     // Create VClouds
     if (!this->skyx->getVCloudsManager()->isCreated())
     {
@@ -1989,14 +2024,27 @@ void Scene::SetSky()
     }
   }
 
-  /*vclouds->getLightningManager()->setEnabled(preset.vcLightnings);
-  vclouds->getLightningManager()->setAverageLightningApparitionTime(
-      preset.vcLightningsAT);
-  vclouds->getLightningManager()->setLightningColor(
-      preset.vcLightningsColor);
-  vclouds->getLightningManager()->setLightningTimeMultiplier(
-      preset.vcLightningsTM);
-      */
+  // Set the lightning parameters
+  if (skyElem->HasElement("lightning"))
+  {
+    sdf::Element lightningElem = skyElem->GetElement("lightning");
+
+    vclouds->getLightningManager()->setEnabled(true);
+
+    // Set the time between lightning strikes
+    vclouds->getLightningManager()->setAverageLightningApparitionTime(
+        lightningElem->GetValueDouble("mean_time"));
+
+    vclouds->getLightningManager()->setLightningColor(
+        conversions::Convert(lightningElem->GetValueColor("color")));
+
+    vclouds->getLightningManager()->setLightningTimeMultiplier(
+        lightningElem->GetValueDouble("time_multiplier"));
+  }
+  else
+  {
+    vclouds->getLightningManager()->setEnabled(false);
+  }
 
   Ogre::Root::getSingletonPtr()->addFrameListener(this->skyx);
 

@@ -50,6 +50,16 @@ namespace gazebo
       /// \return Gazebo vector
       public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
 
+      /// \brief return Ogre Vector4 from Gazebo Vector4
+      /// \param[in] _v Gazebo vector4
+      /// \return Ogre vector4
+      public: static Ogre::Vector4 Convert(const math::Vector4 &_v);
+
+      /// \brief return gazebo Vector4 from ogre Vector4
+      /// \param[in] _v Ogre vector4
+      /// \return Gazebo vector4
+      public: static math::Vector4 Convert(const Ogre::Vector4 &_v);
+
       /// \brief Gazebo quaternion to Ogre quaternion
       /// \param[in] _v Gazebo quaternion
       /// \return Ogre quaternion

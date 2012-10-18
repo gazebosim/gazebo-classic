@@ -597,6 +597,46 @@ namespace gazebo
       return result;
     }
 
+    msgs::Sky SkyFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Sky msg;
+
+      msg->set_time(_sdf->GetValueDouble("time"));
+      msg->set_sunrise(_sdf->GetValueDouble("sunrise"));
+      msg->set_sunset(_sdf->GetValueDouble("sunset"));
+      msg->set_moon_phase(_sdf->GetValueDouble("moon_phase"));
+
+      if (_sdf->HasElement("clouds"))
+      {
+        sdf::ElementPtr cloudsElem = _sdf->GetElement("clouds");
+
+        msg->set_speed(cloudsElem->GetValueDouble("speed"));
+        msg->set_direction(cloudsElem->GetValueDouble("direction"));
+        msg->set_humidity(cloudsElem->GetValueDouble("humidity"));
+        msg->set_mean_size(cloudsElem->GetValueDouble("mean_size"));
+        msgs::Set(msg->mutable_cloud_ambient(),
+                  cloudsElem->GetValueColor("ambient"));
+        msgs::Set(msg->mutable_ambient_factors(),
+                  cloudsElem->GetValueColor("ambient_factors"));
+        msgs::Set(msg->mutable_light_response(),
+                  cloudsElem->GetValueColor("light_response"));
+      }
+
+      if (_sdf->HasElement("lightning"))
+      {
+        sdf::ElementPtr lightningElem = _sdf->GetElement("lightning");
+
+        msg->mutable_lightning()->set_mean_time(
+            lightningElem->GetValueDouble("mean_time"));
+        msg->mutable_lightning()->set_time_multiplier(
+            lightningElem->GetValueDouble("time_multiplier"));
+        msgs::Set(msg->mutable_lighting()->mutable_cloud(),
+                 lightningElem->GetValueColor("color"));
+      }
+
+      return msg;
+    }
+
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Scene result;
@@ -621,22 +661,7 @@ namespace gazebo
       if (_sdf->HasElement("sky"))
       {
         msgs::Sky *skyMsg = result.mutable_sky();
-        skyMsg->set_time(_sdf->GetElement("sky")->GetValueDouble("time"));
-        skyMsg->set_sunrise(_sdf->GetElement("sky")->GetValueDouble("sunrise"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->GetValueDouble("sunset"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->GetValueDouble("sunset"));
-
-        if (_sdf->GetElement("sky")->HasElement("clouds"))
-        {
-          sdf::ElementPtr cloudsElem =
-            _sdf->GetElement("sky")->GetElement("clouds");
-          skyMsg->set_wind_speed(cloudsElem->GetValueDouble("speed"));
-          skyMsg->set_wind_direction(cloudsElem->GetValueDouble("direction"));
-          skyMsg->set_humidity(cloudsElem->GetValueDouble("humidity"));
-          skyMsg->set_mean_cloud_size(cloudsElem->GetValueDouble("mean_size"));
-          msgs::Set(skyMsg->mutable_cloud_ambient(),
-                    cloudsElem->GetValueColor("ambient"));
-        }
+        skyMsg->CopyFrom(SkyFromSDF(_sdf->GetElement("sky")));
       }
 
       if (_sdf->HasElement("fog"))
