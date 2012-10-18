@@ -110,7 +110,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
   TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
   while (nodeXml)
   {
-    this->LoadNode(nodeXml , _mesh, math::Matrix4::IDENTITY);
+    this->LoadNode(nodeXml, _mesh, math::Matrix4::IDENTITY);
     nodeXml = nodeXml->NextSiblingElement("node");
   }
 }
@@ -723,6 +723,9 @@ void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
   TiXmlElement *meshXml = _xml->FirstChildElement("mesh");
   TiXmlElement *childXml;
 
+  if (!meshXml)
+    return;
+
   childXml = meshXml->FirstChildElement("triangles");
   while (childXml)
   {
@@ -791,6 +794,7 @@ void ColladaLoader::LoadVertices(const std::string &_id,
 {
   TiXmlElement *verticesXml = this->GetElementId(this->colladaXml,
                                                  "vertices", _id);
+
   if (!verticesXml)
   {
     gzerr << "Unable to find vertices[" << _id << "] in collada file\n";
@@ -858,7 +862,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
   TiXmlElement *floatArrayXml = normalsXml->FirstChildElement("float_array");
   if (!floatArrayXml)
   {
-    gzerr << "Normal source missing float_array element\n";
+    gzwarn << "Normal source missing float_array element\n";
     return;
   }
 
@@ -912,9 +916,12 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 /////////////////////////////////////////////////
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
 {
-  Material *mat = new Material();
 
   TiXmlElement *matXml = this->GetElementId("material", _name);
+  if (!matXml || !matXml->FirstChildElement("instance_effect"))
+    return NULL;
+
+  Material *mat = new Material();
   std::string effectName =
     matXml->FirstChildElement("instance_effect")->Attribute("url");
   TiXmlElement *effectXml = this->GetElementId("effect", effectName);
@@ -1080,8 +1087,11 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     if (iter != this->materialMap.end())
       matStr = iter->second;
 
-    unsigned int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
-    subMesh->SetMaterialIndex(matIndex);
+    int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
+    if (matIndex < 0)
+      gzwarn << "Unable to add material[" << matStr << "]\n";
+    else
+      subMesh->SetMaterialIndex(matIndex);
   }
 
   TiXmlElement *polylistInputXml = _polylistXml->FirstChildElement("input");
@@ -1247,8 +1257,11 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     if (iter != this->materialMap.end())
       matStr = iter->second;
 
-    unsigned int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
-    subMesh->SetMaterialIndex(matIndex);
+    int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
+    if (matIndex < 0)
+      gzwarn << "Unable to add material[" << matStr << "]\n";
+    else
+      subMesh->SetMaterialIndex(matIndex);
   }
 
   TiXmlElement *trianglesInputXml = _trianglesXml->FirstChildElement("input");
@@ -1303,7 +1316,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
 
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
-  for (unsigned int j = 0; j < strs.size(); j+= inputs.size())
+  for (unsigned int j = 0; j < strs.size(); j += inputs.size())
   {
     for (unsigned int i = 0; i < inputs.size(); i++)
       values[i] = math::parseInt(strs[j+i]);

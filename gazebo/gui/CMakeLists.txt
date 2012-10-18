@@ -19,7 +19,6 @@ set (sources
   GLWidget.cc 
   TimePanel.cc
   InsertModelWidget.cc
-  LightRightMenu.cc
   ModelListWidget.cc
   EntityMaker.cc
   BoxMaker.cc
@@ -43,7 +42,6 @@ set (qt_headers
   InsertModelWidget.hh
   ModelListWidget.hh
   ModelEditWidget.hh
-  LightRightMenu.hh
   ModelRightMenu.hh
   JointControlWidget.hh
 )

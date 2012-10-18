@@ -95,7 +95,7 @@ namespace gazebo
       /// \brief Add a material to the mesh
       /// \param[in] _mat the material
       /// \return Index of this material
-      public: unsigned int AddMaterial(Material *_mat);
+      public: int AddMaterial(Material *_mat);
 
       /// \brief Get the number of materials
       /// \return the count

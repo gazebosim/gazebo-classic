@@ -19,6 +19,8 @@
 #include <algorithm>
 
 #include "math/Helpers.hh"
+
+#include "common/Material.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
@@ -39,10 +41,20 @@ Mesh::Mesh()
 //////////////////////////////////////////////////
 Mesh::~Mesh()
 {
-  std::vector<SubMesh*>::iterator iter;
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
+  for (std::vector<SubMesh*>::iterator iter = this->submeshes.begin();
+       iter != this->submeshes.end(); ++iter)
+  {
     delete *iter;
+  }
   this->submeshes.clear();
+
+  for (std::vector<Material*>::iterator iter = this->materials.begin();
+       iter != this->materials.end(); ++iter)
+  {
+    delete *iter;
+  }
+  this->materials.clear();
+
   delete this->skeleton;
 }
 
@@ -205,10 +217,17 @@ const SubMesh *Mesh::GetSubMesh(unsigned int i) const
 }
 
 //////////////////////////////////////////////////
-unsigned int Mesh::AddMaterial(Material *_mat)
+int Mesh::AddMaterial(Material *_mat)
 {
-  this->materials.push_back(_mat);
-  return this->materials.size()-1;
+  int result = -1;
+
+  if (_mat)
+  {
+    this->materials.push_back(_mat);
+    result = this->materials.size()-1;
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////

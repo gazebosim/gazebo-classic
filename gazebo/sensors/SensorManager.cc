@@ -103,6 +103,15 @@ void SensorManager::Update(bool force)
 }
 
 //////////////////////////////////////////////////
+bool SensorManager::SensorsInitialized()
+{
+  this->mutex->lock();
+  bool result = this->initSensors.empty();
+  this->mutex->unlock();
+  return result;
+}
+
+//////////////////////////////////////////////////
 void SensorManager::Init()
 {
   this->mutex->lock();
