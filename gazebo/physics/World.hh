@@ -421,6 +421,8 @@ namespace gazebo
 
       private: common::Time statPeriod;
       private: common::Time prevStatTime;
+      private: common::Time processMsgsPeriod;
+      private: common::Time prevProcessMsgsTime;
       private: common::Time pauseStartTime;
       private: common::Time realTimeOffset;
 
