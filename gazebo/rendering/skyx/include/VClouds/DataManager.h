@@ -24,11 +24,12 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_DataManager_H_
 #define _SkyX_VClouds_DataManager_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
 #include "VClouds/FastFakeRandom.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
   class VClouds;
   class Ellipsoid;

@@ -166,7 +166,6 @@ namespace gazebo
 
       /// \brief Min command clamping value.
       private: double cmdMin;
-
     };
     /// \}
   }

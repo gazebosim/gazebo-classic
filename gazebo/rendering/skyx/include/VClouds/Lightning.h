@@ -24,9 +24,10 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_Lightning_H_
 #define _SkyX_VClouds_Lightning_H_
 
+#include <vector>
 #include "Prerequisites.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
   class DllExport Lightning
   {
@@ -72,8 +73,12 @@ namespace SkyX { namespace VClouds{
         @param wm Width multiplier
         @param b Bounds
         */
-      Lightning(Ogre::SceneManager* sm, Ogre::SceneNode* sn, const Ogre::Vector3& orig, const Ogre::Vector3& dir, const Ogre::Real& l,
-          const Ogre::uint32& d, const Ogre::uint32& rec, const Ogre::Real& tm,  const Ogre::Real& wm, const Ogre::Vector2& b = Ogre::Vector2(0,1));
+      Lightning(Ogre::SceneManager* sm, Ogre::SceneNode* sn,
+          const Ogre::Vector3& orig, const Ogre::Vector3& dir,
+          const Ogre::Real& l,
+          const Ogre::uint32& d, const Ogre::uint32& rec,
+          const Ogre::Real& tm,  const Ogre::Real& wm,
+          const Ogre::Vector2& b = Ogre::Vector2(0, 1));
 
       /** Destructor
       */
@@ -152,7 +157,8 @@ namespace SkyX { namespace VClouds{
         @param currentPos Current position
         @param parentTime Parent time
         */
-      void _updateData(const Ogre::Real& alpha, const Ogre::Real& currentPos, const Ogre::Real& parentTime);
+      void _updateData(const Ogre::Real& alpha, const Ogre::Real& currentPos,
+                       const Ogre::Real& parentTime);
 
       /// Ray origin
       Ogre::Vector3 mOrigin;
@@ -180,7 +186,8 @@ namespace SkyX { namespace VClouds{
 
       /// Ray bounds (for internal visual calculations)
       Ogre::Vector2 mBounds;
-      /// Angle range (Little values -> Less derivations, bigger values -> More derivations)
+      /// Angle range (Little values -> Less derivations,
+      /// bigger values -> More derivations)
       Ogre::Vector2 mAngleRange;
 
 
@@ -204,7 +211,6 @@ namespace SkyX { namespace VClouds{
       /// Has the ray finished?
       bool mFinished;
   };
-
 }}
 
 #endif

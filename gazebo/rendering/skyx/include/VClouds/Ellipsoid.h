@@ -28,7 +28,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "VClouds/DataManager.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
   /** Ellipsoid class
       x^2   y^2   z^2
