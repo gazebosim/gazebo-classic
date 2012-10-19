@@ -18,6 +18,8 @@
  * Author: Andrew Howard and Nate Koenig
  */
 
+#include <time.h>
+
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -95,6 +97,9 @@ World::World(const std::string &_name)
   this->setWorldPoseMutex = new boost::mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
 
+  this->prevStatTime = common::Time::GetWallTime();
+  this->prevProcessMsgsTime = common::Time::GetWallTime();
+
   this->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
   this->connections.push_back(
@@ -140,6 +145,9 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0, 200000000);
+
+  // The period at which messages are processed
+  this->processMsgsPeriod = common::Time(0, 200000000);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
@@ -294,8 +302,10 @@ void World::Step()
 {
   this->worldUpdateMutex->lock();
 
+  common::Time cur_wall_time = common::Time::GetWallTime();
+
   // Send statistics about the world simulation
-  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
+  if (cur_wall_time - this->prevStatTime > this->statPeriod)
   {
     msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
     msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
@@ -303,15 +313,24 @@ void World::Step()
     this->worldStatsMsg.set_paused(this->IsPaused());
 
     this->statPub->Publish(this->worldStatsMsg);
-    this->prevStatTime = common::Time::GetWallTime();
+    this->prevStatTime = cur_wall_time;
   }
 
   if (this->IsPaused() && !this->stepInc > 0)
     this->pauseTime += this->physicsEngine->GetStepTime();
   else
   {
+    // sleep here to get the correct update rate
+    common::Time sleep_time = this->prevStepWallTime +
+      common::Time(this->physicsEngine->GetUpdatePeriod()) -
+      common::Time::GetWallTime();
+    struct timespec nsleep;
+    nsleep.tv_sec = sleep_time.sec;
+    nsleep.tv_nsec = sleep_time.nsec;
+    nanosleep(&nsleep, NULL);
+
     // throttling update rate
-    if (common::Time::GetWallTime() - this->prevStepWallTime
+    if (cur_wall_time - this->prevStepWallTime
            >= common::Time(this->physicsEngine->GetUpdatePeriod()))
     {
       this->prevStepWallTime = common::Time::GetWallTime();
@@ -324,10 +343,15 @@ void World::Step()
     }
   }
 
-  this->ProcessEntityMsgs();
-  this->ProcessRequestMsgs();
-  this->ProcessFactoryMsgs();
-  this->ProcessModelMsgs();
+  if (cur_wall_time - this->prevProcessMsgsTime > this->processMsgsPeriod)
+  {
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
+    this->prevProcessMsgsTime = cur_wall_time;
+  }
+
   this->worldUpdateMutex->unlock();
 }
 
