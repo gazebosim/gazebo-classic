@@ -348,7 +348,7 @@ void World::Step()
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
-    this->prevProcessMsgsTime = (common::Time::GetWallTime();
+    this->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 
   this->worldUpdateMutex->unlock();
