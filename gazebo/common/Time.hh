@@ -393,8 +393,8 @@ namespace gazebo
       private: inline void Correct()
                {
                  // Make any corrections
-                 this->sec += this->nsec / 1e9;
-                 this->nsec = this->nsec % 1e9;
+                 this->sec += this->nsec / static_cast<int32_t>(1e9);
+                 this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
     };
     /// \}
