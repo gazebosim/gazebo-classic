@@ -15,12 +15,13 @@
  *
  */
 #include <vector>
+#include <boost/thread/mutex.hpp>
+
 #include "transport/transport.hh"
 #include "common/common.hh"
 #include "math/gzmath.hh"
 #include "gazebo_config.h"
 #include "gazebo.hh"
-#include <boost/thread/mutex.hpp>
 
 boost::mutex fini_mutex;
 std::vector<gazebo::SystemPluginPtr> g_plugins;

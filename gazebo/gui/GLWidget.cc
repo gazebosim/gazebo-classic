@@ -427,7 +427,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     this->OnMouseMoveMakeEntity();
   else if (this->state == "select")
     this->OnMouseMoveNormal();
-  else if (this->state == "translate" || this->state=="rotate")
+  else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseMoveTranslate();
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;

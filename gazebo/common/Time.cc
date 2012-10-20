@@ -20,6 +20,7 @@
  */
 
 #include <sys/time.h>
+#include <time.h>
 #include <math.h>
 #include "math/Helpers.hh"
 #include "common/Time.hh"
@@ -50,6 +51,13 @@ Time::Time(const struct timeval &_tv)
 }
 
 /////////////////////////////////////////////////
+Time::Time(const struct timespec &_tv)
+{
+  this->sec = _tv.tv_sec;
+  this->nsec = _tv.tv_nsec;
+}
+
+/////////////////////////////////////////////////
 Time::Time(int32_t _sec, int32_t _nsec)
 : sec(_sec), nsec(_nsec)
 {
@@ -70,8 +78,8 @@ Time::~Time()
 /////////////////////////////////////////////////
 const Time &Time::GetWallTime()
 {
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
+  struct timespec tv;
+  clock_gettime(0, &tv);
   wallTime = tv;
   return wallTime;
 }
@@ -141,6 +149,15 @@ Time &Time::operator =(const struct timeval &_tv)
 }
 
 /////////////////////////////////////////////////
+Time &Time::operator =(const struct timespec &_tv)
+{
+  this->sec = _tv.tv_sec;
+  this->nsec = _tv.tv_nsec;
+
+  return *this;
+}
+
+/////////////////////////////////////////////////
 Time &Time::operator =(const Time &_time)
 {
   this->sec = _time.sec;
@@ -158,10 +175,27 @@ Time Time::operator +(const struct timeval &_tv) const
 }
 
 /////////////////////////////////////////////////
+Time Time::operator +(const struct timespec &_tv) const
+{
+  Time t(this->sec + _tv.tv_sec, this->nsec + _tv.tv_nsec);
+  t.Correct();
+  return t;
+}
+
+/////////////////////////////////////////////////
 const Time &Time::operator +=(const struct timeval &_tv)
 {
   this->sec += _tv.tv_sec;
   this->nsec += _tv.tv_usec*1000;
+  this->Correct();
+  return *this;
+}
+
+/////////////////////////////////////////////////
+const Time &Time::operator +=(const struct timespec &_tv)
+{
+  this->sec += _tv.tv_sec;
+  this->nsec += _tv.tv_nsec;
   this->Correct();
   return *this;
 }
@@ -203,6 +237,24 @@ const Time &Time::operator -=(const struct timeval &_tv)
 }
 
 /////////////////////////////////////////////////
+Time Time::operator -(const struct timespec &_tv) const
+{
+  Time t(this->sec - _tv.tv_sec, this->nsec - _tv.tv_nsec);
+  t.Correct();
+
+  return t;
+}
+
+/////////////////////////////////////////////////
+const Time &Time::operator -=(const struct timespec &_tv)
+{
+  this->sec -= _tv.tv_sec;
+  this->nsec -= _tv.tv_nsec;
+  this->Correct();
+  return *this;
+}
+
+/////////////////////////////////////////////////
 Time Time::operator -(const Time &_time) const
 {
   Time t(this->sec - _time.sec, this->nsec - _time.nsec);
@@ -237,6 +289,23 @@ const Time &Time::operator *=(const struct timeval &_tv)
 }
 
 /////////////////////////////////////////////////
+Time Time::operator *(const struct timespec &_tv) const
+{
+  Time t(this->sec * _tv.tv_sec, this->nsec * _tv.tv_nsec);
+  t.Correct();
+  return t;
+}
+
+/////////////////////////////////////////////////
+const Time &Time::operator *=(const struct timespec &_tv)
+{
+  this->sec *= _tv.tv_sec;
+  this->nsec *= _tv.tv_nsec;
+  this->Correct();
+  return *this;
+}
+
+/////////////////////////////////////////////////
 Time Time::operator *(const Time &_time) const
 {
   Time t(this->sec * _time.sec, this->nsec * _time.nsec);
@@ -261,6 +330,19 @@ Time Time::operator /(const struct timeval &_tv) const
 
 /////////////////////////////////////////////////
 const Time &Time::operator /=(const struct timeval &_tv)
+{
+  *this = *this / Time(_tv);
+  return *this;
+}
+
+/////////////////////////////////////////////////
+Time Time::operator /(const struct timespec &_tv) const
+{
+  return (*this) / Time(_tv);
+}
+
+/////////////////////////////////////////////////
+const Time &Time::operator /=(const struct timespec &_tv)
 {
   *this = *this / Time(_tv);
   return *this;
@@ -300,6 +382,12 @@ bool Time::operator ==(const struct timeval &_tv) const
 }
 
 /////////////////////////////////////////////////
+bool Time::operator ==(const struct timespec &_tv) const
+{
+  return *this == Time(_tv);
+}
+
+/////////////////////////////////////////////////
 bool Time::operator ==(const Time &_time) const
 {
   return this->sec == _time.sec && this->nsec == _time.nsec;
@@ -318,6 +406,12 @@ bool Time::operator!=(const struct timeval &_tv) const
 }
 
 /////////////////////////////////////////////////
+bool Time::operator!=(const struct timespec &_tv) const
+{
+  return !(*this == _tv);
+}
+
+/////////////////////////////////////////////////
 bool Time::operator!=(const Time &_time) const
 {
   return !(*this == _time);
@@ -331,6 +425,12 @@ bool Time::operator!=(double _time) const
 
 /////////////////////////////////////////////////
 bool Time::operator<(const struct timeval &_tv) const
+{
+  return *this < Time(_tv);
+}
+
+/////////////////////////////////////////////////
+bool Time::operator<(const struct timespec &_tv) const
 {
   return *this < Time(_tv);
 }
@@ -355,6 +455,12 @@ bool Time::operator<=(const struct timeval &_tv) const
 }
 
 /////////////////////////////////////////////////
+bool Time::operator<=(const struct timespec &_tv) const
+{
+  return *this <= Time(_tv);
+}
+
+/////////////////////////////////////////////////
 bool Time::operator<=(const Time &_time) const
 {
   return !(_time < *this);
@@ -373,6 +479,12 @@ bool Time::operator>(const struct timeval &_tv) const
 }
 
 /////////////////////////////////////////////////
+bool Time::operator>(const struct timespec &_tv) const
+{
+  return *this > Time(_tv);
+}
+
+/////////////////////////////////////////////////
 bool Time::operator>(const Time &_time) const
 {
   return _time < *this;
@@ -386,6 +498,12 @@ bool Time::operator>(double _time) const
 
 /////////////////////////////////////////////////
 bool Time::operator>=(const struct timeval &_tv) const
+{
+  return *this >= Time(_tv);
+}
+
+/////////////////////////////////////////////////
+bool Time::operator>=(const struct timespec &_tv) const
 {
   return *this >= Time(_tv);
 }

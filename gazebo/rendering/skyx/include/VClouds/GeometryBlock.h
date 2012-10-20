@@ -26,7 +26,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 #include "Prerequisites.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
   class VClouds;
 
@@ -37,7 +37,7 @@ namespace SkyX { namespace VClouds{
       */
       struct VERTEX
       {        // Position
-        float x,y,z,
+        float x, y, z,
               // 3D Coords
               xc, yc, zc,
               // Noise coords

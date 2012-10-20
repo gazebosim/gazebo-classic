@@ -302,10 +302,8 @@ void World::Step()
 {
   this->worldUpdateMutex->lock();
 
-  common::Time cur_wall_time = common::Time::GetWallTime();
-
   // Send statistics about the world simulation
-  if (cur_wall_time - this->prevStatTime > this->statPeriod)
+  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
     msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
     msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
@@ -313,7 +311,7 @@ void World::Step()
     this->worldStatsMsg.set_paused(this->IsPaused());
 
     this->statPub->Publish(this->worldStatsMsg);
-    this->prevStatTime = cur_wall_time;
+    this->prevStatTime = common::Time::GetWallTime();
   }
 
   if (this->IsPaused() && !this->stepInc > 0)
@@ -330,7 +328,7 @@ void World::Step()
     nanosleep(&nsleep, NULL);
 
     // throttling update rate
-    if (cur_wall_time - this->prevStepWallTime
+    if (common::Time::GetWallTime() - this->prevStepWallTime
            >= common::Time(this->physicsEngine->GetUpdatePeriod()))
     {
       this->prevStepWallTime = common::Time::GetWallTime();
@@ -343,13 +341,14 @@ void World::Step()
     }
   }
 
-  if (cur_wall_time - this->prevProcessMsgsTime > this->processMsgsPeriod)
+  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
+      this->processMsgsPeriod)
   {
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
-    this->prevProcessMsgsTime = cur_wall_time;
+    this->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 
   this->worldUpdateMutex->unlock();

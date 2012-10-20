@@ -49,8 +49,10 @@ TEST_F(CameraSensor, EmptyWorld)
     std::string cameraName = "camera_sensor";
     unsigned int width  = 320;
     unsigned int height = 240;  // 106 fps
-    width  = 640; height = 480;  // 80.25 fps
-    width  = 1280; height = 960;  // 41.19 fps
+    width  = 640;
+    height = 480;  // 80.25 fps
+    width  = 1280;
+    height = 960;  // 41.19 fps
     math::Pose setPose, testPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
     SpawnCamera(modelName, cameraName, setPose.pos,
