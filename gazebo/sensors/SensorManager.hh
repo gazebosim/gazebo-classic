@@ -20,8 +20,8 @@
  * Date: 18 Dec 2009
  */
 
-#ifndef SENSORMANAGER_HH
-#define SENSORMANAGER_HH
+#ifndef _SENSORMANAGER_HH_
+#define _SENSORMANAGER_HH_
 
 #include <boost/thread.hpp>
 #include <list>
@@ -112,7 +112,7 @@ namespace gazebo
       private: boost::thread *runThread;
 
       /// \brief Mutex used when adding and removing sensors.
-      private: boost::recursive_mutex *mutex;
+      private: boost::recursive_mutex mutex;
 
       /// \brief The list of initialized sensors.
       private: std::list<SensorPtr> sensors;

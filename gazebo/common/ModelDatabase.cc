@@ -127,7 +127,6 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     return modelCache;
 
   std::string xmlString = ModelDatabase::GetManifest(ModelDatabase::GetURI());
-  std::string uriStr = ModelDatabase::GetURI();
 
   if (!xmlString.empty())
   {
@@ -160,7 +159,6 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
       std::string suffix = uri;
       if (index != std::string::npos)
       {
-        std::string prefix = uri.substr(0, index);
         suffix = uri.substr(index + 3, uri.size() - index - 3);
       }
 

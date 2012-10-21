@@ -120,11 +120,11 @@ void Spawn(po::variables_map &vm)
 /////////////////////////////////////////////////
 void Delete(po::variables_map &vm)
 {
-  std::string filename, modelName;
-  std::string worldName = "default";
+  std::string modelName;
+  // std::string worldName = "default";
 
-  if (vm.count("world-name"))
-    worldName = vm["world-name"].as<std::string>();
+  // if (vm.count("world-name"))
+  //  worldName = vm["world-name"].as<std::string>();
 
   if (vm.count("model-name"))
     modelName = vm["model-name"].as<std::string>();
