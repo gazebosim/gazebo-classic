@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef MODEL_LIST_WIDGET_HH
-#define MODEL_LIST_WIDGET_HH
+#ifndef _MODEL_LIST_WIDGET_HH_
+#define _MODEL_LIST_WIDGET_HH_
 
 #include <string>
 #include <list>
@@ -158,9 +158,9 @@ namespace gazebo
       private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
 
-
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
+      private: void ProcessRemoveEntity();
 
       public: void InitTransport(const std::string &_name ="");
       private: void ResetTree();
@@ -216,6 +216,9 @@ namespace gazebo
 
       typedef std::list<msgs::Light> LightMsgs_L;
       private: LightMsgs_L lightMsgs;
+
+      typedef std::list<std::string> RemoveEntity_L;
+      private: RemoveEntity_L removeEntityList;
 
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;

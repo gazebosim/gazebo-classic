@@ -29,15 +29,13 @@ using namespace sensors;
 
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
-  : stop(true), initialized(false), runThread(NULL),
-    mutex(new boost::recursive_mutex())
+  : stop(true), initialized(false), runThread(NULL)
 {
 }
 
 //////////////////////////////////////////////////
 SensorManager::~SensorManager()
 {
-  delete this->mutex;
   this->sensors.clear();
   this->initSensors.clear();
 }
@@ -73,17 +71,19 @@ void SensorManager::RunLoop()
 void SensorManager::Update(bool force)
 {
   std::list<SensorPtr>::iterator iter;
+  std::list<SensorPtr>::iterator end;
 
-  this->mutex->lock();
-  // in case things are spawn, sensors length changes
-  std::list<SensorPtr>::iterator end = this->initSensors.end();
-  for (iter = this->initSensors.begin(); iter != end; ++iter)
   {
-    (*iter)->Init();
-    this->sensors.push_back((*iter));
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+    // in case things are spawn, sensors length changes
+    end = this->initSensors.end();
+    for (iter = this->initSensors.begin(); iter != end; ++iter)
+    {
+      (*iter)->Init();
+      this->sensors.push_back((*iter));
+    }
+    this->initSensors.clear();
   }
-  this->initSensors.clear();
-  this->mutex->unlock();
 
   event::Events::preRender();
 
@@ -92,46 +92,45 @@ void SensorManager::Update(bool force)
 
   event::Events::postRender();
 
-  this->mutex->lock();
-  // in case things are spawn, sensors length changes
-  end = this->sensors.end();
-  for (iter = this->sensors.begin(); iter != end; ++iter)
   {
-    (*iter)->Update(force);
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+    // in case things are spawn, sensors length changes
+    end = this->sensors.end();
+    for (iter = this->sensors.begin(); iter != end; ++iter)
+    {
+      (*iter)->Update(force);
+    }
   }
-  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
 bool SensorManager::SensorsInitialized()
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   bool result = this->initSensors.empty();
-  this->mutex->unlock();
   return result;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::Init()
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     (*iter)->Init();
-  this->mutex->unlock();
   this->initialized = true;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::Fini()
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   this->initialized = false;
-  this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     (*iter)->Fini();
   this->sensors.clear();
-  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -165,9 +164,8 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   }
   else
   {
-    this->mutex->lock();
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
     this->initSensors.push_back(sensor);
-    this->mutex->unlock();
   }
 
   return sensor->GetName();
@@ -176,16 +174,15 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
 //////////////////////////////////////////////////
 SensorPtr SensorManager::GetSensor(const std::string &_name)
 {
-  SensorPtr result;
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  this->mutex->lock();
+  SensorPtr result;
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       result = (*iter);
   }
-  this->mutex->unlock();
 
   return result;
 }
@@ -193,28 +190,28 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
 //////////////////////////////////////////////////
 void SensorManager::RemoveSensor(const std::string &_name)
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     if ((*iter)->GetName() == _name)
       break;
 
   if (iter != this->sensors.end())
+  {
+    (*iter)->Fini();
     this->sensors.erase(iter);
-  this->mutex->unlock();
+  }
 }
 
 //////////////////////////////////////////////////
 void SensorManager::RemoveSensors()
 {
-  this->mutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     (*iter)->Fini();
 
   this->sensors.clear();
   this->initSensors.clear();
-  this->mutex->unlock();
 }
-
-
