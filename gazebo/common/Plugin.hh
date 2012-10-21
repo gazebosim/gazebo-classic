@@ -65,7 +65,7 @@ namespace gazebo
   template<class T>
   class PluginT
   {
-  /// \brief plugin pointer type definition
+    /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
             /// \brief Get the name of the handler
@@ -238,7 +238,7 @@ namespace gazebo
   ///        reference</a>.
   class ModelPlugin : public PluginT<ModelPlugin>
   {
-  /// \brief Constructor
+    /// \brief Constructor
     public: ModelPlugin()
              {this->type = MODEL_PLUGIN;}
 
