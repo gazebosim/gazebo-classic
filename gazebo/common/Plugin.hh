@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GZ_PLUGIN_HH
-#define GZ_PLUGIN_HH
+#ifndef _GZ_PLUGIN_HH_
+#define _GZ_PLUGIN_HH_
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -65,7 +65,7 @@ namespace gazebo
   template<class T>
   class PluginT
   {
-	/// \brief plugin pointer type definition
+    /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
 
             /// \brief Get the name of the handler
@@ -80,7 +80,8 @@ namespace gazebo
               return this->handle;
             }
 
-    /// \brief a class method that creates a plugin from a file name. It locates the shared library and loads it dynamically.
+    /// \brief a class method that creates a plugin from a file name.
+    /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
     /// \param[in] _handle short name of the handler
     public: static TPtr Create(const std::string &_filename,
@@ -212,8 +213,12 @@ namespace gazebo
   ///        reference</a>.
   class WorldPlugin : public PluginT<WorldPlugin>
   {
+    /// \brief Constructor
     public: WorldPlugin()
              {this->type = WORLD_PLUGIN;}
+
+    /// \brief Destructor
+    public: virtual ~WorldPlugin() {}
 
     /// \brief Load function
     ///
@@ -233,9 +238,12 @@ namespace gazebo
   ///        reference</a>.
   class ModelPlugin : public PluginT<ModelPlugin>
   {
-	/// \brief Constructor
+    /// \brief Constructor
     public: ModelPlugin()
              {this->type = MODEL_PLUGIN;}
+
+    /// \brief Destructor
+    public: virtual ~ModelPlugin() {}
 
     /// \brief Load function
     ///
@@ -258,9 +266,12 @@ namespace gazebo
   ///        reference</a>.
   class SensorPlugin : public PluginT<SensorPlugin>
   {
+    /// \brief Constructor
     public: SensorPlugin()
              {this->type = SENSOR_PLUGIN;}
 
+    /// \brief Destructor
+    public: virtual ~SensorPlugin() {}
 
     /// \brief Load function
     ///
@@ -284,8 +295,12 @@ namespace gazebo
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class SystemPlugin : public PluginT<SystemPlugin>
   {
+    /// \brief Constructor
     public: SystemPlugin()
              {this->type = SYSTEM_PLUGIN;}
+
+    /// \brief Destructor
+    public: virtual ~SystemPlugin() {}
 
     /// \brief Load function
     ///
