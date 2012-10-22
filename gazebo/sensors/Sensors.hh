@@ -27,6 +27,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief Load the sensor library
     /// \return True if successfully loaded, false if not
     /// \TODO Nate check
@@ -68,9 +69,17 @@ namespace gazebo
     /// \return True if all successfully removed, false if not
     bool remove_sensors();
 
-    /// \brief Get a sensor by name
-    /// \param[in] _name Name of sensor
-    /// \return Pointer to sensor
+    /// \brief Get a sensor using by name
+    ///
+    /// The given name should have:
+    /// world_name::model_name::link_name::sensor_name
+    /// \param[in] _name Name of the sensor. This name should be fully scoped.
+    /// This means _name = world_name::model_name::link_name::sensor_name.
+    /// You may use the unscoped sensor name if that name is unique within
+    /// the entire simulation. If the name is not unique a NULL pointer is
+    /// returned.
+    /// \return Pointer to the sensor, NULL if the sensor could not be
+    /// found.
     SensorPtr get_sensor(const std::string &_name);
 
     /// \}
