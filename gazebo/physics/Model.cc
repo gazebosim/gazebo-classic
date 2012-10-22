@@ -132,7 +132,14 @@ void Model::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      this->LoadJoint(jointElem);
+      try
+      {
+        this->LoadJoint(jointElem);
+      }
+      catch (...)
+      {
+        gzerr << "LoadJoint Failed\n";
+      }
       jointElem = jointElem->GetNextElement("joint");
     }
   }

@@ -55,7 +55,11 @@ RaySensor::RaySensor()
 RaySensor::~RaySensor()
 {
   delete this->mutex;
+
+  this->laserCollision->Fini();
   this->laserCollision.reset();
+
+  this->laserShape->Fini();
   this->laserShape.reset();
 }
 
@@ -90,10 +94,8 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserCollision->SetRelativePose(this->pose);
 
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
-      this->laserCollision->GetShape());
-
+                     this->laserCollision->GetShape());
   this->laserShape->Load(this->sdf);
-
   this->laserShape->Init();
 
   this->parentEntity = this->world->GetEntity(this->parentName);
