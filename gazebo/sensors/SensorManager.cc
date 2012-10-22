@@ -168,7 +168,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
     this->initSensors.push_back(sensor);
   }
 
-  return sensor->GetName();
+  return sensor->GetScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -180,8 +180,31 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name)
       result = (*iter);
+  }
+
+  // If the sensor was not found, then try to find based on an unscoped
+  // name.
+  // If multiple sensors exist with the same name, then an error occurs
+  // because we don't know which sensor is correct.
+  if (!result)
+  {
+    for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+    {
+      if ((*iter)->GetName() != _name)
+        continue;
+
+      if (!result)
+        result = (*iter);
+      else
+      {
+        gzerr << "Unable to get a sensor, multiple sensors with the same "
+              << "name[" << _name << "]. Use a scoped name instead, "
+              << "world_name::model_name::link_name::sensor_name.\n";
+        result.reset();
+      }
+    }
   }
 
   return result;
@@ -190,17 +213,30 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
 //////////////////////////////////////////////////
 void SensorManager::RemoveSensor(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  SensorPtr sensor = this->GetSensor(_name);
 
-  std::list<SensorPtr>::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
-    if ((*iter)->GetName() == _name)
-      break;
-
-  if (iter != this->sensors.end())
+  if (!sensor)
   {
-    (*iter)->Fini();
-    this->sensors.erase(iter);
+    gzerr << "Unable to remove sensor[" << _name << "]\n";
+  }
+  else
+  {
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+    std::list<SensorPtr>::iterator iter;
+    for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+      if ((*iter)->GetScopedName() == sensor->GetScopedName())
+        break;
+
+    if (iter != this->sensors.end())
+    {
+      (*iter)->Fini();
+      this->sensors.erase(iter);
+    }
+    else
+      gzerr << "RemoveSensor failed. The SensorManager's list of sensors "
+        << "changed during sensor removal. This is bad, and should "
+        << "never happen.\n";
   }
 }
 
