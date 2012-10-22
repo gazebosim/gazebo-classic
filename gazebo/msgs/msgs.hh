@@ -161,6 +161,11 @@ namespace gazebo
     /// \param _v A common::Color reference
     void Set(msgs::Color *_c, const common::Color &_v);
 
+    /// \brief Set a msgs::Vector4d from a math::Vector4
+    /// \param _msg A msgs::Vector4d pointer
+    /// \param _vec A math::Vector reference
+    void Set(msgs::Vector4d *_msg, const math::Vector4 &_vec);
+
     /// \brief Set a msgs::Time from a common::Time
     /// \param _p A msgs::Time pointer
     /// \param _v A common::Time reference

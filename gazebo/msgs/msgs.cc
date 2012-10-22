@@ -154,6 +154,14 @@ namespace gazebo
       _c->set_a(_v.a);
     }
 
+    void Set(msgs::Vector4d *_msg, const math::Vector4 &_vec)
+    {
+      _msg->set_x(_vec.x);
+      _msg->set_y(_vec.y);
+      _msg->set_z(_vec.z);
+      _msg->set_w(_vec.w);
+    }
+
     void Set(msgs::Time *_t, const common::Time &_v)
     {
       _t->set_sec(_v.sec);
@@ -601,37 +609,39 @@ namespace gazebo
     {
       msgs::Sky msg;
 
-      msg->set_time(_sdf->GetValueDouble("time"));
-      msg->set_sunrise(_sdf->GetValueDouble("sunrise"));
-      msg->set_sunset(_sdf->GetValueDouble("sunset"));
-      msg->set_moon_phase(_sdf->GetValueDouble("moon_phase"));
+      msg.set_time(_sdf->GetValueDouble("time"));
+      msg.set_sunrise(_sdf->GetValueDouble("sunrise"));
+      msg.set_sunset(_sdf->GetValueDouble("sunset"));
+      msg.set_moon_phase(_sdf->GetValueDouble("moon_phase"));
 
       if (_sdf->HasElement("clouds"))
       {
         sdf::ElementPtr cloudsElem = _sdf->GetElement("clouds");
+        msgs::Sky::Clouds *cloudsMsg = msg.mutable_clouds();
 
-        msg->set_speed(cloudsElem->GetValueDouble("speed"));
-        msg->set_direction(cloudsElem->GetValueDouble("direction"));
-        msg->set_humidity(cloudsElem->GetValueDouble("humidity"));
-        msg->set_mean_size(cloudsElem->GetValueDouble("mean_size"));
-        msgs::Set(msg->mutable_cloud_ambient(),
+        cloudsMsg->set_speed(cloudsElem->GetValueDouble("speed"));
+        cloudsMsg->set_direction(cloudsElem->GetValueDouble("direction"));
+        cloudsMsg->set_humidity(cloudsElem->GetValueDouble("humidity"));
+        cloudsMsg->set_mean_size(cloudsElem->GetValueDouble("mean_size"));
+
+        msgs::Set(cloudsMsg->mutable_ambient(),
                   cloudsElem->GetValueColor("ambient"));
-        msgs::Set(msg->mutable_ambient_factors(),
-                  cloudsElem->GetValueColor("ambient_factors"));
-        msgs::Set(msg->mutable_light_response(),
-                  cloudsElem->GetValueColor("light_response"));
+        msgs::Set(cloudsMsg->mutable_ambient_factors(),
+                  cloudsElem->GetValueVector4("ambient_factors"));
+        msgs::Set(cloudsMsg->mutable_light_response(),
+                  cloudsElem->GetValueVector4("light_response"));
       }
 
       if (_sdf->HasElement("lightning"))
       {
         sdf::ElementPtr lightningElem = _sdf->GetElement("lightning");
 
-        msg->mutable_lightning()->set_mean_time(
+        msg.mutable_lightning()->set_mean_time(
             lightningElem->GetValueDouble("mean_time"));
-        msg->mutable_lightning()->set_time_multiplier(
+        msg.mutable_lightning()->set_time_multiplier(
             lightningElem->GetValueDouble("time_multiplier"));
-        msgs::Set(msg->mutable_lighting()->mutable_cloud(),
-                 lightningElem->GetValueColor("color"));
+        msgs::Set(msg.mutable_lightning()->mutable_color(),
+                  lightningElem->GetValueColor("color"));
       }
 
       return msg;

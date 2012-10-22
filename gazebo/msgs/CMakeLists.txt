@@ -60,6 +60,7 @@ set (msgs
   topic_info.proto
   vector2d.proto
   vector3d.proto
+  vector4d.proto
   visual.proto
   world_control.proto
   world_reset.proto 

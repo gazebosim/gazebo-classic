@@ -6,18 +6,19 @@ package gazebo.msgs;
 /// \verbatim
 
 import "color.proto";
+import "vector4d.proto";
 
 message Sky
 {
   message Clouds
   {
-    required double speed            = 1[default=0.0];
-    required double direction        = 2[default=0.0];
-    required Color  ambient          = 3;
-    required double humidity         = 4[default=0.5];
-    required double mean_size        = 5[default=0.5];
-    optional Vector4 light_response  = 6;
-    optional Vector4 ambient_factors = 7;
+    required double speed             = 1[default=0.0];
+    required double direction         = 2[default=0.0];
+    required Color ambient            = 3;
+    required double humidity          = 4[default=0.5];
+    required double mean_size         = 5[default=0.5];
+    optional Vector4d light_response  = 6;
+    optional Vector4d ambient_factors = 7;
   }
 
   message Lightning

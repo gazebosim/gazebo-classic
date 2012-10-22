@@ -121,6 +121,7 @@ namespace sdf
     public: bool Get(char &_value);
     public: bool Get(std::string &_value);
     public: bool Get(gazebo::math::Vector3 &_value);
+    public: bool Get(gazebo::math::Vector4 &_value);
     public: bool Get(gazebo::math::Vector2i &_value);
     public: bool Get(gazebo::math::Vector2d &_value);
     public: bool Get(gazebo::math::Quaternion &_value);

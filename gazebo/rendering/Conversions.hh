@@ -21,6 +21,7 @@
 
 #include "common/Color.hh"
 #include "math/Vector3.hh"
+#include "math/Vector4.hh"
 #include "math/Quaternion.hh"
 
 namespace gazebo
