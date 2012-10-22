@@ -97,7 +97,6 @@ namespace gazebo
 
       private: Contact_M contacts;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr contactsPub;
 
       private: boost::mutex *mutex;

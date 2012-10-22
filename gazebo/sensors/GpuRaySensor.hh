@@ -226,7 +226,6 @@ namespace gazebo
       private: rendering::GpuLaserPtr laserCam;
       private: rendering::ScenePtr scene;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
       private: boost::mutex *mutex;
       private: msgs::LaserScan laserMsg;

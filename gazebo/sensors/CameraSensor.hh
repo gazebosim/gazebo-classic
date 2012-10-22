@@ -95,7 +95,6 @@ namespace gazebo
       private: rendering::CameraPtr camera;
       private: rendering::ScenePtr scene;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr imagePub;
     };
     /// \}

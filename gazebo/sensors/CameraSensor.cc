@@ -46,7 +46,6 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
@@ -80,7 +79,6 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->node->Init(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->GetTopic());
 }
 

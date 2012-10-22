@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 /* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
@@ -64,7 +64,6 @@ namespace gazebo
       public: math::Pose GetTagPose() {return entity->GetWorldPose();}
 
       private: physics::EntityPtr entity;
-      private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
     };
     /// \}

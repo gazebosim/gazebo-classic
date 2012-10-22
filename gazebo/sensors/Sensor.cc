@@ -54,9 +54,11 @@ Sensor::Sensor()
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
+  this->node->Fini();
+  this->node.reset();
+
   this->sdf->Reset();
   this->sdf.reset();
-  this->node.reset();
   this->connections.clear();
 }
 
@@ -142,6 +144,13 @@ void Sensor::Fini()
 std::string Sensor::GetName() const
 {
   return this->sdf->GetValueString("name");
+}
+
+//////////////////////////////////////////////////
+std::string Sensor::GetScopedName() const
+{
+  return this->world->GetName() + "::" + this->parentName + "::" +
+         this->GetName();
 }
 
 //////////////////////////////////////////////////
