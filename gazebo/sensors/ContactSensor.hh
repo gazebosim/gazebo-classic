@@ -97,7 +97,8 @@ namespace gazebo
       public: physics::Contact GetCollisionContact(
                   const std::string &_collisionName, unsigned int _index) const;
 
-      /// \brief Gets contacts of a collision
+      /// \brief Returns a std::map of collision names and contacts
+      ///   in collision with _collisionName.
       /// \param[in] _collisionName Name of collision
       /// \return Container of contacts
       /// \TODO: nate check
