@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
  * Date: 18 Dec 2009
  */
 
-#ifndef SENSORMANAGER_HH
-#define SENSORMANAGER_HH
+#ifndef _SENSORMANAGER_HH_
+#define _SENSORMANAGER_HH_
 
 #include <boost/thread.hpp>
 #include <list>
@@ -34,11 +34,13 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
     /// \{
-
+    /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
     {
@@ -53,7 +55,8 @@ namespace gazebo
       ///
       /// Checks to see if any sensor need to be initialized first,
       /// then updates all sensors once.
-      public: void Update(bool force = false);
+      /// \param[in] _force True force update, false if not
+      public: void Update(bool _force = false);
 
       /// \brief Init all the sensors
       public: void Init();
@@ -94,18 +97,13 @@ namespace gazebo
       /// \brief Remove all sensors
       public: void RemoveSensors();
 
-      /// \brief True if SensorManager::initSensors queue is empty
-      /// i.e. all sensors managed by SensorManager have been initialized
-      public: bool SensorsInitialized();
-
       /// \brief Update loop
       private: void RunLoop();
 
       /// \brief If True the sensor manager stop processing sensors.
       private: bool stop;
 
-      /// \brief True if SensorManager::Init has been called
-      ///        i.e. SensorManager::sensors are initialized.
+      /// \brief True if initialized.
       private: bool initialized;
 
       /// \brief The thread to run sensor updates in.
