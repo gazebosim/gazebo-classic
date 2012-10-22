@@ -168,7 +168,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
     this->initSensors.push_back(sensor);
   }
 
-  return sensor->GetName();
+  return sensor->GetScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -180,7 +180,7 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name)
       result = (*iter);
   }
 
@@ -194,7 +194,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
 
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name)
       break;
 
   if (iter != this->sensors.end())

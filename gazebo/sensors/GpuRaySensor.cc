@@ -44,7 +44,6 @@ GpuRaySensor::GpuRaySensor()
 {
   this->mutex = new boost::mutex();
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////

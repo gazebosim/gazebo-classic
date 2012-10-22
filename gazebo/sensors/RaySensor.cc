@@ -48,7 +48,6 @@ RaySensor::RaySensor()
 {
   this->mutex = new boost::mutex();
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
@@ -83,8 +82,6 @@ std::string RaySensor::GetTopic() const
 void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-
-  this->node->Init(_worldName);
   this->scanPub = this->node->Advertise<msgs::LaserScan>(this->GetTopic());
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
