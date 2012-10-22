@@ -34,12 +34,12 @@ namespace gazebo
       public: Box();
 
       /// \brief Constructor
-      /// \param _min Minimum corner of the box
-      /// \param _max Maximum corner of the box
+      /// \param[in] _min Minimum corner of the box
+      /// \param[in] _max Maximum corner of the box
       public: Box(const Vector3 &_min, const Vector3 &_max);
 
       /// \brief Copy Constructor
-      /// \param _b Box to copy
+      /// \param[in]  _b Box to copy
       public: Box(const Box &_b);
 
       /// \brief Destructor
@@ -66,26 +66,26 @@ namespace gazebo
       public: math::Vector3 GetCenter() const;
 
       /// \brief Merge a box with this box
-      /// \param _box Box to add to this box
+      /// \param[in]  _box Box to add to this box
       public: void Merge(const Box &_box);
 
-      /// \brief Equal operator. Set this box to the parameter
-      /// \param _b Box to copy
+      /// \brief Assignment operator. Set this box to the parameter
+      /// \param[in]  _b Box to copy
       /// \return The new box.
       public: Box &operator =(const Box &_b);
 
       /// \brief Addition operator. result = this + _b
-      /// \param _b Box to add
+      /// \param[in] _b Box to add
       /// \return The new box
       public: Box operator+(const Box &_b) const;
 
       /// \brief Addition set operator. this = this + _b
-      /// \param _b Box to add
+      /// \param[in] _b Box to add
       /// \return This new box
       public: const Box &operator+=(const Box &_b);
 
       /// \brief Equality test operatoer
-      /// \param _b Box to test
+      /// \param[in] _b Box to test
       /// \return True if equal
       public: bool operator==(const Box &_b);
 
@@ -95,8 +95,8 @@ namespace gazebo
       public: Box operator-(const Vector3 &_v);
 
       /// \brief Output operator
-      /// \param _out Output stream
-      /// \param _b Box to output to the stream
+      /// \param[in] _out Output stream
+      /// \param[in] _b Box to output to the stream
       /// \return The stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                                                const gazebo::math::Box &_b)
@@ -112,7 +112,11 @@ namespace gazebo
       /// \brief Maximum corner of the box
       public: Vector3 max;
 
+      /// \brief Enumeration of extents
       private: enum Extent {EXTENT_NULL, EXTENT_FINITE};
+
+      /// \brief When set to EXTENT_NULL (in the default constructor)
+      /// the min and max are not valid positions
       private: Extent extent;
     };
     /// \}
