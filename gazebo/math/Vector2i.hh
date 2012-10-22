@@ -40,79 +40,128 @@ namespace gazebo
       public: Vector2i();
 
       /// \brief Constructor
+      /// \param[in] _x value along x
+      /// \param[in] _y value along y
       public: Vector2i(const int &_x, const int &_y);
 
-      /// \brief Constructor
+      /// \brief Copy onstructor
+      /// \param[in] _pt a point
       public: Vector2i(const Vector2i &_pt);
 
       /// \brief Destructor
       public: virtual ~Vector2i();
 
       /// \brief Calc distance to the given point
+      /// \param[in] _pt a point
+      /// \return the distance
       public: int Distance(const Vector2i &_pt) const;
 
       /// \brief  Normalize the vector length
       public: void Normalize();
 
       /// \brief Set the contents of the vector
+      /// \param[in] _x value along x
+      /// \param[in] _y value along y
       public: void Set(int _x, int _y);
 
       /// \brief Return the cross product of this vector and pt
+      /// \param[in] the other vector
+      /// \return the product
       public: Vector2i Cross(const Vector2i &_pt) const;
 
-      /// \brief Equal operator
-      public: Vector2i &operator =(const Vector2i &pt);
+      /// \brief Assignment operator
+      /// \param[in] _v the value
+      /// \return this
+      public: Vector2i &operator =(const Vector2i &_v);
 
-      /// \brief Equal operator
-      public: const Vector2i &operator =(int value);
+      /// \brief Assignment operator
+      /// \param[in] _value the value for x and y
+      /// \return this
+      public: const Vector2i &operator =(int _value);
 
       /// \brief Addition operator
-      public: Vector2i operator+(const Vector2i &pt) const;
+      /// \param[in] _v the vector to add
+      /// \return the sum vector
+      public: Vector2i operator+(const Vector2i &_v) const;
 
-      /// \brief Addition operator
-      public: const Vector2i &operator+=(const Vector2i &pt);
+      /// \brief Addition assignment operator
+      /// \param[in] _v the vector to add
+      /// \return this
+      public: const Vector2i &operator+=(const Vector2i &_v);
+
+      /// \brief Subtraction operator
+      /// \param[in] _v the vector to substract
+      /// \return the result vector
+      public: Vector2i operator-(const Vector2i &_v) const;
 
       /// \brief Subtraction operators
-      public: Vector2i operator-(const Vector2i &pt) const;
+      /// \param[in] _v the vector to substract
+      /// \return this
+      public: const Vector2i &operator-=(const Vector2i &_v);
 
-      /// \brief Subtraction operators
-      public: const Vector2i &operator-=(const Vector2i &pt);
+      /// \brief Division operator
+      /// \remarks this is an element wise division.
+      /// \param[in] _v the vector to divide
+      /// \return the result
+      public: const Vector2i operator/(const Vector2i &_v) const;
 
-      /// \brief Division operators
-      public: const Vector2i operator/(const Vector2i &pt) const;
+      /// \brief Division operator
+      /// \remarks this is an element wise division.
+      /// \param[in] _v the vector to divide
+      /// \return this
+      public: const Vector2i &operator/=(const Vector2i &_v);
 
-      /// \brief Division operators
-      public: const Vector2i &operator/=(const Vector2i &pt);
+      /// \brief Division operator
+      /// \remarks this is an element wise division.
+      /// \param[in] _v the vector to divide
+      /// \return the result
+      public: const Vector2i operator/(int _v) const;
 
-      /// \brief Division operators
-      public: const Vector2i operator/(int v) const;
+      /// \brief Division operator
+      /// \remarks this is an element wise division.
+      /// \param[in] _v the vector to divide
+      /// \result this
+      public: const Vector2i &operator/=(int _v);
 
-      /// \brief Division operators
-      public: const Vector2i &operator/=(int v);
+      /// \brief Multiplication operator
+      /// \remarks this is an element wise multiplication
+      /// \param[in] _v the vector
+      /// \return the result
+      public: const Vector2i operator*(const Vector2i &_v) const;
 
       /// \brief Multiplication operators
-      public: const Vector2i operator*(const Vector2i &pt) const;
+      /// \remarks this is an element wise multiplication
+      /// \param[in] _v the vector
+      /// \return this
+      public: const Vector2i &operator*=(const Vector2i &_v);
 
-      /// \brief Multiplication operators
-      public: const Vector2i &operator*=(const Vector2i &pt);
+      /// \brief Multiplication operator
+      /// \param[in] _v the scaling factor
+      /// \return the result
+      public: const Vector2i operator*(int _v) const;
 
-      /// \brief Multiplication operators
-      public: const Vector2i operator*(int v) const;
+      /// \brief Multiplication operator
+      /// \param[in] _v scaling factor
+      /// \return this
+      public: const Vector2i &operator*=(int _v);
 
-      /// \brief Multiplication operators
-      public: const Vector2i &operator*=(int v);
+      /// \brief Equality operator
+      /// \param _v the vector to compare with
+      /// \return true if component have the same values, false otherwise
+      public: bool operator ==(const Vector2i &_v) const;
 
       /// \brief Equality operators
-      public: bool operator ==(const Vector2i &pt) const;
-
-      /// \brief Equality operators
-      public: bool operator!=(const Vector2i &pt) const;
+      /// \param _v the vector to compare with
+      /// \return true if component have different values, false otherwise
+      public: bool operator!=(const Vector2i &_v) const;
 
       /// \brief See if a point is finite (e.g., not nan)
+      /// \return the result
       public: bool IsFinite() const;
 
-      /// \brief [] operator
-      public: int operator[](unsigned int index) const;
+      /// \brief Array subscript operator
+      /// \param[in] _index the array index
+      public: int operator[](unsigned int _index) const;
 
       /// \brief x data
       public: int x;
@@ -120,10 +169,10 @@ namespace gazebo
       /// \brief y data
       public: int y;
 
-      /// \brief Ostream operator
-      /// \param out Ostream
-      /// \param pt Vector2i to output
-      /// \return The Ostream
+      /// \brief Stream insertion operator
+      /// \param[in] _out output stream
+      /// \param[in] pt Vector2i to output
+      /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::math::Vector2i &_pt)
       {
@@ -131,10 +180,10 @@ namespace gazebo
         return _out;
       }
 
-      /// \brief Istream operator
-      /// \param in Ostream
-      /// \param pt Vector3 to read values into
-      /// \return The istream
+      /// \brief Stream extraction operator
+      /// \param[in] _in input stream
+      /// \param[in] _pt Vector3 to read values into
+      /// \return The stream
       public: friend std::istream &operator>>(std::istream &_in,
                   gazebo::math::Vector2i &_pt)
       {
