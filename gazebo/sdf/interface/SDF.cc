@@ -1407,7 +1407,7 @@ void SDF::PrintDoc()
   << "   }\n"
   << "  $().ready(function() {\n"
   << "        $('.simple').splitter();\n"
-  << "        $('.simple').splitter('resize', 300);\n"
+  << "        $('.simple').splitter('resize', [ 300 ]);\n"
   << "        });\n"
   << "  </script>\n"
   << "  <style type='text/css' media='all'>\n"
