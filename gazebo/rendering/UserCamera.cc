@@ -58,7 +58,6 @@ UserCamera::UserCamera(const std::string &_name, Scene *_scene)
   this->viewController = NULL;
 
   this->selectionBuffer = NULL;
-  this->SetRenderRate(1000.0);
 }
 
 //////////////////////////////////////////////////

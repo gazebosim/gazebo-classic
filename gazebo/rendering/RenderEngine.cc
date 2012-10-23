@@ -69,7 +69,6 @@ RenderEngine::RenderEngine()
   this->root = NULL;
 
   this->dummyDisplay = NULL;
-  this->dummyWindowId = 0;
 
   this->initialized = false;
 
@@ -135,18 +134,11 @@ void RenderEngine::Load()
   // Setup the available resources
   this->SetupResources();
 
-  if (this->dummyWindowId)
-  {
-    std::stringstream stream;
-    stream << this->dummyWindowId;
+  std::stringstream stream;
+  stream << (int32_t)this->dummyWindowId;
 
-    WindowManager::Instance()->CreateWindow(stream.str(), 1, 1);
-    this->CheckSystemCapabilities();
-  }
-  else
-  {
-    gzerr << "Unable to create rendering context\n";
-  }
+  WindowManager::Instance()->CreateWindow(stream.str(), 1, 1);
+  this->CheckSystemCapabilities();
 }
 
 //////////////////////////////////////////////////
@@ -661,6 +653,7 @@ bool RenderEngine::CreateContext()
   {
     result = false;
   }
+
 
   return result;
 }

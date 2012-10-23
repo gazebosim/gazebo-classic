@@ -96,9 +96,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
-  this->postRenderConnection = event::Events::ConnectPostRender(
-		  boost::bind(&Scene::PostRender, this));
-
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
@@ -228,7 +225,7 @@ void Scene::Load()
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
   this->manager->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
-} 
+}
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetWorldVisual() const
@@ -239,6 +236,51 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Init()
 {
+  this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
+
+  // RTShader system self-enables if the render path type is FORWARD,
+  RTShaderSystem::Instance()->AddScene(this);
+  RTShaderSystem::Instance()->ApplyShadows(this);
+
+  if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
+    this->InitDeferredShading();
+
+  for (uint32_t i = 0; i < this->grids.size(); i++)
+    this->grids[i]->Init();
+
+  this->SetSky();
+
+  // Create Fog
+  if (this->sdf->HasElement("fog"))
+  {
+    boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
+    this->SetFog(fogElem->GetValueString("type"),
+                 fogElem->GetValueColor("color"),
+                 fogElem->GetValueDouble("density"),
+                 fogElem->GetValueDouble("start"),
+                 fogElem->GetValueDouble("end"));
+  }
+
+  // Create ray scene query
+  this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
+  this->raySceneQuery->setSortByDistance(true);
+  this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
+
+  // Force shadows on.
+  this->SetShadowsEnabled(true);
+
+  this->requestMsg = msgs::CreateRequest("scene_info");
+  this->requestPub->Publish(*this->requestMsg);
+
+  // TODO: Add GUI option to view all contacts
+  /*ContactVisualPtr contactVis(new ContactVisual(
+        "_GUIONLY_world_contact_vis",
+        this->worldVisual, "~/physics/contacts"));
+  this->visuals[contactVis->GetName()] = contactVis;
+  */
+
+  Road2d *road = new Road2d();
+  road->Load(this->worldVisual);
 }
 
 //////////////////////////////////////////////////
@@ -1393,60 +1435,6 @@ void Scene::PreRender()
     this->SelectVisual(this->selectionMsg->name());
     this->selectionMsg.reset();
   }
-}
-
-
-/////////////////////////////////////////////////
-void Scene::PostRender()
-{
-  printf("PostRender\n");
-  event::Events::DisconnectPostRender(this->postRenderConnection);
-
-  this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
-
-  // RTShader system self-enables if the render path type is FORWARD,
-  RTShaderSystem::Instance()->AddScene(this);
-  // RTShaderSystem::Instance()->ApplyShadows(this);
-
-  if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
-    this->InitDeferredShading();
-
-  // this->SetSky();
-
-  for (uint32_t i = 0; i < this->grids.size(); i++)
-    this->grids[i]->Init();
-
-  // Create Fog
-  if (this->sdf->HasElement("fog"))
-  {
-    boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
-    this->SetFog(fogElem->GetValueString("type"),
-                 fogElem->GetValueColor("color"),
-                 fogElem->GetValueDouble("density"),
-                 fogElem->GetValueDouble("start"),
-                 fogElem->GetValueDouble("end"));
-  }
-
-  // Create ray scene query
-  this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
-  this->raySceneQuery->setSortByDistance(true);
-  this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
-
-  // Force shadows on.
-  // this->SetShadowsEnabled(true);
-
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
-
-
-  // TODO: Add GUI option to view all contacts
-  //ContactVisualPtr contactVis(new ContactVisual(
-  //      "_GUIONLY_world_contact_vis",
-  //      this->worldVisual, "~/physics/contacts"));
-  //this->visuals[contactVis->GetName()] = contactVis;
-
-  Road2d *road = new Road2d();
-  road->Load(this->worldVisual);
 }
 
 /////////////////////////////////////////////////

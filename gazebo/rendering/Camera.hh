@@ -585,8 +585,9 @@ namespace gazebo
       private: Ogre::CompositorInstance *ssaoInstance;
 
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
-      private: int renderCounter;
-      private: double updatePeriod;
+      private: unsigned int renderCounter;
+      private: int rFaces;
+      private: int bFaces;
     };
     /// \}
   }

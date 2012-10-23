@@ -88,9 +88,6 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   {
     try
     {
-      printf("%d %d\n",_width, _height);
-      fflush(stdout);
-
       window = RenderEngine::Instance()->root->createRenderWindow(
           stream.str(), _width, _height, false, &params);
     }
