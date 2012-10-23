@@ -351,37 +351,45 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string> plugins;
     std::vector<std::string>::iterator piter;
 
-    plugins.push_back(path+"/RenderSystem_GL.so");
-    plugins.push_back(path+"/Plugin_ParticleFX.so");
-    plugins.push_back(path+"/Plugin_BSPSceneManager.so");
-    plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+    plugins.push_back(path+"/RenderSystem_GL");
+    plugins.push_back(path+"/Plugin_ParticleFX");
+    plugins.push_back(path+"/Plugin_BSPSceneManager");
+    plugins.push_back(path+"/Plugin_OctreeSceneManager");
 
     // This is needed by the Ogre::Terrain System.
     // We should spend some tim fixing Ogre::Terrain so that GLSL is
     // supported.
-    plugins.push_back(path+"/Plugin_CgProgramManager.so");
+    plugins.push_back(path+"/Plugin_CgProgramManager");
 
     for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
     {
       try
       {
         // Load the plugin into OGRE
-        this->root->loadPlugin(*piter);
+        this->root->loadPlugin(*piter+".so");
       }
       catch(Ogre::Exception &e)
       {
-        if ((*piter).find("RenderSystem") != std::string::npos)
+        try
         {
-          gzerr << "Unable to load Ogre Plugin[" << *piter
-                << "]. Rendering will not be possible."
-                << "Make sure you have installed OGRE and Gazebo properly.\n";
+          // Load the debug plugin into OGRE
+          this->root->loadPlugin(*piter+"_d.so");
         }
-        else if ((*piter).find("CgProgramManager") != std::string::npos)
+        catch(Ogre::Exception &ed)
         {
-          gzwarn << "Unable to load Ogre Plugin[" << *piter
-                 << "]Heightmaps(Terrain) will not display properly."
-                 << "You'll need to install Ogre3d from source."
-                 << "Please visit www.ogre3d.org.\n";
+          if ((*piter).find("RenderSystem") != std::string::npos)
+          {
+            gzerr << "Unable to load Ogre Plugin[" << *piter
+                  << "]. Rendering will not be possible."
+                  << "Make sure you have installed OGRE and Gazebo properly.\n";
+          }
+          else if ((*piter).find("CgProgramManager") != std::string::npos)
+          {
+            gzwarn << "Unable to load Ogre Plugin[" << *piter
+                   << "]Heightmaps(Terrain) will not display properly."
+                   << "You'll need to install Ogre3d from source."
+                   << "Please visit www.ogre3d.org.\n";
+          }
         }
       }
     }
