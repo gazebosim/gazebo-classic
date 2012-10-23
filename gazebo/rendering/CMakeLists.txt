@@ -44,6 +44,7 @@ set (sources
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  Sky.cc
   UserCamera.cc
   VideoVisual.cc
   ViewController.cc
@@ -83,6 +84,7 @@ set (headers
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  Sky.hh
   UserCamera.hh
   VideoVisual.hh
   ViewController.hh

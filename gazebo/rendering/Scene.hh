@@ -34,12 +34,6 @@
 #include "common/Color.hh"
 #include "math/Vector2i.hh"
 
-namespace SkyX
-{
-  class SkyX;
-  class BasicController;
-}
-
 namespace Ogre
 {
   class SceneManager;
@@ -65,6 +59,7 @@ namespace gazebo
     class Visual;
     class Grid;
     class Heightmap;
+    class Sky;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -345,6 +340,10 @@ namespace gazebo
       /// \brief Clear rendering::Scene
       public: void Clear();
 
+      /// \brief Get a pointer to the sky.
+      /// \return Pointer to the sky.
+      public: SkyPtr GetSky();
+
       /// \brief Clone a visual.
       /// \param[in] _visualName Name of the visual to clone.
       /// \param[in] _newName New name of the visual.
@@ -356,9 +355,6 @@ namespace gazebo
       /// \return Pointer to the currently selected visual, or NULL if
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
-
-      /// \brief Helper function to setup the sky.
-      private: void SetSky();
 
       /// \brief Initialize the deferred shading render path.
       private: void InitDeferredShading();
@@ -427,10 +423,6 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: bool ProcessModelMsg(const msgs::Model &_msg);
 
-      /// \brief Process a sky message.
-      /// \param[in] _msg The message data.
-      private: void ProcessSkyMsg(const msgs::Sky &_msg);
-
       /// \brief Scene message callback.
       /// \param[in] _msg The message data.
       private: void OnSensorMsg(ConstSensorPtr &_msg);
@@ -458,10 +450,6 @@ namespace gazebo
       /// \brief Selection message callback.
       /// \param[in] _msg The message data.
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
-
-      /// \brief Sky message callback.
-      /// \param[in] _msg The message data.
-      private: void OnSkyMsg(ConstSkyPtr &_msg);
 
       /// \brief Model message callback.
       /// \param[in] _msg The message data.
@@ -637,9 +625,6 @@ namespace gazebo
       /// \brief Subscribe to skeleton pose updates.
       private: transport::SubscriberPtr skeletonPoseSub;
 
-      /// \brief Subscribe to sky updates.
-      private: transport::SubscriberPtr skySub;
-
       /// \brief Subscribe to model info updates
       private: transport::SubscriberPtr modelInfoSub;
 
@@ -673,11 +658,8 @@ namespace gazebo
       /// \brief All the projectors.
       private: std::map<std::string, Projector *> projectors;
 
-      /// \brief Pointer to the sky.
-      public: SkyX::SkyX *skyx;
-
-      /// \brief Controls the sky.
-      private: SkyX::BasicController *skyxController;
+      /// \brief Pointer to the interface to SkyX.
+      private: SkyPtr sky;
     };
     /// \}
   }

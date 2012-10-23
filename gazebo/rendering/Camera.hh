@@ -394,6 +394,10 @@ namespace gazebo
       /// \return Pointer to the render texture
       public: Ogre::Texture *GetRenderTexture() const;
 
+      /// \brief Get the render target
+      /// \return Pointer to the render target
+      public: Ogre::RenderTarget *GetRenderTarget() const;
+
       /// \brief Get the camera's direction vector
       /// \return Direction the camera is facing
       public: math::Vector3 GetDirection() const;

@@ -52,6 +52,7 @@ namespace gazebo
     class COMVisual;
     class RFIDVisual;
     class RFIDTagVisual;
+    class Sky;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -72,6 +73,7 @@ namespace gazebo
     typedef boost::shared_ptr<COMVisual> COMVisualPtr;
     typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
     typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
+    typedef boost::shared_ptr<Sky> SkyPtr;
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

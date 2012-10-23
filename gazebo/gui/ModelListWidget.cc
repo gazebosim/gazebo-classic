@@ -609,6 +609,8 @@ void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
     else if ((*iter)->propertyName().toStdString() == "sky")
     {
       msgs::Sky *sky = msg.mutable_sky();
+      msgs::Sky::Clouds *clouds = sky->mutable_clouds();
+      msgs::Sky::Lightning *lightning = sky->mutable_lightning();
 
       sky->set_time(this->variantManager->value(
             this->GetChildItem((*iter), "time")).toDouble());
@@ -617,19 +619,25 @@ void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
       sky->set_sunset(this->variantManager->value(
             this->GetChildItem((*iter), "sunset")).toDouble());
 
-      QtProperty *windItem = this->GetChildItem((*iter), "wind");
-      sky->set_wind_speed(this->variantManager->value(
-            this->GetChildItem(windItem, "speed")).toDouble());
-      sky->set_wind_direction(this->variantManager->value(
-            this->GetChildItem(windItem, "direction")).toDouble());
-
       QtProperty *cloudItem = this->GetChildItem((*iter), "clouds");
+      clouds->set_speed(this->variantManager->value(
+            this->GetChildItem(cloudItem, "speed")).toDouble());
+      clouds->set_direction(this->variantManager->value(
+            this->GetChildItem(cloudItem, "direction")).toDouble());
       this->FillColorMsg(this->GetChildItem(cloudItem, "color"),
-                         sky->mutable_cloud_ambient());
-      sky->set_humidity(this->variantManager->value(
+                         clouds->mutable_ambient());
+      clouds->set_humidity(this->variantManager->value(
             this->GetChildItem(cloudItem, "humidity")).toDouble());
-      sky->set_mean_cloud_size(this->variantManager->value(
+      clouds->set_mean_size(this->variantManager->value(
             this->GetChildItem(cloudItem, "size")).toDouble());
+
+      QtProperty *lightningItem = this->GetChildItem((*iter), "lightning");
+      lightning->set_mean_time(this->variantManager->value(
+            this->GetChildItem(lightningItem, "mean time")).toDouble());
+      lightning->set_time_multiplier(this->variantManager->value(
+            this->GetChildItem(lightningItem, "time multiplier")).toDouble());
+      this->FillColorMsg(this->GetChildItem(lightingItem, "color"),
+                         lightning->color());
     }
   }
 
@@ -2222,23 +2230,18 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   item = this->variantManager->addProperty(QVariant::Double, tr("sunset"));
   topItem->addSubProperty(item);
 
-  // Add Wind group item
-  QtProperty *windItem = this->variantManager->addProperty(
-             QtVariantPropertyManager::groupTypeId(), tr("wind"));
-  topItem->addSubProperty(windItem);
-
-  item = this->variantManager->addProperty(QVariant::Double, tr("speed"));
-  windItem->addSubProperty(item);
-
-  item = this->variantManager->addProperty(QVariant::Double, tr("direction"));
-  windItem->addSubProperty(item);
-
   // Add Cloud group item
   QtProperty *cloudItem = this->variantManager->addProperty(
              QtVariantPropertyManager::groupTypeId(), tr("clouds"));
   topItem->addSubProperty(cloudItem);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("color"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("speed"));
+  cloudItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("direction"));
+  cloudItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Color, tr("color"));
   cloudItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("humidity"));
@@ -2246,6 +2249,21 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
 
   item = this->variantManager->addProperty(QVariant::Double, tr("size"));
   cloudItem->addSubProperty(item);
+
+  // Add lightning group item
+  QtProperty *lightningItem = this->variantManager->addProperty(
+             QtVariantPropertyManager::groupTypeId(), tr("lightning"));
+  topItem->addSubProperty(lightningItem);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("mean time"));
+  lightningItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("time multiplier"));
+  lightningItem->addSubProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Color, tr("color"));
+  lightningItem->addSubProperty(item);
 }
 
 /////////////////////////////////////////////////
