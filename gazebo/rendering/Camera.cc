@@ -304,7 +304,7 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    printf("Camera RenderImpl %d\n", this->renderCounter++);
+    printf("Camera RenderImpl %d\n", this->renderCounter);
     fflush(stdout);
 
     std::cout << "Render[" << common::Time::GetWallTime() - this->lastRenderWallTime << "]\n";
@@ -328,6 +328,8 @@ void Camera::RenderImpl()
         this->renderTarget->getViewport(i)->setClearEveryFrame(true);
         if (this->renderCounter > 10)
           this->renderTarget->getViewport(i)->update();
+        else
+          this->renderCounter++;
         //this->renderTarget->_updateViewport(i);
       }
       //this->renderTarget->_updateAutoUpdatedViewports();
