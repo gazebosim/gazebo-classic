@@ -49,6 +49,10 @@ unsigned int Camera::cameraCounter = 0;
 //////////////////////////////////////////////////
 Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
 {
+  this->renderCounter = 0;
+
+  this->updatePeriod = 0.001;
+
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("camera.sdf", this->sdf);
@@ -287,8 +291,12 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  this->newData = true;
-  this->RenderImpl();
+  if (common::Time::GetWallTime() - this->lastRenderWallTime >=
+      this->updatePeriod)
+  {
+    this->newData = true;
+    this->RenderImpl();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -296,8 +304,45 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
-    this->renderTarget->update(false);
-    this->lastRenderWallTime = common::Time::GetWallTime();
+    printf("Camera RenderImpl %d\n", this->renderCounter++);
+    fflush(stdout);
+
+    std::cout << "Render[" << common::Time::GetWallTime() - this->lastRenderWallTime << "]\n";
+
+    try
+    {
+      this->renderTarget->_beginUpdate();
+      //this->renderTarget->_updateViewport(this->viewport);
+      //this->renderTarget->swapBuffers();
+      unsigned short n = this->renderTarget->getNumViewports();
+      for (unsigned short i = 0; i < n; ++i)
+      {
+        printf("RT is active %d\n",this->renderTarget->isActive());
+        printf("VP %d/%d f[%d]\n",i,n,
+          this->renderTarget->getViewport(i)->_getNumRenderedFaces());
+        fflush(stdout);
+        this->renderTarget->getViewport(i)->_clearUpdatedFlag();
+        this->renderTarget->getViewport(i)->setShadowsEnabled(false);
+        //this->renderTarget->getViewport(i)->setDepthClear(1);
+        this->renderTarget->getViewport(i)->clear();
+        this->renderTarget->getViewport(i)->setClearEveryFrame(true);
+        if (this->renderCounter > 10)
+          this->renderTarget->getViewport(i)->update();
+        //this->renderTarget->_updateViewport(i);
+      }
+      //this->renderTarget->_updateAutoUpdatedViewports();
+      this->renderTarget->_endUpdate();
+
+      //this->renderTarget->update(false);
+      
+      //this->viewport->clear();
+      //this->viewport->update();
+      //this->renderTarget->_endUpdate();
+      this->lastRenderWallTime = common::Time::GetWallTime();
+    }
+    catch (...)
+    {
+    }
   }
 }
 
@@ -1413,4 +1458,10 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->prevAnimTime = common::Time::GetWallTime();
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetRenderRate(double _hz)
+{
+  this->updatePeriod = 1.0/_hz;
 }

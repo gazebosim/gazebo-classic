@@ -156,7 +156,7 @@ namespace gazebo
       private: Ogre::LogManager *logManager;
 
       /// \brief ID for a dummy window. Used for gui-less operation
-      protected: uint64_t dummyWindowId;
+      protected: unsigned long dummyWindowId;
 
       /// \brief Pointer to the dummy display.Used for gui-less operation
       protected: void *dummyDisplay;
