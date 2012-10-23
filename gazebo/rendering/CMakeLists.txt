@@ -100,6 +100,10 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
 
+link_directories(  
+  ${HACK_OGRE_LIBRARY_PATH}
+)
+
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering

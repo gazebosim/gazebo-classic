@@ -29,6 +29,10 @@ set (headers
   TechniqueDefinitions.hh
 )
 
+link_directories(  
+  ${HACK_OGRE_LIBRARY_PATH}
+)
+
 gz_add_library(gazebo_rendering_deferred ${sources})
 
 target_link_libraries(gazebo_rendering_deferred
