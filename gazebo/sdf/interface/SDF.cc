@@ -334,21 +334,18 @@ void Element::PrintDescription(std::string _prefix)
   std::cout << _prefix << "</element>\n";
 }
 
-void Element::PrintDoc2(std::string &_divs, std::string &_html,
-                       int _spacing, int &_index)
+/////////////////////////////////////////////////
+void Element::PrintDocRightPane(std::string &_html, int _spacing)
 {
   std::ostringstream stream;
   ElementPtr_V::iterator eiter;
-
-  int start = _index++;
 
   std::string childHTML;
   for (eiter = this->elementDescriptions.begin();
       eiter != this->elementDescriptions.end(); ++eiter)
   {
-    (*eiter)->PrintDoc2(_divs, childHTML, _spacing + 4, _index);
+    (*eiter)->PrintDocRightPane(childHTML, _spacing + 4);
   }
-  int end = _index;
 
   stream << "<a name=\"" << this->name << "\">&lt" << this->name << "&gt</a>";
 
@@ -415,8 +412,7 @@ void Element::PrintDoc2(std::string &_divs, std::string &_html,
 }
 
 /////////////////////////////////////////////////
-void Element::PrintDoc(std::string &_divs, std::string &_html,
-                       int _spacing, int &_index)
+void Element::PrintDocLeftPane(std::string &_html, int _spacing, int &_index)
 {
   std::ostringstream stream;
   ElementPtr_V::iterator eiter;
@@ -427,70 +423,13 @@ void Element::PrintDoc(std::string &_divs, std::string &_html,
   for (eiter = this->elementDescriptions.begin();
       eiter != this->elementDescriptions.end(); ++eiter)
   {
-    (*eiter)->PrintDoc(_divs, childHTML, _spacing + 4, _index);
+    (*eiter)->PrintDocLeftPane(childHTML, _spacing + 4, _index);
   }
-  int end = _index;
 
   stream << "<a id='" << start << "' onclick='highlight(" << start
-         << ")' href=\"#" << this->name << "\">&lt" << this->name << "&gt</a>";
+         << ");' href=\"#" << this->name << "\">&lt" << this->name << "&gt</a>";
 
   stream << "<div style='padding-left:" << _spacing << "px;'>\n";
-
-  /*stream << "<div style='background-color: #ffffff'>\n";
-
-  stream << "<font style='font-weight:bold'>Description: </font>";
-  if (!this->description.empty())
-    stream << this->description << "<br>\n";
-  else
-    stream << "none<br>\n";
-
-  stream << "<font style='font-weight:bold'>Required: </font>"
-         << this->required << "&nbsp;&nbsp;&nbsp;\n";
-
-  stream << "<font style='font-weight:bold'>Type: </font>";
-  if (this->value)
-    stream << this->value->GetTypeName() << "\n";
-  else
-    stream << "n/a\n";
-
-  stream << "</div>";
-  */
-
-  /*if (this->attributes.size() > 0)
-  {
-    stream << "<div style='background-color: #dedede; padding-left:10px; "
-           << "display:inline-block;'>\n";
-    stream << "<font style='font-weight:bold'>Attributes</font><br>";
-
-    Param_V::iterator aiter;
-    for (aiter = this->attributes.begin();
-        aiter != this->attributes.end(); ++aiter)
-    {
-      stream << "<div style='display: inline-block;padding-bottom: 4px;'>\n";
-
-      stream << "<div style='float:left; width: 80px;'>\n";
-      stream << "<font style='font-style: italic;'>" << (*aiter)->GetKey()
-        << "</font>: ";
-      stream << "</div>\n";
-
-      stream << "<div style='float:left; padding-left: 4px; width: 300px;'>\n";
-
-      if (!(*aiter)->GetDescription().empty())
-          stream << (*aiter)->GetDescription() << "<br>\n";
-      else
-          stream << "no description<br>\n";
-
-      stream << "<font style='font-weight:bold'>Type: </font>"
-             << (*aiter)->GetTypeName() << "&nbsp;&nbsp;&nbsp;"
-        << "<font style='font-weight:bold'>Default: </font>"
-        << (*aiter)->GetDefaultAsString() << "<br>";
-      stream << "</div>\n";
-
-      stream << "</div>\n";
-    }
-    stream << "</div>\n";
-    stream << "<br>\n";
-  }*/
 
   _html += stream.str();
   _html += childHTML;
@@ -1386,42 +1325,50 @@ void SDF::PrintValues()
 
 void SDF::PrintDoc()
 {
-  std::string divs, html, html2;
+  std::string html, html2;
   int index = 0;
-  this->root->PrintDoc(divs, html, 10, index);
+  this->root->PrintDocLeftPane(html, 10, index);
 
-  index = 0;
-  this->root->PrintDoc2(divs, html2, 10, index);
+  this->root->PrintDocRightPane(html2, 10);
 
   std::cout << "<!DOCTYPE HTML>\n"
   << "<html>\n"
   << "<head>\n"
   << "  <link href='style.css' rel='stylesheet' type='text/css'>\n"
-  << "  <script type='text/javascript'"
-  << "  src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'>"
-  << "  </script>\n"
-  << "  <script type='text/javascript' src='splitter.js'></script>\n"
+  << "  <script type='text/javascript' src='jquery.js'></script>\n"
+  << "  <script type='text/javascript' src='splitter-152.js'></script>\n"
   << "  <script type='text/javascript'>\n"
-  << "   function highlight(id) {\n"
-  // << "     document.getElementById(id).select();\n"
-  << "   }\n"
+  << "    var prevId = 0;\n"
+  << "  function highlight(id) {\n"
+  << "    var elem = document.getElementById(prevId);\n"
+  << "    elem.style.background = '#ffffff';\n"
+  << "    elem.style.color = '#da7800';\n"
+  << "    elem = document.getElementById(id);\n"
+  << "    elem.style.background = '#da7800';\n"
+  << "    elem.style.color = '#ffffff';\n"
+  << "    prevId = id;\n"
+  << "  }\n"
   << "  $().ready(function() {\n"
-  << "        $('.simple').splitter();\n"
-  << "        $('.simple').splitter('resize', [ 300 ]);\n"
-  << "        });\n"
+  << "    $('#my_splitter').splitter({\n"
+  << "      splitVertical: true,\n"
+  << "      outline: true,\n"
+  << "      sizeLeft: true,\n"
+  << "      resizeTo: window,\n"
+  << "      accessKey: 'I'\n"
+  << "    });\n"
+  << "  });\n"
   << "  </script>\n"
   << "  <style type='text/css' media='all'>\n"
-  << "  .simple {\n"
-  << "      height: 800px;\n"
-  << "      width: 90%;\n"
-  << "      border: 5px solid #aaa;\n"
+  << "  #my_splitter {\n"
+  << "      height: 500px;\n"
+  << "      width: 100%;\n"
+  << "      border: 1px solid #aaa;\n"
   << "  }\n"
-  << "  .simple div {\n"
-  << "      overflow: auto;\n"
+  << "  #left_pane {\n"
+  << "    min-width:320px;\n"
   << "  }\n"
-  << "  .vsplitbar {\n"
-  << "      width: 5px;\n"
-  << "      background: #cab;\n"
+  << "  #right_pane {\n"
+  << "    min-width:500px;\n"
   << "  }\n"
   << "  </style>\n"
   << "</head>\n<body>\n";
@@ -1430,21 +1377,31 @@ void SDF::PrintDoc()
             << "<h1>SDF " << SDF::version << "</h1>\n";
 
   std::cout << "<p>The Simulation Description Format (SDF) is an XML file "
-    << "format used to describe all the elements in a simulation "
-    << "environment.\n</p>";
+            << "format used to describe all the elements in a simulation "
+            << "environment.\n</p>";
+  std::cout << "<h3>Usage</h3>\n";
+  std::cout << "<blockquote>";
+  std::cout << "<ul><li><b>Left Panel:</b> List of all the SDF elements.</li>";
+  std::cout << "<li><b>Right Panel:</b> Descriptions of all the SDF "
+            << "elements.</li>";
+  std::cout << "<li><b>Selection:</b> Click an element in the Left Panel "
+            << "moves the corresponding description to the top of the Right "
+            << "Panel.</li>";
+  std::cout << "<li><b>Search:</b> Use your web-browser's built in 'find' "
+            << "function to locate a specific element."
+            << "</li></ul>";
+  std::cout << "</blockquote>";
 
-  std::cout << "<div style='margin-left: 20px'>\n";
-  std::cout << "<div class='simple'>\n";
+  std::cout << "</div>\n";
 
-  std::cout << "<div>\n";
+  std::cout << "<div id='my_splitter'>\n";
+
+  std::cout << "<div id='left_pane'>\n";
   std::cout << html;
   std::cout << "</div>\n";
 
-  std::cout << "<div>\n";
+  std::cout << "<div id='right_pane'>\n";
   std::cout << html2;
-  std::cout << "</div>\n";
-
-  std::cout << "</div>\n";
   std::cout << "</div>\n";
 
   std::cout << "</div>\n";
