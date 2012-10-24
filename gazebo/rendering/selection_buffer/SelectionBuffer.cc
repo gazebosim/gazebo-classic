@@ -123,6 +123,9 @@ void SelectionBuffer::UpdateBufferSize()
 /////////////////////////////////////////////////
 Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 {
+  if (_x < 0 || _y < 0 );
+    return 0;
+
   // this->Update();
   size_t posInStream = (this->pixelBox->getWidth() * _y) * 4;
   posInStream += _x * 4;
