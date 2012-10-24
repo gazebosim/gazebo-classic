@@ -52,7 +52,6 @@ Collision::Collision(LinkPtr _link)
 
   this->link = _link;
 
-  this->transparency = 0;
   this->contactsEnabled = false;
 
   this->surface.reset(new SurfaceParams());
@@ -74,7 +73,6 @@ void Collision::Fini()
   this->link.reset();
   this->shape.reset();
   this->surface.reset();
-  this->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -286,6 +284,12 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 
 //////////////////////////////////////////////////
 void Collision::FillCollisionMsg(msgs::Collision &_msg)
+{
+  this->FillMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void Collision::FillMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
   _msg.set_id(this->GetId());

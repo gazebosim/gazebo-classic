@@ -60,7 +60,7 @@ namespace gazebo
 
       /// \brief Fills out a msgs::Geometry message containing
       ///        information about this map geometry object.
-      public: void FillShapeMsg(msgs::Geometry &_msg);
+      public: void FillMsg(msgs::Geometry &_msg);
 
       /// \brief Not yet implemented.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);

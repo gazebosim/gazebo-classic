@@ -14,17 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef ACTOR_HH
-#define ACTOR_HH
+#ifndef _ACTOR_HH_
+#define _ACTOR_HH_
 
 #include <string>
 #include <map>
 #include <vector>
 
-#include "physics/Model.hh"
-#include "common/Time.hh"
-#include "common/Skeleton.hh"
-#include "common/Animation.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {
@@ -32,7 +30,10 @@ namespace gazebo
   {
     class Mesh;
     class Color;
+    class Skeleton;
+    class SkeletonAnimation;
   }
+
   namespace physics
   {
     struct TrajectoryInfo

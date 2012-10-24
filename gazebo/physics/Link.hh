@@ -244,9 +244,12 @@ namespace gazebo
       public: void DisconnectEnabled(event::ConnectionPtr &c)
               { enabledSignal.Disconnect(c); }
 
+      /// \brief DEPRECATED
+      public: void FillLinkMsg(msgs::Link &_msg) GAZEBO_DEPRECATED;
+
       /// \brief Fill a link message
       /// \param _msg Message to fill
-      public: void FillLinkMsg(msgs::Link &_msg);
+      public: void FillMsg(msgs::Link &_msg);
 
       /// \brief Update parameters from a message
       /// \param _msg Message to read

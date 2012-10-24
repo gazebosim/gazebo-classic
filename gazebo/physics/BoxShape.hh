@@ -19,8 +19,8 @@
  * Date: 8 May 2003
  */
 
-#ifndef BOXSHAPE_HH
-#define BOXSHAPE_HH
+#ifndef _BOXSHAPE_HH_
+#define _BOXSHAPE_HH_
 
 #include "physics/Shape.hh"
 
@@ -31,31 +31,44 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Box geometry primitive
+    /// \class BoxShape BoxShape.hh physics/physcs.hh
+    /// \brief Box geometry primitive.
     class BoxShape : public Shape
     {
-      /// \brief Constructor
-      public: BoxShape(CollisionPtr parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit BoxShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~BoxShape();
 
-      /// \brief Initialize the box
+      /// \brief Initialize the box.
       public: virtual void Init();
 
-      /// \brief Set the size of the box
-      public: virtual void SetSize(const math::Vector3 &size);
+      /// \brief Set the size of the box.
+      /// \param[in] _size Size of each side of the box.
+      public: virtual void SetSize(const math::Vector3 &_size);
 
-      /// \brief Get the size of the box
+      /// \brief Get the size of the box.
+      /// \return The size of each side of the box.
       public: math::Vector3 GetSize() const;
 
-      public: void FillShapeMsg(msgs::Geometry &_msg);
+      /// \brief Fill in the values for a geomertry message.
+      /// \param[out] _msg The geometry message to fill.
+      public: void FillMsg(msgs::Geometry &_msg);
 
+      /// \brief Process a geometry message.
+      /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
+      /// \brief Get the mass of the box give a density value.
+      /// \param[in] _density Density to compute a mass from.
       public: virtual double GetMass(double _density) const;
 
-      /// \brief Get inertial for a shape
+      /// \brief Get inertial for a shape.
+      /// \param[in] _mass Mass of the box.
+      /// \param[out] _inertial Inertial element to populate with the
+      /// result.
       public: virtual void GetInertial(double _mass,
                                        InertialPtr _inertial) const;
     };

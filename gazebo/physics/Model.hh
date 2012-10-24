@@ -178,9 +178,12 @@ namespace gazebo
       /// \param retro Retro reflectance value
       public: void SetLaserRetro(const float &retro);
 
+      /// \brief DEPRECATED
+      public: void FillModelMsg(msgs::Model &_msg) GAZEBO_DEPRECATED;
+
       /// \brief Fill a model message
       /// \param _msg Message to fill
-      public: void FillModelMsg(msgs::Model &_msg);
+      public: void FillMsg(msgs::Model &_msg);
 
       /// \brief Update parameters from a model message
       public: void ProcessMsg(const msgs::Model &_msg);

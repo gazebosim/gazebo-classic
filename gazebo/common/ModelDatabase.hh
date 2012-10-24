@@ -27,7 +27,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    /// \class ModelDatabase ModelDatabase.hh common/ModelDatabase.hh
+    /// \class ModelDatabase ModelDatabase.hh common/common.hh
     /// \brief Connects to model database, and has utility functions to find
     /// models
     class ModelDatabase

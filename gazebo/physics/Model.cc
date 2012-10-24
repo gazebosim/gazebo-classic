@@ -750,6 +750,12 @@ void Model::SetLaserRetro(const float &_retro)
 //////////////////////////////////////////////////
 void Model::FillModelMsg(msgs::Model &_msg)
 {
+  this->FillMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void Model::FillMsg(msgs::Model &_msg)
+{
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.mutable_pose()->CopyFrom(msgs::Convert(this->GetWorldPose()));
@@ -763,7 +769,7 @@ void Model::FillModelMsg(msgs::Model &_msg)
     if (this->GetChild(j)->HasType(Base::LINK))
     {
       LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
-      link->FillLinkMsg(*_msg.add_link());
+      link->FillMsg(*_msg.add_link());
     }
   }
 

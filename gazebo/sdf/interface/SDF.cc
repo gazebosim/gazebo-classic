@@ -678,12 +678,6 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-ElementPtr Element::GetOrCreateElement(const std::string &_name)
-{
-  return this->GetElement(_name);
-}
-
-/////////////////////////////////////////////////
 ElementPtr Element::GetElement(const std::string &_name)
 {
   if (this->HasElement(_name))

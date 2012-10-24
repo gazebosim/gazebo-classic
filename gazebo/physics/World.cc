@@ -469,22 +469,10 @@ ModelPtr World::GetModelById(unsigned int _id)
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::GetModelByName(const std::string &_name)
-{
-  return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
-}
-
-//////////////////////////////////////////////////
 ModelPtr World::GetModel(const std::string &_name)
 {
   boost::mutex::scoped_lock lock(*this->loadModelMutex);
   return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
-}
-
-//////////////////////////////////////////////////
-EntityPtr World::GetEntityByName(const std::string &_name)
-{
-  return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
@@ -508,7 +496,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     event::Events::addEntity(model->GetScopedName());
 
     msgs::Model msg;
-    model->FillModelMsg(msg);
+    model->FillMsg(msg);
     this->modelPub->Publish(msg);
   }
   else
@@ -530,7 +518,7 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
   event::Events::addEntity(actor->GetScopedName());
 
   msgs::Model msg;
-  actor->FillModelMsg(msg);
+  actor->FillMsg(msg);
   this->modelPub->Publish(msg);
 
   return actor;
@@ -860,7 +848,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
     if (_entity->HasType(Entity::MODEL))
     {
       msgs::Model *modelMsg = _scene.add_model();
-      boost::shared_static_cast<Model>(_entity)->FillModelMsg(*modelMsg);
+      boost::shared_static_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
@@ -1014,7 +1002,7 @@ void World::ProcessRequestMsgs()
         {
           msgs::Model *modelMsg = modelVMsg.add_models();
           ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
-          model->FillModelMsg(*modelMsg);
+          model->FillMsg(*modelMsg);
         }
       }
 
@@ -1035,7 +1023,7 @@ void World::ProcessRequestMsgs()
         {
           msgs::Model modelMsg;
           ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
-          model->FillModelMsg(modelMsg);
+          model->FillMsg(modelMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
           modelMsg.SerializeToString(serializedData);
@@ -1045,7 +1033,7 @@ void World::ProcessRequestMsgs()
         {
           msgs::Link linkMsg;
           LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
-          link->FillLinkMsg(linkMsg);
+          link->FillMsg(linkMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
           linkMsg.SerializeToString(serializedData);
@@ -1056,7 +1044,7 @@ void World::ProcessRequestMsgs()
           msgs::Collision collisionMsg;
           CollisionPtr collision =
             boost::shared_dynamic_cast<Collision>(entity);
-          collision->FillCollisionMsg(collisionMsg);
+          collision->FillMsg(collisionMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
           collisionMsg.SerializeToString(serializedData);
@@ -1138,7 +1126,7 @@ void World::ProcessModelMsgs()
 
       // Let all other subscribers know about the change
       msgs::Model msg;
-      model->FillModelMsg(msg);
+      model->FillMsg(msg);
       this->modelPub->Publish(msg);
     }
   }

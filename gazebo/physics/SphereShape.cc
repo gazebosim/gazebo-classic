@@ -54,7 +54,7 @@ double SphereShape::GetRadius() const
 }
 
 //////////////////////////////////////////////////
-void SphereShape::FillShapeMsg(msgs::Geometry &_msg)
+void SphereShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::SPHERE);
   _msg.mutable_sphere()->set_radius(this->GetRadius());
