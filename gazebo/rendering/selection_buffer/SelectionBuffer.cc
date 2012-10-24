@@ -123,7 +123,7 @@ void SelectionBuffer::UpdateBufferSize()
 /////////////////////////////////////////////////
 Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 {
-  if (_x < 0 || _y < 0 );
+  if (_x < 0 || _y < 0 )
     return 0;
 
   // this->Update();

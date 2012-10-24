@@ -445,8 +445,6 @@ void Visual::Update()
       this->animState = NULL;
       this->sceneNode->getCreator()->destroyAnimation(
           this->GetName() + "_animation");
-      this->sceneNode->getCreator()->destroyAnimationState(
-          this->GetName() + "_animation");
       if (this->onAnimationComplete)
         this->onAnimationComplete();
       // event::Events::DisconnectPreRender(this->preRenderConnection);
