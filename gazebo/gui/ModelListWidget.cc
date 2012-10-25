@@ -636,8 +636,8 @@ void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
             this->GetChildItem(lightningItem, "mean time")).toDouble());
       lightning->set_time_multiplier(this->variantManager->value(
             this->GetChildItem(lightningItem, "time multiplier")).toDouble());
-      this->FillColorMsg(this->GetChildItem(lightingItem, "color"),
-                         lightning->color());
+      this->FillColorMsg(this->GetChildItem(lightningItem, "color"),
+                         lightning->mutable_color());
     }
   }
 
