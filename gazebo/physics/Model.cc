@@ -645,7 +645,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     gzthrow("can't have two joint with the same name");
 
   msgs::Joint msg;
-  joint->FillJointMsg(msg);
+  joint->FillMsg(msg);
   this->jointPub->Publish(msg);
 
   this->joints.push_back(joint);
@@ -774,7 +774,7 @@ void Model::FillMsg(msgs::Model &_msg)
   }
 
   for (unsigned int j = 0; j < this->joints.size(); ++j)
-    this->joints[j]->FillJointMsg(*_msg.add_joint());
+    this->joints[j]->FillMsg(*_msg.add_joint());
 }
 
 //////////////////////////////////////////////////

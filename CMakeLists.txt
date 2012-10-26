@@ -35,7 +35,8 @@ message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 
-# developer's option to cache PKG_CONFIG_PATH and LD_LIBRARY_PATH for local installs
+# developer's option to cache PKG_CONFIG_PATH and
+# LD_LIBRARY_PATH for local installs
 if(PKG_CONFIG_PATH)
   set (ENV{PKG_CONFIG_PATH} ${PKG_CONFIG_PATH}:$ENV{PKG_CONFIG_PATH})
 endif()

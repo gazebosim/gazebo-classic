@@ -1054,7 +1054,7 @@ void World::ProcessRequestMsgs()
         {
           msgs::Joint jointMsg;
           JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
-          joint->FillJointMsg(jointMsg);
+          joint->FillMsg(jointMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
           jointMsg.SerializeToString(serializedData);
