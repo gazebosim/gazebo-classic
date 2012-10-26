@@ -65,7 +65,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   {
     this->node->Init(this->world->GetName());
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
-        this->sdf->GetElement("topic")->GetValueString());
+        this->sdf->GetElement("topic")->Get<std::string>());
   }
 }
 
@@ -85,7 +85,7 @@ void ContactSensor::Load(const std::string &_worldName)
   while (collisionElem)
   {
     // get collision name
-    collisionName = collisionElem->GetValueString();
+    collisionName = collisionElem->Get<std::string>();
     collisionScopedName =
       this->world->GetEntity(this->parentName)->GetScopedName();
     collisionScopedName += "::" + collisionName;

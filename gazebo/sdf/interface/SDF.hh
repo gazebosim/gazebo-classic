@@ -22,11 +22,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
+#include "sdf/interface/Types.hh"
 #include "sdf/interface/Param.hh"
 
 #define SDF_VERSION "1.2"
 
-/// \ingroup gazebo_parser
+/// \ingroup sdf_parser
 /// \brief namespace for Simulation Description Format parser
 namespace sdf
 {
@@ -36,7 +37,7 @@ namespace sdf
   typedef boost::shared_ptr<Element> ElementPtr;
   typedef std::vector< ElementPtr > ElementPtr_V;
 
-  /// \addtogroup gazebo_parser
+  /// \addtogroup sdf_parser
   /// \{
 
   /// \brief SDF Element class
@@ -112,37 +113,57 @@ namespace sdf
     /// \brief Get the param of the elements value
     public: ParamPtr GetValue();
 
-    public: bool GetValueBool(const std::string &_key = "");
-    public: int GetValueInt(const std::string &_key = "");
-    public: float GetValueFloat(const std::string &_key = "");
-    public: double GetValueDouble(const std::string &_key = "");
-    public: unsigned int GetValueUInt(const std::string &_key = "");
-    public: char GetValueChar(const std::string &_key = "");
-    public: std::string GetValueString(const std::string &_key = "");
-    public: gazebo::math::Vector3 GetValueVector3(const std::string &_key = "");
-    public: gazebo::math::Vector2d GetValueVector2d(
-                const std::string &_key = "");
-    public: gazebo::math::Quaternion GetValueQuaternion(
-                const std::string &_key = "");
-    public: gazebo::math::Pose GetValuePose(const std::string &_key = "");
-    public: gazebo::common::Color GetValueColor(const std::string &_key = "");
-    public: gazebo::common::Time GetValueTime(const std::string &_key = "");
+    public: bool GetValueBool(const std::string &_key = "") SDF_DEPRECATED;
+    public: int GetValueInt(const std::string &_key = "") SDF_DEPRECATED;
+    public: float GetValueFloat(const std::string &_key = "") SDF_DEPRECATED;
+    public: double GetValueDouble(const std::string &_key = "") SDF_DEPRECATED;
+    public: unsigned int GetValueUInt(const std::string &_key = "")
+            SDF_DEPRECATED;
+    public: char GetValueChar(const std::string &_key = "") SDF_DEPRECATED;
+    public: std::string GetValueString(const std::string &_key = "")
+            SDF_DEPRECATED;
+    public: Vector3 GetValueVector3(const std::string &_key = "")
+            SDF_DEPRECATED;
+    public: Vector2d GetValueVector2d(
+                const std::string &_key = "") SDF_DEPRECATED;
+    public: Quaternion GetValueQuaternion(
+                const std::string &_key = "") SDF_DEPRECATED;
+    public: Pose GetValuePose(const std::string &_key = "") SDF_DEPRECATED;
+    public: Color GetValueColor(const std::string &_key = "") SDF_DEPRECATED;
+    public: Time GetValueTime(const std::string &_key = "") SDF_DEPRECATED;
 
-    public: bool Set(const bool &_value);
-    public: bool Set(const int &_value);
-    public: bool Set(const unsigned int &_value);
-    public: bool Set(const float &_value);
-    public: bool Set(const double &_value);
-    public: bool Set(const char &_value);
-    public: bool Set(const std::string &_value);
-    public: bool Set(const char *_value);
-    public: bool Set(const gazebo::math::Vector3 &_value);
-    public: bool Set(const gazebo::math::Vector2i &_value);
-    public: bool Set(const gazebo::math::Vector2d &_value);
-    public: bool Set(const gazebo::math::Quaternion &_value);
-    public: bool Set(const gazebo::math::Pose &_value);
-    public: bool Set(const gazebo::common::Color &_value);
-    public: bool Set(const gazebo::common::Time &_value);
+    public: template<typename T>
+            T Get(const std::string &_key = "")
+            {
+              T result;
+
+              if (_key.empty())
+                this->value->Get(result);
+              else
+              {
+                ParamPtr param = this->GetAttribute(_key);
+                if (param)
+                  param->Get(result);
+                else if (this->HasElement(_key))
+                  result = this->GetElementImpl(_key)->Get<T>();
+                else if (this->HasElementDescription(_key))
+                  result = this->GetElementDescription(_key)->Get<T>();
+                else
+                  sdferr << "Unable to find value for key[" << _key << "]\n";
+              }
+              return result;
+            }
+
+    public: template<typename T>
+            bool Set(const T &_value)
+            {
+              if (this->value)
+              {
+                this->value->Set(_value);
+                return true;
+              }
+              return false;
+            }
 
     public: bool HasElement(const std::string &_name) const;
 
@@ -152,7 +173,7 @@ namespace sdf
     public: ElementPtr GetNextElement(const std::string &_name = "") const;
 
     public: ElementPtr GetOrCreateElement(
-                const std::string &_name) GAZEBO_DEPRECATED;
+                const std::string &_name) SDF_DEPRECATED;
     public: ElementPtr GetElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);
     public: void InsertElement(ElementPtr _elem);

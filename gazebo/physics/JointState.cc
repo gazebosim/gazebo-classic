@@ -15,6 +15,8 @@
  *
  */
 
+#include "common/Console.hh"
+
 #include "physics/Joint.hh"
 #include "physics/Link.hh"
 #include "physics/World.hh"

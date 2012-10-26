@@ -65,7 +65,7 @@ void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
   this->outputPoints =
-    (_sdf->GetElement("depth_camera")->GetValueString("output")
+    (_sdf->GetElement("depth_camera")->Get<std::string>("output")
     == "points");
 }
 

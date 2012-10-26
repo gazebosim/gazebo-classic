@@ -19,6 +19,7 @@
 #include "msgs/msgs.hh"
 #include "gui/GuiEvents.hh"
 #include "common/MouseEvent.hh"
+#include "common/Console.hh"
 #include "math/Quaternion.hh"
 
 #include "rendering/UserCamera.hh"

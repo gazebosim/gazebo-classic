@@ -129,11 +129,11 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
 
-  if (this->sdf->GetValueString("name").empty())
+  if (this->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
            << this->name << "]) overwrites sdf world name\n!";
   else
-    this->name = this->sdf->GetValueString("name");
+    this->name = this->sdf->Get<std::string>("name");
 
   this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
   this->sceneMsg.set_name(this->GetName());
@@ -165,7 +165,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  std::string type = this->sdf->GetElement("physics")->GetValueString("type");
+  std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
@@ -951,8 +951,8 @@ void World::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
 
@@ -1416,7 +1416,7 @@ void World::UpdateSDFFromState(const WorldState &_state)
       for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
       {
         ModelState modelState = _state.GetModelState(i);
-        if (modelState.GetName() == childElem->GetValueString("name"))
+        if (modelState.GetName() == childElem->Get<std::string>("name"))
         {
           modelState.UpdateModelSDF(childElem);
         }

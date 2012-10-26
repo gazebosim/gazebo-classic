@@ -22,6 +22,7 @@
 #include "common/Common.hh"
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
+#include "common/Console.hh"
 #include "common/Exception.hh"
 
 #include "physics/World.hh"
@@ -52,9 +53,9 @@ void TrimeshShape::Init()
 
   this->mesh = NULL;
   common::MeshManager *meshManager = common::MeshManager::Instance();
-  if (this->sdf->GetValueString("filename") != "__default__")
+  if (this->sdf->Get<std::string>("filename") != "__default__")
   {
-    filename = common::find_file(this->sdf->GetValueString("filename"));
+    filename = common::find_file(this->sdf->Get<std::string>("filename"));
 
     gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
           << " is deprecated.\n";
@@ -63,7 +64,7 @@ void TrimeshShape::Init()
   }
   else
   {
-    filename = common::find_file(this->sdf->GetValueString("uri"));
+    filename = common::find_file(this->sdf->Get<std::string>("uri"));
     if (filename == "__default__" || filename.empty())
     {
       gzerr << "No mesh specified\n";
@@ -84,13 +85,13 @@ void TrimeshShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 math::Vector3 TrimeshShape::GetSize() const
 {
-  return this->sdf->GetValueVector3("scale");
+  return this->sdf->Get<math::Vector3>("scale");
 }
 
 //////////////////////////////////////////////////
 std::string TrimeshShape::GetFilename() const
 {
-  return this->sdf->GetValueString("uri");
+  return this->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////

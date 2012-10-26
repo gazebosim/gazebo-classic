@@ -93,7 +93,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
+  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
 
@@ -164,10 +164,10 @@ void Link::Init()
       boost::shared_static_cast<Collision>(*iter)->Init();
   }
 
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   // If no collisions are attached, then don't let gravity affect the body.
-  if (this->children.size()== 0 || !this->sdf->GetValueBool("gravity"))
+  if (this->children.size()== 0 || !this->sdf->Get<bool>("gravity"))
     this->SetGravityMode(false);
 
   this->SetLinearDamping(this->GetLinearDamping());
@@ -233,8 +233,8 @@ void Link::Init()
   this->enabled = true;
 
   // DO THIS LAST!
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
-  this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -293,13 +293,13 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
-  if (this->sdf->GetValueBool("gravity") != this->GetGravityMode())
-    this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
+    this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   // before loading child collsiion, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
   // body has its own spaceId
-  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
+  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
 
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -326,7 +326,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     while (collisionElem)
     {
       CollisionPtr collision = boost::shared_dynamic_cast<Collision>(
-          this->GetChild(collisionElem->GetValueString("name")));
+          this->GetChild(collisionElem->Get<std::string>("name")));
 
       if (collision)
         collision->UpdateParameters(collisionElem);
@@ -367,7 +367,7 @@ void Link::SetCollideMode(const std::string & /*m*/)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide()
 {
-  return this->sdf->GetValueBool("self_collide");
+  return this->sdf->Get<bool>("self_collide");
 }
 
 //////////////////////////////////////////////////
@@ -690,12 +690,12 @@ void Link::FillLinkMsg(msgs::Link &_msg)
     sdf::ElementPtr elem = this->sdf->GetElement("projector");
 
     msgs::Projector *proj = _msg.add_projector();
-    proj->set_name(this->GetScopedName() + "::" + elem->GetValueString("name"));
-    proj->set_texture(elem->GetValueString("texture"));
-    proj->set_fov(elem->GetValueDouble("fov"));
-    proj->set_near_clip(elem->GetValueDouble("near_clip"));
-    proj->set_far_clip(elem->GetValueDouble("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->GetValuePose("pose"));
+    proj->set_name(this->GetScopedName() + "::" + elem->Get<std::string>("name"));
+    proj->set_texture(elem->Get<std::string>("texture"));
+    proj->set_fov(elem->Get<double>("fov"));
+    proj->set_near_clip(elem->Get<double>("near_clip"));
+    proj->set_far_clip(elem->Get<double>("far_clip"));
+    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
   }
 }
 
@@ -834,7 +834,7 @@ void Link::SetState(const LinkState &_state)
 double Link::GetLinearDamping() const
 {
   if (this->sdf->HasElement("damping"))
-    return this->sdf->GetElement("damping")->GetValueDouble("linear");
+    return this->sdf->GetElement("damping")->Get<double>("linear");
   else
     return 0.0;
 }
@@ -843,7 +843,7 @@ double Link::GetLinearDamping() const
 double Link::GetAngularDamping() const
 {
   if (this->sdf->HasElement("damping"))
-    return this->sdf->GetElement("damping")->GetValueDouble("angular");
+    return this->sdf->GetElement("damping")->Get<double>("angular");
   else
     return 0.0;
 }

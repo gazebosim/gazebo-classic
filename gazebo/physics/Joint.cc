@@ -74,12 +74,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string parentName = _sdf->GetValueString("parent");
-  std::string childName = _sdf->GetValueString("child");
+  std::string parentName = _sdf->Get<std::string>("parent");
+  std::string childName = _sdf->Get<std::string>("child");
 
   math::Pose pose;
   if (_sdf->HasElement("pose"))
-    pose = _sdf->GetValuePose("pose");
+    pose = _sdf->Get<math::Pose>("pose");
 
   if (this->model)
   {
@@ -131,7 +131,7 @@ void Joint::Init()
   if (this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -139,16 +139,16 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-      this->SetLowStop(0, limitElem->GetValueDouble("lower"));
-      this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+      this->SetHighStop(0, limitElem->Get<double>("upper"));
+      this->SetLowStop(0, limitElem->Get<double>("lower"));
+      this->SetHighStop(0, limitElem->Get<double>("upper"));
     }
   }
 
   if (this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->GetValueVector3("xyz"));
+    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -157,9 +157,9 @@ void Joint::Init()
       // parameters  are set properly.
       // This is taken from the ODE wiki.
       limitElem = axisElem->GetElement("limit");
-      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
-      this->SetLowStop(1, limitElem->GetValueDouble("lower"));
-      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
+      this->SetHighStop(1, limitElem->Get<double>("upper"));
+      this->SetLowStop(1, limitElem->Get<double>("lower"));
+      this->SetHighStop(1, limitElem->Get<double>("upper"));
     }
   }
 
@@ -171,41 +171,41 @@ void Joint::Init()
     if (this->sdf->HasElement("axis"))
     {
       this->SetAxis(0, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
+            this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")));
     }
 
     if (this->sdf->HasElement("axis2"))
     {
       this->SetAxis(1, modelPose.rot.RotateVector(
-            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
+            this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")));
     }
   }
   else
   {
     if (this->sdf->HasElement("axis"))
     {
-      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-      if (this->sdf->GetValueString("parent") != "world")
+      this->SetAxis(0, this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+      if (this->sdf->Get<std::string>("parent") != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
+          << this->sdf->Get<std::string>("parent")
           << "], loading axis from SDF ["
-          << this->sdf->GetElement("axis")->GetValueVector3("xyz")
+          << this->sdf->GetElement("axis")->Get<math::Vector3>("xyz")
           << "]\n";
       }
     }
     if (this->sdf->HasElement("axis2"))
     {
-      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+      this->SetAxis(1, this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
 
-      if (this->sdf->GetValueString("parent") != "world")
+      if (this->sdf->Get<std::string>("parent") != "world")
       {
         gzwarn << "joint [" << this->GetScopedName()
           << "] has a non-real parentLink ["
-          << this->sdf->GetValueString("parent")
+          << this->sdf->Get<std::string>("parent")
           << "], loading axis2 from SDF ["
-          << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
+          << this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz")
           << "]\n";
       }
     }
@@ -218,9 +218,9 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   math::Vector3 vec;
 
   if (_index == 0 && this->sdf->HasElement("axis"))
-    vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
   else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;
@@ -291,7 +291,7 @@ void Joint::FillJointMsg(msgs::Joint &_msg)
   if (this->sdf->HasElement("pose"))
   {
     msgs::Set(_msg.mutable_pose(),
-              this->sdf->GetValuePose("pose"));
+              this->sdf->Get<math::Pose>("pose"));
   }
   else
     msgs::Set(_msg.mutable_pose(), math::Pose(0, 0, 0, 0, 0, 0));

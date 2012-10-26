@@ -184,9 +184,9 @@ void UserCamera::PostRender()
   Camera::PostRender();
   sdf::ElementPtr elem = this->sdf->GetElement("save");
 
-  if (elem->GetValueBool("enabled"))
+  if (elem->Get<bool>("enabled"))
   {
-    std::string path = elem->GetValueString("path");
+    std::string path = elem->Get<std::string>("path");
 
     char tmp[1024];
     if (!path.empty())
@@ -338,7 +338,7 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
                    static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
-      this->sdf->GetValueDouble("horizontal_fov");
+      this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-#include "common/Color.hh"
-#include "math/Pose.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
-
 #include "sdf/interface/parser.hh"
 #include "sdf/interface/SDF.hh"
 
@@ -165,49 +160,49 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   }
   else if (_type == "color")
   {
-    boost::shared_ptr<ParamT<gazebo::common::Color> > param(
-        new ParamT<gazebo::common::Color>(_key, _defaultValue, _required,
+    boost::shared_ptr<ParamT<Color> > param(
+        new ParamT<Color>(_key, _defaultValue, _required,
                                           _type, _description));
     return param;
   }
   else if (_type == "vector3")
   {
-    boost::shared_ptr<ParamT<gazebo::math::Vector3> > param(
-        new ParamT<gazebo::math::Vector3>(_key, _defaultValue, _required,
+    boost::shared_ptr<ParamT<Vector3> > param(
+        new ParamT<Vector3>(_key, _defaultValue, _required,
                                           _type, _description));
     return param;
   }
   else if (_type == "vector2i")
   {
-    boost::shared_ptr<ParamT<gazebo::math::Vector2i> > param(
-        new ParamT<gazebo::math::Vector2i>(_key, _defaultValue, _required,
+    boost::shared_ptr<ParamT<Vector2i> > param(
+        new ParamT<Vector2i>(_key, _defaultValue, _required,
                                            _type, _description));
     return param;
   }
   else if (_type == "vector2d")
   {
-    boost::shared_ptr<ParamT<gazebo::math::Vector2d> > param(
-        new ParamT<gazebo::math::Vector2d>(_key, _defaultValue, _required,
+    boost::shared_ptr<ParamT<Vector2d> > param(
+        new ParamT<Vector2d>(_key, _defaultValue, _required,
                                            _type, _description));
     return param;
   }
   else if (_type == "pose")
   {
-    boost::shared_ptr<ParamT<gazebo::math::Pose> > param(
-        new ParamT<gazebo::math::Pose>(_key, _defaultValue, _required,
+    boost::shared_ptr<ParamT<Pose> > param(
+        new ParamT<Pose>(_key, _defaultValue, _required,
                                        _type, _description));
     return param;
   }
   else if (_type == "time")
   {
-    boost::shared_ptr<ParamT<gazebo::common::Time> > param(
-        new ParamT<gazebo::common::Time>(_key, _defaultValue, _required,
+    boost::shared_ptr<ParamT<Time> > param(
+        new ParamT<Time>(_key, _defaultValue, _required,
                                          _type, _description));
     return param;
   }
   else
   {
-    gzerr << "Unknown attribute _type[" << _type << "]\n";
+    sdferr << "Unknown attribute _type[" << _type << "]\n";
     return boost::shared_ptr<Param>();
   }
 }
@@ -739,276 +734,80 @@ ElementPtr Element::AddElement(const std::string &_name)
       return this->elements.back();
     }
   }
-  gzerr << "Missing element description for [" << _name << "]\n";
+  sdferr << "Missing element description for [" << _name << "]\n";
   return ElementPtr();
 }
 
 /////////////////////////////////////////////////
 bool Element::GetValueBool(const std::string &_key)
 {
-  bool result = false;
-
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueBool();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueBool();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<bool>(_key);
 }
 
 /////////////////////////////////////////////////
 int Element::GetValueInt(const std::string &_key)
 {
-  int result = 0;
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueInt();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueInt();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<int>(_key);
 }
 
 /////////////////////////////////////////////////
 float Element::GetValueFloat(const std::string &_key)
 {
-  float result = 0.0;
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueFloat();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueFloat();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<float>(_key);
 }
 
 /////////////////////////////////////////////////
 double Element::GetValueDouble(const std::string &_key)
 {
-  double result = 0.0;
-  if (_key.empty())
-  {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<double>(this->value->GetAsString());
-    else
-      this->value->Get(result);
-  }
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueDouble();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueDouble();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<double>(_key);
 }
 
 /////////////////////////////////////////////////
 unsigned int Element::GetValueUInt(const std::string &_key)
 {
-  unsigned int result = 0;
-  if (_key.empty())
-  {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<unsigned int>(this->value->GetAsString());
-    else
-      this->value->Get(result);
-  }
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueUInt();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueUInt();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<unsigned int>(_key);
 }
 
 /////////////////////////////////////////////////
 char Element::GetValueChar(const std::string &_key)
 {
-  char result = '\0';
-  if (_key.empty())
-  {
-    if (this->value->IsStr())
-      result = boost::lexical_cast<char>(this->value->GetAsString());
-    else
-      this->value->Get(result);
-  }
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueChar();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueChar();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<char>(_key);
 }
 
 /////////////////////////////////////////////////
 std::string Element::GetValueString(const std::string &_key)
 {
-  std::string result = "";
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueString();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueString();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<std::string>(_key);
 }
 
 /////////////////////////////////////////////////
-gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
+Vector3 Element::GetValueVector3(const std::string &_key)
 {
-  gazebo::math::Vector3 result;
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueVector3();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueVector3();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<Vector3>(_key);
 }
 
 /////////////////////////////////////////////////
-gazebo::math::Vector2d Element::GetValueVector2d(const std::string &_key)
+Vector2d Element::GetValueVector2d(const std::string &_key)
 {
-  gazebo::math::Vector2d result;
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueVector2d();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueVector2d();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<Vector2d>(_key);
 }
 
 /////////////////////////////////////////////////
-gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
+Quaternion Element::GetValueQuaternion(const std::string &_key)
 {
-  gazebo::math::Quaternion result;
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueQuaternion();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueQuaternion();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<Quaternion>(_key);
 }
 
 /////////////////////////////////////////////////
-gazebo::math::Pose Element::GetValuePose(const std::string &_key)
+Pose Element::GetValuePose(const std::string &_key)
 {
-  gazebo::math::Pose result;
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValuePose();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValuePose();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<Pose>(_key);
 }
 
 /////////////////////////////////////////////////
-gazebo::common::Color Element::GetValueColor(const std::string &_key)
+Color Element::GetValueColor(const std::string &_key)
 {
-  gazebo::common::Color result;
-  if (_key.empty())
-    this->value->Get(result);
-  else
-  {
-    ParamPtr param = this->GetAttribute(_key);
-    if (param)
-      param->Get(result);
-    else if (this->HasElement(_key))
-      result = this->GetElementImpl(_key)->GetValueColor();
-    else if (this->HasElementDescription(_key))
-      result = this->GetElementDescription(_key)->GetValueColor();
-    else
-      gzerr << "Unable to find value for key[" << _key << "]\n";
-  }
-  return result;
+  return this->Get<Color>(_key);
 }
 
 /////////////////////////////////////////////////
@@ -1073,171 +872,6 @@ void Element::SetInclude(const std::string &_filename)
 std::string Element::GetInclude() const
 {
   return this->includeFilename;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const bool &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const int &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const unsigned int &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const float &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const double &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const char &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const std::string &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const char *_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const gazebo::math::Vector3 &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const gazebo::math::Vector2i &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const gazebo::math::Vector2d &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const gazebo::math::Quaternion &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const gazebo::math::Pose &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const gazebo::common::Color &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-bool Element::Set(const gazebo::common::Time &_value)
-{
-  if (this->value)
-  {
-    this->value->Set(_value);
-    return true;
-  }
-  return false;
 }
 
 /////////////////////////////////////////////////
@@ -1331,7 +965,7 @@ void SDF::Write(const std::string &_filename)
 
   if (!out)
   {
-    gzerr << "Unable to open file[" << _filename << "] for writing\n";
+    sdferr << "Unable to open file[" << _filename << "] for writing\n";
     return;
   }
   out << string;
@@ -1343,13 +977,13 @@ std::string SDF::ToString() const
 {
   std::ostringstream stream;
 
-  if (this->root->GetName() != "gazebo")
-    stream << "<gazebo version='" << SDF::version << "'>\n";
+  if (this->root->GetName() != "sdf")
+    stream << "<sdf version='" << SDF::version << "'>\n";
 
   stream << this->root->ToString("");
 
-  if (this->root->GetName() != "gazebo")
-    stream << "</gazebo>";
+  if (this->root->GetName() != "sdf")
+    stream << "</sdf>";
 
   return stream.str();
 }
@@ -1357,9 +991,9 @@ std::string SDF::ToString() const
 /////////////////////////////////////////////////
 void SDF::SetFromString(const std::string &_sdfData)
 {
-  sdf::initFile("gazebo.sdf", this->root);
+  sdf::initFile("sdf.sdf", this->root);
   if (!sdf::readString(_sdfData, this->root))
   {
-    gzerr << "Unable to parse sdf string[" << _sdfData << "]\n";
+    sdferr << "Unable to parse sdf string[" << _sdfData << "]\n";
   }
 }

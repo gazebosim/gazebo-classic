@@ -18,6 +18,9 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
+
+#include "gazebo/common/Console.hh"
+
 #include "Server.hh"
 #include "gui/Gui.hh"
 

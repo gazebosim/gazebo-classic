@@ -287,7 +287,7 @@ namespace gazebo
     {
       msgs::GUI result;
 
-      result.set_fullscreen(_sdf->GetValueBool("fullscreen"));
+      result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
 
 
       if (_sdf->HasElement("camera"))
@@ -295,17 +295,17 @@ namespace gazebo
         sdf::ElementPtr camSDF = _sdf->GetElement("camera");
         msgs::GUICamera *guiCam = result.mutable_camera();
 
-        guiCam->set_name(camSDF->GetValueString("name"));
+        guiCam->set_name(camSDF->Get<std::string>("name"));
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_origin(), camSDF->GetValuePose("pose"));
+          msgs::Set(guiCam->mutable_origin(), camSDF->Get<math::Pose>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
         {
           guiCam->set_view_controller(
-              camSDF->GetValueString("view_controller"));
+              camSDF->Get<std::string>("view_controller"));
         }
 
         if (camSDF->HasElement("track_visual"))
@@ -323,13 +323,13 @@ namespace gazebo
     {
       msgs::TrackVisual result;
 
-      result.set_name(_sdf->GetValueString("name"));
+      result.set_name(_sdf->Get<std::string>("name"));
 
       if (_sdf->HasElement("min_dist"))
-        result.set_min_dist(_sdf->GetElement("min_dist")->GetValueDouble());
+        result.set_min_dist(_sdf->GetElement("min_dist")->Get<double>());
 
       if (_sdf->HasElement("max_dist"))
-        result.set_max_dist(_sdf->GetElement("max_dist")->GetValueDouble());
+        result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
       return result;
     }
@@ -340,12 +340,12 @@ namespace gazebo
     {
       msgs::Light result;
 
-      std::string type = _sdf->GetValueString("type");
+      std::string type = _sdf->Get<std::string>("type");
       std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 
-      result.set_name(_sdf->GetValueString("name"));
+      result.set_name(_sdf->Get<std::string>("name"));
 
-      result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
+      result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
 
       if (type == "point")
         result.set_type(msgs::Light::POINT);
@@ -356,42 +356,42 @@ namespace gazebo
 
       if (_sdf->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->GetValuePose("pose")));
+        result.mutable_pose()->CopyFrom(Convert(_sdf->Get<math::Pose>("pose")));
       }
 
       if (_sdf->HasElement("diffuse"))
       {
         result.mutable_diffuse()->CopyFrom(
-            Convert(_sdf->GetValueColor("diffuse")));
+            Convert(_sdf->Get<common::Color>("diffuse")));
       }
 
       if (_sdf->HasElement("specular"))
       {
         result.mutable_specular()->CopyFrom(
-            Convert(_sdf->GetValueColor("specular")));
+            Convert(_sdf->Get<common::Color>("specular")));
       }
 
       if (_sdf->HasElement("attenuation"))
       {
         sdf::ElementPtr elem = _sdf->GetElement("attenuation");
-        result.set_attenuation_constant(elem->GetValueDouble("constant"));
-        result.set_attenuation_linear(elem->GetValueDouble("linear"));
-        result.set_attenuation_quadratic(elem->GetValueDouble("quadratic"));
-        result.set_range(elem->GetValueDouble("range"));
+        result.set_attenuation_constant(elem->Get<double>("constant"));
+        result.set_attenuation_linear(elem->Get<double>("linear"));
+        result.set_attenuation_quadratic(elem->Get<double>("quadratic"));
+        result.set_range(elem->Get<double>("range"));
       }
 
       if (_sdf->HasElement("direction"))
       {
         result.mutable_direction()->CopyFrom(
-            Convert(_sdf->GetValueVector3("direction")));
+            Convert(_sdf->Get<math::Vector3>("direction")));
       }
 
       if (_sdf->HasElement("spot"))
       {
         sdf::ElementPtr elem = _sdf->GetElement("spot");
-        result.set_spot_inner_angle(elem->GetValueDouble("inner_angle"));
-        result.set_spot_outer_angle(elem->GetValueDouble("outer_angle"));
-        result.set_spot_falloff(elem->GetValueDouble("falloff"));
+        result.set_spot_inner_angle(elem->Get<double>("inner_angle"));
+        result.set_spot_outer_angle(elem->Get<double>("outer_angle"));
+        result.set_spot_falloff(elem->Get<double>("falloff"));
       }
 
       return result;
@@ -402,10 +402,10 @@ namespace gazebo
     {
       msgs::Visual result;
 
-      result.set_name(_sdf->GetValueString("name"));
-      result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
-      result.set_transparency(_sdf->GetValueDouble("transparency"));
-      result.set_laser_retro(_sdf->GetValueDouble("laser_retro"));
+      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_cast_shadows(_sdf->Get<bool>("cast_shadows"));
+      result.set_transparency(_sdf->Get<double>("transparency"));
+      result.set_laser_retro(_sdf->Get<double>("laser_retro"));
 
       // Load the geometry
       if (_sdf->HasElement("geometry"))
@@ -422,49 +422,49 @@ namespace gazebo
         {
           geomMsg->set_type(msgs::Geometry::BOX);
           msgs::Set(geomMsg->mutable_box()->mutable_size(),
-              geomElem->GetValueVector3("size"));
+              geomElem->Get<math::Vector3>("size"));
         }
         else if (geomElem->GetName() == "cylinder")
         {
           geomMsg->set_type(msgs::Geometry::CYLINDER);
           geomMsg->mutable_cylinder()->set_radius(
-              geomElem->GetValueDouble("radius"));
+              geomElem->Get<double>("radius"));
           geomMsg->mutable_cylinder()->set_length(
-              geomElem->GetValueDouble("length"));
+              geomElem->Get<double>("length"));
         }
         else if (geomElem->GetName() == "sphere")
         {
           geomMsg->set_type(msgs::Geometry::SPHERE);
           geomMsg->mutable_sphere()->set_radius(
-              geomElem->GetValueDouble("radius"));
+              geomElem->Get<double>("radius"));
         }
         else if (geomElem->GetName() == "plane")
         {
           geomMsg->set_type(msgs::Geometry::PLANE);
           msgs::Set(geomMsg->mutable_plane()->mutable_normal(),
-                    geomElem->GetValueVector3("normal"));
+                    geomElem->Get<math::Vector3>("normal"));
           msgs::Set(geomMsg->mutable_plane()->mutable_size(),
-                    geomElem->GetValueVector2d("size"));
+                    geomElem->Get<math::Vector2d>("size"));
         }
         else if (geomElem->GetName() == "image")
         {
           geomMsg->set_type(msgs::Geometry::IMAGE);
           geomMsg->mutable_image()->set_scale(
-              geomElem->GetValueDouble("scale"));
+              geomElem->Get<double>("scale"));
           geomMsg->mutable_image()->set_height(
-              geomElem->GetValueDouble("height"));
+              geomElem->Get<double>("height"));
           geomMsg->mutable_image()->set_uri(
-              geomElem->GetValueString("uri"));
+              geomElem->Get<std::string>("uri"));
         }
         else if (geomElem->GetName() == "heightmap")
         {
           geomMsg->set_type(msgs::Geometry::HEIGHTMAP);
           msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
-              geomElem->GetValueVector3("size"));
+              geomElem->Get<math::Vector3>("size"));
           msgs::Set(geomMsg->mutable_heightmap()->mutable_origin(),
-              geomElem->GetValueVector3("pos"));
+              geomElem->Get<math::Vector3>("pos"));
 
-          common::Image img(geomElem->GetValueString("uri"));
+          common::Image img(geomElem->Get<std::string>("uri"));
           msgs::Set(geomMsg->mutable_heightmap()->mutable_image(), img);
 
           sdf::ElementPtr textureElem = geomElem->GetElement("texture");
@@ -472,9 +472,9 @@ namespace gazebo
           while (textureElem)
           {
             tex = geomMsg->mutable_heightmap()->add_texture();
-            tex->set_diffuse(textureElem->GetValueString("diffuse"));
-            tex->set_normal(textureElem->GetValueString("normal"));
-            tex->set_size(textureElem->GetValueDouble("size"));
+            tex->set_diffuse(textureElem->Get<std::string>("diffuse"));
+            tex->set_normal(textureElem->Get<std::string>("normal"));
+            tex->set_size(textureElem->Get<double>("size"));
             textureElem = textureElem->GetNextElement("texture");
           }
 
@@ -484,8 +484,8 @@ namespace gazebo
           {
             blend = geomMsg->mutable_heightmap()->add_blend();
 
-            blend->set_min_height(blendElem->GetValueDouble("min_height"));
-            blend->set_fade_dist(blendElem->GetValueDouble("fade_dist"));
+            blend->set_min_height(blendElem->Get<double>("min_height"));
+            blend->set_fade_dist(blendElem->Get<double>("fade_dist"));
             blendElem = blendElem->GetNextElement("blend");
           }
         }
@@ -493,20 +493,20 @@ namespace gazebo
         {
           geomMsg->set_type(msgs::Geometry::MESH);
           msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
-              geomElem->GetValueVector3("scale"));
+              geomElem->Get<math::Vector3>("scale"));
 
           // The if clause is used to detect instances of "filename" with
           // the sdf. Eventually this code will be deprecated as people
           // switch to using uris.
-          if (geomElem->GetValueString("filename") != "__default__")
+          if (geomElem->Get<std::string>("filename") != "__default__")
           {
             geomMsg->mutable_mesh()->set_filename(
-                common::find_file(geomElem->GetValueString("filename")));
+                common::find_file(geomElem->Get<std::string>("filename")));
           }
           else
           {
             geomMsg->mutable_mesh()->set_filename(
-                geomElem->GetValueString("uri"));
+                geomElem->Get<std::string>("uri"));
           }
         }
         else
@@ -523,52 +523,52 @@ namespace gazebo
         {
           sdf::ElementPtr scriptElem = elem->GetElement("script");
           matMsg->mutable_script()->set_name(
-              scriptElem->GetValueString("name"));
+              scriptElem->Get<std::string>("name"));
           matMsg->mutable_script()->set_uri(
-              scriptElem->GetValueString("uri"));
+              scriptElem->Get<std::string>("uri"));
         }
 
         if (elem->HasElement("shader"))
         {
           sdf::ElementPtr shaderElem = elem->GetElement("shader");
 
-          if (shaderElem->GetValueString("type") == "pixel")
+          if (shaderElem->Get<std::string>("type") == "pixel")
             matMsg->set_shader_type(msgs::Material::PIXEL);
-          else if (shaderElem->GetValueString("type") == "vertex")
+          else if (shaderElem->Get<std::string>("type") == "vertex")
             matMsg->set_shader_type(msgs::Material::VERTEX);
-          else if (shaderElem->GetValueString("type") ==
+          else if (shaderElem->Get<std::string>("type") ==
               "normal_map_object_space")
             matMsg->set_shader_type(msgs::Material::NORMAL_MAP_OBJECT_SPACE);
-          else if (shaderElem->GetValueString("type") ==
+          else if (shaderElem->Get<std::string>("type") ==
               "normal_map_tangent_space")
             matMsg->set_shader_type(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
           else
             gzthrow(std::string("Unknown shader type[") +
-                shaderElem->GetValueString("type") + "]");
+                shaderElem->Get<std::string>("type") + "]");
 
           if (shaderElem->HasElement("normal_map"))
             matMsg->set_normal_map(
-                shaderElem->GetElement("normal_map")->GetValueString());
+                shaderElem->GetElement("normal_map")->Get<std::string>());
         }
 
         if (elem->HasElement("ambient"))
           msgs::Set(matMsg->mutable_ambient(),
-              elem->GetValueColor("ambient"));
+              elem->Get<common::Color>("ambient"));
         if (elem->HasElement("diffuse"))
           msgs::Set(matMsg->mutable_diffuse(),
-              elem->GetValueColor("diffuse"));
+              elem->Get<common::Color>("diffuse"));
         if (elem->HasElement("specular"))
           msgs::Set(matMsg->mutable_specular(),
-              elem->GetValueColor("specular"));
+              elem->Get<common::Color>("specular"));
         if (elem->HasElement("emissive"))
           msgs::Set(matMsg->mutable_emissive(),
-              elem->GetValueColor("emissive"));
+              elem->Get<common::Color>("emissive"));
       }
 
       // Set the origin of the visual
       if (_sdf->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->GetValuePose("pose"));
+        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
       }
 
       return result;
@@ -578,7 +578,7 @@ namespace gazebo
     {
       msgs::Fog result;
 
-      std::string type = _sdf->GetValueString("type");
+      std::string type = _sdf->Get<std::string>("type");
       if (type == "linear")
         result.set_type(msgs::Fog::LINEAR);
       else if (type == "exp")
@@ -590,10 +590,10 @@ namespace gazebo
       else
         gzthrow(std::string("Unknown fog type[") + type + "]");
 
-      result.mutable_color()->CopyFrom(Convert(_sdf->GetValueColor("color")));
-      result.set_density(_sdf->GetValueDouble("density"));
-      result.set_start(_sdf->GetValueDouble("start"));
-      result.set_end(_sdf->GetValueDouble("end"));
+      result.mutable_color()->CopyFrom(Convert(_sdf->Get<common::Color>("color")));
+      result.set_density(_sdf->Get<double>("density"));
+      result.set_start(_sdf->Get<double>("start"));
+      result.set_end(_sdf->Get<double>("end"));
       return result;
     }
 
@@ -604,38 +604,38 @@ namespace gazebo
       Init(result, "scene");
 
       if (_sdf->HasElement("grid"))
-        result.set_grid(_sdf->GetValueBool("grid"));
+        result.set_grid(_sdf->Get<bool>("grid"));
       else
         result.set_grid(true);
 
       if (_sdf->HasElement("ambient"))
         result.mutable_ambient()->CopyFrom(
-            Convert(_sdf->GetValueColor("ambient")));
+            Convert(_sdf->Get<common::Color>("ambient")));
 
       if (_sdf->HasElement("background"))
       {
         result.mutable_background()->CopyFrom(
-            Convert(_sdf->GetValueColor("background")));
+            Convert(_sdf->Get<common::Color>("background")));
       }
 
       if (_sdf->HasElement("sky"))
       {
         msgs::Sky *skyMsg = result.mutable_sky();
-        skyMsg->set_time(_sdf->GetElement("sky")->GetValueDouble("time"));
-        skyMsg->set_sunrise(_sdf->GetElement("sky")->GetValueDouble("sunrise"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->GetValueDouble("sunset"));
-        skyMsg->set_sunset(_sdf->GetElement("sky")->GetValueDouble("sunset"));
+        skyMsg->set_time(_sdf->GetElement("sky")->Get<double>("time"));
+        skyMsg->set_sunrise(_sdf->GetElement("sky")->Get<double>("sunrise"));
+        skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
+        skyMsg->set_sunset(_sdf->GetElement("sky")->Get<double>("sunset"));
 
         if (_sdf->GetElement("sky")->HasElement("clouds"))
         {
           sdf::ElementPtr cloudsElem =
             _sdf->GetElement("sky")->GetElement("clouds");
-          skyMsg->set_wind_speed(cloudsElem->GetValueDouble("speed"));
-          skyMsg->set_wind_direction(cloudsElem->GetValueDouble("direction"));
-          skyMsg->set_humidity(cloudsElem->GetValueDouble("humidity"));
-          skyMsg->set_mean_cloud_size(cloudsElem->GetValueDouble("mean_size"));
+          skyMsg->set_wind_speed(cloudsElem->Get<double>("speed"));
+          skyMsg->set_wind_direction(cloudsElem->Get<double>("direction"));
+          skyMsg->set_humidity(cloudsElem->Get<double>("humidity"));
+          skyMsg->set_mean_cloud_size(cloudsElem->Get<double>("mean_size"));
           msgs::Set(skyMsg->mutable_cloud_ambient(),
-                    cloudsElem->GetValueColor("ambient"));
+                    cloudsElem->Get<common::Color>("ambient"));
         }
       }
 
@@ -643,7 +643,7 @@ namespace gazebo
         result.mutable_fog()->CopyFrom(FogFromSDF(_sdf->GetElement("fog")));
 
       if (_sdf->HasElement("shadows"))
-        result.set_shadows(_sdf->GetValueBool("shadows"));
+        result.set_shadows(_sdf->Get<bool>("shadows"));
 
       return result;
     }

@@ -19,6 +19,9 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
+
+#include "common/Console.hh"
+
 #include "rendering/RenderEngine.hh"
 #include "sensors/Sensor.hh"
 #include "sensors/SensorFactory.hh"
@@ -145,7 +148,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
                                         const std::string &_parentName)
 {
-  std::string type = _elem->GetValueString("type");
+  std::string type = _elem->Get<std::string>("type");
   SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
 
   if (!sensor)

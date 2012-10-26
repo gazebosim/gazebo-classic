@@ -15,6 +15,8 @@
  *
  */
 
+#include "common/Console.hh"
+
 #include "physics/Model.hh"
 #include "physics/Link.hh"
 #include "physics/World.hh"
@@ -55,9 +57,9 @@ ModelState::~ModelState()
 /////////////////////////////////////////////////
 void ModelState::Load(sdf::ElementPtr _elem)
 {
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetElement("pose")->GetValuePose("");
+    this->pose = _elem->GetElement("pose")->Get<math::Pose>("");
 
   if (_elem->HasElement("link"))
   {
@@ -103,7 +105,7 @@ void ModelState::UpdateModelSDF(sdf::ElementPtr _elem)
       for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
           iter != this->linkStates.end(); ++iter)
       {
-        if ((*iter).GetName() == childElem->GetValueString("name"))
+        if ((*iter).GetName() == childElem->Get<std::string>("name"))
         {
           (*iter).UpdateLinkSDF(childElem);
         }

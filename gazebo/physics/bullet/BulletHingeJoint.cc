@@ -60,7 +60,7 @@ void BulletHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
     gzthrow("Requires bullet bodies");
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis = axisElem->GetValueVector3("xyz");
+  math::Vector3 axis = axisElem->Get<math::Vector3>("xyz");
 
   math::Vector3 pivotA, pivotB, axisA, axisB;
 

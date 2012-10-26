@@ -19,6 +19,7 @@
  */
 
 #include "common/MeshManager.hh"
+#include "common/Console.hh"
 
 #include "rendering/ogre_gazebo.h"
 #include "rendering/Scene.hh"

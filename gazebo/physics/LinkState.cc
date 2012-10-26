@@ -15,6 +15,8 @@
  *
  */
 
+#include "common/Console.hh"
+
 #include "physics/Link.hh"
 #include "physics/Collision.hh"
 #include "physics/World.hh"
@@ -49,10 +51,10 @@ LinkState::~LinkState()
 /////////////////////////////////////////////////
 void LinkState::Load(sdf::ElementPtr _elem)
 {
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetElement("pose")->GetValuePose("");
+    this->pose = _elem->GetElement("pose")->Get<math::Pose>("");
 }
 
 /////////////////////////////////////////////////

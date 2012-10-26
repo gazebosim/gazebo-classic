@@ -343,7 +343,7 @@ void Visual::Load()
     this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->sdf->GetValuePose("pose");
+  pose = this->sdf->Get<math::Pose>("pose");
 
   std::string meshName = this->GetMeshName();
 
@@ -371,7 +371,7 @@ void Visual::Load()
     for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
     {
       ent->getSubEntity(i)->setCustomParameter(1, Ogre::Vector4(
-          this->sdf->GetValueDouble("laser_retro"), 0.0, 0.0, 0.0));
+          this->sdf->Get<double>("laser_retro"), 0.0, 0.0, 0.0));
     }
   }
 
@@ -392,8 +392,8 @@ void Visual::Load()
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
-      std::string matUri = scriptElem->GetValueString("uri");
-      std::string matName = scriptElem->GetValueString("name");
+      std::string matUri = scriptElem->Get<std::string>("uri");
+      std::string matName = scriptElem->Get<std::string>("name");
 
       if (!matUri.empty())
         RenderEngine::Instance()->AddResourcePath(matUri);
@@ -401,17 +401,17 @@ void Visual::Load()
         this->SetMaterial(matName);
     }
     else if (matElem->HasElement("ambient"))
-      this->SetAmbient(matElem->GetValueColor("ambient"));
+      this->SetAmbient(matElem->Get<common::Color>("ambient"));
     else if (matElem->HasElement("diffuse"))
-      this->SetDiffuse(matElem->GetValueColor("diffuse"));
+      this->SetDiffuse(matElem->Get<common::Color>("diffuse"));
     else if (matElem->HasElement("specular"))
-      this->SetSpecular(matElem->GetValueColor("specular"));
+      this->SetSpecular(matElem->Get<common::Color>("specular"));
     else if (matElem->HasElement("emissive"))
-      this->SetEmissive(matElem->GetValueColor("emissive"));
+      this->SetEmissive(matElem->Get<common::Color>("emissive"));
   }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->SetCastShadows(this->sdf->Get<bool>("cast_shadows"));
 }
 
 //////////////////////////////////////////////////
@@ -639,28 +639,28 @@ math::Vector3 Visual::GetScale()
 
     if (geomElem->HasElement("box"))
     {
-      result = geomElem->GetElement("box")->GetValueVector3("size");
+      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
-      double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
+      double r = geomElem->GetElement("sphere")->Get<double>("radius");
       result.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
-      double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
-      double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
+      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
+      double l = geomElem->GetElement("cylinder")->Get<double>("length");
       result.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {
       math::Vector2d size =
-        geomElem->GetElement("plane")->GetValueVector2d("size");
+        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
       result.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
-      result = geomElem->GetElement("mesh")->GetValueVector3("scale");
+      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
   }
 
@@ -1345,7 +1345,7 @@ void Visual::DisableTrackVisual()
 std::string Visual::GetNormalMap() const
 {
   return this->sdf->GetElement("material")->GetElement(
-      "shader")->GetElement("normal_map")->GetValueString();
+      "shader")->GetElement("normal_map")->Get<std::string>();
 }
 
 //////////////////////////////////////////////////
@@ -1361,7 +1361,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 std::string Visual::GetShaderType() const
 {
   return this->sdf->GetElement("material")->GetElement(
-      "shader")->GetValueString("type");
+      "shader")->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -1939,9 +1939,9 @@ std::string Visual::GetMeshName() const
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
 
-      if (tmpElem->GetValueString("filename") != "__default__")
+      if (tmpElem->Get<std::string>("filename") != "__default__")
       {
-        filename = tmpElem->GetValueString("filename");
+        filename = tmpElem->Get<std::string>("filename");
 
         gzerr << "<mesh><filename>" << filename << "</filename></mesh>"
           << " is deprecated.\n";
@@ -1949,7 +1949,7 @@ std::string Visual::GetMeshName() const
       }
       else
       {
-        filename = common::find_file(tmpElem->GetValueString("uri"));
+        filename = common::find_file(tmpElem->Get<std::string>("uri"));
         if (filename == "__default__" || filename.empty())
           gzerr << "No mesh specified\n";
       }

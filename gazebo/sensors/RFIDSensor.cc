@@ -68,7 +68,7 @@ void RFIDSensor::Load(const std::string &_worldName)
   {
     this->node->Init(this->world->GetName());
     this->scanPub = this->node->Advertise<msgs::Pose>(
-        this->sdf->GetElement("topic")->GetValueString());
+        this->sdf->GetElement("topic")->Get<std::string>());
   }
   this->entity = this->world->GetEntity(this->parentName);
 

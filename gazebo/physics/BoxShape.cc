@@ -36,7 +36,7 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->GetValueVector3("size"));
+  this->SetSize(this->sdf->Get<math::Vector3>("size"));
 }
 
 //////////////////////////////////////////////////
@@ -48,7 +48,7 @@ void BoxShape::SetSize(const math::Vector3 &_size)
 //////////////////////////////////////////////////
 math::Vector3 BoxShape::GetSize() const
 {
-  return this->sdf->GetValueVector3("size");
+  return this->sdf->Get<math::Vector3>("size");
 }
 
 //////////////////////////////////////////////////

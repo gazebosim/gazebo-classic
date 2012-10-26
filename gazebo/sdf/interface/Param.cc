@@ -181,43 +181,43 @@ bool Param::Set(const char *_value)
 }
 
 //////////////////////////////////////////////////
-bool Param::Set(const gazebo::math::Vector3 &_value)
+bool Param::Set(const Vector3 &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
 
 //////////////////////////////////////////////////
-bool Param::Set(const gazebo::math::Vector2i &_value)
+bool Param::Set(const Vector2i &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
 
 //////////////////////////////////////////////////
-bool Param::Set(const gazebo::math::Vector2d &_value)
+bool Param::Set(const Vector2d &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
 
 //////////////////////////////////////////////////
-bool Param::Set(const gazebo::math::Quaternion &_value)
+bool Param::Set(const Quaternion &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
 
 //////////////////////////////////////////////////
-bool Param::Set(const gazebo::math::Pose &_value)
+bool Param::Set(const Pose &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
 
 //////////////////////////////////////////////////
-bool Param::Set(const gazebo::common::Color &_value)
+bool Param::Set(const Color &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
 
 //////////////////////////////////////////////////
-bool Param::Set(const gazebo::common::Time &_value)
+bool Param::Set(const Time &_value)
 {
   return this->SetFromString(boost::lexical_cast<std::string>(_value));
 }
@@ -232,7 +232,7 @@ bool Param::Get(bool &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a bool\n";
+    sdferr << "Parameter [" << this->key << "] is not a bool\n";
     return false;
   }
 }
@@ -247,7 +247,7 @@ bool Param::Get(double &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is a ["
+    sdferr << "Parameter [" << this->key << "] is a ["
           << this->typeName << "], attempting to get as a double.\n";
     return false;
   }
@@ -263,67 +263,67 @@ bool Param::Get(float &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a float\n";
+    sdferr << "Parameter [" << this->key << "] is not a float\n";
     return false;
   }
 }
 
 /////////////////////////////////////////////////
-bool Param::Get(gazebo::common::Color &_value)
+bool Param::Get(Color &_value)
 {
   if (this->IsColor())
   {
-    _value = ((ParamT<gazebo::common::Color>*)this)->GetValue();
+    _value = ((ParamT<Color>*)this)->GetValue();
     return true;
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a color\n";
+    sdferr << "Parameter [" << this->key << "] is not a color\n";
     return false;
   }
 }
 
 /////////////////////////////////////////////////
-bool Param::Get(gazebo::common::Time &_value)
+bool Param::Get(Time &_value)
 {
   if (this->IsTime())
   {
-    _value = ((ParamT<gazebo::common::Time>*)this)->GetValue();
+    _value = ((ParamT<Time>*)this)->GetValue();
     return true;
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a time\n";
+    sdferr << "Parameter [" << this->key << "] is not a time\n";
     return false;
   }
 }
 
 /////////////////////////////////////////////////
-bool Param::Get(gazebo::math::Pose &_value)
+bool Param::Get(Pose &_value)
 {
   if (this->IsPose())
   {
-    _value = ((ParamT<gazebo::math::Pose>*)this)->GetValue();
+    _value = ((ParamT<Pose>*)this)->GetValue();
     return true;
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a pose\n";
+    sdferr << "Parameter [" << this->key << "] is not a pose\n";
     return false;
   }
 }
 
 /////////////////////////////////////////////////
-bool Param::Get(gazebo::math::Vector3 &_value)
+bool Param::Get(Vector3 &_value)
 {
   if (this->IsVector3())
   {
-    _value = ((ParamT<gazebo::math::Vector3>*)this)->GetValue();
+    _value = ((ParamT<Vector3>*)this)->GetValue();
     return true;
   }
   else
   {
-    // gzwarn << "Parameter [" << this->key
+    // sdfwarn << "Parameter [" << this->key
     //        << "] is not a vector3, parse as string\n";
     std::string val_str = this->GetAsString();
     std::vector<double> elements;
@@ -331,7 +331,7 @@ bool Param::Get(gazebo::math::Vector3 &_value)
     boost::split(pieces, val_str, boost::is_any_of(" "));
     if (pieces.size() != 3)
     {
-      gzerr <<
+      sdferr <<
         "string does not have 3 pieces to parse into Vector3, using 0s\n";
       return false;
     }
@@ -347,7 +347,7 @@ bool Param::Get(gazebo::math::Vector3 &_value)
           }
           catch(boost::bad_lexical_cast &e)
           {
-            gzerr << "value ["
+            sdferr << "value ["
                   << pieces[i]
                   << "] is not a valid double for Vector3[" << i << "]\n";
             return false;
@@ -363,16 +363,16 @@ bool Param::Get(gazebo::math::Vector3 &_value)
 }
 
 /////////////////////////////////////////////////
-bool Param::Get(gazebo::math::Vector2i &_value)
+bool Param::Get(Vector2i &_value)
 {
   if (this->IsVector2i())
   {
-    _value = ((ParamT<gazebo::math::Vector2i>*)this)->GetValue();
+    _value = ((ParamT<Vector2i>*)this)->GetValue();
     return true;
   }
   else
   {
-    // gzwarn << "Parameter [" << this->key
+    // sdfwarn << "Parameter [" << this->key
     //        << "] is not a vector2i,parse as string\n";
     std::string val_str = this->GetAsString();
     std::vector<int> elements;
@@ -380,7 +380,7 @@ bool Param::Get(gazebo::math::Vector2i &_value)
     boost::split(pieces, val_str, boost::is_any_of(" "));
     if (pieces.size() != 2)
     {
-      gzerr <<
+      sdferr <<
         "string does not have 2 parts to parse into Vector2i, using 0s\n";
       return false;
     }
@@ -396,7 +396,7 @@ bool Param::Get(gazebo::math::Vector2i &_value)
           }
           catch(boost::bad_lexical_cast &e)
           {
-            gzerr << "value ["
+            sdferr << "value ["
                   << pieces[i]
                   << "] is not a valid double for Vector2i[" << i << "]\n";
             return false;
@@ -411,16 +411,16 @@ bool Param::Get(gazebo::math::Vector2i &_value)
 }
 
 /////////////////////////////////////////////////
-bool Param::Get(gazebo::math::Vector2d &_value)
+bool Param::Get(Vector2d &_value)
 {
   if (this->IsVector2d())
   {
-    _value = ((ParamT<gazebo::math::Vector2d>*)this)->GetValue();
+    _value = ((ParamT<Vector2d>*)this)->GetValue();
     return true;
   }
   else
   {
-    // gzwarn << "Parameter [" << this->key
+    // sdfwarn << "Parameter [" << this->key
     //        << "] is not vector2d, parse as string\n";
     std::string val_str = this->GetAsString();
     std::vector<double> elements;
@@ -428,7 +428,7 @@ bool Param::Get(gazebo::math::Vector2d &_value)
     boost::split(pieces, val_str, boost::is_any_of(" "));
     if (pieces.size() != 2)
     {
-      gzerr <<
+      sdferr <<
         "string does not have 2 pieces to parse into Vector2d, using 0s\n";
       return false;
     }
@@ -444,7 +444,7 @@ bool Param::Get(gazebo::math::Vector2d &_value)
           }
           catch(boost::bad_lexical_cast &e)
           {
-            gzerr << "value ["
+            sdferr << "value ["
                   << pieces[i]
                   << "] is not a valid double for Vector2d[" << i << "]\n";
             return false;
@@ -468,7 +468,7 @@ bool Param::Get(int &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not an int\n";
+    sdferr << "Parameter [" << this->key << "] is not an int\n";
     return false;
   }
 }
@@ -483,7 +483,7 @@ bool Param::Get(unsigned int &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not an unsigned int\n";
+    sdferr << "Parameter [" << this->key << "] is not an unsigned int\n";
     return false;
   }
 }
@@ -498,7 +498,7 @@ bool Param::Get(char &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not an unsigned int\n";
+    sdferr << "Parameter [" << this->key << "] is not an unsigned int\n";
     return false;
   }
 }
@@ -513,22 +513,22 @@ bool Param::Get(std::string &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a string\n";
+    sdferr << "Parameter [" << this->key << "] is not a string\n";
     return false;
   }
 }
 
 /////////////////////////////////////////////////
-bool Param::Get(gazebo::math::Quaternion &_value)
+bool Param::Get(Quaternion &_value)
 {
   if (this->IsQuaternion())
   {
-    _value = ((ParamT<gazebo::math::Quaternion>*)this)->GetValue();
+    _value = ((ParamT<Quaternion>*)this)->GetValue();
     return true;
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a quaternion\n";
+    sdferr << "Parameter [" << this->key << "] is not a quaternion\n";
     return false;
   }
 }

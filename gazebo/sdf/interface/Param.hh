@@ -31,14 +31,8 @@
 #include <string>
 #include <vector>
 
-#include "common/Console.hh"
-#include "common/Color.hh"
-#include "common/Time.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2i.hh"
-#include "math/Vector2d.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
+#include "sdf/interface/Console.hh"
+#include "sdf/interface/Types.hh"
 
 namespace sdf
 {
@@ -102,13 +96,13 @@ namespace sdf
     public: bool Set(const char &_value);
     public: bool Set(const std::string &_value);
     public: bool Set(const char *_value);
-    public: bool Set(const gazebo::math::Vector3 &_value);
-    public: bool Set(const gazebo::math::Vector2i &_value);
-    public: bool Set(const gazebo::math::Vector2d &_value);
-    public: bool Set(const gazebo::math::Quaternion &_value);
-    public: bool Set(const gazebo::math::Pose &_value);
-    public: bool Set(const gazebo::common::Color &_value);
-    public: bool Set(const gazebo::common::Time &_value);
+    public: bool Set(const Vector3 &_value);
+    public: bool Set(const Vector2i &_value);
+    public: bool Set(const Vector2d &_value);
+    public: bool Set(const Quaternion &_value);
+    public: bool Set(const Pose &_value);
+    public: bool Set(const Color &_value);
+    public: bool Set(const Time &_value);
 
     public: bool Get(bool &_value);
     public: bool Get(int &_value);
@@ -117,13 +111,13 @@ namespace sdf
     public: bool Get(double &_value);
     public: bool Get(char &_value);
     public: bool Get(std::string &_value);
-    public: bool Get(gazebo::math::Vector3 &_value);
-    public: bool Get(gazebo::math::Vector2i &_value);
-    public: bool Get(gazebo::math::Vector2d &_value);
-    public: bool Get(gazebo::math::Quaternion &_value);
-    public: bool Get(gazebo::math::Pose &_value);
-    public: bool Get(gazebo::common::Color &_value);
-    public: bool Get(gazebo::common::Time &_value);
+    public: bool Get(Vector3 &_value);
+    public: bool Get(Vector2i &_value);
+    public: bool Get(Vector2d &_value);
+    public: bool Get(Quaternion &_value);
+    public: bool Get(Pose &_value);
+    public: bool Get(Color &_value);
+    public: bool Get(Time &_value);
 
     /// \brief Set the description of the parameter
     public: void SetDescription(const std::string &_desc);
@@ -202,7 +196,7 @@ namespace sdf
       boost::trim(str);
       if (str.empty() && this->required)
       {
-        gzerr << "Empty string used when setting a required parameter. Key["
+        sdferr << "Empty string used when setting a required parameter. Key["
               << this->GetKey() << "]\n";
         return false;
       }
@@ -232,12 +226,12 @@ namespace sdf
         {
           // in this case, the parser complains, but seems to assign the
           // right values
-          gzmsg << "INFO [sdf::Param]: boost throws when lexical casting "
+          sdfmsg << "INFO [sdf::Param]: boost throws when lexical casting "
             << "inf's, but the values are usually passed through correctly\n";
         }
         else
         {
-          gzerr << "Unable to set value [" <<  str
+          sdferr << "Unable to set value [" <<  str
                 << "] for key[" << this->key << "]\n";
           return false;
         }

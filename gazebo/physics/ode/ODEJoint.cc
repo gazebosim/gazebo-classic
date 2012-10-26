@@ -59,37 +59,37 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
     if (elem->HasElement("limit"))
     {
       this->SetParam(dParamStopERP,
-          elem->GetElement("limit")->GetValueDouble("erp"));
+          elem->GetElement("limit")->Get<double>("erp"));
       this->SetParam(dParamStopCFM,
-          elem->GetElement("limit")->GetValueDouble("cfm"));
+          elem->GetElement("limit")->Get<double>("cfm"));
     }
 
     if (elem->HasElement("suspension"))
     {
       this->SetParam(dParamSuspensionERP,
-          elem->GetElement("suspension")->GetValueDouble("erp"));
+          elem->GetElement("suspension")->Get<double>("erp"));
       this->SetParam(dParamSuspensionCFM,
-          elem->GetElement("suspension")->GetValueDouble("cfm"));
+          elem->GetElement("suspension")->Get<double>("cfm"));
     }
 
     if (elem->HasElement("fudge_factor"))
       this->SetParam(dParamFudgeFactor,
-          elem->GetElement("fudge_factor")->GetValueDouble());
+          elem->GetElement("fudge_factor")->Get<double>());
 
     if (elem->HasElement("cfm"))
-        this->SetParam(dParamCFM, elem->GetElement("cfm")->GetValueDouble());
+        this->SetParam(dParamCFM, elem->GetElement("cfm")->Get<double>());
 
     if (elem->HasElement("bounce"))
         this->SetParam(dParamBounce,
-          elem->GetElement("bounce")->GetValueDouble());
+          elem->GetElement("bounce")->Get<double>());
 
     if (elem->HasElement("max_force"))
       this->SetParam(dParamFMax,
-          elem->GetElement("max_force")->GetValueDouble());
+          elem->GetElement("max_force")->Get<double>());
 
     if (elem->HasElement("velocity"))
       this->SetParam(dParamVel,
-          elem->GetElement("velocity")->GetValueDouble());
+          elem->GetElement("velocity")->Get<double>());
   }
 
   // TODO: reimplement

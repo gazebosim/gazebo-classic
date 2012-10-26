@@ -18,9 +18,12 @@
  * Author: Nate Koenig
  */
 
-#include "World.hh"
-#include "Model.hh"
-#include "WorldState.hh"
+
+#include "gazebo/common/Console.hh"
+
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/WorldState.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -60,7 +63,7 @@ WorldState::~WorldState()
 /////////////////////////////////////////////////
 void WorldState::Load(sdf::ElementPtr _elem)
 {
-  this->name = _elem->GetValueString("world_name");
+  this->name = _elem->Get<std::string>("world_name");
 
   if (_elem->HasElement("model"))
   {

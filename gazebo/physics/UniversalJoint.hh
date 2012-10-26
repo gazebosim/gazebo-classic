@@ -19,10 +19,12 @@
  * Date: 21 May 2003
  */
 
-#ifndef UNIVERSALJOINT_HH
-#define UNIVERSALJOINT_HH
+#ifndef _UNIVERSALJOINT_HH_
+#define _UNIVERSALJOINT_HH_
 
-#include "physics/Joint.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/math/MathTypes.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -37,20 +39,28 @@ namespace gazebo
     {
       /// \brief Constructor
       public: UniversalJoint(BasePtr _parent) : T(_parent)
-              { this->AddType(Base::UNIVERSAL_JOINT); }
+              {this->AddType(Base::UNIVERSAL_JOINT);}
 
       /// \brief Destuctor
       public: virtual ~UniversalJoint()
-              { }
+              {}
+
       /// \brief Load a UniversalJoint
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
+                   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+                   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
 
-                   this->SetAxis(0,
-                       this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-                   this->SetAxis(1,
-                       this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+                   math::Vector3 axis =
+                     axisElem->Get<gazebo::math::Vector3>("xyz");
+
+                   math::Vector3 axis2 =
+                     axis2Elem->Get<gazebo::math::Vector3>("xyz");
+
+
+                   this->SetAxis(0, axis);
+                   this->SetAxis(1, axis2);
                  }
     };
     /// \}

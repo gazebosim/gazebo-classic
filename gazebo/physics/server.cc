@@ -98,7 +98,7 @@ void Load()
   while (worldElem)
   {
     gazebo::physics::WorldPtr world =
-      gazebo::physics::create_world(worldElem->GetValueString("name"));
+      gazebo::physics::create_world(worldElem->Get<std::string>("name"));
 
     // Create the world
     try

@@ -125,9 +125,9 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  this->stepTimeDouble = bulletElem->GetElement("dt")->GetValueDouble();
+  this->stepTimeDouble = bulletElem->GetElement("dt")->Get<double>();
 
-  math::Vector3 g = this->sdf->GetValueVector3("gravity");
+  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
   this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
@@ -139,8 +139,8 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   if (bulletElem->HasElement("constraints"))
   {
     info.m_globalCfm =
-      bulletElem->GetElement("constraints")->GetValueDouble("cfm");
-    info.m_erp = bulletElem->GetElement("constraints")->GetValueDouble("erp");
+      bulletElem->GetElement("constraints")->Get<double>("cfm");
+    info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
   }
 }
 
