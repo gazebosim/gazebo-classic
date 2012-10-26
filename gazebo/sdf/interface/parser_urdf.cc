@@ -34,6 +34,7 @@
 
 #include <urdf_parser/urdf_parser.h>
 #include <sdf/interface/parser_urdf.hh>
+#include <sdf/interface/parser_deprecated.hh>
 
 #include <fstream>
 #include <sstream>
@@ -398,6 +399,14 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
       {
           std::ostringstream stream;
           stream << *child_elem;
+
+          /// \TODO: check of blob is deprecated format
+
+
+          /// \TODO: convert to sdf 1.2 if it is the deprecated format
+
+
+
           // save all unknown stuff in a vector of blobs
           TiXmlElement *blob = new TiXmlElement(*child_elem);
           gazebo->blobs.push_back(blob);

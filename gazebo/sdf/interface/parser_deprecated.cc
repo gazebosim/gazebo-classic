@@ -501,9 +501,14 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf)
   poseString += "0 0 0";
 
   sdf::ElementPtr sdfOrigin = _sdf->AddElement("origin");
-  sdfOrigin->GetAttribute("pose")->SetFromString(poseString);
 
-  initAttr(_config, "mass", _sdf->GetAttribute("mass"));
+  /// sdf 1.0, pose is an attribute
+  // sdfOrigin->GetAttribute("pose")->SetFromString(poseString);
+  /// sdf 1.2, pose is an attribute
+  sdfOrigin->GetOrCreateElement("pose")->Set(poseString);
+
+  // initAttr(_config, "mass", _sdf->GetAttribute("mass"));
+  _sdf->GetOrCreateElement("mass")->Set(getNodeValue(_config, "mass"));
 
   sdf::ElementPtr sdfInertia = _sdf->AddElement("inertia");
 
@@ -519,12 +524,12 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf)
           << " ixy, ixz, iyy, iyz, izz attributes\n";
     return false;
   }
-  if (!sdfInertia->GetAttribute("ixx")->SetFromString(getValue(ixx_xml)) ||
-      !sdfInertia->GetAttribute("ixy")->SetFromString(getValue(ixy_xml)) ||
-      !sdfInertia->GetAttribute("ixz")->SetFromString(getValue(ixz_xml)) ||
-      !sdfInertia->GetAttribute("iyy")->SetFromString(getValue(iyy_xml)) ||
-      !sdfInertia->GetAttribute("iyz")->SetFromString(getValue(iyz_xml)) ||
-      !sdfInertia->GetAttribute("izz")->SetFromString(getValue(izz_xml)))
+  if (!sdfInertia->GetOrCreateElement("ixx")->Set(getValue(ixx_xml)) ||
+      !sdfInertia->GetOrCreateElement("ixy")->Set(getValue(ixy_xml)) ||
+      !sdfInertia->GetOrCreateElement("ixz")->Set(getValue(ixz_xml)) ||
+      !sdfInertia->GetOrCreateElement("iyy")->Set(getValue(iyy_xml)) ||
+      !sdfInertia->GetOrCreateElement("iyz")->Set(getValue(iyz_xml)) ||
+      !sdfInertia->GetOrCreateElement("izz")->Set(getValue(izz_xml)))
   {
     gzerr << "one of the inertia elements: "
       << "ixx (" << getValue(ixx_xml) << ") "
@@ -706,7 +711,9 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
   else
       poseStr += "0 0 0";
 
-  origin->GetAttribute("pose")->SetFromString(poseStr);
+  /// sdf 1.0 is attribute, 1.2 is pose
+  // origin->GetAttribute("pose")->SetFromString(poseStr);
+  origin->GetOrCreateElement("pose")->Set(poseStr);
 
   return true;
 }
@@ -789,7 +796,10 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
       vis_pose.rot = col_pose.rot * vis_pose.rot;
 
       // update the sdf pose
-      sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
+      // sdf 1.0 to 1.2
+      // sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
+      sdfVisual->GetElement("origin")->GetOrCreateElement("pose")->
+        Set(vis_pose);
     }
     // TODO: check for duplicate geoms
   }
@@ -933,7 +943,9 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
   // for rpy, which doesn't exist in old model xml
   poseStr += "0 0 0";
   sdf::ElementPtr origin = _sdf->AddElement("origin");
-  origin->GetAttribute("pose")->SetFromString(poseStr);
+  /// sdf 1.0 to 1.2
+  // origin->GetAttribute("pose")->SetFromString(poseStr);
+  origin->GetOrCreateElement("pose")->Set(poseStr);
 
 
   // setup parent / child links
