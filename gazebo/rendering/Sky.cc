@@ -54,14 +54,6 @@ void Sky::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Sky::Init()
 {
-  /// Only enable the sky if the SDF contains a <sky> element.
-  if (this->sdf->HasElement("sky"))
-    this->SetSky();
-}
-
-/////////////////////////////////////////////////
-void Sky::SetSky()
-{
   // Create SkyX
   if (!this->skyxController)
   {
@@ -72,6 +64,14 @@ void Sky::SetSky()
     this->skyx->setTimeMultiplier(0);
   }
 
+  /// Only enable the sky if the SDF contains a <sky> element.
+  if (this->sdf->HasElement("sky"))
+    this->SetSky();
+}
+
+/////////////////////////////////////////////////
+void Sky::SetSky()
+{
   // Set the time:
   // x = current time[0-24],
   // y = sunrise time[0-24],
@@ -115,9 +115,9 @@ void Sky::SetSky()
 
     // Set the ambient color of the clouds
     vclouds->setAmbientColor(Ogre::Vector3(
-          cloudElem->GetValueColor("ambientl").r,
-          cloudElem->GetValueColor("ambientl").g,
-          cloudElem->GetValueColor("ambientl").b));
+          cloudElem->GetValueColor("ambient").r,
+          cloudElem->GetValueColor("ambient").g,
+          cloudElem->GetValueColor("ambient").b));
 
     // x = sun light power
     // y = sun beta multiplier
@@ -145,11 +145,8 @@ void Sky::SetSky()
   }
   else
   {
-    // Remove VClouds
-    if (this->skyx->getVCloudsManager()->isCreated())
-    {
-      this->skyx->getVCloudsManager()->remove();
-    }
+    // Disable VClouds
+    this->skyx->getVCloudsManager()->getVClouds()->setWheater(0, 0, false);
   }
 
   // Set the lightning parameters
@@ -188,9 +185,6 @@ void Sky::SetSky()
 //////////////////////////////////////////////////
 void Sky::ProcessSkyMsg(const msgs::Sky &_msg)
 {
-  SkyX::VClouds::VClouds *vclouds =
-    this->skyx->getVCloudsManager()->getVClouds();
-
   if (_msg.has_time())
   {
     Ogre::Vector3 t = this->skyxController->getTime();
@@ -214,36 +208,49 @@ void Sky::ProcessSkyMsg(const msgs::Sky &_msg)
 
   if (_msg.has_clouds())
   {
-    msgs::Sky::Clouds cloudsMsg = _msg.clouds();
+    if (!this->skyx->getVCloudsManager()->isCreated())
+      this->skyx->getVCloudsManager()->create();
 
-    if (cloudsMsg.has_speed())
-      vclouds->setWindSpeed(cloudsMsg.speed());
+    SkyX::VClouds::VClouds *vclouds =
+      this->skyx->getVCloudsManager()->getVClouds();
 
-    if (cloudsMsg.has_direction())
-      vclouds->setWindDirection(Ogre::Radian(cloudsMsg.direction()));
-
-    if (cloudsMsg.has_ambient())
+    if (_msg.clouds().enabled())
     {
-      vclouds->setAmbientFactors(Ogre::Vector4(
-            cloudsMsg.ambient().r(),
-            cloudsMsg.ambient().g(),
-            cloudsMsg.ambient().b(),
-            cloudsMsg.ambient().a()));
+      msgs::Sky::Clouds cloudsMsg = _msg.clouds();
+
+      if (cloudsMsg.has_speed())
+        vclouds->setWindSpeed(cloudsMsg.speed());
+
+      if (cloudsMsg.has_direction())
+        vclouds->setWindDirection(Ogre::Radian(cloudsMsg.direction()));
+
+      if (cloudsMsg.has_ambient())
+      {
+        vclouds->setAmbientFactors(Ogre::Vector4(
+              cloudsMsg.ambient().r(),
+              cloudsMsg.ambient().g(),
+              cloudsMsg.ambient().b(),
+              cloudsMsg.ambient().a()));
+      }
+
+      if (cloudsMsg.has_humidity())
+      {
+        Ogre::Vector2 wheater = vclouds->getWheater();
+        vclouds->setWheater(
+            math::clamp(cloudsMsg.humidity(), 0.0, 1.0),
+            wheater.y, false);
+      }
+
+      if (cloudsMsg.has_mean_size())
+      {
+        Ogre::Vector2 wheater = vclouds->getWheater();
+        vclouds->setWheater(wheater.x,
+            math::clamp(cloudsMsg.mean_size(), 0.0, 1.0), false);
+      }
     }
-
-    if (cloudsMsg.has_humidity())
+    else
     {
-      Ogre::Vector2 wheater = vclouds->getWheater();
-      vclouds->setWheater(
-          math::clamp(cloudsMsg.humidity(), 0.0, 1.0),
-          wheater.y, true);
-    }
-
-    if (cloudsMsg.has_mean_size())
-    {
-      Ogre::Vector2 wheater = vclouds->getWheater();
-      vclouds->setWheater(wheater.x,
-          math::clamp(cloudsMsg.mean_size(), 0.0, 1.0), true);
+      vclouds->setWheater(0, 0, false);
     }
   }
 
@@ -252,8 +259,8 @@ void Sky::ProcessSkyMsg(const msgs::Sky &_msg)
     msgs::Sky::Lightning lightningMsg = _msg.lightning();
   }
 
-
-  this->skyx->update(0);
+  /// \todo: Add skyx to the root's frame listener: Ogre::Root::addFrameListener
+  this->skyx->update(0.1);
 }
 
 /////////////////////////////////////////////////
@@ -267,4 +274,9 @@ void Sky::AddCamera(CameraPtr _camera)
 {
   if (this->skyx)
     _camera->GetRenderTarget()->addListener(this->skyx);
+  else
+  {
+    gzerr << "Sky is improperly initialized. "
+          << "Unable to add camera listner to the sky.\n";
+  }
 }

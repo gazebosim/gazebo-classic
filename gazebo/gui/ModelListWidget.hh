@@ -100,17 +100,9 @@ namespace gazebo
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
 
-      private: QtProperty *GetParentItemValue(const std::string &_name);
-      private: QtProperty *GetParentItemValue(QtProperty *_item,
-                                           const std::string &_name);
-
       private: QtProperty *GetParentItem(const std::string &_name);
       private: QtProperty *GetParentItem(QtProperty *_item,
                                            const std::string &_name);
-
-      private: QtProperty *GetChildItemValue(const std::string &_name);
-      private: QtProperty *GetChildItemValue(QtProperty *_item,
-                                             const std::string &_name);
 
       private: QtProperty *GetChildItem(const std::string &_name);
       private: QtProperty *GetChildItem(QtProperty *_item,

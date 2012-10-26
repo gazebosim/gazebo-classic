@@ -614,14 +614,19 @@ namespace gazebo
       msg.set_sunset(_sdf->GetValueDouble("sunset"));
       msg.set_moon_phase(_sdf->GetValueDouble("moon_phase"));
 
+      msgs::Sky::Clouds *cloudsMsg = msg.mutable_clouds();
+
       if (_sdf->HasElement("clouds"))
       {
         sdf::ElementPtr cloudsElem = _sdf->GetElement("clouds");
-        msgs::Sky::Clouds *cloudsMsg = msg.mutable_clouds();
 
+        cloudsMsg->set_enabled(true);
         cloudsMsg->set_speed(cloudsElem->GetValueDouble("speed"));
+
         cloudsMsg->set_direction(cloudsElem->GetValueDouble("direction"));
+
         cloudsMsg->set_humidity(cloudsElem->GetValueDouble("humidity"));
+
         cloudsMsg->set_mean_size(cloudsElem->GetValueDouble("mean_size"));
 
         msgs::Set(cloudsMsg->mutable_ambient(),
@@ -631,6 +636,8 @@ namespace gazebo
         msgs::Set(cloudsMsg->mutable_light_response(),
                   cloudsElem->GetValueVector4("light_response"));
       }
+      else
+        cloudsMsg->set_enabled(false);
 
       if (_sdf->HasElement("lightning"))
       {

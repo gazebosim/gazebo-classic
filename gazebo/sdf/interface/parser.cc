@@ -93,7 +93,7 @@ bool initFile(const std::string &_filename, ElementPtr _sdf)
   std::string filename = find_file(_filename);
 
   TiXmlDocument xmlDoc;
-  if (xmlDoc.LoadFile(filename))
+  if (!filename.empty() && xmlDoc.LoadFile(filename))
     return initDoc(&xmlDoc, _sdf);
   else
     gzerr << "Unable to load file[" << filename << "]\n";

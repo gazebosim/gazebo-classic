@@ -22,6 +22,7 @@ set (sdfs
   road.sdf
   scene.sdf 
   sensor.sdf 
+  sky.sdf
   state.sdf
   surface.sdf 
   visual.sdf 
