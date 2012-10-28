@@ -161,21 +161,24 @@ if (PKG_CONFIG_FOUND)
   if (OGRE-RTShaderSystem_FOUND)
     set(ogre_ldflags ${OGRE-RTShaderSystem_LDFLAGS})
     set(ogre_include_dirs ${OGRE-RTShaderSystem_INCLUDE_DIRS})
-    set(ogre_libraries "OgreRTShaderSystem")
+    set(ogre_libraries ${OGRE-RTShaderSystem_LIBRARIES})
+    set(ogre_library_dirs ${OGRE-RTShaderSystem_LIBRARY_DIRS})
     set(ogre_cflags ${OGRE-RTShaderSystem_CFLAGS})
 
     set (INCLUDE_RTSHADER ON CACHE BOOL "Enable GPU shaders")
   else ()
     set (INCLUDE_RTSHADER OFF CACHE BOOL "Enable GPU shaders")
+  endif ()
 
-    pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-    if (NOT OGRE_FOUND)
-      BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-    else (NOT OGRE_FOUND)
-      set(ogre_ldflags ${OGRE_LDFLAGS})
-      set(ogre_include_dirs ${OGRE_INCLUDE_DIRS})
-      set(ogre_cflags ${OGRE_CFLAGS})
-    endif ()
+  pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
+  if (NOT OGRE_FOUND)
+    BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
+  else (NOT OGRE_FOUND)
+    set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
+    set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
+    set(ogre_libraries ${ogre_libraries};${OGRE_LIBRARIES})
+    set(ogre_library_dirs ${ogre_library_dirs} ${OGRE_LIBRARY_DIRS})
+    set(ogre_cflags ${ogre_cflags} ${OGRE_CFLAGS})
   endif ()
 
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs}
@@ -185,8 +188,8 @@ if (PKG_CONFIG_FOUND)
   if (OGRE-Terrain_FOUND)
     set(ogre_ldflags ${ogre_ldflags} ${OGRE-Terrain_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE-Terrain_INCLUDE_DIRS})
+    set(ogre_libraries ${ogre_libraries};${OGRE-Terrain_LIBRARIES})
     set(ogre_library_dirs ${ogre_library_dirs} ${OGRE-Terrain_LIBRARY_DIRS})
-    set(ogre_libraries "${ogre_libraries};OgreTerrain;OgrePaging")
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
 
@@ -196,11 +199,15 @@ if (PKG_CONFIG_FOUND)
   # is not installed in a default search path, even if we forcibly find the 
   # FindOGRE.cmake file does not return correct paths. So, we are forced to
   # use find_path to find where OGRE and its plugins are installed.
-  find_path(OGRE_LIBRARY_PATH libOgreMain.so /usr/lib /usr/local/lib
+  find_path(HACK_OGRE_LIBRARY_PATH libOgreMain.so /usr/lib /usr/local/lib
             /usr/lib/x86_64-linux-gnu /usr/lib/i386-linux-gnu
             ${ogre_library_dirs})
+  if (NOT HACK_OGRE_LIBRARY_PATH)
+    find_path(HACK_OGRE_LIBRARY_PATH libOgreMain_d.so /usr/lib /usr/local/lib
+              /usr/lib/x86_64-linux-gnu /usr/lib/i386-linux-gnu
+              ${ogre_library_dirs})
+  endif()
 
-  set(ogre_libraries "${ogre_libraries};OgreMain")
 
   #################################################
   # Find XML
