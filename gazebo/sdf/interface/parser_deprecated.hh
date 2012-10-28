@@ -93,13 +93,6 @@ namespace deprecated_sdf
   /// physics
   bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
-  /// parser helper
-  void xmlToSDFAttrib(xmlNodePtr _config, sdf::ElementPtr _sdf,
-                    std::string _config_key, std::string _sdf_key);
-  /// parser helper
-  void xmlToSDFElem(xmlNodePtr _config, sdf::ElementPtr _sdf,
-                  std::string _config_key, std::string _sdf_key);
-
   /// copying <controller:...> to <plugins>
   void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool controller2Plugins(xmlNodePtr pluginXml, sdf::ElementPtr _sdf);
@@ -107,7 +100,10 @@ namespace deprecated_sdf
   bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   bool initAttr(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
-  bool initElem(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
+  bool initElem(xmlNodePtr _node, const std::string &_key,
+                sdf::ElementPtr _attr);
+  bool initElem(xmlNodePtr _node, const std::string &_config_key,
+                sdf::ElementPtr _attr, const std::string &_sdf_key);
 
   ////////////////////////////////////////////////////////////////////////////
   //

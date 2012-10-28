@@ -185,7 +185,6 @@ bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf)
 // light parsing
 bool initLight(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
-  initOrigin(_config, _sdf);
   xmlNodePtr lightNode = firstChildElement(_config, "light");
   if (!lightNode)
   {
@@ -193,42 +192,54 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
 
-  initAttr(_config, "name", _sdf->GetAttribute("name"));
-  if (firstChildElement(lightNode, "castShadows"))
-    initAttr(lightNode, "castShadows", _sdf->GetAttribute("cast_shadows"));
-  initAttr(lightNode, "type", _sdf->GetAttribute("type"));
+  sdf::ElementPtr sdfLight = _sdf->GetOrCreateElement("light");
 
-  sdf::ElementPtr sdfDiffuse = _sdf->AddElement("diffuse");
-  initAttr(lightNode, "diffuse", sdfDiffuse->GetAttribute("rgba"));
+  // origin
+  initOrigin(_config, sdfLight);
 
-  sdf::ElementPtr sdfSpecular = _sdf->AddElement("specular");
-  initAttr(lightNode, "specular", sdfDiffuse->GetAttribute("rgba"));
+  // name
+  initAttr(_config, "name", sdfLight->GetAttribute("name"));
 
-  sdf::ElementPtr sdfAttenuation = _sdf->AddElement("attenuation");
-  initAttr(lightNode, "range", sdfAttenuation->GetAttribute("range"));
-  sdfAttenuation->GetAttribute("constant")->SetFromString(
+  // type
+  initAttr(lightNode, "type", sdfLight->GetAttribute("type"));
+
+  // diffuse
+  initElem(lightNode, "diffuseColor", sdfLight, "diffuse");
+
+  // specular
+  initElem(lightNode, "specularColor", sdfLight, "specular");
+
+  // attenuation
+  sdf::ElementPtr sdfAttenuation = sdfLight->AddElement("attenuation");
+
+  // range
+  initElem(lightNode, "range", sdfAttenuation);
+
+  // attenuation constants
+  sdfAttenuation->GetOrCreateElement("constant")->Set(
       getNodeTuple(lightNode, "attenuation", 0));
-  sdfAttenuation->GetAttribute("linear")->SetFromString(
+  sdfAttenuation->GetOrCreateElement("linear")->Set(
       getNodeTuple(lightNode, "attenuation", 1));
-  sdfAttenuation->GetAttribute("quadratic")->SetFromString(
+  sdfAttenuation->GetOrCreateElement("quadratic")->Set(
       getNodeTuple(lightNode, "attenuation", 2));
 
-  sdf::ElementPtr sdfDirection = _sdf->AddElement("direction");
-  initAttr(lightNode, "direction", sdfDirection->GetAttribute("xyz"));
+  // direction
+  initElem(lightNode, "direction", sdfLight);
 
+  // spot
   if (firstChildElement(lightNode, "sportCone"))
   {
-    sdf::ElementPtr sdfSpot = _sdf->AddElement("spot");
+    sdf::ElementPtr sdfSpot = sdfLight->AddElement("spot");
     double innerAngle =
       boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone", 0));
     double outerAngle =
       boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone", 1));
 
-    sdfSpot->GetAttribute("inner_angle")->SetFromString(
+    sdfSpot->GetOrCreateElement("inner_angle")->Set(
         boost::lexical_cast<std::string>(GZ_DTOR(innerAngle)));
-    sdfSpot->GetAttribute("outer_angle")->SetFromString(
+    sdfSpot->GetOrCreateElement("outer_angle")->Set(
         boost::lexical_cast<std::string>(GZ_DTOR(outerAngle)));
-    sdfSpot->GetAttribute("falloff")->SetFromString(
+    sdfSpot->GetOrCreateElement("falloff")->Set(
         getNodeTuple(lightNode, "spotCone", 2));
   }
 
@@ -1178,110 +1189,70 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
-  sdf::ElementPtr sdfAmbient = _sdf->AddElement("ambient");
-  if (sdfAmbient)
-    initAttr(_config, "ambient", sdfAmbient->GetAttribute("rgba"));
+  xmlNodePtr sceneNode = firstChildElement(_config, "scene");
+  if (!sceneNode)
+    return true;
 
-  sdf::ElementPtr sdfBackground = _sdf->AddElement("background");
-  if (sdfBackground)
-    initAttr(_config, "background", sdfBackground->GetAttribute("rgba"));
+  sdf::ElementPtr sceneSDF = _sdf->GetOrCreateElement("scene");
 
-  xmlNodePtr sky = firstChildElement(_config, "sky");
+  initElem(sceneNode, "ambient", sceneSDF);
+  initElem(sceneNode, "background", sceneSDF);
+
+  xmlNodePtr sky = firstChildElement(sceneNode, "sky");
   if (sky)
   {
-    sdf::ElementPtr sdfSky = sdfBackground->AddElement("sky");
-    if (sdfSky)
-      initAttr(sky, "material", sdfSky->GetAttribute("material"));
+    gzwarn << "<sky> is not parsed, please create new SDF-1.2 scene.sdf\n";
   }
 
-  sdf::ElementPtr sdfShadow = _sdf->AddElement("shadows");
-
-  if (sdfShadow)
-    initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
-
-  //  per pixel shading does not allow options
-  // sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
-  // initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
-
+  initElem(sceneNode, "shadows", sceneSDF);
   return true;
-}
-
-void xmlToSDFAttrib(xmlNodePtr _config, sdf::ElementPtr _sdf,
-                  std::string _config_key, std::string _sdf_key)
-{
-  std::string str = getNodeValue(_config, _config_key);
-  if (!str.empty())
-  {
-    _sdf->GetAttribute(_sdf_key)->SetFromString(str);
-  }
-}
-
-void xmlToSDFElem(xmlNodePtr _config, sdf::ElementPtr _sdf,
-                std::string _config_key, std::string _sdf_key)
-{
-  std::string str = getNodeValue(_config, _config_key);
-  if (!str.empty())
-  {
-    _sdf->GetOrCreateElement(_sdf_key)->Set(str);
-  }
 }
 
 /// initialize physics sdf from deprecated xml
 bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
+  xmlNodePtr physicsNode = firstChildElement(_config, "physics");
+  if (!physicsNode)
+    return true;
+
   // <physics type="ode">
   sdf::ElementPtr sdfPhysics = _sdf->AddElement("physics");
-  // hardcode to ode, by the time we have the other option, this code
+
+  // hardcode to ode, by the time we have other options, this code
   // should be extinct
   sdfPhysics->GetAttribute("type")->SetFromString("ode");
+
   //   <update_rate>1000</update_rate>
-  xmlNodePtr updateRateXml = firstChildElement(_config, "update_rate");
-  if (updateRateXml)
-    sdfPhysics->GetOrCreateElement("update_rate")->Set(getValue(updateRateXml));
-  //   <max_contacts>1000</max_contacts>
-  //   <gravity>1000</gravity>
-  xmlNodePtr gravityXml = firstChildElement(_config, "gravity");
-  if (gravityXml)
+  initElem(physicsNode, "updateRate", sdfPhysics, "update_rate");
+
+  //   <max_contacts>20</max_contacts>
+  initElem(physicsNode, "maxContacts", sdfPhysics, "max_contacts");
+
+  //   <gravity>0 0 1</gravity>
+  xmlNodePtr gravityConfig = firstChildElement(physicsNode, "gravity");
+  if (gravityConfig)
     sdfPhysics->GetOrCreateElement("gravity")->Set(
-      getNodeValue(gravityXml, "xyz"));
+      getNodeValue(gravityConfig, "xyz"));
+
   //   <ode>
-  xmlNodePtr odeConfig = firstChildElement(_config, "ode");
-  //     <solver>
   sdf::ElementPtr sdfODE = sdfPhysics->AddElement("ode");
+
+  //    <solver>
   sdf::ElementPtr sdfODESolver = sdfODE->AddElement("solver");
 
+  initElem(physicsNode, "stepType",  sdfODESolver, "type");
+  initElem(physicsNode, "stepTime",  sdfODESolver, "dt");
+  initElem(physicsNode, "stepIters", sdfODESolver, "iters");
+  initElem(physicsNode, "stepW",     sdfODESolver, "sor");
+
   sdf::ElementPtr sdfODEConstraints = sdfODE->AddElement("constraints");
+  initElem(physicsNode, "cfm", sdfODEConstraints);
+  initElem(physicsNode, "erp", sdfODEConstraints);
+  initElem(physicsNode, "contactMaxCorrectingVel",
+           sdfODEConstraints, "contact_max_correcting_vel");
+  initElem(physicsNode, "contactSurfaceLayer",
+           sdfODEConstraints, "contact_surface_layer");
 
-
-  if (sdfODESolver)
-  {
-    initAttr(odeConfig, "stepType", sdfODESolver->GetAttribute("type"));
-    initAttr(odeConfig, "stepTime", sdfODESolver->GetAttribute("dt"));
-
-    if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
-    {
-      initAttr(odeConfig, "stepIters", sdfODESolver->GetAttribute("iters"));
-      initAttr(odeConfig, "stepW", sdfODESolver->GetAttribute("sor"));
-    }
-
-    if (sdfODESolver->GetAttribute("type")->GetAsString() == "pgs")
-    {
-      initAttr(odeConfig, "stepIters", sdfODESolver->GetAttribute("iters"));
-      initAttr(odeConfig, "stepW", sdfODESolver->GetAttribute("sor"));
-    }
-  }
-
-
-  // Contraints
-  if (sdfODEConstraints)
-  {
-    initAttr(odeConfig, "cfm", sdfODEConstraints->GetAttribute("cfm"));
-    initAttr(odeConfig, "erp", sdfODEConstraints->GetAttribute("erp"));
-    initAttr(odeConfig, "contactMaxCorrectingVel",
-        sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
-    initAttr(odeConfig, "contactSurfaceLayer",
-        sdfODEConstraints->GetAttribute("contact_surface_layer"));
-  }
   return true;
 }
 
@@ -1315,11 +1286,25 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-bool initElem(xmlNodePtr /*_node*/, const std::string &/*_key*/,
-              sdf::ElementPtr /*_attr*/)
+bool initElem(xmlNodePtr _config, const std::string &_key,
+              sdf::ElementPtr _sdf)
+{
+  return initElem(_config, _key, _sdf, _key);
+}
+
+//////////////////////////////////////////////////
+bool initElem(xmlNodePtr _config, const std::string &_config_key,
+              sdf::ElementPtr _sdf, const std::string &_sdf_key)
 {
   // to be implemented
-  return false;
+  xmlNodePtr config = firstChildElement(_config, _config_key);
+  if (config)
+  {
+    _sdf->GetOrCreateElement(_sdf_key)->Set(getValue(config));
+    return false;
+  }
+  else
+    return false;
 }
 
 //////////////////////////////////////////////////
@@ -1426,9 +1411,9 @@ bool initWorldDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 
   // add or set version string if needed
   if (_sdf->root->GetAttribute("version"))
-    _sdf->root->GetAttribute("version")->SetFromString("1.0");
+    _sdf->root->GetAttribute("version")->SetFromString("1.2");
   else
-    _sdf->root->AddAttribute("version", "string", "1.0", false);
+    _sdf->root->AddAttribute("version", "string", "1.2", false);
 
   bool world_initialized = false;
   xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world");
