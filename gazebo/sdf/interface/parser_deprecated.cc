@@ -49,6 +49,14 @@
 
 namespace deprecated_sdf
 {
+
+std::string lowerStr(std::string str)
+{
+  std::string out = str;
+  std::transform(out.begin(), out.end(), out.begin(), ::tolower);
+  return out;
+}
+
 void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Iterate over all the child elements
@@ -183,7 +191,7 @@ bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf)
 }
 
 // light parsing
-bool initLight(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
 {
   xmlNodePtr lightNode = firstChildElement(_config, "light");
   if (!lightNode)
@@ -191,8 +199,6 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr _sdf)
     gzerr << "Light is missing the <light> child node\n";
     return false;
   }
-
-  sdf::ElementPtr sdfLight = _sdf->GetOrCreateElement("light");
 
   // origin
   initOrigin(_config, sdfLight);
@@ -475,7 +481,7 @@ bool initContact(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
 // _config = <body>
 // _sdf = <inertial>
-bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initInertial(xmlNodePtr _config, sdf::ElementPtr sdfInertial)
 {
   // Origin (old gazebo xml supports only cx, cy, cz translations, no rotation
   // xyz and rpy under body:... is for the link frame
@@ -511,47 +517,23 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf)
   // Put in the rpy values
   poseString += "0 0 0";
 
-  sdf::ElementPtr sdfOrigin = _sdf->AddElement("origin");
+  sdf::ElementPtr sdfOrigin = sdfInertial->AddElement("origin");
 
   /// sdf 1.0, pose is an attribute
   // sdfOrigin->GetAttribute("pose")->SetFromString(poseString);
   /// sdf 1.2, pose is an attribute
   sdfOrigin->GetOrCreateElement("pose")->Set(poseString);
 
-  // initAttr(_config, "mass", _sdf->GetAttribute("mass"));
-  _sdf->GetOrCreateElement("mass")->Set(getNodeValue(_config, "mass"));
 
-  sdf::ElementPtr sdfInertia = _sdf->AddElement("inertia");
 
-  xmlNodePtr ixx_xml = firstChildElement(_config, "ixx");
-  xmlNodePtr ixy_xml = firstChildElement(_config, "ixy");
-  xmlNodePtr ixz_xml = firstChildElement(_config, "ixz");
-  xmlNodePtr iyy_xml = firstChildElement(_config, "iyy");
-  xmlNodePtr iyz_xml = firstChildElement(_config, "iyz");
-  xmlNodePtr izz_xml = firstChildElement(_config, "izz");
-  if (!ixx_xml || !ixy_xml || !ixz_xml || !iyy_xml || !iyz_xml || !izz_xml)
-  {
-    gzerr << "Inertial: inertia element must have ixx,"
-          << " ixy, ixz, iyy, iyz, izz attributes\n";
-    return false;
-  }
-  if (!sdfInertia->GetOrCreateElement("ixx")->Set(getValue(ixx_xml)) ||
-      !sdfInertia->GetOrCreateElement("ixy")->Set(getValue(ixy_xml)) ||
-      !sdfInertia->GetOrCreateElement("ixz")->Set(getValue(ixz_xml)) ||
-      !sdfInertia->GetOrCreateElement("iyy")->Set(getValue(iyy_xml)) ||
-      !sdfInertia->GetOrCreateElement("iyz")->Set(getValue(iyz_xml)) ||
-      !sdfInertia->GetOrCreateElement("izz")->Set(getValue(izz_xml)))
-  {
-    gzerr << "one of the inertia elements: "
-      << "ixx (" << getValue(ixx_xml) << ") "
-      << "ixy (" << getValue(ixy_xml) << ") "
-      << "ixz (" << getValue(ixz_xml) << ") "
-      << "iyy (" << getValue(iyy_xml) << ") "
-      << "iyz (" << getValue(iyz_xml) << ") "
-      << "izz (" << getValue(izz_xml) << ") "
-      << "is not a valid double.\n";
-    return false;
-  }
+  initElem(_config, "mass", sdfInertial);
+  sdf::ElementPtr sdfInertia = sdfInertial->AddElement("inertia");
+  initElem(_config, "ixx", sdfInertia);
+  initElem(_config, "ixy", sdfInertia);
+  initElem(_config, "ixz", sdfInertia);
+  initElem(_config, "iyy", sdfInertia);
+  initElem(_config, "iyz", sdfInertia);
+  initElem(_config, "izz", sdfInertia);
 
   return true;
 }
@@ -731,39 +713,38 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
 // _config = <body>
 // _sdf = <link>
-bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
 {
-  initAttr(_config, "name", _sdf->GetAttribute("name"));
-  initOrigin(_config, _sdf);
+  initAttr(_config, "name", sdfLink->GetAttribute("name"));
+  initOrigin(_config, sdfLink);
 
   // optional features (turnGravityOff, selfCollide)
-  initAttr(_config, "selfCollide", _sdf->GetAttribute("self_collide"));
+  initAttr(_config, "selfCollide", sdfLink->GetAttribute("self_collide"));
 
   // kind of tricky, new attribute gravity is opposite of turnGravityOff
-  initAttr(_config, "", _sdf->GetAttribute("gravity"));
   xmlNodePtr tgo = firstChildElement(_config, "turnGravityOff");
   if (tgo)
   {
-    sdf::ParamT<bool> tgoP("turnGravity", "false", false);
-    tgoP.SetFromString(getValue(tgo).c_str());
-    _sdf->GetAttribute("gravity")->Set(!tgoP.GetValue());
+    std::string value_str = getValue(tgo);
+    if (lowerStr(value_str) == "true" || lowerStr(value_str) == "yes" ||
+        value_str == "1")
+      sdfLink->GetOrCreateElement("gravity")->Set("false");
+    else
+      sdfLink->GetOrCreateElement("gravity")->Set("true");
   }
 
   // Inertial (optional)
   xmlNodePtr mm = firstChildElement(_config, "massMatrix");
-  if (mm)
+  std::string mm_str = getValue(mm);
+  if (lowerStr(mm_str) == "true" || lowerStr(mm_str) == "yes" ||
+      mm_str == "1")
   {
-    sdf::ParamT<bool> custom_mass_matrix("mass", "false", false);
-    custom_mass_matrix.SetFromString(getValue(mm).c_str());
-    if (custom_mass_matrix.GetValue())
+    sdf::ElementPtr sdfInertial = sdfLink->AddElement("inertial");
+    if (!initInertial(_config, sdfInertial))
     {
-      sdf::ElementPtr sdfInertial = _sdf->AddElement("inertial");
-      if (!initInertial(_config, sdfInertial))
-      {
-        gzerr << "Could not parse inertial element for Link '"
-          << _sdf->GetAttribute("name")->GetAsString() << "'\n";
-        return false;
-      }
+      gzerr << "Could not parse inertial element for Link '"
+        << sdfLink->GetAttribute("name")->GetAsString() << "'\n";
+      return false;
     }
   }
 
@@ -771,7 +752,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
   for (xmlNodePtr  collision_xml = getChildByNSPrefix(_config, "geom");
       collision_xml; collision_xml = getNextByNSPrefix(collision_xml, "geom"))
   {
-    sdf::ElementPtr sdfCollision = _sdf->AddElement("collision");
+    sdf::ElementPtr sdfCollision = sdfLink->AddElement("collision");
     if (!initCollision(collision_xml, sdfCollision))
     {
       gzerr << "Unable to parser geom\n";
@@ -781,7 +762,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
     for (xmlNodePtr  visual_xml = firstChildElement(collision_xml, "visual");
         visual_xml; visual_xml = nextSiblingElement(visual_xml, "visual"))
     {
-      sdf::ElementPtr sdfVisual = _sdf->AddElement("visual");
+      sdf::ElementPtr sdfVisual = sdfLink->AddElement("visual");
 
       // set name to geom(collision) name append _visual
       sdfVisual->GetAttribute("name")->SetFromString(
@@ -819,7 +800,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
   for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor");
       sensor_xml; sensor_xml = getNextByNSPrefix(sensor_xml, "sensor"))
   {
-    sdf::ElementPtr sdfSensor = _sdf->AddElement("sensor");
+    sdf::ElementPtr sdfSensor = sdfLink->AddElement("sensor");
     if (!initSensor(sensor_xml, sdfSensor))
     {
       gzerr << "Unable to parse sensor\n";
@@ -829,7 +810,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   // Get projector elements
-  getProjectors(_config, _sdf);
+  getProjectors(_config, sdfLink);
 
   return true;
 }
@@ -1103,17 +1084,19 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initModel(xmlNodePtr _config, sdf::ElementPtr sdfModel)
 {
-  initAttr(_config, "name", _sdf->GetAttribute("name"));
-  initAttr(_config, "static", _sdf->GetAttribute("static"));
-  initOrigin(_config, _sdf);
+  initAttr(_config, "name", sdfModel->GetAttribute("name"));
+
+  initElem(_config, "static", sdfModel);
+
+  initOrigin(_config, sdfModel);
 
   // Get all Link elements
   for (xmlNodePtr  linkXml = getChildByNSPrefix(_config, "body");
       linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
   {
-    sdf::ElementPtr sdfLink = _sdf->AddElement("link");
+    sdf::ElementPtr sdfLink = sdfModel->AddElement("link");
     if (!initLink(linkXml, sdfLink))
     {
       gzerr << "link xml is not initialized correctly\n";
@@ -1125,7 +1108,7 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
   for (xmlNodePtr  jointXml = getChildByNSPrefix(_config, "joint");
        jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
   {
-    sdf::ElementPtr sdfJoint = _sdf->AddElement("joint");
+    sdf::ElementPtr sdfJoint = sdfModel->AddElement("joint");
     if (!initJoint(jointXml, sdfJoint))
     {
       gzerr << "joint xml is not initialized correctly\n";
@@ -1134,8 +1117,8 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  controller2Plugins(_config, _sdf);
-  getGrippers(_config, _sdf);
+  controller2Plugins(_config, sdfModel);
+  getGrippers(_config, sdfModel);
 
   return true;
 }
@@ -1154,7 +1137,8 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
   initScene(firstChildElement(_config, "ogre"), sdfScene);
 
   // Get physics block
-  initPhysics(_config, _sdf);
+  sdf::ElementPtr sdfPhysics = _sdf->AddElement("physics");
+  initPhysics(_config, sdfPhysics);
 
   // Get all model elements
   for (xmlNodePtr  modelXml = getChildByNSPrefix(_config, "model");
@@ -1187,16 +1171,14 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initScene(xmlNodePtr _config, sdf::ElementPtr sdfScene)
 {
   xmlNodePtr sceneNode = firstChildElement(_config, "scene");
   if (!sceneNode)
     return true;
 
-  sdf::ElementPtr sceneSDF = _sdf->GetOrCreateElement("scene");
-
-  initElem(sceneNode, "ambient", sceneSDF);
-  initElem(sceneNode, "background", sceneSDF);
+  initElem(sceneNode, "ambient", sdfScene);
+  initElem(sceneNode, "background", sdfScene);
 
   xmlNodePtr sky = firstChildElement(sceneNode, "sky");
   if (sky)
@@ -1204,20 +1186,18 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf)
     gzwarn << "<sky> is not parsed, please create new SDF-1.2 scene.sdf\n";
   }
 
-  initElem(sceneNode, "shadows", sceneSDF);
+  initElem(sceneNode, "shadows", sdfScene);
   return true;
 }
 
 /// initialize physics sdf from deprecated xml
-bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initPhysics(xmlNodePtr _config, sdf::ElementPtr sdfPhysics)
 {
   xmlNodePtr physicsNode = firstChildElement(_config, "physics");
   if (!physicsNode)
     return true;
 
   // <physics type="ode">
-  sdf::ElementPtr sdfPhysics = _sdf->AddElement("physics");
-
   // hardcode to ode, by the time we have other options, this code
   // should be extinct
   sdfPhysics->GetAttribute("type")->SetFromString("ode");
