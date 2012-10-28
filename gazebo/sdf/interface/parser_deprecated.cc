@@ -1142,8 +1142,8 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
   sdf::ElementPtr sdfScene = _sdf->AddElement("scene");
   initScene(firstChildElement(_config, "ogre"), sdfScene);
 
-  sdf::ElementPtr sdfPhysics = _sdf->AddElement("physics");
-  initPhysics(firstChildElement(_config, "ode"), sdfPhysics);
+  // Get physics block
+  initPhysics(_config, _sdf);
 
   // Get all model elements
   for (xmlNodePtr  modelXml = getChildByNSPrefix(_config, "model");
@@ -1206,35 +1206,68 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf)
   return true;
 }
 
-// _config = physics:ode
-// _sdf = physics
+void xmlToSDFAttrib(xmlNodePtr _config, sdf::ElementPtr _sdf,
+                  std::string _config_key, std::string _sdf_key)
+{
+  std::string str = getNodeValue(_config, _config_key);
+  if (!str.empty())
+  {
+    _sdf->GetAttribute(_sdf_key)->SetFromString(str);
+  }
+}
+
+void xmlToSDFElem(xmlNodePtr _config, sdf::ElementPtr _sdf,
+                std::string _config_key, std::string _sdf_key)
+{
+  std::string str = getNodeValue(_config, _config_key);
+  if (!str.empty())
+  {
+    _sdf->GetOrCreateElement(_sdf_key)->Set(str);
+  }
+}
+
+/// initialize physics sdf from deprecated xml
 bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
-  _sdf->GetAttribute("type")->SetFromString("ode");
-
-  sdf::ElementPtr sdfGravity = _sdf->AddElement("gravity");
-  sdf::ElementPtr sdfODE = _sdf->AddElement("ode");
+  // <physics type="ode">
+  sdf::ElementPtr sdfPhysics = _sdf->AddElement("physics");
+  // hardcode to ode, by the time we have the other option, this code
+  // should be extinct
+  sdfPhysics->GetAttribute("type")->SetFromString("ode");
+  //   <update_rate>1000</update_rate>
+  xmlNodePtr updateRateXml = firstChildElement(_config, "update_rate");
+  if (updateRateXml)
+    sdfPhysics->GetOrCreateElement("update_rate")->Set(getValue(updateRateXml));
+  //   <max_contacts>1000</max_contacts>
+  //   <gravity>1000</gravity>
+  xmlNodePtr gravityXml = firstChildElement(_config, "gravity");
+  if (gravityXml)
+    sdfPhysics->GetOrCreateElement("gravity")->Set(
+      getNodeValue(gravityXml, "xyz"));
+  //   <ode>
+  xmlNodePtr odeConfig = firstChildElement(_config, "ode");
+  //     <solver>
+  sdf::ElementPtr sdfODE = sdfPhysics->AddElement("ode");
   sdf::ElementPtr sdfODESolver = sdfODE->AddElement("solver");
+
   sdf::ElementPtr sdfODEConstraints = sdfODE->AddElement("constraints");
 
-  if (sdfGravity)
-    initAttr(_config, "gravity", sdfGravity->GetAttribute("xyz"));
 
   if (sdfODESolver)
   {
-    initAttr(_config, "stepType", sdfODESolver->GetAttribute("type"));
-    initAttr(_config, "stepTime", sdfODESolver->GetAttribute("dt"));
+    initAttr(odeConfig, "stepType", sdfODESolver->GetAttribute("type"));
+    initAttr(odeConfig, "stepTime", sdfODESolver->GetAttribute("dt"));
 
     if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
     {
-      initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
-      initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+      initAttr(odeConfig, "stepIters", sdfODESolver->GetAttribute("iters"));
+      initAttr(odeConfig, "stepW", sdfODESolver->GetAttribute("sor"));
     }
 
     if (sdfODESolver->GetAttribute("type")->GetAsString() == "pgs")
     {
-      initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
-      initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+      initAttr(odeConfig, "stepIters", sdfODESolver->GetAttribute("iters"));
+      initAttr(odeConfig, "stepW", sdfODESolver->GetAttribute("sor"));
     }
   }
 
@@ -1242,11 +1275,11 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf)
   // Contraints
   if (sdfODEConstraints)
   {
-    initAttr(_config, "cfm", sdfODEConstraints->GetAttribute("cfm"));
-    initAttr(_config, "erp", sdfODEConstraints->GetAttribute("erp"));
-    initAttr(_config, "contactMaxCorrectingVel",
+    initAttr(odeConfig, "cfm", sdfODEConstraints->GetAttribute("cfm"));
+    initAttr(odeConfig, "erp", sdfODEConstraints->GetAttribute("erp"));
+    initAttr(odeConfig, "contactMaxCorrectingVel",
         sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
-    initAttr(_config, "contactSurfaceLayer",
+    initAttr(odeConfig, "contactSurfaceLayer",
         sdfODEConstraints->GetAttribute("contact_surface_layer"));
   }
   return true;
