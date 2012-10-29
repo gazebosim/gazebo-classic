@@ -147,7 +147,6 @@ void MainWindow::Init()
   winSize.setHeight(std::max(768, winSize.height()));
 
   this->resize(winSize);
-  this->modelListWidget->InitTransport();
 
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
