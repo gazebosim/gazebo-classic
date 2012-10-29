@@ -252,6 +252,22 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
   return true;
 }
 
+// gripper parsing
+bool initGripper(xmlNodePtr _config, sdf::ElementPtr sdfGripper)
+{
+  initAttr(_config, "name", sdfGripper->GetAttribute("name"));
+  sdf::ElementPtr sdfGraspCheck = sdfGripper->AddElement("grasp_check");
+  initElem(_config, "detach_steps", sdfGraspCheck);
+  initElem(_config, "attach_steps", sdfGraspCheck);
+  initElem(_config, "min_countact_count", sdfGraspCheck);
+  initElem(_config, "palm_link", sdfGripper);
+  for (xmlNodePtr  glink_xml = firstChildElement(_config, "gripper_link");
+      glink_xml; glink_xml = nextSiblingElement(glink_xml, "gripper_link"))
+  {
+    sdfGripper->AddElement("gripper_link")->Set(getValue(glink_xml));
+  }
+}
+
 // Sensor parsing
 bool initSensor(xmlNodePtr _config, sdf::ElementPtr sdfSensor)
 {
@@ -804,6 +820,18 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
       return false;
     }
     // TODO: check for duplicate sensors
+  }
+
+  // Get all gripper elements
+  for (xmlNodePtr  gripper_xml = getChildByNSPrefix(_config, "gripper");
+      gripper_xml; gripper_xml = getNextByNSPrefix(gripper_xml, "gripper"))
+  {
+    sdf::ElementPtr sdfGripper = sdfLink->AddElement("gripper");
+    if (!initGripper(gripper_xml, sdfGripper))
+    {
+      gzerr << "Unable to parse gripper\n";
+      return false;
+    }
   }
 
   // Get projector elements

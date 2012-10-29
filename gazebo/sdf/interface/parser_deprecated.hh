@@ -90,6 +90,9 @@ namespace deprecated_sdf
   /// scene
   bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
+  /// gripper
+  bool initGripper(xmlNodePtr _config, sdf::ElementPtr _sdf);
+
   /// physics
   bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
