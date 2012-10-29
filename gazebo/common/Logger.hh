@@ -26,13 +26,14 @@
 #include <fstream>
 #include <string>
 
+#include "common/Event.hh"
 #include "common/SingletonT.hh"
 
 namespace gazebo
 {
-  namespace physics
+  namespace common
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_common
     /// \{
 
     /// \class Logger Logger.hh physics/Logger.hh
@@ -60,18 +61,22 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~Logger();
 
-      /// \brief Add an entity to a log file.
+      /// \brief Add an object to a log file.
       ///
-      /// Add a new entity to a log. An entity can be any valid named object
-      /// in the world, including the world itself. Duplicate additions are
-      /// ignored. Entites can be added to the same file by passing
+      /// Add a new object to a log. An object can be any valid named object
+      /// in simulation, including the world itself. Duplicate additions are
+      /// ignored. Objects can be added to the same file by passing
       /// specifying the same _filename.
-      /// \param _entityName Name of the entity to log.
-      /// \param _filename Filename of the log file.
+      /// \param[in] _name Name of the object to log.
+      /// \param[in] _filename Filename of the log file.
+      /// \param[in] _logCallback Function used to log data for the object.
+      /// Typically an object will have a log function that outputs data to
+      /// the provided ofstream.
       /// \return True if the Entity was added to a log. False if the entity
       /// is already being logged.
-      public: bool Add(const std::string &_entityName,
-                       const std::string &_filename);
+      public: bool Add(const std::string &_name,
+                       const std::string &_filename,
+                       boost::function<bool (std::fstream &)> _logCallback);
 
       /// \brief Remove an entity from a log
       ///
@@ -92,20 +97,24 @@ namespace gazebo
       /// \brief A logger for an entitiy
       private: class LogObj
                {
-                 public: LogObj(const std::string &entityName,
-                                const std::string &filename);
+                 public: LogObj(const std::string &_name,
+                                const std::string &_filename,
+                                boost::function<bool (std::fstream&)> _logCB);
                  public: virtual ~LogObj();
                  public: void Update();
-                 public: std::string GetEntityName() const;
+                 public: std::string GetName() const;
 
                  public: bool valid;
-                 private: Entity *entity;
+                 private: boost::function<bool (std::fstream&)> logCB;
+                 private: std::string name;
                  private: std::fstream logFile;
-                 private: Time startSimTime;
-                 private: Time startRealTime;
                };
 
       private: std::vector<LogObj*> logObjects;
+      private: std::vector<LogObj*>::iterator updateIter;
+      private: std::vector<LogObj*>::iterator logObjectsEnd;
+
+      private: event::ConnectionPtr updateConnection;
 
       private: friend class SingletonT<Logger>;
     };

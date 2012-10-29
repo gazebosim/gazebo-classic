@@ -15,8 +15,9 @@
  *
  */
 #include <iomanip>
+
+#include "common/Events.hh"
 #include "common/Time.hh"
-#include "physics/Entity.hh"
 #include "common/Console.hh"
 #include "common/Logger.hh"
 
@@ -26,6 +27,8 @@ using namespace common;
 //////////////////////////////////////////////////
 Logger::Logger()
 {
+  this->updateConnection =
+    event::Events::ConnectWorldUpdateStart(boost::bind(&Logger::Update, this));
 }
 
 //////////////////////////////////////////////////
@@ -36,12 +39,15 @@ Logger::~Logger()
   for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
     delete *iter;
   this->logObjects.clear();
+
+  event::Events::DisconnectWorldUpdateStart(this->updateConnection);
 }
 
 //////////////////////////////////////////////////
-void Logger::AddLog(const std::string &_entity, const std::string &_filename)
+bool Logger::Add(const std::string &_object, const std::string &_filename,
+                 boost::function<bool (std::fstream &)> _logCallback)
 {
-  Logger::LogObj *newLog = new Logger::LogObj(_entity, _filename);
+  Logger::LogObj *newLog = new Logger::LogObj(_object, _filename, _logCallback);
 
   if (newLog->valid)
     this->logObjects.push_back(newLog);
@@ -50,52 +56,53 @@ void Logger::AddLog(const std::string &_entity, const std::string &_filename)
     gzerr << "Unable to create log\n";
     delete newLog;
   }
+
+  this->logObjectsEnd = this->logObjects.end();
+  return true;
 }
 
 //////////////////////////////////////////////////
-void Logger::RemoveLog(const std::string &_entity)
+bool Logger::Remove(const std::string &_object)
 {
   std::vector<LogObj*>::iterator iter;
 
   for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
   {
-    if ((*iter)->GetEntityName() == _entity)
+    if ((*iter)->GetName() == _object)
     {
       delete *iter;
       this->logObjects.erase(iter);
       break;
     }
   }
+
+  this->logObjectsEnd = this->logObjects.end();
+  return true;
 }
 
 //////////////////////////////////////////////////
 void Logger::Update()
 {
-  std::vector<LogObj*>::iterator iter;
-
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
-    (*iter)->Update();
+  for (this->updateIter = this->logObjects.begin();
+       this->updateIter != this->logObjectsEnd; ++this->updateIter)
+  {
+    (*this->updateIter)->Update();
+  }
 }
 
-
 //////////////////////////////////////////////////
-Logger::LogObj::LogObj(const std::string &_entityName,
-    const std::string &_filename) : valid(false)
+Logger::LogObj::LogObj(const std::string &_name,
+                       const std::string &_filename,
+                       boost::function<bool (std::fstream&)> _logCB)
+: valid(false)
 {
   this->logFile.open(_filename.c_str(), std::fstream::out);
-  this->startRealTime = Simulator::Instance()->GetRealTime();
-  this->startSimTime = Simulator::Instance()->GetSimTime();
-  this->entity = dynamic_cast<Entity*>(Common::GetByName(_entityName));
+  this->name = _name;
+  this->logCB = _logCB;
 
   if (!this->logFile.is_open())
   {
     gzerr << "Unable to open file for logging:" << _filename << "\n";
-    return;
-  }
-
-  if (!this->entity)
-  {
-    gzerr << "Unable to find entity with name:" << _entityName << "\n";
     return;
   }
 
@@ -115,41 +122,12 @@ Logger::LogObj::~LogObj()
 //////////////////////////////////////////////////
 void Logger::LogObj::Update()
 {
-  if (this->entity)
-  {
-    math::Pose pose3d = entity->GetWorldPose();
-    Time simTime = Simulator::Instance()->GetSimTime();
-    Time realTime = Simulator::Instance()->GetRealTime();
-
-    double roll, pitch, yaw;
-    math::Vector3 linearVel = this->entity->GetWorldLinearVel();
-    math::Vector3 angularVel = this->entity->GetWorldAngularVel();
-
-    roll = pose3d.rot.GetRoll();
-    pitch = pose3d.rot.GetPitch();
-    yaw = pose3d.rot.GetYaw();
-
-    this->logFile << std::setprecision(8) << std::fixed
-      << simTime.Double() << " " << realTime.Double()
-      << " " << (simTime - this->startSimTime).Double()
-      << " " << (realTime - this->startRealTime).Double()
-      << " " << pose3d.pos.x << " " << pose3d.pos.y << " " << pose3d.pos.z
-      << " " << roll << " " << pitch << " " << yaw
-      << " " << linearVel.x << " " << linearVel.y << " " << linearVel.z
-      << " " << angularVel.x << " " << angularVel.y << " " << angularVel.z
-      << "\n";
-  }
-  else
-    this->logFile << "0 ";
-
-  this->logFile << "\n";
+  if (!this->logCB(this->logFile))
+    gzerr << "Unable to update log object[" << this->name << "]\n";
 }
 
 //////////////////////////////////////////////////
-std::string Logger::LogObj::GetEntityName() const
+std::string Logger::LogObj::GetName() const
 {
-  if (this->entity)
-    return this->entity->GetName();
-  else
-    return std::string("");
+  return this->name;
 }
