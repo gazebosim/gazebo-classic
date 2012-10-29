@@ -39,7 +39,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
-    /// \
+
     /// \class RFIDSensor RFIDSensor.hh sensors/sensors.hh
     /// \brief Sensor class for RFID type of sensor
     class RFIDSensor: public Sensor
@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
-      /// \brief 
+      /// \brief
       /// \TODO Nate fill in
       private: void EvaluateTags();
 
