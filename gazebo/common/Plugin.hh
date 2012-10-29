@@ -131,8 +131,6 @@ namespace gazebo
                 return result;
               }
 
-              printf("HAVE DL\n");
-
               // Register the new controller.
               result.reset(registerFunc.func());
 
