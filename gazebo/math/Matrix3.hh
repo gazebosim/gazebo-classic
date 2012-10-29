@@ -39,15 +39,15 @@ namespace gazebo
       public: Matrix3(const Matrix3 &_m);
 
       /// \brief Constructor
-      /// \param _v00 Row 0, Col 0 value
-      /// \param _v01 Row 0, Col 1 value
-      /// \param _v02 Row 0, Col 2 value
-      /// \param _v10 Row 1, Col 0 value
-      /// \param _v11 Row 1, Col 1 value
-      /// \param _v12 Row 1, Col 2 value
-      /// \param _v20 Row 2, Col 0 value
-      /// \param _v21 Row 2, Col 1 value
-      /// \param _v22 Row 2, Col 2 value
+      /// \param[in] _v00 Row 0, Col 0 value
+      /// \param[in] _v01 Row 0, Col 1 value
+      /// \param[in] _v02 Row 0, Col 2 value
+      /// \param[in] _v10 Row 1, Col 0 value
+      /// \param[in] _v11 Row 1, Col 1 value
+      /// \param[in] _v12 Row 1, Col 2 value
+      /// \param[in] _v20 Row 2, Col 0 value
+      /// \param[in] _v21 Row 2, Col 1 value
+      /// \param[in] _v22 Row 2, Col 2 value
       public: Matrix3(double _v00, double _v01, double _v02,
                       double _v10, double _v11, double _v12,
                       double _v20, double _v21, double _v22);
@@ -55,34 +55,42 @@ namespace gazebo
       /// \brief Desctructor
       public: virtual ~Matrix3();
 
-      /// \brief Set the matrix from three axis
-      /// \param _xAxis The x axis
-      /// \param _yAxis The y axis
-      /// \param _zAxis The z axis
+      /// \brief Set the matrix from three axis (1 per column)
+      /// \param[in] _xAxis The x axis
+      /// \param[in] _yAxis The y axis
+      /// \param[in] _zAxis The z axis
       public: void SetFromAxes(const Vector3 &_xAxis,
                                const Vector3 &_yAxis,
                                const Vector3 &_zAxis);
 
 
       /// \brief Set the matrix from an axis and angle
+      /// \param[in] _axis the axis
+      /// \param[in] _angle ccw rotation around the axis in radians
       public: void SetFromAxis(const Vector3 &_axis, double _angle);
 
       /// \brief Set a column
-      /// \param _c The colum index (0, 1, 2)
-      /// \param _v The value to set in each row of the column
+      /// \param[in] _c The colum index (0, 1, 2)
+      /// \param[in] _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
 
-      /// \brief Equality test operatoer
-      /// \param _m Matrix3 to test
-      /// \return True if equal
+      /// \brief Equality test operatorr
+      /// \param[in] _m Matrix3 to test
+      /// \return True if equal (using the default tolerance of 1e-6)
       public: bool operator==(const Matrix3 &_m) const;
 
+      /// \brief Array subscript operator
+      /// \param[in] _row row index
+      /// \return a pointer to the row
       public: inline const double *operator[](size_t _row) const
               {
                 assert(_row < 3);
                 return this->m[_row];
               }
 
+      /// \brief Array subscript operator
+      /// \param[in] _row row index
+      /// \return a pointer to the row
       public: inline double *operator[](size_t _row)
               {
                 assert(_row < 3);
@@ -90,9 +98,10 @@ namespace gazebo
               }
 
 
-      /// \brief Output operator
-      /// \param _out Output stream
-      /// \param _m Matrix to output
+      /// \brief Stream insertion operator
+      /// \param[in] _out Output stream
+      /// \param[in] _m Matrix to output
+      /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                                                const gazebo::math::Matrix3 &_m)
             {
@@ -110,6 +119,7 @@ namespace gazebo
 
       /// \brief the 3x3 matrix
       protected: double m[3][3];
+
       friend class Matrix4;
     };
     /// \}

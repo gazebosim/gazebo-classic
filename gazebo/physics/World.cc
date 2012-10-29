@@ -335,18 +335,11 @@ void World::Step()
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
+
+      if (this->IsPaused() && this->stepInc > 0)
+        this->stepInc--;
     }
   }
-
-  // TODO: Fix timeout:  this belongs in simulator.cc
-  /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
-  {
-    this->stop = true;
-    break;
-  }*/
-
-  if (this->IsPaused() && this->stepInc > 0)
-    this->stepInc--;
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)

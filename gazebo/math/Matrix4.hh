@@ -44,22 +44,22 @@ namespace gazebo
       public: Matrix4(const Matrix4 &_m);
 
       /// \brief Constructor
-      /// \param _v00 Row 0, Col 0 value
-      /// \param _v01 Row 0, Col 1 value
-      /// \param _v02 Row 0, Col 2 value
-      /// \param _v03 Row 0, Col 3 value
-      /// \param _v10 Row 1, Col 0 value
-      /// \param _v11 Row 1, Col 1 value
-      /// \param _v12 Row 1, Col 2 value
-      /// \param _v13 Row 1, Col 3 value
-      /// \param _v20 Row 2, Col 0 value
-      /// \param _v21 Row 2, Col 1 value
-      /// \param _v22 Row 2, Col 2 value
-      /// \param _v23 Row 2, Col 3 value
-      /// \param _v30 Row 3, Col 0 value
-      /// \param _v31 Row 3, Col 1 value
-      /// \param _v32 Row 3, Col 2 value
-      /// \param _v33 Row 3, Col 3 value
+      /// \param[in] _v00 Row 0, Col 0 value
+      /// \param[in] _v01 Row 0, Col 1 value
+      /// \param[in] _v02 Row 0, Col 2 value
+      /// \param[in] _v03 Row 0, Col 3 value
+      /// \param[in] _v10 Row 1, Col 0 value
+      /// \param[in] _v11 Row 1, Col 1 value
+      /// \param[in] _v12 Row 1, Col 2 value
+      /// \param[in] _v13 Row 1, Col 3 value
+      /// \param[in] _v20 Row 2, Col 0 value
+      /// \param[in] _v21 Row 2, Col 1 value
+      /// \param[in] _v22 Row 2, Col 2 value
+      /// \param[in] _v23 Row 2, Col 3 value
+      /// \param[in] _v30 Row 3, Col 0 value
+      /// \param[in] _v31 Row 3, Col 1 value
+      /// \param[in] _v32 Row 3, Col 2 value
+      /// \param[in] _v33 Row 3, Col 3 value
       public: Matrix4(double _v00, double _v01, double _v02, double _v03,
                       double _v10, double _v11, double _v12, double _v13,
                       double _v20, double _v21, double _v22, double _v23,
@@ -68,23 +68,23 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Matrix4();
 
-      /// \brief Set
-      /// \param _v00 Row 0, Col 0 value
-      /// \param _v01 Row 0, Col 1 value
-      /// \param _v02 Row 0, Col 2 value
-      /// \param _v03 Row 0, Col 3 value
-      /// \param _v10 Row 1, Col 0 value
-      /// \param _v11 Row 1, Col 1 value
-      /// \param _v12 Row 1, Col 2 value
-      /// \param _v13 Row 1, Col 3 value
-      /// \param _v20 Row 2, Col 0 value
-      /// \param _v21 Row 2, Col 1 value
-      /// \param _v22 Row 2, Col 2 value
-      /// \param _v23 Row 2, Col 3 value
-      /// \param _v30 Row 3, Col 0 value
-      /// \param _v31 Row 3, Col 1 value
-      /// \param _v32 Row 3, Col 2 value
-      /// \param _v33 Row 3, Col 3 value
+      /// \brief Change the values
+      /// \param[in] _v00 Row 0, Col 0 value
+      /// \param[in] _v01 Row 0, Col 1 value
+      /// \param[in] _v02 Row 0, Col 2 value
+      /// \param[in] _v03 Row 0, Col 3 value
+      /// \param[in] _v10 Row 1, Col 0 value
+      /// \param[in] _v11 Row 1, Col 1 value
+      /// \param[in] _v12 Row 1, Col 2 value
+      /// \param[in] _v13 Row 1, Col 3 value
+      /// \param[in] _v20 Row 2, Col 0 value
+      /// \param[in] _v21 Row 2, Col 1 value
+      /// \param[in] _v22 Row 2, Col 2 value
+      /// \param[in] _v23 Row 2, Col 3 value
+      /// \param[in] _v30 Row 3, Col 0 value
+      /// \param[in] _v31 Row 3, Col 1 value
+      /// \param[in] _v32 Row 3, Col 2 value
+      /// \param[in] _v33 Row 3, Col 3 value
       public: void Set(double _v00, double _v01, double _v02, double _v03,
                        double _v10, double _v11, double _v12, double _v13,
                        double _v20, double _v21, double _v22, double _v23,
@@ -93,27 +93,31 @@ namespace gazebo
 
 
       /// \brief Set the translational values [ (0, 3) (1, 3) (2, 3) ]
-      /// \param _t Values to set
+      /// \param[in] _t Values to set
       public: void SetTranslate(const Vector3 &_t);
 
       /// \brief Get the translational values as a Vector3
+      /// \return x,y,z
       public: Vector3 GetTranslation() const;
 
       /// \brief Get the rotation as a quaternion
+      /// \return the rotation
       public: Quaternion GetRotation() const;
 
       /// \brief Get the rotation as a Euler angles
+      /// \return the rotation
       public: Vector3 GetEulerRotation(unsigned int solution_number = 1) const;
 
       /// \brief Get the transformation as math::Pose
+      /// \return the pose
       public: math::Pose GetAsPose() const;
 
       /// \brief Set the scale
-      /// \param _s scale
+      /// \param[in] _s scale
       public: void SetScale(const Vector3 &_s);
 
       /// \brief Return true if the matrix is affine
-      /// \return True if the matrix is affine
+      /// \return true if the matrix is affine, false otherwise
       public: bool IsAffine() const;
 
       /// \brief Perform an affine transformation
@@ -126,12 +130,12 @@ namespace gazebo
 
       /// \brief Equal operator. this = _mat
       /// \param _mat Incoming matrix
-      /// \return The resulting matrix
+      /// \return itself
       public: Matrix4 &operator =(const Matrix4 &_mat);
 
       /// \brief Equal operator for 3x3 matrix
       /// \param _mat Incoming matrix
-      /// \return The resulting matrix
+      /// \return itself
       public: const Matrix4 & operator =(const Matrix3 &_mat);
 
       /// \brief Multiplication operator
@@ -150,26 +154,32 @@ namespace gazebo
       /// \return Resulting vector from multiplication
       public: Vector3 operator*(const Vector3 &_vec) const;
 
+      /// \brief Array subscript operator
+      /// \param[in] _row the row index
+      /// \return the row
       public: inline double *operator[](size_t _row)
               {
                 assert(_row < 4);
                 return this->m[_row];
               }
-
+      /// \param[in] _row the row index
+      /// \return the row
        public: inline const double *operator[](size_t _row) const
               {
                 assert(_row < 4);
                 return this->m[_row];
               }
 
-      /// \brief Equality test operatoer
-      /// \param _m Matrix3 to test
-      /// \return True if equal
+      /// \brief Equality operator
+      /// \param[in] _m Matrix3 to test
+      /// \return true if the 2 matrices are equal (using the tolerance 1e-6),
+      ///  false otherwise
       public: bool operator==(const Matrix4 &_m) const;
 
-      /// \brief Output operator
-      /// \param _out Output stream
+      /// \brief Stream insertion operator
+      /// \param _out output stream
       /// \param _m Matrix to output
+      /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                                                const gazebo::math::Matrix4 &_m)
             {

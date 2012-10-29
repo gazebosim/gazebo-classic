@@ -14,7 +14,7 @@
  *
  */
 /* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
@@ -40,7 +40,6 @@ RFIDTag::RFIDTag()
 : Sensor()
 {
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 /////////////////////////////////////////////////
@@ -61,7 +60,6 @@ void RFIDTag::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(this->world->GetName());
     this->scanPub = this->node->Advertise<msgs::Pose>(
         this->sdf->GetElement("topic")->GetValueString());
   }

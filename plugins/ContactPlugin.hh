@@ -39,8 +39,8 @@ namespace gazebo
     /// \brief Constructor
     public: ContactPlugin();
 
-    /// \brief  Destructor
-    public: ~ContactPlugin();
+    /// \brief Destructor
+    public: virtual ~ContactPlugin();
 
     /// \brief Load the plugin
     /// \param take in SDF root element

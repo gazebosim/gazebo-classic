@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SERVER_HH
-#define SERVER_HH
+#ifndef _SERVER_HH_
+#define _SERVER_HH_
 
 #include <string>
 #include <vector>
@@ -41,6 +41,7 @@ namespace gazebo
 {
   class Master;
 
+  /// \class Master Master.hh gazebo_core.hh
   /// \brief Base class for simulation server that handles commandline options,
   /// starts a Master, runs World update and sensor generation loops.
   class Server
