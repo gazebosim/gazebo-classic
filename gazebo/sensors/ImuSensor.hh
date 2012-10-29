@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,40 +25,51 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
+    /// \TODO This class inherits from Sensor, but looks like it specifically 
+    ///       doesn't override any methods, is this intentional? i.e. LoadChild 
+    ///       instead of Load, InitChild instead of Init
+    /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
-
     /// \brief An IMU sensor
     class ImuSensor: public Sensor
     {
       /// \brief Constructor
-      /// \param body The IMU sensor must be attached to a body.
-      public: ImuSensor(Body *body);
+      /// \param _body The IMU sensor must be attached to a body.
+      public: ImuSensor(Body *_body);
 
       /// \brief Destructor
       public: virtual ~ImuSensor();
 
-      /// \param node The XMLConfig node
-      protected: virtual void LoadChild(XMLConfigNode *node);
+      /// \brief Load the ImuSensor from XMLConfigNode
+      /// \param _node The XMLConfig node
+      protected: virtual void LoadChild(XMLConfigNode *_node);
 
       /// \brief Save the sensor info in XML format
-      protected: virtual void SaveChild(std::string &prefix,
-                                        std::ostream &stream);
+      /// \param _prefix 
+      /// \param _stream
+      /// \TODO Nate fill in
+      protected: virtual void SaveChild(std::string &_prefix,
+                                        std::ostream &_stream);
 
-      /// Initialize the ray
+      /// \brief Initialize the ray
       protected: virtual void InitChild();
 
-      ///  Update sensed values
+      /// \brief Update sensed values
       protected: virtual void UpdateChild();
 
-      /// Finalize the ray
+      /// \brief Finalize the ray
       protected: virtual void FiniChild();
 
       /// Returns velocity as a math::Pose
       /// FIXME storing x,y,z components in a quaternion seems like a bad idea
       /// @todo storing x,y,z components in a quaternion seems like a bad idea
+      /// \return velocity data stored in Pose
+      /// \TODO Nate check
       public: Pose GetVelocity();
 
       private: Pose prevPose;

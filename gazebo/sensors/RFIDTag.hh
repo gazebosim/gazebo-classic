@@ -1,4 +1,4 @@
-/* Copyright (C)
+/* Copyright (C) 2012
  *     Jonas Mellin & Zakiruz Zaman
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,15 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
     /// \{
-
-    /// \brief RFID tag sensor
+    /// \class RFIDTag RFIDTag.hh sensors/sensors.hh
+    /// \brief RFIDTag to interact with RFIDTagSensors
+    /// \TODO Nate check
     class RFIDTag: public Sensor
     {
       /// \brief  Constructor
@@ -45,22 +48,27 @@ namespace gazebo
       public: virtual ~RFIDTag();
 
       /// \brief Load the sensor with SDF parameters
-      /// \param _sdf SDF Sensor parameteres
+      /// \param[in] _sdf SDF Sensor parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string & _worldName,
                                 sdf::ElementPtr &_sdf);
 
       /// \brief Load the sensor with default parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string & _worldName);
 
       /// \brief  Initialize the sensor
       public: virtual void Init();
 
+      /// \brief Update the sensor information
+      /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool _force);
 
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
       /// \brief  returns pose of tag in world coordinate
+      /// \return Pose of object
       public: math::Pose GetTagPose() {return entity->GetWorldPose();}
 
       private: physics::EntityPtr entity;

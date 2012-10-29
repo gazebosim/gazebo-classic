@@ -253,145 +253,22 @@ JointControlWidget::JointControlWidget(const std::string &_modelName,
   msgs::Model modelMsg;
   modelMsg.ParseFromString(response.serialized_data());
 
+  QTabWidget *tabWidget = new QTabWidget;
 
   // Create the Force control scroll area
-  QScrollArea *scrollArea = new QScrollArea;
-  scrollArea->setLineWidth(0);
-  scrollArea->setFrameShape(QFrame::NoFrame);
-  scrollArea->setFrameShadow(QFrame::Plain);
-
-  QFrame *forceFrame = new QFrame;
-  forceFrame->setLineWidth(0);
-
   QGridLayout *gridLayout = new QGridLayout;
-  gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum), 0, 0, 2);
-  gridLayout->addWidget(new QLabel("Newton-meter", this), 0, 2);
-  for (int i = 0; i < modelMsg.joint_size(); ++i)
-  {
-    std::string jointName = modelMsg.joint(i).name();
-    gridLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
-    gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                   QSizePolicy::Minimum), i+1, 1);
-
-    JointForceControl *slider = new JointForceControl(jointName, gridLayout,
-                                                      this);
-    this->sliders[jointName] = slider;
-    connect(slider, SIGNAL(changed(double, const std::string &)),
-            this, SLOT(OnForceChanged(double, const std::string &)));
-  }
-
-  forceFrame->setLayout(gridLayout);
-  forceFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  scrollArea->setWidget(forceFrame);
-  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-
+  this->LayoutForceTab(gridLayout, modelMsg);
+  this->AddScrollableTab(tabWidget, gridLayout, tr("Force"));
 
   // Create a PID Pos scroll area
-  QScrollArea *pidPosScrollArea = new QScrollArea;
-  pidPosScrollArea->setLineWidth(0);
-  pidPosScrollArea->setFrameShape(QFrame::NoFrame);
-  pidPosScrollArea->setFrameShadow(QFrame::Plain);
-
-  QFrame *pidPosFrame = new QFrame;
-  pidPosFrame->setLineWidth(0);
-
   gridLayout = new QGridLayout;
-  gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum), 0, 0, 2);
-  QComboBox *unitsCombo = new QComboBox;
-  unitsCombo->addItem("Radians");
-  unitsCombo->addItem("Degrees");
-  connect(unitsCombo, SIGNAL(currentIndexChanged(int)),
-      this, SLOT(OnPIDPosUnitsChanged(int)));
-
-  gridLayout->addWidget(unitsCombo, 0, 2);
-  gridLayout->addWidget(new QLabel("P Gain", this), 0, 3);
-  gridLayout->addWidget(new QLabel("I Gain", this), 0, 4);
-  gridLayout->addWidget(new QLabel("D Gain", this), 0, 5);
-
-  for (int i = 0; i < modelMsg.joint_size(); ++i)
-  {
-    std::string jointName = modelMsg.joint(i).name();
-    gridLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
-    gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                   QSizePolicy::Minimum), i+1, 1);
-
-    JointPIDPosControl *slider = new JointPIDPosControl(jointName,
-        gridLayout, this);
-
-    this->pidPosSliders[jointName] = slider;
-    connect(slider, SIGNAL(changed(double, const std::string &)),
-            this, SLOT(OnPIDPosChanged(double, const std::string &)));
-    connect(slider, SIGNAL(pChanged(double, const std::string &)),
-            this, SLOT(OnPPosGainChanged(double, const std::string &)));
-    connect(slider, SIGNAL(iChanged(double, const std::string &)),
-            this, SLOT(OnIPosGainChanged(double, const std::string &)));
-    connect(slider, SIGNAL(dChanged(double, const std::string &)),
-            this, SLOT(OnDPosGainChanged(double, const std::string &)));
-  }
-
-  pidPosFrame->setLayout(gridLayout);
-  pidPosFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  pidPosScrollArea->setWidget(pidPosFrame);
-  pidPosScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
+  this->LayoutPositionTab(gridLayout, modelMsg);
+  this->AddScrollableTab(tabWidget, gridLayout, tr("Position"));
 
   // Create a PID Vel scroll area
-  QScrollArea *pidVelScrollArea = new QScrollArea;
-  pidVelScrollArea->setLineWidth(0);
-  pidVelScrollArea->setFrameShape(QFrame::NoFrame);
-  pidVelScrollArea->setFrameShadow(QFrame::Plain);
-
-  QFrame *pidVelFrame = new QFrame;
-  pidVelFrame->setLineWidth(0);
   gridLayout = new QGridLayout;
-
-  gridLayout->addItem(new QSpacerItem(10, 27, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum), 0, 0, 2);
-
-  // Set fixed height for the label to make the tabs stay a consistent size.
-  QLabel *label;
-  label = new QLabel("m/s", this);
-  label->setFixedHeight(27);
-
-  gridLayout->addWidget(label, 0, 2);
-  gridLayout->addWidget(new QLabel("P Gain", this), 0, 3);
-  gridLayout->addWidget(new QLabel("I Gain", this), 0, 4);
-  gridLayout->addWidget(new QLabel("D Gain", this), 0, 5);
-
-  for (int i = 0; i < modelMsg.joint_size(); ++i)
-  {
-    std::string jointName = modelMsg.joint(i).name();
-    gridLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
-    gridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                   QSizePolicy::Minimum), i+1, 1);
-
-    JointPIDVelControl *slider =
-      new JointPIDVelControl(jointName, gridLayout, this);
-
-    this->pidVelSliders[jointName] = slider;
-    connect(slider, SIGNAL(changed(double, const std::string &)),
-            this, SLOT(OnPIDVelChanged(double, const std::string &)));
-    connect(slider, SIGNAL(pChanged(double, const std::string &)),
-            this, SLOT(OnPVelGainChanged(double, const std::string &)));
-    connect(slider, SIGNAL(iChanged(double, const std::string &)),
-            this, SLOT(OnIVelGainChanged(double, const std::string &)));
-    connect(slider, SIGNAL(dChanged(double, const std::string &)),
-            this, SLOT(OnDVelGainChanged(double, const std::string &)));
-  }
-
-  pidVelFrame->setLayout(gridLayout);
-  pidVelFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  pidVelScrollArea->setWidget(pidVelFrame);
-  pidVelScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  pidVelScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-  QTabWidget *tabWidget = new QTabWidget;
-  tabWidget->addTab(scrollArea, tr("Force"));
-  tabWidget->addTab(pidPosScrollArea, tr("Position"));
-  tabWidget->addTab(pidVelScrollArea, tr("Velocity"));
+  this->LayoutVelocityTab(gridLayout, modelMsg);
+  this->AddScrollableTab(tabWidget, gridLayout, tr("Velocity"));
 
   // Add the the force and pid scroll areas to the tab
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -596,5 +473,125 @@ void JointControlWidget::OnIVelGainChanged(double _value,
     msg.set_name(_name);
     msg.mutable_velocity()->set_i_gain(_value);
     this->jointPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::AddScrollableTab(QTabWidget *_tabPane,
+                                          QGridLayout *_tabLayout,
+                                          const QString &_name)
+{
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setLineWidth(0);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setFrameShadow(QFrame::Plain);
+  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+  QFrame *frame = new QFrame;
+  frame->setLineWidth(0);
+  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  frame->setLayout(_tabLayout);
+
+  scrollArea->setWidget(frame);
+  _tabPane->addTab(scrollArea, _name);
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
+                                        msgs::Model &_modelMsg)
+{
+  _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                      QSizePolicy::Minimum), 0, 0, 2);
+  _tabLayout->addWidget(new QLabel("Newton-meter", this), 0, 2);
+  for (int i = 0; i < _modelMsg.joint_size(); ++i)
+  {
+    std::string jointName = _modelMsg.joint(i).name();
+    _tabLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+    _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                   QSizePolicy::Minimum), i+1, 1);
+
+    JointForceControl *slider = new JointForceControl(jointName, _tabLayout,
+                                                      this);
+    this->sliders[jointName] = slider;
+    connect(slider, SIGNAL(changed(double, const std::string &)),
+            this, SLOT(OnForceChanged(double, const std::string &)));
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
+                                           msgs::Model &_modelMsg)
+{
+  _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                      QSizePolicy::Minimum), 0, 0, 2);
+  QComboBox *unitsCombo = new QComboBox;
+  unitsCombo->addItem("Radians");
+  unitsCombo->addItem("Degrees");
+  connect(unitsCombo, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnPIDPosUnitsChanged(int)));
+
+  _tabLayout->addWidget(unitsCombo, 0, 2);
+  _tabLayout->addWidget(new QLabel("P Gain", this), 0, 3);
+  _tabLayout->addWidget(new QLabel("I Gain", this), 0, 4);
+  _tabLayout->addWidget(new QLabel("D Gain", this), 0, 5);
+
+  for (int i = 0; i < _modelMsg.joint_size(); ++i)
+  {
+    std::string jointName = _modelMsg.joint(i).name();
+    _tabLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+    _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                   QSizePolicy::Minimum), i+1, 1);
+
+    JointPIDPosControl *slider = new JointPIDPosControl(jointName,
+        _tabLayout, this);
+
+    this->pidPosSliders[jointName] = slider;
+    connect(slider, SIGNAL(changed(double, const std::string &)),
+            this, SLOT(OnPIDPosChanged(double, const std::string &)));
+    connect(slider, SIGNAL(pChanged(double, const std::string &)),
+            this, SLOT(OnPPosGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(iChanged(double, const std::string &)),
+            this, SLOT(OnIPosGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(dChanged(double, const std::string &)),
+            this, SLOT(OnDPosGainChanged(double, const std::string &)));
+  }
+}
+
+/////////////////////////////////////////////////
+void JointControlWidget::LayoutVelocityTab(QGridLayout *_tabLayout,
+                                           msgs::Model &_modelMsg)
+{
+  _tabLayout->addItem(new QSpacerItem(10, 27, QSizePolicy::Expanding,
+                                      QSizePolicy::Minimum), 0, 0, 2);
+
+  // Set fixed height for the label to make the tabs stay a consistent size.
+  QLabel *label = new QLabel("m/s", this);
+  label->setFixedHeight(27);
+
+  _tabLayout->addWidget(label, 0, 2);
+  _tabLayout->addWidget(new QLabel("P Gain", this), 0, 3);
+  _tabLayout->addWidget(new QLabel("I Gain", this), 0, 4);
+  _tabLayout->addWidget(new QLabel("D Gain", this), 0, 5);
+
+  for (int i = 0; i < _modelMsg.joint_size(); ++i)
+  {
+    std::string jointName = _modelMsg.joint(i).name();
+    _tabLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+    _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                                   QSizePolicy::Minimum), i+1, 1);
+
+    JointPIDVelControl *slider =
+      new JointPIDVelControl(jointName, _tabLayout, this);
+
+    this->pidVelSliders[jointName] = slider;
+    connect(slider, SIGNAL(changed(double, const std::string &)),
+            this, SLOT(OnPIDVelChanged(double, const std::string &)));
+    connect(slider, SIGNAL(pChanged(double, const std::string &)),
+            this, SLOT(OnPVelGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(iChanged(double, const std::string &)),
+            this, SLOT(OnIVelGainChanged(double, const std::string &)));
+    connect(slider, SIGNAL(dChanged(double, const std::string &)),
+            this, SLOT(OnDVelGainChanged(double, const std::string &)));
   }
 }

@@ -20,7 +20,6 @@
  */
 #define BOOST_FILESYSTEM_VERSION 2
 
-#include <boost/filesystem.hpp>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -29,9 +28,9 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <string.h>
-
+#include <string>
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 #include "rendering/ogre_gazebo.h"
 

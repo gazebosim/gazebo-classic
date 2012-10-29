@@ -33,15 +33,15 @@ namespace gazebo
       /// \brief Constructor
       public: Plane();
 
-      /// \brief Constructor
-      /// \param _normal The plane normal
-      /// \param _offset Offset along the normal
+      /// \brief Constructor from a normal and a distanec
+      /// \param[in] _normal The plane normal
+      /// \param[in] _offset Offset along the normal
       public: Plane(const Vector3 &_normal, double _offset = 0.0);
 
       /// \brief Constructor
-      /// \param _normal The plane normal
-      /// \param _size Size of the plane
-      /// \param _offset Offset along the normal
+      /// \param[in] _normal The plane normal
+      /// \param[in] _size Size of the plane
+      /// \param[in] _offset Offset along the normal
       public: Plane(const Vector3 &_normal, const Vector2d &_size,
                     double _offset);
 
@@ -49,18 +49,22 @@ namespace gazebo
       public: virtual ~Plane();
 
       /// \brief Set the plane
-      /// \param _normal The plane normal
-      /// \param _size Size of the plane
-      /// \param _offset Offset along the normal
+      /// \param[in] _normal The plane normal
+      /// \param[in] _size Size of the plane
+      /// \param[in] _offset Offset along the normal
       public: void Set(const Vector3 &_normal, const Vector2d &_size,
                        double offset);
 
       /// \brief Get distance to the plane give an origin and direction
+      /// \param[in] _origin the origin
+      /// \param[in] _dir a direction
+      /// \return the shortest distance
       public: double Distance(const Vector3 &_origin,
                               const Vector3 &_dir) const;
 
       /// \brief Equal operator
-      /// \param _p Plane values
+      /// \param _p another plane
+      /// \return itself
       public: Plane &operator =(const Plane &_p);
 
       /// \brief Plane normal

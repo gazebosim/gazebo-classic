@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef CYLINDERMAKER_HH
-#define CYLINDERMAKER_HH
+#ifndef _CYLINDERMAKER_HH_
+#define _CYLINDERMAKER_HH_
+
+#include <string>
 
 #include "math/Vector2i.hh"
 #include "gui/EntityMaker.hh"

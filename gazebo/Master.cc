@@ -103,15 +103,16 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 
 
   // Add the connection to our list
-  this->connectionMutex->lock();
-  int index = this->connections.size();
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+    int index = this->connections.size();
 
-  this->connections[index] = new_connection;
+    this->connections[index] = new_connection;
 
-  // Start reading from the connection
-  new_connection->AsyncRead(
-      boost::bind(&Master::OnRead, this, index, _1));
-  this->connectionMutex->unlock();
+    // Start reading from the connection
+    new_connection->AsyncRead(
+        boost::bind(&Master::OnRead, this, index, _1));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -135,9 +136,8 @@ void Master::OnRead(const unsigned int _connectionIndex,
   // Store the message if it's not empty
   if (!_data.empty())
   {
-    this->msgsMutex->lock();
+    boost::recursive_mutex::scoped_lock lock(*this->msgsMutex);
     this->msgs.push_back(std::make_pair(_connectionIndex, _data));
-    this->msgsMutex->unlock();
   }
   else
   {
@@ -169,9 +169,9 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
         worldNameMsg.data());
     if (iter == this->worldNames.end())
     {
+      boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
       this->worldNames.push_back(worldNameMsg.data());
 
-      this->connectionMutex->lock();
       Connection_M::iterator iter2;
       for (iter2 = this->connections.begin();
           iter2 != this->connections.end(); ++iter2)
@@ -179,22 +179,20 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
         iter2->second->EnqueueMsg(
             msgs::Package("topic_namespace_add", worldNameMsg));
       }
-      this->connectionMutex->unlock();
     }
   }
   else if (packet.type() == "advertise")
   {
+    boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
 
-    this->connectionMutex->lock();
     Connection_M::iterator iter2;
     for (iter2 = this->connections.begin();
          iter2 != this->connections.end(); ++iter2)
     {
       iter2->second->EnqueueMsg(msgs::Package("publisher_add", pub));
     }
-    this->connectionMutex->unlock();
 
     this->publishers.push_back(std::make_pair(pub, conn));
 
@@ -202,7 +200,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
     // Find all subscribers of the topic
     for (iter = this->subscribers.begin();
-        iter != this->subscribers.end(); ++iter)
+         iter != this->subscribers.end(); ++iter)
     {
       if (iter->first.topic() == pub.topic())
       {
@@ -334,32 +332,34 @@ void Master::RunOnce()
   Connection_M::iterator iter;
 
   // Process the incoming message queue
-  this->msgsMutex->lock();
-  while (this->msgs.size() > 0)
   {
-    this->ProcessMessage(this->msgs.front().first,
-        this->msgs.front().second);
-    this->msgs.pop_front();
+    boost::recursive_mutex::scoped_lock lock(*this->msgsMutex);
+    while (this->msgs.size() > 0)
+    {
+      this->ProcessMessage(this->msgs.front().first,
+                           this->msgs.front().second);
+      this->msgs.pop_front();
+    }
   }
-  this->msgsMutex->unlock();
 
   // Process all the connections
-  this->connectionMutex->lock();
-  for (iter = this->connections.begin();
-       iter != this->connections.end();)
   {
-    if (iter->second->IsOpen())
+    boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+    for (iter = this->connections.begin();
+        iter != this->connections.end();)
     {
-      iter->second->ProcessWriteQueue();
-      ++iter;
-    }
-    else
-    {
-      this->RemoveConnection(iter->first);
-      ++iter;
+      if (iter->second->IsOpen())
+      {
+        iter->second->ProcessWriteQueue();
+        ++iter;
+      }
+      else
+      {
+        this->RemoveConnection(iter->first);
+        ++iter;
+      }
     }
   }
-  this->connectionMutex->unlock();
 }
 
 /////////////////////////////////////////////////
@@ -373,16 +373,17 @@ void Master::RemoveConnection(unsigned int _index)
     return;
 
   // Remove all messages for this connection
-  this->msgsMutex->lock();
-  msgIter = this->msgs.begin();
-  while (msgIter != this->msgs.end())
   {
-    if ((*msgIter).first == _index)
-      this->msgs.erase(msgIter++);
-    else
-      ++msgIter;
+    boost::recursive_mutex::scoped_lock lock(*this->msgsMutex);
+    msgIter = this->msgs.begin();
+    while (msgIter != this->msgs.end())
+    {
+      if ((*msgIter).first == _index)
+        this->msgs.erase(msgIter++);
+      else
+        ++msgIter;
+    }
   }
-  this->msgsMutex->unlock();
 
   // Remove all publishers for this connection
   bool done = false;
@@ -431,14 +432,15 @@ void Master::RemoveConnection(unsigned int _index)
 /////////////////////////////////////////////////
 void Master::RemovePublisher(const msgs::Publish _pub)
 {
-  this->connectionMutex->lock();
-  Connection_M::iterator iter2;
-  for (iter2 = this->connections.begin();
-      iter2 != this->connections.end(); ++iter2)
   {
-    iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub));
+    boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+    Connection_M::iterator iter2;
+    for (iter2 = this->connections.begin();
+        iter2 != this->connections.end(); ++iter2)
+    {
+      iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub));
+    }
   }
-  this->connectionMutex->unlock();
 
   SubList::iterator iter;
   // Find all subscribers of the topic
@@ -540,18 +542,19 @@ transport::ConnectionPtr Master::FindConnection(const std::string &_host,
   transport::ConnectionPtr conn;
   Connection_M::iterator iter;
 
-  this->connectionMutex->lock();
-  for (iter = this->connections.begin();
-       iter != this->connections.end(); ++iter)
   {
-    if (iter->second->GetRemoteAddress() == _host &&
-        iter->second->GetRemotePort() == _port)
+    boost::recursive_mutex::scoped_lock lock(*this->connectionMutex);
+    for (iter = this->connections.begin();
+        iter != this->connections.end(); ++iter)
     {
-      conn = iter->second;
-      break;
+      if (iter->second->GetRemoteAddress() == _host &&
+          iter->second->GetRemotePort() == _port)
+      {
+        conn = iter->second;
+        break;
+      }
     }
   }
-  this->connectionMutex->unlock();
 
   return conn;
 }

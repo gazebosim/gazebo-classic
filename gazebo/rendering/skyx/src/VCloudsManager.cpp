@@ -38,27 +38,46 @@ namespace SkyX
   {
     mVClouds = new VClouds::VClouds(mSkyX->getSceneManager());
     mVClouds->setRenderQueueGroups(
-      VClouds::VClouds::RenderQueueGroups(mSkyX->getRenderQueueGroups().vclouds, mSkyX->getRenderQueueGroups().vcloudsLightnings));
+      VClouds::VClouds::RenderQueueGroups(
+        mSkyX->getRenderQueueGroups().vclouds,
+        mSkyX->getRenderQueueGroups().vcloudsLightnings));
 
     mAmbientGradient = ColorGradient();
-    mAmbientGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(1,1,1)*0.9f, 1.0f));
-    mAmbientGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.7,0.7,0.65), 0.625f));
-    mAmbientGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.6,0.55,0.4)*0.5, 0.5625f));
-    mAmbientGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.6,0.55,0.4)*0.25, 0.475f));
-    mAmbientGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.6,0.45,0.3)*0.2, 0.4f));
-    mAmbientGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.2,0.2,0.3)*0.2, 0.325f));
-    mAmbientGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.2,0.2,0.3)*0.15, 0));
+    mAmbientGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(1, 1, 1)*0.9f, 1.0f));
+    mAmbientGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.7, 0.7, 0.65), 0.625f));
+    mAmbientGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.6, 0.55, 0.4)*0.5, 0.5625f));
+    mAmbientGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.6, 0.55, 0.4)*0.25, 0.475f));
+    mAmbientGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.6, 0.45, 0.3)*0.2, 0.4f));
+    mAmbientGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.2, 0.2, 0.3)*0.2, 0.325f));
+    mAmbientGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.2, 0.2, 0.3)*0.15, 0));
 
     mSunGradient = ColorGradient();
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(1,1,1)*0.9f, 1.0f));
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(1,1,1)*0.8, 0.75f));
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.8,0.75,0.55)*1.3, 0.5625f));
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.6,0.5,0.2)*1.5, 0.5f));
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.6,0.5,0.2)*0.6, 0.4725f));
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.6,0.5,0.2)*0.4, 0.45f));
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.0,0.0,0.0), 0.4125f)); // Sun-Moon threshold
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.25,0.25,0.25), 0.25f));
-    mSunGradient.addCFrame(ColorGradient::ColorFrame(Ogre::Vector3(0.4,0.4,0.4), 0.0f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(1, 1, 1)*0.9f, 1.0f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(1, 1, 1)*0.8, 0.75f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.8, 0.75, 0.55)*1.3, 0.5625f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.6, 0.5, 0.2)*1.5, 0.5f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.6, 0.5, 0.2)*0.6, 0.4725f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.6, 0.5, 0.2)*0.4, 0.45f));
+    // Sun-Moon threshold
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.0, 0.0, 0.0), 0.4125f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.25, 0.25, 0.25), 0.25f));
+    mSunGradient.addCFrame(
+        ColorGradient::ColorFrame(Ogre::Vector3(0.4, 0.4, 0.4), 0.0f));
   }
 
   VCloudsManager::~VCloudsManager()
@@ -75,10 +94,13 @@ namespace SkyX
       return;
     }
 
-    Ogre::Real selectedRadius = radius < 0 ? mVClouds->getGeometrySettings().Radius : radius;
+    Ogre::Real selectedRadius = radius < 0 ?
+      mVClouds->getGeometrySettings().Radius : radius;
 
-    // Use default options if the user haven't set any specific Height parameters
-    Ogre::Vector2 defaultheight = Ogre::Vector2(selectedRadius*0.025f, selectedRadius*0.1f);
+    // Use default options if the user haven't set any specific Height
+    // parameters
+    Ogre::Vector2 defaultheight = Ogre::Vector2(selectedRadius*0.025f,
+        selectedRadius*0.1f);
     Ogre::Vector2 height = (equal(mHeight.x, -1.0f) ||
                             equal(mHeight.y, -1.0f)) ? defaultheight : mHeight;
 
