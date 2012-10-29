@@ -228,6 +228,7 @@ void ModelListWidget::Update()
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
     this->fillingPropertyTree = true;
+    this->propTreeBrowser->clear();
 
     if (this->fillTypes[0] == "model")
       this->FillPropertyTree(this->modelMsg, NULL);
@@ -352,7 +353,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->modelMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("model");
     this->propMutex->unlock();
   }
@@ -360,7 +360,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->linkMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("link");
     this->propMutex->unlock();
   }
@@ -368,7 +367,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->jointMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("joint");
     this->propMutex->unlock();
   }
@@ -376,7 +374,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->sceneMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("scene");
     this->propMutex->unlock();
   }
@@ -384,7 +381,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->physicsMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("physics");
     this->propMutex->unlock();
   }
@@ -392,7 +388,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->lightMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("light");
     this->propMutex->unlock();
   }

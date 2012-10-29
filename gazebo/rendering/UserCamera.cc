@@ -408,7 +408,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
   {
     this->scene->GetManager()->destroyAnimation("cameratrack");
-    this->scene->GetManager()->destroyAnimationState("cameratrack");
   }
 
   math::Box box = _visual->GetBoundingBox();
