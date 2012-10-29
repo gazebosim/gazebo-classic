@@ -445,8 +445,6 @@ void Visual::Update()
       this->animState = NULL;
       this->sceneNode->getCreator()->destroyAnimation(
           this->GetName() + "_animation");
-      this->sceneNode->getCreator()->destroyAnimationState(
-          this->GetName() + "_animation");
       if (this->onAnimationComplete)
         this->onAnimationComplete();
       // event::Events::DisconnectPreRender(this->preRenderConnection);
@@ -1894,7 +1892,7 @@ VisualPtr Visual::GetParent() const
 VisualPtr Visual::GetRootVisual()
 {
   VisualPtr p = shared_from_this();
-  while (p->GetParent()->GetName() != "__world_node__")
+  while (p->GetParent() && p->GetParent()->GetName() != "__world_node__")
     p = p->GetParent();
 
   return p;
@@ -1903,7 +1901,7 @@ VisualPtr Visual::GetRootVisual()
 //////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-   if (this->sdf->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("plane"))

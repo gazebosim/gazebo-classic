@@ -24,13 +24,15 @@ http://www.gnu.org/copyleft/lesser.txt.
 #ifndef _SkyX_VClouds_VClouds_H_
 #define _SkyX_VClouds_VClouds_H_
 
+#include <vector>
+
 #include "Prerequisites.h"
 
 #include "VClouds/DataManager.h"
 #include "VClouds/GeometryManager.h"
 #include "VClouds/LightningManager.h"
 
-namespace SkyX { namespace VClouds{
+namespace SkyX { namespace VClouds {
 
   class DllExport VClouds
   {
@@ -58,7 +60,8 @@ namespace SkyX { namespace VClouds{
      */
     struct GeometrySettings
     {
-      /// Height: x = Altitude over the camera, y: Field height (both in world coordinates)
+      /// Height: x = Altitude over the camera,
+      /// y: Field height (both in world coordinates)
       Ogre::Vector2 Height;
       /// Angles
       Ogre::Radian Alpha, Beta;
@@ -72,7 +75,7 @@ namespace SkyX { namespace VClouds{
       /** Default constructor
        */
       GeometrySettings()
-        : Height(Ogre::Vector2(10,50))
+        : Height(Ogre::Vector2(10, 50))
         , Alpha(Ogre::Degree(12)), Beta(Ogre::Degree(40))
         , Radius(100)
         , NumberOfBlocks(12)
@@ -114,20 +117,20 @@ namespace SkyX { namespace VClouds{
        */
       inline CameraData()
         : camera(0)
-        , lastPosition(Ogre::Vector3(0,0,0))
-        , cameraOffset(Ogre::Vector2(0,0))
-        , geometryDisplacement(Ogre::Vector3(0,0,0))
+        , lastPosition(Ogre::Vector3(0, 0, 0))
+        , cameraOffset(Ogre::Vector2(0, 0))
+        , geometryDisplacement(Ogre::Vector3(0, 0, 0))
       {
       }
 
       /** Constructor
           @param c Camera
        */
-      inline CameraData(Ogre::Camera* c)
+      explicit inline CameraData(Ogre::Camera* c)
         : camera(c)
         , lastPosition(c->getDerivedPosition())
-        , cameraOffset(Ogre::Vector2(0,0))
-        , geometryDisplacement(Ogre::Vector3(0,0,0))
+        , cameraOffset(Ogre::Vector2(0, 0))
+        , geometryDisplacement(Ogre::Vector3(0, 0, 0))
       {
       }
 
@@ -160,7 +163,8 @@ namespace SkyX { namespace VClouds{
     void create(const GeometrySettings& gs);
 
     /** Create
-      @param Height x = Cloud field y-coord start, y: Field height (both in world coordinates)
+      @param Height x = Cloud field y-coord start,
+       y: Field height (both in world coordinates)
       @param Radius Radius
      */
     void create(const Ogre::Vector2& Height, const float& Radius);
@@ -176,21 +180,24 @@ namespace SkyX { namespace VClouds{
 
     /** Notify camera render, to be invoked per-camera and per-frame
       @param c Rendering camera
-        @param timeSinceLastCameraFrame Time since last CAMERA frame
+      @param timeSinceLastCameraFrame Time since last CAMERA frame
          */
-        void notifyCameraRender(Ogre::Camera* c, const Ogre::Real& timeSinceLastCameraFrame);
+        void notifyCameraRender(Ogre::Camera* c,
+                                const Ogre::Real& timeSinceLastCameraFrame);
 
     /** Register camera
         @param c Camera
-      @remarks If a rendering camera is used(in notifyCameraRender(...)) without having registered it before,
-               all will work as expected but a warning will be logged since the user should manually unregister
-           the camera one time it'll be remove
+      @remarks If a rendering camera is used(in notifyCameraRender(...))
+      without having registered it before,
+      all will work as expected but a warning will be logged since the
+      user should manually unregister the camera one time it'll be remove
      */
     void registerCamera(Ogre::Camera* c);
 
     /** Unregister camera
         @param c Camera
-      @remarks After having used a camera (i.e. before removing the camera), the user should manually unregister it
+      @remarks After having used a camera (i.e. before removing the camera),
+      the user should manually unregister it
      */
     void unregisterCamera(Ogre::Camera* c);
 
@@ -288,7 +295,8 @@ namespace SkyX { namespace VClouds{
      */
     inline const Ogre::Vector2 getWindDirectionV2() const
     {
-      return Ogre::Vector2(Ogre::Math::Cos(mWindDirection), Ogre::Math::Sin(mWindDirection));
+      return Ogre::Vector2(Ogre::Math::Cos(mWindDirection),
+                           Ogre::Math::Sin(mWindDirection));
     }
 
     /** Set wind speed
@@ -428,17 +436,24 @@ namespace SkyX { namespace VClouds{
     }
 
     /** Set wheater parameters
-        Use this funtion to update the cloud field parameters, you'll get a smart and smooth transition from your old
-      setting to your new ones.
-      @param Humidity Humidity, in other words: the percentage of clouds in [0,1] range.
-      @param AverageCloudsSize Average clouds size, for example: if previous wheater clouds size parameter was very different from new one(i.e: more little)
-             only the old biggest clouds are going to be keept and the little ones are going to be replaced
-        @param DelayedResponse false to change wheather conditions over several updates, true to change it at the moment
+        Use this funtion to update the cloud field parameters, you'll get a
+        smart and smooth transition from your old setting to your new ones.
+        @param Humidity Humidity, in other words: the percentage of clouds
+        in [0,1] range.
+      @param AverageCloudsSize Average clouds size, for example: if
+      previous wheater clouds size parameter was very different from
+      new one(i.e: more little)
+      only the old biggest clouds are going to be keept and the little
+      ones are going to be replaced
+      @param DelayedResponse false to change wheather conditions over
+      several updates, true to change it at the moment
      */
-    void setWheater(const float& Humidity, const float& AverageCloudsSize, const bool& DelayedResponse);
+    void setWheater(const float& Humidity, const float& AverageCloudsSize,
+        const bool& DelayedResponse);
 
     /** Get wheater
-        @return Wheater parameters: x = Humidity, y = Average clouds size, both un [0,1] range
+        @return Wheater parameters: x = Humidity,
+        y = Average clouds size, both un [0,1] range
      */
     inline const Ogre::Vector2& getWheater() const
     {
@@ -531,9 +546,11 @@ namespace SkyX { namespace VClouds{
     /// Wind speed
     float mWindSpeed;
 
-    /// Wheater parameters: x = Humidity, y = Average clouds size, both un [0,1] range
+    /// Wheater parameters: x = Humidity, y = Average clouds size,
+    /// both un [0,1] range
     Ogre::Vector2 mWheater;
-    /// Delayed response (This param is stored to allow the user call setWheater(...) before create() )
+    /// Delayed response (This param is stored to allow the user call
+    /// setWheater(...) before create() )
     bool mDelayedResponse;
 
     /// Sun direction
@@ -582,7 +599,6 @@ namespace SkyX { namespace VClouds{
 
     /// Vol. clouds + lightning material
     Ogre::MaterialPtr mVolCloudsLightningMaterial;
-
   };
 }}
 

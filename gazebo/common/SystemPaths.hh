@@ -87,7 +87,7 @@ namespace gazebo
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
       public: std::string FindFileWithGazeboPaths(const std::string &_filename,
-                  bool _searchLocalPath=true) GAZEBO_DEPRECATED;
+                  bool _searchLocalPath = true) GAZEBO_DEPRECATED;
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
@@ -98,7 +98,7 @@ namespace gazebo
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
       public: std::string FindFile(const std::string &_filename,
-                                   bool _searchLocalPath=true);
+                                   bool _searchLocalPath = true);
 
       /// \brief Add colon delimited paths to Gazebo install
       /// \param[in] _path the directory to add

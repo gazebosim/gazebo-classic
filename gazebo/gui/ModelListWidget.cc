@@ -229,6 +229,7 @@ void ModelListWidget::Update()
   {
     boost::mutex::scoped_lock lock(*this->propMutex);
     this->fillingPropertyTree = true;
+    this->propTreeBrowser->clear();
 
     if (this->fillTypes[0] == "model")
       this->FillPropertyTree(this->modelMsg, NULL);
@@ -253,6 +254,7 @@ void ModelListWidget::Update()
     this->propTreeBrowser->clear();
   }
 
+  this->ProcessRemoveEntity();
   this->ProcessModelMsgs();
   this->ProcessLightMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
@@ -351,7 +353,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->modelMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("model");
     this->propMutex->unlock();
   }
@@ -359,7 +360,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->linkMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("link");
     this->propMutex->unlock();
   }
@@ -367,7 +367,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->jointMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("joint");
     this->propMutex->unlock();
   }
@@ -375,7 +374,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->sceneMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("scene");
     this->propMutex->unlock();
   }
@@ -383,7 +381,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->physicsMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("physics");
     this->propMutex->unlock();
   }
@@ -391,7 +388,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->lightMsg.ParseFromString(_msg->serialized_data());
-    this->propTreeBrowser->clear();
     this->fillTypes.push_back("light");
     this->propMutex->unlock();
   }
@@ -399,7 +395,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     if (_msg->response() == "nonexistant")
     {
-      this->RemoveEntity(this->selectedEntityName);
+      this->removeEntityList.push_back(this->selectedEntityName);
     }
   }
 
@@ -1968,8 +1964,19 @@ void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    this->RemoveEntity(_msg->data());
+    this->removeEntityList.push_back(_msg->data());
   }
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ProcessRemoveEntity()
+{
+  for (RemoveEntity_L::iterator iter = this->removeEntityList.begin();
+       iter != this->removeEntityList.end(); ++iter)
+  {
+    this->RemoveEntity(*iter);
+  }
+  this->removeEntityList.clear();
 }
 
 /////////////////////////////////////////////////
@@ -2023,6 +2030,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
+
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
@@ -2033,7 +2041,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
       &ModelListWidget::OnRequest, this, false);
 
   this->lightSub = this->node->Subscribe("~/light",
-      &ModelListWidget::OnLightMsg, this);
+                                         &ModelListWidget::OnLightMsg, this);
 }
 
 /////////////////////////////////////////////////

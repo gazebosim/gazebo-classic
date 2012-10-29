@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
  * Date: 18 Dec 2009
  */
 
-#ifndef SENSORMANAGER_HH
-#define SENSORMANAGER_HH
+#ifndef _SENSORMANAGER_HH_
+#define _SENSORMANAGER_HH_
 
 #include <boost/thread.hpp>
 #include <list>
@@ -34,11 +34,13 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
     /// \addtogroup gazebo_sensors
     /// \{
-
+    /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
     {
@@ -53,7 +55,8 @@ namespace gazebo
       ///
       /// Checks to see if any sensor need to be initialized first,
       /// then updates all sensors once.
-      public: void Update(bool force = false);
+      /// \param[in] _force True force update, false if not
+      public: void Update(bool _force = false);
 
       /// \brief Init all the sensors
       public: void Init();
@@ -112,7 +115,7 @@ namespace gazebo
       private: boost::thread *runThread;
 
       /// \brief Mutex used when adding and removing sensors.
-      private: boost::recursive_mutex *mutex;
+      private: boost::recursive_mutex mutex;
 
       /// \brief The list of initialized sensors.
       private: std::list<SensorPtr> sensors;

@@ -25,6 +25,13 @@ DepthCameraPlugin::DepthCameraPlugin() : SensorPlugin()
 }
 
 /////////////////////////////////////////////////
+DepthCameraPlugin::~DepthCameraPlugin()
+{
+  this->parentSensor.reset();
+  this->depthCamera.reset();
+}
+
+/////////////////////////////////////////////////
 void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {

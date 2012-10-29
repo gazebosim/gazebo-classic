@@ -368,6 +368,9 @@ void GLWidget::OnMousePressTranslate()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressNormal()
 {
+  if (!this->userCamera)
+    return;
+
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
   this->SetMouseMoveVisual(rendering::VisualPtr());
@@ -427,7 +430,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     this->OnMouseMoveMakeEntity();
   else if (this->state == "select")
     this->OnMouseMoveNormal();
-  else if (this->state == "translate" || this->state=="rotate")
+  else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseMoveTranslate();
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;
@@ -538,6 +541,9 @@ void GLWidget::OnMouseMoveTranslate()
 /////////////////////////////////////////////////
 void GLWidget::OnMouseMoveNormal()
 {
+  if (!this->userCamera)
+    return;
+
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
   if (vis && !vis->IsPlane())
@@ -616,6 +622,9 @@ void GLWidget::OnMouseReleaseTranslate()
 //////////////////////////////////////////////////
 void GLWidget::OnMouseReleaseNormal()
 {
+  if (!this->userCamera)
+    return;
+
   if (!this->mouseEvent.dragging)
   {
     rendering::VisualPtr vis =
@@ -747,23 +756,25 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   if (this->entityMaker)
     this->entityMaker->Stop();
 
+  this->entityMaker = NULL;
+
   if (_type == "box")
   {
     this->boxMaker.Start(this->userCamera);
-    this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString());
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString()))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "sphere")
   {
     this->sphereMaker.Start(this->userCamera);
-    this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString());
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString()))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "cylinder")
   {
     this->cylinderMaker.Start(this->userCamera);
-    this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString());
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString()))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "mesh" && !_data.empty())
   {
@@ -772,8 +783,8 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   }
   else if (_type == "model" && !_data.empty())
   {
-    this->modelMaker.InitFromFile(_data);
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromFile(_data))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "pointlight")
     this->entityMaker =  &this->pointLightMaker;
@@ -781,8 +792,6 @@ void GLWidget::OnCreateEntity(const std::string &_type,
     this->entityMaker =  &this->spotLightMaker;
   else if (_type == "directionallight")
     this->entityMaker =  &this->directionalLightMaker;
-  else
-    this->entityMaker = NULL;
 
   if (this->entityMaker)
   {

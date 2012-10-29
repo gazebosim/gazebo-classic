@@ -135,21 +135,24 @@ void InsertModelWidget::ConnectToModelDatabase()
   std::map<std::string, std::string> models =
     common::ModelDatabase::GetModels();
 
-  // Create a top-level tree item for the path
-  QTreeWidgetItem *topItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(QString::fromStdString(uri))));
-  this->fileTreeWidget->addTopLevelItem(topItem);
-
-  for (std::map<std::string, std::string>::iterator iter = models.begin();
-       iter != models.end(); ++iter)
+  if (models.size() > 0)
   {
-    // Add a child item for the model
-    QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
-        QStringList(QString("%1").arg(
-            QString::fromStdString(iter->second))));
-    childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
-    this->fileTreeWidget->addTopLevelItem(childItem);
+    // Create a top-level tree item for the path
+    QTreeWidgetItem *topItem =
+      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+          QStringList(QString("%1").arg(QString::fromStdString(uri))));
+    this->fileTreeWidget->addTopLevelItem(topItem);
+
+    for (std::map<std::string, std::string>::iterator iter = models.begin();
+        iter != models.end(); ++iter)
+    {
+      // Add a child item for the model
+      QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(
+              QString::fromStdString(iter->second))));
+      childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
+      this->fileTreeWidget->addTopLevelItem(childItem);
+    }
   }
 }
 
@@ -164,7 +167,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 {
   if (_item)
   {
-    std::string path, manifest, filename;
+    std::string path, filename;
 
     if (_item->parent())
       path = _item->parent()->text(0).toStdString() + "/";

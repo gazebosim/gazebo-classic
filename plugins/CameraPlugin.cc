@@ -26,6 +26,13 @@ CameraPlugin::CameraPlugin() : SensorPlugin()
 }
 
 /////////////////////////////////////////////////
+CameraPlugin::~CameraPlugin()
+{
+  this->parentSensor.reset();
+  this->camera.reset();
+}
+
+/////////////////////////////////////////////////
 void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   if (!_sensor)
