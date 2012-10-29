@@ -48,14 +48,17 @@ RaySensor::RaySensor()
 {
   this->mutex = new boost::mutex();
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
   delete this->mutex;
+
+  this->laserCollision->Fini();
   this->laserCollision.reset();
+
+  this->laserShape->Fini();
   this->laserShape.reset();
 }
 
@@ -79,8 +82,6 @@ std::string RaySensor::GetTopic() const
 void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-
-  this->node->Init(_worldName);
   this->scanPub = this->node->Advertise<msgs::LaserScan>(this->GetTopic());
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
@@ -90,10 +91,8 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserCollision->SetRelativePose(this->pose);
 
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
-      this->laserCollision->GetShape());
-
+                     this->laserCollision->GetShape());
   this->laserShape->Load(this->sdf);
-
   this->laserShape->Init();
 
   this->parentEntity = this->world->GetEntity(this->parentName);

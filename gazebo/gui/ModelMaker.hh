@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MODELMAKER_HH
-#define MODELMAKER_HH
+#ifndef _MODELMAKER_HH_
+#define _MODELMAKER_HH_
 
 #include <list>
 #include <string>
@@ -37,9 +37,9 @@ namespace gazebo
       public: ModelMaker();
       public: virtual ~ModelMaker();
 
-      public: void InitFromModel(const std::string &_modelName);
-      public: void InitFromSDFString(const std::string &_data);
-      public: void InitFromFile(const std::string &_filename);
+      public: bool InitFromModel(const std::string &_modelName);
+      public: bool InitFromSDFString(const std::string &_data);
+      public: bool InitFromFile(const std::string &_filename);
 
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
@@ -52,7 +52,7 @@ namespace gazebo
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Internal init function.
-      private: void Init();
+      private: bool Init();
 
       private: virtual void CreateTheEntity();
       private: int state;

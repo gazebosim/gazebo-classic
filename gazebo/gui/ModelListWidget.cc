@@ -253,6 +253,7 @@ void ModelListWidget::Update()
     this->propTreeBrowser->clear();
   }
 
+  this->ProcessRemoveEntity();
   this->ProcessModelMsgs();
   this->ProcessLightMsgs();
   QTimer::singleShot(1000, this, SLOT(Update()));
@@ -395,7 +396,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     if (_msg->response() == "nonexistant")
     {
-      this->RemoveEntity(this->selectedEntityName);
+      this->removeEntityList.push_back(this->selectedEntityName);
     }
   }
 
@@ -1966,8 +1967,19 @@ void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    this->RemoveEntity(_msg->data());
+    this->removeEntityList.push_back(_msg->data());
   }
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::ProcessRemoveEntity()
+{
+  for (RemoveEntity_L::iterator iter = this->removeEntityList.begin();
+       iter != this->removeEntityList.end(); ++iter)
+  {
+    this->RemoveEntity(*iter);
+  }
+  this->removeEntityList.clear();
 }
 
 /////////////////////////////////////////////////
