@@ -96,10 +96,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   }
 
   if (!this->parentLink && parentName != std::string("world"))
-    gzthrow("Couldn't Find Parent Link[" + parentName);
+    gzthrow("Couldn't Find Parent Link[" + parentName + "]");
 
   if (!this->childLink && childName != std::string("world"))
-    gzthrow("Couldn't Find Child Link[" + childName);
+    gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
   this->LoadImpl(pose);
 }

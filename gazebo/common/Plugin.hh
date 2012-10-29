@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GZ_PLUGIN_HH
-#define GZ_PLUGIN_HH
+#ifndef _GZ_PLUGIN_HH_
+#define _GZ_PLUGIN_HH_
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -213,8 +213,12 @@ namespace gazebo
   ///        reference</a>.
   class WorldPlugin : public PluginT<WorldPlugin>
   {
+    /// \brief Constructor
     public: WorldPlugin()
              {this->type = WORLD_PLUGIN;}
+
+    /// \brief Destructor
+    public: virtual ~WorldPlugin() {}
 
     /// \brief Load function
     ///
@@ -238,6 +242,9 @@ namespace gazebo
     public: ModelPlugin()
              {this->type = MODEL_PLUGIN;}
 
+    /// \brief Destructor
+    public: virtual ~ModelPlugin() {}
+
     /// \brief Load function
     ///
     /// Called when a Plugin is first created, and after the World has been
@@ -259,9 +266,12 @@ namespace gazebo
   ///        reference</a>.
   class SensorPlugin : public PluginT<SensorPlugin>
   {
+    /// \brief Constructor
     public: SensorPlugin()
              {this->type = SENSOR_PLUGIN;}
 
+    /// \brief Destructor
+    public: virtual ~SensorPlugin() {}
 
     /// \brief Load function
     ///
@@ -285,8 +295,12 @@ namespace gazebo
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class SystemPlugin : public PluginT<SystemPlugin>
   {
+    /// \brief Constructor
     public: SystemPlugin()
              {this->type = SYSTEM_PLUGIN;}
+
+    /// \brief Destructor
+    public: virtual ~SystemPlugin() {}
 
     /// \brief Load function
     ///

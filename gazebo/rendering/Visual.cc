@@ -1892,7 +1892,7 @@ VisualPtr Visual::GetParent() const
 VisualPtr Visual::GetRootVisual()
 {
   VisualPtr p = shared_from_this();
-  while (p->GetParent()->GetName() != "__world_node__")
+  while (p->GetParent() && p->GetParent()->GetName() != "__world_node__")
     p = p->GetParent();
 
   return p;
