@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf.hh"
-#include "Inertial.hh"
+#include <sdf/sdf.hh>
+#include "physics/Inertial.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -104,6 +104,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   this->SetMass(this->sdf->Get<double>("mass"));
   this->sdf->GetElement("mass")->GetValue()->SetUpdateFunc(
       boost::bind(&Inertial::GetMass, this));
+
 }
 
 //////////////////////////////////////////////////

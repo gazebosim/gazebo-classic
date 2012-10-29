@@ -3,6 +3,7 @@ include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
+  ${SDF_INCLUDE_DIRS}
 )
 
 include_directories(
@@ -17,7 +18,6 @@ link_directories(
 
 add_subdirectory(msgs)
 add_subdirectory(math)
-add_subdirectory(sdf)
 add_subdirectory(transport)
 add_subdirectory(common)
 add_subdirectory(rendering)
@@ -41,24 +41,23 @@ gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 
 target_link_libraries(gzmaster gazebo_common
                                gazebo_transport
-                               gazebo_sdf_interface
                                gazebo_msgs
                                pthread
+                               ${SDF_LIBRARIES}
 )
 
 
 target_link_libraries(gzserver gazebo_common
-                               gazebo_sdf_interface
                                gazebo_transport
                                gazebo_physics
                                gazebo_sensors
                                gazebo_rendering
                                gazebo_msgs
                                pthread
+                               ${SDF_LIBRARIES}
 )
 
 target_link_libraries(gazebo gazebo_common
-                             gazebo_sdf_interface
                              gazebo_transport
                              gazebo_physics
                              gazebo_sensors
@@ -66,6 +65,7 @@ target_link_libraries(gazebo gazebo_common
                              gazebo_msgs
                              gazebo_gui
                              pthread
+                             ${SDF_LIBRARIES}
 )
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
@@ -85,10 +85,11 @@ target_link_libraries(libgazebo gazebo_common
                                 gazebo_physics
                                 gazebo_sensors
                                 gazebo_rendering
-                                gazebo_sdf_interface
                                 gazebo_msgs
                                 gazebo_math
-                                pthread)
+                                pthread
+                                ${SDF_LIBRARIES}
+)
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)

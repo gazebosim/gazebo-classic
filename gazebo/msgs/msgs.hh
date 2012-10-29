@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef MESSAGES_UTILITY_H
-#define MESSAGES_UTILITY_H
+#ifndef _MESSAGES_UTILITY_HH_
+#define _MESSAGES_UTILITY_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 
 #include "msgs/MessageTypes.hh"
-#include "sdf/sdf.hh"
 
 #include "math/MathTypes.hh"
 #include "math/Vector3.hh"

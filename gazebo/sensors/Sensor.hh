@@ -26,7 +26,7 @@
 #include <vector>
 #include <string>
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "physics/PhysicsTypes.hh"
 

@@ -45,6 +45,11 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
+  pkg_check_modules(SDF sdf)
+  if (NOT SDF_FOUND)
+    BUILD_ERROR ("Missing: sdf. Required for reading and writing SDF files.")
+  endif()
+
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")

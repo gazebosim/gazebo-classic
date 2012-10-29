@@ -69,7 +69,6 @@ gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_transport
-                                 gazebo_sdf_interface
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
@@ -77,11 +76,11 @@ target_link_libraries(gazebo_gui gazebo_common
                                  ${QT_LIBRARIES} 
                                  ${ogre_libraries} 
                                  ${Boost_LIBRARIES} 
+                                 ${SDF_LIBRARIES} 
                                  pthread)
 
 target_link_libraries(gzclient  gazebo_common
                                 gazebo_transport
-                                gazebo_sdf_interface
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
@@ -89,6 +88,7 @@ target_link_libraries(gzclient  gazebo_common
                                 ${QT_LIBRARIES} 
                                 ${ogre_libraries} 
                                 ${Boost_LIBRARIES} 
+                                ${SDF_LIBRARIES} 
                                 pthread)
 
  

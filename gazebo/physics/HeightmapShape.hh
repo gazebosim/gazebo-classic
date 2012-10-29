@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "common/Image.hh"
-#include "math/Vector3.hh"
+#include "math/MathTypes.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Shape.hh"
 

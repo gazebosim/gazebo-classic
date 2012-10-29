@@ -55,7 +55,6 @@ target_link_libraries(${BINARY_NAME}
   ${GTEST_LIBRARY} 
   ${GTEST_MAIN_LIBRARY} 
     gazebo_common
-    gazebo_sdf_interface
     gazebo_transport
     gazebo_physics
     gazebo_sensors
@@ -63,7 +62,9 @@ target_link_libraries(${BINARY_NAME}
     gazebo_msgs
     pthread
     ${tinyxml_libraries}
+    ${SDF_LIBRARIES}
     )
+
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
 endforeach()

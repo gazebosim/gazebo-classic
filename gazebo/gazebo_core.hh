@@ -20,10 +20,11 @@
  */
 #ifndef _GAZEBO_CORE_HH_
 #define _GAZEBO_CORE_HH_
+#include <sdf/sdf.hh>
+
 #include <gazebo/common/common.hh>
 #include <gazebo/math/gzmath.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/sdf/sdf.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/Server.hh>
 #include <gazebo/Master.hh>

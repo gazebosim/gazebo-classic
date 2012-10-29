@@ -27,7 +27,6 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
 
   target_link_libraries(${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
     gazebo_common
-    gazebo_sdf_interface
     gazebo_transport
     gazebo_physics
     gazebo_sensors
@@ -36,6 +35,8 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
     pthread
     ${tinyxml_libraries}
     ${PLAYER_LINK_LIBS}
+    ${SDF_LIBRARIES}
     )
+
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
 endforeach()

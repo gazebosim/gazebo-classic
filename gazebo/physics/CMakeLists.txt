@@ -96,11 +96,11 @@ gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics
   gazebo_common 
-  gazebo_sdf_interface
   gazebo_physics_ode
   ${TBB_LIBRARIES} 
   ${libtool_library} 
   ${Boost_LIBRARIES}
+  ${SDF_LIBRARIES}
 )
 
 if (HAVE_BULLET)
@@ -112,9 +112,9 @@ target_link_libraries(gzphysics gazebo_common
                                 gazebo_transport
                                 gazebo_physics
                                 gazebo_sensors
-                                gazebo_sdf_interface
                                 gazebo_msgs
                                 pthread
+                                ${SDF_LIBRARIES}
                                 )
 
 gz_install_executable( gzphysics )

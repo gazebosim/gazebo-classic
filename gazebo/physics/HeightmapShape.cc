@@ -22,6 +22,9 @@
 #include <string.h>
 #include <math.h>
 
+#include "math/Vector2i.hh"
+#include "math/Vector3.hh"
+
 #include "common/Image.hh"
 #include "common/Common.hh"
 #include "common/Console.hh"

@@ -5,6 +5,7 @@ include_directories (
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${SDF_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
 )
@@ -12,6 +13,7 @@ include_directories (
 link_directories(  
   ${OGRE_LIBRARY_PATH}
   ${Boost_LIBRARY_DIRS} 
+  ${SDF_LIBRARY_DIRS} 
   ${ODE_LIBRARY_DIRS}
 )
 

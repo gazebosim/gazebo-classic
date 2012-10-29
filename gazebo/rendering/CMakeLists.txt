@@ -104,12 +104,12 @@ gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
   gazebo_common 
-  gazebo_sdf_interface
   gazebo_skyx
   gazebo_selection_buffer
   ${ogre_libraries} 
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}
+  ${SDF_LIBRARIES}
   X11 
 )
 

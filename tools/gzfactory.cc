@@ -77,11 +77,11 @@ void Spawn(po::variables_map &vm)
 
   // Get/Set the model name
   if (modelName.empty())
-    modelName = modelElem->GetValueString("name");
+    modelName = modelElem->Get<std::string>("name");
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 
-  math::Pose pose = modelElem->GetValuePose("origin");
+  math::Pose pose = modelElem->Get<gazebo::math::Pose>("origin");
   math::Vector3 rpy = pose.rot.GetAsEuler();
   if (vm.count("pose-x"))
     pose.pos.x = vm["pose-x"].as<double>();

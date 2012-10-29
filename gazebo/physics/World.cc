@@ -25,7 +25,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
 #include "gazebo/transport/Publisher.hh"

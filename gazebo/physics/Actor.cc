@@ -20,6 +20,7 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <sdf/sdf.hh>
 
 #include "common/KeyFrame.hh"
 #include "common/Animation.hh"

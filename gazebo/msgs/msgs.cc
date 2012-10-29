@@ -299,7 +299,8 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_origin(), camSDF->Get<math::Pose>("pose"));
+          msgs::Set(guiCam->mutable_origin(),
+                    camSDF->Get<math::Pose>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
