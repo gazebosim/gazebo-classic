@@ -287,16 +287,16 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         else
           gazebo->setStaticFlag = false;
       }
-      else if (child_elem->ValueStr() == "gravity")
+      else if (child_elem->ValueStr() == "turnGravityOff")
       {
         std::string value_str = getKeyValueAsString(child_elem);
 
         // default of gravity is true
         if (lowerStr(value_str) == "false" || lowerStr(value_str) == "no" ||
             value_str == "0")
-          gazebo->gravity = false;
-        else
           gazebo->gravity = true;
+        else
+          gazebo->gravity = false;
       }
       else if (child_elem->ValueStr() == "damping_factor")
       {
@@ -344,7 +344,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           gazebo->kd = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "self_collide")
+      else if (child_elem->ValueStr() == "selfCollide")
       {
         std::string value_str = getKeyValueAsString(child_elem);
 
@@ -355,22 +355,22 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
         else
           gazebo->self_collide = false;
       }
-      else if (child_elem->ValueStr() == "laser_retro")
+      else if (child_elem->ValueStr() == "laserRetro")
       {
           gazebo->is_laser_retro = true;
           gazebo->laser_retro = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "stop_cfm")
+      else if (child_elem->ValueStr() == "stopKp")
       {
-          gazebo->is_stop_cfm = true;
-          gazebo->stop_cfm = boost::lexical_cast<double>(
+          gazebo->is_stop_kp = true;
+          gazebo->stop_kp = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "stop_erp")
+      else if (child_elem->ValueStr() == "stopKd")
       {
-          gazebo->is_stop_erp = true;
-          gazebo->stop_erp = boost::lexical_cast<double>(
+          gazebo->is_stop_kd = true;
+          gazebo->stop_kd = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
       else if (child_elem->ValueStr() == "initial_joint_position")
@@ -379,7 +379,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           gazebo->initial_joint_position = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "fudge_factor")
+      else if (child_elem->ValueStr() == "fudgeFactor")
       {
           gazebo->is_fudge_factor = true;
           gazebo->fudge_factor = boost::lexical_cast<double>(
@@ -395,13 +395,73 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           else
             gazebo->provideFeedback = false;
       }
+      else if (child_elem->ValueStr() == "canonicalBody")
+      {
+          gzwarn << "do nothing with canonicalBody\n";
+      }
       else
       {
           std::ostringstream stream;
-          stream << *child_elem;
+          stream << "<blob xmlns:controller='http://gazebosim.org/'"
+                 <<     "  xmlns:interface='http://gazebosim.org/'"
+                 <<     "  xmlns:sensor='http://gazebosim.org/'>"
+                 << *child_elem << "</blob>";
 
-          /// \TODO: check of blob is deprecated format
+          // *********************************************
+          // check if blob is any of the deprecated format
+          // this is not needed if we don't support
+          // deprecated xml format any more, will be out
+          // from groovy
+          // *********************************************
+          xmlDocPtr xmlDoc =
+            xmlParseDoc(reinterpret_cast<const xmlChar*>(stream.str().c_str()));
+          xmlNodePtr node = xmlDocGetRootElement(xmlDoc)->xmlChildrenNode;
 
+          gzerr << "str: " << stream.str() << "\n";
+          // gzerr << "doc: " << deprecated_sdf::ToString(xmlDoc) << "\n";
+          // gzerr << "node: " << deprecated_sdf::ToString(node) << "\n";
+
+          sdf::ElementPtr sdf(new sdf::Element);
+
+          // for (xmlNodePtr pluginXml = node->xmlChildrenNode;
+          //      pluginXml != NULL; pluginXml = pluginXml->next)
+          // {
+          gzerr << "value " << deprecated_sdf::getValue(node) << "\n";
+          gzerr << "attribute " << deprecated_sdf::getNodeValue(node, "name") << "\n";
+          // }
+
+          if (node->ns &&
+              (const char*)node->ns->prefix == std::string("controller"))
+          {
+            deprecated_sdf::controller2Plugins(
+              node, sdf);
+
+            gzerr << "controller sdf: " << sdf->ToString("") << "\n";
+          }
+          else if (stream.str().find("<sensor:",0) == 0)
+          {
+            gzerr << "sensor: \n";
+          }
+          else if (stream.str().find("<body:",0) == 0)
+          {
+            gzerr << "body: \n";
+          }
+          else if (stream.str().find("<joint:",0) == 0)
+          {
+            gzerr << "joint: \n";
+          }
+          else if (stream.str().find("<gripper",0) == 0)
+          {
+            gzerr << "gripper: \n";
+          }
+          else if (stream.str().find("<projector",0) == 0)
+          {
+            gzerr << "projector: not altered, pushed back to blob\n";
+          }
+          else
+          {
+            gzerr << stream.str() << "\n";
+          }
 
           /// \TODO: convert to sdf 1.2 if it is the deprecated format
 
@@ -548,14 +608,14 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         TiXmlElement *physics     = new TiXmlElement("physics");
         TiXmlElement *physics_ode     = new TiXmlElement("ode");
         TiXmlElement *limit     = new TiXmlElement("limit");
-        // insert stop_cfm, stop_erp, fudge_factor
-        if ((*ge)->is_stop_cfm)
+        // insert stop_kp, stop_kd, fudge_factor
+        if ((*ge)->is_stop_kp)
         {
-          addKeyValue(limit, "erp", values2str(1, &(*ge)->stop_cfm));
+          addKeyValue(limit, "stopKp", values2str(1, &(*ge)->stop_kp));
         }
-        if ((*ge)->is_stop_erp)
+        if ((*ge)->is_stop_kd)
         {
-          addKeyValue(limit, "cfm", values2str(1, &(*ge)->stop_erp));
+          addKeyValue(limit, "stopKd", values2str(1, &(*ge)->stop_kd));
         }
         /* gone
         if ((*ge)->is_initial_joint_position)

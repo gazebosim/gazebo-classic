@@ -91,8 +91,8 @@ namespace urdf2gazebo
       double laser_retro;
 
       // joint, joint limit dynamics
-      bool is_stop_cfm, is_stop_erp, is_initial_joint_position, is_fudge_factor;
-      double stop_cfm, stop_erp, initial_joint_position, fudge_factor;
+      bool is_stop_kp, is_stop_kd, is_initial_joint_position, is_fudge_factor;
+      double stop_kp, stop_kd, initial_joint_position, fudge_factor;
       bool provideFeedback;
 
       // blobs into body or robot
@@ -113,8 +113,8 @@ namespace urdf2gazebo
         is_kd = false;
         self_collide = false;
         is_laser_retro = false;
-        is_stop_cfm = false;
-        is_stop_erp = false;
+        is_stop_kp = false;
+        is_stop_kd = false;
         is_initial_joint_position = false;
         is_fudge_factor = false;
         provideFeedback = false;
@@ -128,8 +128,8 @@ namespace urdf2gazebo
         kp = 100000000;
         kd = 1;
         laser_retro = 101;
-        stop_cfm = 0;
-        stop_erp = 0.1;
+        stop_kp = 100000000;
+        stop_kd = 1;
         initial_joint_position = 0;
         fudge_factor = 1;
       };
@@ -149,8 +149,8 @@ namespace urdf2gazebo
         is_kd = ge.is_kd;
         self_collide = ge.self_collide;
         is_laser_retro = ge.is_laser_retro;
-        is_stop_cfm = ge.is_stop_cfm;
-        is_stop_erp = ge.is_stop_erp;
+        is_stop_kp = ge.is_stop_kp;
+        is_stop_kd = ge.is_stop_kd;
         is_initial_joint_position = ge.is_initial_joint_position;
         is_fudge_factor = ge.is_fudge_factor;
         provideFeedback = ge.provideFeedback;
@@ -166,8 +166,8 @@ namespace urdf2gazebo
         kp = ge.kp;
         kd = ge.kd;
         laser_retro = ge.laser_retro;
-        stop_cfm = ge.stop_cfm;
-        stop_erp = ge.stop_erp;
+        stop_kp = ge.stop_kp;
+        stop_kd = ge.stop_kd;
         initial_joint_position = ge.initial_joint_position;
         fudge_factor = ge.fudge_factor;
       };
