@@ -965,7 +965,6 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     return false;
   }
   sdfChild->Set(getNodeValue(_config, "anchor"));
-  gzerr << "str: " << ToString(_config) << "\n";
 
   // Get Child Link
   xmlNodePtr body1Xml = firstChildElement(_config, "body1");
