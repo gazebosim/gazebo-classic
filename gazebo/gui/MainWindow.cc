@@ -32,6 +32,7 @@
 #include "gui/ModelListWidget.hh"
 #include "gui/LightListWidget.hh"
 #include "gui/RenderWidget.hh"
+#include "gui/ToolsWidget.hh"
 #include "gui/GLWidget.hh"
 #include "gui/MainWindow.hh"
 #include "gui/GuiEvents.hh"
@@ -74,6 +75,8 @@ MainWindow::MainWindow()
                                  QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(250);
 
+  this->toolsWidget = new ToolsWidget();
+
   this->renderWidget = new RenderWidget(mainWidget);
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
@@ -81,12 +84,16 @@ MainWindow::MainWindow()
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->tabWidget);
   splitter->addWidget(this->renderWidget);
+  splitter->addWidget(this->toolsWidget);
+
   QList<int> sizes;
   sizes.push_back(300);
-  sizes.push_back(1000);
+  sizes.push_back(700);
+  sizes.push_back(300);
   splitter->setSizes(sizes);
   splitter->setStretchFactor(0, 1);
   splitter->setStretchFactor(1, 2);
+  splitter->setStretchFactor(2, 1);
   splitter->setCollapsible(1, false);
 
   centerLayout->addWidget(splitter);

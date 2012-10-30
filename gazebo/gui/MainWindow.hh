@@ -31,7 +31,7 @@ namespace gazebo
   namespace gui
   {
     class RenderWidget;
-    class GLWidget;
+    class ToolsWidget;
 
     class ModelListWidget;
 
@@ -105,6 +105,7 @@ namespace gazebo
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
+      private: ToolsWidget *toolsWidget;
       private: ModelListWidget *modelListWidget;
 
       private: transport::NodePtr node;
