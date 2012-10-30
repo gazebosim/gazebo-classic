@@ -24,6 +24,7 @@
 #include <math.h>
 #include "math/Helpers.hh"
 #include "common/Time.hh"
+#include "common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
