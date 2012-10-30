@@ -484,7 +484,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
             sdf = includeSDF->root->GetOrCreateElement("model")
                   ->GetOrCreateElement("link");
             deprecated_sdf::initLink(node, sdf);
-            // gzdbg << "body:\n" << sdf->ToString("") << "\n";
+            gzerr << "body:\n" << sdf->ToString("") << "\n";
           }
           else if (node->ns && (const char*)node->ns->prefix
                 == std::string("joint"))
@@ -2186,23 +2186,29 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(
       // extract projector link name and projector name
       size_t pos = projector_name.find("/");
       if (pos == std::string::npos)
-        gzwarn << "no slash in projector reference tag [" << projector_name
-              << "], expecting link_name/projector_name.\n";
-      std::string projector_link_name = projector_name.substr(0, pos);
-
-      if (projector_link_name == link_name)
       {
-        // do the replacement
-        projector_name = new_link_name + "/" +
-          projector_name.substr(pos+1, projector_name.size());
+        /// FIXME: check to see if this is still needed?
+        // gzwarn << "no slash in projector reference tag [" << projector_name
+        //        << "], expecting link_name/projector_name.\n";
+      }
+      else
+      {
+        std::string projector_link_name = projector_name.substr(0, pos);
 
-        (*blob_it)->RemoveChild(projector_elem);
-        TiXmlElement* body_name_key = new TiXmlElement("projector");
-        std::ostringstream body_name_stream;
-        body_name_stream << projector_name;
-        TiXmlText* body_name_txt = new TiXmlText(body_name_stream.str());
-        body_name_key->LinkEndChild(body_name_txt);
-        (*blob_it)->LinkEndChild(body_name_key);
+        if (projector_link_name == link_name)
+        {
+          // do the replacement
+          projector_name = new_link_name + "/" +
+            projector_name.substr(pos+1, projector_name.size());
+
+          (*blob_it)->RemoveChild(projector_elem);
+          TiXmlElement* body_name_key = new TiXmlElement("projector");
+          std::ostringstream body_name_stream;
+          body_name_stream << projector_name;
+          TiXmlText* body_name_txt = new TiXmlText(body_name_stream.str());
+          body_name_key->LinkEndChild(body_name_txt);
+          (*blob_it)->LinkEndChild(body_name_key);
+        }
       }
     }
   }
