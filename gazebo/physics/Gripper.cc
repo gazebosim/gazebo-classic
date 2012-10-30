@@ -70,11 +70,10 @@ void Gripper::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
 
-
   while (gripperLinkElem)
   {
-    physics::LinkPtr gripperLink
-      = this->model->GetLink(gripperLinkElem->GetValueString());
+    std::string linkName = gripperLinkElem->GetValueString();
+    physics::LinkPtr gripperLink = this->model->GetLink(linkName);
     for (unsigned int j = 0; j < gripperLink->GetChildCount(); ++j)
     {
       physics::CollisionPtr collision = gripperLink->GetCollision(j);
