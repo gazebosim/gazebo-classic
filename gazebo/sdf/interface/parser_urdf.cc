@@ -484,7 +484,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
             sdf = includeSDF->root->GetOrCreateElement("model")
                   ->GetOrCreateElement("link");
             deprecated_sdf::initLink(node, sdf);
-            gzerr << "body:\n" << sdf->ToString("") << "\n";
+            // gzdbg << "body:\n" << sdf->ToString("") << "\n";
           }
           else if (node->ns && (const char*)node->ns->prefix
                 == std::string("joint"))
