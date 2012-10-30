@@ -276,10 +276,14 @@ bool initGripper(xmlNodePtr _config, sdf::ElementPtr &sdfGripper)
   initElem(_config, "attach_steps", sdfGraspCheck);
   initElem(_config, "min_countact_count", sdfGraspCheck);
   initElem(_config, "palm_link", sdfGripper);
+  bool firstElem = true;
   for (xmlNodePtr  glink_xml = firstChildElement(_config, "gripper_link");
       glink_xml; glink_xml = nextSiblingElement(glink_xml, "gripper_link"))
   {
-    sdfGripper->AddElement("gripper_link")->Set(getValue(glink_xml));
+    if (firstElem)
+      sdfGripper->GetElement("gripper_link")->Set(getValue(glink_xml));
+    else
+      sdfGripper->AddElement("gripper_link")->Set(getValue(glink_xml));
   }
 }
 
