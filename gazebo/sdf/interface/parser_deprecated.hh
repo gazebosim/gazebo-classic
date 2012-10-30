@@ -98,7 +98,9 @@ namespace deprecated_sdf
 
   /// copying <controller:...> to <plugins>
   void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initPlugins(xmlNodePtr pluginXml, sdf::ElementPtr &_sdf);
   bool initPlugin(xmlNodePtr pluginXml, sdf::ElementPtr &_sdf);
+  bool initProjectors(xmlNodePtr _config, sdf::ElementPtr &_sdf);
   bool initProjector(xmlNodePtr _config, sdf::ElementPtr &_sdf);
   // bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf);
 

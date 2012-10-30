@@ -450,9 +450,9 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           // *********************************************
           xmlDocPtr xmlDoc =
             xmlParseDoc(reinterpret_cast<const xmlChar*>(stream.str().c_str()));
-          xmlNodePtr node = xmlDocGetRootElement(xmlDoc);
+          xmlNodePtr node = xmlDocGetRootElement(xmlDoc)->xmlChildrenNode;
 
-          // gzerr << "name: " << node->xmlChildrenNode->name << "\n";
+          // gzerr << "name: " << node->name << "\n";
           // gzerr << "str: " << stream.str() << "\n";
           // gzerr << "doc: " << deprecated_sdf::ToString(xmlDoc) << "\n";
           // gzerr << "node: " << deprecated_sdf::ToString(node) << "\n";
@@ -461,70 +461,66 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           initSDF(includeSDF);
           sdf::ElementPtr sdf;
 
-          if (node->xmlChildrenNode->ns &&
-              (const char*)node->xmlChildrenNode->ns->prefix
+          if (node->ns && (const char*)node->ns->prefix
                 == std::string("controller"))
           {
-            sdf = includeSDF->root->AddElement("model");
+            sdf = includeSDF->root->GetOrCreateElement("model")
+                                  ->GetOrCreateElement("plugin");
             deprecated_sdf::initPlugin(node, sdf);
-
-            gzdbg << "controller:\n" << sdf->ToString("") << "\n";
+            // gzdbg << "controller:\n" << sdf->ToString("") << "\n";
           }
-          else if (node->xmlChildrenNode->ns &&
-              (const char*)node->xmlChildrenNode->ns->prefix
-                == std::string("sensor"))
+          else if (node->ns && (const char*)node->ns->prefix
+                   == std::string("sensor"))
           {
             sdf = includeSDF->root->AddElement("model")
                   ->AddElement("link")
                   ->AddElement("sensor");
-            deprecated_sdf::initSensor(node->xmlChildrenNode, sdf);
-            gzdbg << "sensor:\n" << sdf->ToString("") << "\n";
+            deprecated_sdf::initSensor(node, sdf);
+            // gzdbg << "sensor:\n" << sdf->ToString("") << "\n";
           }
-          else if (node->xmlChildrenNode->ns &&
-              (const char*)node->xmlChildrenNode->ns->prefix
+          else if (node->ns && (const char*)node->ns->prefix
                 == std::string("body"))
           {
             sdf = includeSDF->root->AddElement("model")
                   ->AddElement("link");
-            deprecated_sdf::initLink(node->xmlChildrenNode, sdf);
-            gzdbg << "body:\n" << sdf->ToString("") << "\n";
+            deprecated_sdf::initLink(node, sdf);
+            // gzdbg << "body:\n" << sdf->ToString("") << "\n";
           }
-          else if (node->xmlChildrenNode->ns &&
-              (const char*)node->xmlChildrenNode->ns->prefix
+          else if (node->ns && (const char*)node->ns->prefix
                 == std::string("joint"))
           {
             sdf = includeSDF->root->AddElement("model")
                   ->AddElement("joint");
-            deprecated_sdf::initJoint(node->xmlChildrenNode, sdf);
-            gzdbg << "joint:\n" << sdf->ToString("") << "\n";
+            deprecated_sdf::initJoint(node, sdf);
+            // gzdbg << "joint:\n" << sdf->ToString("") << "\n";
           }
-          else if (std::string((const char*)node->xmlChildrenNode->name)
-                   == "gripper")
+          else if (std::string((const char*)node->name) == "gripper")
           {
             sdf = includeSDF->root->AddElement("model")
                   ->AddElement("gripper");
-            deprecated_sdf::initGripper(node->xmlChildrenNode, sdf);
-            gzdbg << "gripper:\n" << sdf->ToString("") << "\n";
+            deprecated_sdf::initGripper(node, sdf);
+            // gzdbg << "gripper:\n" << sdf->ToString("") << "\n";
           }
-          else if (std::string((const char*)node->xmlChildrenNode->name)
+          else if (std::string((const char*)node->name)
                    == "projector")
           {
-            sdf = includeSDF->root->AddElement("model")
-                  ->AddElement("link");
-            deprecated_sdf::initProjector(node->xmlChildrenNode, sdf);
-            gzdbg << "projector:\n" << sdf->ToString("") << "\n";
+            sdf = includeSDF->root->GetOrCreateElement("model")
+                  ->GetOrCreateElement("link")
+                  ->GetOrCreateElement("projector");
+            deprecated_sdf::initProjector(node, sdf);
+            // gzdbg << "projector:\n" << sdf->ToString("") << "\n";
           }
           else
           {
-            gzerr << stream.str() << "\n";
+            gzerr << "extension [" << stream.str() << "] not converted.\n";
           }
 
           /// \TODO: convert to sdf 1.2 if it is the deprecated format
-
-
+          TiXmlDocument xmlNewDoc;
+          xmlNewDoc.Parse(sdf->ToString("").c_str());
 
           // save all unknown stuff in a vector of blobs
-          TiXmlElement *blob = new TiXmlElement(*child_elem);
+          TiXmlElement *blob = new TiXmlElement(*xmlNewDoc.FirstChildElement());
           gazebo->blobs.push_back(blob);
       }
     }
@@ -664,16 +660,21 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         TiXmlElement *physics     = new TiXmlElement("physics");
         TiXmlElement *physics_ode     = new TiXmlElement("ode");
         TiXmlElement *limit     = new TiXmlElement("limit");
-        // insert stop_kp, stop_kd, fudge_factor
+
+        /* stop_kp and stop_kd have become stop_cfm and stop_erp
+           but this requires time step size to translate.
+           FIXME: will skip for now.
         if ((*ge)->is_stop_kp)
         {
-          addKeyValue(limit, "stopKp", values2str(1, &(*ge)->stop_kp));
+          addKeyValue(limit, "stop_kp", values2str(1, &(*ge)->stop_kp));
         }
         if ((*ge)->is_stop_kd)
         {
-          addKeyValue(limit, "stopKd", values2str(1, &(*ge)->stop_kd));
+          addKeyValue(limit, "stop_kd", values2str(1, &(*ge)->stop_kd));
         }
-        /* gone
+        */
+
+        /* FIXME: provideFeedback flag is gone, need to recover
         if ((*ge)->is_initial_joint_position)
             addKeyValue(elem, "initial_joint_position",
               values2str(1, &(*ge)->initial_joint_position));
@@ -683,6 +684,8 @@ void URDF2Gazebo::insertGazeboExtensionJoint(TiXmlElement *elem,
         else
             addKeyValue(elem, "provideFeedback", "false");
         */
+
+        // insert fudge_factor
         if ((*ge)->is_fudge_factor)
           addKeyValue(physics_ode, "fudge_factor",
                       values2str(1, &(*ge)->fudge_factor));
@@ -2183,7 +2186,7 @@ void URDF2Gazebo::reduceGazeboExtensionProjectorFrameReplace(
       // extract projector link name and projector name
       size_t pos = projector_name.find("/");
       if (pos == std::string::npos)
-        gzerr << "no slash in projector reference tag [" << projector_name
+        gzwarn << "no slash in projector reference tag [" << projector_name
               << "], expecting link_name/projector_name.\n";
       std::string projector_link_name = projector_name.substr(0, pos);
 
