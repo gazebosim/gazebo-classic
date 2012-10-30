@@ -392,6 +392,18 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
+                 // In the case sec and nsec have different signs, normalize
+                 while (this->sec > 0 && this->nsec < 0)
+                 {
+                   this->sec--;
+                   this->nsec += 1e9;
+                 }
+                 while (this->sec < 0 && this->nsec > 0)
+                 {
+                   this->sec++;
+                   this->nsec -= 1e9;
+                 }
+
                  // Make any corrections
                  this->sec += this->nsec / static_cast<int32_t>(1e9);
                  this->nsec = this->nsec % static_cast<int32_t>(1e9);
