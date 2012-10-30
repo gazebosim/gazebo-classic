@@ -76,12 +76,15 @@ bool gazebo::init()
     (*iter)->Init();
   }
 
+
   return true;
 }
 
 /////////////////////////////////////////////////
 void gazebo::run()
 {
+  common::Logger::Instance()->Start();
+
   // Run transport loop. Starts a thread
   gazebo::transport::run();
 }
@@ -89,6 +92,7 @@ void gazebo::run()
 /////////////////////////////////////////////////
 void gazebo::stop()
 {
+  common::Logger::Instance()->Stop();
   gazebo::transport::stop();
 }
 
@@ -96,6 +100,7 @@ void gazebo::stop()
 void gazebo::fini()
 {
   boost::mutex::scoped_lock lock(fini_mutex);
+  common::Logger::Instance()->Stop();
   g_plugins.clear();
   gazebo::transport::fini();
 }

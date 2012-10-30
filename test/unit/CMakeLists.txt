@@ -22,21 +22,8 @@ link_directories(
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
-  common.cc
-  factory.cc
-  file_handling.cc
-  heightmap.cc
-  laser.cc
-  math.cc
-  msgs.cc
-  physics.cc
-  pioneer2dx.cc
-  pr2.cc
-  projector.cc
-  speed.cc
-  transport.cc)
-
-set (plugins)
+  logger.cc
+)
 
 # Build plugins
 foreach (src ${plugins})

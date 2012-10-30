@@ -7,6 +7,7 @@ include_directories (
   ${Boost_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/test/gtest/include
   ${PROJECT_SOURCE_DIR}/test/gtest
+  ${PROJECT_SOURCE_DIR}/test
 )
 
 link_directories(  
@@ -14,6 +15,8 @@ link_directories(
   ${Boost_LIBRARY_DIRS} 
   ${ODE_LIBRARY_DIRS}
 )
+
+configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build gtest
 add_library(gtest gtest/src/gtest-all.cc)
@@ -27,3 +30,4 @@ execute_process(COMMAND cmake -E make_directory ${CMAKE_BINARY_DIR}/test_results
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_subdirectory(regression)
+add_subdirectory(unit)

@@ -23,6 +23,7 @@
 
 #include "msgs/msgs.hh"
 
+#include "common/Logger.hh"
 #include "common/Events.hh"
 #include "common/Console.hh"
 #include "common/Animation.hh"
@@ -123,8 +124,17 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->setWorldPoseFunc = &Entity::SetWorldPoseCanonicalLink;
   else
     this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
+
+  common::Logger::Instance()->Add(this->GetName(),
+                                  boost::bind(&Entity::OnLog, this, _1));
 }
 
+//////////////////////////////////////////////////
+bool Entity::OnLog(std::ostringstream &_stream)
+{
+  _stream << "Hello\n";
+  return true;
+}
 
 //////////////////////////////////////////////////
 void Entity::SetName(const std::string &_name)

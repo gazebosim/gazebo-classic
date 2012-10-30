@@ -25,6 +25,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <boost/thread.hpp>
 
 #include "common/Event.hh"
 #include "common/SingletonT.hh"
@@ -61,6 +62,22 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~Logger();
 
+      public: bool Init(const std::string &_subdir);
+
+      /// \brief Add an object to a log file.
+      ///
+      /// Add a new object to a log. An object can be any valid named object
+      /// in simulation, including the world itself. Duplicate additions are
+      /// ignored.
+      /// \param[in] _name Name of the object to log.
+      /// \param[in] _logCallback Function used to log data for the object.
+      /// Typically an object will have a log function that outputs data to
+      /// the provided ofstream.
+      /// \return True if the Entity was added to a log. False if the entity
+      /// is already being logged.
+      public: bool Add(const std::string &_name,
+                    boost::function<bool (std::ostringstream &)> _logCallback);
+
       /// \brief Add an object to a log file.
       ///
       /// Add a new object to a log. An object can be any valid named object
@@ -75,8 +92,8 @@ namespace gazebo
       /// \return True if the Entity was added to a log. False if the entity
       /// is already being logged.
       public: bool Add(const std::string &_name,
-                       const std::string &_filename,
-                       boost::function<bool (std::fstream &)> _logCallback);
+                    const std::string &_filename,
+                    boost::function<bool (std::ostringstream &)> _logCallback);
 
       /// \brief Remove an entity from a log
       ///
@@ -88,26 +105,37 @@ namespace gazebo
       /// entity was not registered with the logger.
       public: bool Remove(const std::string &_entity);
 
+      /// \brief Stop the logger.
+      public: void Stop();
+
+      /// \brief Start the logger.
+      public: void Start();
+
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs
       /// the data to their respective log files.
       private: void Update();
 
+      /// \brief Run the Write loop.
+      private: void Run();
+
       /// \brief A logger for an entitiy
       private: class LogObj
                {
                  public: LogObj(const std::string &_name,
-                                const std::string &_filename,
-                                boost::function<bool (std::fstream&)> _logCB);
+                            const std::string &_filename,
+                            boost::function<bool (std::ostringstream&)> _logCB);
                  public: virtual ~LogObj();
                  public: void Update();
-                 public: std::string GetName() const;
+                 public: void Write();
+                 public: const std::string &GetName() const;
 
                  public: bool valid;
-                 private: boost::function<bool (std::fstream&)> logCB;
+                 private: boost::function<bool (std::ostringstream &)> logCB;
                  private: std::string name;
                  private: std::fstream logFile;
+                 private: std::string buffer;
                };
 
       private: std::vector<LogObj*> logObjects;
@@ -115,6 +143,17 @@ namespace gazebo
       private: std::vector<LogObj*>::iterator logObjectsEnd;
 
       private: event::ConnectionPtr updateConnection;
+
+      private: bool stop;
+      private: boost::thread *writeThread;
+      private: boost::mutex writeMutex;
+      private: boost::mutex controlMutex;
+
+      private: boost::condition_variable dataAvailableCondition;
+
+      private: std::string logPathname;
+      private: std::string dataLogFilename;
+      private: std::string gzoutLogFilename;
 
       private: friend class SingletonT<Logger>;
     };

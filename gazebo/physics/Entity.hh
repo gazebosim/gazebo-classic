@@ -222,6 +222,9 @@ namespace gazebo
       /// \brief Update an animation
       private: void UpdateAnimation();
 
+      /// \brief Log callback;
+      private: bool OnLog(std::ostringstream &_stream);
+
       /// A helper that prevents numerous dynamic_casts
       protected: EntityPtr parentEntity;
 
