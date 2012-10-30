@@ -59,6 +59,14 @@ namespace gazebo
       public: virtual void HandleMouseEvent(
                   const common::MouseEvent &_event) = 0;
 
+      /// \brief Handle a key release event.
+      /// \param[in] _key The key that was released.
+      public: virtual void HandleKeyReleaseEvent(const std::string &_key) = 0;
+
+      /// \brief Handle a key press event
+      /// \param[in] _key The key that was pressed.
+      public: virtual void HandleKeyPressEvent(const std::string &_key) = 0;
+
       /// \brief Get the type of view controller.
       /// \return The view controller type string.
       public: std::string GetTypeString() const;
