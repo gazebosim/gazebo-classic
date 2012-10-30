@@ -90,6 +90,10 @@ URDF2Gazebo::URDF2Gazebo()
     // default options
     this->enforce_limits = true;
     this->reduce_fixed_joints = true;
+
+    // for compatibility with old gazebo, consider changing to "_collision"
+    this->collision_ext = "_geom";
+    this->visual_ext = "_visual";
 }
 
 URDF2Gazebo::~URDF2Gazebo()
@@ -1123,9 +1127,9 @@ void URDF2Gazebo::reduceGazeboExtensionFrameReplace(GazeboExtension* ge,
   // HACK: need to do this more generally, but we also need to replace
   //       all instances of link name with new link name
   //       e.g. contact sensor refers to
-  //         <collision>base_link_collision</collision>
+  //         <collision>base_link_geom</collision>
   //         and it needs to be reparented to
-  //         <collision>base_footprint_collision</collision>
+  //         <collision>base_footprint_geom</collision>
   // gzdbg << "  STRING REPLACE: instances of link name ["
   //       << link_name << "] with [" << new_link_name << "]\n";
   for (std::vector<TiXmlElement*>::iterator blob_it = blobs.begin();
@@ -1562,10 +1566,10 @@ void URDF2Gazebo::createCollision(TiXmlElement* elem,
     /* set its name, if lumped, add original link name */
     if (old_link_name == link->name)
       gazebo_collision->SetAttribute("name",
-        link->name + std::string("_collision"));
+        link->name + this->collision_ext);
     else
       gazebo_collision->SetAttribute("name",
-        link->name + std::string("_collision_")+old_link_name);
+        link->name + this->collision_ext + std::string("_")+old_link_name);
 
     /* set transform */
     double pose[6];
@@ -1605,10 +1609,10 @@ void URDF2Gazebo::createVisual(TiXmlElement *elem,
     // gzdbg << "original link name [" << old_link_name
     //       << "] new link name [" << link->name << "]\n";
     if (old_link_name == link->name)
-      gazebo_visual->SetAttribute("name", link->name + std::string("_vis"));
+      gazebo_visual->SetAttribute("name", link->name + this->visual_ext);
     else
-      gazebo_visual->SetAttribute("name", link->name + std::string("_vis_")
-        + old_link_name);
+      gazebo_visual->SetAttribute("name", link->name + this->visual_ext
+        + std::string("_") + old_link_name);
 
     /* add the visualisation transfrom */
     double pose[6];
@@ -2065,12 +2069,13 @@ void URDF2Gazebo::reduceGazeboExtensionContactSensorFrameReplace(
       if (collision)
       {
         if (getKeyValueAsString(collision->ToElement()) ==
-          link_name + std::string("_collision"))
+          link_name + this->collision_ext)
         {
           contact->RemoveChild(collision);
           TiXmlElement* collision_name_key = new TiXmlElement("collision");
           std::ostringstream collision_name_stream;
-          collision_name_stream << new_link_name << "_collision_" << link_name;
+          collision_name_stream << new_link_name << this->collision_ext
+                                << "_" << link_name;
           TiXmlText* collision_name_txt = new TiXmlText(
             collision_name_stream.str());
           collision_name_key->LinkEndChild(collision_name_txt);

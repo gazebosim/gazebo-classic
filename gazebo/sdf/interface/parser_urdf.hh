@@ -399,6 +399,8 @@ namespace urdf2gazebo
 
       private: bool enforce_limits;
       private: bool reduce_fixed_joints;
+      private: std::string collision_ext;
+      private: std::string visual_ext;
   };
   /// \}
 }

@@ -180,7 +180,12 @@ bool initProjectors(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 bool initProjector(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
-  deprecated_sdf::copyBlockChildren(_config, _sdf);
+  initElem(_config, "texture", _sdf);
+  initElem(_config, "fov", _sdf);
+  initElem(_config, "near_clip", _sdf);
+  initElem(_config, "far_clip", _sdf);
+  initElem(_config, "pose", _sdf);
+  // deprecated_sdf::copyBlockChildren(_config, _sdf);
   return true;
 }
 
@@ -515,6 +520,15 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
 bool initContact(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initElem(_config, "geom", _sdf, "collision");
+
+  // if topic is not specified, use collision name
+  sdf::ElementPtr sdfTopic = _sdf->GetElement("topic");
+  std::string topicName = getNodeValue(_config, "topic");
+  if (topicName.empty())
+    sdfTopic->Set(getNodeValue(_config, "geom"));
+  else
+    initElem(_config, "topic", _sdf);
+
   return true;
 }
 
