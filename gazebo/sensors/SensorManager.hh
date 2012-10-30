@@ -115,7 +115,7 @@ namespace gazebo
       private: boost::thread *runThread;
 
       /// \brief Mutex used when adding and removing sensors.
-      private: boost::recursive_mutex *mutex;
+      private: boost::recursive_mutex mutex;
 
       /// \brief The list of initialized sensors.
       private: std::list<SensorPtr> sensors;

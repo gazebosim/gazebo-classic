@@ -97,6 +97,10 @@ namespace gazebo
       /// \return name of sensor
       public: std::string GetName() const;
 
+      /// \brief Get fully scoped name of the sensor
+      /// \return world_name::parent_name::sensor_name
+      public: std::string GetScopedName() const;
+
       /// \brief Get the current pose
       /// \return Current pose of the sensor
       public: virtual math::Pose GetPose() const;
