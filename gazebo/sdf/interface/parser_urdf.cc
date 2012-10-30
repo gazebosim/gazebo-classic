@@ -472,32 +472,32 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           else if (node->ns && (const char*)node->ns->prefix
                    == std::string("sensor"))
           {
-            sdf = includeSDF->root->AddElement("model")
-                  ->AddElement("link")
-                  ->AddElement("sensor");
+            sdf = includeSDF->root->GetOrCreateElement("model")
+                  ->GetOrCreateElement("link")
+                  ->GetOrCreateElement("sensor");
             deprecated_sdf::initSensor(node, sdf);
             // gzdbg << "sensor:\n" << sdf->ToString("") << "\n";
           }
           else if (node->ns && (const char*)node->ns->prefix
                 == std::string("body"))
           {
-            sdf = includeSDF->root->AddElement("model")
-                  ->AddElement("link");
+            sdf = includeSDF->root->GetOrCreateElement("model")
+                  ->GetOrCreateElement("link");
             deprecated_sdf::initLink(node, sdf);
             // gzdbg << "body:\n" << sdf->ToString("") << "\n";
           }
           else if (node->ns && (const char*)node->ns->prefix
                 == std::string("joint"))
           {
-            sdf = includeSDF->root->AddElement("model")
-                  ->AddElement("joint");
+            sdf = includeSDF->root->GetOrCreateElement("model")
+                  ->GetOrCreateElement("joint");
             deprecated_sdf::initJoint(node, sdf);
             // gzdbg << "joint:\n" << sdf->ToString("") << "\n";
           }
           else if (std::string((const char*)node->name) == "gripper")
           {
-            sdf = includeSDF->root->AddElement("model")
-                  ->AddElement("gripper");
+            sdf = includeSDF->root->GetOrCreateElement("model")
+                  ->GetOrCreateElement("gripper");
             deprecated_sdf::initGripper(node, sdf);
             // gzdbg << "gripper:\n" << sdf->ToString("") << "\n";
           }
