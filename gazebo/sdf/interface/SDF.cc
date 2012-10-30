@@ -733,7 +733,11 @@ ElementPtr Element::AddElement(const std::string &_name)
       for (iter2 = elem->elementDescriptions.begin();
            iter2 != elem->elementDescriptions.end(); ++iter2)
       {
-        elem->AddElement((*iter2)->name);
+        // add only required child element
+        if ((*iter2)->GetRequired() == "1" || (*iter2)->GetRequired() == "+")
+        {
+          elem->AddElement((*iter2)->name);
+        }
       }
 
       return this->elements.back();
