@@ -58,7 +58,7 @@ namespace deprecated_sdf
   bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf);
   bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf);
-  bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf);
   bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   /// \brief Load Model given a filename
@@ -91,16 +91,16 @@ namespace deprecated_sdf
   bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   /// gripper
-  bool initGripper(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initGripper(xmlNodePtr _config, sdf::ElementPtr &_sdf);
 
   /// physics
   bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   /// copying <controller:...> to <plugins>
   void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf);
-  bool controller2Plugins(xmlNodePtr pluginXml, sdf::ElementPtr _sdf);
-  bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf);
-  bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf);
+  bool initPlugin(xmlNodePtr pluginXml, sdf::ElementPtr &_sdf);
+  bool initProjector(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  // bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf);
 
   bool initAttr(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
   bool initElem(xmlNodePtr _node, const std::string &_key,

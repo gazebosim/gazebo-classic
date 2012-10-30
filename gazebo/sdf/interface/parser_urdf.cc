@@ -41,6 +41,7 @@
 #include <algorithm>
 #include <string>
 
+#include "common/common.hh"
 #include "common/SystemPaths.hh"
 
 namespace urdf2gazebo
@@ -50,6 +51,38 @@ std::string lowerStr(std::string str)
   std::string out = str;
   std::transform(out.begin(), out.end(), out.begin(), ::tolower);
   return out;
+}
+
+std::string find_file(const std::string &_filename)
+{
+  std::string result = _filename;
+
+  if (_filename[0] == '/')
+    result = gazebo::common::find_file(_filename, false);
+  else
+  {
+    std::string tmp = std::string("sdf/") + sdf::SDF::version + "/" + _filename;
+    result = gazebo::common::find_file(tmp, false);
+  }
+
+  return result;
+}
+
+bool initSDF(sdf::SDFPtr _sdf)
+{
+  bool result = false;
+
+  std::string filename;
+  filename = find_file("gazebo.sdf");
+
+  FILE *ftest = fopen(filename.c_str(), "r");
+  if (ftest && initFile(filename, _sdf))
+  {
+    result = true;
+    fclose(ftest);
+  }
+
+  return result;
 }
 
 URDF2Gazebo::URDF2Gazebo()
@@ -403,6 +436,8 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
       {
           std::ostringstream stream;
           stream << "<blob xmlns:controller='http://gazebosim.org/'"
+                 <<     "  xmlns:joint='http://gazebosim.org/'"
+                 <<     "  xmlns:body='http://gazebosim.org/'"
                  <<     "  xmlns:interface='http://gazebosim.org/'"
                  <<     "  xmlns:sensor='http://gazebosim.org/'>"
                  << *child_elem << "</blob>";
@@ -415,48 +450,69 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           // *********************************************
           xmlDocPtr xmlDoc =
             xmlParseDoc(reinterpret_cast<const xmlChar*>(stream.str().c_str()));
-          xmlNodePtr node = xmlDocGetRootElement(xmlDoc)->xmlChildrenNode;
+          xmlNodePtr node = xmlDocGetRootElement(xmlDoc);
 
-          gzerr << "str: " << stream.str() << "\n";
+          // gzerr << "name: " << node->xmlChildrenNode->name << "\n";
+          // gzerr << "str: " << stream.str() << "\n";
           // gzerr << "doc: " << deprecated_sdf::ToString(xmlDoc) << "\n";
           // gzerr << "node: " << deprecated_sdf::ToString(node) << "\n";
 
-          sdf::ElementPtr sdf(new sdf::Element);
+          sdf::SDFPtr includeSDF(new sdf::SDF);
+          initSDF(includeSDF);
+          sdf::ElementPtr sdf;
 
-          // for (xmlNodePtr pluginXml = node->xmlChildrenNode;
-          //      pluginXml != NULL; pluginXml = pluginXml->next)
-          // {
-          gzerr << "value " << deprecated_sdf::getValue(node) << "\n";
-          gzerr << "attribute " << deprecated_sdf::getNodeValue(node, "name") << "\n";
-          // }
+          if (node->xmlChildrenNode->ns &&
+              (const char*)node->xmlChildrenNode->ns->prefix
+                == std::string("controller"))
+          {
+            sdf = includeSDF->root->AddElement("model");
+            deprecated_sdf::initPlugin(node, sdf);
 
-          if (node->ns &&
-              (const char*)node->ns->prefix == std::string("controller"))
-          {
-            deprecated_sdf::controller2Plugins(
-              node, sdf);
-
-            gzerr << "controller sdf: " << sdf->ToString("") << "\n";
+            gzdbg << "controller:\n" << sdf->ToString("") << "\n";
           }
-          else if (stream.str().find("<sensor:",0) == 0)
+          else if (node->xmlChildrenNode->ns &&
+              (const char*)node->xmlChildrenNode->ns->prefix
+                == std::string("sensor"))
           {
-            gzerr << "sensor: \n";
+            sdf = includeSDF->root->AddElement("model")
+                  ->AddElement("link")
+                  ->AddElement("sensor");
+            deprecated_sdf::initSensor(node->xmlChildrenNode, sdf);
+            gzdbg << "sensor:\n" << sdf->ToString("") << "\n";
           }
-          else if (stream.str().find("<body:",0) == 0)
+          else if (node->xmlChildrenNode->ns &&
+              (const char*)node->xmlChildrenNode->ns->prefix
+                == std::string("body"))
           {
-            gzerr << "body: \n";
+            sdf = includeSDF->root->AddElement("model")
+                  ->AddElement("link");
+            deprecated_sdf::initLink(node->xmlChildrenNode, sdf);
+            gzdbg << "body:\n" << sdf->ToString("") << "\n";
           }
-          else if (stream.str().find("<joint:",0) == 0)
+          else if (node->xmlChildrenNode->ns &&
+              (const char*)node->xmlChildrenNode->ns->prefix
+                == std::string("joint"))
           {
-            gzerr << "joint: \n";
+            sdf = includeSDF->root->AddElement("model")
+                  ->AddElement("joint");
+            deprecated_sdf::initJoint(node->xmlChildrenNode, sdf);
+            gzdbg << "joint:\n" << sdf->ToString("") << "\n";
           }
-          else if (stream.str().find("<gripper",0) == 0)
+          else if (std::string((const char*)node->xmlChildrenNode->name)
+                   == "gripper")
           {
-            gzerr << "gripper: \n";
+            sdf = includeSDF->root->AddElement("model")
+                  ->AddElement("gripper");
+            deprecated_sdf::initGripper(node->xmlChildrenNode, sdf);
+            gzdbg << "gripper:\n" << sdf->ToString("") << "\n";
           }
-          else if (stream.str().find("<projector",0) == 0)
+          else if (std::string((const char*)node->xmlChildrenNode->name)
+                   == "projector")
           {
-            gzerr << "projector: not altered, pushed back to blob\n";
+            sdf = includeSDF->root->AddElement("model")
+                  ->AddElement("link");
+            deprecated_sdf::initProjector(node->xmlChildrenNode, sdf);
+            gzdbg << "projector:\n" << sdf->ToString("") << "\n";
           }
           else
           {

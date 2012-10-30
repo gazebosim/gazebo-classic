@@ -126,7 +126,7 @@ void copyBlockChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 }
 
-bool controller2Plugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initPlugin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Get all controllers and convert to plugins
   for (xmlNodePtr pluginXml = _config->xmlChildrenNode;
@@ -152,7 +152,7 @@ bool controller2Plugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
   return true;
 }
 
-bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initProjector(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Get all projectors
   for (xmlNodePtr projectorXml = _config->xmlChildrenNode;
@@ -171,6 +171,7 @@ bool getProjectors(xmlNodePtr _config, sdf::ElementPtr _sdf)
   return true;
 }
 
+/*
 bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Get all grippers
@@ -189,6 +190,7 @@ bool getGrippers(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
   return true;
 }
+*/
 
 // light parsing
 bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
@@ -216,7 +218,7 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
   initElem(lightNode, "specularColor", sdfLight, "specular");
 
   // attenuation
-  sdf::ElementPtr sdfAttenuation = sdfLight->AddElement("attenuation");
+  sdf::ElementPtr sdfAttenuation = sdfLight->GetOrCreateElement("attenuation");
 
   // range
   initElem(lightNode, "range", sdfAttenuation);
@@ -235,7 +237,7 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
   // spot
   if (firstChildElement(lightNode, "sportCone"))
   {
-    sdf::ElementPtr sdfSpot = sdfLight->AddElement("spot");
+    sdf::ElementPtr sdfSpot = sdfLight->GetOrCreateElement("spot");
     double innerAngle =
       boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone", 0));
     double outerAngle =
@@ -253,10 +255,10 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
 }
 
 // gripper parsing
-bool initGripper(xmlNodePtr _config, sdf::ElementPtr sdfGripper)
+bool initGripper(xmlNodePtr _config, sdf::ElementPtr &sdfGripper)
 {
   initAttr(_config, "name", sdfGripper->GetAttribute("name"));
-  sdf::ElementPtr sdfGraspCheck = sdfGripper->AddElement("grasp_check");
+  sdf::ElementPtr sdfGraspCheck = sdfGripper->GetOrCreateElement("grasp_check");
   initElem(_config, "detach_steps", sdfGraspCheck);
   initElem(_config, "attach_steps", sdfGraspCheck);
   initElem(_config, "min_countact_count", sdfGraspCheck);
@@ -314,7 +316,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr sdfSensor)
   }
 
   /// Get all the plugins
-  controller2Plugins(_config, sdfSensor);
+  initPlugin(_config, sdfSensor);
 
   return true;
 }
@@ -411,17 +413,19 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
 
   try
   {
-    int verticalRangeCount =
-      boost::lexical_cast<int>(getNodeValue(_config, "verticalRangeCount"));
-    int verticalRayCount = boost::lexical_cast<int>(getNodeValue(_config,
-          "verticalRayCount"));
-
-    if (!sdfVerti->GetOrCreateElement("resolution")->Set(
-          boost::lexical_cast<std::string>(verticalRangeCount /
-                                           verticalRayCount)))
+    std::string vRangeCountStr = getNodeValue(_config, "verticalRangeCount");
+    std::string vRayCountStr = getNodeValue(_config, "verticalRayCount");
+    if (!vRangeCountStr.empty() && !vRayCountStr.empty())
     {
-      gzerr << "Unable to parse ray sensor verticalRayCount";
-      return false;
+      int verticalRangeCount = boost::lexical_cast<int>(vRangeCountStr);
+      int verticalRayCount = boost::lexical_cast<int>(vRayCountStr);
+      if (!sdfVerti->GetOrCreateElement("resolution")->Set(
+            boost::lexical_cast<std::string>(verticalRangeCount /
+                                             verticalRayCount)))
+      {
+        gzerr << "Unable to parse ray sensor verticalRayCount";
+        return false;
+      }
     }
   }
   catch(boost::bad_lexical_cast& e)
@@ -526,12 +530,9 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr sdfInertial)
   // Put in the rpy values
   poseString += "0 0 0";
 
-  sdf::ElementPtr sdfOrigin = sdfInertial->AddElement("origin");
-
-  /// sdf 1.0, pose is an attribute
-  // sdfOrigin->GetAttribute("pose")->SetFromString(poseString);
-  /// sdf 1.2, pose is an attribute
-  sdfOrigin->GetOrCreateElement("pose")->Set(poseString);
+  /// sdf 1.0 to 1.2
+  sdf::ElementPtr sdfOrigin = sdfInertial->AddElement("pose");
+  sdfOrigin->Set(poseString);
 
 
 
@@ -656,7 +657,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
 
   // parse xyz
-  sdf::ElementPtr origin = _sdf->AddElement("origin");
+  sdf::ElementPtr origin = _sdf->AddElement("pose");
   std::string poseStr;
 
   if (xyz_xml)
@@ -718,8 +719,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
       poseStr += "0 0 0";
 
   /// sdf 1.0 is attribute, 1.2 is pose
-  // origin->GetAttribute("pose")->SetFromString(poseStr);
-  origin->GetOrCreateElement("pose")->Set(poseStr);
+  origin->Set(poseStr);
 
   return true;
 }
@@ -791,9 +791,9 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
       // to new sdf, we need to unwrap visual pose from within collision.
       // take origin of visual, multiply it by collision's transform
       gazebo::math::Pose col_pose =
-        sdfCollision->GetElement("origin")->GetValuePose("pose");
+        sdfCollision->GetElement("pose")->GetValuePose();
       gazebo::math::Pose vis_pose =
-        sdfVisual->GetElement("origin")->GetValuePose("pose");
+        sdfVisual->GetElement("pose")->GetValuePose();
 
       // aggregate poses
       vis_pose.pos = col_pose.pos +
@@ -801,10 +801,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
       vis_pose.rot = col_pose.rot * vis_pose.rot;
 
       // update the sdf pose
-      // sdf 1.0 to 1.2
-      // sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
-      sdfVisual->GetElement("origin")->GetOrCreateElement("pose")->
-        Set(vis_pose);
+      sdfVisual->GetOrCreateElement("pose")->Set(vis_pose);
     }
     // TODO: check for duplicate geoms
   }
@@ -822,20 +819,8 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
     // TODO: check for duplicate sensors
   }
 
-  // Get all gripper elements
-  for (xmlNodePtr  gripper_xml = getChildByNSPrefix(_config, "gripper");
-      gripper_xml; gripper_xml = getNextByNSPrefix(gripper_xml, "gripper"))
-  {
-    sdf::ElementPtr sdfGripper = sdfLink->AddElement("gripper");
-    if (!initGripper(gripper_xml, sdfGripper))
-    {
-      gzerr << "Unable to parse gripper\n";
-      return false;
-    }
-  }
-
   // Get projector elements
-  getProjectors(_config, sdfLink);
+  initProjector(_config, sdfLink);
 
   return true;
 }
@@ -947,7 +932,7 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
 // _config = <joint>
 // _sdf = joint
-bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
+bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
 
@@ -960,15 +945,14 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
     poseStr += "0 0 0 ";
   // for rpy, which doesn't exist in old model xml
   poseStr += "0 0 0";
-  sdf::ElementPtr origin = _sdf->AddElement("origin");
   /// sdf 1.0 to 1.2
-  // origin->GetAttribute("pose")->SetFromString(poseStr);
-  origin->GetOrCreateElement("pose")->Set(poseStr);
+  sdf::ElementPtr origin = _sdf->GetOrCreateElement("pose");
+  origin->Set(poseStr);
 
 
   // setup parent / child links
-  sdf::ElementPtr sdfParent = _sdf->AddElement("parent");
-  sdf::ElementPtr sdfChild = _sdf->AddElement("child");
+  sdf::ElementPtr sdfParent = _sdf->GetOrCreateElement("parent");
+  sdf::ElementPtr sdfChild = _sdf->GetOrCreateElement("child");
 
   // Get Parent Link
   // parent is specified by <anchor> element in old xml
@@ -981,18 +965,18 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
   sdfChild->Set(getNodeValue(_config, "anchor"));
+  gzerr << "str: " << ToString(_config) << "\n";
 
   // Get Child Link
   xmlNodePtr body1Xml = firstChildElement(_config, "body1");
   xmlNodePtr body2Xml = firstChildElement(_config, "body2");
   if (body1Xml && body2Xml)
   {
-    if (sdfChild->GetAttribute("link")->GetAsString() == getValue(body1Xml))
+    if (sdfChild->GetValueString() == getValue(body1Xml))
     {
       sdfParent->Set(getNodeValue(_config, "body2"));
     }
-    else if (sdfChild->GetAttribute("link")->GetAsString() ==
-             getValue(body2Xml))
+    else if (sdfChild->GetValueString() == getValue(body2Xml))
     {
       sdfParent->Set(getNodeValue(_config, "body1"));
     }
@@ -1031,14 +1015,14 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
   if (firstChildElement(_config, "axis"))
   {
-    sdf::ElementPtr sdfAxis = _sdf->AddElement("axis");
+    sdf::ElementPtr sdfAxis = _sdf->GetOrCreateElement("axis");
     initElem(_config, "axis", sdfAxis, "xyz");
 
-    sdf::ElementPtr sdfDynamics = sdfAxis->AddElement("dynamics");
+    sdf::ElementPtr sdfDynamics = sdfAxis->GetOrCreateElement("dynamics");
     initElem(_config, "damping", sdfDynamics);
     initElem(_config, "friction", sdfDynamics);
 
-    sdf::ElementPtr sdfLimit = sdfAxis->AddElement("limit");
+    sdf::ElementPtr sdfLimit = sdfAxis->GetOrCreateElement("limit");
 
     // Get limit
     if (firstChildElement(_config, "lowStop"))
@@ -1065,14 +1049,14 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
   if (firstChildElement(_config, "axis2"))
   {
-    sdf::ElementPtr sdfAxis = _sdf->AddElement("axis2");
+    sdf::ElementPtr sdfAxis = _sdf->GetOrCreateElement("axis2");
     initElem(_config, "axis", sdfAxis, "xyz");
 
-    sdf::ElementPtr sdfDynamics = sdfAxis->AddElement("dynamics");
+    sdf::ElementPtr sdfDynamics = sdfAxis->GetOrCreateElement("dynamics");
     initElem(_config, "damping", sdfDynamics);
     initElem(_config, "friction", sdfDynamics);
 
-    sdf::ElementPtr sdfLimit = sdfAxis->AddElement("limit");
+    sdf::ElementPtr sdfLimit = sdfAxis->GetOrCreateElement("limit");
 
     // Get limit
     if (firstChildElement(_config, "lowStop"))
@@ -1133,8 +1117,21 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr sdfModel)
   }
 
   /// Get all the plugins
-  controller2Plugins(_config, sdfModel);
-  getGrippers(_config, sdfModel);
+  initPlugin(_config, sdfModel);
+
+  // Get all gripper elements
+  // getGrippers(_config, sdfModel);
+  for (xmlNodePtr  gripper_xml = getChildByNSPrefix(_config, "gripper");
+      gripper_xml; gripper_xml = getNextByNSPrefix(gripper_xml, "gripper"))
+  {
+    sdf::ElementPtr sdfGripper = sdfModel->AddElement("gripper");
+    if (!initGripper(gripper_xml, sdfGripper))
+    {
+      gzerr << "Unable to parse gripper\n";
+      return false;
+    }
+  }
+
 
   return true;
 }
@@ -1149,11 +1146,11 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
 
-  sdf::ElementPtr sdfScene = _sdf->AddElement("scene");
+  sdf::ElementPtr sdfScene = _sdf->GetOrCreateElement("scene");
   initScene(firstChildElement(_config, "ogre"), sdfScene);
 
   // Get physics block
-  sdf::ElementPtr sdfPhysics = _sdf->AddElement("physics");
+  sdf::ElementPtr sdfPhysics = _sdf->GetOrCreateElement("physics");
   initPhysics(_config, sdfPhysics);
 
   // Get all model elements
@@ -1181,7 +1178,7 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
   }
 
   /// Get all the plugins
-  controller2Plugins(_config, _sdf);
+  initPlugin(_config, _sdf);
 
   return true;
 }
@@ -1231,17 +1228,17 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr sdfPhysics)
       getNodeValue(gravityConfig, "xyz"));
 
   //   <ode>
-  sdf::ElementPtr sdfODE = sdfPhysics->AddElement("ode");
+  sdf::ElementPtr sdfODE = sdfPhysics->GetOrCreateElement("ode");
 
   //    <solver>
-  sdf::ElementPtr sdfODESolver = sdfODE->AddElement("solver");
+  sdf::ElementPtr sdfODESolver = sdfODE->GetOrCreateElement("solver");
 
   initElem(physicsNode, "stepType",  sdfODESolver, "type");
   initElem(physicsNode, "stepTime",  sdfODESolver, "dt");
   initElem(physicsNode, "stepIters", sdfODESolver, "iters");
   initElem(physicsNode, "stepW",     sdfODESolver, "sor");
 
-  sdf::ElementPtr sdfODEConstraints = sdfODE->AddElement("constraints");
+  sdf::ElementPtr sdfODEConstraints = sdfODE->GetOrCreateElement("constraints");
   initElem(physicsNode, "cfm", sdfODEConstraints);
   initElem(physicsNode, "erp", sdfODEConstraints);
   initElem(physicsNode, "contactMaxCorrectingVel",
@@ -1675,7 +1672,7 @@ std::string ToString(xmlNodePtr _xml)
   // this doesn't appear to work, do i need to allocate some memory here?
   // or do something else?
   xmlOutputBufferPtr output = NULL;
-  xmlNodeDumpOutput(output, doc, _xml, 0, 1, "UTF-8");
+  xmlNodeDumpOutput(output, NULL, _xml, 0, 1, "UTF-8");
 
   // somehow convert output to a string?
   xmlChar *s;
