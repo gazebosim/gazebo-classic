@@ -53,7 +53,7 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::InitFromModel(const std::string &_modelName)
+bool ModelMaker::InitFromModel(const std::string &_modelName)
 {
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
   if (this->modelVisual)
@@ -66,13 +66,18 @@ void ModelMaker::InitFromModel(const std::string &_modelName)
   this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
 
   if (!this->modelVisual)
+  {
     gzerr << "Unable to clone\n";
+    return false;
+  }
 
   this->clone = true;
+
+  return true;
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::InitFromSDFString(const std::string &_data)
+bool ModelMaker::InitFromSDFString(const std::string &_data)
 {
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
@@ -87,12 +92,18 @@ void ModelMaker::InitFromSDFString(const std::string &_data)
   sdf::initFile("gazebo.sdf", this->modelSDF);
   sdf::readString(_data, this->modelSDF);
 
-  this->Init();
+  if (!sdf::readString(_data, this->modelSDF))
+  {
+    gzerr << "Unable to load SDF from data\n";
+    return false;
+  }
+
+  return this->Init();
 }
 
 
 /////////////////////////////////////////////////
-void ModelMaker::InitFromFile(const std::string &_filename)
+bool ModelMaker::InitFromFile(const std::string &_filename)
 {
   this->clone = false;
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
@@ -106,13 +117,18 @@ void ModelMaker::InitFromFile(const std::string &_filename)
 
   this->modelSDF.reset(new sdf::SDF);
   sdf::initFile("gazebo.sdf", this->modelSDF);
-  sdf::readFile(_filename, this->modelSDF);
 
-  this->Init();
+  if (!sdf::readFile(_filename, this->modelSDF))
+  {
+    gzerr << "Unable to load file[" << _filename << "]\n";
+    return false;
+  }
+
+  return this->Init();
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::Init()
+bool ModelMaker::Init()
 {
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
@@ -125,6 +141,11 @@ void ModelMaker::Init()
     modelElem = this->modelSDF->root->GetElement("model");
   else if (this->modelSDF->root->HasElement("light"))
     modelElem = this->modelSDF->root->GetElement("light");
+  else
+  {
+    gzerr << "No model or light in SDF\n";
+    return false;
+  }
 
   if (modelElem->HasElement("pose"))
     modelPose = modelElem->GetValuePose("pose");
@@ -133,7 +154,7 @@ void ModelMaker::Init()
     modelElem->GetValueString("name");
 
   this->modelVisual.reset(new rendering::Visual(modelName,
-        scene->GetWorldVisual()));
+                          scene->GetWorldVisual()));
   this->modelVisual->Load();
   this->modelVisual->SetPose(modelPose);
 
@@ -194,12 +215,19 @@ void ModelMaker::Init()
     catch(common::Exception &_e)
     {
       this->visuals.clear();
+      return false;
     }
   }
-  else
+  else if (modelElem->GetName() == "light")
   {
     this->modelVisual->AttachMesh("unit_sphere");
   }
+  else
+  {
+    return false;
+  }
+
+  return true;
 }
 
 /////////////////////////////////////////////////

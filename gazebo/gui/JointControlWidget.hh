@@ -64,6 +64,18 @@ namespace gazebo
                                          const std::string &_name);
 
       private slots: void OnPIDPosUnitsChanged(int _index);
+
+      private: void AddScrollableTab(QTabWidget *_tabPane,
+                                     QGridLayout *_tabLayout,
+                                     const QString &_name);
+
+      private: void LayoutForceTab(QGridLayout *_tabLayout,
+                                    msgs::Model &_modelMsg);
+      private: void LayoutPositionTab(QGridLayout *_tabLayout,
+                                    msgs::Model &_modelMsg);
+      private: void LayoutVelocityTab(QGridLayout *_tabLayout,
+                                    msgs::Model &_modelMsg);
+
       private: transport::NodePtr node;
       private: transport::PublisherPtr jointPub;
 

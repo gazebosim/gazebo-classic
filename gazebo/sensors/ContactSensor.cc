@@ -45,7 +45,6 @@ GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 ContactSensor::ContactSensor()
     : Sensor()
 {
-  this->node = transport::NodePtr(new transport::Node());
   this->mutex = new boost::mutex();
 }
 
@@ -63,7 +62,6 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(this->world->GetName());
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
         this->sdf->GetElement("topic")->GetValueString());
   }

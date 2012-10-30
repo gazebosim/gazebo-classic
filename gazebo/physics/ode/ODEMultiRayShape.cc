@@ -27,8 +27,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-  ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
-: MultiRayShape(_parent)
+ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
+  : MultiRayShape(_parent)
 {
   this->SetName("ODE Multiray Shape");
 
@@ -53,6 +53,11 @@ using namespace physics;
 //////////////////////////////////////////////////
 ODEMultiRayShape::~ODEMultiRayShape()
 {
+  dSpaceSetCleanup(this->raySpaceId, 0);
+  dSpaceDestroy(this->raySpaceId);
+
+  dSpaceSetCleanup(this->superSpaceId, 0);
+  dSpaceDestroy(this->superSpaceId);
 }
 
 //////////////////////////////////////////////////

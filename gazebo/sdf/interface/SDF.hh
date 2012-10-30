@@ -67,6 +67,8 @@ namespace sdf
     public: void PrintWiki(std::string _prefix);
     public: void PrintDoc(std::string &_divs, std::string &_html,
                           int _spacing, int &_index);
+    public: void PrintDoc2(std::string &_divs, std::string &_html,
+                           int _spacing, int &_index);
 
     private: void ToString(const std::string &_prefix,
                            std::ostringstream &_out) const;

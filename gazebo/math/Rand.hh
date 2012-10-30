@@ -44,23 +44,23 @@ namespace gazebo
     class Rand
     {
       /// \brief Get a double from a uniform distribution
-      /// \param min Minimum bound for the random number
-      /// \param max Maximum bound for the random number
+      /// \param[in] _min Minimum bound for the random number
+      /// \param[in] _max Maximum bound for the random number
       public: static double GetDblUniform(double _min = 0, double _max = 1);
 
       /// \brief Get a double from a normal distribution
-      /// \param mean Mean value for the distribution
-      /// \param sigma Sigma value for the distribution
+      /// \param[in] _mean Mean value for the distribution
+      /// \param[in] _sigma Sigma value for the distribution
       public: static double GetDblNormal(double _mean = 0, double _sigma = 1);
 
       /// \brief Get a integer from a uniform distribution
-      /// \param min Minimum bound for the random number
-      /// \param max Maximum bound for the random number
+      /// \param[in] _min Minimum bound for the random number
+      /// \param[in] _max Maximum bound for the random number
       public: static int GetIntUniform(int _min, int _max);
 
       /// \brief Get a double from a normal distribution
-      /// \param mean Mean value for the distribution
-      /// \param sigma Sigma value for the distribution
+      /// \param[in] _mean Mean value for the distribution
+      /// \param[in] _sigma Sigma value for the distribution
       public: static int GetIntNormal(int _mean, int _sigma);
 
       // The random number generator
