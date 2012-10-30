@@ -63,6 +63,14 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 }
 
 //////////////////////////////////////////////////
+void Pose::Set(double _x, double _y, double _z,
+               double _roll, double _pitch, double _yaw)
+{
+  this->pos.Set(_x, _y, _z);
+  this->rot.SetFromEuler(math::Vector3(_roll, _pitch, _yaw));
+}
+
+//////////////////////////////////////////////////
 bool Pose::IsFinite() const
 {
   return this->pos.IsFinite() && this->rot.IsFinite();

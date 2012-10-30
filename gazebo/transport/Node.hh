@@ -81,10 +81,9 @@ namespace gazebo
           transport::TopicManager::Instance()->Advertise<M>(
               decodedTopic, _queueLimit, _latch);
 
-        this->publisherMutex->lock();
+        boost::recursive_mutex::scoped_lock lock(this->publisherMutex);
         this->publishers.push_back(publisher);
         this->publishersEnd = this->publishers.end();
-        this->publisherMutex->unlock();
 
         return publisher;
       }
@@ -99,10 +98,9 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
-        this->incomingMutex->lock();
+        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
               new CallbackHelperT<M>(boost::bind(fp, obj, _1))));
-        this->incomingMutex->unlock();
 
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
@@ -116,10 +114,9 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
-        this->incomingMutex->lock();
+        boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
         this->callbacks[decodedTopic].push_back(
             CallbackHelperPtr(new CallbackHelperT<M>(fp)));
-        this->incomingMutex->unlock();
 
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
@@ -151,8 +148,10 @@ namespace gazebo
       private: typedef std::map<std::string, Callback_L> Callback_M;
       private: Callback_M callbacks;
       private: std::map<std::string, std::list<std::string> > incomingMsgs;
-      private: boost::recursive_mutex *publisherMutex;
-      private: boost::recursive_mutex *incomingMutex;
+      private: boost::recursive_mutex publisherMutex;
+      private: boost::recursive_mutex incomingMutex;
+
+      private: bool initialized;
     };
     /// \}
   }

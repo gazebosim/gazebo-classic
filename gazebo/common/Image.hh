@@ -41,6 +41,7 @@ namespace gazebo
     /// \brief Encapsulates an image
     class Image
     {
+      /// \brief Pixel formats enumeration
       public: enum PixelFormat {
                 UNKNOWN,
                 L_INT8,
@@ -64,45 +65,53 @@ namespace gazebo
               };
 
       /// \brief Constructor
+      /// \param[in] _filename the path to the image
       public: Image(const std::string &_filename="");
 
       /// \brief Destructor
       public: virtual ~Image();
 
       /// \brief Load an image. Return 0 on success
+      /// \param[in] _filename the path to the image file
       public: int Load(const std::string &_filename);
 
       /// \brief Save the image in PNG format
-      /// \param _filename The name of the saved image
+      /// \param[in] _filename The name of the saved image
       public: void SavePNG(const std::string &_filename);
 
       /// \brief Set the image from raw data (R8G8B8)
-      /// \param data Pointer to the raw image data
-      /// \param width Width in pixels
-      /// \param height Height in pixels
-      /// \param scanline_bytes Size of a image row in bytes
-      /// \param bpp Bits per pixels, aka depth
-      public: void SetFromData(const unsigned char *data, unsigned int width,
-                  unsigned int height, int scanline_bytes, unsigned int bpp)
+      /// \param[in] _data Pointer to the raw image data
+      /// \param[in] _width Width in pixels
+      /// \param[in] _height Height in pixels
+      /// \param[in] _scanline_bytes Size of a image row in bytes
+      /// \param[in] _bpp Bits per pixels, aka depth
+      public: void SetFromData(const unsigned char *_data,
+                               unsigned int _width,
+                               unsigned int _height,
+                               int _scanline_bytes,
+                               unsigned int _bpp)
               GAZEBO_DEPRECATED;
 
       /// \brief Set the image from raw data
-      /// \param _data Pointer to the raw image data
-      /// \param _width Width in pixels
-      /// \param _height Height in pixels
-      /// \param _format Pixel format of the provided data
-      public: void SetFromData(const unsigned char *_data, unsigned int _width,
-                  unsigned int _height, Image::PixelFormat _format);
+      /// \param[in] _data Pointer to the raw image data
+      /// \param[in] _width Width in pixels
+      /// \param[in] _height Height in pixels
+      /// \param[in] _format Pixel format of the provided data
+      public: void SetFromData(const unsigned char *_data,
+                               unsigned int _width,
+                               unsigned int _height,
+                               Image::PixelFormat _format);
 
       /// \brief Get the image as a data array
-      /// \param _data Pointer to a NULL array of char.
-      /// \param _count The resulting data array size
-      public: void GetData(unsigned char **_data, unsigned int &_count) const;
+      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _count The resulting data array size
+      public: void GetData(unsigned char **_data,
+                           unsigned int &_count) const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
-      /// \param _data Pointer to a NULL array of char.
-      /// \param _count The resulting data array size
+      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _count The resulting data array size
       public: void GetRGBData(unsigned char **_data,
                               unsigned int &_count) const;
 
@@ -131,8 +140,8 @@ namespace gazebo
       public: PixelFormat GetPixelFormat() const;
 
       /// \brief Get a pixel color value
-      /// \param _x Column location in the image
-      /// \param _y Row location in the image
+      /// \param[in] _x Column location in the image
+      /// \param[in] _y Row location in the image
       public: Color GetPixel(unsigned int _x, unsigned int _y);
 
       /// \brief Get the average color
@@ -144,22 +153,26 @@ namespace gazebo
       public: Color GetMaxColor();
 
       /// \brief Rescale the image
-      /// \param _width New image width
-      /// \param _height New image height
+      /// \param[in] _width New image width
+      /// \param[in] _height New image height
       public: void Rescale(int _width, int _height);
 
       /// \brief Returns whether this is a valid image
+      /// \return true if image has a bitmap
       public: bool Valid() const;
 
       /// \brief Implementation of GetData
       private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
                         FIBITMAP *_img) const;
 
-      /// Count the number of images created. Used for initialising free image
+      /// \brief Count the number of images created. Used for initialising
+      /// free image
       private: static int count;
 
+      /// \brief bitmap data
       private: FIBITMAP *bitmap;
 
+      /// \brief path name of the image file
       private: std::string fullName;
     };
     /// \}

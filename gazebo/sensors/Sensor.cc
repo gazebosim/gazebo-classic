@@ -54,9 +54,11 @@ Sensor::Sensor()
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
+  this->node->Fini();
+  this->node.reset();
+
   this->sdf->Reset();
   this->sdf.reset();
-  this->node.reset();
   this->connections.clear();
 }
 
@@ -83,6 +85,8 @@ void Sensor::Load(const std::string &_worldName)
 
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
+  this->controlSub = this->node->Subscribe("~/world_control",
+                                           &Sensor::OnControl, this);
 }
 
 //////////////////////////////////////////////////
@@ -140,6 +144,13 @@ void Sensor::Fini()
 std::string Sensor::GetName() const
 {
   return this->sdf->GetValueString("name");
+}
+
+//////////////////////////////////////////////////
+std::string Sensor::GetScopedName() const
+{
+  return this->world->GetName() + "::" + this->parentName + "::" +
+         this->GetName();
 }
 
 //////////////////////////////////////////////////
@@ -243,4 +254,17 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
 std::string Sensor::GetWorldName() const
 {
   return this->world->GetName();
+}
+
+//////////////////////////////////////////////////
+void Sensor::OnControl(ConstWorldControlPtr &_data)
+{
+  if (_data->has_reset())
+  {
+    if ((_data->reset().has_all() && _data->reset().all()) ||
+        (_data->reset().has_time_only() && _data->reset().time_only()))
+    {
+      this->lastUpdateTime = 0.0;
+    }
+  }
 }

@@ -162,17 +162,25 @@ namespace SkyX
     }
 
     /** Set under-horizon rendering params
-        @remarks In an ideal situation, you only must see the avobe horizon sky due to the fact that the terrain/water
-               must be 'infinite' and the under-horizont sky part is hide.
-           But, infinite terrain/water is not always implemented in games and 3d apps in general, so... in order to
-           get a good-looking sky, SkyX provides an approach to render realistic under-horizont sky.
-      @param UnderHorizonCircles Number of circles of SkyX::MeshManager::mCircles reserved for the under-horizont geometry part,
-           0 means not under-horizon rendering
+      @remarks In an ideal situation, you only must see the avobe
+      horizon sky due to the fact that the terrain/water
+      must be 'infinite' and the under-horizont sky part is hide.
+      But, infinite terrain/water is not always implemented in games and
+      3d apps in general, so... in order to get a good-looking sky, SkyX
+      provides an approach to render realistic under-horizont sky.
+      @param UnderHorizonCircles Number of circles of
+      SkyX::MeshManager::mCircles reserved for the under-horizont geometry part,
+      0 means not under-horizon rendering
       @param UnderHorizonFading true/false to fade or not the under-horizon sky
-      @param UnderHorizonFadingExponent Exponent of the fading, pow(vertex_angle, exp), 1=linear
-      @param UnderHorizonFadingMultiplier Fading multiplier, opacity = saturate(pow(opacity,fading_exp)*fading_multiplier)
+      @param UnderHorizonFadingExponent Exponent of the fading,
+      pow(vertex_angle, exp), 1=linear
+      @param UnderHorizonFadingMultiplier Fading multiplier,
+      opacity = saturate(pow(opacity,fading_exp)*fading_multiplier)
      */
-    void setUnderHorizonParams(const int& UnderHorizonCircles = 15, const bool& UnderHorizonFading = true, const Ogre::Real& UnderHorizonFadingExponent = 1, const Ogre::Real& UnderHorizonFadingMultiplier = 2);
+    void setUnderHorizonParams(const int& UnderHorizonCircles = 15,
+        const bool& UnderHorizonFading = true,
+        const Ogre::Real& UnderHorizonFadingExponent = 1,
+        const Ogre::Real& UnderHorizonFadingMultiplier = 2);
 
     /** Get under-horizon circles
         @return Under-horizon circles

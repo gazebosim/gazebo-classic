@@ -69,7 +69,6 @@ void JointController::Update()
       this->joints[iter->first]->SetForce(0, iter->second);
   }
 
-  /*
   if (this->positions.size() > 0)
   {
     double cmd;
@@ -82,7 +81,7 @@ void JointController::Update()
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
-  }*/
+  }
 
   if (this->velocities.size() > 0)
   {
@@ -100,7 +99,7 @@ void JointController::Update()
   }
 
   // Disabled for now. Collisions don't update properly
-  if (this->positions.size() > 0)
+  /*if (this->positions.size() > 0)
   {
     std::map<std::string, JointPtr>::iterator iter;
     for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
@@ -110,7 +109,7 @@ void JointController::Update()
     }
     this->SetJointPositions(this->positions);
     this->positions.clear();
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -282,10 +281,11 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 
       _link->SetWorldPose(newWorldPose);
 
-      // @todo: ideally we want to set this according to Joint Trajectory velocity
-      //        and use time step since last update.
-      // double dt = this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
-      // this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+      /// \TODO: ideally we want to set this according to
+      /// Joint Trajectory velocity and use time step since last update.
+      /// double dt =
+      /// this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
+      /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }
@@ -306,10 +306,11 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 
       _link->SetWorldPose(newWorldPose);
 
-      // @todo: ideally we want to set this according to Joint Trajectory velocity
-      //        and use time step since last update.
-      // double dt = this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
-      // this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+      /// \TODO: ideally we want to set this according to Joint Trajectory
+      /// velocity and use time step since last update.
+      /// double dt = this->model->GetWorld()->GetPhysicsEngine()->
+      /// GetStepTime();
+      /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
       this->updated_links.push_back(_link);
     }

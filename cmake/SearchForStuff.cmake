@@ -129,13 +129,10 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ################################################# 
-  # Find CCD 
-  pkg_check_modules(CCD ccd) 
-  if (NOT CCD_FOUND) 
-    message(STATUS "External CCD not found, using internal copy") 
-    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-    set(CCD_LIBRARIES gazebo_ccd) 
-  endif () 
+  # Use internal CCD (built as libgazebo_ccd.so)
+  #
+  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+  set(CCD_LIBRARIES gazebo_ccd) 
 
   #################################################
   # Find TBB
@@ -157,8 +154,6 @@ if (PKG_CONFIG_FOUND)
   execute_process(COMMAND pkg-config --modversion OGRE 
                   OUTPUT_VARIABLE OGRE_VERSION)
   string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
-
-  message (STATUS "VERSION||${OGRE_VERSION}||")
 
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
@@ -206,13 +201,6 @@ if (PKG_CONFIG_FOUND)
             ${ogre_library_dirs})
 
   set(ogre_libraries "${ogre_libraries};OgreMain")
-
-  #################################################
-  # Find XML
-  pkg_check_modules(XML libxml-2.0)
-  if (NOT XML_FOUND)
-    BUILD_ERROR("Missing: libxml2(http://www.xmlsoft.org)")
-  endif ()
 
   ########################################
   # Find OpenAL
