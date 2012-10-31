@@ -77,6 +77,7 @@ target_link_libraries(gazebo_common gazebo_math
                                     ${CURL_LIBRARIES}
                                     ${libswscale_LIBRARIES}
                                     ${libtar_libraries}
+                                    rt
                                     )
 
 gz_install_library(gazebo_common)

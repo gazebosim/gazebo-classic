@@ -75,10 +75,9 @@ namespace gazebo
       /// \brief Shift key press flag.
       public: bool shift;
 
-
       /// \brief Alt key press flag.
       public: bool alt;
-     
+
       /// \brief Control key press flag.
       public: bool control;
     };
@@ -86,5 +85,3 @@ namespace gazebo
   }
 }
 #endif
-
-

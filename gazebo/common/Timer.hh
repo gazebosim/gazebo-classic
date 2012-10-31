@@ -55,7 +55,8 @@ namespace gazebo
                 return out;
               }
 
-      private: Time start; /// \brief the time of the last call to Start
+      /// \brief the time of the last call to Start
+      private: Time start;
     };
     /// \}
   }

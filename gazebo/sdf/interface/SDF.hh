@@ -65,8 +65,22 @@ namespace sdf
     public: void PrintDescription(std::string _prefix);
     public: void PrintValues(std::string _prefix);
     public: void PrintWiki(std::string _prefix);
-    public: void PrintDoc(std::string &_divs, std::string &_html,
-                          int _spacing, int &_index);
+
+    /// \brief Helper function for SDF::PrintDoc
+    ///
+    /// This generates the SDF html documentation.
+    /// \param[out] _html Accumulated HTML for output.
+    /// \param[in] _spacing Amount of spacing for this element.
+    /// \param[in] _index Unique index for this element.
+    public: void PrintDocLeftPane(std::string &_html,
+                                  int _spacing, int &_index);
+
+    /// \brief Helper function for SDF::PrintDoc
+    ///
+    /// This generates the SDF html documentation.
+    /// \param[out] _html Accumulated HTML for output
+    /// \param[in] _spacing Amount of spacing for this element.
+    public: void PrintDocRightPane(std::string &_html, int _spacing);
 
     private: void ToString(const std::string &_prefix,
                            std::ostringstream &_out) const;

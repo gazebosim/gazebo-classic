@@ -916,7 +916,6 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 /////////////////////////////////////////////////
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
 {
-
   TiXmlElement *matXml = this->GetElementId("material", _name);
   if (!matXml || !matXml->FirstChildElement("instance_effect"))
     return NULL;

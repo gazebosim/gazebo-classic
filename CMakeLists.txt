@@ -4,6 +4,53 @@ if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
   CMAKE_POLICY(SET CMP0004 NEW)
 endif(COMMAND CMAKE_POLICY)
+
+project (Gazebo)
+string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
+set (GAZEBO_VERSION_NAME "helium")
+set (GAZEBO_MAJOR_VERSION 1)
+set (GAZEBO_MINOR_VERSION 2)
+set (GAZEBO_PATCH_VERSION 5)
+
+set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
+set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
+
+message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
+
+set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
+
+########################################
+# Package Creation: 
+include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
+set (CPACK_PACKAGE_VERSION "${GAZEBO_VERSION_FULL}")
+set (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
+set (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
+set (CPACK_PACKAGE_VERSION_PATCH "${GAZEBO_PATCH_VERSION}")
+
+if (CPACK_GENERATOR)
+  message(STATUS "Found CPack generators: ${CPACK_GENERATOR}")
+
+  configure_file("${gazebo_cmake_dir}/cpack_options.cmake.in" ${GAZEBO_CPACK_CFG_FILE} @ONLY)
+  set(CPACK_PROJECT_CONFIG_FILE ${GAZEBO_CPACK_CFG_FILE})
+  include (CPack)
+endif()
+
+# If we're configuring only to package source, stop here
+if (PACKAGE_SOURCE_ONLY)
+  message(WARNING "Configuration was done in PACKAGE_SOURCE_ONLY mode.  You can build a tarball (make package_source), but nothing else.")
+  return()
+endif()
+
+# Documentation
+add_subdirectory(doc)
+
+# If we're configuring only to build docs, stop here
+if (DOC_ONLY)
+  message(WARNING "Configuration was done in DOC_ONLY mode.  You can build documentation (make doc), but nothing else.")
+  return()
+endif()
+
 enable_testing()
 
 # with -fPIC
@@ -20,20 +67,7 @@ if(UNIX AND NOT WIN32)
  endif(CMAKE_UNAME)
 endif()
 
-project (Gazebo)
-string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
-
-set (GAZEBO_VERSION_NAME "helium")
-set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 2)
-set (GAZEBO_PATCH_VERSION 5)
-
-set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
-set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
-
-message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
-
 
 # developer's option to cache PKG_CONFIG_PATH and LD_LIBRARY_PATH for local installs
 if(PKG_CONFIG_PATH)
@@ -83,8 +117,6 @@ set (MIN_BOOST_VERSION 1.40.0 CACHE INTERNAL "Boost min version requirement" FOR
 set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
 set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
 set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
-
-set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
@@ -204,14 +236,7 @@ configure_file(
 add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
-add_subdirectory(doc)
-
 if (build_errors)
-
-  # Create a Makefile that allows doxygen to run
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Makefile
-       "doc: gazebo.dox\n\tdoxygen $<\n\n")
-
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
@@ -253,22 +278,6 @@ else (build_errors)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
-
-  ########################################
-  # Package Creation: 
-  include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
-  set (CPACK_PACKAGE_VERSION "${GAZEBO_VERSION_FULL}")
-  set (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
-  set (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
-  set (CPACK_PACKAGE_VERSION_PATCH "${GAZEBO_PATCH_VERSION}")
-
-  if (CPACK_GENERATOR)
-    message(STATUS "Found CPack generators: ${CPACK_GENERATOR}")
-
-    configure_file("${gazebo_cmake_dir}/cpack_options.cmake.in" ${GAZEBO_CPACK_CFG_FILE} @ONLY)
-    set(CPACK_PROJECT_CONFIG_FILE ${GAZEBO_CPACK_CFG_FILE})
-    include (CPack)
-  endif()
 
   message(STATUS "Configuration successful. Type make to compile gazebo")
 endif(build_errors)

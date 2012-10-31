@@ -445,8 +445,6 @@ void Visual::Update()
       this->animState = NULL;
       this->sceneNode->getCreator()->destroyAnimation(
           this->GetName() + "_animation");
-      this->sceneNode->getCreator()->destroyAnimationState(
-          this->GetName() + "_animation");
       if (this->onAnimationComplete)
         this->onAnimationComplete();
       // event::Events::DisconnectPreRender(this->preRenderConnection);
@@ -1061,7 +1059,7 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetHighlighted(bool _highlighted)
+void Visual::SetHighlighted(bool /*_highlighted*/)
 {
   /*
   if (this->GetAttachedObjectCount() > 0)
@@ -1903,7 +1901,7 @@ VisualPtr Visual::GetRootVisual()
 //////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-   if (this->sdf->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("plane"))

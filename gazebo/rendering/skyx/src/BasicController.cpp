@@ -25,107 +25,107 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace SkyX
 {
-	BasicController::BasicController(const bool& deleteBySkyX)
-		: Controller(deleteBySkyX)
-		, mTime(Ogre::Vector3(14.0f, 7.50f, 20.50f))
-		, mSunDirection(Ogre::Vector3(0,1,0))
-		, mMoonDirection(Ogre::Vector3(0,-1,0))
-		, mEastDirection(Ogre::Vector2(0,1))
-		, mMoonPhase(0)
-	{
-	}
+  BasicController::BasicController(const bool& deleteBySkyX)
+    : Controller(deleteBySkyX)
+      , mTime(Ogre::Vector3(14.0f, 7.50f, 20.50f))
+      , mSunDirection(Ogre::Vector3(0, 1, 0))
+      , mMoonDirection(Ogre::Vector3(0, -1, 0))
+      , mEastDirection(Ogre::Vector2(0, 1))
+      , mMoonPhase(0)
+  {
+  }
 
-	void BasicController::update(const Ogre::Real& simDeltaTime)
-	{
-		mTime.x += simDeltaTime;
+  void BasicController::update(const Ogre::Real& simDeltaTime)
+  {
+    mTime.x += simDeltaTime;
 
-		if (mTime.x > 24)
-		{
-			mTime.x -= 24;
-		} 
-		else if (mTime.x < 0)
-		{
-			mTime.x += 24;
-		}
+    if (mTime.x > 24)
+    {
+      mTime.x -= 24;
+    }
+    else if (mTime.x < 0)
+    {
+      mTime.x += 24;
+    }
 
-		// 24h day: 
-		// 0______A(Sunrise)_______B(Sunset)______24
-		//                     
+    // 24h day:
+    // 0______A(Sunrise)_______B(Sunset)______24
+    //
 
-		float y,
-			X = mTime.x,
-			A = mTime.y,
-			B = mTime.z,
-			AB  = A+24-B,
-			AB_ = B-A,
-			XB  = X+24-B;
+    float y,
+          X = mTime.x,
+          A = mTime.y,
+          B = mTime.z,
+          AB  = A+24-B,
+          AB_ = B-A,
+          XB  = X+24-B;
 
-		if (X<A || X>B)
-		{
-			if (X<A)
-			{
-                y = -XB / AB;
-			}
-			else
-			{
-				y = -(X-B) / AB;
-			}
-            
-			if (y > -0.5f)
-			{
-				y *= 2;
-			}
-			else
-			{
-				y = -(1 + y)*2;
-			}
-		}
-		else
-		{
-			y = (X-A)/(B-A);
+    if (X<A || X>B)
+    {
+      if (X < A)
+      {
+        y = -XB / AB;
+      }
+      else
+      {
+        y = -(X-B) / AB;
+      }
 
-			if (y < 0.5f)
-			{
-				y *= 2;
-			}
-			else
-			{
-				y = (1 - y)*2;
-			}
-		}
+      if (y > -0.5f)
+      {
+        y *= 2;
+      }
+      else
+      {
+        y = -(1 + y)*2;
+      }
+    }
+    else
+    {
+      y = (X-A)/(B-A);
 
-		Ogre::Vector2 East = mEastDirection;
+      if (y < 0.5f)
+      {
+        y *= 2;
+      }
+      else
+      {
+        y = (1 - y)*2;
+      }
+    }
 
-		if (X > A && X < B)
-		{
-			if (X > (A + AB_/2))
-			{
-				East = -East;
-			}
-		}
-		else
-		{
-			if (X<=A)
-			{
-				if (XB < (24-AB_)/2)
-				{
-					East = -East;
-				}
-			}
-			else
-			{
-				if ((X-B) < (24-AB_)/2)
-				{
-					East = -East;
-				}
-			}
-		}
+    Ogre::Vector2 East = mEastDirection;
 
-		float ydeg = (Ogre::Math::PI/2)*y,
-		      sn = Ogre::Math::Sin(ydeg),
-		      cs = Ogre::Math::Cos(ydeg);
+    if (X > A && X < B)
+    {
+      if (X > (A + AB_/2))
+      {
+        East = -East;
+      }
+    }
+    else
+    {
+      if (X <= A)
+      {
+        if (XB < (24-AB_)/2)
+        {
+          East = -East;
+        }
+      }
+      else
+      {
+        if ((X-B) < (24-AB_)/2)
+        {
+          East = -East;
+        }
+      }
+    }
 
-		mSunDirection = Ogre::Vector3(East.x*cs, East.y*cs, sn);
-		mMoonDirection = -mSunDirection;
-	}
+    float ydeg = (Ogre::Math::PI/2)*y,
+          sn = Ogre::Math::Sin(ydeg),
+          cs = Ogre::Math::Cos(ydeg);
+
+    mSunDirection = Ogre::Vector3(East.x*cs, East.y*cs, sn);
+    mMoonDirection = -mSunDirection;
+  }
 }
