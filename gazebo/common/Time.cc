@@ -309,23 +309,6 @@ const Time &Time::operator *=(const struct timespec &_tv)
 }
 
 /////////////////////////////////////////////////
-Time Time::operator *(const struct timespec &_tv) const
-{
-  Time t(this->sec * _tv.tv_sec, this->nsec * _tv.tv_nsec);
-  t.Correct();
-  return t;
-}
-
-/////////////////////////////////////////////////
-const Time &Time::operator *=(const struct timespec &_tv)
-{
-  this->sec *= _tv.tv_sec;
-  this->nsec *= _tv.tv_nsec;
-  this->Correct();
-  return *this;
-}
-
-/////////////////////////////////////////////////
 Time Time::operator *(const Time &_time) const
 {
   Time t(this->Double() * _time.Double());
