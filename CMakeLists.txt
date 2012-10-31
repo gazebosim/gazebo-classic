@@ -38,6 +38,7 @@ endif()
 
 # If we're configuring only to package source, stop here
 if (PACKAGE_SOURCE_ONLY)
+  message(WARNING "Configuration was done in PACKAGE_SOURCE_ONLY mode.  You can build a tarball (make package_source), but nothing else.")
   return()
 endif()
 
@@ -46,6 +47,7 @@ add_subdirectory(doc)
 
 # If we're configuring only to build docs, stop here
 if (DOC_ONLY)
+  message(WARNING "Configuration was done in DOC_ONLY mode.  You can build documentation (make doc), but nothing else.")
   return()
 endif()
 
