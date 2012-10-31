@@ -131,7 +131,7 @@ Time Time::MSleep(unsigned int _ms)
   struct timespec resolution;
   clock_getres(CLOCK_REALTIME, &resolution);
 
-  if (Time(resolution) <= Time(0, _ms*1000))
+  if (Time(resolution) <= Time(0, _ms*1000000))
   {
     struct timespec interval;
     struct timespec remainder;
