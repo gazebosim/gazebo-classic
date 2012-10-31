@@ -322,10 +322,8 @@ void World::Step()
     common::Time sleep_time = this->prevStepWallTime +
       common::Time(this->physicsEngine->GetUpdatePeriod()) -
       common::Time::GetWallTime();
-    struct timespec nsleep;
-    nsleep.tv_sec = sleep_time.sec;
-    nsleep.tv_nsec = sleep_time.nsec;
-    nanosleep(&nsleep, NULL);
+
+    common::Time::NSleep(sleep_time);
 
     // throttling update rate
     if (common::Time::GetWallTime() - this->prevStepWallTime

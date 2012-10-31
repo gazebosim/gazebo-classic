@@ -92,6 +92,14 @@ namespace gazebo
       /// \param[in] _ms milliseconds
       public: static Time MSleep(unsigned int _ms);
 
+      /// \brief Nano sleep
+      /// \param[in] _ns nanoseconds
+      public: static Time NSleep(unsigned int _ns);
+
+      /// \brief Nano sleep
+      /// \param[in] _time is a Time
+      public: static Time NSleep(Time _time);
+
       /// \brief Assignment operator
       /// \param[in] tv the new time
       /// \return a reference to this instance
