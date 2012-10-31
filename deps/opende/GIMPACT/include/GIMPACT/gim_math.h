@@ -75,7 +75,7 @@ Constants starting with G_
 #define G_ROOT2 1.41421f
 #define G_UINT_INFINITY 65534
 #define G_REAL_INFINITY FLT_MAX
-#define	G_SIGN_BITMASK			0x80000000
+#define  G_SIGN_BITMASK      0x80000000
 #define G_USE_EPSILON_TEST
 #define G_EPSILON 0.0000001f
 //! @}
@@ -88,16 +88,19 @@ mathematical functions
 #define G_RADTODEG(X) ((X)*180.0f/3.1415926f)
 
 //! Integer representation of a floating-point value.
-#define IR(x)					((GUINT32&)(x))
+//#define IR(x)          ((GUINT32&)(x))
+#define IR(x)          (static_cast<GUINT32>(x))
 
 //! Signed integer representation of a floating-point value.
-#define SIR(x)					((GINT32&)(x))
+//#define SIR(x)          ((GINT32&)(x))
+#define SIR(x)          (static_cast<GINT32>(x))
 
 //! Absolute integer representation of a floating-point value
-#define AIR(x)					(IR(x)&0x7fffffff)
+#define AIR(x)          (IR(x)&0x7fffffff)
 
 //! Floating-point representation of an integer value.
-#define FR(x)					((GREAL&)(x))
+//#define FR(x)          ((GREAL&)(x))
+#define FR(x)          (static_cast<GREAL>(x))
 
 #define MAX(a,b) ((a)<(b)?(b):(a))
 #define MIN(a,b) ((a)>(b)?(b):(a))
