@@ -25,9 +25,21 @@ email: projectileman@yahoo.com
 
 -----------------------------------------------------------------------------
 */
+#include <cmath>
 
 #include "GIMPACT/gim_trimesh.h"
 
+
+/// \brief check if two values are equal, within a tolerance
+/// \param[in] _a the first value
+/// \param[in] _b the second value
+/// \param[in] _epsilon the tolerance
+template<typename T>
+inline bool equal(const T &_a, const T &_b,
+    const T &_epsilon = 1e-6)
+{
+  return std::fabs(_a - _b) <= _epsilon;
+}
 
 #define FABS(x) (float(fabs(x)))        /* implement as is fastest on your machine */
 
@@ -38,24 +50,24 @@ email: projectileman@yahoo.com
     _distances[0] = DISTANCE_PLANE_POINT(faceplane,v1);\
     _distances[1] =  _distances[0] * DISTANCE_PLANE_POINT(faceplane,v2);\
     _distances[2] =  _distances[0] * DISTANCE_PLANE_POINT(faceplane,v3); \
-	if(_distances[1]>0.0f && _distances[2]>0.0f)\
-	{\
-	    out_of_face = 1;\
-	}\
-	else\
-	{\
-	    out_of_face = 0;\
-	}\
+  if(_distances[1]>0.0f && _distances[2]>0.0f)\
+  {\
+      out_of_face = 1;\
+  }\
+  else\
+  {\
+      out_of_face = 0;\
+  }\
 }\
 
 /* sort so that a<=b */
 #define SORT(a,b)       \
              if(a>b)    \
              {          \
-               float c; \
-               c=a;     \
+               float _c_; \
+               _c_=a;     \
                a=b;     \
-               b=c;     \
+               b=_c_;     \
              }
 
 
@@ -158,16 +170,16 @@ int coplanar_tri_tri(GIM_TRIANGLE_DATA *tri1,
                 /* here we know that d0d1<=0.0 */ \
             A=VV1; B=(VV0-VV1)*D1; C=(VV2-VV1)*D1; X0=D1-D0; X1=D1-D2; \
         } \
-        else if(D1*D2>0.0f || D0!=0.0f) \
+        else if(D1*D2>0.0f || !equal(D0, 0.0f)) \
         { \
                 /* here we know that d0d1<=0.0 or that D0!=0.0 */ \
                 A=VV0; B=(VV1-VV0)*D0; C=(VV2-VV0)*D0; X0=D0-D1; X1=D0-D2; \
         } \
-        else if(D1!=0.0f) \
+        else if(!equal(D1, 0.0f)) \
         { \
                 A=VV1; B=(VV0-VV1)*D1; C=(VV2-VV1)*D1; X0=D1-D0; X1=D1-D2; \
         } \
-        else if(D2!=0.0f) \
+        else if(!equal(D2, 0.0f)) \
         { \
                 A=VV2; B=(VV0-VV2)*D2; C=(VV1-VV2)*D2; X0=D2-D0; X1=D2-D1; \
         } \
@@ -181,8 +193,8 @@ int coplanar_tri_tri(GIM_TRIANGLE_DATA *tri1,
 
 
 int gim_triangle_triangle_overlap(
-							GIM_TRIANGLE_DATA *tri1,
-							GIM_TRIANGLE_DATA *tri2)
+              GIM_TRIANGLE_DATA *tri1,
+              GIM_TRIANGLE_DATA *tri2)
 {
     vec3f _distances;
     char out_of_face;
