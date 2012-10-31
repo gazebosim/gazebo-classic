@@ -158,9 +158,13 @@ class ServerFixture : public testing::Test
                this->realTime = msgs::Convert(_msg->real_time());
                this->pauseTime = msgs::Convert(_msg->pause_time());
                this->paused = _msg->paused();
-               this->percentRealTime =
-                 (this->simTime / this->realTime).Double();
 
+               if (this->realTime == 0)
+                 this->percentRealTime = 0;
+               else
+                 this->percentRealTime =
+                   (this->simTime / this->realTime).Double();
+ 
                this->serverRunning = true;
              }
 

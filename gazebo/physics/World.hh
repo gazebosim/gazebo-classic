@@ -520,7 +520,7 @@ namespace gazebo
       /// \brief Last time a world statistics message was sent
       private: common::Time prevStatTime;
 
-      /// \brief Last time a message was processed
+      /// \brief Last time messages were processed
       private: common::Time prevProcessMsgsTime;
 
       /// \brief Time at which pause started.
