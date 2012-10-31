@@ -235,6 +235,7 @@ void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyPressEvent(_key);
+  this->viewController->HandleKeyPressEvent(_key);
 }
 
 /////////////////////////////////////////////////
@@ -242,6 +243,7 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyReleaseEvent(_key);
+  this->viewController->HandleKeyReleaseEvent(_key);
 }
 
 /////////////////////////////////////////////////
@@ -408,7 +410,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
   {
     this->scene->GetManager()->destroyAnimation("cameratrack");
-    this->scene->GetManager()->destroyAnimationState("cameratrack");
   }
 
   math::Box box = _visual->GetBoundingBox();

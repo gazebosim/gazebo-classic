@@ -176,12 +176,12 @@ void gim_aabbset_sort(GIM_AABB_SET * aabbset, char calc_global_bound)
     while(_i>0 && max_coord_uint >= _psorted_tokens->m_key)\
     {\
         AABBCOLLISION(_intersected,test_aabb,aabbarray[_psorted_tokens->m_value]);\
-    	if(_intersected)\
-    	{\
-    	    push_pair_macro(curr_index, _psorted_tokens->m_value,pairset);\
-    	}\
-    	_psorted_tokens++;\
-    	_i--;\
+      if(_intersected)\
+      {\
+          push_pair_macro(curr_index, _psorted_tokens->m_value,pairset);\
+      }\
+      _psorted_tokens++;\
+      _i--;\
     }\
 }
 
@@ -209,7 +209,7 @@ void gim_aabbset_self_intersections_sorted(GIM_AABB_SET * aabbset, GDYNAMIC_ARRA
         ///next pairs
         sorted_tokens++;
         count--;
-    	FIND_OVERLAPPING_FOWARD( curr_index, count, test_aabb, max_coord_uint, sorted_tokens , paabb, (*collision_pairs),PUSH_PAIR);
+      FIND_OVERLAPPING_FOWARD( curr_index, count, test_aabb, max_coord_uint, sorted_tokens , paabb, (*collision_pairs),PUSH_PAIR);
     }
 }
 
@@ -283,11 +283,11 @@ void gim_aabbset_bipartite_intersections_sorted(GIM_AABB_SET * aabbset1, GIM_AAB
     {
         curr_index = sorted_tokens1[i].m_value;
         AABBCOLLISION(intersected,paabb1[curr_index],int_abbb);
-    	if(intersected)
-    	{
-    	    classified_tokens1[classified_count1] = sorted_tokens1[i];
-    	    classified_count1++;
-    	}
+      if(intersected)
+      {
+          classified_tokens1[classified_count1] = sorted_tokens1[i];
+          classified_count1++;
+      }
     }
 
     if(classified_count1==0)
@@ -303,11 +303,11 @@ void gim_aabbset_bipartite_intersections_sorted(GIM_AABB_SET * aabbset1, GIM_AAB
     {
         curr_index = sorted_tokens2[i].m_value;
         AABBCOLLISION(intersected,paabb2[curr_index],int_abbb);
-    	if(intersected)
-    	{
-    	    classified_tokens2[classified_count2] = sorted_tokens2[i];
-    	    classified_count2++;
-    	}
+      if(intersected)
+      {
+          classified_tokens2[classified_count2] = sorted_tokens2[i];
+          classified_count2++;
+      }
     }
 
     if(classified_count2==0)
@@ -379,11 +379,11 @@ void gim_aabbset_bipartite_intersections_brute_force(GIM_AABB_SET * aabbset1,GIM
     for (i=0;i<count;i++ )
     {
         AABBCOLLISION(intersected,paabb1[i],int_abbb);
-    	if(intersected)
-    	{
-    	    classified[classified_count] = i;
-    	    classified_count++;
-    	}
+      if(intersected)
+      {
+          classified[classified_count] = i;
+          classified_count++;
+      }
     }
 
     if(classified_count==0)
@@ -500,6 +500,7 @@ void gim_aabbset_ray_collision(vec3f vorigin,vec3f vdir, GREAL tmax, GIM_AABB_SE
     collided->m_size = 0;
     char intersected;
     GREAL tparam = 0;
+    (void)tparam;
     BOX_INTERSECTS_RAY(aabbset->m_global_bound, vorigin, vdir, tparam, tmax,intersected);
     if(intersected==0) return;
 
