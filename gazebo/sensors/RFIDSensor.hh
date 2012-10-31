@@ -86,7 +86,6 @@ namespace gazebo
       private: physics::CollisionPtr laserCollision;
       private: physics::RayShapePtr laserShape;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
 
       private: RFIDTagManager *rtm;

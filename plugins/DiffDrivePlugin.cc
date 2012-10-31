@@ -104,7 +104,7 @@ void DiffDrivePlugin::OnUpdate()
   /* double d1, d2;
   double dr, da;
 
-  this->prevUpdateTime = currTime; 
+  this->prevUpdateTime = currTime;
 
   // Distance travelled by front wheels
   d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->GetVelocity(0);

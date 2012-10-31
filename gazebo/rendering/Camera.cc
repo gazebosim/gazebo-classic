@@ -255,9 +255,7 @@ void Camera::Update()
       try
       {
         this->scene->GetManager()->destroyAnimation(
-            this->animState->getAnimationName());
-        this->scene->GetManager()->destroyAnimationState(
-            this->animState->getAnimationName());
+            std::string(this->animState->getAnimationName()));
       } catch(Ogre::Exception &_e)
       {
       }

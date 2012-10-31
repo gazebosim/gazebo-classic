@@ -169,12 +169,10 @@ namespace gazebo
       public: physics::MultiRayShapePtr GetLaserShape() const
               {return this->laserShape;}
 
-      private: physics::LinkPtr link;
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;
       private: physics::EntityPtr parentEntity;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
       private: boost::mutex *mutex;
       private: msgs::LaserScan laserMsg;

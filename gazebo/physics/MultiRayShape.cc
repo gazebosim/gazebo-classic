@@ -20,7 +20,6 @@
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 MultiRayShape::MultiRayShape(CollisionPtr _parent)
   : Shape(_parent)

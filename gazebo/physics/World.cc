@@ -18,6 +18,8 @@
  * Author: Andrew Howard and Nate Koenig
  */
 
+#include <time.h>
+
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -95,6 +97,9 @@ World::World(const std::string &_name)
   this->setWorldPoseMutex = new boost::mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
 
+  this->prevStatTime = common::Time::GetWallTime();
+  this->prevProcessMsgsTime = common::Time::GetWallTime();
+
   this->connections.push_back(
      event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
   this->connections.push_back(
@@ -140,6 +145,9 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0, 200000000);
+
+  // The period at which messages are processed
+  this->processMsgsPeriod = common::Time(0, 200000000);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
@@ -310,6 +318,15 @@ void World::Step()
     this->pauseTime += this->physicsEngine->GetStepTime();
   else
   {
+    // sleep here to get the correct update rate
+    common::Time sleep_time = this->prevStepWallTime +
+      common::Time(this->physicsEngine->GetUpdatePeriod()) -
+      common::Time::GetWallTime();
+    struct timespec nsleep;
+    nsleep.tv_sec = sleep_time.sec;
+    nsleep.tv_nsec = sleep_time.nsec;
+    nanosleep(&nsleep, NULL);
+
     // throttling update rate
     if (common::Time::GetWallTime() - this->prevStepWallTime
            >= common::Time(this->physicsEngine->GetUpdatePeriod()))
@@ -318,23 +335,22 @@ void World::Step()
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
+
+      if (this->IsPaused() && this->stepInc > 0)
+        this->stepInc--;
     }
   }
 
-  // TODO: Fix timeout:  this belongs in simulator.cc
-  /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
+  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
+      this->processMsgsPeriod)
   {
-    this->stop = true;
-    break;
-  }*/
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
+    this->prevProcessMsgsTime = common::Time::GetWallTime();
+  }
 
-  if (this->IsPaused() && this->stepInc > 0)
-    this->stepInc--;
-
-  this->ProcessEntityMsgs();
-  this->ProcessRequestMsgs();
-  this->ProcessFactoryMsgs();
-  this->ProcessModelMsgs();
   this->worldUpdateMutex->unlock();
 }
 

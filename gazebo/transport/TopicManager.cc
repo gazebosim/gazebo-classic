@@ -85,6 +85,27 @@ void TopicManager::RemoveNode(unsigned int _id)
   {
     if ((*iter)->GetId() == _id)
     {
+      // Remove the node from all publications.
+      for (PublicationPtr_M::iterator piter = this->advertisedTopics.begin();
+           piter != this->advertisedTopics.end(); ++piter)
+      {
+        piter->second->RemoveSubscription(*iter);
+      }
+
+      // Remove the node from all subscriptions.
+      for (SubNodeMap::iterator siter = this->subscribedNodes.begin();
+           siter != this->subscribedNodes.end(); ++siter)
+      {
+        std::list<NodePtr>::iterator subIter = siter->second.begin();
+        while (subIter != siter->second.end())
+        {
+          if (*subIter == *iter)
+            siter->second.erase(subIter++);
+          else
+            ++subIter;
+        }
+      }
+
       this->nodes.erase(iter);
       break;
     }
@@ -170,7 +191,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 
   // Use this to find other remote publishers
   ConnectionManager::Instance()->Subscribe(_ops.GetTopic(), _ops.GetMsgType(),
-      _ops.GetLatching());
+                                           _ops.GetLatching());
   return sub;
 }
 
@@ -191,7 +212,7 @@ void TopicManager::Unsubscribe(const std::string &_topic,
 
 //////////////////////////////////////////////////
 void TopicManager::ConnectPubToSub(const std::string &topic,
-                                    const SubscriptionTransportPtr &sublink)
+                                   const SubscriptionTransportPtr &sublink)
 {
   PublicationPtr publication = this->FindPublication(topic);
   publication->AddSubscription(sublink);
@@ -271,7 +292,7 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 
 //////////////////////////////////////////////////
 PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
-                                                 const std::string &msgType)
+                                                const std::string &msgType)
 {
   // Find a current publication on this topic
   PublicationPtr pub = this->FindPublication(topic);
@@ -279,8 +300,8 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
   if (pub)
   {
     if (msgType != pub->GetMsgType())
-      gzthrow(std::string("Attempting to advertise on an existing topic with") +
-          " a conflicting message type\n");
+      gzthrow("Attempting to advertise on an existing topic with"
+              " a conflicting message type\n");
   }
   else
   {
@@ -332,6 +353,7 @@ void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
 }
 
+//////////////////////////////////////////////////
 void TopicManager::ClearBuffers()
 {
   PublicationPtr_M::iterator iter;
@@ -341,6 +363,7 @@ void TopicManager::ClearBuffers()
   }
 }
 
+//////////////////////////////////////////////////
 void TopicManager::PauseIncoming(bool _pause)
 {
   this->pauseIncoming = _pause;

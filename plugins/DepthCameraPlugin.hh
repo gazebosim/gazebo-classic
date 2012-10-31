@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
-#define __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
+#ifndef _GAZEBO_DEPTH_CAMERA_PLUGIN_HH_
+#define _GAZEBO_DEPTH_CAMERA_PLUGIN_HH_
 
 #include <string>
 
@@ -30,7 +30,11 @@ namespace gazebo
 {
   class DepthCameraPlugin : public SensorPlugin
   {
+    /// \brief Constructor
     public: DepthCameraPlugin();
+
+    /// \brief Destructor
+    public: virtual ~DepthCameraPlugin();
 
     public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 

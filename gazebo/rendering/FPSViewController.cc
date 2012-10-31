@@ -89,3 +89,13 @@ std::string FPSViewController::GetTypeString()
 {
   return TYPE_STRING;
 }
+
+//////////////////////////////////////////////////
+void FPSViewController::HandleKeyReleaseEvent(const std::string &/*_key*/)
+{
+}
+
+//////////////////////////////////////////////////
+void FPSViewController::HandleKeyPressEvent(const std::string &/*_key*/)
+{
+}

@@ -50,9 +50,9 @@ struct GIM_RSORT_TOKEN
 #define RSORT_TOKEN_COMPARATOR(x, y) ((int)((x.m_key) - (y.m_key)))
 
 // ---- utils for accessing 11-bit quantities
-#define D11_0(x)	(x & 0x7FF)
-#define D11_1(x)	(x >> 11 & 0x7FF)
-#define D11_2(x)	(x >> 22 )
+#define D11_0(x)  (x & 0x7FF)
+#define D11_1(x)  (x >> 11 & 0x7FF)
+#define D11_2(x)  (x >> 22 )
 
 
 //COMMON FUNCTIONS FOR ACCESSING THE KEY OF AN ELEMENT
@@ -75,63 +75,63 @@ struct GIM_RSORT_TOKEN
 
 #define GIM_RADIX_SORT_RTOKENS(array,sorted,element_count)\
 {\
-	GUINT32 i;\
-	GUINT32 b0[kHist * 3];\
-	GUINT32 *b1 = b0 + kHist;\
-	GUINT32 *b2 = b1 + kHist;\
-	for (i = 0; i < kHist * 3; i++)\
-	{\
-		b0[i] = 0;\
-	}\
-	GUINT32 fi;\
-	GUINT32 pos;\
-	for (i = 0; i < element_count; i++)\
-	{\
-	    fi = array[i].m_key;\
-		b0[D11_0(fi)] ++;\
-		b1[D11_1(fi)] ++;\
-		b2[D11_2(fi)] ++;\
-	}\
-	{\
-		GUINT32 sum0 = 0, sum1 = 0, sum2 = 0;\
-		GUINT32 tsum;\
-		for (i = 0; i < kHist; i++)\
-		{\
-			tsum = b0[i] + sum0;\
-			b0[i] = sum0 - 1;\
-			sum0 = tsum;\
-			tsum = b1[i] + sum1;\
-			b1[i] = sum1 - 1;\
-			sum1 = tsum;\
-			tsum = b2[i] + sum2;\
-			b2[i] = sum2 - 1;\
-			sum2 = tsum;\
-		}\
-	}\
-	for (i = 0; i < element_count; i++)\
-	{\
-        fi = array[i].m_key;\
-		pos = D11_0(fi);\
-		pos = ++b0[pos];\
-		sorted[pos].m_key = array[i].m_key;\
-		sorted[pos].m_value = array[i].m_value;\
-	}\
-	for (i = 0; i < element_count; i++)\
-	{\
-        fi = sorted[i].m_key;\
-		pos = D11_1(fi);\
-		pos = ++b1[pos];\
-		array[pos].m_key = sorted[i].m_key;\
-		array[pos].m_value = sorted[i].m_value;\
-	}\
-	for (i = 0; i < element_count; i++)\
-	{\
-        fi = array[i].m_key;\
-		pos = D11_2(fi);\
-		pos = ++b2[pos];\
-		sorted[pos].m_key = array[i].m_key;\
-		sorted[pos].m_value = array[i].m_value;\
-	}\
+  GUINT32 _i;\
+  GUINT32 b0[kHist * 3];\
+  GUINT32 *b1 = b0 + kHist;\
+  GUINT32 *b2 = b1 + kHist;\
+  for (_i = 0; _i < kHist * 3; _i++)\
+  {\
+  	b0[_i] = 0;\
+  }\
+  GUINT32 fi;\
+  GUINT32 pos;\
+  for (_i = 0; _i < element_count; _i++)\
+  {\
+      fi = array[_i].m_key;\
+  	b0[D11_0(fi)] ++;\
+  	b1[D11_1(fi)] ++;\
+  	b2[D11_2(fi)] ++;\
+  }\
+  {\
+  	GUINT32 sum0 = 0, sum1 = 0, sum2 = 0;\
+  	GUINT32 tsum;\
+  	for (_i = 0; _i < kHist; _i++)\
+  	{\
+  		tsum = b0[_i] + sum0;\
+  		b0[_i] = sum0 - 1;\
+  		sum0 = tsum;\
+  		tsum = b1[_i] + sum1;\
+  		b1[_i] = sum1 - 1;\
+  		sum1 = tsum;\
+  		tsum = b2[_i] + sum2;\
+  		b2[_i] = sum2 - 1;\
+  		sum2 = tsum;\
+  	}\
+  }\
+  for (_i = 0; _i < element_count; _i++)\
+  {\
+        fi = array[_i].m_key;\
+  	pos = D11_0(fi);\
+  	pos = ++b0[pos];\
+  	sorted[pos].m_key = array[_i].m_key;\
+  	sorted[pos].m_value = array[_i].m_value;\
+  }\
+  for (_i = 0; _i < element_count; _i++)\
+  {\
+        fi = sorted[_i].m_key;\
+  	pos = D11_1(fi);\
+  	pos = ++b1[pos];\
+  	array[pos].m_key = sorted[_i].m_key;\
+  	array[pos].m_value = sorted[_i].m_value;\
+  }\
+  for (_i = 0; _i < element_count; _i++)\
+  {\
+        fi = array[_i].m_key;\
+  	pos = D11_2(fi);\
+  	pos = ++b2[pos];\
+  	sorted[pos].m_key = array[_i].m_key;\
+  	sorted[pos].m_value = array[_i].m_value;\
+  }\
 }\
 
 /// Get the sorted tokens from an array. For generic use. Tokens are GIM_RSORT_TOKEN

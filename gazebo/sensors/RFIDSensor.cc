@@ -15,7 +15,7 @@
  *
  */
 /* Desc: RFID Sensor
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
@@ -42,7 +42,6 @@ RFIDSensor::RFIDSensor()
   : Sensor()
 {
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 /////////////////////////////////////////////////
@@ -66,7 +65,6 @@ void RFIDSensor::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(this->world->GetName());
     this->scanPub = this->node->Advertise<msgs::Pose>(
         this->sdf->GetElement("topic")->GetValueString());
   }
@@ -105,7 +103,7 @@ void RFIDSensor::Load(const std::string &_worldName)
 
     manager = rendering::get_scene(this->world->GetName())->GetManager();
 
-    query = manager->createRayQuery(Ogre::Ray()); 
+    query = manager->createRayQuery(Ogre::Ray());
 
 */
 }
