@@ -277,26 +277,15 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
 
   // Create the Force control scroll area
   this->forceGridLayout = new QGridLayout;
-  this->forceScrollArea = new QScrollArea(this);
-  this->forceFrame = new QFrame();
-  this->AddScrollTab(this->tabWidget, this->forceGridLayout,
-                     this->forceScrollArea, this->forceFrame, tr("Force"));
+  this->AddScrollTab(this->tabWidget, this->forceGridLayout, tr("Force"));
 
   // Create a PID Pos scroll area
   this->positionGridLayout = new QGridLayout;
-  this->positionScrollArea = new QScrollArea(this);
-  this->positionFrame = new QFrame();
-  this->AddScrollTab(this->tabWidget, this->positionGridLayout,
-                     this->positionScrollArea, this->positionFrame,
-                     tr("Position"));
+  this->AddScrollTab(this->tabWidget, this->positionGridLayout, tr("Position"));
 
   // Create a PID Vel scroll area
   this->velocityGridLayout = new QGridLayout;
-  this->velocityScrollArea = new QScrollArea(this);
-  this->velocityFrame = new QFrame();
-  this->AddScrollTab(this->tabWidget, this->velocityGridLayout,
-                     this->velocityScrollArea, this->velocityFrame,
-                     tr("Velocity"));
+  this->AddScrollTab(this->tabWidget, this->velocityGridLayout, tr("Velocity"));
 
   // Add the the force and pid scroll areas to the tab
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -501,24 +490,25 @@ void JointControlWidget::OnIVelGainChanged(double _value,
 
 /////////////////////////////////////////////////
 void JointControlWidget::AddScrollTab(QTabWidget *_tabPane,
-    QGridLayout *_tabLayout, QScrollArea *_scrollArea, QFrame *_frame,
-    const QString &_name)
+    QGridLayout *_tabLayout, const QString &_name)
 {
   _tabLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
-  _scrollArea->setLineWidth(0);
-  _scrollArea->setFrameShape(QFrame::NoFrame);
-  _scrollArea->setFrameShadow(QFrame::Plain);
-  _scrollArea->setSizePolicy(QSizePolicy::Maximum,
+  QScrollArea *scrollArea = new QScrollArea(this);
+  scrollArea->setLineWidth(0);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setFrameShadow(QFrame::Plain);
+  scrollArea->setSizePolicy(QSizePolicy::Maximum,
                              QSizePolicy::Maximum);
 
-  _frame->setObjectName("pidControl");
-  _frame->setLineWidth(0);
-  _frame->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-  _frame->setLayout(_tabLayout);
+  QFrame *frame = new QFrame(scrollArea);
+  frame->setObjectName("pidControl");
+  frame->setLineWidth(0);
+  frame->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  frame->setLayout(_tabLayout);
 
-  _scrollArea->setWidget(_frame);
-  _tabPane->addTab(_scrollArea, _name);
+  scrollArea->setWidget(frame);
+  _tabPane->addTab(scrollArea, _name);
 }
 
 /////////////////////////////////////////////////

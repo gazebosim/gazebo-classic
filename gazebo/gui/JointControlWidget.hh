@@ -114,13 +114,9 @@ namespace gazebo
       /// \brief Add a tab widget with a scrollable area.
       /// \param[in] _tabPane Tab pane that will have all the controls.
       /// \param[in] _tabLayout Layout for the controls in the tab.
-      /// \param[in] _scollArea Scroll area for the tab.
-      /// \param[in] _frame Frame withing the scroll area.
       /// \param[in] _name Name of the tab.
       private: void AddScrollTab(QTabWidget *_tabPane,
                                  QGridLayout *_tabLayout,
-                                 QScrollArea *_scrollArea,
-                                 QFrame *_frame,
                                  const QString &_name);
 
       /// \brief Layout the force tab.
@@ -167,24 +163,6 @@ namespace gazebo
 
       /// \brief Layout for the velocity controls.
       private: QGridLayout *velocityGridLayout;
-
-      /// \brief Frame for the force controls.
-      private: QFrame *forceFrame;
-
-      /// \brief Frame for the force scroll area.
-      private: QScrollArea *forceScrollArea;
-
-      /// \brief Frame for the position controls.
-      private: QFrame *positionFrame;
-
-      /// \brief Frame for the position scroll area.
-      private: QScrollArea *positionScrollArea;
-
-      /// \brief Frame for the velocity controls.
-      private: QFrame *velocityFrame;
-
-      /// \brief Frame for the velocity scroll area.
-      private: QScrollArea *velocityScrollArea;
     };
 
     /// \class JointForceControl JointForceControl gui/JointForceControl.hh
