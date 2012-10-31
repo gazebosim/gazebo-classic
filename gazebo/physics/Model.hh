@@ -177,7 +177,7 @@ namespace gazebo
       /// \param[in] _value False to turn gravity on for the model.
       public: void SetGravityMode(const bool &_value);
 
-      /// \TODO This is not implemented in Link, which means this function 
+      /// \TODO This is not implemented in Link, which means this function
       /// doesn't do anything.
       /// \brief Set the collide mode of the model.
       /// \param[in] _mode The collision mode
@@ -328,9 +328,6 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointController *jointController;
-
-      /// \brief True if the plugins have been loaded.
-      private: bool pluginsLoaded;
 
       /// \brief Used by Model::AttachStaticModel.
       protected: std::vector<ModelPtr> attachedModels;

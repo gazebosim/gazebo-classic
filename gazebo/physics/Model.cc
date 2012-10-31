@@ -43,8 +43,6 @@
 #include "physics/Model.hh"
 #include "physics/Contact.hh"
 
-#include "sensors/SensorManager.hh"
-
 #include "transport/Node.hh"
 
 using namespace gazebo;
@@ -72,7 +70,6 @@ Model::Model(BasePtr _parent)
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
   this->jointController = NULL;
-  this->pluginsLoaded = false;
 }
 
 //////////////////////////////////////////////////
@@ -192,16 +189,6 @@ void Model::Init()
 void Model::Update()
 {
   this->updateMutex->lock();
-
-  /// Load plugins for this model once
-  /// @todo: john: this works fine, but we should add a regression test
-  /// to make sure there is no race condition.
-  if (!this->pluginsLoaded &&
-      sensors::SensorManager::Instance()->SensorsInitialized())
-  {
-    this->LoadPlugins();
-    this->pluginsLoaded = true;
-  }
 
   if (this->jointController)
     this->jointController->Update();

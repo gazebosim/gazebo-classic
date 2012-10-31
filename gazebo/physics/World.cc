@@ -27,6 +27,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "gazebo/sensors/SensorManager.hh"
+
 #include "gazebo/sdf/sdf.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Transport.hh"
@@ -412,7 +414,8 @@ void World::Update()
     /// until dWorld.*Step
     /// Plugins that manipulate joints (and probably other properties) require
     /// one iteration of the physics engine. Do not remove this.
-    if (!this->pluginsLoaded)
+    if (!this->pluginsLoaded &&
+        sensors::SensorManager::Instance()->SensorsInitialized())
     {
       this->LoadPlugins();
       this->pluginsLoaded = true;
@@ -905,6 +908,16 @@ void World::LoadPlugins()
     }
   }
 
+  // Load the plugins for all the models
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+  {
+    if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
+    {
+      ModelPtr model = boost::shared_static_cast<Model>(
+          this->rootElement->GetChild(i));
+      model->LoadPlugins();
+    }
+  }
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
@@ -1283,6 +1296,7 @@ void World::ProcessFactoryMsgs()
       {
         ModelPtr model = this->LoadModel(elem, this->rootElement);
         model->Init();
+        model->LoadPlugins();
       }
       else if (isLight)
       {
