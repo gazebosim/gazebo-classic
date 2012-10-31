@@ -392,7 +392,6 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
-
                  // In the case sec and nsec have different signs, normalize
                  while (this->sec > 0 && this->nsec < 0)
                  {

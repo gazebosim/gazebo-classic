@@ -209,7 +209,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       if (this->key == "x")
         translation.Set((drag.y / static_cast<float>(height)) *
-                        this->distance * tan(fovY / 2.0) * 2.0, 0.0,0.0);
+                        this->distance * tan(fovY / 2.0) * 2.0, 0.0, 0.0);
       else if (this->key == "y")
         translation.Set(0.0, (drag.x / static_cast<float>(width)) *
                         this->distance * tan(fovX / 2.0) * 2.0, 0.0);
