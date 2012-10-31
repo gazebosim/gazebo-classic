@@ -30,7 +30,7 @@ set (headers
 )
 
 link_directories(  
-  ${HACK_OGRE_LIBRARY_PATH}
+  ${ogre_library_dirs}
 )
 
 gz_add_library(gazebo_rendering_deferred ${sources})
