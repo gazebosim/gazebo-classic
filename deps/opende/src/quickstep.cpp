@@ -204,7 +204,7 @@ static void compute_invM_JT (int m, dRealPtr J, dRealMutablePtr iMJ, int *jb,
 
 // compute out = inv(M)*J'*in.
 //#ifdef WARM_STARTING
-static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
+/*static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
   dRealPtr in, dRealMutablePtr out)
 {
   dSetZero (out,6*nb);
@@ -222,7 +222,7 @@ static void multiply_invM_JT (int m, int nb, dRealMutablePtr iMJ, int *jb,
     }
     iMJ_ptr += 6;
   }
-}
+}*/
 //#endif
 
 // compute out = J*in.
@@ -324,12 +324,12 @@ static void CG_LCP (dxWorldProcessContext *context,
   for (int k=0; k<m; k++) r[k] = rhs[k] - r[k];
 #else
   dSetZero (lambda,m);
-  memcpy (r,rhs,m*sizeof(dReal));		// residual r = rhs - A*lambda
+  memcpy (r,rhs,m*sizeof(dReal));    // residual r = rhs - A*lambda
 #endif
 
   for (int iteration=0; iteration < num_iterations; iteration++) {
-    for (int i=0; i<m; i++) z[i] = r[i]*Ad[i];	// z = inv(M)*r
-    dReal rho = dot (m,r,z);		// rho = r'*z
+    for (int i=0; i<m; i++) z[i] = r[i]*Ad[i];  // z = inv(M)*r
+    dReal rho = dot (m,r,z);    // rho = r'*z
 
     // @@@
     // we must check for convergence, otherwise rho will go to 0 if
@@ -340,18 +340,18 @@ static void CG_LCP (dxWorldProcessContext *context,
     }
 
     if (iteration==0) {
-      memcpy (p,z,m*sizeof(dReal));	// p = z
+      memcpy (p,z,m*sizeof(dReal));  // p = z
     }
     else {
-      add (m,p,z,p,rho/last_rho);	// p = z + (rho/last_rho)*p
+      add (m,p,z,p,rho/last_rho);  // p = z + (rho/last_rho)*p
     }
 
     // compute q = (J*inv(M)*J')*p
     multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,p,q);
 
-    dReal alpha = rho/dot (m,p,q);		// alpha = rho/(p'*q)
-    add (m,lambda,lambda,p,alpha);		// lambda = lambda + alpha*p
-    add (m,r,r,q,-alpha);			// r = r - alpha*q
+    dReal alpha = rho/dot (m,p,q);    // alpha = rho/(p'*q)
+    add (m,lambda,lambda,p,alpha);    // lambda = lambda + alpha*p
+    add (m,r,r,q,-alpha);      // r = r - alpha*q
     last_rho = rho;
   }
 
@@ -372,10 +372,10 @@ static void CG_LCP (dxWorldProcessContext *context,
 
 struct IndexError {
 #ifdef REORDER_CONSTRAINTS
-  dReal error;		// error to sort on
+  dReal error;    // error to sort on
   int findex;
 #endif
-  int index;		// row index
+  int index;    // row index
 };
 
 
@@ -409,7 +409,7 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
     // mimic computation of rhs, but do it with J*M*inv(J) prefixed for preconditioned case.
     BEGIN_STATE_SAVE(context, tmp2state) {
       IFTIMING (dTimerNow ("compute rhs_precon"));
-      
+
       // compute the "preconditioned" right hand side `rhs_precon'
       dReal *tmp1 = context->AllocateArray<dReal> (nb*6);
       // this is slightly different than non precon, where M is left multiplied by the pre J terms
@@ -547,7 +547,7 @@ static void ComputeRows(
   printf("J_orig\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
-      printf("	%12.6f",J_orig[i*12+j]);
+      printf("  %12.6f",J_orig[i*12+j]);
     }
     printf("\n");
   }
@@ -557,7 +557,7 @@ static void ComputeRows(
   printf("J_precon\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
-      printf("	%12.6f",J_precon[i*12+j]);
+      printf("  %12.6f",J_precon[i*12+j]);
     }
     printf("\n");
   }
@@ -566,7 +566,7 @@ static void ComputeRows(
   printf("J\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
-      printf("	%12.6f",J[i*12+j]);
+      printf("  %12.6f",J[i*12+j]);
     }
     printf("\n");
   }
@@ -574,12 +574,12 @@ static void ComputeRows(
 
   printf("rhs_precon\n");
   for (int i=startRow; i<startRow+nRows; i++)
-    printf("	%12.6f",rhs_precon[i]);
+    printf("  %12.6f",rhs_precon[i]);
   printf("\n");
 
   printf("rhs\n");
   for (int i=startRow; i<startRow+nRows; i++)
-    printf("	%12.6f",rhs[i]);
+    printf("  %12.6f",rhs[i]);
   printf("\n");
   */
 
@@ -739,7 +739,7 @@ static void ComputeRows(
         if (cforce_ptr2)
           delta_precon -= dot6(cforce_ptr2, J_ptr + 6);
 
-        // set the limits for this constraint. 
+        // set the limits for this constraint.
         // this is the place where the QuickStep method differs from the
         // direct LCP solving method, since that method only performs this
         // limit adjustment once per time step, whereas this method performs
@@ -818,7 +818,7 @@ static void ComputeRows(
           if (caccel_ptr2)
             delta -= dot6(caccel_ptr2, J_ptr + 6);
 
-          // set the limits for this constraint. 
+          // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
           // direct LCP solving method, since that method only performs this
           // limit adjustment once per time step, whereas this method performs
@@ -913,7 +913,7 @@ static void ComputeRows(
             delta_erp -= dot6(caccel_erp_ptr2, J_ptr + 6);
 
           // for the _erp version
-          // set the limits for this constraint. 
+          // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
           // direct LCP solving method, since that method only performs this
           // limit adjustment once per time step, whereas this method performs
@@ -970,7 +970,7 @@ static void ComputeRows(
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
       //delta *= ramp;
-      
+
     } // end of for loop on m
 #ifdef PENETRATION_JVERROR_CORRECTION
     Jvnew_final = Jvnew*stepsize1;
@@ -1112,7 +1112,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *Ad = context->AllocateArray<dReal> (m);
 
   {
-    const dReal sor_w = qs->w;		// SOR over-relaxation parameter
+    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
     // precompute 1 / diagonals of A
     dRealPtr iMJ_ptr = iMJ;
     dRealPtr J_ptr = J;
@@ -1132,7 +1132,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dReal *Ad_precon = context->AllocateArray<dReal> (m);
 
   {
-    const dReal sor_w = qs->w;		// SOR over-relaxation parameter
+    const dReal sor_w = qs->w;    // SOR over-relaxation parameter
     // precompute 1 / diagonals of A
     // preconditioned version uses J instead of iMJ
     dRealPtr J_ptr = J;
@@ -1158,7 +1158,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
 
   {
-    // NOTE: This may seem unnecessary but it's indeed an optimization 
+    // NOTE: This may seem unnecessary but it's indeed an optimization
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
     // scale J_precon and rhs_precon by Ad
@@ -1182,7 +1182,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 
 
   {
-    // NOTE: This may seem unnecessary but it's indeed an optimization 
+    // NOTE: This may seem unnecessary but it's indeed an optimization
     // to move multiplication by Ad[i] and cfm[i] out of iteration loop.
 
     // scale J and rhs by Ad
@@ -1343,7 +1343,7 @@ struct dJointWithInfo1
   dxJoint::Info1 info;
 };
 
-void dxQuickStepper (dxWorldProcessContext *context, 
+void dxQuickStepper (dxWorldProcessContext *context,
   dxWorld *world, dxBody * const *body, int nb,
   dxJoint * const *_joint, int _nj, dReal stepsize)
 {
@@ -1439,11 +1439,11 @@ void dxQuickStepper (dxWorldProcessContext *context,
   // entirely, so that the code that follows does not consider them.
   dJointWithInfo1 *const jointiinfos = context->AllocateArray<dJointWithInfo1> (_nj);
   int nj;
-  
+
   {
     dJointWithInfo1 *jicurr = jointiinfos;
     dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {	// jicurr=dest, _jcurr=src
+    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {  // jicurr=dest, _jcurr=src
       dxJoint *j = *_jcurr;
       j->getInfo1 (&jicurr->info);
       dIASSERT (jicurr->info.m >= 0 && jicurr->info.m <= 6 && jicurr->info.nub >= 0 && jicurr->info.nub <= jicurr->info.m);
@@ -1617,7 +1617,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
           int *findex_ofsi = findex + ofsi;
           for (int j=0; j<infom; j++) {
             int fival = findex_ofsi[j];
-            if (fival >= 0) 
+            if (fival >= 0)
               findex_ofsi[j] = fival + ofsi;
           }
 
@@ -1819,10 +1819,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
             fb->t2[1] = data[4];
             fb->t2[2] = data[5];
           }
-          
+
           Jcopyrow += infom * 12;
         }
-      
+
         lambdacurr += infom;
       }
     }
@@ -2042,10 +2042,10 @@ size_t dxEstimateQuickStepMemoryRequirements (
     int njcurr = 0, mcurr = 0, mfbcurr = 0;
     dxJoint::SureMaxInfo info;
     dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {	
+    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {
       dxJoint *j = *_jcurr;
       j->getSureMaxInfo (&info);
-      
+
       int jm = info.max_m;
       if (jm > 0) {
         njcurr++;
@@ -2084,7 +2084,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for c
         {
           size_t sub3_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for tmp1
-    
+
           size_t sub3_res2 = 0;
 
           sub2_res1 += (sub3_res1 >= sub3_res2) ? sub3_res1 : sub3_res2;
@@ -2122,7 +2122,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
         sub1_res2 += (sub2_res1 >= sub2_res2) ? sub2_res1 : sub2_res2;
       }
     }
-    
+
     res += (sub1_res1 >= sub1_res2) ? sub1_res1 : sub1_res2;
   }
 
