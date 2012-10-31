@@ -130,3 +130,53 @@ double PhysicsEngine::GetUpdatePeriod()
   else
     return 0;
 }
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetWorldCFM(double /*_cfm*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetWorldERP(double /*_erp*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetSORPGSPreconIters(unsigned int /*_iters*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetSORPGSIters(unsigned int /*_iters*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetSORPGSW(double /*_w*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetMaxContacts(double /*_maxContacts*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
+{
+}
