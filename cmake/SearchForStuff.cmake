@@ -193,28 +193,18 @@ if (PKG_CONFIG_FOUND)
     set(ogre_cflags ${ogre_cflags} ${OGRE-Terrain_CFLAGS})
   endif()
 
-  # There is a major problem with OGRE and Ubuntu. Ubuntu has instituted
-  # a multi-arch install policy (https://wiki.ubuntu.com/MultiarchSpec).
-  # But OGRE and cmake do not handle it very well. The FindOGRE.cmake file
-  # is not installed in a default search path, even if we forcibly find the 
-  # FindOGRE.cmake file does not return correct paths. So, we are forced to
-  # use find_path to find where OGRE and its plugins are installed.
-  find_path(HACK_OGRE_LIBRARY_PATH libOgreMain.so /usr/lib /usr/local/lib
-            /usr/lib/x86_64-linux-gnu /usr/lib/i386-linux-gnu
-            ${ogre_library_dirs})
-  if (NOT HACK_OGRE_LIBRARY_PATH)
-    find_path(HACK_OGRE_LIBRARY_PATH libOgreMain_d.so /usr/lib /usr/local/lib
-              /usr/lib/x86_64-linux-gnu /usr/lib/i386-linux-gnu
-              ${ogre_library_dirs})
+  # Also find OGRE's plugin directory, which is provided in its .pc file as the
+  # `plugindir` variable.  We have to call pkg-config manually to get it.
+  execute_process(COMMAND pkg-config --variable=plugindir OGRE
+                  OUTPUT_VARIABLE _pkgconfig_invoke_result
+                  RESULT_VARIABLE _pkgconfig_failed)
+  if(_pkgconfig_failed)
+    BUILD_WARNING ("Failed to find OGRE's plugin directory.  The build will succeed, but gazebo will likely fail to run.")
+  else()
+    # This variable will be substituted into cmake/setup.sh.in
+    set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
   endif()
 
-
-  #################################################
-  # Find XML
-  pkg_check_modules(XML libxml-2.0)
-  if (NOT XML_FOUND)
-    BUILD_ERROR("Missing: libxml2(http://www.xmlsoft.org)")
-  endif ()
 
   ########################################
   # Find OpenAL
