@@ -8,6 +8,7 @@
 
 import sys
 import re
+import xml.sax.saxutils
 
 def cpplint_score_to_cppcheck_severity(score):
     # I'm making this up
@@ -39,7 +40,9 @@ def parse():
         g = m.groups()
         if len(g) != 5:
             continue
-        fname, lineno, msg, label, score = g  
+        fname, lineno, rawmsg, label, score = g  
+        # Protect Jenkins from bad XML, which makes it barf
+        msg = xml.sax.saxutils.escape(rawmsg)
         severity = cpplint_score_to_cppcheck_severity(int(score))
         sys.stderr.write('''<error file="%s" line="%s" id="%s" severity="%s" msg="%s"/>\n'''%(fname, lineno, label, severity, msg))
 
