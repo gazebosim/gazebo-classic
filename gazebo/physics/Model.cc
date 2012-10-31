@@ -717,7 +717,6 @@ void Model::SetGravityMode(const bool &_v)
   }
 }
 
-
 //////////////////////////////////////////////////
 void Model::SetCollideMode(const std::string &_m)
 {
@@ -731,7 +730,6 @@ void Model::SetCollideMode(const std::string &_m)
     }
   }
 }
-
 
 //////////////////////////////////////////////////
 void Model::SetLaserRetro(const float &_retro)

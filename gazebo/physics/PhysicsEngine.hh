@@ -18,16 +18,12 @@
  * Author: Nate Koenig
  */
 
-#ifndef PHYSICSENGINE_HH
-#define PHYSICSENGINE_HH
+#ifndef _PHYSICSENGINE_HH_
+#define _PHYSICSENGINE_HH_
 
 #include <boost/thread/recursive_mutex.hpp>
-#include <map>
 #include <string>
 
-#include "common/Event.hh"
-#include "common/CommonTypes.hh"
-#include "msgs/msgs.hh"
 #include "transport/TransportTypes.hh"
 #include "physics/PhysicsTypes.hh"
 
@@ -38,116 +34,147 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Base class for a physics engine
+    /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
+    /// \brief Base class for a physics engine.
     class PhysicsEngine
     {
-      /// \brief Default constructor
-      /// \param world Pointer to the world
-      public: PhysicsEngine(WorldPtr _world);
+      /// \brief Default constructor.
+      /// \param[in] _world Pointer to the world.
+      public: explicit PhysicsEngine(WorldPtr _world);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~PhysicsEngine();
 
-      /// \brief Load the physics engine
-      /// \param _sdf Pointer to the SDF parameters
+      /// \brief Load the physics engine.
+      /// \param[in] _sdf Pointer to the SDF parameters.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the physics engine
+      /// \brief Initialize the physics engine.
       public: virtual void Init() = 0;
 
-      /// \brief Finilize the physics engine
+      /// \brief Finilize the physics engine.
       public: virtual void Fini();
 
-      /// \brief Empty
+      /// \brief Rest the physics engine.
       public: virtual void Reset() {}
 
       /// \brief Init the engine for threads.
       public: virtual void InitForThread() = 0;
 
-      /// \brief Update the physics engine collision
+      /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
-      /// \brief Set the simulation update rate
+      /// \brief Set the simulation update rate.
+      /// \param[in] _value Value of the update rate.
       public: void SetUpdateRate(double _value);
 
-      /// \brief Get the simulation update rate
+      /// \brief Get the simulation update rate.
+      /// \return Update rate.
       public: double GetUpdateRate();
 
-      /// \brief Get the simulation update period
+      /// \brief Get the simulation update period.
+      /// \return Simulation update period.
       public: double GetUpdatePeriod();
 
-      /// \brief Set the simulation step time
+      /// \brief Set the simulation step time.
+      /// \param[in] _value Value of the step time.
       public: virtual void SetStepTime(double _value) = 0;
 
-      /// \brief Get the simulation step time
+      /// \brief Get the simulation step time.
+      /// \return Simulation step time.
       public: virtual double GetStepTime() = 0;
 
-      /// \brief Update the physics engine
+      /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
-      /// \brief Create a new body
+
+      /// \brief Create a new body.
+      /// \param[in] _parent Parent model for the link.
       public: virtual LinkPtr CreateLink(ModelPtr _parent) = 0;
 
-      /// \brief Create a collision
+      /// \brief Create a collision.
+      /// \param[in] _shapeType Type of collision to create.
+      /// \param[in] _link Parent link.
       public: virtual CollisionPtr CreateCollision(
                   const std::string &_shapeType, LinkPtr _link) = 0;
 
-      /// \brief Create a collision
+      /// \brief Create a collision.
+      /// \param[in] _shapeType Type of collision to create.
+      /// \param[in] _linkName Name of the parent link.
       public: CollisionPtr CreateCollision(const std::string &_shapeType,
                                            const std::string &_linkName);
 
-      /// \brief Create a physics::Shape object
-      public: virtual ShapePtr CreateShape(
-                  const std::string &_shapeType,
-                  CollisionPtr _collision) = 0;
+      /// \brief Create a physics::Shape object.
+      /// \param[in] _shapeType Type of shape to create.
+      /// \param[in] _collision Collision parent.
+      public: virtual ShapePtr CreateShape(const std::string &_shapeType,
+                                           CollisionPtr _collision) = 0;
 
-      /// \brief Create a new joint
+      /// \brief Create a new joint.
+      /// \param[in] _type Type of joint to create.
+      /// \param[in] _parent Model parent.
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent) = 0;
 
-      /// \brief Return the gavity vector
-      /// \return The gavity vector
+      /// \brief Return the gavity vector.
+      /// \return The gavity vector.
       public: math::Vector3 GetGravity() const;
 
-      /// \brief Set the gavity vector
-      public: virtual void SetGravity(const gazebo::math::Vector3 &gravity) = 0;
+      /// \brief Set the gavity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: virtual void SetGravity(
+                  const gazebo::math::Vector3 &_gravity) = 0;
 
-      /// \brief Set whether to show contacts
-      public: void ShowContacts(const bool &show);
+      /// \brief access functions to set ODE parameters
+      public: virtual void SetWorldCFM(double _cfm) {}
 
       /// \brief access functions to set ODE parameters
-      public: virtual void SetWorldCFM(double /*cfm_*/) {}
+      public: virtual void SetWorldERP(double _erp) {}
+
       /// \brief access functions to set ODE parameters
-      public: virtual void SetWorldERP(double /*erp_*/) {}
+      public: virtual void SetAutoDisableFlag(bool _autoDisable) {}
+
       /// \brief access functions to set ODE parameters
-      public: virtual void SetAutoDisableFlag(bool /*autoDisable_*/) {}
+      public: virtual void SetSORPGSPreconIters(unsigned int _iters) {}
+
       /// \brief access functions to set ODE parameters
-      public: virtual void SetSORPGSPreconIters(unsigned int /*iters_*/) {}
+      public: virtual void SetSORPGSIters(unsigned int _iters) {}
+
       /// \brief access functions to set ODE parameters
-      public: virtual void SetSORPGSIters(unsigned int /*iters_*/) {}
-      /// \brief access functions to set ODE parameters
-      public: virtual void SetSORPGSW(double /*w_*/) {}
+      public: virtual void SetSORPGSW(double _w) {}
+
       /// \brief access functions to set ODE parameters
       public: virtual void SetContactMaxCorrectingVel(double /*vel_*/) {}
+
       /// \brief access functions to set ODE parameters
       public: virtual void SetContactSurfaceLayer(double /*layerDepth_*/) {}
+
       /// \brief access functions to set ODE parameters
       public: virtual void SetMaxContacts(double /*maxContacts_*/) {}
+
       /// \brief access functions to set ODE parameters
       public: virtual double GetWorldCFM() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual double GetWorldERP() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual bool GetAutoDisableFlag() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual int GetSORPGSPreconIters() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual int GetSORPGSIters() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual double GetSORPGSW() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual double GetContactMaxCorrectingVel() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual double GetContactSurfaceLayer() {return 0;}
+
       /// \brief access functions to set ODE parameters
       public: virtual int GetMaxContacts() {return 0;}
 
@@ -156,7 +183,7 @@ namespace gazebo
 
       /// \brief returns a pointer to the PhysicsEngine#physicsUpdateMutex
       public: boost::recursive_mutex* GetPhysicsUpdateMutex() const
-              { return this->physicsUpdateMutex; }
+              {return this->physicsUpdateMutex;}
 
       /// \brief virtual callback for gztopic "~/request"
       protected: virtual void OnRequest(ConstRequestPtr &/*_msg*/) {}
