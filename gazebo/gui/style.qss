@@ -419,7 +419,7 @@ QWidget#renderWidget > QWidget
   border-bottom-left-radius: 10px;
 
   background-color: #808080;
-  margin-right: 10px;
+  margin-right: 0px;
 }
 
 QWidget#toolFrame 
@@ -464,4 +464,18 @@ QFrame#pidControl
 {
   background-color: #808080;
   padding: 2px;
+}
+
+QComboBox
+{
+  border: 1px solid #101010;
+  background-color: #808080;
+  color: #d0d0d0;
+  border-radius: 4px;
+}
+
+QComboBox:on
+{ /* shift the text when the popup opens */
+  padding-top: -10px;
+  padding-left: 4px;
 }

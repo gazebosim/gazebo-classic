@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef JOINT_CONTROL_WIDGET_HH
-#define JOINT_CONTROL_WIDGET_HH
+#ifndef _JOINT_CONTROL_WIDGET_HH_
+#define _JOINT_CONTROL_WIDGET_HH_
 
 #include <string>
 #include <map>
@@ -84,6 +84,9 @@ namespace gazebo
       private: std::map<std::string, JointForceControl*> sliders;
       private: std::map<std::string, JointPIDPosControl*> pidPosSliders;
       private: std::map<std::string, JointPIDVelControl*> pidVelSliders;
+
+      /// \brief Label for the name of the current model being controlled.
+      private: QLabel *modelLabel;
 
       private: QTabWidget *tabWidget;
       private: QGridLayout *forceGridLayout;

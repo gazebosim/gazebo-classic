@@ -61,7 +61,7 @@ ToolsWidget::ToolsWidget(QWidget *_parent)
   // Listen to entity selection events
   this->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
-        boost::bind(&ToolsWidget::OnSetSelectedEntity, this, _1)));
+        boost::bind(&ToolsWidget::OnSetSelectedEntity, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
@@ -70,8 +70,8 @@ ToolsWidget::~ToolsWidget()
 }
 
 /////////////////////////////////////////////////
-void ToolsWidget::OnSetSelectedEntity(const std::string &_name)
+void ToolsWidget::OnSetSelectedEntity(const std::string &_name,
+                                      const std::string &/*_mode*/)
 {
-  std::cout << "on Entitty[" << _name << "]\n";
   this->jointControlWidget->SetModelName(_name);
 }

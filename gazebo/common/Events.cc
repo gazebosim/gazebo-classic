@@ -25,10 +25,9 @@ EventT<void ()> Events::stop;
 
 EventT<void (std::string)> Events::worldCreated;
 EventT<void (std::string)> Events::entityCreated;
-EventT<void (std::string)> Events::setSelectedEntity;
+EventT<void (std::string, std::string)> Events::setSelectedEntity;
 EventT<void (std::string)> Events::addEntity;
 EventT<void (std::string)> Events::deleteEntity;
-EventT<void (std::string)> Events::entitySelected;
 
 EventT<void ()> Events::worldUpdateStart;
 EventT<void ()> Events::worldUpdateEnd;

@@ -47,7 +47,8 @@ namespace gazebo
 
       /// \brief Callback when an entity is selected.
       /// \param[in] _name Name of the selected entity.
-      private: void OnSetSelectedEntity(const std::string &_name);
+      private: void OnSetSelectedEntity(const std::string &_name,
+                                        const std::string &_mode);
 
       /// \brief Pointer to the tab widget for all the tools.
       private: QTabWidget *tabWidget;

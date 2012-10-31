@@ -130,7 +130,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   this->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
-        boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1)));
+        boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1, _2)));
 
   QTimer::singleShot(500, this, SLOT(Update()));
 }
@@ -175,7 +175,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     }
     else
     {
-      event::Events::setSelectedEntity(name);
+      event::Events::setSelectedEntity(name, "normal");
     }
   }
   else
@@ -183,7 +183,8 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnSetSelectedEntity(const std::string &_name)
+void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
+                                          const std::string &/*_mode*/)
 {
   this->selectedEntityName = _name;
 

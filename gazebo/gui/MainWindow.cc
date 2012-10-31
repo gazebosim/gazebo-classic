@@ -30,7 +30,6 @@
 #include "gui/InsertModelWidget.hh"
 #include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
-#include "gui/LightListWidget.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/ToolsWidget.hh"
 #include "gui/GLWidget.hh"
@@ -128,7 +127,7 @@ MainWindow::MainWindow()
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
+       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
@@ -857,7 +856,8 @@ void MainWindow::OnManipMode(const std::string &_mode)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnSetSelectedEntity(const std::string &_name)
+void MainWindow::OnSetSelectedEntity(const std::string &_name,
+                                     const std::string &/*_mode*/)
 {
   if (!_name.empty())
   {

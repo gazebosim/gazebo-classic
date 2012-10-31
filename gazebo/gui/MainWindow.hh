@@ -95,7 +95,8 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
       private: void OnManipMode(const std::string &_mode);
-      private: void OnSetSelectedEntity(const std::string &_name);
+      private: void OnSetSelectedEntity(const std::string &_name,
+                                        const std::string &_mode);
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       private: QMenu *fileMenu;

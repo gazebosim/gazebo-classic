@@ -241,6 +241,9 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   if (this->jointPub)
     this->jointPub.reset();
 
+  this->modelLabel->setText(QString::fromStdString(
+        std::string("Model: ") + _modelName));
+
   this->jointPub = this->node->Advertise<msgs::JointCmd>(
       std::string("~/") + _modelName + "/joint_cmd");
 
@@ -299,8 +302,9 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   QHBoxLayout *hboxLayout = new QHBoxLayout;
-  std::string title = std::string("Model: ") + "Fill Me IN";
-  hboxLayout->addWidget(new QLabel(tr(title.c_str())));
+
+  this->modelLabel = new QLabel(tr("Model: "));
+  hboxLayout->addWidget(this->modelLabel);
 
   hboxLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
@@ -521,6 +525,7 @@ void JointControlWidget::AddScrollTab(QTabWidget *_tabPane,
 void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
                                         msgs::Model &_modelMsg)
 {
+  // Remove the old widgets;
   QLayoutItem *wItem;
   while ((wItem = _tabLayout->takeAt(0)) != NULL)
   {
@@ -536,7 +541,13 @@ void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
   for (int i = 0; i < _modelMsg.joint_size(); ++i)
   {
     std::string jointName = _modelMsg.joint(i).name();
-    _tabLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+
+    // Get the joint name minus the model name
+    int modelNameIndex = jointName.find("::") + 2;
+    std::string shortName = jointName.substr(modelNameIndex,
+                            jointName.size() - modelNameIndex);
+
+    _tabLayout->addWidget(new QLabel(tr(shortName.c_str())), i+1, 0);
     _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                    QSizePolicy::Minimum), i+1, 1);
 
@@ -552,6 +563,7 @@ void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
 void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
                                            msgs::Model &_modelMsg)
 {
+  // Remove the old widgets;
   QLayoutItem *wItem;
   while ((wItem = _tabLayout->takeAt(0)) != NULL)
   {
@@ -577,7 +589,13 @@ void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
   for (int i = 0; i < _modelMsg.joint_size(); ++i)
   {
     std::string jointName = _modelMsg.joint(i).name();
-    _tabLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+
+    // Get the joint name minus the model name
+    int modelNameIndex = jointName.find("::") + 2;
+    std::string shortName = jointName.substr(modelNameIndex,
+                            jointName.size() - modelNameIndex);
+
+    _tabLayout->addWidget(new QLabel(tr(shortName.c_str())), i+1, 0);
     _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                    QSizePolicy::Minimum), i+1, 1);
 
@@ -600,6 +618,7 @@ void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
 void JointControlWidget::LayoutVelocityTab(QGridLayout *_tabLayout,
                                            msgs::Model &_modelMsg)
 {
+  // Remove the old widgets;
   QLayoutItem *wItem;
   while ((wItem = _tabLayout->takeAt(0)) != NULL)
   {
@@ -624,7 +643,13 @@ void JointControlWidget::LayoutVelocityTab(QGridLayout *_tabLayout,
   for (int i = 0; i < _modelMsg.joint_size(); ++i)
   {
     std::string jointName = _modelMsg.joint(i).name();
-    _tabLayout->addWidget(new QLabel(tr(jointName.c_str())), i+1, 0);
+
+    // Get the joint name minus the model name
+    int modelNameIndex = jointName.find("::") + 2;
+    std::string shortName = jointName.substr(modelNameIndex,
+                            jointName.size() - modelNameIndex);
+
+    _tabLayout->addWidget(new QLabel(tr(shortName.c_str())), i+1, 0);
     _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                    QSizePolicy::Minimum), i+1, 1);
 

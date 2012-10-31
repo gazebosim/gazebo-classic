@@ -145,17 +145,7 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldUpdateEnd(ConnectionPtr _subscriber)
               { worldUpdateEnd.Disconnect(_subscriber); }
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the entity selected signal
-      /// \param[in] _subscriber the subscriber to this event
-      /// \return a connection
-      public: template<typename T>
-              static ConnectionPtr ConnectEntitySelected(T _subscriber)
-              { return entitySelected.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the entity selected signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectEntitySelected(ConnectionPtr _subscriber)
-              { entitySelected.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       /// \param[in] _subscriber the subscriber to this event
@@ -228,16 +218,13 @@ namespace gazebo
       public: static EventT<void (std::string)> entityCreated;
 
       /// \brief An entity has been selected
-      public: static EventT<void (std::string)> setSelectedEntity;
+      public: static EventT<void (std::string, std::string)> setSelectedEntity;
 
       /// \brief An entity has been added
       public: static EventT<void (std::string)> addEntity;
 
       /// \brief An entity has been deleted
       public: static EventT<void (std::string)> deleteEntity;
-
-      /// \brief Entity has been selected
-      public: static EventT<void (std::string)> entitySelected;
 
       /// \brief World update has started
       public: static EventT<void ()> worldUpdateStart;
