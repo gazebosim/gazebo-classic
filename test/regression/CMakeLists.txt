@@ -9,7 +9,7 @@ include_directories (
 )
 
 link_directories(  
-  ${OGRE_LIBRARY_PATH}
+  ${HACK_OGRE_LIBRARY_PATH}
   ${Boost_LIBRARY_DIRS} 
   ${ODE_LIBRARY_DIRS}
 )
