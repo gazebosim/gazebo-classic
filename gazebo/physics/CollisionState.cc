@@ -51,3 +51,11 @@ math::Pose CollisionState::GetPose() const
 {
   return this->pose;
 }
+
+/////////////////////////////////////////////////
+CollisionState &CollisionState::operator=(const CollisionState &_state)
+{
+  State::operator=(_state);
+
+  this->pose = _state.pose;
+}

@@ -596,6 +596,8 @@ namespace gazebo
 
       /// \brief True if the plugins have been loaded.
       private: bool pluginsLoaded;
+
+      private: WorldState prevState.
     };
     /// \}
   }

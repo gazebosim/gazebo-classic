@@ -53,84 +53,120 @@ namespace gazebo
       /// \brief Constructor
       ///
       /// Build a LinkState from an existing Link.
-      /// \param _model Pointer to the Link from which to gather state
+      /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
-      public: LinkState(const LinkPtr _link);
+      public: explicit LinkState(const LinkPtr _link);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~LinkState();
 
-      /// \brief Load state from SDF element
+      /// \brief Load state from SDF element.
       ///
-      /// Load LinkState information from stored data in and SDF::Element
-      /// \param _elem Pointer to the SDF::Element containing state info.
+      /// Load LinkState information from stored data in and SDF::Element.
+      /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(sdf::ElementPtr _elem);
 
-      /// \brief Get the link pose
-      /// \return The math::Pose of the Link
+      /// \brief Get the link pose.
+      /// \return The math::Pose of the Link.
       public: math::Pose GetPose() const;
 
-      /// \brief Get the link velocity
-      /// \return The velocity represented as a math::Pose
+      /// \brief Get the link velocity.
+      /// \return The velocity represented as a math::Pose.
       public: math::Pose GetVelocity() const;
 
-      /// \brief Get the link acceleration
-      /// \return The acceleration represented as a math::Pose
+      /// \brief Get the link acceleration.
+      /// \return The acceleration represented as a math::Pose.
       public: math::Pose GetAcceleration() const;
 
-      /// \brief Get the forces applied to the Link
-      /// \return The list of forces represented as a math::Pose
+      /// \brief Get the forces applied to the Link.
+      /// \return The list of forces represented as a math::Pose.
       public: std::list<math::Pose> GetForces() const;
 
-      /// \brief Get the number of link states
+      /// \brief Get the number of link states.
       ///
       /// This returns the number of Collisions recorded.
-      /// \return Number of CollisionState recorded
+      /// \return Number of CollisionState recorded.
       public: unsigned int GetCollisionStateCount() const;
 
-      /// \brief Get a collision state
+      /// \brief Get a collision state.
       ///
       /// Get a Collision State based on an index, where index is in the
-      /// range of  0...LinkState::GetCollisionStateCount
-      /// \param _index Index of the CollisionState
-      /// \return State of the Collision
+      /// range of  0...LinkState::GetCollisionStateCount.
+      /// \param[in] _index Index of the CollisionState.
+      /// \return State of the Collision.
       public: CollisionState GetCollisionState(unsigned int _index) const;
 
-      /// \brief Get a link state by link name
+      /// \brief Get a link state by link name.
       ///
       /// Searches through all CollisionStates.
       /// Returns the CollisionState with the matching name, if any.
-      /// \param _collisionName Name of the CollisionState
+      /// \param[in] _collisionName Name of the CollisionState
       /// \return State of the Collision.
       public: CollisionState GetCollisionState(
                   const std::string &_collisionName) const;
 
-      /// \brief Fill a State SDF element with state info
+      /// \brief Fill a State SDF element with state info.
       ///
       /// Stored state information into an SDF::Element pointer.
-      /// \param _elem Pointer to the SDF::Element which recieves the data.
+      /// \param[in] _elem Pointer to the SDF::Element which recieves the data.
       public: void FillStateSDF(sdf::ElementPtr _elem);
 
-      /// \brief Update a Link SDF element with this state info
+      /// \brief Update a Link SDF element with this state info.
       ///
       /// Set the values in a Links's SDF::Element with the information
       /// stored in this instance.
-      /// \param _elem Pointer to a Links's SDF::Element
+      /// \param[in] _elem Pointer to a Links's SDF::Element
       public: void UpdateLinkSDF(sdf::ElementPtr _elem);
 
-      /// 3D pose of the link relative to the model.
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: LinkState &operator=(const LinkState &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: LinkState &operator-(const LinkState &_state) const;
+
+      /// \brief Stream insertion operator
+      /// \param[in] _out output stream
+      /// \param[in] _state Link state to output
+      /// \return the stream
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                     const gazebo::physics::LinkState &_state)
+      {
+        _out << _state.name << "\0" << _state.pose << "\0";
+        _out << _state.velocity << "\0" << _state.acceleration << "\0";
+
+        for (std::vector<math::Pose>::iterator iter =
+            _state.forces.begin(); iter != _state.forces.end(); ++iter)
+        {
+          _out << *iter << "\0";
+        }
+
+        for (std::vector<CollisionState>::iterator iter =
+            _state.collisionStates.begin();
+            iter != _state.collisionStates.end(); ++iter)
+        {
+          _out << *iter;
+        }
+
+        return _out;
+      }
+
+      /// \brief 3D pose of the link relative to the model.
       private: math::Pose pose;
 
-      /// Velocity of the link (linear and angular).
+      /// \brief Velocity of the link (linear and angular).
       private: math::Pose velocity;
 
-      /// Acceleration of the link (linear and angular).
+      /// \brief Acceleration of the link (linear and angular).
       private: math::Pose acceleration;
 
-      /// Forces on the link(linear and angular).
+      /// \brief Forces on the link(linear and angular).
       private: std::vector<math::Pose> forces;
 
-      /// State of all the child Collision objects.
+      /// \brief State of all the child Collision objects.
       private: std::vector<CollisionState> collisionStates;
     };
     /// \}

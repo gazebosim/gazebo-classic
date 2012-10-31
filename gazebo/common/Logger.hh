@@ -37,6 +37,12 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    class LogData
+    {
+      public: std::ofstream stream;
+      public: unsigned long iteration;
+    };
+
     /// \class Logger Logger.hh physics/Logger.hh
     /// \brief Handles logging of data to disk
     ///
@@ -76,7 +82,7 @@ namespace gazebo
       /// \return True if the Entity was added to a log. False if the entity
       /// is already being logged.
       public: bool Add(const std::string &_name,
-                    boost::function<bool (std::ostringstream &)> _logCallback);
+                    boost::function<bool (LogData &)> _logCallback);
 
       /// \brief Add an object to a log file.
       ///
@@ -93,7 +99,7 @@ namespace gazebo
       /// is already being logged.
       public: bool Add(const std::string &_name,
                     const std::string &_filename,
-                    boost::function<bool (std::ostringstream &)> _logCallback);
+                    boost::function<bool (LogData &)> _logCallback);
 
       /// \brief Remove an entity from a log
       ///
@@ -125,14 +131,14 @@ namespace gazebo
                {
                  public: LogObj(const std::string &_name,
                             const std::string &_filename,
-                            boost::function<bool (std::ostringstream&)> _logCB);
+                            boost::function<bool (LogData &)> _logCB);
                  public: virtual ~LogObj();
                  public: void Update();
                  public: void Write();
                  public: const std::string &GetName() const;
 
                  public: bool valid;
-                 private: boost::function<bool (std::ostringstream &)> logCB;
+                 private: boost::function<bool (LogData &)> logCB;
                  private: std::string name;
                  private: std::fstream logFile;
                  private: std::string buffer;

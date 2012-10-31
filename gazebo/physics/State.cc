@@ -62,3 +62,26 @@ common::Time State::GetSimTime() const
 {
   return this->simTime;
 }
+
+/////////////////////////////////////////////////
+State &State::operator=(const State &_state)
+{
+  this->name = _state.name;
+  this->wallTime = _state.wallTime;
+  this->realTime = _state.realTime;
+  this->simTime = _state.simTime;
+}
+
+/////////////////////////////////////////////////
+State &State::operator-(const State &_state) const
+{
+  // Make sure the names match
+  if (_state.name != this->name)
+  {
+    gzthrow("Invalid state substraction operator this[" + this->name +
+            "] != [" + _state.name + "]\n");
+  }
+
+  return State(this->name, this->realTime - _state.realTime,
+               this->simTime - _state.simTime);
+}

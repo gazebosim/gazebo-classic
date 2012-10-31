@@ -105,6 +105,9 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
+
+  common::Logger::Instance()->Add(this->GetName(),
+      boost::bind(&World::OnLog, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -1452,4 +1455,22 @@ void World::DisableAllModels()
 {
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
     this->GetModel(i)->SetEnabled(false);
+}
+
+//////////////////////////////////////////////////
+bool World::OnLog(LogData &_data)
+{
+  if (_data.iteration == 0)
+  {
+    std::cout << "Save the initial state\n";
+  }
+  else
+  {
+    WorldState currentState = this->GetState();
+    WorldState stateDiff = currentState - this->prevState;
+    this->prevState = currentState;
+
+    _data.stream << stateDiff;
+  }
+  return true;
 }

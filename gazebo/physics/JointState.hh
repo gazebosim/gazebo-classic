@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef JOINT_STATE_HH
-#define JOINT_STATE_HH
+#ifndef _JOINT_STATE_HH_
+#define _JOINT_STATE_HH_
 
 #include <vector>
 #include <string>
@@ -54,6 +54,30 @@ namespace gazebo
 
       /// \brief Get the joint angle
       public: math::Angle GetAngle(unsigned int _axis) const;
+
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: JointState &operator=(const JointState &_state);
+
+      /// \brief Stream insertion operator.
+      /// \param[in] _out output stream.
+      /// \param[in] _state Joint state to output.
+      /// \return The stream.
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                     const gazebo::physics::JointState &_state)
+      {
+        _out << _state->GetName() << "\0";
+
+        for (std::vector<math::Angle>::iterator iter =
+            _state.angles.begin(); iter != _state.angles.end();
+            ++iter)
+        {
+          _out << *iter << "\0";
+        }
+
+        return _out;
+      }
 
       private: std::vector<math::Angle> angles;
     };

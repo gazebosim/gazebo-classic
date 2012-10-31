@@ -223,7 +223,7 @@ namespace gazebo
       private: void UpdateAnimation();
 
       /// \brief Log callback;
-      private: bool OnLog(std::ostringstream &_stream);
+      private: bool OnLog(LogData &_data);
 
       /// A helper that prevents numerous dynamic_casts
       protected: EntityPtr parentEntity;

@@ -85,6 +85,32 @@ namespace gazebo
       /// \brief Get a model state by model name
       public: ModelState GetModelState(const std::string &_modelName) const;
 
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: WorldState &operator=(const WorldState &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: WorldState &operator-(const WorldState &_state) const;
+
+      /// \brief Stream insertion operator
+      /// \param[in] _out output stream
+      /// \param[in] _state World state to output
+      /// \return the stream
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                     const gazebo::physics::WorldState &_state)
+      {
+        for (std::vector<ModelState>::iterator iter =
+            _state.modelStates.begin(); iter != _state.modelStates.end();
+            ++iter)
+        {
+          _out << *iter;
+        }
+        return _out;
+      }
+
       /// State of all the models.
       private: std::vector<ModelState> modelStates;
 

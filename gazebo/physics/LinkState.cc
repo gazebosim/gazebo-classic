@@ -112,3 +112,69 @@ void LinkState::UpdateLinkSDF(sdf::ElementPtr _elem)
 {
   _elem->GetElement("pose")->Set(this->pose);
 }
+
+/////////////////////////////////////////////////
+LinkState &LinkState:;operator=(const LinkState &_state)
+{
+  State::operator=(_state);
+
+  // Copy the pose
+  this->pose = _state.pose;
+
+  // Copy the velocity
+  this->velocity = _state.velocity;
+
+  // Copy the acceleration
+  this->acceleration = _state.acceleration;
+
+  // Clear the forces
+  this->forces.clear();
+
+  // Clear the collision states
+  this->collisionStates.clear();
+
+  // Copy the forces
+  for (std::vector<math::Pose>::const_iterator iter = _state.forces.begin();
+       iter != _state.forces.end(); ++iter)
+  {
+    this->forces.push_back(*iter);
+  }
+
+  // Copy the collision states
+  for (std::vector<CollisionState>::const_iterator iter =
+       _state.collisionStates.begin();
+       iter != _state.collisionStates.end(); ++iter)
+  {
+    this->collisionStates.push_back(*iter);
+  }
+
+  return *this;
+}
+
+/////////////////////////////////////////////////
+LinkState &LinkState::operator-(const LinkState &_state) const
+{
+  LinkState result;
+
+  result.pose = this->pose - _state.pose;
+  result.velocity = this->velocity - _state.velocity;
+  result.acceleration = this->acceleration - _state.acceleration;
+
+  // Insert the force differences
+  for (std::vector<math::Pose>::const_iterator iter = _state.forces.begin();
+       iter != _state.forces.end(); ++iter)
+  {
+    this->forces.push_back();
+  }
+
+  // Copy the collision states
+  for (std::vector<CollisionState>::const_iterator iter =
+       _state.collisionStates.begin();
+       iter != _state.collisionStates.end(); ++iter)
+  {
+    result.collisionStates.push_back(
+        this->GetCollisionState((*iter)->GetName()) - *iter);
+  }
+
+  return result;
+}

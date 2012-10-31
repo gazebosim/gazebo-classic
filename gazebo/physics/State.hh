@@ -63,6 +63,16 @@ namespace gazebo
       /// \param _elem Pointer to the SDF::Element
       public: virtual void Load(sdf::ElementPtr _elem) = 0;
 
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: State &operator=(const State &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: State &operator-(const State &_state) const;
+
       /// \brief Get the name associated with this State
       /// \return Name associated with this state information. Typically
       /// a name of an Entity.

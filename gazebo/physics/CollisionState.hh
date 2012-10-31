@@ -62,6 +62,23 @@ namespace gazebo
       /// \brief Get the Collision pose
       public: math::Pose GetPose() const;
 
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: CollisionState &operator=(const CollisionState &_state);
+
+      /// \brief Stream insertion operator
+      /// \param[in] _out output stream
+      /// \param[in] _state Collision state to output
+      /// \return the stream
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                 const gazebo::physics::CollisionState &_state)
+      {
+        _out << _state.name << "\0" << _state.pose << "\0";
+
+        return _out;
+      }
+
       /// Pose of the Collision object
       private: math::Pose pose;
     };

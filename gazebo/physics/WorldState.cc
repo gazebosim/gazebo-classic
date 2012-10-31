@@ -113,3 +113,39 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
 
   return ModelState();
 }
+
+/////////////////////////////////////////////////
+WorldState &WorldState::operator=(const WorldState &_state)
+{
+  State::operator=(_state);
+
+  // Clear the model states
+  this->modelStates.clear();
+
+  // Copy the model states.
+  for (std::vector<ModelState>::const_iterator iter =
+       _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
+  {
+    this->modelStates.push_back(ModelState(*iter));
+  }
+
+  // Copy the SDF values
+  this->sdf = _state.sdf;
+
+  return *this;
+}
+
+/////////////////////////////////////////////////
+WorldState &WorldState::operator-(const WorldState &_state) const
+{
+  WorldState result;
+  result = static_cast<State>(result) - _state;
+
+  for (std::vector<ModelState>::const_iterator iter =
+       _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
+  {
+    result.push_back(this->GetModelState((*iter)->GetName()) - *iter);
+  }
+
+  return result;
+}
