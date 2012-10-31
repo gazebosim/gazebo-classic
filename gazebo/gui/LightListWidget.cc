@@ -40,7 +40,6 @@
 #include "math/Angle.hh"
 #include "math/Helpers.hh"
 
-#include "gui/LightRightMenu.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
