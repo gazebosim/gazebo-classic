@@ -9,18 +9,42 @@
 import sys
 import re
 
+def cpplint_score_to_cppcheck_severity(score):
+    # I'm making this up
+    if score == 1:
+        return 'style'
+    elif score == 2:
+        return 'style'
+    elif score == 3:
+        return 'warning'
+    elif score == 4:
+        return 'warning'
+    elif score == 5:
+        return 'error'
+  
+
 def parse():
     # TODO: do this properly, using the xml module.
     # Write header
-    sys.stderr.write('''<?xml version="1.0" encoding="UTF-8"?>''')
-    sys.stderr.write('''<results>''')
+    sys.stderr.write('''<?xml version="1.0" encoding="UTF-8"?>\n''')
+    sys.stderr.write('''<results>\n''')
 
     # Do line-by-line conversion
-    r=re.compile('([^:]*):([0-9]*):  ([^\[]*)\[([^\]]*)\] \[([0-9]*)\].*')
-    
+    r = re.compile('([^:]*):([0-9]*):  ([^\[]*)\[([^\]]*)\] \[([0-9]*)\].*')
+
+    for l in sys.stdin.readlines():
+        m = r.match(l.strip())
+        if not m:
+            continue
+        g = m.groups()
+        if len(g) != 5:
+            continue
+        fname, lineno, msg, label, score = g  
+        severity = cpplint_score_to_cppcheck_severity(int(score))
+        sys.stderr.write('''<error file="%s" line="%s" id="%s" severity="%s" msg="%s"/>\n'''%(fname, lineno, label, severity, msg))
 
     # Write footer
-    sys.stderr.write('''</results>''')
+    sys.stderr.write('''</results>\n''')
 
 
 if __name__ == '__main__':
