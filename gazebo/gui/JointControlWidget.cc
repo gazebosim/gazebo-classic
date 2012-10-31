@@ -255,11 +255,11 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   msgs::Model modelMsg;
   modelMsg.ParseFromString(response.serialized_data());
 
-  this->LayoutForceTab(this->forceGridLayout, modelMsg);
+  this->LayoutForceTab(modelMsg);
 
-  this->LayoutPositionTab(this->positionGridLayout, modelMsg);
+  this->LayoutPositionTab(modelMsg);
 
-  this->LayoutVelocityTab(this->velocityGridLayout, modelMsg);
+  this->LayoutVelocityTab(modelMsg);
 }
 
 /////////////////////////////////////////////////
@@ -522,12 +522,11 @@ void JointControlWidget::AddScrollTab(QTabWidget *_tabPane,
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
-                                        msgs::Model &_modelMsg)
+void JointControlWidget::LayoutForceTab(msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
-  while ((wItem = _tabLayout->takeAt(0)) != NULL)
+  while ((wItem = this->forceGridLayout->takeAt(0)) != NULL)
   {
     if (wItem->widget())
       delete wItem->widget();
@@ -535,9 +534,9 @@ void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
   }
   this->sliders.clear();
 
-  _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
+  this->forceGridLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum), 0, 0, 2);
-  _tabLayout->addWidget(new QLabel("Newton-meter", this), 0, 2);
+  this->forceGridLayout->addWidget(new QLabel("Newton-meter", this), 0, 2);
   for (int i = 0; i < _modelMsg.joint_size(); ++i)
   {
     std::string jointName = _modelMsg.joint(i).name();
@@ -547,12 +546,13 @@ void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
     std::string shortName = jointName.substr(modelNameIndex,
                             jointName.size() - modelNameIndex);
 
-    _tabLayout->addWidget(new QLabel(tr(shortName.c_str())), i+1, 0);
-    _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                   QSizePolicy::Minimum), i+1, 1);
+    this->forceGridLayout->addWidget(new QLabel(tr(shortName.c_str())), i+1, 0);
+    this->forceGridLayout->addItem(new QSpacerItem(10, 20,
+          QSizePolicy::Expanding, QSizePolicy::Minimum), i+1, 1);
 
-    JointForceControl *slider = new JointForceControl(jointName, _tabLayout,
-                                                      this, i+1);
+    JointForceControl *slider = new JointForceControl(jointName,
+        this->forceGridLayout, this, i+1);
+
     this->sliders[jointName] = slider;
     connect(slider, SIGNAL(changed(double, const std::string &)),
             this, SLOT(OnForceChanged(double, const std::string &)));
@@ -560,12 +560,11 @@ void JointControlWidget::LayoutForceTab(QGridLayout *_tabLayout,
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
-                                           msgs::Model &_modelMsg)
+void JointControlWidget::LayoutPositionTab(msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
-  while ((wItem = _tabLayout->takeAt(0)) != NULL)
+  while ((wItem = this->positionGridLayout->takeAt(0)) != NULL)
   {
     if (wItem->widget())
       delete wItem->widget();
@@ -573,18 +572,19 @@ void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
   }
   this->pidPosSliders.clear();
 
-  _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum), 0, 0, 2);
+  this->positionGridLayout->addItem(new QSpacerItem(10, 20,
+        QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 0, 2);
+
   QComboBox *unitsCombo = new QComboBox;
   unitsCombo->addItem("Radians");
   unitsCombo->addItem("Degrees");
   connect(unitsCombo, SIGNAL(currentIndexChanged(int)),
       this, SLOT(OnPIDPosUnitsChanged(int)));
 
-  _tabLayout->addWidget(unitsCombo, 0, 2);
-  _tabLayout->addWidget(new QLabel("P Gain", this), 0, 3);
-  _tabLayout->addWidget(new QLabel("I Gain", this), 0, 4);
-  _tabLayout->addWidget(new QLabel("D Gain", this), 0, 5);
+  this->positionGridLayout->addWidget(unitsCombo, 0, 2);
+  this->positionGridLayout->addWidget(new QLabel("P Gain", this), 0, 3);
+  this->positionGridLayout->addWidget(new QLabel("I Gain", this), 0, 4);
+  this->positionGridLayout->addWidget(new QLabel("D Gain", this), 0, 5);
 
   for (int i = 0; i < _modelMsg.joint_size(); ++i)
   {
@@ -595,12 +595,14 @@ void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
     std::string shortName = jointName.substr(modelNameIndex,
                             jointName.size() - modelNameIndex);
 
-    _tabLayout->addWidget(new QLabel(tr(shortName.c_str())), i+1, 0);
-    _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                   QSizePolicy::Minimum), i+1, 1);
+    this->positionGridLayout->addWidget(
+        new QLabel(tr(shortName.c_str())), i+1, 0);
+    this->positionGridLayout->addItem(
+        new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                        QSizePolicy::Minimum), i+1, 1);
 
     JointPIDPosControl *slider = new JointPIDPosControl(jointName,
-        _tabLayout, this, i+1);
+        this->positionGridLayout, this, i+1);
 
     this->pidPosSliders[jointName] = slider;
     connect(slider, SIGNAL(changed(double, const std::string &)),
@@ -615,12 +617,11 @@ void JointControlWidget::LayoutPositionTab(QGridLayout *_tabLayout,
 }
 
 /////////////////////////////////////////////////
-void JointControlWidget::LayoutVelocityTab(QGridLayout *_tabLayout,
-                                           msgs::Model &_modelMsg)
+void JointControlWidget::LayoutVelocityTab(msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
-  while ((wItem = _tabLayout->takeAt(0)) != NULL)
+  while ((wItem = this->velocityGridLayout->takeAt(0)) != NULL)
   {
     if (wItem->widget())
       delete wItem->widget();
@@ -628,17 +629,18 @@ void JointControlWidget::LayoutVelocityTab(QGridLayout *_tabLayout,
   }
   this->pidVelSliders.clear();
 
-  _tabLayout->addItem(new QSpacerItem(10, 27, QSizePolicy::Expanding,
-                                      QSizePolicy::Minimum), 0, 0, 2);
+  this->velocityGridLayout->addItem(
+      new QSpacerItem(10, 27, QSizePolicy::Expanding,
+                      QSizePolicy::Minimum), 0, 0, 2);
 
   // Set fixed height for the label to make the tabs stay a consistent size.
   QLabel *label = new QLabel("m/s", this);
   label->setFixedHeight(27);
 
-  _tabLayout->addWidget(label, 0, 2);
-  _tabLayout->addWidget(new QLabel("P Gain", this), 0, 3);
-  _tabLayout->addWidget(new QLabel("I Gain", this), 0, 4);
-  _tabLayout->addWidget(new QLabel("D Gain", this), 0, 5);
+  this->velocityGridLayout->addWidget(label, 0, 2);
+  this->velocityGridLayout->addWidget(new QLabel("P Gain", this), 0, 3);
+  this->velocityGridLayout->addWidget(new QLabel("I Gain", this), 0, 4);
+  this->velocityGridLayout->addWidget(new QLabel("D Gain", this), 0, 5);
 
   for (int i = 0; i < _modelMsg.joint_size(); ++i)
   {
@@ -649,12 +651,14 @@ void JointControlWidget::LayoutVelocityTab(QGridLayout *_tabLayout,
     std::string shortName = jointName.substr(modelNameIndex,
                             jointName.size() - modelNameIndex);
 
-    _tabLayout->addWidget(new QLabel(tr(shortName.c_str())), i+1, 0);
-    _tabLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                                   QSizePolicy::Minimum), i+1, 1);
+    this->velocityGridLayout->addWidget(
+        new QLabel(tr(shortName.c_str())), i+1, 0);
+    this->velocityGridLayout->addItem(
+        new QSpacerItem(10, 20, QSizePolicy::Expanding,
+                        QSizePolicy::Minimum), i+1, 1);
 
     JointPIDVelControl *slider =
-      new JointPIDVelControl(jointName, _tabLayout, this, i+1);
+      new JointPIDVelControl(jointName, this->velocityGridLayout, this, i+1);
 
     this->pidVelSliders[jointName] = slider;
     connect(slider, SIGNAL(changed(double, const std::string &)),
