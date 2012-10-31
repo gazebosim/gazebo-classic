@@ -1,13 +1,14 @@
 <?xml version="1.0" ?>
 <gazebo version="1.2">
   <world name="default">
-    <scene>
-      <grid>false</grid>
-    </scene>
-
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
     </include>
   </world>
 </gazebo>

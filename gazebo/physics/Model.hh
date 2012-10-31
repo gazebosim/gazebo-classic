@@ -185,7 +185,7 @@ namespace gazebo
 
       /// \brief Set the laser retro reflectiveness of the model.
       /// \param[in] _retro Retro reflectance value.
-      public: void SetLaserRetro(const float &_retro);
+      public: void SetLaserRetro(const float _retro);
 
       /// \brief DEPRECATED
       public: void FillModelMsg(msgs::Model &_msg) GAZEBO_DEPRECATED;

@@ -66,16 +66,16 @@ namespace gazebo
     /// \brief Static physics registration macro
     ///
     /// Use this macro to register physics engine with the server.
-    /// \param[in] _name Physics type name, as it appears in the world file.
-    /// \param[in] _classname C++ class name for the physics engine.
-    #define GZ_REGISTER_PHYSICS_ENGINE(_name, _classname) \
-    PhysicsEnginePtr New##_classname(WorldPtr _world) \
+    /// \param[in] name Physics type name, as it appears in the world file.
+    /// \param[in] classname C++ class name for the physics engine.
+    #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
+    PhysicsEnginePtr New##classname(WorldPtr _world) \
     { \
-      return PhysicsEnginePtr(new gazebo::physics::_classname(_world)); \
+      return PhysicsEnginePtr(new gazebo::physics::classname(_world)); \
     } \
-    void Register##_classname() \
+    void Register##classname() \
     {\
-      PhysicsFactory::RegisterPhysicsEngine(_name, New##_classname);\
+      PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\
     }
     /// \}
   }

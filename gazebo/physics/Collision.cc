@@ -87,7 +87,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
-
   if (this->shape)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else

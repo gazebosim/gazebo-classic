@@ -726,7 +726,7 @@ void Model::SetCollideMode(const std::string &_m)
 }
 
 //////////////////////////////////////////////////
-void Model::SetLaserRetro(const float &_retro)
+void Model::SetLaserRetro(const float _retro)
 {
   Base_V::iterator iter;
 
