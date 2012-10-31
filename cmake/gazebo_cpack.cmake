@@ -13,7 +13,7 @@ endif()
 
 list (APPEND CPACK_SOURCE_GENERATOR "TBZ2")
 list (APPEND CPACK_SOURCE_GENERATOR "ZIP")
-list (APPEND CPACK_SOURCE_IGNORE_FILES ";Ogre.log;TODO;/.hg/;.swp$;/build/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES ";Ogre.log;TODO;/.hg/;.swp$;/build/;.hgtags")
 
 include (InstallRequiredSystemLibraries)
 
