@@ -171,11 +171,11 @@ namespace gazebo
                 std::deque<QuadNode*>::iterator iter;
 
                 printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",
-                    space.c_str(), x, y, width, height, occupied, leaf, valid);
-                space += "  ";
+                    _space.c_str(), x, y, width, height, occupied, leaf, valid);
+                _space += "  ";
                 for (iter = children.begin(); iter != children.end(); ++iter)
                   if ((*iter)->occupied)
-                    (*iter)->Print(space);
+                    (*iter)->Print(_space);
               }
 
       /// \brief X and Y location of the node.

@@ -180,3 +180,8 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
 {
 }
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
+{
+}

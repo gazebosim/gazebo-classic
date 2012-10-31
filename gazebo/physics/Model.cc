@@ -246,10 +246,10 @@ void Model::Update()
 }
 
 //////////////////////////////////////////////////
-void Model::SetJointPosition(std::string _joint_name, double _position)
+void Model::SetJointPosition(const std::string &_jointName, double _position)
 {
   if (this->jointController)
-    this->jointController->SetJointPosition(_joint_name, _position);
+    this->jointController->SetJointPosition(_jointName, _position);
 }
 
 //////////////////////////////////////////////////

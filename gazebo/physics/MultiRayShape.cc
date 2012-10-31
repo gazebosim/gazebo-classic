@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "common/Exception.hh"
 #include "msgs/msgs.hh"
 #include "physics/MultiRayShape.hh"
 
@@ -263,6 +264,6 @@ void MultiRayShape::FillMsg(msgs::Geometry &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void MultRayShape::ProcessMsg(const msgs::Geometry &_msg)
+void MultiRayShape::ProcessMsg(const msgs::Geometry &_msg)
 {
 }

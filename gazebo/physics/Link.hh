@@ -264,7 +264,7 @@ namespace gazebo
       /// \TODO Implement this function.
       /// \brief Set whether this body is in the kinematic state.
       /// \param[in] _kinematic True to make the link kinematic only.
-      public: virtual void SetKinematic(const bool &_kinematic)
+      public: virtual void SetKinematic(const bool &_kinematic);
 
       /// \TODO Implement this function.
       /// \brief Get whether this body is in the kinematic state.
@@ -297,12 +297,12 @@ namespace gazebo
       /// \return Pointer to the connection, which must be kept in scope.
       public: template<typename T>
               event::ConnectionPtr ConnectEnabled(T _subscriber)
-              {return enabledSignal.Connect(subscriber);}
+              {return enabledSignal.Connect(_subscriber);}
 
       /// \brief Disconnect to the add entity signal.
       /// \param[in] _conn Connection pointer to disconnect.
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
-              {enabledSignal.Disconnect(c);}
+              {enabledSignal.Disconnect(_conn);}
 
       /// \brief DEPRECATED
       public: void FillLinkMsg(msgs::Link &_msg) GAZEBO_DEPRECATED;

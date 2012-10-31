@@ -41,11 +41,11 @@ namespace gazebo
       /// \return *this
       public: JointFeedback &operator =(const JointFeedback &_feedback)
               {
-                this->body1Force = f.body1Force;
-                this->body2Force = f.body2Force;
+                this->body1Force = _feedback.body1Force;
+                this->body2Force = _feedback.body2Force;
 
-                this->body1Torque = f.body1Torque;
-                this->body2Torque = f.body2Torque;
+                this->body1Torque = _feedback.body1Torque;
+                this->body2Torque = _feedback.body2Torque;
                 return *this;
               }
 

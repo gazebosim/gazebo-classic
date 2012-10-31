@@ -855,6 +855,6 @@ double Link::GetAngularDamping() const
 }
 
 /////////////////////////////////////////////////
-void LInk::SetKinematic(const bool &/*_kinematic*/)
+void Link::SetKinematic(const bool &/*_kinematic*/)
 {
 }
