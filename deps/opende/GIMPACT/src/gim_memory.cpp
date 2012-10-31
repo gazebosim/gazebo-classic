@@ -48,8 +48,8 @@ static gim_free_function *g_freefn = 0;
     if(bm_data == 0) return G_BUFFER_OP_INVALID;\
 
 #define VALIDATE_BUFFER_ID_PT(buffer_id)\
-	GBUFFER_MANAGER_DATA * bm_data = buffer_id->m_bm_data;\
-	if(bm_data == 0) return G_BUFFER_OP_INVALID;\
+  GBUFFER_MANAGER_DATA * bm_data = buffer_id->m_bm_data;\
+  if(bm_data == 0) return G_BUFFER_OP_INVALID;\
     if(buffer_id->m_buffer_id>=bm_data->m_buffer_array.m_size) return G_BUFFER_OP_INVALID;\
     GBUFFER_DATA * pbuffer = GIM_DYNARRAY_POINTER(GBUFFER_DATA,bm_data->m_buffer_array);\
     pbuffer += buffer_id->m_buffer_id;\
@@ -125,12 +125,12 @@ void * gim_alloc(size_t size)
 /*
   if (g_allocfn)
   {
-	  ptr = g_allocfn(size);
+    ptr = g_allocfn(size);
   }
-  else 
+  else
 */
   {
-	  ptr = malloc(size);//_mm_malloc(size,0);*/
+    ptr = malloc(size);//_mm_malloc(size,0);*/
   }
   assert(ptr);
   return ptr;
@@ -148,14 +148,14 @@ void * gim_realloc(void *ptr, size_t oldsize, size_t newsize)
   /*if (g_reallocfn) return g_reallocfn(ptr,oldsize,newsize);
   else return realloc(ptr,newsize);*/
   //return realloc(ptr,newsize);
-	void * newptr = gim_alloc(newsize);
-	size_t copysize = newsize> oldsize? oldsize: newsize;
-	memcpy(newptr,ptr,copysize);
-	gim_free(ptr,oldsize);
-	return newptr;
+  void * newptr = gim_alloc(newsize);
+  size_t copysize = newsize> oldsize? oldsize: newsize;
+  memcpy(newptr,ptr,copysize);
+  gim_free(ptr,oldsize);
+  return newptr;
 }
 
-void gim_free(void *ptr, size_t size)
+void gim_free(void *ptr, size_t /*size*/)
 {
   if (!ptr) return;
 /* -- if custom allocation function is not used, custom free must not be used too
@@ -174,21 +174,21 @@ void gim_free(void *ptr, size_t size)
 
 //!** Basic buffer prototype functions
 
-static GPTR _system_buffer_alloc_function(GUINT32 size,int usage)
+static GPTR _system_buffer_alloc_function(GUINT32 size,int /*usage*/)
 {
     void * newdata = gim_alloc(size);
     memset(newdata,0,size);
     return (GPTR)newdata;
 }
 
-static GPTR _system_buffer_alloc_data_function(const void * pdata,GUINT32 size,int usage)
+static GPTR _system_buffer_alloc_data_function(const void * pdata,GUINT32 size,int /*usage*/)
 {
     void * newdata = gim_alloc(size);
     memcpy(newdata,pdata,size);
     return (GPTR)(newdata);
 }
 
-static GPTR _system_buffer_realloc_function(GPTR buffer_handle,GUINT32 oldsize,int old_usage,GUINT32 newsize,int new_usage)
+static GPTR _system_buffer_realloc_function(GPTR buffer_handle,GUINT32 oldsize,int /*old_usage*/,GUINT32 newsize,int /*new_usage*/)
 {
     void * newdata = gim_realloc(buffer_handle,oldsize,newsize);
     return (GPTR)(newdata);
@@ -199,132 +199,132 @@ static void _system_buffer_free_function(GPTR buffer_handle,GUINT32 size)
     gim_free(buffer_handle,size);
 }
 
-static char * _system_lock_buffer_function(GPTR buffer_handle,int access)
+static char * _system_lock_buffer_function(GPTR buffer_handle,int /*access*/)
 {
     return (char * )(buffer_handle);
 }
 
 
-static void _system_unlock_buffer_function(GPTR buffer_handle)
+static void _system_unlock_buffer_function(GPTR /*buffer_handle*/)
 {
 }
 
 static void _system_download_from_buffer_function(
         GPTR source_buffer_handle,
-		GUINT32 source_pos,
-		void * destdata,
-		GUINT32 copysize)
+    GUINT32 source_pos,
+    void * destdata,
+    GUINT32 copysize)
 {
     char * pdata;
-	pdata = (char *)source_buffer_handle;
-	memcpy(destdata,pdata+source_pos,copysize);
+  pdata = (char *)source_buffer_handle;
+  memcpy(destdata,pdata+source_pos,copysize);
 }
 
 static void  _system_upload_to_buffer_function(
         GPTR dest_buffer_handle,
-		GUINT32 dest_pos,
-		void * sourcedata,
-		GUINT32 copysize)
+    GUINT32 dest_pos,
+    void * sourcedata,
+    GUINT32 copysize)
 {
     char * pdata;
-	pdata = (char * )dest_buffer_handle;
-	memcpy(pdata+dest_pos,sourcedata,copysize);
+  pdata = (char * )dest_buffer_handle;
+  memcpy(pdata+dest_pos,sourcedata,copysize);
 }
 
 static void  _system_copy_buffers_function(
-		GPTR source_buffer_handle,
-		GUINT32 source_pos,
-		GPTR dest_buffer_handle,
-		GUINT32 dest_pos,
-		GUINT32 copysize)
+    GPTR source_buffer_handle,
+    GUINT32 source_pos,
+    GPTR dest_buffer_handle,
+    GUINT32 dest_pos,
+    GUINT32 copysize)
 {
     char * pdata1,*pdata2;
-	pdata1 = (char *)source_buffer_handle;
-	pdata2 = (char *)dest_buffer_handle;
-	memcpy(pdata2+dest_pos,pdata1+source_pos,copysize);
+  pdata1 = (char *)source_buffer_handle;
+  pdata2 = (char *)dest_buffer_handle;
+  memcpy(pdata2+dest_pos,pdata1+source_pos,copysize);
 }
 
-static GPTR _shared_buffer_alloc_function(GUINT32 size,int usage)
+static GPTR _shared_buffer_alloc_function(GUINT32 /*size*/,int /*usage*/)
 {
     return 0;
 }
 
-static GPTR _shared_buffer_alloc_data_function(const void * pdata,GUINT32 size,int usage)
+static GPTR _shared_buffer_alloc_data_function(const void * pdata,GUINT32 /*size*/,int /*usage*/)
 {
     return (GPTR)pdata;
 }
 
-static GPTR _shared_buffer_realloc_function(GPTR buffer_handle,GUINT32 oldsize,int old_usage,GUINT32 newsize,int new_usage)
-{
-    return 0;
-}
+// static GPTR _shared_buffer_realloc_function(GPTR /*buffer_handle*/,GUINT32 /*oldsize*/,int /*old_usage*/,GUINT32 /*newsize*/,int /*new_usage*/)
+//{
+//    return 0;
+//}
 
-static void _shared_buffer_free_function(GPTR buffer_handle,GUINT32 size)
+static void _shared_buffer_free_function(GPTR /*buffer_handle*/,GUINT32 /*size*/)
 {
 }
 
 static inline int _is_buffer_manager_data_active(GBUFFER_MANAGER_DATA * bm_data)
 {
-	return bm_data->m_buffer_array.m_pdata != 0;
+  return bm_data->m_buffer_array.m_pdata != 0;
 }
 
 static inline void _init_buffer_manager_data(GBUFFER_MANAGER_DATA * bm_data)
 {
-	bm_data->m_buffer_array.m_pdata = 0;
+  bm_data->m_buffer_array.m_pdata = 0;
 }
 
 static const GBUFFER_MANAGER_PROTOTYPE g_bm_prototypes[G_BUFFER_MANAGER__MAX] =
 {
-	{
-		&_system_buffer_alloc_function, // alloc_fn;
-		&_system_buffer_alloc_data_function, // alloc_data_fn;
-		&_system_buffer_realloc_function, // realloc_fn;
-		&_system_buffer_free_function, // free_fn;
-		&_system_lock_buffer_function, // lock_buffer_fn;
-		&_system_unlock_buffer_function, // unlock_buffer_fn;
-		&_system_download_from_buffer_function, // download_from_buffer_fn;
-		&_system_upload_to_buffer_function, // upload_to_buffer_fn;
-		&_system_copy_buffers_function, // copy_buffers_fn;
-	}, // G_BUFFER_MANAGER_SYSTEM
+  {
+    &_system_buffer_alloc_function, // alloc_fn;
+    &_system_buffer_alloc_data_function, // alloc_data_fn;
+    &_system_buffer_realloc_function, // realloc_fn;
+    &_system_buffer_free_function, // free_fn;
+    &_system_lock_buffer_function, // lock_buffer_fn;
+    &_system_unlock_buffer_function, // unlock_buffer_fn;
+    &_system_download_from_buffer_function, // download_from_buffer_fn;
+    &_system_upload_to_buffer_function, // upload_to_buffer_fn;
+    &_system_copy_buffers_function, // copy_buffers_fn;
+  }, // G_BUFFER_MANAGER_SYSTEM
 
-	{
-		&_shared_buffer_alloc_function, // alloc_fn;
-		&_shared_buffer_alloc_data_function, // alloc_data_fn;
-		&_system_buffer_realloc_function, // realloc_fn;
-		&_shared_buffer_free_function, // free_fn;
-		&_system_lock_buffer_function, // lock_buffer_fn;
-		&_system_unlock_buffer_function, // unlock_buffer_fn;
-		&_system_download_from_buffer_function, // download_from_buffer_fn;
-		&_system_upload_to_buffer_function, // upload_to_buffer_fn;
-		&_system_copy_buffers_function, // copy_buffers_fn;
-	}, // G_BUFFER_MANAGER_SHARED
+  {
+    &_shared_buffer_alloc_function, // alloc_fn;
+    &_shared_buffer_alloc_data_function, // alloc_data_fn;
+    &_system_buffer_realloc_function, // realloc_fn;
+    &_shared_buffer_free_function, // free_fn;
+    &_system_lock_buffer_function, // lock_buffer_fn;
+    &_system_unlock_buffer_function, // unlock_buffer_fn;
+    &_system_download_from_buffer_function, // download_from_buffer_fn;
+    &_system_upload_to_buffer_function, // upload_to_buffer_fn;
+    &_system_copy_buffers_function, // copy_buffers_fn;
+  }, // G_BUFFER_MANAGER_SHARED
 };
 
 int gim_is_buffer_manager_active(GBUFFER_MANAGER_DATA buffer_managers[],
-	GUINT32 buffer_manager_id)
+  GUINT32 buffer_manager_id)
 {
-	GBUFFER_MANAGER_DATA * bm_data;
-	bm_data = &buffer_managers[buffer_manager_id];
-	return _is_buffer_manager_data_active(bm_data);
+  GBUFFER_MANAGER_DATA * bm_data;
+  bm_data = &buffer_managers[buffer_manager_id];
+  return _is_buffer_manager_data_active(bm_data);
 }
 
 //!** Buffer manager operations
 void gim_create_buffer_manager(GBUFFER_MANAGER_DATA buffer_managers[],
-	GUINT32 buffer_manager_id)
+  GUINT32 buffer_manager_id)
 {
     GBUFFER_MANAGER_DATA * bm_data;
     bm_data = &buffer_managers[buffer_manager_id];
 
-	if (_is_buffer_manager_data_active(bm_data))
-	{
-		gim_destroy_buffer_manager(buffer_managers, buffer_manager_id);
-	}
+  if (_is_buffer_manager_data_active(bm_data))
+  {
+    gim_destroy_buffer_manager(buffer_managers, buffer_manager_id);
+  }
 
     //CREATE ARRAYS
     GIM_DYNARRAY_CREATE(GBUFFER_DATA,bm_data->m_buffer_array,G_ARRAY_BUFFERMANAGER_INIT_SIZE);
     GIM_DYNARRAY_CREATE(GUINT32,bm_data->m_free_positions,G_ARRAY_BUFFERMANAGER_INIT_SIZE);
-	bm_data->m_prototype = g_bm_prototypes + buffer_manager_id;
-	bm_data->m_buffer_manager_id = buffer_manager_id;
+  bm_data->m_prototype = g_bm_prototypes + buffer_manager_id;
+  bm_data->m_buffer_manager_id = buffer_manager_id;
 }
 
 void gim_destroy_buffer_manager(GBUFFER_MANAGER_DATA buffer_managers[], GUINT32 buffer_manager_id)
@@ -338,12 +338,12 @@ void gim_destroy_buffer_manager(GBUFFER_MANAGER_DATA buffer_managers[], GUINT32 
     GUINT32 i, buffer_count = bm_data->m_buffer_array.m_size;
     for (i=0;i<buffer_count ;i++ )
     {
-		GBUFFER_DATA * current_buffer = buffers + i;
-    	if(current_buffer->m_buffer_handle!=0) //Is active
-    	{
-    	    // free handle
-    	    bm_data->m_prototype->free_fn(current_buffer->m_buffer_handle,current_buffer->m_size);
-    	}
+    GBUFFER_DATA * current_buffer = buffers + i;
+      if(current_buffer->m_buffer_handle!=0) //Is active
+      {
+          // free handle
+          bm_data->m_prototype->free_fn(current_buffer->m_buffer_handle,current_buffer->m_size);
+      }
     }
 
     //destroy buffer array
@@ -351,19 +351,19 @@ void gim_destroy_buffer_manager(GBUFFER_MANAGER_DATA buffer_managers[], GUINT32 
     //destroy free positions
     GIM_DYNARRAY_DESTROY(bm_data->m_free_positions);
 }
-void gim_get_buffer_manager_data(GBUFFER_MANAGER_DATA buffer_managers[], 
-	GUINT32 buffer_manager_id,GBUFFER_MANAGER_DATA ** pbm_data)
+void gim_get_buffer_manager_data(GBUFFER_MANAGER_DATA buffer_managers[],
+  GUINT32 buffer_manager_id,GBUFFER_MANAGER_DATA ** pbm_data)
 {
-	GBUFFER_MANAGER_DATA * bm_data;
+  GBUFFER_MANAGER_DATA * bm_data;
     bm_data = &buffer_managers[buffer_manager_id];
 
     if (_is_buffer_manager_data_active(bm_data))
     {
-		*pbm_data = bm_data;
+    *pbm_data = bm_data;
     }
     else
     {
-		*pbm_data = 0;
+    *pbm_data = 0;
     }
 }
 
@@ -372,10 +372,10 @@ void gim_init_buffer_managers(GBUFFER_MANAGER_DATA buffer_managers[])
     GUINT32 i;
     for (i=0;i<G_BUFFER_MANAGER__MAX;i++)
     {
-		_init_buffer_manager_data(buffer_managers + i);
+    _init_buffer_manager_data(buffer_managers + i);
     }
 
-	// Add the two most important buffer managers
+  // Add the two most important buffer managers
 
     //add system buffer manager
     gim_create_buffer_manager(buffer_managers,G_BUFFER_MANAGER_SYSTEM );
@@ -419,7 +419,7 @@ GINT32 _validate_buffer_id(GBUFFER_ID * buffer_id,GBUFFER_DATA ** ppbuffer,GBUFF
 }
 
 GUINT32 gim_create_buffer(
-	GBUFFER_MANAGER_DATA buffer_managers[],
+  GBUFFER_MANAGER_DATA buffer_managers[],
     GUINT32 buffer_manager_id,
     GUINT32 buffer_size,
     int usage,
@@ -445,14 +445,14 @@ GUINT32 gim_create_buffer(
     //set shadow buffer if needed
 
     if(usage == G_MU_STATIC_READ ||
-			usage == G_MU_STATIC_READ_DYNAMIC_WRITE||
-			usage == G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
+      usage == G_MU_STATIC_READ_DYNAMIC_WRITE||
+      usage == G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
     {
         gim_create_common_buffer(buffer_managers,buffer_size,&pbuffer->m_shadow_buffer);
     }
     else
     {
-		pbuffer->m_shadow_buffer.m_bm_data = 0;
+    pbuffer->m_shadow_buffer.m_bm_data = 0;
         pbuffer->m_shadow_buffer.m_buffer_id = G_UINT_INFINITY;
     }
     return G_BUFFER_OP_SUCCESS;
@@ -460,7 +460,7 @@ GUINT32 gim_create_buffer(
 
 
 GUINT32 gim_create_buffer_from_data(
-	GBUFFER_MANAGER_DATA buffer_managers[],
+  GBUFFER_MANAGER_DATA buffer_managers[],
     GUINT32 buffer_manager_id,
     const void * pdata,
     GUINT32 buffer_size,
@@ -487,21 +487,21 @@ GUINT32 gim_create_buffer_from_data(
     //set shadow buffer if needed
 
     if(usage == G_MU_STATIC_READ ||
-			usage == G_MU_STATIC_READ_DYNAMIC_WRITE||
-			usage == G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
+      usage == G_MU_STATIC_READ_DYNAMIC_WRITE||
+      usage == G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
     {
         gim_create_common_buffer_from_data(buffer_managers,pdata,buffer_size,&pbuffer->m_shadow_buffer);
     }
     else
     {
-		pbuffer->m_shadow_buffer.m_bm_data = 0;
+    pbuffer->m_shadow_buffer.m_bm_data = 0;
         pbuffer->m_shadow_buffer.m_buffer_id = G_UINT_INFINITY;
     }
     return G_BUFFER_OP_SUCCESS;
 }
 
 GUINT32 gim_create_common_buffer(GBUFFER_MANAGER_DATA buffer_managers[],
-	GUINT32 buffer_size, GBUFFER_ID * buffer_id)
+  GUINT32 buffer_size, GBUFFER_ID * buffer_id)
 {
     return gim_create_buffer(buffer_managers,G_BUFFER_MANAGER_SYSTEM,buffer_size,G_MU_DYNAMIC_READ_WRITE,buffer_id);
 }
@@ -523,7 +523,7 @@ GINT32 gim_buffer_realloc(GBUFFER_ID * buffer_id,GUINT32 newsize)
     VALIDATE_BUFFER_ID_PT(buffer_id)
     if(pbuffer->m_lock_count>0) return G_BUFFER_OP_INVALID;
     GPTR newhandle = buffer_id->m_bm_data->m_prototype->realloc_fn(
-		pbuffer->m_buffer_handle,pbuffer->m_size,pbuffer->m_usage,newsize,pbuffer->m_usage);
+    pbuffer->m_buffer_handle,pbuffer->m_size,pbuffer->m_usage,newsize,pbuffer->m_usage);
     if(newhandle==0) return G_BUFFER_OP_INVALID;
     pbuffer->m_buffer_handle = newhandle;
     //realloc shadow buffer if any
@@ -546,15 +546,15 @@ GINT32 gim_buffer_free(GBUFFER_ID * buffer_id)
     if(pbuffer->m_refcount>0) return G_BUFFER_OP_STILLREFCOUNTED;
 
     buffer_id->m_bm_data->m_prototype->free_fn(
-		pbuffer->m_buffer_handle,pbuffer->m_size);
+    pbuffer->m_buffer_handle,pbuffer->m_size);
     //destroy shadow buffer if needed
     gim_buffer_free(&pbuffer->m_shadow_buffer);
     // Obtain a free slot index for a new buffer
     GIM_DYNARRAY_PUSH_ITEM(GUINT32,bm_data->m_free_positions,buffer_id->m_buffer_id);
-	pbuffer->m_buffer_handle = 0;
-	pbuffer->m_size = 0;
-	pbuffer->m_shadow_buffer.m_bm_data = 0;
-	pbuffer->m_shadow_buffer.m_buffer_id = G_UINT_INFINITY;
+  pbuffer->m_buffer_handle = 0;
+  pbuffer->m_size = 0;
+  pbuffer->m_shadow_buffer.m_bm_data = 0;
+  pbuffer->m_shadow_buffer.m_buffer_id = G_UINT_INFINITY;
     return G_BUFFER_OP_SUCCESS;
 }
 
@@ -573,76 +573,76 @@ GINT32 gim_lock_buffer(GBUFFER_ID * buffer_id,int access,char ** map_pointer)
 
     GUINT32 result;
     if(pbuffer->m_usage==G_MU_STATIC_WRITE)
-	{
-		*map_pointer = 0;///no access
-		return G_BUFFER_OP_INVALID;
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_READ)
-	{
-		if(pbuffer->m_access == G_MA_READ_ONLY)
-		{
-			result = gim_lock_buffer(&pbuffer->m_shadow_buffer,access,map_pointer);
-			if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
-			pbuffer->m_mapped_pointer = *map_pointer;
-			pbuffer->m_lock_count++;
-		}
-		else
-		{
-			*map_pointer = 0;
-			return G_BUFFER_OP_INVALID;
-		}
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE)
-	{
-		if(pbuffer->m_access == G_MA_READ_ONLY)
-		{
-			result = gim_lock_buffer(&pbuffer->m_shadow_buffer,access,map_pointer);
-			if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
-			pbuffer->m_mapped_pointer = *map_pointer;
-			pbuffer->m_lock_count++;
-		}
-		else if(pbuffer->m_access == G_MA_WRITE_ONLY)
-		{
-		    pbuffer->m_mapped_pointer = buffer_id->m_bm_data->m_prototype->lock_buffer_fn(
-				pbuffer->m_buffer_handle,access);
+  {
+    *map_pointer = 0;///no access
+    return G_BUFFER_OP_INVALID;
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_READ)
+  {
+    if(pbuffer->m_access == G_MA_READ_ONLY)
+    {
+      result = gim_lock_buffer(&pbuffer->m_shadow_buffer,access,map_pointer);
+      if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
+      pbuffer->m_mapped_pointer = *map_pointer;
+      pbuffer->m_lock_count++;
+    }
+    else
+    {
+      *map_pointer = 0;
+      return G_BUFFER_OP_INVALID;
+    }
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE)
+  {
+    if(pbuffer->m_access == G_MA_READ_ONLY)
+    {
+      result = gim_lock_buffer(&pbuffer->m_shadow_buffer,access,map_pointer);
+      if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
+      pbuffer->m_mapped_pointer = *map_pointer;
+      pbuffer->m_lock_count++;
+    }
+    else if(pbuffer->m_access == G_MA_WRITE_ONLY)
+    {
+        pbuffer->m_mapped_pointer = buffer_id->m_bm_data->m_prototype->lock_buffer_fn(
+        pbuffer->m_buffer_handle,access);
             *map_pointer = pbuffer->m_mapped_pointer;
-			pbuffer->m_lock_count++;
-		}
-		else if(pbuffer->m_access == G_MA_READ_WRITE)
-		{
-			*map_pointer = 0;
-			return G_BUFFER_OP_INVALID;
-		}
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
-	{
-		result = gim_lock_buffer(&pbuffer->m_shadow_buffer,access,map_pointer);
+      pbuffer->m_lock_count++;
+    }
+    else if(pbuffer->m_access == G_MA_READ_WRITE)
+    {
+      *map_pointer = 0;
+      return G_BUFFER_OP_INVALID;
+    }
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
+  {
+    result = gim_lock_buffer(&pbuffer->m_shadow_buffer,access,map_pointer);
         if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
         pbuffer->m_mapped_pointer = *map_pointer;
         pbuffer->m_lock_count++;
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_WRITE_DYNAMIC_READ)
-	{
-		if(pbuffer->m_access == G_MA_READ_ONLY)
-		{
-			pbuffer->m_mapped_pointer = buffer_id->m_bm_data->m_prototype->lock_buffer_fn(
-				pbuffer->m_buffer_handle,access);
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_WRITE_DYNAMIC_READ)
+  {
+    if(pbuffer->m_access == G_MA_READ_ONLY)
+    {
+      pbuffer->m_mapped_pointer = buffer_id->m_bm_data->m_prototype->lock_buffer_fn(
+        pbuffer->m_buffer_handle,access);
             *map_pointer = pbuffer->m_mapped_pointer;
-			pbuffer->m_lock_count++;
-		}
-		else
-		{
-			*map_pointer = 0;
-			return G_BUFFER_OP_INVALID;
-		}
-	}
-	else if(pbuffer->m_usage==G_MU_DYNAMIC_READ_WRITE)
-	{
-		pbuffer->m_mapped_pointer = buffer_id->m_bm_data->m_prototype->lock_buffer_fn(
-			pbuffer->m_buffer_handle,access);
+      pbuffer->m_lock_count++;
+    }
+    else
+    {
+      *map_pointer = 0;
+      return G_BUFFER_OP_INVALID;
+    }
+  }
+  else if(pbuffer->m_usage==G_MU_DYNAMIC_READ_WRITE)
+  {
+    pbuffer->m_mapped_pointer = buffer_id->m_bm_data->m_prototype->lock_buffer_fn(
+      pbuffer->m_buffer_handle,access);
         *map_pointer = pbuffer->m_mapped_pointer;
         pbuffer->m_lock_count++;
-	}
+  }
     return G_BUFFER_OP_SUCCESS;
 }
 
@@ -660,85 +660,85 @@ GINT32 gim_unlock_buffer(GBUFFER_ID * buffer_id)
 
     GUINT32 result;
     if(pbuffer->m_usage==G_MU_STATIC_WRITE)
-	{
-		pbuffer->m_mapped_pointer = 0;
+  {
+    pbuffer->m_mapped_pointer = 0;
         pbuffer->m_lock_count=0;
         return G_BUFFER_OP_INVALID;
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_READ)
-	{
-		if(pbuffer->m_access == G_MA_READ_ONLY)
-		{
-			result = gim_unlock_buffer(&pbuffer->m_shadow_buffer);
-			if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
-			pbuffer->m_mapped_pointer = 0;
-			pbuffer->m_lock_count=0;
-		}
-		else
-		{
-			pbuffer->m_mapped_pointer = 0;
-			pbuffer->m_lock_count=0;
-			return G_BUFFER_OP_INVALID;
-		}
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE)
-	{
-		if(pbuffer->m_access == G_MA_READ_ONLY)
-		{
-			result = gim_unlock_buffer(&pbuffer->m_shadow_buffer);
-			if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
-			pbuffer->m_mapped_pointer = 0;
-			pbuffer->m_lock_count=0;
-		}
-		else if(pbuffer->m_access == G_MA_WRITE_ONLY)
-		{
-		    buffer_id->m_bm_data->m_prototype->unlock_buffer_fn(
-				pbuffer->m_buffer_handle);
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_READ)
+  {
+    if(pbuffer->m_access == G_MA_READ_ONLY)
+    {
+      result = gim_unlock_buffer(&pbuffer->m_shadow_buffer);
+      if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
+      pbuffer->m_mapped_pointer = 0;
+      pbuffer->m_lock_count=0;
+    }
+    else
+    {
+      pbuffer->m_mapped_pointer = 0;
+      pbuffer->m_lock_count=0;
+      return G_BUFFER_OP_INVALID;
+    }
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE)
+  {
+    if(pbuffer->m_access == G_MA_READ_ONLY)
+    {
+      result = gim_unlock_buffer(&pbuffer->m_shadow_buffer);
+      if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
+      pbuffer->m_mapped_pointer = 0;
+      pbuffer->m_lock_count=0;
+    }
+    else if(pbuffer->m_access == G_MA_WRITE_ONLY)
+    {
+        buffer_id->m_bm_data->m_prototype->unlock_buffer_fn(
+        pbuffer->m_buffer_handle);
             pbuffer->m_mapped_pointer = 0;
-			pbuffer->m_lock_count=0;
-		}
-		else if(pbuffer->m_access == G_MA_READ_WRITE)
-		{
-			pbuffer->m_mapped_pointer = 0;
-			pbuffer->m_lock_count=0;
-			return G_BUFFER_OP_INVALID;
-		}
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
-	{
-	    result = gim_unlock_buffer(&pbuffer->m_shadow_buffer);
+      pbuffer->m_lock_count=0;
+    }
+    else if(pbuffer->m_access == G_MA_READ_WRITE)
+    {
+      pbuffer->m_mapped_pointer = 0;
+      pbuffer->m_lock_count=0;
+      return G_BUFFER_OP_INVALID;
+    }
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_READ_DYNAMIC_WRITE_COPY)
+  {
+      result = gim_unlock_buffer(&pbuffer->m_shadow_buffer);
         if(result!= G_BUFFER_OP_SUCCESS) return G_BUFFER_OP_INVALID;
         pbuffer->m_mapped_pointer = 0;
         pbuffer->m_lock_count=0;
-	    if(pbuffer->m_access == G_MA_WRITE_ONLY||pbuffer->m_access == G_MA_READ_WRITE)
-		{
-		    gim_copy_buffers(&pbuffer->m_shadow_buffer,0,buffer_id,0,pbuffer->m_size);
-		}
-	}
-	else if(pbuffer->m_usage==G_MU_STATIC_WRITE_DYNAMIC_READ)
-	{
-		if(pbuffer->m_access == G_MA_READ_ONLY)
-		{
-			buffer_id->m_bm_data->m_prototype->unlock_buffer_fn(
-				pbuffer->m_buffer_handle);
+      if(pbuffer->m_access == G_MA_WRITE_ONLY||pbuffer->m_access == G_MA_READ_WRITE)
+    {
+        gim_copy_buffers(&pbuffer->m_shadow_buffer,0,buffer_id,0,pbuffer->m_size);
+    }
+  }
+  else if(pbuffer->m_usage==G_MU_STATIC_WRITE_DYNAMIC_READ)
+  {
+    if(pbuffer->m_access == G_MA_READ_ONLY)
+    {
+      buffer_id->m_bm_data->m_prototype->unlock_buffer_fn(
+        pbuffer->m_buffer_handle);
             pbuffer->m_mapped_pointer = 0;
-			pbuffer->m_lock_count=0;
-		}
-		else
-		{
-			pbuffer->m_mapped_pointer = 0;
-			pbuffer->m_lock_count=0;
-			return G_BUFFER_OP_INVALID;
-		}
-	}
-	else if(pbuffer->m_usage==G_MU_DYNAMIC_READ_WRITE)
-	{
-		buffer_id->m_bm_data->m_prototype->unlock_buffer_fn(
-			pbuffer->m_buffer_handle);
+      pbuffer->m_lock_count=0;
+    }
+    else
+    {
+      pbuffer->m_mapped_pointer = 0;
+      pbuffer->m_lock_count=0;
+      return G_BUFFER_OP_INVALID;
+    }
+  }
+  else if(pbuffer->m_usage==G_MU_DYNAMIC_READ_WRITE)
+  {
+    buffer_id->m_bm_data->m_prototype->unlock_buffer_fn(
+      pbuffer->m_buffer_handle);
         pbuffer->m_mapped_pointer = 0;
         pbuffer->m_lock_count=0;
-	}
-	return G_BUFFER_OP_SUCCESS;
+  }
+  return G_BUFFER_OP_SUCCESS;
 }
 
 GINT32 gim_get_buffer_size(GBUFFER_ID * buffer_id,GUINT32 * buffer_size)
@@ -758,9 +758,9 @@ GINT32 gim_get_buffer_is_locked(GBUFFER_ID * buffer_id,GUINT32 * lock_count)
 
 GINT32 gim_download_from_buffer(
         GBUFFER_ID * buffer_id,
-		GUINT32 source_pos,
-		void * destdata,
-		GUINT32 copysize)
+    GUINT32 source_pos,
+    void * destdata,
+    GUINT32 copysize)
 {
     VALIDATE_BUFFER_ID_PT(buffer_id)
     buffer_id->m_bm_data->m_prototype->download_from_buffer_fn(
@@ -769,10 +769,10 @@ GINT32 gim_download_from_buffer(
 }
 
 GINT32  gim_upload_to_buffer(
-		GBUFFER_ID * buffer_id,
-		GUINT32 dest_pos,
-		void * sourcedata,
-		GUINT32 copysize)
+    GBUFFER_ID * buffer_id,
+    GUINT32 dest_pos,
+    void * sourcedata,
+    GUINT32 copysize)
 {
     VALIDATE_BUFFER_ID_PT(buffer_id)
     buffer_id->m_bm_data->m_prototype->upload_to_buffer_fn(
@@ -781,11 +781,11 @@ GINT32  gim_upload_to_buffer(
 }
 
 GINT32  gim_copy_buffers(
-		GBUFFER_ID * source_buffer_id,
-		GUINT32 source_pos,
-		GBUFFER_ID * dest_buffer_id,
-		GUINT32 dest_pos,
-		GUINT32 copysize)
+    GBUFFER_ID * source_buffer_id,
+    GUINT32 source_pos,
+    GBUFFER_ID * dest_buffer_id,
+    GUINT32 dest_pos,
+    GUINT32 copysize)
 {
     GBUFFER_MANAGER_DATA * bm_data1,* bm_data2;
     GBUFFER_DATA * pbuffer1, * pbuffer2;
@@ -800,30 +800,30 @@ GINT32  gim_copy_buffers(
     )
     {//smooth copy
         bm_data1->m_prototype->copy_buffers_fn(
-			pbuffer1->m_buffer_handle,source_pos,pbuffer2->m_buffer_handle,dest_pos,copysize);
+      pbuffer1->m_buffer_handle,source_pos,pbuffer2->m_buffer_handle,dest_pos,copysize);
     }
-    else if(bm_data1->m_buffer_manager_id == G_BUFFER_MANAGER_SYSTEM || 
-		bm_data1->m_buffer_manager_id == G_BUFFER_MANAGER_SHARED)
+    else if(bm_data1->m_buffer_manager_id == G_BUFFER_MANAGER_SYSTEM ||
+    bm_data1->m_buffer_manager_id == G_BUFFER_MANAGER_SHARED)
     {
         //hard copy
         tempdata = (void *)pbuffer1->m_buffer_handle;
         //upload data
         bm_data2->m_prototype->upload_to_buffer_fn(
-			pbuffer2->m_buffer_handle,dest_pos,tempdata,copysize);
+      pbuffer2->m_buffer_handle,dest_pos,tempdata,copysize);
     }
     else
     {
         //very hard copy
-        void * tempdata = gim_alloc(copysize);
+        void *tempdataA = gim_alloc(copysize);
         //download data
         bm_data1->m_prototype->download_from_buffer_fn(
-			pbuffer1->m_buffer_handle,source_pos,tempdata,copysize);
+      pbuffer1->m_buffer_handle,source_pos,tempdataA,copysize);
 
         //upload data
         bm_data2->m_prototype->upload_to_buffer_fn(
-			pbuffer2->m_buffer_handle,dest_pos,tempdata,copysize);
+      pbuffer2->m_buffer_handle,dest_pos,tempdataA,copysize);
         //delete temp buffer
-        gim_free(tempdata,copysize);
+        gim_free(tempdataA,copysize);
     }
     return G_BUFFER_OP_SUCCESS;
 }
@@ -858,8 +858,8 @@ void gim_buffer_array_copy_ref(GBUFFER_ARRAY * source_data,GBUFFER_ARRAY  * dest
 }
 
 void gim_buffer_array_copy_value(GBUFFER_ARRAY * source_data,
-	GBUFFER_MANAGER_DATA dest_buffer_managers[],GBUFFER_ARRAY  * dest_data, 
-	GUINT32 buffer_manager_id,int usage)
+  GBUFFER_MANAGER_DATA dest_buffer_managers[],GBUFFER_ARRAY  * dest_data,
+  GUINT32 buffer_manager_id,int usage)
 {
     //Create new buffer
     GUINT32 buffsize = source_data->m_element_count*source_data->m_byte_stride;

@@ -49,6 +49,10 @@ namespace gazebo
       public: Time(const struct timeval &_tv);
 
       /// \brief Constructor
+      /// \param[in] tv Time to initialize to
+      public: Time(const struct timespec &_tv);
+
+      /// \brief Constructor
       /// \param[in] sec Seconds
       /// \param[in] nsec Microseconds
       public: Time(int32_t _sec, int32_t _nsec);
@@ -94,6 +98,11 @@ namespace gazebo
       public: Time &operator =(const struct timeval &tv);
 
       /// \brief Assignment operator
+      /// \param[in] tv the new time
+      /// \return a reference to this instance
+      public: Time &operator =(const struct timespec &tv);
+
+      /// \brief Assignment operator
       /// \param[in] time the new time
       /// \return a reference to this instance
       public: Time &operator =(const Time &time);
@@ -103,10 +112,20 @@ namespace gazebo
       /// \return a Time instance
       public: Time operator +(const struct timeval &tv) const;
 
+      /// \brief Addition operators
+      /// \param[in] tv the time to add
+      /// \return a Time instance
+      public: Time operator +(const struct timespec &tv) const;
+
       /// \brief Addition assignment operator
       /// \param[in] tv
       /// \return a reference to this instance
       public: const Time &operator +=(const struct timeval &tv);
+
+      /// \brief Addition assignment operator
+      /// \param[in] tv
+      /// \return a reference to this instance
+      public: const Time &operator +=(const struct timespec &tv);
 
       /// \brief Addition operators
       /// \return a Time instance
@@ -126,6 +145,14 @@ namespace gazebo
 
       /// \brief Subtraction operator
       /// \return a Time instance
+      public: Time operator -(const struct timespec &tv) const;
+
+      /// \brief Subtraction assignment operator
+      /// \return a Time instance
+      public: const Time &operator -=(const struct timespec &tv);
+
+      /// \brief Subtraction operator
+      /// \return a Time instance
       public: Time operator -(const Time &time) const;
 
       /// \brief Subtraction assignment operator
@@ -140,6 +167,15 @@ namespace gazebo
       /// \param[in] tv the scaling duration
       /// \return a reference to this instance
       public: const Time &operator *=(const struct timeval &tv);
+
+      /// \brief Multiplication operator
+      /// \return Time instance
+      public: Time operator *(const struct timespec &tv) const;
+
+      /// \brief Multiplication assignment operator
+      /// \param[in] tv the scaling duration
+      /// \return a reference to this instance
+      public: const Time &operator *=(const struct timespec &tv);
 
       /// \brief Multiplication operators
       /// \param[in] time the scaling factor
@@ -162,6 +198,16 @@ namespace gazebo
       public: const Time &operator /=(const struct timeval &tv);
 
       /// \brief Division operator
+      /// \param[in] tv a timespec divisor
+      /// \return a Time instance
+      public: Time operator /(const struct timespec &tv) const;
+
+      /// \brief Division assignment operator
+      /// \param[in] tv a divisor
+      /// \return a Time instance
+      public: const Time &operator /=(const struct timespec &tv);
+
+      /// \brief Division operator
       /// \param[in] time the divisor
       /// \return a Time instance
       public: Time operator /(const Time &time) const;
@@ -179,6 +225,11 @@ namespace gazebo
       /// \brief Equal to operator
       /// \param[in] tv the time to compare to
       /// \return true if values are the same, false otherwise
+      public: bool operator ==(const struct timespec &tv) const;
+
+      /// \brief Equal to operator
+      /// \param[in] tv the time to compare to
+      /// \return true if values are the same, false otherwise
       public: bool operator ==(const Time &time) const;
 
       /// \brief Equal to operator
@@ -190,6 +241,11 @@ namespace gazebo
       /// \param[in] tv the time to compare to
       /// \return true if values are the same, false otherwise
       public: bool operator!=(const struct timeval &tv) const;
+
+      /// \brief Equal to operator
+      /// \param[in] tv the time to compare to
+      /// \return true if values are the same, false otherwise
+      public: bool operator!=(const struct timespec &tv) const;
 
       /// \brief Equal to operator
       /// \param[in] time the time to compare to
@@ -207,6 +263,11 @@ namespace gazebo
       public: bool operator<(const struct timeval &tv) const;
 
       /// \brief Less than operator
+      /// \param[in] tv the time to compare with
+      /// \return true if tv is shorter than this, false otherwise
+      public: bool operator<(const struct timespec &tv) const;
+
+      /// \brief Less than operator
       /// \param[in] time the time to compare with
       /// \return true if time is shorter than this, false otherwise
       public: bool operator<(const Time &time) const;
@@ -221,6 +282,10 @@ namespace gazebo
       /// \return true if tv is shorter than or equal to this, false otherwise
       public: bool operator<=(const struct timeval &tv) const;
 
+      /// \brief Less than or equal to operator
+      /// \param[in] tv the time to compare with
+      /// \return true if tv is shorter than or equal to this, false otherwise
+      public: bool operator<=(const struct timespec &tv) const;
 
       /// \brief Less than or equal to operator
       /// \param[in] time the time to compare with
@@ -240,6 +305,11 @@ namespace gazebo
       /// \brief Greater than operator
       /// \param[in] time the time to compare with
       /// \return true if time is greater than this, false otherwise
+      public: bool operator>(const struct timespec &tv) const;
+
+      /// \brief Greater than operator
+      /// \param[in] time the time to compare with
+      /// \return true if time is greater than this, false otherwise
       public: bool operator>(const Time &time) const;
 
       /// \brief Greater than operator
@@ -251,6 +321,11 @@ namespace gazebo
       /// \param[in] tv the time to compare with
       /// \return true if tv is greater than or equal to this, false otherwise
       public: bool operator>=(const struct timeval &tv) const;
+
+      /// \brief Greater than or equal operator
+      /// \param[in] tv the time to compare with
+      /// \return true if tv is greater than or equal to this, false otherwise
+      public: bool operator>=(const struct timespec &tv) const;
 
       /// \brief Greater than or equal operator
       /// \param[in] time the time to compare with
@@ -317,17 +392,22 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
-                 // Make any corrections
-                 if (this->nsec >= 1e9)
-                 {
-                   this->sec++;
-                   this->nsec = (int32_t)(this->nsec - 1e9);
-                 }
-                 else if (this->nsec < 0)
+
+                 // In the case sec and nsec have different signs, normalize
+                 while (this->sec > 0 && this->nsec < 0)
                  {
                    this->sec--;
-                   this->nsec = (int32_t)(this->nsec + 1e9);
+                   this->nsec += 1e9;
                  }
+                 while (this->sec < 0 && this->nsec > 0)
+                 {
+                   this->sec++;
+                   this->nsec -= 1e9;
+                 }
+
+                 // Make any corrections
+                 this->sec += this->nsec / static_cast<int32_t>(1e9);
+                 this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
     };
     /// \}

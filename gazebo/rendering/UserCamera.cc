@@ -235,6 +235,7 @@ void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyPressEvent(_key);
+  this->viewController->HandleKeyPressEvent(_key);
 }
 
 /////////////////////////////////////////////////
@@ -242,6 +243,7 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyReleaseEvent(_key);
+  this->viewController->HandleKeyReleaseEvent(_key);
 }
 
 /////////////////////////////////////////////////

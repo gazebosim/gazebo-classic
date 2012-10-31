@@ -447,13 +447,14 @@ TEST_F(CommonTest, Time)
 
   time.Set(1, 1000);
   time *= common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(2, 2000));
+  EXPECT_TRUE(time == common::Time(2, 2002));
 
   time.Set(2, 4000);
   time /= common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(1, 2000));
-  EXPECT_FALSE(time != common::Time(1, 2000));
+  EXPECT_TRUE(time == common::Time(1, 1999));
+  EXPECT_FALSE(time != common::Time(1, 1999));
 
+  time += common::Time(0, 1);
   tv.tv_sec = 1;
   tv.tv_usec = 2;
   EXPECT_TRUE(time == tv);
@@ -493,27 +494,27 @@ TEST_F(CommonTest, Time)
   tv.tv_sec = 2;
   tv.tv_usec = 1000;
   time = common::Time(1, 1000) * tv;
-  EXPECT_TRUE(time == common::Time(3, 0));
+  EXPECT_TRUE(time == common::Time(2, 1002001));
 
   time.Set(1, 1000);
   time *= tv;
-  EXPECT_TRUE(time == common::Time(3, 0));
+  EXPECT_TRUE(time == common::Time(2, 1002001));
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) * common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(2, 2000));
+  EXPECT_TRUE(time == common::Time(2, 2002));
 
 
   time = common::Time(1, 2000000) / tv;
-  EXPECT_TRUE(time == common::Time(0, 500000002));
+  EXPECT_TRUE(time == common::Time(0, 500749625));
 
   time.Set(1, 2000000);
   time /= tv;
-  EXPECT_TRUE(time == common::Time(0, 500000002));
+  EXPECT_TRUE(time == common::Time(0, 500749625));
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) / common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(0, 500000500));
+  EXPECT_TRUE(time == common::Time(0, 500000499));
 }
 
 

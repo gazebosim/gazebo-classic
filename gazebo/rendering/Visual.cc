@@ -1059,7 +1059,7 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetHighlighted(bool _highlighted)
+void Visual::SetHighlighted(bool /*_highlighted*/)
 {
   /*
   if (this->GetAttachedObjectCount() > 0)

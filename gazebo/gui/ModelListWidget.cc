@@ -20,6 +20,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "sdf/sdf.hh"
 #include "common/Image.hh"
@@ -341,8 +342,6 @@ void ModelListWidget::ProcessModelMsgs()
     }
   }
   this->modelMsgs.clear();
-
-  this->receiveMutex->unlock();
 }
 
 /////////////////////////////////////////////////
@@ -482,12 +481,12 @@ void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 {
-  if (!this->propMutex->try_lock())
+  boost::mutex::scoped_try_lock lock(*this->propMutex);
+  if (!lock)
     return;
 
   if (this->selectedProperty != _item || this->fillingPropertyTree)
   {
-    this->propMutex->unlock();
     return;
   }
 
@@ -501,8 +500,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (this->modelTreeWidget->currentItem() == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
-
-  this->propMutex->unlock();
 }
 
 /////////////////////////////////////////////////
