@@ -18,7 +18,7 @@
 #include "common/Time.hh"
 #include "physics/Entity.hh"
 #include "common/Console.hh"
-#include "common/Logger.hh"
+#include "physics/Logger.hh"
 
 using namespace gazebo;
 using namespace common;

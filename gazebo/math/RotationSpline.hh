@@ -41,7 +41,6 @@ namespace gazebo
     /// \brief Spline for rotations
     class  RotationSpline
     {
-
         /// \brief Constructor. Sets the autoCalc to true
         public: RotationSpline();
 
@@ -104,9 +103,9 @@ namespace gazebo
         ///          by calling this method with a parameter of 'false'. Just
         ///          remember to manually call the recalcTangents method when
         ///          you are done.
-        /// \param[in] _autoCalc If true, tangents are calculated for you whenever
-        ///        a point changes. If false, you must call reclacTangents to
-        ///        recalculate them when it best suits.
+        /// \param[in] _autoCalc If true, tangents are calculated for you
+        /// whenever a point changes. If false, you must call reclacTangents to
+        /// recalculate them when it best suits.
         public: void SetAutoCalculate(bool _autoCalc);
 
       /// \brief Recalculates the tangents associated with this spline.
