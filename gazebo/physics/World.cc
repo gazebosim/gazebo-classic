@@ -326,17 +326,18 @@ void World::Step()
 
     common::Time actualSleep = common::Time::GetWallTime();
     common::Time::NSleep(sleepTime);
-    actualSleep = common::Time::GetWallTime() - actualSleep;
+    common::Time tmpTime = common::Time::GetWallTime();
+    actualSleep = tmpTime - actualSleep;
 
     // throttling update rate
-    if (common::Time::GetWallTime() - this->prevStepWallTime
+    if (tmpTime - this->prevStepWallTime
            >= common::Time(this->physicsEngine->GetUpdatePeriod()))
     {
-      this->sleepOffset = common::Time::GetWallTime() - this->prevStepWallTime
+      this->sleepOffset = tmpTime - this->prevStepWallTime
         - common::Time(this->physicsEngine->GetUpdatePeriod())
         + actualSleep - sleepTime;
 
-      this->prevStepWallTime = common::Time::GetWallTime();
+      this->prevStepWallTime = tmpTime;
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
