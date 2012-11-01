@@ -30,6 +30,8 @@
 #include "common/Event.hh"
 #include "common/SingletonT.hh"
 
+#define GZ_LOG_VERSION 1.0
+
 namespace gazebo
 {
   namespace common
@@ -37,10 +39,22 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    class LogData
+    /// \brief A logger for an entitiy
+    private: class Log
     {
-      public: std::ofstream stream;
-      public: unsigned long iteration;
+      public: Log(const std::string &_filename,
+                  boost::function<bool (Log *)> _logCB);
+
+      public: virtual ~LogObj();
+
+      public: void Write(const std::string &_data);
+
+      public: const std::string &GetBuffer() const;
+
+      public: void ClearBuffer();
+
+      private: boost::function<bool (Log*)> logCB;
+      private: std::string buffer;
     };
 
     /// \class Logger Logger.hh physics/Logger.hh
@@ -126,23 +140,10 @@ namespace gazebo
       /// \brief Run the Write loop.
       private: void Run();
 
-      /// \brief A logger for an entitiy
-      private: class LogObj
-               {
-                 public: LogObj(const std::string &_name,
-                            const std::string &_filename,
-                            boost::function<bool (LogData &)> _logCB);
-                 public: virtual ~LogObj();
-                 public: void Update();
-                 public: void Write();
-                 public: const std::string &GetName() const;
+      /// \brief Write the header to file.
+      private: void WriteHeader();
 
-                 public: bool valid;
-                 private: boost::function<bool (LogData &)> logCB;
-                 private: std::string name;
-                 private: std::fstream logFile;
-                 private: std::string buffer;
-               };
+
 
       private: std::vector<LogObj*> logObjects;
       private: std::vector<LogObj*>::iterator updateIter;
@@ -160,6 +161,9 @@ namespace gazebo
       private: std::string logPathname;
       private: std::string dataLogFilename;
       private: std::string gzoutLogFilename;
+
+      private: std::string buffer;
+      private: std::fstream logFile;
 
       private: friend class SingletonT<Logger>;
     };

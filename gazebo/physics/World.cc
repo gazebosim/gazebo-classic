@@ -106,8 +106,8 @@ World::World(const std::string &_name)
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
 
-  common::Logger::Instance()->Add(this->GetName(),
-      boost::bind(&World::OnLog, this, _1));
+  this->log = new common::Log("state.log",
+                              boost::bind(&World::OnLog, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -1458,7 +1458,7 @@ void World::DisableAllModels()
 }
 
 //////////////////////////////////////////////////
-bool World::OnLog(LogData &_data)
+bool World::OnLog(Log *_state)
 {
   if (_data.iteration == 0)
   {
@@ -1470,7 +1470,7 @@ bool World::OnLog(LogData &_data)
     WorldState stateDiff = currentState - this->prevState;
     this->prevState = currentState;
 
-    _data.stream << stateDiff;
+    _log->Write(stateDiff.ToString());
   }
   return true;
 }

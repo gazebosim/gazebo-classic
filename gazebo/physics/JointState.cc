@@ -83,3 +83,19 @@ JointState &JointState::operator=(const JointState &_state)
 
   return *this;
 }
+
+/////////////////////////////////////////////////
+JointState &JointState::operator-(const JointState &_state) const
+{
+  JointState result = static_cast<State>(result) - _state;
+
+  // Copy the angles.
+  for (std::vector<math::Angle>::iterator iter = this->angles.begin(),
+       iterB = _state.angles.begin(); iterA != this->angles.end() &&
+       iterB != _state.angles.end(); ++iterA, ++iterB)
+  {
+    this->angles.push_back((*iterA) - (*iterB));
+  }
+
+  return result;
+}

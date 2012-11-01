@@ -213,7 +213,8 @@ ModelState &ModelState::operator=(const ModelState &_state)
 /////////////////////////////////////////////////
 ModelState &ModelState::operator-(const ModelState &_state) const
 {
-  ModelState result;
+  ModelState result = static_cast<State>(result) - _state;
+
   result.pose = this->pose - _state.pose;
 
   // Insert the link state diffs.

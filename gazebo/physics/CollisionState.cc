@@ -59,3 +59,12 @@ CollisionState &CollisionState::operator=(const CollisionState &_state)
 
   this->pose = _state.pose;
 }
+
+/////////////////////////////////////////////////
+CollisionState &CollisionState::operator-(const CollisionState &_state) const
+{
+  CollisionState result = static_cast<State>(result) - _state;
+
+  result.pose = this->pose - _state.pose;
+  return result;
+}

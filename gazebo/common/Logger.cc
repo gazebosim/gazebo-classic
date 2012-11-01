@@ -144,7 +144,7 @@ void Logger::Stop()
 
 //////////////////////////////////////////////////
 bool Logger::Add(const std::string &_object,
-                 boost::function<bool (std::ostringstream &)> _logCallback)
+                 boost::function<bool (LogData &)> _logCallback)
 {
   // Use the default data log filename
   return this->Add(_object, this->dataLogFilename, _logCallback);
@@ -152,7 +152,7 @@ bool Logger::Add(const std::string &_object,
 
 //////////////////////////////////////////////////
 bool Logger::Add(const std::string &_object, const std::string &_filename,
-                 boost::function<bool (std::ostringstream &)> _logCallback)
+                 boost::function<bool (LogData &)> _logCallback)
 {
   // Create a new log object
   Logger::LogObj *newLog = new Logger::LogObj(_object, _filename, _logCallback);
@@ -198,11 +198,13 @@ void Logger::Update()
   {
     boost::mutex::scoped_lock lock(this->writeMutex);
 
+    LogData data;
+    
     // Collect all the new log data. This will not write data to disk.
     for (this->updateIter = this->logObjects.begin();
         this->updateIter != this->logObjectsEnd; ++this->updateIter)
     {
-      (*this->updateIter)->Update();
+      (*this->updateIter)->Update(data);
     }
   }
 
@@ -213,6 +215,11 @@ void Logger::Update()
 //////////////////////////////////////////////////
 void Logger::Run()
 {
+  this->logFile.open(this->dataLogFilename.c_str(), std::fstream::out);
+
+  if (!this->logFile.is_open())
+    gzthrow("Unable to open file for logging:" + this->dataLogFilenaem + "]");
+
   // This loop will write data to disk.
   while (!this->stop)
   {
@@ -221,62 +228,55 @@ void Logger::Run()
       boost::mutex::scoped_lock lock(this->writeMutex);
       this->dataAvailableCondition.wait(lock);
 
-      // Write all the data
-      for (this->updateIter = this->logObjects.begin();
-          this->updateIter != this->logObjectsEnd; ++this->updateIter)
-      {
-        (*this->updateIter)->Write();
-      }
+      this->logFile.write(this->buffer.c_str(), this->buffer.size());
     }
 
     // Throttle the write loop.
     common::Time::MSleep(1000);
   }
+
+  this->logFile.close();
+}
+
+//////////////////////////////////////////////////
+void Logger::WriteHeader()
+{
+  std::ostringstream stream;
+  stream << GZ_LOG_VERSION << std::endl 
+         << GAZEBO_FULL_VERSION  << std::endl
+         << "random_number_seed_placeholder" << std::endl;
+
+  this->buffer.append(stream.str());
 }
 
 //////////////////////////////////////////////////
 Logger::LogObj::LogObj(const std::string &_name,
                        const std::string &_filename,
-                       boost::function<bool (std::ostringstream&)> _logCB)
+                       boost::function<bool (LogData &)> _logCB)
 : valid(false)
 {
-  this->logFile.open(_filename.c_str(), std::fstream::out);
   this->name = _name;
   this->logCB = _logCB;
-
-  if (!this->logFile.is_open())
-  {
-    gzerr << "Unable to open file for logging:" << _filename << "\n";
-    return;
-  }
-
-  this->logFile << "# Global_Sim_Time Global_Real_Time Accum_Sim_Time " <<
-    "Accum_Real_Time X Y Z Roll Pitch Yaw Linear_Vel_X Linear_Vel_Y " <<
-    "Linear_Vel_Z Angular_Vel_Z Angular_Vel_Y Angular_Vel_Z\n";
-
   this->valid = true;
 }
 
 //////////////////////////////////////////////////
 Logger::LogObj::~LogObj()
 {
-  this->logFile.close();
 }
 
 //////////////////////////////////////////////////
-void Logger::LogObj::Update()
+void Logger::LogObj::Update(LogData &_data)
 {
-  std::ostringstream stream;
-  if (!this->logCB(stream))
+  if (!this->logCB(_data))
     gzerr << "Unable to update log object[" << this->name << "]\n";
   else
-    this->buffer.append(stream.str());
+    this->buffer.append(_data.stream.str());
 }
 
 //////////////////////////////////////////////////
 void Logger::LogObj::Write()
 {
-  this->logFile.write(this->buffer.c_str(), this->buffer.size());
   this->buffer.clear();
 }
 

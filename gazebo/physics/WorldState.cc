@@ -138,8 +138,7 @@ WorldState &WorldState::operator=(const WorldState &_state)
 /////////////////////////////////////////////////
 WorldState &WorldState::operator-(const WorldState &_state) const
 {
-  WorldState result;
-  result = static_cast<State>(result) - _state;
+  WorldState result = static_cast<State>(result) - _state;
 
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)

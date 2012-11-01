@@ -60,6 +60,11 @@ namespace gazebo
       /// \return this
       public: JointState &operator=(const JointState &_state);
 
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: JointState &operator-(const JointState &_state) const;
+
       /// \brief Stream insertion operator.
       /// \param[in] _out output stream.
       /// \param[in] _state Joint state to output.

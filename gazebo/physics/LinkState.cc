@@ -154,20 +154,22 @@ LinkState &LinkState:;operator=(const LinkState &_state)
 /////////////////////////////////////////////////
 LinkState &LinkState::operator-(const LinkState &_state) const
 {
-  LinkState result;
+  LinkState result = static_cast<State>(result) - _state;
 
   result.pose = this->pose - _state.pose;
   result.velocity = this->velocity - _state.velocity;
   result.acceleration = this->acceleration - _state.acceleration;
 
   // Insert the force differences
-  for (std::vector<math::Pose>::const_iterator iter = _state.forces.begin();
-       iter != _state.forces.end(); ++iter)
+  for (std::vector<math::Pose>::const_iterator
+       iterA = this->forces.begin(), iterB = _state.forces.begin;
+       iterA != this->forces.end() && iterB != _state.forces.end();
+       ++iterA, ++iter B)
   {
-    this->forces.push_back();
+    this->forces.push_back((*iterA) - (*iterB));
   }
 
-  // Copy the collision states
+  // Insert the collision differences
   for (std::vector<CollisionState>::const_iterator iter =
        _state.collisionStates.begin();
        iter != _state.collisionStates.end(); ++iter)
