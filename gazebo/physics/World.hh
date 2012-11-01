@@ -596,6 +596,9 @@ namespace gazebo
 
       /// \brief True if the plugins have been loaded.
       private: bool pluginsLoaded;
+
+      /// \brief sleep timing error offset due to clock wake up latency
+      private: common::Time sleepOffset;
     };
     /// \}
   }

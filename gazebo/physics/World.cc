@@ -93,9 +93,10 @@ World::World(const std::string &_name)
   this->resetTimeOnly = false;
   this->resetModelOnly = false;
   this->enablePhysicsEngine = true;
-
   this->setWorldPoseMutex = new boost::mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
+
+  this->sleepOffset = common::Time(0);
 
   this->prevStatTime = common::Time::GetWallTime();
   this->prevProcessMsgsTime = common::Time::GetWallTime();
@@ -319,16 +320,22 @@ void World::Step()
   else
   {
     // sleep here to get the correct update rate
-    common::Time sleep_time = this->prevStepWallTime +
+    common::Time sleepTime = this->prevStepWallTime +
       common::Time(this->physicsEngine->GetUpdatePeriod()) -
-      common::Time::GetWallTime();
+      common::Time::GetWallTime() - this->sleepOffset;
 
-    common::Time::NSleep(sleep_time);
+    common::Time actualSleep = common::Time::GetWallTime();
+    common::Time::NSleep(sleepTime);
+    actualSleep = common::Time::GetWallTime() - actualSleep;
 
     // throttling update rate
     if (common::Time::GetWallTime() - this->prevStepWallTime
            >= common::Time(this->physicsEngine->GetUpdatePeriod()))
     {
+      this->sleepOffset = common::Time::GetWallTime() - this->prevStepWallTime
+        - common::Time(this->physicsEngine->GetUpdatePeriod())
+        + actualSleep - sleepTime;
+
       this->prevStepWallTime = common::Time::GetWallTime();
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
