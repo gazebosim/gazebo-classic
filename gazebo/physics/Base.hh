@@ -128,7 +128,7 @@ namespace gazebo
               };
 
       /// \brief Constructor
-      /// \param[in[ parent Parent of this object
+      /// \param[in] parent Parent of this object
       public: Base(BasePtr parent);
 
       /// \brief Destructor

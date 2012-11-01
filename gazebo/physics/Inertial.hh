@@ -39,7 +39,7 @@ namespace gazebo
       public: Inertial();
 
       /// \brief Constructor.
-      /// \param[in] _mass Mass value in kg.
+      /// \param[in] _mass Mass value in kg if using metric.
       public: Inertial(double _mass);
 
       /// \brief Copy constructor.
@@ -67,9 +67,9 @@ namespace gazebo
       public: double GetMass() const;
 
       /// \brief Set the mass matrix.
-      /// \param[in] _ixx X inertia.
-      /// \param[in] _iyy Y inertia.
-      /// \param[in] _zz Z inertia.
+      /// \param[in] _ixx X second moment of inertia about x axis.
+      /// \param[in] _iyy Y second moment of inertia about y axis.
+      /// \param[in] _izz Z second moment of inertia about z axis.
       /// \param[in] _ixy XY inertia.
       /// \param[in] _ixz XZ inertia.
       /// \param[in] _iyz YZ inertia.
@@ -91,7 +91,8 @@ namespace gazebo
       public: inline const math::Vector3 &GetCoG() const
               {return this->cog;}
 
-      /// \brief Get the inertial pose.
+      /// \brief Get the pose about which the mass and inertia matrix is
+      /// specified in the Link frame.
       /// \return The inertial pose.
       public: inline const math::Pose GetPose() const
               { return math::Pose(this->cog, math::Quaternion());}
@@ -192,16 +193,16 @@ namespace gazebo
                 return _out;
               }
 
-      /// \brief Mass  the object.
+      /// \brief Mass the object. Default is 1.0.
       private: double mass;
 
-      /// \brief Center of gravity.
+      /// \brief Center of gravity. Default is (0.0 0.0 0.0)
       private: math::Vector3 cog;
 
-      /// \brief Principal moments of inertia.
+      /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
       private: math::Vector3 principals;
 
-      /// \brief Product moments of inertia.
+      /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
       private: math::Vector3 products;
 
       /// \brief Our SDF values.

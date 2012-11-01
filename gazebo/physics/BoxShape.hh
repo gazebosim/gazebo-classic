@@ -22,7 +22,7 @@
 #ifndef _BOXSHAPE_HH_
 #define _BOXSHAPE_HH_
 
-#include "physics/Shape.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {
@@ -52,6 +52,9 @@ namespace gazebo
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.
       public: math::Vector3 GetSize() const;
+
+      /// \brief Deprecated.
+      public: void FillShapeMsg(msgs::Geometry &_msg) GAZEBO_DEPRECATED;
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
