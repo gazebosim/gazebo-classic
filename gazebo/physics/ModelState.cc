@@ -211,9 +211,9 @@ ModelState &ModelState::operator=(const ModelState &_state)
 }
 
 /////////////////////////////////////////////////
-ModelState &ModelState::operator-(const ModelState &_state) const
+ModelState ModelState::operator-(const ModelState &_state) const
 {
-  ModelState result = static_cast<State>(result) - _state;
+  ModelState result;
 
   result.pose = this->pose - _state.pose;
 
@@ -221,7 +221,7 @@ ModelState &ModelState::operator-(const ModelState &_state) const
   for (std::vector<LinkState>::const_iterator iter =
        _state.linkStates.begin(); iter != _state.linkStates.end(); ++iter)
   {
-    result.linkStates.push_back(this->GetLinkState((*iter)->GetName()) - *iter);
+    result.linkStates.push_back(this->GetLinkState((*iter).GetName()) - *iter);
   }
 
   // Insert the joint state diffs.
@@ -229,7 +229,7 @@ ModelState &ModelState::operator-(const ModelState &_state) const
        _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
   {
     result.jointStates.push_back(
-        this->GetJointState((*iter)->GetName()) - *iter);
+        this->GetJointState((*iter).GetName()) - *iter);
   }
 
   return result;

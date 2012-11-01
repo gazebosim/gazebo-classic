@@ -19,8 +19,8 @@
  * Date: 27 May 2009
  */
 
-#ifndef RAND_HH
-#define RAND_HH
+#ifndef _RAND_HH_
+#define _RAND_HH_
 
 #include <boost/random.hpp>
 
@@ -43,6 +43,16 @@ namespace gazebo
     /// \brief Random number generator class
     class Rand
     {
+      /// \brief Set the seed value.
+      /// \param[in] _seed The seed used to initialize the randon number
+      /// generator.
+      public: static void SetSeed(uint32_t _seed);
+
+      /// \brief Get the seed value.
+      /// \return The seed value used to initialize the random number
+      /// generator.
+      public: static uint32_t GetSeed();
+
       /// \brief Get a double from a uniform distribution
       /// \param[in] _min Minimum bound for the random number
       /// \param[in] _max Maximum bound for the random number
@@ -65,6 +75,8 @@ namespace gazebo
 
       // The random number generator
       private: static GeneratorType *randGenerator;
+
+      private: static uint32_t seed;
     };
     /// \}
   }

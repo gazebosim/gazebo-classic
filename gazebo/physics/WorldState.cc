@@ -37,6 +37,12 @@ WorldState::WorldState()
 WorldState::WorldState(WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
+  this->UpdateSDF(_world);
+}
+
+/////////////////////////////////////////////////
+void WorldState::UpdateSDF(WorldPtr _world)
+{
   this->sdf.reset(new sdf::Element);
   sdf::initFile("state.sdf", this->sdf);
 
@@ -136,14 +142,15 @@ WorldState &WorldState::operator=(const WorldState &_state)
 }
 
 /////////////////////////////////////////////////
-WorldState &WorldState::operator-(const WorldState &_state) const
+WorldState WorldState::operator-(const WorldState &_state) const
 {
-  WorldState result = static_cast<State>(result) - _state;
+  WorldState result;
 
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
-    result.push_back(this->GetModelState((*iter)->GetName()) - *iter);
+    result.modelStates.push_back(
+        this->GetModelState((*iter).GetName()) - *iter);
   }
 
   return result;

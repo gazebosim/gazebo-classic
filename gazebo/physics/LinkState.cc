@@ -114,7 +114,7 @@ void LinkState::UpdateLinkSDF(sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-LinkState &LinkState:;operator=(const LinkState &_state)
+LinkState &LinkState::operator=(const LinkState &_state)
 {
   State::operator=(_state);
 
@@ -152,9 +152,9 @@ LinkState &LinkState:;operator=(const LinkState &_state)
 }
 
 /////////////////////////////////////////////////
-LinkState &LinkState::operator-(const LinkState &_state) const
+LinkState LinkState::operator-(const LinkState &_state) const
 {
-  LinkState result = static_cast<State>(result) - _state;
+  LinkState result;
 
   result.pose = this->pose - _state.pose;
   result.velocity = this->velocity - _state.velocity;
@@ -162,11 +162,11 @@ LinkState &LinkState::operator-(const LinkState &_state) const
 
   // Insert the force differences
   for (std::vector<math::Pose>::const_iterator
-       iterA = this->forces.begin(), iterB = _state.forces.begin;
+       iterA = this->forces.begin(), iterB = _state.forces.begin();
        iterA != this->forces.end() && iterB != _state.forces.end();
-       ++iterA, ++iter B)
+       ++iterA, ++iterB)
   {
-    this->forces.push_back((*iterA) - (*iterB));
+    result.forces.push_back((*iterA) - (*iterB));
   }
 
   // Insert the collision differences
@@ -175,7 +175,7 @@ LinkState &LinkState::operator-(const LinkState &_state) const
        iter != _state.collisionStates.end(); ++iter)
   {
     result.collisionStates.push_back(
-        this->GetCollisionState((*iter)->GetName()) - *iter);
+        this->GetCollisionState((*iter).GetName()) - *iter);
   }
 
   return result;

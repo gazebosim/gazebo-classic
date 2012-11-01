@@ -33,6 +33,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
+#include "gazebo/common/Logger.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Diagnostics.hh"
@@ -106,8 +107,8 @@ World::World(const std::string &_name)
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
 
-  this->log = new common::Log("state.log",
-                              boost::bind(&World::OnLog, this, _1));
+  common::Logger::Instance()->Add(this->GetName(), "state.log",
+      boost::bind(&World::OnLog, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -1458,19 +1459,14 @@ void World::DisableAllModels()
 }
 
 //////////////////////////////////////////////////
-bool World::OnLog(Log *_state)
+bool World::OnLog(std::ostringstream &_stream)
 {
-  if (_data.iteration == 0)
-  {
-    std::cout << "Save the initial state\n";
-  }
-  else
-  {
-    WorldState currentState = this->GetState();
-    WorldState stateDiff = currentState - this->prevState;
-    this->prevState = currentState;
+  WorldState currentState = this->GetState();
+  WorldState stateDiff = currentState - this->prevState;
+  this->prevState = currentState;
 
-    _log->Write(stateDiff.ToString());
-  }
+  stateDiff.UpdateSDF(shared_from_this());
+  _stream << stateDiff.GetSDF()->ToString("");
+
   return true;
 }

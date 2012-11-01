@@ -63,16 +63,16 @@ namespace gazebo
       /// \brief Subtraction operator.
       /// \param[in] _pt A state to substract.
       /// \return The resulting state.
-      public: JointState &operator-(const JointState &_state) const;
+      public: JointState operator-(const JointState &_state) const;
 
       /// \brief Stream insertion operator.
       /// \param[in] _out output stream.
       /// \param[in] _state Joint state to output.
       /// \return The stream.
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::JointState &_state)
+                                     const gazebo::physics::JointState &/*_state*/)
       {
-        _out << _state->GetName() << "\0";
+        /*_out << _state->GetName() << "\0";
 
         for (std::vector<math::Angle>::iterator iter =
             _state.angles.begin(); iter != _state.angles.end();
@@ -80,6 +80,7 @@ namespace gazebo
         {
           _out << *iter << "\0";
         }
+        */
 
         return _out;
       }

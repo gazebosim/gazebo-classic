@@ -134,16 +134,16 @@ namespace gazebo
       /// \brief Subtraction operator.
       /// \param[in] _pt A state to substract.
       /// \return The resulting state.
-      public: ModelState &operator-(const ModelState &_state) const;
+      public: ModelState operator-(const ModelState &_state) const;
 
       /// \brief Stream insertion operator.
       /// \param[in] _out output stream.
       /// \param[in] _state Model state to output.
       /// \return The stream.
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::ModelState &_state)
+                                     const gazebo::physics::ModelState &/*_state*/)
       {
-        _out << _state->GetName() << "\0" << _state.pose << "\0";
+        /*_out << _state->GetName() << "\0" << _state.pose << "\0";
 
         for (std::vector<LinkState>::iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
@@ -158,6 +158,7 @@ namespace gazebo
         {
           _out << *iter;
         }
+        */
 
         return _out;
       }

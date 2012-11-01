@@ -30,7 +30,7 @@
 #include "common/Event.hh"
 #include "common/SingletonT.hh"
 
-#define GZ_LOG_VERSION 1.0
+#define GZ_LOG_VERSION "1.0"
 
 namespace gazebo
 {
@@ -38,24 +38,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_common
     /// \{
-
-    /// \brief A logger for an entitiy
-    private: class Log
-    {
-      public: Log(const std::string &_filename,
-                  boost::function<bool (Log *)> _logCB);
-
-      public: virtual ~LogObj();
-
-      public: void Write(const std::string &_data);
-
-      public: const std::string &GetBuffer() const;
-
-      public: void ClearBuffer();
-
-      private: boost::function<bool (Log*)> logCB;
-      private: std::string buffer;
-    };
 
     /// \class Logger Logger.hh physics/Logger.hh
     /// \brief Handles logging of data to disk
@@ -88,20 +70,6 @@ namespace gazebo
       ///
       /// Add a new object to a log. An object can be any valid named object
       /// in simulation, including the world itself. Duplicate additions are
-      /// ignored.
-      /// \param[in] _name Name of the object to log.
-      /// \param[in] _logCallback Function used to log data for the object.
-      /// Typically an object will have a log function that outputs data to
-      /// the provided ofstream.
-      /// \return True if the Entity was added to a log. False if the entity
-      /// is already being logged.
-      public: bool Add(const std::string &_name,
-                    boost::function<bool (LogData &)> _logCallback);
-
-      /// \brief Add an object to a log file.
-      ///
-      /// Add a new object to a log. An object can be any valid named object
-      /// in simulation, including the world itself. Duplicate additions are
       /// ignored. Objects can be added to the same file by passing
       /// specifying the same _filename.
       /// \param[in] _name Name of the object to log.
@@ -109,21 +77,19 @@ namespace gazebo
       /// \param[in] _logCallback Function used to log data for the object.
       /// Typically an object will have a log function that outputs data to
       /// the provided ofstream.
-      /// \return True if the Entity was added to a log. False if the entity
-      /// is already being logged.
-      public: bool Add(const std::string &_name,
-                    const std::string &_filename,
-                    boost::function<bool (LogData &)> _logCallback);
+      /// \throws Exception
+      public: void Add(const std::string &_name, const std::string &_filename,
+                    boost::function<bool (std::ostringstream &)> _logCallback);
 
       /// \brief Remove an entity from a log
       ///
       /// Removes an entity from the logger. The stops data recording for
       /// the entity and all its children. For example, specifying a world
       /// will stop all data logging.
-      /// \param _entity Name of the entity to stop logging
+      /// \param[in] _name Name of the log
       /// \return True if the entity existed and was removed. False if the
       /// entity was not registered with the logger.
-      public: bool Remove(const std::string &_entity);
+      public: bool Remove(const std::string &_name);
 
       /// \brief Stop the logger.
       public: void Stop();
@@ -141,13 +107,31 @@ namespace gazebo
       private: void Run();
 
       /// \brief Write the header to file.
-      private: void WriteHeader();
+      // private: void WriteHeader();
 
+      /// \brief A logger for an entitiy
+      private: class Log
+      {
+        public: Log(const std::string &_filename,
+                    boost::function<bool (std::ostringstream &)> _logCB);
 
+        public: virtual ~Log();
 
-      private: std::vector<LogObj*> logObjects;
-      private: std::vector<LogObj*>::iterator updateIter;
-      private: std::vector<LogObj*>::iterator logObjectsEnd;
+        public: void Write();
+
+        public: void Update();
+
+        public: void ClearBuffer();
+
+        public: boost::function<bool (std::ostringstream &)> logCB;
+        public: std::string buffer;
+        public: std::fstream logFile;
+      };
+
+      private: typedef std::map<std::string, Log*> Log_M;
+      private: Log_M logs;
+      private: Log_M::iterator updateIter;
+      private: Log_M::iterator logsEnd;
 
       private: event::ConnectionPtr updateConnection;
 
@@ -159,11 +143,8 @@ namespace gazebo
       private: boost::condition_variable dataAvailableCondition;
 
       private: std::string logPathname;
-      private: std::string dataLogFilename;
-      private: std::string gzoutLogFilename;
 
-      private: std::string buffer;
-      private: std::fstream logFile;
+      // private: std::string buffer;
 
       private: friend class SingletonT<Logger>;
     };

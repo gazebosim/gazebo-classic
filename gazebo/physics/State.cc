@@ -15,7 +15,8 @@
  *
  */
 
-#include "State.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/State.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -36,6 +37,11 @@ State::State(const std::string &_name, const common::Time &_realTime,
 
 /////////////////////////////////////////////////
 State::~State()
+{
+}
+
+/////////////////////////////////////////////////
+void State::Load(sdf::ElementPtr /*_elem*/)
 {
 }
 
@@ -70,10 +76,12 @@ State &State::operator=(const State &_state)
   this->wallTime = _state.wallTime;
   this->realTime = _state.realTime;
   this->simTime = _state.simTime;
+
+  return *this;
 }
 
 /////////////////////////////////////////////////
-State &State::operator-(const State &_state) const
+State State::operator-(const State &_state) const
 {
   // Make sure the names match
   if (_state.name != this->name)

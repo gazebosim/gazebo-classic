@@ -420,6 +420,9 @@ namespace gazebo
       /// \brief Update the state SDF values from the current state.
       private: void UpdateStateSDF();
 
+      /// \brief Log callback. This is where we write out state info.
+      private: bool OnLog(std::ostringstream &_stream);
+
       /// \brief Update the state SDF from a given state.
       /// \param[in] _state State to update from.
       private: void UpdateSDFFromState(const WorldState &_state);
@@ -597,7 +600,7 @@ namespace gazebo
       /// \brief True if the plugins have been loaded.
       private: bool pluginsLoaded;
 
-      private: WorldState prevState.
+      private: WorldState prevState;
     };
     /// \}
   }

@@ -23,7 +23,6 @@
 
 #include "msgs/msgs.hh"
 
-#include "common/Logger.hh"
 #include "common/Events.hh"
 #include "common/Console.hh"
 #include "common/Animation.hh"

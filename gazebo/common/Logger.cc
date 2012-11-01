@@ -18,10 +18,15 @@
 #include <boost/filesystem.hpp>
 #include <boost/date_time.hpp>
 
-#include "common/Events.hh"
-#include "common/Time.hh"
-#include "common/Console.hh"
-#include "common/Logger.hh"
+#include "gazebo/math/Rand.hh"
+
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Logger.hh"
+
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace common;
@@ -56,12 +61,6 @@ bool Logger::Init(const std::string &_subdir)
   if (!boost::filesystem::exists(path))
     boost::filesystem::create_directories(path);
 
-  // Set the data log filename
-  this->dataLogFilename = this->logPathname + "/data.log";
-
-  // Set the log filename for output from gz* macros.
-  this->gzoutLogFilename = this->logPathname + "/gzout.log";
-
   // Listen to the world update event
   if (!this->updateConnection)
   {
@@ -94,12 +93,13 @@ Logger::~Logger()
   this->Stop();
 
   // Delete all the log objects
-  for (std::vector<LogObj*>::iterator iter = this->logObjects.begin();
-       iter != this->logObjects.end(); ++iter)
+  for (Log_M::iterator iter = this->logs.begin();
+       iter != this->logs.end(); ++iter)
   {
-    delete *iter;
+    delete iter->second;
   }
-  this->logObjects.clear();
+
+  this->logs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -143,53 +143,57 @@ void Logger::Stop()
 }
 
 //////////////////////////////////////////////////
-bool Logger::Add(const std::string &_object,
-                 boost::function<bool (LogData &)> _logCallback)
+void Logger::Add(const std::string &_name, const std::string &_filename,
+                 boost::function<bool (std::ostringstream &)> _logCallback)
 {
-  // Use the default data log filename
-  return this->Add(_object, this->dataLogFilename, _logCallback);
-}
+  if (this->logs.find(_name) != this->logs.end())
+    gzthrow("Log file with name[" + _name + "] already exists.\n");
 
-//////////////////////////////////////////////////
-bool Logger::Add(const std::string &_object, const std::string &_filename,
-                 boost::function<bool (LogData &)> _logCallback)
-{
+  // Make the full path
+  boost::filesystem::path path = boost::filesystem::path(this->logPathname);
+  path = boost::filesystem::operator/(path, _filename);
+
+  // Make sure the file does not exist
+  if (boost::filesystem::exists(path))
+    gzthrow("Filename[" + path.string() + "], already exists\n");
+
+  Logger::Log *newLog;
+
   // Create a new log object
-  Logger::LogObj *newLog = new Logger::LogObj(_object, _filename, _logCallback);
-
-  // Make sure the log object is valid
-  if (newLog->valid)
-    this->logObjects.push_back(newLog);
-  else
+  try
   {
-    gzerr << "Unable to create log. File permissions are probably bad.\n";
-    delete newLog;
+    newLog = new Logger::Log(path.string(), _logCallback);
+  }
+  catch(...)
+  {
+    gzthrow("Unable to create log. File permissions are probably bad.");
   }
 
+  // Add the log to our map
+  this->logs[_name] = newLog;
+
   // Update the pointer to the end of the log objects list.
-  this->logObjectsEnd = this->logObjects.end();
-  return true;
+  this->logsEnd = this->logs.end();
 }
 
 //////////////////////////////////////////////////
-bool Logger::Remove(const std::string &_object)
+bool Logger::Remove(const std::string &_name)
 {
-  std::vector<LogObj*>::iterator iter;
+  bool result = false;
 
-  // Find the log object to remove
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
+  Log_M::iterator iter = this->logs.find(_name);
+  if (iter != this->logs.end())
   {
-    if ((*iter)->GetName() == _object)
-    {
-      delete *iter;
-      this->logObjects.erase(iter);
-      break;
-    }
+    delete iter->second;
+    this->logs.erase(iter);
+
+    // Update the pointer to the end of the log objects list.
+    this->logsEnd = this->logs.end();
+
+    result = true;
   }
 
-  // Update the pointer to the end of the log objects list.
-  this->logObjectsEnd = this->logObjects.end();
-  return true;
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -198,13 +202,11 @@ void Logger::Update()
   {
     boost::mutex::scoped_lock lock(this->writeMutex);
 
-    LogData data;
-    
     // Collect all the new log data. This will not write data to disk.
-    for (this->updateIter = this->logObjects.begin();
-        this->updateIter != this->logObjectsEnd; ++this->updateIter)
+    for (this->updateIter = this->logs.begin();
+         this->updateIter != this->logsEnd; ++this->updateIter)
     {
-      (*this->updateIter)->Update(data);
+      this->updateIter->second->Update();
     }
   }
 
@@ -215,11 +217,6 @@ void Logger::Update()
 //////////////////////////////////////////////////
 void Logger::Run()
 {
-  this->logFile.open(this->dataLogFilename.c_str(), std::fstream::out);
-
-  if (!this->logFile.is_open())
-    gzthrow("Unable to open file for logging:" + this->dataLogFilenaem + "]");
-
   // This loop will write data to disk.
   while (!this->stop)
   {
@@ -228,60 +225,62 @@ void Logger::Run()
       boost::mutex::scoped_lock lock(this->writeMutex);
       this->dataAvailableCondition.wait(lock);
 
-      this->logFile.write(this->buffer.c_str(), this->buffer.size());
+      // Collect all the new log data. This will not write data to disk.
+      for (this->updateIter = this->logs.begin();
+           this->updateIter != this->logsEnd; ++this->updateIter)
+      {
+        this->updateIter->second->Write();
+      }
     }
 
     // Throttle the write loop.
     common::Time::MSleep(1000);
   }
-
-  this->logFile.close();
 }
 
 //////////////////////////////////////////////////
-void Logger::WriteHeader()
+Logger::Log::Log(const std::string &_filename,
+                 boost::function<bool (std::ostringstream &)> _logCB)
 {
+  this->logCB = _logCB;
+  this->logFile.open(_filename.c_str(), std::fstream::out);
+
+  if (!this->logFile.is_open())
+    gzthrow("Unable to open file for logging:" + _filename + "]");
+
   std::ostringstream stream;
-  stream << GZ_LOG_VERSION << std::endl 
-         << GAZEBO_FULL_VERSION  << std::endl
-         << "random_number_seed_placeholder" << std::endl;
+  stream << GZ_LOG_VERSION << std::endl
+         << GAZEBO_VERSION_FULL  << std::endl
+         << math::Rand::GetSeed() << std::endl;
 
   this->buffer.append(stream.str());
 }
 
 //////////////////////////////////////////////////
-Logger::LogObj::LogObj(const std::string &_name,
-                       const std::string &_filename,
-                       boost::function<bool (LogData &)> _logCB)
-: valid(false)
+Logger::Log::~Log()
 {
-  this->name = _name;
-  this->logCB = _logCB;
-  this->valid = true;
+  this->logFile.close();
 }
 
 //////////////////////////////////////////////////
-Logger::LogObj::~LogObj()
+void Logger::Log::Update()
 {
+  std::ostringstream stream;
+
+  if (this->logCB(stream))
+    this->buffer.append(stream.str());
 }
 
 //////////////////////////////////////////////////
-void Logger::LogObj::Update(LogData &_data)
-{
-  if (!this->logCB(_data))
-    gzerr << "Unable to update log object[" << this->name << "]\n";
-  else
-    this->buffer.append(_data.stream.str());
-}
-
-//////////////////////////////////////////////////
-void Logger::LogObj::Write()
+void Logger::Log::ClearBuffer()
 {
   this->buffer.clear();
 }
 
 //////////////////////////////////////////////////
-const std::string &Logger::LogObj::GetName() const
+void Logger::Log::Write()
 {
-  return this->name;
+  this->logFile.write(this->buffer.c_str(), this->buffer.size());
+  this->logFile.flush();
+  this->buffer.clear();
 }

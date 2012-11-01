@@ -222,9 +222,6 @@ namespace gazebo
       /// \brief Update an animation
       private: void UpdateAnimation();
 
-      /// \brief Log callback;
-      private: bool OnLog(LogData &_data);
-
       /// A helper that prevents numerous dynamic_casts
       protected: EntityPtr parentEntity;
 

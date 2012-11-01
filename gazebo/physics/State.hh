@@ -61,7 +61,7 @@ namespace gazebo
       ///
       /// Populates the State information from data stored in an SDF::Element
       /// \param _elem Pointer to the SDF::Element
-      public: virtual void Load(sdf::ElementPtr _elem) = 0;
+      public: virtual void Load(sdf::ElementPtr _elem);
 
       /// \brief Assignment operator
       /// \param[in] _state State value
@@ -71,7 +71,7 @@ namespace gazebo
       /// \brief Subtraction operator.
       /// \param[in] _pt A state to substract.
       /// \return The resulting state.
-      public: State &operator-(const State &_state) const;
+      public: State operator-(const State &_state) const;
 
       /// \brief Get the name associated with this State
       /// \return Name associated with this state information. Typically
