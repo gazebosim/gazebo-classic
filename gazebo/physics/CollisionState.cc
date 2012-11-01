@@ -53,6 +53,12 @@ math::Pose CollisionState::GetPose() const
 }
 
 /////////////////////////////////////////////////
+bool CollisionState::IsZero() const
+{
+  return this->pose == math::Pose::Zero;
+}
+
+/////////////////////////////////////////////////
 CollisionState &CollisionState::operator=(const CollisionState &_state)
 {
   State::operator=(_state);
@@ -64,7 +70,6 @@ CollisionState &CollisionState::operator=(const CollisionState &_state)
 CollisionState CollisionState::operator-(const CollisionState &_state) const
 {
   CollisionState result;
-
   result.pose = this->pose - _state.pose;
   return result;
 }

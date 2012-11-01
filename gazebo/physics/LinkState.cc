@@ -152,6 +152,29 @@ LinkState &LinkState::operator=(const LinkState &_state)
 }
 
 /////////////////////////////////////////////////
+bool LinkState::IsZero() const
+{
+  bool result = true;
+
+  for (std::vector<math::Pose>::const_iterator iter = this->forces.begin();
+       iter != this->forces.end() && result; ++iter)
+  {
+    result = result && (*iter) == math::Pose::Zero;
+  }
+
+  for (std::vector<CollisionState>::const_iterator iter =
+       this->collisionStates.begin();
+       iter != this->collisionStates.end() && result; ++iter)
+  {
+    result = result && (*iter)->IsZero();
+  }
+
+  return result && this->pose == math::Pose::Zero &&
+         this->velocity == math::Pose::Zero &&
+         this->acceleration == zeroPose;
+}
+
+/////////////////////////////////////////////////
 LinkState LinkState::operator-(const LinkState &_state) const
 {
   LinkState result;
@@ -166,7 +189,9 @@ LinkState LinkState::operator-(const LinkState &_state) const
        iterA != this->forces.end() && iterB != _state.forces.end();
        ++iterA, ++iterB)
   {
-    result.forces.push_back((*iterA) - (*iterB));
+    math::Pose force = (*iterA) - (*iterB);
+    if (force != math::Pose::Zero)
+      result.forces.push_back(force);
   }
 
   // Insert the collision differences
@@ -174,8 +199,9 @@ LinkState LinkState::operator-(const LinkState &_state) const
        _state.collisionStates.begin();
        iter != _state.collisionStates.end(); ++iter)
   {
-    result.collisionStates.push_back(
-        this->GetCollisionState((*iter).GetName()) - *iter);
+    CollisionState state = this->GetCollisionState((*iter).GetName()) - *iter;
+    if (!state.IsZero())
+      result.collisionStates.push_back(state);
   }
 
   return result;

@@ -102,7 +102,7 @@ namespace gazebo
       /// \param[in] _state World state to output
       /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::WorldState &/*_state*/)
+                                 const gazebo::physics::WorldState &/*_state*/)
       {
         /*for (std::vector<ModelState>::iterator iter =
             _state.modelStates.begin(); iter != _state.modelStates.end();

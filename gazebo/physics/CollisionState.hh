@@ -62,6 +62,10 @@ namespace gazebo
       /// \brief Get the Collision pose
       public: math::Pose GetPose() const;
 
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this

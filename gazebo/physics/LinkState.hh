@@ -118,6 +118,10 @@ namespace gazebo
       /// \param[in] _elem Pointer to a Links's SDF::Element
       public: void UpdateLinkSDF(sdf::ElementPtr _elem);
 
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this

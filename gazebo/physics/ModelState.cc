@@ -182,6 +182,27 @@ JointState ModelState::GetJointState(const std::string &_jointName) const
 }
 
 /////////////////////////////////////////////////
+bool ModelState::IsZero() const
+{
+  bool result = true;
+
+  for (std::vector<LinkState>::const_iterator iter =
+       this->linkStates.begin();
+       iter != this->linkStates.end() && result; ++iter)
+  {
+    result = result && (*iter).IsZero();
+  }
+
+  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end() && result; ++iter)
+  {
+    result = result && (*iter).IsZero();
+  }
+
+  return result && this->pose == math::Pose::Zero;
+}
+
+/////////////////////////////////////////////////
 ModelState &ModelState::operator=(const ModelState &_state)
 {
   State::operator=(_state);
@@ -221,15 +242,18 @@ ModelState ModelState::operator-(const ModelState &_state) const
   for (std::vector<LinkState>::const_iterator iter =
        _state.linkStates.begin(); iter != _state.linkStates.end(); ++iter)
   {
-    result.linkStates.push_back(this->GetLinkState((*iter).GetName()) - *iter);
+    LinkState state = this->GetLinkState((*iter).GetName()) - *iter;
+    if (!state.IsZero())
+      result.linkStates.push_back(state);
   }
 
   // Insert the joint state diffs.
   for (std::vector<JointState>::const_iterator iter =
        _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
   {
-    result.jointStates.push_back(
-        this->GetJointState((*iter).GetName()) - *iter);
+    JointState state = this->GetJointState((*iter).GetName()) - *iter;
+    if (!state.IsZero())
+      result.jointStates.push_back(state);
   }
 
   return result;
