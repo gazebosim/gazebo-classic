@@ -11,7 +11,7 @@ include_directories(
 )
 
 link_directories(  
-  ${HACK_OGRE_LIBRARY_PATH}
+  ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS} 
 )
 
