@@ -21,6 +21,8 @@
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
+
+#include "gazebo/common/Logger.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
@@ -85,6 +87,7 @@ bool Server::ParseArgs(int argc, char **argv)
   po::options_description v_desc("Allowed options");
   v_desc.add_options()
     ("help,h", "Produce this help message.")
+    ("log,l", "Log state data to disk.")
     ("pause,u", "Start the server in a paused state.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
@@ -109,7 +112,8 @@ bool Server::ParseArgs(int argc, char **argv)
         po::command_line_parser(argc, argv).options(desc).positional(
           p_desc).allow_unregistered().run(), this->vm);
     po::notify(this->vm);
-  } catch(boost::exception &_e)
+  }
+  catch(boost::exception &_e)
   {
     std::cerr << "Error. Invalid arguments\n";
     // NOTE: boost::diagnostic_information(_e) breaks lucid
@@ -136,6 +140,9 @@ bool Server::ParseArgs(int argc, char **argv)
       gazebo::add_plugin(*iter);
     }
   }
+
+  if (this->vm.count("log"))
+    this->params["log"] = "true";
 
   if (this->vm.count("pause"))
     this->params["pause"] = "true";
@@ -336,6 +343,10 @@ void Server::ProcessParams()
       }
 
       physics::pause_worlds(p);
+    }
+    else if (iter->first == "log")
+    {
+      common::Logger::Instance()->Start();
     }
   }
 }

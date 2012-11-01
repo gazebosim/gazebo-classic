@@ -34,7 +34,7 @@ using namespace common;
 //////////////////////////////////////////////////
 Logger::Logger()
 {
-  this->stop = false;
+  this->stop = true;
 
   // Get the user's home directory
   char *homePath = getenv("HOME");
@@ -55,33 +55,6 @@ bool Logger::Init(const std::string &_subdir)
 {
   if (!_subdir.empty())
     this->logPathname += "/" + _subdir;
-
-  // Create the log directory
-  boost::filesystem::path path(this->logPathname);
-  if (!boost::filesystem::exists(path))
-    boost::filesystem::create_directories(path);
-
-  // Listen to the world update event
-  if (!this->updateConnection)
-  {
-    this->updateConnection =
-      event::Events::ConnectWorldUpdateStart(
-          boost::bind(&Logger::Update, this));
-  }
-  else
-  {
-    gzerr << "Logger has already been initialized\n";
-    return false;
-  }
-
-  // Start the logging thread
-  if (!this->writeThread)
-    this->writeThread = new boost::thread(boost::bind(&Logger::Run, this));
-  else
-  {
-    gzerr << "Logger has already been initialized\n";
-    return false;
-  }
 
   return true;
 }
@@ -111,13 +84,34 @@ void Logger::Start()
   if (!this->stop)
     return;
 
-  // Start the log write thread
-  this->stop = false;
-  this->writeThread = new boost::thread(boost::bind(&Logger::Run, this));
+  // Create the log directory if necessary
+  boost::filesystem::path path(this->logPathname);
+  if (!boost::filesystem::exists(path))
+    boost::filesystem::create_directories(path);
 
-  // Listen to the world update signal
-  this->updateConnection =
-    event::Events::ConnectWorldUpdateStart(boost::bind(&Logger::Update, this));
+  this->stop = false;
+
+  // Listen to the world update event
+  if (!this->updateConnection)
+  {
+    this->updateConnection =
+      event::Events::ConnectWorldUpdateStart(
+          boost::bind(&Logger::Update, this));
+  }
+  else
+  {
+    gzerr << "Logger has already been initialized\n";
+    return;
+  }
+
+  // Start the logging thread
+  if (!this->writeThread)
+    this->writeThread = new boost::thread(boost::bind(&Logger::Run, this));
+  else
+  {
+    gzerr << "Logger has already been initialized\n";
+    return;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -146,6 +140,8 @@ void Logger::Stop()
 void Logger::Add(const std::string &_name, const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCallback)
 {
+  boost::mutex::scoped_lock lock(this->controlMutex);
+
   if (this->logs.find(_name) != this->logs.end())
     gzthrow("Log file with name[" + _name + "] already exists.\n");
 
@@ -243,11 +239,8 @@ Logger::Log::Log(const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCB)
 {
   this->logCB = _logCB;
-  this->logFile.open(_filename.c_str(), std::fstream::out);
 
-  if (!this->logFile.is_open())
-    gzthrow("Unable to open file for logging:" + _filename + "]");
-
+  this->filename = _filename;
   std::ostringstream stream;
   stream << GZ_LOG_VERSION << std::endl
          << GAZEBO_VERSION_FULL  << std::endl
@@ -280,7 +273,21 @@ void Logger::Log::ClearBuffer()
 //////////////////////////////////////////////////
 void Logger::Log::Write()
 {
+  // Make sure the file is open for writing
+  if (!this->logFile.is_open())
+  {
+    // Try to open it...
+    this->logFile.open(this->filename.c_str(), std::fstream::out);
+
+    // Throw an error if we couldn't open the file for writing.
+    if (!this->logFile.is_open())
+      gzthrow("Unable to open file for logging:" + this->filename + "]");
+  }
+
+  // Write out the contents of the buffer.
   this->logFile.write(this->buffer.c_str(), this->buffer.size());
   this->logFile.flush();
+
+  // Clear the buffer.
   this->buffer.clear();
 }

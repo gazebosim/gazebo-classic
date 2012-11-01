@@ -109,7 +109,7 @@ namespace gazebo
       /// \brief Write the header to file.
       // private: void WriteHeader();
 
-      /// \brief A logger for an entitiy
+      /// \cond
       private: class Log
       {
         public: Log(const std::string &_filename,
@@ -126,26 +126,46 @@ namespace gazebo
         public: boost::function<bool (std::ostringstream &)> logCB;
         public: std::string buffer;
         public: std::fstream logFile;
+        public: std::string filename;
       };
+      /// \endcond
 
+      /// \def Log_M
+      /// \brief Map of names to logs.
       private: typedef std::map<std::string, Log*> Log_M;
+
+      /// \brief All the log objects.
       private: Log_M logs;
+
+      /// \brief Iterator used to update the log objects.
       private: Log_M::iterator updateIter;
+
+      /// \brief Convenience iterator to the end of the log objects map.
       private: Log_M::iterator logsEnd;
 
+      /// \brief Event connected to the World update.
       private: event::ConnectionPtr updateConnection;
 
+      /// \brief True if logging is stopped.
       private: bool stop;
+
+      /// \brief Thread used to write data to disk.
       private: boost::thread *writeThread;
+
+      /// \brief Mutext to protect writing.
       private: boost::mutex writeMutex;
+
+      /// \brief Mutex to protect logging control.
       private: boost::mutex controlMutex;
 
+      /// \brief Used by the write thread to know when data needs to be
+      /// written to disk
       private: boost::condition_variable dataAvailableCondition;
 
+      /// \brief The base pathname for all the logs.
       private: std::string logPathname;
 
-      // private: std::string buffer;
-
+      /// \brief This is a singleton
       private: friend class SingletonT<Logger>;
     };
     /// \}

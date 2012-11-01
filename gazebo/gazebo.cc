@@ -83,8 +83,6 @@ bool gazebo::init()
 /////////////////////////////////////////////////
 void gazebo::run()
 {
-  common::Logger::Instance()->Start();
-
   // Run transport loop. Starts a thread
   gazebo::transport::run();
 }
@@ -104,4 +102,3 @@ void gazebo::fini()
   g_plugins.clear();
   gazebo::transport::fini();
 }
-
