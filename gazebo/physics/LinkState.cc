@@ -34,11 +34,18 @@ LinkState::LinkState(const LinkPtr _link)
   : State(_link->GetName(), _link->GetWorld()->GetRealTime(),
           _link->GetWorld()->GetSimTime())
 {
+  this->pose = _link->GetRelativePose();
+  this->velocity = math::Pose(_link->GetRelativeLinearVel(),
+      math::Quaternion(_link->GetRelativeAngularVel()));
+  this->acceleration = math::Pose(_link->GetRelativeLinearAccel(),
+      math::Quaternion(_link->GetRelativeAngularAccel()));
+  this->forces.push_back(math::Pose(_link->GetRelativeForce(),
+                                    math::Quaternion()));
+
   for (unsigned int i = 0; i < _link->GetChildCount(); ++i)
   {
-    this->collisionStates.push_back(_link->GetCollision(i)->GetState());
+    this->collisionStates.push_back(CollisionState(_link->GetCollision(i)));
   }
-  this->pose = _link->GetRelativePose();
 }
 
 /////////////////////////////////////////////////
@@ -94,17 +101,25 @@ CollisionState LinkState::GetCollisionState(
 }
 
 /////////////////////////////////////////////////
-void LinkState::FillStateSDF(sdf::ElementPtr _elem)
+void LinkState::FillStateSDF(sdf::ElementPtr _elem) const
 {
   _elem->GetAttribute("name")->Set(this->GetName());
   _elem->GetElement("pose")->GetValue()->Set(this->pose);
   _elem->GetElement("velocity")->GetValue()->Set(this->velocity);
 
-  /*for (std::vector<math::Pose>::iterator iter = this->forces.begin();
+  for (std::vector<math::Pose>::const_iterator iter = this->forces.begin();
        iter != this->forces.end(); ++iter)
   {
     sdf::ElementPtr forceElem = _elem->AddElement("force");
-  }*/
+  }
+
+  for (std::vector<CollisionState>::const_iterator iter =
+      this->collisionStates.begin();
+      iter != this->collisionStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _elem->AddElement("collision");
+    (*iter).FillStateSDF(elem);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -166,22 +181,25 @@ bool LinkState::IsZero() const
        this->collisionStates.begin();
        iter != this->collisionStates.end() && result; ++iter)
   {
-    result = result && (*iter)->IsZero();
+    result = result && (*iter).IsZero();
   }
 
   return result && this->pose == math::Pose::Zero &&
          this->velocity == math::Pose::Zero &&
-         this->acceleration == zeroPose;
+         this->acceleration == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
 LinkState LinkState::operator-(const LinkState &_state) const
 {
-  LinkState result;
+  LinkState result = *this;
 
-  result.pose = this->pose - _state.pose;
-  result.velocity = this->velocity - _state.velocity;
-  result.acceleration = this->acceleration - _state.acceleration;
+  result.pose -= _state.pose;
+  result.velocity -= _state.velocity;
+  result.acceleration -= _state.acceleration;
+
+  result.forces.clear();
+  result.collisionStates.clear();
 
   // Insert the force differences
   for (std::vector<math::Pose>::const_iterator

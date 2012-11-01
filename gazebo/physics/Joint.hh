@@ -252,6 +252,8 @@ namespace gazebo
       protected: double damping_coefficient;
 
       private: math::Angle staticAngle;
+
+      private: JointState state;
     };
     /// \}
   }

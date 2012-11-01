@@ -315,20 +315,22 @@ namespace gazebo
       protected: math::Vector3 linearAccel;
       protected: math::Vector3 angularAccel;
 
+      protected: std::vector<math::Pose> attachedModelsOffset;
+      protected: math::Pose newPose;
+
       private: event::EventT<void (bool)> enabledSignal;
       private: event::ConnectionPtr showPhysicsConnection;
 
       /// This flag is used to trigger the enabled
       private: bool enabled;
 
-      protected: math::Pose newPose;
-
       private: std::vector<std::string> sensors;
       private: std::vector<JointPtr> parentJoints;
       private: std::vector<JointPtr> childJoints;
 
       private: std::vector<ModelPtr> attachedModels;
-      protected: std::vector<math::Pose> attachedModelsOffset;
+
+      private: LinkState state;
     };
     /// \}
   }

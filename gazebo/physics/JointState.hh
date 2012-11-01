@@ -55,6 +55,10 @@ namespace gazebo
       /// \brief Get the joint angle
       public: math::Angle GetAngle(unsigned int _axis) const;
 
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this
@@ -70,17 +74,18 @@ namespace gazebo
       /// \param[in] _state Joint state to output.
       /// \return The stream.
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::JointState &/*_state*/)
+                                     const gazebo::physics::JointState &_state)
       {
-        /*_out << _state->GetName() << "\0";
+        _out << "<joint name=" << _state.GetName() << ">\n";
 
-        for (std::vector<math::Angle>::iterator iter =
+        for (std::vector<math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end();
             ++iter)
         {
-          _out << *iter << "\0";
+          _out << *iter;
         }
-        */
+
+        _out << "</joint>\n";
 
         return _out;
       }

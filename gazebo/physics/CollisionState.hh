@@ -62,6 +62,12 @@ namespace gazebo
       /// \brief Get the Collision pose
       public: math::Pose GetPose() const;
 
+      /// \brief Fill a State SDF element with state info.
+      ///
+      /// Stored state information into an SDF::Element pointer.
+      /// \param[in] _elem Pointer to the SDF::Element which recieves the data.
+      public: void FillStateSDF(sdf::ElementPtr _elem) const;
+
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
@@ -81,9 +87,9 @@ namespace gazebo
       /// \param[in] _state Collision state to output
       /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                 const gazebo::physics::CollisionState &/*_state*/)
+                                 const gazebo::physics::CollisionState &_state)
       {
-        //_out << _state.name << "\0" << _state.pose << "\0";
+        _out << _state.name << "\n" << _state.pose << "\n";
 
         return _out;
       }

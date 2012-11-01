@@ -256,6 +256,12 @@ namespace gazebo
 
       protected: virtual void OnPoseChange();
 
+      /// used by Model::AttachStaticModel
+      protected: std::vector<ModelPtr> attachedModels;
+
+      /// used by Model::AttachStaticModel
+      protected: std::vector<math::Pose> attachedModelsOffset;
+
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint(sdf::ElementPtr _sdf);
@@ -288,11 +294,7 @@ namespace gazebo
 
       private: bool pluginsLoaded;
 
-      /// used by Model::AttachStaticModel
-      protected: std::vector<ModelPtr> attachedModels;
-
-      /// used by Model::AttachStaticModel
-      protected: std::vector<math::Pose> attachedModelsOffset;
+      private: ModelState state;
     };
     /// \}
   }

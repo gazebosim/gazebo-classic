@@ -811,7 +811,7 @@ void Link::OnPoseChange()
 //////////////////////////////////////////////////
 LinkState Link::GetState()
 {
-  return LinkState(boost::shared_static_cast<Link>(shared_from_this()));
+  return this->state;
 }
 
 //////////////////////////////////////////////////

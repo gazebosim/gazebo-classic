@@ -117,7 +117,10 @@ namespace gazebo
       ///
       /// Stored state information into an SDF::Element pointer.
       /// \param[in] _elem Pointer to the SDF::Element which recieves the data.
-      public: void FillStateSDF(sdf::ElementPtr _elem);
+      public: void FillStateSDF(sdf::ElementPtr _elem) const;
+
+      /// \brief Update the state information using the specified model.
+      public: void Update(ModelPtr _model);
 
       /// \brief Update a Model SDF element with this state info.
       ///
@@ -145,24 +148,26 @@ namespace gazebo
       /// \param[in] _state Model state to output.
       /// \return The stream.
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::ModelState &/*_state*/)
+                                     const gazebo::physics::ModelState &_state)
       {
-        /*_out << _state->GetName() << "\0" << _state.pose << "\0";
+        _out << "  <model name=" << _state.GetName() << ">\n";
+        _out << "    <pose>" << _state.pose << "</pose>\n";
 
-        for (std::vector<LinkState>::iterator iter =
+        for (std::vector<LinkState>::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
             ++iter)
         {
           _out << *iter;
         }
 
-        for (std::vector<JointState>::iterator iter =
+        /*for (std::vector<JointState>::const_iterator iter =
             _state.jointStates.begin(); iter != _state.jointStates.end();
             ++iter)
         {
           _out << *iter;
-        }
-        */
+        }*/
+
+        _out << "  </model>\n";
 
         return _out;
       }

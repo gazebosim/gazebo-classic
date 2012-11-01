@@ -197,11 +197,11 @@ void World::Load(sdf::ElementPtr _sdf)
 
     while (childElem)
     {
-      WorldState state;
-      state.Load(childElem);
+      WorldState myState;
+      myState.Load(childElem);
       this->sdf->InsertElement(childElem);
-      this->UpdateSDFFromState(state);
-      // this->SetState(state);
+      this->UpdateSDFFromState(myState);
+      // this->SetState(myState);
 
       childElem = childElem->GetNextElement("state");
 
@@ -1344,7 +1344,32 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 //////////////////////////////////////////////////
 WorldState World::GetState()
 {
-  return WorldState(shared_from_this());
+  // return WorldState(shared_from_this());
+  return this->state;
+}
+
+//////////////////////////////////////////////////
+void World::SetState(const WorldState &_state)
+{
+  this->state = _state;
+  /// \TODO: Implement setting the state of all the models
+/*  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
+
+  stateElem->GetAttribute("world_name")->Set(_state.GetName());
+  stateElem->GetElement("time")->Set(_state.GetSimTime());
+
+  this->SetSimTime(_state.GetSimTime());
+  for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
+  {
+    ModelState modelState = _state.GetModelState(i);
+    ModelPtr model = this->GetModel(modelState.GetName());
+    modelState.FillStateSDF(stateElem->AddElement("model"));
+    if (model)
+      model->SetState(modelState);
+    else
+      gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
+  }
+  */
 }
 
 //////////////////////////////////////////////////
@@ -1364,26 +1389,7 @@ void World::UpdateStateSDF()
   }
 }
 
-//////////////////////////////////////////////////
-void World::SetState(const WorldState &_state)
-{
-  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
 
-  stateElem->GetAttribute("world_name")->Set(_state.GetName());
-  stateElem->GetElement("time")->Set(_state.GetSimTime());
-
-  this->SetSimTime(_state.GetSimTime());
-  for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
-  {
-    ModelState modelState = _state.GetModelState(i);
-    ModelPtr model = this->GetModel(modelState.GetName());
-    modelState.FillStateSDF(stateElem->AddElement("model"));
-    if (model)
-      model->SetState(modelState);
-    else
-      gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
-  }
-}
 
 //////////////////////////////////////////////////
 void World::InsertModelFile(const std::string &_sdfFilename)
@@ -1461,12 +1467,17 @@ void World::DisableAllModels()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
-  WorldState currentState = this->GetState();
-  WorldState stateDiff = currentState - this->prevState;
-  this->prevState = currentState;
+  // Get the current state of the world.
+  WorldState myState(shared_from_this());
 
-  stateDiff.UpdateSDF(shared_from_this());
-  _stream << stateDiff.GetSDF()->ToString("");
+  // Get the difference from the previous state.
+  WorldState stateDiff = myState - this->prevState;
+
+  // Store the current state
+  this->prevState = myState;
+
+  // stateDiff.UpdateSDF();
+  std::cout << stateDiff;
 
   return true;
 }

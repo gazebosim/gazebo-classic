@@ -183,6 +183,8 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
 
       private: float laserRetro;
+
+      private: CollisionState state;
     };
     /// \}
   }

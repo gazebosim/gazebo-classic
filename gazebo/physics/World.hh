@@ -159,7 +159,7 @@ namespace gazebo
       public: void PrintEntityTree();
 
       /// \brief Get the world simulation time, note if you want the PC
-      /// wall clock call World::GetRealTime.
+      /// wall clock call common::Time::GetWallTime.
       /// \return The current simulation time
       public: common::Time GetSimTime() const;
 
@@ -601,6 +601,7 @@ namespace gazebo
       private: bool pluginsLoaded;
 
       private: WorldState prevState;
+      private: WorldState state;
     };
     /// \}
   }

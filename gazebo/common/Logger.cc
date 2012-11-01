@@ -230,7 +230,7 @@ void Logger::Run()
     }
 
     // Throttle the write loop.
-    common::Time::MSleep(1000);
+    common::Time::MSleep(2000);
   }
 }
 

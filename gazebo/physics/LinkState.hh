@@ -109,7 +109,7 @@ namespace gazebo
       ///
       /// Stored state information into an SDF::Element pointer.
       /// \param[in] _elem Pointer to the SDF::Element which recieves the data.
-      public: void FillStateSDF(sdf::ElementPtr _elem);
+      public: void FillStateSDF(sdf::ElementPtr _elem) const;
 
       /// \brief Update a Link SDF element with this state info.
       ///
@@ -137,25 +137,29 @@ namespace gazebo
       /// \param[in] _state Link state to output
       /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::LinkState &/*_state*/)
+                                     const gazebo::physics::LinkState &_state)
       {
-        /*_out << _state.name << "\0" << _state.pose << "\0";
-        _out << _state.velocity << "\0" << _state.acceleration << "\0";
+        _out << "    <link name=" << _state.name << ">\n";
+        _out << "      <pose>" << _state.pose << "</pose>\n";
+        _out << "      <velocity>" << _state.velocity << "</velocity>\n";
+        _out << "      <acceleration>" << _state.acceleration
+             << "</acceleration>\n";
 
-        for (std::vector<math::Pose>::iterator iter =
+        /*for (std::vector<math::Pose>::const_iterator iter =
              _state.forces.begin(); iter != _state.forces.end(); ++iter)
-        {
-          _out << *iter << "\0";
-        }
-
-        for (std::vector<CollisionState>::iterator iter =
-            _state.collisionStates.begin();
-            iter != _state.collisionStates.end(); ++iter)
         {
           _out << *iter;
         }
 
-        */
+        for (std::vector<CollisionState>::const_iterator iter =
+            _state.collisionStates.begin();
+            iter != _state.collisionStates.end(); ++iter)
+        {
+          _out << *iter;
+        }*/
+
+        _out << "    </link>\n";
+
         return _out;
       }
 

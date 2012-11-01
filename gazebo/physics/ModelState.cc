@@ -34,17 +34,17 @@ ModelState::ModelState(ModelPtr _model)
 : State(_model->GetName(), _model->GetWorld()->GetRealTime(),
         _model->GetWorld()->GetSimTime())
 {
+  this->pose = _model->GetWorldPose();
+
   for (unsigned int i = 0; i < _model->GetChildCount(); ++i)
   {
-    this->linkStates.push_back(_model->GetLink(i)->GetState());
+    this->linkStates.push_back(LinkState(_model->GetLink(i)));
   }
 
-  /*for (unsigned int i = 0; i < _model->GetJointCount(); ++i)
+  for (unsigned int i = 0; i < _model->GetJointCount(); ++i)
   {
-    this->jointStates.push_back(_model->GetJoint(i)->GetState());
-  }*/
-
-  this->pose = _model->GetWorldPose();
+    this->jointStates.push_back(JointState(_model->GetJoint(i)));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -74,12 +74,12 @@ void ModelState::Load(sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-void ModelState::FillStateSDF(sdf::ElementPtr _elem)
+void ModelState::FillStateSDF(sdf::ElementPtr _elem) const
 {
   _elem->GetAttribute("name")->Set(this->GetName());
   _elem->GetElement("pose")->GetValue()->Set(this->pose);
 
-  for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
+  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)
   {
     sdf::ElementPtr elem = _elem->AddElement("link");
@@ -236,7 +236,12 @@ ModelState ModelState::operator-(const ModelState &_state) const
 {
   ModelState result;
 
+  result = *this;
+
   result.pose = this->pose - _state.pose;
+
+  result.linkStates.clear();
+  result.jointStates.clear();
 
   // Insert the link state diffs.
   for (std::vector<LinkState>::const_iterator iter =

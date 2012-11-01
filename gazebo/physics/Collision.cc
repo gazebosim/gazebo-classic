@@ -409,8 +409,7 @@ msgs::Visual Collision::CreateCollisionVisual()
 /////////////////////////////////////////////////
 CollisionState Collision::GetState()
 {
-  return CollisionState(
-      boost::shared_static_cast<Collision>(shared_from_this()));
+  return this->state;
 }
 
 /////////////////////////////////////////////////

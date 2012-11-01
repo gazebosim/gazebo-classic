@@ -37,7 +37,30 @@ WorldState::WorldState()
 WorldState::WorldState(WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
-  this->UpdateSDF(_world);
+  for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
+  {
+    this->modelStates.push_back(ModelState(_world->GetModel(i)));
+  }
+}
+
+/////////////////////////////////////////////////
+void WorldState::UpdateSDF()
+{
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("state.sdf", this->sdf);
+
+  this->sdf->GetAttribute("world_name")->Set(this->GetName());
+
+  this->sdf->GetElement("sim_time")->Set(this->GetSimTime());
+  this->sdf->GetElement("wall_time")->Set(this->GetWallTime());
+  this->sdf->GetElement("real_time")->Set(this->GetRealTime());
+
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end(); ++iter)
+  {
+    sdf::ElementPtr modelElem = this->sdf->AddElement("model");
+    (*iter).FillStateSDF(modelElem);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -46,7 +69,9 @@ void WorldState::UpdateSDF(WorldPtr _world)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("state.sdf", this->sdf);
 
-  this->sdf->GetElement("time")->Set(_world->GetSimTime());
+  this->sdf->GetElement("sim_time")->Set(_world->GetSimTime());
+  this->sdf->GetElement("wall_time")->Set(common::Time::GetWallTime());
+  this->sdf->GetElement("real_time")->Set(_world->GetRealTime());
 
   for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
   {
@@ -144,13 +169,15 @@ WorldState &WorldState::operator=(const WorldState &_state)
 /////////////////////////////////////////////////
 WorldState WorldState::operator-(const WorldState &_state) const
 {
-  WorldState result;
+  WorldState result = *this;
 
+  result.modelStates.clear();
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
-    result.modelStates.push_back(
-        this->GetModelState((*iter).GetName()) - *iter);
+    ModelState state = this->GetModelState((*iter).GetName()) - *iter;
+    if (!state.IsZero())
+      result.modelStates.push_back(state);
   }
 
   return result;

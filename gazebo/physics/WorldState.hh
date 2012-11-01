@@ -85,6 +85,10 @@ namespace gazebo
       /// \brief Get a model state by model name
       public: ModelState GetModelState(const std::string &_modelName) const;
 
+      public: void Update(WorldPtr _world);
+
+      public: void UpdateSDF();
+
       public: void UpdateSDF(WorldPtr _world);
 
       /// \brief Assignment operator
@@ -102,14 +106,21 @@ namespace gazebo
       /// \param[in] _state World state to output
       /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                 const gazebo::physics::WorldState &/*_state*/)
+                                 const gazebo::physics::WorldState &_state)
       {
-        /*for (std::vector<ModelState>::iterator iter =
+        _out << "<state world=" << _state.name << ">\n";
+        _out << "  <sim_time>" << _state.simTime << "</sim_time>\n";
+        _out << "  <wall_time>" << _state.wallTime << "</wall_time>\n";
+        _out << "  <real_time>" << _state.realTime << "</real_time>\n";
+
+        for (std::vector<ModelState>::const_iterator iter =
             _state.modelStates.begin(); iter != _state.modelStates.end();
             ++iter)
         {
           _out << *iter;
-        }*/
+        }
+        _out << "</state>\n";
+
         return _out;
       }
 

@@ -876,7 +876,8 @@ void Model::OnPoseChange()
 //////////////////////////////////////////////////
 ModelState Model::GetState()
 {
-  return ModelState(boost::shared_static_cast<Model>(shared_from_this()));
+  return this->state;
+  // return ModelState(boost::shared_static_cast<Model>(shared_from_this()));
 }
 
 //////////////////////////////////////////////////
