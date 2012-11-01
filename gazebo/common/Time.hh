@@ -417,6 +417,7 @@ namespace gazebo
                  this->sec += this->nsec / static_cast<int32_t>(1e9);
                  this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
+      private: static struct timespec clock_resolution;
     };
     /// \}
   }
