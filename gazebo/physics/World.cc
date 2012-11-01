@@ -721,7 +721,6 @@ void World::SetSelectedEntityCB(const std::string &_name)
   }
   else
     this->selectedEntity.reset();
-  // event::Events::entitySelected(this->selectedEntity);
 }
 
 //////////////////////////////////////////////////

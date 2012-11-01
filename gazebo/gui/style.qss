@@ -215,10 +215,26 @@ QScrollBar:vertical
   margin: 22px 0 22px 0;
 }
 
+QScrollBar:horizontal
+{
+  border: 1px solid #808080;
+  border-radius: 5px;
+  background: #808080;
+  height: 10px;
+  margin: 0 22px 0 22px;
+}
+
 QScrollBar::handle:vertical
 {
   background: #505050;
   min-height: 10px;
+  border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal
+{
+  background: #505050;
+  min-width: 10px;
   border-radius: 4px;
 }
 
@@ -231,6 +247,15 @@ QScrollBar::add-line:vertical
   subcontrol-origin: margin;
 }
 
+QScrollBar::add-line:horizontal
+{
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  subcontrol-position: right;
+  subcontrol-origin: margin;
+}
+
 QScrollBar::sub-line:vertical
 {
   width: 0px;
@@ -240,28 +265,63 @@ QScrollBar::sub-line:vertical
   subcontrol-origin: margin;
 }
 
-QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
+QScrollBar::sub-line:horizontal
+{
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  subcontrol-position: left;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical,
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal
 {
   width: 0px;
   height: 0px;
   background: #f58113;
 }
 
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
 {
   background: none;
 }
+
 
 QTabBar
 {
   /*background-color: #808080;*/
 }
 
+QTabWidget#embeddedTab::pane
+{
+  border-top: 1px solid #101010;
+  border-left: 1px solid #101010;
+  border-bottom: 1px solid #101010;
+  border-right: 1px solid #101010;
+  top: -1px;
+
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+  background-color: #808080;
+  padding: 2px;
+
+  margin: 0px;
+  color: #f0f0f0;
+}
+
 QTabBar::tab
 {
+  color: #d0d0d0;
   background-color: #808080;
-  border: 1px solid  #404040;
-  border-bottom-color: #101010;
+  border-top: 1px solid  #101010;
+  border-left: 1px solid  #101010;
+  border-right: 1px solid  #101010;
+  border-bottom: 1px solid  #101010;
 
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
@@ -273,9 +333,9 @@ QTabBar::tab
 QTabBar::tab:selected
 {
   background-color: #808080;
-  border-bottom-color: #808080;
   margin-left: -4px;
   margin-right: -4px;
+  border-bottom-style: none;
 }
 
 QTabBar::tab:first:selected
@@ -290,7 +350,8 @@ QTabBar::tab:last:selected
 
 QTabBar::tab::only-one
 {
-  margin: 0;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 QTabBar::tab:!selected
@@ -303,11 +364,13 @@ QTabWidget#mainTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
+  border-top: 1px solid #101010;
 
   border-top-left-radius: 0px;
   border-bottom-left-radius: 10px;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
+  top: -1px;
 
   background-color: #808080;
   padding: 2px;
@@ -315,6 +378,8 @@ QTabWidget#mainTab::pane
   margin: 0px;
   color: #f0f0f0;
 }
+
+
 
 QTabWidget::tab
 {
@@ -327,7 +392,8 @@ QTabWidget::tab-bar
 }
 
 QWidget#modelList,
-QWidget#jointControl
+QWidget#jointControl,
+QWidget#toolsWidget
 {
   background: #808080;
 }
@@ -335,7 +401,8 @@ QWidget#jointControl
 
 QWidget#modelList > QFrame,
 QWidget#insertModel > QFrame,
-QWidget#jointControl > QFrame
+QWidget#jointControl > QFrame,
+QWidget#toolsWidget > QFrame
 {
   padding: 4px;
   background-color: #808080;
@@ -352,7 +419,7 @@ QWidget#renderWidget > QWidget
   border-bottom-left-radius: 10px;
 
   background-color: #808080;
-  margin-right: 10px;
+  margin-right: 0px;
 }
 
 QWidget#toolFrame 
@@ -383,4 +450,32 @@ QWidget#timePanel > QFrame
 {
   background-color: #808080;
   border-bottom-right-radius: 10px;
+}
+
+QScrollArea
+{
+  background-color: #808080;
+  border-radius: 10px;
+  padding: 2px;
+}
+
+QWidget#toolsWidget > QFrame,
+QFrame#pidControl
+{
+  background-color: #808080;
+  padding: 2px;
+}
+
+QComboBox
+{
+  border: 1px solid #101010;
+  background-color: #808080;
+  color: #d0d0d0;
+  border-radius: 4px;
+}
+
+QComboBox:on
+{ /* shift the text when the popup opens */
+  padding-top: -10px;
+  padding-left: 4px;
 }
