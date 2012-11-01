@@ -27,7 +27,7 @@ JointForceControl::JointForceControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->forceSpin = new QDoubleSpinBox;
-  this->forceSpin->setRange(-100.0, 100.0);
+  this->forceSpin->setRange(-1000.0, 1000.0);
   this->forceSpin->setSingleStep(0.001);
   this->forceSpin->setDecimals(3);
   this->forceSpin->setValue(0.000);
@@ -62,7 +62,7 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->posSpin = new QDoubleSpinBox;
-  this->posSpin->setRange(-360, 360);
+  this->posSpin->setRange(-1000, 1000);
   this->posSpin->setSingleStep(0.001);
   this->posSpin->setDecimals(3);
   this->posSpin->setValue(0.000);
@@ -164,7 +164,7 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->posSpin = new QDoubleSpinBox;
-  posSpin->setRange(-360, 360);
+  posSpin->setRange(-1000, 1000);
   posSpin->setSingleStep(0.001);
   posSpin->setDecimals(3);
   posSpin->setValue(0.000);
