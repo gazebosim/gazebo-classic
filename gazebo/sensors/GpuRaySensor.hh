@@ -108,7 +108,7 @@ namespace gazebo
       /// \brief Get the range resolution
       ///      If RangeResolution is 1, the number of simulated rays is equal
       ///      to the number of returned range readings. If it's less than 1,
-      ///      fewer simulated rays than actual returned range readings are 
+      ///      fewer simulated rays than actual returned range readings are
       ///      used, the results are interpolated from two nearest neighbors,
       ///      and vice versa.
       /// \return The Range Resolution
@@ -192,39 +192,40 @@ namespace gazebo
       /// \return True if horizontal, false if not
       public: bool IsHorizontal();
 
-      /// \brief 
-      /// \TODO Nate fill in. I'm not sure what these what these sensor parameters refer to
+      /// \brief
+      /// \TODO Nate fill in.
+      /// I'm not sure what these what these sensor parameters refer to
       public: double Get1stRatio();
 
-      /// \brief 
+      /// \brief
       /// @todo Document me
       public: double Get2ndRatio();
 
-      /// \brief 
+      /// \brief
       /// @todo Document me
       public: double GetHFOV();
 
-      /// \brief 
+      /// \brief
       /// @todo Document me
       public: double GetCHFOV();
 
-      /// \brief 
+      /// \brief
       /// @todo Document me
       public: double GetVFOV();
 
-      /// \brief 
+      /// \brief
       /// @todo Document me
       public: double GetCVFOV();
 
-      /// \brief 
+      /// \brief
       /// @todo Document me
       public: double GetHAngle();
 
-      /// \brief 
+      /// \brief
       /// @todo Document me
       public: double GetVAngle();
-  
-      /// \brief 
+
+      /// \brief
       /// @todo Document me
       private: void OnPose(ConstPosePtr &_msg);
 

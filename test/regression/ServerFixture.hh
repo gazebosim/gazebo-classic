@@ -164,7 +164,7 @@ class ServerFixture : public testing::Test
                else
                  this->percentRealTime =
                    (this->simTime / this->realTime).Double();
- 
+
                this->serverRunning = true;
              }
 

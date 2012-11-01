@@ -136,7 +136,7 @@ void Model::Load(sdf::ElementPtr _sdf)
       {
         this->LoadJoint(jointElem);
       }
-      catch (...)
+      catch(...)
       {
         gzerr << "LoadJoint Failed\n";
       }

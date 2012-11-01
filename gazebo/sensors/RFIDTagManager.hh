@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 /* Desc: RFID Tag Manager
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
-#ifndef _RFID_TAG_MANAGER__
-#define _RFID_TAG_MANAGER__
+#ifndef _RFID_TAG_MANAGER_
+#define _RFID_TAG_MANAGER_
 
 #include <vector>
 #include "common/SingletonT.hh"
@@ -33,9 +33,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \class RFIDTagManager RFIDTagManager.hh sensors/sensors.hh
-    /// \brief 
-    /// \TODO Nate fill in
+    /// \brief \TODO Nate fill in
     class RFIDTagManager : public SingletonT<RFIDTagManager>
     {
       /// \brief Adds tag model
