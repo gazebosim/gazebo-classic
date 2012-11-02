@@ -81,9 +81,6 @@ namespace gazebo
       /// \brief Reset the joint
       public: virtual void Reset();
 
-      /// \brief Get the joint state
-      public: JointState GetState();
-
       /// \brief Set the joint state
       public: void SetState(const JointState &_state);
 
@@ -252,8 +249,6 @@ namespace gazebo
       protected: double damping_coefficient;
 
       private: math::Angle staticAngle;
-
-      private: JointState state;
     };
     /// \}
   }

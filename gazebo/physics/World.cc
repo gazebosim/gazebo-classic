@@ -397,6 +397,15 @@ void World::Update()
     this->needsReset = false;
   }
 
+  // Get the difference from the previous state.
+  WorldState stateDiff = WorldState(shared_from_this()) - this->states.back();
+  if (!stateDiff.IsZero())
+  {
+    this->states.push_back(stateDiff);
+    if (this->states.size() > 1000)
+      this->states.pop_front();
+  }
+
   event::Events::worldUpdateStart();
 
   // Update all the models
@@ -429,7 +438,9 @@ void World::Update()
     }
 
     this->dirtyPoses.clear();
+
   }
+
 
   event::Events::worldUpdateEnd();
 }
@@ -1342,16 +1353,8 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-WorldState World::GetState()
+void World::SetState(const WorldState &/*_state*/)
 {
-  // return WorldState(shared_from_this());
-  return this->state;
-}
-
-//////////////////////////////////////////////////
-void World::SetState(const WorldState &_state)
-{
-  this->state = _state;
   /// \TODO: Implement setting the state of all the models
 /*  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
 
@@ -1375,7 +1378,7 @@ void World::SetState(const WorldState &_state)
 //////////////////////////////////////////////////
 void World::UpdateStateSDF()
 {
-  this->sdf->Update();
+  /*this->sdf->Update();
   sdf::ElementPtr stateElem = this->sdf->GetElement("state");
   stateElem->ClearElements();
 
@@ -1387,6 +1390,7 @@ void World::UpdateStateSDF()
     sdf::ElementPtr elem = stateElem->AddElement("model");
     this->GetModel(i)->GetState().FillStateSDF(elem);
   }
+  */
 }
 
 
@@ -1467,17 +1471,15 @@ void World::DisableAllModels()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
-  // Get the current state of the world.
-  WorldState myState(shared_from_this());
-
-  // Get the difference from the previous state.
-  WorldState stateDiff = myState - this->prevState;
-
-  // Store the current state
-  this->prevState = myState;
-
-  // stateDiff.UpdateSDF();
-  std::cout << stateDiff;
+  // Output the first 100 states
+  if (this->states.size() > 100)
+  {
+    for (unsigned int i = 0; i < 100; ++i)
+    {
+      std::cout << this->states.front();
+      this->states.pop_front();
+    }
+  }
 
   return true;
 }

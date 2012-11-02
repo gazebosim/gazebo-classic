@@ -874,13 +874,6 @@ void Model::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-ModelState Model::GetState()
-{
-  return this->state;
-  // return ModelState(boost::shared_static_cast<Model>(shared_from_this()));
-}
-
-//////////////////////////////////////////////////
 void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);

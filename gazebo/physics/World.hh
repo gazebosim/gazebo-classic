@@ -234,10 +234,6 @@ namespace gazebo
       /// \return A pointer to nearest Entity, NULL if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
-      /// \brief Get the current world state
-      /// \return A object that contains the entire state of the World
-      public: WorldState GetState();
-
       /// \brief Set the current world state
       /// \param _state The state to set the World to.
       public: void SetState(const WorldState &_state);
@@ -600,8 +596,8 @@ namespace gazebo
       /// \brief True if the plugins have been loaded.
       private: bool pluginsLoaded;
 
-      private: WorldState prevState;
-      private: WorldState state;
+      /// \brief Buffer of states.
+      private: std::list<WorldState> states;
     };
     /// \}
   }

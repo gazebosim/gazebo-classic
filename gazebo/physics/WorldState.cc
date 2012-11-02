@@ -66,6 +66,7 @@ void WorldState::UpdateSDF()
 /////////////////////////////////////////////////
 void WorldState::UpdateSDF(WorldPtr _world)
 {
+  /*
   this->sdf.reset(new sdf::Element);
   sdf::initFile("state.sdf", this->sdf);
 
@@ -76,9 +77,10 @@ void WorldState::UpdateSDF(WorldPtr _world)
   for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
   {
     sdf::ElementPtr modelElem = this->sdf->AddElement("model");
-    this->modelStates.push_back(_world->GetModel(i)->GetState());
+    this->modelStates.push_back(ModelState(_world->GetModel(i)));
     this->modelStates.back().FillStateSDF(modelElem);
   }
+  */
 }
 
 /////////////////////////////////////////////////
@@ -178,6 +180,20 @@ WorldState WorldState::operator-(const WorldState &_state) const
     ModelState state = this->GetModelState((*iter).GetName()) - *iter;
     if (!state.IsZero())
       result.modelStates.push_back(state);
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+bool WorldState::IsZero() const
+{
+  bool result = true;
+
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end(); ++iter)
+  {
+    result = result && (*iter).IsZero();
   }
 
   return result;

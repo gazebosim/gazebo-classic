@@ -809,12 +809,6 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-LinkState Link::GetState()
-{
-  return this->state;
-}
-
-//////////////////////////////////////////////////
 void Link::SetState(const LinkState &_state)
 {
   this->SetRelativePose(_state.GetPose());

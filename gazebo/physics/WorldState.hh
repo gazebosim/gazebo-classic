@@ -91,6 +91,10 @@ namespace gazebo
 
       public: void UpdateSDF(WorldPtr _world);
 
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return this
@@ -108,10 +112,10 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                  const gazebo::physics::WorldState &_state)
       {
-        _out << "<state world=" << _state.name << ">\n";
-        _out << "  <sim_time>" << _state.simTime << "</sim_time>\n";
-        _out << "  <wall_time>" << _state.wallTime << "</wall_time>\n";
-        _out << "  <real_time>" << _state.realTime << "</real_time>\n";
+        _out << "<state world='" << _state.name << "'>\n";
+        _out << "<sim_time>" << _state.simTime << "</sim_time>\n";
+        _out << "<wall_time>" << _state.wallTime << "</wall_time>\n";
+        _out << "<real_time>" << _state.realTime << "</real_time>\n";
 
         for (std::vector<ModelState>::const_iterator iter =
             _state.modelStates.begin(); iter != _state.modelStates.end();

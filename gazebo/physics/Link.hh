@@ -276,9 +276,6 @@ namespace gazebo
 
       public: virtual void OnPoseChange();
 
-      /// \brief Get the link state
-      public: LinkState GetState();
-
       /// \brief Set the current link state
       public: void SetState(const LinkState &_state);
 
@@ -329,8 +326,6 @@ namespace gazebo
       private: std::vector<JointPtr> childJoints;
 
       private: std::vector<ModelPtr> attachedModels;
-
-      private: LinkState state;
     };
     /// \}
   }

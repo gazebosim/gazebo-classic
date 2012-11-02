@@ -78,9 +78,9 @@ namespace gazebo
       /// \return The acceleration represented as a math::Pose.
       public: math::Pose GetAcceleration() const;
 
-      /// \brief Get the forces applied to the Link.
-      /// \return The list of forces represented as a math::Pose.
-      public: std::list<math::Pose> GetForces() const;
+      /// \brief Get the force applied to the Link.
+      /// \return The list of force represented as a math::Pose.
+      public: math::Pose GetForce() const;
 
       /// \brief Get the number of link states.
       ///
@@ -139,26 +139,20 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                      const gazebo::physics::LinkState &_state)
       {
-        _out << "    <link name=" << _state.name << ">\n";
-        _out << "      <pose>" << _state.pose << "</pose>\n";
-        _out << "      <velocity>" << _state.velocity << "</velocity>\n";
-        _out << "      <acceleration>" << _state.acceleration
-             << "</acceleration>\n";
+        _out << "<link name='" << _state.name << "'>\n";
+        _out << "<pose>" << _state.pose << "</pose>\n";
+        _out << "<velocity>" << _state.velocity << "</velocity>\n";
+        _out << "<acceleration>" << _state.acceleration << "</acceleration>\n";
+        _out << "<force>" << _state.acceleration << "</force>\n";
 
-        /*for (std::vector<math::Pose>::const_iterator iter =
-             _state.forces.begin(); iter != _state.forces.end(); ++iter)
+        for (std::vector<CollisionState>::const_iterator iter =
+             _state.collisionStates.begin();
+             iter != _state.collisionStates.end(); ++iter)
         {
           _out << *iter;
         }
 
-        for (std::vector<CollisionState>::const_iterator iter =
-            _state.collisionStates.begin();
-            iter != _state.collisionStates.end(); ++iter)
-        {
-          _out << *iter;
-        }*/
-
-        _out << "    </link>\n";
+        _out << "</link>\n";
 
         return _out;
       }
@@ -172,8 +166,8 @@ namespace gazebo
       /// \brief Acceleration of the link (linear and angular).
       private: math::Pose acceleration;
 
-      /// \brief Forces on the link(linear and angular).
-      private: std::vector<math::Pose> forces;
+      /// \brief Force on the link(linear and angular).
+      private: math::Pose force;
 
       /// \brief State of all the child Collision objects.
       private: std::vector<CollisionState> collisionStates;

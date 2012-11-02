@@ -369,12 +369,6 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-JointState Joint::GetState()
-{
-  return this->state;
-}
-
-//////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
   this->SetMaxForce(0, 0);

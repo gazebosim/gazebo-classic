@@ -221,9 +221,6 @@ namespace gazebo
       /// \brief Detach a static model from this model
       public: void DetachStaticModel(const std::string &_model);
 
-      /// \brief Get the current model state
-      public: ModelState GetState();
-
       /// \brief Set the current model state
       public: void SetState(const ModelState &_state);
 
@@ -293,8 +290,6 @@ namespace gazebo
       private: JointController *jointController;
 
       private: bool pluginsLoaded;
-
-      private: ModelState state;
     };
     /// \}
   }
