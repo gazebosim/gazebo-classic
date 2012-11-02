@@ -261,6 +261,8 @@ void World::Init()
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   this->initialized = true;
+
+  this->states.push_back(WorldState());
 }
 
 //////////////////////////////////////////////////
@@ -397,14 +399,6 @@ void World::Update()
     this->needsReset = false;
   }
 
-  // Get the difference from the previous state.
-  WorldState stateDiff = WorldState(shared_from_this()) - this->states.back();
-  if (!stateDiff.IsZero())
-  {
-    this->states.push_back(stateDiff);
-    if (this->states.size() > 1000)
-      this->states.pop_front();
-  }
 
   event::Events::worldUpdateStart();
 
@@ -441,6 +435,15 @@ void World::Update()
 
   }
 
+  // Get the difference from the previous state.
+  // This needs to be placed after one iteration of the physics update.
+  WorldState stateDiff = WorldState(shared_from_this()) - this->states.back();
+  if (!stateDiff.IsZero())
+  {
+    this->states.push_back(stateDiff);
+    if (this->states.size() > 1000)
+      this->states.pop_front();
+  }
 
   event::Events::worldUpdateEnd();
 }
@@ -1476,7 +1479,7 @@ bool World::OnLog(std::ostringstream &_stream)
   {
     for (unsigned int i = 0; i < 100; ++i)
     {
-      std::cout << this->states.front();
+      _stream << this->states.front();
       this->states.pop_front();
     }
   }

@@ -140,15 +140,22 @@ namespace gazebo
       /// \return Get the number of joints
       public: unsigned int GetJointCount() const;
 
+      /// Deprecated
+      public: Link_V GetAllLinks() const GAZEBO_DEPRECATED;
+
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
-      public: Link_V GetAllLinks() const;
+      public: Link_V GetLinks() const;
 
       /// \brief Get a joint by index
       /// \param index Index of the joint
       /// \return A pointer to the joint
-      public: JointPtr GetJoint(unsigned int index) const;
+      public: JointPtr GetJoint(unsigned int index) const GAZEBO_DEPRECATED;
+
+      /// \brief Get the joints.
+      /// \return Vector of joints.
+      public: const Joint_V &GetJoints() const;
 
       /// \brief Get a joint
       /// \param name The name of the joint, specified in the world file
@@ -163,9 +170,8 @@ namespace gazebo
       /// \return Pointer to the link
       public: LinkPtr GetLink(const std::string &name ="canonical") const;
 
-      /// \brief Get a child link by index
-      /// \return Point to the link
-      public: LinkPtr GetLink(unsigned int _index) const;
+      /// \brief This function is dangerous. Do not use.
+      public: LinkPtr GetLink(unsigned int _index) const GAZEBO_DEPRECATED;
 
       /// \brief Set the gravity mode of the model
       public: void SetGravityMode(const bool &v);

@@ -43,7 +43,9 @@ LinkState::LinkState(const LinkPtr _link)
 
   for (unsigned int i = 0; i < _link->GetChildCount(); ++i)
   {
-    this->collisionStates.push_back(CollisionState(_link->GetCollision(i)));
+    CollisionPtr coll = _link->GetCollision(i);
+    if (coll)
+      this->collisionStates.push_back(CollisionState(coll));
   }
 }
 

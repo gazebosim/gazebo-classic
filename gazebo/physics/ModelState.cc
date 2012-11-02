@@ -36,14 +36,17 @@ ModelState::ModelState(ModelPtr _model)
 {
   this->pose = _model->GetWorldPose();
 
-  for (unsigned int i = 0; i < _model->GetChildCount(); ++i)
+  const Link_V links = _model->GetLinks();
+  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
-    this->linkStates.push_back(LinkState(_model->GetLink(i)));
+    this->linkStates.push_back(LinkState((*iter)));
   }
 
-  for (unsigned int i = 0; i < _model->GetJointCount(); ++i)
+  const Joint_V joints = _model->GetJoints();
+  for (Joint_V::const_iterator iter = joints.begin();
+       iter != joints.end(); ++iter)
   {
-    this->jointStates.push_back(JointState(_model->GetJoint(i)));
+    this->jointStates.push_back(JointState(*iter));
   }
 }
 

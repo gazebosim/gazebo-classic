@@ -39,7 +39,9 @@ WorldState::WorldState(WorldPtr _world)
 {
   for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
   {
-    this->modelStates.push_back(ModelState(_world->GetModel(i)));
+    ModelPtr model = _world->GetModel(i);
+    if (model)
+      this->modelStates.push_back(ModelState(model));
   }
 }
 
@@ -64,7 +66,7 @@ void WorldState::UpdateSDF()
 }
 
 /////////////////////////////////////////////////
-void WorldState::UpdateSDF(WorldPtr _world)
+void WorldState::UpdateSDF(WorldPtr /*_world*/)
 {
   /*
   this->sdf.reset(new sdf::Element);

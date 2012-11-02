@@ -88,6 +88,7 @@ bool Server::ParseArgs(int argc, char **argv)
   v_desc.add_options()
     ("help,h", "Produce this help message.")
     ("log,l", "Log state data to disk.")
+    ("play,p", po::value<std::string>(), "Playback a log file.")
     ("pause,u", "Start the server in a paused state.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
@@ -141,8 +142,13 @@ bool Server::ParseArgs(int argc, char **argv)
     }
   }
 
+  // Set the parameter to record a log file
   if (this->vm.count("log"))
     this->params["log"] = "true";
+
+  // Set the parameter to playback a log file
+  if (this->vm.count("play"))
+    this->params["play"] = this->vm["play"].as<std::string>();
 
   if (this->vm.count("pause"))
     this->params["pause"] = "true";
@@ -347,6 +353,10 @@ void Server::ProcessParams()
     else if (iter->first == "log")
     {
       common::Logger::Instance()->Start();
+    }
+    else if (iter->first == "play")
+    {
+      // common::Logger::Instance()->Play(iter->second);
     }
   }
 }
