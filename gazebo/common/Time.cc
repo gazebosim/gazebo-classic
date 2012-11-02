@@ -30,12 +30,17 @@ using namespace gazebo;
 using namespace common;
 
 Time Time::wallTime;
+struct timespec Time::clock_resolution;
 
 /////////////////////////////////////////////////
 Time::Time()
 {
   this->sec = 0;
   this->nsec = 0;
+
+  // get clock resolution, skip sleep if resolution is larger then
+  // requested sleep tiem
+  clock_getres(CLOCK_REALTIME, &clock_resolution);
 }
 
 /////////////////////////////////////////////////
@@ -126,15 +131,74 @@ Time Time::MSleep(unsigned int _ms)
 {
   Time result;
 
-  struct timespec interval;
-  struct timespec remainder;
-  interval.tv_sec = _ms / 1000;
-  interval.tv_nsec = (_ms % 1000) * 1000000;
-
-  if (nanosleep(&interval, &remainder) == -1)
+  if (Time(clock_resolution) <= Time(0, _ms*1000000))
   {
-    result.sec = remainder.tv_sec;
-    result.nsec = remainder.tv_nsec;
+    struct timespec interval;
+    struct timespec remainder;
+    interval.tv_sec = _ms / 1000;
+    interval.tv_nsec = (_ms % 1000) * 1000000;
+
+    if (nanosleep(&interval, &remainder) == -1)
+    {
+      result.sec = remainder.tv_sec;
+      result.nsec = remainder.tv_nsec;
+    }
+  }
+  else
+  {
+    /// \TODO: warn user about skipping sleep because clock resolution too big
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+Time Time::NSleep(unsigned int _ns)
+{
+  Time result;
+
+  if (Time(clock_resolution) <= Time(0, _ns))
+  {
+    struct timespec nsleep;
+    struct timespec remainder;
+    nsleep.tv_sec = 0;
+    nsleep.tv_nsec = _ns;
+
+    if (clock_nanosleep(CLOCK_REALTIME, 0, &nsleep, &remainder) == -1)
+    {
+      result.sec = remainder.tv_sec;
+      result.nsec = remainder.tv_nsec;
+    }
+  }
+  else
+  {
+    /// \TODO: warn user about skipping sleep because clock resolution too big
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+Time Time::NSleep(Time _time)
+{
+  Time result;
+
+  if (Time(clock_resolution) <= _time)
+  {
+    struct timespec nsleep;
+    struct timespec remainder;
+    nsleep.tv_sec = _time.sec;
+    nsleep.tv_nsec = _time.nsec;
+
+    if (clock_nanosleep(CLOCK_REALTIME, 0, &nsleep, &remainder) == -1)
+    {
+      result.sec = remainder.tv_sec;
+      result.nsec = remainder.tv_nsec;
+    }
+  }
+  else
+  {
+    /// \TODO: warn user about skipping sleep because clock resolution too big
   }
 
   return result;
