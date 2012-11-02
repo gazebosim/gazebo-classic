@@ -113,8 +113,14 @@ double PID::Update(double _error, common::Time _dt)
   double pTerm, dTerm, iTerm;
   this->pErr = _error;
 
-  if (_dt == common::Time(0, 0) || math::isnan(_error) || isinf(_error))
-    return 0.0;
+  if (_dt == common::Time(0, 0))
+    return this->cmd;
+
+  if (math::isnan(_error) || isinf(_error))
+  {
+    gzerr << "PID: error is NaN or Inf, setting command to 0.\n";
+    return 0;
+  }
 
   // Calculate proportional contribution to command
   pTerm = this->pGain * this->pErr;
@@ -122,30 +128,38 @@ double PID::Update(double _error, common::Time _dt)
   // Calculate the integral error
   this->iErr = this->iErr + _dt.Double() * this->pErr;
 
-  // Calculate integral contribution to command
-  iTerm = this->iGain * this->iErr;
+  if (!math::equal(this->iGain, 0.0))
+  {
+    // Calculate integral contribution to command
+    iTerm = this->iGain * this->iErr;
 
-  // Limit iTerm so that the limit is meaningful in the output
-  if (iTerm > this->iMax)
-  {
-    iTerm = this->iMax;
-    this->iErr = iTerm / this->iGain;
+    // Limit iTerm so that the limit is meaningful in the output
+    if (iTerm > this->iMax)
+    {
+      iTerm = this->iMax;
+      this->iErr = iTerm / this->iGain;
+    }
+    else if (iTerm < this->iMin)
+    {
+      iTerm = this->iMin;
+      this->iErr = iTerm / this->iGain;
+    }
   }
-  else if (iTerm < this->iMin)
-  {
-    iTerm = this->iMin;
-    this->iErr = iTerm / this->iGain;
-  }
-
-  // Calculate the derivative error
-  if (_dt != common::Time(0, 0))
-  {
-    this->dErr = (this->pErr - this->pErrLast) / _dt.Double();
-    this->pErrLast = this->pErr;
-  }
+  else
+    iTerm = 0;
 
   // Calculate derivative contribution to command
-  dTerm = this->dGain * this->dErr;
+  if (!math::equal(this->dGain, 0.0))
+  {
+    this->dErr = (this->pErr - this->pErrLast) / _dt.Double();
+    dTerm = this->dGain * this->dErr;
+  }
+  else
+    dTerm = 0;
+
+  // Save pErr for dErr calculation
+  this->pErrLast = this->pErr;
+
   this->cmd = -pTerm - iTerm - dTerm;
 
   // Check the command limits
