@@ -374,7 +374,8 @@ void RenderEngine::LoadPlugins()
         {
           gzerr << "Unable to load Ogre Plugin[" << *piter
                 << "]. Rendering will not be possible."
-                << "Make sure you have installed OGRE and Gazebo properly.\n";
+                << "Make sure you have installed OGRE and Gazebo properly.\n"
+                << "error: "<<e.what()<<"\n";
         }
         else if ((*piter).find("CgProgramManager") != std::string::npos)
         {

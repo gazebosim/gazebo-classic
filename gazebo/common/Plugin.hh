@@ -39,6 +39,7 @@
 #include "physics/PhysicsTypes.hh"
 #include "sensors/SensorTypes.hh"
 #include "sdf/sdf.hh"
+#include "rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -58,7 +59,9 @@ namespace gazebo
     /// \brief A Sensor plugin
     SENSOR_PLUGIN,
     /// \brief A System plugin
-    SYSTEM_PLUGIN
+    SYSTEM_PLUGIN,
+    /// \brief A Visual plugin
+    VISUAL_PLUGIN
   };
 
   /// \brief A class which all plugins must inherit from
@@ -303,6 +306,32 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+  /// \brief A plugin loaded within the gzserver on startup.  See
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
+  ///        reference</a>.
+  class VisualPlugin : public PluginT<VisualPlugin>
+  {
+    public: VisualPlugin()
+             {this->type = VISUAL_PLUGIN;}
+
+    /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param[in] _visual Pointer the Visual Object.
+    /// \param[in] _sdf Pointer the the SDF element of the plugin.
+    public: virtual void Load(rendering::VisualPtr _visual,
+                              sdf::ElementPtr _sdf) = 0;
+
+    /// \brief Initialize the plugin
+    ///
+    /// Called after Gazebo has been loaded. Must not block.
+    public: virtual void Init() {}
+
+    /// \brief Override this method for custom plugin reset behavior.
+    public: virtual void Reset() {}
+  };
+
   /// \}
 
 /// \brief Plugin registration function for model plugin. Part of the shared
@@ -348,5 +377,17 @@ namespace gazebo
   {\
     return new classname();\
   }
+
+/// \brief Plugin registration function for visual plugin. Part of the
+/// shared object interface. This function is called when loading the shared
+/// library to add the plugin to the registered list.
+/// \return the name of the registered plugin
+#define GZ_REGISTER_VISUAL_PLUGIN(classname) \
+  extern "C" gazebo::VisualPlugin *RegisterPlugin(); \
+  gazebo::VisualPlugin *RegisterPlugin() \
+  {\
+    return new classname();\
+  }
 }
+
 #endif
