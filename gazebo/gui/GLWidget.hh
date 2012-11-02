@@ -103,7 +103,8 @@ namespace gazebo
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
 
-      private: void OnSetSelectedEntity(const std::string &_name);
+      private: void OnSetSelectedEntity(const std::string &_name,
+                                        const std::string &_mode);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
       private: void TranslateEntity(rendering::VisualPtr &_vis);

@@ -44,7 +44,6 @@ namespace gazebo
       private slots: void OnShowCOM();
       private slots: void OnTransparent();
       private slots: void OnSkeleton();
-      private slots: void OnJointControl();
 
       private: std::string modelName;
 
@@ -56,7 +55,6 @@ namespace gazebo
       private: QAction *skeletonAction;
       private: QAction *showJointsAction;
       private: QAction *showCOMAction;
-      private: QAction *jointControlAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub;
