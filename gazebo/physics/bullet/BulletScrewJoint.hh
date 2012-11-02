@@ -61,10 +61,10 @@ namespace gazebo
       public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int _index, math::Angle _angle);
+      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int _index, math::Angle _angle);
+      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
       public: virtual math::Angle GetHighStop(int _index);
