@@ -424,6 +424,9 @@ namespace gazebo
       /// \param[in] _state State to update from.
       private: void UpdateSDFFromState(const WorldState &_state);
 
+      /// \brief Used to load model plugins
+      private: void ModelLoadPlugins();
+
       /// \brief For keeping track of time step throttling
       private: common::Time prevStepWallTime;
 
@@ -596,6 +599,11 @@ namespace gazebo
 
       /// \brief True if the plugins have been loaded.
       private: bool pluginsLoaded;
+
+      /// \brief Used to load model
+      private: boost::mutex *modelLoadPluginsMutex;
+      private: event::ConnectionPtr modelLoadPluginsEvents;
+      private: Model_V modelsPendingLoadPlugin;
     };
     /// \}
   }

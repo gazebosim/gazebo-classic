@@ -80,6 +80,7 @@ World::World(const std::string &_name)
 
   this->receiveMutex = new boost::mutex();
   this->loadModelMutex = new boost::mutex();
+  this->modelLoadPluginsMutex = new boost::mutex();
 
   this->initialized = false;
   this->stepInc = 0;
@@ -116,6 +117,8 @@ World::~World()
   this->receiveMutex = NULL;
   delete this->loadModelMutex;
   this->loadModelMutex = NULL;
+  delete this->modelLoadPluginsMutex;
+  this->modelLoadPluginsMutex = NULL;
   delete this->setWorldPoseMutex;
   this->setWorldPoseMutex = NULL;
   delete this->worldUpdateMutex;
@@ -1297,24 +1300,15 @@ void World::ProcessFactoryMsgs()
         ModelPtr model = this->LoadModel(elem, this->rootElement);
         model->Init();
 
-        int iterations = 0;
-
-        // Wait for the sensors to be initialized before loading
-        // plugins.
-        while (!sensors::SensorManager::Instance()->SensorsInitialized() &&
-               iterations < 10)
         {
-          common::Time::MSleep(100);
-          iterations++;
-        }
-
-        if (iterations < 10)
-          model->LoadPlugins();
-        else
-        {
-          gzerr << "Sensors failed to initialize when loading model["
-                << model->GetName() << "] via the factory mechanism."
-                << "Plugins for the model will not be loaded.\n";
+          boost::mutex::scoped_lock pluginsLock(*this->modelLoadPluginsMutex);
+          this->modelsPendingLoadPlugin.push_back(model);
+          // Create an event that waits for the sensors to be
+          // initialized before loading plugins.
+          if (!this->modelLoadPluginsEvents)
+            this->modelLoadPluginsEvents =
+              event::Events::ConnectWorldUpdateStart(
+                boost::bind(&World::ModelLoadPlugins, this));
         }
       }
       else if (isLight)
@@ -1329,6 +1323,23 @@ void World::ProcessFactoryMsgs()
   }
 
   this->factoryMsgs.clear();
+}
+
+
+//////////////////////////////////////////////////
+void World::ModelLoadPlugins()
+{
+  if (sensors::SensorManager::Instance()->SensorsInitialized())
+  {
+    boost::mutex::scoped_lock pluginsLock(*this->modelLoadPluginsMutex);
+    for (Model_V::iterator iter = this->modelsPendingLoadPlugin.begin();
+                           iter != this->modelsPendingLoadPlugin.end();
+                           ++iter)
+      (*iter)->LoadPlugins();
+    this->modelsPendingLoadPlugin.clear();
+    event::Events::DisconnectWorldUpdateStart(this->modelLoadPluginsEvents);
+    this->modelLoadPluginsEvents.reset();
+  }
 }
 
 //////////////////////////////////////////////////
