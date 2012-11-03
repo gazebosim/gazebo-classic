@@ -28,6 +28,7 @@
 
 #include <float.h>
 #include "physics/Joint.hh"
+#include "gazebo/common/Console.hh"
 
 namespace gazebo
 {
@@ -89,6 +90,11 @@ namespace gazebo
       /// \brief Get the anchor
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
                {return fakeAnchor;}
+
+      /// \brief Set screw joint thread pitch
+      public: virtual void SetThreadPitch(int index,
+                                          const double _thread_pitch)
+               {gzerr << "not implemented\n";}
 
       protected: math::Vector3 fakeAnchor;
       protected: double threadPitch;
