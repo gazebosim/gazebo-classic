@@ -92,8 +92,8 @@ namespace gazebo
                {return fakeAnchor;}
 
       /// \brief Set screw joint thread pitch
-      public: virtual void SetThreadPitch(int index,
-                                          const double _thread_pitch)
+      public: virtual void SetThreadPitch(int /*_index*/,
+                                          const double /*_thread_pitch*/)
                {gzerr << "not implemented\n";}
 
       protected: math::Vector3 fakeAnchor;
