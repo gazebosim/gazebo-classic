@@ -336,32 +336,56 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Link::SetCollideMode(const std::string & /*m*/)
+void Link::SetCollideMode(const std::string & _mode)
 {
-  /*TODO: Put this back in
-  Base_V::iterator giter;
-
+  unsigned int categoryBits;
   unsigned int collideBits;
 
-  if (m == "all")
+  if (_mode == "all")
+  {
+    categoryBits =  GZ_ALL_COLLIDE;
     collideBits =  GZ_ALL_COLLIDE;
-  else if (m == "none")
+  }
+  else if (_mode == "none")
+  {
+    categoryBits =  GZ_NONE_COLLIDE;
     collideBits =  GZ_NONE_COLLIDE;
-  else if (m == "sensors")
-    collideBits = GZ_SENSOR_COLLIDE;
-  else if (m == "ghost")
-    collideBits = GZ_GHOST_COLLIDE;
+  }
+  else if (_mode == "sensors")
+  {
+    categoryBits = GZ_SENSOR_COLLIDE;
+    collideBits = ~GZ_SENSOR_COLLIDE;
+  }
+  else if (_mode == "fixed")
+  {
+    categoryBits = GZ_FIXED_COLLIDE;
+    collideBits = ~GZ_FIXED_COLLIDE;
+  }
+  else if (_mode == "ghost")
+  {
+    categoryBits = GZ_GHOST_COLLIDE;
+    collideBits = ~GZ_GHOST_COLLIDE;
+  }
   else
   {
-    gzerr << "Unknown collide mode[" << m << "]\n";
+    gzerr << "Unknown collide mode[" << _mode << "]\n";
     return;
   }
 
-  for (giter = this->collisions.begin(); giter != this->collisions.end(); giter++)
+  for (Base_V::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
   {
-    (*giter)->SetCategoryBits(collideBits);
-    (*giter)->SetCollideBits(collideBits);
-  }*/
+    if ((*iter)->HasType(Base::COLLISION))
+    {
+      physics::CollisionPtr pc =
+        boost::dynamic_pointer_cast<physics::Collision>(*iter);
+      if (pc)
+      {
+        pc->SetCategoryBits(categoryBits);
+        pc->SetCollideBits(collideBits);
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
