@@ -93,7 +93,13 @@ namespace gazebo
       public: virtual void SetSelfCollide(bool collide) = 0;
 
       /// \brief Set the collide mode of the body
-      public: void SetCollideMode(const std::string &m);
+      /// this can be: [all|none|sensors|fixed|ghost]
+      /// all: collides with everything
+      /// none: collides with nothing
+      /// sensors: collides with everything else but other sensors
+      /// fixed: collides with everything else but other fixed
+      /// ghost: collides with everything else but other ghost
+      public: void SetCollideMode(const std::string &_mode);
 
       /// \brief Get Self-Collision Flag, if this is true, this body will
       ///        collide with other bodies even if they share the same parent.
