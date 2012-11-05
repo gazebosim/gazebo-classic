@@ -36,6 +36,8 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   math::Vector3 topLeft = _sdf->GetValueVector3("top_left");
   math::Vector3 minSize = _sdf->GetValueVector3("min_size");
   math::Vector3 maxSize = _sdf->GetValueVector3("max_size");
+  double minMass = _sdf->GetValueDouble("min_mass");
+  double maxMass = _sdf->GetValueDouble("max_mass");
   unsigned int count = _sdf->GetValueUInt("count");
 
   std::vector<CompoundObj> objects;
@@ -43,7 +45,8 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   for (unsigned int i = 0; i < count; ++i)
   {
-    int rubbleType = math::Rand::GetIntUniform(0,2);
+    int rubbleType = math::Rand::GetIntUniform(0, 2);
+    double mass = math::Rand::GetDblUniform(minMass, maxMass);
 
     Obj obj;
 
@@ -83,11 +86,11 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     name << "rubble_" << i;
 
     if (rubbleType == 0)
-      this->MakeBox(name.str(), obj.pos, obj.size);
+      this->MakeBox(name.str(), obj.pos, obj.size, mass);
     else if (rubbleType == 1)
-      this->MakeSphere(name.str(), obj.pos, obj.size);
+      this->MakeSphere(name.str(), obj.pos, obj.size, mass);
     else
-      this->MakeCylinder(name.str(), obj.pos, obj.size);
+      this->MakeCylinder(name.str(), obj.pos, obj.size, mass);
 
     // Disable compound objects for now.
     // bool merged = false;
@@ -162,11 +165,10 @@ void RubblePlugin::Init()
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeSphere(const std::string &_name, math::Vector3 &_pos,
-                              math::Vector3 &_size)
+                              math::Vector3 &_size, double _mass)
 {
   std::ostringstream newModelStr;
 
-  float mass = 0.1;
   float radius = _size.x;
 
   newModelStr << "<gazebo version='1.2'>"
@@ -177,11 +179,11 @@ void RubblePlugin::MakeSphere(const std::string &_name, math::Vector3 &_pos,
         "<linear>0.1</linear>"
         "<angular>0.1</angular>"
       "</velocity_decay>"
-      "<inertial><mass>" << mass << "</mass>"
+      "<inertial><mass>" << _mass << "</mass>"
         "<inertia>"
-          "<ixx>" << (2.0/5.0)* mass * radius << "</ixx>"
-          "<iyy>" << (2.0/5.0)* mass * radius << "</iyy>"
-          "<izz>" << (2.0/5.0)* mass * radius << "</izz>"
+          "<ixx>" << (2.0/5.0)* _mass * radius << "</ixx>"
+          "<iyy>" << (2.0/5.0)* _mass * radius << "</iyy>"
+          "<izz>" << (2.0/5.0)* _mass * radius << "</izz>"
           "<ixy>" << 0.0 << "</ixy>"
           "<ixz>" << 0.0 << "</ixz>"
           "<iyz>" << 0.0 << "</iyz>"
@@ -206,11 +208,10 @@ void RubblePlugin::MakeSphere(const std::string &_name, math::Vector3 &_pos,
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeBox(const std::string &_name, math::Vector3 &_pos,
-                           math::Vector3 &_size)
+                           math::Vector3 &_size, double _mass)
 {
   std::ostringstream newModelStr;
 
-  float mass = 0.1;
   float w = _size.y;
   float h = _size.z;
   float d = _size.x;
@@ -223,11 +224,11 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Vector3 &_pos,
         "<linear>0.1</linear>"
         "<angular>0.1</angular>"
       "</velocity_decay>"
-      "<inertial><mass>" << mass << "</mass>"
+      "<inertial><mass>" << _mass << "</mass>"
         "<inertia>"
-        "<ixx>" << (1.0/12.0) * mass * (h*h + d*d) << "</ixx>"
-        "<iyy>" << (1.0/12.0) * mass * (w*w + d*d) << "</iyy>"
-        "<izz>" << (1.0/12.0) * mass * (w*w + h*h) << "</izz>"
+        "<ixx>" << (1.0/12.0) * _mass * (h*h + d*d) << "</ixx>"
+        "<iyy>" << (1.0/12.0) * _mass * (w*w + d*d) << "</iyy>"
+        "<izz>" << (1.0/12.0) * _mass * (w*w + h*h) << "</izz>"
         "<ixy>" << 0.0 << "</ixy>"
         "<ixz>" << 0.0 << "</ixz>"
         "<iyz>" << 0.0 << "</iyz>"
@@ -252,11 +253,10 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Vector3 &_pos,
 
 /////////////////////////////////////////////////
 void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                                math::Vector3 &_size)
+                                math::Vector3 &_size, double _mass)
 {
   std::ostringstream newModelStr;
 
-  float mass = 0.1;
   float r = _size.x * 0.5;
   float h = _size.z;
 
@@ -268,11 +268,11 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
         "<linear>0.1</linear>"
         "<angular>0.1</angular>"
       "</velocity_decay>"
-      "<inertial><mass>" << mass << "</mass>"
+      "<inertial><mass>" << _mass << "</mass>"
         "<inertia>"
-          "<ixx>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</ixx>"
-          "<iyy>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</iyy>"
-          "<izz>" << (1.0/12.0) * mass * r * r << "</izz>"
+          "<ixx>" << (1.0/12.0) * _mass * (3*r*r + h*h) << "</ixx>"
+          "<iyy>" << (1.0/12.0) * _mass * (3*r*r + h*h) << "</iyy>"
+          "<izz>" << (1.0/12.0) * _mass * r * r << "</izz>"
           "<ixy>" << 0.0 << "</ixy>"
           "<ixz>" << 0.0 << "</ixz>"
           "<iyz>" << 0.0 << "</iyz>"

@@ -39,13 +39,13 @@ namespace gazebo
     public: virtual void Init();
 
     private: void MakeBox(const std::string &_name, math::Vector3 &_pos,
-                          math::Vector3 &_size);
+                          math::Vector3 &_size, double _mass);
 
     private: void MakeSphere(const std::string &_name, math::Vector3 &_pos,
-                             math::Vector3 &_size);
+                             math::Vector3 &_size, double _mass);
 
     private: void MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                               math::Vector3 &_size);
+                               math::Vector3 &_size, double _mass);
 
     private: class Obj
              {

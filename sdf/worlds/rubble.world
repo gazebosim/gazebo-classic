@@ -17,6 +17,8 @@
       <top_left>0.5 1.0 0.4</top_left>
       <min_size>0.05 0.05 0.05</min_size>
       <max_size>0.2 0.2 0.2</max_size>
+      <min_mass>0.1</min_mass>
+      <max_mass>1.0</max_mass>
       <count>100</count>
     </plugin>
 

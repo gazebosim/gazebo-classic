@@ -181,7 +181,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   // auto-disable
   dWorldSetAutoDisableFlag(this->worldId, 1);
 
-  dWorldSetAutoDisableTime(this->worldId, 2);
+  dWorldSetAutoDisableTime(this->worldId, 1);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.1);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->worldId, 5);
