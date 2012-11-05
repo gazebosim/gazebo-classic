@@ -1302,13 +1302,13 @@ void World::ProcessFactoryMsgs()
         // Wait for the sensors to be initialized before loading
         // plugins.
         while (!sensors::SensorManager::Instance()->SensorsInitialized() &&
-               iterations < 10)
+               iterations < 50)
         {
           common::Time::MSleep(100);
           iterations++;
         }
 
-        if (iterations < 10)
+        if (iterations < 50)
           model->LoadPlugins();
         else
         {
