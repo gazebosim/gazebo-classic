@@ -78,6 +78,11 @@ namespace gazebo
       /// a name of an Entity.
       public: std::string GetName() const;
 
+      /// \brief Set the name associated with this State.
+      /// \param[in] _name Name associated with this state information.
+      /// Typically the name of an Entity.
+      public: void SetName(const std::string &_name);
+
       /// \brief Get the wall time when this state was generated
       /// \return The absolute clock time when the State data was recorded.
       public: common::Time GetWallTime() const;
