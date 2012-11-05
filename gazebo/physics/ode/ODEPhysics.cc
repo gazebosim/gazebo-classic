@@ -177,15 +177,14 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
        odeElem->GetElement("constraints")->GetValueDouble(
         "contact_surface_layer"));
 
-  // If auto-disable is active, then user interaction with the joints
-  // doesn't behave properly
-  // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId, 0);
+  // Enable auto-disable by default. Models with joints are excluded from
+  // auto-disable
+  dWorldSetAutoDisableFlag(this->worldId, 1);
 
   dWorldSetAutoDisableTime(this->worldId, 2);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableSteps(this->worldId, 20);
+  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.1);
+  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
+  dWorldSetAutoDisableSteps(this->worldId, 5);
 
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
 

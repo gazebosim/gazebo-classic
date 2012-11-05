@@ -89,6 +89,7 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     else
       this->MakeCylinder(name.str(), obj.pos, obj.size);
 
+    // Disable compound objects for now.
     // bool merged = false;
     /*for (iter = objects.begin(); iter != objects.end(); ++iter)
     {
@@ -131,9 +132,9 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
         merged = true;
         break;
       }
-    }*/
+    }
 
-    /*if (!merged)
+    if (!merged)
     {
       RubblePlugin::CompoundObj co;
       co.pos = obj.pos;
@@ -143,22 +144,15 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }*/
   }
 
+  // Disable compound objects for now.
+  /*
   int i =0;
   for (iter = objects.begin(); iter != objects.end(); ++iter, ++i)
   {
     std::ostringstream name;
     name << "rubble_" << i;
     this->MakeCompound(name.str(), *iter);
-  }
-
-  /*if (rubbleType == 0)
-    this->MakeBox(name.str(), pose, size);
-  else if (rubbleType == 1)
-    this->MakeSphere(name.str(), pose, size);
-  else
-    this->MakeCylinder(name.str(), pose, size);
-    */
-
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -166,6 +160,7 @@ void RubblePlugin::Init()
 {
 }
 
+/////////////////////////////////////////////////
 void RubblePlugin::MakeSphere(const std::string &_name, math::Vector3 &_pos,
                               math::Vector3 &_size)
 {
@@ -178,6 +173,10 @@ void RubblePlugin::MakeSphere(const std::string &_name, math::Vector3 &_pos,
     "<model name='" << _name << "'>"
     "<pose>" << _pos << " 0 0 0</pose>"
     "<link name='link'>"
+      "<velocity_decay>"
+        "<linear>0.1</linear>"
+        "<angular>0.1</angular>"
+      "</velocity_decay>"
       "<inertial><mass>" << mass << "</mass>"
         "<inertia>"
           "<ixx>" << (2.0/5.0)* mass * radius << "</ixx>"
@@ -205,6 +204,7 @@ void RubblePlugin::MakeSphere(const std::string &_name, math::Vector3 &_pos,
   this->world->InsertModelString(newModelStr.str());
 }
 
+/////////////////////////////////////////////////
 void RubblePlugin::MakeBox(const std::string &_name, math::Vector3 &_pos,
                            math::Vector3 &_size)
 {
@@ -219,6 +219,10 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Vector3 &_pos,
     "<allow_auto_disable>true</allow_auto_disable>"
     "<pose>" << _pos << " 0 0 0</pose>"
     "<link name='link'>"
+      "<velocity_decay>"
+        "<linear>0.1</linear>"
+        "<angular>0.1</angular>"
+      "</velocity_decay>"
       "<inertial><mass>" << mass << "</mass>"
         "<inertia>"
         "<ixx>" << (1.0/12.0) * mass * (h*h + d*d) << "</ixx>"
@@ -246,6 +250,7 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Vector3 &_pos,
   this->world->InsertModelString(newModelStr.str());
 }
 
+/////////////////////////////////////////////////
 void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
                                 math::Vector3 &_size)
 {
@@ -259,13 +264,18 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
     "<model name='" << _name << "'>"
     "<pose>" << _pos << " 0 0 0</pose>"
     "<link name='link'>"
+      "<velocity_decay>"
+        "<linear>0.1</linear>"
+        "<angular>0.1</angular>"
+      "</velocity_decay>"
       "<inertial><mass>" << mass << "</mass>"
-        "<ixx>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</ixx>"
-        "<iyy>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</iyy>"
-        "<izz>" << (1.0/12.0) * mass * r * r << "</izz>"
-        "<ixy>" << 0.0 << "</ixy>"
-        "<ixz>" << 0.0 << "</ixz>"
-        "<iyz>" << 0.0 << "</iyz>"
+        "<inertia>"
+          "<ixx>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</ixx>"
+          "<iyy>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</iyy>"
+          "<izz>" << (1.0/12.0) * mass * r * r << "</izz>"
+          "<ixy>" << 0.0 << "</ixy>"
+          "<ixz>" << 0.0 << "</ixz>"
+          "<iyz>" << 0.0 << "</iyz>"
         "</inertia>"
       "</inertial>"
       "<collision name ='collision'>"
@@ -287,6 +297,7 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
   this->world->InsertModelString(newModelStr.str());
 }
 
+/////////////////////////////////////////////////
 void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
 {
   std::ostringstream newModelStr, geomStr, inertiaStr;
