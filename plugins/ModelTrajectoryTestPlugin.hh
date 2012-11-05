@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH__
-#define __GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH__
+#ifndef _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
+#define _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
 
-#include "common/common.h"
-#include "physics/physics.h"
-#include "transport/TransportTypes.hh"
-#include "gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {

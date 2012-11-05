@@ -215,7 +215,7 @@ namespace gazebo
       ///
       /// This function is the same as GetByName, but limits the search to
       /// only Entities.
-      /// \param[in[ _name The name of the Entity to find.
+      /// \param[in] _name The name of the Entity to find.
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
