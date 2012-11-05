@@ -52,6 +52,12 @@ std::string State::GetName() const
 }
 
 /////////////////////////////////////////////////
+void State::SetName(const std::string &_name)
+{
+  this->name = _name;
+}
+
+/////////////////////////////////////////////////
 common::Time State::GetWallTime() const
 {
   return this->wallTime;

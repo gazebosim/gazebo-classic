@@ -37,6 +37,7 @@ WorldState::WorldState()
 WorldState::WorldState(WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
+  std::cout << "Models[" << _world->GetModelCount() << "\n";
   for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
   {
     ModelPtr model = _world->GetModel(i);

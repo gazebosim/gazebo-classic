@@ -266,6 +266,7 @@ void World::Init()
   this->initialized = true;
 
   this->states.push_back(WorldState());
+  this->states.front().SetName(this->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -444,15 +445,9 @@ void World::Update()
 
   }
 
-  // Get the difference from the previous state.
-  // This needs to be placed after one iteration of the physics update.
-  WorldState stateDiff = WorldState(shared_from_this()) - this->states.back();
-  if (!stateDiff.IsZero())
-  {
-    this->states.push_back(stateDiff);
-    if (this->states.size() > 1000)
-      this->states.pop_front();
-  }
+  this->states.push_back(WorldState(shared_from_this()));
+  if (this->states.size() > 1000)
+    this->states.pop_front();
 
   event::Events::worldUpdateEnd();
 }
@@ -1503,9 +1498,14 @@ bool World::OnLog(std::ostringstream &_stream)
   // Output the first 100 states
   if (this->states.size() > 100)
   {
-    for (unsigned int i = 0; i < 100; ++i)
+    std::cout << this->states[0] << "\n\n";
+    std::cout << this->states[1] << "\n\n";
+
+
+    for (unsigned int i = 0; i < 99; ++i)
     {
-      _stream << this->states.front();
+      // Get the difference from the previous state.
+      _stream << this->states[0] - this->states[1];
       this->states.pop_front();
     }
   }
