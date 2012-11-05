@@ -19,10 +19,10 @@
  * Date: 30 July 2003
  */
 
-#ifndef SURFACEPARAMS_HH
-#define SURFACEPARAMS_HH
+#ifndef _SURFACEPARAMS_HH_
+#define _SURFACEPARAMS_HH_
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "sdf/sdf.hh"
 
 namespace gazebo
@@ -32,22 +32,28 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class SurfaceParams SurfaceParams.hh physics/physics.hh
     /// \brief SurfaceParams defines various Surface contact parameters.
-    ///        These parameters defines the properties of a
-    ///        physics::Contact constraint.
+    /// These parameters defines the properties of a
+    /// physics::Contact constraint.
     class SurfaceParams
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: SurfaceParams();
 
-      /// \brief Constructor
+      /// \brief Destructor.
       public: virtual ~SurfaceParams();
 
-      /// \brief Load the contact params
+      /// \brief Load the contact params.
+      /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Fill in a surface message
-      public: void FillSurfaceMsg(msgs::Surface &_msg);
+      /// \brief Deprecated.
+      public: void FillSurfaceMsg(msgs::Surface &_msg) GAZEBO_DEPRECATED;
+
+      /// \brief Fill in a surface message.
+      /// \param[in] _msg Message to fill with this object's values.
+      public: void FillMsg(msgs::Surface &_msg);
 
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 

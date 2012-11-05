@@ -349,8 +349,6 @@ void Link::SetCollideMode(const std::string & /*m*/)
     collideBits =  GZ_NONE_COLLIDE;
   else if (m == "sensors")
     collideBits = GZ_SENSOR_COLLIDE;
-  else if (m == "ghost")
-    collideBits = GZ_GHOST_COLLIDE;
   else
   {
     gzerr << "Unknown collide mode[" << m << "]\n";
