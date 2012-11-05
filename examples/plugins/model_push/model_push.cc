@@ -15,8 +15,8 @@
  *
 */
 #include <boost/bind.hpp>
-#include "physics/physics.h"
-#include "gazebo.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/gazebo.hh"
 
 /// \example examples/plugins/model_push.cc
 /// This example creates a ModelPlugin, and applies a force to a box to move
