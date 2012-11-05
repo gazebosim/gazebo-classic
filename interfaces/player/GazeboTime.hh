@@ -24,9 +24,9 @@
 
 #include "player.h"
 
-#include "common/CommonTypes.hh"
-#include "transport/TransportTypes.hh"
-#include "msgs/msgs.h"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/msgs.hh"
 
 /// \addtogroup player
 /// \brief Gazebo player driver
