@@ -21,6 +21,7 @@ set (files
   pr2.world
   presentation.world
   projector.world
+  rubble.world
   shapes.world
   weshare2012.world
   willowgarage.world)
