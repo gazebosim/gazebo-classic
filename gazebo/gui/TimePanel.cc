@@ -37,14 +37,17 @@ TimePanel::TimePanel(QWidget *_parent)
   this->percentRealTimeEdit = new QLineEdit;
   this->percentRealTimeEdit->setReadOnly(true);
   this->percentRealTimeEdit->setFixedWidth(90);
+  this->percentRealTimeEdit->setAlignment(Qt::AlignCenter);
 
   this->simTimeEdit = new QLineEdit;
   this->simTimeEdit->setReadOnly(true);
   this->simTimeEdit->setFixedWidth(110);
+  this->simTimeEdit->setAlignment(Qt::AlignCenter);
 
   this->realTimeEdit = new QLineEdit;
   this->realTimeEdit->setReadOnly(true);
   this->realTimeEdit->setFixedWidth(110);
+  this->realTimeEdit->setAlignment(Qt::AlignCenter);
 
   QLabel *percentRealTimeLabel = new QLabel(tr("Real Time Factor:"));
   QLabel *simTimeLabel = new QLabel(tr("Sim Time:"));
