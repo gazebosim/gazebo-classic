@@ -103,7 +103,7 @@ void MapShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MapShape::FillShapeMsg(msgs::Geometry &_msg)
+void MapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
   _msg.mutable_image()->set_uri(this->GetURI());

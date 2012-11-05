@@ -15,9 +15,9 @@
  *
 */
 #include <map>
-#include "gazebo.hh"
-#include "common/common.h"
-#include "physics/physics.h"
+#include "gazebo/gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
 
 namespace gazebo
 {

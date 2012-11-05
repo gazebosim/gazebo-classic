@@ -15,7 +15,7 @@
  *
 */
 
-#include "physics/physics.h"
+#include "gazebo/physics/physics.hh"
 #include "plugins/SpringTestPlugin.hh"
 
 using namespace gazebo;

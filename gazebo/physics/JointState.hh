@@ -34,25 +34,31 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class JointState JointState.hh physics/physics.hh
     /// \brief keeps track of state of a physics::Joint
     class JointState : public State
     {
-      /// \brief Default constructor
+      /// \brief Default constructor.
       public: JointState();
 
-      /// \brief Constructor
-      public: JointState(JointPtr _joint);
+      /// \brief Constructor.
+      /// \param[in] _joint Joint to get the state of.
+      public: explicit JointState(JointPtr _joint);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~JointState();
 
-      /// \brief Load state from SDF element
+      /// \brief Load state from SDF element.
+      /// \param[in] _elem SDf values to load from.
       public: virtual void Load(sdf::ElementPtr _elem);
 
-      /// \brief Get the number of angles
+      /// \brief Get the number of angles.
+      /// \return The number of angles.
       public: unsigned int GetAngleCount() const;
 
-      /// \brief Get the joint angle
+      /// \brief Get the joint angle.
+      /// \param[in] _axis The axis index.
+      /// \return Angle of the axis.
       public: math::Angle GetAngle(unsigned int _axis) const;
 
       /// \brief Return true if the values in the state are zero.

@@ -22,8 +22,8 @@
 #include <math.h>
 #include <iostream>
 
-#include "transport/transport.h"
-#include "msgs/msgs.h"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "GazeboDriver.hh"
 #include "CameraInterface.hh"
 

@@ -92,6 +92,14 @@ namespace gazebo
       /// \param[in] _ms milliseconds
       public: static Time MSleep(unsigned int _ms);
 
+      /// \brief Nano sleep
+      /// \param[in] _ns nanoseconds
+      public: static Time NSleep(unsigned int _ns);
+
+      /// \brief Nano sleep
+      /// \param[in] _time is a Time
+      public: static Time NSleep(Time _time);
+
       /// \brief Assignment operator
       /// \param[in] tv the new time
       /// \return a reference to this instance
@@ -392,7 +400,6 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
-
                  // In the case sec and nsec have different signs, normalize
                  while (this->sec > 0 && this->nsec < 0)
                  {
@@ -409,6 +416,7 @@ namespace gazebo
                  this->sec += this->nsec / static_cast<int32_t>(1e9);
                  this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
+      private: static struct timespec clock_resolution;
     };
     /// \}
   }

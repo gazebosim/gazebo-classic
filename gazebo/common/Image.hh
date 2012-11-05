@@ -79,19 +79,6 @@ namespace gazebo
       /// \param[in] _filename The name of the saved image
       public: void SavePNG(const std::string &_filename);
 
-      /// \brief Set the image from raw data (R8G8B8)
-      /// \param[in] _data Pointer to the raw image data
-      /// \param[in] _width Width in pixels
-      /// \param[in] _height Height in pixels
-      /// \param[in] _scanline_bytes Size of a image row in bytes
-      /// \param[in] _bpp Bits per pixels, aka depth
-      public: void SetFromData(const unsigned char *_data,
-                               unsigned int _width,
-                               unsigned int _height,
-                               int _scanline_bytes,
-                               unsigned int _bpp)
-              GAZEBO_DEPRECATED;
-
       /// \brief Set the image from raw data
       /// \param[in] _data Pointer to the raw image data
       /// \param[in] _width Width in pixels

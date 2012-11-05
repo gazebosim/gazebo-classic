@@ -7,6 +7,11 @@ if test "$1" = "-xmldir" -a -n "$2"; then
   xmldir=$2
   mkdir -p $xmldir
   rm -rf $xmldir/*.xml
+  # Assuming that Jenkins called, the `build` directory is a sibling to the src dir
+  builddir=../build
+else
+  # This is a heuristic guess; not every developer puts the `build` dir in the src dir
+  builddir=./build
 fi
 
 echo "*:gazebo/common/Plugin.hh:113" > /tmp/gazebo_cpp_check.suppress
@@ -16,12 +21,13 @@ echo "*:gazebo/common/STLLoader.cc:94" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:105" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:126" >> /tmp/gazebo_cpp_check.suppress
 echo "*:gazebo/common/STLLoader.cc:149" >> /tmp/gazebo_cpp_check.suppress
+echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> /tmp/gazebo_cpp_check.suppress
 
 #cppcheck
 if [ $xmlout -eq 1 ]; then
-  (cppcheck --enable=all -q --suppressions-list=/tmp/gazebo_cpp_check.suppress --xml `find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -name "*.cc"`) 2> $xmldir/cppcheck.xml
+  (cppcheck --enable=all -q --suppressions-list=/tmp/gazebo_cpp_check.suppress --xml `find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -name "*.cc"` -I gazebo -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo -I $builddir/gazebo/msgs -I deps/opende/include --check-config) 2> $xmldir/cppcheck.xml
 else
-  cppcheck --enable=all -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -name "*.cc"`
+  cppcheck --enable=all -q --suppressions-list=/tmp/gazebo_cpp_check.suppress `find ./gazebo ./tools ./plugins ./examples ./test/regression ./interfaces -name "*.cc"` -I gazebo -I gazebo/rendering/skyx/include -I . -I $builddir -I $builddir/gazebo -I $builddir/gazebo/msgs -I deps/opende/include --check-config
 fi
 
 # cpplint

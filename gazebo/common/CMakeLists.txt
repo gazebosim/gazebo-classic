@@ -83,4 +83,4 @@ target_link_libraries(gazebo_common gazebo_math
                                     )
 
 gz_install_library(gazebo_common)
-gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)
+gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)

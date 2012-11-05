@@ -66,7 +66,7 @@ namespace gazebo
     /// \def RFIDSensorPtr
     /// \brief Shared pointer to RFIDSensor
     typedef boost::shared_ptr<RFIDSensor> RFIDSensorPtr;
-    
+
     /// \def RFIDTagPtr
     /// \brief Shared pointer to RFIDTag
     typedef boost::shared_ptr<RFIDTag> RFIDTagPtr;
@@ -96,7 +96,7 @@ namespace gazebo
     typedef std::vector<GpuRaySensorPtr> GpuRaySensor_V;
 
     /// \def RFIDSensor_V
-    /// \brief Vector of RFIDSensors 
+    /// \brief Vector of RFIDSensors
     typedef std::vector<RFIDSensor> RFIDSensor_V;
 
     /// \def RFIDTag_V

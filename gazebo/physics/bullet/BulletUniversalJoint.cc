@@ -148,7 +148,7 @@ double BulletUniversalJoint::GetMaxForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
+void BulletUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
 {
   if (this->btUniversal)
   {
@@ -164,7 +164,7 @@ void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetLowStop(int _index, math::Angle _angle)
+void BulletUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
 {
   if (this->btUniversal)
   {

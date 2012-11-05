@@ -17,9 +17,9 @@
 #ifndef __GAZEBO_SPRING_TEST_PLUGIN_HH__
 #define __GAZEBO_SPRING_TEST_PLUGIN_HH__
 
-#include "common/common.h"
-#include "physics/physics.h"
-#include "gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {

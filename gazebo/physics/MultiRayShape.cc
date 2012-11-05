@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "common/Exception.hh"
 #include "msgs/msgs.hh"
 #include "physics/MultiRayShape.hh"
 
@@ -257,3 +258,12 @@ math::Angle MultiRayShape::GetVerticalMaxAngle() const
     return math::Angle(0);
 }
 
+//////////////////////////////////////////////////
+void MultiRayShape::FillMsg(msgs::Geometry &/*_msg*/)
+{
+}
+
+//////////////////////////////////////////////////
+void MultiRayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
+{
+}

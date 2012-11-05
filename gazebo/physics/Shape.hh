@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SHAPE_HH
-#define SHAPE_HH
+#ifndef _SHAPE_HH_
+#define _SHAPE_HH_
 
 #include <string>
 
@@ -53,7 +53,10 @@ namespace gazebo
       public: virtual void GetInertial(double _mass,
                                        InertialPtr _inertial) const;
 
-      public: virtual void FillShapeMsg(msgs::Geometry &_msg) = 0;
+      public: virtual void FillShapeMsg(msgs::Geometry &_msg)
+              GAZEBO_DEPRECATED;
+
+      public: virtual void FillMsg(msgs::Geometry &_msg) = 0;
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg) = 0;
 

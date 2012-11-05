@@ -679,12 +679,6 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-ElementPtr Element::GetOrCreateElement(const std::string &_name)
-{
-  return this->GetElement(_name);
-}
-
-/////////////////////////////////////////////////
 ElementPtr Element::GetElement(const std::string &_name)
 {
   if (this->HasElement(_name))
@@ -1276,54 +1270,6 @@ void SDF::PrintValues()
 }
 
 /////////////////////////////////////////////////
-//void SDF::PrintDoc()
-//{
-//  std::string divs, html;
-//  int index = 0;
-//  this->root->PrintDoc(divs, html, 10, index);
-//
-//  std::cout << "<!DOCTYPE HTML>\n"
-//  << "<html>\n"
-//  << "<head>\n"
-//  << "  <link href='style.css' rel='stylesheet' type='text/css'>\n"
-//  << "  <script type='text/javascript'"
-//  << "  src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'>"
-//  << "  </script>\n"
-//  << "  <script type='text/javascript' src='animatedcollapse.js'>\n"
-//  << "  /***********************************************\n"
-//  << "   * Animated Collapsible DIV v2.4- (c) Dynamic Drive DHTML code\n"
-//  << "   * library (www.dynamicdrive.com)\n"
-//  << "   * This notice MUST stay intact for legal use\n"
-//  << "   * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this\n"
-//  << "   * script and 100s more\n"
-//  << "   ***********************************************/\n"
-//  << "  </script>\n"
-//  << "  <script type='text/javascript'>\n";
-//
-//  std::cout << divs << "\n";
-//
-//  std::cout << "animatedcollapse.ontoggle=function($, divobj, state)\n"
-//      << "{ }\n animatedcollapse.init()\n </script>\n";
-//  std::cout << "</head>\n<body>\n";
-//
-//  std::cout << "<div style='padding:4px'>\n"
-//            << "<h1>SDF " << SDF::version << "</h1>\n";
-//
-//  std::cout << "<p>The Simulation Description Format (SDF) is an XML file "
-//    << "format used to describe all the elements in a simulation "
-//    << "environment.\n</p>";
-//
-//  std::cout << "<div style='margin-left: 20px'>\n";
-//  std::cout << html;
-//  std::cout << "</div>\n";
-//
-//  std::cout << "</div>\n";
-//
-//  std::cout << "
-//    </body>
-//    </html>";
-//}
-
 void SDF::PrintDoc()
 {
   std::string html, html2;

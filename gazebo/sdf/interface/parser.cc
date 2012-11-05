@@ -540,7 +540,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               << elemXml->FirstChildElement("uri")->GetText() << "]\n";
 
             std::string uri = elemXml->FirstChildElement("uri")->GetText();
-            if (uri.find("model://") != 0)
+            size_t beginning = 0;
+            if (uri.find("model://") != beginning)
             {
               gzerr << "Invalid uri[" << uri << "]. Should be model://"
                     << uri << "\n";

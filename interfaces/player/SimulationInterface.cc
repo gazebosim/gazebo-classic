@@ -25,9 +25,10 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "player.h"
-#include "transport/transport.h"
 
-#include "gazebo.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/gazebo.hh"
+
 #include "GazeboTime.hh"
 #include "GazeboDriver.hh"
 #include "SimulationInterface.hh"

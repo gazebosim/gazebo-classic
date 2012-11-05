@@ -15,12 +15,12 @@
  *
 */
 #include <boost/bind.hpp>
-#include "physics/physics.h"
-#include "gazebo.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/gazebo.hh"
 
-#include "transport/TransportTypes.hh"
-#include "msgs/MessageTypes.hh"
-#include "common/Time.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {

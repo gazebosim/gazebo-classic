@@ -36,7 +36,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class ModelState ModelState.hh physics/ModelState.hh
+    /// \class ModelState ModelState.hh physics/physics.hh
     /// \brief Store state information of a physics::Model object
     ///
     /// This class captures the entire state of a Model at one
@@ -61,12 +61,12 @@ namespace gazebo
 
       /// \brief Load state from SDF element.
       ///
-      /// Load ModelState information from stored data in and SDF::Element.
+      /// Load ModelState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(sdf::ElementPtr _elem);
 
       /// \brief Get the stored model pose.
-      /// \return The math::Pose of the Model.
+      /// \return The math::Pose of the Model
       public: math::Pose GetPose() const;
 
       /// \brief Get the number of link states.
@@ -78,16 +78,16 @@ namespace gazebo
       /// \brief Get a link state.
       ///
       /// Get a Link State based on an index, where index is in the range of
-      /// 0...ModelState::GetLinkStateCount.
-      /// \param[in] _index Index of the LinkState.
-      /// \return State of the Link.
+      /// 0...ModelState::GetLinkStateCount
+      /// \param[in] _index Index of the LinkState
+      /// \return State of the Link
       public: LinkState GetLinkState(unsigned int _index) const;
 
       /// \brief Get a link state by Link name
       ///
       /// Searches through all LinkStates. Returns the LinkState with the
       /// matching name, if any.
-      /// \param _linkName Name of the LinkState.
+      /// \param[in] _linkName Name of the LinkState
       /// \return State of the Link.
       public: LinkState GetLinkState(const std::string &_linkName) const;
 

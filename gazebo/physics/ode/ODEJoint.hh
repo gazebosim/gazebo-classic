@@ -85,10 +85,10 @@ namespace gazebo
       public: dJointFeedback *GetFeedback();
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, math::Angle angle);
+      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, math::Angle angle);
+      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
       public: virtual math::Angle GetHighStop(int index);

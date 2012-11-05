@@ -297,6 +297,10 @@ void Server::Run()
   if (this->stop)
     return;
 
+  // Make sure the sensors are updated once before running the world.
+  // This makes sure plugins get loaded properly.
+  sensors::run_once(true);
+
   // Run each world. Each world starts a new thread
   physics::run_worlds();
 

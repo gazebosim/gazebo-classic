@@ -633,6 +633,12 @@ void Link::RemoveChildJoint(JointPtr _joint)
 //////////////////////////////////////////////////
 void Link::FillLinkMsg(msgs::Link &_msg)
 {
+  this->FillMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void Link::FillMsg(msgs::Link &_msg)
+{
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
@@ -659,7 +665,7 @@ void Link::FillLinkMsg(msgs::Link &_msg)
     {
       CollisionPtr coll = boost::shared_dynamic_cast<Collision>(
           this->GetChild(j));
-      coll->FillCollisionMsg(*_msg.add_collision());
+      coll->FillMsg(*_msg.add_collision());
     }
   }
 
@@ -840,4 +846,9 @@ double Link::GetAngularDamping() const
     return this->sdf->GetElement("damping")->GetValueDouble("angular");
   else
     return 0.0;
+}
+
+/////////////////////////////////////////////////
+void Link::SetKinematic(const bool &/*_kinematic*/)
+{
 }

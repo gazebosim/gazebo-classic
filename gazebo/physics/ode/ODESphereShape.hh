@@ -41,7 +41,7 @@ namespace gazebo
       public: virtual ~ODESphereShape() {}
 
       /// \brief Set the radius
-      public: void SetRadius(const double &_radius)
+      public: void SetRadius(double _radius)
       {
         SphereShape::SetRadius(_radius);
         ODECollisionPtr oParent;
