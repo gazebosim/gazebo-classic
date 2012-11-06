@@ -301,7 +301,7 @@ void World::RunLoop()
   this->prevStepWallTime = common::Time::GetWallTime();
 
   // Store the first state
-  this->states.push_back(WorldState());
+  this->states.push_back(WorldState(shared_from_this()));
   this->states.front().SetName(this->GetName());
 
   if (!common::LogPlay::Instance()->IsOpen())
@@ -332,15 +332,16 @@ void World::LogStep()
     WorldState state;
     state.Load(stateSDF);
 
-    //this->SetState(WorldState(shared_from_this()) + state);
-    this->SetState(state);
+    printf("-------\n");
+    this->SetState(WorldState(shared_from_this()) + state);
+    printf("*******\n");
     this->PublishWorldStats();
 
     this->Update();
 
     //this->stepInc--;
   }
-  common::Time::MSleep(10);
+  common::Time::MSleep(100);
 
   this->ProcessMessages();
 }
@@ -467,9 +468,13 @@ void World::Update()
     this->dirtyPoses.clear();
   }
 
-  this->states.push_back(WorldState(shared_from_this()) - this->states.front());
-  if (this->states.size() > 1000)
-    this->states.pop_front();
+  WorldState state = WorldState(shared_from_this()) - this->states.back();
+  if (!state.IsZero())
+  {
+    this->states.push_back(state);
+    if (this->states.size() > 1000)
+      this->states.pop_front();
+  }
 
   event::Events::worldUpdateEnd();
 }
@@ -1403,7 +1408,6 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 //////////////////////////////////////////////////
 void World::SetState(const WorldState &_state)
 {
-  this->SetSimTime(_state.GetSimTime());
   this->SetSimTime(_state.GetSimTime());
 
   for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)

@@ -158,6 +158,7 @@ namespace gazebo
         _out << "<model name='" << _state.GetName() << "'>\n";
         _out << "<pose>" << _state.pose << "</pose>\n";
 
+        /*
         for (std::vector<LinkState>::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
             ++iter)
@@ -170,7 +171,7 @@ namespace gazebo
             ++iter)
         {
           _out << *iter;
-        }
+        }*/
 
         _out << "</model>\n";
 

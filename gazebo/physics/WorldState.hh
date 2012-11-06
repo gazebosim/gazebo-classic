@@ -82,6 +82,8 @@ namespace gazebo
       /// \return State of the requested Model
       public: ModelState GetModelState(unsigned int _index) const;
 
+      public: bool HasModelState(const std::string &_modelName) const;
+
       /// \brief Get a model state by model name
       public: ModelState GetModelState(const std::string &_modelName) const;
 

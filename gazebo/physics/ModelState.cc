@@ -188,7 +188,7 @@ JointState ModelState::GetJointState(const std::string &_jointName) const
 /////////////////////////////////////////////////
 bool ModelState::IsZero() const
 {
-  bool result = true;
+  /*bool result = true;
 
   for (std::vector<LinkState>::const_iterator iter =
        this->linkStates.begin();
@@ -204,6 +204,8 @@ bool ModelState::IsZero() const
   }
 
   return result && this->pose == math::Pose::Zero;
+  */
+  return this->pose == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -242,11 +244,14 @@ ModelState ModelState::operator-(const ModelState &_state) const
 
   result = *this;
 
-  result.pose = this->pose - _state.pose;
+  result.pose.pos = this->pose.pos - _state.pose.pos;
+  std::cout << "P[" << this->pose.pos.y << "] O[" << _state.pose.pos.y << "] R[" << result.pose.pos.y << "]\n";
+
 
   result.linkStates.clear();
   result.jointStates.clear();
 
+  /*
   // Insert the link state diffs.
   for (std::vector<LinkState>::const_iterator iter =
        this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
@@ -264,6 +269,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
     if (!state.IsZero())
       result.jointStates.push_back(state);
   }
+  */
 
   return result;
 }
@@ -275,7 +281,8 @@ ModelState ModelState::operator+(const ModelState &_state) const
 
   result = *this;
 
-  result.pose = this->pose + _state.pose;
+  result.pose.pos = this->pose.pos + _state.pose.pos;
+  std::cout << "P[" << this->pose.pos.y << "] O[" << _state.pose.pos.y << "] R[" << result.pose.pos.y << "]\n";
 
   result.linkStates.clear();
   result.jointStates.clear();
