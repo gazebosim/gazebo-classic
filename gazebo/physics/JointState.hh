@@ -89,12 +89,11 @@ namespace gazebo
       {
         _out << "<joint name='" << _state.GetName() << "'>\n";
 
-        int i = 0;
-        for (std::vector<math::Angle>::const_iterator iter =
-            _state.angles.begin(); iter != _state.angles.end();
-            ++iter, ++i)
+        for (std::map<int, math::Angle>::const_iterator iter =
+            _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
-          _out << "<angle axis='" << i << "'>" << *iter << "</angle>\n";
+          _out << "<angle axis='" << iter->first << "'>"
+               << iter->second << "</angle>\n";
         }
 
         _out << "</joint>\n";
@@ -102,7 +101,7 @@ namespace gazebo
         return _out;
       }
 
-      private: std::vector<math::Angle> angles;
+      private: std::map<int, math::Angle> angles;
     };
     /// \}
   }

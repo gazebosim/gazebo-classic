@@ -80,6 +80,9 @@ World::World(const std::string &_name)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
+  this->logPlayStateSDF.reset(new sdf::Element);
+  sdf::initFile("state.sdf", this->logPlayStateSDF);
+
   this->receiveMutex = new boost::mutex();
   this->loadModelMutex = new boost::mutex();
 
@@ -322,28 +325,31 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  //if (this->stepInc)
+  if (!this->IsPaused() || this->stepInc > 0)
   {
     std::string data;
-    common::LogPlay::Instance()->Step(data);
+    if (!common::LogPlay::Instance()->Step(data))
+    {
+      this->SetPaused(true);
+    }
+    else
+    {
+      this->logPlayStateSDF->ClearElements();
+      sdf::readString(data, this->logPlayStateSDF);
 
-    sdf::ElementPtr stateSDF(new sdf::Element);
-    sdf::initFile("state.sdf", stateSDF);
-    sdf::readString(data, stateSDF);
+      this->logPlayState.Load(this->logPlayStateSDF);
 
-    WorldState state;
-    state.Load(stateSDF);
+      this->SetState(WorldState(shared_from_this()) + this->logPlayState);
 
-    printf("-------\n");
-    this->SetState(WorldState(shared_from_this()) + state);
-    printf("*******\n");
-    this->PublishWorldStats();
+      this->Update();
+    }
 
-    this->Update();
 
-    //this->stepInc--;
+    if (this->stepInc > 0)
+      this->stepInc--;
   }
-  common::Time::MSleep(100);
+
+  this->PublishWorldStats();
 
   this->ProcessMessages();
 }
@@ -1524,10 +1530,24 @@ void World::DisableAllModels()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
-  if (this->states.size() > 1)
+  static bool first = true;
+
+  // Save the entire state when its the first call to OnLog.
+  if (first)
+  {
+    this->UpdateStateSDF();
+    _stream << "<gazebo version ='";
+    _stream << SDF_VERSION;
+    _stream << "'>\n";
+    _stream << this->sdf->ToString("");
+    _stream << "</gazebo>\n";
+
+    first = false;
+  }
+  else if (this->states.size() > 1)
   {
     // Get the difference from the previous state.
-    _stream << "<gazebo version='1.2'>";
+    _stream << "<gazebo version='" << SDF_VERSION << "'>";
     _stream << this->states[0];
     _stream << "</gazebo>";
     this->states.pop_front();

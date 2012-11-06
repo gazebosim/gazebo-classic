@@ -613,6 +613,9 @@ namespace gazebo
       private: std::deque<WorldState> states;
       private: WorldState prevStates[2];
       private: int stateToggle;
+
+      private: sdf::ElementPtr logPlayStateSDF;
+      private: WorldState logPlayState;
     };
     /// \}
   }

@@ -36,7 +36,7 @@
         <description>Name of the joint</description>
       </attribute>
 
-      <element name="angle" type="double" default="0" required="1">
+      <element name="angle" type="double" default="0" required="+">
         <attribute name="axis" type="int" default="0" required="1">
           <description>Index of the axis.</description>
         </attribute>

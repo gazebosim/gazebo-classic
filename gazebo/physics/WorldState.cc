@@ -100,6 +100,7 @@ void WorldState::Load(sdf::ElementPtr _elem)
   this->wallTime = _elem->GetValueTime("wall_time");
   this->realTime = _elem->GetValueTime("real_time");
 
+  this->modelStates.clear();
   if (_elem->HasElement("model"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("model");

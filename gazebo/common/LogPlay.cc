@@ -83,14 +83,15 @@ bool LogPlay::IsOpen() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  bool result = false;
+  if (this->file.eof())
+    return false;
 
   std::string compression;
   uint32_t size;
 
   this->file >> compression >> size;
-
-  std::cout << "Compression[" << compression << "] Size[ " << size << "]\n";
+  if (compression.empty() || this->file.eof())
+    return false;
 
   // Read the data.
   char *data = new char[size];
@@ -98,7 +99,5 @@ bool LogPlay::Step(std::string &_data)
 
   _data = data;
 
-  result = true;
-
-  return result;
+  return !this->file.eof();
 }

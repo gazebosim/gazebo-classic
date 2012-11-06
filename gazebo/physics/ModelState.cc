@@ -62,7 +62,10 @@ void ModelState::Load(sdf::ElementPtr _elem)
 
   if (_elem->HasElement("pose"))
     this->pose = _elem->GetValuePose("pose");
+  else
+    this->pose.Set(0, 0, 0, 0, 0, 0);
 
+  this->linkStates.clear();
   if (_elem->HasElement("link"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("link");
@@ -282,7 +285,6 @@ ModelState ModelState::operator+(const ModelState &_state) const
   result = *this;
 
   result.pose.pos = this->pose.pos + _state.pose.pos;
-  std::cout << "P[" << this->pose.pos.y << "] O[" << _state.pose.pos.y << "] R[" << result.pose.pos.y << "]\n";
 
   result.linkStates.clear();
   result.jointStates.clear();

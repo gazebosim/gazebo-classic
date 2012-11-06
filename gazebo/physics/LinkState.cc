@@ -61,17 +61,28 @@ void LinkState::Load(sdf::ElementPtr _elem)
 
   if (_elem->HasElement("pose"))
     this->pose = _elem->GetValuePose("pose");
+  else
+    this->pose.Set(0, 0, 0, 0, 0, 0);
 
   if (_elem->HasElement("velocity"))
     this->velocity = _elem->GetValuePose("velocity");
+  else
+    this->velocity.Set(0, 0, 0, 0, 0, 0);
 
   if (_elem->HasElement("acceleration"))
     this->acceleration = _elem->GetValuePose("acceleration");
+  else
+    this->acceleration.Set(0, 0, 0, 0, 0, 0);
 
   if (_elem->HasElement("wrench"))
   {
     this->forcePos = _elem->GetElement("wrench")->GetValueVector3("pos");
     this->forceMag = _elem->GetElement("wrench")->GetValuePose("mag");
+  }
+  else
+  {
+    this->forcePos.Set(0, 0, 0);
+    this->forceMag.Set(0, 0, 0, 0, 0, 0);
   }
 }
 

@@ -143,7 +143,7 @@ class ServerFixture : public testing::Test
              {
                ASSERT_NO_THROW(this->server = new Server());
 
-               ASSERT_NO_THROW(this->server->Load(_worldFilename));
+               ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);
                this->server->Run();

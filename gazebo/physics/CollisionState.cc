@@ -42,8 +42,14 @@ CollisionState::~CollisionState()
 }
 
 /////////////////////////////////////////////////
-void CollisionState::Load(sdf::ElementPtr /*_elem*/)
+void CollisionState::Load(sdf::ElementPtr _elem)
 {
+  this->name = _elem->GetValueString("name");
+
+  if (_elem->HasElement("pose"))
+    this->pose = _elem->GetValuePose("pose");
+  else
+    this->pose.Set(0, 0, 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////

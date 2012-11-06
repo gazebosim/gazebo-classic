@@ -34,7 +34,8 @@ JointState::JointState(JointPtr _joint)
 : State(_joint->GetName(), _joint->GetWorld()->GetRealTime(),
         _joint->GetWorld()->GetSimTime())
 {
-  this->angles.push_back(_joint->GetAngle(0));
+  this->angles[0] = _joint->GetAngle(0);
+  this->angles[1] = _joint->GetAngle(1);
 }
 
 /////////////////////////////////////////////////
@@ -43,8 +44,23 @@ JointState::~JointState()
 }
 
 /////////////////////////////////////////////////
-void JointState::Load(sdf::ElementPtr /*_elem*/)
+void JointState::Load(sdf::ElementPtr _elem)
 {
+  this->name = _elem->GetValueString("name");
+
+  this->angles.clear();
+  if (_elem->HasElement("angle"))
+  {
+    sdf::ElementPtr childElem = _elem->GetElement("angle");
+    while (childElem)
+    {
+      int axis = childElem->GetValueInt("axis");
+      double angle = childElem->GetValueDouble();
+      this->angles[axis] = angle;
+      childElem = childElem->GetNextElement("angle");
+    }
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -58,10 +74,11 @@ math::Angle JointState::GetAngle(unsigned int _axis) const
 {
   math::Angle angle;
 
-  if (_axis < this->angles.size())
-    angle = this->angles[_axis];
+  std::map<int, math::Angle>::const_iterator iter = this->angles.find(_axis);
+  if (iter != this->angles.end())
+    angle = iter->second;
   else
-    gzerr << "Index[" << _axis << " is out of range.\n";
+    gzerr << "Index[" << _axis << "] is out of range.\n";
 
   return angle;
 }
@@ -70,10 +87,10 @@ math::Angle JointState::GetAngle(unsigned int _axis) const
 bool JointState::IsZero() const
 {
   bool result = true;
-  for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
+  for (std::map<int, math::Angle>::const_iterator iter = this->angles.begin();
        iter != this->angles.end() && result; ++iter)
   {
-    result = result && (*iter) == math::Angle(0.0);
+    result = result && iter->second == math::Angle(0.0);
   }
 
   return result;
@@ -88,10 +105,10 @@ JointState &JointState::operator=(const JointState &_state)
   this->angles.clear();
 
   // Copy the angles.
-  for (std::vector<math::Angle>::const_iterator iter = _state.angles.begin();
+  for (std::map<int, math::Angle>::const_iterator iter = _state.angles.begin();
        iter != _state.angles.end(); ++iter)
   {
-    this->angles.push_back(*iter);
+    this->angles[iter->first] = iter->second;
   }
 
   return *this;
@@ -105,11 +122,14 @@ JointState JointState::operator-(const JointState &_state) const
   result.angles.clear();
 
   // Copy the angles.
-  for (std::vector<math::Angle>::const_iterator iterA = this->angles.begin(),
+  /// \TODO: this will produce incorrect results if _state doesn't have the
+  /// same set of angles as *this.
+  int i = 0;
+  for (std::map<int, math::Angle>::const_iterator iterA = this->angles.begin(),
        iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB)
+       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
   {
-    result.angles.push_back((*iterA) - (*iterB));
+    result.angles[i] = iterA->second - iterB->second;
   }
 
   return result;
@@ -123,11 +143,14 @@ JointState JointState::operator+(const JointState &_state) const
   result.angles.clear();
 
   // Copy the angles.
-  for (std::vector<math::Angle>::const_iterator iterA = this->angles.begin(),
+  /// \TODO: this will produce incorrect results if _state doesn't have the
+  /// same set of angles as *this.
+  int i = 0;
+  for (std::map<int, math::Angle>::const_iterator iterA = this->angles.begin(),
        iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB)
+       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
   {
-    result.angles.push_back((*iterA) + (*iterB));
+    result.angles[i] = iterA->second + iterB->second;
   }
 
   return result;
