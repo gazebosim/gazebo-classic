@@ -39,7 +39,7 @@ LinkState::LinkState(const LinkPtr _link)
       math::Quaternion(_link->GetRelativeAngularVel()));
   this->acceleration = math::Pose(_link->GetRelativeLinearAccel(),
       math::Quaternion(_link->GetRelativeAngularAccel()));
-  this->force = math::Pose(_link->GetRelativeForce(), math::Quaternion());
+  this->forceMag = math::Pose(_link->GetRelativeForce(), math::Quaternion());
 
   for (unsigned int i = 0; i < _link->GetChildCount(); ++i)
   {
@@ -60,7 +60,19 @@ void LinkState::Load(sdf::ElementPtr _elem)
   this->name = _elem->GetValueString("name");
 
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetElement("pose")->GetValuePose("");
+    this->pose = _elem->GetValuePose("pose");
+
+  if (_elem->HasElement("velocity"))
+    this->velocity = _elem->GetValuePose("velocity");
+
+  if (_elem->HasElement("acceleration"))
+    this->acceleration = _elem->GetValuePose("acceleration");
+
+  if (_elem->HasElement("wrench"))
+  {
+    this->forcePos = _elem->GetElement("wrench")->GetValueVector3("pos");
+    this->forceMag = _elem->GetElement("wrench")->GetValuePose("mag");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -107,7 +119,8 @@ void LinkState::FillStateSDF(sdf::ElementPtr _elem) const
   _elem->GetAttribute("name")->Set(this->GetName());
   _elem->GetElement("pose")->Set(this->pose);
   _elem->GetElement("velocity")->Set(this->velocity);
-  _elem->GetElement("force")->Set(this->force);
+  _elem->GetElement("wrench")->GetElement("pos")->Set(this->forcePos);
+  _elem->GetElement("wrench")->GetElement("mag")->Set(this->forceMag);
 
   for (std::vector<CollisionState>::const_iterator iter =
       this->collisionStates.begin();
@@ -139,7 +152,8 @@ LinkState &LinkState::operator=(const LinkState &_state)
   this->acceleration = _state.acceleration;
 
   // Copy the force
-  this->force = _state.force;
+  this->forcePos = _state.forcePos;
+  this->forceMag = _state.forceMag;
 
   // Clear the collision states
   this->collisionStates.clear();
@@ -170,7 +184,7 @@ bool LinkState::IsZero() const
   return result && this->pose == math::Pose::Zero &&
          this->velocity == math::Pose::Zero &&
          this->acceleration == math::Pose::Zero &&
-         this->force == math::Pose::Zero;
+         this->forceMag == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -181,7 +195,8 @@ LinkState LinkState::operator-(const LinkState &_state) const
   result.pose -= _state.pose;
   result.velocity -= _state.velocity;
   result.acceleration -= _state.acceleration;
-  result.force -= _state.force;
+  result.forceMag -= _state.forceMag;
+  result.forcePos -= _state.forcePos;
 
   result.collisionStates.clear();
 
@@ -193,6 +208,31 @@ LinkState LinkState::operator-(const LinkState &_state) const
     CollisionState state = this->GetCollisionState((*iter).GetName()) - *iter;
     if (!state.IsZero())
       result.collisionStates.push_back(state);
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+LinkState LinkState::operator+(const LinkState &_state) const
+{
+  LinkState result = *this;
+
+  result.pose += _state.pose;
+  result.velocity += _state.velocity;
+  result.acceleration += _state.acceleration;
+  result.forceMag += _state.forceMag;
+  result.forcePos += _state.forcePos;
+
+  result.collisionStates.clear();
+
+  // Insert the collision differences
+  for (std::vector<CollisionState>::const_iterator iter =
+       _state.collisionStates.begin();
+       iter != _state.collisionStates.end(); ++iter)
+  {
+    CollisionState state = this->GetCollisionState((*iter).GetName()) + *iter;
+    result.collisionStates.push_back(state);
   }
 
   return result;

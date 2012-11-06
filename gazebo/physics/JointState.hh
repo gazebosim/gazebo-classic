@@ -75,6 +75,11 @@ namespace gazebo
       /// \return The resulting state.
       public: JointState operator-(const JointState &_state) const;
 
+      /// \brief Addition operator.
+      /// \param[in] _pt A state to add.
+      /// \return The resulting state.
+      public: JointState operator+(const JointState &_state) const;
+
       /// \brief Stream insertion operator.
       /// \param[in] _out output stream.
       /// \param[in] _state Joint state to output.
@@ -84,11 +89,12 @@ namespace gazebo
       {
         _out << "<joint name='" << _state.GetName() << "'>\n";
 
+        int i = 0;
         for (std::vector<math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end();
-            ++iter)
+            ++iter, ++i)
         {
-          _out << *iter;
+          _out << "<angle axis='" << i << "'>" << *iter << "</angle>\n";
         }
 
         _out << "</joint>\n";

@@ -82,6 +82,11 @@ namespace gazebo
       /// \return The resulting state.
       public: CollisionState operator-(const CollisionState &_state) const;
 
+      /// \brief Addition operator.
+      /// \param[in] _pt A state to add.
+      /// \return The resulting state.
+      public: CollisionState operator+(const CollisionState &_state) const;
+
       /// \brief Stream insertion operator
       /// \param[in] _out output stream
       /// \param[in] _state Collision state to output
@@ -89,7 +94,7 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                  const gazebo::physics::CollisionState &_state)
       {
-        
+
         _out << "<collision name='" << _state.name << "'>\n"
              << "<pose>" << _state.pose << "</pose>\n";
         _out << "</collision>\n";

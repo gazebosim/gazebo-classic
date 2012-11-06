@@ -80,3 +80,11 @@ CollisionState CollisionState::operator-(const CollisionState &_state) const
   result.pose -= _state.pose;
   return result;
 }
+
+/////////////////////////////////////////////////
+CollisionState CollisionState::operator+(const CollisionState &_state) const
+{
+  CollisionState result = *this;
+  result.pose += _state.pose;
+  return result;
+}

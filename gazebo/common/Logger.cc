@@ -51,15 +51,6 @@ Logger::Logger()
 }
 
 //////////////////////////////////////////////////
-bool Logger::Init(const std::string &_subdir)
-{
-  if (!_subdir.empty())
-    this->logPathname += "/" + _subdir;
-
-  return true;
-}
-
-//////////////////////////////////////////////////
 Logger::~Logger()
 {
   // Stop the write thread.
@@ -74,6 +65,16 @@ Logger::~Logger()
 
   this->logs.clear();
 }
+
+//////////////////////////////////////////////////
+bool Logger::Init(const std::string &_subdir)
+{
+  if (!_subdir.empty())
+    this->logPathname += "/" + _subdir;
+
+  return true;
+}
+
 
 //////////////////////////////////////////////////
 void Logger::Start()
@@ -260,8 +261,13 @@ void Logger::Log::Update()
 {
   std::ostringstream stream;
 
-  if (this->logCB(stream))
+  if (this->logCB(stream) && !stream.str().empty())
+  {
+    this->buffer.append("text ");
+    this->buffer.append(boost::lexical_cast<std::string>(stream.str().size()));
+    this->buffer.append("\n");
     this->buffer.append(stream.str());
+  }
 }
 
 //////////////////////////////////////////////////

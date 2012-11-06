@@ -35,6 +35,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 
+#include "gazebo/common/LogPlay.hh"
 #include "gazebo/common/Logger.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
@@ -264,9 +265,6 @@ void World::Init()
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   this->initialized = true;
-
-  this->states.push_back(WorldState());
-  this->states.front().SetName(this->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -289,7 +287,6 @@ void World::Stop()
   }
 }
 
-
 //////////////////////////////////////////////////
 void World::RunLoop()
 {
@@ -303,8 +300,49 @@ void World::RunLoop()
 
   this->prevStepWallTime = common::Time::GetWallTime();
 
-  while (!this->stop)
-    this->Step();
+  // Store the first state
+  this->states.push_back(WorldState());
+  this->states.front().SetName(this->GetName());
+
+  if (!common::LogPlay::Instance()->IsOpen())
+  {
+    while (!this->stop)
+      this->Step();
+  }
+  else
+  {
+    this->enablePhysicsEngine = false;
+    while (!this->stop)
+      this->LogStep();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::LogStep()
+{
+  //if (this->stepInc)
+  {
+    std::string data;
+    common::LogPlay::Instance()->Step(data);
+
+    sdf::ElementPtr stateSDF(new sdf::Element);
+    sdf::initFile("state.sdf", stateSDF);
+    sdf::readString(data, stateSDF);
+
+    WorldState state;
+    state.Load(stateSDF);
+
+    //this->SetState(WorldState(shared_from_this()) + state);
+    this->SetState(state);
+    this->PublishWorldStats();
+
+    this->Update();
+
+    //this->stepInc--;
+  }
+  common::Time::MSleep(10);
+
+  this->ProcessMessages();
 }
 
 //////////////////////////////////////////////////
@@ -315,13 +353,7 @@ void World::Step()
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
-    msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
-    msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
-    msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
-    this->worldStatsMsg.set_paused(this->IsPaused());
-
-    this->statPub->Publish(this->worldStatsMsg);
-    this->prevStatTime = common::Time::GetWallTime();
+    this->PublishWorldStats();
   }
 
   if (this->IsPaused() && !this->stepInc > 0)
@@ -356,15 +388,7 @@ void World::Step()
     }
   }
 
-  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
-      this->processMsgsPeriod)
-  {
-    this->ProcessEntityMsgs();
-    this->ProcessRequestMsgs();
-    this->ProcessFactoryMsgs();
-    this->ProcessModelMsgs();
-    this->prevProcessMsgsTime = common::Time::GetWallTime();
-  }
+  this->ProcessMessages();
 
   this->worldUpdateMutex->unlock();
 }
@@ -408,7 +432,6 @@ void World::Update()
     this->needsReset = false;
   }
 
-
   event::Events::worldUpdateStart();
 
   // Update all the models
@@ -442,10 +465,9 @@ void World::Update()
     }
 
     this->dirtyPoses.clear();
-
   }
 
-  this->states.push_back(WorldState(shared_from_this()));
+  this->states.push_back(WorldState(shared_from_this()) - this->states.front());
   if (this->states.size() > 1000)
     this->states.pop_front();
 
@@ -527,6 +549,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     model.reset(new Model(_parent));
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
+
+    std::cout << "Load Model[" << model->GetName() << "]\n";
 
     event::Events::addEntity(model->GetScopedName());
 
@@ -1377,26 +1401,20 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-void World::SetState(const WorldState &/*_state*/)
+void World::SetState(const WorldState &_state)
 {
-  /// \TODO: Implement setting the state of all the models
-/*  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
-
-  stateElem->GetAttribute("world_name")->Set(_state.GetName());
-  stateElem->GetElement("time")->Set(_state.GetSimTime());
-
   this->SetSimTime(_state.GetSimTime());
+  this->SetSimTime(_state.GetSimTime());
+
   for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
   {
     ModelState modelState = _state.GetModelState(i);
     ModelPtr model = this->GetModel(modelState.GetName());
-    modelState.FillStateSDF(stateElem->AddElement("model"));
     if (model)
       model->SetState(modelState);
     else
       gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
   }
-  */
 }
 
 //////////////////////////////////////////////////
@@ -1495,20 +1513,40 @@ void World::DisableAllModels()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
-  // Output the first 100 states
-  if (this->states.size() > 100)
+  if (this->states.size() > 1)
   {
-    std::cout << this->states[0] << "\n\n";
-    std::cout << this->states[1] << "\n\n";
-
-
-    for (unsigned int i = 0; i < 99; ++i)
-    {
-      // Get the difference from the previous state.
-      _stream << this->states[0] - this->states[1];
-      this->states.pop_front();
-    }
+    // Get the difference from the previous state.
+    _stream << "<gazebo version='1.2'>";
+    _stream << this->states[0];
+    _stream << "</gazebo>";
+    this->states.pop_front();
   }
 
   return true;
+}
+
+//////////////////////////////////////////////////
+void World::ProcessMessages()
+{
+  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
+      this->processMsgsPeriod)
+  {
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
+    this->prevProcessMsgsTime = common::Time::GetWallTime();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::PublishWorldStats()
+{
+  msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
+  msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
+  msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
+  this->worldStatsMsg.set_paused(this->IsPaused());
+
+  this->statPub->Publish(this->worldStatsMsg);
+  this->prevStatTime = common::Time::GetWallTime();
 }

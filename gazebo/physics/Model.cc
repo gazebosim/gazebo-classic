@@ -877,11 +877,11 @@ void Model::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void Model::SetState(const ModelState & /*_state*/)
+void Model::SetState(const ModelState &_state)
 {
-  /*
+  std::cout << "SetState[" << this->GetName() << "] Pose[" << _state.GetPose() << "]\n";
   this->SetWorldPose(_state.GetPose(), true);
-
+  /*
   for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
     LinkState linkState = _state.GetLinkState(i);

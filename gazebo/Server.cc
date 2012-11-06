@@ -23,6 +23,7 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/common/Logger.hh"
+#include "gazebo/common/LogPlay.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
@@ -148,7 +149,9 @@ bool Server::ParseArgs(int argc, char **argv)
 
   // Set the parameter to playback a log file
   if (this->vm.count("play"))
+  {
     this->params["play"] = this->vm["play"].as<std::string>();
+  }
 
   if (this->vm.count("pause"))
     this->params["pause"] = "true";
@@ -360,7 +363,7 @@ void Server::ProcessParams()
     }
     else if (iter->first == "play")
     {
-      // common::Logger::Instance()->Play(iter->second);
+      common::LogPlay::Instance()->Open(iter->second);
     }
   }
 }

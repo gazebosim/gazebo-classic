@@ -105,6 +105,11 @@ namespace gazebo
       /// \return The resulting state.
       public: WorldState operator-(const WorldState &_state) const;
 
+      /// \brief Addition operator.
+      /// \param[in] _pt A state to add.
+      /// \return The resulting state.
+      public: WorldState operator+(const WorldState &_state) const;
+
       /// \brief Stream insertion operator
       /// \param[in] _out output stream
       /// \param[in] _state World state to output
@@ -112,7 +117,7 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                  const gazebo::physics::WorldState &_state)
       {
-        _out << "<state world='" << _state.name << "'>\n";
+        _out << "<state world_name='" << _state.name << "'>\n";
         _out << "<sim_time>" << _state.simTime << "</sim_time>\n";
         _out << "<wall_time>" << _state.wallTime << "</wall_time>\n";
         _out << "<real_time>" << _state.realTime << "</real_time>\n";

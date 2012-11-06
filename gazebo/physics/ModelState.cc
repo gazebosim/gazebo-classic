@@ -59,8 +59,9 @@ ModelState::~ModelState()
 void ModelState::Load(sdf::ElementPtr _elem)
 {
   this->name = _elem->GetValueString("name");
+
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetElement("pose")->GetValuePose("");
+    this->pose = _elem->GetValuePose("pose");
 
   if (_elem->HasElement("link"))
   {
@@ -248,21 +249,52 @@ ModelState ModelState::operator-(const ModelState &_state) const
 
   // Insert the link state diffs.
   for (std::vector<LinkState>::const_iterator iter =
-       _state.linkStates.begin(); iter != _state.linkStates.end(); ++iter)
+       this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
   {
-    LinkState state = this->GetLinkState((*iter).GetName()) - *iter;
+    LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
     if (!state.IsZero())
       result.linkStates.push_back(state);
   }
 
   // Insert the joint state diffs.
   for (std::vector<JointState>::const_iterator iter =
-       _state.jointStates.begin(); iter != _state.jointStates.end(); ++iter)
+       this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
-    JointState state = this->GetJointState((*iter).GetName()) - *iter;
+    JointState state = (*iter) - _state.GetJointState((*iter).GetName());
     if (!state.IsZero())
       result.jointStates.push_back(state);
   }
 
+  return result;
+}
+
+/////////////////////////////////////////////////
+ModelState ModelState::operator+(const ModelState &_state) const
+{
+  ModelState result;
+
+  result = *this;
+
+  result.pose = this->pose + _state.pose;
+
+  result.linkStates.clear();
+  result.jointStates.clear();
+
+  // Insert the link state diffs.
+  /*for (std::vector<LinkState>::const_iterator iter =
+       this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  {
+    LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
+    result.linkStates.push_back(state);
+  }
+
+  // Insert the joint state diffs.
+  for (std::vector<JointState>::const_iterator iter =
+       this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
+  {
+    JointState state = (*iter) + _state.GetJointState((*iter).GetName());
+    result.jointStates.push_back(state);
+  }
+  */
   return result;
 }

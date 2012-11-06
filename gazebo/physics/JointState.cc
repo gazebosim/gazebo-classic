@@ -114,3 +114,21 @@ JointState JointState::operator-(const JointState &_state) const
 
   return result;
 }
+
+/////////////////////////////////////////////////
+JointState JointState::operator+(const JointState &_state) const
+{
+  JointState result = *this;
+
+  result.angles.clear();
+
+  // Copy the angles.
+  for (std::vector<math::Angle>::const_iterator iterA = this->angles.begin(),
+       iterB = _state.angles.begin(); iterA != this->angles.end() &&
+       iterB != _state.angles.end(); ++iterA, ++iterB)
+  {
+    result.angles.push_back((*iterA) + (*iterB));
+  }
+
+  return result;
+}

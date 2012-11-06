@@ -18,9 +18,9 @@
  * Author: Nate Koenig
  */
 
-#include "World.hh"
-#include "Model.hh"
-#include "WorldState.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/WorldState.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -37,7 +37,6 @@ WorldState::WorldState()
 WorldState::WorldState(WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
-  std::cout << "Models[" << _world->GetModelCount() << "\n";
   for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
   {
     ModelPtr model = _world->GetModel(i);
@@ -97,6 +96,9 @@ WorldState::~WorldState()
 void WorldState::Load(sdf::ElementPtr _elem)
 {
   this->name = _elem->GetValueString("world_name");
+  this->simTime = _elem->GetValueTime("sim_time");
+  this->wallTime = _elem->GetValueTime("wall_time");
+  this->realTime = _elem->GetValueTime("real_time");
 
   if (_elem->HasElement("model"))
   {
@@ -176,6 +178,10 @@ WorldState WorldState::operator-(const WorldState &_state) const
 {
   WorldState result = *this;
 
+  result.simTime -= _state.simTime;
+  result.realTime -= _state.realTime;
+  result.wallTime -= _state.wallTime;
+
   result.modelStates.clear();
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
@@ -183,6 +189,26 @@ WorldState WorldState::operator-(const WorldState &_state) const
     ModelState state = this->GetModelState((*iter).GetName()) - *iter;
     if (!state.IsZero())
       result.modelStates.push_back(state);
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+WorldState WorldState::operator+(const WorldState &_state) const
+{
+  WorldState result = *this;
+
+  result.simTime += _state.simTime;
+  result.realTime += _state.realTime;
+  result.wallTime += _state.wallTime;
+
+  result.modelStates.clear();
+  for (std::vector<ModelState>::const_iterator iter =
+       _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
+  {
+    ModelState state = this->GetModelState((*iter).GetName()) + *iter;
+    result.modelStates.push_back(state);
   }
 
   return result;

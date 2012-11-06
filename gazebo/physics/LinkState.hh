@@ -79,8 +79,9 @@ namespace gazebo
       public: math::Pose GetAcceleration() const;
 
       /// \brief Get the force applied to the Link.
-      /// \return The list of force represented as a math::Pose.
-      public: math::Pose GetForce() const;
+      /// \param[out] _pose Pos of the force on the Link.
+      /// \param[out] _mag Magnitude of the force.
+      public: void GetForce(math::Vector3 &_pos, math::Pose &_mag) const;
 
       /// \brief Get the number of link states.
       ///
@@ -132,6 +133,11 @@ namespace gazebo
       /// \return The resulting state.
       public: LinkState operator-(const LinkState &_state) const;
 
+      /// \brief Addition operator.
+      /// \param[in] _pt A state to add.
+      /// \return The resulting state.
+      public: LinkState operator+(const LinkState &_state) const;
+
       /// \brief Stream insertion operator
       /// \param[in] _out output stream
       /// \param[in] _state Link state to output
@@ -143,7 +149,8 @@ namespace gazebo
         _out << "<pose>" << _state.pose << "</pose>\n";
         _out << "<velocity>" << _state.velocity << "</velocity>\n";
         _out << "<acceleration>" << _state.acceleration << "</acceleration>\n";
-        _out << "<force>" << _state.acceleration << "</force>\n";
+        _out << "<wrench>" << "<pos>" << _state.forcePos << "</pos>\n"
+             << "<mag>" << _state.forceMag << "</mag></wrench>\n";
 
         for (std::vector<CollisionState>::const_iterator iter =
              _state.collisionStates.begin();
@@ -167,7 +174,8 @@ namespace gazebo
       private: math::Pose acceleration;
 
       /// \brief Force on the link(linear and angular).
-      private: math::Pose force;
+      private: math::Vector3 forcePos;
+      private: math::Pose forceMag;
 
       /// \brief State of all the child Collision objects.
       private: std::vector<CollisionState> collisionStates;

@@ -347,6 +347,9 @@ namespace gazebo
       /// \brief Step the world once.
       private: void Step();
 
+      /// \brief Step the world once by reading from a log file.
+      private: void LogStep();
+
       /// \brief Update the world
       private: void Update();
 
@@ -423,6 +426,12 @@ namespace gazebo
       /// \brief Update the state SDF from a given state.
       /// \param[in] _state State to update from.
       private: void UpdateSDFFromState(const WorldState &_state);
+
+      /// \brief Process all incoming messages.
+      private: void ProcessMessages();
+
+      /// \brief Publish the world stats message.
+      private: void PublishWorldStats();
 
       /// \brief For keeping track of time step throttling
       private: common::Time prevStepWallTime;

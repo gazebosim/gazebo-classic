@@ -1008,6 +1008,27 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
 }
 
 /////////////////////////////////////////////////
+gazebo::common::Time Element::GetValueTime(const std::string &_key)
+{
+  gazebo::common::Time result;
+  if (_key.empty())
+    this->value->Get(result);
+  else
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElementImpl(_key)->GetValueTime();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueTime();
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
 void Element::ClearElements()
 {
   this->elements.clear();
