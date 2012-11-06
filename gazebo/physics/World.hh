@@ -611,6 +611,8 @@ namespace gazebo
 
       /// \brief Buffer of states.
       private: std::deque<WorldState> states;
+      private: WorldState prevStates[2];
+      private: int stateToggle;
     };
     /// \}
   }

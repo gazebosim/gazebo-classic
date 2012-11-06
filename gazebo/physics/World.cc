@@ -88,6 +88,8 @@ World::World(const std::string &_name)
   this->pause = false;
   this->thread = NULL;
 
+  this->stateToggle = 0;
+
   this->pluginsLoaded = false;
 
   this->name = _name;
@@ -300,9 +302,9 @@ void World::RunLoop()
 
   this->prevStepWallTime = common::Time::GetWallTime();
 
-  // Store the first state
-  this->states.push_back(WorldState(shared_from_this()));
-  this->states.front().SetName(this->GetName());
+  // Get the first state
+  this->prevStates[0] = WorldState(shared_from_this());
+  this->stateToggle = 0;
 
   if (!common::LogPlay::Instance()->IsOpen())
   {
@@ -468,10 +470,15 @@ void World::Update()
     this->dirtyPoses.clear();
   }
 
-  WorldState state = WorldState(shared_from_this()) - this->states.back();
-  if (!state.IsZero())
+  int currState = (this->stateToggle + 1) % 2;
+  this->prevStates[currState] = WorldState(shared_from_this());
+  WorldState diffState = this->prevStates[currState] -
+                         this->prevStates[this->stateToggle];
+
+  if (!diffState.IsZero())
   {
-    this->states.push_back(state);
+    this->stateToggle = currState;
+    this->states.push_back(diffState);
     if (this->states.size() > 1000)
       this->states.pop_front();
   }

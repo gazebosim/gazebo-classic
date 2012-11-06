@@ -245,7 +245,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
   result = *this;
 
   result.pose.pos = this->pose.pos - _state.pose.pos;
-  std::cout << "P[" << this->pose.pos.y << "] O[" << _state.pose.pos.y << "] R[" << result.pose.pos.y << "]\n";
+  // std::cout << "P[" << this->pose.pos.y << "] O[" << _state.pose.pos.y << "] R[" << result.pose.pos.y << "]\n";
 
 
   result.linkStates.clear();
