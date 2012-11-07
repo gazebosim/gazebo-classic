@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,18 +31,21 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
-  // Prototype for sensor factory functions
+  /// \def Sensor 
+  /// \brief Prototype for sensor factory functions
   typedef Sensor* (*SensorFactoryFn) ();
 
   /// \addtogroup gazebo_sensors
   /// \{
-
+  /// \class SensorFactor SensorFactory.hh sensors/sensors.hh
   /// \brief The sensor factory; the class is just for namespacing purposes.
   class SensorFactory
   {
-    /// \brief Register all know sensors
+    /// \brief Register all known sensors
     ///  \li sensors::CameraSensor
     ///  \li sensors::DepthCameraSensor
     ///  \li sensors::GpuRaySensor
@@ -53,14 +56,20 @@ namespace gazebo
     public: static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).
-    public: static void RegisterSensor(const std::string &classname,
-                                       SensorFactoryFn factoryfn);
+    /// \param[in] _classname Name of class of sensor to register
+    /// \param _factoryfn Function handle for registration
+    /// \TODO Nate check
+    public: static void RegisterSensor(const std::string &_classname,
+                                       SensorFactoryFn _factoryfn);
 
     /// \brief Create a new instance of a sensor.  Used by the world when
     /// reading the world file.
-    public: static SensorPtr NewSensor(const std::string &classname);
+    /// \param[in] Name of sensor class
+    /// \return Pointer to Sensor
+    public: static SensorPtr NewSensor(const std::string &_classname);
 
     /// \brief Get all the sensor types
+    /// \param _types Vector of strings of the sensor types, populated by function
     public: static void GetSensorTypes(std::vector<std::string> &_types);
 
     /// \brief A list of registered sensor classes
