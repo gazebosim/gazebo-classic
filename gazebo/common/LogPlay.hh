@@ -108,7 +108,7 @@ namespace gazebo
       /// \param _world Pointer to the World
       /// \param _entityNames Names of the entities to search the log for
       /// \return True if replay was successful
-      //public: bool Play(WorldPtr _world,
+      /// public: bool Play(WorldPtr _world,
       //                  const std::list<std::string> &_entityNames);
 
       /// \brief Play a segment of a log file in a given World
@@ -120,7 +120,7 @@ namespace gazebo
       /// \param _start Start time, in simulation time.
       /// \param _stop Stop time, in simulation time.
       /// \return True if replay was successful.
-      //public: bool Play(WorldPtr _world, common::Time _start,
+      /// public: bool Play(WorldPtr _world, common::Time _start,
       //                  common::Time _stop);
 
       /// \brief Play a segment of a log file in a given World using only
@@ -135,7 +135,7 @@ namespace gazebo
       /// \param _start Start time, in simulation time.
       /// \param _stop Stop time, in simulation time.
       /// \return True if replay was successful.
-      //public: bool Play(WorldPtr _world, const std::string &_entityName,
+      /// public: bool Play(WorldPtr _world, const std::string &_entityName,
       //                  common::Time _start, common::Time _stop);
 
       /// \brief Play a segment of a log file in a given World using
@@ -149,7 +149,7 @@ namespace gazebo
       /// \param _start Start time, in simulation time.
       /// \param _stop Stop time, in simulation time.
       /// \return True if replay was successful
-      //public: bool Play(WorldPtr _world,
+      // public: bool Play(WorldPtr _world,
       //                  const std::list<std::string> &_entityNames,
       //                  common::Time _start, common::Time _stop);
 

@@ -521,8 +521,8 @@ math::Vector3 Link::GetRelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeAngularVel() const
 {
-   return this->GetWorldPose().rot.RotateVectorReverse(
-          this->GetWorldAngularVel());
+  return this->GetWorldPose().rot.RotateVectorReverse(
+         this->GetWorldAngularVel());
 }
 
 //////////////////////////////////////////////////

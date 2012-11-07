@@ -59,7 +59,6 @@ namespace gazebo
                    this->SetAxis(1,
                        _sdf->GetElement("axis2")->GetValueVector3("xyz"));
                  }
-
     };
     /// \}
   }

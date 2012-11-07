@@ -22,9 +22,9 @@
 #ifndef _LOGGER_HH_
 #define _LOGGER_HH_
 
-#include <vector>
 #include <fstream>
 #include <string>
+#include <map>
 #include <boost/thread.hpp>
 
 #include "common/Event.hh"
