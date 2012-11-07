@@ -99,8 +99,11 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
@@ -831,7 +834,7 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-  for (;iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
+  for (; iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
 
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 

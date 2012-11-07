@@ -20,6 +20,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <deque>
 
 #include "gui/qt.h"
 #include "sdf/sdf.hh"

@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <vector>
 #include "VClouds/Lightning.h"
 
 namespace SkyX { namespace VClouds
@@ -40,8 +41,11 @@ namespace SkyX { namespace VClouds
       , mIntensity(0)
       , mWidthMultiplier(wm)
       , mBounds(b)
-      , mAngleRange(Ogre::Vector2(Ogre::Math::RangeRandom(0.3,0.5), Ogre::Math::RangeRandom(0.6,0.8)))
-      , mTimeMultipliers(Ogre::Vector3(Ogre::Math::RangeRandom(1.75,4.25), Ogre::Math::RangeRandom(0.4,1.25f), Ogre::Math::RangeRandom(0.2,1.0f)))
+      , mAngleRange(Ogre::Vector2(Ogre::Math::RangeRandom(0.3, 0.5),
+            Ogre::Math::RangeRandom(0.6, 0.8)))
+      , mTimeMultipliers(Ogre::Vector3(Ogre::Math::RangeRandom(1.75, 4.25),
+            Ogre::Math::RangeRandom(0.4, 1.25f),
+            Ogre::Math::RangeRandom(0.2, 1.0f)))
       , mSegments(std::vector<Lightning::Segment>())
       , mChildren(std::vector<Lightning*>())
       , mBillboardSet(0)
@@ -65,7 +69,7 @@ namespace SkyX { namespace VClouds
     Ogre::Vector3 current, last = mOrigin;
 
     // Create ray segments
-    for(Ogre::uint32 k = 1; k < mDivisions+1; k++)
+    for (Ogre::uint32 k = 1; k < mDivisions+1; k++)
     {
       Ogre::Vector3 curr = mOrigin +
         mDirection*mLength*(static_cast<Ogre::Real>(k)/mDivisions);
@@ -86,42 +90,49 @@ namespace SkyX { namespace VClouds
     mBillboardSet->setMaterialName("SkyX_Lightning");
     mBillboardSet->setBillboardType(Ogre::BBT_ORIENTED_SELF);
 
-    Ogre::Real width = mWidthMultiplier*3*(static_cast<Ogre::Real>(mRecursivity)/4+1)*Ogre::Math::RangeRandom(0.5f, 2.5f-mRecursivity/3);
+    Ogre::Real width = mWidthMultiplier*3*(static_cast<Ogre::Real>(
+          mRecursivity)/4+1)*Ogre::Math::RangeRandom(0.5f, 2.5f-mRecursivity/3);
 
     // Create the associated billboard for each segment
     Ogre::Real delta;
     Ogre::Vector2 bounds;
     Ogre::Billboard* bb;
-    for(Ogre::uint32 k = 0; k < mSegments.size(); k++)
+    for (Ogre::uint32 k = 0; k < mSegments.size(); k++)
     {
       delta = 1.0f / mSegments.size();
-      bounds = Ogre::Vector2(k*delta,(k+1)*delta);
+      bounds = Ogre::Vector2(k*delta, (k+1)*delta);
 
-      bounds = Ogre::Vector2(mBounds.x, mBounds.x) + bounds*(mBounds.y-mBounds.x);
+      bounds = Ogre::Vector2(mBounds.x, mBounds.x) +
+        bounds*(mBounds.y-mBounds.x);
 
-      bb = mBillboardSet->createBillboard((mSegments.at(k).a+mSegments.at(k).b)/2);
+      bb = mBillboardSet->createBillboard((
+            mSegments.at(k).a+mSegments.at(k).b)/2);
       bb->setDimensions(width, (mSegments.at(k).a-mSegments.at(k).b).length());
-      bb->setColour(Ogre::ColourValue(0,bounds.x,bounds.y));
+      bb->setColour(Ogre::ColourValue(0, bounds.x, bounds.y));
       bb->mDirection = (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy();
 
-      bb = mBillboardSet->createBillboard(mSegments.at(k).a + (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy()*width/2);
+      bb = mBillboardSet->createBillboard(
+          mSegments.at(k).a +
+          (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy()*width/2);
       bb->setDimensions(width, width);
-      bb->setColour(Ogre::ColourValue(1,bounds.x,bounds.x));
+      bb->setColour(Ogre::ColourValue(1, bounds.x, bounds.x));
       bb->mDirection = (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy();
 
-      bb = mBillboardSet->createBillboard(mSegments.at(k).b - (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy()*width/2);
+      bb = mBillboardSet->createBillboard(mSegments.at(k).b -
+          (mSegments.at(k).a-mSegments.at(k).b).normalisedCopy()*width/2);
       bb->setDimensions(width, width);
-      bb->setColour(Ogre::ColourValue(1,bounds.y,bounds.y));
+      bb->setColour(Ogre::ColourValue(1, bounds.y, bounds.y));
       bb->mDirection = -(mSegments.at(k).a-mSegments.at(k).b).normalisedCopy();
 
-      width *= 1-(1.0f/(mRecursivity*mRecursivity+1.0f))*(1.0f/mSegments.size());
+      width *= 1-(1.0f/(mRecursivity*mRecursivity+1.0f))*
+        (1.0f/mSegments.size());
     }
 
     mBillboardSet->_updateBounds();
 
     mSceneNode->attachObject(mBillboardSet);
 
-    mBillboardSet->setCustomParameter(0, Ogre::Vector4(1,0,0,0));
+    mBillboardSet->setCustomParameter(0, Ogre::Vector4(1, 0, 0, 0));
 
     // Ramifications
     if (mRecursivity > 0)
@@ -131,7 +142,8 @@ namespace SkyX { namespace VClouds
       Ogre::Real lengthMult;
       for (Ogre::uint32 k = 0; k < mDivisions-1; k++)
       {
-        angle = (mSegments.at(k).b-mSegments.at(k).a).normalisedCopy().dotProduct(
+        angle = (mSegments.at(k).b-mSegments.at(k).a).
+          normalisedCopy().dotProduct(
             ((mSegments.at(k+1).b-mSegments.at(k+1).a).normalisedCopy()));
 
         if (angle < Ogre::Math::RangeRandom(mAngleRange.x, mAngleRange.y))
@@ -143,11 +155,15 @@ namespace SkyX { namespace VClouds
           dir.normalise();
 
           delta = 1.0f / mSegments.size();
-          bounds = Ogre::Vector2(mBounds.x+(mBounds.y-mBounds.x)*(k+1)*delta,1);
+          bounds = Ogre::Vector2(mBounds.x+
+              (mBounds.y-mBounds.x)*(k+1)*delta, 1);
 
           lengthMult = Ogre::Math::RangeRandom(0.1f, 0.7f);
 
-          Lightning* lightning = new Lightning(mSceneManager, mSceneNode, mSegments.at(k).b, dir, lengthMult*mLength, 2+mDivisions*lengthMult, mRecursivity-1, mTimeMultiplier, mWidthMultiplier, bounds);
+          Lightning* lightning = new Lightning(mSceneManager,
+              mSceneNode, mSegments.at(k).b, dir, lengthMult*mLength,
+              2+mDivisions*lengthMult, mRecursivity-1, mTimeMultiplier,
+              mWidthMultiplier, bounds);
           lightning->create();
 
           mChildren.push_back(lightning);
@@ -170,7 +186,7 @@ namespace SkyX { namespace VClouds
 
     mSegments.clear();
 
-    for(Ogre::uint32 k = 0; k < mChildren.size(); k++)
+    for (Ogre::uint32 k = 0; k < mChildren.size(); k++)
     {
       delete mChildren.at(k);
     }
@@ -203,9 +219,9 @@ namespace SkyX { namespace VClouds
     {
       mTime += timeSinceLastFrame*mTimeMultipliers.x;
 
-      if (mTime > 2) mTime = 1.5f; // Prevent big changes
+      if (mTime > 2) mTime = 1.5f;  // Prevent big changes
 
-      if (mTime > 0.8f) // Big flash start
+      if (mTime > 0.8f)  // Big flash start
       {
         alpha += (mTime-0.8f)*(maxAlpha/0.2f);
       }
@@ -214,28 +230,30 @@ namespace SkyX { namespace VClouds
     {
       mTime += timeSinceLastFrame*mTimeMultipliers.y;
 
-      if (mTime > 3) mTime = 2.5f; // Prevent big changes
+      if (mTime > 3) mTime = 2.5f;  // Prevent big changes
 
-      if (mTime < 1.2f) // Big flash end
+      if (mTime < 1.2f)  // Big flash end
       {
         alpha += (0.2f-(mTime-1.0f))*(maxAlpha/0.2f);
       }
-      else // Sinus flashing pattern
+      else  // Sinus flashing pattern
       {
-        alpha += Ogre::Math::Abs(Ogre::Math::Sin((mTime-1.2f)*1.5f*mTimeMultipliers.x));
+        alpha += Ogre::Math::Abs(Ogre::Math::Sin((mTime-1.2f)*
+              1.5f*mTimeMultipliers.x));
       }
     }
-    else if (mTime > 2) // Ray fading
+    else if (mTime > 2)  // Ray fading
     {
       mTime += timeSinceLastFrame*mTimeMultipliers.z;
 
       if (mTime > 3)
       {
-        mTime = 3; // Prevent big changes
+        mTime = 3;  // Prevent big changes
         mFinished = true;
       }
 
-      alpha += Ogre::Math::Abs(Ogre::Math::Sin((2-1.2f)*1.5f*mTimeMultipliers.x));
+      alpha += Ogre::Math::Abs(
+          Ogre::Math::Sin((2-1.2f)*1.5f*mTimeMultipliers.x));
       alpha *= 3.0f-mTime;
     }
 
@@ -248,28 +266,31 @@ namespace SkyX { namespace VClouds
   {
     mBillboardSet->setRenderQueueGroup(rqg);
 
-    for(Ogre::uint32 k = 0; k < mChildren.size(); k++)
+    for (Ogre::uint32 k = 0; k < mChildren.size(); k++)
     {
       mChildren.at(k)->_updateRenderQueueGroup(rqg);
     }
   }
 
-  void Lightning::_updateData(const Ogre::Real& alpha, const Ogre::Real& currentPos, const Ogre::Real& parentTime)
+  void Lightning::_updateData(const Ogre::Real& alpha,
+      const Ogre::Real& currentPos, const Ogre::Real& parentTime)
   {
-    Ogre::Vector4 params = Ogre::Vector4(alpha,currentPos,(3-mRecursivity)*0.075f+(mBounds.x*1.5f+0.2f)*0.85f,0);
+    Ogre::Vector4 params = Ogre::Vector4(alpha, currentPos,
+        (3-mRecursivity)*0.075f+(mBounds.x*1.5f+0.2f)*0.85f, 0);
 
     if (parentTime > 1 && parentTime < 2.2f)
     {
-      params.z *= Ogre::Math::Clamp<Ogre::Real>(1.5-parentTime,0.2f,1);
+      params.z *= Ogre::Math::Clamp<Ogre::Real>(1.5-parentTime, 0.2f, 1);
     }
     else if (parentTime > 2.2f)
     {
-      params.z *= Ogre::Math::Clamp<Ogre::Real>((-2.2f+parentTime)*1.25f,0.2f,1);
+      params.z *= Ogre::Math::Clamp<Ogre::Real>(
+          (-2.2f+parentTime)*1.25f, 0.2f, 1);
     }
 
     mBillboardSet->setCustomParameter(0, params);
 
-    for(Ogre::uint32 k = 0; k < mChildren.size(); k++)
+    for (Ogre::uint32 k = 0; k < mChildren.size(); k++)
     {
       mChildren.at(k)->_updateData(alpha*0.75f, currentPos, parentTime);
     }

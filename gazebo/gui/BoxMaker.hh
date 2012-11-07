@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef BOXMAKER_HH
-#define BOXMAKER_HH
+#ifndef _BOXMAKER_HH_
+#define _BOXMAKER_HH_
 
+#include <string>
 #include "math/Vector2i.hh"
 #include "gui/EntityMaker.hh"
 

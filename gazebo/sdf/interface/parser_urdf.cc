@@ -685,7 +685,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
         std::string model_filename = mesh->filename;
         std::string package_prefix("package://");
         std::string model_prefix("model://");
-        size_t pos1 = model_filename.find(package_prefix,0);
+        size_t pos1 = model_filename.find(package_prefix, 0);
         if (pos1 != std::string::npos)
         {
           size_t rep_len = package_prefix.size();
@@ -711,7 +711,7 @@ void URDF2Gazebo::createGeometry(TiXmlElement* elem,
     break;
   }
 
-  if(geometry_type)
+  if (geometry_type)
   {
     gazebo_geometry->LinkEndChild(geometry_type);
     elem->LinkEndChild(gazebo_geometry);
