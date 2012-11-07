@@ -339,11 +339,11 @@ void World::LogStep()
 
       this->logPlayState.Load(this->logPlayStateSDF);
 
-      this->SetState(WorldState(shared_from_this()) + this->logPlayState);
+      WorldState state = WorldState(shared_from_this()) + this->logPlayState;
+      this->SetState(state);
 
       this->Update();
     }
-
 
     if (this->stepInc > 0)
       this->stepInc--;
@@ -567,8 +567,6 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     model.reset(new Model(_parent));
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
-
-    std::cout << "Load Model[" << model->GetName() << "]\n";
 
     event::Events::addEntity(model->GetScopedName());
 

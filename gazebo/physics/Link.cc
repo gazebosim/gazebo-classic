@@ -817,8 +817,9 @@ void Link::OnPoseChange()
 //////////////////////////////////////////////////
 void Link::SetState(const LinkState &_state)
 {
-  this->SetRelativePose(_state.GetPose());
+  // this->SetRelativePose(_state.GetPose());
 
+  /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
   {
     CollisionState collisionState = _state.GetCollisionState(i);
@@ -827,7 +828,7 @@ void Link::SetState(const LinkState &_state)
       collision->SetState(collisionState);
     else
       gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

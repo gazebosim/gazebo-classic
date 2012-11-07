@@ -35,6 +35,7 @@ LinkState::LinkState(const LinkPtr _link)
           _link->GetWorld()->GetSimTime())
 {
   this->pose = _link->GetRelativePose();
+  /*
   this->velocity = math::Pose(_link->GetRelativeLinearVel(),
       math::Quaternion(_link->GetRelativeAngularVel()));
   this->acceleration = math::Pose(_link->GetRelativeLinearAccel(),
@@ -47,6 +48,7 @@ LinkState::LinkState(const LinkPtr _link)
     if (coll)
       this->collisionStates.push_back(CollisionState(coll));
   }
+  */
 }
 
 /////////////////////////////////////////////////
@@ -183,7 +185,7 @@ LinkState &LinkState::operator=(const LinkState &_state)
 /////////////////////////////////////////////////
 bool LinkState::IsZero() const
 {
-  bool result = true;
+  /*bool result = true;
 
   for (std::vector<CollisionState>::const_iterator iter =
        this->collisionStates.begin();
@@ -195,7 +197,9 @@ bool LinkState::IsZero() const
   return result && this->pose == math::Pose::Zero &&
          this->velocity == math::Pose::Zero &&
          this->acceleration == math::Pose::Zero &&
-         this->forceMag == math::Pose::Zero;
+         this->forceMag == math::Pose::Zero;*/
+
+  return this->pose == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -203,13 +207,15 @@ LinkState LinkState::operator-(const LinkState &_state) const
 {
   LinkState result = *this;
 
-  result.pose -= _state.pose;
-  result.velocity -= _state.velocity;
+  result.collisionStates.clear();
+
+  result.pose.pos = this->pose.pos - _state.pose.pos;
+  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+
+  /*result.velocity -= _state.velocity;
   result.acceleration -= _state.acceleration;
   result.forceMag -= _state.forceMag;
   result.forcePos -= _state.forcePos;
-
-  result.collisionStates.clear();
 
   // Insert the collision differences
   for (std::vector<CollisionState>::const_iterator iter =
@@ -220,6 +226,7 @@ LinkState LinkState::operator-(const LinkState &_state) const
     if (!state.IsZero())
       result.collisionStates.push_back(state);
   }
+  */
 
   return result;
 }
@@ -228,14 +235,16 @@ LinkState LinkState::operator-(const LinkState &_state) const
 LinkState LinkState::operator+(const LinkState &_state) const
 {
   LinkState result = *this;
+  result.collisionStates.clear();
 
-  result.pose += _state.pose;
-  result.velocity += _state.velocity;
+  result.pose.pos = this->pose.pos + _state.pose.pos;
+  result.pose.rot = _state.pose.rot * this->pose.rot;
+
+  /*result.velocity += _state.velocity;
   result.acceleration += _state.acceleration;
   result.forceMag += _state.forceMag;
   result.forcePos += _state.forcePos;
 
-  result.collisionStates.clear();
 
   // Insert the collision differences
   for (std::vector<CollisionState>::const_iterator iter =
@@ -245,6 +254,6 @@ LinkState LinkState::operator+(const LinkState &_state) const
     CollisionState state = this->GetCollisionState((*iter).GetName()) + *iter;
     result.collisionStates.push_back(state);
   }
-
+  */
   return result;
 }

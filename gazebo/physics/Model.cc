@@ -880,8 +880,8 @@ void Model::OnPoseChange()
 void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
-  /*
-  for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+
+  /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
   {
     LinkState linkState = _state.GetLinkState(i);
     LinkPtr link = this->GetLink(linkState.GetName());
@@ -889,18 +889,21 @@ void Model::SetState(const ModelState &_state)
       link->SetState(linkState);
     else
       gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
-  }
+  }*/
 
   for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
   {
     JointState jointState = _state.GetJointState(i);
-    JointPtr joint = this->GetJoint(jointState.GetName());
+    this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+                           jointState.GetAngle(0).Radian());
+
+    /*JointPtr joint = this->GetJoint(jointState.GetName());
     if (joint)
       joint->SetState(jointState);
     else
       gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
+      */
   }
-  */
 }
 
 /////////////////////////////////////////////////

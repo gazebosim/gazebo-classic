@@ -33,7 +33,7 @@ CollisionState::CollisionState(const CollisionPtr _collision)
 : State(_collision->GetName(), _collision->GetWorld()->GetRealTime(),
         _collision->GetWorld()->GetSimTime())
 {
-  this->pose = _collision->GetWorldPose();
+  this->pose = _collision->GetRelativePose();
 }
 
 /////////////////////////////////////////////////

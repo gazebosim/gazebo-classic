@@ -147,6 +147,7 @@ namespace gazebo
       {
         _out << "<link name='" << _state.name << "'>\n";
         _out << "<pose>" << _state.pose << "</pose>\n";
+        /*
         _out << "<velocity>" << _state.velocity << "</velocity>\n";
         _out << "<acceleration>" << _state.acceleration << "</acceleration>\n";
         _out << "<wrench>" << "<pos>" << _state.forcePos << "</pos>\n"
@@ -158,7 +159,7 @@ namespace gazebo
         {
           _out << *iter;
         }
-
+        */
         _out << "</link>\n";
 
         return _out;
