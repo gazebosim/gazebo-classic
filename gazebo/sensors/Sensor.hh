@@ -93,9 +93,8 @@ namespace gazebo
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
-      /// \brief Get the sensor's name
-      /// \return The unscoped name of the sensor.
-      /// \sa Sensor::GetScopedName
+      /// \brief Get name
+      /// \return name of sensor
       public: std::string GetName() const;
 
       /// \brief Get fully scoped name of the sensor
