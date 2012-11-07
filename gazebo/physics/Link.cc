@@ -470,6 +470,22 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+Collision_V Link::GetCollisions() const
+{
+  Collision_V result;
+  Base_V::const_iterator biter;
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+  {
+    if ((*biter)->HasType(Base::COLLISION))
+    {
+      result.push_back(boost::shared_static_cast<Collision>(*biter));
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
@@ -815,7 +831,7 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void Link::SetState(const LinkState &_state)
+void Link::SetState(const LinkState & /*_state*/)
 {
   // this->SetRelativePose(_state.GetPose());
 

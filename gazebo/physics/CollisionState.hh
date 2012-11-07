@@ -18,11 +18,11 @@
  * Author: Nate Koenig
  */
 
-#ifndef _COLLISION_STATE_HH_
-#define _COLLISION_STATE_HH_
+#ifndef _COLLISIONSTATE_HH_
+#define _COLLISIONSTATE_HH_
 
-#include "physics/State.hh"
-#include "math/Pose.hh"
+#include "gazebo/physics/State.hh"
+#include "gazebo/math/Pose.hh"
 
 namespace gazebo
 {
@@ -48,7 +48,13 @@ namespace gazebo
       /// Build a CollisionState from an existing Collision.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
-      public: CollisionState(const CollisionPtr _collision);
+      public: explicit CollisionState(const CollisionPtr _collision);
+
+      /// \brief Constructor
+      ///
+      /// Build a CollisionState from SDF data
+      /// \param[in] _sdf SDF data to load a collision state from.
+      public: explicit CollisionState(const sdf::ElementPtr _sdf);
 
       /// \brief Destructor
       public: virtual ~CollisionState();
@@ -57,16 +63,11 @@ namespace gazebo
       ///
       /// Load CollisionState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
-      public: virtual void Load(sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the Collision pose
-      public: math::Pose GetPose() const;
-
-      /// \brief Fill a State SDF element with state info.
-      ///
-      /// Stored state information into an SDF::Element pointer.
-      /// \param[in] _elem Pointer to the SDF::Element which recieves the data.
-      public: void FillStateSDF(sdf::ElementPtr _elem) const;
+      /// \return The pose of the CollisionState
+      public: const math::Pose &GetPose() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -74,7 +75,7 @@ namespace gazebo
 
       /// \brief Assignment operator
       /// \param[in] _state State value
-      /// \return this
+      /// \return Reference to this
       public: CollisionState &operator=(const CollisionState &_state);
 
       /// \brief Subtraction operator.
@@ -102,7 +103,7 @@ namespace gazebo
         return _out;
       }
 
-      /// Pose of the Collision object
+      /// \brief Pose of the Collision object.
       private: math::Pose pose;
     };
     /// \}

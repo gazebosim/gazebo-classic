@@ -37,7 +37,7 @@
       </attribute>
 
       <element name="angle" type="double" default="0" required="+">
-        <attribute name="axis" type="int" default="0" required="1">
+        <attribute name="axis" type="unsigned int" default="0" required="1">
           <description>Index of the axis.</description>
         </attribute>
 
@@ -66,15 +66,8 @@
         <description>Acceleration of the link</description>
       </element>
 
-      <!-- Zero or more wrenches -->
-      <element name="wrench" required="0">
+      <element name="wrench" type="pose" default="0 0 0 0 0 0" required="0">
         <description>Force applied to the link</description>
-        <element name="pos" type="vector3" default="0 0 0" required="0">
-          <description>Position of the force.</description>
-        </element>
-        <element name="mag" type="pose" default="0 0 0 0 0 0" required="1">
-          <description>Magnitude of the force.</description>
-        </element>
       </element>
 
       <element name="collision" required="*">

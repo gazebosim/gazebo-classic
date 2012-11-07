@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef _WORLD_STATE_HH_
-#define _WORLD_STATE_HH_
+#ifndef _WORLDSTATE_HH_
+#define _WORLDSTATE_HH_
 
 #include <string>
 #include <vector>
@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class WorldState WorldState.hh physics/WorldState.hh
+    /// \class WorldState WorldState.hh physics/physics.hh
     /// \brief Store state information of a physics::World object
     ///
     /// Instances of this class contain the state of a World at a specific
@@ -46,60 +46,67 @@ namespace gazebo
       /// \brief Default constructor
       public: WorldState();
 
-      /// \brief Constructor
+      /// \brief Constructor.
       ///
       /// Generate a WorldState from an instance of a World.
-      /// \param _world Pointer to a world
-      public: WorldState(WorldPtr _world);
+      /// \param[in] _world Pointer to a world
+      public: explicit WorldState(const WorldPtr _world);
 
-      /// \brief Destructor
+      /// \brief Constructor
+      ///
+      /// Build a WorldState from SDF data
+      /// \param[in] _sdf SDF data to load a world state from.
+      public: explicit WorldState(const sdf::ElementPtr _sdf);
+
+      /// \brief Destructor.
       public: virtual ~WorldState();
 
-      /// \brief Load state from SDF element
+      /// \brief Load state from SDF element.
       ///
       /// Set a WorldState from an SDF element containing WorldState info.
-      /// \param _elem Pointer to the WorldState SDF element.
-      public: virtual void Load(sdf::ElementPtr _elem);
+      /// \param[in] _elem Pointer to the WorldState SDF element.
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
-      /// \brief Get the number of model states
+      /// \brief Get the model states.
+      /// \return A vector of model states.
+      public: const std::vector<ModelState> &GetModelStates() const;
+
+      /// \brief Get the number of model states.
       ///
       /// Returns the number of models in this instance.
-      /// \return Number of models
+      /// \return Number of models.
       public: unsigned int GetModelStateCount() const;
 
-      /// \brief Get the state in SDF format
-      ///
-      /// Returns a pointer to the SDF representation of the WorldState
-      /// \return Pointer to the SDF representation of the WorldState
-      public: const sdf::ElementPtr &GetSDF() const;
-
-      /// \brief Get a model state
+      /// \brief Get a model state.
       ///
       /// Get the state of a Model based on an index. The min index is
-      /// and the max is WorldState::GetModelStateCount()
+      /// and the max is WorldState::GetModelStateCount().
       ///
-      /// \param _index Index of the model
-      /// \return State of the requested Model
+      /// \param[in] _index Index of the model.
+      /// \return State of the requested Model.
       public: ModelState GetModelState(unsigned int _index) const;
 
-      public: bool HasModelState(const std::string &_modelName) const;
-
-      /// \brief Get a model state by model name
+      /// \brief Get a model state by model name.
+      /// \param[in] _modelName Name of the model state to get.
+      /// \return The model state.
+      /// \throws common::Exception When the _modelName doesn't exist.
       public: ModelState GetModelState(const std::string &_modelName) const;
 
-      public: void Update(WorldPtr _world);
-
-      public: void UpdateSDF();
-
-      public: void UpdateSDF(WorldPtr _world);
+      /// \brief Return true if WorldState has a ModelState with the given
+      /// name.
+      /// \param[in] _modelName Name of the model to search for.
+      /// \return True if the ModelState exists.
+      public: bool HasModelState(const std::string &_modelName) const;
 
       /// \brief Return true if the values in the state are zero.
+      ///
+      /// This will check to see if the all model states are zero.
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
 
       /// \brief Assignment operator
       /// \param[in] _state State value
-      /// \return this
+      /// \return Reference to this
       public: WorldState &operator=(const WorldState &_state);
 
       /// \brief Subtraction operator.
@@ -137,8 +144,6 @@ namespace gazebo
 
       /// State of all the models.
       private: std::vector<ModelState> modelStates;
-
-      private: sdf::ElementPtr sdf;
     };
     /// \}
   }

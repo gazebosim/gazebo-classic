@@ -64,6 +64,9 @@ namespace gazebo
       /// \return The error string
       public: std::string GetErrorStr() const;
 
+      /// \brief Print the exception to std out.
+      public: void Print() const;
+
       /// \brief The error function
       private: std::string file;
 

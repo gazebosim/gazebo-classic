@@ -18,16 +18,17 @@
  * Author: Nate Koenig
  */
 
-#ifndef _MODEL_STATE_HH_
-#define _MODEL_STATE_HH_
+#ifndef _MODELSTATE_HH_
+#define _MODELSTATE_HH_
 
 #include <vector>
 #include <string>
 
-#include "physics/State.hh"
-#include "physics/LinkState.hh"
-#include "physics/JointState.hh"
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
+
+#include "gazebo/physics/State.hh"
+#include "gazebo/physics/LinkState.hh"
+#include "gazebo/physics/JointState.hh"
 
 namespace gazebo
 {
@@ -54,7 +55,13 @@ namespace gazebo
       /// Build a ModelState from an existing Model.
       /// \param[in] _model Pointer to the model from which to gather state
       /// info.
-      public: explicit ModelState(ModelPtr _model);
+      public: explicit ModelState(const ModelPtr _model);
+
+      /// \brief Constructor
+      ///
+      /// Build a ModelState from SDF data
+      /// \param[in] _sdf SDF data to load a model state from.
+      public: explicit ModelState(const sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
       public: virtual ~ModelState();
@@ -63,11 +70,15 @@ namespace gazebo
       ///
       /// Load ModelState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
-      public: virtual void Load(sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the stored model pose.
-      /// \return The math::Pose of the Model
-      public: math::Pose GetPose() const;
+      /// \return The math::Pose of the Model.
+      public: const math::Pose &GetPose() const;
+
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
 
       /// \brief Get the number of link states.
       ///
@@ -80,7 +91,8 @@ namespace gazebo
       /// Get a Link State based on an index, where index is in the range of
       /// 0...ModelState::GetLinkStateCount
       /// \param[in] _index Index of the LinkState
-      /// \return State of the Link
+      /// \return State of the Link.
+      /// \throws common::Exception When _index is out of range.
       public: LinkState GetLinkState(unsigned int _index) const;
 
       /// \brief Get a link state by Link name
@@ -89,7 +101,12 @@ namespace gazebo
       /// matching name, if any.
       /// \param[in] _linkName Name of the LinkState
       /// \return State of the Link.
+      /// \throws common::Exception When _linkName is invalid.
       public: LinkState GetLinkState(const std::string &_linkName) const;
+
+      /// \brief Get the link states.
+      /// \return A vector of link states.
+      public: const std::vector<LinkState> &GetLinkStates() const;
 
       /// \brief Get the number of joint states.
       ///
@@ -103,6 +120,7 @@ namespace gazebo
       /// 0...ModelState::GetJointStateCount().
       /// \param[in] _index Index of a JointState.
       /// \return State of a Joint.
+      /// \throws common::Exception When _index is out of range.
       public: JointState GetJointState(unsigned int _index) const;
 
       /// \brief Get a Joint state by Joint name.
@@ -111,27 +129,12 @@ namespace gazebo
       /// matching name, if any.
       /// \param[in] _jointName Name of the JointState.
       /// \return State of the Joint.
+      /// \throws common::Exception When _jointName is invalid.
       public: JointState GetJointState(const std::string &_jointName) const;
 
-      /// \brief Fill a State SDF element with state info.
-      ///
-      /// Stored state information into an SDF::Element pointer.
-      /// \param[in] _elem Pointer to the SDF::Element which recieves the data.
-      public: void FillStateSDF(sdf::ElementPtr _elem) const;
-
-      /// \brief Update the state information using the specified model.
-      public: void Update(ModelPtr _model);
-
-      /// \brief Update a Model SDF element with this state info.
-      ///
-      /// Set the values in a Model's SDF::Element with the information
-      /// stored in this instance.
-      /// \param[in] _elem Pointer to a Models's SDF::Element.
-      public: void UpdateModelSDF(sdf::ElementPtr _elem);
-
-      /// \brief Return true if the values in the state are zero.
-      /// \return True if the values in the state are zero.
-      public: bool IsZero() const;
+      /// \brief Get the joint states.
+      /// \return A vector of joint states.
+      public: const std::vector<JointState> &GetJointStates() const;
 
       /// \brief Assignment operator
       /// \param[in] _state State value
@@ -158,13 +161,14 @@ namespace gazebo
         _out << "<model name='" << _state.GetName() << "'>\n";
         _out << "<pose>" << _state.pose << "</pose>\n";
 
-        /*for (std::vector<LinkState>::const_iterator iter =
-            _state.linkStates.begin(); iter != _state.linkStates.end();
-            ++iter)
-        {
-          _out << *iter;
-        }*/
+        // for (std::vector<LinkState>::const_iterator iter =
+        //     _state.linkStates.begin(); iter != _state.linkStates.end();
+        //     ++iter)
+        // {
+        //   _out << *iter;
+        // }
 
+        // Output the joint information
         for (std::vector<JointState>::const_iterator iter =
             _state.jointStates.begin(); iter != _state.jointStates.end();
             ++iter)
@@ -177,13 +181,13 @@ namespace gazebo
         return _out;
       }
 
-      /// Pose of the model
+      /// \brief Pose of the model.
       private: math::Pose pose;
 
-      /// All the link states
+      /// \brief All the link states.
       private: std::vector<LinkState> linkStates;
 
-      /// All the joint states
+      /// \brief All the joint states.
       private: std::vector<JointState> jointStates;
     };
     /// \}

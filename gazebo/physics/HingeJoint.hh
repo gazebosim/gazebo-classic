@@ -42,6 +42,11 @@ namespace gazebo
       ///  \brief Destructor
       public: virtual ~HingeJoint()
               { }
+
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 1;}
+
       /// \brief Load joint
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {

@@ -133,7 +133,7 @@ namespace gazebo
 
       /// \brief Get a list of all the models
       /// \return A list of all the Models in the world
-      public: std::list<ModelPtr> GetModels() const;
+      public: Model_V GetModels() const;
 
       /// \brief Reset with options
       ///
@@ -305,6 +305,9 @@ namespace gazebo
       public: void EnablePhysicsEngine(bool _enable)
               {this->enablePhysicsEngine = _enable;}
 
+      /// \brief Update the state SDF value from the current state.
+      public: void UpdateStateSDF();
+
       /// \brief Get a model by id
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -417,15 +420,8 @@ namespace gazebo
       /// \brief Process all recieved model messages.
       private: void ProcessModelMsgs();
 
-      /// \brief Update the state SDF values from the current state.
-      private: void UpdateStateSDF();
-
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
-
-      /// \brief Update the state SDF from a given state.
-      /// \param[in] _state State to update from.
-      private: void UpdateSDFFromState(const WorldState &_state);
 
       /// \brief Process all incoming messages.
       private: void ProcessMessages();

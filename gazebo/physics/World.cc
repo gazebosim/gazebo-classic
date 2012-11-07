@@ -209,7 +209,6 @@ void World::Load(sdf::ElementPtr _sdf)
       WorldState myState;
       myState.Load(childElem);
       this->sdf->InsertElement(childElem);
-      this->UpdateSDFFromState(myState);
       // this->SetState(myState);
 
       childElem = childElem->GetNextElement("state");
@@ -686,13 +685,11 @@ ModelPtr World::GetModel(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-std::list<ModelPtr> World::GetModels() const
+Model_V World::GetModels() const
 {
-  std::list<ModelPtr> models;
+  Model_V models;
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-  {
     models.push_back(this->GetModel(i));
-  }
 
   return models;
 }
@@ -1432,25 +1429,6 @@ void World::SetState(const WorldState &_state)
   }
 }
 
-//////////////////////////////////////////////////
-void World::UpdateStateSDF()
-{
-  /*this->sdf->Update();
-  sdf::ElementPtr stateElem = this->sdf->GetElement("state");
-  stateElem->ClearElements();
-
-  stateElem->GetAttribute("world_name")->Set(this->GetName());
-  stateElem->GetElement("time")->Set(this->GetSimTime());
-
-  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-  {
-    sdf::ElementPtr elem = stateElem->AddElement("model");
-    this->GetModel(i)->GetState().FillStateSDF(elem);
-  }
-  */
-}
-
-
 
 //////////////////////////////////////////////////
 void World::InsertModelFile(const std::string &_sdfFilename)
@@ -1489,29 +1467,6 @@ std::string World::StripWorldName(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void World::UpdateSDFFromState(const WorldState &_state)
-{
-  if (this->sdf->HasElement("model"))
-  {
-    sdf::ElementPtr childElem = this->sdf->GetElement("model");
-
-    while (childElem)
-    {
-      for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
-      {
-        ModelState modelState = _state.GetModelState(i);
-        if (modelState.GetName() == childElem->GetValueString("name"))
-        {
-          modelState.UpdateModelSDF(childElem);
-        }
-      }
-
-      childElem = childElem->GetNextElement("model");
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 void World::EnableAllModels()
 {
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
@@ -1523,6 +1478,24 @@ void World::DisableAllModels()
 {
   for (unsigned int i = 0; i < this->GetModelCount(); ++i)
     this->GetModel(i)->SetEnabled(false);
+}
+
+//////////////////////////////////////////////////
+void World::UpdateStateSDF()
+{
+  this->sdf->Update();
+  /*sdf::ElementPtr stateElem = this->sdf->GetElement("state");
+  stateElem->ClearElements();
+
+  stateElem->GetAttribute("world_name")->Set(this->GetName());
+  stateElem->GetElement("time")->Set(this->GetSimTime());
+
+  for (unsigned int i = 0; i < this->GetModelCount(); ++i)
+  {
+    sdf::ElementPtr elem = stateElem->AddElement("model");
+    this->GetModel(i)->GetState().FillStateSDF(elem);
+  }
+  */
 }
 
 //////////////////////////////////////////////////

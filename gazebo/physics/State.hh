@@ -61,7 +61,7 @@ namespace gazebo
       ///
       /// Populates the State information from data stored in an SDF::Element
       /// \param _elem Pointer to the SDF::Element
-      public: virtual void Load(sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

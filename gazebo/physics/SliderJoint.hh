@@ -48,6 +48,10 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  { T::Load(_sdf); }
 
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 1;}
+
       /// \brief Set the anchor
       public: virtual void SetAnchor(int /*_index*/,
                                       const math::Vector3 &_anchor)

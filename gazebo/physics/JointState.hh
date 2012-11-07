@@ -18,14 +18,14 @@
  * Author: Nate Koenig
  */
 
-#ifndef _JOINT_STATE_HH_
-#define _JOINT_STATE_HH_
+#ifndef _JOINTSTATE_HH_
+#define _JOINTSTATE_HH_
 
 #include <vector>
 #include <string>
 
-#include "physics/State.hh"
-#include "math/Pose.hh"
+#include "gazebo/physics/State.hh"
+#include "gazebo/math/Pose.hh"
 
 namespace gazebo
 {
@@ -45,12 +45,18 @@ namespace gazebo
       /// \param[in] _joint Joint to get the state of.
       public: explicit JointState(JointPtr _joint);
 
+      /// \brief Constructor
+      ///
+      /// Build a JointState from SDF data
+      /// \param[in] _sdf SDF data to load a joint state from.
+      public: explicit JointState(const sdf::ElementPtr _sdf);
+
       /// \brief Destructor.
       public: virtual ~JointState();
 
       /// \brief Load state from SDF element.
       /// \param[in] _elem SDf values to load from.
-      public: virtual void Load(sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the number of angles.
       /// \return The number of angles.
@@ -59,7 +65,12 @@ namespace gazebo
       /// \brief Get the joint angle.
       /// \param[in] _axis The axis index.
       /// \return Angle of the axis.
+      /// \throw common::Exception When _axis is invalid.
       public: math::Angle GetAngle(unsigned int _axis) const;
+
+      /// \brief Get the angles.
+      /// \return Vector of angles.
+      public: const std::vector<math::Angle> &GetAngles() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -89,11 +100,11 @@ namespace gazebo
       {
         _out << "<joint name='" << _state.GetName() << "'>\n";
 
-        for (std::map<int, math::Angle>::const_iterator iter =
+        int i = 0;
+        for (std::vector<math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
-          _out << "<angle axis='" << iter->first << "'>"
-               << iter->second << "</angle>\n";
+          _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>\n";
         }
 
         _out << "</joint>\n";
@@ -101,7 +112,7 @@ namespace gazebo
         return _out;
       }
 
-      private: std::map<int, math::Angle> angles;
+      private: std::vector<math::Angle> angles;
     };
     /// \}
   }

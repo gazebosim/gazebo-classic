@@ -42,6 +42,11 @@ namespace gazebo
       /// \brief Destuctor
       public: virtual ~UniversalJoint()
               { }
+
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 2;}
+
       /// \brief Load a UniversalJoint
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {

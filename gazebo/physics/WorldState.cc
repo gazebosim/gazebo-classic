@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  */
 
+#include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/WorldState.hh"
@@ -29,77 +30,44 @@ using namespace physics;
 WorldState::WorldState()
   : State()
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("state.sdf", this->sdf);
 }
 
 /////////////////////////////////////////////////
-WorldState::WorldState(WorldPtr _world)
+WorldState::WorldState(const WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
-  for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
+  // Add a state for all the models
+  Model_V models = _world->GetModels();
+  for (Model_V::const_iterator iter = models.begin();
+       iter != models.end(); ++iter)
   {
-    ModelPtr model = _world->GetModel(i);
-    if (model)
-      this->modelStates.push_back(ModelState(model));
+    this->modelStates.push_back(ModelState(*iter));
   }
 }
 
 /////////////////////////////////////////////////
-void WorldState::UpdateSDF()
+WorldState::WorldState(const sdf::ElementPtr _sdf)
+  : State()
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("state.sdf", this->sdf);
-
-  this->sdf->GetAttribute("world_name")->Set(this->GetName());
-
-  this->sdf->GetElement("sim_time")->Set(this->GetSimTime());
-  this->sdf->GetElement("wall_time")->Set(this->GetWallTime());
-  this->sdf->GetElement("real_time")->Set(this->GetRealTime());
-
-  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
-  {
-    sdf::ElementPtr modelElem = this->sdf->AddElement("model");
-    (*iter).FillStateSDF(modelElem);
-  }
-}
-
-/////////////////////////////////////////////////
-void WorldState::UpdateSDF(WorldPtr /*_world*/)
-{
-  /*
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("state.sdf", this->sdf);
-
-  this->sdf->GetElement("sim_time")->Set(_world->GetSimTime());
-  this->sdf->GetElement("wall_time")->Set(common::Time::GetWallTime());
-  this->sdf->GetElement("real_time")->Set(_world->GetRealTime());
-
-  for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
-  {
-    sdf::ElementPtr modelElem = this->sdf->AddElement("model");
-    this->modelStates.push_back(ModelState(_world->GetModel(i)));
-    this->modelStates.back().FillStateSDF(modelElem);
-  }
-  */
+  this->Load(_sdf);
 }
 
 /////////////////////////////////////////////////
 WorldState::~WorldState()
 {
-  this->sdf.reset();
   this->modelStates.clear();
 }
 
 /////////////////////////////////////////////////
-void WorldState::Load(sdf::ElementPtr _elem)
+void WorldState::Load(const sdf::ElementPtr _elem)
 {
+  // Copy the name and time information
   this->name = _elem->GetValueString("world_name");
   this->simTime = _elem->GetValueTime("sim_time");
   this->wallTime = _elem->GetValueTime("wall_time");
   this->realTime = _elem->GetValueTime("real_time");
 
+  // Add the model states
   this->modelStates.clear();
   if (_elem->HasElement("model"))
   {
@@ -107,12 +75,16 @@ void WorldState::Load(sdf::ElementPtr _elem)
 
     while (childElem)
     {
-      ModelState state;
-      state.Load(childElem);
-      this->modelStates.push_back(state);
+      this->modelStates.push_back(ModelState(childElem));
       childElem = childElem->GetNextElement("model");
     }
   }
+}
+
+/////////////////////////////////////////////////
+const std::vector<ModelState> &WorldState::GetModelStates() const
+{
+  return this->modelStates;
 }
 
 /////////////////////////////////////////////////
@@ -122,14 +94,9 @@ unsigned int WorldState::GetModelStateCount() const
 }
 
 /////////////////////////////////////////////////
-const sdf::ElementPtr &WorldState::GetSDF() const
-{
-  return this->sdf;
-}
-
-/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(unsigned int _index) const
 {
+  // Check to see if the _index is valid.
   if (_index < this->modelStates.size())
     return this->modelStates[_index];
   else
@@ -141,24 +108,24 @@ ModelState WorldState::GetModelState(unsigned int _index) const
 /////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
-  std::vector<ModelState>::const_iterator iter;
-
-  for (iter = this->modelStates.begin();
+  // Search for the model name
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
        iter != this->modelStates.end(); ++iter)
   {
     if ((*iter).GetName() == _modelName)
       return *iter;
   }
 
+  // Throw exception if the model name doesn't exist.
+  gzthrow("Invalid model name[" + _modelName + "].");
   return ModelState();
 }
 
 /////////////////////////////////////////////////
 bool WorldState::HasModelState(const std::string &_modelName) const
 {
-  std::vector<ModelState>::const_iterator iter;
-
-  for (iter = this->modelStates.begin();
+  // Search for the model name
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
        iter != this->modelStates.end(); ++iter)
   {
     if ((*iter).GetName() == _modelName)
@@ -168,6 +135,19 @@ bool WorldState::HasModelState(const std::string &_modelName) const
   return false;
 }
 
+/////////////////////////////////////////////////
+bool WorldState::IsZero() const
+{
+  bool result = true;
+
+  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end(); ++iter)
+  {
+    result = result && (*iter).IsZero();
+  }
+
+  return result;
+}
 
 /////////////////////////////////////////////////
 WorldState &WorldState::operator=(const WorldState &_state)
@@ -184,22 +164,20 @@ WorldState &WorldState::operator=(const WorldState &_state)
     this->modelStates.push_back(ModelState(*iter));
   }
 
-  // Copy the SDF values
-  this->sdf = _state.sdf;
-
   return *this;
 }
 
 /////////////////////////////////////////////////
 WorldState WorldState::operator-(const WorldState &_state) const
 {
-  WorldState result = *this;
+  WorldState result;
 
-  result.simTime -= _state.simTime;
-  result.realTime -= _state.realTime;
-  result.wallTime -= _state.wallTime;
+  result.name = this->name;
+  result.simTime = this->simTime - _state.simTime;
+  result.realTime = this->realTime - _state.realTime;
+  result.wallTime = this->wallTime - _state.wallTime;
 
-  result.modelStates.clear();
+  // Subtract the model states.
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
@@ -219,32 +197,19 @@ WorldState WorldState::operator-(const WorldState &_state) const
 /////////////////////////////////////////////////
 WorldState WorldState::operator+(const WorldState &_state) const
 {
-  WorldState result = *this;
+  WorldState result;
 
-  result.simTime += _state.simTime;
-  result.realTime += _state.realTime;
-  result.wallTime += _state.wallTime;
+  result.name = this->name;
+  result.simTime = this->simTime + _state.simTime;
+  result.realTime = this->realTime + _state.realTime;
+  result.wallTime = this->wallTime + _state.wallTime;
 
-  result.modelStates.clear();
+  // Add the states.
   for (std::vector<ModelState>::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
     ModelState state = this->GetModelState((*iter).GetName()) + *iter;
     result.modelStates.push_back(state);
-  }
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-bool WorldState::IsZero() const
-{
-  bool result = true;
-
-  for (std::vector<ModelState>::const_iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
-  {
-    result = result && (*iter).IsZero();
   }
 
   return result;

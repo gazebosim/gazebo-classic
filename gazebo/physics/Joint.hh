@@ -262,6 +262,10 @@ namespace gazebo
       /// \return Angle of the axis.
       public: math::Angle GetAngle(int _index) const;
 
+      /// \brief Get the angle count.
+      /// \return The number of DOF for the joint.
+      public: virtual unsigned int GetAngleCount() const = 0;
+
       /// \brief If the Joint is static, Gazebo stores the state of
       /// this Joint as a scalar inside the Joint class, so
       /// this call will NOT move the joint dynamically for a static Model.

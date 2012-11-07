@@ -15,9 +15,9 @@
  *
  */
 
-#include "physics/Collision.hh"
-#include "physics/World.hh"
-#include "physics/CollisionState.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/CollisionState.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -37,15 +37,25 @@ CollisionState::CollisionState(const CollisionPtr _collision)
 }
 
 /////////////////////////////////////////////////
+CollisionState::CollisionState(const sdf::ElementPtr _sdf)
+  : State()
+{
+  // Load the state from SDF
+  this->Load(_sdf);
+}
+
+/////////////////////////////////////////////////
 CollisionState::~CollisionState()
 {
 }
 
 /////////////////////////////////////////////////
-void CollisionState::Load(sdf::ElementPtr _elem)
+void CollisionState::Load(const sdf::ElementPtr _elem)
 {
+  // Set the name
   this->name = _elem->GetValueString("name");
 
+  // Set the pose
   if (_elem->HasElement("pose"))
     this->pose = _elem->GetValuePose("pose");
   else
@@ -53,16 +63,9 @@ void CollisionState::Load(sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-math::Pose CollisionState::GetPose() const
+const math::Pose &CollisionState::GetPose() const
 {
   return this->pose;
-}
-
-/////////////////////////////////////////////////
-void CollisionState::FillStateSDF(sdf::ElementPtr _elem) const
-{
-  sdf::ElementPtr poseElem = _elem->AddElement("pose");
-  poseElem->Set(this->pose);
 }
 
 /////////////////////////////////////////////////
@@ -82,15 +85,25 @@ CollisionState &CollisionState::operator=(const CollisionState &_state)
 /////////////////////////////////////////////////
 CollisionState CollisionState::operator-(const CollisionState &_state) const
 {
-  CollisionState result = *this;
-  result.pose -= _state.pose;
+  CollisionState result;
+  result.name = this->name;
+
+  // Subtract the pose
+  result.pose.pos = this->pose.pos - _state.pose.pos;
+  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+
   return result;
 }
 
 /////////////////////////////////////////////////
 CollisionState CollisionState::operator+(const CollisionState &_state) const
 {
-  CollisionState result = *this;
-  result.pose += _state.pose;
+  CollisionState result;
+  result.name = this->name;
+
+  // Add the pose
+  result.pose.pos = this->pose.pos + _state.pose.pos;
+  result.pose.rot = _state.pose.rot * this->pose.rot;
+
   return result;
 }

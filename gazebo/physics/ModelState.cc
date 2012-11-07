@@ -15,10 +15,11 @@
  *
  */
 
-#include "physics/Model.hh"
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/ModelState.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/ModelState.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -30,18 +31,20 @@ ModelState::ModelState()
 }
 
 /////////////////////////////////////////////////
-ModelState::ModelState(ModelPtr _model)
+ModelState::ModelState(const ModelPtr _model)
 : State(_model->GetName(), _model->GetWorld()->GetRealTime(),
         _model->GetWorld()->GetSimTime())
 {
   this->pose = _model->GetWorldPose();
 
+  // Copy all the links
   const Link_V links = _model->GetLinks();
   for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
     this->linkStates.push_back(LinkState((*iter)));
   }
 
+  // Copy all the joints
   const Joint_V joints = _model->GetJoints();
   for (Joint_V::const_iterator iter = joints.begin();
        iter != joints.end(); ++iter)
@@ -51,20 +54,30 @@ ModelState::ModelState(ModelPtr _model)
 }
 
 /////////////////////////////////////////////////
+ModelState::ModelState(const sdf::ElementPtr _sdf)
+  : State()
+{
+  this->Load(_sdf);
+}
+
+/////////////////////////////////////////////////
 ModelState::~ModelState()
 {
 }
 
 /////////////////////////////////////////////////
-void ModelState::Load(sdf::ElementPtr _elem)
+void ModelState::Load(const sdf::ElementPtr _elem)
 {
+  // Set the name
   this->name = _elem->GetValueString("name");
 
+  // Set the model pose
   if (_elem->HasElement("pose"))
     this->pose = _elem->GetValuePose("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
+  // Set all the links
   this->linkStates.clear();
   if (_elem->HasElement("link"))
   {
@@ -72,13 +85,12 @@ void ModelState::Load(sdf::ElementPtr _elem)
 
     while (childElem)
     {
-      LinkState state;
-      state.Load(childElem);
-      this->linkStates.push_back(state);
+      this->linkStates.push_back(LinkState(childElem));
       childElem = childElem->GetNextElement("link");
     }
   }
 
+  // Set all the joints
   this->jointStates.clear();
   if (_elem->HasElement("joint"))
   {
@@ -86,59 +98,38 @@ void ModelState::Load(sdf::ElementPtr _elem)
 
     while (childElem)
     {
-      JointState state;
-      state.Load(childElem);
-      this->jointStates.push_back(state);
+      this->jointStates.push_back(JointState(childElem));
       childElem = childElem->GetNextElement("joint");
     }
   }
 }
 
 /////////////////////////////////////////////////
-void ModelState::FillStateSDF(sdf::ElementPtr _elem) const
-{
-  _elem->GetAttribute("name")->Set(this->GetName());
-  _elem->GetElement("pose")->GetValue()->Set(this->pose);
-
-  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
-       iter != this->linkStates.end(); ++iter)
-  {
-    sdf::ElementPtr elem = _elem->AddElement("link");
-    (*iter).FillStateSDF(elem);
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelState::UpdateModelSDF(sdf::ElementPtr _elem)
-{
-  _elem->GetElement("pose")->Set(this->pose);
-
-  if (_elem->HasElement("link"))
-  {
-    sdf::ElementPtr childElem = _elem->GetElement("link");
-
-    // Update all links
-    while (childElem)
-    {
-      // Find matching link state
-      for (std::vector<LinkState>::iterator iter = this->linkStates.begin();
-          iter != this->linkStates.end(); ++iter)
-      {
-        if ((*iter).GetName() == childElem->GetValueString("name"))
-        {
-          (*iter).UpdateLinkSDF(childElem);
-        }
-      }
-
-      childElem = childElem->GetNextElement("link");
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-math::Pose ModelState::GetPose() const
+const math::Pose &ModelState::GetPose() const
 {
   return this->pose;
+}
+
+/////////////////////////////////////////////////
+bool ModelState::IsZero() const
+{
+  bool result = true;
+
+  /// \TODO: put back in.
+  // for (std::vector<LinkState>::const_iterator iter =
+  //      this->linkStates.begin();
+  //      iter != this->linkStates.end() && result; ++iter)
+  // {
+  //   result = result && (*iter).IsZero();
+  // }
+
+  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
+       iter != this->jointStates.end() && result; ++iter)
+  {
+    result = result && (*iter).IsZero();
+  }
+
+  return result && this->pose == math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -152,23 +143,30 @@ LinkState ModelState::GetLinkState(unsigned int _index) const
 {
   if (_index < this->linkStates.size())
     return this->linkStates[_index];
-  else
-    gzerr << "Index is out of range\n";
 
+  gzthrow("Index is out of range");
   return LinkState();
 }
 
 /////////////////////////////////////////////////
 LinkState ModelState::GetLinkState(const std::string &_linkName) const
 {
-  std::vector<LinkState>::const_iterator iter;
-  for (iter = this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  // Search for the link name
+  for (std::vector<LinkState>::const_iterator iter = this->linkStates.begin();
+       iter != this->linkStates.end(); ++iter)
   {
     if ((*iter).GetName() == _linkName)
       return *iter;
   }
 
+  gzthrow("Invalid link name[" + _linkName + "]");
   return LinkState();
+}
+
+/////////////////////////////////////////////////
+const std::vector<LinkState> &ModelState::GetLinkStates() const
+{
+  return this->linkStates;
 }
 
 /////////////////////////////////////////////////
@@ -182,47 +180,29 @@ JointState ModelState::GetJointState(unsigned int _index) const
 {
   if (_index < this->jointStates.size())
     return this->jointStates[_index];
-  else
-    gzerr << "Index is out of range\n";
 
+  gzthrow("Index is out of range");
   return JointState();
 }
 
 /////////////////////////////////////////////////
 JointState ModelState::GetJointState(const std::string &_jointName) const
 {
-  std::vector<JointState>::const_iterator iter;
-  for (iter = this->jointStates.begin();
+  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     if ((*iter).GetName() == _jointName)
       return *iter;
   }
 
+  gzthrow("Invalid joint name[" + _jointName + "]");
   return JointState();
 }
 
 /////////////////////////////////////////////////
-bool ModelState::IsZero() const
+const std::vector<JointState> &ModelState::GetJointStates() const
 {
-  bool result = true;
-
-  /// \TODO: put back in.
-/*  for (std::vector<LinkState>::const_iterator iter =
-       this->linkStates.begin();
-       iter != this->linkStates.end() && result; ++iter)
-  {
-    result = result && (*iter).IsZero();
-  }
-  */
-
-  for (std::vector<JointState>::const_iterator iter = this->jointStates.begin();
-       iter != this->jointStates.end() && result; ++iter)
-  {
-    result = result && (*iter).IsZero();
-  }
-
-  return result && this->pose == math::Pose::Zero;
+  return this->jointStates;
 }
 
 /////////////////////////////////////////////////
@@ -259,31 +239,35 @@ ModelState ModelState::operator-(const ModelState &_state) const
 {
   ModelState result;
 
-  result = *this;
-
+  result.name = this->name;
   result.pose.pos = this->pose.pos - _state.pose.pos;
   result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
 
-  result.linkStates.clear();
-  result.jointStates.clear();
-
   /// \TODO: put back in.
   // Insert the link state diffs.
-  /*for (std::vector<LinkState>::const_iterator iter =
-       this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
-  {
-    LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
-    if (!state.IsZero())
-      result.linkStates.push_back(state);
-  }*/
+  // for (std::vector<LinkState>::const_iterator iter =
+  //      this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  // {
+  //   LinkState state = (*iter) - _state.GetLinkState((*iter).GetName());
+  //   if (!state.IsZero())
+  //     result.linkStates.push_back(state);
+  // }
 
   // Insert the joint state diffs.
   for (std::vector<JointState>::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
-    JointState state = (*iter) - _state.GetJointState((*iter).GetName());
-//    if (!state.IsZero())
-      result.jointStates.push_back(state);
+    try
+    {
+      JointState state = (*iter) - _state.GetJointState((*iter).GetName());
+      if (!state.IsZero())
+        result.jointStates.push_back(state);
+    }
+    catch(common::Exception &)
+    {
+      // Ignore exception, which is just the fact that a joint state may not
+      // have been recorded.
+    }
   }
 
   return result;
@@ -294,28 +278,32 @@ ModelState ModelState::operator+(const ModelState &_state) const
 {
   ModelState result;
 
-  result = *this;
-
+  result.name = this->name;
   result.pose.pos = this->pose.pos + _state.pose.pos;
   result.pose.rot = _state.pose.rot * this->pose.rot;
 
-  result.linkStates.clear();
-  result.jointStates.clear();
-
   // Insert the link state diffs.
-  /*for (std::vector<LinkState>::const_iterator iter =
-       this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
-  {
-    LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
-    result.linkStates.push_back(state);
-  }*/
+  // for (std::vector<LinkState>::const_iterator iter =
+  //      this->linkStates.begin(); iter != this->linkStates.end(); ++iter)
+  // {
+  //   LinkState state = (*iter) + _state.GetLinkState((*iter).GetName());
+  //   result.linkStates.push_back(state);
+  // }
 
   // Insert the joint state diffs.
   for (std::vector<JointState>::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
   {
-    JointState state = (*iter) + _state.GetJointState((*iter).GetName());
-    result.jointStates.push_back(state);
+    try
+    {
+      JointState state = (*iter) + _state.GetJointState((*iter).GetName());
+      result.jointStates.push_back(state);
+    }
+    catch(common::Exception &)
+    {
+      // Ignore exception, which is just the fact that a joint state may not
+      // have been recorded.
+    }
   }
 
   return result;

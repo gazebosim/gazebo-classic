@@ -78,6 +78,10 @@ namespace gazebo
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int /*_index*/)
               {return math::Angle();}
+
+      /// \internal
+      public: virtual unsigned int GetAngleCount() const
+              {return 0;}
     };
     /// \}
   }
