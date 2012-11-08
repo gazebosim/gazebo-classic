@@ -38,6 +38,7 @@
 #include "common/Skeleton.hh"
 #include "rendering/Material.hh"
 #include "rendering/Visual.hh"
+#include "gazebo/common/Plugin.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -54,6 +55,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
+  this->initialized = false;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -88,6 +90,7 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   this->sceneNode = NULL;
   this->animState = NULL;
   this->skeleton = NULL;
+  this->initialized = false;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -139,6 +142,7 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
+  this->plugins.clear();
   // Detach from the parent
   if (this->parent)
     this->parent->DetachVisual(this->GetName());
@@ -224,6 +228,7 @@ void Visual::Init()
 
   if (this->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -319,6 +324,15 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_laser_retro())
     this->sdf->GetElement("laser_retro")->Set(_msg->laser_retro());
 
+  if (_msg->has_plugin())
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("plugin");
+    if (_msg->plugin().has_name())
+      elem->GetAttribute("name")->Set(_msg->plugin().name());
+    if (_msg->plugin().has_filename())
+      elem->GetAttribute("filename")->Set(_msg->plugin().filename());
+  }
+
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -412,6 +426,7 @@ void Visual::Load()
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->LoadPlugins();
 }
 
 //////////////////////////////////////////////////
@@ -1867,6 +1882,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       else
         scale.x = scale.y = scale.z = 1.0;
     }
+    else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
+      scale.x = scale.y = scale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2170,4 +2187,73 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     bone->setPosition(p);
     bone->setOrientation(quat);
   }
+}
+
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugins()
+{
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+
+
+  for (std::vector<VisualPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugin(const std::string &_filename,
+                       const std::string &_name,
+                       sdf::ElementPtr _sdf)
+{
+  gazebo::VisualPluginPtr plugin = gazebo::VisualPlugin::Create(_filename,
+                                                              _name);
+
+  if (plugin)
+  {
+    if (plugin->GetType() != VISUAL_PLUGIN)
+    {
+      gzerr << "Visual[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
+      return;
+    }
+    plugin->Load(shared_from_this(), _sdf);
+    this->plugins.push_back(plugin);
+
+    if (this->initialized)
+      plugin->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::RemovePlugin(const std::string &_name)
+{
+  std::vector<VisualPluginPtr>::iterator iter;
+  for (iter = this->plugins.begin(); iter != this->plugins.end(); ++iter)
+  {
+    if ((*iter)->GetHandle() == _name)
+    {
+      this->plugins.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugin(sdf::ElementPtr _sdf)
+{
+  std::string pluginName = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
+  this->LoadPlugin(filename, pluginName, _sdf);
 }

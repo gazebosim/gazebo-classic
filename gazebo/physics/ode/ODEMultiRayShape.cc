@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+#include "common/Exception.hh"
+
 #include "physics/World.hh"
 #include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODELink.hh"

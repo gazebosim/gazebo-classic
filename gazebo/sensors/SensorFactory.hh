@@ -35,7 +35,7 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-  /// \def Sensor 
+  /// \def Sensor
   /// \brief Prototype for sensor factory functions
   typedef Sensor* (*SensorFactoryFn) ();
 
@@ -69,7 +69,8 @@ namespace gazebo
     public: static SensorPtr NewSensor(const std::string &_classname);
 
     /// \brief Get all the sensor types
-    /// \param _types Vector of strings of the sensor types, populated by function
+    /// \param _types Vector of strings of the sensor types,
+    /// populated by function
     public: static void GetSensorTypes(std::vector<std::string> &_types);
 
     /// \brief A list of registered sensor classes

@@ -81,7 +81,7 @@ void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetDamping(int /*_index*/, const double _damping)
+void ODEHinge2Joint::SetDamping(int /*_index*/, double _damping)
 {
   dJointSetDamping(this->jointId, _damping);
 }

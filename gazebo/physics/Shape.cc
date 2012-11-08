@@ -43,3 +43,9 @@ void Shape::GetInertial(double /*_mass*/, InertialPtr /*_inertial*/) const
 {
   return;
 }
+
+//////////////////////////////////////////////////
+void Shape::FillShapeMsg(msgs::Geometry &_msg)
+{
+  this->FillMsg(_msg);
+}

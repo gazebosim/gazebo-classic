@@ -49,7 +49,7 @@ namespace gazebo
       public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
 
       /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      public: virtual void SetDamping(int index, double damping);
 
       /// \brief Get the first axis of rotation
       public: virtual math::Vector3 GetGlobalAxis(int index) const;

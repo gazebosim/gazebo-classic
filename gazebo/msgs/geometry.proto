@@ -27,6 +27,7 @@ message Geometry
     MESH         = 7;
     TRIANGLE_FAN = 8;
     LINE_STRIP   = 9;
+    EMPTY        =10;
   }
 
   optional Type type                = 1;

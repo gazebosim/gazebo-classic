@@ -130,6 +130,20 @@ void OrbitViewController::Update()
 }
 
 //////////////////////////////////////////////////
+void OrbitViewController::HandleKeyPressEvent(const std::string &_key)
+{
+  if (_key == "x" || _key == "y" || _key == "z")
+    this->key = _key;
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::HandleKeyReleaseEvent(const std::string &_key)
+{
+  if (_key == "x" || _key == "y" || _key == "z")
+    this->key.clear();
+}
+
+//////////////////////////////////////////////////
 void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
   if (!this->enabled)
@@ -152,11 +166,31 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
           this->focalPoint);
     }
 
-    this->yaw += drag.x * _event.moveScale * -0.2;
-    this->pitch += drag.y * _event.moveScale * 0.2;
 
-    this->NormalizeYaw(this->yaw);
-    this->NormalizePitch(this->pitch);
+    /// Lock rotation to an axis if the "y" or "z" key is pressed.
+    if (!this->key.empty() && (this->key == "y" || this->key == "z"))
+    {
+      // Limit rotation about the "y" axis.
+      if (this->key == "y")
+      {
+        this->pitch += drag.y * _event.moveScale * 0.2;
+        this->NormalizePitch(this->pitch);
+      }
+      // Limit rotation about the "z" axis.
+      else
+      {
+        this->yaw += drag.x * _event.moveScale * -0.2;
+        this->NormalizeYaw(this->yaw);
+      }
+    }
+    // Otherwise rotate about "y" and "z".
+    else
+    {
+      this->yaw += drag.x * _event.moveScale * -0.2;
+      this->pitch += drag.y * _event.moveScale * 0.2;
+      this->NormalizeYaw(this->yaw);
+      this->NormalizePitch(this->pitch);
+    }
   }
   else if (_event.buttons & common::MouseEvent::LEFT)
   {
@@ -167,11 +201,40 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     double fovX = 2.0f * atan(tan(fovY / 2.0f) *
         this->camera->GetAspectRatio());
 
-    this->Translate(math::Vector3(0.0,
+    math::Vector3 translation;
+
+    // If the "x", "y", or "z" key is pressed, then lock translation to the
+    // indicated axis.
+    if (!this->key.empty())
+    {
+      if (this->key == "x")
+        translation.Set((drag.y / static_cast<float>(height)) *
+                        this->distance * tan(fovY / 2.0) * 2.0, 0.0, 0.0);
+      else if (this->key == "y")
+        translation.Set(0.0, (drag.x / static_cast<float>(width)) *
+                        this->distance * tan(fovX / 2.0) * 2.0, 0.0);
+      else if (this->key == "z")
+        translation.Set(0.0, 0.0, (drag.y / static_cast<float>(height)) *
+                        this->distance * tan(fovY / 2.0) * 2.0);
+      else
+        gzerr << "Unable to handle key [" << this->key << "] in orbit view "
+              << "controller.\n";
+
+      // Translate in the global coordinate frame
+      this->TranslateGlobal(translation);
+    }
+    else
+    {
+      // Translate in the "y" "z" plane.
+      translation.Set(0.0,
           (drag.x / static_cast<float>(width)) *
           this->distance * tan(fovX / 2.0) * 2.0,
           (drag.y / static_cast<float>(height)) *
-          this->distance * tan(fovY / 2.0) * 2.0));
+          this->distance * tan(fovY / 2.0) * 2.0);
+
+      // Translate in the local coordinate frame
+      this->TranslateLocal(translation);
+    }
   }
   else if (_event.type == common::MouseEvent::SCROLL)
   {
@@ -208,9 +271,15 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::Translate(math::Vector3 vec)
+void OrbitViewController::TranslateLocal(math::Vector3 vec)
 {
   this->focalPoint += this->camera->GetWorldPose().rot * vec;
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::TranslateGlobal(math::Vector3 vec)
+{
+  this->focalPoint += vec;
 }
 
 //////////////////////////////////////////////////

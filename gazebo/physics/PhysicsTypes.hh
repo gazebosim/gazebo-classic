@@ -81,14 +81,26 @@ namespace gazebo
 
     #ifndef GZ_COLLIDE_BITS
 
+    /// \def GZ_ALL_COLLIDE
+    /// \brief Collides with everything.
     #define GZ_ALL_COLLIDE 0x0FFFFFFF
+
+    /// \def GZ_NONE_COLLIDE
+    /// \brief Collides with nothing.
     #define GZ_NONE_COLLIDE 0x00000000
+
+    /// \def GZ_FIXED_COLLIDE
+    /// \brief Collides with everything else but other fixed.
     #define GZ_FIXED_COLLIDE 0x00000001
+
+    /// \def GZ_SENSOR_COLLIDE
+    /// \brief Collides with everything else but other sensors.
     #define GZ_SENSOR_COLLIDE 0x00000003
+
+    /// \def GZ_GHOST_COLLIDE
+    /// \brief Collides with everything else but other ghost.
     #define GZ_GHOST_COLLIDE 0x10000000
 
     #endif
   }
 }
-
-
