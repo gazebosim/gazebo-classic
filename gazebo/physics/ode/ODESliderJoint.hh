@@ -52,7 +52,7 @@ namespace gazebo
       public: virtual void SetAxis(int index, const math::Vector3 &axis);
 
       /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief callback to apply damping force to joint
       public: void ApplyDamping();
