@@ -8,6 +8,7 @@ package gazebo.msgs;
 import "pose.proto";
 import "geometry.proto";
 import "material.proto";
+import "plugin.proto";
 
 message Visual
 {
@@ -23,6 +24,7 @@ message Visual
   optional bool visible        = 9;
   optional bool delete_me      = 11;
   optional bool is_static      = 12;
+  optional Plugin plugin       = 13;
 }
 
 /// \endverbatim

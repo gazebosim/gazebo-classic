@@ -67,4 +67,5 @@
   </element> <!-- End Material -->
 
   <include filename="geometry.sdf" required="1"/>
+  <include filename="plugin.sdf" required="*"/>
 </element> <!-- End Visual -->
