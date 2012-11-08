@@ -22,8 +22,8 @@
 #include <math.h>
 #include <iostream>
 
-#include "math/gzmath.h"
-#include "transport/transport.h"
+#include "gazebo/math/gzmath.hh"
+#include "gazebo/transport/transport.hh"
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"
 

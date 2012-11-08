@@ -59,7 +59,7 @@ namespace gazebo
 
       public: void SetScale(const math::Vector3 &_scale);
 
-      public: void FillShapeMsg(msgs::Geometry &_msg);
+      public: void FillMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
