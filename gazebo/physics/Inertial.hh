@@ -44,7 +44,7 @@ namespace gazebo
 
       /// \brief Copy constructor.
       /// \param[in] _inertial Inertial element to copy
-      public: explicit Inertial(const Inertial &_inertial);
+      public: Inertial(const Inertial &_inertial);
 
       /// \brief Destructor.
       public: virtual ~Inertial();

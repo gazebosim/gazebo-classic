@@ -40,7 +40,6 @@ namespace gazebo
     template<class T>
     class ScrewJoint : public T
     {
-
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
       public: explicit ScrewJoint(BasePtr _parent) : T(_parent)
