@@ -52,7 +52,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(int /*index*/) const
               {return math::Vector3();}
       /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      public: virtual void SetDamping(int _index, double _damping);
 
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}

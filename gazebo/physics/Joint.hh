@@ -153,7 +153,7 @@ namespace gazebo
       /// \brief Set the joint damping.
       /// \param[in] _index Index of the axis to set.
       /// \param[in] _damping Damping value for the axis.
-      public: virtual void SetDamping(int _index, const double _damping) = 0;
+      public: virtual void SetDamping(int _index, double _damping) = 0;
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
@@ -306,10 +306,6 @@ namespace gazebo
       /// \param[in] _value Value of the attribute.
       public: virtual void SetAttribute(Attribute _attr, int _index,
                                         double _value) = 0;
-
-      /// \brief Set a parameter for the joint
-      public: virtual void SetThreadPitch(int /*_index*/, double /*_pitch*/)
-                {gzerr << "not implemented\n";}
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
