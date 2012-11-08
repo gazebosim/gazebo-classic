@@ -19,7 +19,7 @@
  * Date: 2 March 2006
  */
 
-#include "transport/transport.h"
+#include "gazebo/transport/transport.hh"
 #include "GazeboInterface.hh"
 #include "GazeboDriver.hh"
 

@@ -31,112 +31,154 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class Inertial Inertial.hh physics/physics.hh
     /// \brief A class for inertial information about a link
     class Inertial
     {
       /// \brief Default Constructor
       public: Inertial();
 
-      /// \brief Constructor
-      public: Inertial(double mass);
+      /// \brief Constructor.
+      /// \param[in] _mass Mass value in kg if using metric.
+      public: Inertial(double _mass);
 
-      /// \brief Copy constructor
+      /// \brief Copy constructor.
+      /// \param[in] _inertial Inertial element to copy
       public: Inertial(const Inertial &_inertial);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~Inertial();
 
+      /// \brief Load from SDF values.
+      /// \param[in] _sdf SDF value to load from.
       public: void Load(sdf::ElementPtr _sdf);
 
-      /// \brief update the parameters using new sdf values
+      /// \brief update the parameters using new sdf values.
+      /// \param[in] _sdf Update values from.
       public: void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Reset all the mass properties
+      /// \brief Reset all the mass properties.
       public: void Reset();
 
-      /// \brief Set the mass
+      /// \brief Set the mass.
       public: void SetMass(double m);
 
       /// \brief Get the mass
       public: double GetMass() const;
 
-      /// \brief Set the mass matrix
-      public: void SetInertiaMatrix(double ixx, double iyy, double izz,
-                                     double ixy, double ixz, double iyz);
+      /// \brief Set the mass matrix.
+      /// \param[in] _ixx X second moment of inertia about x axis.
+      /// \param[in] _iyy Y second moment of inertia about y axis.
+      /// \param[in] _izz Z second moment of inertia about z axis.
+      /// \param[in] _ixy XY inertia.
+      /// \param[in] _ixz XZ inertia.
+      /// \param[in] _iyz YZ inertia.
+      public: void SetInertiaMatrix(double _ixx, double _iyy, double _izz,
+                                     double _ixy, double _ixz, double iyz);
 
-      /// \brief Set the center of gravity
-      public: void SetCoG(double cx, double cy, double cz);
+      /// \brief Set the center of gravity.
+      /// \param[in] _cx X position.
+      /// \param[in] _cy Y position.
+      /// \param[in] _cz Z position.
+      public: void SetCoG(double _cx, double _cy, double _cz);
 
-      /// \brief Set the center of gravity
-      public: void SetCoG(const math::Vector3 &c);
+      /// \brief Set the center of gravity.
+      /// \param[in] _center Center of the gravity.
+      public: void SetCoG(const math::Vector3 &_center);
 
-      /// \brief Get the center of gravity
+      /// \brief Get the center of gravity.
+      /// \return The cneter of gravity.
       public: inline const math::Vector3 &GetCoG() const
-              { return this->cog; }
+              {return this->cog;}
 
+      /// \brief Get the pose about which the mass and inertia matrix is
+      /// specified in the Link frame.
+      /// \return The inertial pose.
       public: inline const math::Pose GetPose() const
               { return math::Pose(this->cog, math::Quaternion());}
 
-      /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
+      /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
+      /// \return The principal moments.
       public: math::Vector3 GetPrincipalMoments() const;
 
-      /// \brief Get the products of inertia (Ixy, Ixy, Iyz)
+      /// \brief Get the products of inertia (Ixy, Ixy, Iyz).
+      /// \return The products of inertia.
       public: math::Vector3 GetProductsofInertia() const;
 
+      /// \brief Get IXX
+      /// \return IXX value
       public: double GetIXX() const;
+
+      /// \brief Get IYY
+      /// \return IYY value
       public: double GetIYY() const;
+
+      /// \brief Get IZZ
+      /// \return IZZ value
       public: double GetIZZ() const;
+
+      /// \brief Get IXY
+      /// \return IXY value
       public: double GetIXY() const;
+
+      /// \brief Get IXZ
+      /// \return IXZ value
       public: double GetIXZ() const;
+
+      /// \brief Get IXZ
+      /// \return IYZ value
       public: double GetIYZ() const;
 
+      /// \brief Set IXX
+      /// \param[in] _v IXX value
       public: void SetIXX(double _v);
+
+      /// \brief Set IYY
+      /// \param[in] _v IYY value
       public: void SetIYY(double _v);
+
+      /// \brief Set IZZ
+      /// \param[in] _v IZZ value
       public: void SetIZZ(double _v);
+
+      /// \brief Set IXY
+      /// \param[in] _v IXY value
       public: void SetIXY(double _v);
+
+      /// \brief Set IXZ
+      /// \param[in] _v IXZ value
       public: void SetIXZ(double _v);
+
+      /// \brief Set IYZ
+      /// \param[in] _v IXX value
       public: void SetIYZ(double _v);
 
-      /// \brief Set the inertia matrix for a box based on a density
-      public: void SetBoxDensity(double _density, const math::Vector3 &_size);
-
-      /// \brief Set the inertia matrix for a box based on a total mass
-      public: void SetBoxMass(double _mass, const math::Vector3 &_size);
-
-      /// \brief Set the inertia matrix for a cylinder based on a density
-      public: void SetCylinderDensity(double _density, double _radius,
-                                      double _length);
-
-      /// \brief Set the inertia matrix for a cylinder based on a total mass
-      public: void SetCylinderMass(double _mass, double _radius,
-                                   double _length);
-
-      /// \brief Set the inertia matrix for a sphere based on a density
-      public: void SetSphereDensity(double _density, double _radius);
-
-      /// \brief Set the inertia matrix for a sphere based on a total mass
-      public: void SetSphereMass(double _mass, double _radius);
-
-      /// \brief Set the inertia matrix for a mesh based on a density
-      public: void SetMeshDensity(double _density,
-                                  const std::string &_meshName);
-
-      /// \brief Set the inertia matrix for a mesh based on a total mass
-      public: void SetMeshMass(double _mass, const std::string &_meshName);
-
-      /// \brief Rotate this mass
+      /// \brief Rotate this mass.
+      /// \param[in] _rot Rotation amount.
       public: void Rotate(const math::Quaternion &rot);
 
-      /// \brief Equal operator
+      /// \brief Equal operator.
+      /// \param[in] _inertial Inertial to copy.
+      /// \return Reference to this object.
       public: Inertial &operator=(const Inertial &_inertial);
 
+      /// \brief Addition operator.
+      /// \param[in] _inertial Inertial to add.
+      /// \return The result of the addition.
       public: Inertial operator+(const Inertial &_inertial) const;
+
+      /// \brief Addition equal operator.
+      /// \param[in] _inertial Inertial to add.
+      /// \return Reference to this object.
       public: const Inertial &operator+=(const Inertial &_inertial);
 
       /// \brief Update parameters from a message
-      /// \param _msg Message to read
+      /// \param[in] _msg Message to read
       public: void ProcessMsg(const msgs::Inertial &_msg);
 
+      /// \brief Output operator.
+      /// \param[in] _out Output stream.
+      /// \param[in] _inertial Inertial object to output.
       public: friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::Inertial &_inertial)
               {
@@ -151,15 +193,22 @@ namespace gazebo
                 return _out;
               }
 
-      /// Mass properties of the object
+      /// \brief Mass the object. Default is 1.0.
       private: double mass;
+
+      /// \brief Center of gravity. Default is (0.0 0.0 0.0)
       private: math::Vector3 cog;
+
+      /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
       private: math::Vector3 principals;
+
+      /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
       private: math::Vector3 products;
+
+      /// \brief Our SDF values.
       private: sdf::ElementPtr sdf;
     };
     /// \}
   }
 }
-
 #endif

@@ -18,6 +18,7 @@
 #define _TOOLS_WIDGET_HH_
 
 #include <vector>
+#include <string>
 
 #include "gazebo/common/Event.hh"
 #include "gui/qt.h"

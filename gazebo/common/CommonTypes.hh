@@ -75,6 +75,7 @@ namespace gazebo
     class NumericAnimation;
     class Animation;
     class Color;
+    class SkeletonAnimation;
 
     template <typename T>
     class ParamT;

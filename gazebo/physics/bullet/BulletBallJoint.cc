@@ -139,3 +139,38 @@ math::Angle BulletBallJoint::GetAngleImpl(int /*_index*/) const
 {
   return math::Angle();
 }
+
+//////////////////////////////////////////////////
+void BulletBallJoint::SetHighStop(int /*_index*/,
+                                   const math::Angle &/*_angle*/)
+{
+  if (this->btBall)
+  {
+    // this function has additional parameters that we may one day
+    // implement. Be warned that this function will reset them to default
+    // settings
+    // this->btBall->setLimit(this->btBall->getLowerLimit(),
+    //                         _angle.Radian());
+  }
+  else
+  {
+    gzthrow("Joint must be created first");
+  }
+}
+
+//////////////////////////////////////////////////
+void BulletBallJoint::SetLowStop(int /*_index*/,
+                                  const math::Angle &/*_angle*/)
+{
+  if (this->btBall)
+  {
+    // this function has additional parameters that we may one day
+    // implement. Be warned that this function will reset them to default
+    // settings
+    // this->btBall->setLimit(-_angle.Radian(),
+    //                         this->btBall->getUpperLimit());
+  }
+  else
+    gzthrow("Joint must be created first");
+}
+

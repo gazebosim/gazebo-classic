@@ -64,7 +64,7 @@ namespace gazebo
       /// \brief Get the size
       public: math::Vector2d GetSize() const;
 
-      public: void FillShapeMsg(msgs::Geometry &_msg);
+      public: void FillMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
     };
