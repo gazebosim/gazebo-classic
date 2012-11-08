@@ -1349,24 +1349,31 @@ void World::ProcessFactoryMsgs()
         ModelPtr model = this->LoadModel(elem, this->rootElement);
         model->Init();
 
-        int iterations = 0;
-
-        // Wait for the sensors to be initialized before loading
-        // plugins.
-        while (!sensors::SensorManager::Instance()->SensorsInitialized() &&
-               iterations < 50)
+        // Check to see if we need to load any model plugins
+        if (model->GetPluginCount() > 0)
         {
-          common::Time::MSleep(100);
-          iterations++;
-        }
+          int iterations = 0;
 
-        if (iterations < 50)
-          model->LoadPlugins();
-        else
-        {
-          gzerr << "Sensors failed to initialize when loading model["
-                << model->GetName() << "] via the factory mechanism."
-                << "Plugins for the model will not be loaded.\n";
+          // Wait for the sensors to be initialized before loading
+          // plugins, if there are any sensors
+          while (model->GetSensorCount() > 0 &&
+              !sensors::SensorManager::Instance()->SensorsInitialized() &&
+              iterations < 50)
+          {
+            common::Time::MSleep(100);
+            iterations++;
+          }
+
+          // Load the plugins if the sensors have been loaded, or if there
+          // are no sensors attached to the model.
+          if (iterations < 50)
+            model->LoadPlugins();
+          else
+          {
+            gzerr << "Sensors failed to initialize when loading model["
+              << model->GetName() << "] via the factory mechanism."
+              << "Plugins for the model will not be loaded.\n";
+          }
         }
       }
       else if (isLight)

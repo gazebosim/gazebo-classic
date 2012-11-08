@@ -143,6 +143,10 @@ void Logger::Add(const std::string &_name, const std::string &_filename,
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
+  // Check to see if the logger is already started.
+  if (this->stop)
+    return;
+
   if (this->logs.find(_name) != this->logs.end())
     gzthrow("Log file with name[" + _name + "] already exists.\n");
 

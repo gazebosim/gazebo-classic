@@ -687,6 +687,40 @@ void Model::LoadPlugins()
 }
 
 //////////////////////////////////////////////////
+unsigned int Model::GetPluginCount() const
+{
+  unsigned int result = 0;
+
+  // Count all the plugins specified in SDF
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      result++;
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+unsigned int Model::GetSensorCount() const
+{
+  unsigned int result = 0;
+
+  // Count all the sensors on all the links
+  Link_V links = this->GetLinks();
+  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  {
+    result += (*iter)->GetSensorCount();
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");

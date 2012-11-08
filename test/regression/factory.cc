@@ -71,7 +71,6 @@ TEST_F(FactoryTest, Sphere)
   }
 }
 
-
 TEST_F(FactoryTest, Cylinder)
 {
   math::Pose setPose, testPose;
@@ -90,7 +89,6 @@ TEST_F(FactoryTest, Cylinder)
     EXPECT_TRUE(math::equal(testPose.pos.z, setPose.pos.z, 0.1));
   }
 }
-
 
 TEST_F(FactoryTest, Camera)
 {

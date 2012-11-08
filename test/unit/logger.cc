@@ -16,7 +16,7 @@
 */
 
 #include "ServerFixture.hh"
-#include "common/Logger.hh"
+#include "gazebo/common/Logger.hh"
 
 using namespace gazebo;
 class LoggerTest : public ServerFixture
@@ -26,7 +26,6 @@ class LoggerTest : public ServerFixture
 TEST_F(LoggerTest, Init)
 {
   EXPECT_TRUE(common::Logger::Instance()->Init("test"));
-  EXPECT_FALSE(common::Logger::Instance()->Init("test"));
 
   common::Logger::Instance()->Stop();
   common::Logger::Instance()->Stop();
