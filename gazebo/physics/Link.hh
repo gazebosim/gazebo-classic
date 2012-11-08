@@ -102,9 +102,15 @@ namespace gazebo
       /// \param[in] _collid True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
 
-      /// \TODO: reimplment this. Make collision mode an enum.
+
       /// \brief Set the collide mode of the body.
-      /// \param[in] _mode Collision Mode.
+      /// \param[in] _mode Collision Mode,
+      /// this can be: [all|none|sensors|fixed|ghost]
+      /// all: collides with everything
+      /// none: collides with nothing
+      /// sensors: collides with everything else but other sensors
+      /// fixed: collides with everything else but other fixed
+      /// ghost: collides with everything else but other ghost
       public: void SetCollideMode(const std::string &_mode);
 
       /// \brief Get Self-Collision Flag, if this is true, this body will
