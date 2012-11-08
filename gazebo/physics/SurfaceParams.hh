@@ -23,7 +23,7 @@
 #define _SURFACEPARAMS_HH_
 
 #include "gazebo/msgs/msgs.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -72,8 +72,8 @@ namespace gazebo
       /// \sa    See for example
       ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_2
       ///        for more details.
-
       public: double kp;
+
       /// \brief spring damping constant equivalents of a contact as a
       ///        function of SurfaceParams::cfm and SurfaceParams::erp.
       /// \sa    See for example
@@ -140,5 +140,3 @@ namespace gazebo
   }
 }
 #endif
-
-

@@ -19,11 +19,11 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef SPHERESHAPE_HH
-#define SPHERESHAPE_HH
+#ifndef _SPHERESHAPE_HH_
+#define _SPHERESHAPE_HH_
 
-#include "physics/Shape.hh"
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
@@ -62,10 +62,10 @@ namespace gazebo
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      /// \brief DEPRECATED.
+      /// \brief Deprecated.
       public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
 
-      /// \brief DEPRECATED.
+      /// \brief Deprecated.
       public: virtual void GetInertial(double _mass, InertialPtr _inertial)
               const GAZEBO_DEPRECATED;
     };

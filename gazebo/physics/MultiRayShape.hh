@@ -20,12 +20,12 @@
 #include <vector>
 #include <string>
 
-#include "math/Vector3.hh"
-#include "math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Angle.hh"
 
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
-#include "physics/RayShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/RayShape.hh"
 
 namespace gazebo
 {

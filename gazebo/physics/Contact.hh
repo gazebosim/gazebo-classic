@@ -53,7 +53,7 @@ namespace gazebo
 
       /// \brief Copy constructor
       /// \param[in] _contact Contact to copy.
-      public: Contact(const Contact &_contact);
+      public: explicit Contact(const Contact &_contact);
 
       /// \brief Destructor.
       public: virtual ~Contact();

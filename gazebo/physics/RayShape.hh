@@ -40,11 +40,11 @@ namespace gazebo
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.
-      public: RayShape(PhysicsEnginePtr _physicsEngine);
+      public: explicit RayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Constructor.
       /// \param[in] _parent Collision parent of the shape.
-      public: RayShape(CollisionPtr _parent);
+      public: explicit RayShape(CollisionPtr _parent);
 
       /// \brief Destructor.
       public: virtual ~RayShape();

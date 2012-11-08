@@ -26,8 +26,7 @@
 #ifndef _SCREWJOINT_HH_
 #define _SCREWJOINT_HH_
 
-#include <float.h>
-#include "physics/Joint.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {
