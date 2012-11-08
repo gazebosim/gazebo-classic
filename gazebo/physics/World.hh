@@ -593,6 +593,12 @@ namespace gazebo
 
       /// \brief sleep timing error offset due to clock wake up latency
       private: common::Time sleepOffset;
+
+      /// \brief Last time incoming messages were processed.
+      private: common::Time prevProcessMsgsTime;
+
+      /// \brief Period over which messages should be processed.
+      private: common::Time processMsgsPeriod;
     };
     /// \}
   }
