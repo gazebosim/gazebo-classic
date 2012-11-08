@@ -336,7 +336,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Link::SetCollideMode(const std::string & _mode)
+void Link::SetCollideMode(const std::string &_mode)
 {
   unsigned int categoryBits;
   unsigned int collideBits;
