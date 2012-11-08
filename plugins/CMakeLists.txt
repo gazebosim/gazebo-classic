@@ -12,6 +12,7 @@ set (plugins
   CartTestPlugin
   ModelTrajectoryTestPlugin
   RayPlugin
+  RubblePlugin
   SpringTestPlugin
   DiffDrivePlugin
   JointTrajectoryPlugin

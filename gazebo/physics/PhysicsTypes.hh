@@ -178,6 +178,10 @@ namespace gazebo
     /// \brief Collision object will collide only with sensors
     #define GZ_SENSOR_COLLIDE 0x00000003
 
+    /// \def GZ_GHOST_COLLIDE
+    /// \brief Collides with everything else but other ghost.
+    #define GZ_GHOST_COLLIDE 0x10000000
+
     #endif
   }
 }

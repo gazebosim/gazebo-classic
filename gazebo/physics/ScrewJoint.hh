@@ -98,6 +98,13 @@ namespace gazebo
       /// \return Anchor for the joint.
       public: virtual math::Vector3 GetAnchor(int _index) const;
 
+      /// \brief Set screw joint thread pitch.
+      ///
+      /// This must be implemented in a child class
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _threadPitch Thread pitch value.
+      public: virtual void SetThreadPitch(int _index, double _threadPitch) = 0;
+
       /// \brief The anchor value is not used internally.
       protected: math::Vector3 fakeAnchor;
 

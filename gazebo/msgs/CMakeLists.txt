@@ -36,6 +36,7 @@ set (msgs
   physics.proto
   planegeom.proto
   pid.proto
+  plugin.proto
   pose.proto
   pose_stamped.proto
   pose_trajectory.proto

@@ -514,14 +514,8 @@ namespace gazebo
       /// \brief Period used to send out world statistics
       private: common::Time statPeriod;
 
-      /// \brief Period used to process messages
-      private: common::Time processMsgsPeriod;
-
       /// \brief Last time a world statistics message was sent
       private: common::Time prevStatTime;
-
-      /// \brief Last time messages were processed
-      private: common::Time prevProcessMsgsTime;
 
       /// \brief Time at which pause started.
       private: common::Time pauseStartTime;
