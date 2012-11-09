@@ -18,6 +18,8 @@
 #ifndef _LOGPLAY_HH_
 #define _LOGPLAY_HH_
 
+#include <tinyxml.h>
+
 #include <list>
 #include <string>
 #include <fstream>
@@ -156,6 +158,7 @@ namespace gazebo
       /// \brief Read the header from the log file.
       private: void ReadHeader();
 
+      private: TiXmlElement *logXml;
       private: std::ifstream file;
       private: std::string filename;
 

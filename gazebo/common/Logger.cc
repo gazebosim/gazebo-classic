@@ -16,6 +16,9 @@
  */
 #include <iomanip>
 #include <boost/filesystem.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
 #include <boost/date_time.hpp>
 
 #include "gazebo/math/Rand.hh"
@@ -48,6 +51,8 @@ Logger::Logger()
   // Add the current time
   boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
   this->logPathname += boost::posix_time::to_iso_extended_string(now);
+
+  this->logsEnd = this->logs.end();
 }
 
 //////////////////////////////////////////////////
@@ -72,6 +77,7 @@ bool Logger::Init(const std::string &_subdir)
   if (!_subdir.empty())
     this->logPathname += "/" + _subdir;
 
+  this->logsEnd = this->logs.end();
   return true;
 }
 
@@ -89,6 +95,8 @@ void Logger::Start()
   boost::filesystem::path path(this->logPathname);
   if (!boost::filesystem::exists(path))
     boost::filesystem::create_directories(path);
+
+  this->logsEnd = this->logs.end();
 
   this->stop = false;
 
@@ -247,9 +255,13 @@ Logger::Log::Log(const std::string &_filename,
 
   this->filename = _filename;
   std::ostringstream stream;
-  stream << GZ_LOG_VERSION << std::endl
-         << GAZEBO_VERSION_FULL  << std::endl
-         << math::Rand::GetSeed() << std::endl;
+  stream << "<?xml version='1.0'?>\n"
+         << "<gazebo_log>\n"
+         << "<header>\n"
+         << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
+         << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
+         << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
+         << "</header>\n";
 
   this->buffer.append(stream.str());
 }
@@ -257,6 +269,9 @@ Logger::Log::Log(const std::string &_filename,
 //////////////////////////////////////////////////
 Logger::Log::~Log()
 {
+  std::string xmlEnd = "</gazebo_log>";
+  this->logFile.write(xmlEnd.c_str(), xmlEnd.size());
+
   this->logFile.close();
 }
 
@@ -267,10 +282,39 @@ void Logger::Log::Update()
 
   if (this->logCB(stream) && !stream.str().empty())
   {
-    this->buffer.append("text ");
-    this->buffer.append(boost::lexical_cast<std::string>(stream.str().size()));
-    this->buffer.append("\n");
-    this->buffer.append(stream.str());
+    std::string encoding = "bz2";
+
+    this->buffer.append("<chunk encoding='");
+    this->buffer.append(encoding);
+    this->buffer.append("'>\n");
+
+    this->buffer.append("<![CDATA[");
+    {
+      // Compress the data.
+      if (encoding == "bz2")
+      {
+        std::string str;
+
+        // Compress to bzip2
+        {
+          boost::iostreams::filtering_ostream out;
+          out.push(boost::iostreams::bzip2_compressor());
+          out.push(std::back_inserter(str));
+          out << stream.str();
+          out.flush();
+        }
+
+        // Encode in base64.
+        std::copy(Base64Text(str.c_str()),
+                  Base64Text(str.c_str() + str.size()),
+                  std::back_inserter(this->buffer));
+      }
+      else
+        this->buffer.append(stream.str());
+    }
+    this->buffer.append("]]>\n");
+
+    this->buffer.append("</chunk>\n");
   }
 }
 
@@ -287,7 +331,8 @@ void Logger::Log::Write()
   if (!this->logFile.is_open())
   {
     // Try to open it...
-    this->logFile.open(this->filename.c_str(), std::fstream::out);
+    this->logFile.open(this->filename.c_str(),
+                       std::fstream::out | std::ios::binary);
 
     // Throw an error if we couldn't open the file for writing.
     if (!this->logFile.is_open())

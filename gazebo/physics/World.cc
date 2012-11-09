@@ -115,9 +115,6 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&World::SetSelectedEntityCB, this, _1)));
-
-  common::Logger::Instance()->Add(this->GetName(), "state.log",
-      boost::bind(&World::OnLog, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -266,6 +263,9 @@ void World::Init()
 
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  common::Logger::Instance()->Add(this->GetName(), "state.log",
+      boost::bind(&World::OnLog, this, _1));
 
   this->initialized = true;
 }

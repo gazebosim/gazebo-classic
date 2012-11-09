@@ -26,6 +26,10 @@
 #include <string>
 #include <map>
 #include <boost/thread.hpp>
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/insert_linebreaks.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/iterators/ostream_iterator.hpp>
 
 #include "common/Event.hh"
 #include "common/SingletonT.hh"
@@ -36,6 +40,13 @@ namespace gazebo
 {
   namespace common
   {
+    /// \def Base64Text
+    /// \brief Convert binary values to base64 characters
+    typedef boost::archive::iterators::base64_from_binary<
+            // retrieve 6 bit integers from a sequence of 8 bit bytes
+            boost::archive::iterators::transform_width<const char *, 6, 8> >
+            Base64Text;
+
     /// \addtogroup gazebo_common
     /// \{
 
@@ -125,7 +136,7 @@ namespace gazebo
 
         public: boost::function<bool (std::ostringstream &)> logCB;
         public: std::string buffer;
-        public: std::fstream logFile;
+        public: std::ofstream logFile;
         public: std::string filename;
       };
       /// \endcond

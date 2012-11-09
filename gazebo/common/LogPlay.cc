@@ -16,6 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "gazebo/math/Rand.hh"
 
@@ -44,11 +45,20 @@ void LogPlay::Open(const std::string &_logFile)
   if (!boost::filesystem::exists(path))
     gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.\n");
 
-  this->file.open(_logFile.c_str(), std::fstream::in);
-  if (!this->file)
-    gzthrow("Invalid logfile[" + _logFile + "]. Unable to open for reading.\n");
+  TiXmlDocument xmlDoc;
+  if (!xmlDoc.LoadFile(_logFile))
+    gzerr << "Unable to parser log file[" << _logFile << "]\n";
+
+  this->logXml = xmlDoc.FirstChildElement("gazebo_log");
+  if (!this->logXml)
+    gzerr << "Log file is missing the <gazebo_log> element\n";
+
+  //this->file.open(_logFile.c_str(), std::fstream::in);
+  //if (!this->file)
+  //  gzthrow("Invalid logfile[" + _logFile + "]. Unable to open for reading.\n");
 
   this->filename = _logFile;
+
   this->ReadHeader();
 }
 
@@ -58,8 +68,30 @@ void LogPlay::ReadHeader()
   std::string logVersion, gazeboVersion;
   uint32_t randSeed;
 
+  TiXmlElement *xml = this->logXml->FirstChildElement("header");
+  if (!xml)
+    gzerr << "Log file has no header\n";
+
+  TiXmlElement *childXml = xml->FirstChildElement("log_version");
+  if (!childXml)
+    gzerr << "Log file header is missing the log version.\n";
+  else
+    logVersion = childXml->GetText();
+
+  childXml = xml->FirstChildElement("gazebo_version");
+  if (!childXml)
+    gzerr << "Log file header is missing the gazebo version.\n";
+  else
+    gazeboVersion = childXml->GetText();
+
+  childXml = xml->FirstChildElement("rand_seed");
+  if (!childXml)
+    gzerr << "Log file header is missing the random number seed.\n";
+  else
+    randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
+
   /// \TODO: add error checking for the header.
-  this->file >> logVersion >> gazeboVersion >> randSeed;
+  /*this->file >> logVersion >> gazeboVersion >> randSeed;*/
 
   std::cout << "Log Version["
             << logVersion << "] Gz["
@@ -83,6 +115,8 @@ bool LogPlay::IsOpen() const
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  return false;
+
   if (this->file.eof())
     return false;
 
