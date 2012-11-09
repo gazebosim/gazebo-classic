@@ -28,6 +28,7 @@
 #include <dirent.h>
 #include <string>
 #include <iostream>
+
 #include <boost/filesystem.hpp>
 
 #include "rendering/ogre_gazebo.h"
