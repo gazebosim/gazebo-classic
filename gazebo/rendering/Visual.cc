@@ -2257,4 +2257,3 @@ void Visual::LoadPlugin(sdf::ElementPtr _sdf)
   std::string filename = _sdf->GetValueString("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
 }
-
