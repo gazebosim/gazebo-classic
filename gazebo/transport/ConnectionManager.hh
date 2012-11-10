@@ -36,6 +36,7 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
+    /// \class ConnectionManager ConnectionManager.hh transport/transport.hh
     /// \brief Manager of connections
     class ConnectionManager : public SingletonT<ConnectionManager>
     {
@@ -45,54 +46,83 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
-      public: bool Init(const std::string &master_host,
-                        unsigned int master_port);
+      /// \brief Initialize the connection manager
+      /// \param[in] _master_host Host where the master is running
+      /// \param[in] _master_port Port where the master is running
+      /// \return true if initialization succeeded, false otherwise
+      public: bool Init(const std::string &_master_host,
+                        unsigned int _master_port);
 
-      /// \brief Run the connection manager loop
+      /// \brief Run the connection manager loop.  Does not return until stopped.
       public: void Run();
 
-      /// \brief Return true if running (not stopped)
+      /// \brief Is the manager running?
+      /// \return true if running, false otherwise
       public: bool IsRunning() const;
 
-      /// \brief Finalize the conneciton manager
+      /// \brief Finalize the connection manager
       public: void Fini();
 
       /// \brief Stop the conneciton manager
       public: void Stop();
 
+      /// \brief Subscribe to a topic
+      /// \param[in] _topic The topic to subscribe to
+      /// \param[in] _msgType The type of the topic
+      /// \param[in] _latching If true, latch the latest incoming message; otherwise don't
       public: void Subscribe(const std::string &_topic,
                               const std::string &_msgType,
                               bool _latching);
 
+      /// \brief Unsubscribe from a topic
+      /// \param[in] _sub A subscription object
       public: void Unsubscribe(const msgs::Subscribe &_sub);
 
+      /// \brief Unsubscribe from a topic
+      /// \param[in] _topic The topic to unsubscribe from
+      /// \param[in] _msgType The type of the topic
       public: void Unsubscribe(const std::string &_topic,
                                 const std::string &_msgType);
 
-      public: void Advertise(const std::string &topic,
-                              const std::string &msgType);
+      /// \brief Advertise a topic
+      /// \param[in] _topic The topic to advertise
+      /// \param[in] _msgType The type of the topic
+      public: void Advertise(const std::string &_topic,
+                              const std::string &_msgType);
 
-      public: void Unadvertise(const std::string &topic);
+      /// \brief Unadvertise a topic
+      /// \param[in] _topic The topic to unadvertise
+      public: void Unadvertise(const std::string &_topic);
 
       /// \brief Explicitly update the publisher list
-      public: void GetAllPublishers(std::list<msgs::Publish> &publishers);
+      /// \param[out] _publishers The updated list of publishers is written here
+      public: void GetAllPublishers(std::list<msgs::Publish> &_publishers);
 
-      /// \brief Remove a connection
-      public: void RemoveConnection(ConnectionPtr &conn);
+      /// \brief Remove a connection from the manager
+      /// \param[in] _conn The connection to be removed
+      public: void RemoveConnection(ConnectionPtr &_conn);
 
       /// \brief Register a new topic namespace
+      /// \param[in] _name The name of the topic namespace to be registered
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
+      /// \param[out] _namespaces The list of namespace is written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
       /// \brief Find a connection that matches a host and port
-      private: ConnectionPtr FindConnection(const std::string &host,
-                                            unsigned int port);
+      /// \param[in] _host The host of the connection
+      /// \param[in] _port The port of the connection
+      /// \return Pointer to the connection; can be null (if no match was found)
+      private: ConnectionPtr FindConnection(const std::string &_host,
+                                            unsigned int _port);
 
       /// \brief Connect to a remote server
-      public: ConnectionPtr ConnectToRemoteHost(const std::string &host,
-                                                  unsigned int port);
+      /// \param[in] _host Host to connect to
+      /// \param[in] _port Port to connect to
+      /// \return Pointer to the connection; can be null (if connection failed)
+      public: ConnectionPtr ConnectToRemoteHost(const std::string &_host,
+                                                  unsigned int _port);
 
       private: void OnMasterRead(const std::string &data);
 
@@ -103,6 +133,7 @@ namespace gazebo
 
       private: void ProcessMessage(const std::string &_packet);
 
+      /// \brief Run the manager update loop once
       public: void RunUpdate();
 
       private: ConnectionPtr masterConn;

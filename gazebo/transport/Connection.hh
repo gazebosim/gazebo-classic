@@ -48,10 +48,11 @@ namespace gazebo
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
-    /// \addtogroup gazebo_transport
+    /// \addtogroup gazebo_transport Transport
     /// \{
 
-    /// \brief TCP/IP Connection
+    /// \class Connection Connection.hh transport/transport.hh
+    /// \brief Single TCP/IP connection manager
     class Connection : public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
@@ -61,17 +62,26 @@ namespace gazebo
       public: virtual ~Connection();
 
       /// \brief Connect to a remote host
-      public: bool Connect(const std::string &host, unsigned int port);
+      /// \param[in] _host The host to connect to
+      /// \param[in] _port The port to connect to
+      /// \return true if connection succeeded, false otherwise
+      public: bool Connect(const std::string &_host, unsigned int _port);
 
+      /// \brief The signature of a connection accept callback
       typedef boost::function<void(const ConnectionPtr&)> AcceptCallback;
 
       /// \brief Start a server that listens on a port
-      public: void Listen(unsigned int port, const AcceptCallback &accept_cb);
+      /// \param[in] _port The port to listen on
+      /// \param[in] _port The callback to invoke when a new connection has been accepted
+      public: void Listen(unsigned int _port, const AcceptCallback &_accept_cb);
 
+      /// \brief The signature of a connection read callback
       typedef boost::function<void(const std::string &data)> ReadCallback;
-      /// \brief Start a thread that reads from the connection, and passes
+
+      /// \brief Start a thread that reads from the connection and passes
       ///        new message to the ReadCallback
-      public: void StartRead(const ReadCallback &cb);
+      /// \param[in] _cb The callback to invoke when a new message is received
+      public: void StartRead(const ReadCallback &_cb);
 
       /// \brief Stop the read loop
       public: void StopRead();
@@ -79,7 +89,8 @@ namespace gazebo
       /// \brief Shutdown the socket
       public: void Shutdown();
 
-      /// \brief Return true if the connection is open
+      /// \brief Is the connection open?
+      /// \return true if the connection is open; false otherwise
       public: bool IsOpen() const;
 
       /// \brief Close a connection
@@ -89,38 +100,52 @@ namespace gazebo
       public: void Cancel();
 
       /// \brief Read data from the socket
-      public: bool Read(std::string &data);
+      /// \param[out] _data Destination for data that is read
+      /// \return true if data was successfully read, false otherwise
+      public: bool Read(std::string &_data);
 
       /// \brief Write data to the socket
+      /// \param[in] _buffer Data to write
+      /// \param[in] _force If true, block until the data has been written to the socket, 
+      /// otherwise just enqueue the data for asynchronous write
       public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
 
       /// \brief Get the local URI
+      /// \return The local URI
       public: std::string GetLocalURI() const;
 
       /// \brief Get the remote URI
+      /// \return The remote URI
       public: std::string GetRemoteURI() const;
 
-      /// \brief Get the address of this connection
+      /// \brief Get the local address of this connection
+      /// \return The local address
       public: std::string GetLocalAddress() const;
 
       /// \brief Get the port of this connection
+      /// \return The local port
       public: unsigned int GetLocalPort() const;
 
       /// \brief Get the remote address
+      /// \return The remote address
       public: std::string GetRemoteAddress() const;
 
       /// \brief Get the remote port number
+      /// \return The remote port
       public: unsigned int GetRemotePort() const;
 
       /// \brief Get the remote hostname
+      /// \return The remote hostname
       public: std::string GetRemoteHostname() const;
 
       /// \brief Get the local hostname
+      /// \return The local hostname
       public: std::string GetLocalHostname() const;
 
-      /// \brief Peform and asyncronous read
+      /// \brief Peform an asyncronous read
+      /// param[in] _handler Callback to invoke on received data
       public: template<typename Handler>
-              void AsyncRead(Handler handler)
+              void AsyncRead(Handler _handler)
               {
                 if (!this->IsOpen())
                 {
@@ -136,12 +161,15 @@ namespace gazebo
                     boost::asio::buffer(this->inbound_header),
                     boost::bind(f, this,
                                 boost::asio::placeholders::error,
-                                boost::make_tuple(handler)));
+                                boost::make_tuple(_handler)));
               }
 
-      // Handle a completed read of a message header. The handler is passed
-      // using a tuple since boost::bind seems to have trouble binding
-      // a function object created using boost::bind as a parameter
+      /// \brief Handle a completed read of a message header. 
+      ///
+      /// The handler is passed using a tuple since boost::bind seems to have 
+      /// trouble binding a function object created using boost::bind as a parameter
+      /// \param[in] _e Error code, if any, associated with the read
+      /// \param[in] _handler Callback to invoke on received data
       private: template<typename Handler>
                void OnReadHeader(const boost::system::error_code &_e,
                                  boost::tuple<Handler> _handler)
@@ -199,11 +227,17 @@ namespace gazebo
                 }
               }
 
-     private: template<typename Handler>
-              void OnReadData(const boost::system::error_code &e,
-                              boost::tuple<Handler> handler)
+      /// \brief Handle a completed read of a message body. 
+      ///
+      /// The handler is passed using a tuple since boost::bind seems to have 
+      /// trouble binding a function object created using boost::bind as a parameter
+      /// \param[in] _e Error code, if any, associated with the read
+      /// \param[in] _handler Callback to invoke on received data
+      private: template<typename Handler>
+               void OnReadData(const boost::system::error_code &_e,
+                              boost::tuple<Handler> _handler)
               {
-                if (e)
+                if (_e)
                   gzerr << "Error Reading data!\n";
 
                 // Inform caller that data has been received
@@ -214,20 +248,25 @@ namespace gazebo
                 if (data.empty())
                   gzerr << "OnReadData got empty data!!!\n";
 
-                if (!e && !transport::is_stopped())
+                if (!_e && !transport::is_stopped())
                 {
-                  boost::get<0>(handler)(data);
+                  boost::get<0>(_handler)(data);
                 }
               }
 
+     /// \brief Register a function to be called when the connection is shut down
+     /// \param[in] _subscriber Function to be called
+     /// \return Handle that can be used to unregister the function
      public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
-                 subscriber_)
-             { return this->shutdown.Connect(subscriber_); }
+                 _subscriber)
+             { return this->shutdown.Connect(_subscriber); }
 
-     public: void DisconnectShutdown(event::ConnectionPtr subscriber_)
-             {this->shutdown.Disconnect(subscriber_);}
+     /// \brief Unregister a function to be called when the connection is shut down
+     /// \param[in] _subscriber Handle previously returned by ConnectToShutdown()
+     public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
+             {this->shutdown.Disconnect(_subscriber);}
 
-     /// \brief Handle on write callbacks
+     /// \brief Handle on-write callbacks
      public: void ProcessWriteQueue();
 
      private: void OnWrite(const boost::system::error_code &e,
