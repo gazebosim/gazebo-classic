@@ -68,8 +68,6 @@ void DepthCameraSensor::Load(const std::string &_worldName,
 void DepthCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->poseSub = this->node->Subscribe("~/pose",
-                                        &DepthCameraSensor::OnPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -141,10 +139,6 @@ void DepthCameraSensor::UpdateImpl(bool /*_force*/)
     this->camera->PostRender();
     this->lastUpdateTime = this->world->GetSimTime();
   }
-}
-
-void DepthCameraSensor::OnPose(ConstPosePtr &/*_msg*/)
-{
 }
 
 //////////////////////////////////////////////////

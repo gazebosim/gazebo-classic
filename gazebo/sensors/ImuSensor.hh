@@ -15,64 +15,47 @@
  *
 */
 
-#ifndef IMUSENSOR_HH
-#define IMUSENSOR_HH
+#ifndef _IMUSENSOR_HH_
+#define _IMUSENSOR_HH_
 
 #include <vector>
 #include <string>
 
-#include "Sensor.hh"
+#include "gazebo/sensors/Sensor.hh"
 
 namespace gazebo
 {
-  /// \ingroup gazebo_sensors
-  /// \brief Sensors namespace
   namespace sensors
   {
-    /// \TODO This class inherits from Sensor, but looks like it specifically
-    /// doesn't override any methods, is this intentional? i.e. LoadChild
-    /// instead of Load, InitChild instead of Init
-
     /// \addtogroup gazebo_sensors
     /// \{
 
     /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
-    /// \brief An IMU sensor
+    /// \brief An IMU sensor.
     class ImuSensor: public Sensor
     {
-      /// \brief Constructor
-      /// \param _body The IMU sensor must be attached to a body.
-      public: ImuSensor(Body *_body);
+      /// \brief Constructor.
+      public: ImuSensor();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ImuSensor();
 
-      /// \brief Load the ImuSensor from XMLConfigNode
-      /// \param _node The XMLConfig node
-      protected: virtual void LoadChild(XMLConfigNode *_node);
+      /// \brief Load the ImuSensor from SDF.
+      /// \param[in] _node The SDF data.
+      protected: virtual void Load(sdf::ElementPtr _node);
 
-      /// \brief Save the sensor info in XML format
-      /// \param _prefix
-      /// \param _stream
-      /// \TODO Nate fill in
-      protected: virtual void SaveChild(std::string &_prefix,
-                                        std::ostream &_stream);
+      /// \brief Initialize the IMU.
+      protected: virtual void Init();
 
-      /// \brief Initialize the ray
-      protected: virtual void InitChild();
+      /// \brief Update sensed values.
+      protected: virtual void Update();
 
-      /// \brief Update sensed values
-      protected: virtual void UpdateChild();
+      /// \brief Finalize the IMU.
+      protected: virtual void Fini();
 
-      /// \brief Finalize the ray
-      protected: virtual void FiniChild();
-
-      /// Returns velocity as a math::Pose
-      /// FIXME storing x,y,z components in a quaternion seems like a bad idea
-      /// @todo storing x,y,z components in a quaternion seems like a bad idea
+      /// \brief Returns velocity as a math::Pose
       /// \return velocity data stored in Pose
-      /// \TODO Nate check
-      public: Pose GetVelocity();
+      public: math::Pose GetVelocity();
 
       private: Pose prevPose;
       private: Pose imuVel;
