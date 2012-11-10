@@ -17,6 +17,12 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/remove_whitespace.hpp>
+#include <boost/archive/iterators/istream_iterator.hpp>
 
 #include "gazebo/math/Rand.hh"
 
@@ -28,9 +34,13 @@
 using namespace gazebo;
 using namespace common;
 
+    typedef boost::archive::iterators::transform_width<
+      boost::archive::iterators::binary_from_base64<const char*>, 8, 6 > base64_to_bin;
+
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
 {
+  this->logStartXml = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -43,22 +53,22 @@ void LogPlay::Open(const std::string &_logFile)
 {
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
-    gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.\n");
+    gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.");
 
-  TiXmlDocument xmlDoc;
-  if (!xmlDoc.LoadFile(_logFile))
-    gzerr << "Unable to parser log file[" << _logFile << "]\n";
+  // Parse the log file
+  if (!this->xmlDoc.LoadFile(_logFile))
+    gzthrow("Unable to parser log file[" << _logFile << "]");
 
-  this->logXml = xmlDoc.FirstChildElement("gazebo_log");
-  if (!this->logXml)
-    gzerr << "Log file is missing the <gazebo_log> element\n";
+  // Get the gazebo_log element
+  this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
 
-  //this->file.open(_logFile.c_str(), std::fstream::in);
-  //if (!this->file)
-  //  gzthrow("Invalid logfile[" + _logFile + "]. Unable to open for reading.\n");
+  if (!this->logStartXml)
+    gzthrow("Log file is missing the <gazebo_log> element");
 
+  // Store the filename for future use.
   this->filename = _logFile;
 
+  // Read in the header.
   this->ReadHeader();
 }
 
@@ -67,35 +77,38 @@ void LogPlay::ReadHeader()
 {
   std::string logVersion, gazeboVersion;
   uint32_t randSeed;
+  TiXmlElement *headerXml, *childXml;
 
-  TiXmlElement *xml = this->logXml->FirstChildElement("header");
-  if (!xml)
-    gzerr << "Log file has no header\n";
+  // Get the header element
+  headerXml = this->logStartXml->FirstChildElement("header");
+  if (!headerXml)
+    gzthrow("Log file has no header");
 
-  TiXmlElement *childXml = xml->FirstChildElement("log_version");
+  // Get the log format version
+  childXml = headerXml->FirstChildElement("log_version");
   if (!childXml)
     gzerr << "Log file header is missing the log version.\n";
   else
     logVersion = childXml->GetText();
 
-  childXml = xml->FirstChildElement("gazebo_version");
+  // Get the gazebo version
+  childXml = headerXml->FirstChildElement("gazebo_version");
   if (!childXml)
     gzerr << "Log file header is missing the gazebo version.\n";
   else
     gazeboVersion = childXml->GetText();
 
-  childXml = xml->FirstChildElement("rand_seed");
+  // Get the random number seed.
+  childXml = headerXml->FirstChildElement("rand_seed");
   if (!childXml)
     gzerr << "Log file header is missing the random number seed.\n";
   else
     randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
-  /// \TODO: add error checking for the header.
-  /*this->file >> logVersion >> gazeboVersion >> randSeed;*/
-
-  std::cout << "Log Version["
-            << logVersion << "] Gz["
-            << gazeboVersion << "] Seed[" << randSeed << "]\n";
+  gzmsg << "\nLog playback:"
+        << "  Log Version[" << logVersion << "]\n"
+        << "  Gazebo Version[" << gazeboVersion << "]\n"
+        << "  Random Seed[" << randSeed << "]\n\n";
 
   if (logVersion != GZ_LOG_VERSION)
     gzwarn << "Log version[" << logVersion << "] in file[" << this->filename
@@ -109,29 +122,50 @@ void LogPlay::ReadHeader()
 /////////////////////////////////////////////////
 bool LogPlay::IsOpen() const
 {
-  return this->file.is_open();
+  return this->logStartXml != NULL;
 }
 
 /////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
-  return false;
+  if (!this->logCurrXml)
+    this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
 
-  if (this->file.eof())
+  // Make sure we have valid xml pointer
+  if (!this->logCurrXml)
     return false;
 
-  std::string compression;
-  uint32_t size;
+  /// Get the chunk's encoding
+  std::string encoding = this->logCurrXml->Attribute("encoding");
 
-  this->file >> compression >> size;
-  if (compression.empty() || this->file.eof())
-    return false;
+  // Make sure there is an encoding value.
+  if (encoding.empty())
+    gzthrow("Enconding missing for a chunk in log file[" +
+            this->filename + "]");
 
-  // Read the data.
-  char *data = new char[size];
-  this->file.read(data, size);
+  if (encoding == "txt")
+    _data = this->logCurrXml->GetText();
+  else if (encoding == "bz2")
+  {
+    std::string data = this->logCurrXml->GetText();
+    std::string buffer;
+    std::copy(base64_to_bin(data.c_str()),
+              base64_to_bin(data.c_str() + data.size()),
+              std::back_inserter(buffer));
 
-  _data = data;
+    {
+      boost::iostreams::filtering_istream in;
+      in.push(boost::iostreams::bzip2_decompressor());
+      in.push(boost::make_iterator_range(buffer));
+      std::getline(in, _data);
+    }
+  }
+  else
+  {
+    gzerr << "Inavlid encoding[" << encoding << "] in log file["
+          << this->filename << "]\n";
+      return false;
+  }
 
-  return !this->file.eof();
+  return true;
 }

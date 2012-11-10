@@ -47,7 +47,7 @@ namespace gazebo
             boost::archive::iterators::transform_width<const char *, 6, 8> >
             Base64Text;
 
-    /// \addtogroup gazebo_common
+    //addtogroup gazebo_common
     /// \{
 
     /// \class Logger Logger.hh physics/Logger.hh

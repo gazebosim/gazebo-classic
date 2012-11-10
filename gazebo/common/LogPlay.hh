@@ -158,8 +158,8 @@ namespace gazebo
       /// \brief Read the header from the log file.
       private: void ReadHeader();
 
-      private: TiXmlElement *logXml;
-      private: std::ifstream file;
+      private: TiXmlDocument xmlDoc;
+      private: TiXmlElement *logStartXml, *logCurrXml;
       private: std::string filename;
 
       /// \brief This is a singleton
