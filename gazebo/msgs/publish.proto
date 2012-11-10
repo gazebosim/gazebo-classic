@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Publish
 /// \brief Message that contains information about a publisher of data
-/// \verbatim
+
 
 message Publish
 {
@@ -13,4 +13,4 @@ message Publish
   required uint32 port     = 4;
 }
 
-/// \endverbatim
+

@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface WorldStatistics
 /// \brief A message statiscs about a world
-/// \verbatim
+
 
 import "header.proto";
 import "time.proto";
@@ -17,4 +17,4 @@ message WorldStatistics
   optional int32 model_count = 6;
 }
 
-/// \endverbatim
+

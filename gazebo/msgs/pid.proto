@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface PID 
 /// \brief Message for simple PID controllers
-/// \verbatim
+
 
 message PID
 {
@@ -15,4 +15,4 @@ message PID
   optional double i_min  = 6[default=0.0];
   optional double limit  = 7[default=0.0];
 }
-/// \endverbatim
+
