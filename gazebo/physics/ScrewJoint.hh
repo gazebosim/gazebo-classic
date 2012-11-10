@@ -49,7 +49,7 @@ namespace gazebo
       public: virtual ~ScrewJoint()
               {}
 
-      /// \brief Load a ScreJoint.
+      /// \brief Load a ScrewJoint.
       /// \param[in] _sdf SDF value to load from
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {

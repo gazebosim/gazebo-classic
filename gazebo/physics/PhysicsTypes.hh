@@ -112,7 +112,7 @@ namespace gazebo
     typedef boost::shared_ptr<Inertial> InertialPtr;
 
     /// \def RoadPtr
-    /// \brief Boost shared pointer to a Raod object
+    /// \brief Boost shared pointer to a Road object
     typedef boost::shared_ptr<Road> RoadPtr;
 
     /// \def SurfaceParamsPtr
@@ -128,7 +128,7 @@ namespace gazebo
     typedef boost::shared_ptr<CylinderShape> CylinderShapePtr;
 
     /// \def SphereShapePtr
-    /// \brief Boost shared pointer to a SpherShape object
+    /// \brief Boost shared pointer to a SphereShape object
     typedef boost::shared_ptr<SphereShape> SphereShapePtr;
 
     /// \def MeshShapePtr

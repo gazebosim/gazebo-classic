@@ -539,7 +539,7 @@ namespace gazebo
       /// World::StepWorld for changing World::stepInc,
       /// and waits on setpInc on World::stepIhc as it's decremented.
       /// World::Reset while World::ResetTime, entities, World::physicsEngine
-      /// World::SetPuased to assign world::pause
+      /// World::SetPaused to assign world::pause
       private: boost::recursive_mutex *worldUpdateMutex;
 
       /// \brief THe world's SDF values.

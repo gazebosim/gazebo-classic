@@ -60,7 +60,7 @@ namespace gazebo
       public: virtual void FillShapeMsg(msgs::Geometry &_msg)
               GAZEBO_DEPRECATED;
 
-      /// \brief Fill in the values for a geomertry message.
+      /// \brief Fill in the values for a geometry message.
       /// \param[out] _msg The geometry message to fill.
       public: virtual void FillMsg(msgs::Geometry &_msg) = 0;
 
