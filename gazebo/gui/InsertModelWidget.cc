@@ -165,6 +165,12 @@ void InsertModelWidget::ConnectToModelDatabase()
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
+  if (this->modelDatabaseThread)
+  {
+    this->modelDatabaseThread->join();
+    delete this->modelDatabaseThread;
+    this->modelDatabaseThread = NULL;
+  }
 }
 
 /////////////////////////////////////////////////
