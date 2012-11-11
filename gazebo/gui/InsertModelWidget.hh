@@ -24,6 +24,11 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QPushButton;
 
+namespace boost
+{
+  class thread;
+}
+
 namespace gazebo
 {
   namespace gui
@@ -44,6 +49,11 @@ namespace gazebo
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
       private: QTreeWidget *fileTreeWidget;
+      
+      /// \brief Thread that connects to the model database
+      private: boost::thread *modelDatabaseThread;
+      
+      private: QTreeWidgetItem* modelDatabaseItem;
     };
   }
 }

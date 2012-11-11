@@ -18,6 +18,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
 
 #include "sdf/sdf.hh"
 #include "common/SystemPaths.hh"
@@ -44,6 +45,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent)
 {
   this->setObjectName("insertModel");
+  this->modelDatabaseThread = NULL;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
@@ -125,7 +127,14 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     this->fileTreeWidget->expandItem(topItem);
   }
 
-  this->ConnectToModelDatabase();
+  // Create a top-level tree item for the path
+  this->modelDatabaseItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("Connecting to model database...")));
+  this->fileTreeWidget->addTopLevelItem(this->modelDatabaseItem);
+
+  this->modelDatabaseThread = new boost::thread(
+      boost::bind(&InsertModelWidget::ConnectToModelDatabase, this));
 }
 
 /////////////////////////////////////////////////
@@ -135,19 +144,16 @@ void InsertModelWidget::ConnectToModelDatabase()
   std::map<std::string, std::string> models =
     common::ModelDatabase::GetModels();
 
+  modelDatabaseItem->setText(0,
+    QString("%1").arg(QString::fromStdString(uri)));
+      
   if (!models.empty())
   {
-    // Create a top-level tree item for the path
-    QTreeWidgetItem *topItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-          QStringList(QString("%1").arg(QString::fromStdString(uri))));
-    this->fileTreeWidget->addTopLevelItem(topItem);
-
     for (std::map<std::string, std::string>::iterator iter = models.begin();
         iter != models.end(); ++iter)
     {
       // Add a child item for the model
-      QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
+      QTreeWidgetItem *childItem = new QTreeWidgetItem(this->modelDatabaseItem,
           QStringList(QString("%1").arg(
               QString::fromStdString(iter->second))));
       childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
