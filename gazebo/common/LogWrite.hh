@@ -43,30 +43,30 @@ namespace gazebo
     //addtogroup gazebo_common
     /// \{
 
-    /// \class Logger Logger.hh physics/Logger.hh
+    /// \class LogWrite LogWrite.hh physics/LogWrite.hh
     /// \brief Handles logging of data to disk
     ///
-    /// The Logger class is a Singleton that manages data logging of any
+    /// The LogWrite class is a Singleton that manages data logging of any
     /// entity within a running simulation. An entity may be a World, Model,
     /// or any of their child entities. This class only writes log files,
     /// see LogPlay for playback functionality.
     ///
-    /// State information for an entity may be logged through the Logger::Add
-    /// function, and stopped through the Logger::Remove function. Data may
+    /// State information for an entity may be logged through the LogWrite::Add
+    /// function, and stopped through the LogWrite::Remove function. Data may
     /// be logged into a single file, or split into many separate files by
-    /// specifying different filenames for the Logger::Add function.
+    /// specifying different filenames for the LogWrite::Add function.
     ///
-    /// The Logger is updated at the start of each simulation step. This
+    /// The LogWrite is updated at the start of each simulation step. This
     /// guarantees that all data is stored.
     ///
     /// \sa Logplay, State
-    class Logger : public SingletonT<Logger>
+    class LogWrite : public SingletonT<LogWrite>
     {
       /// \brief Constructor
-      private: Logger();
+      private: LogWrite();
 
       /// \brief Destructor
-      private: virtual ~Logger();
+      private: virtual ~LogWrite();
 
       public: bool Init(const std::string &_subdir);
 
@@ -170,7 +170,7 @@ namespace gazebo
       private: std::string logPathname;
 
       /// \brief This is a singleton
-      private: friend class SingletonT<Logger>;
+      private: friend class SingletonT<LogWrite>;
     };
     /// \}
   }

@@ -22,7 +22,7 @@
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/common/Logger.hh"
+#include "gazebo/common/LogWrite.hh"
 #include "gazebo/common/LogPlay.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
@@ -401,7 +401,7 @@ void Server::ProcessParams()
     }
     else if (iter->first == "log")
     {
-      common::Logger::Instance()->Start();
+      common::LogWrite::Instance()->Start();
     }
   }
 }

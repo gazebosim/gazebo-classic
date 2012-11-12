@@ -36,7 +36,7 @@
 #include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/common/LogPlay.hh"
-#include "gazebo/common/Logger.hh"
+#include "gazebo/common/LogWrite.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Diagnostics.hh"
@@ -264,7 +264,7 @@ void World::Init()
   this->testRay = boost::shared_dynamic_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  common::Logger::Instance()->Add(this->GetName(), "state.log",
+  common::LogWrite::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
 
   this->initialized = true;

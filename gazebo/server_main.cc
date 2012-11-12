@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Logger.hh"
+#include "gazebo/common/LogWrite.hh"
 #include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gazebo::common::Logger::Instance()->Init("server");
+  gazebo::common::LogWrite::Instance()->Init("server");
 
   gazebo::Server *server = new gazebo::Server();
   if (!server->ParseArgs(argc, argv))

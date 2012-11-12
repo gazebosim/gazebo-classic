@@ -27,7 +27,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/Logger.hh"
+#include "gazebo/common/LogWrite.hh"
 
 #include "gazebo/gazebo_config.h"
 
@@ -41,7 +41,7 @@ typedef boost::archive::iterators::base64_from_binary<
         Base64Text;
 
 //////////////////////////////////////////////////
-Logger::Logger()
+LogWrite::LogWrite()
 {
   this->stop = true;
 
@@ -62,7 +62,7 @@ Logger::Logger()
 }
 
 //////////////////////////////////////////////////
-Logger::~Logger()
+LogWrite::~LogWrite()
 {
   // Stop the write thread.
   this->Stop();
@@ -78,7 +78,7 @@ Logger::~Logger()
 }
 
 //////////////////////////////////////////////////
-bool Logger::Init(const std::string &_subdir)
+bool LogWrite::Init(const std::string &_subdir)
 {
   if (!_subdir.empty())
     this->logPathname += "/" + _subdir;
@@ -89,7 +89,7 @@ bool Logger::Init(const std::string &_subdir)
 
 
 //////////////////////////////////////////////////
-void Logger::Start()
+void LogWrite::Start()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
@@ -111,26 +111,26 @@ void Logger::Start()
   {
     this->updateConnection =
       event::Events::ConnectWorldUpdateStart(
-          boost::bind(&Logger::Update, this));
+          boost::bind(&LogWrite::Update, this));
   }
   else
   {
-    gzerr << "Logger has already been initialized\n";
+    gzerr << "LogWrite has already been initialized\n";
     return;
   }
 
   // Start the logging thread
   if (!this->writeThread)
-    this->writeThread = new boost::thread(boost::bind(&Logger::Run, this));
+    this->writeThread = new boost::thread(boost::bind(&LogWrite::Run, this));
   else
   {
-    gzerr << "Logger has already been initialized\n";
+    gzerr << "LogWrite has already been initialized\n";
     return;
   }
 }
 
 //////////////////////////////////////////////////
-void Logger::Stop()
+void LogWrite::Stop()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
@@ -152,7 +152,7 @@ void Logger::Stop()
 }
 
 //////////////////////////////////////////////////
-void Logger::Add(const std::string &_name, const std::string &_filename,
+void LogWrite::Add(const std::string &_name, const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCallback)
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
@@ -172,12 +172,12 @@ void Logger::Add(const std::string &_name, const std::string &_filename,
   if (boost::filesystem::exists(path))
     gzthrow("Filename[" + path.string() + "], already exists\n");
 
-  Logger::Log *newLog;
+  LogWrite::Log *newLog;
 
   // Create a new log object
   try
   {
-    newLog = new Logger::Log(path.string(), _logCallback);
+    newLog = new LogWrite::Log(path.string(), _logCallback);
   }
   catch(...)
   {
@@ -192,7 +192,7 @@ void Logger::Add(const std::string &_name, const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-bool Logger::Remove(const std::string &_name)
+bool LogWrite::Remove(const std::string &_name)
 {
   bool result = false;
 
@@ -212,7 +212,7 @@ bool Logger::Remove(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void Logger::Update()
+void LogWrite::Update()
 {
   {
     boost::mutex::scoped_lock lock(this->writeMutex);
@@ -230,7 +230,7 @@ void Logger::Update()
 }
 
 //////////////////////////////////////////////////
-void Logger::Run()
+void LogWrite::Run()
 {
   // This loop will write data to disk.
   while (!this->stop)
@@ -254,7 +254,7 @@ void Logger::Run()
 }
 
 //////////////////////////////////////////////////
-Logger::Log::Log(const std::string &_filename,
+LogWrite::Log::Log(const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCB)
 {
   this->logCB = _logCB;
@@ -273,7 +273,7 @@ Logger::Log::Log(const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-Logger::Log::~Log()
+LogWrite::Log::~Log()
 {
   std::string xmlEnd = "</gazebo_log>";
   this->logFile.write(xmlEnd.c_str(), xmlEnd.size());
@@ -282,7 +282,7 @@ Logger::Log::~Log()
 }
 
 //////////////////////////////////////////////////
-void Logger::Log::Update()
+void LogWrite::Log::Update()
 {
   std::ostringstream stream;
 
@@ -325,13 +325,13 @@ void Logger::Log::Update()
 }
 
 //////////////////////////////////////////////////
-void Logger::Log::ClearBuffer()
+void LogWrite::Log::ClearBuffer()
 {
   this->buffer.clear();
 }
 
 //////////////////////////////////////////////////
-void Logger::Log::Write()
+void LogWrite::Log::Write()
 {
   // Make sure the file is open for writing
   if (!this->logFile.is_open())

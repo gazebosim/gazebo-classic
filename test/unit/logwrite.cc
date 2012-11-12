@@ -16,31 +16,31 @@
 */
 
 #include "ServerFixture.hh"
-#include "gazebo/common/Logger.hh"
+#include "gazebo/common/LogWrite.hh"
 
 using namespace gazebo;
-class LoggerTest : public ServerFixture
+class LogWriteTest : public ServerFixture
 {
 };
 
-TEST_F(LoggerTest, Init)
+TEST_F(LogWriteTest, Init)
 {
-  EXPECT_TRUE(common::Logger::Instance()->Init("test"));
+  EXPECT_TRUE(common::LogWrite::Instance()->Init("test"));
 
-  common::Logger::Instance()->Stop();
-  common::Logger::Instance()->Stop();
+  common::LogWrite::Instance()->Stop();
+  common::LogWrite::Instance()->Stop();
 
-  common::Logger::Instance()->Start();
-  common::Logger::Instance()->Start();
+  common::LogWrite::Instance()->Start();
+  common::LogWrite::Instance()->Start();
 
-  common::Logger::Instance()->Stop();
-  common::Logger::Instance()->Start();
+  common::LogWrite::Instance()->Stop();
+  common::LogWrite::Instance()->Start();
 
 
-  common::Logger::Instance()->Start();
-  common::Logger::Instance()->Stop();
+  common::LogWrite::Instance()->Start();
+  common::LogWrite::Instance()->Stop();
 
-  common::Logger::Instance()->Stop();
+  common::LogWrite::Instance()->Stop();
 }
 
 int main(int argc, char **argv)
