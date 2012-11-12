@@ -34,8 +34,32 @@
 using namespace gazebo;
 using namespace common;
 
-    typedef boost::archive::iterators::transform_width<
-      boost::archive::iterators::binary_from_base64<const char*>, 8, 6 > base64_to_bin;
+/////////////////////////////////////////////////
+// Convert a Base64 string.
+// We have to use our own function, instead of just using the
+// boost::archive iterators, because the boost::archive iterators throw an
+// error when the end of the Base64 string is reached. The expection then
+// causes nothing to happen.
+// TLDR; Boost is broken.
+void base64_decode(std::string &_dest, const std::string &_src)
+{
+  typedef boost::archive::iterators::transform_width<
+    boost::archive::iterators::binary_from_base64<const char*>, 8, 6>
+    base64_dec;
+
+  try
+  {
+    base64_dec srcIter(_src.c_str());
+    for(unsigned int i=0; i < _src.size(); ++i)
+    {
+      _dest += *srcIter;
+      ++srcIter;
+    }
+  }
+  catch(boost::archive::iterators::dataflow_exception &)
+  {
+  }
+}
 
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
@@ -105,7 +129,7 @@ void LogPlay::ReadHeader()
   else
     randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
-  gzmsg << "\nLog playback:"
+  gzmsg << "\nLog playback:\n"
         << "  Log Version[" << logVersion << "]\n"
         << "  Gazebo Version[" << gazeboVersion << "]\n"
         << "  Random Seed[" << randSeed << "]\n\n";
@@ -130,6 +154,8 @@ bool LogPlay::Step(std::string &_data)
 {
   if (!this->logCurrXml)
     this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+  else
+    this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
 
   // Make sure we have valid xml pointer
   if (!this->logCurrXml)
@@ -149,15 +175,18 @@ bool LogPlay::Step(std::string &_data)
   {
     std::string data = this->logCurrXml->GetText();
     std::string buffer;
-    std::copy(base64_to_bin(data.c_str()),
-              base64_to_bin(data.c_str() + data.size()),
-              std::back_inserter(buffer));
 
+    // Decode the base64 string
+    base64_decode(buffer, data);
+
+    // Decompress the bz2 data
     {
       boost::iostreams::filtering_istream in;
       in.push(boost::iostreams::bzip2_decompressor());
       in.push(boost::make_iterator_range(buffer));
-      std::getline(in, _data);
+
+      // Get the data
+      std::getline(in, _data, '\0');
     }
   }
   else

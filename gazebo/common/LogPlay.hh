@@ -54,7 +54,7 @@ namespace gazebo
       /// \brief Open a log file for reading
       ///
       /// Open a log file that was previously recorded.
-      /// \param _logFile The file to load
+      /// \param[in] _logFile The file to load
       /// \throws Exception
       public: void Open(const std::string &_logFile);
 
@@ -63,103 +63,22 @@ namespace gazebo
       public: bool IsOpen() const;
 
       /// \brief Step through the open log file.
+      /// \param[out] _data Data from next entry in the log file.
       public: bool Step(std::string &_data);
-
-      /// \brief Get an iterator to the beginning of the log file.
-      ///
-      /// Requires a log file to be opened first.
-      /// Use the iterator to step through a log file.
-      /// \sa Logplay::Open.
-      /// \return Iterator the beginning of the opened log file
-      // public: Iterator Begin();
-
-      /// \brief Get an iterator to the end of the log file.
-      ///
-      /// Requires a log file to be opened first
-      /// Use the iterator to step through a log file.
-      /// \sa Logplay::Open.
-      /// \return Iterator the end of the opened log file
-      // public: Iterator End();
-
-      /// \brief Play a log file in a given World
-      ///
-      /// Replay a complete log file in a World.
-      /// Requires a log file to be opened first, \sa Logplay::Open.
-      /// \param _world Pointer to the World
-      /// \return True if replay was successful
-      // public: bool Play(WorldPtr _world);
-
-      /// \brief Play a log file in a given World using only data for a
-      /// given entity.
-      ///
-      /// Replay a log file in a World, but only apply data for the given
-      /// entity.
-      /// Requires a log file to be opened first
-      /// \sa Logplay::Open.
-      /// \param _world Pointer to the World
-      /// \param _entityName Name of the entity to search the log for
-      /// \return True if replay was successful
-      // public: bool Play(WorldPtr _world, const std::string &_entityName);
-
-      /// \brief Play a log file in a given World using only data for a
-      /// list of entities.
-      ///
-      /// Replay a log file in a World, but only apply data for the given
-      /// list of entities.
-      /// Requires a log file to be opened first, \sa Logplay::Open.
-      /// \param _world Pointer to the World
-      /// \param _entityNames Names of the entities to search the log for
-      /// \return True if replay was successful
-      /// public: bool Play(WorldPtr _world,
-      //                  const std::list<std::string> &_entityNames);
-
-      /// \brief Play a segment of a log file in a given World
-      ///
-      /// Replay a segment of log file in a World. The segment is defined
-      /// by a start and end time, where time is simulation time.
-      /// Requires a log file to be opened first, \sa Logplay::Open.
-      /// \param _world Pointer to the World.
-      /// \param _start Start time, in simulation time.
-      /// \param _stop Stop time, in simulation time.
-      /// \return True if replay was successful.
-      /// public: bool Play(WorldPtr _world, common::Time _start,
-      //                  common::Time _stop);
-
-      /// \brief Play a segment of a log file in a given World using only
-      /// data for a given entity.
-      ///
-      /// Replay a segment of log file in a World, but only apply data for
-      /// the given entity. The segment is defined
-      /// by a start and end time, where time is simulation time.
-      /// Requires a log file to be opened first, \sa Logplay::Open.
-      /// \param _world Pointer to the World.
-      /// \param _entityName Name of the entity to search the log for
-      /// \param _start Start time, in simulation time.
-      /// \param _stop Stop time, in simulation time.
-      /// \return True if replay was successful.
-      /// public: bool Play(WorldPtr _world, const std::string &_entityName,
-      //                  common::Time _start, common::Time _stop);
-
-      /// \brief Play a segment of a log file in a given World using
-      /// only data for a list of entities.
-      ///
-      /// Replay a segment of a log file in a World, but only apply data for
-      /// the given list of entities.
-      /// Requires a log file to be opened first, \sa Logplay::Open.
-      /// \param _world Pointer to the World
-      /// \param _entityNames Names of the entities to search the log for
-      /// \param _start Start time, in simulation time.
-      /// \param _stop Stop time, in simulation time.
-      /// \return True if replay was successful
-      // public: bool Play(WorldPtr _world,
-      //                  const std::list<std::string> &_entityNames,
-      //                  common::Time _start, common::Time _stop);
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();
 
+      /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;
-      private: TiXmlElement *logStartXml, *logCurrXml;
+
+      /// \brief Start of the log.
+      private: TiXmlElement *logStartXml;
+
+      /// \brief Current position in the log file.
+      private: TiXmlElement *logCurrXml;
+
+      /// \brief Name of the log file.
       private: std::string filename;
 
       /// \brief This is a singleton

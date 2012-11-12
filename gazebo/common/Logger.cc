@@ -34,6 +34,12 @@
 using namespace gazebo;
 using namespace common;
 
+/// Convert binary values to base64 characters
+typedef boost::archive::iterators::base64_from_binary<
+        // retrieve 6 bit integers from a sequence of 8 bit bytes
+        boost::archive::iterators::transform_width<const char *, 6, 8> >
+        Base64Text;
+
 //////////////////////////////////////////////////
 Logger::Logger()
 {
