@@ -129,7 +129,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] parent Parent of this object
-      public: Base(BasePtr parent);
+      public: explicit Base(BasePtr parent);
 
       /// \brief Destructor
       public: virtual ~Base();

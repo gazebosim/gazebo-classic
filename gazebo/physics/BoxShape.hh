@@ -64,16 +64,12 @@ namespace gazebo
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      /// \brief Get the mass of the box give a density value.
-      /// \param[in] _density Density to compute a mass from.
-      public: virtual double GetMass(double _density) const;
+      /// \brief Deprecated
+      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
 
-      /// \brief Get inertial for a shape.
-      /// \param[in] _mass Mass of the box.
-      /// \param[out] _inertial Inertial element to populate with the
-      /// result.
-      public: virtual void GetInertial(double _mass,
-                                       InertialPtr _inertial) const;
+      /// \brief Deprecated
+      public: virtual void GetInertial(double _mass, InertialPtr _inertial)
+              const GAZEBO_DEPRECATED;
     };
     /// \}
   }
