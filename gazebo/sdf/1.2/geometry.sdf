@@ -102,4 +102,7 @@
       </element>
     </element>
   </element> <!-- End Heightmap -->
+  <element name="empty" required="0">
+    <description>You can use the empty tag to make empty geometries.</description>
+  </element> <!-- End empty -->
 </element><!-- End Geometry -->

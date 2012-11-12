@@ -362,7 +362,7 @@ namespace gazebo
       /// \param[in] _poses Series of poses the visual will move to.
       /// \param[in] _time Time it takes the visual to move to the pose.
       /// \param[in] _onComplete Callback used when the move is complete.
-     public: void MoveToPositions(const std::vector<math::Pose> &_pts,
+      public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
                                    boost::function<void()> _onComplete = NULL);
 
@@ -411,6 +411,27 @@ namespace gazebo
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
+
+      /// \brief Load a plugin
+      /// \param _filename The filename of the plugin
+      /// \param _name A unique name for the plugin
+      /// \param _sdf The SDF to pass into the plugin.
+      public: void LoadPlugin(const std::string &_filename,
+                               const std::string &_name,
+                               sdf::ElementPtr _sdf);
+
+      /// \brief Remove a running plugin
+      /// \param _name The unique name of the plugin to remove
+      public: void RemovePlugin(const std::string &_name);
+
+      /// \brief Load all plugins
+      ///
+      /// Load all plugins specified in the SDF for the model.
+      private: void LoadPlugins();
+
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
+
+      private: std::vector<VisualPluginPtr> plugins;
 
       /// \brief Helper function to get the bounding box for a visual.
       /// \param[in] _node Pointer to the Ogre Node to process.
@@ -493,6 +514,8 @@ namespace gazebo
 
       /// \brief True to use RT shader system
       private: bool useRTShader;
+
+      private: bool initialized;
     };
     /// \}
   }

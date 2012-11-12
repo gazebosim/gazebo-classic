@@ -91,10 +91,12 @@ namespace gazebo
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
                {return fakeAnchor;}
 
-      /// \brief Set screw joint thread pitch
-      public: virtual void SetThreadPitch(int /*_index*/,
-                                          const double /*_thread_pitch*/)
-               {gzerr << "not implemented\n";}
+      /// \brief Set screw joint thread pitch.
+      ///
+      /// This must be implemented in a child class
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _threadPitch Thread pitch value.
+      public: virtual void SetThreadPitch(int _index, double _threadPitch) = 0;
 
       protected: math::Vector3 fakeAnchor;
       protected: double threadPitch;

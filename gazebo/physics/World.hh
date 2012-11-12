@@ -215,7 +215,7 @@ namespace gazebo
       ///
       /// This function is the same as GetByName, but limits the search to
       /// only Entities.
-      /// \param[in[ _name The name of the Entity to find.
+      /// \param[in] _name The name of the Entity to find.
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
@@ -514,14 +514,8 @@ namespace gazebo
       /// \brief Period used to send out world statistics
       private: common::Time statPeriod;
 
-      /// \brief Period used to process messages
-      private: common::Time processMsgsPeriod;
-
       /// \brief Last time a world statistics message was sent
       private: common::Time prevStatTime;
-
-      /// \brief Last time messages were processed
-      private: common::Time prevProcessMsgsTime;
 
       /// \brief Time at which pause started.
       private: common::Time pauseStartTime;
@@ -599,6 +593,12 @@ namespace gazebo
 
       /// \brief sleep timing error offset due to clock wake up latency
       private: common::Time sleepOffset;
+
+      /// \brief Last time incoming messages were processed.
+      private: common::Time prevProcessMsgsTime;
+
+      /// \brief Period over which messages should be processed.
+      private: common::Time processMsgsPeriod;
     };
     /// \}
   }

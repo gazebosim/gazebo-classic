@@ -336,7 +336,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Link::SetCollideMode(const std::string & _mode)
+void Link::SetCollideMode(const std::string &_mode)
 {
   unsigned int categoryBits;
   unsigned int collideBits;
@@ -657,6 +657,12 @@ void Link::RemoveChildJoint(JointPtr _joint)
 //////////////////////////////////////////////////
 void Link::FillLinkMsg(msgs::Link &_msg)
 {
+  this->FillMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void Link::FillMsg(msgs::Link &_msg)
+{
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
@@ -683,7 +689,7 @@ void Link::FillLinkMsg(msgs::Link &_msg)
     {
       CollisionPtr coll = boost::shared_dynamic_cast<Collision>(
           this->GetChild(j));
-      coll->FillCollisionMsg(*_msg.add_collision());
+      coll->FillMsg(*_msg.add_collision());
     }
   }
 
@@ -857,8 +863,8 @@ void Link::SetState(const LinkState &_state)
 /////////////////////////////////////////////////
 double Link::GetLinearDamping() const
 {
-  if (this->sdf->HasElement("damping"))
-    return this->sdf->GetElement("damping")->GetValueDouble("linear");
+  if (this->sdf->HasElement("velocity_decay"))
+    return this->sdf->GetElement("velocity_decay")->GetValueDouble("linear");
   else
     return 0.0;
 }
@@ -866,8 +872,13 @@ double Link::GetLinearDamping() const
 /////////////////////////////////////////////////
 double Link::GetAngularDamping() const
 {
-  if (this->sdf->HasElement("damping"))
-    return this->sdf->GetElement("damping")->GetValueDouble("angular");
+  if (this->sdf->HasElement("velocity_decay"))
+    return this->sdf->GetElement("velocity_decay")->GetValueDouble("angular");
   else
     return 0.0;
+}
+
+/////////////////////////////////////////////////
+void Link::SetKinematic(const bool &/*_kinematic*/)
+{
 }

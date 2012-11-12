@@ -41,7 +41,7 @@ void CylinderShape::Init()
 
 
 //////////////////////////////////////////////////
-void CylinderShape::SetRadius(const double &_radius)
+void CylinderShape::SetRadius(double _radius)
 {
   this->sdf->GetElement("radius")->Set(_radius);
   this->SetSize(this->sdf->GetValueDouble("radius"),
@@ -49,7 +49,7 @@ void CylinderShape::SetRadius(const double &_radius)
 }
 
 //////////////////////////////////////////////////
-void CylinderShape::SetLength(const double &_length)
+void CylinderShape::SetLength(double _length)
 {
   this->sdf->GetElement("length")->Set(_length);
   this->SetSize(this->sdf->GetValueDouble("radius"),
@@ -57,23 +57,26 @@ void CylinderShape::SetLength(const double &_length)
 }
 
 //////////////////////////////////////////////////
-void CylinderShape::SetSize(const double &_radius, const double &_length)
+void CylinderShape::SetSize(double _radius, double _length)
 {
   this->sdf->GetElement("radius")->Set(_radius);
   this->sdf->GetElement("length")->Set(_length);
 }
 
+/////////////////////////////////////////////////
 double CylinderShape::GetRadius() const
 {
   return this->sdf->GetValueDouble("radius");
 }
 
+/////////////////////////////////////////////////
 double CylinderShape::GetLength() const
 {
   return this->sdf->GetValueDouble("length");
 }
 
-void CylinderShape::FillShapeMsg(msgs::Geometry &_msg)
+/////////////////////////////////////////////////
+void CylinderShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::CYLINDER);
   _msg.mutable_cylinder()->set_radius(this->GetRadius());

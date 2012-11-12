@@ -45,11 +45,11 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Set the size
-      public: virtual void SetRadius(const double &radius);
+      public: virtual void SetRadius(double _radius);
 
       public: double GetRadius() const;
 
-      public: virtual void FillShapeMsg(msgs::Geometry &_msg);
+      public: virtual void FillMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
