@@ -30,7 +30,10 @@ using namespace gazebo;
 using namespace common;
 
 Time Time::wallTime;
+#if defined(__APPLE__) || defined(__MACOSX__)
+#else
 struct timespec Time::clock_resolution;
+#endif
 
 /////////////////////////////////////////////////
 Time::Time()
@@ -38,9 +41,12 @@ Time::Time()
   this->sec = 0;
   this->nsec = 0;
 
+#if defined(__APPLE__) || defined(__MACOSX__)
+#else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep tiem
   clock_getres(CLOCK_REALTIME, &clock_resolution);
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -84,8 +90,14 @@ Time::~Time()
 /////////////////////////////////////////////////
 const Time &Time::GetWallTime()
 {
+#if defined(__APPLE__) || defined(__MACOSX__)
+  struct timeval tv;
+  struct timeval tz;
+  gettimeofday(&tv, &tz);
+#else
   struct timespec tv;
   clock_gettime(0, &tv);
+#endif
   wallTime = tv;
   return wallTime;
 }
@@ -131,7 +143,12 @@ Time Time::MSleep(unsigned int _ms)
 {
   Time result;
 
+#if defined(__APPLE__) || defined(__MACOSX__)
+  // not checking resolution in mac
+  if (true)
+#else
   if (Time(clock_resolution) <= Time(0, _ms*1000000))
+#endif
   {
     struct timespec interval;
     struct timespec remainder;
@@ -157,14 +174,23 @@ Time Time::NSleep(unsigned int _ns)
 {
   Time result;
 
+#if defined(__APPLE__) || defined(__MACOSX__)
+  // not checking resolution
+  if (true)
+#else
   if (Time(clock_resolution) <= Time(0, _ns))
+#endif
   {
     struct timespec nsleep;
     struct timespec remainder;
     nsleep.tv_sec = 0;
     nsleep.tv_nsec = _ns;
 
+#if defined(__APPLE__) || defined(__MACOSX__)
+    if (nanosleep(&nsleep, &remainder) == -1)
+#else
     if (clock_nanosleep(CLOCK_REALTIME, 0, &nsleep, &remainder) == -1)
+#endif
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
@@ -183,14 +209,23 @@ Time Time::NSleep(Time _time)
 {
   Time result;
 
+#if defined(__APPLE__) || defined(__MACOSX__)
+  // not checking resolution
+  if (true)
+#else
   if (Time(clock_resolution) <= _time)
+#endif
   {
     struct timespec nsleep;
     struct timespec remainder;
     nsleep.tv_sec = _time.sec;
     nsleep.tv_nsec = _time.nsec;
 
+#if defined(__APPLE__) || defined(__MACOSX__)
+    if (nanosleep(&nsleep, &remainder) == -1)
+#else
     if (clock_nanosleep(CLOCK_REALTIME, 0, &nsleep, &remainder) == -1)
+#endif
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;

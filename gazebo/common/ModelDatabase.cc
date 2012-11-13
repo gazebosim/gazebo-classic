@@ -17,6 +17,7 @@
 
 #define BOOST_FILESYSTEM_VERSION 2
 
+#include <sys/socket.h>
 #include <tinyxml.h>
 #include <libtar.h>
 #include <curl/curl.h>

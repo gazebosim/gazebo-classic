@@ -20,6 +20,7 @@ set (sources ODEPhysics.cc
              ODEMultiRayShape.cc
              ODEHeightmapShape.cc
              ODEScrewJoint.cc
+             ODEPlaneShape.hh
 )
 
 SET (headers ODEPhysics.hh
@@ -44,6 +45,6 @@ SET (headers ODEPhysics.hh
 )
 
 gz_add_library(gazebo_physics_ode ${sources})
-target_link_libraries(gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
+target_link_libraries(gazebo_physics_ode gazebo_msgs gazebo_ode gazebo_opcode ${TBB_LIBRARIES} gazebo_sdf_interface)
 
 gz_install_library(gazebo_physics_ode)

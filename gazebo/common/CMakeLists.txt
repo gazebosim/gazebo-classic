@@ -67,6 +67,19 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
 gz_add_library(gazebo_common ${sources})
+IF (APPLE)
+target_link_libraries(gazebo_common gazebo_math
+                                    ${libdl_library}
+                                    ${Boost_LIBRARIES}
+                                    ${freeimage_library}
+                                    ${tinyxml_libraries}
+                                    ${libavcodec_LIBRARIES}
+                                    ${libavformat_LIBRARIES}
+                                    ${CURL_LIBRARIES}
+                                    ${libswscale_LIBRARIES}
+                                    ${libtar_libraries}
+                                    )
+ELSEIF (APPLE)
 target_link_libraries(gazebo_common gazebo_math
                                     ${libdl_library}
                                     ${Boost_LIBRARIES}
@@ -79,6 +92,7 @@ target_link_libraries(gazebo_common gazebo_math
                                     ${libtar_libraries}
                                     rt
                                     )
+ENDIF (APPLE)
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)

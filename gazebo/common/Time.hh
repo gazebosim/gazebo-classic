@@ -416,7 +416,10 @@ namespace gazebo
                  this->sec += this->nsec / static_cast<int32_t>(1e9);
                  this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
+      #if defined(__APPLE__) || defined(__MACOSX__)
+      #else
       private: static struct timespec clock_resolution;
+      #endif
     };
     /// \}
   }
