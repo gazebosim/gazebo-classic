@@ -99,7 +99,12 @@ namespace gazebo
       public: void Stop();
 
       /// \brief Start the logger.
-      public: void Start();
+      public: void Start(const std::string &_encoding="bz2");
+
+      /// \brief Get the encoding used.
+      /// \return Either [txt, or bz2], where txt is plain txt and bz2 is
+      /// bzip2 compressed data with Base64 encoding.
+      public: const std::string &GetEncoding() const;
 
       /// \brief Update the log files
       ///
@@ -116,7 +121,7 @@ namespace gazebo
       /// \cond
       private: class Log
       {
-        public: Log(const std::string &_filename,
+        public: Log(LogWrite *_parent, const std::string &_filename,
                     boost::function<bool (std::ostringstream &)> _logCB);
 
         public: virtual ~Log();
@@ -127,6 +132,7 @@ namespace gazebo
 
         public: void ClearBuffer();
 
+        public: LogWrite *parent;
         public: boost::function<bool (std::ostringstream &)> logCB;
         public: std::string buffer;
         public: std::ofstream logFile;
@@ -168,6 +174,9 @@ namespace gazebo
 
       /// \brief The base pathname for all the logs.
       private: std::string logPathname;
+
+      /// \brief Encoding format for each chunk.
+      private: std::string encoding;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogWrite>;

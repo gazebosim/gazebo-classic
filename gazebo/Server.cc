@@ -110,8 +110,9 @@ bool Server::ParseArgs(int argc, char **argv)
   try
   {
     po::store(
-        po::command_line_parser(argc, argv).options(desc).positional(
-          p_desc).allow_unregistered().run(), this->vm);
+        po::parse_command_line(argc, argv, v_desc), this->vm);
+        //po::command_line_parser(argc, argv).options(desc).positional(
+          //p_desc).allow_unregistered().run(), this->vm);
     po::notify(this->vm);
   }
   catch(boost::exception &_e)
@@ -144,7 +145,7 @@ bool Server::ParseArgs(int argc, char **argv)
 
   // Set the parameter to record a log file
   if (this->vm.count("log"))
-    this->params["log"] = "true";
+    this->params["log"] = "bz2";
 
   if (this->vm.count("pause"))
     this->params["pause"] = "true";
@@ -401,7 +402,7 @@ void Server::ProcessParams()
     }
     else if (iter->first == "log")
     {
-      common::LogWrite::Instance()->Start();
+      common::LogWrite::Instance()->Start(iter->second);
     }
   }
 }

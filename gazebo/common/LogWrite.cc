@@ -89,13 +89,19 @@ bool LogWrite::Init(const std::string &_subdir)
 
 
 //////////////////////////////////////////////////
-void LogWrite::Start()
+void LogWrite::Start(const std::string &_encoding)
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
   // Check to see if the logger is already started.
   if (!this->stop)
     return;
+
+  if (_encoding != "bz2" && _encoding != "txt")
+    gzthrow("Invalid log encoding[" + _encoding +
+            "]. Must be one of [bz2, txt]");
+
+  this->encoding = _encoding;
 
   // Create the log directory if necessary
   boost::filesystem::path path(this->logPathname);
@@ -127,6 +133,12 @@ void LogWrite::Start()
     gzerr << "LogWrite has already been initialized\n";
     return;
   }
+}
+
+//////////////////////////////////////////////////
+const std::string &LogWrite::GetEncoding() const
+{
+  return this->encoding;
 }
 
 //////////////////////////////////////////////////
@@ -177,7 +189,7 @@ void LogWrite::Add(const std::string &_name, const std::string &_filename,
   // Create a new log object
   try
   {
-    newLog = new LogWrite::Log(path.string(), _logCallback);
+    newLog = new LogWrite::Log(this, path.string(), _logCallback);
   }
   catch(...)
   {
@@ -254,9 +266,10 @@ void LogWrite::Run()
 }
 
 //////////////////////////////////////////////////
-LogWrite::Log::Log(const std::string &_filename,
+LogWrite::Log::Log(LogWrite *_parent, const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCB)
 {
+  this->parent = _parent;
   this->logCB = _logCB;
 
   this->filename = _filename;
@@ -288,7 +301,7 @@ void LogWrite::Log::Update()
 
   if (this->logCB(stream) && !stream.str().empty())
   {
-    std::string encoding = "bz2";
+    const std::string encoding = this->parent->GetEncoding();
 
     this->buffer.append("<chunk encoding='");
     this->buffer.append(encoding);
@@ -315,8 +328,10 @@ void LogWrite::Log::Update()
                   Base64Text(str.c_str() + str.size()),
                   std::back_inserter(this->buffer));
       }
-      else
+      else if (encoding == "txt")
         this->buffer.append(stream.str());
+      else
+        gzerr << "Unknown log file encoding[" << encoding << "]\n";
     }
     this->buffer.append("]]>\n");
 
