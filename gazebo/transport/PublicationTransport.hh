@@ -31,22 +31,42 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
+    /// \class PublicationTransport PublicationTransport.hh transport/transport.hh
     /// \brief Reads data from a remote advertiser, and passes the data
     /// along to local subscribers
     class PublicationTransport
     {
-      public: PublicationTransport(const std::string &topic,
-                                   const std::string &msgType);
+      /// \brief Constructor
+      /// \param[in] _topic Topic that we're publishing
+      /// \param[in] _topic Type of the topic that we're publishing
+      public: PublicationTransport(const std::string &_topic,
+                                   const std::string &_msgType);
 
+      /// \brief Destructor
       public: virtual ~PublicationTransport();
 
-      public: void Init(const ConnectionPtr &conn);
-      public: void Fini();
-      public: void AddCallback(
-                  const boost::function<void(const std::string &)> &cb);
+      /// \brief Initialize the transport
+      /// \param[in] _conn The underlying connection
+      public: void Init(const ConnectionPtr &_conn);
 
+      /// \brief Finalize the transport
+      public: void Fini();
+
+      /// \brief Add a callback to the transport
+      /// \param[in] _cb The callback to be added
+      public: void AddCallback(
+                  const boost::function<void(const std::string &)> &_cb);
+
+      /// \brief Get the underlying connection
+      /// \return Pointer to the underlying connection
       public: const ConnectionPtr GetConnection() const;
+
+      /// \brief Get the topic name
+      /// \return The topic name
       public: std::string GetTopic() const;
+
+      /// \brief Get the topic type
+      /// \return The topic type
       public: std::string GetMsgType() const;
 
       private: void OnConnectionShutdown();

@@ -30,47 +30,57 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_transport
-  /// \brief Transport namespace
   namespace transport
   {
     /// \addtogroup gazebo_transport Transport
-    /// \brief Handles transportation of messages
     /// \{
 
+    /// \class CallbackHelper CallbackHelper.hh transport/transport.hh
     /// \brief A helper class to handle callbacks when messages arrive
     class CallbackHelper
     {
+      /// \brief Constructor
       public: CallbackHelper() : latching(false) {}
+      /// \brief Destructor
       public: virtual ~CallbackHelper() {}
 
       /// \brief Get the typename of the message that is handled
+      /// \return String representation of the message type
       public: virtual std::string GetMsgType() const
               {
                 return std::string();
               }
 
-      public: virtual bool HandleData(const std::string &newdata) = 0;
+      /// \brief Process new incoming data
+      /// \param[in] _newdata Incoming data to be processed
+      /// \return true if successfully processed; false otherwise
+      public: virtual bool HandleData(const std::string &_newdata) = 0;
 
-      /// \brief Return true if the callback is local, false if the callback
-      ///        is tied to a remote connection
+      /// \brief Is the callback local?
+      /// \return true if the callback is local, false if the callback
+      ///         is tied to a remote connection
       public: virtual bool IsLocal() const = 0;
 
+      /// \brief Is the callback latching?
+      /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const
               {return this->latching;}
       protected: bool latching;
     };
 
-    /// boost shared pointer to transport::CallbackHelper
+    /// \brief boost shared pointer to transport::CallbackHelper
     typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
 
 
+    /// \class CallbackHelperT CallbackHelper.hh transport/transport.hh
     /// \brief Callback helper Template
     template<class M>
     class CallbackHelperT : public CallbackHelper
     {
+      /// \brief Constructor
+      /// \param[in] _cb boost function to call on incoming messages
       public: CallbackHelperT(const boost::function<
-                  void (const boost::shared_ptr<M const> &)> &cb) : callback(cb)
+                  void (const boost::shared_ptr<M const> &)> &_cb) : callback(_cb)
               {
                 // Just some code to make sure we have a google protobuf.
                 /*M test;
@@ -81,7 +91,7 @@ namespace gazebo
                   */
               }
 
-      /// \brief Get the typename of the message that is handled
+      // documentation inherited
       public: std::string GetMsgType() const
               {
                 M test;
@@ -92,14 +102,16 @@ namespace gazebo
                 return m->GetTypeName();
               }
 
-      public: virtual bool HandleData(const std::string &newdata)
+      // documentation inherited
+      public: virtual bool HandleData(const std::string &_newdata)
               {
                 boost::shared_ptr<M> m(new M);
-                m->ParseFromString(newdata);
+                m->ParseFromString(_newdata);
                 this->callback(m);
                 return true;
               }
 
+      // documentation inherited
       public: virtual bool IsLocal() const
               {
                 return true;
@@ -109,32 +121,38 @@ namespace gazebo
                callback;
     };
 
+    /// \class DebugCallbackHelper CallbackHelper.hh transport/transport.hh
+    /// \brief CallbackHelper subclass with debug facilities
     class DebugCallbackHelper : public CallbackHelper
     {
+      /// \brief Constructor
+      /// \param[in] _cb boost function to call on incoming messages
       public: DebugCallbackHelper(
-                  const boost::function<void (ConstGzStringPtr &)> &cb)
-              : callback(cb)
+                  const boost::function<void (ConstGzStringPtr &)> &_cb)
+              : callback(_cb)
               {
               }
 
-      /// \brief Get the typename of the message that is handled
+      // documentation inherited
       public: std::string GetMsgType() const
               {
                 msgs::GzString m;
                 return m.GetTypeName();
               }
 
-      public: virtual bool HandleData(const std::string &newdata)
+      // documentation inherited
+      public: virtual bool HandleData(const std::string &_newdata)
               {
                 msgs::Packet packet;
-                packet.ParseFromString(newdata);
+                packet.ParseFromString(_newdata);
 
                 boost::shared_ptr<msgs::GzString> m(new msgs::GzString);
-                m->ParseFromString(newdata);
+                m->ParseFromString(_newdata);
                 this->callback(m);
                 return true;
               }
 
+      // documentation inherited
       public: virtual bool IsLocal() const
               {
                 return true;
