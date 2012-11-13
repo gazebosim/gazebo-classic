@@ -9,7 +9,7 @@ include_directories (
 )
 
 link_directories(  
-  ${ogre_library_dirs}
+  ${OGRE_LIBRARY_PATH}
   ${Boost_LIBRARY_DIRS} 
   ${ODE_LIBRARY_DIRS}
 )
@@ -22,20 +22,8 @@ link_directories(
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
-  factory.cc
-  file_handling.cc
-  heightmap.cc
-  laser.cc
-  math.cc
-  msgs.cc
-  physics.cc
-  pioneer2dx.cc
-  pr2.cc
-  projector.cc
-  speed.cc
-  transport.cc)
-
-set (plugins)
+  common.cc
+)
 
 # Build plugins
 foreach (src ${plugins})
