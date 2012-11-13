@@ -59,33 +59,33 @@ void ODETrimeshShape::Update()
   // this is fairly important for good results.
 
   // Fill in the (4x4) matrix.
-  dReal* p_matrix = this->matrix_dblbuff + (this->last_matrix_index * 16);
+  dReal *matrix = this->transform + (this->transformIndex * 16);
   const dReal *Pos = dGeomGetPosition(ocollision->GetCollisionId());
   const dReal *Rot = dGeomGetRotation(ocollision->GetCollisionId());
 
-  p_matrix[ 0 ] = Rot[ 0 ];
-  p_matrix[ 1 ] = Rot[ 1 ];
-  p_matrix[ 2 ] = Rot[ 2 ];
-  p_matrix[ 3 ] = 0;
-  p_matrix[ 4 ] = Rot[ 4 ];
-  p_matrix[ 5 ] = Rot[ 5 ];
-  p_matrix[ 6 ] = Rot[ 6 ];
-  p_matrix[ 7 ] = 0;
-  p_matrix[ 8 ] = Rot[ 8 ];
-  p_matrix[ 9 ] = Rot[ 9 ];
-  p_matrix[10 ] = Rot[10 ];
-  p_matrix[11 ] = 0;
-  p_matrix[12 ] = Pos[ 0 ];
-  p_matrix[13 ] = Pos[ 1 ];
-  p_matrix[14 ] = Pos[ 2 ];
-  p_matrix[15 ] = 1;
+  matrix[ 0 ] = Rot[ 0 ];
+  matrix[ 1 ] = Rot[ 1 ];
+  matrix[ 2 ] = Rot[ 2 ];
+  matrix[ 3 ] = 0;
+  matrix[ 4 ] = Rot[ 4 ];
+  matrix[ 5 ] = Rot[ 5 ];
+  matrix[ 6 ] = Rot[ 6 ];
+  matrix[ 7 ] = 0;
+  matrix[ 8 ] = Rot[ 8 ];
+  matrix[ 9 ] = Rot[ 9 ];
+  matrix[10 ] = Rot[10 ];
+  matrix[11 ] = 0;
+  matrix[12 ] = Pos[ 0 ];
+  matrix[13 ] = Pos[ 1 ];
+  matrix[14 ] = Pos[ 2 ];
+  matrix[15 ] = 1;
 
   // Flip to other matrix.
-  this->last_matrix_index = !this->last_matrix_index;
+  this->transformIndex = !this->transformIndex;
 
   dGeomTriMeshSetLastTransform(ocollision->GetCollisionId(),
-      *reinterpret_cast<dMatrix4*>(this->matrix_dblbuff +
-                                   this->last_matrix_index * 16));
+      *reinterpret_cast<dMatrix4*>(this->transform +
+                                   this->transformIndex * 16));
 }
 
 //////////////////////////////////////////////////
@@ -143,6 +143,6 @@ void ODETrimeshShape::Init()
     dGeomTriMeshSetData(pcollision->GetCollisionId(), this->odeData);
   }
 
-  memset(this->matrix_dblbuff, 0, 32*sizeof(dReal));
-  this->last_matrix_index = 0;
+  memset(this->transform, 0, 32*sizeof(dReal));
+  this->transformIndex = 0;
 }

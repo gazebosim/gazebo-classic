@@ -35,7 +35,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _worldId ODE world id.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
-      public: ODESliderJoint(dWorldID worldId, BasePtr _parent);
+      public: ODESliderJoint(dWorldID _worldId, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODESliderJoint();

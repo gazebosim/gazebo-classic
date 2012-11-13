@@ -22,7 +22,7 @@
 #ifndef _ODECOLLISION_HH_
 #define _ODECOLLISION_HH_
 
-#include "gazebo/ode/ode.h"
+#include "ode/ode.h"
 
 #include "gazebo/common/CommonTypes.hh"
 

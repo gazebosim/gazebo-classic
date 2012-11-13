@@ -57,7 +57,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetAltitude(const math::Vector3 &_pos)
       {
-        PlaneShape::SetAltitude(pos);
+        PlaneShape::SetAltitude(_pos);
         ODECollisionPtr odeParent;
         odeParent =
           boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
@@ -67,7 +67,7 @@ namespace gazebo
         dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
 
         // Compute "altitude": scalar product of position and normal
-        vec4[3] = vec4[0] * pos.x + vec4[1] * pos.y + vec4[2] * pos.z;
+        vec4[3] = vec4[0] * _pos.x + vec4[1] * _pos.y + vec4[2] * _pos.z;
 
         dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
                             vec4[2], vec4[3]);

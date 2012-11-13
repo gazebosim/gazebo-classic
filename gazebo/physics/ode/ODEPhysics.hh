@@ -271,10 +271,6 @@ namespace gazebo
       /// \brief Indices used during creation of contact joints.
       private: int indices[MAX_CONTACT_JOINTS];
     };
-
-    /// \def ODEPhysicsPtr
-    /// \brief Boost shared pointer for ODEPhysics.
-    typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
   }
 }
 #endif

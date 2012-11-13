@@ -37,8 +37,8 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ODESphereShape() {}
 
-      /// \brief Set the radius
-      public: void SetRadius(double _radius)
+      // Documentation inherited.
+      public: virtual void SetRadius(double _radius)
       {
         SphereShape::SetRadius(_radius);
         ODECollisionPtr oParent;
