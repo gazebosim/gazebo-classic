@@ -39,9 +39,10 @@ namespace gazebo
               {}
 
       /// \brief Initialize the options
-      /// \param[in] _topic Topic we're subscribing to 
+      /// \param[in] _topic Topic we're subscribing to
       /// \param[in,out] _node The associated node
-      /// \param[in] _latching If true, latch the latest message; if false, don't latch
+      /// \param[in] _latching If true, latch the latest message; if false,
+      /// don't latch
       public: template<class M>
               void Init(const std::string &_topic,
                         NodePtr _node,

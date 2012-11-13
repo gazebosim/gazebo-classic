@@ -30,8 +30,10 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
-    /// \class SubscriptionTransport SubscriptionTransport.hh transport/transport.hh
-    /// \brief Handles sending data over the wire to remote subscribers
+    /// \class SubscriptionTransport SubscriptionTransport.hh
+    /// transport/transport.hh
+    /// \brief Handles sending data over the wire to
+    /// remote subscribers
     class SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
@@ -42,7 +44,8 @@ namespace gazebo
 
       /// \brief Initialize the publication link
       /// \param[in] _conn The connection to use
-      /// \param[in] _latching If true, latch the latest message; if false, don't latch
+      /// \param[in] _latching If true, latch the latest message; if false,
+      /// don't latch
       public: void Init(const ConnectionPtr &_conn, bool _latching);
 
       /// \brief Output a message to a connection
