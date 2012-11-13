@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <list>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include "gazebo/common/SingletonT.hh"
@@ -126,10 +127,14 @@ namespace gazebo
       /// \brief Condition variable for the updateCacheThread.
       private: boost::condition_variable updateCacheCondition;
 
+      /// \def CallbackFunc
+      /// \brief Boost function that is used to passback the model cache.
+      private: typedef boost::function<
+               void (const std::map<std::string, std::string> &)> CallbackFunc;
+
       /// \brief List of all callbacks set from the
       /// ModelDatabase::GetModels function.
-      private: std::list<boost::function<
-               void (const std::map<std::string, std::string> &)> > callbacks;
+      private: std::list<CallbackFunc> callbacks;
 
       /// \brief Handy trick to automatically call a singleton's
       /// constructor.

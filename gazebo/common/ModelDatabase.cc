@@ -218,9 +218,8 @@ void ModelDatabase::UpdateModelCache()
       gzerr << "Unable to download model manifests\n";
     else
     {
-      for (std::list<boost::function<
-          void (const std::map<std::string, std::string> &)> >::iterator
-          iter = this->callbacks.begin(); iter != this->callbacks.end(); ++iter)
+      for (std::list<CallbackFunc>::iterator iter = this->callbacks.begin();
+           iter != this->callbacks.end(); ++iter)
       {
         (*iter)(this->modelCache);
       }

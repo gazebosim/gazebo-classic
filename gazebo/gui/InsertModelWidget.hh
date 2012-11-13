@@ -18,6 +18,7 @@
 #define INSERT_MODEL_WIDGET_HH
 
 #include <string>
+#include <map>
 #include "gui/qt.h"
 
 class QTreeWidget;
