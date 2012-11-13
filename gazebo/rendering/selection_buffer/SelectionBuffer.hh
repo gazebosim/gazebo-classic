@@ -63,6 +63,9 @@ namespace gazebo
       /// \brief Call this to update the selection buffer contents
       public: void Update();
 
+      /// \brief Create the render texture
+      private: void createRTTBuffer();
+
       /// \brief Create the selection buffer offscreen render texture.
       private: void CreateRTTOverlays();
 
@@ -84,6 +87,12 @@ namespace gazebo
       private: uint8_t *buffer;
       private: Ogre::PixelBox *pixelBox;
       private: Ogre::Overlay *selectionDebugOverlay;
+
+      private: Ogre::CompositorInstance *dsGBufferInstance;
+      private: Ogre::CompositorInstance *dsMergeInstance;
+      private: Ogre::CompositorInstance *dlGBufferInstance;
+      private: Ogre::CompositorInstance *dlMergeInstance;
+
     };
   }
 }
