@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Packet 
 /// \brief Message that encapsulates another message with a type description
-/// \verbatim
+
 
 import "time.proto";
 
@@ -14,4 +14,4 @@ message Packet
   required bytes serialized_data = 3;
 }
 
-/// \endverbatim
+

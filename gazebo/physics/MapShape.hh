@@ -24,10 +24,10 @@
 #include <deque>
 #include <string>
 
-#include "common/CommonTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {

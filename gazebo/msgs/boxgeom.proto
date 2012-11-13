@@ -3,7 +3,6 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface BoxGeom 
 /// \brief Information about a box geometry
-/// \verbatim
 
 import "vector3d.proto";
 
@@ -11,4 +10,3 @@ message BoxGeom
 {
   required Vector3d size  = 1;
 }
-/// \endverbatim

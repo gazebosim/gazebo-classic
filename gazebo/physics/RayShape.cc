@@ -25,16 +25,18 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/TransportTypes.hh"
-
-#include "common/CommonTypes.hh"
-#include "common/Event.hh"
-
-#include "physics/PhysicsTypes.hh"
 #include "sdf/sdf.hh"
 
-#include "physics/Collision.hh"
-#include "physics/RayShape.hh"
+#include "gazebo/transport/TransportTypes.hh"
+
+#include "gazebo/math/Helpers.hh"
+
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/RayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -45,7 +47,7 @@ RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = DBL_MAX;
+  this->contactLen = GZ_DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 }
@@ -57,7 +59,7 @@ RayShape::RayShape(CollisionPtr _parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = DBL_MAX;
+  this->contactLen = GZ_DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 
@@ -156,5 +158,15 @@ int RayShape::GetFiducial() const
 
 //////////////////////////////////////////////////
 void RayShape::Init()
+{
+}
+
+//////////////////////////////////////////////////
+void RayShape::FillMsg(msgs::Geometry &/*_msg*/)
+{
+}
+
+//////////////////////////////////////////////////
+void RayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 {
 }

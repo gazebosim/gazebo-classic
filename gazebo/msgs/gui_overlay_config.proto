@@ -3,11 +3,11 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface GUIOverlayConfig 
 /// \brief Message for a gui overlay configuration
-/// \verbatim
+
 
 message GUIOverlayConfig
 {
   required string layout_filename = 1;
 }
 
-/// \endverbatim
+

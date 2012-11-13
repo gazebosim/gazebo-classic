@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "physics/PhysicsTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {

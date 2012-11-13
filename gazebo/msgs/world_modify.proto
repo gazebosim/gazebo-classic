@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface WorldModify
 /// \brief A message that allows for modifying (open, close) worlds
-/// \verbatim
+
 
 message WorldModify
 {
@@ -12,4 +12,4 @@ message WorldModify
   optional bool create          = 3;
 }
 
-/// \endverbatim
+
