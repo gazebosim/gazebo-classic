@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Factory 
 /// \brief Message to create new model in gazebo
-/// \verbatim
+
 
 import "header.proto";
 import "pose.proto";
@@ -16,4 +16,4 @@ message Factory
   optional string edit_name                 = 4;
   optional string clone_model_name          = 5;
 }
-/// \endverbatim
+
