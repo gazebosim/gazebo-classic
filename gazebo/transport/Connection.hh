@@ -72,7 +72,8 @@ namespace gazebo
 
       /// \brief Start a server that listens on a port
       /// \param[in] _port The port to listen on
-      /// \param[in] _port The callback to invoke when a new connection has been accepted
+      /// \param[in] _port The callback to invoke when a new connection has
+      /// been accepted
       public: void Listen(unsigned int _port, const AcceptCallback &_accept_cb);
 
       /// \brief The signature of a connection read callback
@@ -106,8 +107,8 @@ namespace gazebo
 
       /// \brief Write data to the socket
       /// \param[in] _buffer Data to write
-      /// \param[in] _force If true, block until the data has been written to the socket, 
-      /// otherwise just enqueue the data for asynchronous write
+      /// \param[in] _force If true, block until the data has been written
+      /// to the socket, otherwise just enqueue the data for asynchronous write
       public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
 
       /// \brief Get the local URI
@@ -164,10 +165,11 @@ namespace gazebo
                                 boost::make_tuple(_handler)));
               }
 
-      /// \brief Handle a completed read of a message header. 
+      /// \brief Handle a completed read of a message header.
       ///
-      /// The handler is passed using a tuple since boost::bind seems to have 
-      /// trouble binding a function object created using boost::bind as a parameter
+      /// The handler is passed using a tuple since boost::bind seems to
+      /// have trouble binding a function object created using boost::bind
+      /// as a parameter
       /// \param[in] _e Error code, if any, associated with the read
       /// \param[in] _handler Callback to invoke on received data
       private: template<typename Handler>
@@ -227,10 +229,11 @@ namespace gazebo
                 }
               }
 
-      /// \brief Handle a completed read of a message body. 
+      /// \brief Handle a completed read of a message body.
       ///
-      /// The handler is passed using a tuple since boost::bind seems to have 
-      /// trouble binding a function object created using boost::bind as a parameter
+      /// The handler is passed using a tuple since boost::bind seems to
+      /// have trouble binding a function object created using boost::bind
+      /// as a parameter
       /// \param[in] _e Error code, if any, associated with the read
       /// \param[in] _handler Callback to invoke on received data
       private: template<typename Handler>
@@ -254,15 +257,16 @@ namespace gazebo
                 }
               }
 
-     /// \brief Register a function to be called when the connection is shut down
-     /// \param[in] _subscriber Function to be called
-     /// \return Handle that can be used to unregister the function
+     /// \brief Register a function to be called when the connection is shut
+     /// down \param[in] _subscriber Function to be called \return Handle
+     /// that can be used to unregister the function
      public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
                  _subscriber)
              { return this->shutdown.Connect(_subscriber); }
 
-     /// \brief Unregister a function to be called when the connection is shut down
-     /// \param[in] _subscriber Handle previously returned by ConnectToShutdown()
+     /// \brief Unregister a function to be called when the connection is
+     /// shut down \param[in] _subscriber Handle previously returned by
+     /// ConnectToShutdown()
      public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
              {this->shutdown.Disconnect(_subscriber);}
 

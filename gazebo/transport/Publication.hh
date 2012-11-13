@@ -73,7 +73,8 @@ namespace gazebo
       /// \brief Remove a transport
       /// \param[in] _host The transport's hostname
       /// \param[in] _port The transport's port
-      public: void RemoveTransport(const std::string &_host, unsigned int _port);
+      public: void RemoveTransport(const std::string &_host, unsigned
+                                   int _port);
 
       /// \brief Get the number of transports
       /// \return The number of transports
@@ -92,11 +93,13 @@ namespace gazebo
       public: unsigned int GetRemoteSubscriptionCount();
 
       /// \brief Was the topic has been advertised from this process?
-      /// \return true if the topic has been advertised from this process, false otherwise
+      /// \return true if the topic has been advertised from this process,
+      /// false otherwise
       public: bool GetLocallyAdvertised() const;
 
       /// \brief Set whether this topic has been advertised from this process
-      /// \param[in] _value If true, the topic was locally advertise, otherwise it was not
+      /// \param[in] _value If true, the topic was locally advertise,
+      /// otherwise it was not
       public: void SetLocallyAdvertised(bool _value);
 
       /// \brief Publish data to local subscribers (skip serialization)
@@ -105,12 +108,14 @@ namespace gazebo
 
       /// \brief Publish data to remote subscribers
       /// \param[in] _msg Message to be published
-      /// \param[in] _cb If non-null, callback to be invoked after publishing is completed
+      /// \param[in] _cb If non-null, callback to be invoked after publishing
+      /// is completed
       public: void Publish(const google::protobuf::Message &_msg,
                            const boost::function<void()> &_cb = NULL);
 
       /// \brief Add a transport
-      /// \param[in] _publink Pointer to publication transport object to be added
+      /// \param[in] _publink Pointer to publication transport object to
+      /// be added
       public: void AddTransport(const PublicationTransportPtr &_publink);
 
       /// \brief Does a given transport exist?

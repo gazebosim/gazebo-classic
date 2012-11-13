@@ -80,8 +80,10 @@ namespace gazebo
 
       /// \brief Adverise a topic
       /// \param[in] _topic The topic to advertise
-      /// \param[in] _queueLimit The maximum number of outgoing messages to queue for delivery
-      /// \param[in] _latch If true, latch the last message; otherwise, don't latch
+      /// \param[in] _queueLimit The maximum number of outgoing messages to
+      /// queue for delivery
+      /// \param[in] _latch If true, latch the last message; otherwise,
+      /// don't latch
       /// \return Pointer to new publisher object
       template<typename M>
       transport::PublisherPtr Advertise(const std::string &_topic,
@@ -104,7 +106,8 @@ namespace gazebo
       /// \param[in] _topic The topic to subscribe to
       /// \param[in] _fp Class method to be called on receipt of new message
       /// \param[in] _obj Class instance to be used on receipt of new message
-      /// \param[in] _latching If true, latch latest incoming message; otherwise don't latch
+      /// \param[in] _latching If true, latch latest incoming message;
+      /// otherwise don't latch
       /// \return Pointer to new Subscriber object
       template<typename M, typename T>
       SubscriberPtr Subscribe(const std::string &_topic,
@@ -125,11 +128,13 @@ namespace gazebo
       /// \brief Subscribe to a topic using a bare function as the callback
       /// \param[in] _topic The topic to subscribe to
       /// \param[in] _fp Function to be called on receipt of new message
-      /// \param[in] _latching If true, latch latest incoming message; otherwise don't latch
+      /// \param[in] _latching If true, latch latest incoming message;
+      /// otherwise don't latch
       /// \return Pointer to new Subscriber object
       template<typename M>
       SubscriberPtr Subscribe(const std::string &_topic,
-          void(*_fp)(const boost::shared_ptr<M const> &), bool _latching = false)
+          void(*_fp)(const boost::shared_ptr<M const> &),
+                     bool _latching = false)
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(_topic);

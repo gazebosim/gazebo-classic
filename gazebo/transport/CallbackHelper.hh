@@ -80,7 +80,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
       public: CallbackHelperT(const boost::function<
-                  void (const boost::shared_ptr<M const> &)> &_cb) : callback(_cb)
+                void (const boost::shared_ptr<M const> &)> &_cb) : callback(_cb)
               {
                 // Just some code to make sure we have a google protobuf.
                 /*M test;

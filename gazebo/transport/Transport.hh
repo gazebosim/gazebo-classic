@@ -33,12 +33,12 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
-    /// \brief Get the hostname and port of the master from the GAZEBO_MASTER_URI
-    /// environment variable
+    /// \brief Get the hostname and port of the master from the
+    /// GAZEBO_MASTER_URI environment variable
     /// \param[out] _master_host The hostname of the master is set to this param
     /// \param[out] _master_port The port of the master is set to this param
-    /// \return true if GAZEBO_MASTER_URI was successfully parsed; false otherwise 
-    /// (in which case output params are not set)
+    /// \return true if GAZEBO_MASTER_URI was successfully parsed; false
+    /// otherwise (in which case output params are not set)
     bool get_master_uri(std::string &_master_host, unsigned int &_master_port);
 
     /// \brief Initialize the transport system
@@ -50,8 +50,9 @@ namespace gazebo
     bool init(const std::string &_master_host ="",
               unsigned int _master_port = 0);
 
-    /// \brief Run the transport component. Creates a thread to handle message passing. This call
-    ///        will block until the master can be contacted or until a retry limit is reached
+    /// \brief Run the transport component. Creates a thread to handle
+    /// message passing. This call will block until the master can
+    /// be contacted or until a retry limit is reached
     void run();
 
     /// \brief Return all the namespace (world names) on the master
@@ -71,14 +72,15 @@ namespace gazebo
     /// \brief Clear any remaining communication buffers
     void clear_buffers();
 
-    /// \brief Pause or unpause incoming messages. When paused, messages are queued
-    ///        for later delivery
+    /// \brief Pause or unpause incoming messages. When paused, messages
+    /// are queued for later delivery
     /// \param[in] _pause If true, pause; otherwise unpause
     void pause_incoming(bool _pause);
 
-    /// \brief Send a request and receive a response.  This call will block until a 
-    /// response is received.
-    /// \param[in] _worldName The name of the world to which the request should be sent
+    /// \brief Send a request and receive a response.  This call will block
+    /// until a response is received.
+    /// \param[in] _worldName The name of the world to which the request
+    /// should be sent
     /// \param[in] _request The request itself
     /// \return The response to the request.  Can be empty.
     msgs::Response request(const std::string &_worldName,
