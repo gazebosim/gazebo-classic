@@ -26,7 +26,7 @@ DOXYFILE_ENCODING      = UTF-8
 # identify the project. Note that if you do not use Doxywizard you need
 # to put quotes around the project name if it contains spaces.
 
-PROJECT_NAME           = Gazebo
+PROJECT_NAME           = Gazebo Messages
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or
@@ -52,7 +52,7 @@ PROJECT_LOGO           =
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = doxygen
+OUTPUT_DIRECTORY       = doxygen_msgs
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -518,19 +518,19 @@ STRICT_PROTO_MATCHING  = NO
 # disable (NO) the todo list. This list is created by putting \todo
 # commands in the documentation.
 
-GENERATE_TODOLIST      = YES
+GENERATE_TODOLIST      = NO
 
 # The GENERATE_TESTLIST tag can be used to enable (YES) or
 # disable (NO) the test list. This list is created by putting \test
 # commands in the documentation.
 
-GENERATE_TESTLIST      = YES
+GENERATE_TESTLIST      = NO
 
 # The GENERATE_BUGLIST tag can be used to enable (YES) or
 # disable (NO) the bug list. This list is created by putting \bug
 # commands in the documentation.
 
-GENERATE_BUGLIST       = YES
+GENERATE_BUGLIST       = NO
 
 # The GENERATE_DEPRECATEDLIST tag can be used to enable (YES) or
 # disable (NO) the deprecated list. This list is created by putting
@@ -661,8 +661,8 @@ WARN_LOGFILE           = /tmp/gazebo_dox.warn
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @CMAKE_SOURCE_DIR@/doc/mainpage.html \
-                         @CMAKE_SOURCE_DIR@/gazebo
+INPUT                  = @CMAKE_SOURCE_DIR@/doc/mainpage_msgs.html \
+                         @CMAKE_SOURCE_DIR@/gazebo/msgs/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -680,8 +680,7 @@ INPUT_ENCODING         = UTF-8
 # *.hxx *.hpp *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm *.dox *.py
 # *.f90 *.f *.for *.vhd *.vhdl
 
-FILE_PATTERNS          = *.hh \
-                         *.h
+FILE_PATTERNS          = *.proto
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -695,11 +694,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/gui \
-                         @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest \
-                         @CMAKE_SOURCE_DIR@/gazebo/rendering/skyx \
-                         @CMAKE_SOURCE_DIR@/gazebo/rendering/selection_buffer \
-                         @CMAKE_SOURCE_DIR@/gazebo/rendering/deferred_shading
+EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/msgs/generator
 
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -728,21 +723,21 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           = examples
+EXAMPLE_PATH           =
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
 # and *.h) to filter out the source-files in the directories. If left
 # blank all files are included.
 
-EXAMPLE_PATTERNS       = *.cc *.hh
+EXAMPLE_PATTERNS       =
 
 # If the EXAMPLE_RECURSIVE tag is set to YES then subdirectories will be
 # searched for input files to be used with the \include or \dontinclude
 # commands irrespective of the value of the RECURSIVE tag.
 # Possible values are YES and NO. If left blank NO is used.
 
-EXAMPLE_RECURSIVE      = YES
+EXAMPLE_RECURSIVE      = NO
 
 # The IMAGE_PATH tag can be used to specify one or more files or
 # directories that contain image that are included in the documentation (see
@@ -759,7 +754,7 @@ IMAGE_PATH             =
 # If FILTER_PATTERNS is specified, this tag will be
 # ignored.
 
-INPUT_FILTER           = "sed 's/boost::shared_ptr<\(.*\)>/\1*/'"
+INPUT_FILTER           =
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
 # basis.
@@ -897,7 +892,7 @@ HTML_FILE_EXTENSION    = .html
 # have to redo this when upgrading to a newer version of doxygen or when
 # changing the value of configuration settings such as GENERATE_TREEVIEW!
 
-HTML_HEADER            = "@CMAKE_SOURCE_DIR@/doc/header.html"
+HTML_HEADER            = "@CMAKE_SOURCE_DIR@/doc/header_msgs.html"
 
 # The HTML_FOOTER tag can be used to specify a personal HTML footer for
 # each generated HTML page. If it is left blank doxygen will generate a
@@ -912,7 +907,7 @@ HTML_FOOTER            = "@CMAKE_SOURCE_DIR@/doc/footer.html"
 # HTML_EXTRA_STYLESHEET instead of this one, as it is more robust and this
 # tag will in the future become obsolete.
 
-HTML_STYLESHEET        = "@CMAKE_SOURCE_DIR@/doc/doxygen.css"
+HTML_STYLESHEET        = 
 
 # The HTML_EXTRA_STYLESHEET tag can be used to specify an additional
 # user-defined cascading style sheet that is included after the standard
@@ -999,7 +994,7 @@ GENERATE_DOCSET        = NO
 # documentation sets from a single provider (such as a company or product suite)
 # can be grouped.
 
-DOCSET_FEEDNAME        = "Gazebo API Documentation"
+DOCSET_FEEDNAME        = "Gazebo Message Documentation"
 
 # When GENERATE_DOCSET tag is set to YES, this tag specifies a string that
 # should uniquely identify the documentation set bundle. This should be a
@@ -1509,13 +1504,13 @@ EXPAND_ONLY_PREDEF     = NO
 # If the SEARCH_INCLUDES tag is set to YES (the default) the includes files
 # pointed to by INCLUDE_PATH will be searched when a #include is found.
 
-SEARCH_INCLUDES        = YES
+SEARCH_INCLUDES        = NO
 
 # The INCLUDE_PATH tag can be used to specify one or more directories that
 # contain include files that are not input files but should be processed by
 # the preprocessor.
 
-INCLUDE_PATH           = .
+INCLUDE_PATH           =
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the
@@ -1600,7 +1595,7 @@ PERL_PATH              = /usr/bin/perl
 # this option also works with HAVE_DOT disabled, but it is recommended to
 # install and use dot, since it yields more powerful graphs.
 
-CLASS_DIAGRAMS         = YES
+CLASS_DIAGRAMS         = NO
 
 # You can define message sequence charts within doxygen comments using the \msc
 # command. Doxygen will then run the mscgen tool (see
@@ -1615,14 +1610,14 @@ MSCGEN_PATH            =
 # inheritance and usage relations if the target is undocumented
 # or is not a class.
 
-HIDE_UNDOC_RELATIONS   = YES
+HIDE_UNDOC_RELATIONS   = NO
 
 # If you set the HAVE_DOT tag to YES then doxygen will assume the dot tool is
 # available from the path. This tool is part of Graphviz, a graph visualization
 # toolkit from AT&T and Lucent Bell Labs. The other options in this section
 # have no effect if this option is set to NO (the default)
 
-HAVE_DOT               = YES
+HAVE_DOT               = NO
 
 # The DOT_NUM_THREADS specifies the number of dot invocations doxygen is
 # allowed to run in parallel. When set to 0 (the default) doxygen will
@@ -1657,7 +1652,7 @@ DOT_FONTPATH           =
 # indirect inheritance relations. Setting this tag to YES will force the
 # CLASS_DIAGRAMS tag to NO.
 
-CLASS_GRAPH            = YES
+CLASS_GRAPH            = NO
 
 # If the COLLABORATION_GRAPH and HAVE_DOT tags are set to YES then doxygen
 # will generate a graph for each documented class showing the direct and
@@ -1669,7 +1664,7 @@ COLLABORATION_GRAPH    = NO
 # If the GROUP_GRAPHS and HAVE_DOT tags are set to YES then doxygen
 # will generate a graph for groups, showing the direct groups dependencies
 
-GROUP_GRAPHS           = YES
+GROUP_GRAPHS           = NO
 
 # If the UML_LOOK tag is set to YES doxygen will generate inheritance and
 # collaboration diagrams in a style similar to the OMG's Unified Modeling
@@ -1696,14 +1691,14 @@ TEMPLATE_RELATIONS     = NO
 # file showing the direct and indirect include dependencies of the file with
 # other documented files.
 
-INCLUDE_GRAPH          = YES
+INCLUDE_GRAPH          = NO
 
 # If the ENABLE_PREPROCESSING, SEARCH_INCLUDES, INCLUDED_BY_GRAPH, and
 # HAVE_DOT tags are set to YES then doxygen will generate a graph for each
 # documented header file showing the documented files that directly or
 # indirectly include this file.
 
-INCLUDED_BY_GRAPH      = YES
+INCLUDED_BY_GRAPH      = NO
 
 # If the CALL_GRAPH and HAVE_DOT options are set to YES then
 # doxygen will generate a call dependency graph for every global function
@@ -1724,14 +1719,14 @@ CALLER_GRAPH           = NO
 # If the GRAPHICAL_HIERARCHY and HAVE_DOT tags are set to YES then doxygen
 # will generate a graphical hierarchy of all classes instead of a textual one.
 
-GRAPHICAL_HIERARCHY    = YES
+GRAPHICAL_HIERARCHY    = NO
 
 # If the DIRECTORY_GRAPH and HAVE_DOT tags are set to YES
 # then doxygen will show the dependencies a directory has on other directories
 # in a graphical way. The dependency relations are determined by the #include
 # relations between the files in the directories.
 
-DIRECTORY_GRAPH        = YES
+DIRECTORY_GRAPH        = NO
 
 # The DOT_IMAGE_FORMAT tag can be used to set the image format of the images
 # generated by dot. Possible values are svg, png, jpg, or gif.

@@ -24,7 +24,6 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
-#include <stdint.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <string>
