@@ -17,28 +17,26 @@
 #ifndef _ODEPLANESHAPE_HH_
 #define _ODEPLANESHAPE_HH_
 
-#include "physics/PlaneShape.hh"
-#include "physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/PlaneShape.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief An ODE Plane shape
+    /// \brief An ODE Plane shape.
     class ODEPlaneShape : public PlaneShape
     {
-      /// \brief Constructor
-      public: ODEPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit ODEPlaneShape(CollisionPtr _parent)
+              : PlaneShape(_parent) {}
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODEPlaneShape() {}
 
-      /// \brief Create the plane
-      public: void CreatePlane()
+      // Documentation inherited
+      public: virtual void CreatePlane()
       {
         PlaneShape::CreatePlane();
         ODECollisionPtr oParent;
@@ -56,8 +54,8 @@ namespace gazebo
                               n.x, n.y, n.z, altitude);
       }
 
-      /// Set the altitude of the plane
-      public: void SetAltitude(const math::Vector3 &pos)
+      // Documentation inherited
+      public: virtual void SetAltitude(const math::Vector3 &_pos)
       {
         PlaneShape::SetAltitude(pos);
         ODECollisionPtr odeParent;
@@ -75,13 +73,6 @@ namespace gazebo
                             vec4[2], vec4[3]);
       }
     };
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-

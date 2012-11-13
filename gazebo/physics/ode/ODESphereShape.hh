@@ -17,27 +17,24 @@
 #ifndef _ODESPHERESHAPE_HH_
 #define _ODESPHERESHAPE_HH_
 
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODECollision.hh"
-
-#include "physics/PhysicsTypes.hh"
-#include "physics/SphereShape.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/SphereShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief A ODE sphere shape
     class ODESphereShape : public SphereShape
     {
-      /// \brief Constructor
-      public: ODESphereShape(ODECollisionPtr _parent) : SphereShape(_parent) {}
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit ODESphereShape(ODECollisionPtr _parent)
+              : SphereShape(_parent) {}
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODESphereShape() {}
 
       /// \brief Set the radius
@@ -55,7 +52,6 @@ namespace gazebo
           dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
       }
     };
-    /// \}
   }
 }
 #endif
