@@ -3,11 +3,11 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface GzString
 /// \brief A message for string data
-/// \verbatim
+
 
 message GzString
 {
   required string data = 1;
 }
 
-/// \endverbatim
+
