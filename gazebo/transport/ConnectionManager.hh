@@ -47,11 +47,11 @@ namespace gazebo
       private: virtual ~ConnectionManager();
 
       /// \brief Initialize the connection manager
-      /// \param[in] _master_host Host where the master is running
-      /// \param[in] _master_port Port where the master is running
+      /// \param[in] _masterHost Host where the master is running
+      /// \param[in] _masterPort Port where the master is running
       /// \return true if initialization succeeded, false otherwise
-      public: bool Init(const std::string &_master_host,
-                        unsigned int _master_port);
+      public: bool Init(const std::string &_masterHost,
+                        unsigned int _masterPort);
 
       /// \brief Run the connection manager loop.  Does not return until stopped.
       public: void Run();

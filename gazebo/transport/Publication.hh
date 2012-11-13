@@ -55,6 +55,7 @@ namespace gazebo
       /// \brief Subscribe a callback to our topic
       /// \param[in] _callback The callback
       public: void AddSubscription(const CallbackHelperPtr &_callback);
+
       /// \brief Subscribe a node to our topic
       /// \param[in] _node The node
       public: void AddSubscription(const NodePtr &_node);
@@ -77,12 +78,15 @@ namespace gazebo
       /// \brief Get the number of transports
       /// \return The number of transports
       public: unsigned int GetTransportCount() const;
+
       /// \brief Get the number of callbacks
       /// \return The number of callbacks
       public: unsigned int GetCallbackCount() const;
+
       /// \brief Get the number of nodes
       /// \return The number of nodes
       public: unsigned int GetNodeCount() const;
+
       /// \brief Get the number of remote subscriptions
       /// \return The number of remote subscriptions
       public: unsigned int GetRemoteSubscriptionCount();
@@ -108,6 +112,7 @@ namespace gazebo
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to be added
       public: void AddTransport(const PublicationTransportPtr &_publink);
+
       /// \brief Does a given transport exist?
       /// \param[in] _host Hostname of the transport
       /// \param[in] _port Port of the transport

@@ -48,8 +48,10 @@ namespace gazebo
       /// \brief Initialize the transport
       /// \param[in] _conn The underlying connection
       public: void Init(const ConnectionPtr &_conn);
+
       /// \brief Finalize the transport
       public: void Fini();
+
       /// \brief Add a callback to the transport
       /// \param[in] _cb The callback to be added
       public: void AddCallback(
@@ -58,9 +60,11 @@ namespace gazebo
       /// \brief Get the underlying connection
       /// \return Pointer to the underlying connection
       public: const ConnectionPtr GetConnection() const;
+
       /// \brief Get the topic name
       /// \return The topic name
       public: std::string GetTopic() const;
+
       /// \brief Get the topic type
       /// \return The topic type
       public: std::string GetMsgType() const;

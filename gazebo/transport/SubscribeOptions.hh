@@ -59,7 +59,7 @@ namespace gazebo
                 this->latching = _latching;
               }
 
-      /// \brief Get the node we're subscribed for
+      /// \brief Get the node we're subscribed to
       /// \return The associated node
       public: NodePtr GetNode() const
               {

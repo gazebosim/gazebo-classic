@@ -69,12 +69,16 @@ namespace gazebo
       public: void Publish(const google::protobuf::Message &_message,
                  bool _block = false)
               { this->PublishImpl(_message, _block); }
+
       /// \brief Publish an arbitrary message on the topic
       /// \param[in] _message Message to be published
-      /// \param[_block] Whether to block until the message is actually written out
+      /// \param[in] _block Whether to block until the message is actually written out
       public: template< typename M>
               void Publish(M _message, bool _block = false)
               { this->PublishImpl(_message, _block); }
+
+      /// \brief Get the number of outgoing messages
+      /// \return The number of outgoing messages
       public: unsigned int GetOutgoingCount() const;
 
       private: void PublishImpl(const google::protobuf::Message &_message,
@@ -90,6 +94,7 @@ namespace gazebo
 
       /// \brief Send latest message over the wire. For internal use only
       public: void SendMessage();
+
       /// \brief Are we latching the latest message?
       /// \return true if we latching the latest message, false otherwise
       public: bool GetLatching() const;
