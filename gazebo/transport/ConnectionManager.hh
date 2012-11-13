@@ -53,7 +53,8 @@ namespace gazebo
       public: bool Init(const std::string &_masterHost,
                         unsigned int _masterPort);
 
-      /// \brief Run the connection manager loop.  Does not return until stopped.
+      /// \brief Run the connection manager loop.  Does not return until
+      /// stopped.
       public: void Run();
 
       /// \brief Is the manager running?
@@ -69,7 +70,8 @@ namespace gazebo
       /// \brief Subscribe to a topic
       /// \param[in] _topic The topic to subscribe to
       /// \param[in] _msgType The type of the topic
-      /// \param[in] _latching If true, latch the latest incoming message; otherwise don't
+      /// \param[in] _latching If true, latch the latest incoming message;
+      /// otherwise don't
       public: void Subscribe(const std::string &_topic,
                               const std::string &_msgType,
                               bool _latching);

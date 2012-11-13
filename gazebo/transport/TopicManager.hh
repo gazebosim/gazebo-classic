@@ -92,8 +92,10 @@ namespace gazebo
 
       /// \brief Advertise on a topic
       /// \param[in] _topic The name of the topic
-      /// \param[in] _queueLimit The maximum number of outgoing messages to queue
-      /// \param[in] _latch If true, latch the latest message; if false, don't latch
+      /// \param[in] _queueLimit The maximum number of outgoing messages
+      /// to queue
+      /// \param[in] _latch If true, latch the latest message; if false,
+      /// don't latch
       /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
@@ -207,7 +209,8 @@ namespace gazebo
       /// \brief Update our list of advertised topics
       /// \param[in] _topic The topic to be updated
       /// \param[in] _msgType The type of the topic to be updated
-      /// \return True if the provided params define a new publisher, false otherwise
+      /// \return True if the provided params define a new publisher,
+      /// false otherwise
       public: PublicationPtr UpdatePublications(const std::string &_topic,
                                                 const std::string &_msgType);
 

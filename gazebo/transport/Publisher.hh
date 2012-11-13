@@ -51,7 +51,7 @@ namespace gazebo
       public: virtual ~Publisher();
 
       /// \brief Are there any connections?
-      /// \return true if there are any connections, false otherwise 
+      /// \return true if there are any connections, false otherwise
       public: bool HasConnections() const;
 
       /// \brief Block until a connection has been established with this
@@ -65,14 +65,16 @@ namespace gazebo
 
       /// \brief Publish a protobuf message on the topic
       /// \param[in] _message Message to be published
-      /// \param[_block] Whether to block until the message is actually written out
+      /// \param[_block] Whether to block until the message is actually
+      /// written out
       public: void Publish(const google::protobuf::Message &_message,
                  bool _block = false)
               { this->PublishImpl(_message, _block); }
 
       /// \brief Publish an arbitrary message on the topic
       /// \param[in] _message Message to be published
-      /// \param[in] _block Whether to block until the message is actually written out
+      /// \param[in] _block Whether to block until the message is actually
+      /// written out
       public: template< typename M>
               void Publish(M _message, bool _block = false)
               { this->PublishImpl(_message, _block); }

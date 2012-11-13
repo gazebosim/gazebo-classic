@@ -31,7 +31,8 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
-    /// \class PublicationTransport PublicationTransport.hh transport/transport.hh
+    /// \class PublicationTransport PublicationTransport.hh
+    /// transport/transport.hh
     /// \brief Reads data from a remote advertiser, and passes the data
     /// along to local subscribers
     class PublicationTransport
