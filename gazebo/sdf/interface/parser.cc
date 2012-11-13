@@ -530,7 +530,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 
         if (elemXml->FirstChildElement("uri"))
         {
-          modelPath = gazebo::common::ModelDatabase::GetModelPath(
+          modelPath = gazebo::common::ModelDatabase::Instance()->GetModelPath(
               elemXml->FirstChildElement("uri")->GetText());
 
           // Test the model path
