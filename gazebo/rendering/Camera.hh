@@ -97,6 +97,10 @@ namespace gazebo
       /// \param[in] _hz The Hz rate
       public: void SetRenderRate(double _hz);
 
+      /// \brief Get the render Hz rate
+      /// \return The Hz rate
+      public: double GetRenderRate() const;
+
       /// \brief Render the camera
       ///
       /// Called after the pre-render signal. This function will generate
@@ -586,6 +590,9 @@ namespace gazebo
       private: Ogre::CompositorInstance *ssaoInstance;
 
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
+
+      /// \brief Render period.
+      private: common::Time renderPeriod;
     };
     /// \}
   }
