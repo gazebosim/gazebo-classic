@@ -19,87 +19,87 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef ODECOLLISION_HH
-#define ODECOLLISION_HH
+#ifndef _ODECOLLISION_HH_
+#define _ODECOLLISION_HH_
 
 #include "ode/ode.h"
 
-#include "common/CommonTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Collision.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief Base class for all ODE collisions
+    /// \brief Base class for all ODE collisions.
     class ODECollision : public Collision
     {
-      /// \brief Constructor
-      public: ODECollision(LinkPtr link);
+      /// \brief Constructor.
+      /// \param[in] _link Parent Link
+      public: explicit ODECollision(LinkPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODECollision();
 
-      /// \brief Load the collision
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /*public: virtual void Load()
-              {
-                Base::Load();
-              }
-              */
+      // Documentation inherited.
+      public: virtual void Fini();
 
-      /// \brief Finalize the collision
-      public: void Fini();
+      /// \brief Set the encapsulated collsion object.
+      /// \param[in] _collisionId ODE id of the collision object.
+      /// \param[in] _placeable True to make the object m.
+      public: void SetCollision(dGeomID _collisionId, bool _placeable);
 
-      /// \brief Set the encapsulated geometry object
-      public: void SetCollision(dGeomID collisionId, bool placeable);
-
-      /// \brief Return the collision id
-      /// \return The collision id
+      /// \brief Return the collision id.
+      /// \return The collision id.
       public: dGeomID GetCollisionId() const;
 
-      /// \brief Get the ODE collision class
+      /// \brief Get the ODE collision class.
+      /// \return The ODE collision class.
       public: int GetCollisionClass() const;
 
+      // Documentation inherited.
       public: virtual void OnPoseChange();
 
-      /// \brief Set the category bits, used during collision detection
-      /// \param bits The bits
+      // Documentation inherited.
       public: virtual void SetCategoryBits(unsigned int bits);
 
-      /// \brief Set the collide bits, used during collision detection
-      /// \param bits The bits
+      // Documentation inherited.
       public: virtual void SetCollideBits(unsigned int bits);
 
-      /// \brief Get the bounding box, defined by the physics engine
+      // Documentation inherited.
       public: virtual math::Box GetBoundingBox() const;
 
       /// \brief Get the collision's space ID
+      /// \return The collision's space ID
       public: dSpaceID GetSpaceId() const;
 
       /// \brief Set the collision's space ID
-      public: void SetSpaceId(dSpaceID spaceid);
+      /// \param[in] _spaceid ID of an ODE collision space.
+      public: void SetSpaceId(dSpaceID _spaceid);
 
+      /// \brief Used when this is static to set the posse.
       private: void OnPoseChangeGlobal();
+
+      /// \brief Used when this is not statis to set the posse.
       private: void OnPoseChangeRelative();
+
+      /// \brief Empty pose change callback.
       private: void OnPoseChangeNull();
 
+      /// \brief Collision space for this.
       protected: dSpaceID spaceId;
 
-      ///  ID for the sub-collision
+      /// \brief ID for the collision.
       protected: dGeomID collisionId;
 
+      /// \brief Function used to set the pose of the ODE object.
       private: void (ODECollision::*onPoseChangeFunc)();
     };
-
-    /// \}
   }
 }
 #endif

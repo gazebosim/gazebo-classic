@@ -20,14 +20,14 @@
  * Date: 18 May 2003
  */
 
-#ifndef SENSORFACTORY_HH
-#define SENSORFACTORY_HH
+#ifndef _SENSORFACTORY_HH_
+#define _SENSORFACTORY_HH_
 
 #include <string>
 #include <map>
 #include <vector>
 
-#include "sensors/SensorTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo
 {
@@ -56,9 +56,8 @@ namespace gazebo
     public: static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).
-    /// \param[in] _classname Name of class of sensor to register
-    /// \param _factoryfn Function handle for registration
-    /// \TODO Nate check
+    /// \param[in] _classname Name of class of sensor to register.
+    /// \param[in] _factoryfn Function handle for registration.
     public: static void RegisterSensor(const std::string &_classname,
                                        SensorFactoryFn _factoryfn);
 

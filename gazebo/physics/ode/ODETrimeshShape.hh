@@ -22,46 +22,46 @@
 #ifndef _ODETRIMESHSHAPE_HH_
 #define _ODETRIMESHSHAPE_HH_
 
-#include "physics/TrimeshShape.hh"
+#include "gazebo/physics/TrimeshShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief Triangle mesh collision
+    /// \brief Triangle mesh collision.
     class ODETrimeshShape : public TrimeshShape
     {
-      /// \brief Constructor
-      public: ODETrimeshShape(CollisionPtr _parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent collision object.
+      public: explicit ODETrimeshShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODETrimeshShape();
 
-      /// \brief Update function
-      public: void Update();
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Load the trimesh
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited
+      public: virtual void Init();
 
-      protected: virtual void Init();
+      // Documentation inherited
+      public: virtual void Update();
 
-      private: dReal matrix_dblbuff[16*2];
-      private: int last_matrix_index;
+      /// \brief Transform matrix.
+      private: dReal transform[16*2];
+
+      /// \brief Transform matrix index.
+      private: int transformIndex;
+
+      /// \brief Array of vertex values.
       private: float *vertices;
+
+      /// \brief Array of index values.
       private: int *indices;
+
+      /// \brief ODE trimesh data.
       private: dTriMeshDataID odeData;
     };
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-

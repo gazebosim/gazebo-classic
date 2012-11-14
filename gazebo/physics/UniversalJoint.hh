@@ -47,15 +47,15 @@ namespace gazebo
 
       /// \brief Load a UniversalJoint.
       /// \param[in] _sdf SDF values to load from.
-      protected: virtual void Load(sdf::ElementPtr _sdf)
-                 {
-                   T::Load(_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf)
+              {
+                T::Load(_sdf);
 
-                   this->SetAxis(0,
-                       this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-                   this->SetAxis(1,
-                       this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-                 }
+                this->SetAxis(0,
+                    this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+                this->SetAxis(1,
+                    this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+              }
     };
     /// \}
   }

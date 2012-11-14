@@ -18,17 +18,16 @@
  * Date: 6th December 2011
  */
 
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "math/Vector3.hh"
-
-#include "sensors/SensorFactory.hh"
-#include "sensors/RFIDTagManager.hh"
-#include "sensors/RFIDTag.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/RFIDSensor.hh"
+#include "gazebo/sensors/RFIDTag.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -66,7 +65,15 @@ void RFIDTag::Load(const std::string &_worldName)
 
   this->entity = this->world->GetEntity(this->parentName);
 
-  RFIDTagManager::Instance()->AddTaggedModel(this);
+  // Add the tag to all the RFID sensors.
+  Sensor_V sensors = SensorManager::Instance()->GetSensors();
+  for (Sensor_V::iterator iter = sensors.begin(); iter != sensors.end(); ++iter)
+  {
+    if ((*iter)->GetType() == "rfid")
+    {
+      boost::shared_dynamic_cast<RFIDSensor>(*iter)->AddTag(this);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

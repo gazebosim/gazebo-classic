@@ -14,43 +14,47 @@
  * limitations under the License.
  *
 */
-#ifndef ODEMULTIRAYSHAPE_HH
-#define ODEMULTIRAYSHAPE_HH
+#ifndef _ODEMULTIRAYSHAPE_HH_
+#define _ODEMULTIRAYSHAPE_HH_
 
-#include "physics/MultiRayShape.hh"
+#include "gazebo/physics/MultiRayShape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief ODE specific version of MultiRayShape
     class ODEMultiRayShape : public MultiRayShape
     {
-      /// \brief Constructor
-      public: ODEMultiRayShape(CollisionPtr parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit ODEMultiRayShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODEMultiRayShape();
 
-      /// \brief Update the rays
+      // Documentation inherited.
       public: virtual void UpdateRays();
 
-      /// \brief Ray-intersection callback
-      private: static void UpdateCallback(void *data, dGeomID o1, dGeomID o2);
+      /// \brief Ray-intersection callback.
+      /// \param[in] _data Pointer to user data.
+      /// \param[in] _o1 First geom to check for collisions.
+      /// \param[in] _o2 Second geom to check for collisions.
+      private: static void UpdateCallback(void *_data, dGeomID _o1,
+                                          dGeomID _o2);
 
-      /// \brief Add a ray to the collision
-      protected: void AddRay(const math::Vector3 &start,
-                             const math::Vector3 &end);
+      /// \brief Add a ray to the collision.
+      /// \param[in] _start Start of a ray.
+      /// \param[in] _end End of a ray.
+      protected: void AddRay(const math::Vector3 &_start,
+                             const math::Vector3 &_end);
 
-      /// Ray space for collision detector
+      /// \brief Space to contain the ray space, for efficiency.
       private: dSpaceID superSpaceId;
+
+      /// \brief Ray space for collision detector.
       private: dSpaceID raySpaceId;
     };
-    /// \}
   }
 }
 #endif
