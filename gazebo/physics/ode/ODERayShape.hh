@@ -19,69 +19,63 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef ODERAYSHAPE_HH
-#define ODERAYSHAPE_HH
+#ifndef _ODERAYSHAPE_HH_
+#define _ODERAYSHAPE_HH_
 
 #include <string>
 
-#include "physics/RayShape.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/RayShape.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief Ray collision
     class ODERayShape : public RayShape
     {
-      /// \brief Constructor for a global ray
-      public: ODERayShape(PhysicsEnginePtr _physicsEngine);
+      /// \brief Constructor for a global ray.
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      public: explicit ODERayShape(PhysicsEnginePtr _physicsEngine);
 
-      /// \brief Constructor
-      /// \param body Link the ray is attached to
-      public: ODERayShape(CollisionPtr collision);
+      /// \brief Constructor.
+      /// \param[in] _collision Collision object this ray is attached to.
+      public: explicit ODERayShape(CollisionPtr _collision);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODERayShape();
 
-      /// \brief Update the tay collision
       public: virtual void Update();
 
-      /// \brief Get the nearest intersection
-      public: virtual void GetIntersection(double &_dist,
-                                           std::string &_entity);
+      public: virtual void GetIntersection(double &_dist, std::string &_entity);
 
-      /// \brief Set the ray based on starting and ending points relative to the
-      ///        body
-      /// \param posStart Start position, relative the body
-      /// \param posEnd End position, relative to the body
-      public: virtual void SetPoints(const math::Vector3 &posStart,
-                                     const math::Vector3 &posEnd);
+      public: virtual void SetPoints(const math::Vector3 &_posStart,
+                                     const math::Vector3 &_posEnd);
 
-      private: static void UpdateCallback(void *data, dGeomID o1, dGeomID o2);
+      /// \brief Ray-intersection callback.
+      /// \param[in] _data Pointer to user data.
+      /// \param[in] _o1 First geom to check for collisions.
+      /// \param[in] _o2 Second geom to check for collisions.
+      private: static void UpdateCallback(void *_data, dGeomID _o1,
+                                          dGeomID _o2);
 
+      /// \brief ODE geom id.
       private: dGeomID geomId;
+
+      /// \brief Pointer to the ODE physics engine
       private: ODEPhysicsPtr physicsEngine;
 
-      /// \brief an intersection class keeping track of name and depth of
-      ///        intersections
+      /// \brief An intersection class keeping track of name and depth of
+      ///        intersections.
       private: class Intersection
                {
+                 /// \brief Depth of the ray intersection.
                  public: double depth;
+
+                 /// \brief Name of the collision object that was hit.
                  public: std::string name;
                };
     };
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-
