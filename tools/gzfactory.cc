@@ -81,7 +81,7 @@ void Spawn(po::variables_map &vm)
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 
-  math::Pose pose = modelElem->GetValuePose("origin");
+  math::Pose pose = modelElem->GetValuePose("pose");
   math::Vector3 rpy = pose.rot.GetAsEuler();
   if (vm.count("pose-x"))
     pose.pos.x = vm["pose-x"].as<double>();
@@ -96,7 +96,7 @@ void Spawn(po::variables_map &vm)
   if (vm.count("pose-Y"))
     rpy.z = vm["pose-Y"].as<double>();
   pose.rot.SetFromEuler(rpy);
-  modelElem->GetElement("origin")->Set(pose);
+  modelElem->GetElement("pose")->Set(pose);
 
   std::cout << "Spawning " << modelName << " into "
             << worldName  << " world.\n";
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("pose-x,x", po::value<double>(), "set model x position.")
     ("pose-y,y", po::value<double>(), "set model y position.")
-    ("pose-z,z", po::value<double>(), "set model z positione.")
+    ("pose-z,z", po::value<double>(), "set model z position.")
     ("pose-R,R", po::value<double>(), "set model roll orientation in radians.")
     ("pose-P,P", po::value<double>(), "set model pitch orientation in radians.")
     ("pose-Y,Y", po::value<double>(), "set model yaw orientation in radians.");
