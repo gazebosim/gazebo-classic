@@ -471,7 +471,7 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
   {
     this->laserCam->Render();
     this->laserCam->PostRender();
-    this->lastUpdateTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->world->GetSimTime();
   }
 }
 

@@ -111,6 +111,9 @@ namespace gazebo
       /// \brief Returns last time that Sensor::UpdateImpl was called
       public: common::Time GetLastUpdateTime();
 
+      /// \brief Returns last time that a sensor measurement was generated
+      public: common::Time GetLastMeasurementTime();
+
       /// \brief Returns true if user requests the sensor to be visualized
       ///        via tag:  <visualize>true</visualize> in SDF
       public: bool GetVisualize() const;
@@ -151,6 +154,9 @@ namespace gazebo
       protected: common::Time updatePeriod;
       /// \brief Stores last time that Sensor::UpdateImpl was called
       protected: common::Time lastUpdateTime;
+      /// \brief Stores last time that a sensor measurement was generated;
+      ///        this value must be updated within each sensor's UpdateImpl
+      protected: common::Time lastMeasurementTime;
     };
     /// \}
   }

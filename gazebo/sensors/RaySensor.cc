@@ -232,7 +232,7 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  this->lastUpdateTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
