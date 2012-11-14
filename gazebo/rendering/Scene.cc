@@ -365,7 +365,8 @@ void Scene::SetAmbientColor(const common::Color &_color)
   this->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->manager)
+  if (this->manager &&
+      Conversions::Convert(this->manager->getAmbientLight()) != _color)
   {
     this->manager->setAmbientLight(Conversions::Convert(_color));
   }
@@ -1307,6 +1308,7 @@ void Scene::PreRender()
   static SensorMsgs_L::iterator sensorIter;
   static LinkMsgs_L::iterator linkIter;
 
+  std::cout << "SceneMsgs[" << this->sceneMsgs.size() << "]\n";
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
        sIter != this->sceneMsgs.end(); ++sIter)
