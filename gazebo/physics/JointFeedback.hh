@@ -19,8 +19,8 @@
  * Date: 10 Nov 2009
  */
 
-#ifndef JOINTFEEDBACK_HH
-#define JOINTFEEDBACK_HH
+#ifndef _JOINTFEEDBACK_HH_
+#define _JOINTFEEDBACK_HH_
 
 #include "math/Vector3.hh"
 
@@ -31,30 +31,37 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class JointFeedback JointFeedback.hh physics/physics.hh
     /// \brief Feedback information from a joint.  These are
-    ///        forces and torques on parent and child Link's
+    /// forces and torques on parent and child Link's
     class JointFeedback
     {
       /// \brief Operator =
-      public: JointFeedback &operator =(const JointFeedback &f)
+      /// \param[in] _feedback Joint feedback to set from.
+      /// \return *this
+      public: JointFeedback &operator =(const JointFeedback &_feedback)
               {
-                this->body1Force = f.body1Force;
-                this->body2Force = f.body2Force;
+                this->body1Force = _feedback.body1Force;
+                this->body2Force = _feedback.body2Force;
 
-                this->body1Torque = f.body1Torque;
-                this->body2Torque = f.body2Torque;
+                this->body1Torque = _feedback.body1Torque;
+                this->body2Torque = _feedback.body2Torque;
                 return *this;
               }
 
+      /// \brief Force on the first link.
       public: math::Vector3 body1Force;
+
+      /// \brief Force on the second link.
       public: math::Vector3 body2Force;
 
+      /// \brief Torque on the first link.
       public: math::Vector3 body1Torque;
+
+      /// \brief Torque on the second link.
       public: math::Vector3 body2Torque;
     };
     /// \}
   }
 }
 #endif
-
-

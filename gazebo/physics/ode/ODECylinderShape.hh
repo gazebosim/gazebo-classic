@@ -38,7 +38,7 @@ namespace gazebo
       public: virtual ~ODECylinderShape() {}
 
       /// Set radius and length of a cylinder
-      public: void SetSize(const double &_radius, const double &_length)
+      public: void SetSize(double _radius, double _length)
       {
         CylinderShape::SetSize(_radius, _length);
         ODECollisionPtr oParent;

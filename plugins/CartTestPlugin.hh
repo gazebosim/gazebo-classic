@@ -17,10 +17,10 @@
 #ifndef __GAZEBO_CART_TEST_PLUGIN_HH__
 #define __GAZEBO_CART_TEST_PLUGIN_HH__
 
-#include "common/common.h"
-#include "physics/physics.h"
-#include "transport/TransportTypes.hh"
-#include "gazebo.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gazebo.hh"
 
 #define NUM_JOINTS 3
 namespace gazebo

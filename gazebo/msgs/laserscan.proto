@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface LaserScan
 /// \brief Data from a laser scan
-/// \verbatim
+
 
 import "pose.proto";
 

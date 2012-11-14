@@ -169,7 +169,10 @@ void TimePanel::Update()
     ++simIter;
     ++realIter;
   }
-  simAvg = simAvg / realAvg;
+  if (realAvg == 0)
+    simAvg = 0;
+  else
+    simAvg = simAvg / realAvg;
 
   if (simAvg > 0)
     percent << std::fixed << std::setprecision(2) << simAvg.Double();

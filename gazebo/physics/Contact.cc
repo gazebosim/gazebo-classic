@@ -19,7 +19,7 @@
  * Date: 10 Nov 2009
  */
 
-#include "Contact.hh"
+#include "gazebo/physics/Contact.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -47,8 +47,7 @@ Contact::~Contact()
 //////////////////////////////////////////////////
 Contact Contact::Clone() const
 {
-  Contact c = *this;
-  return c;
+  return Contact(*this);
 }
 
 //////////////////////////////////////////////////

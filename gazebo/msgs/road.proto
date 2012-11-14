@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Road 
 /// \brief Message for a road
-/// \verbatim
+
 
 import "vector3d.proto";
 
@@ -14,4 +14,4 @@ message Road
   repeated Vector3d point   = 3;
 }
 
-/// \endverbatim
+
