@@ -1074,11 +1074,11 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetHighlighted(bool /*_highlighted*/)
+void Visual::SetHighlighted(bool _highlighted)
 {
+  this->sceneNode->showBoundingBox(_highlighted);
   /*
   if (this->GetAttachedObjectCount() > 0)
-    this->sceneNode->showBoundingBox(_highlighted);
     */
 
 /* TODO: This code will cause objects that use the same mesh to be

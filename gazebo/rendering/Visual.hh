@@ -198,6 +198,9 @@ namespace gazebo
       /// \return The transparency.
       public: float GetTransparency();
 
+      /// \brief Set the visual to be visually highlighted. This is most
+      /// often used when an object is selected by a user via the GUI.
+      /// \param[in] _highlighted True to enable the highlighting.
       public: void SetHighlighted(bool _highlighted);
 
       /// \brief Set the emissive value.
