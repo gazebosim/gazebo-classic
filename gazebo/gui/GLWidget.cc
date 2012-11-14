@@ -615,7 +615,7 @@ void GLWidget::OnMouseReleaseTranslate()
   }
   else
   {
-    event::Events::setSelectedEntity("", "normal");
+    this->SetSelectedVisual(rendering::VisualPtr());
   }
 }
 
@@ -991,12 +991,15 @@ void GLWidget::Paste(const std::string &_object)
 /////////////////////////////////////////////////
 void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
 {
-  msgs::Model msg;
-  msg.set_id(gui::get_entity_id(_vis->GetName()));
-  msg.set_name(_vis->GetName());
+  if (_vis)
+  {
+    msgs::Model msg;
+    msg.set_id(gui::get_entity_id(_vis->GetName()));
+    msg.set_name(_vis->GetName());
 
-  msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
-  this->modelPub->Publish(msg);
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+    this->modelPub->Publish(msg);
+  }
 }
 
 /////////////////////////////////////////////////

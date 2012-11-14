@@ -27,6 +27,7 @@ WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
   this->parent = _parent;
   this->lines = new DynamicLines(RENDERING_LINE_LIST);
   this->lines->setMaterial("BaseWhiteNoLighting");
+  this->parent->AttachObject(this->lines);
 
   this->Init(_box);
 }
@@ -93,7 +94,6 @@ void WireBox::Init(const math::Box &_box)
   this->lines->AddPoint(min.x, min.y, max.z);
   this->lines->AddPoint(max.x, min.y, max.z);
 
-  this->parent->AttachObject(this->lines);
   this->lines->Update();
 }
 
