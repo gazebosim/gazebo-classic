@@ -110,7 +110,7 @@ namespace gazebo
 
       /// \brief Used by ModelDatabase::UpdateModelCache,
       /// no one else should use this function.
-      private: bool UpdateModelCachImpl();
+      private: bool UpdateModelCacheImpl();
 
       /// \brief A dictionary of all model names indexed by their uri.
       private: std::map<std::string, std::string> modelCache;

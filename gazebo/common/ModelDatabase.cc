@@ -144,7 +144,7 @@ std::string ModelDatabase::GetManifest(const std::string &_uri)
 
 
 /////////////////////////////////////////////////
-bool ModelDatabase::UpdateModelCachImpl()
+bool ModelDatabase::UpdateModelCacheImpl()
 {
   std::string xmlString = ModelDatabase::GetManifest(ModelDatabase::GetURI());
 
@@ -195,13 +195,6 @@ bool ModelDatabase::UpdateModelCachImpl()
 /////////////////////////////////////////////////
 void ModelDatabase::UpdateModelCache()
 {
-  // Update the model cache when the thread is started.
-  /*{
-    boost::mutex::scoped_lock lock(this->updateMutex);
-    if (!this->UpdateModelCachImpl())
-      gzerr << "Unable to download model manifests\n";
-  }*/
-
   // Continually update the model cache when requested.
   while (!this->stop)
   {
@@ -214,7 +207,7 @@ void ModelDatabase::UpdateModelCache()
       break;
 
     // Update the model cache.
-    if (!this->UpdateModelCachImpl())
+    if (!this->UpdateModelCacheImpl())
       gzerr << "Unable to download model manifests\n";
     else
     {
