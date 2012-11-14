@@ -19,10 +19,10 @@
  * Date: 21 May 2003
  */
 
-#ifndef UNIVERSALJOINT_HH
-#define UNIVERSALJOINT_HH
+#ifndef _UNIVERSALJOINT_HH_
+#define _UNIVERSALJOINT_HH_
 
-#include "physics/Joint.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {
@@ -31,23 +31,26 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief A universal joint
+    /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
+    /// \brief A universal joint.
     template<class T>
     class UniversalJoint : public T
     {
-      /// \brief Constructor
-      public: UniversalJoint(BasePtr _parent) : T(_parent)
-              { this->AddType(Base::UNIVERSAL_JOINT); }
+      /// \brief Constructor.
+      /// \param[in] _parent Parent link of the univeral joint.
+      public: explicit UniversalJoint(BasePtr _parent) : T(_parent)
+              {this->AddType(Base::UNIVERSAL_JOINT);}
 
-      /// \brief Destuctor
+      /// \brief Destuctor.
       public: virtual ~UniversalJoint()
-              { }
+              {}
 
       /// \interal
       public: virtual unsigned int GetAngleCount() const
               {return 2;}
 
-      /// \brief Load a UniversalJoint
+      /// \brief Load a UniversalJoint.
+      /// \param[in] _sdf SDF values to load from.
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
@@ -62,6 +65,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-

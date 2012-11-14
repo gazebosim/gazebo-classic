@@ -30,23 +30,34 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class Road Road.hh physics/physics.hh
     /// \brief for building a Road from SDF
     class Road : public Base
     {
-      /// \brief Constructor
-      public: Road(BasePtr _parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent of this road object.
+      public: explicit Road(BasePtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~Road();
 
-      /// \brief Load the road from SDF
-      public: void Load(sdf::ElementPtr _elem);
+      /// \brief Load the road from SDF.
+      /// \param[in] _sdf SDF values to load from.
+      public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Initialize the road.
       public: virtual void Init();
 
+      /// \brief Width of the road.
       private: double width;
+
+      /// \brief Points that makes up the mid-line of the road.
       private: std::vector<math::Vector3> points;
+
+      /// \brief Transportation node.
       private: transport::NodePtr node;
+
+      /// \brief Publisher for road information.
       private: transport::PublisherPtr roadPub;
     };
     /// \}

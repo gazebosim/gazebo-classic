@@ -787,7 +787,7 @@ gazebo::common::Time World::GetSimTime() const
 }
 
 //////////////////////////////////////////////////
-void World::SetSimTime(common::Time _t)
+void World::SetSimTime(const common::Time &_t)
 {
   this->simTime = _t;
 }

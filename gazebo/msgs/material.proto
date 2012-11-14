@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Material 
 /// \brief Information about a material
-/// \verbatim
+
 
 import "color.proto";
 
@@ -31,4 +31,4 @@ message Material
   optional Color specular         = 6;
   optional Color emissive         = 7;
 }
-/// \endverbatim
+

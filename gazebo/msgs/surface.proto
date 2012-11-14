@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Surface 
 /// \brief Information about a surface element
-/// \verbatim
+
 
 import "friction.proto";
 
@@ -19,4 +19,4 @@ message Surface
   optional double max_vel                   = 8;
   optional double min_depth                 = 9;
 }
-/// \endverbatim
+

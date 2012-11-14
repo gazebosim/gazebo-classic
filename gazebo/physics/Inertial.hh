@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef INERTIAL_HH
-#define INERTIAL_HH
+#ifndef _INERTIAL_HH_
+#define _INERTIAL_HH_
 
 #include <string>
 
-#include "msgs/msgs.hh"
-#include "sdf/sdf.hh"
-#include "math/Quaternion.hh"
-#include "math/Vector3.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -40,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _mass Mass value in kg if using metric.
-      public: Inertial(double _mass);
+      public: explicit Inertial(double _mass);
 
       /// \brief Copy constructor.
       /// \param[in] _inertial Inertial element to copy

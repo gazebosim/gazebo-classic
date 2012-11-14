@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface ImageStamped
 /// \brief Message for an image with a time
-/// \verbatim
+
 
 import "time.proto";
 import "image.proto";
@@ -14,4 +14,4 @@ message ImageStamped
   required Image image        = 2;
 }
 
-/// \endverbatim
+

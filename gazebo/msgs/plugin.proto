@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Plugin
 /// \brief A message containing visual information for gazebo::Plugin
-/// \verbatim
+
 
 message Plugin
 {
@@ -11,4 +11,4 @@ message Plugin
   required string filename     = 2;
 }
 
-/// \endverbatim
+

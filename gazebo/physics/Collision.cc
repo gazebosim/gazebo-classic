@@ -299,7 +299,7 @@ void Collision::FillMsg(msgs::Collision &_msg)
   _msg.set_laser_retro(this->GetLaserRetro());
 
   this->shape->FillMsg(*_msg.mutable_geometry());
-  this->surface->FillSurfaceMsg(*_msg.mutable_surface());
+  this->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);

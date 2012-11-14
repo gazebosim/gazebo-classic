@@ -23,12 +23,10 @@
  * Date: 21 May 2003
  */
 
-#ifndef SCREWJOINT_HH
-#define SCREWJOINT_HH
+#ifndef _SCREWJOINT_HH_
+#define _SCREWJOINT_HH_
 
-#include <float.h>
-#include "physics/Joint.hh"
-#include "gazebo/common/Console.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {
@@ -37,14 +35,17 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief A screw joint
+    /// \class ScrewJoint ScrewJoint.hh physics/physics.hh
+    /// \brief A screw joint, which has both  prismatic and rotational DOFs
     template<class T>
     class ScrewJoint : public T
     {
-      /// \brief Constructor
-      public: ScrewJoint(BasePtr _parent) : T(_parent)
-              { this->AddType(Base::SCREW_JOINT); }
-      /// \brief Destructor
+      /// \brief Constructor.
+      /// \param[in] _parent Parent of the joint.
+      public: explicit ScrewJoint(BasePtr _parent) : T(_parent)
+              {this->AddType(Base::SCREW_JOINT);}
+
+      /// \brief Destructor.
       public: virtual ~ScrewJoint()
               { }
 
@@ -52,7 +53,8 @@ namespace gazebo
       public: virtual unsigned int GetAngleCount() const
               {return 2;}
 
-      /// \brief Load a ScreJoint
+      /// \brief Load a ScrewJoint.
+      /// \param[in] _sdf SDF value to load from
       protected: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
@@ -87,14 +89,16 @@ namespace gazebo
                    }
                  }
 
-      /// \brief Set the anchor
-      public: virtual void SetAnchor(int /*_index */,
-                                     const math::Vector3 &anchor)
-              {fakeAnchor = anchor;}
+      /// \brief Set the anchor.
+      /// \param[in] _index Index of the axis. Not Used.
+      /// \param[in] _anchor Anchor value for the joint.
+      public: virtual void SetAnchor(int _index,
+                                     const math::Vector3 &_anchor);
 
-      /// \brief Get the anchor
-      public: virtual math::Vector3 GetAnchor(int /*_index*/) const
-               {return fakeAnchor;}
+      /// \brief Get the anchor.
+      /// \param[in] _index Index of the axis. Not Used.
+      /// \return Anchor for the joint.
+      public: virtual math::Vector3 GetAnchor(int _index) const;
 
       /// \brief Set screw joint thread pitch.
       ///
@@ -103,12 +107,22 @@ namespace gazebo
       /// \param[in] _threadPitch Thread pitch value.
       public: virtual void SetThreadPitch(int _index, double _threadPitch) = 0;
 
+      /// \brief The anchor value is not used internally.
       protected: math::Vector3 fakeAnchor;
+
+      /// \brief Pitch of the thread.
       protected: double threadPitch;
     };
     /// \}
+
+    template<class T>
+    void ScrewJoint<T>::SetAnchor(int /*_index*/,
+                                  const math::Vector3 &_anchor)
+    {this->fakeAnchor = _anchor;}
+
+    template<class T>
+    math::Vector3 ScrewJoint<T>::GetAnchor(int /*_index*/) const
+    {return this->fakeAnchor;}
   }
 }
 #endif
-
-

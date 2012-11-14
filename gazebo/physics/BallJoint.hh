@@ -40,7 +40,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent link.
-      public: BallJoint(BasePtr _parent) : T(_parent)
+      public: explicit BallJoint(BasePtr _parent) : T(_parent)
               {
                 this->AddType(Base::BALL_JOINT);
               }
