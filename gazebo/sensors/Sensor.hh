@@ -81,6 +81,7 @@ namespace gazebo
       protected: virtual void UpdateImpl(bool /*_force*/) {}
 
       /// \brief Set the update rate of the sensor
+      /// \param _hz Frequency in Hertz
       public: void SetUpdateRate(double _hz);
 
       /// \brief  Finalize the sensor
@@ -107,10 +108,10 @@ namespace gazebo
       /// \brief Get sensor type
       public: std::string GetType() const;
 
-      /// \brief return last update time
+      /// \brief Returns last time that Sensor::UpdateImpl was called
       public: common::Time GetLastUpdateTime();
 
-      /// \brief return true if user requests the sensor to be visualized
+      /// \brief Returns true if user requests the sensor to be visualized
       ///        via tag:  <visualize>true</visualize> in SDF
       public: bool GetVisualize() const;
 
@@ -131,7 +132,7 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
-      /// \brief True if active
+      /// \brief True if sensor generation is active
       protected: bool active;
       protected: sdf::ElementPtr sdf;
       protected: math::Pose pose;
@@ -145,7 +146,10 @@ namespace gazebo
       protected: std::vector<SensorPluginPtr> plugins;
 
       protected: gazebo::physics::WorldPtr world;
+      /// \brief Desired time between Sensor::UpdateImpl function calls,
+      ///        set indirectly by Sensor::SetUpdateRate
       protected: common::Time updatePeriod;
+      /// \brief Stores last time that Sensor::UpdateImpl was called
       protected: common::Time lastUpdateTime;
     };
     /// \}
