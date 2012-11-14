@@ -1423,7 +1423,7 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 //////////////////////////////////////////////////
 void Camera::SetRenderRate(double _hz)
 {
-  this->renderPeriod = _hz;
+  this->renderPeriod = 1.0 / _hz;
 }
 
 //////////////////////////////////////////////////
