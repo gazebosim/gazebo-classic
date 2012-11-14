@@ -98,7 +98,7 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
   this->lastRenderWallTime = common::Time::GetWallTime();
 
   // Set default render rate to 30Hz
-  this->renderPeriod = 1.0 / 30.0;
+  this->SetRenderRate(30.0);
 }
 
 //////////////////////////////////////////////////
