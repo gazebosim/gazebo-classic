@@ -39,6 +39,8 @@ ContactPlugin::ContactPlugin()
 /////////////////////////////////////////////////
 ContactPlugin::~ContactPlugin()
 {
+  this->parentSensor.reset();
+  this->world.reset();
 }
 
 /////////////////////////////////////////////////

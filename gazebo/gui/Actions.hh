@@ -18,6 +18,8 @@
 #ifndef _GUI_ACTIONS_HH_
 #define _GUI_ACTIONS_HH_
 
+#include <string>
+
 #include "gui/qt.h"
 
 namespace gazebo

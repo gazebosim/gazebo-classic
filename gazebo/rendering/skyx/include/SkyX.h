@@ -57,7 +57,8 @@ namespace SkyX
          For more information have a look to sample projects.
 
      */
-  class DllExport SkyX : public Ogre::FrameListener, public Ogre::RenderTargetListener
+  class DllExport SkyX : public Ogre::FrameListener,
+                         public Ogre::RenderTargetListener
   {
   public:
     /** Render queue groups
@@ -65,11 +66,13 @@ namespace SkyX
     struct RenderQueueGroups
     {
       /** Constructor
-          @param s Skydome render queue group (Note: Moon = skydome_render_queue+1)
+          @param s Skydome render queue group (Note: Moon =
+          skydome_render_queue+1)
         @param vc VClouds render queue group
         @param vcl VClouds lightnings render queue group
        */
-      inline RenderQueueGroups(const Ogre::uint8& s, const Ogre::uint8& vc, const Ogre::uint8& vcl)
+      inline RenderQueueGroups(const Ogre::uint8& s, const Ogre::uint8& vc,
+                              const Ogre::uint8& vcl)
         : skydome(s), vclouds(vc), vcloudsLightnings(vcl)
       {
       }
@@ -83,11 +86,14 @@ namespace SkyX
     };
 
     /** Lighting mode enumeration
-        SkyX is designed for true HDR rendering, but there is a big number of applications
-      which don't use HDR rendering, due to this fact a little exponential tone-mapping
-      algoritm is applied to SkyX materials if LM_LDR is selected. (See: AtmosphereManager::Options::Exposure)
-      Select LM_HDR if your app is designed for true HDR rendering. In HDR mode, we assume you're ussing a
-      full linear rendering pipeline, so all textures are gamma corrected if needed.
+        SkyX is designed for true HDR rendering, but there is a big
+        number of applications which don't use HDR rendering, due to this
+        fact a little exponential tone-mapping algoritm is applied to SkyX
+        materials if LM_LDR is selected.
+        (See: AtmosphereManager::Options::Exposure)
+        Select LM_HDR if your app is designed for true HDR rendering.
+        In HDR mode, we assume you're ussing a full linear rendering pipeline,
+        so all textures are gamma corrected if needed.
      */
     enum LightingMode
     {
@@ -117,19 +123,21 @@ namespace SkyX
 
         /** Update (to be invoked per frame)
         @param timeSinceLastFrame Time elapsed since last frame
-            @remarks Invoke this function only one time per frame.
-           Per-frame update must be performed before per-camera updates through SkyX::notifyCameraRender(...)
-               Also it's possible to use listeners, making all this process transparent,
-           just register SkyX in ogre root through Ogre::Root::addFrameListener(...)
+        @remarks Invoke this function only one time per frame.
+        Per-frame update must be performed before per-camera updates through
+        SkyX::notifyCameraRender(...) Also it's possible to use listeners,
+        making all this process transparent, just register SkyX in ogre root
+        through Ogre::Root::addFrameListener(...)
          */
         void update(const Ogre::Real &timeSinceLastFrame);
 
     /** Notify camera render (to be invoked per camera and per frame)
         @param c Camera
-      @remarks Invoke this method manually before the camera render operation
-             Per-camera updates must be performed after the per-frame update through SkyX::update(...)
-               Also it's possible to use listeners, making all this process transparent,
-           just register SkyX in your render target through Ogre::RenderTarget::addListener(...)
+        @remarks Invoke this method manually before the camera render operation
+        Per-camera updates must be performed after the per-frame update
+        through SkyX::update(...) Also it's possible to use listeners,
+        making all this process transparent, just register SkyX in your render
+        target through Ogre::RenderTarget::addListener(...)
      */
     void notifyCameraRender(Ogre::Camera* c);
 
@@ -155,9 +163,10 @@ namespace SkyX
     }
 
     /** Set time multiplier
-        @param TimeMultiplier Time multiplier
-      @remarks The time multiplier can be a negative number, 0 will disable auto-updating
-               For setting a custom time of day, check: AtmosphereManager::Options::Time
+      @param TimeMultiplier Time multiplier
+      @remarks The time multiplier can be a negative number, 0 will disable
+      auto-updating For setting a custom time of day, check:
+      AtmosphereManager::Options::Time
      */
     inline void setTimeMultiplier(const Ogre::Real& TimeMultiplier)
     {
@@ -256,12 +265,14 @@ namespace SkyX
     }
 
     /** Set lighting mode
-        @param lm Lighting mode
-      @remarks SkyX is designed for true HDR rendering, but there're a lot of applications
-             that doesn't use HDR rendering, due to this a little exponential tone-mapping
-               algoritm is applied to SkyX materials if LM_LDR is selected. (See: AtmosphereManager::Options::Exposure)
-                Select LM_HDR if your app is designed for true HDR rendering. In HDR mode, we assume you're ussing a
-           full linear rendering pipeline, so all textures are gamma corrected if needed.
+      @param lm Lighting mode
+      @remarks SkyX is designed for true HDR rendering, but there're a lot of
+      applications that doesn't use HDR rendering, due to this a little
+      exponential tone-mapping algoritm is applied to SkyX materials if
+      LM_LDR is selected. (See: AtmosphereManager::Options::Exposure)
+      Select LM_HDR if your app is designed for true HDR rendering.
+      In HDR mode, we assume you're ussing a full linear rendering pipeline,
+      so all textures are gamma corrected if needed.
      */
     void setLightingMode(const LightingMode& lm);
 
@@ -287,10 +298,11 @@ namespace SkyX
     }
 
     /** Set infinite camera far clip distance
-        @param d Infinite camera far clip distance
-      @remarks SkyX needs a finite camera far clip distance in order to builds its geometry. Since Ogre allows infinite far clip
-               camera distances (camearFarClipDistance = 0) you'll need to manually provide a far clip distance if you're using
-           an infinite camera far clip distance.
+      @param d Infinite camera far clip distance
+      @remarks SkyX needs a finite camera far clip distance in order to builds
+      its geometry. Since Ogre allows infinite far clip camera distances
+      (camearFarClipDistance = 0) you'll need to manually provide a far clip
+      distance if you're using an infinite camera far clip distance.
      */
     inline void setInfiniteCameraFarClipDistance(const Ogre::Real& d)
     {

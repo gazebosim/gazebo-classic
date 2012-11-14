@@ -509,6 +509,12 @@ namespace gazebo
                 geomElem->GetValueString("uri"));
           }
         }
+        else if (geomElem->GetName() == "empty")
+        {
+          geomMsg->set_type(msgs::Geometry::EMPTY);
+          // msgs::Set(geomMsg->mutable_mesh()->mutable_scale(),
+              // geomElem->GetValueVector3("scale"));
+        }
         else
           gzthrow("Unknown geometry type\n");
       }
@@ -569,6 +575,17 @@ namespace gazebo
       if (_sdf->HasElement("pose"))
       {
         msgs::Set(result.mutable_pose(), _sdf->GetValuePose("pose"));
+      }
+
+      // Set plugins of the visual
+      if (_sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr elem = _sdf->GetElement("plugin");
+        msgs::Plugin *plgnMsg = result.mutable_plugin();
+        // if (elem->HasElement("name"))
+          plgnMsg->set_name(elem->GetValueString("name"));
+        // if (elem->HasElement("filename"))
+          plgnMsg->set_filename(elem->GetValueString("filename"));
       }
 
       return result;

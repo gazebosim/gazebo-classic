@@ -39,6 +39,8 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
+  this->parentSensor.reset();
+  this->world.reset();
 }
 
 /////////////////////////////////////////////////
@@ -58,6 +60,7 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
       boost::bind(&RayPlugin::OnNewLaserScans, this));
 }
 
+/////////////////////////////////////////////////
 void RayPlugin::OnNewLaserScans()
 {
   /* overload with useful callback here */

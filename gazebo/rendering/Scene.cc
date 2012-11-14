@@ -99,8 +99,11 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
@@ -578,9 +581,10 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Scene::SelectVisual(const std::string &_name)
+void Scene::SelectVisual(const std::string &_name, const std::string &_mode)
 {
   this->selectedVis = this->GetVisual(_name);
+  this->selectionMode = _mode;
 }
 
 //////////////////////////////////////////////////
@@ -831,7 +835,7 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-  for (;iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
+  for (; iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
 
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 
@@ -1358,7 +1362,7 @@ void Scene::PreRender()
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      if (!this->selectedVis ||
+      if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
@@ -1383,7 +1387,7 @@ void Scene::PreRender()
       if (iter2 != this->visuals.end())
       {
         // If an object is selected, don't let the physics engine move it.
-        if (!this->selectedVis ||
+        if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
         {
           math::Pose pose = msgs::Convert(pose_msg);
@@ -1432,7 +1436,7 @@ void Scene::PreRender()
 
   if (this->selectionMsg)
   {
-    this->SelectVisual(this->selectionMsg->name());
+    this->SelectVisual(this->selectionMsg->name(), "normal");
     this->selectionMsg.reset();
   }
 }

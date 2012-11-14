@@ -49,11 +49,14 @@ namespace gazebo
       /// \return The name of the controller type: "fps"
       public: static std::string GetTypeString();
 
-      /// \brief Handle a mouse event
-      ///
-      /// This is ususally called from the graphical interface.
-      /// \param[in] _event The mouse event.
+      // Documentation inherited from parent
       public: virtual void HandleMouseEvent(const common::MouseEvent &_event);
+
+      // Documentation inherited from parent
+      public: void HandleKeyReleaseEvent(const std::string &_key);
+
+      // Documentation inherited from parent
+      public: void HandleKeyPressEvent(const std::string &_key);
     };
     /// \}
   }

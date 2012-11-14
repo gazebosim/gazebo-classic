@@ -238,7 +238,7 @@ dJointFeedback *ODEJoint::GetFeedback()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetHighStop(int _index, math::Angle _angle)
+void ODEJoint::SetHighStop(int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -258,7 +258,7 @@ void ODEJoint::SetHighStop(int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetLowStop(int _index, math::Angle _angle)
+void ODEJoint::SetLowStop(int _index, const math::Angle &_angle)
 {
   switch (_index)
   {

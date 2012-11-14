@@ -24,7 +24,6 @@
 #include "gazebo/sdf/interface/SDF.hh"
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
-#include "gazebo/sdf/interface/parser_deprecated.hh"
 #include "gazebo_config.h"
 #ifdef HAVE_URDFDOM
   #include "gazebo/sdf/interface/parser_urdf.hh"
@@ -541,7 +540,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               << elemXml->FirstChildElement("uri")->GetText() << "]\n";
 
             std::string uri = elemXml->FirstChildElement("uri")->GetText();
-            if (uri.find("model://") != 0)
+            size_t beginning = 0;
+            if (uri.find("model://") != beginning)
             {
               gzerr << "Invalid uri[" << uri << "]. Should be model://"
                     << uri << "\n";

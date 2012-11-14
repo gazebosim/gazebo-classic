@@ -108,7 +108,7 @@ void TrimeshShape::SetFilename(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::FillShapeMsg(msgs::Geometry &_msg)
+void TrimeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
   _msg.mutable_mesh()->set_filename(this->GetFilename());

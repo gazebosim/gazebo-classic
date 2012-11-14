@@ -89,7 +89,7 @@ void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetDamping(int /*index*/, const double _damping)
+void ODESliderJoint::SetDamping(int /*index*/, double _damping)
 {
   this->damping_coefficient = _damping;
   dJointSetDamping(this->jointId, this->damping_coefficient);

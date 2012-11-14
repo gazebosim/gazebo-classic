@@ -96,8 +96,7 @@ TEST_F(FactoryTest, Camera)
 {
   // Disabling this test for now. Different machines return different
   // camera images. Need a better way to evaluate rendered content.
-  return;
-
+/*
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
     return;
@@ -124,6 +123,7 @@ TEST_F(FactoryTest, Camera)
   ASSERT_LT(diffSum, static_cast<unsigned int>(100));
   ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
   ASSERT_EQ(0.0, diffAvg);
+  */
 }
 
 int main(int argc, char **argv)

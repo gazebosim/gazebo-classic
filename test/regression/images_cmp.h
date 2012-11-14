@@ -15,8 +15,17 @@
  *
 */
 
-#ifndef TEST_IMAGES_CMP_H_
-#define TEST_IMAGES_CMP_H_
+#ifndef _TEST_IMAGES_CMP_H_
+#define _TEST_IMAGES_CMP_H_
+
+#ifdef __GNUC__
+    #define MAYBE_UNUSED __attribute__((used))
+#elif defined _MSC_VER
+    #pragma warning(disable: Cxxxxx)
+    #define MAYBE_UNUSED
+#else
+    #define MAYBE_UNUSED
+#endif
 
 static unsigned char __empty_world_camera1[] = {
 152, 152, 152, 152, 152, 152, 152, 152, 152, 152,
@@ -23059,7 +23068,7 @@ static unsigned char __empty_world_camera1[] = {
 94, 94, 94, 94, 94, 94, 94, 94, 94, 94,
 94, 94, 94, 94, 94, 94, 94, 94, 94, 94,
 94, 94, 94, 94, 94, 94, 94, 94, 94, 94};
-static unsigned char *empty_world_camera1 = __empty_world_camera1;
+static unsigned char *empty_world_camera1 MAYBE_UNUSED = __empty_world_camera1;
 
 static unsigned char __projector_world_camera[] = {
 178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
@@ -46102,6 +46111,7 @@ static unsigned char __projector_world_camera[] = {
 129, 129, 129, 129, 129, 129, 129, 129, 129, 129,
 129, 129, 129, 129, 129, 129, 129, 129, 129, 129,
 129, 129, 129, 129, 128, 128, 128, 128, 128, 128};
-static unsigned char *projector_world_camera = __projector_world_camera;
+static unsigned char *projector_world_camera MAYBE_UNUSED
+= __projector_world_camera;
 
 #endif

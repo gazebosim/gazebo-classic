@@ -113,38 +113,6 @@ namespace gazebo
       /// \return r, g, b, or a when _index is 0, 1, 2 or 3
       public: float operator[](unsigned int _index);
 
-      /// \brief Get the red color
-      /// \return red color component
-      public: float R() const GAZEBO_DEPRECATED;
-
-      /// \brief Get the green color
-      /// \return green color component
-      public: float G() const GAZEBO_DEPRECATED;
-
-      /// \brief Get the blue color
-      /// \return blue color component
-      public: float B() const GAZEBO_DEPRECATED;
-
-      /// \brief Get the alpha color
-      /// \return alpha value
-      public: float A() const GAZEBO_DEPRECATED;
-
-      /// \brief Set the red color
-      /// \param _r Red color component
-      public: void R(float _r) GAZEBO_DEPRECATED;
-
-      /// \brief Set the green color
-      /// \param _g Green color component
-      public: void G(float _g) GAZEBO_DEPRECATED;
-
-      /// \brief Set the blue color
-      /// \param _b Blue color component
-      public: void B(float _b) GAZEBO_DEPRECATED;
-
-      /// \brief Set the alpha color
-      /// \param _a Alpha value
-      public: void A(float _a) GAZEBO_DEPRECATED;
-
       /// \brief Get as uint32 RGBA packed value
       /// \return the color
       public: RGBA GetAsRGBA() const;

@@ -14,12 +14,13 @@
  * limitations under the License.
  *
  */
-#ifndef MODEL_LIST_WIDGET_HH
-#define MODEL_LIST_WIDGET_HH
+#ifndef _MODEL_LIST_WIDGET_HH_
+#define _MODEL_LIST_WIDGET_HH_
 
 #include <string>
 #include <list>
 #include <vector>
+#include <deque>
 
 #include "gui/qt.h"
 #include "sdf/sdf.hh"
@@ -60,7 +61,8 @@ namespace gazebo
       private slots: void OnPropertyChanged(QtProperty *_item);
       private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
-      private: void OnSetSelectedEntity(const std::string &_name);
+      private: void OnSetSelectedEntity(const std::string &_name,
+                                        const std::string &_mode);
       private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
@@ -158,9 +160,9 @@ namespace gazebo
       private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
 
-
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
+      private: void ProcessRemoveEntity();
 
       public: void InitTransport(const std::string &_name ="");
       private: void ResetTree();
@@ -216,6 +218,9 @@ namespace gazebo
 
       typedef std::list<msgs::Light> LightMsgs_L;
       private: LightMsgs_L lightMsgs;
+
+      typedef std::list<std::string> RemoveEntity_L;
+      private: RemoveEntity_L removeEntityList;
 
       private: msgs::Model modelMsg;
       private: msgs::Link linkMsg;

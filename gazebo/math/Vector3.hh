@@ -44,39 +44,58 @@ namespace gazebo
       public: Vector3();
 
       /// \brief Constructor
+      /// \param[in] _x value along x
+      /// \param[in] _y value along y
+      /// \param[in] _z value along z
       public: Vector3(const double &_x, const double &_y, const double &_z);
 
-      /// \brief Constructor
-      public: Vector3(const Vector3 &_pt);
+      /// \brief Copy constructor
+      /// \param[in] _v a vector
+      public: Vector3(const Vector3 &_v);
 
       /// \brief Destructor
       public: virtual ~Vector3();
 
       /// \brief Return the sum of the values
+      /// \return the sum
       public: double GetSum() const;
 
       /// \brief Calc distance to the given point
+      /// \param[in] _pt the point
+      /// \return the distance
       public: double Distance(const Vector3 &_pt) const;
 
       /// \brief Calc distance to the given point
+      /// \param[in] _x value along x
+      /// \param[in] _y value along y
+      /// \param[in] _z value along z
+      /// \return the distance
       public: double Distance(double _x, double _y, double _z) const;
 
       /// \brief Returns the length (magnitude) of the vector
+      /// \ return the length
       public: double GetLength() const;
 
       /// \brief Return the square of the length (magnitude) of the vector
+      /// \return the lenght
       public: double GetSquaredLength() const;
 
       /// \brief Normalize the vector length
+      /// \return unit length vector
       public: Vector3 Normalize();
 
       /// \brief Round to near whole number, return the result.
+      /// \return the result
       public: Vector3 Round();
 
       /// \brief Get a rounded version of this vector
+      /// \return a rounded vector
       public: Vector3 GetRounded() const;
 
       /// \brief Set the contents of the vector
+      /// \param[in] _x value along x
+      /// \param[in] _y value along y
+      /// \param[in] _z value aling z
       public: inline void Set(double _x = 0, double _y = 0 , double _z = 0)
               {
                 this->x = _x;
@@ -85,59 +104,75 @@ namespace gazebo
               }
 
       /// \brief Return the cross product of this vector and pt
+      /// \return the product
       public: Vector3 Cross(const Vector3 &_pt) const;
-      public: Vector3 GetCrossProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
-              {
-                return this->Cross(_pt);
-              }
 
       /// \brief Return the dot product of this vector and pt
+      /// \return the product
       public: double Dot(const Vector3 &_pt) const;
-      public: double GetDotProd(const Vector3 &_pt) const GAZEBO_DEPRECATED
-              {
-                return this->Dot(_pt);
-              }
 
-      /// \breif Get the absolute value of the vector
+      /// \brief Get the absolute value of the vector
+      /// \return a vector with positive elements
       public: Vector3 GetAbs() const;
 
       /// \brief Return a vector that is perpendicular to this one.
+      /// \return an orthogonal vector
       public: Vector3 GetPerpendicular() const;
 
       /// \brief Get a normal vector to a triangle
-      public: static Vector3 GetNormal(const Vector3 &v1, const Vector3 &v2,
-                                       const Vector3 &v3);
+      /// \param[in] _v1 first vertex of the triangle
+      /// \param[in] _v2 second vertex
+      /// \param[in] _v3 third vertex
+      /// \return the normal
+      public: static Vector3 GetNormal(const Vector3 &_v1, const Vector3 &_v2,
+                                       const Vector3 &_v3);
 
       /// \brief Get distance to a line
+      /// \param[in] _pt1 first point on the line
+      /// \param[in] _pt2 second point on the line
+      /// \return the minimum distance from this point to the line
       public: double GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2);
 
       /// \brief Set this vector's components to the maximum of itself and the
       ///        passed in vector
+      /// \param[in] _v the maximum clamping vector
       public: void SetToMax(const Vector3 &_v);
 
       /// \brief Set this vector's components to the minimum of itself and the
       ///        passed in vector
+      /// \param[in] the minimumn clamping vector
       public: void SetToMin(const Vector3 &_v);
 
       /// \brief Get the maximum value in the vector
+      /// \return the maximum element
       public: double GetMax() const;
 
       /// \brief Get the minimum value in the vector
+      /// \return the minimum element
       public: double GetMin() const;
 
-      /// \brief Equal operator
-      public: Vector3 &operator =(const Vector3 &_pt);
+      /// \brief Assignment operator
+      /// \param[in] _v a new value
+      /// \return this
+      public: Vector3 &operator =(const Vector3 &_v);
 
-      /// \brief Equal operator
+      /// \brief Assignment operator
+      /// \param[in] _value assigned to all elements
+      /// \return this
       public: Vector3 &operator =(double _value);
 
       /// \brief Addition operator
-      public: Vector3 operator+(const Vector3 &_pt) const;
+      /// \param[in] _v vector to add
+      /// \return the sum vector
+      public: Vector3 operator+(const Vector3 &_v) const;
 
-      /// \brief Addition operator
-      public: const Vector3 &operator+=(const Vector3 &_pt);
+      /// \brief Addition assignment operator
+      /// \param[in] _v vector to add
+      public: const Vector3 &operator+=(const Vector3 &_v);
 
       /// \brief Subtraction operators
+      /// \param[in] _pt a vector to substract
+      /// \return a vector
       public: inline Vector3 operator-(const Vector3 &_pt) const
               {
                 return Vector3(this->x - _pt.x,
@@ -148,35 +183,57 @@ namespace gazebo
       /// \brief Subtraction operators
       public: const Vector3 &operator-=(const Vector3 &_pt);
 
-      /// \brief Division operators
+      /// \brief Division operator
+      /// \remarks this is an element wise division
+      /// \return a vector
       public: const Vector3 operator/(const Vector3 &_pt) const;
 
-      /// \brief Division operators
+      /// \brief Division assignment operator
+      /// \remarks this is an element wise division
+      /// \return a vector
       public: const Vector3 &operator/=(const Vector3 &_pt);
 
-      /// \brief Division operators
+      /// \brief Division operator
+      /// \remarks this is an element wise division
+      /// \return a vector
       public: const Vector3 operator/(double _v) const;
 
-      /// \brief Division operators
+      /// \brief Division operator
+      /// \remarks this is an element wise division
+      /// \return this
       public: const Vector3 &operator/=(double _v);
 
-      /// \brief Multiplication operators
-      public: Vector3 operator*(const Vector3 &_pt) const;
+      /// \brief Multiplication operator
+      /// \remarks this is an element wise multiplication, not a cross product
+      /// \param[in] _v
+      public: Vector3 operator*(const Vector3 &_p) const;
 
       /// \brief Multiplication operators
-      public: const Vector3 &operator*=(const Vector3 &_pt);
+      /// \remarks this is an element wise multiplication, not a cross product
+      /// \param[in] _v a vector
+      /// \return this
+      public: const Vector3 &operator*=(const Vector3 &_v);
 
       /// \brief Multiplication operators
+      /// \param[in] _v the scaling factor
+      /// \return a scaled vector
       public: Vector3 operator*(double _v) const;
 
-      /// \brief Multiplication operators
+      /// \brief Multiplication operator
+      /// \param[in] _v scaling factor
+      /// \return this
       public: const Vector3 &operator*=(double _v);
 
-      /// \brief Equality operators
+      /// \brief Equal to operator
+      /// \return true if each component is equal withing a
+      /// default tolerence (1e-6), false otherwise
       public: bool operator ==(const Vector3 &_pt) const;
 
-      /// \brief Equality operators
-      public: bool operator!=(const Vector3 &_pt) const;
+      /// \brief Not equal to operator
+      /// \param[in] _v a vector
+      /// \return true if each component is equal withing a
+      /// default tolerence (1e-6), false otherwise
+      public: bool operator!=(const Vector3 &_v) const;
 
       /// \brief See if a point is finite (e.g., not nan)
       public: bool IsFinite() const;
@@ -196,9 +253,13 @@ namespace gazebo
       public: double operator[](unsigned int index) const;
 
       /// \brief Round all values to _precision decimal places
+      /// \param[in] _precision the decimal places
       public: void Round(int _precision);
 
-      /// \brief Returns true if the two vectors are exacatly equal
+      /// \brief Equality test
+      /// \remarks This is equivalent to the == operator
+      /// \param[in] _v the other vector
+      /// \return true if the 2 vectors have the same values, false otherwise
       public: bool Equal(const Vector3 &_v) const;
 
       /// \brief X location
@@ -210,22 +271,21 @@ namespace gazebo
       /// \brief Z location
       public: double z;
 
-      /// \brief Ostream operator
-      /// \param out Ostream
-      /// \param pt Vector3 to output
-      /// \return The Ostream
+      /// \brief Stream insertion operator
+      /// \param _out output stream
+      /// \param _pt Vector3 to output
+      /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Vector3 &_pt)
       {
         _out << _pt.x << " " << _pt.y << " " << _pt.z;
-
         return _out;
       }
 
-      /// \brief Istream operator
-      /// \param in Ostream
-      /// \param pt Vector3 to read values into
-      /// \return The istream
+      /// \brief Stream extraction operator
+      /// \param _in input stream
+      /// \param _pt vector3 to read values into
+      /// \return the stream
       public: friend std::istream &operator>>(std::istream &_in,
                                               gazebo::math::Vector3 &_pt)
       {

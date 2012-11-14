@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface RaySensor 
 /// \brief Information about a ray sensor element
-/// \verbatim
+
 
 message RaySensor
 {
@@ -22,4 +22,4 @@ message RaySensor
   optional double range_max             = 11; 
   optional double range_resolution      = 12;
 }
-/// \endverbatim
+

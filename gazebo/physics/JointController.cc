@@ -69,7 +69,6 @@ void JointController::Update()
       this->joints[iter->first]->SetForce(0, iter->second);
   }
 
-  /*
   if (this->positions.size() > 0)
   {
     double cmd;
@@ -82,7 +81,7 @@ void JointController::Update()
           stepTime);
       this->joints[iter->first]->SetForce(0, cmd);
     }
-  }*/
+  }
 
   if (this->velocities.size() > 0)
   {
@@ -100,7 +99,7 @@ void JointController::Update()
   }
 
   // Disabled for now. Collisions don't update properly
-  if (this->positions.size() > 0)
+  /*if (this->positions.size() > 0)
   {
     std::map<std::string, JointPtr>::iterator iter;
     for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
@@ -110,7 +109,7 @@ void JointController::Update()
     }
     this->SetJointPositions(this->positions);
     this->positions.clear();
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -207,7 +206,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
   _position = _position < lower? lower : (_position > upper? upper : _position);
 
   // keep track of updatd links, make sure each is upated only once
-  this->updated_links.clear();
+  this->updatedLinks.clear();
 
   // only deal with hinge and revolute joints in the user
   // request joint_names list
@@ -242,7 +241,7 @@ void JointController::SetJointPosition(JointPtr _joint, double _position)
 
       // we don't want to move the parent link
       if (parentLink)
-        this->updated_links.push_back(parentLink);
+        this->updatedLinks.push_back(parentLink);
 
       this->MoveLinks(_joint, childLink, anchor, axis, dposition,
         true);
@@ -259,7 +258,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
     const math::Vector3 &_anchor, const math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
-  if (!this->ContainsLink( this->updated_links, _link))
+  if (!this->ContainsLink(this->updatedLinks, _link))
   {
     if (_joint->HasType(Base::HINGE_JOINT))
     {
@@ -282,12 +281,13 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 
       _link->SetWorldPose(newWorldPose);
 
-      // @todo: ideally we want to set this according to Joint Trajectory velocity
-      //        and use time step since last update.
-      // double dt = this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
-      // this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+      /// \TODO: ideally we want to set this according to
+      /// Joint Trajectory velocity and use time step since last update.
+      /// double dt =
+      /// this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
+      /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
-      this->updated_links.push_back(_link);
+      this->updatedLinks.push_back(_link);
     }
     else if (_joint->HasType(Base::SLIDER_JOINT))
     {
@@ -306,12 +306,13 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 
       _link->SetWorldPose(newWorldPose);
 
-      // @todo: ideally we want to set this according to Joint Trajectory velocity
-      //        and use time step since last update.
-      // double dt = this->model->GetWorld()->GetPhysicsEngine()->GetStepTime();
-      // this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+      /// \TODO: ideally we want to set this according to Joint Trajectory
+      /// velocity and use time step since last update.
+      /// double dt = this->model->GetWorld()->GetPhysicsEngine()->
+      /// GetStepTime();
+      /// this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
 
-      this->updated_links.push_back(_link);
+      this->updatedLinks.push_back(_link);
     }
     else
       gzerr << "should not be here\n";
@@ -321,10 +322,10 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
   // recurse through connected links
   if (_updateChildren)
   {
-    std::vector<LinkPtr> connected_links;
+    Link_V connected_links;
     this->AddConnectedLinks(connected_links, _link, true);
 
-    for (std::vector<LinkPtr>::iterator liter = connected_links.begin();
+    for (Link_V::iterator liter = connected_links.begin();
         liter != connected_links.end(); ++liter)
     {
       this->MoveLinks(_joint, (*liter), _anchor, _axis, _dposition);
@@ -352,7 +353,7 @@ void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
 }
 
 //////////////////////////////////////////////////
-void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
+void JointController::AddConnectedLinks(Link_V &_linksOut,
                                         const LinkPtr &_link,
                                         bool _checkParentTree)
 {
@@ -360,17 +361,17 @@ void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
   //           for each child, also look for parents to catch multiple roots
 
 
-  std::vector<LinkPtr> childLinks = _link->GetChildJointsLinks();
-  for (std::vector<LinkPtr>::iterator childLink = childLinks.begin();
+  Link_V childLinks = _link->GetChildJointsLinks();
+  for (Link_V::iterator childLink = childLinks.begin();
                                       childLink != childLinks.end();
                                       ++childLink)
   {
     // add this link to the list of links to be updated by SetJointPosition
-    if (!this->ContainsLink(_links_out, *childLink))
+    if (!this->ContainsLink(_linksOut, *childLink))
     {
-      _links_out.push_back(*childLink);
+      _linksOut.push_back(*childLink);
       // recurse into children, but not parents
-      this->AddConnectedLinks(_links_out, *childLink);
+      this->AddConnectedLinks(_linksOut, *childLink);
     }
 
     if (_checkParentTree)
@@ -378,18 +379,18 @@ void JointController::AddConnectedLinks(std::vector<LinkPtr> &_links_out,
       // catch additional roots by looping
       // through all parents of childLink,
       // but skip parent link is self (_link)
-      std::vector<LinkPtr> parentLinks = (*childLink)->GetParentJointsLinks();
-      for (std::vector<LinkPtr>::iterator parentLink = parentLinks.begin();
+      Link_V parentLinks = (*childLink)->GetParentJointsLinks();
+      for (Link_V::iterator parentLink = parentLinks.begin();
                                           parentLink != parentLinks.end();
                                           ++parentLink)
       {
         if ((*parentLink)->GetName() != _link->GetName() &&
-            !this->ContainsLink(_links_out, (*parentLink)))
+            !this->ContainsLink(_linksOut, (*parentLink)))
         {
-          _links_out.push_back(*parentLink);
+          _linksOut.push_back(*parentLink);
           // add all childrend links of parentLink, but
           // stop the recursion if any of the child link is already added
-          this->AddConnectedLinks(_links_out, *parentLink, _link);
+          this->AddConnectedLinks(_linksOut, *parentLink, _link);
         }
       }
     }

@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "rendering/ogre_gazebo.h"
 #include "rendering/Camera.hh"
-#include "OGRE/OgreRenderObjectListener.h"
 #include "sensors/SensorTypes.hh"
 
 #include "common/Event.hh"

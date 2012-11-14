@@ -21,6 +21,7 @@ http://www.gnu.org/copyleft/lesser.txt.
 --------------------------------------------------------------------------------
 */
 
+#include <algorithm>
 #include "VClouds/GeometryBlock.h"
 
 #include "VClouds/VClouds.h"
@@ -44,11 +45,11 @@ namespace SkyX { namespace VClouds
       , mBeta(Beta)
       , mRadius(Radius)
       , mPhi(Phi)
-      , mNa(Na) , mNb(Nb) , mNc(Nc)
-      , mA(A) , mB(B) , mC(C)
+      , mNa(Na), mNb(Nb), mNc(Nc)
+      , mA(A), mB(B), mC(C)
       , mPosition(Position)
-      , mDisplacement(Ogre::Vector3(0,0,0))
-      , mWorldOffset(Ogre::Vector2(0,0))
+      , mDisplacement(Ogre::Vector3(0, 0, 0))
+      , mWorldOffset(Ogre::Vector2(0, 0))
       , mCamera(0)
       , mLastFallingDistance(0)
   {
@@ -118,7 +119,7 @@ namespace SkyX { namespace VClouds
 
   const Ogre::AxisAlignedBox GeometryBlock::_buildAABox(const float& fd) const
   {
-    Ogre::Vector2 Center = Ogre::Vector2(0,0);
+    Ogre::Vector2 Center = Ogre::Vector2(0, 0);
     Ogre::Vector2 V1     = mRadius *
       Ogre::Vector2(Ogre::Math::Cos(mPhi*mPosition),
           Ogre::Math::Sin(mPhi*mPosition));
@@ -135,9 +136,9 @@ namespace SkyX { namespace VClouds
 
     return Ogre::AxisAlignedBox(
         // Min x,y,z
-        Min.x, Min.y, -std::max<float>(fd,0),
+        Min.x, Min.y, -std::max<float>(fd, 0),
         // Max x,y,z
-        Max.x, Max.y, mHeight - std::min<float>(fd,0));
+        Max.x, Max.y, mHeight - std::min<float>(fd, 0));
   }
 
   void GeometryBlock::_calculateDataSize()
@@ -188,7 +189,7 @@ namespace SkyX { namespace VClouds
 
     vbind->setBinding(0, mVertexBuffer);
 
-    unsigned short *indexbuffer = new unsigned short[mNumberOfTriangles*3];
+    uint16_t *indexbuffer = new uint16_t[mNumberOfTriangles*3];
 
     int IndexOffset = 0;
     int VertexOffset = 0;
@@ -307,7 +308,7 @@ namespace SkyX { namespace VClouds
       (mEntity->getParentSceneNode()->_getDerivedPosition().z-
        c->getDerivedPosition().z);
 
-    if (mVClouds->getDistanceFallingParams().y > 0) // -1 means no max falling
+    if (mVClouds->getDistanceFallingParams().y > 0)  // -1 means no max falling
     {
       if (fallingDistance > 0)
       {
@@ -370,7 +371,7 @@ namespace SkyX { namespace VClouds
   {
     int VertexOffset = n*4;
 
-    // TODO, calculate constants by zone, not by slice
+    // TODO calculate constants by zone, not by slice
     float Radius = mB+((mC-mB)/mNc)*(mNc-n);
 
     Radius += mDisplacement.z;
@@ -514,9 +515,9 @@ namespace SkyX { namespace VClouds
     float fallingDistance = mVClouds->getDistanceFallingParams().x*
       (mEntity->getParentSceneNode()->_getDerivedPosition().z-
        mCamera->getDerivedPosition().z)*
-      (Ogre::Vector2(p.x,p.z).length()/mRadius);
+      (Ogre::Vector2(p.x, p.z).length()/mRadius);
 
-    if (mVClouds->getDistanceFallingParams().y > 0) // -1 means no max falling
+    if (mVClouds->getDistanceFallingParams().y > 0)  // -1 means no max falling
     {
       if (fallingDistance > 0)
       {
@@ -548,18 +549,18 @@ namespace SkyX { namespace VClouds
 
     // Noise coords
     float noise_scale = mVClouds->getNoiseScale()/mRadius;
-    float xz_length_radius = Ogre::Vector2(p.x,p.z).length() / mRadius;
+    float xz_length_radius = Ogre::Vector2(p.x, p.z).length() / mRadius;
     Ogre::Vector3 origin = Ogre::Vector3(0,
         -(mEntity->getParentSceneNode()->_getDerivedPosition().y-
           mCamera->getDerivedPosition().y) -mRadius*(0.5f+0.5f*
-          Ogre::Vector2(p.x,p.z).length()/mRadius),0);
+          Ogre::Vector2(p.x, p.z).length()/mRadius), 0);
 
     Ogre::Vector3 dir = (p-origin).normalisedCopy();
     float hip = Ogre::Math::Sqrt(
         Ogre::Math::Pow(xz_length_radius * mRadius, 2) +
         Ogre::Math::Pow(origin.y, 2));
 
-    Ogre::Vector3 uv = dir*hip; // Only x/z, += origin doesn't need
+    Ogre::Vector3 uv = dir*hip;  // Only x/z, += origin doesn't need
     mVertices[index].u = (uv.x+mWorldOffset.x)*noise_scale;
     mVertices[index].v = (uv.z+mWorldOffset.y)*noise_scale;
 
