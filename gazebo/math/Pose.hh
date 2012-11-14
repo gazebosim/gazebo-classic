@@ -37,6 +37,9 @@ namespace gazebo
     /// \brief Encapsulates a position and rotation in three space
     class Pose
     {
+      /// \brief math::Pose(0, 0, 0, 0, 0, 0)
+      public: static const Pose Zero;
+
       /// \brief Default constructors
       public: Pose();
 
