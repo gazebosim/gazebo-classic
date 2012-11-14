@@ -101,7 +101,7 @@ namespace gazebo
       /// \brief Turn contact recording on or off
       public: void SetContactsEnabled(bool _enable);
 
-      /// \brief Return true of contact recording is on
+      /// \brief Return true if contact recording is on
       public: bool GetContactsEnabled() const;
 
       /// \brief Add an occurance of a contact to this collision
