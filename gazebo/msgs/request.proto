@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Request
 /// \brief A message containing a string request
-/// \verbatim
+
 
 message Request
 {
@@ -13,4 +13,4 @@ message Request
   optional double dbl_data  = 4;
 }
 
-/// \endverbatim
+

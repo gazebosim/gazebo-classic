@@ -29,12 +29,14 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    /// \TODO This class inherits from Sensor, but looks like it specifically 
-    ///       doesn't override any methods, is this intentional? i.e. LoadChild 
-    ///       instead of Load, InitChild instead of Init
-    /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
+    /// \TODO This class inherits from Sensor, but looks like it specifically
+    /// doesn't override any methods, is this intentional? i.e. LoadChild
+    /// instead of Load, InitChild instead of Init
+
     /// \addtogroup gazebo_sensors
     /// \{
+
+    /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \brief An IMU sensor
     class ImuSensor: public Sensor
     {
@@ -50,7 +52,7 @@ namespace gazebo
       protected: virtual void LoadChild(XMLConfigNode *_node);
 
       /// \brief Save the sensor info in XML format
-      /// \param _prefix 
+      /// \param _prefix
       /// \param _stream
       /// \TODO Nate fill in
       protected: virtual void SaveChild(std::string &_prefix,
@@ -79,4 +81,3 @@ namespace gazebo
   }
 }
 #endif
-

@@ -166,6 +166,9 @@ math::Box ODECollision::GetBoundingBox() const
 
   memset(aabb, 0, 6 * sizeof(dReal));
 
+  if (this->collisionId == NULL)
+    printf("HOW IS THIS NULL\n");
+
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 

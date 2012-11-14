@@ -55,12 +55,11 @@ namespace gazebo
       /// \brief Set the axis of motion
       public: virtual void SetAxis(int index, const math::Vector3 &axis);
 
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      /// \copydoc ScrewJoint::SetDamping
+      public: virtual void SetDamping(int _index, double _damping);
 
-      /// \brief Set screw joint thread pitch
-      public: virtual void SetThreadPitch(int index,
-                                          const double _thread_pitch);
+      /// \copydoc ScrewJoint::SetThreadPitch
+      public: virtual void SetThreadPitch(int _index, double _threadPitch);
 
       /// \brief callback to apply damping force to joint
       public: void ApplyDamping();

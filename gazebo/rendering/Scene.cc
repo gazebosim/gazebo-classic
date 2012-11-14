@@ -581,9 +581,10 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Scene::SelectVisual(const std::string &_name)
+void Scene::SelectVisual(const std::string &_name, const std::string &_mode)
 {
   this->selectedVis = this->GetVisual(_name);
+  this->selectionMode = _mode;
 }
 
 //////////////////////////////////////////////////
@@ -1361,7 +1362,7 @@ void Scene::PreRender()
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      if (!this->selectedVis ||
+      if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
@@ -1386,7 +1387,7 @@ void Scene::PreRender()
       if (iter2 != this->visuals.end())
       {
         // If an object is selected, don't let the physics engine move it.
-        if (!this->selectedVis ||
+        if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
         {
           math::Pose pose = msgs::Convert(pose_msg);
@@ -1435,7 +1436,7 @@ void Scene::PreRender()
 
   if (this->selectionMsg)
   {
-    this->SelectVisual(this->selectionMsg->name());
+    this->SelectVisual(this->selectionMsg->name(), "normal");
     this->selectionMsg.reset();
   }
 }

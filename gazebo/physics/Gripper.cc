@@ -171,9 +171,9 @@ void Gripper::HandleAttach()
         math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
           this->palmLink->GetWorldPose();
 
-        double dd = (diff - prevDiff).pos.GetSquaredLength();
+        double dd = (diff - this->prevDiff).pos.GetSquaredLength();
 
-        prevDiff = diff;
+        this->prevDiff = diff;
 
         this->diffs[this->diffIndex] = dd;
         double var = math::variance<double>(this->diffs);

@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Contact
 /// \brief Contact message for passing info between two entities
-/// \verbatim
+
 
 import "vector3d.proto";
 
@@ -16,4 +16,4 @@ message Contact
   repeated Vector3d normal   = 4;
   repeated double depth      = 5;
 }
-/// \endverbatim
+

@@ -85,7 +85,7 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetDamping(int /*_index*/, const double _damping)
+void ODEUniversalJoint::SetDamping(int /*_index*/, double _damping)
 {
   dJointSetDamping(this->jointId, _damping);
 }

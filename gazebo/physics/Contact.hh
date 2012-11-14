@@ -19,14 +19,14 @@
  * Date: 10 Nov 2009
  */
 
-#ifndef CONTACT_HH
-#define CONTACT_HH
+#ifndef _CONTACT_HH_
+#define _CONTACT_HH_
 
 #include <vector>
 
-#include "common/Time.hh"
-#include "math/Vector3.hh"
-#include "JointFeedback.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/JointFeedback.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
@@ -43,40 +43,54 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class Contact Contact.hh physics/physics.hh
     /// \brief A contact between two collisions. Each contact can consist of
-    ///        a numnber of contact points
+    /// a number of contact points
     class Contact
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       public: Contact();
 
       /// \brief Copy constructor
-      public: Contact(const Contact &c);
+      /// \param[in] _contact Contact to copy.
+      public: Contact(const Contact &_contact);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~Contact();
 
-      /// \brief Clone the contact
-      public: Contact Clone() const;
+      /// \brief Deprecated
+      public: Contact Clone() const GAZEBO_DEPRECATED;
 
-      /// \brief Operator =
-      public: Contact &operator =(const Contact &contact);
+      /// \brief Operator =.
+      /// \param[in] _contact Contact to copy.
+      /// \return Reference to this contact
+      public: Contact &operator =(const Contact &_contact);
 
-      /// \brief Reset
+      /// \brief Reset to default values.
       public: void Reset();
 
+      /// \brief Pointer to the first collision in the contact.
       public: Collision *collision1;
+
+      /// \brief Pointer to the second collision in the contact.
       public: Collision *collision2;
 
+      /// \brief Array of forces for the contact.
       public: JointFeedback forces[MAX_CONTACT_JOINTS];
 
+      /// \brief Array of force positions.
       public: math::Vector3 positions[MAX_CONTACT_JOINTS];
+
+      /// \brief Array of force normals.
       public: math::Vector3 normals[MAX_CONTACT_JOINTS];
 
+      /// \brief Array of contact depths
       public: double depths[MAX_CONTACT_JOINTS];
 
+      /// \brief Length of all the arrays.
       public: int count;
 
+      /// \brief Time at which the contact occured.
       public: common::Time time;
     };
     /// \}

@@ -610,14 +610,15 @@ const sdf::ElementPtr Actor::GetSDF()
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
-            double mass, double radius)
+void Actor::AddSphereInertia(sdf::ElementPtr _linkSdf,
+                             const math::Pose &_pose,
+                             double _mass, double _radius)
 {
-  double ixx = 2.0 * mass * radius * radius / 5.0;
-  sdf::ElementPtr inertialSdf = linkSdf->GetElement("inertial");
+  double ixx = 2.0 * _mass * _radius * _radius / 5.0;
+  sdf::ElementPtr inertialSdf = _linkSdf->GetElement("inertial");
   sdf::ElementPtr inertialPoseSdf = inertialSdf->GetElement("pose");
-  inertialPoseSdf->Set(pose);
-  inertialSdf->GetElement("mass")->Set(mass);
+  inertialPoseSdf->Set(_pose);
+  inertialSdf->GetElement("mass")->Set(_mass);
   sdf::ElementPtr tensorSdf = inertialSdf->GetElement("inertia");
   tensorSdf->GetElement("ixx")->Set(ixx);
   tensorSdf->GetElement("ixy")->Set(0.00);
@@ -628,60 +629,64 @@ void Actor::AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereCollision(sdf::ElementPtr linkSdf, std::string name,
-            math::Pose pose, double radius)
+void Actor::AddSphereCollision(sdf::ElementPtr _linkSdf,
+                               const std::string &_name,
+                               const math::Pose &_pose,
+                               double _radius)
 {
-  sdf::ElementPtr collisionSdf = linkSdf->GetElement("collision");
-  collisionSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr collisionSdf = _linkSdf->GetElement("collision");
+  collisionSdf->GetAttribute("name")->Set(_name);
   sdf::ElementPtr collPoseSdf = collisionSdf->GetElement("pose");
-  collPoseSdf->Set(pose);
+  collPoseSdf->Set(_pose);
   sdf::ElementPtr geomColSdf = collisionSdf->GetElement("geometry");
   sdf::ElementPtr sphereColSdf = geomColSdf->GetElement("sphere");
-  sphereColSdf->GetElement("radius")->Set(radius);
+  sphereColSdf->GetElement("radius")->Set(_radius);
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
-            math::Pose pose, double radius, std::string material, Color ambient)
+void Actor::AddSphereVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
+            const math::Pose &_pose, double _radius,
+            const std::string &_material, const common::Color &_ambient)
 {
-  sdf::ElementPtr visualSdf = linkSdf->GetElement("visual");
-  visualSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr visualSdf = _linkSdf->GetElement("visual");
+  visualSdf->GetAttribute("name")->Set(_name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
-  visualPoseSdf->Set(pose);
+  visualPoseSdf->Set(_pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
   sdf::ElementPtr sphereVisSdf = geomVisSdf->GetElement("sphere");
-  sphereVisSdf->GetElement("radius")->Set(radius);
+  sphereVisSdf->GetElement("radius")->Set(_radius);
   sdf::ElementPtr matSdf = visualSdf->GetElement("material");
-  matSdf->GetElement("script")->Set(material);
+  matSdf->GetElement("script")->Set(_material);
   sdf::ElementPtr colorSdf = matSdf->GetElement("ambient");
-  colorSdf->Set(ambient);
+  colorSdf->Set(_ambient);
 }
 
 //////////////////////////////////////////////////
-void Actor::AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
-    math::Pose pose, math::Vector3 size, std::string material, Color ambient)
+void Actor::AddBoxVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
+    const math::Pose &_pose, const math::Vector3 &_size,
+    const std::string &_material, const common::Color &_ambient)
 {
-  sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
-  visualSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
+  visualSdf->GetAttribute("name")->Set(_name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
-  visualPoseSdf->Set(pose);
+  visualPoseSdf->Set(_pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
   sdf::ElementPtr boxSdf = geomVisSdf->GetElement("box");
-  boxSdf->GetElement("size")->Set(size);
+  boxSdf->GetElement("size")->Set(_size);
   sdf::ElementPtr matSdf = visualSdf->GetElement("material");
-  matSdf->GetElement("script")->Set(material);
+  matSdf->GetElement("script")->Set(_material);
   sdf::ElementPtr colorSdf = matSdf->GetElement("ambient");
-  colorSdf->Set(ambient);
+  colorSdf->Set(_ambient);
 }
 
 //////////////////////////////////////////////////
-void Actor::AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
-    math::Pose pose)
+void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
+                           const math::Pose &_pose)
 {
-  sdf::ElementPtr visualSdf = linkSdf->AddElement("visual");
-  visualSdf->GetAttribute("name")->Set(name);
+  sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
+  visualSdf->GetAttribute("name")->Set(_name);
   sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
-  visualPoseSdf->Set(pose);
+  visualPoseSdf->Set(_pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetElement("mesh");
   meshSdf->GetElement("filename")->Set(this->skinFile);

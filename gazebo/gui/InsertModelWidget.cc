@@ -135,7 +135,7 @@ void InsertModelWidget::ConnectToModelDatabase()
   std::map<std::string, std::string> models =
     common::ModelDatabase::GetModels();
 
-  if (models.size() > 0)
+  if (!models.empty())
   {
     // Create a top-level tree item for the path
     QTreeWidgetItem *topItem =

@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface WorldReset 
 /// \brief A message that controls how the world is reset
-/// \verbatim
+
 
 import "header.proto";
 
@@ -14,4 +14,4 @@ message WorldReset
   optional bool model_only   = 3[default = false];
 }
 
-/// \endverbatim
+

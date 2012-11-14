@@ -22,7 +22,6 @@
 
 #include "gui/Actions.hh"
 #include "gui/Gui.hh"
-#include "gui/JointControlWidget.hh"
 #include "gui/ModelRightMenu.hh"
 
 using namespace gazebo;
@@ -85,11 +84,6 @@ ModelRightMenu::ModelRightMenu()
   // this->showCOMAction->setCheckable(true);
   // connect(this->showCOMAction, SIGNAL(triggered()), this,
   //         SLOT(OnShowCOM()));
-
-  this->jointControlAction = new QAction(tr("Control Joints"), this);
-  this->jointControlAction->setStatusTip(tr("Control the model's Joints"));
-  connect(this->jointControlAction, SIGNAL(triggered()), this,
-          SLOT(OnJointControl()));
 }
 
 /////////////////////////////////////////////////
@@ -113,7 +107,6 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   // menu.addAction(this->transparentAction);
   // menu.addAction(this->skeletonAction);
   menu.addAction(g_deleteAct);
-  menu.addAction(this->jointControlAction);
 
   // if (this->transparentActionState[this->modelName])
   //   this->transparentAction->setChecked(true);
@@ -248,11 +241,4 @@ void ModelRightMenu::OnDelete(const std::string &_name)
     this->requestMsg = msgs::CreateRequest("entity_delete", name);
     this->requestPub->Publish(*this->requestMsg);
   }
-}
-
-/////////////////////////////////////////////////
-void ModelRightMenu::OnJointControl()
-{
-  JointControlWidget *jc = new JointControlWidget(this->modelName);
-  jc->show();
 }

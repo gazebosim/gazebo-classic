@@ -3,7 +3,6 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs Messages
 /// \interface Axis
 /// \brief msgs::Joint axis message
-/// \verbatim
 
 import "vector3d.proto";
 
@@ -17,5 +16,3 @@ message Axis
   required double damping        = 6;
   required double friction       = 7;
 }
-
-/// \endverbatim

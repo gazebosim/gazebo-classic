@@ -34,9 +34,9 @@
 #include <math.h>
 #include <iostream>
 
-#include "transport/transport.h"
-#include "msgs/msgs.h"
-#include "math/gzmath.h"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/math/gzmath.hh"
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
 

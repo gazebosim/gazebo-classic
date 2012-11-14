@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Projector 
 /// \brief Information about a projector
-/// \verbatim
+
 
 import "pose.proto";
 
@@ -17,4 +17,4 @@ message Projector
   optional double far_clip      = 6[default=10.0];
   optional bool enabled         = 7[default=true];
 }
-/// \endverbatim
+

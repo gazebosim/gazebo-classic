@@ -31,6 +31,7 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   JointControlWidget.cc
+  ToolsWidget.cc
 )
 
 set (qt_headers
@@ -44,6 +45,7 @@ set (qt_headers
   ModelEditWidget.hh
   ModelRightMenu.hh
   JointControlWidget.hh
+  ToolsWidget.hh
 )
 
 set (headers

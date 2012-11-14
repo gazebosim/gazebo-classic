@@ -73,6 +73,12 @@ namespace gazebo
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int _index, double _t);
 
+      /// \brief Set the high stop of an axis(index).
+      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+
+      /// \brief Set the low stop of an axis(index).
+      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+
       /// \brief Get the angle of rotation of an axis(index)
       public: virtual math::Angle GetAngle(int _index) const;
 

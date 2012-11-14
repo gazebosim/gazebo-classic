@@ -308,8 +308,44 @@ bool Param::Get(gazebo::math::Pose &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a pose\n";
-    return false;
+    // used by plugin parameters, they are all labeled string, but
+    // nice to be able to get them as something else.
+    std::string val_str = this->GetAsString();
+    std::vector<double> elements;
+    std::vector<std::string> pieces;
+    boost::split(pieces, val_str, boost::is_any_of(" "));
+    if (pieces.size() != 6)
+    {
+      gzerr <<
+        "string does not have 6 pieces to parse into Pose, using 0s\n";
+      return false;
+    }
+    else
+    {
+      for (unsigned int i = 0; i < pieces.size(); ++i)
+      {
+        if (pieces[i] != "")
+        {
+          try
+          {
+            elements.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
+          }
+          catch(boost::bad_lexical_cast &e)
+          {
+            gzerr << "value ["
+                  << pieces[i]
+                  << "] is not a valid double for Pose[" << i << "]\n";
+            return false;
+          }
+        }
+      }
+      _value.pos.x = elements[0];
+      _value.pos.y = elements[1];
+      _value.pos.z = elements[2];
+      gazebo::math::Quaternion rpy(elements[3], elements[4], elements[5]);
+      _value.rot = rpy;
+      return true;
+    }
   }
 }
 

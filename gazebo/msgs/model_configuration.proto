@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface ModelConfiguration 
 /// \brief Message for model configuration (joint positions)
-/// \verbatim
+
 
 import "time.proto";
 import "pose.proto";
@@ -16,4 +16,4 @@ message ModelConfiguration
   optional Pose pose                        = 4; // Specify model pose
   optional string link_name                 = 5; // Option to set model pose by specifying pose of link
 }
-/// \endverbatim
+

@@ -27,7 +27,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
-
     /// \brief Load the sensor library
     /// \return True if successfully loaded, false if not
     /// \TODO Nate check

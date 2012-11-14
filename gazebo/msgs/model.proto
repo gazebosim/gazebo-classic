@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Model 
 /// \brief Information about a model
-/// \verbatim
+
 
 import "joint.proto";
 import "link.proto";
@@ -21,4 +21,4 @@ message Model
   optional bool deleted        = 7;
   repeated Visual visual       = 8;
 }
-/// \endverbatim
+

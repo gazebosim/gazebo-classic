@@ -236,17 +236,17 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
   initElem(lightNode, "specularColor", sdfLight, "specular");
 
   // attenuation
-  sdf::ElementPtr sdfAttenuation = sdfLight->GetOrCreateElement("attenuation");
+  sdf::ElementPtr sdfAttenuation = sdfLight->GetElement("attenuation");
 
   // range
   initElem(lightNode, "range", sdfAttenuation);
 
   // attenuation constants
-  sdfAttenuation->GetOrCreateElement("constant")->Set(
+  sdfAttenuation->GetElement("constant")->Set(
       getNodeTuple(lightNode, "attenuation", 0));
-  sdfAttenuation->GetOrCreateElement("linear")->Set(
+  sdfAttenuation->GetElement("linear")->Set(
       getNodeTuple(lightNode, "attenuation", 1));
-  sdfAttenuation->GetOrCreateElement("quadratic")->Set(
+  sdfAttenuation->GetElement("quadratic")->Set(
       getNodeTuple(lightNode, "attenuation", 2));
 
   // direction
@@ -255,17 +255,17 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
   // spot
   if (firstChildElement(lightNode, "sportCone"))
   {
-    sdf::ElementPtr sdfSpot = sdfLight->GetOrCreateElement("spot");
+    sdf::ElementPtr sdfSpot = sdfLight->GetElement("spot");
     double innerAngle =
       boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone", 0));
     double outerAngle =
       boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone", 1));
 
-    sdfSpot->GetOrCreateElement("inner_angle")->Set(
+    sdfSpot->GetElement("inner_angle")->Set(
         boost::lexical_cast<std::string>(GZ_DTOR(innerAngle)));
-    sdfSpot->GetOrCreateElement("outer_angle")->Set(
+    sdfSpot->GetElement("outer_angle")->Set(
         boost::lexical_cast<std::string>(GZ_DTOR(outerAngle)));
-    sdfSpot->GetOrCreateElement("falloff")->Set(
+    sdfSpot->GetElement("falloff")->Set(
         getNodeTuple(lightNode, "spotCone", 2));
   }
 
@@ -276,7 +276,7 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr sdfLight)
 bool initGripper(xmlNodePtr _config, sdf::ElementPtr &sdfGripper)
 {
   initAttr(_config, "name", sdfGripper->GetAttribute("name"));
-  sdf::ElementPtr sdfGraspCheck = sdfGripper->GetOrCreateElement("grasp_check");
+  sdf::ElementPtr sdfGraspCheck = sdfGripper->GetElement("grasp_check");
   initElem(_config, "detach_steps", sdfGraspCheck);
   initElem(_config, "attach_steps", sdfGraspCheck);
   initElem(_config, "min_countact_count", sdfGraspCheck);
@@ -290,6 +290,7 @@ bool initGripper(xmlNodePtr _config, sdf::ElementPtr &sdfGripper)
     else
       sdfGripper->AddElement("gripper_link")->Set(getValue(glink_xml));
   }
+  return true;
 }
 
 // Sensor parsing
@@ -304,7 +305,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr sdfSensor)
 
   if (std::string((const char*)_config->name) == "contact")
   {
-    sdf::ElementPtr contact = sdfSensor->GetOrCreateElement("contact");
+    sdf::ElementPtr contact = sdfSensor->GetElement("contact");
     initContact(_config, contact);
 
     if (!sdfSensor->GetAttribute("type")->SetFromString("contact"))
@@ -315,7 +316,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr sdfSensor)
   }
   else if (std::string((const char*)_config->name) == "camera")
   {
-    sdf::ElementPtr camera = sdfSensor->GetOrCreateElement("camera");
+    sdf::ElementPtr camera = sdfSensor->GetElement("camera");
     initCamera(_config, camera);
 
     // convert all camera to depth cameras so we can get point cloud if needed
@@ -327,7 +328,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr sdfSensor)
   }
   else if (std::string((const char*)_config->name) == "ray")
   {
-    sdf::ElementPtr sdfRay = sdfSensor->GetOrCreateElement("ray");
+    sdf::ElementPtr sdfRay = sdfSensor->GetElement("ray");
     initRay(_config, sdfRay);
 
     if (!sdfSensor->GetAttribute("type")->SetFromString("ray"))
@@ -345,7 +346,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr sdfSensor)
 
 bool initCamera(xmlNodePtr _config, sdf::ElementPtr sdfCamera)
 {
-  sdf::ElementPtr sdfHFOV = sdfCamera->GetOrCreateElement("horizontal_fov");
+  sdf::ElementPtr sdfHFOV = sdfCamera->GetElement("horizontal_fov");
   double hfov = boost::lexical_cast<double>(getNodeValue(_config, "hfov"));
   if (!sdfHFOV->Set(boost::lexical_cast<std::string>(GZ_DTOR(hfov))))
   {
@@ -353,7 +354,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr sdfCamera)
     return false;
   }
 
-  sdf::ElementPtr sdfImage = sdfCamera->GetOrCreateElement("image");
+  sdf::ElementPtr sdfImage = sdfCamera->GetElement("image");
 
   // parse imageSize
   std::string image_size_str = getNodeValue(_config, "imageSize");
@@ -384,20 +385,20 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr sdfCamera)
     return false;
   }
 
-  sdfImage->GetOrCreateElement("width")->Set(pieces[0]);
-  sdfImage->GetOrCreateElement("height")->Set(pieces[1]);
+  sdfImage->GetElement("width")->Set(pieces[0]);
+  sdfImage->GetElement("height")->Set(pieces[1]);
 
 
   initElem(_config, "imageFormat", sdfImage, "format");
 
-  sdf::ElementPtr sdfClip = sdfCamera->GetOrCreateElement("clip");
+  sdf::ElementPtr sdfClip = sdfCamera->GetElement("clip");
   initElem(_config, "nearClip", sdfClip, "near");
   initElem(_config, "farClip", sdfClip, "far");
 
   // save
   if (firstChildElement(_config, "saveFrames"))
   {
-    sdf::ElementPtr sdfSave = sdfCamera->GetOrCreateElement("save");
+    sdf::ElementPtr sdfSave = sdfCamera->GetElement("save");
     initAttr(_config, "saveFrames", sdfSave->GetAttribute("enabled"));
     initElem(_config, "saveFramePath", sdfSave, "path");
   }
@@ -407,10 +408,10 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr sdfCamera)
 
 bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
 {
-  sdf::ElementPtr sdfScan = sdfRay->GetOrCreateElement("scan");
+  sdf::ElementPtr sdfScan = sdfRay->GetElement("scan");
 
-  sdf::ElementPtr sdfHoriz = sdfScan->GetOrCreateElement("horizontal");
-  sdf::ElementPtr sdfVerti = sdfScan->GetOrCreateElement("vertical");
+  sdf::ElementPtr sdfHoriz = sdfScan->GetElement("horizontal");
+  sdf::ElementPtr sdfVerti = sdfScan->GetElement("vertical");
 
   initElem(_config, "rangeCount", sdfHoriz, "samples");
   initElem(_config, "verticalRangeCount", sdfVerti, "samples");
@@ -421,7 +422,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
       boost::lexical_cast<int>(getNodeValue(_config, "rangeCount"));
     int rayCount = boost::lexical_cast<int>(getNodeValue(_config, "rayCount"));
 
-    if (!sdfHoriz->GetOrCreateElement("resolution")->Set(
+    if (!sdfHoriz->GetElement("resolution")->Set(
           boost::lexical_cast<std::string>(rangeCount / rayCount)))
     {
       gzerr << "Unable to parse ray sensor rayCount\n";
@@ -441,7 +442,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
     {
       int verticalRangeCount = boost::lexical_cast<int>(vRangeCountStr);
       int verticalRayCount = boost::lexical_cast<int>(vRayCountStr);
-      if (!sdfVerti->GetOrCreateElement("resolution")->Set(
+      if (!sdfVerti->GetElement("resolution")->Set(
             boost::lexical_cast<std::string>(verticalRangeCount /
                                              verticalRayCount)))
       {
@@ -459,7 +460,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
   if (!minAngleStr.empty())
   {
     double minAngle = boost::lexical_cast<double>(minAngleStr);
-    if (!sdfHoriz->GetOrCreateElement("min_angle")->Set(
+    if (!sdfHoriz->GetElement("min_angle")->Set(
           boost::lexical_cast<std::string>(GZ_DTOR(minAngle))))
     {
       gzerr << "Unable to parse min_angle\n";
@@ -471,7 +472,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
   if (!maxAngleStr.empty())
   {
     double maxAngle = boost::lexical_cast<double>(maxAngleStr);
-    if (!sdfHoriz->GetOrCreateElement("max_angle")->Set(
+    if (!sdfHoriz->GetElement("max_angle")->Set(
           boost::lexical_cast<std::string>(GZ_DTOR(maxAngle))))
     {
       gzerr << "Unable to parse max_angle\n";
@@ -485,7 +486,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
     if (!vMinAngleStr.empty())
     {
       double verticalMinAngle = boost::lexical_cast<double>(vMinAngleStr);
-      if (!sdfVerti->GetOrCreateElement("min_angle")->Set(
+      if (!sdfVerti->GetElement("min_angle")->Set(
             boost::lexical_cast<std::string>(GZ_DTOR(verticalMinAngle))))
       {
         gzerr << "Unable to parse vertical min_angle\n";
@@ -496,7 +497,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
     if (!vMaxAngleStr.empty())
     {
       double verticalMaxAngle = boost::lexical_cast<double>(vMaxAngleStr);
-      if (!sdfVerti->GetOrCreateElement("max_angle")->Set(
+      if (!sdfVerti->GetElement("max_angle")->Set(
             boost::lexical_cast<std::string>(GZ_DTOR(verticalMaxAngle))))
       {
         gzerr << "Unable to parse vertical max_angle\n";
@@ -509,7 +510,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr sdfRay)
     gzerr << "max_angle not parsable\n";
   }
 
-  sdf::ElementPtr sdfRange = sdfRay->GetOrCreateElement("range");
+  sdf::ElementPtr sdfRange = sdfRay->GetElement("range");
   initElem(_config, "minRange", sdfRange, "min");
   initElem(_config, "maxRange", sdfRange, "max");
   initElem(_config, "resRange", sdfRange, "resolution");
@@ -571,13 +572,13 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr sdfInertial)
   poseString += "0 0 0";
 
   /// sdf 1.0 to 1.2
-  sdf::ElementPtr sdfOrigin = sdfInertial->GetOrCreateElement("pose");
+  sdf::ElementPtr sdfOrigin = sdfInertial->GetElement("pose");
   sdfOrigin->Set(poseString);
 
 
 
   initElem(_config, "mass", sdfInertial);
-  sdf::ElementPtr sdfInertia = sdfInertial->GetOrCreateElement("inertia");
+  sdf::ElementPtr sdfInertia = sdfInertial->GetElement("inertia");
   initElem(_config, "ixx", sdfInertia);
   initElem(_config, "ixy", sdfInertia);
   initElem(_config, "ixz", sdfInertia);
@@ -597,32 +598,32 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
   // Origin
   initOrigin(_config, _sdf);
 
-  sdf::ElementPtr sdfGeom = _sdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr sdfGeom = _sdf->GetElement("geometry");
   if (std::string((const char *)_config->name) == "plane")
   {
-    sdf::ElementPtr sdfPlane = sdfGeom->GetOrCreateElement("plane");
-    sdfPlane->GetOrCreateElement("normal")->Set(
+    sdf::ElementPtr sdfPlane = sdfGeom->GetElement("plane");
+    sdfPlane->GetElement("normal")->Set(
         getNodeValue(_config, "normal"));
   }
   else if (std::string((const char *)_config->name) == "box")
   {
-    sdf::ElementPtr sdfBox = sdfGeom->GetOrCreateElement("box");
-    sdfBox->GetOrCreateElement("size")->Set(getNodeValue(_config, "size"));
+    sdf::ElementPtr sdfBox = sdfGeom->GetElement("box");
+    sdfBox->GetElement("size")->Set(getNodeValue(_config, "size"));
   }
   else if (std::string((const char *)_config->name) == "sphere")
   {
-    sdf::ElementPtr sdfSphere = sdfGeom->GetOrCreateElement("sphere");
-    sdfSphere->GetOrCreateElement("radius")->Set(
+    sdf::ElementPtr sdfSphere = sdfGeom->GetElement("sphere");
+    sdfSphere->GetElement("radius")->Set(
         getNodeValue(_config, "size"));
   }
   else if (std::string((const char *)_config->name) == "cylinder")
   {
-    sdf::ElementPtr sdfCylinder = sdfGeom->GetOrCreateElement("cylinder");
+    sdf::ElementPtr sdfCylinder = sdfGeom->GetElement("cylinder");
     if (firstChildElement(_config, "size"))
     {
-      sdfCylinder->GetOrCreateElement("radius")->Set(
+      sdfCylinder->GetElement("radius")->Set(
           getNodeTuple(_config, "size", 0));
-      sdfCylinder->GetOrCreateElement("length")->Set(
+      sdfCylinder->GetElement("length")->Set(
           getNodeTuple(_config, "size", 1));
     }
   }
@@ -632,7 +633,7 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
     //   <uri></uri>
     //   <scale></scale>
     // </mesh>
-    sdf::ElementPtr sdfMesh = sdfGeom->GetOrCreateElement("mesh");
+    sdf::ElementPtr sdfMesh = sdfGeom->GetElement("mesh");
     initElem(_config, "mesh", sdfMesh, "uri");
     initElem(_config, "scale", sdfMesh);
 
@@ -644,12 +645,12 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
   //
   // parse surface properties
   //
-  sdf::ElementPtr sdfSurface = _sdf->GetOrCreateElement("surface");
+  sdf::ElementPtr sdfSurface = _sdf->GetElement("surface");
   // friction ode has mu, mu2, fdir1, slip1, slip2 attributes
   sdf::ElementPtr sdfSurfaceFriction =
-    sdfSurface->GetOrCreateElement("friction");
+    sdfSurface->GetElement("friction");
   sdf::ElementPtr sdfSurfaceFrictionOde =
-    sdfSurfaceFriction->GetOrCreateElement("ode");
+    sdfSurfaceFriction->GetElement("ode");
   // mu1 --> mu
   initElem(_config, "mu1", sdfSurfaceFrictionOde, "mu");
   // mu2 --> mu2
@@ -662,7 +663,7 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
   initElem(_config, "slip2", sdfSurfaceFrictionOde, "slip2");
 
   // bounce has restitution_coefficient and threshold attributes
-  sdf::ElementPtr sdfSurfaceBounce = sdfSurface->GetOrCreateElement("bounce");
+  sdf::ElementPtr sdfSurfaceBounce = sdfSurface->GetElement("bounce");
   // bounce --> restitution_coefficient
   initElem(_config, "bounce", sdfSurfaceBounce, "restitution_coefficient");
   // bounceVel --> threshold
@@ -670,9 +671,9 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
 
   // contact ode has soft_cfm, kp, kd, max_vel, min_depth attributes
   sdf::ElementPtr sdfSurfaceContact =
-    sdfSurface->GetOrCreateElement("contact");
+    sdfSurface->GetElement("contact");
   sdf::ElementPtr sdfSurfaceContactOde =
-    sdfSurfaceContact->GetOrCreateElement("ode");
+    sdfSurfaceContact->GetElement("ode");
   // kp --> kp
   initElem(_config, "kp", sdfSurfaceContactOde, "kp");
   // kd --> kd
@@ -701,7 +702,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
 
   // parse xyz
-  sdf::ElementPtr origin = _sdf->GetOrCreateElement("pose");
+  sdf::ElementPtr origin = _sdf->GetElement("pose");
   std::string poseStr;
 
   if (xyz_xml)
@@ -785,9 +786,9 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
     std::string value_str = getValue(tgo);
     if (lowerStr(value_str) == "true" || lowerStr(value_str) == "yes" ||
         value_str == "1")
-      sdfLink->GetOrCreateElement("gravity")->Set("false");
+      sdfLink->GetElement("gravity")->Set("false");
     else
-      sdfLink->GetOrCreateElement("gravity")->Set("true");
+      sdfLink->GetElement("gravity")->Set("true");
   }
 
   // Inertial (optional)
@@ -796,7 +797,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
   if (lowerStr(mm_str) == "true" || lowerStr(mm_str) == "yes" ||
       mm_str == "1")
   {
-    sdf::ElementPtr sdfInertial = sdfLink->GetOrCreateElement("inertial");
+    sdf::ElementPtr sdfInertial = sdfLink->GetElement("inertial");
     if (!initInertial(_config, sdfInertial))
     {
       gzerr << "Could not parse inertial element for Link '"
@@ -845,7 +846,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
       vis_pose.rot = col_pose.rot * vis_pose.rot;
 
       // update the sdf pose
-      sdfVisual->GetOrCreateElement("pose")->Set(vis_pose);
+      sdfVisual->GetElement("pose")->Set(vis_pose);
     }
     // TODO: check for duplicate geoms
   }
@@ -873,89 +874,89 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr sdfLink)
 /// _sdf = visual
 bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
-  _sdf->GetOrCreateElement("cast_shadows")->Set("true");
+  _sdf->GetElement("cast_shadows")->Set("true");
 
   initOrigin(_config, _sdf);
 
-  sdf::ElementPtr sdfGeom = _sdf->GetOrCreateElement("geometry");
+  sdf::ElementPtr sdfGeom = _sdf->GetElement("geometry");
 
   std::string mesh_attribute = getNodeValue(_config, "mesh");
   // check each mesh type
   if (mesh_attribute == "unit_box")
   {
-    sdf::ElementPtr sdfBox = sdfGeom->GetOrCreateElement("box");
+    sdf::ElementPtr sdfBox = sdfGeom->GetElement("box");
     if (firstChildElement(_config, "scale"))
     {
-      sdfBox->GetOrCreateElement("size")->Set(getNodeValue(_config, "scale"));
+      sdfBox->GetElement("size")->Set(getNodeValue(_config, "scale"));
     }
     else if (firstChildElement(_config, "size"))
     {
-      sdfBox->GetOrCreateElement("size")->Set(getNodeValue(_config, "size"));
+      sdfBox->GetElement("size")->Set(getNodeValue(_config, "size"));
     }
     else
     {
-      sdfBox->GetOrCreateElement("size")->Set("1 1 1");
+      sdfBox->GetElement("size")->Set("1 1 1");
     }
   }
   else if (mesh_attribute == "unit_sphere")
   {
-    sdf::ElementPtr sdfSphere = sdfGeom->GetOrCreateElement("sphere");
+    sdf::ElementPtr sdfSphere = sdfGeom->GetElement("sphere");
     if (firstChildElement(_config, "scale"))
     {
       // FIXME: using first elem
       double sx =
         boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0));
-      sdfSphere->GetOrCreateElement("radius")->Set(0.5*sx);
+      sdfSphere->GetElement("radius")->Set(0.5*sx);
     }
     else if (firstChildElement(_config, "size"))
     {
       // FIXME: using first elem
       double sx =
         boost::lexical_cast<double>(getNodeTuple(_config, "size", 0));
-      sdfSphere->GetOrCreateElement("radius")->Set(sx);
+      sdfSphere->GetElement("radius")->Set(sx);
     }
     else
-      sdfSphere->GetOrCreateElement("radius")->Set("1.0");
+      sdfSphere->GetElement("radius")->Set("1.0");
   }
   else if (mesh_attribute == "unit_cylinder")
   {
-    sdf::ElementPtr sdfCylinder = sdfGeom->GetOrCreateElement("cylinder");
+    sdf::ElementPtr sdfCylinder = sdfGeom->GetElement("cylinder");
 
     if (firstChildElement(_config, "scale"))
     {
       double sx =
         boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0));
-      sdfCylinder->GetOrCreateElement("radius")->Set(0.5*sx);
-      sdfCylinder->GetOrCreateElement("length")->Set(
+      sdfCylinder->GetElement("radius")->Set(0.5*sx);
+      sdfCylinder->GetElement("length")->Set(
           getNodeTuple(_config, "scale", 2));
     }
     else if (firstChildElement(_config, "size"))
     {
       double sx = boost::lexical_cast<double>(getNodeTuple(_config, "size", 0));
-      sdfCylinder->GetOrCreateElement("radius")->Set(0.5*sx);
-      sdfCylinder->GetOrCreateElement("length")->Set(
+      sdfCylinder->GetElement("radius")->Set(0.5*sx);
+      sdfCylinder->GetElement("length")->Set(
           getNodeTuple(_config, "size", 2));
     }
     else
     {
-      sdfCylinder->GetOrCreateElement("radius")->Set("1");
-      sdfCylinder->GetOrCreateElement("length")->Set("1");
+      sdfCylinder->GetElement("radius")->Set("1");
+      sdfCylinder->GetElement("length")->Set("1");
     }
   }
   else if (!mesh_attribute.empty())
   {
-    sdf::ElementPtr sdfMesh = sdfGeom->GetOrCreateElement("mesh");
-    sdfMesh->GetOrCreateElement("uri")->Set(mesh_attribute);
+    sdf::ElementPtr sdfMesh = sdfGeom->GetElement("mesh");
+    sdfMesh->GetElement("uri")->Set(mesh_attribute);
     if (firstChildElement(_config, "scale"))
     {
-      sdfMesh->GetOrCreateElement("scale")->Set(
+      sdfMesh->GetElement("scale")->Set(
           getNodeValue(_config, "scale"));
     }
   }
   else
   {
-    sdf::ElementPtr sdfPlane = sdfGeom->GetOrCreateElement("plane");
-    sdfPlane->GetOrCreateElement("normal")->Set(
+    sdf::ElementPtr sdfPlane = sdfGeom->GetElement("plane");
+    sdfPlane->GetElement("normal")->Set(
         getNodeValue(_config, "normal"));
   }
 
@@ -963,11 +964,11 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf)
   xmlNodePtr mat_xml = firstChildElement(_config, "material");
   if (mat_xml)
   {
-    sdf::ElementPtr sdfMat = _sdf->GetOrCreateElement("material");
-    sdf::ElementPtr sdfScript = sdfMat->GetOrCreateElement("script");
+    sdf::ElementPtr sdfMat = _sdf->GetElement("material");
+    sdf::ElementPtr sdfScript = sdfMat->GetElement("script");
     initElem(_config, "material", sdfScript, "name");
     /// \TODO: do we need this?  automatically found?
-    // sdf::ElementPtr sdfURI = sdfMat->GetOrCreateElement("uri");
+    // sdf::ElementPtr sdfURI = sdfMat->GetElement("uri");
     // sdfURI->Set("file://media/materials/scripts/gazebo.material");
   }
 
@@ -990,13 +991,13 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   // for rpy, which doesn't exist in old model xml
   poseStr += "0 0 0";
   /// sdf 1.0 to 1.2
-  sdf::ElementPtr origin = _sdf->GetOrCreateElement("pose");
+  sdf::ElementPtr origin = _sdf->GetElement("pose");
   origin->Set(poseStr);
 
 
   // setup parent / child links
-  sdf::ElementPtr sdfParent = _sdf->GetOrCreateElement("parent");
-  sdf::ElementPtr sdfChild = _sdf->GetOrCreateElement("child");
+  sdf::ElementPtr sdfParent = _sdf->GetElement("parent");
+  sdf::ElementPtr sdfChild = _sdf->GetElement("child");
 
   // Get Parent Link
   // parent is specified by <anchor> element in old xml
@@ -1058,14 +1059,14 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   if (firstChildElement(_config, "axis"))
   {
-    sdf::ElementPtr sdfAxis = _sdf->GetOrCreateElement("axis");
+    sdf::ElementPtr sdfAxis = _sdf->GetElement("axis");
     initElem(_config, "axis", sdfAxis, "xyz");
 
-    sdf::ElementPtr sdfDynamics = sdfAxis->GetOrCreateElement("dynamics");
+    sdf::ElementPtr sdfDynamics = sdfAxis->GetElement("dynamics");
     initElem(_config, "damping", sdfDynamics);
     initElem(_config, "friction", sdfDynamics);
 
-    sdf::ElementPtr sdfLimit = sdfAxis->GetOrCreateElement("limit");
+    sdf::ElementPtr sdfLimit = sdfAxis->GetElement("limit");
 
     // Get limit
     if (firstChildElement(_config, "lowStop"))
@@ -1074,9 +1075,9 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         boost::lexical_cast<double>(getNodeValue(_config, "lowStop"));
       if ((std::string((const char*)_config->name) == "slider") ||
           (std::string((const char*)_config->name) == "screw"))
-        sdfLimit->GetOrCreateElement("lower")->Set(stop_angle);
+        sdfLimit->GetElement("lower")->Set(stop_angle);
       else
-        sdfLimit->GetOrCreateElement("lower")->Set(GZ_DTOR(stop_angle));
+        sdfLimit->GetElement("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
@@ -1084,22 +1085,22 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
             "highStop"));
       if ((std::string((const char*)_config->name) == "slider") ||
           (std::string((const char*)_config->name) == "screw"))
-        sdfLimit->GetOrCreateElement("upper")->Set(stop_angle);
+        sdfLimit->GetElement("upper")->Set(stop_angle);
       else
-        sdfLimit->GetOrCreateElement("upper")->Set(GZ_DTOR(stop_angle));
+        sdfLimit->GetElement("upper")->Set(GZ_DTOR(stop_angle));
     }
   }
 
   if (firstChildElement(_config, "axis2"))
   {
-    sdf::ElementPtr sdfAxis = _sdf->GetOrCreateElement("axis2");
+    sdf::ElementPtr sdfAxis = _sdf->GetElement("axis2");
     initElem(_config, "axis", sdfAxis, "xyz");
 
-    sdf::ElementPtr sdfDynamics = sdfAxis->GetOrCreateElement("dynamics");
+    sdf::ElementPtr sdfDynamics = sdfAxis->GetElement("dynamics");
     initElem(_config, "damping", sdfDynamics);
     initElem(_config, "friction", sdfDynamics);
 
-    sdf::ElementPtr sdfLimit = sdfAxis->GetOrCreateElement("limit");
+    sdf::ElementPtr sdfLimit = sdfAxis->GetElement("limit");
 
     // Get limit
     if (firstChildElement(_config, "lowStop"))
@@ -1108,9 +1109,9 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
             "lowStop"));
       if ((std::string((const char*)_config->name) == "slider") ||
           (std::string((const char*)_config->name) == "screw"))
-        sdfLimit->GetOrCreateElement("lower")->Set(stop_angle);
+        sdfLimit->GetElement("lower")->Set(stop_angle);
       else
-        sdfLimit->GetOrCreateElement("lower")->Set(GZ_DTOR(stop_angle));
+        sdfLimit->GetElement("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
@@ -1118,9 +1119,9 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         boost::lexical_cast<double>(getNodeValue(_config, "highStop"));
       if ((std::string((const char*)_config->name) == "slider") ||
           (std::string((const char*)_config->name) == "screw"))
-        sdfLimit->GetOrCreateElement("upper")->Set(stop_angle);
+        sdfLimit->GetElement("upper")->Set(stop_angle);
       else
-        sdfLimit->GetOrCreateElement("upper")->Set(GZ_DTOR(stop_angle));
+        sdfLimit->GetElement("upper")->Set(GZ_DTOR(stop_angle));
     }
   }
   return true;
@@ -1189,11 +1190,11 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
     return false;
   }
 
-  sdf::ElementPtr sdfScene = _sdf->GetOrCreateElement("scene");
+  sdf::ElementPtr sdfScene = _sdf->GetElement("scene");
   initScene(firstChildElement(_config, "ogre"), sdfScene);
 
   // Get physics block
-  sdf::ElementPtr sdfPhysics = _sdf->GetOrCreateElement("physics");
+  sdf::ElementPtr sdfPhysics = _sdf->GetElement("physics");
   initPhysics(_config, sdfPhysics);
 
   // Get all model elements
@@ -1267,21 +1268,21 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr sdfPhysics)
   //   <gravity>0 0 1</gravity>
   xmlNodePtr gravityConfig = firstChildElement(physicsNode, "gravity");
   if (gravityConfig)
-    sdfPhysics->GetOrCreateElement("gravity")->Set(
+    sdfPhysics->GetElement("gravity")->Set(
       getNodeValue(gravityConfig, "xyz"));
 
   //   <ode>
-  sdf::ElementPtr sdfODE = sdfPhysics->GetOrCreateElement("ode");
+  sdf::ElementPtr sdfODE = sdfPhysics->GetElement("ode");
 
   //    <solver>
-  sdf::ElementPtr sdfODESolver = sdfODE->GetOrCreateElement("solver");
+  sdf::ElementPtr sdfODESolver = sdfODE->GetElement("solver");
 
   initElem(physicsNode, "stepType",  sdfODESolver, "type");
   initElem(physicsNode, "stepTime",  sdfODESolver, "dt");
   initElem(physicsNode, "stepIters", sdfODESolver, "iters");
   initElem(physicsNode, "stepW",     sdfODESolver, "sor");
 
-  sdf::ElementPtr sdfODEConstraints = sdfODE->GetOrCreateElement("constraints");
+  sdf::ElementPtr sdfODEConstraints = sdfODE->GetElement("constraints");
   initElem(physicsNode, "cfm", sdfODEConstraints);
   initElem(physicsNode, "erp", sdfODEConstraints);
   initElem(physicsNode, "contactMaxCorrectingVel",
@@ -1336,7 +1337,7 @@ bool initElem(xmlNodePtr _config, const std::string &_config_key,
   xmlNodePtr config = firstChildElement(_config, _config_key);
   if (config)
   {
-    _sdf->GetOrCreateElement(_sdf_key)->Set(getValue(config));
+    _sdf->GetElement(_sdf_key)->Set(getValue(config));
     return false;
   }
   else

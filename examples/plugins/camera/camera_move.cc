@@ -15,8 +15,8 @@
  *
 */
 #include <boost/bind.hpp>
-#include "gazebo.hh"
-#include "physics/physics.h"
+#include "gazebo/gazebo.hh"
+#include "gazebo/physics/physics.hh"
 
 namespace gazebo
 {

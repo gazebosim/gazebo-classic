@@ -57,12 +57,14 @@ namespace gazebo
   class SensorPlugin;
   class GUIPlugin;
   class SystemPlugin;
+  class VisualPlugin;
 
   typedef boost::shared_ptr<WorldPlugin> WorldPluginPtr;
   typedef boost::shared_ptr<ModelPlugin> ModelPluginPtr;
   typedef boost::shared_ptr<SensorPlugin> SensorPluginPtr;
   typedef boost::shared_ptr<GUIPlugin> GUIPluginPtr;
   typedef boost::shared_ptr<SystemPlugin> SystemPluginPtr;
+  typedef boost::shared_ptr<VisualPlugin> VisualPluginPtr;
 
   namespace common
   {
@@ -75,6 +77,7 @@ namespace gazebo
     class NumericAnimation;
     class Animation;
     class Color;
+    class SkeletonAnimation;
 
     template <typename T>
     class ParamT;
