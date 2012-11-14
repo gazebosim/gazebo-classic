@@ -54,6 +54,8 @@ namespace gazebo
 {
   namespace rendering
   {
+    class WireBox;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -518,7 +520,11 @@ namespace gazebo
       /// \brief True to use RT shader system
       private: bool useRTShader;
 
+      /// \brief True if initialized.
       private: bool initialized;
+
+      /// \brief A wire frame bounding box.
+      private: WireBox *boundingBox;
     };
     /// \}
   }

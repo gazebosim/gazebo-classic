@@ -15,28 +15,30 @@
  *
 */
 
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/WireBox.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-WireBoundingBox::WireBoundingBox(const math::Box &_box)
+WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
 {
-  this->lines = new DynamicLines();
+  this->parent = _parent;
+  this->lines = new DynamicLines(RENDERING_LINE_LIST);
   this->lines->setMaterial("BaseWhiteNoLighting");
 
   this->Init(_box);
 }
 
 /////////////////////////////////////////////////
-WireBoundingBox::~WireBoundingBox()
+WireBox::~WireBox()
 {
   delete this->lines;
 }
 
 /////////////////////////////////////////////////
-void WireBoundingBox::Init(const math::Box &_box)
+void WireBox::Init(const math::Box &_box)
 {
   math::Vector3 max = _box.max;
   math::Vector3 min = _box.min;
@@ -90,4 +92,13 @@ void WireBoundingBox::Init(const math::Box &_box)
   // line 11
   this->lines->AddPoint(min.x, min.y, max.z);
   this->lines->AddPoint(max.x, min.y, max.z);
+
+  this->parent->AttachObject(this->lines);
+  this->lines->Update();
+}
+
+/////////////////////////////////////////////////
+void WireBox::SetVisible(bool _visible)
+{
+  this->lines->setVisible(_visible);
 }

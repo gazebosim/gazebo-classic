@@ -26,6 +26,7 @@
 #include "common/Events.hh"
 #include "common/Common.hh"
 
+#include "rendering/WireBox.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
@@ -47,6 +48,7 @@ using namespace rendering;
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
@@ -81,6 +83,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
@@ -116,6 +119,8 @@ Visual::~Visual()
 
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender(this->preRenderConnection);
+
+  delete this->boundingBox;
 
   // delete instance from lines vector
   /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
@@ -1076,73 +1081,20 @@ void Visual::SetTransparency(float _trans)
 //////////////////////////////////////////////////
 void Visual::SetHighlighted(bool _highlighted)
 {
-  this->sceneNode->showBoundingBox(_highlighted);
-  /*
-  if (this->GetAttachedObjectCount() > 0)
-    */
-
-/* TODO: This code will cause objects that use the same mesh to be
- * highlighted. Using the same mesh is good for performance. We need to come
- * up with a better way to highlight objects, possibly by attaching
- * a special visual to selected objects.
-  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  if (_highlighted)
   {
-    Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+    math::Box box = this->GetBoundingBox() - this->GetWorldPose().pos;
+    if (!this->boundingBox)
+      this->boundingBox = new WireBox(shared_from_this(), box);
+    else
+      this->boundingBox->Init(box);
 
-    entity = dynamic_cast<Ogre::Entity*>(obj);
-
-    if (!entity)
-      continue;
-
-    // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
-    {
-      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
-      Ogre::MaterialPtr material = subEntity->getMaterial();
-
-      unsigned int techniqueCount;
-      Ogre::Technique *technique;
-      Ogre::Pass *pass;
-      Ogre::ColourValue dc;
-
-      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-          techniqueCount++)
-      {
-        technique = material->getTechnique(techniqueCount);
-        if (_highlighted)
-        {
-          pass = technique->createPass();
-          pass->setName("highlight");
-          pass->setDiffuse(
-              Conversions::Convert(common::Color(0.8, 0.8, 0.8, 0.8)));
-          pass->setSelfIllumination(
-              Conversions::Convert(common::Color(0.8, 0.8, 0.8)));
-          pass->setDepthBias(0.2, 0.1);
-
-          pass->setDepthWriteEnabled(false);
-          pass->setDepthCheckEnabled(true);
-          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-        }
-        else
-        {
-          for (unsigned int k = 0; k < technique->getNumPasses(); ++k)
-          {
-            if (technique->getPass(k)->getName() == "highlight")
-            {
-              technique->removePass(k);
-            }
-          }
-        }
-      }
-    }
+    this->boundingBox->SetVisible(true);
   }
-  */
-
-  /*for (unsigned int i = 0; i < this->children.size(); ++i)
+  else if (this->boundingBox)
   {
-    this->children[i]->SetHighlighted(_highlighted);
-  }*/
+    this->boundingBox->SetVisible(false);
+  }
 }
 
 //////////////////////////////////////////////////

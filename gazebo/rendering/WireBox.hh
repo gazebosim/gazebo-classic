@@ -14,31 +14,48 @@
  * limitations under the License.
  *
 */
-#ifndef _WIREBOUNDINGBOX_HH_
-#define _WIREBOUNDINGBOX_HH_
+#ifndef _WIREBOX_HH_
+#define _WIREBOX_HH_
 
 #include <string>
+
 #include "gazebo/math/Box.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class WireBoundingBox
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \class WireBox WireBox.hh rendering/rendering.hh
+    /// \brief Draws a wireframe box.
+    class WireBox
     {
       /// \brief Constructor
-      public: explicit WireBoundingBox(const math::Box &_box);
+      /// \param[in] _box Dimenision of the box to draw.
+      public: explicit WireBox(VisualPtr _parent, const math::Box &_box);
 
-      /// \brief Destructor
-      public: ~WireBoundingBox();
+      /// \brief Destructor.
+      public: ~WireBox();
 
       /// \brief Builds the wireframe line list.
-      /// \param[in] _box Bounding box to build a wireframe from.
+      /// \param[in] _box Box to build a wireframe from.
       public: void Init(const math::Box &_box);
 
+      /// \brief Set the visibility of the box.
+      /// \param[in] _visible True to make the box visible, False to hide.
+      public: void SetVisible(bool _visible);
+
+      /// \brief The lines which outline the box.
       private: DynamicLines *lines;
+
+      /// \brief The visual which this box is attached to.
+      private: VisualPtr parent;
     };
+    /// \}
   }
 }
 #endif

@@ -610,12 +610,13 @@ void GLWidget::OnMouseReleaseTranslate()
     {
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
-      event::Events::setSelectedEntity("", "normal");
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
   }
-
-  this->scene->SelectVisual("", "normal");
+  else
+  {
+    event::Events::setSelectedEntity("", "normal");
+  }
 }
 
 //////////////////////////////////////////////////
