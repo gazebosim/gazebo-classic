@@ -34,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \class Logplay Logplay.hh common/common.hh
-    /// \brief Open and playback log files that were recorded using LogWrite.
+    /// \brief Open and playback log files that were recorded using LogRecord.
     ///
     /// Use Logplay to open a log file (Logplay::Open), and access the
     /// recorded state information. Iterators are available to step through
@@ -42,7 +42,7 @@ namespace gazebo
     /// World using the Play functions. Replay involves reading and applying
     /// state information to a World.
     ///
-    /// \sa LogWrite, State
+    /// \sa LogRecord, State
     class LogPlay : public SingletonT<LogPlay>
     {
       /// \brief Constructor

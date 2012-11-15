@@ -90,7 +90,7 @@ void gazebo::run()
 /////////////////////////////////////////////////
 void gazebo::stop()
 {
-  common::LogWrite::Instance()->Stop();
+  common::LogRecord::Instance()->Stop();
   gazebo::transport::stop();
 }
 
@@ -98,7 +98,7 @@ void gazebo::stop()
 void gazebo::fini()
 {
   boost::mutex::scoped_lock lock(fini_mutex);
-  common::LogWrite::Instance()->Stop();
+  common::LogRecord::Instance()->Stop();
   g_plugins.clear();
   gazebo::transport::fini();
 }

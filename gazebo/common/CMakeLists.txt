@@ -14,7 +14,7 @@ set (sources
   Image.cc
   KeyFrame.cc
   LogPlay.cc
-  LogWrite.cc
+  LogRecord.cc
   Material.cc
   Mesh.cc
   MeshLoader.cc
@@ -45,7 +45,7 @@ set (headers
   Image.hh 
   KeyFrame.hh
   LogPlay.hh
-  LogWrite.hh
+  LogRecord.hh
   Material.hh
   Mesh.hh
   MeshLoader.hh

@@ -20,7 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
-#include "gazebo/common/LogWrite.hh"
+#include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -176,7 +176,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
-  gazebo::common::LogWrite::Instance()->Init("gui");
+  gazebo::common::LogRecord::Instance()->Init("gui");
 
   if (!parse_args(_argc, _argv))
     return false;
