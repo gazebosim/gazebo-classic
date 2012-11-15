@@ -40,11 +40,11 @@ namespace gazebo
     ///        functions.
     /// \{
 
-    /// \brief Not a number
+    /// \brief Returns the representation of a quiet not a number (NAN)
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
 
-    /// \brief TODO Nate: type int has no quiet_NaN ... what does this 0 mean?
-    static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
+    /// \brief Returns the representation of a quiet not a number (NAN)
+    static const int NAN_I = std::numeric_limits<int>::quiet_NaN();
 
     /// \brief simple clamping function
     /// \param[in] _v value

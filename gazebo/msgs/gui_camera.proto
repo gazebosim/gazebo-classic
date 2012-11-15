@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface GUICamera 
 /// \brief Message for a GUI Camera
-/// \verbatim
+
 
 
 import "pose.proto";
@@ -17,4 +17,4 @@ message GUICamera
   optional TrackVisual track            = 4;
 }
 
-/// \endverbatim
+

@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface ServerControl
 /// \brief A message that allows for control of the server functions
-/// \verbatim
+
 
 import "header.proto";
 
@@ -15,4 +15,4 @@ message ServerControl
   optional bool new_world         = 4;
 }
 
-/// \endverbatim
+
