@@ -232,13 +232,12 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  this->lastMeasurementTime = this->world->GetSimTime();
-
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->laserShape->Update();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
   // moving this behind laserShap update
   this->mutex->lock();
