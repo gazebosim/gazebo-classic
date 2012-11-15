@@ -50,7 +50,7 @@ namespace gazebo
       public: virtual ~Collision();
 
       /// \brief Finalize the collision.
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Load the collision.
       /// \param[in] _sdf SDF to load from.

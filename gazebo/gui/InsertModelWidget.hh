@@ -18,6 +18,7 @@
 #define INSERT_MODEL_WIDGET_HH
 
 #include <string>
+#include <map>
 #include "gui/qt.h"
 
 class QTreeWidget;
@@ -38,12 +39,19 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~InsertModelWidget();
 
-      private: void ConnectToModelDatabase();
+      /// \brief Callback triggered when the ModelDatabase has returned
+      /// the list of models.
+      /// \param[in] _models The map of all models in the database.
+      private: void OnModels(
+                   const std::map<std::string, std::string> &_models);
 
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
       private: QTreeWidget *fileTreeWidget;
+
+      /// \brief Tree item that is populated with models from the ModelDatabase.
+      private: QTreeWidgetItem *modelDatabaseItem;
     };
   }
 }

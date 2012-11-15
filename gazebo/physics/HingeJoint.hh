@@ -19,11 +19,11 @@
  * Date: 21 May 2003
  */
 
-#ifndef HINGEJOINT_HH
-#define HINGEJOINT_HH
+#ifndef _HINGEJOINT_HH_
+#define _HINGEJOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -48,10 +48,10 @@ namespace gazebo
               {return 1;}
 
       /// \brief Load joint
-      protected: virtual void Load(sdf::ElementPtr _sdf)
-                 {
-                   T::Load(_sdf);
-                 }
+      public: virtual void Load(sdf::ElementPtr _sdf)
+              {
+                T::Load(_sdf);
+              }
 
       protected: virtual void Init()
                  {

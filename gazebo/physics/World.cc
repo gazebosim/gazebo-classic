@@ -1240,7 +1240,7 @@ void World::ProcessFactoryMsgs()
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
-      std::string filename = common::ModelDatabase::GetModelFile(
+      std::string filename = common::ModelDatabase::Instance()->GetModelFile(
           (*iter).sdf_filename());
 
       if (!sdf::readFile(filename, factorySDF))

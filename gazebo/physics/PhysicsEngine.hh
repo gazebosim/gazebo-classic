@@ -117,7 +117,7 @@ namespace gazebo
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.
-      public: math::Vector3 GetGravity() const;
+      public: virtual math::Vector3 GetGravity() const;
 
       /// \brief Set the gavity vector.
       /// \param[in] _gravity New gravity vector.

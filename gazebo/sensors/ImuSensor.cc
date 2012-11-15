@@ -19,31 +19,23 @@
  * Date: 6 September 2008
 */
 
-#include <assert.h>
-#include <float.h>
-#include <sstream>
+#include "gazebo/common/Exception.hh"
 
-#include "SensorFactory.hh"
-// #include "World.hh"
-// #include "PhysicsEngine.hh"
-#include "common/Exception.hh"
-#include "ImuSensor.hh"
+#include "gazebo/math/Vector3.hh"
 
-#include "math/Vector3.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/ImuSensor.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor);
 
 //////////////////////////////////////////////////
-ImuSensor::ImuSensor(Body *body)
-    : Sensor(body)
+ImuSensor::ImuSensor()
+    : Sensor()
 {
-  this->active = false;
-
-  this->typeName = "imu";
 }
-
 
 //////////////////////////////////////////////////
 ImuSensor::~ImuSensor()
@@ -51,43 +43,28 @@ ImuSensor::~ImuSensor()
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::LoadChild(XMLConfigNode *node)
-{
-  if (this->body == NULL)
-  {
-    gzthrow("Null body in the IMU sensor");
-  }
-}
-
-//////////////////////////////////////////////////
-void ImuSensor::SaveChild(std::string &prefix, std::ostream &stream)
+void ImuSensor::Load(sdf::ElementPtr _node)
 {
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::InitChild()
-{
-  Pose bodyPose;
-  bodyPose = this->body->GetWorldPose();
-  this->prevPose = bodyPose;
-}
-
-void ImuSensor::FiniChild()
+void ImuSensor::Init()
 {
 }
 
+//////////////////////////////////////////////////
+void ImuSensor::Fini()
+{
+}
+
+//////////////////////////////////////////////////
 Pose ImuSensor::GetVelocity()
 {
   return this->imuVel;
 }
 
-Vector3 ImuSensor::GetEulerAngles()
-{
-  return this->eulerAngles;
-}
-
 //////////////////////////////////////////////////
-void ImuSensor::UpdateChild()
+void ImuSensor::Update()
 {
 //  if (this->active)
   {
@@ -122,8 +99,7 @@ void ImuSensor::UpdateChild()
 
     this->imuVel.pos.z = 0;
 
-    /// FIXME storing x,y,z components in a quaternion seems like a bad idea
-    /// @todo storing x,y,z components in a quaternion seems like a bad idea
+    /// \TODO storing x,y,z components in a quaternion seems like a bad idea
     velocity = this->body->GetWorldAngularVel();
     this->imuVel.rot.x = velocity.x;
     this->imuVel.rot.y = velocity.y;
@@ -132,5 +108,3 @@ void ImuSensor::UpdateChild()
     this->eulerAngles = rot;
   }
 }
-
-
