@@ -20,13 +20,13 @@
  * Date: 18 May 2003
  */
 
-#include "sensors/SensorManager.hh"
-#include "sensors/SensorFactory.hh"
-#include "sensors/Sensor.hh"
+#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/Sensor.hh"
 
 void RegisterCameraSensor();
 void RegisterDepthCameraSensor();
-void RegisterGpuRaySensor();
+// void RegisterGpuRaySensor();
 void RegisterRaySensor();
 void RegisterContactSensor();
 void RegisterRFIDSensor();
@@ -42,7 +42,7 @@ void SensorFactory::RegisterAll()
 {
   RegisterCameraSensor();
   RegisterDepthCameraSensor();
-  RegisterGpuRaySensor();
+  // RegisterGpuRaySensor();
   RegisterRaySensor();
   RegisterContactSensor();
   RegisterRFIDSensor();
