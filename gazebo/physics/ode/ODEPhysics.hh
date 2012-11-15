@@ -45,13 +45,13 @@ namespace gazebo
     /// \brief Data structure for contact feedbacks
     class ContactFeedback
     {
-      /// \bried Contact information.
+      /// \brief Contact information.
       public: Contact contact;
 
-      /// \bried Contact joint feedback information.
+      /// \brief Contact joint feedback information.
       public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
 
-      /// \bried Number of elements in feedbacks array.
+      /// \brief Number of elements in feedbacks array.
       public: int feedbackCount;
     };
 
