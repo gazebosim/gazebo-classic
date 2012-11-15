@@ -60,10 +60,10 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
-  if (this->sdf->GetElement("topic"))
+  if (this->sdf->GetElement("contact")->GetElement("topic"))
   {
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
-        this->sdf->GetElement("topic")->GetValueString());
+      this->sdf->GetElement("contact")->GetElement("topic")->GetValueString());
   }
 }
 
