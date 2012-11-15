@@ -149,11 +149,14 @@ namespace gazebo
       protected: std::vector<SensorPluginPtr> plugins;
 
       protected: gazebo::physics::WorldPtr world;
+
       /// \brief Desired time between Sensor::UpdateImpl function calls,
       ///        set indirectly by Sensor::SetUpdateRate
       protected: common::Time updatePeriod;
+
       /// \brief Stores last time that Sensor::UpdateImpl was called
       protected: common::Time lastUpdateTime;
+
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
