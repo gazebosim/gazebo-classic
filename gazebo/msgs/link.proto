@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Link 
 /// \brief Information about a link
-/// \verbatim
+
 
 import "header.proto";
 import "inertial.proto";
@@ -28,4 +28,4 @@ message Link
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
 }
-/// \endverbatim
+

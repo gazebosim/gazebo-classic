@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SENSORTYPES_HH
-#define SENSORTYPES_HH
+#ifndef _SENSORTYPES_HH_
+#define _SENSORTYPES_HH_
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -38,25 +38,24 @@ namespace gazebo
     class RFIDSensor;
     class RFIDTag;
 
-    /// \TODO Nate check file
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
     typedef boost::shared_ptr<Sensor> SensorPtr;
 
     /// \def RaySensorPtr
-    /// \brief Shared pointer to Ray Sensor
+    /// \brief Shared pointer to RaySensor
     typedef boost::shared_ptr<RaySensor> RaySensorPtr;
 
     /// \def CameraSensorPtr
-    /// \brief Shared pointer to Camera Sensor
+    /// \brief Shared pointer to CameraSensor
     typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
 
     /// \def DepthCameraSensorPtr
-    /// \brief Shared pointer to Depth Camera Sensor
+    /// \brief Shared pointer to DepthCameraSensor
     typedef boost::shared_ptr<DepthCameraSensor> DepthCameraSensorPtr;
 
     /// \def ContactSensorPtr
-    /// \brief Shared pointer to Contact Sensor
+    /// \brief Shared pointer to ContactSensor
     typedef boost::shared_ptr<ContactSensor> ContactSensorPtr;
 
     /// \def GpuRaySensorPtr
@@ -66,7 +65,7 @@ namespace gazebo
     /// \def RFIDSensorPtr
     /// \brief Shared pointer to RFIDSensor
     typedef boost::shared_ptr<RFIDSensor> RFIDSensorPtr;
-    
+
     /// \def RFIDTagPtr
     /// \brief Shared pointer to RFIDTag
     typedef boost::shared_ptr<RFIDTag> RFIDTagPtr;
@@ -96,7 +95,7 @@ namespace gazebo
     typedef std::vector<GpuRaySensorPtr> GpuRaySensor_V;
 
     /// \def RFIDSensor_V
-    /// \brief Vector of RFIDSensors 
+    /// \brief Vector of RFIDSensors
     typedef std::vector<RFIDSensor> RFIDSensor_V;
 
     /// \def RFIDTag_V

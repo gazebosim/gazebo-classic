@@ -54,7 +54,7 @@ void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-void ODEBallJoint::SetDamping(int /*_index*/, const double _damping)
+void ODEBallJoint::SetDamping(int /*_index*/, double _damping)
 {
   dJointSetDamping(this->jointId, _damping);
 }

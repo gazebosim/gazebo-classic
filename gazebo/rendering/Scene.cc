@@ -40,7 +40,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
-#include "gazebo/rendering/GpuLaser.hh"
+// #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
@@ -99,7 +99,11 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
   this->jointSub = this->node->Subscribe("~/joint", &Scene::OnJointMsg, this);
   this->skeletonPoseSub = this->node->Subscribe("~/skeleton_pose/info",
@@ -122,7 +126,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
       &Scene::OnResponse, this);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
@@ -455,7 +458,7 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
+/*GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
                                         bool _autoRender)
 {
   GpuLaserPtr camera(new GpuLaser(this->name + "::" + _name,
@@ -463,7 +466,7 @@ GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
   this->cameras.push_back(camera);
 
   return camera;
-}
+}*/
 
 //////////////////////////////////////////////////
 uint32_t Scene::GetCameraCount() const
@@ -528,7 +531,8 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 LightPtr Scene::GetLight(const std::string &_name) const
 {
   LightPtr result;
-  Light_M::const_iterator iter = this->lights.find(_name);
+  std::string n = this->StripSceneName(_name);
+  Light_M::const_iterator iter = this->lights.find(n);
   if (iter != this->lights.end())
     result = iter->second;
   return result;
@@ -577,9 +581,10 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void Scene::SelectVisual(const std::string &_name)
+void Scene::SelectVisual(const std::string &_name, const std::string &_mode)
 {
   this->selectedVis = this->GetVisual(_name);
+  this->selectionMode = _mode;
 }
 
 //////////////////////////////////////////////////
@@ -830,7 +835,7 @@ math::Vector3 Scene::GetFirstContact(CameraPtr _camera,
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-  for (;iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
+  for (; iter != result.end() && math::equal(iter->distance, 0.0f); ++iter);
 
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 
@@ -1357,7 +1362,7 @@ void Scene::PreRender()
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      if (!this->selectedVis ||
+      if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
@@ -1382,7 +1387,7 @@ void Scene::PreRender()
       if (iter2 != this->visuals.end())
       {
         // If an object is selected, don't let the physics engine move it.
-        if (!this->selectedVis ||
+        if (!this->selectedVis || this->selectionMode != "move" ||
           iter->first.find(this->selectedVis->GetName()) == std::string::npos)
         {
           math::Pose pose = msgs::Convert(pose_msg);
@@ -1431,7 +1436,7 @@ void Scene::PreRender()
 
   if (this->selectionMsg)
   {
-    this->SelectVisual(this->selectionMsg->name());
+    this->SelectVisual(this->selectionMsg->name(), "normal");
     this->selectionMsg.reset();
   }
 }
@@ -1828,6 +1833,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
   Light_M::iterator iter;
   iter = this->lights.find(_msg->name());
 
+
   if (iter == this->lights.end())
   {
     LightPtr light(new Light(this));
@@ -2063,6 +2069,24 @@ void Scene::RemoveVisual(VisualPtr _vis)
 {
   if (_vis)
   {
+    // Remove all projectors attached to the visual
+    std::map<std::string, Projector *>::iterator piter =
+      this->projectors.begin();
+    while (piter != this->projectors.end())
+    {
+      // Check to see if the projector is a child of the visual that is
+      // being removed.
+      if (piter->second->GetParent()->GetRootVisual()->GetName() ==
+          _vis->GetRootVisual()->GetName())
+      {
+        delete piter->second;
+        this->projectors.erase(piter++);
+      }
+      else
+        ++piter;
+    }
+
+    // Delete the visual
     Visual_M::iterator iter = this->visuals.find(_vis->GetName());
     if (iter != this->visuals.end())
     {

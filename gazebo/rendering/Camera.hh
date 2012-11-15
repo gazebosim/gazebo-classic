@@ -24,6 +24,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
+#include <utility>
 #include <list>
 #include <vector>
 #include <deque>
@@ -95,6 +96,10 @@ namespace gazebo
       /// \brief Set the render Hz rate
       /// \param[in] _hz The Hz rate
       public: void SetRenderRate(double _hz);
+
+      /// \brief Get the render Hz rate
+      /// \return The Hz rate
+      public: double GetRenderRate() const;
 
       /// \brief Render the camera
       ///
@@ -585,6 +590,9 @@ namespace gazebo
       private: Ogre::CompositorInstance *ssaoInstance;
 
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
+
+      /// \brief Render period.
+      private: common::Time renderPeriod;
     };
     /// \}
   }

@@ -77,7 +77,8 @@ target_link_libraries(gazebo_common gazebo_math
                                     ${CURL_LIBRARIES}
                                     ${libswscale_LIBRARIES}
                                     ${libtar_libraries}
+                                    rt
                                     )
 
 gz_install_library(gazebo_common)
-gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh common.h)
+gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)

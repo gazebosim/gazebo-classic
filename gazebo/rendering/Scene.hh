@@ -164,8 +164,8 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new laser.
-     public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
-                                         bool _autoRender = true);
+      // public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
+      //                                   bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of lasers.
@@ -220,7 +220,9 @@ namespace gazebo
 
       /// \brief Select a visual by name.
       /// \param[in] _name Name of the visual to select.
-      public: void SelectVisual(const std::string &_name);
+      /// \param[in] _mode Selection mode (normal, or move).
+      public: void SelectVisual(const std::string &_name,
+                                const std::string &_mode);
 
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking.
@@ -656,6 +658,13 @@ namespace gazebo
 
       /// \brief Pointer to a visual selected by a user via the GUI.
       private: VisualPtr selectedVis;
+
+      /// \brief Selection mode (normal or move). Normal means the the
+      /// object is just selection, and not being moved by the user. Move
+      /// means the object is being actively moved by the user and the Scene
+      /// should then ignore pose updates from the physics engine until
+      /// after the move is complete.
+      private: std::string selectionMode;
 
       /// \brief Keep around our request message.
       private: msgs::Request *requestMsg;

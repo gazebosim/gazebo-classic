@@ -43,40 +43,60 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
+    /// \class TopicManager TopicManager.hh transport/transport.hh
     /// \brief Manages topics and their subscriptions
     class TopicManager : public SingletonT<TopicManager>
     {
       private: TopicManager();
       private: virtual ~TopicManager();
 
+      /// \brief Initialize the manager
       public: void Init();
 
+      /// \brief Finalize the manager
       public: void Fini();
 
-      public: PublicationPtr FindPublication(const std::string &topic);
+      /// \brief Find a publication object by topic
+      /// \param[in] _topic The topic to search for
+      /// \return Pointer to the publication object, if found (can be null)
+      public: PublicationPtr FindPublication(const std::string &_topic);
 
+      /// \brief Add a node to the manager
+      /// \param[in,out] _node The node to be added
       public: void AddNode(NodePtr _node);
 
+      /// \brief Remove a node by its id
+      /// \param[in] The ID of the node to be removed
       public: void RemoveNode(unsigned int _id);
 
-      /// \param _onlyOut True means only outbound messages on nodes will be
+      /// \brief Process all nodes under management
+      /// \param[in] _onlyOut True means only outbound messages on nodes will be
       /// sent. False means nodes process both outbound and inbound messages
       public: void ProcessNodes(bool _onlyOut = false);
 
-      /// \brief Returns true if the topic has been advertised
-      /// \param _topic The name of the topic to check
-      /// \return True if the topic has been advertised
+      /// \brief Has the topic been advertised?
+      /// \param[in] _topic The name of the topic to check
+      /// \return true if the topic has been advertised, false otherwise
       public: bool IsAdvertised(const std::string &_topic);
 
       /// \brief Subscribe to a topic
-      public: SubscriberPtr Subscribe(const SubscribeOptions &options);
+      /// \param[in] _options The options to use for the subscription
+      /// \return Pointer to the newly created subscriber
+      public: SubscriberPtr Subscribe(const SubscribeOptions &_options);
 
       /// \brief Unsubscribe from a topic. Use a Subscriber rather than
       ///        calling this function directly
+      /// \param[in] _topic The topic to unsubscribe from
+      /// \param[in] _sub The node to unsubscribe
       public: void Unsubscribe(const std::string &_topic, const NodePtr &_sub);
 
       /// \brief Advertise on a topic
-      /// \param topic The name of the topic
+      /// \param[in] _topic The name of the topic
+      /// \param[in] _queueLimit The maximum number of outgoing messages
+      /// to queue
+      /// \param[in] _latch If true, latch the latest message; if false,
+      /// don't latch
+      /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
                                      unsigned int _queueLimit,
@@ -143,53 +163,73 @@ namespace gazebo
                 return pub;
               }
 
-      /// \brief Stop advertising on a topic
-      public: void Unadvertise(const std::string &topic);
+      /// \brief Unadvertise a topic
+      /// \param[in] _topic The topic to be unadvertised
+      public: void Unadvertise(const std::string &_topic);
 
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.
-      /// \param topic Name of the topic
-      /// \param message The message to send.
-      /// \param cb Callback, used when the publish is completed.
-      public: void Publish(const std::string &topic,
-                            const google::protobuf::Message &message,
-                            const boost::function<void()> &cb = NULL);
+      /// \param _topic Name of the topic
+      /// \param _message The message to send.
+      /// \param _cb Callback, used when the publish is completed.
+      public: void Publish(const std::string &_topic,
+                            const google::protobuf::Message &_message,
+                            const boost::function<void()> &_cb = NULL);
 
       /// \brief Connection a local Publisher to a remote Subscriber
-      public: void ConnectPubToSub(const std::string &topic,
-                                    const SubscriptionTransportPtr &sublink);
+      /// \param[in] _topic The topic to use
+      /// \param[in] _sublink The subscription transport object to use
+      public: void ConnectPubToSub(const std::string &_topic,
+                                    const SubscriptionTransportPtr &_sublink);
 
       /// \brief Connect a local Subscriber to a remote Publisher
+      /// \param[in] _pub The publish object to use
       public: void ConnectSubToPub(const msgs::Publish &_pub);
 
       /// \brief Disconnect a local publisher from a remote subscriber
-      public: void DisconnectPubFromSub(const std::string &topic,
-                                         const std::string &host,
-                                         unsigned int port);
+      /// \param[in] _topic The topic to be disconnected
+      /// \param[in] _host The host to be disconnected
+      /// \param[in] _port The port to be disconnected
+      public: void DisconnectPubFromSub(const std::string &_topic,
+                                         const std::string &_host,
+                                         unsigned int _port);
 
-      /// \brief Disconnection all local subscribers from a remote publisher
-      public: void DisconnectSubFromPub(const std::string &topic,
-                                         const std::string &host,
-                                         unsigned int port);
+      /// \brief Disconnect all local subscribers from a remote publisher
+      /// \param[in] _topic The topic to be disconnected
+      /// \param[in] _host The host to be disconnected
+      /// \param[in] _port The port to be disconnected
+      public: void DisconnectSubFromPub(const std::string &_topic,
+                                         const std::string &_host,
+                                         unsigned int _port);
 
       /// \brief Connect all subscribers on a topic to known publishers
-      public: void ConnectSubscribers(const std::string &topic);
+      /// \param[in] _topic The topic to be connected
+      public: void ConnectSubscribers(const std::string &_topic);
 
       /// \brief Update our list of advertised topics
-      /// \return True if the provided params define a new publisher.
-      public: PublicationPtr UpdatePublications(const std::string &topic,
-                                                 const std::string &msgType);
+      /// \param[in] _topic The topic to be updated
+      /// \param[in] _msgType The type of the topic to be updated
+      /// \return True if the provided params define a new publisher,
+      /// false otherwise
+      public: PublicationPtr UpdatePublications(const std::string &_topic,
+                                                const std::string &_msgType);
 
       /// \brief Register a new topic namespace
+      /// \param[in] _name The name of the new namespace
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
+      /// \param[out] The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
+      /// \brief Clear all buffers
       public: void ClearBuffers();
 
+      /// \brief Pause or unpause processing of incoming messages
+      /// \param[in] _pause If true pause processing; otherwse unpause
       public: void PauseIncoming(bool _pause);
 
+      /// \brief A map of string->list of Node pointers
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
 
       private: typedef std::map<std::string, PublicationPtr> PublicationPtr_M;

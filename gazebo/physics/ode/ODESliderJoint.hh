@@ -19,76 +19,66 @@
  * Date: 21 May 2003
  */
 
-#ifndef ODESLIDERJOINT_HH
-#define ODESLIDERJOINT_HH
+#ifndef _ODESLIDERJOINT_HH_
+#define _ODESLIDERJOINT_HH_
 
-#include "physics/SliderJoint.hh"
-#include "physics/ode/ODEJoint.hh"
+#include "gazebo/physics/SliderJoint.hh"
+#include "gazebo/physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief A slider joint
     class ODESliderJoint : public SliderJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODESliderJoint(dWorldID worldId, BasePtr _parent);
+      /// \param[in] _worldId ODE world id.
+      /// \param[in] _parent Pointer to the Link that is the joint' parent
+      public: ODESliderJoint(dWorldID _worldId, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODESliderJoint();
 
-      /// \brief Load the ODESliderJoint
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int index) const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// \brief Set the axis of motion
-      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+      // Documentation inherited
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
+
+      // Documentation inherited
+      public: virtual math::Angle GetAngleImpl(int _index) const;
+
+      // Documentation inherited
+      public: virtual double GetVelocity(int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetVelocity(int _index, double _angle);
+
+      // Documentation inherited
+      public: virtual void SetForce(int _index, double _force);
+
+      // Documentation inherited
+      public: virtual void SetMaxForce(int _index, double _t);
+
+      // Documentation inherited
+      public: virtual double GetMaxForce(int _index);
+
+      // Documentation inherited
+      public: virtual double GetParam(int _parameter) const;
+
+      // Documentation inherited
+      public: virtual void SetParam(int _parameter, double _value);
 
       /// \brief callback to apply damping force to joint
       public: void ApplyDamping();
-
-      /// \brief Get the position of the joint
-      public: virtual math::Angle GetAngleImpl(int index) const;
-
-      /// \brief Get the rate of change
-      public: virtual double GetVelocity(int index) const;
-
-      /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle);
-
-      /// \brief Set the slider force
-      public: virtual void SetForce(int index, double force);
-
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t);
-
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index);
-
-      /// \brief Get the _parameter
-      public: virtual double GetParam(int parameter) const;
-
-      /// \brief Set the _parameter
-      public: virtual void SetParam(int parameter, double value);
     };
-
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-

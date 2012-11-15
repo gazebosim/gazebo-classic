@@ -25,7 +25,6 @@ set (sources
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
-  GpuLaser.cc
   Grid.cc
   GUIOverlay.cc
   Heightmap.cc
@@ -63,7 +62,6 @@ set (headers
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
-  GpuLaser.hh
   Grid.hh
   GUIOverlay.hh
   Heightmap.hh
@@ -99,6 +97,10 @@ foreach (hdr ${headers})
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
+
+link_directories(  
+  ${ogre_library_dirs}
+)
 
 gz_add_library(gazebo_rendering ${sources})
 

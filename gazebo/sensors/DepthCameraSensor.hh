@@ -86,11 +86,6 @@ namespace gazebo
       /// \return True if saved, false if not
       public: bool SaveFrame(const std::string &_filename);
 
-      /// \brief 
-      /// \param[in] _msg
-      /// \TODO nate fill in
-      private: void OnPose(ConstPosePtr &_msg);
-
       private: rendering::DepthCameraPtr camera;
 
       private: rendering::ScenePtr scene;

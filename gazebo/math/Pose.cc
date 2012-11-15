@@ -24,6 +24,7 @@
 using namespace gazebo;
 using namespace math;
 
+const Pose Pose::Zero = math::Pose(0, 0, 0, 0, 0, 0);
 
 //////////////////////////////////////////////////
 Pose::Pose()
@@ -60,6 +61,14 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 {
   this->pos = _pos;
   this->rot = _rot;
+}
+
+//////////////////////////////////////////////////
+void Pose::Set(double _x, double _y, double _z,
+               double _roll, double _pitch, double _yaw)
+{
+  this->pos.Set(_x, _y, _z);
+  this->rot.SetFromEuler(math::Vector3(_roll, _pitch, _yaw));
 }
 
 //////////////////////////////////////////////////

@@ -148,11 +148,14 @@ namespace SkyX
     const Ogre::Vector3 getColorAt(const Ogre::Vector3& Direction) const;
 
     /** Update atmoshpere
-        @param NewOptions Update only the differences between actual parameters and new ones.
-      @param ForceToUpdateAll Forces to upload all current parameters to skyx material.
+        @param NewOptions Update only the differences between actual
+        parameters and new ones.
+      @param ForceToUpdateAll Forces to upload all current
+      parameters to skyx material.
       @remarks Current options parameters are updated if needed.
      */
-    void _update(const Options& NewOptions, const bool& ForceToUpdateAll = false);
+    void _update(const Options& NewOptions,
+                 const bool& ForceToUpdateAll = false);
 
   private:
     /** Shader scale funtion

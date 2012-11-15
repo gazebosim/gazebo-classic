@@ -38,6 +38,7 @@
 #include "common/Skeleton.hh"
 #include "rendering/Material.hh"
 #include "rendering/Visual.hh"
+#include "gazebo/common/Plugin.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -54,6 +55,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
+  this->initialized = false;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -88,6 +90,7 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   this->sceneNode = NULL;
   this->animState = NULL;
   this->skeleton = NULL;
+  this->initialized = false;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -139,6 +142,7 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
+  this->plugins.clear();
   // Detach from the parent
   if (this->parent)
     this->parent->DetachVisual(this->GetName());
@@ -224,6 +228,7 @@ void Visual::Init()
 
   if (this->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -319,6 +324,15 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_laser_retro())
     this->sdf->GetElement("laser_retro")->Set(_msg->laser_retro());
 
+  if (_msg->has_plugin())
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("plugin");
+    if (_msg->plugin().has_name())
+      elem->GetAttribute("name")->Set(_msg->plugin().name());
+    if (_msg->plugin().has_filename())
+      elem->GetAttribute("filename")->Set(_msg->plugin().filename());
+  }
+
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -412,6 +426,7 @@ void Visual::Load()
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->LoadPlugins();
 }
 
 //////////////////////////////////////////////////
@@ -444,8 +459,6 @@ void Visual::Update()
     {
       this->animState = NULL;
       this->sceneNode->getCreator()->destroyAnimation(
-          this->GetName() + "_animation");
-      this->sceneNode->getCreator()->destroyAnimationState(
           this->GetName() + "_animation");
       if (this->onAnimationComplete)
         this->onAnimationComplete();
@@ -1061,8 +1074,17 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetHighlighted(bool _highlighted)
+void Visual::SetHighlighted(bool /*_highlighted*/)
 {
+  /*
+  if (this->GetAttachedObjectCount() > 0)
+    this->sceneNode->showBoundingBox(_highlighted);
+    */
+
+/* TODO: This code will cause objects that use the same mesh to be
+ * highlighted. Using the same mesh is good for performance. We need to come
+ * up with a better way to highlight objects, possibly by attaching
+ * a special visual to selected objects.
   for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
@@ -1115,11 +1137,12 @@ void Visual::SetHighlighted(bool _highlighted)
       }
     }
   }
+  */
 
-  for (unsigned int i = 0; i < this->children.size(); ++i)
+  /*for (unsigned int i = 0; i < this->children.size(); ++i)
   {
     this->children[i]->SetHighlighted(_highlighted);
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
@@ -1154,7 +1177,6 @@ void Visual::SetEmissive(const common::Color &_color)
         for (passCount = 0; passCount < technique->getNumPasses();
             passCount++)
         {
-          std::cout << "Set emmissive\n";
           pass = technique->getPass(passCount);
           pass->setSelfIllumination(Conversions::Convert(_color));
         }
@@ -1521,7 +1543,6 @@ void Visual::InsertMesh(const std::string &_meshName)
 
   this->InsertMesh(mesh);
 
-
   // Add the mesh into OGRE
   /*if (!this->sceneNode->getCreator()->hasEntity(_meshName) &&
       common::MeshManager::Instance()->HasMesh(_meshName))
@@ -1533,33 +1554,35 @@ void Visual::InsertMesh(const std::string &_meshName)
 }
 
 //////////////////////////////////////////////////
-void Visual::InsertMesh(const common::Mesh *mesh)
+void Visual::InsertMesh(const common::Mesh *_mesh)
 {
   Ogre::MeshPtr ogreMesh;
 
-  if (mesh->GetSubMeshCount() == 0)
+  if (_mesh->GetSubMeshCount() == 0)
   {
     gzerr << "Visual::InsertMesh no submeshes, this is an invalid mesh\n";
     return;
   }
 
   // Don't re-add existing meshes
-  if (Ogre::MeshManager::getSingleton().resourceExists(mesh->GetName()))
+  if (Ogre::MeshManager::getSingleton().resourceExists(_mesh->GetName()))
+  {
     return;
+  }
 
   try
   {
     // Create a new mesh specifically for manual definition.
-    ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
+    ogreMesh = Ogre::MeshManager::getSingleton().createManual(_mesh->GetName(),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     Ogre::SkeletonPtr ogreSkeleton;
 
-    if (mesh->HasSkeleton())
+    if (_mesh->HasSkeleton())
     {
-      common::Skeleton *skel = mesh->GetSkeleton();
+      common::Skeleton *skel = _mesh->GetSkeleton();
       ogreSkeleton = Ogre::SkeletonManager::getSingleton().create(
-        mesh->GetName() + "_skeleton",
+        _mesh->GetName() + "_skeleton",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         true);
 
@@ -1580,9 +1603,9 @@ void Visual::InsertMesh(const common::Mesh *mesh)
         bone->setManuallyControlled(true);
         bone->setInitialState();
       }
-      ogreMesh->setSkeletonName(mesh->GetName() + "_skeleton");
+      ogreMesh->setSkeletonName(_mesh->GetName() + "_skeleton");
     }
-    for (unsigned int i = 0; i < mesh->GetSubMeshCount(); i++)
+    for (unsigned int i = 0; i < _mesh->GetSubMeshCount(); i++)
     {
       Ogre::SubMesh *ogreSubMesh;
       Ogre::VertexData *vertexData;
@@ -1594,7 +1617,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
 
       size_t currOffset = 0;
 
-      const common::SubMesh *subMesh = mesh->GetSubMesh(i);
+      const common::SubMesh *subMesh = _mesh->GetSubMesh(i);
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
@@ -1659,9 +1682,9 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       vertices = static_cast<float*>(vBuf->lock(
                       Ogre::HardwareBuffer::HBL_DISCARD));
 
-      if (mesh->HasSkeleton())
+      if (_mesh->HasSkeleton())
       {
-        common::Skeleton *skel = mesh->GetSkeleton();
+        common::Skeleton *skel = _mesh->GetSkeleton();
         for (unsigned int j = 0; j < subMesh->GetNodeAssignmentsCount(); j++)
         {
           common::NodeAssignment na = subMesh->GetNodeAssignment(j);
@@ -1716,7 +1739,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
         *indices++ = subMesh->GetIndex(j);
 
       const common::Material *material;
-      material = mesh->GetMaterial(subMesh->GetMaterialIndex());
+      material = _mesh->GetMaterial(subMesh->GetMaterialIndex());
       if (material)
       {
         rendering::Material::Update(material);
@@ -1728,10 +1751,10 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       iBuf->unlock();
     }
 
-    math::Vector3 max = mesh->GetMax();
-    math::Vector3 min = mesh->GetMin();
+    math::Vector3 max = _mesh->GetMax();
+    math::Vector3 min = _mesh->GetMin();
 
-    if (mesh->HasSkeleton())
+    if (_mesh->HasSkeleton())
     {
       min = math::Vector3(-1, -1, -1);
       max = math::Vector3(1, 1, 1);
@@ -1859,6 +1882,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       else
         scale.x = scale.y = scale.z = 1.0;
     }
+    else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
+      scale.x = scale.y = scale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -1884,7 +1909,7 @@ VisualPtr Visual::GetParent() const
 VisualPtr Visual::GetRootVisual()
 {
   VisualPtr p = shared_from_this();
-  while (p->GetParent()->GetName() != "__world_node__")
+  while (p->GetParent() && p->GetParent()->GetName() != "__world_node__")
     p = p->GetParent();
 
   return p;
@@ -1893,7 +1918,7 @@ VisualPtr Visual::GetRootVisual()
 //////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
-   if (this->sdf->HasElement("geometry"))
+  if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
     if (geomElem->HasElement("plane"))
@@ -2162,4 +2187,73 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     bone->setPosition(p);
     bone->setOrientation(quat);
   }
+}
+
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugins()
+{
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+
+
+  for (std::vector<VisualPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugin(const std::string &_filename,
+                       const std::string &_name,
+                       sdf::ElementPtr _sdf)
+{
+  gazebo::VisualPluginPtr plugin = gazebo::VisualPlugin::Create(_filename,
+                                                              _name);
+
+  if (plugin)
+  {
+    if (plugin->GetType() != VISUAL_PLUGIN)
+    {
+      gzerr << "Visual[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
+      return;
+    }
+    plugin->Load(shared_from_this(), _sdf);
+    this->plugins.push_back(plugin);
+
+    if (this->initialized)
+      plugin->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::RemovePlugin(const std::string &_name)
+{
+  std::vector<VisualPluginPtr>::iterator iter;
+  for (iter = this->plugins.begin(); iter != this->plugins.end(); ++iter)
+  {
+    if ((*iter)->GetHandle() == _name)
+    {
+      this->plugins.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugin(sdf::ElementPtr _sdf)
+{
+  std::string pluginName = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
+  this->LoadPlugin(filename, pluginName, _sdf);
 }

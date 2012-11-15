@@ -71,7 +71,8 @@ void TrimeshShape::Init()
     }
   }
 
-  this->mesh = meshManager->Load(filename);
+  if ((this->mesh = meshManager->Load(filename)) == NULL)
+    gzerr << "Unable to load mesh from file[" << filename << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -107,7 +108,7 @@ void TrimeshShape::SetFilename(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::FillShapeMsg(msgs::Geometry &_msg)
+void TrimeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
   _msg.mutable_mesh()->set_filename(this->GetFilename());

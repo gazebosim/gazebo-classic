@@ -7,11 +7,9 @@ set (sources Sensors.cc
              CameraSensor.cc
              DepthCameraSensor.cc
              RaySensor.cc
-             GpuRaySensor.cc
              ContactSensor.cc
              RFIDSensor.cc
              RFIDTag.cc
-             RFIDTagManager.cc
 ) 
 
 set (headers Sensors.hh
@@ -22,11 +20,9 @@ set (headers Sensors.hh
              CameraSensor.hh
              DepthCameraSensor.hh
              RaySensor.hh
-             GpuRaySensor.hh
              ContactSensor.hh
              RFIDSensor.hh
              RFIDTag.hh
-             RFIDTagManager.hh
 )
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
@@ -57,4 +53,4 @@ target_link_libraries( gzsensor gazebo_common
 
 gz_install_executable( gzsensor )
 gz_install_library(gazebo_sensors)
-gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh sensors.h)
+gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)

@@ -66,7 +66,8 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 
   sensors::RaySensorPtr laser =
     boost::shared_static_cast<sensors::RaySensor>(
-        sensors::SensorManager::Instance()->GetSensor("laser"));
+        sensors::SensorManager::Instance()->GetSensor(
+          "default::box::link::laser"));
   EXPECT_TRUE(laser);
   laser->Update(true);
   while (laser->GetRange(0) == 0)

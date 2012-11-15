@@ -19,17 +19,16 @@
  * Date: 09 Sept. 2008
 */
 
-#ifndef CONTACTSENSOR_HH
-#define CONTACTSENSOR_HH
+#ifndef _CONTACTSENSOR_HH_
+#define _CONTACTSENSOR_HH_
 
-#include <stdint.h>
 #include <vector>
 #include <map>
 #include <string>
 
-#include "math/Angle.hh"
-#include "sensors/Sensor.hh"
-#include "physics/Contact.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/physics/Contact.hh"
 
 namespace gazebo
 {
@@ -93,21 +92,18 @@ namespace gazebo
       /// \param[in] _collisionName Name of collision contact
       /// \param[in] _index Index of collision to get
       /// \return Contact object
-      /// \TODO: nate check
       public: physics::Contact GetCollisionContact(
                   const std::string &_collisionName, unsigned int _index) const;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
       /// \return Container of contacts
-      /// \TODO: nate check
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
       /// \brief Function callback that occurs during contact event
       /// \param[in] _collisionName Name of collision
       /// \param[in] _contact Contact undergoing event
-      /// \TODO: nate check
       private: void OnContact(const std::string &_collisionName,
                               const physics::Contact &_contact);
 
@@ -118,7 +114,6 @@ namespace gazebo
 
       private: Contact_M contacts;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr contactsPub;
 
       private: boost::mutex *mutex;

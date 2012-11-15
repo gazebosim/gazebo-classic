@@ -22,78 +22,72 @@
 #ifndef _ODEHINGEJOINT_HH_
 #define _ODEHINGEJOINT_HH_
 
-#include "math/Angle.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
 
-#include "physics/HingeJoint.hh"
-#include "physics/ode/ODEJoint.hh"
+#include "gazebo/physics/HingeJoint.hh"
+#include "gazebo/physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief A single axis hinge joint
+    /// \brief A single axis hinge joint.
     class ODEHingeJoint : public HingeJoint<ODEJoint>
     {
-      ///  Constructor
-      public: ODEHingeJoint(dWorldID worldId, BasePtr _parent);
+      /// \brief Constructor
+      /// \param[in] _worldID ODE id of the world.
+      /// \param[in] _parent Parent of the Joint
+      public: ODEHingeJoint(dWorldID _worldId, BasePtr _parent);
 
-      /// Destructor
+      /// \brief Destructor.
       public: virtual ~ODEHingeJoint();
 
-      /// \brief Load joint
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// Get the anchor point
-      public: virtual math::Vector3 GetAnchor(int index) const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(int _index) const;
 
-      /// Set the anchor point
-      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
+      // Documentation inherited
+      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
-      /// Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int index) const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// Set the axis of rotation
-      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+      // Documentation inherited
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \brief Set the joint damping
-      public: virtual void SetDamping(int index, const double damping);
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
 
-      /// \brief callback to apply damping force to joint
+      /// \brief callback to apply damping force to joint.
       public: void ApplyDamping();
 
-      /// Get the angle of rotation
-      public: virtual math::Angle GetAngleImpl(int index) const;
+      // Documentation inherited
+      public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle);
+      // Documentation inherited
+      public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Get the rotation rate of an axis(index)
-      public: virtual double GetVelocity(int index) const;
+      // Documentation inherited
+      public: virtual double GetVelocity(int _index) const;
 
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t);
+      // Documentation inherited
+      public: virtual void SetMaxForce(int _index, double _t);
 
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index);
+      // Documentation inherited
+      public: virtual double GetMaxForce(int _index);
 
-      /// \brief Set the torque of a joint.
-      public: virtual void SetForce(int index, double torque);
+      // Documentation inherited
+      public: virtual void SetForce(int _index, double _torque);
 
-      /// Get the specified parameter
-      public: virtual double GetParam(int parameter) const;
+      // Documentation inherited
+      public: virtual double GetParam(int _parameter) const;
 
-      /// Set the parameter to value
-      public: virtual void SetParam(int parameter, double value);
-
-      private: event::ConnectionPtr jointUpdateConnection;
+      // Documentation inherited
+      public: virtual void SetParam(int _parameter, double _value);
     };
-
-    /// \}
   }
 }
 #endif

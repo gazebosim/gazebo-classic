@@ -122,27 +122,6 @@ void Image::SavePNG(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void Image::SetFromData(const unsigned char *data, unsigned int width,
-    unsigned int height, int scanline_bytes, unsigned int bpp)
-{
-  // int redmask = FI_RGBA_RED_MASK;
-  int redmask = 0xff0000;
-
-  // int greenmask = FI_RGBA_GREEN_MASK;
-  int greenmask = 0x00ff00;
-
-  // int bluemask = FI_RGBA_BLUE_MASK;
-  int bluemask = 0x0000ff;
-
-  if (this->bitmap)
-    FreeImage_Unload(this->bitmap);
-  this->bitmap = NULL;
-
-  this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(data),
-      width, height, scanline_bytes, bpp, redmask, greenmask, bluemask);
-}
-
-//////////////////////////////////////////////////
 void Image::SetFromData(const unsigned char *_data, unsigned int _width,
     unsigned int _height, PixelFormat _format)
 {

@@ -24,7 +24,6 @@
 #define _SENSORMANAGER_HH_
 
 #include <boost/thread.hpp>
-#include <list>
 #include <string>
 #include <vector>
 
@@ -90,6 +89,10 @@ namespace gazebo
       /// \return A pointer to the sensor. NULL if not found.
       public: SensorPtr GetSensor(const std::string &_name);
 
+      /// \brief Get all the sensors.
+      /// \return Vector of all the sensors.
+      public: Sensor_V GetSensors() const;
+
       /// \brief Remove a sensor
       /// \param[in] _name The name of the sensor to remove.
       public: void RemoveSensor(const std::string &_name);
@@ -97,26 +100,31 @@ namespace gazebo
       /// \brief Remove all sensors
       public: void RemoveSensors();
 
+      /// \brief True if SensorManager::initSensors queue is empty
+      /// i.e. all sensors managed by SensorManager have been initialized
+      public: bool SensorsInitialized();
+
       /// \brief Update loop
       private: void RunLoop();
 
       /// \brief If True the sensor manager stop processing sensors.
       private: bool stop;
 
-      /// \brief True if initialized.
+      /// \brief True if SensorManager::Init has been called
+      ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
 
       /// \brief The thread to run sensor updates in.
       private: boost::thread *runThread;
 
       /// \brief Mutex used when adding and removing sensors.
-      private: boost::recursive_mutex *mutex;
+      private: boost::recursive_mutex mutex;
 
       /// \brief The list of initialized sensors.
-      private: std::list<SensorPtr> sensors;
+      private: Sensor_V sensors;
 
       /// \brief List of sensors that require initialization.
-      private: std::list<SensorPtr> initSensors;
+      private: Sensor_V initSensors;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<SensorManager>;

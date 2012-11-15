@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Subscribe
 /// \brief A message for subscription data
-/// \verbatim
+
 
 message Subscribe
 {
@@ -14,4 +14,4 @@ message Subscribe
   optional bool latching   = 5 [default=false];
 }
 
-/// \endverbatim
+

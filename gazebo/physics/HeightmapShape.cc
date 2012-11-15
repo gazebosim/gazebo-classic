@@ -179,7 +179,7 @@ math::Vector3 HeightmapShape::GetPos() const
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
+void HeightmapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
   msgs::Set(_msg.mutable_heightmap()->mutable_image(),

@@ -97,7 +97,7 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&GLWidget::OnSetSelectedEntity, this, _1)));
+       boost::bind(&GLWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -229,7 +229,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     g_deleteAct->Signal(this->selectedVis->GetName());
 
   if (_event->key() == Qt::Key_Escape)
-    event::Events::setSelectedEntity("");
+    event::Events::setSelectedEntity("", "normal");
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
@@ -359,8 +359,7 @@ void GLWidget::OnMousePressTranslate()
 
     this->SetMouseMoveVisual(vis);
 
-    this->scene->SelectVisual(this->mouseMoveVis->GetName());
-    event::Events::setSelectedEntity(vis->GetName());
+    event::Events::setSelectedEntity(this->mouseMoveVis->GetName(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
   }
 }
@@ -368,6 +367,9 @@ void GLWidget::OnMousePressTranslate()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressNormal()
 {
+  if (!this->userCamera)
+    return;
+
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
   this->SetMouseMoveVisual(rendering::VisualPtr());
@@ -427,7 +429,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     this->OnMouseMoveMakeEntity();
   else if (this->state == "select")
     this->OnMouseMoveNormal();
-  else if (this->state == "translate" || this->state=="rotate")
+  else if (this->state == "translate" || this->state == "rotate")
     this->OnMouseMoveTranslate();
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;
@@ -538,6 +540,9 @@ void GLWidget::OnMouseMoveTranslate()
 /////////////////////////////////////////////////
 void GLWidget::OnMouseMoveNormal()
 {
+  if (!this->userCamera)
+    return;
+
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
 
   if (vis && !vis->IsPlane())
@@ -605,17 +610,20 @@ void GLWidget::OnMouseReleaseTranslate()
     {
       this->PublishVisualPose(this->mouseMoveVis);
       this->SetMouseMoveVisual(rendering::VisualPtr());
-      event::Events::setSelectedEntity("");
+      event::Events::setSelectedEntity("", "normal");
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
   }
 
-  this->scene->SelectVisual("");
+  this->scene->SelectVisual("", "normal");
 }
 
 //////////////////////////////////////////////////
 void GLWidget::OnMouseReleaseNormal()
 {
+  if (!this->userCamera)
+    return;
+
   if (!this->mouseEvent.dragging)
   {
     rendering::VisualPtr vis =
@@ -630,7 +638,7 @@ void GLWidget::OnMouseReleaseNormal()
       {
         vis = vis->GetRootVisual();
         this->SetSelectedVisual(vis);
-        event::Events::setSelectedEntity(vis->GetName());
+        event::Events::setSelectedEntity(vis->GetName(), "normal");
       }
     }
     else
@@ -747,23 +755,25 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   if (this->entityMaker)
     this->entityMaker->Stop();
 
+  this->entityMaker = NULL;
+
   if (_type == "box")
   {
     this->boxMaker.Start(this->userCamera);
-    this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString());
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString()))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "sphere")
   {
     this->sphereMaker.Start(this->userCamera);
-    this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString());
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString()))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "cylinder")
   {
     this->cylinderMaker.Start(this->userCamera);
-    this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString());
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString()))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "mesh" && !_data.empty())
   {
@@ -772,8 +782,8 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   }
   else if (_type == "model" && !_data.empty())
   {
-    this->modelMaker.InitFromFile(_data);
-    this->entityMaker = &this->modelMaker;
+    if (this->modelMaker.InitFromFile(_data))
+      this->entityMaker = &this->modelMaker;
   }
   else if (_type == "pointlight")
     this->entityMaker =  &this->pointLightMaker;
@@ -781,8 +791,6 @@ void GLWidget::OnCreateEntity(const std::string &_type,
     this->entityMaker =  &this->spotLightMaker;
   else if (_type == "directionallight")
     this->entityMaker =  &this->directionalLightMaker;
-  else
-    this->entityMaker = NULL;
 
   if (this->entityMaker)
   {
@@ -1001,11 +1009,12 @@ void GLWidget::ClearSelection()
 
   this->SetSelectedVisual(rendering::VisualPtr());
 
-  this->scene->SelectVisual("");
+  this->scene->SelectVisual("", "normal");
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnSetSelectedEntity(const std::string &_name)
+void GLWidget::OnSetSelectedEntity(const std::string &_name,
+                                   const std::string &_mode)
 
 {
   std::map<std::string, unsigned int>::iterator iter;
@@ -1015,13 +1024,12 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name)
     boost::replace_first(name, gui::get_world()+"::", "");
 
     this->SetSelectedVisual(this->scene->GetVisual(name));
-    this->scene->SelectVisual(name);
+    this->scene->SelectVisual(name, _mode);
   }
   else
   {
     this->SetSelectedVisual(rendering::VisualPtr());
-    this->scene->SelectVisual("");
-    gui::Events::manipMode("select");
+    this->scene->SelectVisual("", _mode);
   }
 
   this->hoverVis.reset();

@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Sensor 
 /// \brief Information about a sensor element
-/// \verbatim
+
 
 import "pose.proto";
 import "camerasensor.proto";
@@ -24,4 +24,4 @@ message Sensor
   optional bool visualize          = 10;
   optional string topic            = 11;
 }
-/// \endverbatim
+

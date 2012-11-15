@@ -19,68 +19,63 @@
  * Date: 21 May 2003
 */
 
-#ifndef ODEUNIVERSALJOINT_HH
-#define ODEUNIVERSALJOINT_HH
+#ifndef _ODEUNIVERSALJOINT_HH_
+#define _ODEUNIVERSALJOINT_HH_
 
-#include "physics/UniversalJoint.hh"
-#include "physics/ode/ODEJoint.hh"
+#include "gazebo/physics/UniversalJoint.hh"
+#include "gazebo/physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief A universal joint
+    /// \brief A universal joint.
     class ODEUniversalJoint : public UniversalJoint<ODEJoint>
     {
-      /// \brief Constructor
-      public: ODEUniversalJoint(dWorldID worldId, BasePtr _parent);
+      /// \brief Constructor.
+      /// \param[in] _worldId ODE world id.
+      /// \param[in] _parent Pointer to the Link that is the joint' parent
+      public: ODEUniversalJoint(dWorldID _worldId, BasePtr _parent);
 
-      /// \brief Destuctor
+      /// \brief Destuctor.
       public: virtual ~ODEUniversalJoint();
 
-      /// \brief Get the anchor point
-      public: virtual math::Vector3 GetAnchor(int index) const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(int _index) const;
 
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
+      // Documentation inherited
+      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
 
-      /// \brief Get the first axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int index) const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 
-      /// \brief Set the first axis of rotation
-      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+      // Documentation inherited
+      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
 
-      /// \brief Get the angle of axis
-      public: virtual math::Angle GetAngleImpl(int index) const;
+      // Documentation inherited
+      public: virtual math::Angle GetAngleImpl(int _index) const;
 
-      /// \brief Get the angular rate of an axis
-      public: virtual double GetVelocity(int index) const;
+      // Documentation inherited
+      public: virtual double GetVelocity(int _index) const;
 
-      /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle);
+      // Documentation inherited
+      public: virtual void SetVelocity(int _index, double _angle);
 
-      /// \brief Set the torque of a joint.
-      public: virtual void SetForce(int index, double torque);
+      // Documentation inherited
+      public: virtual void SetForce(int _index, double _torque);
 
-      /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t);
+      // Documentation inherited
+      public: virtual void SetMaxForce(int _index, double _t);
 
-      /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index);
+      // Documentation inherited
+      public: virtual double GetMaxForce(int _index);
 
-
-      /// \brief Set the parameter to value
-      public: virtual void SetParam(int parameter, double value);
+      // Documentation inherited
+      public: virtual void SetParam(int _parameter, double _value);
     };
-
-    /// \}
   }
 }
 #endif

@@ -15,22 +15,25 @@
  *
  */
 /* Desc: RFID Sensor
- * Author: Jonas Mellin & Zakiruz Zaman 
+ * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
 
-#include "common/Exception.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Entity.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "msgs/msgs.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "math/Vector3.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/RFIDSensor.hh"
-#include "sensors/RFIDTagManager.hh"
+#include "gazebo/math/Vector3.hh"
+
+#include "gazebo/sensors/RFIDTag.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/RFIDSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -42,7 +45,6 @@ RFIDSensor::RFIDSensor()
   : Sensor()
 {
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 /////////////////////////////////////////////////
@@ -66,13 +68,11 @@ void RFIDSensor::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(this->world->GetName());
     this->scanPub = this->node->Advertise<msgs::Pose>(
         this->sdf->GetElement("topic")->GetValueString());
   }
-  this->entity = this->world->GetEntity(this->parentName);
 
-  this->rtm = RFIDTagManager::Instance();
+  this->entity = this->world->GetEntity(this->parentName);
 
   // this->sdf->PrintDescription("something");
   /*std::cout << " setup ray" << std::endl;
@@ -105,7 +105,7 @@ void RFIDSensor::Load(const std::string &_worldName)
 
     manager = rendering::get_scene(this->world->GetName())->GetManager();
 
-    query = manager->createRayQuery(Ogre::Ray()); 
+    query = manager->createRayQuery(Ogre::Ray());
 
 */
 }
@@ -130,7 +130,7 @@ void RFIDSensor::UpdateImpl(bool /*_force*/)
   if (this->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, entity->GetWorldPose());
+    msgs::Set(&msg, this->entity->GetWorldPose());
     this->scanPub->Publish(msg);
   }
 }
@@ -138,11 +138,10 @@ void RFIDSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 void RFIDSensor::EvaluateTags()
 {
-  std::vector<RFIDTag*> tags = this->rtm->GetTags();
   std::vector<RFIDTag*>::const_iterator ci;
 
   // iterate through the tags contained given rfid tag manager
-  for (ci = tags.begin(); ci != tags.end(); ++ci)
+  for (ci = this->tags.begin(); ci != this->tags.end(); ++ci)
   {
     math::Pose pos = (*ci)->GetTagPose();
     // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
@@ -173,10 +172,14 @@ bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::CheckRayIntersection(const math::Pose &/*_pose*/)
+void RFIDSensor::AddTag(RFIDTag *_tag)
 {
-  /** rendering code below to check for intersections
+  this->tags.push_back(_tag);
+}
 
+//////////////////////////////////////////////////
+/*bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
+{
     math::Vector3 d;
   //calculate direction, by adding 2 vectors?
   d = _pose.pos + entity->GetWorldPose().pos;
@@ -185,6 +188,6 @@ bool RFIDSensor::CheckRayIntersection(const math::Pose &/*_pose*/)
   query->setRay(ray);
   Ogre::RaySceneQueryResult &result = query->execute();
   return false;
-   **/
   return false;
-}
+}*/
+
