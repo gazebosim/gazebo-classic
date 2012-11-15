@@ -27,6 +27,7 @@
 #define _SCREWJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/common/Console.hh"
 
 namespace gazebo
 {
@@ -48,6 +49,10 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ScrewJoint()
               { }
+
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 2;}
 
       /// \interal
       public: virtual unsigned int GetAngleCount() const

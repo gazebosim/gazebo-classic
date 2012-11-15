@@ -43,7 +43,11 @@ namespace gazebo
 
       /// \brief Destuctor.
       public: virtual ~UniversalJoint()
-              {}
+              { }
+
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 2;}
 
       /// \interal
       public: virtual unsigned int GetAngleCount() const

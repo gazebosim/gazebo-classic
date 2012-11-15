@@ -234,7 +234,6 @@ namespace gazebo
       /// \return A pointer to nearest Entity, NULL if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
-
       /// \brief Set the current world state.
       /// \param _state The state to set the World to.
       public: void SetState(const WorldState &_state);
@@ -308,7 +307,7 @@ namespace gazebo
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
 
-      /// \brief Get a model by id
+      /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
       /// a passed in _id.
@@ -353,7 +352,7 @@ namespace gazebo
       /// \brief Step the world once by reading from a log file.
       private: void LogStep();
 
-      /// \brief Update the world
+      /// \brief Update the world.
       private: void Update();
 
       /// \brief Pause callback.
