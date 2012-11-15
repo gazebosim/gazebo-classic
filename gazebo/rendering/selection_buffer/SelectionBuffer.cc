@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include "gazebo/common/Console.hh"
+
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
@@ -41,6 +44,15 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
       Ogre::TEX_TYPE_2D, width, height, 0, Ogre::PF_R8G8B8,
       Ogre::TU_RENDERTARGET);
 
+  // Make sure we get a valid pointer
+  if (this->texture->getBuffer().isNull() ||
+      !this->texture->getBuffer()->getRenderTarget())
+  {
+    gzerr << "Unable to create texture for selection buffer."
+          << "Mouse interactions will be disabled\n";
+    return;
+  }
+
   this->renderTexture = this->texture->getBuffer()->getRenderTarget();
   this->renderTexture->setAutoUpdated(false);
   this->renderTexture->setPriority(0);
@@ -54,11 +66,29 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
   this->renderTexture->addListener(this->selectionTargetListener);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
 
+  // Make sure we get a valid pointer
+  if (pixelBuffer.isNull())
+  {
+    gzerr << "Unable to get pixel buffer for selection buffer."
+          << "Mouse interactions will be disabled\n";
+    return;
+  }
+
+  // Check for a valid pixel buffer.
+  if (pixelBuffer->getWidth() == 0 || pixelBuffer->getHeight() == 0 ||
+      pixelBuffer->getDepth() == 0)
+  {
+    gzerr << "Invalid pixel buffer for selection buffer."
+          << "Mouse interactions will be disabled\n";
+    return;
+  }
+
   size_t bufferSize = pixelBuffer->getSizeInBytes();
   this->buffer = new uint8_t[bufferSize];
   this->pixelBox = new Ogre::PixelBox(pixelBuffer->getWidth(),
       pixelBuffer->getHeight(), pixelBuffer->getDepth(),
       pixelBuffer->getFormat(), this->buffer);
+
   this->CreateRTTOverlays();
 }
 
@@ -75,6 +105,10 @@ SelectionBuffer::~SelectionBuffer()
 /////////////////////////////////////////////////
 void SelectionBuffer::Update()
 {
+  // Make sure we have a valid buffer
+  if (!this->pixelBox || !this->buffer)
+    return;
+
   this->UpdateBufferSize();
   this->materialSwitchListener->Reset();
   this->renderTexture->update();
@@ -85,6 +119,10 @@ void SelectionBuffer::Update()
 /////////////////////////////////////////////////
 void SelectionBuffer::UpdateBufferSize()
 {
+  // Make sure we have a valid buffer
+  if (!this->pixelBox || !this->buffer)
+    return;
+
   unsigned int width = this->renderTarget->getWidth();
   unsigned int height = this->renderTarget->getHeight();
 
@@ -123,7 +161,7 @@ void SelectionBuffer::UpdateBufferSize()
 /////////////////////////////////////////////////
 Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 {
-  if (_x < 0 || _y < 0 )
+  if (_x < 0 || _y < 0 || !this->pixelBox || !this->buffer)
     return 0;
 
   this->Update();
