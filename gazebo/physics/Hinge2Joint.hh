@@ -51,10 +51,6 @@ namespace gazebo
       public: virtual unsigned int GetAngleCount() const
               {return 2;}
 
-      /// \interal
-      public: virtual unsigned int GetAngleCount() const
-              {return 2;}
-
       /// \brief Load the joint.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf)
