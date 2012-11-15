@@ -80,8 +80,8 @@ namespace gazebo
       ///         SensorManager::Update
       protected: virtual void UpdateImpl(bool /*_force*/) {}
 
-      /// \brief Set the update rate of the sensor
-      /// \param _hz Frequency in Hertz
+      /// \brief Set the update rate of the sensor.
+      /// \param[in] _hz update rate of sensor.
       public: void SetUpdateRate(double _hz);
 
       /// \brief  Finalize the sensor
@@ -108,14 +108,17 @@ namespace gazebo
       /// \brief Get sensor type
       public: std::string GetType() const;
 
-      /// \brief Returns last time that Sensor::UpdateImpl was called
+      /// \brief Return last update time.
+      /// \return Time of last update.
       public: common::Time GetLastUpdateTime();
 
-      /// \brief Returns last time that a sensor measurement was generated
+      /// \brief Return last measurement time.
+      /// \return Time of last measurement.
       public: common::Time GetLastMeasurementTime();
 
       /// \brief Returns true if user requests the sensor to be visualized
-      ///        via tag:  <visualize>true</visualize> in SDF
+      ///        via tag:  <visualize>true</visualize> in SDF.
+      /// \return True if visualized, false if not.
       public: bool GetVisualize() const;
 
       /// \brief Returns the topic name as set in SDF.
@@ -135,7 +138,7 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
-      /// \brief True if sensor generation is active
+      /// \brief True if sensor generation is active.
       protected: bool active;
       protected: sdf::ElementPtr sdf;
       protected: math::Pose pose;
@@ -150,11 +153,11 @@ namespace gazebo
 
       protected: gazebo::physics::WorldPtr world;
 
-      /// \brief Desired time between Sensor::UpdateImpl function calls,
-      ///        set indirectly by Sensor::SetUpdateRate
+      /// \brief Desired time between updates, set indirectly by
+      ///        Sensor::SetUpdateRate.
       protected: common::Time updatePeriod;
 
-      /// \brief Stores last time that Sensor::UpdateImpl was called
+      /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;
 
       /// \brief Stores last time that a sensor measurement was generated;
