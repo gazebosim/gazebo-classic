@@ -281,5 +281,15 @@ else (build_errors)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
 
+  ########################################
+  # If present, load platform-specific build hooks.  This system is used,
+  # for example, by the Ubuntu overlay (in the gazebo-release repo), to
+  # arrange for installation of Ubuntu-specific application-launching
+  # configuration.
+  if (EXISTS ${PROJECT_SOURCE_DIR}/cmake/packager-hooks/CMakeLists.txt)
+    message(STATUS "Loading packager build hooks from cmake/packager-hooks")
+    add_subdirectory(cmake/packager-hooks)
+  endif()
+
   message(STATUS "Configuration successful. Type make to compile gazebo")
 endif(build_errors)
