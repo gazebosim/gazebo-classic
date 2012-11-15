@@ -27,6 +27,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/ode/ODELink.hh"
 #include "physics/ode/ODEJoint.hh"
+#include "physics/ScrewJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -367,6 +368,69 @@ void ODEJoint::SetAttribute(Attribute _attr, int /*_index*/, double _value)
   };
 }
 
+//////////////////////////////////////////////////
+void ODEJoint::SetAttribute(const std::string &_key, int /*_index*/,
+                            const boost::any &_value)
+{
+  if (_key == "fudge_factor")
+  {
+    this->SetParam(dParamFudgeFactor, boost::any_cast<double>(_value));
+  }
+  else if (_key == "suspension_erp")
+  {
+    this->SetParam(dParamSuspensionERP, boost::any_cast<double>(_value));
+  }
+  else if (_key == "suspension_cfm")
+  {
+    this->SetParam(dParamSuspensionCFM, boost::any_cast<double>(_value));
+  }
+  else if (_key == "stop_erp")
+  {
+    this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
+  }
+  else if (_key == "stop_cfm")
+  {
+    this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
+  }
+  else if (_key == "erp")
+  {
+    this->SetParam(dParamERP, boost::any_cast<double>(_value));
+  }
+  else if (_key == "cfm")
+  {
+    this->SetParam(dParamCFM, boost::any_cast<double>(_value));
+  }
+  else if (_key == "fmax")
+  {
+    this->SetParam(dParamFMax, boost::any_cast<double>(_value));
+  }
+  else if (_key == "vel")
+  {
+    this->SetParam(dParamVel, boost::any_cast<double>(_value));
+  }
+  else if (_key == "hi_stop")
+  {
+    this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
+  }
+  else if (_key == "lo_stop")
+  {
+    this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
+  }
+  else if (_key == "thread_pitch")
+  {
+    ScrewJoint<ODEJoint>* screwJoint =
+      dynamic_cast<ScrewJoint<ODEJoint>* >(this);
+    if (screwJoint != NULL)
+      screwJoint->SetThreadPitch(0, boost::any_cast<double>(_value));
+  }
+  else
+  {
+    gzerr << "Unable to handle joint attribute["
+          << boost::any_cast<std::string>(_value) << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::Reset()
 {
   dJointReset(this->jointId);
