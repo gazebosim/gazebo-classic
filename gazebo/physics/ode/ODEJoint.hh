@@ -22,6 +22,8 @@
 #ifndef _ODEJOINT_HH_
 #define _ODEJOINT_HH_
 
+#include <boost/any.hpp>
+
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/Joint.hh"
 
@@ -114,6 +116,10 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetAttribute(Attribute _attr, int _index,
                                         double _value);
+
+      // Documentation inherited.
+      public: virtual void SetAttribute(const std::string &_key, int _index,
+                                        const boost::any &_value) ;
 
       /// \brief This is our ODE ID
       protected: dJointID jointId;
