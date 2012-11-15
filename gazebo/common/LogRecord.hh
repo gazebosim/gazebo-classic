@@ -19,8 +19,8 @@
  * Date: 1 Jun 2010
  */
 
-#ifndef _LOGGER_HH_
-#define _LOGGER_HH_
+#ifndef _LOGRECORD_HH_
+#define _LOGRECORD_HH_
 
 #include <fstream>
 #include <string>
@@ -43,38 +43,43 @@ namespace gazebo
     //addtogroup gazebo_common
     /// \{
 
-    /// \class LogWrite LogWrite.hh physics/LogWrite.hh
+    /// \class LogRecord LogRecord.hh physics/LogRecord.hh
     /// \brief Handles logging of data to disk
     ///
-    /// The LogWrite class is a Singleton that manages data logging of any
+    /// The LogRecord class is a Singleton that manages data logging of any
     /// entity within a running simulation. An entity may be a World, Model,
     /// or any of their child entities. This class only writes log files,
     /// see LogPlay for playback functionality.
     ///
-    /// State information for an entity may be logged through the LogWrite::Add
-    /// function, and stopped through the LogWrite::Remove function. Data may
+    /// State information for an entity may be logged through the LogRecord::Add
+    /// function, and stopped through the LogRecord::Remove function. Data may
     /// be logged into a single file, or split into many separate files by
-    /// specifying different filenames for the LogWrite::Add function.
+    /// specifying different filenames for the LogRecord::Add function.
     ///
-    /// The LogWrite is updated at the start of each simulation step. This
+    /// The LogRecord is updated at the start of each simulation step. This
     /// guarantees that all data is stored.
     ///
     /// \sa Logplay, State
-    class LogWrite : public SingletonT<LogWrite>
+    class LogRecord : public SingletonT<LogRecord>
     {
       /// \brief Constructor
-      private: LogWrite();
+      private: LogRecord();
 
       /// \brief Destructor
-      private: virtual ~LogWrite();
+      private: virtual ~LogRecord();
 
+      /// \brief Initialize logging into a subdirectory.
+      ///
+      /// Init may only be called once, False will be returned if called
+      /// multiple times.
+      /// \return True if successful.
       public: bool Init(const std::string &_subdir);
 
       /// \brief Add an object to a log file.
       ///
       /// Add a new object to a log. An object can be any valid named object
       /// in simulation, including the world itself. Duplicate additions are
-      /// ignored. Objects can be added to the same file by passing
+      /// ignored. Objects can be added to the same file by
       /// specifying the same _filename.
       /// \param[in] _name Name of the object to log.
       /// \param[in] _filename Filename of the log file.
@@ -99,6 +104,7 @@ namespace gazebo
       public: void Stop();
 
       /// \brief Start the logger.
+      /// \param[in] _encoding The type of encoding (txt, or bz2).
       public: void Start(const std::string &_encoding="bz2");
 
       /// \brief Get the encoding used.
@@ -121,7 +127,7 @@ namespace gazebo
       /// \cond
       private: class Log
       {
-        public: Log(LogWrite *_parent, const std::string &_filename,
+        public: Log(LogRecord *_parent, const std::string &_filename,
                     boost::function<bool (std::ostringstream &)> _logCB);
 
         public: virtual ~Log();
@@ -132,7 +138,7 @@ namespace gazebo
 
         public: void ClearBuffer();
 
-        public: LogWrite *parent;
+        public: LogRecord *parent;
         public: boost::function<bool (std::ostringstream &)> logCB;
         public: std::string buffer;
         public: std::ofstream logFile;
@@ -173,13 +179,16 @@ namespace gazebo
       private: boost::condition_variable dataAvailableCondition;
 
       /// \brief The base pathname for all the logs.
-      private: std::string logPathname;
+      private: boost::filesystem::path logPath;
 
       /// \brief Encoding format for each chunk.
       private: std::string encoding;
 
+      /// \brief True if initialized.
+      private: bool initialized;
+
       /// \brief This is a singleton
-      private: friend class SingletonT<LogWrite>;
+      private: friend class SingletonT<LogRecord>;
     };
     /// \}
   }

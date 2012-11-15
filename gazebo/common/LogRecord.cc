@@ -27,7 +27,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/LogWrite.hh"
+#include "gazebo/common/LogRecord.hh"
 
 #include "gazebo/gazebo_config.h"
 
@@ -41,28 +41,32 @@ typedef boost::archive::iterators::base64_from_binary<
         Base64Text;
 
 //////////////////////////////////////////////////
-LogWrite::LogWrite()
+LogRecord::LogRecord()
 {
   this->stop = true;
+  this->initialized = false;
 
   // Get the user's home directory
+  // \todo getenv is not portable, and there is no generic cross-platform
+  // method. Must check OS and choose a method
   char *homePath = getenv("HOME");
-  if (!homePath)
-    this->logPathname = "/tmp/gazebo";
-  else
-    this->logPathname = homePath;
 
-  this->logPathname += "/.gazebo/log/";
+  if (!homePath)
+    this->logPath = boost::filesystem::path("/tmp/gazebo");
+  else
+    this->logPath = boost::filesystem::path(homePath);
+
+  this->logPath /= "/.gazebo/log/";
 
   // Add the current time
   boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-  this->logPathname += boost::posix_time::to_iso_extended_string(now);
+  this->logPath /= boost::posix_time::to_iso_extended_string(now);
 
   this->logsEnd = this->logs.end();
 }
 
 //////////////////////////////////////////////////
-LogWrite::~LogWrite()
+LogRecord::~LogRecord()
 {
   // Stop the write thread.
   this->Stop();
@@ -78,18 +82,23 @@ LogWrite::~LogWrite()
 }
 
 //////////////////////////////////////////////////
-bool LogWrite::Init(const std::string &_subdir)
+bool LogRecord::Init(const std::string &_subdir)
 {
+  if (this->initialized)
+    return false;
+
   if (!_subdir.empty())
-    this->logPathname += "/" + _subdir;
+    this->logPath /=  _subdir;
 
   this->logsEnd = this->logs.end();
+  this->initialized = true;
+
   return true;
 }
 
 
 //////////////////////////////////////////////////
-void LogWrite::Start(const std::string &_encoding)
+void LogRecord::Start(const std::string &_encoding)
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
@@ -104,9 +113,8 @@ void LogWrite::Start(const std::string &_encoding)
   this->encoding = _encoding;
 
   // Create the log directory if necessary
-  boost::filesystem::path path(this->logPathname);
-  if (!boost::filesystem::exists(path))
-    boost::filesystem::create_directories(path);
+  if (!boost::filesystem::exists(this->logPath))
+    boost::filesystem::create_directories(this->logPath);
 
   this->logsEnd = this->logs.end();
 
@@ -117,32 +125,32 @@ void LogWrite::Start(const std::string &_encoding)
   {
     this->updateConnection =
       event::Events::ConnectWorldUpdateStart(
-          boost::bind(&LogWrite::Update, this));
+          boost::bind(&LogRecord::Update, this));
   }
   else
   {
-    gzerr << "LogWrite has already been initialized\n";
+    gzerr << "LogRecord has already been initialized\n";
     return;
   }
 
   // Start the logging thread
   if (!this->writeThread)
-    this->writeThread = new boost::thread(boost::bind(&LogWrite::Run, this));
+    this->writeThread = new boost::thread(boost::bind(&LogRecord::Run, this));
   else
   {
-    gzerr << "LogWrite has already been initialized\n";
+    gzerr << "LogRecord has already been initialized\n";
     return;
   }
 }
 
 //////////////////////////////////////////////////
-const std::string &LogWrite::GetEncoding() const
+const std::string &LogRecord::GetEncoding() const
 {
   return this->encoding;
 }
 
 //////////////////////////////////////////////////
-void LogWrite::Stop()
+void LogRecord::Stop()
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
 
@@ -164,7 +172,7 @@ void LogWrite::Stop()
 }
 
 //////////////////////////////////////////////////
-void LogWrite::Add(const std::string &_name, const std::string &_filename,
+void LogRecord::Add(const std::string &_name, const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCallback)
 {
   boost::mutex::scoped_lock lock(this->controlMutex);
@@ -177,19 +185,18 @@ void LogWrite::Add(const std::string &_name, const std::string &_filename,
     gzthrow("Log file with name[" + _name + "] already exists.\n");
 
   // Make the full path
-  boost::filesystem::path path = boost::filesystem::path(this->logPathname);
-  path = boost::filesystem::operator/(path, _filename);
+  boost::filesystem::path path = this->logPath / _filename;
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(path))
     gzthrow("Filename[" + path.string() + "], already exists\n");
 
-  LogWrite::Log *newLog;
+  LogRecord::Log *newLog;
 
   // Create a new log object
   try
   {
-    newLog = new LogWrite::Log(this, path.string(), _logCallback);
+    newLog = new LogRecord::Log(this, path.string(), _logCallback);
   }
   catch(...)
   {
@@ -204,7 +211,7 @@ void LogWrite::Add(const std::string &_name, const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-bool LogWrite::Remove(const std::string &_name)
+bool LogRecord::Remove(const std::string &_name)
 {
   bool result = false;
 
@@ -224,7 +231,7 @@ bool LogWrite::Remove(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void LogWrite::Update()
+void LogRecord::Update()
 {
   {
     boost::mutex::scoped_lock lock(this->writeMutex);
@@ -242,7 +249,7 @@ void LogWrite::Update()
 }
 
 //////////////////////////////////////////////////
-void LogWrite::Run()
+void LogRecord::Run()
 {
   // This loop will write data to disk.
   while (!this->stop)
@@ -252,7 +259,7 @@ void LogWrite::Run()
       boost::mutex::scoped_lock lock(this->writeMutex);
       this->dataAvailableCondition.wait(lock);
 
-      // Collect all the new log data. This will not write data to disk.
+      // Collect all the new log data.
       for (this->updateIter = this->logs.begin();
            this->updateIter != this->logsEnd; ++this->updateIter)
       {
@@ -266,7 +273,7 @@ void LogWrite::Run()
 }
 
 //////////////////////////////////////////////////
-LogWrite::Log::Log(LogWrite *_parent, const std::string &_filename,
+LogRecord::Log::Log(LogRecord *_parent, const std::string &_filename,
                  boost::function<bool (std::ostringstream &)> _logCB)
 {
   this->parent = _parent;
@@ -286,7 +293,7 @@ LogWrite::Log::Log(LogWrite *_parent, const std::string &_filename,
 }
 
 //////////////////////////////////////////////////
-LogWrite::Log::~Log()
+LogRecord::Log::~Log()
 {
   std::string xmlEnd = "</gazebo_log>";
   this->logFile.write(xmlEnd.c_str(), xmlEnd.size());
@@ -295,7 +302,7 @@ LogWrite::Log::~Log()
 }
 
 //////////////////////////////////////////////////
-void LogWrite::Log::Update()
+void LogRecord::Log::Update()
 {
   std::ostringstream stream;
 
@@ -340,13 +347,13 @@ void LogWrite::Log::Update()
 }
 
 //////////////////////////////////////////////////
-void LogWrite::Log::ClearBuffer()
+void LogRecord::Log::ClearBuffer()
 {
   this->buffer.clear();
 }
 
 //////////////////////////////////////////////////
-void LogWrite::Log::Write()
+void LogRecord::Log::Write()
 {
   // Make sure the file is open for writing
   if (!this->logFile.is_open())

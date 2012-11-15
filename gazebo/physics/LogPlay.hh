@@ -32,7 +32,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class Logplay Logplay.hh physics/Logplay.hh
+    /// \class Logplay Logplay.hh common/common.hh
     /// \brief Open and playback log files that were recorded using Logger.
     ///
     /// Use Logplay to open a log file (Logplay::Open), and access the
