@@ -40,7 +40,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
-#include "gazebo/rendering/GpuLaser.hh"
+// #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
@@ -458,7 +458,7 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
+/*GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
                                         bool _autoRender)
 {
   GpuLaserPtr camera(new GpuLaser(this->name + "::" + _name,
@@ -466,7 +466,7 @@ GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
   this->cameras.push_back(camera);
 
   return camera;
-}
+}*/
 
 //////////////////////////////////////////////////
 uint32_t Scene::GetCameraCount() const

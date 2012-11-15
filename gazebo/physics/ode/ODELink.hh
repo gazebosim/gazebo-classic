@@ -18,157 +18,153 @@
  * Author: Nate Koenig
  */
 
-#ifndef ODELINK_HH
-#define ODELINK_HH
+#ifndef _ODELINK_HH_
+#define _ODELINK_HH_
 
-#include "physics/ode/ode_inc.h"
-#include "physics/ode/ODETypes.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/ode/ode_inc.h"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/Link.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \brief ODE physics engine wrapper
-    /// \{
-
-    /// \brief ODE Link class
+    /// \brief ODE Link class.
     class ODELink : public Link
     {
-      /// \brief Constructor
-      public: ODELink(EntityPtr _parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent model.
+      public: explicit ODELink(EntityPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODELink();
 
-      /// \brief Load the link based on SDF parameters
-      /// \param _sdf the sdf parameters
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the link
+      // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Finalize the link
+      // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Update the link
+      // Documentation inherited
       public: virtual void Update();
 
-      /// \brief Called when the pose of the entity (or one of its parents) has
-      /// changed
+      // Documentation inherited
       public: virtual void OnPoseChange();
+
+      // Documentation inherited
+      public: virtual void SetEnabled(bool _enable) const;
+
+      // Documentation inherited
+      public: virtual bool GetEnabled() const;
+
+      // Documentation inherited
+      public: virtual void UpdateMass();
+
+      // Documentation inherited
+      public: virtual void UpdateSurface();
+
+      // Documentation inherited
+      public: virtual void SetLinearVel(const math::Vector3 &_vel);
+
+      // Documentation inherited
+      public: virtual void SetAngularVel(const math::Vector3 &_vel);
+
+      // Documentation inherited
+      public: virtual void SetForce(const math::Vector3 &_force);
+
+      // Documentation inherited
+      public: virtual void SetTorque(const math::Vector3 &_torque);
+
+      // Documentation inherited
+      public: virtual void AddForce(const math::Vector3 &_force);
+
+      // Documentation inherited
+      public: virtual void AddRelativeForce(const math::Vector3 &_force);
+
+      // Documentation inherited
+      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
+                                                   const math::Vector3 &_pos);
+
+      // Documentation inherited
+      public: virtual void AddForceAtRelativePosition(
+                  const math::Vector3 &_force,
+                  const math::Vector3 &_relpos);
+
+      // Documentation inherited
+      public: virtual void AddTorque(const math::Vector3 &_torque);
+
+      // Documentation inherited
+      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel() const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldAngularVel() const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldForce() const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldTorque() const;
+
+      // Documentation inherited
+      public: virtual void SetGravityMode(bool _mode);
+
+      // Documentation inherited
+      public: virtual bool GetGravityMode();
+
+      // Documentation inherited
+      public: void SetSelfCollide(bool _collide);
+
+      // Documentation inherited
+      public: virtual void SetLinearDamping(double _damping);
+
+      // Documentation inherited
+      public: virtual void SetAngularDamping(double _damping);
+
+      // Documentation inherited
+      public: virtual void SetKinematic(const bool &_state);
+
+      // Documentation inherited
+      public: virtual bool GetKinematic() const;
+
+      // Documentation inherited
+      public: virtual void SetAutoDisable(bool _disable);
 
       /// \brief Return the ID of this link
       /// \return ODE link id
       public: dBodyID GetODEId() const;
 
-      /// \brief Set whether this link is enabled
-      public: virtual void SetEnabled(bool enable) const;
-
-      /// \brief Get whether this link is enabled in the physics engine
-      public: virtual bool GetEnabled() const;
-
-      /// \brief Update the mass matrix
-      public: virtual void UpdateMass();
-
-      /// \brief Update other parameters for ODE
-      public: virtual void UpdateSurface();
-
-      /// \brief Set the linear velocity of the link
-      public: virtual void SetLinearVel(const math::Vector3 &vel);
-
-      /// \brief Set the angular velocity of the link
-      public: virtual void SetAngularVel(const math::Vector3 &vel);
-
-      /// \brief Set the force applied to the link
-      public: virtual void SetForce(const math::Vector3 &_force);
-
-      /// \brief Set the torque applied to the link
-      public: virtual void SetTorque(const math::Vector3 &_torque);
-
-      /// \brief Add a force to the body
-      public: virtual void AddForce(const math::Vector3 &_force);
-
-      /// \brief Add a force to the body
-      public: virtual void AddRelativeForce(const math::Vector3 &_force);
-
-      /// \brief Add a force to the body using a global position
-      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
-                                                   const math::Vector3 &_pos);
-
-      /// \brief Set the force applied to the body (add by Stefano)
-      public: virtual void AddForceAtRelativePosition(
-                  const math::Vector3 &_force, const math::Vector3 &_relpos);
-
-      /// \brief Add a torque to the body
-      public: virtual void AddTorque(const math::Vector3 &_torque);
-
-      /// \brief Add a torque to the body relative frame
-      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
-
-      /// \brief Get the linear velocity of the link in the world frame
-      public: virtual math::Vector3 GetWorldLinearVel() const;
-
-      /// \brief Get the angular velocity of the link in the world frame
-      public: virtual math::Vector3 GetWorldAngularVel() const;
-
-      /// \brief Get the force applied to the link in the world frame
-      public: virtual math::Vector3 GetWorldForce() const;
-
-      /// \brief Get the torque applied to the link in the world frame
-      public: virtual math::Vector3 GetWorldTorque() const;
-
-      /// \brief Set whether gravity affects this link
-      public: virtual void SetGravityMode(bool mode);
-
-      /// \brief Get the gravity mode
-      public: virtual bool GetGravityMode();
-
-      /// \brief Set whether this link will collide with others in the model
-      public: void SetSelfCollide(bool collide);
-
-      /// \brief Get the link's space ID
+      /// \brief Get the ID of the collision space this link is in.
+      /// \return The collision space ID for the link.
       public: dSpaceID GetSpaceId() const;
 
-      /// \brief Set the link's space ID
-      public: void SetSpaceId(dSpaceID spaceid);
+      /// \brief Set the ID of the collision space this link is in.
+      /// \param[in] _spaceId The collision space ID for the link.
+      public: void SetSpaceId(dSpaceID _spaceid);
 
-      /// \brief Set the linear damping factor
-      public: virtual void SetLinearDamping(double damping);
-
-      /// \brief Set the angular damping factor
-      public: virtual void SetAngularDamping(double damping);
-
-      /// \brief callback when ODE determines a body is disabled
+      /// \brief Callback when ODE determines a body is disabled.
+      /// \param[in] _id Id of the body.
       public: static void DisabledCallback(dBodyID _id);
 
       /// \brief when ODE updates dynamics bodies, this callback
       ///        propagates the chagnes in pose back to Gazebo
-      public: static void MoveCallback(dBodyID id);
+      /// \param[in] _id Id of the body.
+      public: static void MoveCallback(dBodyID _id);
 
-      /// \brief Set whether this link is in the kinematic state
-      public: virtual void SetKinematic(const bool &state);
-
-      /// \brief Get whether this link is in the kinematic state
-      public: virtual bool GetKinematic() const;
-
-      /// \brief Allow the link to auto disable.
-      /// \param _disable If true, the link is allowed to auto disable.
-      public: virtual void SetAutoDisable(bool _disable);
-
-      protected: math::Pose pose;
-
-      /// ODE link handle
+      /// \brief ODE link handle
       private: dBodyID linkId;
 
+      /// \brief Pointer to the ODE Physics engine
       private: ODEPhysicsPtr odePhysics;
 
+      /// \brief Collision space id.
       private: dSpaceID spaceId;
     };
-
-    /// \}
   }
 }
 #endif
