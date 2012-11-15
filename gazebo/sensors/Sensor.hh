@@ -116,7 +116,7 @@ namespace gazebo
       /// \return Time of last measurement.
       public: common::Time GetLastMeasurementTime();
 
-      /// \brief Returns true if user requests the sensor to be visualized
+      /// \brief Return true if user requests the sensor to be visualized
       ///        via tag:  <visualize>true</visualize> in SDF.
       /// \return True if visualized, false if not.
       public: bool GetVisualize() const;
