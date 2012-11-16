@@ -40,17 +40,16 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ImuSensor();
 
-      /// \brief Load the ImuSensor from SDF.
-      /// \param[in] _node The SDF data.
+      /// Documentation inherited
       protected: virtual void Load(sdf::ElementPtr _node);
 
-      /// \brief Initialize the IMU.
+      /// Documentation inherited
       protected: virtual void Init();
 
-      /// \brief Update sensed values.
+      /// Documentation inherited
       protected: virtual void Update();
 
-      /// \brief Finalize the IMU.
+      /// Documentation inherited
       protected: virtual void Fini();
 
       /// \brief Returns velocity as a math::Pose

@@ -46,40 +46,37 @@ namespace gazebo
     /// \brief Sensor class for RFID type of sensor
     class RFIDSensor: public Sensor
     {
-      /// \brief  Constructor
+      /// \brief Constructor
       public: RFIDSensor();
 
       /// \brief Destructor
       public: virtual ~RFIDSensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
+      /// Documentation inherited
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      /// Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
-      /// \brief  Initialize the sensor
+      /// Documentation inherited
       public: virtual void Init();
 
-      /// \brief Add RFID tag.
-      /// \param[in] _tag RFID tag to add.
+      /// Documentation inherited
       public: void AddTag(RFIDTag *_tag);
 
       protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief  Finalize the sensor
+      /// Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Iterates through all the RFID tags, and finds the one which
+      /// \brief Iterates through all the RFID tags, and finds the ones which
       /// are in range of the sensor.
       private: void EvaluateTags();
 
       /// \brief Check the range for one RFID tag.
       /// \param[in] _pose Pose of a tag.
+      /// \return Checks if tag is in range
       private: bool CheckTagRange(const math::Pose &_pose);
 
       /// \brief Checks if ray intersects RFID sensor.

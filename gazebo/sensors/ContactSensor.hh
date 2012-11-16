@@ -53,31 +53,27 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ContactSensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
+      /// Documentation Inherited
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      /// Documentation Inherited
       public: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the sensor
+      /// Documentation Inherited
       public: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
+      /// Documentation Inherited
       protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the sensor
+      /// Documentation Inherited
       protected: virtual void Fini();
 
       /// \brief Get the number of collisions that the sensor is observing
       /// \return Number of collisions
       public: unsigned int GetCollisionCount() const;
 
-      /// \brief Get a collision name at index _index
+      /// \brief Get a collision name at an index
       /// \param[in] _index Index of collision in collection of collisions
       /// \return name of collision
       public: std::string GetCollisionName(unsigned int _index) const;
