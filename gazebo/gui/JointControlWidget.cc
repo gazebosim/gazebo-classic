@@ -244,16 +244,21 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   this->modelLabel->setText(QString::fromStdString(
         std::string("Model: ") + _modelName));
 
-  this->jointPub = this->node->Advertise<msgs::JointCmd>(
-      std::string("~/") + _modelName + "/joint_cmd");
-
-  this->requestMsg = msgs::CreateRequest("entity_info");
-  this->requestMsg->set_data(_modelName);
-
-  msgs::Response response = transport::request("default", *this->requestMsg);
-
   msgs::Model modelMsg;
-  modelMsg.ParseFromString(response.serialized_data());
+
+  // Only request info if the model has a name.
+  if (!_modelName.empty())
+  {
+    this->jointPub = this->node->Advertise<msgs::JointCmd>(
+        std::string("~/") + _modelName + "/joint_cmd");
+
+    this->requestMsg = msgs::CreateRequest("entity_info");
+    this->requestMsg->set_data(_modelName);
+
+    msgs::Response response = transport::request("default", *this->requestMsg);
+
+    modelMsg.ParseFromString(response.serialized_data());
+  }
 
   this->LayoutForceTab(modelMsg);
 
@@ -696,5 +701,4 @@ void JointControlWidget::LayoutVelocityTab(msgs::Model &_modelMsg)
       new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Expanding), i+1, 0);
   this->velocityGridLayout->setRowStretch(i+1, 2);
-
 }

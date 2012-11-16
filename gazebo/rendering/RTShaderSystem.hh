@@ -148,6 +148,9 @@ namespace gazebo
       /// \brief True if initialized.
       private: bool initialized;
 
+      /// \brief True if shadows have been applied.
+      private: bool shadowsApplied;
+
       /// \brief All the scenes.
       private: std::vector<Scene *> scenes;
 

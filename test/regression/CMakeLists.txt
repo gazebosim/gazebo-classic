@@ -22,7 +22,6 @@ link_directories(
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
-  common.cc
   factory.cc
   file_handling.cc
   heightmap.cc
