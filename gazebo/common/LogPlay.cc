@@ -28,7 +28,7 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/LogWrite.hh"
+#include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/LogPlay.hh"
 
 using namespace gazebo;

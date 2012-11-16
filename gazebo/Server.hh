@@ -52,7 +52,8 @@ namespace gazebo
     public: void PrintUsage();
     public: bool ParseArgs(int argc, char **argv);
 
-    public: bool Load(const std::string &_filename="worlds/empty.world");
+    public: bool LoadFile(const std::string &_filename="worlds/empty.world");
+    public: bool LoadString(const std::string &_sdfString);
     public: void Init();
     public: void Run();
     public: void Stop();
@@ -61,6 +62,10 @@ namespace gazebo
     public: void SetParams(const common::StrStr_M &params);
 
     public: bool GetInitialized() const;
+
+    /// \brief Load implementation.
+    /// \param[in] _elem Description of the world to load.
+    private: bool LoadImpl(sdf::ElementPtr _elem);
 
     private: static void SigInt(int _v);
 
@@ -82,7 +87,6 @@ namespace gazebo
 
     private: boost::mutex *receiveMutex;
     private: std::list<msgs::ServerControl> controlMsgs;
-    private: std::map<std::string, std::string> worldFilenames;
 
     private: gazebo::common::StrStr_M params;
     private: po::variables_map vm;
