@@ -28,7 +28,6 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/LogWrite.hh"
 #include "gazebo/common/LogPlay.hh"
 
 using namespace gazebo;
@@ -50,7 +49,7 @@ void base64_decode(std::string &_dest, const std::string &_src)
   try
   {
     base64_dec srcIter(_src.c_str());
-    for(unsigned int i=0; i < _src.size(); ++i)
+    for (unsigned int i = 0; i < _src.size(); ++i)
     {
       _dest += *srcIter;
       ++srcIter;
