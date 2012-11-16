@@ -19,62 +19,56 @@
  * Date: 13 Oct 2009
  */
 
-#ifndef ODEBALLJOINT_HH
-#define ODEBALLJOINT_HH
+#ifndef _ODEBALLJOINT_HH_
+#define _ODEBALLJOINT_HH_
 
-#include "physics/BallJoint.hh"
-#include "physics/ode/ODEJoint.hh"
+#include "gazebo/physics/BallJoint.hh"
+#include "gazebo/physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief An ODEBallJoint
     class ODEBallJoint : public BallJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEBallJoint(dWorldID worldId, BasePtr _parent);
+      /// \param[in] _worldID ODE id of the world.
+      /// \param[in] _parent Parent of the Joint
+      public: ODEBallJoint(dWorldID _worldId, BasePtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODEBallJoint();
 
-      /// \brief Get joint's anchor point
-      public: virtual math::Vector3 GetAnchor(int index) const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(int _index) const;
 
-      /// \brief Set joint's anchor point
-      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
+      // Documentation inherited
+      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
-      /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int /*index*/) const
+      // Documentation inherited
+      public: virtual math::Vector3 GetGlobalAxis(int /*_index*/) const
               {return math::Vector3();}
-      /// \brief Set joint damping, not yet implemented
-      public: virtual void SetDamping(int index, const double damping);
 
-      /// \brief Set the velocity of an axis(index).
+      // Documentation inherited
+      public: virtual void SetDamping(int _index, double _damping);
+
+      // Documentation inherited
       public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}
-      /// \brief Get the rotation rate of an axis(index)
+
+      // Documentation inherited
       public: virtual double GetVelocity(int /*index*/) const {return 0;}
-      /// \brief Get the max allowed force of an axis(index).
+
+      // Documentation inherited
       public: virtual double GetMaxForce(int /*index*/) {return 0;}
-      /// \brief Set the max allowed force of an axis(index).
+
+      // Documentation inherited
       public: virtual void SetMaxForce(int /*index*/, double /*t*/) {}
-      /// \brief Get the angle of rotation of an axis(index)
+
+      // Documentation inherited
       public: virtual math::Angle GetAngleImpl(int /*index*/) const
               {return math::Angle(0);}
     };
-
-    /// \}
   }
 }
 #endif
-
-
-
-
-
-
-

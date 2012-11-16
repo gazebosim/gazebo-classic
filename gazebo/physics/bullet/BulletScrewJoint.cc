@@ -50,6 +50,7 @@ BulletScrewJoint::~BulletScrewJoint()
 void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<BulletJoint>::Load(_sdf);
+  this->SetThreadPitch(0, this->threadPitch);
 }
 
 //////////////////////////////////////////////////
@@ -124,6 +125,12 @@ void BulletScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
+{
+  gzerr << "Not implemented\n";
+}
+
+//////////////////////////////////////////////////
+void BulletScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
 {
   gzerr << "Not implemented\n";
 }

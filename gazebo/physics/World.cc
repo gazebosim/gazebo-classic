@@ -231,9 +231,8 @@ void World::Save(const std::string &_filename)
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
-  data += "<gazebo version ='";
-  data += SDF_VERSION;
-  data += "'>\n";
+  data += "<gazebo version='" +
+          boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
   data += this->sdf->ToString("");
   data += "</gazebo>\n";
 
@@ -741,7 +740,7 @@ gazebo::common::Time World::GetSimTime() const
 }
 
 //////////////////////////////////////////////////
-void World::SetSimTime(common::Time _t)
+void World::SetSimTime(const common::Time &_t)
 {
   this->simTime = _t;
 }
@@ -1194,7 +1193,7 @@ void World::ProcessFactoryMsgs()
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
-      std::string filename = common::ModelDatabase::GetModelFile(
+      std::string filename = common::ModelDatabase::Instance()->GetModelFile(
           (*iter).sdf_filename());
 
       if (!sdf::readFile(filename, factorySDF))

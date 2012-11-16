@@ -28,16 +28,15 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \brief Load the sensor library
-    /// \return True if successfully loaded, false if not
-    /// \TODO Nate check
+    /// \brief Load the sensor library.
+    /// \return True if successfully loaded, false if not.
     bool load();
 
-    /// \brief Create a sensor using SDF
-    /// \param[in] _elem The SDF element that describes the sensor
-    /// \param[in] _worldName Name of the world in which to create the sensor
-    /// \param[in] _parentName The fully scoped parent name (model::link)
-    /// \return The name of the new sensor
+    /// \brief Create a sensor using SDF.
+    /// \param[in] _elem The SDF element that describes the sensor.
+    /// \param[in] _worldName Name of the world in which to create the sensor.
+    /// \param[in] _parentName The fully scoped parent name (model::link).
+    /// \return The name of the new sensor.
     std::string create_sensor(sdf::ElementPtr _elem,
                               const std::string &_worldName,
                               const std::string &_parentName);
@@ -86,4 +85,3 @@ namespace gazebo
   }
 }
 #endif
-

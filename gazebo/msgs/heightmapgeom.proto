@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface HeightmapGeom 
 /// \brief Message for a heightmap geometry
-/// \verbatim
+
 
 import "image.proto";
 import "vector3d.proto";
@@ -31,4 +31,4 @@ message HeightmapGeom
   repeated Blend blend     = 5; // How to blend the textures
 }
 
-/// \endverbatim
+

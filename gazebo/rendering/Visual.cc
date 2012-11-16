@@ -26,6 +26,7 @@
 #include "common/Events.hh"
 #include "common/Common.hh"
 
+#include "rendering/WireBox.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
@@ -38,6 +39,7 @@
 #include "common/Skeleton.hh"
 #include "rendering/Material.hh"
 #include "rendering/Visual.hh"
+#include "gazebo/common/Plugin.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -46,6 +48,7 @@ using namespace rendering;
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
@@ -54,6 +57,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
+  this->initialized = false;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -79,6 +83,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
@@ -88,6 +93,7 @@ Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
   this->sceneNode = NULL;
   this->animState = NULL;
   this->skeleton = NULL;
+  this->initialized = false;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -114,6 +120,8 @@ Visual::~Visual()
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender(this->preRenderConnection);
 
+  delete this->boundingBox;
+
   // delete instance from lines vector
   /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
        iter!= this->lines.end(); ++iter)
@@ -139,6 +147,7 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
+  this->plugins.clear();
   // Detach from the parent
   if (this->parent)
     this->parent->DetachVisual(this->GetName());
@@ -224,6 +233,7 @@ void Visual::Init()
 
   if (this->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -319,6 +329,15 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_laser_retro())
     this->sdf->GetElement("laser_retro")->Set(_msg->laser_retro());
 
+  if (_msg->has_plugin())
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("plugin");
+    if (_msg->plugin().has_name())
+      elem->GetAttribute("name")->Set(_msg->plugin().name());
+    if (_msg->plugin().has_filename())
+      elem->GetAttribute("filename")->Set(_msg->plugin().filename());
+  }
+
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -412,6 +431,7 @@ void Visual::Load()
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->LoadPlugins();
 }
 
 //////////////////////////////////////////////////
@@ -1059,75 +1079,23 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetHighlighted(bool /*_highlighted*/)
+void Visual::SetHighlighted(bool _highlighted)
 {
-  /*
-  if (this->GetAttachedObjectCount() > 0)
-    this->sceneNode->showBoundingBox(_highlighted);
-    */
-
-/* TODO: This code will cause objects that use the same mesh to be
- * highlighted. Using the same mesh is good for performance. We need to come
- * up with a better way to highlight objects, possibly by attaching
- * a special visual to selected objects.
-  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  if (_highlighted)
   {
-    Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
-
-    entity = dynamic_cast<Ogre::Entity*>(obj);
-
-    if (!entity)
-      continue;
-
-    // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    // Create the bounding box if it's not already created.
+    if (!this->boundingBox)
     {
-      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
-      Ogre::MaterialPtr material = subEntity->getMaterial();
-
-      unsigned int techniqueCount;
-      Ogre::Technique *technique;
-      Ogre::Pass *pass;
-      Ogre::ColourValue dc;
-
-      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-          techniqueCount++)
-      {
-        technique = material->getTechnique(techniqueCount);
-        if (_highlighted)
-        {
-          pass = technique->createPass();
-          pass->setName("highlight");
-          pass->setDiffuse(
-              Conversions::Convert(common::Color(0.8, 0.8, 0.8, 0.8)));
-          pass->setSelfIllumination(
-              Conversions::Convert(common::Color(0.8, 0.8, 0.8)));
-          pass->setDepthBias(0.2, 0.1);
-
-          pass->setDepthWriteEnabled(false);
-          pass->setDepthCheckEnabled(true);
-          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-        }
-        else
-        {
-          for (unsigned int k = 0; k < technique->getNumPasses(); ++k)
-          {
-            if (technique->getPass(k)->getName() == "highlight")
-            {
-              technique->removePass(k);
-            }
-          }
-        }
-      }
+      this->boundingBox = new WireBox(shared_from_this(),
+                                      this->GetBoundingBox());
     }
-  }
-  */
 
-  /*for (unsigned int i = 0; i < this->children.size(); ++i)
+    this->boundingBox->SetVisible(true);
+  }
+  else if (this->boundingBox)
   {
-    this->children[i]->SetHighlighted(_highlighted);
-  }*/
+    this->boundingBox->SetVisible(false);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1485,9 +1453,23 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
           continue;
       }
 
-      Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
-      math::Vector3 min = Conversions::Convert(bb.getMinimum());
-      math::Vector3 max = Conversions::Convert(bb.getMaximum());
+      Ogre::AxisAlignedBox bb = obj->getBoundingBox();
+
+      math::Vector3 min;
+      math::Vector3 max;
+      math::Quaternion rotDiff;
+      math::Vector3 posDiff;
+
+      rotDiff = Conversions::Convert(node->_getDerivedOrientation()) -
+                this->GetWorldPose().rot;
+
+      posDiff = Conversions::Convert(node->_getDerivedPosition()) -
+                this->GetWorldPose().pos;
+
+      min = rotDiff * Conversions::Convert(bb.getMinimum() * node->getScale())
+            + posDiff;
+      max = rotDiff * Conversions::Convert(bb.getMaximum() * node->getScale())
+            + posDiff;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
@@ -1867,6 +1849,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       else
         scale.x = scale.y = scale.z = 1.0;
     }
+    else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
+      scale.x = scale.y = scale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2170,4 +2154,73 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     bone->setPosition(p);
     bone->setOrientation(quat);
   }
+}
+
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugins()
+{
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
+
+
+  for (std::vector<VisualPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugin(const std::string &_filename,
+                       const std::string &_name,
+                       sdf::ElementPtr _sdf)
+{
+  gazebo::VisualPluginPtr plugin = gazebo::VisualPlugin::Create(_filename,
+                                                              _name);
+
+  if (plugin)
+  {
+    if (plugin->GetType() != VISUAL_PLUGIN)
+    {
+      gzerr << "Visual[" << this->GetName() << "] is attempting to load "
+            << "a plugin, but detected an incorrect plugin type. "
+            << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
+      return;
+    }
+    plugin->Load(shared_from_this(), _sdf);
+    this->plugins.push_back(plugin);
+
+    if (this->initialized)
+      plugin->Init();
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::RemovePlugin(const std::string &_name)
+{
+  std::vector<VisualPluginPtr>::iterator iter;
+  for (iter = this->plugins.begin(); iter != this->plugins.end(); ++iter)
+  {
+    if ((*iter)->GetHandle() == _name)
+    {
+      this->plugins.erase(iter);
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::LoadPlugin(sdf::ElementPtr _sdf)
+{
+  std::string pluginName = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
+  this->LoadPlugin(filename, pluginName, _sdf);
 }

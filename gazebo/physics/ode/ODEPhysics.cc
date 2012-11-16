@@ -177,15 +177,14 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
        odeElem->GetElement("constraints")->GetValueDouble(
         "contact_surface_layer"));
 
-  // If auto-disable is active, then user interaction with the joints
-  // doesn't behave properly
-  // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId, 0);
+  // Enable auto-disable by default. Models with joints are excluded from
+  // auto-disable
+  dWorldSetAutoDisableFlag(this->worldId, 1);
 
-  dWorldSetAutoDisableTime(this->worldId, 2);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableSteps(this->worldId, 20);
+  dWorldSetAutoDisableTime(this->worldId, 1);
+  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.1);
+  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
+  dWorldSetAutoDisableSteps(this->worldId, 5);
 
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
 
@@ -679,12 +678,6 @@ void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEPhysics::GetGravity() const
-{
-  return this->sdf->GetValueVector3("gravity");
-}
-
-//////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dBodyID b1 = dGeomGetBody(_o1);
@@ -937,7 +930,7 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
-                                     ODECollision *_collision2)
+                                    ODECollision *_collision2)
 {
   if (this->trimeshCollidersCount >= this->trimeshColliders.size())
     this->trimeshColliders.resize(this->trimeshColliders.size() + 100);

@@ -29,32 +29,38 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \brief Handles transportation of messages
     /// \addtogroup gazebo_transport
     /// \{
 
-    /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
-    /// environment variable
-    /// \param master_host The hostname of the master is set to this param
-    /// \param master_port The port of the master is set to this param
-    /// \return False if the GAZEBO_MASTER_URI was not found
-    bool get_master_uri(std::string &master_host, unsigned int &master_port);
+    /// \brief Get the hostname and port of the master from the
+    /// GAZEBO_MASTER_URI environment variable
+    /// \param[out] _master_host The hostname of the master is set to this param
+    /// \param[out] _master_port The port of the master is set to this param
+    /// \return true if GAZEBO_MASTER_URI was successfully parsed; false
+    /// otherwise (in which case output params are not set)
+    bool get_master_uri(std::string &_master_host, unsigned int &_master_port);
 
     /// \brief Initialize the transport system
-    /// \param master_host The hostname or IP of the master. Leave empty to
+    /// \param[in] _master_host The hostname or IP of the master. Leave empty to
     ///                    use pull address from the GAZEBO_MASTER_URI env var.
-    /// \param master_port The port  of the master. Leave empty to
+    /// \param[in] _master_port The port  of the master. Leave empty to
     ///                    use pull address from the GAZEBO_MASTER_URI env var.
-    bool init(const std::string &master_host ="",
-              unsigned int master_port = 0);
+    /// \return true if initialization succeeded; false otherwise
+    bool init(const std::string &_master_host ="",
+              unsigned int _master_port = 0);
 
-    /// \brief Run the transport component. This starts message passing. This is
-    ///        a blocking call
+    /// \brief Run the transport component. Creates a thread to handle
+    /// message passing. This call will block until the master can
+    /// be contacted or until a retry limit is reached
     void run();
 
     /// \brief Return all the namespace (world names) on the master
+    /// \param[out] _namespaces The list of namespace will be written here
     void get_topic_namespaces(std::list<std::string> &_namespaces);
 
-    /// \brief Return true if the transport system is stopped
+    /// \brief Is the transport system stopped?
+    /// \return true if the transport system is stopped; false otherwise
     bool is_stopped();
 
     /// \brief Stop the transport component from running.
@@ -63,14 +69,20 @@ namespace gazebo
     /// \brief Cleanup the transport component
     void fini();
 
-    /// \brief clear any remaining communication buffers
+    /// \brief Clear any remaining communication buffers
     void clear_buffers();
 
-    /// \brief Set to true to pause incoming messages. They are still queued
-    ///        for later delivery
+    /// \brief Pause or unpause incoming messages. When paused, messages
+    /// are queued for later delivery
+    /// \param[in] _pause If true, pause; otherwise unpause
     void pause_incoming(bool _pause);
 
-    /// \brief Send a request, and receive a response.
+    /// \brief Send a request and receive a response.  This call will block
+    /// until a response is received.
+    /// \param[in] _worldName The name of the world to which the request
+    /// should be sent
+    /// \param[in] _request The request itself
+    /// \return The response to the request.  Can be empty.
     msgs::Response request(const std::string &_worldName,
                            const msgs::Request &_request);
     /// \}

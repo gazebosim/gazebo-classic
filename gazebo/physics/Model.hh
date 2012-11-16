@@ -26,11 +26,11 @@
 #include <map>
 #include <vector>
 
-#include "common/CommonTypes.hh"
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
-#include "physics/ModelState.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/ModelState.hh"
+#include "gazebo/physics/Entity.hh"
 
 namespace boost
 {
