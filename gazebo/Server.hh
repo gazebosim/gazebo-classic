@@ -63,6 +63,8 @@ namespace gazebo
 
     public: bool GetInitialized() const;
 
+    /// \brief Load implementation.
+    /// \param[in] _elem Description of the world to load.
     private: bool LoadImpl(sdf::ElementPtr _elem);
 
     private: static void SigInt(int _v);
