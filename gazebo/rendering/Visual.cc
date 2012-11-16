@@ -1083,11 +1083,12 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
-    math::Box box = this->GetBoundingBox() - this->GetWorldPose().pos;
+    // Create the bounding box if it's not already created.
     if (!this->boundingBox)
-      this->boundingBox = new WireBox(shared_from_this(), box);
-    else
-      this->boundingBox->Init(box);
+    {
+      this->boundingBox = new WireBox(shared_from_this(),
+                                      this->GetBoundingBox());
+    }
 
     this->boundingBox->SetVisible(true);
   }
@@ -1452,9 +1453,23 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
           continue;
       }
 
-      Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
-      math::Vector3 min = Conversions::Convert(bb.getMinimum());
-      math::Vector3 max = Conversions::Convert(bb.getMaximum());
+      Ogre::AxisAlignedBox bb = obj->getBoundingBox();
+
+      math::Vector3 min;
+      math::Vector3 max;
+      math::Quaternion rotDiff;
+      math::Vector3 posDiff;
+
+      rotDiff = Conversions::Convert(node->_getDerivedOrientation()) -
+                this->GetWorldPose().rot;
+
+      posDiff = Conversions::Convert(node->_getDerivedPosition()) -
+                this->GetWorldPose().pos;
+
+      min = rotDiff * Conversions::Convert(bb.getMinimum() * node->getScale())
+            + posDiff;
+      max = rotDiff * Conversions::Convert(bb.getMaximum() * node->getScale())
+            + posDiff;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")

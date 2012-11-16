@@ -616,6 +616,7 @@ void GLWidget::OnMouseReleaseTranslate()
   else
   {
     this->SetSelectedVisual(rendering::VisualPtr());
+    event::Events::setSelectedEntity("", "normal");
   }
 }
 
