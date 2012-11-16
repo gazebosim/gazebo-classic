@@ -696,5 +696,4 @@ void JointControlWidget::LayoutVelocityTab(msgs::Model &_modelMsg)
       new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Expanding), i+1, 0);
   this->velocityGridLayout->setRowStretch(i+1, 2);
-
 }
