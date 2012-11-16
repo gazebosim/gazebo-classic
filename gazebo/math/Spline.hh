@@ -31,7 +31,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
-    /// \class Spline Spline.hh gzmath/gzmath.hh
+    /// \class Spline Spline.hh math/gzmath.hh
     /// \brief Splines
     class Spline
     {

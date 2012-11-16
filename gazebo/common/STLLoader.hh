@@ -71,7 +71,7 @@ namespace gazebo
       /// \param[in] _a the vector data
       /// \param[in] _m the number of columns in the table
       /// \param[in] _n the number of rows in the table
-      /// \TODO Nate what does this return?
+      /// \return The column index of the vector
       private: int RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[]);
 
       /// \brief Reads a long int from a binary file.

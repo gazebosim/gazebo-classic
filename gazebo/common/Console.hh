@@ -107,7 +107,7 @@ namespace gazebo
       /// \brief True if logging data
       private: bool logData;
 
-      /// \TODO Nate does this private class need to be documented?
+      /// \class NullStream Animation.hh common/common.hh
       /// \brief A stream that does not output anywhere
       private: class NullStream : public std::ostream
                {

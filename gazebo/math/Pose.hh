@@ -34,7 +34,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
-    /// \class Pose Pose.hh gzmath/gzmath.hh
+    /// \class Pose Pose.hh math/gzmath.hh
     /// \brief Encapsulates a position and rotation in three space
     class Pose
     {
@@ -45,8 +45,8 @@ namespace gazebo
       public: Pose();
 
       /// \brief Constructor
-      /// \param[in] pos A position
-      /// \param[is] rot A rotation
+      /// \param[in] _pos A position
+      /// \param[in] _rot A rotation
       public: Pose(const Vector3 &_pos, const Quaternion &_rot);
 
       /// \brief Constructor
@@ -60,7 +60,7 @@ namespace gazebo
                    double _roll, double _pitch, double _yaw);
 
       /// \brief Copy constructor
-      /// \param pose Pose to copy
+      /// \param[in] _pose Pose to copy
       public: Pose(const Pose &_pose);
 
       /// \brief Destructor
@@ -96,17 +96,17 @@ namespace gazebo
       public: Pose GetInverse() const;
 
       /// \brief Addition operator
-      /// \param[in] pose Pose to add to this pose
+      /// \param[in] _pose Pose to add to this pose
       /// \return The resulting pose
       public: Pose operator+(const Pose &_pose) const;
 
       /// \brief Add-Equals operator
-      /// \param[in] pose Pose to add to this pose
+      /// \param[in] _pose Pose to add to this pose
       /// \return The resulting pose
       public: const Pose &operator+=(const Pose &_pose);
 
       /// \brief Subtraction operator
-      /// \param[in] pose Pose to subtract from this one
+      /// \param[in] _pose Pose to subtract from this one
       /// \return The resulting pose
       public: inline Pose operator-(const Pose &_pose) const
               {
@@ -115,7 +115,7 @@ namespace gazebo
               }
 
       /// \brief Subtraction operator
-      /// \param[in] pose Pose to subtract from this one
+      /// \param[in] _pose Pose to subtract from this one
       /// \return The resulting pose
       public: const Pose &operator-=(const Pose &_pose);
 

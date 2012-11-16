@@ -39,7 +39,7 @@ namespace gazebo
   /// \addtogroup gazebo_math
   /// \{
 
-  /// \class Quaternion Quaternion.hh gzmath/gzmath.hh
+  /// \class Quaternion Quaternion.hh math/gzmath.hh
   /// \brief A quaternion class
   class Quaternion
   {

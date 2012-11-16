@@ -50,7 +50,7 @@ namespace gazebo
   /// \addtogroup gazebo_math Math
   /// \{
 
-  /// \class Angle Angle.hh gzmath/gzmath.hh
+  /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
   class Angle
   {

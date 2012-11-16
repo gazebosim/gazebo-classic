@@ -27,7 +27,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
-    /// \class Box Box.hh gzmath/gzmath.hh
+    /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
     class Box
     {

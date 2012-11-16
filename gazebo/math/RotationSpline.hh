@@ -38,7 +38,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
-    /// \class RotationSpline RotationSpline.hh gzmath/gzmath.hh
+    /// \class RotationSpline RotationSpline.hh math/gzmath.hh
     /// \brief Spline for rotations
     class  RotationSpline
     {

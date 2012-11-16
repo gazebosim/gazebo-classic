@@ -33,23 +33,23 @@ namespace gazebo
     /// \brief boost::mt19937
     typedef boost::mt19937 GeneratorType;
     /// \def UniformRealDist
-    /// \brief boost::uniform_real
+    /// \brief boost::uniform_real<double>
     typedef boost::uniform_real<double> UniformRealDist;
     /// \def NormalRealDist
-    /// \brief boost::normal_distribution
+    /// \brief boost::normal_distribution<double>
     typedef boost::normal_distribution<double> NormalRealDist;
     /// \def UniformIntDist
-    /// \brief boost::uniform_int
+    /// \brief boost::uniform_int<int>
     typedef boost::uniform_int<int> UniformIntDist;
 
     /// \def URealGen
     /// \brief boost::variate_generator with GeneratorType and UniformRealDist
     typedef boost::variate_generator<GeneratorType&, UniformRealDist > URealGen;
     /// \def NRealGen
-    /// \brief boost::variate_generator with GeneratorType and UniformRealDist
+    /// \brief boost::variate_generator with GeneratorType and NormalRealDist
     typedef boost::variate_generator<GeneratorType&, NormalRealDist > NRealGen;
-    /// \def UINTGen
-    /// \brief boost::variate_generator with GeneratorType and UniformRealDist
+    /// \def UIntGen
+    /// \brief boost::variate_generator with GeneratorType and UniformIntDist
     typedef boost::variate_generator<GeneratorType&, UniformIntDist > UIntGen;
 
     /// \addtogroup gazebo_math

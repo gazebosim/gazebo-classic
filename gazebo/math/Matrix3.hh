@@ -28,7 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
-    /// \class Matrix3 Matrix3hh gzmath/gzmath.hh
+    /// \class Matrix3 Matrix3hh math/gzmath.hh
     /// \brief A 3x3 matrix class
     class Matrix3
     {

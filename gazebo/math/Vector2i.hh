@@ -33,7 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
-    /// \class Vector2i Vector2i.hh gzmath/gzmath.hh
+    /// \class Vector2i Vector2i.hh math/gzmath.hh
     /// \brief Generic integer x, y vector
     class Vector2i
     {
