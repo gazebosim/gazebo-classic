@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef CONNECTION_HH
-#define CONNECTION_HH
+#ifndef _CONNECTION_HH_
+#define _CONNECTION_HH_
 
 #include <google/protobuf/message.h>
 
@@ -72,12 +72,12 @@ namespace gazebo
 
       /// \brief Start a server that listens on a port
       /// \param[in] _port The port to listen on
-      /// \param[in] _port The callback to invoke when a new connection has
+      /// \param[in] _accept_cb The callback to invoke when a new connection has
       /// been accepted
       public: void Listen(unsigned int _port, const AcceptCallback &_accept_cb);
 
       /// \brief The signature of a connection read callback
-      typedef boost::function<void(const std::string &data)> ReadCallback;
+      typedef boost::function<void(const std::string &_data)> ReadCallback;
 
       /// \brief Start a thread that reads from the connection and passes
       ///        new message to the ReadCallback
@@ -277,22 +277,33 @@ namespace gazebo
                   boost::asio::streambuf *_b);
 
      /// \brief Handle new connections, if this is a server
-     private: void OnAccept(const boost::system::error_code &e);
+     /// \param[in] _e Error code for accept method
+     /// \TODO Nate check
+     private: void OnAccept(const boost::system::error_code &_e);
 
      /// \brief Parse a header to get the size of a packet
-     private: std::size_t ParseHeader(const std::string &header);
+     /// \param[in] _header Header as a string
+     private: std::size_t ParseHeader(const std::string &_header);
 
      /// \brief the read thread
-     private: void ReadLoop(const ReadCallback &cb);
+     private: void ReadLoop(const ReadCallback &_cb);
 
      /// \brief Get the local endpoint
+     /// \return The endpoint
      private: boost::asio::ip::tcp::endpoint GetLocalEndpoint() const;
 
      /// \brief Get the remote endpoint
+     /// \return The endpoint
      private: boost::asio::ip::tcp::endpoint GetRemoteEndpoint() const;
 
-     private: static std::string GetHostname(boost::asio::ip::tcp::endpoint ep);
+     /// \brief Gets hostname
+     /// \param[in] _ep The end point to get the hostename of
+     private: static std::string GetHostname(boost::asio::ip::tcp::endpoint _ep);
 
+     /// \brief Callback method when connected
+     /// \param[in] _error Error code thrown during connection
+     /// \param[in] _endPointIter Pointer to resolver iterator
+     /// \TODO Nate check
      private: void OnConnect(const boost::system::error_code &_error,
                   boost::asio::ip::tcp::resolver::iterator _endPointIter);
 

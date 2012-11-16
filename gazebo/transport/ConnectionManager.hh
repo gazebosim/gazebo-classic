@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef CONNECTION_MANAGER_HH
-#define CONNECTION_MANAGER_HH
+#ifndef _CONNECTION_MANAGER_HH_
+#define _CONNECTION_MANAGER_HH_
 
 
 #include <boost/shared_ptr.hpp>
@@ -126,13 +126,26 @@ namespace gazebo
       public: ConnectionPtr ConnectToRemoteHost(const std::string &_host,
                                                   unsigned int _port);
 
-      private: void OnMasterRead(const std::string &data);
+      /// \brief Callback function called when
+      /// \param[in] _data String of incoming data
+      /// \TODO NATE finish
+      private: void OnMasterRead(const std::string &_data);
 
-      private: void OnAccept(const ConnectionPtr &new_connection);
+      /// \brief Callback function called when a connection is accepted
+      /// \param[in] _new_connection Pointer to the new connection
+      /// \TODO Nate finish
+      private: void OnAccept(const ConnectionPtr &_new_connection);
 
-      private: void OnRead(const ConnectionPtr &new_connection,
-                            const std::string &data);
+      /// \brief Callback function called when a connection is read
+      /// \param[in] _new_connection Pointer to new connection
+      /// \param[in] _data 
+      /// \TODO Nate finish
+      private: void OnRead(const ConnectionPtr &_new_connection,
+                            const std::string &_data);
 
+      /// \brief 
+      /// \param[in] _packet
+      /// \TODO Nate fill in
       private: void ProcessMessage(const std::string &_packet);
 
       /// \brief Run the manager update loop once

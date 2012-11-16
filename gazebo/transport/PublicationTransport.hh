@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef PUBLICATIONTRANSPORT_HH
-#define PUBLICATIONTRANSPORT_HH
+#ifndef _PUBLICATIONTRANSPORT_HH_
+#define _PUBLICATIONTRANSPORT_HH_
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -70,8 +70,12 @@ namespace gazebo
       /// \return The topic type
       public: std::string GetMsgType() const;
 
+      /// \brief Called when connection is shutdown
+      /// \TODO Nate check
       private: void OnConnectionShutdown();
 
+      /// \brief Called when published
+      /// \TODO Nate check
       private: void OnPublish(const std::string &data);
 
       private: std::string topic;
