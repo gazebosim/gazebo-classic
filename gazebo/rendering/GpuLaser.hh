@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,13 +144,29 @@ namespace gazebo
 
       private: void CreateCanvas();
 
-      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float left, float right,
-               float bottom, float top, float near, float far);
+      /// \TODO Nate, fill in
+      /// \brief Builds scaled Orthogonal Matrix from parameters
+      /// \param[in] _left
+      /// \param[in] _right
+      /// \param[in] _bottom
+      /// \param[in] _top
+      /// \param[in] _near
+      /// \param[in] _far
+      /// \return The Scaled orthogonal Ogre::Matrix4
+      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float _left, float _right,
+               float _bottom, float _top, float _near, float _far);
 
-      private: virtual void Set1stPassTarget(Ogre::RenderTarget *target,
-                  unsigned int index);
+      /// \TODO Nate, fill in
+      /// \brief Sets first pass target
+      /// \param[in] _target
+      /// \param[in] _index
+      private: virtual void Set1stPassTarget(Ogre::RenderTarget *_target,
+                  unsigned int _index);
 
-      private: virtual void Set2ndPassTarget(Ogre::RenderTarget *target);
+      /// \TODO Nate fill in
+      /// \brief Sets second pass target
+      /// \param[in] _target
+      private: virtual void Set2ndPassTarget(Ogre::RenderTarget *_target);
 
       private: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newLaserFrame;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,21 +56,53 @@ namespace gazebo
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
     typedef boost::shared_ptr<Scene> ScenePtr;
+    /// \def LightPtr
+    /// \brief Shared pointer to Light
     typedef boost::shared_ptr<Light> LightPtr;
+    /// \def CameraPtr
+    /// \brief Shared pointer to Camera
     typedef boost::shared_ptr<Camera> CameraPtr;
+    /// \def UserCameraPtr
+    /// \brief Shared pointer to UserCamera
     typedef boost::shared_ptr<UserCamera> UserCameraPtr;
+    /// \def DepthCameraPtr
+    /// \brief Shared pointer to DepthCamera
     typedef boost::shared_ptr<DepthCamera> DepthCameraPtr;
+    /// \def GpuLaserPtr
+    /// \brief Shared pointer to GpuLaser
     typedef boost::shared_ptr<GpuLaser> GpuLaserPtr;
+    /// \def DynamicLinesPtr
+    /// \brief Shared pointer to DynamicLines
     typedef boost::shared_ptr<DynamicLines> DynamicLinesPtr;
+    /// \def VisualPtr
+    /// \brief Shared pointer to Visual
     typedef boost::shared_ptr<Visual> VisualPtr;
+    /// \def LaserVisualPtr
+    /// \brief Shared pointer to LaserVisual
     typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
+    /// \def CameraVisualPtr
+    /// \brief Shared pointer to CameraVisual
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
+    /// \def JointVisualPtr
+    /// \brief Shared pointer to JointVisual
     typedef boost::shared_ptr<JointVisual> JointVisualPtr;
+    /// \def ContactVisualPtr
+    /// \brief Shared pointer to ContactVisual
     typedef boost::shared_ptr<ContactVisual> ContactVisualPtr;
+    /// \def ArrowVisualPtr
+    /// \brief Shared pointer to ArrowVisual
     typedef boost::shared_ptr<ArrowVisual> ArrowVisualPtr;
+    /// \def AxisVisualPtr
+    /// \brief Shared pointer to AxisVisual
     typedef boost::shared_ptr<AxisVisual> AxisVisualPtr;
+    /// \def COMVisualPtr
+    /// \brief Shared pointer to COMVisual
     typedef boost::shared_ptr<COMVisual> COMVisualPtr;
+    /// \def RFIDVisual
+    /// \brief Shared pointer to RFIDVisual
     typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
+    /// \def RFIDTagVisual
+    /// \brief Shared pointer to RFIDTagVisual
     typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
 
     /// \enum RenderOpType

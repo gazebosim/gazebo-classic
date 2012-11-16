@@ -98,6 +98,9 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::SubscriberPtr controlSub;
 
+      /// \class ProjectorFrameListener Projector.hh rendering/rendering.hh
+      /// \brief
+      /// \TODO Nate, does this class need to be documented?
       private: class ProjectorFrameListener : public Ogre::FrameListener
       {
         public: ProjectorFrameListener();

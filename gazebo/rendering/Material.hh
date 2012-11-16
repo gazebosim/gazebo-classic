@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,14 @@ namespace gazebo
 {
   namespace rendering
   {
+
+    /// \class Material Material.hh rendering/rendering.hh
+    /// \TODO Nate fill in
     class Material
     {
+      /// \brief 
+      /// \param[in] _mat
+      /// \TODO Nate, fill in
       public: static void CreateMaterials();
       public: static void Update(const gazebo::common::Material *_mat);
     };

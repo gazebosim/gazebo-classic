@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -284,7 +284,7 @@ namespace gazebo
 
       /// \brief Set the normal map.
       /// \param[in] _nmap Name of the normal map material.
-      public: void SetNormalMap(const std::string &nmap);
+      public: void SetNormalMap(const std::string &_nmap);
 
       /// \brief True on or off a ribbon trail.
       /// \param[in] _value True to enable ribbon trail.
