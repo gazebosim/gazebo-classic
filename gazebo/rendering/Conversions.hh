@@ -40,6 +40,11 @@ namespace gazebo
       /// \return Ogre color value
       public: static Ogre::ColourValue Convert(const common::Color &_clr);
 
+      /// \brief Return the equivalent gazebo color
+      /// \param[in] _clr Ogre color to convert
+      /// \return Gazebo color value
+      public: static common::Color Convert(const Ogre::ColourValue &_clr);
+
       /// \brief return Ogre Vector from Gazebo Vector3
       /// \param[in] _v Gazebo vector
       /// \return Ogre vector

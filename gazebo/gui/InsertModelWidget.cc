@@ -44,6 +44,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent)
 {
   this->setObjectName("insertModel");
+  this->modelDatabaseItem = NULL;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
@@ -125,40 +126,66 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     this->fileTreeWidget->expandItem(topItem);
   }
 
-  this->ConnectToModelDatabase();
+  // Create a top-level tree item for the path
+  this->modelDatabaseItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Connecting to model database...")));
+    this->fileTreeWidget->addTopLevelItem(this->modelDatabaseItem);
+
+  /// Non-blocking call to get all the models in the database.
+  common::ModelDatabase::Instance()->GetModels(
+      boost::bind(&InsertModelWidget::OnModels, this, _1));
+
+  // Start a timer to check for the results from the ModelDatabase. We need
+  // to do this so that the QT elements get added in the main thread.
+  QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
-void InsertModelWidget::ConnectToModelDatabase()
+void InsertModelWidget::Update()
 {
-  std::string uri = common::ModelDatabase::GetURI();
-  std::map<std::string, std::string> models =
-    common::ModelDatabase::GetModels();
+  boost::mutex::scoped_lock lock(this->mutex);
 
-  if (!models.empty())
+  // If the model database has call the OnModels callback function, then
+  // add all the models from the database.
+  if (this->modelBuffer.size() > 0)
   {
-    // Create a top-level tree item for the path
-    QTreeWidgetItem *topItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-          QStringList(QString("%1").arg(QString::fromStdString(uri))));
-    this->fileTreeWidget->addTopLevelItem(topItem);
+    std::string uri = common::ModelDatabase::Instance()->GetURI();
+    this->modelDatabaseItem->setText(0,
+        QString("%1").arg(QString::fromStdString(uri)));
 
-    for (std::map<std::string, std::string>::iterator iter = models.begin();
-        iter != models.end(); ++iter)
+    if (!this->modelBuffer.empty())
     {
-      // Add a child item for the model
-      QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
-          QStringList(QString("%1").arg(
-              QString::fromStdString(iter->second))));
-      childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
-      this->fileTreeWidget->addTopLevelItem(childItem);
+      for (std::map<std::string, std::string>::const_iterator iter =
+          this->modelBuffer.begin(); iter != this->modelBuffer.end(); ++iter)
+      {
+        // Add a child item for the model
+        QTreeWidgetItem *childItem = new QTreeWidgetItem(
+            this->modelDatabaseItem,
+            QStringList(QString("%1").arg(
+                QString::fromStdString(iter->second))));
+        childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
+        this->fileTreeWidget->addTopLevelItem(childItem);
+      }
     }
+
+    this->modelBuffer.clear();
   }
+  else
+    QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::OnModels(
+    const std::map<std::string, std::string> &_models)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->modelBuffer = _models;
 }
 
 /////////////////////////////////////////////////
@@ -177,7 +204,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     if (!path.empty())
     {
       QApplication::setOverrideCursor(Qt::BusyCursor);
-      filename = common::ModelDatabase::GetModelFile(path);
+      filename = common::ModelDatabase::Instance()->GetModelFile(path);
       gui::Events::createEntity("model", filename);
 
       this->fileTreeWidget->clearSelection();
