@@ -76,7 +76,6 @@ bool gazebo::init()
     (*iter)->Init();
   }
 
-
   return true;
 }
 

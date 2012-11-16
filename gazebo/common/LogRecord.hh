@@ -30,6 +30,7 @@
 #include <boost/archive/iterators/insert_linebreaks.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
+#include <boost/filesystem.hpp>
 
 #include "common/Event.hh"
 #include "common/SingletonT.hh"
