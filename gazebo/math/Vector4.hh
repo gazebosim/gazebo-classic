@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 19 Aug 2008
  */
 
-#ifndef VECTOR4_HH
-#define VECTOR4_HH
+#ifndef _VECTOR4_HH_
+#define _VECTOR4_HH_
 
 #include <iostream>
 #include <fstream>
@@ -33,6 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Vector4 Vector4.hh gzmath/gzmath.hh
     /// \brief double Generic x, y, z, w vector
     class Vector4
     {

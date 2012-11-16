@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 18 Aug 2008
  */
 
-#ifndef ANGLE_HH
-#define ANGLE_HH
+#ifndef _ANGLE_HH_
+#define _ANGLE_HH_
 
 #include <math.h>
 #include <iostream>
@@ -50,6 +50,7 @@ namespace gazebo
   /// \addtogroup gazebo_math Math
   /// \{
 
+  /// \class Angle Angle.hh gzmath/gzmath.hh
   /// \brief An angle and related functions.
   class Angle
   {

@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef ROTATIONALSPLINE_HH
-#define ROTATIONALSPLINE_HH
+#ifndef _ROTATIONALSPLINE_HH_
+#define _ROTATIONALSPLINE_HH_
 
 #include <vector>
 #include "math/Quaternion.hh"
@@ -38,6 +38,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class RotationSpline RotationSpline.hh gzmath/gzmath.hh
     /// \brief Spline for rotations
     class  RotationSpline
     {

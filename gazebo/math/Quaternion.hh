@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef QUATERN_HH
-#define QUATERN_HH
+#ifndef _QUATERN_HH_
+#define _QUATERN_HH_
 
 #include <math.h>
 #include <iostream>
@@ -39,6 +39,7 @@ namespace gazebo
   /// \addtogroup gazebo_math
   /// \{
 
+  /// \class Quaternion Quaternion.hh gzmath/gzmath.hh
   /// \brief A quaternion class
   class Quaternion
   {
@@ -53,7 +54,7 @@ namespace gazebo
     public: Quaternion(const double &_w, const double &_x, const double &_y,
                         const double &_z);
 
-    /// \brief Constructor from Euler angles
+    /// \brief Constructor from Euler angles in radians
     /// \param[in] _roll  roll
     /// \param[in] _pitch pitch
     /// \param[in] _yaw   yaw
@@ -77,8 +78,8 @@ namespace gazebo
     public: ~Quaternion();
 
     /// \brief Equal operator
-    /// \param[in] qt Quaternion to copy
-    public: Quaternion &operator =(const Quaternion &qt);
+    /// \param[in] _qt Quaternion to copy
+    public: Quaternion &operator =(const Quaternion &_qt);
 
     /// \brief Invert the quaternion
     public: void Invert();
@@ -158,9 +159,9 @@ namespace gazebo
     public: static Quaternion EulerToQuaternion(const Vector3 &_vec);
 
     /// \brief Convert euler angles to quatern.
-    /// \param _x rotation along x
-    /// \param _y rotation along y
-    /// \param _z rotation along z
+    /// \param[in] _x rotation along x
+    /// \param[in] _y rotation along y
+    /// \param[in] _z rotation along z
     public: static Quaternion EulerToQuaternion(double _x,
                                                 double _y,
                                                 double _z);
@@ -187,7 +188,7 @@ namespace gazebo
     public: void Scale(double _scale);
 
     /// \brief Addition operator
-    /// \param _qt[in] quaternion for addition
+    /// \param[in] _qt quaternion for addition
     /// \return this quaternion + _qt
     public: Quaternion operator+(const Quaternion &_qt) const;
 
@@ -229,7 +230,8 @@ namespace gazebo
     public: Quaternion operator*=(const Quaternion &qt);
 
     /// \brief Vector3 multiplication operator
-    public: Vector3 operator*(const Vector3 &v) const;
+    /// \param[in] _v vector to multiply
+    public: Vector3 operator*(const Vector3 &_v) const;
 
     /// \brief Equal to operator
     /// \param[in] _qt Quaternion for comparison
@@ -309,7 +311,7 @@ namespace gazebo
     public: void Round(int _precision);
 
     /// \brief Dot product
-    /// \param[in] the other quaternion
+    /// \param[in] _q the other quaternion
     /// \return the product
     public: double Dot(const Quaternion &_q) const;
 

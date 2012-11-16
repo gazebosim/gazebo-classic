@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef POSE_HH
-#define POSE_HH
+#ifndef _POSE_HH_
+#define _POSE_HH_
 
 #include <iostream>
 
@@ -34,6 +34,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Pose Pose.hh gzmath/gzmath.hh
     /// \brief Encapsulates a position and rotation in three space
     class Pose
     {
@@ -44,11 +45,17 @@ namespace gazebo
       public: Pose();
 
       /// \brief Constructor
-      /// \param pos A position
-      /// \param rot A rotation
+      /// \param[in] pos A position
+      /// \param[is] rot A rotation
       public: Pose(const Vector3 &_pos, const Quaternion &_rot);
 
       /// \brief Constructor
+      /// \param[in] _x x position in meters.
+      /// \param[in] _y y position in meters.
+      /// \param[in] _z z position in meters.
+      /// \param[in] _roll Roll (rotation about X-axis) in radians.
+      /// \param[in] _pitch Pitch (rotation about y-axis) in radians.
+      /// \param[in] _yaw Pitch (rotation about z-axis) in radians.
       public: Pose(double _x, double _y, double _z,
                    double _roll, double _pitch, double _yaw);
 
@@ -128,7 +135,7 @@ namespace gazebo
       public: Pose operator*(const Pose &_pose);
 
       /// \brief Add one point to a vector: result = this + pos
-      /// \param[in] pos Position to add to this pose
+      /// \param[in] _pos Position to add to this pose
       /// \return the resulting position
       public: Vector3 CoordPositionAdd(const Vector3 &_pos) const;
 
@@ -191,8 +198,8 @@ namespace gazebo
       public: Quaternion rot;
 
       /// \brief Stream insertion operator
-      /// \param out output stream
-      /// \param pose pose to output
+      /// \param[in] _out output stream
+      /// \param[in] _pose pose to output
       /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Pose &_pose)

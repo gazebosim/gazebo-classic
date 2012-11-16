@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 3 Apr 2007
  */
 
-#ifndef VECTOR2I_HH
-#define VECTOR2I_HH
+#ifndef _VECTOR2I_HH_
+#define _VECTOR2I_HH_
 
 #include <math.h>
 #include <iostream>
@@ -33,6 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Vector2i Vector2i.hh gzmath/gzmath.hh
     /// \brief Generic integer x, y vector
     class Vector2i
     {
@@ -64,8 +65,8 @@ namespace gazebo
       /// \param[in] _y value along y
       public: void Set(int _x, int _y);
 
-      /// \brief Return the cross product of this vector and pt
-      /// \param[in] the other vector
+      /// \brief Return the cross product of this vector and _pt
+      /// \param[in] _pt the other vector
       /// \return the product
       public: Vector2i Cross(const Vector2i &_pt) const;
 

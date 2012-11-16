@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,27 +28,45 @@ namespace gazebo
     class Visual;
   }
 
+    /// \ingroup gazebo_gui
+    /// \brief gui namespace
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class BoxMaker BoxMaker.hh
+    /// \brief to make a box
     class BoxMaker : public EntityMaker
     {
+      /// \brief Constructor
       public: BoxMaker();
+
+      /// \brief Deconstructor
       public: virtual ~BoxMaker();
 
+      /// Documentation inherited
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
+      /// Documentation inherited
       public: virtual void Stop();
-      public: virtual bool IsActive() const;
 
+      /// Documentation inherited
+      public: virtual bool IsActive() const;
+      /// Documentation inherited
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+      /// Documentation inherited
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+      /// Documentation inherited
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      /// Documentation inherited
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Get the SDF information for the box.
       /// \return The SDF as a string.
       public: std::string GetSDFString();
 
+      /// Documentation inherited
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;
