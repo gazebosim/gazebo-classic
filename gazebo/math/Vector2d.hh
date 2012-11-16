@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 3 Apr 2007
  */
 
-#ifndef VECTOR2D_HH
-#define VECTOR2D_HH
+#ifndef _VECTOR2D_HH_
+#define _VECTOR2D_HH_
 
 #include <math.h>
 #include <iostream>
@@ -33,6 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Vector2d Vector2D.hh gzmath/gzmath.hh
     /// \brief Generic double x, y vector
     class Vector2d
     {

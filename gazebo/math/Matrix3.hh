@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MATRIX3_HH
-#define MATRIX3_HH
+#ifndef _MATRIX3_HH_
+#define _MATRIX3_HH_
 
 #include <assert.h>
 
@@ -28,6 +28,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Matrix3 Matrix3hh gzmath/gzmath.hh
     /// \brief A 3x3 matrix class
     class Matrix3
     {

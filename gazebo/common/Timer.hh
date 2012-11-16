@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 22 Nov 2009
  */
 
-#ifndef TIMER_HH
-#define TIMER_HH
+#ifndef _TIMER_HH_
+#define _TIMER_HH_
 
 #include "common/Console.hh"
 #include "common/Time.hh"
@@ -32,6 +32,7 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
     class Timer
     {
@@ -45,6 +46,7 @@ namespace gazebo
       public: void Start();
 
       /// \brief Get the elapsed time
+      /// \return The time
       public: Time GetElapsed() const;
 
       /// \brief stream operator friendly

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 3 Apr 2007
  */
 
-#ifndef VECTOR3_HH
-#define VECTOR3_HH
+#ifndef _VECTOR3_HH_
+#define _VECTOR3_HH_
 
 #include <math.h>
 #include <iostream>
@@ -35,6 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Vector3 Vector3.hh gzmath/gzmath.hh
     /// \brief The Vector3 class represents the generic vector containing 3
     ///        elements.  Since it's commonly used to keep coordinate system
     ///        related information, its elements are labeled by x, y, z.

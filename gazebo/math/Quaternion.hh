@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef QUATERN_HH
-#define QUATERN_HH
+#ifndef _QUATERN_HH_
+#define _QUATERN_HH_
 
 #include <math.h>
 #include <iostream>
@@ -39,6 +39,7 @@ namespace gazebo
   /// \addtogroup gazebo_math
   /// \{
 
+  /// \class Quaternion Quaternion.hh gzmath/gzmath.hh
   /// \brief A quaternion class
   class Quaternion
   {
@@ -205,7 +206,8 @@ namespace gazebo
     public: Quaternion operator*=(const Quaternion &qt);
 
     /// \brief Vector3 multiplication operator
-    public: Vector3 operator*(const Vector3 &v) const;
+    /// \param[in] _v vector to multiply
+    public: Vector3 operator*(const Vector3 &_v) const;
 
     /// \brief Equality operator
     /// \param _qt Quaternion for comparison

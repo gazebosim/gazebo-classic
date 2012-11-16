@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ namespace gazebo
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
 
+    /// \class DeleteAction Actions.hh
     /// \brief Custom delete action.
     class DeleteAction : public QAction
     {

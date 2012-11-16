@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef TIME_HH
-#define TIME_HH
+#ifndef _TIME_HH_
+#define _TIME_HH_
 
 #include <stdlib.h>
 #include <time.h>
@@ -33,6 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    /// \class Time Time.hh common/common.hh
     /// \brief A Time class, can be used to hold wall- or sim-time.
     ///        stored as sec and nano-sec.
     class Time
@@ -68,12 +69,12 @@ namespace gazebo
       public: void SetToWallTime();
 
       /// \brief Set to sec and nsec
-      /// \param[in] sec Seconds
-      /// \param[in] nsec micro seconds
+      /// \param[in] _sec Seconds
+      /// \param[in] _nsec micro seconds
       public: void Set(int32_t _sec, int32_t _nsec);
 
       /// \brief Set to seconds
-      /// \param[in] seconds Number of seconds
+      /// \param[in] _seconds Number of seconds
       public: void Set(double _seconds);
 
       /// \brief Get the time as a double

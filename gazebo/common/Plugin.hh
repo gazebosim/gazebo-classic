@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,8 @@ namespace gazebo
     SYSTEM_PLUGIN
   };
 
+
+  /// \class PluginT Plugin.hh common/common.hh
   /// \brief A class which all plugins must inherit from
   template<class T>
   class PluginT
@@ -84,6 +86,7 @@ namespace gazebo
     /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
     /// \param[in] _handle short name of the handler
+    /// \return Shared Pointer to this class type
     public: static TPtr Create(const std::string &_filename,
                 const std::string &_handle)
             {
@@ -186,6 +189,7 @@ namespace gazebo
             }
 
     /// \brief Returns the type of the plugin
+    /// \return type of the plugin
     public: PluginType GetType() const
             {
               return this->type;
@@ -208,6 +212,7 @@ namespace gazebo
              } fptr_union_t;
   };
 
+  /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
@@ -249,8 +254,8 @@ namespace gazebo
     ///
     /// Called when a Plugin is first created, and after the World has been
     /// loaded. This function should not be blocking.
-    /// \param _model Pointer the Model
-    /// \param _sdf Pointer the the SDF element of the plugin.
+    /// \param[in] _model Pointer the Model
+    /// \param[in] _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::ModelPtr _model,
                               sdf::ElementPtr _sdf) = 0;
 
@@ -261,6 +266,7 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+  /// \class SensorPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::Sensor.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
