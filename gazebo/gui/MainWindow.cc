@@ -261,7 +261,7 @@ void MainWindow::SaveAs()
 void MainWindow::About()
 {
   std::string helpTxt = "Gazebo is a 3D multi-robot simulator with dynamics. ";
-  helpTxt += "It is capable of simulating articulated robot in complex and ";
+  helpTxt += "It is capable of simulating articulated robots in complex and ";
   helpTxt += "realistic environments.\n\n";
 
   helpTxt += "Web site:\t\thttp://gazebosim.org\n";
