@@ -20,7 +20,7 @@
 #include <tinyxml.h>
 #include <string>
 
-#include "sdf/interface/SDF.hh"
+#include "gazebo/sdf/sdf.hh"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for Simulation Description Format parser
