@@ -71,7 +71,7 @@ div.qindex, div.navtab{
 }
 
 div.qindex, div.navpath {
-	width: 100%;
+  margin-left: 20em;
 	line-height: 140%;
 }
 
