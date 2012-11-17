@@ -145,6 +145,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
           msgs::Set(contactMsg->add_normal(), iter2->second.normals[i]);
           contactMsg->add_depth(iter2->second.depths[i]);
         }
+        msgs::Set(contactMsg->mutable_time(), iter2->second.time);
       }
     }
 
