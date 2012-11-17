@@ -18,11 +18,6 @@
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
-#include "gazebo/rendering/RenderEngine.hh"
-
-#include "common/Console.hh"
-#include "OgreCompositor.h"
-#include "OgreCompositorManager.h"
 
 using namespace gazebo;
 using namespace rendering;
@@ -37,16 +32,14 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
   this->materialSwitchListener = new MaterialSwitcher();
   this->selectionTargetListener = new SelectionRenderListener(
       this->materialSwitchListener);
-  this->createRTTBuffer();
+  this->CreateRTTBuffer();
   this->CreateRTTOverlays();
 }
 
 /////////////////////////////////////////////////
 SelectionBuffer::~SelectionBuffer()
 {
-  Ogre::TextureManager::getSingleton().unload("SelectionPassTex");
-  delete this->pixelBox;
-  delete [] this->buffer;
+  this->DeleteRTTBuffer();
   delete this->selectionTargetListener;
   delete this->materialSwitchListener;
 }
@@ -70,15 +63,19 @@ void SelectionBuffer::Update()
 }
 
 /////////////////////////////////////////////////
-void SelectionBuffer::createRTTBuffer()
+void SelectionBuffer::DeleteRTTBuffer()
 {
   if (!this->texture.isNull() && this->texture->isLoaded())
-    Ogre::TextureManager::getSingleton().unload("SelectionPassTex");
+    this->texture->unload();
   if (this->buffer)
     delete [] this->buffer;
   if (this->pixelBox)
     delete this->pixelBox;
+}
 
+/////////////////////////////////////////////////
+void SelectionBuffer::CreateRTTBuffer()
+{
   unsigned int width = this->renderTarget->getWidth();
   unsigned int height = this->renderTarget->getHeight();
 
@@ -116,17 +113,17 @@ void SelectionBuffer::UpdateBufferSize()
   if (width != this->renderTexture->getWidth() ||
      height != this->renderTexture->getHeight())
   {
-    this->createRTTBuffer();
+    this->DeleteRTTBuffer();
+    this->CreateRTTBuffer();
   }
 }
 
 /////////////////////////////////////////////////
 Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 {
-  unsigned int width = this->renderTarget->getWidth();
-  unsigned int height = this->renderTarget->getHeight();
-
-  if (_x < 0 || _y < 0 || _x > width || _y > height)
+  if (_x < 0 || _y < 0
+      || _x >= static_cast<int>(this->renderTarget->getWidth())
+      || _y >= static_cast<int>(this->renderTarget->getHeight()))
     return 0;
 
   this->Update();

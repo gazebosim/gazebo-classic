@@ -63,8 +63,11 @@ namespace gazebo
       /// \brief Call this to update the selection buffer contents
       public: void Update();
 
+      /// \brief Delete the render texture
+      private: void DeleteRTTBuffer();
+
       /// \brief Create the render texture
-      private: void createRTTBuffer();
+      private: void CreateRTTBuffer();
 
       /// \brief Create the selection buffer offscreen render texture.
       private: void CreateRTTOverlays();
