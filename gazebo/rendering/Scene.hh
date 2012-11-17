@@ -376,14 +376,14 @@ namespace gazebo
                                              bool _ignorSelectionObj);
 
       /// \brief Get the mesh information for the given mesh.
-      /// \param[in] _mesh
-      /// \param[in] _count
-      /// \param[in] _vertices
-      /// \param[in] _indexCount
-      /// \param[in] _indices
-      /// \param[in] _position
-      /// \param[in] _orient
-      /// \param[in] _scale
+      /// \param[in] _mesh Mesh to get info about.
+      /// \param[out] _count Number of vertices in the mesh.
+      /// \param[out] _vertices Array of the vertices.
+      /// \param[out] _indexCount Number if indices.
+      /// \param[out] _indices Array of the indices.
+      /// \param[in] _position Position of the mesh.
+      /// \param[in] _orient Orientation of the mesh.
+      /// \param[in] _scale Scale of the mesh
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
       private: void GetMeshInformation(const Ogre::Mesh *_mesh,
                                        size_t &_vertexCount,

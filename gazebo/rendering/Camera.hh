@@ -85,13 +85,13 @@ namespace gazebo
 
       /// \brief Load the camera with a set of parmeters
       /// \param[in] _sdf The SDF camera info
-      public: void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
        /// \brief Load the camera with default parmeters
-      public: void Load();
+      public: virtual void Load();
 
       /// \brief Initialize the camera
-      public: void Init();
+      public: virtual void Init();
 
       /// \brief Set the render Hz rate
       /// \param[in] _hz The Hz rate
@@ -122,7 +122,7 @@ namespace gazebo
       /// \brief Finalize the camera.
       ///
       /// This function is called before the camera is destructed
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
