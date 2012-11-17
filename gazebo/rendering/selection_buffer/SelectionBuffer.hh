@@ -90,12 +90,6 @@ namespace gazebo
       private: uint8_t *buffer;
       private: Ogre::PixelBox *pixelBox;
       private: Ogre::Overlay *selectionDebugOverlay;
-
-      private: Ogre::CompositorInstance *dsGBufferInstance;
-      private: Ogre::CompositorInstance *dsMergeInstance;
-      private: Ogre::CompositorInstance *dlGBufferInstance;
-      private: Ogre::CompositorInstance *dlMergeInstance;
-
     };
   }
 }
