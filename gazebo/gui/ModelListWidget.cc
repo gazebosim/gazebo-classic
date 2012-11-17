@@ -407,14 +407,16 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void ModelListWidget::RemoveEntity(const std::string &_name)
 {
-  if (gui::has_entity_name(_name))
+  QTreeWidgetItem *items[2];
+  items[0] = this->modelsItem;
+  items[1] = this->lightsItem;
+
+  for (int i = 0; i < 2; ++i)
   {
-    QTreeWidgetItem *listItem = this->GetListItem(_name, this->modelsItem);
+    QTreeWidgetItem *listItem = this->GetListItem(_name, items[i]);
     if (listItem)
     {
-      int i = this->modelsItem->indexOfChild(listItem);
-      this->modelsItem->takeChild(i);
-
+      items[i]->takeChild(items[i]->indexOfChild(listItem));
       this->propTreeBrowser->clear();
       this->selectedEntityName.clear();
       this->sdfElement.reset();
@@ -461,7 +463,16 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
 
+  // Check to see if the selected item is a model
   int i = this->modelsItem->indexOfChild(item);
+  if (i >= 0)
+  {
+    g_modelRightMenu->Run(item->text(0).toStdString(),
+                          this->modelTreeWidget->mapToGlobal(_pt));
+  }
+
+  // Check to see if the selected item is a light
+  i = this->lightsItem->indexOfChild(item);
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
