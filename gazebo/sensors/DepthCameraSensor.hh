@@ -50,26 +50,26 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DepthCameraSensor();
 
-      /// Documentation Inherited
+      // Documentation Inherited
       public: virtual void SetParent(const std::string &_name);
 
-      /// Documentation Inherited
+      // Documentation Inherited
       protected: virtual void Load(const std::string &_worldName,
                                    sdf::ElementPtr &_sdf);
 
-      /// Documentation Inherited
+      // Documentation Inherited
       protected: virtual void Load(const std::string &_worldName);
 
-      /// Documentation Inherited
+      // Documentation Inherited
       protected: virtual void Init();
 
-      /// Documentation Inherited
+      // Documentation Inherited
       protected: virtual void UpdateImpl(bool _force);
 
-      /// Documentation Inherited
+      // Documentation Inherited
       protected: virtual void Fini();
 
-      /// Documentation Inherited
+      // Documentation Inherited
       public: virtual void SetActive(bool _value);
 
       /// \brief Returns a pointer to the rendering::DepthCamera

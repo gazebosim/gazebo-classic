@@ -58,23 +58,23 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RaySensor();
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual void Init();
 
-      /// Documentation inherited
+      // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
-      /// Documentation inherited
+      // Documentation inherited
       protected: virtual void Fini();
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual std::string GetTopic() const;
 
       /// \brief Get the minimum angle in radians

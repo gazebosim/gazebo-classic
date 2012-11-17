@@ -52,22 +52,22 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RFIDSensor();
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual void Init();
 
-      /// Documentation inherited
+      // Documentation inherited
       public: void AddTag(RFIDTag *_tag);
 
       protected: virtual void UpdateImpl(bool _force);
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual void Fini();
 
       /// \brief Iterates through all the RFID tags, and finds the ones which

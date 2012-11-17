@@ -23,11 +23,11 @@
 #include <list>
 #include <vector>
 
-#include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/SingletonT.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Connection.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Connection.hh"
 
 namespace gazebo
 {
@@ -126,26 +126,23 @@ namespace gazebo
       public: ConnectionPtr ConnectToRemoteHost(const std::string &_host,
                                                   unsigned int _port);
 
-      /// \brief Callback function called when
+      /// \brief Callback function called when we have read data from the
+      /// master
       /// \param[in] _data String of incoming data
-      /// \TODO NATE finish
       private: void OnMasterRead(const std::string &_data);
 
       /// \brief Callback function called when a connection is accepted
-      /// \param[in] _new_connection Pointer to the new connection
-      /// \TODO Nate finish
-      private: void OnAccept(const ConnectionPtr &_new_connection);
+      /// \param[in] _newConnection Pointer to the new connection
+      private: void OnAccept(const ConnectionPtr &_newConnection);
 
       /// \brief Callback function called when a connection is read
-      /// \param[in] _new_connection Pointer to new connection
-      /// \param[in] _data 
-      /// \TODO Nate finish
-      private: void OnRead(const ConnectionPtr &_new_connection,
+      /// \param[in] _newConnection Pointer to new connection
+      /// \param[in] _data Data that has been read.
+      private: void OnRead(const ConnectionPtr &_newConnection,
                             const std::string &_data);
 
-      /// \brief 
-      /// \param[in] _packet
-      /// \TODO Nate fill in
+      /// \brief Process a raw message.
+      /// \param[in] _packet The raw message data.
       private: void ProcessMessage(const std::string &_packet);
 
       /// \brief Run the manager update loop once
@@ -176,7 +173,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif
-
-

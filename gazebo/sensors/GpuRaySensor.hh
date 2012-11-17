@@ -55,20 +55,20 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GpuRaySensor();
 
-      /// Documentation Inherited
+      // Documentation Inherited
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr &_sdf);
 
-      /// Documentation Inherited
+      // Documentation Inherited
       public: virtual void Load(const std::string &_worldName);
 
-      /// Documentation Inherited
+      // Documentation Inherited
       public: virtual void Init();
 
-      /// Documentation Inherited
+      // Documentation Inherited
       protected: virtual void UpdateImpl(bool _force);
 
-      /// Documentation Inherited
+      // Documentation Inherited
       protected: virtual void Fini();
 
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
