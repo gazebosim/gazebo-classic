@@ -70,27 +70,35 @@ namespace gazebo
       /// \return The topic type
       public: std::string GetMsgType() const;
 
-      /// \brief Called when connection is shutdown
-      /// \TODO Nate check
+      /// \brief Called when connection is shutdown.
       private: void OnConnectionShutdown();
 
-      /// \brief Called when published
-      /// \TODO Nate check
-      private: void OnPublish(const std::string &data);
+      /// \brief Called when data is published.
+      /// \param[in] _data Data to be published.
+      private: void OnPublish(const std::string &_data);
 
+      /// \brief The topic for this publication transport.
       private: std::string topic;
+
+      /// \brief The type of messages that can be processed.
       private: std::string msgType;
+
+      /// \brief The connection for the publication transport
       private: ConnectionPtr connection;
+
+      /// \brief Callback used when OnPublish is called.
       private: boost::function<void (const std::string &)> callback;
+
+      /// \brief Event listener for the connection's shutdown signal.
       private: event::ConnectionPtr shutdownConnectionPtr;
 
+      /// \brief Counter to give the publication transport a unique id.
       private: static int counter;
+
+      /// \brief The unique id for the publication transport.
       private: int id;
     };
     /// \}
   }
 }
-
 #endif
-
-

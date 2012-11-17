@@ -273,8 +273,15 @@ namespace gazebo
       /// \brief Handle on-write callbacks
       public: void ProcessWriteQueue();
 
+      /// \brief Get the ID of the connection.
+      /// \return The connection's unique ID.
+      public: unsigned int GetId() const;
+
+      /// \brief Callback when a write has occurred.
+      /// \param[in] _e Error code
+      /// \param[in] _b Buffer of the data that was written.
       private: void OnWrite(const boost::system::error_code &e,
-                   boost::asio::streambuf *_b);
+                            boost::asio::streambuf *_b);
 
       /// \brief Handle new connections, if this is a server
       /// \param[in] _e Error code for accept method

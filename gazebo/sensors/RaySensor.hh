@@ -40,7 +40,6 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-
     /// \addtogroup gazebo_sensors
     /// \{
 

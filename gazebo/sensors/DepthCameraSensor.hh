@@ -34,7 +34,6 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    
     /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
     /// \{

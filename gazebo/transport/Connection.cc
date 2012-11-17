@@ -660,3 +660,9 @@ void Connection::OnConnect(const boost::system::error_code &_error,
     this->connectCondition.notify_one();
   }
 }
+
+//////////////////////////////////////////////////
+unsigned int Connection::GetId() const
+{
+  return this->id;
+}

@@ -38,7 +38,6 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-
     /// \addtogroup gazebo_sensors
     /// \{
     /// \brief GPU based laser sensor
