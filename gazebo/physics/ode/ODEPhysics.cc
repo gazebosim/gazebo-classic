@@ -901,6 +901,7 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
     msgs::Set(_msg->add_position(), _feedback->contact.positions[i]);
     msgs::Set(_msg->add_normal(), _feedback->contact.normals[i]);
     _msg->add_depth(_feedback->contact.depths[i]);
+    msgs::Set(_msg->mutable_time(), _feedback->contact.time);
 
     _feedback->contact.forces[i].body1Force.Set(
         _feedback->feedbacks[i].f1[0],
