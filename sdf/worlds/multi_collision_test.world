@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<gazebo version="1.2">
+  <world name="default">
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+
+    <model name="model">
+      <pose>0 0 5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision1">
+          <pose>0 0 0 0.5 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual1">
+          <pose>0 0 0 0.5 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <collision name="collision2">
+          <pose>2 0 0 0 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual2">
+          <pose>2 0 0 0 0.3 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <collision name="collision3">
+          <pose>0 2 0 0.5 0 0.5</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual3">
+          <pose>0 2 0 0.5 0 0.5</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <collision name="collision4">
+          <pose>2 3 0 0 0.5 0.7</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual4">
+          <pose>2 3 0 0 0.5 0.7</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</gazebo>

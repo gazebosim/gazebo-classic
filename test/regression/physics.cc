@@ -397,6 +397,51 @@ TEST_F(PhysicsTest, SimplePendulumTest)
   Unload();
 }
 
+TEST_F(PhysicsTest, SpringCFMERPEquivalencyTest)
+{
+  // Test to make sure that spring and cfm/erp yields the same results
+  Load("worlds/spring_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr modelCFMERP = world->GetModel("model_3");
+  physics::ModelPtr modelSpring = world->GetModel("model_4");
+  EXPECT_TRUE(modelCFMERP);
+  EXPECT_TRUE(modelSpring);
+  physics::LinkPtr linkCFMERP = modelCFMERP->GetLink("link_1");
+  physics::LinkPtr linkSpring = modelSpring->GetLink("link_1");
+  EXPECT_TRUE(linkCFMERP);
+  EXPECT_TRUE(linkSpring);
+
+  // make sure the two links have the same oscillation frequency
+  // although the cfm erp version has more damping, not sure why
+
+  Unload();
+}
+
+TEST_F(PhysicsTest, MultiCollisionTest)
+{
+  // test to make sure a link with multiple offset collisions
+  // are setup correctly.
+  Load("worlds/multi_collision_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr model= world->GetModel("model");
+  EXPECT_TRUE(model);
+  physics::LinkPtr link= model->GetLink("link");
+  EXPECT_TRUE(link);
+
+  // make sure the two links have the same oscillation frequency
+  // although the cfm erp version has more damping, not sure why
+
+  Unload();
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
