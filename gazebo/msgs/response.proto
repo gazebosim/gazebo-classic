@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Response 
 /// \brief Message that encapsulates a respons message with a type description
-/// \verbatim
+
 
 message Response
 {
@@ -14,4 +14,4 @@ message Response
   optional bytes serialized_data = 5;
 }
 
-/// \endverbatim
+

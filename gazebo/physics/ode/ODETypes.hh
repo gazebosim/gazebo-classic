@@ -18,8 +18,6 @@
 #include <boost/shared_ptr.hpp>
 
 /// \file
-/// \ingroup gazebo_physics
-/// \ingroup gazebo_physics_ode
 /// \brief ODE wrapper forward declarations and typedefs
 namespace gazebo
 {
@@ -27,12 +25,28 @@ namespace gazebo
   {
     class ODECollision;
     class ODELink;
-    class ODEPhysics;
     class ODERayShape;
+    class ODESurfaceParams;
+    class ODEPhysics;
 
-    typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
+    /// \def ODECollisionPtr
+    /// \brief Boost shared point to ODECollision
     typedef boost::shared_ptr<ODECollision> ODECollisionPtr;
+
+    /// \def ODELinkPtr
+    /// \brief Boost shared point to ODELink
     typedef boost::shared_ptr<ODELink> ODELinkPtr;
+
+    /// \def ODERayShapePtr
+    /// \brief Boost shared point to ODERayShape
     typedef boost::shared_ptr<ODERayShape> ODERayShapePtr;
+
+    /// \def ODESurfaceParamsPtr
+    /// \brief Boost shared pointer to ODESurfaceParams
+    typedef  boost::shared_ptr<ODESurfaceParams> ODESurfaceParamsPtr;
+
+    /// \def ODEPhysicsPtr
+    /// \brief Boost shared pointer for ODEPhysics.
+    typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
   }
 }

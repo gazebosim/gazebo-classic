@@ -60,6 +60,9 @@ namespace gazebo
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int _index, double _damping);
 
+      /// \copydoc ScrewJoint::SetThreadPitch
+      public: virtual void SetThreadPitch(int _index, double _threadPitch);
+
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 

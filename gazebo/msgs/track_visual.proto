@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Trackvisual
 /// \brief Message for a trackking a rendering::Visual with a rendering::Camera
-/// \verbatim
+
 
 message TrackVisual
 {
@@ -13,4 +13,4 @@ message TrackVisual
   optional double max_dist          = 4;
 }
 
-/// \endverbatim
+

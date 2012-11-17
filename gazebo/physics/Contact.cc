@@ -65,6 +65,8 @@ Contact &Contact::operator =(const Contact &contact)
     this->depths[i] = contact.depths[i];
   }
 
+  this->time = contact.time;
+
   return *this;
 }
 

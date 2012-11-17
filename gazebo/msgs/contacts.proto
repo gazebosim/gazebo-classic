@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Contacts
 /// \brief Contacts from collision detection
-/// \verbatim
+
 
 import "contact.proto";
 
@@ -11,4 +11,4 @@ message Contacts
 {
   repeated Contact contact   = 1;
 }
-/// \endverbatim
+

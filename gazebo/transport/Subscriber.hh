@@ -33,16 +33,20 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
+    /// \class Subscriber Subscriber.hh transport/transport.hh
     /// \brief A subscriber to a topic
     class Subscriber
     {
       /// \brief Constructor
-      public: Subscriber(const std::string &topic, NodePtr _node);
+      /// \param[in] _topic The topic we're subscribing to
+      /// \param[in] _node The associated node
+      public: Subscriber(const std::string &_topic, NodePtr _node);
 
       /// \brief Destructor
       public: virtual ~Subscriber();
 
       /// \brief Get the topic name
+      /// \return The topic name
       public: std::string GetTopic() const;
 
       /// \brief Unsubscribe from the topic

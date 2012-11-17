@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface MeshGeom 
 /// \brief Message for a mesh geometry
-/// \verbatim
+
 
 import "vector3d.proto";
 
@@ -13,4 +13,4 @@ message MeshGeom
   optional Vector3d scale    = 2;
 }
 
-/// \endverbatim
+
