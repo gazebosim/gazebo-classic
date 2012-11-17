@@ -41,6 +41,7 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 ImuSensor::ImuSensor()
     : Sensor()
 {
+  std::cout << "NEW IMU\n";
 }
 
 //////////////////////////////////////////////////
@@ -51,22 +52,19 @@ ImuSensor::~ImuSensor()
 //////////////////////////////////////////////////
 void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  if (this->sdf->GetElement("topic"))
+  Sensor::Load(_worldName, _sdf);
+
+  this->sdf->PrintValues("  ");
+
+  if (this->sdf->GetElement("imu") &&
+      this->sdf->GetElement("imu")->GetElement("topic") &&
+      this->sdf->GetElement("imu")->GetValueString("topic")
+      != "__default_topic__")
   {
     this->pub = this->node->Advertise<msgs::IMU>(
-        this->sdf->GetValueString("topic"));
+        this->sdf->GetElement("imu")->GetValueString("topic"));
   }
-
-  Sensor::Load(_worldName, _sdf);
-}
-
-//////////////////////////////////////////////////
-void ImuSensor::Load(const std::string &_worldName)
-{
-  Sensor::Load(_worldName);
-
-  // Create a publisher if it is not already created.
-  if (!this->pub)
+  else
   {
     std::string topicName = "~/";
     topicName += this->parentName + "/" + this->GetName() + "/imu";
@@ -74,6 +72,12 @@ void ImuSensor::Load(const std::string &_worldName)
 
     this->pub = this->node->Advertise<msgs::IMU>(topicName);
   }
+}
+
+//////////////////////////////////////////////////
+void ImuSensor::Load(const std::string &_worldName)
+{
+  Sensor::Load(_worldName);
 
   this->parentEntity = boost::shared_dynamic_cast<physics::Link>(
       this->world->GetEntity(this->parentName));
