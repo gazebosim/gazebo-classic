@@ -56,14 +56,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RaySensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
-      public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
-
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the ray
