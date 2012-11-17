@@ -135,34 +135,57 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   /// Non-blocking call to get all the models in the database.
   common::ModelDatabase::Instance()->GetModels(
       boost::bind(&InsertModelWidget::OnModels, this, _1));
+
+  // Start a timer to check for the results from the ModelDatabase. We need
+  // to do this so that the QT elements get added in the main thread.
+  QTimer::singleShot(1000, this, SLOT(Update()));
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::Update()
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  // If the model database has call the OnModels callback function, then
+  // add all the models from the database.
+  if (this->modelBuffer.size() > 0)
+  {
+    std::string uri = common::ModelDatabase::Instance()->GetURI();
+    this->modelDatabaseItem->setText(0,
+        QString("%1").arg(QString::fromStdString(uri)));
+
+    if (!this->modelBuffer.empty())
+    {
+      for (std::map<std::string, std::string>::const_iterator iter =
+          this->modelBuffer.begin(); iter != this->modelBuffer.end(); ++iter)
+      {
+        // Add a child item for the model
+        QTreeWidgetItem *childItem = new QTreeWidgetItem(
+            this->modelDatabaseItem,
+            QStringList(QString("%1").arg(
+                QString::fromStdString(iter->second))));
+        childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
+        this->fileTreeWidget->addTopLevelItem(childItem);
+      }
+    }
+
+    this->modelBuffer.clear();
+  }
+  else
+    QTimer::singleShot(1000, this, SLOT(Update()));
+}
+
+/////////////////////////////////////////////////
+InsertModelWidget::~InsertModelWidget()
+{
 }
 
 /////////////////////////////////////////////////
 void InsertModelWidget::OnModels(
     const std::map<std::string, std::string> &_models)
 {
-  std::string uri = common::ModelDatabase::Instance()->GetURI();
-  this->modelDatabaseItem->setText(0,
-        QString("%1").arg(QString::fromStdString(uri)));
-
-  if (!_models.empty())
-  {
-    for (std::map<std::string, std::string>::const_iterator iter =
-        _models.begin(); iter != _models.end(); ++iter)
-    {
-      // Add a child item for the model
-      QTreeWidgetItem *childItem = new QTreeWidgetItem(this->modelDatabaseItem,
-          QStringList(QString("%1").arg(
-              QString::fromStdString(iter->second))));
-      childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
-      this->fileTreeWidget->addTopLevelItem(childItem);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-InsertModelWidget::~InsertModelWidget()
-{
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->modelBuffer = _models;
 }
 
 /////////////////////////////////////////////////

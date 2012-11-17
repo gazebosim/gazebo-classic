@@ -47,6 +47,7 @@ set (sources
   VideoVisual.cc
   ViewController.cc
   Visual.cc
+  WireBox.cc
   WindowManager.cc
 )
 
@@ -85,6 +86,7 @@ set (headers
   VideoVisual.hh
   ViewController.hh
   Visual.hh
+  WireBox.hh
   WindowManager.hh
   ogre_gazebo.h
   cegui.h

@@ -575,7 +575,6 @@ TEST_F(CommonTest, Material)
 
 TEST_F(CommonTest, Console)
 {
-  gzlog << "Log test\n";
   common::Console::Instance()->Load();
   common::Console::Instance()->SetQuiet(true);
 }
