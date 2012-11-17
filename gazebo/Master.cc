@@ -414,7 +414,7 @@ void Master::RemoveConnection(unsigned int _index)
     SubList::iterator subIter = this->subscribers.begin();
     while (subIter != this->subscribers.end())
     {
-      if ((*subIter).second->id == connIter->second->id)
+      if ((*subIter).second->GetId() == connIter->second->GetId())
       {
         this->RemoveSubscriber((*subIter).first);
         done = false;
