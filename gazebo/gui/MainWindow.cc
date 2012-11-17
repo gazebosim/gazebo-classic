@@ -262,8 +262,14 @@ void MainWindow::About()
 {
   std::string helpTxt = "Gazebo is a 3D multi-robot simulator with dynamics. ";
   helpTxt += "It is capable of simulating articulated robot in complex and ";
-  helpTxt += "realistic environments.\n Visit http://www.gazebosim.org for ";
-  helpTxt += "more information.";
+  helpTxt += "realistic environments.\n\n";
+
+  helpTxt += "Web site:\t\thttp://gazebosim.org\n";
+  helpTxt += "Tutorials:\t\thttp://gazebosim.org/wiki/tutorials\n";
+  helpTxt += "User Guide:\t\thttp://gazebosim.org/user_guide\n";
+  helpTxt += "API:\t\thttp://gazebosim.org/api\n";
+  helpTxt += "SDF:\t\thttp://gazebosim.org/sdf\n";
+  helpTxt += "Messages:\t\thttp://gazebosim.org/msgs\n";
   QMessageBox::about(this, tr("About Gazebo"), tr(helpTxt.c_str()));
 }
 
