@@ -421,6 +421,7 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
       this->selectedEntityName.clear();
       this->sdfElement.reset();
       this->fillTypes.clear();
+      return;
     }
   }
 }
@@ -469,6 +470,7 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
                           this->modelTreeWidget->mapToGlobal(_pt));
+    return;
   }
 
   // Check to see if the selected item is a light
