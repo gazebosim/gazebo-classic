@@ -129,6 +129,7 @@ void Sensor::Update(bool _force)
   {
     if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
     {
+      this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
     }
   }
@@ -207,6 +208,12 @@ void Sensor::SetUpdateRate(double _hz)
 common::Time Sensor::GetLastUpdateTime()
 {
   return this->lastUpdateTime;
+}
+
+//////////////////////////////////////////////////
+common::Time Sensor::GetLastMeasurementTime()
+{
+  return this->lastMeasurementTime;
 }
 
 //////////////////////////////////////////////////
