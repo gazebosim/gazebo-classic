@@ -401,15 +401,17 @@ namespace gazebo
       private: inline void Correct()
                {
                  // In the case sec and nsec have different signs, normalize
-                 while (this->sec > 0 && this->nsec < 0)
+                 if (this->sec > 0 && this->nsec < 0)
                  {
-                   this->sec--;
-                   this->nsec += 1e9;
+                   int32_t n = abs(this->nsec / 1e9 + 1);
+                   this->sec -= n;
+                   this->nsec += n * 1e9;
                  }
-                 while (this->sec < 0 && this->nsec > 0)
+                 if (this->sec < 0 && this->nsec > 0)
                  {
-                   this->sec++;
-                   this->nsec -= 1e9;
+                   int32_t n = abs(this->nsec / 1e9 + 1);
+                   this->sec += n;
+                   this->nsec -= n * 1e9;
                  }
 
                  // Make any corrections
