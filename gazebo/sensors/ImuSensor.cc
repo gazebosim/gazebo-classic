@@ -114,7 +114,7 @@ math::Vector3 ImuSensor::GetLinearAcceleration() const
 //////////////////////////////////////////////////
 void ImuSensor::UpdateImpl(bool /*_force*/)
 {
-  this->lastUpdateTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
   this->imuMsg.set_entity_name(this->parentName);
 
