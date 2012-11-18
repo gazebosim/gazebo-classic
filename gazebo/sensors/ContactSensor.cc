@@ -60,10 +60,11 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
-  if (this->sdf->GetElement("topic"))
+  if (this->sdf->HasElement("contact") &&
+      this->sdf->GetElement("contact")->HasElement("topic"))
   {
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
-        this->sdf->GetElement("topic")->GetValueString());
+      this->sdf->GetElement("contact")->GetValueString("topic"));
   }
 }
 
@@ -120,6 +121,7 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
+  // \TODO where to put: this->lastMeasurementTime = this->world->GetSimTime();
   this->mutex->lock();
   if (this->contactsPub && this->contactsPub->HasConnections() &&
       this->contacts.size() > 0)
