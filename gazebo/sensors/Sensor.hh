@@ -146,6 +146,10 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
+      /// \brief Return last measurement time.
+      /// \return Time of last measurement.
+      public: common::Time GetLastMeasurementTime();
+
       /// \brief True if active
       protected: bool active;
 
@@ -184,6 +188,11 @@ namespace gazebo
 
       /// \brief Publish sensor data.
       private: transport::PublisherPtr sensorPub;
+
+      /// \brief Stores last time that a sensor measurement was generated;
+      ///        this value must be updated within each sensor's UpdateImpl
+      protected: common::Time lastMeasurementTime;
+
     };
     /// \}
   }
