@@ -1459,16 +1459,17 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
   if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
-    if (!this->visuals[_msg->name()+"_laser_vis"])
+    std::string rayVisualName = _msg->parent() + "::" + _msg->name();
+    if (!this->visuals[rayVisualName+"_laser_vis"])
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
         return false;
 
       LaserVisualPtr laserVis(new LaserVisual(
-            _msg->name()+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
+            rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
-      this->visuals[_msg->name()+"_laser_vis"] = laserVis;
+      this->visuals[rayVisualName+"_laser_vis"] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
