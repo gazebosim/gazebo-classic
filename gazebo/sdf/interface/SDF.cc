@@ -1392,7 +1392,7 @@ std::string SDF::ToString() const
 /////////////////////////////////////////////////
 void SDF::SetFromString(const std::string &_sdfData)
 {
-  sdf::initFile("gazebo.sdf", this->root);
+  sdf::initFile("root.sdf", this->root);
   if (!sdf::readString(_sdfData, this->root))
   {
     gzerr << "Unable to parse sdf string[" << _sdfData << "]\n";

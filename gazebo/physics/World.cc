@@ -1180,7 +1180,7 @@ void World::ProcessFactoryMsgs()
        iter != this->factoryMsgs.end(); ++iter)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("gazebo.sdf", factorySDF);
+    sdf::initFile("root.sdf", factorySDF);
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
