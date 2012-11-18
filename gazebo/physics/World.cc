@@ -307,38 +307,37 @@ void World::Step()
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
+    this->prevStatTime = common::Time::GetWallTime();
     msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
     msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
     msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
     this->worldStatsMsg.set_paused(this->IsPaused());
 
     this->statPub->Publish(this->worldStatsMsg);
-    this->prevStatTime = common::Time::GetWallTime();
   }
 
-  if (this->IsPaused() && !this->stepInc > 0)
-    this->pauseTime += this->physicsEngine->GetStepTime();
-  else
+  // sleep here to get the correct update rate
+  common::Time sleepTime = this->prevStepWallTime +
+    common::Time(this->physicsEngine->GetUpdatePeriod()) -
+    common::Time::GetWallTime() - this->sleepOffset;
+
+  common::Time actualSleep = common::Time::GetWallTime();
+  common::Time::NSleep(sleepTime);
+  common::Time tmpTime = common::Time::GetWallTime();
+  actualSleep = tmpTime - actualSleep;
+
+  // throttling update rate
+  if (tmpTime - this->prevStepWallTime
+         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
-    // sleep here to get the correct update rate
-    common::Time sleepTime = this->prevStepWallTime +
-      common::Time(this->physicsEngine->GetUpdatePeriod()) -
-      common::Time::GetWallTime() - this->sleepOffset;
+    this->sleepOffset = tmpTime - this->prevStepWallTime
+      - common::Time(this->physicsEngine->GetUpdatePeriod())
+      + actualSleep - sleepTime;
 
-    common::Time actualSleep = common::Time::GetWallTime();
-    common::Time::NSleep(sleepTime);
-    common::Time tmpTime = common::Time::GetWallTime();
-    actualSleep = tmpTime - actualSleep;
+    this->prevStepWallTime = tmpTime;
 
-    // throttling update rate
-    if (tmpTime - this->prevStepWallTime
-           >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+    if (!this->IsPaused() || this->stepInc > 0)
     {
-      this->sleepOffset = tmpTime - this->prevStepWallTime
-        - common::Time(this->physicsEngine->GetUpdatePeriod())
-        + actualSleep - sleepTime;
-
-      this->prevStepWallTime = tmpTime;
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
@@ -346,16 +345,18 @@ void World::Step()
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
     }
+    else
+      this->pauseTime += this->physicsEngine->GetStepTime();
   }
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)
   {
+    this->prevProcessMsgsTime = common::Time::GetWallTime();
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
-    this->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 
   this->worldUpdateMutex->unlock();
@@ -652,6 +653,7 @@ void World::ResetTime()
   this->simTime = common::Time(0);
   this->pauseTime = common::Time(0);
   this->startTime = common::Time::GetWallTime();
+  this->realTimeOffset = common::Time(0);
 }
 
 //////////////////////////////////////////////////
