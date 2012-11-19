@@ -57,7 +57,10 @@ void SelectionBuffer::Update()
   {
     this->renderTexture->update();
   }
-  catch (...) {}
+  catch(...)
+  {
+  }
+
   this->renderTexture->copyContentsToMemory(*this->pixelBox,
       Ogre::RenderTarget::FB_FRONT);
 }
