@@ -50,16 +50,12 @@ namespace gazebo
     #define gzerr (gazebo::common::Console::Instance()->ColorErr("Error", \
           __FILE__, __LINE__, 31))
 
-    /// \brief Log a message
-    #define gzlog (gazebo::common::Console::Instance()->Log() << "[" <<\
-        __FILE__ << ":" << __LINE__ << "] ")
-
     /// start marker
     #define gzclr_start(clr) "\033[1;33m"
     /// end marker
     #define gzclr_end "\033[0m"
 
-    /// \brief Message, error, warning, and logging functionality
+    /// \brief Message, error, and warning functionality
     class Console
     {
       /// \brief Default constructor
@@ -93,13 +89,6 @@ namespace gazebo
       public: std::ostream &ColorErr(const std::string &_lbl,
                   const std::string &_file, unsigned int _line, int _color);
 
-      /// \brief Use this to output a message to a log file
-      /// \return Reference to output stream
-      public: std::ofstream &Log();
-
-      /// \brief True if logging data
-      private: bool logData;
-
       /// \brief A stream that does not output anywhere
       private: class NullStream : public std::ostream
                {
@@ -115,9 +104,6 @@ namespace gazebo
 
       /// \brief error stream
       private: std::ostream *errStream;
-
-      /// \brief log stream
-      private: std::ofstream logStream;
 
       /// Pointer to myself
       private: static Console *myself;

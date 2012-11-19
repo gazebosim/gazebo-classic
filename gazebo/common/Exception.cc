@@ -34,12 +34,15 @@ Exception::Exception(const char *_file, int _line, std::string _msg)
   this->file = _file;
   this->line = _line;
   this->str = _msg;
-  gazebo::common::Console::Instance()->ColorErr("Exception",
-      this->file, this->line, 31) << *this << "\n";
 }
 
 //////////////////////////////////////////////////
 Exception::~Exception()
+{
+}
+
+//////////////////////////////////////////////////
+void Exception::Print() const
 {
   gazebo::common::Console::Instance()->ColorErr("Exception",
       this->file, this->line, 31) << *this << "\n";
