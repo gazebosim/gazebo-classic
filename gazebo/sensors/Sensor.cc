@@ -125,7 +125,8 @@ std::string Sensor::GetParentName() const
 //////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
-  if (this->IsActive())
+  // Don't update sensors if world is paused
+  if (this->IsActive() && !this->world->IsPaused())
   {
     if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
     {
