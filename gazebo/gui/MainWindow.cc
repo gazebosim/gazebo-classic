@@ -186,6 +186,7 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   gazebo::stop();
   this->renderWidget->hide();
   this->tabWidget->hide();
+  this->toolsWidget->hide();
 
   this->connections.clear();
 
@@ -410,6 +411,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showFullScreen();
     this->renderWidget->showFullScreen();
     this->tabWidget->hide();
+    this->toolsWidget->hide();
     this->menuBar->hide();
   }
   else
@@ -417,6 +419,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showNormal();
     this->renderWidget->showNormal();
     this->tabWidget->show();
+    this->toolsWidget->show();
     this->menuBar->show();
   }
 }
