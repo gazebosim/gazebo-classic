@@ -403,13 +403,13 @@ namespace gazebo
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
-                   int32_t n = abs(this->nsec / 1e9 + 1);
+                   int32_t n = abs(this->nsec / 1e9) + 1;
                    this->sec -= n;
                    this->nsec += n * 1e9;
                  }
                  if (this->sec < 0 && this->nsec > 0)
                  {
-                   int32_t n = abs(this->nsec / 1e9 + 1);
+                   int32_t n = abs(this->nsec / 1e9) + 1;
                    this->sec += n;
                    this->nsec -= n * 1e9;
                  }

@@ -317,24 +317,28 @@ void World::Step()
   }
 
   // sleep here to get the correct update rate
+  common::Time tmpTime = common::Time::GetWallTime();
   common::Time sleepTime = this->prevStepWallTime +
     common::Time(this->physicsEngine->GetUpdatePeriod()) -
-    common::Time::GetWallTime() - this->sleepOffset;
+    tmpTime - this->sleepOffset;
 
-  common::Time actualSleep = common::Time::GetWallTime();
-  common::Time::NSleep(sleepTime);
-  common::Time tmpTime = common::Time::GetWallTime();
-  actualSleep = tmpTime - actualSleep;
+  if (sleepTime > 0)
+    common::Time::NSleep(sleepTime);
+  else
+    sleepTime = 0;
 
-  // throttling update rate
-  if (tmpTime - this->prevStepWallTime
+  common::Time actualSleep = common::Time::GetWallTime() - tmpTime;
+
+  // exponentially avg out
+  this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
+                      this->sleepOffset * 0.99;
+
+  // throttling update rate, with sleepOffset as tolerance
+  // the tolerance is needed as the sleep time is not exact
+  if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
-    this->sleepOffset = tmpTime - this->prevStepWallTime
-      - common::Time(this->physicsEngine->GetUpdatePeriod())
-      + actualSleep - sleepTime;
-
-    this->prevStepWallTime = tmpTime;
+    this->prevStepWallTime = common::Time::GetWallTime();
 
     if (!this->IsPaused() || this->stepInc > 0)
     {
