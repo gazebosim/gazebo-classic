@@ -24,7 +24,93 @@ class PhysicsTest : public ServerFixture
 {
 };
 
+TEST_F(PhysicsTest, SpringCFMERPEquivalencyTest)
+{
+  // Test to make sure that spring and cfm/erp yields the same results
+  Load("worlds/spring_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
 
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr modelCFMERP = world->GetModel("model_3");
+  physics::ModelPtr modelSpring = world->GetModel("model_4");
+  EXPECT_TRUE(modelCFMERP);
+  EXPECT_TRUE(modelSpring);
+  physics::LinkPtr linkCFMERP = modelCFMERP->GetLink("link_1");
+  physics::LinkPtr linkSpring = modelSpring->GetLink("link_1");
+  EXPECT_TRUE(linkCFMERP);
+  EXPECT_TRUE(linkSpring);
+
+  // make sure the two links have the same oscillation frequency
+  // although the cfm erp version has more damping, not sure why
+  {
+    for(unsigned int i = 0; i < 2000; ++i)
+    {
+      world->StepWorld(1);  // theoretical contact, but
+      {
+        {
+          math::Vector3 velCFMERP = linkCFMERP->GetWorldLinearVel();
+          math::Pose poseCFMERP = linkCFMERP->GetWorldPose();
+          math::Vector3 velSpring = linkSpring->GetWorldLinearVel();
+          math::Pose poseSpring = linkSpring->GetWorldPose();
+          // gzdbg << "box time [" << world->GetSimTime().Double()
+          //      << "] cfmerp z [" << poseCFMERP.pos.z
+          //      << "] sprint z [" << poseSpring.pos.z
+          //      << "] cfmerp vz [" << velCFMERP.z
+          //      << "] sprint vz [" << velSpring.z
+          //      << "]\n";
+          EXPECT_GT((velCFMERP.z * velSpring.z), 0.0);
+          EXPECT_GT((poseCFMERP.pos.z * poseSpring.pos.z), 0.0);
+        }
+      }
+    }
+  }
+
+  // make sure the other links have the correct frequencies
+
+  Unload();
+}
+
+TEST_F(PhysicsTest, MultiCollisionTest)
+{
+  // test to make sure a link with multiple offset collisions
+  // are setup correctly.
+  Load("worlds/multi_collision_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  EXPECT_TRUE(physicsEngine);
+  physics::ModelPtr model= world->GetModel("model");
+  EXPECT_TRUE(model);
+  physics::LinkPtr link= model->GetLink("link");
+  EXPECT_TRUE(link);
+
+  // make sure the link settles with the correct orientation
+  {
+    world->StepWorld(12000);  // theoretical contact, but
+    {
+      {
+        math::Vector3 vel = link->GetWorldLinearVel();
+        math::Pose pose = link->GetWorldPose();
+        gzdbg << "box time [" << world->GetSimTime().Double()
+             << "] z [" << pose.pos.z
+             << "] rot [" << pose.rot
+             << "] vz [" << vel.z
+             << "]\n";
+        EXPECT_LT(vel.z, 0.00001);
+        EXPECT_LT(fabs(pose.pos.z - 0.48847), 0.00001);
+        EXPECT_LT(fabs(pose.rot.GetAsEuler().x - 1.0708), 0.00001);
+        EXPECT_LT(fabs(pose.rot.GetAsEuler().y - -0.0858099), 0.00001);
+        EXPECT_LT(fabs(pose.rot.GetAsEuler().z - -0.0421335), 0.00001);
+      }
+    }
+  }
+
+
+  Unload();
+}
 TEST_F(PhysicsTest, State)
 {
   Load("worlds/empty.world");
@@ -394,76 +480,6 @@ TEST_F(PhysicsTest, SimplePendulumTest)
       }
     }
   }
-  Unload();
-}
-
-TEST_F(PhysicsTest, SpringCFMERPEquivalencyTest)
-{
-  // Test to make sure that spring and cfm/erp yields the same results
-  Load("worlds/spring_test.world", true);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
-
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
-  physics::ModelPtr modelCFMERP = world->GetModel("model_3");
-  physics::ModelPtr modelSpring = world->GetModel("model_4");
-  EXPECT_TRUE(modelCFMERP);
-  EXPECT_TRUE(modelSpring);
-  physics::LinkPtr linkCFMERP = modelCFMERP->GetLink("link_1");
-  physics::LinkPtr linkSpring = modelSpring->GetLink("link_1");
-  EXPECT_TRUE(linkCFMERP);
-  EXPECT_TRUE(linkSpring);
-
-  // make sure the two links have the same oscillation frequency
-  // although the cfm erp version has more damping, not sure why
-  {
-    for(unsigned int i = 0; i < 2000; ++i)
-    {
-      world->StepWorld(1);  // theoretical contact, but
-      {
-        {
-          math::Vector3 velCFMERP = linkCFMERP->GetWorldLinearVel();
-          math::Pose poseCFMERP = linkCFMERP->GetWorldPose();
-          math::Vector3 velSpring = linkSpring->GetWorldLinearVel();
-          math::Pose poseSpring = linkSpring->GetWorldPose();
-          gzdbg << "box time [" << world->GetSimTime().Double()
-               << "] cfmerp z [" << poseCFMERP.pos.z
-               << "] sprint z [" << poseSpring.pos.z
-               << "] cfmerp vz [" << velCFMERP.z
-               << "] sprint vz [" << velSpring.z
-               << "]\n";
-          EXPECT_LT(fabs(velCFMERP.z - velCFMERP.z), 0.0001);
-          EXPECT_LT(fabs(poseCFMERP.pos.z - poseCFMERP.pos.z),
-                    0.0001);
-        }
-      }
-    }
-  }
-
-  // make sure the other links have the correct frequencies
-
-  Unload();
-}
-
-TEST_F(PhysicsTest, MultiCollisionTest)
-{
-  // test to make sure a link with multiple offset collisions
-  // are setup correctly.
-  Load("worlds/multi_collision_test.world", true);
-  physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
-
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
-  physics::ModelPtr model= world->GetModel("model");
-  EXPECT_TRUE(model);
-  physics::LinkPtr link= model->GetLink("link");
-  EXPECT_TRUE(link);
-
-  // make sure the two links have the same oscillation frequency
-  // although the cfm erp version has more damping, not sure why
-
   Unload();
 }
 
