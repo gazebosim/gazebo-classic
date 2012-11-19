@@ -356,6 +356,7 @@ void ODEPhysics::UpdatePhysics()
     for (unsigned int i = 0; i < this->contactFeedbackIndex; ++i)
       this->ProcessContactFeedback(this->contactFeedbacks[i],
                                    msg.add_contact());
+    msgs::Set(msg.mutable_time(), this->world->GetSimTime());
 
     // don't publish empty messages
     if (msg.contact_size() > 0)
