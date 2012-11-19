@@ -105,7 +105,7 @@ namespace gazebo
 
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string &type,
-                                           ModelPtr _parent);
+                                           ModelPtr _parent = ModelPtr());
 
       /// \brief Return the space id
       public: dSpaceID GetSpaceId() const;
