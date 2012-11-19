@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,11 +77,11 @@ namespace gazebo
       public: math::Vector3 GetFocalPoint() const;
 
       /// \brief Set the yaw angle of the camera.
-      /// \param[in] Yaw angle in radians
+      /// \param[in] _yaw angle in radians
       public: void SetYaw(double _yaw);
 
       /// \brief Set the pitch angle of the camera.
-      /// \param[in] Pitch angle in radians.
+      /// \param[in] _pitch Pitch angle in radians.
       public: void SetPitch(double _pitch);
 
       // Documentation inherited from parent

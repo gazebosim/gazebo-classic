@@ -233,8 +233,10 @@ void GpuLaser::PostRender()
             - blitDur) * 1000 << "\n";   */
 }
 
-void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
-                   Ogre::Material *material, Ogre::Camera *cam, bool updateTex)
+/////////////////////////////////////////////////
+void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
+                   Ogre::Material *_material, Ogre::Camera *_cam,
+                   bool _updateTex)
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
@@ -243,26 +245,26 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
 
   renderSys = this->scene->GetManager()->getDestinationRenderSystem();
   // Get pointer to the material pass
-  pass = material->getBestTechnique()->getPass(0);
+  pass = _material->getBestTechnique()->getPass(0);
 
   // Render the depth texture
   // OgreSceneManager::_render function automatically sets farClip to 0.
   // Which normally equates to infinite distance. We don't want this. So
   // we have to set the distance every time.
-  cam->setFarClipDistance(this->GetFarClip());
+  _cam->setFarClipDistance(this->GetFarClip());
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  vp = target->getViewport(0);
+  vp = _target->getViewport(0);
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
   sceneMgr->_setPass(pass, true, false);
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(target);
+  autoParamDataSource.setCurrentRenderTarget(_target);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
-  autoParamDataSource.setCurrentCamera(cam, true);
+  autoParamDataSource.setCurrentCamera(_cam, true);
 
   renderSys->setLightingEnabled(false);
   renderSys->_setFog(Ogre::FOG_NONE);
@@ -273,7 +275,7 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
   pass->_updateAutoParams(&autoParamDataSource, 1);
 #endif
 
-  if (updateTex)
+  if (_updateTex)
   {
     pass->getFragmentProgramParameters()->setNamedConstant("tex1",
       this->texIdx[0]);
@@ -317,6 +319,7 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *target,
   }
 }
 
+/////////////////////////////////////////////////
 void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *rend,
       const Ogre::Pass* /*pass*/, const Ogre::AutoParamDataSource* /*source*/,
       const Ogre::LightList* /*lights*/, bool /*supp*/)
@@ -421,6 +424,7 @@ const float* GpuLaser::GetLaserData()
   return this->laserBuffer;
 }
 
+/////////////////////////////////////////////////
 void GpuLaser::CreateOrthoCam()
 {
   this->orthoCam = this->scene->GetManager()->createCamera(
@@ -451,6 +455,7 @@ void GpuLaser::CreateOrthoCam()
   }
 }
 
+/////////////////////////////////////////////////
 Ogre::Matrix4 GpuLaser::BuildScaledOrthoMatrix(float left, float right,
            float bottom, float top, float near, float far)
 {
@@ -516,17 +521,20 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *target)
   this->orthoCam->setCustomProjectionMatrix(true, p);
 }
 
+/////////////////////////////////////////////////
 void GpuLaser::SetRangeCount(unsigned int _w, unsigned int _h)
 {
   this->w2nd = _w;
   this->h2nd = _h;
 }
 
+/////////////////////////////////////////////////
 void GpuLaser::SetParentSensor(sensors::GpuRaySensor *parent)
 {
   this->parent_sensor = parent;
 }
 
+/////////////////////////////////////////////////
 void GpuLaser::CreateMesh()
 {
   std::string meshName = this->GetName() + "_undistortion_mesh";
@@ -620,6 +628,7 @@ void GpuLaser::CreateMesh()
   common::MeshManager::Instance()->AddMesh(this->undist_mesh);
 }
 
+/////////////////////////////////////////////////
 void GpuLaser::CreateCanvas()
 {
   this->CreateMesh();
