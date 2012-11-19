@@ -14,9 +14,11 @@
  * limitations under the License.
  *
 */
-#include <iostream>
+
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
+
+#include <iostream>
 
 /////////////////////////////////////////////////
 // Function is called everytime a message is received.
