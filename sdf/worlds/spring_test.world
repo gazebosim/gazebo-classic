@@ -117,7 +117,12 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>1000</effort>
+            <velocity>1000</velocity>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -127,7 +132,10 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="0.0" erp="0.2" />
+            <limit>
+              <cfm>0.0</cfm>
+              <erp>0.2</erp>
+            </limit>
             <!--<suspension cfm="0.0" erp="0.2"/>-->
           </ode>
         </physics>
@@ -209,7 +217,12 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>1000</effort>
+            <velocity>1000</velocity>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -219,7 +232,10 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="3.0" erp="1.0" />
+            <limit>
+              <cfm>3.0</cfm>
+              <erp>1.0</erp>
+            </limit>
             <!--<suspension cfm="0.0" erp="0.2"/>-->
           </ode>
         </physics>
@@ -297,7 +313,12 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>1000</effort>
+            <velocity>1000</velocity>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -307,7 +328,10 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="6.0" erp="1.0" />
+            <limit>
+              <cfm>6.0</cfm>
+              <erp>1.0</erp>
+            </limit>
             <!--<suspension cfm="0.0" erp="0.2"/>-->
           </ode>
         </physics>
@@ -385,7 +409,12 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="0" upper="0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>1000</effort>
+            <velocity>1000</velocity>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
         <physics>
@@ -395,7 +424,10 @@
             <max_force>1000.0</max_force>
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
-            <limit cfm="9.0" erp="1.0" />
+            <limit>
+              <cfm>9.0</cfm>
+              <erp>1.0</erp>
+            </limit>
             <!--<suspension cfm="0.0" erp="0.2"/>-->
           </ode>
         </physics>
@@ -473,7 +505,12 @@
         <child>link_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <limit lower="-1.0" upper="1.0" effort="1000" velocity="1000" />
+          <limit>
+            <lower>-1.0</lower>
+            <upper>1.0</upper>
+            <effort>1000</effort>
+            <velocity>1000</velocity>
+          </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
       </joint>

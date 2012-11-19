@@ -417,6 +417,31 @@ TEST_F(PhysicsTest, SpringCFMERPEquivalencyTest)
 
   // make sure the two links have the same oscillation frequency
   // although the cfm erp version has more damping, not sure why
+  {
+    for(unsigned int i = 0; i < 2000; ++i)
+    {
+      world->StepWorld(1);  // theoretical contact, but
+      {
+        {
+          math::Vector3 velCFMERP = linkCFMERP->GetWorldLinearVel();
+          math::Pose poseCFMERP = linkCFMERP->GetWorldPose();
+          math::Vector3 velSpring = linkSpring->GetWorldLinearVel();
+          math::Pose poseSpring = linkSpring->GetWorldPose();
+          gzdbg << "box time [" << world->GetSimTime().Double()
+               << "] cfmerp z [" << poseCFMERP.pos.z
+               << "] sprint z [" << poseSpring.pos.z
+               << "] cfmerp vz [" << velCFMERP.z
+               << "] sprint vz [" << velSpring.z
+               << "]\n";
+          EXPECT_LT(fabs(velCFMERP.z - velCFMERP.z), 0.0001);
+          EXPECT_LT(fabs(poseCFMERP.pos.z - poseCFMERP.pos.z),
+                    0.0001);
+        }
+      }
+    }
+  }
+
+  // make sure the other links have the correct frequencies
 
   Unload();
 }
