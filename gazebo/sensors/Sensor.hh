@@ -168,6 +168,12 @@ namespace gazebo
       /// \brief Subscribe to pose updates.
       protected: transport::SubscriberPtr poseSub;
 
+      /// \brief Subscribe to control message.
+      private: transport::SubscriberPtr controlSub;
+
+      /// \brief Publish sensor data.
+      private: transport::PublisherPtr sensorPub;
+
       /// \brief Name of the parent.
       protected: std::string parentName;
 
@@ -184,15 +190,9 @@ namespace gazebo
       /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;
 
-      /// \brief Time of the last measurement; this value must be updated
-      ///        within each sensor's UpdateImpl.
+      /// \brief Stores last time that a sensor measurement was generated;
+      ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
-
-      /// \brief Subscribe to control message.
-      private: transport::SubscriberPtr controlSub;
-
-      /// \brief Publish sensor data.
-      private: transport::PublisherPtr sensorPub;
     };
     /// \}
   }
