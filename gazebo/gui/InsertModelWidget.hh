@@ -14,11 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef INSERT_MODEL_WIDGET_HH
-#define INSERT_MODEL_WIDGET_HH
+#ifndef _INSERT_MODEL_WIDGET_HH_
+#define _INSERT_MODEL_WIDGET_HH_
 
 #include <string>
 #include <map>
+#include <boost/thread/mutex.hpp>
+
 #include "gui/qt.h"
 
 class QTreeWidget;
@@ -48,10 +50,21 @@ namespace gazebo
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
+      /// \brief An update function that lets this widget add in the results
+      /// from ModelDatabase::GetModels.
+      private slots: void Update();
+
+      /// \brief Widget that display all the models that can be inserted.
       private: QTreeWidget *fileTreeWidget;
 
       /// \brief Tree item that is populated with models from the ModelDatabase.
       private: QTreeWidgetItem *modelDatabaseItem;
+
+      /// \brief Mutex to protect the modelBuffer.
+      private: boost::mutex mutex;
+
+      /// \brief Buffer to hold the results from ModelDatabase::GetModels.
+      private: std::map<std::string, std::string> modelBuffer;
     };
   }
 }

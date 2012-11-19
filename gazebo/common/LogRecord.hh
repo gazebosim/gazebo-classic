@@ -41,7 +41,7 @@ namespace gazebo
 {
   namespace common
   {
-    //addtogroup gazebo_common
+    /// addtogroup gazebo_common
     /// \{
 
     /// \class LogRecord LogRecord.hh physics/LogRecord.hh

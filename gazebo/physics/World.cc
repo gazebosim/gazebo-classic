@@ -652,6 +652,7 @@ void World::ResetTime()
   this->simTime = common::Time(0);
   this->pauseTime = common::Time(0);
   this->startTime = common::Time::GetWallTime();
+  this->realTimeOffset = common::Time(0);
 }
 
 //////////////////////////////////////////////////

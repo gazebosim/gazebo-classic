@@ -126,6 +126,7 @@ void RFIDSensor::Init()
 void RFIDSensor::UpdateImpl(bool /*_force*/)
 {
   this->EvaluateTags();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
   if (this->scanPub)
   {
