@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,7 @@ namespace gazebo
       public: std::ostream &ColorErr(const std::string &_lbl,
                   const std::string &_file, unsigned int _line, int _color);
 
+      /// \class NullStream Animation.hh common/common.hh
       /// \brief A stream that does not output anywhere
       private: class NullStream : public std::ostream
                {
