@@ -222,7 +222,7 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
     if (this->selectionBuffer)
       this->selectionBuffer->Update();
 
-    // DEBUG: this->selectionBuffer->ShowOverlay(true);
+    this->selectionBuffer->ShowOverlay(true);
     // Ogre::Entity *entity =
     // this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
 
@@ -533,6 +533,8 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
   VisualPtr result;
+
+  this->selectionBuffer->ShowOverlay(true);
 
   Ogre::Entity *entity =
     this->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);

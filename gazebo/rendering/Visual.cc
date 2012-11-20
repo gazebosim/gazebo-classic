@@ -1081,11 +1081,14 @@ void Visual::SetTransparency(float _trans)
 //////////////////////////////////////////////////
 void Visual::SetHighlighted(bool _highlighted)
 {
+  std::cout << "Highlight[" << this->GetName() << "]\n";
+
   if (_highlighted)
   {
     // Create the bounding box if it's not already created.
     if (!this->boundingBox)
     {
+      std::cout << "Bounding Box[" << this->GetBoundingBox() << "]\n";
       this->boundingBox = new WireBox(shared_from_this(),
                                       this->GetBoundingBox());
     }
@@ -1466,19 +1469,20 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       posDiff = Conversions::Convert(node->_getDerivedPosition()) -
                 this->GetWorldPose().pos;
 
-      min = rotDiff * Conversions::Convert(bb.getMinimum() * node->getScale())
-            + posDiff;
-      max = rotDiff * Conversions::Convert(bb.getMaximum() * node->getScale())
-            + posDiff;
-
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = Conversions::Convert(node->getPosition());
-        max = Conversions::Convert(node->getPosition());
-        min -= math::Vector3(0.5, 0.5, 0.5);
-        max += math::Vector3(0.5, 0.5, 0.5);
+        min = math::Vector3(-0.5, -0.5, -0.5);
+        max = math::Vector3(0.5, 0.5, 0.5);
       }
+      else
+      {
+        min = rotDiff *
+          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
+        max = rotDiff *
+          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
+      }
+
 
       box.Merge(math::Box(min, max));
     }

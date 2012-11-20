@@ -362,6 +362,7 @@ void Light::CreateVisual()
 
   this->line->setMaterial("Gazebo/LightOn");
   this->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  static_cast<Ogre::MovableObject*>(this->line)->setUserAny(Ogre::Any(this->GetName()));
 
   // turn off light source box visuals by default
   this->visual->SetVisible(true);
@@ -370,7 +371,6 @@ void Light::CreateVisual()
 //////////////////////////////////////////////////
 void Light::SetPosition(const math::Vector3 &_p)
 {
-  std::cout << "Set position[" << _p << "]\n";
   this->visual->SetPosition(_p);
 }
 
