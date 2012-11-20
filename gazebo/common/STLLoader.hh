@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef STLLOADER_HH
-#define STLLOADER_HH
+#ifndef _STLLOADER_HH_
+#define _STLLOADER_HH_
 
 #include <stdint.h>
 #include <string>
@@ -34,6 +34,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class STLLoader STLLoader.hh common/common.hh
     /// \brief Class used to load STL mesh files
     class STLLoader : public MeshLoader
     {
@@ -44,17 +45,19 @@ namespace gazebo
       public: virtual ~STLLoader();
 
       /// \brief Creates a new mesh and loads the data from a file
-      /// \param[in] filename the mesh file
-      public: virtual Mesh *Load(const std::string &filename);
+      /// \param[in] _filename the mesh file
+      public: virtual Mesh *Load(const std::string &_filename);
 
       /// \brief Reads an ASCII STL (stereolithography) file.
       /// \param[in] _filein the file pointer
       /// \param[out] _mesh the mesh where to load the data
+      /// \return true if read was successful
       private: bool ReadAscii(FILE *_filein, Mesh *_mesh);
 
       /// \brief Reads a binary STL (stereolithography) file.
       /// \param[in] _filein the file pointer
       /// \param[out] the mesh where to load the data
+      /// \return true if read was successful
       private: bool ReadBinary(FILE *_filein, Mesh *_mesh);
 
       /// \brief Compares two strings for equality, disregarding case.
@@ -68,6 +71,7 @@ namespace gazebo
       /// \param[in] _a the vector data
       /// \param[in] _m the number of columns in the table
       /// \param[in] _n the number of rows in the table
+      /// \return The column index of the vector
       private: int RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[]);
 
       /// \brief Reads a long int from a binary file.

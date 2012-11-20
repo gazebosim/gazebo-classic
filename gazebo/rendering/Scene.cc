@@ -1370,9 +1370,11 @@ void Scene::PreRender()
       {
         math::Pose pose = msgs::Convert(*(*pIter));
         iter->second->SetPose(pose);
+        PoseMsgs_L::iterator prev = pIter++;
+        this->poseMsgs.erase(prev);
       }
-      PoseMsgs_L::iterator prev = pIter++;
-      this->poseMsgs.erase(prev);
+      else
+        ++pIter;
     }
     else
       ++pIter;

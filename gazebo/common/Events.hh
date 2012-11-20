@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef EVENTS_HH
-#define EVENTS_HH
+#ifndef _EVENTS_HH_
+#define _EVENTS_HH_
 
 #include <string>
 #include "common/Event.hh"
@@ -24,11 +24,14 @@ namespace gazebo
 {
   namespace event
   {
+
+    /// \addtogroup gazebo_event
+    /// \{
+
+    /// \class Events Events.hh common/common.hh
     /// \brief An Event class to get notifications for simulator events
     class Events
     {
-      /// \addtogroup gazebo_event
-      /// \{
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
