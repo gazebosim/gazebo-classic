@@ -36,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \class EntityMaker EntityMaker.hh gui/gui.hh
-    /// \brief to make an entity base class  
+    /// \brief to make an entity base class
     class EntityMaker
     {
       /// \def CreateCallback
