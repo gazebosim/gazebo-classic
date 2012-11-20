@@ -70,8 +70,15 @@ div.qindex, div.navtab{
 	padding: 2px;
 }
 
-div.qindex, div.navpath {
-	width: 100%;
+div.qindex
+{
+  width: 100%;
+	line-height: 140%;
+}
+
+div.navpath
+{
+  margin-left: 20em;
 	line-height: 140%;
 }
 
