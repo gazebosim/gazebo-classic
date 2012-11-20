@@ -1399,13 +1399,13 @@ std::string SDF::ToString() const
 {
   std::ostringstream stream;
 
-  if (this->root->GetName() != "gazebo")
-    stream << "<gazebo version='" << SDF::version << "'>\n";
+  if (this->root->GetName() != "sdf")
+    stream << "<sdf version='" << SDF::version << "'>\n";
 
   stream << this->root->ToString("");
 
-  if (this->root->GetName() != "gazebo")
-    stream << "</gazebo>";
+  if (this->root->GetName() != "sdf")
+    stream << "</sdf>";
 
   return stream.str();
 }
