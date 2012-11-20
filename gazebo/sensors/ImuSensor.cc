@@ -56,8 +56,8 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
   this->sdf->PrintValues("  ");
 
-  if (this->sdf->GetElement("imu") &&
-      this->sdf->GetElement("imu")->GetElement("topic") &&
+  if (this->sdf->HasElement("imu") &&
+      this->sdf->GetElement("imu")->HasElement("topic") &&
       this->sdf->GetElement("imu")->GetValueString("topic")
       != "__default_topic__")
   {
