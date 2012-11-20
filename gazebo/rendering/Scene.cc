@@ -1837,7 +1837,6 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
   Light_M::iterator iter;
   iter = this->lights.find(_msg->name());
 
-
   if (iter == this->lights.end())
   {
     LightPtr light(new Light(this));

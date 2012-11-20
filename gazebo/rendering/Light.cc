@@ -370,6 +370,7 @@ void Light::CreateVisual()
 //////////////////////////////////////////////////
 void Light::SetPosition(const math::Vector3 &_p)
 {
+  std::cout << "Set position[" << _p << "]\n";
   this->visual->SetPosition(_p);
 }
 
