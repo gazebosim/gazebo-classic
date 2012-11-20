@@ -223,6 +223,8 @@ namespace gazebo
 
       /// \brief The laser retro value.
       private: float laserRetro;
+
+      private: CollisionState state;
     };
     /// \}
   }

@@ -155,8 +155,6 @@ TEST_F(CommonTest, Paths)
   paths->ClearOgrePaths();
   paths->ClearPluginPaths();
 
-  EXPECT_FALSE(paths->GetLogPath().empty());
-
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
   const std::list<std::string> pathList1 = paths->GetGazeboPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList1.size());

@@ -506,7 +506,7 @@ TEST_F(MsgsTest, SDF)
            <visual name='visual'>\
              <cast_shadows>false</cast_shadows>\
              <geometry>\
-               <mesh><scale>1 1 1</scale><uri>test.mesh</uri></mesh>\
+               <mesh><scale>1 1 1</scale><uri>test1.mesh</uri></mesh>\
              </geometry>\
              <material><script>Gazebo/Grey</script>\
              <shader type='vertex'/>\
@@ -531,7 +531,7 @@ TEST_F(MsgsTest, SDF)
                  <height>1</height>\
                  <threshold>255</threshold>\
                  <granularity>10</granularit>\
-                 <uri>test.mesh</uri>\
+                 <uri>test2.mesh</uri>\
                <image>\
              </geometry>\
              <material>\
@@ -559,7 +559,7 @@ TEST_F(MsgsTest, SDF)
              <geometry>\
                <heightmap>\
                  <size>1 2 3</size>\
-                 <uri>test.mesh</uri>\
+                 <uri>test3.mesh</uri>\
                  <pos>0 0 1</pos>\
                </heightmap>\
              </geometry>\
@@ -580,7 +580,8 @@ TEST_F(MsgsTest, SDF)
            <visual name='visual'>\
            </visual>\
         </gazebo>", sdf);
-    msgs::Visual msg = msgs::VisualFromSDF(sdf);
+    EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+        common::Exception);
   }
 
   // Shader type throw
@@ -594,7 +595,7 @@ TEST_F(MsgsTest, SDF)
              <geometry>\
                <heightmap>\
                  <size>1 2 3</size>\
-                 <uri>test.mesh</uri>\
+                 <uri>test4.mesh</uri>\
                  <pos>0 0 0</pos>\
                </heightmap>\
              </geometry>\
@@ -650,7 +651,8 @@ TEST_F(MsgsTest, SDF)
     sdf::ElementPtr badElement(new sdf::Element());
     badElement->SetName("bad_type");
     sdf->GetElement("geometry")->InsertElement(badElement);
-    msgs::Visual msg = msgs::VisualFromSDF(sdf);
+    EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+        common::Exception);
   }
 
   // Throw bad fog type
@@ -670,7 +672,6 @@ TEST_F(MsgsTest, SDF)
         </gazebo>", sdf);
     EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf), common::Exception);
   }
-
 
   // Scene A
   {
