@@ -1515,20 +1515,20 @@ bool World::OnLog(std::ostringstream &_stream)
   if (first)
   {
     this->UpdateStateSDF();
-    _stream << "<gazebo version ='";
+    _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
     _stream << this->sdf->ToString("");
-    _stream << "</gazebo>\n";
+    _stream << "</sdf>\n";
 
     first = false;
   }
   else if (this->states.size() > 1)
   {
     // Get the difference from the previous state.
-    _stream << "<gazebo version='" << SDF_VERSION << "'>";
+    _stream << "<sdf version='" << SDF_VERSION << "'>";
     _stream << this->states[0];
-    _stream << "</gazebo>";
+    _stream << "</sdf>";
     this->states.pop_front();
   }
 
