@@ -283,6 +283,10 @@ namespace gazebo
       /// Load all plugins specified in the SDF for the model.
       public: void LoadPlugins();
 
+      /// \brief Get the number of sensors attached to this model
+      /// \return Number of sensors.
+      public: unsigned int GetSensorCount() const;
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 

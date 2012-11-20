@@ -10,10 +10,59 @@ import "pose.proto";
 
 message Factory
 {
-  optional string sdf                       = 1;
-  optional string sdf_filename              = 2;
-  optional Pose pose                        = 3;
-  optional string edit_name                 = 4;
-  optional string clone_model_name          = 5;
-}
+  enum Operation
+  {
+    /// \brief Create a model from an SDF string.
+    /// Set op_data to the SDF string.
+    NEW_FROM_SDF  = 1;
 
+    /// \brief Createa a model from a file.
+    ///Set op_data to the SDF URI.
+    NEW_FROM_URI  = 2;
+
+    /// \brief Clone an existing model.
+    /// Set op_data to the model's name to clone.
+    CLONE         = 3;
+
+    /// \brief Edit an existing model.
+    /// Set op_data to the model's name to edit.
+    EDIT          = 4;
+  }
+
+  /// \brief the type of operation to perform
+  required Operation op             = 1;
+
+  /// \brief string data associated with the operation.
+  ///
+  /// NEW_FROM_SDF: op_data = SDF string
+  /// NEW_FROM_URI: op_data = SDF file URI
+  /// CLONE: op_data = Model name to clone
+  /// EDIT: op_data = Model name to edit
+  required string op_data           = 2;
+
+  /// \brief This must be an SDF string. The contained SDF value will be applied
+  /// to the model. This is mechanism to edit all the properties of an existing
+  /// model. This will be applied first.
+  optional string edit_sdf_data     = 3;
+
+  /// \brief Pose to set the model to. This will be applied second.
+  optional Pose pose                = 4;
+
+  /// \brief Name for the model. If specified this will override the name in
+  /// the provided SDF, filename, edited model, or cloned model. This will
+  /// be applied third.
+  optional string name              = 5;
+
+
+  /// Deprecated
+  optional string sdf                       = 6;
+
+  /// Deprecated
+  optional string sdf_filename              = 7;
+
+  /// Deprecated
+  optional string edit_name                 = 8;
+
+  /// Deprecated
+  optional string clone_model_name          = 9;
+}

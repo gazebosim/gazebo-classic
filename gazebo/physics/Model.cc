@@ -939,3 +939,19 @@ void Model::SetAutoDisable(bool _auto)
       boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
 }
 
+/////////////////////////////////////////////////
+unsigned int Model::GetSensorCount() const
+{
+  unsigned int result = 0;
+
+  Base_V::const_iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if (*iter && (*iter)->HasType(LINK))
+    {
+      result += boost::static_pointer_cast<Link>(*iter)->GetSensorCount();
+    }
+  }
+
+  return result;
+}

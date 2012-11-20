@@ -1179,130 +1179,118 @@ void World::ProcessFactoryMsgs()
   for (iter = this->factoryMsgs.begin();
        iter != this->factoryMsgs.end(); ++iter)
   {
-    sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("gazebo.sdf", factorySDF);
-
-    if ((*iter).has_sdf() && !(*iter).sdf().empty())
+    /// Remove this if block after Gazebo 1.3
+    if ((*iter).has_sdf() || (*iter).has_sdf_filename() ||
+        (*iter).has_edit_name() || (*iter).has_clone_model_name())
     {
-      // SDF Parsing happens here
-      if (!sdf::readString((*iter).sdf(), factorySDF))
-      {
-        gzerr << "Unable to read sdf string\n";
-        continue;
-      }
-    }
-    else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
-    {
-      std::string filename = common::ModelDatabase::Instance()->GetModelFile(
-          (*iter).sdf_filename());
-
-      if (!sdf::readFile(filename, factorySDF))
-      {
-        gzerr << "Unable to read sdf file.\n";
-        continue;
-      }
-    }
-    else if ((*iter).has_clone_model_name())
-    {
-      ModelPtr model = this->GetModel((*iter).clone_model_name());
-      if (!model)
-      {
-        gzerr << "Unable to clone model[" << (*iter).clone_model_name()
-              << "]. Model not found.\n";
-        continue;
-      }
-
-      factorySDF->root->InsertElement(model->GetSDF()->Clone());
-
-      std::string newName = model->GetName() + "_clone";
-      int i = 0;
-      while (this->GetModel(newName))
-      {
-        newName = model->GetName() + "_clone_" +
-                  boost::lexical_cast<std::string>(i);
-        i++;
-      }
-
-      factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
-    }
-    else
-    {
-      gzerr << "Unable to load sdf from factory message."
-            << "No SDF or SDF filename specified.\n";
+      gzerr << "Old factory message functions are deprecated. "
+            << "Please switch to the new factory function. "
+            << "Documentation: http://gazebosim.org/msgs\n"
+            << "No model will be spawned.";
       continue;
     }
 
-    if ((*iter).has_edit_name())
-    {
-      BasePtr base = this->rootElement->GetByName((*iter).edit_name());
-      if (base)
-      {
-        sdf::ElementPtr elem;
-        if (factorySDF->root->GetName() == "gazebo")
-          elem = factorySDF->root->GetFirstElement();
-        else
-          elem = factorySDF->root;
+    ModelPtr model;
 
-        base->UpdateParameters(elem);
-      }
+    sdf::SDFPtr factorySDF(new sdf::SDF);
+    sdf::initFile("gazebo.sdf", factorySDF);
+
+    switch((*iter).op())
+    {
+      /// Load a model from SDF or from URI
+      case msgs::Factory::NEW_FROM_SDF:
+        {
+          // SDF Parsing happens here
+          if (!sdf::readString((*iter).op_data(), factorySDF))
+          {
+            gzerr << "Unable to read sdf string\n";
+            continue;
+          }
+
+          break;
+        }
+
+      /// Load a model from URI
+      case msgs::Factory::NEW_FROM_URI:
+        {
+          std::string filename =
+            common::ModelDatabase::Instance()->GetModelFile((*iter).op_data());
+          if (!sdf::readFile(filename, factorySDF))
+          {
+            gzerr << "Unable to read sdf file[" << filename << "].\n";
+            continue;
+          }
+          break;
+        }
+
+      /// Clone a model
+      case msgs::Factory::CLONE:
+        {
+          model = this->GetModel((*iter).op_data());
+
+          if (!model)
+          {
+            gzerr << "Unable to clone model[" << (*iter).op_data()
+                  << "]. Model not found.\n";
+            continue;
+          }
+
+          factorySDF->root->InsertElement(model->GetSDF()->Clone());
+
+          std::string newName = model->GetName() + "_clone";
+          int i = 0;
+          while (this->GetModel(newName))
+          {
+            newName = model->GetName() + "_clone_" +
+              boost::lexical_cast<std::string>(i);
+            i++;
+          }
+
+          factorySDF->root->GetElement("model")->GetAttribute("name")->Set(
+              newName);
+          break;
+        }
+
+      /// Edit an existing model
+      case msgs::Factory::EDIT:
+        {
+          model = this->GetModel((*iter).op_data());
+
+          if (!model)
+          {
+            gzerr << "Unable to edit model[" << (*iter).op_data()
+                  << "]. Model not found.\n";
+            continue;
+          }
+
+          break;
+        }
+
+      /// Default produces and error
+      default:
+        {
+          gzerr << "Unable to process factory message. Operation type["
+                << (*iter).op() << "] not supported.\n";
+          continue;
+        }
     }
-    else
+
+    // Load the model if one is being created
+    if ((*iter)->op() == msgs::Factory::NEW_FROM_SDF ||
+        (*iter)->op() == msgs::Factory::NEW_FROM_URI ||
+        (*iter)->op() == msgs::Factory::CLONE)
     {
-      bool isActor = false;
-      bool isModel = false;
-      bool isLight = false;
+      // Load the model from SDF
+      model = this->LoadModel(elem, this->rootElement);
 
-      sdf::ElementPtr elem = factorySDF->root;
+      // Initialize the model
+      model->Init();
 
-      if (elem->HasElement("world"))
-        elem = elem->GetElement("world");
+      int iterations = 0;
 
-      if (elem->HasElement("model"))
+      // Check to see if the model has sensors
+      if (model->GetSensorCount() > 0)
       {
-        elem = elem->GetElement("model");
-        isModel = true;
-      }
-      else if (elem->HasElement("light"))
-      {
-        elem = elem->GetElement("light");
-        isLight = true;
-      }
-      else if (elem->HasElement("actor"))
-      {
-        elem = elem->GetElement("actor");
-        isActor = true;
-      }
-      else
-      {
-        gzerr << "Unable to find a model, light, or actor in:\n";
-        factorySDF->root->PrintValues("");
-        continue;
-      }
-
-      if (!elem)
-      {
-        gzerr << "Invalid SDF:";
-        factorySDF->root->PrintValues("");
-        continue;
-      }
-
-      elem->SetParent(this->sdf);
-      elem->GetParent()->InsertElement(elem);
-      if ((*iter).has_pose())
-        elem->GetElement("pose")->Set(msgs::Convert((*iter).pose()));
-
-      if (isActor)
-      {
-        ActorPtr actor = this->LoadActor(elem, this->rootElement);
-        actor->Init();
-      }
-      else if (isModel)
-      {
-        ModelPtr model = this->LoadModel(elem, this->rootElement);
-        model->Init();
-
-        int iterations = 0;
-
         // Wait for the sensors to be initialized before loading
         // plugins.
         while (!sensors::SensorManager::Instance()->SensorsInitialized() &&
@@ -1311,25 +1299,58 @@ void World::ProcessFactoryMsgs()
           common::Time::MSleep(100);
           iterations++;
         }
-
-        if (iterations < 50)
-          model->LoadPlugins();
-        else
-        {
-          gzerr << "Sensors failed to initialize when loading model["
-                << model->GetName() << "] via the factory mechanism."
-                << "Plugins for the model will not be loaded.\n";
-        }
       }
-      else if (isLight)
-      {
-        /// \TODO: Current broken. See Issue #67.
-        msgs::Light *lm = this->sceneMsg.add_light();
-        lm->CopyFrom(msgs::LightFromSDF(elem));
 
-        this->lightPub->Publish(*lm);
+      // If successful, then load the plugins
+      if (iterations < 50)
+        model->LoadPlugins();
+      else
+      {
+        gzerr << "Sensors failed to initialize when loading model["
+          << model->GetName() << "] via the factory mechanism."
+          << "Plugins for the model will not be loaded.\n";
       }
     }
+
+    // Apply the edit sdf data from the message, if it exists.
+    if ((*iter)->has_edit_sdf_data())
+    {
+      sdf::SDFPtr editSDF(new sdf::SDF);
+      sdf::initFile("gazebo.sdf", editSDF);
+
+      // Parse the SDF string
+      if (!sdf::readString((*iter).edit_sdf_data(), editSDF))
+      {
+        gzerr << "Unable to read edit_sdf_data string\n";
+      }
+      else
+      {
+        sdf::ElementPtr elem;
+
+        if (editSDF->root->GetName() == "gazebo")
+          elem = editSDF->root->GetFirstElement();
+        else
+          elem = editSDF->root;
+
+        model->UpdateParameters(elem);
+      }
+    }
+
+    // Apply this pose to the model
+    if ((*iter)->has_pose())
+    {
+      model->SetWorldPose(msgs::Convert((*iter)->pose()));
+    }
+
+    // Apply the name to the model
+    if ((*iter)->has_name())
+    {
+      model->SetName((*iter)->name());
+    }
+
+    /// \TODO: Current broken. See Issue #67.
+    // msgs::Light *lm = this->sceneMsg.add_light();
+    // lm->CopyFrom(msgs::LightFromSDF(elem));
   }
 
   this->factoryMsgs.clear();
