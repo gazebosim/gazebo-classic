@@ -30,7 +30,6 @@
 #include <fstream>
 #include <sstream>
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -84,7 +83,6 @@ SystemPaths::SystemPaths()
   this->UpdateOgrePaths();
 
   // Add some search paths
-  // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
   this->suffixPaths.push_back("/models/");
   this->suffixPaths.push_back("/media/models/");
   this->suffixPaths.push_back("/Media/models/");

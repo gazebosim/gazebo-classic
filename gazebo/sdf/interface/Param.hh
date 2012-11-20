@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 14 Aug 2008
  */
 
-#ifndef SDF_PARAM_HH
-#define SDF_PARAM_HH
+#ifndef _SDF_PARAM_HH_
+#define _SDF_PARAM_HH_
 
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
