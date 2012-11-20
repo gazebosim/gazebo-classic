@@ -16,7 +16,7 @@
 */
 
 #ifndef _SDF_HEADERS_HH_
-#define _SDF_HEADER_HH_
+#define _SDF_HEADERS_HH_
 
 #include "gazebo/sdf/interface/SDF.hh"
 #include "gazebo/sdf/interface/Param.hh"
