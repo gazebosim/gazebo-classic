@@ -590,8 +590,8 @@ TEST_F(PhysicsTest, State)
     double last_update_time;
     double elapsed_wall_time;
 
-    srand_r(seed)(time(NULL));
-    int seed = time(NULL);
+    // srand_r(seed)(time(NULL));
+    unsigned int seed = time(NULL);
 
 
 
@@ -622,7 +622,7 @@ TEST_F(PhysicsTest, State)
         int n = model->GetJointCount();
         for (int i = 0; i < n; ++i)
           model->GetJoint(i)->SetAngle(0,
-              0.1*static_cast<double>(rand_r(seed)())/
+              0.1*static_cast<double>(rand_r(&seed))/
               static_cast<double>(RAND_MAX));
       }
     test_duration = world->GetSimTime().Double() - start_time;
@@ -665,7 +665,7 @@ TEST_F(PhysicsTest, State)
       {
         last_update_time = world->GetSimTime().Double();
         double a = 0.50*(2.0*
-            static_cast<double>(rand_r(seed)())/
+            static_cast<double>(rand_r(&seed))/
             static_cast<double>(RAND_MAX) - 1.0);
         joint_01->SetAngle(0, a);
         // joint_12->SetAngle(0, a);

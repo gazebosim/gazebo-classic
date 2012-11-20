@@ -33,6 +33,9 @@ set (gtest_sources
   pr2.cc
   projector.cc
   speed.cc
+  set_joint.cc
+  set_pose.cc
+  set_pose_loop.cc
   transport.cc)
 
 set (plugins)
