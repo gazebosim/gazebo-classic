@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef PUBLICATION_HH
-#define PUBLICATION_HH
+#ifndef _PUBLICATION_HH_
+#define _PUBLICATION_HH_
 
 #include <boost/shared_ptr.hpp>
 #include <list>
