@@ -2334,7 +2334,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
   this->propTreeBrowser->addProperty(topItem);
-  this->FillPoseProperty(_msg.pose(), topItem);
+  if (_msg.has_pose())
+    this->FillPoseProperty(_msg.pose(), topItem);
+  else
+    this->FillPoseProperty(msgs::Convert(math::Pose()), topItem);
 
   // Create and set the diffuse color property
   item = this->variantManager->addProperty(QVariant::Color, tr("diffuse"));

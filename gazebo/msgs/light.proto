@@ -22,7 +22,7 @@ message Light
   }
   optional LightType type                = 2;
 
-  required Pose pose                     = 3;
+  optional Pose pose                     = 3;
   optional Color diffuse                 = 4;
   optional Color specular                = 5;
   optional float attenuation_constant    = 6;

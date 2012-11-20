@@ -409,7 +409,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   {
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
-  std::cout << "MoveToVIsual[" << _visual->GetName() << "]\n";
 
   math::Box box = _visual->GetBoundingBox();
   math::Vector3 size = box.GetSize();
