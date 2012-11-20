@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 
-#ifndef _SDF_HEADERS_HH_
-#define _SDF_HEADERS_HH_
+#ifndef _SDF_HH_
+#define _SDF_HH_
 
-#include "gazebo/sdf/interface/SDF.hh"
-#include "gazebo/sdf/interface/Param.hh"
-#include "gazebo/sdf/interface/parser.hh"
-#include "gazebo/sdf/interface/Converter.hh"
+#include "sdf/interface/SDF.hh"
+#include "sdf/interface/Param.hh"
+#include "sdf/interface/parser.hh"
+#include "sdf/interface/Converter.hh"
 
 #endif
