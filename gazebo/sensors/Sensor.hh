@@ -121,6 +121,10 @@ namespace gazebo
       /// \return Time of last update.
       public: common::Time GetLastUpdateTime();
 
+      /// \brief Return last measurement time.
+      /// \return Time of last measurement.
+      public: common::Time GetLastMeasurementTime();
+
       /// \brief Return true if user requests the sensor to be visualized
       ///        via tag:  <visualize>true</visualize> in SDF.
       /// \return True if visualized, false if not.
@@ -146,7 +150,7 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
-      /// \brief True if active
+      /// \brief True if sensor generation is active.
       protected: bool active;
 
       /// \brief Pointer the the SDF element for the sensor.
@@ -164,6 +168,12 @@ namespace gazebo
       /// \brief Subscribe to pose updates.
       protected: transport::SubscriberPtr poseSub;
 
+      /// \brief Subscribe to control message.
+      private: transport::SubscriberPtr controlSub;
+
+      /// \brief Publish sensor data.
+      private: transport::PublisherPtr sensorPub;
+
       /// \brief Name of the parent.
       protected: std::string parentName;
 
@@ -173,17 +183,16 @@ namespace gazebo
       /// \brief Pointer to the world.
       protected: gazebo::physics::WorldPtr world;
 
-      /// \brief Update period.
+      /// \brief Desired time between updates, set indirectly by
+      ///        Sensor::SetUpdateRate.
       protected: common::Time updatePeriod;
 
       /// \brief Time of the last update.
       protected: common::Time lastUpdateTime;
 
-      /// \brief Subscribe to control message.
-      private: transport::SubscriberPtr controlSub;
-
-      /// \brief Publish sensor data.
-      private: transport::PublisherPtr sensorPub;
+      /// \brief Stores last time that a sensor measurement was generated;
+      ///        this value must be updated within each sensor's UpdateImpl
+      protected: common::Time lastMeasurementTime;
     };
     /// \}
   }

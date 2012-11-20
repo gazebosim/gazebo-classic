@@ -5,9 +5,10 @@ set (sources Sensors.cc
              SensorFactory.cc
              SensorManager.cc
              CameraSensor.cc
-             DepthCameraSensor.cc
-             RaySensor.cc
              ContactSensor.cc
+             DepthCameraSensor.cc
+             ImuSensor.cc
+             RaySensor.cc
              RFIDSensor.cc
              RFIDTag.cc
 ) 
@@ -18,9 +19,10 @@ set (headers Sensors.hh
              SensorFactory.hh
              SensorManager.hh
              CameraSensor.hh
-             DepthCameraSensor.hh
-             RaySensor.hh
              ContactSensor.hh
+             DepthCameraSensor.hh
+             ImuSensor.hh
+             RaySensor.hh
              RFIDSensor.hh
              RFIDTag.hh
 )

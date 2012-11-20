@@ -652,6 +652,7 @@ void World::ResetTime()
   this->simTime = common::Time(0);
   this->pauseTime = common::Time(0);
   this->startTime = common::Time::GetWallTime();
+  this->realTimeOffset = common::Time(0);
 }
 
 //////////////////////////////////////////////////
@@ -1180,7 +1181,7 @@ void World::ProcessFactoryMsgs()
        iter != this->factoryMsgs.end(); ++iter)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("gazebo.sdf", factorySDF);
+    sdf::initFile("root.sdf", factorySDF);
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
@@ -1193,7 +1194,7 @@ void World::ProcessFactoryMsgs()
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
-      std::string filename = common::ModelDatabase::GetModelFile(
+      std::string filename = common::ModelDatabase::Instance()->GetModelFile(
           (*iter).sdf_filename());
 
       if (!sdf::readFile(filename, factorySDF))

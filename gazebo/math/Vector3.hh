@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 3 Apr 2007
  */
 
-#ifndef VECTOR3_HH
-#define VECTOR3_HH
+#ifndef _VECTOR3_HH_
+#define _VECTOR3_HH_
 
 #include <math.h>
 #include <iostream>
@@ -35,6 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class Vector3 Vector3.hh math/gzmath.hh
     /// \brief The Vector3 class represents the generic vector containing 3
     ///        elements.  Since it's commonly used to keep coordinate system
     ///        related information, its elements are labeled by x, y, z.
@@ -77,7 +78,7 @@ namespace gazebo
       public: double GetLength() const;
 
       /// \brief Return the square of the length (magnitude) of the vector
-      /// \return the lenght
+      /// \return the squared length
       public: double GetSquaredLength() const;
 
       /// \brief Normalize the vector length
@@ -140,7 +141,7 @@ namespace gazebo
 
       /// \brief Set this vector's components to the minimum of itself and the
       ///        passed in vector
-      /// \param[in] the minimumn clamping vector
+      /// \param[in] _v the minimum clamping vector
       public: void SetToMin(const Vector3 &_v);
 
       /// \brief Get the maximum value in the vector
@@ -181,14 +182,17 @@ namespace gazebo
               }
 
       /// \brief Subtraction operators
+      /// \param[in] _pt subtrahend
       public: const Vector3 &operator-=(const Vector3 &_pt);
 
       /// \brief Division operator
+      /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
       public: const Vector3 operator/(const Vector3 &_pt) const;
 
       /// \brief Division assignment operator
+      /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
       public: const Vector3 &operator/=(const Vector3 &_pt);
@@ -225,12 +229,13 @@ namespace gazebo
       public: const Vector3 &operator*=(double _v);
 
       /// \brief Equal to operator
+      /// \param[in] _pt The vector to compare against
       /// \return true if each component is equal withing a
       /// default tolerence (1e-6), false otherwise
       public: bool operator ==(const Vector3 &_pt) const;
 
       /// \brief Not equal to operator
-      /// \param[in] _v a vector
+      /// \param[in] _v The vector to compare against
       /// \return true if each component is equal withing a
       /// default tolerence (1e-6), false otherwise
       public: bool operator!=(const Vector3 &_v) const;

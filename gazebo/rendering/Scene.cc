@@ -365,7 +365,8 @@ void Scene::SetAmbientColor(const common::Color &_color)
   this->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->manager)
+  if (this->manager &&
+      Conversions::Convert(this->manager->getAmbientLight()) != _color)
   {
     this->manager->setAmbientLight(Conversions::Convert(_color));
   }
@@ -381,22 +382,24 @@ common::Color Scene::GetAmbientColor() const
 void Scene::SetBackgroundColor(const common::Color &_color)
 {
   this->sdf->GetElement("background")->Set(_color);
+  Ogre::ColourValue clr = Conversions::Convert(_color);
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
-    if ((*iter)->GetViewport())
-      (*iter)->GetViewport()->setBackgroundColour(Conversions::Convert(_color));
+    if ((*iter)->GetViewport() &&
+        (*iter)->GetViewport()->getBackgroundColour() != clr)
+      (*iter)->GetViewport()->setBackgroundColour(clr);
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->userCameras.begin();
        iter2 != this->userCameras.end(); ++iter2)
   {
-    if ((*iter2)->GetViewport())
+    if ((*iter2)->GetViewport() &&
+        (*iter2)->GetViewport()->getBackgroundColour() != clr)
     {
-      (*iter2)->GetViewport()->setBackgroundColour(
-          Conversions::Convert(_color));
+      (*iter2)->GetViewport()->setBackgroundColour(clr);
     }
   }
 }
@@ -608,10 +611,26 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     // Make sure we set the _mod only if we have found a selection object
     if (closestEntity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
         closestEntity->getUserAny().getType() == typeid(std::string))
-      _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+    {
+      try
+      {
+        _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+      }
+    }
 
-    visual = this->GetVisual(Ogre::any_cast<std::string>(
-          closestEntity->getUserAny()));
+    try
+    {
+      visual = this->GetVisual(Ogre::any_cast<std::string>(
+            closestEntity->getUserAny()));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
   }
 
   return visual;
@@ -700,10 +719,17 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
       Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
       if (pentity)
       {
-        VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
-                                      pentity->getUserAny()));
-        if (v)
-          _visuals.push_back(v);
+        try
+        {
+          VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
+                                        pentity->getUserAny()));
+          if (v)
+            _visuals.push_back(v);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          gzerr << "boost any_cast error:" << e.what() << "\n";
+        }
       }
     }
   }
@@ -719,8 +745,15 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
                                                       _mousePos, true);
   if (closestEntity)
   {
-    visual = this->GetVisual(Ogre::any_cast<std::string>(
-          closestEntity->getUserAny()));
+    try
+    {
+      visual = this->GetVisual(Ogre::any_cast<std::string>(
+            closestEntity->getUserAny()));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
   }
 
   return visual;
@@ -1367,9 +1400,11 @@ void Scene::PreRender()
       {
         math::Pose pose = msgs::Convert(*(*pIter));
         iter->second->SetPose(pose);
+        PoseMsgs_L::iterator prev = pIter++;
+        this->poseMsgs.erase(prev);
       }
-      PoseMsgs_L::iterator prev = pIter++;
-      this->poseMsgs.erase(prev);
+      else
+        ++pIter;
     }
     else
       ++pIter;
@@ -1456,16 +1491,17 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
   if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
-    if (!this->visuals[_msg->name()+"_laser_vis"])
+    std::string rayVisualName = _msg->parent() + "::" + _msg->name();
+    if (!this->visuals[rayVisualName+"_laser_vis"])
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
         return false;
 
       LaserVisualPtr laserVis(new LaserVisual(
-            _msg->name()+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
+            rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
-      this->visuals[_msg->name()+"_laser_vis"] = laserVis;
+      this->visuals[rayVisualName+"_laser_vis"] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
@@ -2028,7 +2064,7 @@ void Scene::SetShadowsEnabled(bool _value)
 #endif
   }
   else if (RenderEngine::Instance()->GetRenderPathType() ==
-      RenderEngine::FORWARD)
+           RenderEngine::FORWARD)
   {
     // RT Shader shadows
     if (_value)
@@ -2042,7 +2078,8 @@ void Scene::SetShadowsEnabled(bool _value)
     this->manager->setShadowTextureSize(512);
 
     // The default shadows.
-    if (_value)
+    if (_value && this->manager->getShadowTechnique()
+        != Ogre::SHADOWTYPE_TEXTURE_ADDITIVE)
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
     else
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);

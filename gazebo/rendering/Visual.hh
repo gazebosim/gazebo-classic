@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ namespace gazebo
 {
   namespace rendering
   {
+    class WireBox;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -198,6 +200,9 @@ namespace gazebo
       /// \return The transparency.
       public: float GetTransparency();
 
+      /// \brief Set the visual to be visually highlighted. This is most
+      /// often used when an object is selected by a user via the GUI.
+      /// \param[in] _highlighted True to enable the highlighting.
       public: void SetHighlighted(bool _highlighted);
 
       /// \brief Set the emissive value.
@@ -284,7 +289,7 @@ namespace gazebo
 
       /// \brief Set the normal map.
       /// \param[in] _nmap Name of the normal map material.
-      public: void SetNormalMap(const std::string &nmap);
+      public: void SetNormalMap(const std::string &_nmap);
 
       /// \brief True on or off a ribbon trail.
       /// \param[in] _value True to enable ribbon trail.
@@ -515,7 +520,11 @@ namespace gazebo
       /// \brief True to use RT shader system
       private: bool useRTShader;
 
+      /// \brief True if initialized.
       private: bool initialized;
+
+      /// \brief A wire frame bounding box.
+      private: WireBox *boundingBox;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,9 @@ namespace gazebo
 
       /// \brief True if initialized.
       private: bool initialized;
+
+      /// \brief True if shadows have been applied.
+      private: bool shadowsApplied;
 
       /// \brief All the scenes.
       private: std::vector<Scene *> scenes;

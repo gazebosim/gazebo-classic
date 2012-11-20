@@ -98,17 +98,25 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::SubscriberPtr controlSub;
 
+      /// \cond
+      /// \class ProjectorFrameListener Projector.hh rendering/rendering.hh
+      /// \brief Frame listener, used to add projection materials when new
+      /// textures are added to Ogre.
       private: class ProjectorFrameListener : public Ogre::FrameListener
       {
+        /// \brief Constructor.
         public: ProjectorFrameListener();
+
+        /// \brief Destructor.
         public: virtual ~ProjectorFrameListener();
+
         public: void Init(VisualPtr _visual,
                           const std::string &_textureName,
                           double _near = 0.5,
                           double _far = 10,
                           double _fov = 0.785398163);
 
-        public: bool frameStarted(const Ogre::FrameEvent &_evt);
+        public: virtual bool frameStarted(const Ogre::FrameEvent &_evt);
 
         public: void SetTexture(const std::string &_textureName);
 
@@ -148,7 +156,9 @@ namespace gazebo
         private: Ogre::SceneManager *sceneMgr;
         private: std::map<std::string, Ogre::Pass*> projectorTargets;
       };
+      /// \endcond
 
+      /// \brief The projection frame listener.
       private: ProjectorFrameListener projector;
     };
     /// \}

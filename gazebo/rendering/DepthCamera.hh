@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,8 +109,8 @@ namespace gazebo
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: template<typename T>
-              event::ConnectionPtr ConnectNewRGBPointCloud(T subscriber)
-              { return newRGBPointCloud.Connect(subscriber); }
+              event::ConnectionPtr ConnectNewRGBPointCloud(T _subscriber)
+              { return newRGBPointCloud.Connect(_subscriber); }
 
       /// \brief Disconnect from an rgb point cloud singal
       /// \param[in] _c The connection to disconnect

@@ -1338,6 +1338,27 @@ void SDF::PrintDoc()
             << "</li></ul>";
   std::cout << "</blockquote>";
 
+  std::cout << "</br>\n";
+
+  std::cout << "<h3>Meta-Tags</h3>\n";
+  std::cout << "<blockquote>";
+  std::cout << "Meta-tags are processed by the parser before the final "
+            << "SDF file is generated.";
+  std::cout << "<ul>";
+
+  std::cout << "<li><b>&ltinclude&gt</b>: Include an SDF model file "
+            << "within the current SDF file."
+            << "<ul style='margin-left:12px'>"
+            << "<li><b>&lt;uri&gt;</b>: URI of SDF model file to include.</li>"
+            << "<li><b>&lt;name&gt;</b>: Name of the included SDF model.</li>"
+            << "<li><b>&lt;pose&gt;</b>: Pose of the included SDF model.</li>"
+            << "</ul>"
+            << "</li>";
+
+  std::cout << "</ul>";
+  std::cout << "</blockquote>";
+
+
   std::cout << "</div>\n";
 
   std::cout << "<div id='my_splitter'>\n";
@@ -1392,7 +1413,7 @@ std::string SDF::ToString() const
 /////////////////////////////////////////////////
 void SDF::SetFromString(const std::string &_sdfData)
 {
-  sdf::initFile("gazebo.sdf", this->root);
+  sdf::initFile("root.sdf", this->root);
   if (!sdf::readString(_sdfData, this->root))
   {
     gzerr << "Unable to parse sdf string[" << _sdfData << "]\n";

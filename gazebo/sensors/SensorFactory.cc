@@ -25,10 +25,11 @@
 #include "gazebo/sensors/Sensor.hh"
 
 void RegisterCameraSensor();
+void RegisterContactSensor();
 void RegisterDepthCameraSensor();
 // void RegisterGpuRaySensor();
+void RegisterImuSensor();
 void RegisterRaySensor();
-void RegisterContactSensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
 
@@ -41,10 +42,11 @@ std::map<std::string, SensorFactoryFn> SensorFactory::sensorMap;
 void SensorFactory::RegisterAll()
 {
   RegisterCameraSensor();
+  RegisterContactSensor();
   RegisterDepthCameraSensor();
   // RegisterGpuRaySensor();
+  RegisterImuSensor();
   RegisterRaySensor();
-  RegisterContactSensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
 }

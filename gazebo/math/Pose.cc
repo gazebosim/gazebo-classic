@@ -24,6 +24,7 @@
 using namespace gazebo;
 using namespace math;
 
+const Pose Pose::Zero = math::Pose(0, 0, 0, 0, 0, 0);
 
 //////////////////////////////////////////////////
 Pose::Pose()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef EDIT_MODEL_WIDGET_HH
-#define EDIT_MODEL_WIDGET_HH
+#ifndef _EDIT_MODEL_WIDGET_HH_
+#define _EDIT_MODEL_WIDGET_HH_
 
 #include "gui/qt.h"
 #include "transport/TransportTypes.hh"

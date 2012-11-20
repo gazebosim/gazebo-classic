@@ -67,6 +67,12 @@ void DynamicLines::AddPoint(const math::Vector3 &pt)
 }
 
 /////////////////////////////////////////////////
+void DynamicLines::AddPoint(double _x, double _y, double _z)
+{
+  this->AddPoint(math::Vector3(_x, _y, _z));
+}
+
+/////////////////////////////////////////////////
 void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
 {
   if (index >= this->points.size())
