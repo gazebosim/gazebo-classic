@@ -5,22 +5,22 @@ compositor DeferredShading/GBuffer
 	{
 		// temporary textures
 		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA chain_scope
-		
+
 		target mrt_output
 		{
 			input none
 			pass clear {}
-			
+
 			shadows off
 			material_scheme DSGBuffer
-			
+
 			// everything but the lights and their meshes
 			// could do this with something like a visibility mask too
 			pass render_scene
 			{
 				// These values are synchronized with the code
 				first_render_queue 10
-				last_render_queue  79	
+				last_render_queue  79
 			}
 		}
 	}
@@ -33,32 +33,32 @@ compositor DeferredShading/ShowLit
 	{
 		// Reference the main Gbuffer texture
 		texture_ref mrt_output DeferredShading/GBuffer mrt_output
-		
+
     target_output
     {
 			input none
 
 			// We will dispatch the shadow texture rendering ourselves
 			shadows off
-			
+
 			pass clear
 			{
 			}
-			
+
 			// Render skies and other pre-gbuffer objects
 			pass render_scene
 			{
 				first_render_queue 1
-				last_render_queue  9			
+				last_render_queue  9
 			}
-			
+
 			// Render the lights and their meshes
-			pass render_custom DeferredLight
+			pass render_custom DeferredShadingLight
 			{
 				input 0 mrt_output 0
 				input 1 mrt_output 1
 			}
-			
+
 			// Render the objects that skipped rendering into the gbuffer
 			pass render_scene
 			{
@@ -66,7 +66,7 @@ compositor DeferredShading/ShowLit
 				first_render_queue 10
 				last_render_queue 79
 			}
-			
+
 			// Render the post-GBuffer render queue objects
 			pass render_scene
 			{
@@ -80,11 +80,11 @@ compositor DeferredShading/ShowLit
 // Postfilter that shows the color channel
 compositor DeferredShading/ShowColor
 {
-  technique 
+  technique
   {
     // Reference the main Gbuffer texture
     texture_ref mrt_output DeferredShading/GBuffer mrt_output
-		
+
     target_output
     {
       input none
@@ -102,7 +102,7 @@ compositor DeferredShading/ShowColor
 // Postfilter that shows the normal channel
 compositor DeferredShading/ShowNormals
 {
-  technique 
+  technique
 	{
     // Reference the main Gbuffer texture
     texture_ref mrt_output DeferredShading/GBuffer mrt_output
@@ -124,7 +124,7 @@ compositor DeferredShading/ShowNormals
 // Postfilter that shows the depth and specular channel
 compositor DeferredShading/ShowDepthSpecular
 {
-	technique 
+	technique
 	{
 		//Reference the main Gbuffer texture
 		texture_ref mrt_output DeferredShading/GBuffer mrt_output
@@ -132,7 +132,7 @@ compositor DeferredShading/ShowDepthSpecular
 		target_output
     {
 			input none
-			
+
 			pass render_quad
 			{
 				material DeferredShading/Post/ShowDS
@@ -167,7 +167,7 @@ compositor DeferredLighting/GBuffer
       {
         //These values are synchronized with the code
         first_render_queue 10
-        last_render_queue  79	
+        last_render_queue  79
       }
     }
   }
@@ -213,7 +213,7 @@ compositor DeferredLighting/ShowLit
       pass render_scene
       {
         first_render_queue 1
-        last_render_queue  9			
+        last_render_queue  9
       }
 
       pass render_scene
@@ -221,7 +221,7 @@ compositor DeferredLighting/ShowLit
         material_scheme DLMerge
         // These values are synchronized with the code
         first_render_queue 10
-        last_render_queue  79	
+        last_render_queue  79
       }
 
       // Render the objects that skipped rendering into the gbuffer

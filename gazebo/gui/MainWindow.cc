@@ -505,7 +505,7 @@ void MainWindow::CreateActions()
   connect(g_newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
-  g_resetModelsAct->setShortcut(tr("Ctrl+Shift-R"));
+  g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
   g_resetModelsAct->setStatusTip(tr("Reset model poses"));
   connect(g_resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelOnly()));
