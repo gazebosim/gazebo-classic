@@ -59,6 +59,8 @@ Light::~Light()
   if (this->light)
     this->scene->GetManager()->destroyLight(this->GetName());
 
+  this->visual->DeleteDynamicLine(this->line);
+  delete this->line;
   this->scene->RemoveVisual(this->visual);
   this->visual.reset();
 
