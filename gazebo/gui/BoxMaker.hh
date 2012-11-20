@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class BoxMaker BoxMaker.hh
+    /// \class BoxMaker BoxMaker.hh gui/gui.hh
     /// \brief to make a box
     class BoxMaker : public EntityMaker
     {
