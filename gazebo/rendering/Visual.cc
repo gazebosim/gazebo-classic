@@ -754,7 +754,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 
       if (dynamic_cast<Ogre::Entity*>(obj))
         ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
-      else
+      else if (dynamic_cast<Ogre::SimpleRenderable*>(obj))
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
 

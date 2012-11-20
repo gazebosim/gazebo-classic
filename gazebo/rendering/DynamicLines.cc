@@ -39,6 +39,8 @@ DynamicLines::DynamicLines(RenderOpType opType)
   this->Init(opType, false);
   this->setCastShadows(false);
   this->dirty = true;
+
+  this->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
 }
 
 /////////////////////////////////////////////////

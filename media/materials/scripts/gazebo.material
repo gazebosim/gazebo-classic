@@ -357,6 +357,19 @@ material Gazebo/TurquoiseGlow : Gazebo/Turquoise
 	}
 }
 
+material Gazebo/Selection
+{
+  technique
+  {
+    pass
+    {
+			diffuse 0 0 0 0
+      lighting off
+      depth_write off
+    }
+  }
+}
+
 material Gazebo/TurquoiseGlowOutline
 {
 	technique

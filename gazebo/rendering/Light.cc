@@ -254,7 +254,27 @@ void Light::CreateVisual()
   if (this->line)
     this->line->Clear();
   else
+  {
     this->line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
+
+    Ogre::SceneNode *visSceneNode;
+    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
+        this->GetName() + "_SELECTION_NODE_");
+
+    this->visual->InsertMesh("unit_sphere");
+
+    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>
+      (visSceneNode->getCreator()->createEntity(this->GetName() +
+                                                "_selection_sphere",
+                                                "unit_sphere"));
+    visSceneNode->attachObject(obj);
+
+    obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
+    obj->setUserAny(Ogre::Any(this->GetName()));
+    obj->setCastShadows(false);
+
+    visSceneNode->setScale(0.25, 0.25, 0.25);
+  }
 
   std::string lightType = this->sdf->GetValueString("type");
 
@@ -361,8 +381,9 @@ void Light::CreateVisual()
   }
 
   this->line->setMaterial("Gazebo/LightOn");
-  this->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
-  static_cast<Ogre::MovableObject*>(this->line)->setUserAny(Ogre::Any(this->GetName()));
+
+  this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
+                                 GZ_VISIBILITY_GUI);
 
   // turn off light source box visuals by default
   this->visual->SetVisible(true);
