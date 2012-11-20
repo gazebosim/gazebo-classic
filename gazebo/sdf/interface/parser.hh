@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <tinyxml.h>
 #include <string>
 
-#include "gazebo/sdf/sdf.hh"
+#include "sdf/interface/SDF.hh"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for Simulation Description Format parser

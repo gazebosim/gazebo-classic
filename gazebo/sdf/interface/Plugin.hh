@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 */
 /* Author: Nate Koenig, John Hsu */
 
-#ifndef _SDF_PLUGIN_HH_
-#define _SDF_PLUGIN_HH_
+#ifndef SDF_PLUGIN_HH
+#define SDF_PLUGIN_HH
 
 #include <string>
 #include <vector>

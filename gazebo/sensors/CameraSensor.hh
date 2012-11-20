@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef _CAMERASENSOR_HH_
-#define _CAMERASENSOR_HH_
+#ifndef CAMERASENSOR_HH
+#define CAMERASENSOR_HH
 
 #include <string>
 
@@ -48,30 +48,37 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CameraSensor();
 
-      // Documentation Inherited
+      /// \brief Set the parent of the sensor
+      /// \param _name The name of the parent
       public: virtual void SetParent(const std::string &_name);
 
-      // Documentation Inherited
+      /// \brief Load the sensor with SDF parameters
+      /// \param[in] _sdf SDF Sensor parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
-      // Documentation Inherited
+      /// \brief Load the sensor with default parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName);
 
-      // Documentation Inherited
+      /// \brief Initialize the camera
       public: virtual void Init();
 
-      // Documentation Inherited
-      /// \TODO to be implemented
+      /// \brief Gets the topic name of the sensor
+      /// \return Topic name
+      /// @todo to be implemented
       public: virtual std::string GetTopic() const;
 
-      // Documentation Inherited
+      /// \brief Update the sensor information
+      /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool _force);
 
-      // Documentation Inherited
+      /// \brief Finalize the camera
       protected: virtual void Fini();
 
-      // Documentation Inherited
+      /// \brief Set whether the sensor is active or not
+      /// \param[in] _value True if active, false if not
       public: virtual void SetActive(bool _value);
 
       /// \brief Returns a pointer to the rendering::Camera.

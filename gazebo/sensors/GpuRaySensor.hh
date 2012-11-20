@@ -38,11 +38,11 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
     /// \brief GPU based laser sensor
     ///
-    /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
@@ -54,20 +54,24 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GpuRaySensor();
 
-      // Documentation Inherited
+      /// \brief Load the sensor with SDF parameters
+      /// \param[in] _sdf SDF Sensor parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr &_sdf);
 
-      // Documentation Inherited
+      /// \brief Load the sensor with default parameters
+      /// \param[in] _worldName Name of world to load from
       public: virtual void Load(const std::string &_worldName);
 
-      // Documentation Inherited
+      /// \brief Initialize the ray
       public: virtual void Init();
 
-      // Documentation Inherited
+      /// \brief Update the sensor information
+      /// \param[in] _force True if update is forced, false if not
       protected: virtual void UpdateImpl(bool _force);
 
-      // Documentation Inherited
+      /// \brief Finalize the ray
       protected: virtual void Fini();
 
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
@@ -75,23 +79,23 @@ namespace gazebo
       public: rendering::GpuLaserPtr GetLaserCamera() const
               {return this->laserCam;}
 
-      /// \brief Get the minimum angle in radians
+      /// \brief Get the minimum angle
       /// \return The minimum angle
       public: math::Angle GetAngleMin() const;
 
-      /// \brief Set the scan minimum angle in radians
+      /// \brief Set the scan minimum angle
       /// \param[in] _angle The minimum angle
       public: void SetAngleMin(double _angle);
 
-      /// \brief Get the maximum angle in radians
+      /// \brief Get the maximum angle
       /// \return the maximum angle
       public: math::Angle GetAngleMax() const;
 
-      /// \brief Set the scan maximum angle in radians
+      /// \brief Set the scan maximum angle
       /// \param[in] _angle The maximum angle
       public: void SetAngleMax(double _angle);
 
-      /// \brief Get angle in radians between each range
+      /// \brief Get radians between each range
       public: double GetAngleResolution() const;
 
       /// \brief Get the minimum range
