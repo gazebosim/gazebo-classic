@@ -55,7 +55,14 @@ namespace gazebo
     /// end marker
     #define gzclr_end "\033[0m"
 
-    /// \brief Message, error, and warning functionality
+
+
+    /// \addtogroup gazebo_common Common
+    /// \{
+
+    /// \class Console Console.hh common/commom.hh
+    /// \brief Message, error, warning functionality
+
     class Console
     {
       /// \brief Default constructor

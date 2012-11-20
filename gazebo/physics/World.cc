@@ -231,10 +231,10 @@ void World::Save(const std::string &_filename)
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
-  data += "<gazebo version='" +
+  data += "<sdf version='" +
           boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
   data += this->sdf->ToString("");
-  data += "</gazebo>\n";
+  data += "</sdf>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);
   if (!out)
@@ -1106,10 +1106,11 @@ void World::ProcessRequestMsgs()
       msgs::GzString msg;
       this->UpdateStateSDF();
       std::string data;
-      data = "<?xml version ='1.0'?>\n";
-      data += "<gazebo version ='1.0'>\n";
+      data = "<?xml version='1.0'?>\n";
+      data += "<sdf version='" +
+        boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
       data += this->sdf->ToString("");
-      data += "</gazebo>\n";
+      data += "</sdf>\n";
       msg.set_data(data);
 
       std::string *serializedData = response.mutable_serialized_data();
@@ -1181,14 +1182,14 @@ void World::ProcessFactoryMsgs()
        iter != this->factoryMsgs.end(); ++iter)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("gazebo.sdf", factorySDF);
+    sdf::initFile("root.sdf", factorySDF);
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
       // SDF Parsing happens here
       if (!sdf::readString((*iter).sdf(), factorySDF))
       {
-        gzerr << "Unable to read sdf string\n";
+        gzerr << "Unable to read sdf string[" << (*iter).sdf() << "]\n";
         continue;
       }
     }
@@ -1239,7 +1240,7 @@ void World::ProcessFactoryMsgs()
       if (base)
       {
         sdf::ElementPtr elem;
-        if (factorySDF->root->GetName() == "gazebo")
+        if (factorySDF->root->GetName() == "sdf")
           elem = factorySDF->root->GetFirstElement();
         else
           elem = factorySDF->root;

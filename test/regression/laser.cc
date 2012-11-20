@@ -30,7 +30,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 {
   Load("worlds/empty.world");
   std::ostringstream laserModel;
-    laserModel << "<gazebo version='1.2'>"
+    laserModel << "<sdf version='" << SDF_VERSION << "'>"
       "<model name='box'>"
         "<static>true</static>"
         "<link name='link'>"
@@ -58,7 +58,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
         "</sensor>"
       "</link>"
     "</model>"
-  "</gazebo>";
+  "</sdf>";
 
   SpawnSDF(laserModel.str());
   while (!HasEntity("box"))
