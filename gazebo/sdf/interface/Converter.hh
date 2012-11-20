@@ -25,7 +25,7 @@ namespace sdf
   /// \brief Convert from one version of SDF to another
   class Converter
   {
-    public: static bool Convert(TiXmlElement *_elem,
+    public: static bool Convert(TiXmlDocument *_doc,
                                 const std::string &_toVersion,
                                 bool _quiet = false);
 

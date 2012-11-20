@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ namespace gazebo
       public: const std::string &GetFont() const;
 
       /// \brief Set the text to display.
-      /// \param[in] The text to display.
+      /// \param[in] _text The text to display.
       public: void SetText(const std::string &_text);
 
       /// \brief Get the displayed text.
@@ -104,7 +104,7 @@ namespace gazebo
       public: void SetColor(const common::Color &_color);
 
       /// \brief Get the text color.
-      /// \return Textuer color.
+      /// \return Texture color.
       public: const common::Color &GetColor() const;
 
       /// \brief Set the height of a character.
@@ -156,8 +156,10 @@ namespace gazebo
       /// \internal
       /// \brief Method to allow a caller to abstractly iterate over the
       /// renderable instances.
-      public: virtual void visitRenderables(Ogre::Renderable::Visitor* visitor,
-                  bool debug = false);
+      /// \param[in] _visitor Renderable instances to visit
+      /// \param[in] _debug True if set to debug
+      public: virtual void visitRenderables(Ogre::Renderable::Visitor* _visitor,
+                  bool _debug = false);
 
       /// \internal
       /// \brief setup the geometry (from MovableText)

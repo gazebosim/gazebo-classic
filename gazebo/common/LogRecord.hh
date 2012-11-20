@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ namespace gazebo
     /// addtogroup gazebo_common
     /// \{
 
-    /// \class LogRecord LogRecord.hh physics/LogRecord.hh
+    /// \class LogRecord LogRecord.hh common/common.hh
     /// \brief Handles logging of data to disk
     ///
     /// The LogRecord class is a Singleton that manages data logging of any
@@ -72,6 +72,7 @@ namespace gazebo
       ///
       /// Init may only be called once, False will be returned if called
       /// multiple times.
+      /// \param[in] _subdir Directory to record to
       /// \return True if successful.
       public: bool Init(const std::string &_subdir);
 

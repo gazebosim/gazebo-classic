@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,12 +53,11 @@ namespace gazebo
     {
       /// \brief Constructor
       ///
-      /// \param[in] Scene The scene this object is part of
-      /// \param[in] cell_count The number of cells to draw
-      /// \param[in] cell_length The size of each cell
-      /// \param[in] r Red color component, in the range [0, 1]
-      /// \param[in] g Green color component, in the range [0, 1]
-      /// \param[in] b Blue color component, in the range [0, 1]
+      /// \param[in] _scene The scene this object is part of
+      /// \param[in] _cellCount The number of cells to draw
+      /// \param[in] _cellLength The size of each cell
+      /// \param[in] _lineWidth The width of the lines to use
+      /// \param[in] _color The color of the grid
       public: Grid(Scene *_scene, uint32_t _cellCount, float _cellLength,
                    float _lineWidth, const common::Color &_color);
 
@@ -91,14 +90,14 @@ namespace gazebo
       public: common::Color GetColor() const {return this->color;}
 
       /// \brief Set the number of cells
-      /// \param[in] The number of cells
+      /// \param[in] _count The number of cells
       public: void SetCellCount(uint32_t _count);
 
-      /// \brief Get the numb
+      /// \brief Get the number of cells
       public: uint32_t GetCellCount() const {return this->cellCount;}
 
       /// \brief Set the cell length
-      /// \param[in] The cell length
+      /// \param[in] _len The cell length
       public: void SetCellLength(float _len);
 
       /// \brief Get the cell length

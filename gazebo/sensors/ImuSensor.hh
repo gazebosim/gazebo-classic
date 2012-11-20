@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 
 namespace gazebo
@@ -40,24 +41,32 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ImuSensor();
 
-      // Documentation inherited
-      protected: virtual void Load(sdf::ElementPtr _node);
+      // Documentation inherited.
+      protected: void Load(const std::string &_worldName, sdf::ElementPtr _sdf);
 
-      // Documentation inherited
+      // Documentation inherited.
+      protected: virtual void Load(const std::string &_worldName);
+
+      /// \brief Initialize the IMU.
       protected: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void Update();
+      protected: virtual void UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
 
-      /// \brief Returns velocity as a math::Pose
-      /// \return velocity data stored in Pose
-      public: math::Pose GetVelocity();
+      /// \brief Returns the angular velocity.
+      /// \return Angular velocity.
+      public: math::Vector3 GetAngularVelocity() const;
 
-      private: Pose prevPose;
-      private: Pose imuVel;
+      /// \brief Returns the linear acceleration.
+      /// \return Linear acceleration.
+      public: math::Vector3 GetLinearAcceleration() const;
+
+      private: transport::PublisherPtr pub;
+      private: physics::LinkPtr parentEntity;
+      private: msgs::IMU imuMsg;
     };
     /// \}
   }

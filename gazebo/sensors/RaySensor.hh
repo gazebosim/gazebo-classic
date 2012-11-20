@@ -58,10 +58,6 @@ namespace gazebo
       public: virtual ~RaySensor();
 
       // Documentation inherited
-      public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
-
-      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
       // Documentation inherited

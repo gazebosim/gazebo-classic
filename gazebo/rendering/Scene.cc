@@ -611,10 +611,26 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     // Make sure we set the _mod only if we have found a selection object
     if (closestEntity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
         closestEntity->getUserAny().getType() == typeid(std::string))
-      _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+    {
+      try
+      {
+        _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+      }
+    }
 
-    visual = this->GetVisual(Ogre::any_cast<std::string>(
-          closestEntity->getUserAny()));
+    try
+    {
+      visual = this->GetVisual(Ogre::any_cast<std::string>(
+            closestEntity->getUserAny()));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
   }
 
   return visual;
@@ -703,10 +719,17 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
       Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
       if (pentity)
       {
-        VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
-                                      pentity->getUserAny()));
-        if (v)
-          _visuals.push_back(v);
+        try
+        {
+          VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
+                                        pentity->getUserAny()));
+          if (v)
+            _visuals.push_back(v);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          gzerr << "boost any_cast error:" << e.what() << "\n";
+        }
       }
     }
   }
@@ -722,8 +745,15 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
                                                       _mousePos, true);
   if (closestEntity)
   {
-    visual = this->GetVisual(Ogre::any_cast<std::string>(
-          closestEntity->getUserAny()));
+    try
+    {
+      visual = this->GetVisual(Ogre::any_cast<std::string>(
+            closestEntity->getUserAny()));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
   }
 
   return visual;
@@ -1370,9 +1400,11 @@ void Scene::PreRender()
       {
         math::Pose pose = msgs::Convert(*(*pIter));
         iter->second->SetPose(pose);
+        PoseMsgs_L::iterator prev = pIter++;
+        this->poseMsgs.erase(prev);
       }
-      PoseMsgs_L::iterator prev = pIter++;
-      this->poseMsgs.erase(prev);
+      else
+        ++pIter;
     }
     else
       ++pIter;
@@ -1459,16 +1491,17 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
   if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
-    if (!this->visuals[_msg->name()+"_laser_vis"])
+    std::string rayVisualName = _msg->parent() + "::" + _msg->name();
+    if (!this->visuals[rayVisualName+"_laser_vis"])
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
       if (!parentVis)
         return false;
 
       LaserVisualPtr laserVis(new LaserVisual(
-            _msg->name()+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
+            rayVisualName+"_GUIONLY_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
-      this->visuals[_msg->name()+"_laser_vis"] = laserVis;
+      this->visuals[rayVisualName+"_laser_vis"] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,14 @@ namespace gazebo
     /// end marker
     #define gzclr_end "\033[0m"
 
+
+
+    /// \addtogroup gazebo_common Common
+    /// \{
+
+    /// \class Console Console.hh common/commom.hh
     /// \brief Message, error, warning, and logging functionality
+
     class Console
     {
       /// \brief Default constructor
@@ -100,6 +107,7 @@ namespace gazebo
       /// \brief True if logging data
       private: bool logData;
 
+      /// \class NullStream Animation.hh common/common.hh
       /// \brief A stream that does not output anywhere
       private: class NullStream : public std::ostream
                {

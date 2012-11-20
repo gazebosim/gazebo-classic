@@ -24,7 +24,7 @@
 
 #include "sdf/interface/Param.hh"
 
-#define SDF_VERSION "1.2"
+#define SDF_VERSION "1.3"
 
 /// \ingroup gazebo_parser
 /// \brief namespace for Simulation Description Format parser

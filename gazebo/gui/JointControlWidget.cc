@@ -241,10 +241,9 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   if (this->jointPub)
     this->jointPub.reset();
 
-  this->modelLabel->setText(QString::fromStdString(
-        std::string("Model: ") + _modelName));
-
   msgs::Model modelMsg;
+
+  this->modelLabel->setText(QString::fromStdString(std::string("Model: ")));
 
   // Only request info if the model has a name.
   if (!_modelName.empty())
@@ -257,8 +256,12 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
 
     msgs::Response response = transport::request("default", *this->requestMsg);
 
-    modelMsg.ParseFromString(response.serialized_data());
+    if (response.type() != "error")
+      modelMsg.ParseFromString(response.serialized_data());
   }
+
+  this->modelLabel->setText(QString::fromStdString(
+        std::string("Model: ") + modelMsg.name()));
 
   this->LayoutForceTab(modelMsg);
 
