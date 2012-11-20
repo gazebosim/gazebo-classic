@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface CameraSensor 
 /// \brief Information about a camera sensor element
-/// \verbatim
+
 
 
 import "vector2d.proto";
@@ -18,4 +18,4 @@ message CameraSensor
   optional bool save_enabled     = 6;
   optional string save_path      = 7;
 }
-/// \endverbatim
+

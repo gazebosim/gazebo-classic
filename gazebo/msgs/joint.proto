@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Joint 
 /// \brief Message for creating joint in rendering::Scene
-/// \verbatim
+
 
 import "vector3d.proto";
 import "axis.proto";
@@ -39,4 +39,4 @@ message Joint
   optional double suspension_cfm = 15;
   optional double suspension_erp = 16;
 }
-/// \endverbatim
+

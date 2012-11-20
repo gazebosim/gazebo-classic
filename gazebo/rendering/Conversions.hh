@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,11 @@ namespace gazebo
       /// \param[in] _clr Gazebo color to convert
       /// \return Ogre color value
       public: static Ogre::ColourValue Convert(const common::Color &_clr);
+
+      /// \brief Return the equivalent gazebo color
+      /// \param[in] _clr Ogre color to convert
+      /// \return Gazebo color value
+      public: static common::Color Convert(const Ogre::ColourValue &_clr);
 
       /// \brief return Ogre Vector from Gazebo Vector3
       /// \param[in] _v Gazebo vector

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,17 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/CommonTypes.hh"
-#include "common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
 
-#include "physics/Base.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/WorldState.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/physics/Base.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/WorldState.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace boost
 {
@@ -54,7 +54,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class World World.hh physics/World.hh
+    /// \class World World.hh physics/physics.hh
     /// \brief The world provides access to all other object within a simulated
     /// environment.
     ///
@@ -64,65 +64,65 @@ namespace gazebo
     /// update, model updates, and message processing.
     class World : public boost::enable_shared_from_this<World>
     {
-      /// \brief Constructor
+      /// \brief Constructor.
       ///
       /// Constructor for the World. Must specify a unique name.
-      /// \param _name Name of the world
-      public: World(const std::string &_name ="");
+      /// \param[in] _name Name of the world.
+      public: explicit World(const std::string &_name = "");
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: ~World();
 
-      /// \brief Load the world using SDF parameters
+      /// \brief Load the world using SDF parameters.
       ///
-      /// Load a world from and SDF pointer
-      /// \param _sdf SDF parameters
+      /// Load a world from and SDF pointer.
+      /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Save a world to a file
+      /// \brief Save a world to a file.
       ///
-      /// Save the current world and its state to a file
-      /// \param _filename Name of the file to save into
+      /// Save the current world and its state to a file.
+      /// \param[in] _filename Name of the file to save into.
       public: void Save(const std::string &_filename);
 
-      /// \brief Initialize the world
+      /// \brief Initialize the world.
       ///
       /// This is called after Load.
       public: void Init();
 
-      /// \brief Run the world in a thread
+      /// \brief Run the world in a thread.
       ///
       /// Run the update loop.
       public: void Run();
 
-      /// \brief Stop the world
+      /// \brief Stop the world.
       ///
       /// Stop the update loop.
       public: void Stop();
 
-      /// \brief Finilize the world
+      /// \brief Finalize the world.
       ///
       /// Call this function to tear-down the world.
       public: void Fini();
 
-      /// \brief Remove all entities from the world
+      /// \brief Remove all entities from the world.
       public: void Clear();
 
       /// \brief Get the name of the world.
       /// \return The name of the world.
       public: std::string GetName() const;
 
-      /// \brief Return the physics engine
+      /// \brief Return the physics engine.
       ///
       /// Get a pointer to the physics engine used by the world.
-      /// \return Pointer to the physics engine
+      /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
-      /// \brief Get the number of models
+      /// \brief Get the number of models.
       /// \return The number of models in the World.
       public: unsigned int GetModelCount() const;
 
-      /// \brief Get a model based on an index
+      /// \brief Get a model based on an index.
       ///
       /// Get a Model using an index, where index must be greater than zero
       /// and less than World::GetModelCount()
@@ -130,64 +130,64 @@ namespace gazebo
       /// \return A pointer to the Model. NULL if _index is invalid.
       public: ModelPtr GetModel(unsigned int _index) const;
 
-      /// \brief Get a list of all the models
-      /// \return A list of all the Models in the world
+      /// \brief Get a list of all the models.
+      /// \return A list of all the Models in the world.
       public: std::list<ModelPtr> GetModels() const;
 
-      /// \brief Reset with options
+      /// \brief Reset with options.
       ///
       /// The _type parameter specifies which type of eneities to reset. See
       /// Base::EntityType.
       /// \param[in] _type The type of reset.
       public: void ResetEntities(Base::EntityType _type = Base::BASE);
 
-      /// \brief Reset simulation time back to zero
+      /// \brief Reset simulation time back to zero.
       public: void ResetTime();
 
-      /// \brief Reset time and model poses, configurations in simulation
+      /// \brief Reset time and model poses, configurations in simulation.
       public: void Reset();
 
-      /// \brief Get the selected Entity
+      /// \brief Get the selected Entity.
       ///
       /// The selected entity is set via the GUI.
-      /// \return A point to the Entity, NULL if nothing is selected
+      /// \return A point to the Entity, NULL if nothing is selected.
       public: EntityPtr GetSelectedEntity() const;
 
-      /// \brief Print Entity tree
+      /// \brief Print Entity tree.
       ///
-      /// Prints alls the entities to stdout
+      /// Prints alls the entities to stdout.
       public: void PrintEntityTree();
 
       /// \brief Get the world simulation time, note if you want the PC
       /// wall clock call World::GetRealTime.
-      /// \return The current simulation time
+      /// \return The current simulation time.
       public: common::Time GetSimTime() const;
 
-      /// \brief Set the sim time
+      /// \brief Set the sim time.
       /// \param[in] _t The new simulation time
-      public: void SetSimTime(common::Time _t);
+      public: void SetSimTime(const common::Time &_t);
 
-      /// \brief Get the amount of time simulation has been paused
-      /// \return The pause time
+      /// \brief Get the amount of time simulation has been paused.
+      /// \return The pause time.
       public: common::Time GetPauseTime() const;
 
-      /// \brief Get the wall time simulation was started.
-      /// \return The start time
+      /// \brief Get the wall time simulation was started..
+      /// \return The start time.
       public: common::Time GetStartTime() const;
 
-      /// \brief Get the real time (elapsed time)
-      /// \return The real time
+      /// \brief Get the real time (elapsed time).
+      /// \return The real time.
       public: common::Time GetRealTime() const;
 
-      /// \brief Returns the state of the simulation true if paused
+      /// \brief Returns the state of the simulation true if paused.
       /// \return True if paused.
       public: bool IsPaused() const;
 
-      /// \brief Set whether the simulation is paused
+      /// \brief Set whether the simulation is paused.
       /// \param[in] _p True pauses the simulation. False runs the simulation.
       public: void SetPaused(bool _p);
 
-      /// \brief Get an element by name
+      /// \brief Get an element by name.
       ///
       /// Searches the list of entities, and return a pointer to the model
       /// with a matching _name.
@@ -195,10 +195,10 @@ namespace gazebo
       /// \return A pointer to the entity, or NULL if no entity was found.
       public: BasePtr GetByName(const std::string &_name);
 
-      /// \brief Get a model by name DEPRECATED
+      /// \brief Deprecated
       public: ModelPtr GetModelByName(const std::string &name)GAZEBO_DEPRECATED;
 
-      /// \brief Get a model by name
+      /// \brief Get a model by name.
       ///
       /// This function is the same as GetByName, but limits the search to
       /// only models.
@@ -206,12 +206,11 @@ namespace gazebo
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
 
-      /// \brief Get a pointer to a entity based on a name.
-      /// \param[in] _name Name of the entity.
+      /// \brief Deprecated
       public: EntityPtr GetEntityByName(
                   const std::string &_name) GAZEBO_DEPRECATED;
 
-      /// \brief Get a pointer to an Entity based on a name
+      /// \brief Get a pointer to an Entity based on a name.
       ///
       /// This function is the same as GetByName, but limits the search to
       /// only Entities.
@@ -219,14 +218,14 @@ namespace gazebo
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
-      /// \brief Get the nearest model below a point
+      /// \brief Get the nearest model below a point.
       ///
       /// This function makes use of World::GetEntityBelowPoint.
-      /// \param[in] _pt The 3D point to search below
+      /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
 
-      /// \brief Get the nearest entity below a point
+      /// \brief Get the nearest entity below a point.
       ///
       /// Projects a Ray down (-Z axis) starting at the given point. The
       /// first entity hit by the Ray is returned.
@@ -234,63 +233,63 @@ namespace gazebo
       /// \return A pointer to nearest Entity, NULL if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
-      /// \brief Get the current world state
-      /// \return A object that contains the entire state of the World
+      /// \brief Get the current world state.
+      /// \return A object that contains the entire state of the World.
       public: WorldState GetState();
 
-      /// \brief Set the current world state
+      /// \brief Set the current world state.
       /// \param _state The state to set the World to.
       public: void SetState(const WorldState &_state);
 
-      /// \brief Insert a model from an SDF file
+      /// \brief Insert a model from an SDF file.
       ///
-      /// Spawns a model into the world base on and SDF file
+      /// Spawns a model into the world base on and SDF file.
       /// \param[in] _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
-      /// \brief Insert a model from an SDF string
+      /// \brief Insert a model from an SDF string.
       ///
-      /// Spawns a model into the world base on and SDF string
+      /// Spawns a model into the world base on and SDF string.
       /// \param[in] _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
-      /// \brief Insert a model using SDF
+      /// \brief Insert a model using SDF.
       ///
-      /// Spawns a model into the world base on and SDF object
-      /// \param[in] _sdf A reference to an SDF object
+      /// Spawns a model into the world base on and SDF object.
+      /// \param[in] _sdf A reference to an SDF object.
       public: void InsertModelSDF(const sdf::SDF &_sdf);
 
       /// \brief Return a version of the name with "<world_name>::" removed
       /// \param[in] _name Usually the name of an entity.
-      /// \return The stripped world name
+      /// \return The stripped world name.
       public: std::string StripWorldName(const std::string &_name) const;
 
-      /// \brief Enable all links in all the models
+      /// \brief Enable all links in all the models.
       ///
       /// Enable is a physics concept. Enabling means that the physics
       /// engine should update an entity.
       public: void EnableAllModels();
 
-      /// \brief Disable all links in all the models
+      /// \brief Disable all links in all the models.
       ///
       /// Disable is a physics concept. Disabling means that the physics
       /// engine should not update an entity.
       public: void DisableAllModels();
 
-      /// \brief Step callback
-      /// \param[in] _steps The number of steps the World should take
+      /// \brief Step callback.
+      /// \param[in] _steps The number of steps the World should take.
       public: void StepWorld(int _steps);
 
       /// \brief Load a plugin
-      /// \param[in] _filename The filename of the plugin
-      /// \param[in] _name A unique name for the plugin
+      /// \param[in] _filename The filename of the plugin.
+      /// \param[in] _name A unique name for the plugin.
       /// \param[in] _sdf The SDF to pass into the plugin.
       public: void LoadPlugin(const std::string &_filename,
                               const std::string &_name,
                               sdf::ElementPtr _sdf);
 
-      /// \brief Remove a running plugin
-      /// \param[in] _name The unique name of the plugin to remove
+      /// \brief Remove a running plugin.
+      /// \param[in] _name The unique name of the plugin to remove.
       public: void RemovePlugin(const std::string &_name);
 
       /// \brief Get the set world pose mutex.
@@ -303,12 +302,12 @@ namespace gazebo
       public: bool GetEnablePhysicsEngine()
               {return this->enablePhysicsEngine;}
 
-      /// \brief enable/disable physics engine during World::Update
+      /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
       public: void EnablePhysicsEngine(bool _enable)
               {this->enablePhysicsEngine = _enable;}
 
-      /// \brief Get a model by id
+      /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
       /// a passed in _id.
@@ -316,44 +315,44 @@ namespace gazebo
       /// \return A pointer to the model, or NULL if no Model was found.
       private: ModelPtr GetModelById(unsigned int _id);
 
-      /// \brief Load all plugins
+      /// \brief Load all plugins.
       ///
       /// Load all plugins specified in the SDF for the model.
       private: void LoadPlugins();
 
-      /// \brief Create and load all entities
-      /// \param[in] _sdf SDF element
-      /// \param[in] _parent Parent of the model to load
-      private: void LoadEntities(sdf::ElementPtr _sdf , BasePtr _parent);
+      /// \brief Create and load all entities.
+      /// \param[in] _sdf SDF element.
+      /// \param[in] _parent Parent of the model to load.
+      private: void LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent);
 
-      /// \brief Load a model
-      /// \param[in] _sdf SDF element containing the Model description
-      /// \param[in] _parent Parent of the model
-      /// \return Pointer to the newly created Model
+      /// \brief Load a model.
+      /// \param[in] _sdf SDF element containing the Model description.
+      /// \param[in] _parent Parent of the model.
+      /// \return Pointer to the newly created Model.
       private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
 
-      /// \brief Load an actor
-      /// \param[in] _sdf SDF element containing the Actor description
-      /// \param[in] _parent Parent of the Actor
-      /// \return Pointer to the newly created Actor
+      /// \brief Load an actor.
+      /// \param[in] _sdf SDF element containing the Actor description.
+      /// \param[in] _parent Parent of the Actor.
+      /// \return Pointer to the newly created Actor.
       private: ActorPtr LoadActor(sdf::ElementPtr _sdf, BasePtr _parent);
 
-      /// \brief Load a road
-      /// \param[in] _sdf SDF element containing the Road description
-      /// \param[in] _parent Parent of the Road
-      /// \return Pointer to the newly created Road
-      private: RoadPtr LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent);
+      /// \brief Load a road.
+      /// \param[in] _sdf SDF element containing the Road description.
+      /// \param[in] _parent Parent of the Road.
+      /// \return Pointer to the newly created Road.
+      private: RoadPtr LoadRoad(sdf::ElementPtr _sdf, BasePtr _parent);
 
-      /// \brief Function to run physics. Used by physicsThread
+      /// \brief Function to run physics. Used by physicsThread.
       private: void RunLoop();
 
       /// \brief Step the world once.
       private: void Step();
 
-      /// \brief Update the world
+      /// \brief Update the world.
       private: void Update();
 
-      /// \brief Pause callback
+      /// \brief Pause callback.
       /// \param[in] _p True if paused.
       private: void OnPause(bool _p);
 
@@ -402,7 +401,7 @@ namespace gazebo
 
       /// \brief Fills a model message with data from a model
       /// \param[out] _msg Model message to fill.
-      /// \param[int] _model Pointer to the model to get the data from.
+      /// \param[in] _model Pointer to the model to get the data from.
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
       /// \brief Process all recieved entity messages.
@@ -424,22 +423,22 @@ namespace gazebo
       /// \param[in] _state State to update from.
       private: void UpdateSDFFromState(const WorldState &_state);
 
-      /// \brief For keeping track of time step throttling
+      /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
 
-      /// \brief Pointer the physics engine
+      /// \brief Pointer the physics engine.
       private: PhysicsEnginePtr physicsEngine;
 
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
 
-      /// \brief thread in which the world is updated
+      /// \brief thread in which the world is updated.
       private: boost::thread *thread;
 
       /// \brief True to stop the world from running.
       private: bool stop;
 
-      /// \brief The entity currently selected by the user
+      /// \brief The entity currently selected by the user.
       private: EntityPtr selectedEntity;
 
       /// \brief Incoming message buffer.
@@ -448,7 +447,7 @@ namespace gazebo
       /// \brief Name of the world.
       private: std::string name;
 
-      /// \brief Current simulation time
+      /// \brief Current simulation time.
       private: common::Time simTime;
 
       /// \brief Amount of time simulation has been paused.
@@ -511,10 +510,10 @@ namespace gazebo
       /// \brief Function pointer to the model update function.
       private: void (World::*modelUpdateFunc)();
 
-      /// \brief Period used to send out world statistics
+      /// \brief Period used to send out world statistics.
       private: common::Time statPeriod;
 
-      /// \brief Last time a world statistics message was sent
+      /// \brief Last time a world statistics message was sent.
       private: common::Time prevStatTime;
 
       /// \brief Time at which pause started.
@@ -531,17 +530,16 @@ namespace gazebo
 
       /// \TODO: Add an accessor for this, and make it private
       /// Used in Entity.cc.
-      ///   Entity::Reset to call Entity::SetWorldPose and
-      ///     Entity::SetRelativePose
-      ///   Entity::SetWorldPose to call Entity::setWorldPoseFunc
+      /// Entity::Reset to call Entity::SetWorldPose and Entity::SetRelativePose
+      /// Entity::SetWorldPose to call Entity::setWorldPoseFunc
       private: boost::mutex *setWorldPoseMutex;
 
       /// \brief Used by World classs in following calls:
-      ///   World::Step for then entire function
-      ///   World::StepWorld for changing World::stepInc,
-      ///     and waits on setpInc on World::stepIhc as it's decremented.
-      ///   World::Reset while World::ResetTime, entities, World::physicsEngine
-      ///   World::SetPuased to assign world::pause
+      /// World::Step for then entire function
+      /// World::StepWorld for changing World::stepInc,
+      /// and waits on setpInc on World::stepIhc as it's decremented.
+      /// World::Reset while World::ResetTime, entities, World::physicsEngine
+      /// World::SetPaused to assign world::pause
       private: boost::recursive_mutex *worldUpdateMutex;
 
       /// \brief THe world's SDF values.
@@ -554,8 +552,8 @@ namespace gazebo
       private: std::list<std::string> deleteEntity;
 
       /// \brief when physics engine makes an update and changes a link pose,
-      ///        this flag is set to trigger Entity::SetWorldPose on the
-      ///        physics::Link in World::Update.
+      /// this flag is set to trigger Entity::SetWorldPose on the
+      /// physics::Link in World::Update.
       public: std::list<Entity*> dirtyPoses;
 
       /// \brief Request message buffer.

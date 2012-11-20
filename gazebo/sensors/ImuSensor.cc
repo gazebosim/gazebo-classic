@@ -19,31 +19,30 @@
  * Date: 6 September 2008
 */
 
-#include <assert.h>
-#include <float.h>
-#include <sstream>
 
-#include "SensorFactory.hh"
-// #include "World.hh"
-// #include "PhysicsEngine.hh"
-#include "common/Exception.hh"
-#include "ImuSensor.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
+
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/ImuSensor.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor);
+GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 
 //////////////////////////////////////////////////
-ImuSensor::ImuSensor(Body *body)
-    : Sensor(body)
+ImuSensor::ImuSensor()
+    : Sensor()
 {
-  this->active = false;
-
-  this->typeName = "imu";
+  std::cout << "NEW IMU\n";
 }
-
 
 //////////////////////////////////////////////////
 ImuSensor::~ImuSensor()
@@ -51,86 +50,89 @@ ImuSensor::~ImuSensor()
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::LoadChild(XMLConfigNode *node)
+void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  if (this->body == NULL)
+  Sensor::Load(_worldName, _sdf);
+
+  this->sdf->PrintValues("  ");
+
+  if (this->sdf->HasElement("imu") &&
+      this->sdf->GetElement("imu")->HasElement("topic") &&
+      this->sdf->GetElement("imu")->GetValueString("topic")
+      != "__default_topic__")
   {
-    gzthrow("Null body in the IMU sensor");
+    this->pub = this->node->Advertise<msgs::IMU>(
+        this->sdf->GetElement("imu")->GetValueString("topic"));
+  }
+  else
+  {
+    std::string topicName = "~/";
+    topicName += this->parentName + "/" + this->GetName() + "/imu";
+    boost::replace_all(topicName, "::", "/");
+
+    this->pub = this->node->Advertise<msgs::IMU>(topicName);
   }
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::SaveChild(std::string &prefix, std::ostream &stream)
+void ImuSensor::Load(const std::string &_worldName)
 {
-}
+  Sensor::Load(_worldName);
 
-//////////////////////////////////////////////////
-void ImuSensor::InitChild()
-{
-  Pose bodyPose;
-  bodyPose = this->body->GetWorldPose();
-  this->prevPose = bodyPose;
-}
+  this->parentEntity = boost::shared_dynamic_cast<physics::Link>(
+      this->world->GetEntity(this->parentName));
 
-void ImuSensor::FiniChild()
-{
-}
-
-Pose ImuSensor::GetVelocity()
-{
-  return this->imuVel;
-}
-
-Vector3 ImuSensor::GetEulerAngles()
-{
-  return this->eulerAngles;
-}
-
-//////////////////////////////////////////////////
-void ImuSensor::UpdateChild()
-{
-//  if (this->active)
+  if (!this->parentEntity)
   {
-    Vector3 velocity;
-    Pose poseDelta;
-    double heading;
-    double v1;
-
-    double vlong, vlat;
-
-    // Quatern rot;
-    Vector3 rot;
-    Vector3 pose;
-
-    // Get the pose of the sensor body (global cs)
-    poseDelta = this->body->GetWorldPose() - this->prevPose;
-    this->prevPose = this->body->GetWorldPose();
-
-    velocity = this->body->GetWorldLinearVel();
-    rot = this->body->GetWorldPose().rot.GetAsEuler();
-    pose = this->body->GetWorldPose().pos;
-
-    heading = atan2(velocity.y, velocity.x);
-
-    v1 = sqrt(pow(velocity.x, 2) + pow(velocity.y, 2));
-
-    vlong = v1 * cos(heading - rot.z);
-    vlat = v1 * sin(heading - rot.z);
-
-    this->imuVel.pos.x = vlong;
-    this->imuVel.pos.y = vlat;
-
-    this->imuVel.pos.z = 0;
-
-    /// FIXME storing x,y,z components in a quaternion seems like a bad idea
-    /// @todo storing x,y,z components in a quaternion seems like a bad idea
-    velocity = this->body->GetWorldAngularVel();
-    this->imuVel.rot.x = velocity.x;
-    this->imuVel.rot.y = velocity.y;
-    this->imuVel.rot.z = velocity.z;
-
-    this->eulerAngles = rot;
+    gzthrow("IMU has invalid paret[" + this->parentName +
+            "]. Must be a link\n");
   }
 }
 
+//////////////////////////////////////////////////
+void ImuSensor::Init()
+{
+}
 
+//////////////////////////////////////////////////
+void ImuSensor::Fini()
+{
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ImuSensor::GetAngularVelocity() const
+{
+  return msgs::Convert(this->imuMsg.angular_velocity());
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ImuSensor::GetLinearAcceleration() const
+{
+  return msgs::Convert(this->imuMsg.linear_acceleration());
+}
+
+//////////////////////////////////////////////////
+void ImuSensor::UpdateImpl(bool /*_force*/)
+{
+  this->lastMeasurementTime = this->world->GetSimTime();
+
+  this->imuMsg.set_entity_name(this->parentName);
+
+  // Set the time stamp
+  msgs::Set(this->imuMsg.mutable_stamp(), this->world->GetSimTime());
+
+  // Set the IMU orientation
+  msgs::Set(this->imuMsg.mutable_orientation(),
+            this->parentEntity->GetWorldPose().rot);
+
+  // Set the IMU angular velocity
+  msgs::Set(this->imuMsg.mutable_angular_velocity(),
+            this->parentEntity->GetWorldAngularVel());
+
+  // Set the IMU linear acceleration
+  msgs::Set(this->imuMsg.mutable_linear_acceleration(),
+            this->parentEntity->GetWorldLinearAccel());
+
+  if (this->pub)
+    this->pub->Publish(this->imuMsg);
+}

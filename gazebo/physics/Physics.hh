@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "physics/PhysicsTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {

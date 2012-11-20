@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Selection
 /// \brief A message for GUI selection data
-/// \verbatim
+
 
 import "header.proto";
 
@@ -14,4 +14,4 @@ message Selection
   optional bool selected = 3 [default = false];
 }
 
-/// \endverbatim
+

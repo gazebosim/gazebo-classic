@@ -5,13 +5,12 @@ set (sources Sensors.cc
              SensorFactory.cc
              SensorManager.cc
              CameraSensor.cc
-             DepthCameraSensor.cc
-             RaySensor.cc
-             GpuRaySensor.cc
              ContactSensor.cc
+             DepthCameraSensor.cc
+             ImuSensor.cc
+             RaySensor.cc
              RFIDSensor.cc
              RFIDTag.cc
-             RFIDTagManager.cc
 ) 
 
 set (headers Sensors.hh
@@ -20,13 +19,12 @@ set (headers Sensors.hh
              SensorFactory.hh
              SensorManager.hh
              CameraSensor.hh
-             DepthCameraSensor.hh
-             RaySensor.hh
-             GpuRaySensor.hh
              ContactSensor.hh
+             DepthCameraSensor.hh
+             ImuSensor.hh
+             RaySensor.hh
              RFIDSensor.hh
              RFIDTag.hh
-             RFIDTagManager.hh
 )
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)

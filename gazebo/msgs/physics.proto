@@ -3,7 +3,7 @@ package gazebo.msgs;
 /// \ingroup gazebo_msgs
 /// \interface Physics
 /// \brief A message containing a description of the global physics properties
-/// \verbatim
+
 
 import "vector3d.proto";
 import "header.proto";
@@ -27,4 +27,4 @@ message Physics
   optional Vector3d gravity = 11;
   optional double update_rate = 12;
 }
-/// \endverbatim
+

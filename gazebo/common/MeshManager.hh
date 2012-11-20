@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MESHMANAGER_HH
-#define MESHMANAGER_HH
+#ifndef _MESHMANAGER_HH_
+#define _MESHMANAGER_HH_
 
 #include <map>
 #include <string>
@@ -40,6 +40,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class MeshManager MeshManager.hh common/common.hh
     /// \brief Maintains and manages all meshes
     class MeshManager : public SingletonT<MeshManager>
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #define _JOINT_HH_
 
 #include <string>
+
+#include <boost/any.hpp>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/math/Angle.hh"
@@ -305,7 +307,15 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
       public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value) = 0;
+                                        double _value) GAZEBO_DEPRECATED = 0;
+
+      /// \brief Set a non-generic parameter for the joint.
+      /// replaces SetAttribute(Attribute, int, double)
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual void SetAttribute(const std::string &_key, int _index,
+                                        const boost::any &_value) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -316,6 +326,7 @@ namespace gazebo
       public: LinkPtr GetParent() const;
 
       /// \brief DEPRECATED
+      /// \param[out] _msg Message to fill with joint's properties
       /// \sa Joint::FillMsg
       public: void FillJointMsg(msgs::Joint &_msg) GAZEBO_DEPRECATED;
 

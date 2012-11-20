@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_MATH_FUNCTIONS_HH
-#define GAZEBO_MATH_FUNCTIONS_HH
+#ifndef _GAZEBO_MATH_FUNCTIONS_HH_
+#define _GAZEBO_MATH_FUNCTIONS_HH_
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
@@ -40,11 +40,11 @@ namespace gazebo
     ///        functions.
     /// \{
 
-    /// \brief Not a number
+    /// \brief Returns the representation of a quiet not a number (NAN)
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
 
-    /// \brief TODO Nate: type int has no quiet_NaN ... what does this 0 mean?
-    static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
+    /// \brief Returns the representation of a quiet not a number (NAN)
+    static const int NAN_I = std::numeric_limits<int>::quiet_NaN();
 
     /// \brief simple clamping function
     /// \param[in] _v value
@@ -85,7 +85,7 @@ namespace gazebo
     }
 
     /// \brief get variance of vector of values
-    /// \param _values the vector of values
+    /// \param[in] _values the vector of values
     /// \return the squared deviation
     template<typename T>
     inline T variance(const std::vector<T> &_values)

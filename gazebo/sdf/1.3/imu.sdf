@@ -1,0 +1,8 @@
+<element name="imu" required="0">
+  <description>These elements are specific to the IMU sensor.</description>
+
+  <element name="topic" type="string" default="__default_topic__" required="0">
+    <description>Topic on which data is published.</description>
+  </element>
+
+</element>

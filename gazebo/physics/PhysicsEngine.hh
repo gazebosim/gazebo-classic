@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ namespace gazebo
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.
-      public: math::Vector3 GetGravity() const;
+      public: virtual math::Vector3 GetGravity() const;
 
       /// \brief Set the gavity vector.
       /// \param[in] _gravity New gravity vector.

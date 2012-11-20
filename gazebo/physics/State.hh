@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 
 #include <string>
 
-#include "sdf/sdf.hh"
-#include "physics/PhysicsTypes.hh"
-#include "common/Time.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {
@@ -34,8 +34,8 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class State State.hh physics/State.hh
-    /// \brief State of an entity
+    /// \class State State.hh physics/physics.hh
+    /// \brief State of an entity.
     ///
     /// This is the base class for all State information.
     class State

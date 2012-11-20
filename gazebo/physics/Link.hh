@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@
 #include <vector>
 #include <string>
 
-#include "common/Event.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/LinkState.hh"
-#include "physics/Entity.hh"
-#include "physics/Inertial.hh"
-#include "physics/Joint.hh"
+#include "gazebo/physics/LinkState.hh"
+#include "gazebo/physics/Entity.hh"
+#include "gazebo/physics/Inertial.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {

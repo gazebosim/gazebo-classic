@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 #include "math/Angle.hh"
 #include "math/Pose.hh"
@@ -146,7 +147,6 @@ namespace gazebo
       /// \param[in] _angle The Maximum angle of the scan block
       public: void SetVerticalAngleMax(double _angle);
 
-
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
       ///         it's possible that the Ray will update in the middle of
@@ -159,8 +159,8 @@ namespace gazebo
       public: double GetRange(int _index);
 
       /// \brief Get all the ranges
-      /// \param _range A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges);
+      /// \param[out] _range A vector that will contain all the range data
+      public: void GetRanges(std::vector<double> &_ranges) const;
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -171,7 +171,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Intensity value of ray
-      public: double GetRetro(int _index);
+      public: double GetRetro(int _index) const;
 
       /// \brief Get detected fiducial value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -182,89 +182,172 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Fiducial value of ray
-      public: int GetFiducial(int _index);
+      public: int GetFiducial(int _index) const;
 
       /// \brief Gets the camera count
       /// \return Number of cameras
-      public: unsigned int GetCameraCount();
+      public: unsigned int GetCameraCount() const;
 
       /// \brief Gets if sensor is horizontal
       /// \return True if horizontal, false if not
-      public: bool IsHorizontal();
+      public: bool IsHorizontal() const;
 
-      /// \brief
-      /// \TODO Nate fill in.
-      /// I'm not sure what these what these sensor parameters refer to
-      public: double Get1stRatio();
+      /// Deprecated
+      /// \sa GetRayCountRatio
+      public: double Get1stRatio() const GAZEBO_DEPRECATED;
 
-      /// \brief
-      /// @todo Document me
-      public: double Get2ndRatio();
+      /// \brief Return the ratio of horizontal ray count to vertical ray
+      /// count.
+      ///
+      /// A ray count is the number of simulated rays. Whereas a range count
+      /// is the total number of data points returned. When range count
+      /// != ray count, then values are interpolated between rays.
+      public: double GetRayCountRatio() const;
 
-      /// \brief
-      /// @todo Document me
-      public: double GetHFOV();
+      /// Deprecated
+      /// \sa GetRangeCountRatio
+      public: double Get2ndRatio() const GAZEBO_DEPRECATED;
 
-      /// \brief
-      /// @todo Document me
-      public: double GetCHFOV();
+      /// \brief Return the ratio of horizontal range count to vertical
+      /// range count.
+      ///
+      /// A ray count is the number of simulated rays. Whereas a range count
+      /// is the total number of data points returned. When range count
+      /// != ray count, then values are interpolated between rays.
+      public: double GetRangeCountRatio() const;
 
-      /// \brief
-      /// @todo Document me
-      public: double GetVFOV();
+      /// Deprecated.
+      /// \sa GetHorzFOV
+      public: double GetHFOV() const GAZEBO_DEPRECATED;
 
-      /// \brief
-      /// @todo Document me
-      public: double GetCVFOV();
+      /// \brief Get the horizontal field of view of the laser sensor.
+      /// \return The horizontal field of view of the laser sensor.
+      public: double GetHorzFOV() const;
 
-      /// \brief
-      /// @todo Document me
-      public: double GetHAngle();
+      /// Deprecated
+      public: double GetCHFOV() const GAZEBO_DEPRECATED;
 
-      /// \brief
-      /// @todo Document me
-      public: double GetVAngle();
+      /// \brief Get Cos Horz field-of-view
+      /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
+      public: double GetCosHorzFOV() const;
 
-      /// \brief
-      /// @todo Document me
-      private: void OnPose(ConstPosePtr &_msg);
+      /// Deprecated
+      /// \sa GetVertFOV
+      public: double GetVFOV() const GAZEBO_DEPRECATED;
 
-      /// \brief Connect a to the add entity signal
-      /// \TODO Nate do these parameters need to be specified here?
+      /// \brief Get the vertical field-of-view.
+      public: double GetVertFOV() const;
+
+      /// Deprecated
+      /// \sa GetCosVertFOV
+      public: double GetCVFOV() const GAZEBO_DEPRECATED;
+
+      /// \brief Get Cos Vert field-of-view
+      /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
+      public: double GetCosVertFOV() const;
+
+      /// Deprecated.
+      /// \sa GetHorzHalfAngle
+      public: double GetHAngle() const GAZEBO_DEPRECATED;
+
+      /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
+      /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
+      public: double GetHorzHalfAngle() const;
+
+      /// Deprecated.
+      /// \sa GetVertHalfAngle
+      public: double GetVAngle() const GAZEBO_DEPRECATED;
+
+      /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
+      /// \return (vertical_max_angle + vertical_min_angle) * 0.5
+      public: double GetVertHalfAngle() const;
+
+      /// \brief Connect to the new laser frame event.
+      /// \param[in] _subscriber Event callback.
       public: event::ConnectionPtr ConnectNewLaserFrame(
         boost::function<void(const float *, unsigned int, unsigned int,
-        unsigned int, const std::string &)> subscriber);
+        unsigned int, const std::string &)> _subscriber);
 
-      /// \brief Disconnect Laser Frame
-      /// \param Connection pointer to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &c);
+      /// \brief Disconnect Laser Frame.
+      /// \param[in,out] _conn Connection pointer to disconnect.
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
-      protected: math::Vector3 offset;
-      protected: sdf::ElementPtr rayElem;
+      /// \brief Scan SDF elementz.
       protected: sdf::ElementPtr scanElem;
+
+      /// \brief Horizontal SDF element.
       protected: sdf::ElementPtr horzElem;
+
+      /// \brief Vertical SDF element.
       protected: sdf::ElementPtr vertElem;
+
+      /// \brief Range SDF element.
       protected: sdf::ElementPtr rangeElem;
+
+      /// \brief Camera SDF element.
       protected: sdf::ElementPtr cameraElem;
 
+      /// \brief Number of cameras.
       protected: unsigned int cameraCount;
 
-      protected: double hfov, vfov, chfov, cvfov, hang, vang;
-      protected: double near, far;
-      protected: unsigned int width_1st, height_1st;
-      protected: unsigned int width_2nd, height_2nd;
-      protected: double ratio_1st, ratio_2nd;
+      /// \brief Horizontal field-of-view.
+      protected: double hfov;
+
+      /// \brief Vertical field-of-view.
+      protected: double vfov;
+
+      /// \brief Cos horizontal field-of-view.
+      protected: double chfov;
+
+      /// \brief Cos vertical field-of-view.
+      protected: double cvfov;
+
+      /// \brief Horizontal half angle.
+      protected: double horzHalfAngle;
+
+      /// \brief Vertical half angle.
+      protected: double vertHalfAngle;
+
+      /// \brief Near clip plane.
+      protected: double near;
+
+      /// \brief Far clip plane.
+      protected: double far;
+
+      /// \brief Horizontal ray count.
+      protected: unsigned int horzRayCount;
+
+      /// \brief Vertical ray count.
+      protected: unsigned int vertRayCount;
+
+      /// \brief Horizontal range count.
+      protected: unsigned int horzRangeCount;
+
+      /// \brief Vertical range count.
+      protected: unsigned int vertRangeCount;
+
+      /// \brief Ray count ratio.
+      protected: double rayCountRatio;
+
+      /// \brief Range count ratio.
+      protected: double rangeCountRatio;
+
+      /// \brief True if the sensor is horizontal only.
       protected: bool isHorizontal;
 
+      /// \brief GPU laser rendering.
       private: rendering::GpuLaserPtr laserCam;
+
+      /// \brief Pointer to the scene.
       private: rendering::ScenePtr scene;
 
-      private: transport::PublisherPtr scanPub;
-      private: boost::mutex *mutex;
+      /// \brief Mutex to protect getting ranges.
+      private: boost::mutex mutex;
+
+      /// \brief Laser message to publish data.
       private: msgs::LaserScan laserMsg;
     };
     /// \}
   }
 }
-
 #endif
