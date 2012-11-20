@@ -76,12 +76,12 @@ namespace gazebo
       // Documentation inherited
       public: virtual std::string GetTopic() const;
 
-      /// \brief Get the minimum angle in radians
-      /// \return The minimum angle
+      /// \brief Get the minimum angle
+      /// \return The minimum angle object
       public: math::Angle GetAngleMin() const;
 
-      /// \brief Get the maximum angle in radians
-      /// \return the maximum angle
+      /// \brief Get the maximum angle
+      /// \return the maximum angle object
       public: math::Angle GetAngleMax() const;
 
       /// \brief Get the angle in radians between each range
