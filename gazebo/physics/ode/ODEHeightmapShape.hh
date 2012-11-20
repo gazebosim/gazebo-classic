@@ -19,42 +19,41 @@
  * Date: 12 Nov 2009
  */
 
-#ifndef ODEHEIGHTMAPSHAPE_HH
-#define ODEHEIGHTMAPSHAPE_HH
+#ifndef _ODEHEIGHTMAPSHAPE_HH_
+#define _ODEHEIGHTMAPSHAPE_HH_
 
 #include <vector>
 
-#include "physics/HeightmapShape.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/HeightmapShape.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/Collision.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
-    /// \brief ODE Height map collision
+    /// \brief ODE Height map collision.
     class ODEHeightmapShape : public HeightmapShape
     {
-      /// \brief Constructor
+      /// \brief Constructor.
+      /// \param[in] _parent Collision parent.
       public: ODEHeightmapShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEHeightmapShape();
 
-      /// \brief Load the heightmap
+      // Documentation inerited.
       public: virtual void Init();
 
-      /// \brief Called by ODE to get the height at a vertex
-      private: static dReal GetHeightCallback(void *data, int x, int y);
+      /// \brief Called by ODE to get the height at a vertex.
+      /// \param[in] _data Pointer to the heightmap data.
+      /// \param[in] _x X location.
+      /// \param[in] _y Y location.
+      private: static dReal GetHeightCallback(void *_data, int _x, int _y);
 
+      /// \brief The heightmap data.
       private: dHeightfieldDataID odeData;
     };
-
-    /// \}
   }
 }
 #endif

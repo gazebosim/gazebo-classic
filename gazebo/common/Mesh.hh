@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MESH_HH
-#define MESH_HH
+#ifndef _MESH_HH_
+#define _MESH_HH_
 
 #include <vector>
 #include <string>
@@ -34,6 +34,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class Mesh Mesh.hh common/common.hh
     /// \brief A 3D mesh
     class Mesh
     {

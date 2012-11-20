@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ namespace gazebo
       public: virtual ~Collision();
 
       /// \brief Finalize the collision.
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Load the collision.
       /// \param[in] _sdf SDF to load from.

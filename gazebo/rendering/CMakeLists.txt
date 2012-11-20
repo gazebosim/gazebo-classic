@@ -25,7 +25,6 @@ set (sources
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
-  GpuLaser.cc
   Grid.cc
   GUIOverlay.cc
   Heightmap.cc
@@ -48,6 +47,7 @@ set (sources
   VideoVisual.cc
   ViewController.cc
   Visual.cc
+  WireBox.cc
   WindowManager.cc
 )
 
@@ -63,7 +63,6 @@ set (headers
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
-  GpuLaser.hh
   Grid.hh
   GUIOverlay.hh
   Heightmap.hh
@@ -87,6 +86,7 @@ set (headers
   VideoVisual.hh
   ViewController.hh
   Visual.hh
+  WireBox.hh
   WindowManager.hh
   ogre_gazebo.h
   cegui.h

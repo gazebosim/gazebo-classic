@@ -38,6 +38,7 @@ RTShaderSystem::RTShaderSystem()
 {
   this->entityMutex = new boost::mutex();
   this->initialized = false;
+  this->shadowsApplied = false;
 }
 
 //////////////////////////////////////////////////
@@ -413,7 +414,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
 /////////////////////////////////////////////////
 void RTShaderSystem::RemoveShadows(Scene *_scene)
 {
-  if (!this->initialized)
+  if (!this->initialized || !this->shadowsApplied)
     return;
 
   _scene->GetManager()->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
@@ -429,12 +430,14 @@ void RTShaderSystem::RemoveShadows(Scene *_scene)
   this->shaderGenerator->invalidateScheme(_scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
   this->UpdateShaders();
+
+  this->shadowsApplied = false;
 }
 
 /////////////////////////////////////////////////
 void RTShaderSystem::ApplyShadows(Scene *_scene)
 {
-  if (!this->initialized)
+  if (!this->initialized || this->shadowsApplied)
     return;
 
   Ogre::SceneManager *sceneMgr = _scene->GetManager();
@@ -504,4 +507,6 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
   this->UpdateShaders();
+
+  this->shadowsApplied = true;
 }

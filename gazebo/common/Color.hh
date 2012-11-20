@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class Color Color.hh common/common.hh
     /// \brief Defines a color
     class Color
     {
@@ -51,9 +52,20 @@ namespace gazebo
       /// \brief (1, 0, 1)
       public: static const Color Purple;
 
+      /// \def RGBA
+      /// \brief A RGBA packed value as an unsigned int
       public: typedef unsigned int RGBA;
+
+      /// \def BGRA
+      /// \brief A BGRA packed value as an unsigned int
       public: typedef unsigned int BGRA;
+
+      /// \def ARGB
+      /// \brief A ARGB packed value as an unsigned int
       public: typedef unsigned int ARGB;
+
+      /// \def ABGR
+      /// \brief A ABGR packed value as an unsigned int
       public: typedef unsigned int ABGR;
 
       /// \brief Constructor

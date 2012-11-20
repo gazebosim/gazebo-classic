@@ -678,12 +678,6 @@ void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEPhysics::GetGravity() const
-{
-  return this->sdf->GetValueVector3("gravity");
-}
-
-//////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dBodyID b1 = dGeomGetBody(_o1);
@@ -907,6 +901,7 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
     msgs::Set(_msg->add_position(), _feedback->contact.positions[i]);
     msgs::Set(_msg->add_normal(), _feedback->contact.normals[i]);
     _msg->add_depth(_feedback->contact.depths[i]);
+    msgs::Set(_msg->mutable_time(), _feedback->contact.time);
 
     _feedback->contact.forces[i].body1Force.Set(
         _feedback->feedbacks[i].f1[0],
@@ -936,7 +931,7 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
-                                     ODECollision *_collision2)
+                                    ODECollision *_collision2)
 {
   if (this->trimeshCollidersCount >= this->trimeshColliders.size())
     this->trimeshColliders.resize(this->trimeshColliders.size() + 100);

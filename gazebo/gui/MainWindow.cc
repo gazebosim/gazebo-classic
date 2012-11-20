@@ -186,6 +186,7 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   gazebo::stop();
   this->renderWidget->hide();
   this->tabWidget->hide();
+  this->toolsWidget->hide();
 
   this->connections.clear();
 
@@ -261,9 +262,15 @@ void MainWindow::SaveAs()
 void MainWindow::About()
 {
   std::string helpTxt = "Gazebo is a 3D multi-robot simulator with dynamics. ";
-  helpTxt += "It is capable of simulating articulated robot in complex and ";
-  helpTxt += "realistic environments.\n Visit http://www.gazebosim.org for ";
-  helpTxt += "more information.";
+  helpTxt += "It is capable of simulating articulated robots in complex and ";
+  helpTxt += "realistic environments.\n\n";
+
+  helpTxt += "Web site:\t\thttp://gazebosim.org\n";
+  helpTxt += "Tutorials:\t\thttp://gazebosim.org/wiki/tutorials\n";
+  helpTxt += "User Guide:\t\thttp://gazebosim.org/user_guide\n";
+  helpTxt += "API:\t\thttp://gazebosim.org/api\n";
+  helpTxt += "SDF:\t\thttp://gazebosim.org/sdf\n";
+  helpTxt += "Messages:\t\thttp://gazebosim.org/msgs\n";
   QMessageBox::about(this, tr("About Gazebo"), tr(helpTxt.c_str()));
 }
 
@@ -404,6 +411,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showFullScreen();
     this->renderWidget->showFullScreen();
     this->tabWidget->hide();
+    this->toolsWidget->hide();
     this->menuBar->hide();
   }
   else
@@ -411,6 +419,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showNormal();
     this->renderWidget->showNormal();
     this->tabWidget->show();
+    this->toolsWidget->show();
     this->menuBar->show();
   }
 }
