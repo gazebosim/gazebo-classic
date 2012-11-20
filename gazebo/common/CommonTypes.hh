@@ -108,7 +108,7 @@ namespace gazebo
     typedef std::map<std::string, std::string> StrStr_M;
 
     /// \def AnimationPtr
-    /// \brief boost::shared_ptr to as Animation class
+    /// \brief boost::shared_ptr to an Animation class
     typedef boost::shared_ptr<Animation> AnimationPtr;
 
     /// \def PoseAnimationPtr

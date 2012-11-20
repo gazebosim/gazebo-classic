@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef _QUATERN_HH_
-#define _QUATERN_HH_
+#ifndef _QUATERNION_HH_
+#define _QUATERNION_HH_
 
 #include <math.h>
 #include <iostream>

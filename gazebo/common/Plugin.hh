@@ -258,7 +258,7 @@ namespace gazebo
     /// Called when a Plugin is first created, and after the World has been
     /// loaded. This function should not be blocking.
     /// \param[in] _model Pointer the Model
-    /// \param[in] _sdf Pointer the the SDF element of the plugin.
+    /// \param[in] _sdf Pointer to the SDF element of the plugin.
     public: virtual void Load(physics::ModelPtr _model,
                               sdf::ElementPtr _sdf) = 0;
 

@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _sec Seconds
-      /// \param[in] _nsec Microseconds
+      /// \param[in] _nsec Nanoseconds
       public: Time(int32_t _sec, int32_t _nsec);
 
       /// \brief Constuctor
@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Set to sec and nsec
       /// \param[in] _sec Seconds
-      /// \param[in] _nsec micro seconds
+      /// \param[in] _nsec Nanoseconds
       public: void Set(int32_t _sec, int32_t _nsec);
 
       /// \brief Set to seconds

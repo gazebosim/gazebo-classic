@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ROTATIONALSPLINE_HH_
-#define _ROTATIONALSPLINE_HH_
+#ifndef _ROTATIONSPLINE_HH_
+#define _ROTATIONSPLINE_HH_
 
 #include <vector>
 #include "math/Quaternion.hh"

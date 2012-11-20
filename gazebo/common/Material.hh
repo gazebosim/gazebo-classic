@@ -59,7 +59,7 @@ namespace gazebo
 
       /// \brief Set a texture image
       /// \param[in] _tex The name of the texture
-      /// \param[_resourcePath] _resourcePath Path which contains _tex
+      /// \param[in] _resourcePath Path which contains _tex
       public: void SetTextureImage(const std::string &_tex,
                                    const std::string &_resourcePath);
 

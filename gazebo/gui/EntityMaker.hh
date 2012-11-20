@@ -35,7 +35,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class EntityMaker EntityMaker.hh
+    /// \class EntityMaker EntityMaker.hh gui/gui.hh
     /// \brief to make an entity base class  
     class EntityMaker
     {
@@ -55,10 +55,8 @@ namespace gazebo
 
       /// \brief
       /// \param[in] _camera Pointer to the user camera
-      /// \TODO Nate fill in
       public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
       /// \brief
-      /// \TODO Nate fill in
       public: virtual void Stop() = 0;
 
       /// \brief Checks if entity is active

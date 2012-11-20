@@ -141,7 +141,7 @@ namespace gazebo
 
       /// \brief Set this vector's components to the minimum of itself and the
       ///        passed in vector
-      /// \param[in] _v the minimumn clamping vector
+      /// \param[in] _v the minimum clamping vector
       public: void SetToMin(const Vector3 &_v);
 
       /// \brief Get the maximum value in the vector
@@ -186,13 +186,13 @@ namespace gazebo
       public: const Vector3 &operator-=(const Vector3 &_pt);
 
       /// \brief Division operator
-      /// \brief[in] _pt the vector devisor
+      /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
       public: const Vector3 operator/(const Vector3 &_pt) const;
 
       /// \brief Division assignment operator
-      /// \brief[in] _pt the vector devisor
+      /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
       public: const Vector3 &operator/=(const Vector3 &_pt);
