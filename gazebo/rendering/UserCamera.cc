@@ -222,10 +222,7 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
     if (this->selectionBuffer)
       this->selectionBuffer->Update();
 
-    //DEBUG: this->selectionBuffer->ShowOverlay(true);
-
-    // Ogre::Entity *entity =
-    // this->selectionBuffer->OnSelectionClick(_evt.pos.x, _evt.pos.y);
+    // DEBUG: this->selectionBuffer->ShowOverlay(true);
 
     this->viewController->HandleMouseEvent(_evt);
   }
@@ -412,6 +409,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   {
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
+  std::cout << "MoveToVIsual[" << _visual->GetName() << "]\n";
 
   math::Box box = _visual->GetBoundingBox();
   math::Vector3 size = box.GetSize();
@@ -534,8 +532,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
   VisualPtr result;
+  if (!this->selectionBuffer)
+    return result;
 
-  //DEBUG: this->selectionBuffer->ShowOverlay(true);
+  // Update the selection buffer
+  this->selectionBuffer->Update();
 
   Ogre::Entity *entity =
     this->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);

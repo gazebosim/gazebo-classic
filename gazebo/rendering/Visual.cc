@@ -1081,14 +1081,11 @@ void Visual::SetTransparency(float _trans)
 //////////////////////////////////////////////////
 void Visual::SetHighlighted(bool _highlighted)
 {
-  std::cout << "Highlight[" << this->GetName() << "]\n";
-
   if (_highlighted)
   {
     // Create the bounding box if it's not already created.
     if (!this->boundingBox)
     {
-      std::cout << "Bounding Box[" << this->GetBoundingBox() << "]\n";
       this->boundingBox = new WireBox(shared_from_this(),
                                       this->GetBoundingBox());
     }

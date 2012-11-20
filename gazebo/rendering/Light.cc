@@ -60,6 +60,8 @@ Light::~Light()
     this->scene->GetManager()->destroyLight(this->GetName());
 
   this->scene->RemoveVisual(this->visual);
+  this->visual.reset();
+
   this->sdf->Reset();
   this->sdf.reset();
 }
@@ -137,7 +139,7 @@ void Light::UpdateSDFFromMsg(ConstLightPtr &_msg)
     this->sdf->GetAttribute("type")->Set("point");
   else if (_msg->has_type() && _msg->type() == msgs::Light::SPOT)
     this->sdf->GetAttribute("type")->Set("spot");
-  else
+  else if (_msg->has_type() && _msg->type() == msgs::Light::DIRECTIONAL)
     this->sdf->GetAttribute("type")->Set("directional");
 
   if (_msg->has_diffuse())

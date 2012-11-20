@@ -1641,11 +1641,20 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "entity_delete")
   {
-    Visual_M::iterator iter;
-    iter = this->visuals.find(_msg->data());
-    if (iter != this->visuals.end())
+    Light_M::iterator lightIter = this->lights.find(_msg->data());
+
+    // Check to see if the deleted entity is a light.
+    if (lightIter != this->lights.end())
     {
-      this->RemoveVisual(iter->second);
+      this->lights.erase(lightIter);
+    }
+    // Otherwise delete a visual
+    else
+    {
+      Visual_M::iterator iter;
+      iter = this->visuals.find(_msg->data());
+      if (iter != this->visuals.end())
+        this->RemoveVisual(iter->second);
     }
   }
   else if (_msg->request() == "show_collision")

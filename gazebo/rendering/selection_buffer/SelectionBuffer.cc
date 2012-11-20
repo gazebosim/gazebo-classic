@@ -138,8 +138,6 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
   cv.a = 1.0;
   const std::string &entName = this->materialSwitchListener->GetEntityName(cv);
 
-  std::cout << "EntName[" << entName << "]\n";
-
   if (entName.empty())
     return 0;
   else
