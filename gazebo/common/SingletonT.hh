@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@
  * Date: 2 Sept 2007
  */
 
-#ifndef SINGLETONT_HH
-#define SINGLETONT_HH
+#ifndef _SINGLETONT_HH_
+#define _SINGLETONT_HH_
 
 /// \addtogroup gazebo_common Common
 /// \{
 
+/// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>
 class SingletonT

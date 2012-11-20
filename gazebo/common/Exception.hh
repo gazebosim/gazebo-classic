@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ namespace gazebo
       throwStream << msg << std::endl << std::flush;\
       throw gazebo::common::Exception(__FILE__, __LINE__, throwStream.str()); }
 
+    /// \class Exception Exception.hh common/common.hh
     /// \brief Class for generating exceptions
     class Exception
     {
@@ -46,12 +47,12 @@ namespace gazebo
       public: Exception();
 
       /// \brief Default constructor
-      /// \param[in] file File name
-      /// \param[in] line Line number where the error occurred
-      /// \param[in] msg Error message
-      public: Exception(const char *file,
-                          int line,
-                          std::string msg);
+      /// \param[in] _file File name
+      /// \param[in] _line Line number where the error occurred
+      /// \param[in] _msg Error message
+      public: Exception(const char *_file,
+                          int _line,
+                          std::string _msg);
 
       /// \brief Destructor
       public: virtual ~Exception();
