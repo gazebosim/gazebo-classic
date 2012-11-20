@@ -66,7 +66,7 @@ namespace gazebo
 
     /// \class Console Console.hh common/commom.hh
     /// \brief Message, error, warning, and logging functionality
-    
+
     class Console
     {
       /// \brief Default constructor

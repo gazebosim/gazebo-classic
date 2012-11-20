@@ -24,7 +24,6 @@ namespace gazebo
 {
   namespace event
   {
-
     /// \addtogroup gazebo_event
     /// \{
 
@@ -32,7 +31,6 @@ namespace gazebo
     /// \brief An Event class to get notifications for simulator events
     class Events
     {
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
       /// \param[in] _subscriber the subscriber to this event
