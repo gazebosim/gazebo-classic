@@ -27,6 +27,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/ode/ODELink.hh"
 #include "physics/ode/ODEJoint.hh"
+#include "physics/ScrewJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -217,7 +218,7 @@ dJointFeedback *ODEJoint::GetFeedback()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetHighStop(int _index, math::Angle _angle)
+void ODEJoint::SetHighStop(int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -237,7 +238,7 @@ void ODEJoint::SetHighStop(int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetLowStop(int _index, math::Angle _angle)
+void ODEJoint::SetLowStop(int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -367,6 +368,162 @@ void ODEJoint::SetAttribute(Attribute _attr, int /*_index*/, double _value)
   };
 }
 
+//////////////////////////////////////////////////
+void ODEJoint::SetAttribute(const std::string &_key, int /*_index*/,
+                            const boost::any &_value)
+{
+  if (_key == "fudge_factor")
+  {
+    try
+    {
+      this->SetParam(dParamFudgeFactor, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "suspension_erp")
+  {
+    try
+    {
+      this->SetParam(dParamSuspensionERP, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "suspension_cfm")
+  {
+    try
+    {
+      this->SetParam(dParamSuspensionCFM, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "stop_erp")
+  {
+    try
+    {
+      this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "stop_cfm")
+  {
+    try
+    {
+      this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "erp")
+  {
+    try
+    {
+      this->SetParam(dParamERP, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "cfm")
+  {
+    try
+    {
+      this->SetParam(dParamCFM, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "fmax")
+  {
+    try
+    {
+      this->SetParam(dParamFMax, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "vel")
+  {
+    try
+    {
+      this->SetParam(dParamVel, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "hi_stop")
+  {
+    try
+    {
+      this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "lo_stop")
+  {
+    try
+    {
+      this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+  else if (_key == "thread_pitch")
+  {
+    ScrewJoint<ODEJoint>* screwJoint =
+      dynamic_cast<ScrewJoint<ODEJoint>* >(this);
+    if (screwJoint != NULL)
+    {
+      try
+      {
+        screwJoint->SetThreadPitch(0, boost::any_cast<double>(_value));
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+      }
+    }
+  }
+  else
+  {
+    try
+    {
+      gzerr << "Unable to handle joint attribute["
+            << boost::any_cast<std::string>(_value) << "]\n";
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
+  }
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::Reset()
 {
   dJointReset(this->jointId);

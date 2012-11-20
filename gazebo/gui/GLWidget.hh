@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GL_WIDGET_HH
-#define GL_WIDGET_HH
+#ifndef _GL_WIDGET_HH_
+#define _GL_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -103,7 +103,8 @@ namespace gazebo
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
 
-      private: void OnSetSelectedEntity(const std::string &_name);
+      private: void OnSetSelectedEntity(const std::string &_name,
+                                        const std::string &_mode);
 
       private: void RotateEntity(rendering::VisualPtr &_vis);
       private: void TranslateEntity(rendering::VisualPtr &_vis);

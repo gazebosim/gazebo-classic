@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MODELRIGHTMENU_HH
-#define MODELRIGHTMENU_HH
+#ifndef _MODELRIGHTMENU_HH_
+#define _MODELRIGHTMENU_HH_
 
 #include <map>
 #include <string>
@@ -44,7 +44,6 @@ namespace gazebo
       private slots: void OnShowCOM();
       private slots: void OnTransparent();
       private slots: void OnSkeleton();
-      private slots: void OnJointControl();
 
       private: std::string modelName;
 
@@ -56,7 +55,6 @@ namespace gazebo
       private: QAction *skeletonAction;
       private: QAction *showJointsAction;
       private: QAction *showCOMAction;
-      private: QAction *jointControlAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub;

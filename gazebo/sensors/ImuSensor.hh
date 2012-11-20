@@ -15,68 +15,60 @@
  *
 */
 
-#ifndef IMUSENSOR_HH
-#define IMUSENSOR_HH
+#ifndef _IMUSENSOR_HH_
+#define _IMUSENSOR_HH_
 
 #include <vector>
 #include <string>
 
-#include "Sensor.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 
 namespace gazebo
 {
-  /// \ingroup gazebo_sensors
-  /// \brief Sensors namespace
   namespace sensors
   {
-    /// \TODO This class inherits from Sensor, but looks like it specifically 
-    ///       doesn't override any methods, is this intentional? i.e. LoadChild 
-    ///       instead of Load, InitChild instead of Init
-    /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
-    /// \brief An IMU sensor
+
+    /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
+    /// \brief An IMU sensor.
     class ImuSensor: public Sensor
     {
-      /// \brief Constructor
-      /// \param _body The IMU sensor must be attached to a body.
-      public: ImuSensor(Body *_body);
+      /// \brief Constructor.
+      public: ImuSensor();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ImuSensor();
 
-      /// \brief Load the ImuSensor from XMLConfigNode
-      /// \param _node The XMLConfig node
-      protected: virtual void LoadChild(XMLConfigNode *_node);
+      // Documentation inherited.
+      protected: void Load(const std::string &_worldName, sdf::ElementPtr _sdf);
 
-      /// \brief Save the sensor info in XML format
-      /// \param _prefix 
-      /// \param _stream
-      /// \TODO Nate fill in
-      protected: virtual void SaveChild(std::string &_prefix,
-                                        std::ostream &_stream);
+      // Documentation inherited.
+      protected: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the ray
-      protected: virtual void InitChild();
+      /// \brief Initialize the IMU.
+      protected: virtual void Init();
 
-      /// \brief Update sensed values
-      protected: virtual void UpdateChild();
+      // Documentation inherited
+      protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the ray
-      protected: virtual void FiniChild();
+      /// \brief Finalize the IMU.
+      protected: virtual void Fini();
 
-      /// Returns velocity as a math::Pose
-      /// FIXME storing x,y,z components in a quaternion seems like a bad idea
-      /// @todo storing x,y,z components in a quaternion seems like a bad idea
-      /// \return velocity data stored in Pose
-      /// \TODO Nate check
-      public: Pose GetVelocity();
+      /// \brief Returns the angular velocity.
+      /// \return Angular velocity.
+      public: math::Vector3 GetAngularVelocity() const;
 
-      private: Pose prevPose;
-      private: Pose imuVel;
+      /// \brief Returns the linear acceleration.
+      /// \return Linear acceleration.
+      public: math::Vector3 GetLinearAcceleration() const;
+
+      private: transport::PublisherPtr pub;
+      private: physics::LinkPtr parentEntity;
+      private: msgs::IMU imuMsg;
     };
     /// \}
   }
 }
 #endif
-

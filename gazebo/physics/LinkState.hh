@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ namespace gazebo
       /// \brief Constructor
       ///
       /// Build a LinkState from an existing Link.
-      /// \param _model Pointer to the Link from which to gather state
+      /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
-      public: LinkState(const LinkPtr _link);
+      public: explicit LinkState(const LinkPtr _link);
 
       /// \brief Destructor
       public: virtual ~LinkState();
@@ -63,7 +63,7 @@ namespace gazebo
       /// \brief Load state from SDF element
       ///
       /// Load LinkState information from stored data in and SDF::Element
-      /// \param _elem Pointer to the SDF::Element containing state info.
+      /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(sdf::ElementPtr _elem);
 
       /// \brief Get the link pose
@@ -92,7 +92,7 @@ namespace gazebo
       ///
       /// Get a Collision State based on an index, where index is in the
       /// range of  0...LinkState::GetCollisionStateCount
-      /// \param _index Index of the CollisionState
+      /// \param[in] _index Index of the CollisionState
       /// \return State of the Collision
       public: CollisionState GetCollisionState(unsigned int _index) const;
 
@@ -100,7 +100,7 @@ namespace gazebo
       ///
       /// Searches through all CollisionStates.
       /// Returns the CollisionState with the matching name, if any.
-      /// \param _collisionName Name of the CollisionState
+      /// \param[in] _collisionName Name of the CollisionState
       /// \return State of the Collision.
       public: CollisionState GetCollisionState(
                   const std::string &_collisionName) const;
@@ -108,29 +108,29 @@ namespace gazebo
       /// \brief Fill a State SDF element with state info
       ///
       /// Stored state information into an SDF::Element pointer.
-      /// \param _elem Pointer to the SDF::Element which recieves the data.
+      /// \param[in] _elem Pointer to the SDF::Element which recieves the data.
       public: void FillStateSDF(sdf::ElementPtr _elem);
 
       /// \brief Update a Link SDF element with this state info
       ///
       /// Set the values in a Links's SDF::Element with the information
       /// stored in this instance.
-      /// \param _elem Pointer to a Links's SDF::Element
+      /// \param[in] _elem Pointer to a Links's SDF::Element
       public: void UpdateLinkSDF(sdf::ElementPtr _elem);
 
-      /// 3D pose of the link relative to the model.
+      /// \brief 3D pose of the link relative to the model.
       private: math::Pose pose;
 
-      /// Velocity of the link (linear and angular).
+      /// \brief Velocity of the link (linear and angular).
       private: math::Pose velocity;
 
-      /// Acceleration of the link (linear and angular).
+      /// \brief Acceleration of the link (linear and angular).
       private: math::Pose acceleration;
 
-      /// Forces on the link(linear and angular).
+      /// \brief Forces on the link(linear and angular).
       private: std::vector<math::Pose> forces;
 
-      /// State of all the child Collision objects.
+      /// \brief State of all the child Collision objects.
       private: std::vector<CollisionState> collisionStates;
     };
     /// \}

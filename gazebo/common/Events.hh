@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef EVENTS_HH
-#define EVENTS_HH
+#ifndef _EVENTS_HH_
+#define _EVENTS_HH_
 
 #include <string>
 #include "common/Event.hh"
@@ -24,12 +24,13 @@ namespace gazebo
 {
   namespace event
   {
+    /// \addtogroup gazebo_event
+    /// \{
+
+    /// \class Events Events.hh common/common.hh
     /// \brief An Event class to get notifications for simulator events
     class Events
     {
-      /// \addtogroup gazebo_event
-      /// \{
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
       /// \param[in] _subscriber the subscriber to this event
@@ -145,17 +146,7 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldUpdateEnd(ConnectionPtr _subscriber)
               { worldUpdateEnd.Disconnect(_subscriber); }
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the entity selected signal
-      /// \param[in] _subscriber the subscriber to this event
-      /// \return a connection
-      public: template<typename T>
-              static ConnectionPtr ConnectEntitySelected(T _subscriber)
-              { return entitySelected.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the entity selected signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectEntitySelected(ConnectionPtr _subscriber)
-              { entitySelected.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       /// \param[in] _subscriber the subscriber to this event
@@ -228,16 +219,13 @@ namespace gazebo
       public: static EventT<void (std::string)> entityCreated;
 
       /// \brief An entity has been selected
-      public: static EventT<void (std::string)> setSelectedEntity;
+      public: static EventT<void (std::string, std::string)> setSelectedEntity;
 
       /// \brief An entity has been added
       public: static EventT<void (std::string)> addEntity;
 
       /// \brief An entity has been deleted
       public: static EventT<void (std::string)> deleteEntity;
-
-      /// \brief Entity has been selected
-      public: static EventT<void (std::string)> entitySelected;
 
       /// \brief World update has started
       public: static EventT<void ()> worldUpdateStart;

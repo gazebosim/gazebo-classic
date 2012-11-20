@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GZ_PLUGIN_HH
-#define GZ_PLUGIN_HH
+#ifndef _GZ_PLUGIN_HH_
+#define _GZ_PLUGIN_HH_
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -39,6 +39,7 @@
 #include "physics/PhysicsTypes.hh"
 #include "sensors/SensorTypes.hh"
 #include "sdf/sdf.hh"
+#include "rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -58,9 +59,13 @@ namespace gazebo
     /// \brief A Sensor plugin
     SENSOR_PLUGIN,
     /// \brief A System plugin
-    SYSTEM_PLUGIN
+    SYSTEM_PLUGIN,
+    /// \brief A Visual plugin
+    VISUAL_PLUGIN
   };
 
+
+  /// \class PluginT Plugin.hh common/common.hh
   /// \brief A class which all plugins must inherit from
   template<class T>
   class PluginT
@@ -84,6 +89,7 @@ namespace gazebo
     /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
     /// \param[in] _handle short name of the handler
+    /// \return Shared Pointer to this class type
     public: static TPtr Create(const std::string &_filename,
                 const std::string &_handle)
             {
@@ -186,6 +192,7 @@ namespace gazebo
             }
 
     /// \brief Returns the type of the plugin
+    /// \return type of the plugin
     public: PluginType GetType() const
             {
               return this->type;
@@ -208,13 +215,18 @@ namespace gazebo
              } fptr_union_t;
   };
 
+  /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   class WorldPlugin : public PluginT<WorldPlugin>
   {
+    /// \brief Constructor
     public: WorldPlugin()
              {this->type = WORLD_PLUGIN;}
+
+    /// \brief Destructor
+    public: virtual ~WorldPlugin() {}
 
     /// \brief Load function
     ///
@@ -238,12 +250,15 @@ namespace gazebo
     public: ModelPlugin()
              {this->type = MODEL_PLUGIN;}
 
+    /// \brief Destructor
+    public: virtual ~ModelPlugin() {}
+
     /// \brief Load function
     ///
     /// Called when a Plugin is first created, and after the World has been
     /// loaded. This function should not be blocking.
-    /// \param _model Pointer the Model
-    /// \param _sdf Pointer the the SDF element of the plugin.
+    /// \param[in] _model Pointer to the Model
+    /// \param[in] _sdf Pointer to the SDF element of the plugin.
     public: virtual void Load(physics::ModelPtr _model,
                               sdf::ElementPtr _sdf) = 0;
 
@@ -254,14 +269,18 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+  /// \class SensorPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::Sensor.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   class SensorPlugin : public PluginT<SensorPlugin>
   {
+    /// \brief Constructor
     public: SensorPlugin()
              {this->type = SENSOR_PLUGIN;}
 
+    /// \brief Destructor
+    public: virtual ~SensorPlugin() {}
 
     /// \brief Load function
     ///
@@ -285,8 +304,12 @@ namespace gazebo
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class SystemPlugin : public PluginT<SystemPlugin>
   {
+    /// \brief Constructor
     public: SystemPlugin()
              {this->type = SYSTEM_PLUGIN;}
+
+    /// \brief Destructor
+    public: virtual ~SystemPlugin() {}
 
     /// \brief Load function
     ///
@@ -294,6 +317,32 @@ namespace gazebo
     /// \param _argc Number of command line arguments.
     /// \param _argv Array of command line arguments.
     public: virtual void Load(int _argc = 0, char **_argv = NULL) = 0;
+
+    /// \brief Initialize the plugin
+    ///
+    /// Called after Gazebo has been loaded. Must not block.
+    public: virtual void Init() {}
+
+    /// \brief Override this method for custom plugin reset behavior.
+    public: virtual void Reset() {}
+  };
+
+  /// \brief A plugin loaded within the gzserver on startup.  See
+  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
+  ///        reference</a>.
+  class VisualPlugin : public PluginT<VisualPlugin>
+  {
+    public: VisualPlugin()
+             {this->type = VISUAL_PLUGIN;}
+
+    /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param[in] _visual Pointer the Visual Object.
+    /// \param[in] _sdf Pointer the the SDF element of the plugin.
+    public: virtual void Load(rendering::VisualPtr _visual,
+                              sdf::ElementPtr _sdf) = 0;
 
     /// \brief Initialize the plugin
     ///
@@ -349,5 +398,17 @@ namespace gazebo
   {\
     return new classname();\
   }
+
+/// \brief Plugin registration function for visual plugin. Part of the
+/// shared object interface. This function is called when loading the shared
+/// library to add the plugin to the registered list.
+/// \return the name of the registered plugin
+#define GZ_REGISTER_VISUAL_PLUGIN(classname) \
+  extern "C" gazebo::VisualPlugin *RegisterPlugin(); \
+  gazebo::VisualPlugin *RegisterPlugin() \
+  {\
+    return new classname();\
+  }
 }
+
 #endif

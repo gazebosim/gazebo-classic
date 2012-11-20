@@ -39,8 +39,8 @@ namespace gazebo
     /// \brief Constructor
     public: RayPlugin();
 
-    /// \brief  Destructor
-    public: ~RayPlugin();
+    /// \brief Destructor
+    public: virtual ~RayPlugin();
 
     // update callback
     public: virtual void OnNewLaserScans();

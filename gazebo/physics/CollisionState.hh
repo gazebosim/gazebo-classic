@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class CollisionState CollisionState.hh physics/CollisionState.hh
+    /// \class CollisionState CollisionState.hh physics/phyiscs.hh
     /// \brief Store state information of a physics::Collision object
     ///
     /// This class captures the entire state of a Collision at one
@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Constructor
       ///
       /// Build a CollisionState from an existing Collision.
-      /// \param _model Pointer to the Link from which to gather state
+      /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
       public: CollisionState(const CollisionPtr _collision);
 
@@ -56,13 +56,13 @@ namespace gazebo
       /// \brief Load state from SDF element
       ///
       /// Load CollisionState information from stored data in and SDF::Element
-      /// \param _elem Pointer to the SDF::Element containing state info.
+      /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(sdf::ElementPtr _elem);
 
       /// \brief Get the Collision pose
       public: math::Pose GetPose() const;
 
-      /// Pose of the Collision object
+      /// \brief Pose of the Collision object
       private: math::Pose pose;
     };
     /// \}

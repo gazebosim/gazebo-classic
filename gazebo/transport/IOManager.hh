@@ -27,18 +27,28 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
-    /// \brief Managers boost::asio IO
+    /// \class IOManager IOManager.hh transport/transport.hh
+    /// \brief Manages boost::asio IO
     class IOManager
     {
+      /// \brief Constructor
       public: IOManager();
+      /// \brief Destructor
       public: ~IOManager();
 
+      /// \brief Get handle to boost::asio IO service
+      /// \return Handle to boost::asio IO service
       public: boost::asio::io_service &GetIO();
 
+      /// \brief Increment the event count by 1
       public: void IncCount();
+      /// \brief Decrement the event count by 1
       public: void DecCount();
+      /// \brief Get the event count
+      /// \return The event count
       public: unsigned int GetCount() const;
 
+      /// \brief Stop the IO service
       public: void Stop();
 
       private: boost::asio::io_service *io_service;

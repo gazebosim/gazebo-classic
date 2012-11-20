@@ -504,10 +504,12 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete",
-      this->GetScopedName());
-
-  this->requestPub->Publish(*msg, true);
+  if (this->requestPub)
+  {
+    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+        this->GetScopedName());
+    this->requestPub->Publish(*msg, true);
+  }
 
   this->parentEntity.reset();
   Base::Fini();

@@ -250,13 +250,6 @@ std::string SystemPaths::GetWorldPathExtension()
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFileWithGazeboPaths(const std::string &_filename,
-                                                 bool _searchLocalPath)
-{
-  return this->FindFile(_filename, _searchLocalPath);
-}
-
-//////////////////////////////////////////////////
 std::string SystemPaths::FindFileURI(const std::string &_uri)
 {
   int index = _uri.find("://");

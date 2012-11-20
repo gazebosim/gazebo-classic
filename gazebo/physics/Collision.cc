@@ -52,7 +52,6 @@ Collision::Collision(LinkPtr _link)
 
   this->link = _link;
 
-  this->transparency = 0;
   this->contactsEnabled = false;
 
   this->surface.reset(new SurfaceParams());
@@ -66,15 +65,17 @@ Collision::~Collision()
 //////////////////////////////////////////////////
 void Collision::Fini()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete",
-      this->GetScopedName()+"__COLLISION_VISUAL__");
-  this->requestPub->Publish(*msg, true);
+  if (this->requestPub)
+  {
+    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+        this->GetScopedName()+"__COLLISION_VISUAL__");
+    this->requestPub->Publish(*msg, true);
+  }
 
   Entity::Fini();
   this->link.reset();
   this->shape.reset();
   this->surface.reset();
-  this->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -85,7 +86,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
   this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
-
 
   if (this->shape)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
@@ -287,12 +287,19 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::FillCollisionMsg(msgs::Collision &_msg)
 {
+  this->FillMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void Collision::FillMsg(msgs::Collision &_msg)
+{
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
-  this->shape->FillShapeMsg(*_msg.mutable_geometry());
-  this->surface->FillSurfaceMsg(*_msg.mutable_surface());
+
+  this->shape->FillMsg(*_msg.mutable_geometry());
+  this->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef INSERT_MODEL_WIDGET_HH
-#define INSERT_MODEL_WIDGET_HH
+#ifndef _INSERT_MODEL_WIDGET_HH_
+#define _INSERT_MODEL_WIDGET_HH_
 
 #include <string>
+#include <map>
+#include <boost/thread/mutex.hpp>
+
 #include "gui/qt.h"
 
 class QTreeWidget;
@@ -38,12 +41,30 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~InsertModelWidget();
 
-      private: void ConnectToModelDatabase();
+      /// \brief Callback triggered when the ModelDatabase has returned
+      /// the list of models.
+      /// \param[in] _models The map of all models in the database.
+      private: void OnModels(
+                   const std::map<std::string, std::string> &_models);
 
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
+      /// \brief An update function that lets this widget add in the results
+      /// from ModelDatabase::GetModels.
+      private slots: void Update();
+
+      /// \brief Widget that display all the models that can be inserted.
       private: QTreeWidget *fileTreeWidget;
+
+      /// \brief Tree item that is populated with models from the ModelDatabase.
+      private: QTreeWidgetItem *modelDatabaseItem;
+
+      /// \brief Mutex to protect the modelBuffer.
+      private: boost::mutex mutex;
+
+      /// \brief Buffer to hold the results from ModelDatabase::GetModels.
+      private: std::map<std::string, std::string> modelBuffer;
     };
   }
 }

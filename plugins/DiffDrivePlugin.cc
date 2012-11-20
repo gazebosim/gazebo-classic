@@ -81,6 +81,8 @@ void DiffDrivePlugin::Init()
   physics::EntityPtr parent = boost::shared_dynamic_cast<physics::Entity>(
       this->leftJoint->GetChild());
 
+  std::cout << "Parent[" << parent->GetName() << "]\n";
+
   math::Box bb = parent->GetBoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
@@ -104,7 +106,7 @@ void DiffDrivePlugin::OnUpdate()
   /* double d1, d2;
   double dr, da;
 
-  this->prevUpdateTime = currTime; 
+  this->prevUpdateTime = currTime;
 
   // Distance travelled by front wheels
   d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->GetVelocity(0);

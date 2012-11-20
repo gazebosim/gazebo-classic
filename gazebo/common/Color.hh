@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class Color Color.hh common/common.hh
     /// \brief Defines a color
     class Color
     {
@@ -51,9 +52,20 @@ namespace gazebo
       /// \brief (1, 0, 1)
       public: static const Color Purple;
 
+      /// \def RGBA
+      /// \brief A RGBA packed value as an unsigned int
       public: typedef unsigned int RGBA;
+
+      /// \def BGRA
+      /// \brief A BGRA packed value as an unsigned int
       public: typedef unsigned int BGRA;
+
+      /// \def ARGB
+      /// \brief A ARGB packed value as an unsigned int
       public: typedef unsigned int ARGB;
+
+      /// \def ABGR
+      /// \brief A ABGR packed value as an unsigned int
       public: typedef unsigned int ABGR;
 
       /// \brief Constructor
@@ -112,38 +124,6 @@ namespace gazebo
       /// \param[in] _index Color component index(0=red, 1=green, 2=blue)
       /// \return r, g, b, or a when _index is 0, 1, 2 or 3
       public: float operator[](unsigned int _index);
-
-      /// \brief Get the red color
-      /// \return red color component
-      public: float R() const GAZEBO_DEPRECATED;
-
-      /// \brief Get the green color
-      /// \return green color component
-      public: float G() const GAZEBO_DEPRECATED;
-
-      /// \brief Get the blue color
-      /// \return blue color component
-      public: float B() const GAZEBO_DEPRECATED;
-
-      /// \brief Get the alpha color
-      /// \return alpha value
-      public: float A() const GAZEBO_DEPRECATED;
-
-      /// \brief Set the red color
-      /// \param _r Red color component
-      public: void R(float _r) GAZEBO_DEPRECATED;
-
-      /// \brief Set the green color
-      /// \param _g Green color component
-      public: void G(float _g) GAZEBO_DEPRECATED;
-
-      /// \brief Set the blue color
-      /// \param _b Blue color component
-      public: void B(float _b) GAZEBO_DEPRECATED;
-
-      /// \brief Set the alpha color
-      /// \param _a Alpha value
-      public: void A(float _a) GAZEBO_DEPRECATED;
 
       /// \brief Get as uint32 RGBA packed value
       /// \return the color

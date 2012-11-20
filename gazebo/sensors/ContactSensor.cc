@@ -45,7 +45,6 @@ GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 ContactSensor::ContactSensor()
     : Sensor()
 {
-  this->node = transport::NodePtr(new transport::Node());
   this->mutex = new boost::mutex();
 }
 
@@ -61,11 +60,11 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
-  if (this->sdf->GetElement("topic"))
+  if (this->sdf->HasElement("contact") &&
+      this->sdf->GetElement("contact")->HasElement("topic"))
   {
-    this->node->Init(this->world->GetName());
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
-        this->sdf->GetElement("topic")->Get<std::string>());
+      this->sdf->GetElement("contact")->Get<std::string>("topic"));
   }
 }
 
@@ -122,6 +121,7 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
+  // \TODO where to put: this->lastMeasurementTime = this->world->GetSimTime();
   this->mutex->lock();
   if (this->contactsPub && this->contactsPub->HasConnections() &&
       this->contacts.size() > 0)
@@ -147,6 +147,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
           msgs::Set(contactMsg->add_normal(), iter2->second.normals[i]);
           contactMsg->add_depth(iter2->second.depths[i]);
         }
+        msgs::Set(contactMsg->mutable_time(), iter2->second.time);
       }
     }
 

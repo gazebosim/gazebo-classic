@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ namespace gazebo
 {
   namespace rendering
   {
+    class WireBox;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -198,6 +200,9 @@ namespace gazebo
       /// \return The transparency.
       public: float GetTransparency();
 
+      /// \brief Set the visual to be visually highlighted. This is most
+      /// often used when an object is selected by a user via the GUI.
+      /// \param[in] _highlighted True to enable the highlighting.
       public: void SetHighlighted(bool _highlighted);
 
       /// \brief Set the emissive value.
@@ -284,7 +289,7 @@ namespace gazebo
 
       /// \brief Set the normal map.
       /// \param[in] _nmap Name of the normal map material.
-      public: void SetNormalMap(const std::string &nmap);
+      public: void SetNormalMap(const std::string &_nmap);
 
       /// \brief True on or off a ribbon trail.
       /// \param[in] _value True to enable ribbon trail.
@@ -362,7 +367,7 @@ namespace gazebo
       /// \param[in] _poses Series of poses the visual will move to.
       /// \param[in] _time Time it takes the visual to move to the pose.
       /// \param[in] _onComplete Callback used when the move is complete.
-     public: void MoveToPositions(const std::vector<math::Pose> &_pts,
+      public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
                                    boost::function<void()> _onComplete = NULL);
 
@@ -411,6 +416,27 @@ namespace gazebo
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
+
+      /// \brief Load a plugin
+      /// \param _filename The filename of the plugin
+      /// \param _name A unique name for the plugin
+      /// \param _sdf The SDF to pass into the plugin.
+      public: void LoadPlugin(const std::string &_filename,
+                               const std::string &_name,
+                               sdf::ElementPtr _sdf);
+
+      /// \brief Remove a running plugin
+      /// \param _name The unique name of the plugin to remove
+      public: void RemovePlugin(const std::string &_name);
+
+      /// \brief Load all plugins
+      ///
+      /// Load all plugins specified in the SDF for the model.
+      private: void LoadPlugins();
+
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
+
+      private: std::vector<VisualPluginPtr> plugins;
 
       /// \brief Helper function to get the bounding box for a visual.
       /// \param[in] _node Pointer to the Ogre Node to process.
@@ -493,6 +519,12 @@ namespace gazebo
 
       /// \brief True to use RT shader system
       private: bool useRTShader;
+
+      /// \brief True if initialized.
+      private: bool initialized;
+
+      /// \brief A wire frame bounding box.
+      private: WireBox *boundingBox;
     };
     /// \}
   }

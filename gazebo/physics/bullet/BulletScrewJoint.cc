@@ -50,6 +50,7 @@ BulletScrewJoint::~BulletScrewJoint()
 void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<BulletJoint>::Load(_sdf);
+  this->SetThreadPitch(0, this->threadPitch);
 }
 
 //////////////////////////////////////////////////
@@ -129,19 +130,25 @@ void BulletScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
 }
 
 //////////////////////////////////////////////////
+void BulletScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
+{
+  gzerr << "Not implemented\n";
+}
+
+//////////////////////////////////////////////////
 void BulletScrewJoint::SetForce(int /*_index*/, double /*_force*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetHighStop(int /*_index*/, math::Angle _angle)
+void BulletScrewJoint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
   this->btScrew->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetLowStop(int /*_index*/, math::Angle _angle)
+void BulletScrewJoint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
   this->btScrew->setLowerLinLimit(_angle.Radian());
 }

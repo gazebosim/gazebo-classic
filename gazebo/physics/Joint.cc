@@ -40,7 +40,6 @@ Joint::Joint(BasePtr _parent)
   : Base(_parent)
 {
   this->AddType(Base::JOINT);
-  this->showJoints = false;
 }
 
 //////////////////////////////////////////////////
@@ -96,10 +95,10 @@ void Joint::Load(sdf::ElementPtr _sdf)
   }
 
   if (!this->parentLink && parentName != std::string("world"))
-    gzthrow("Couldn't Find Parent Link[" + parentName);
+    gzthrow("Couldn't Find Parent Link[" + parentName + "]");
 
   if (!this->childLink && childName != std::string("world"))
-    gzthrow("Couldn't Find Child Link[" + childName);
+    gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
   this->LoadImpl(pose);
 }
@@ -286,6 +285,12 @@ LinkPtr Joint::GetParent() const
 //////////////////////////////////////////////////
 void Joint::FillJointMsg(msgs::Joint &_msg)
 {
+  this->FillMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void Joint::FillMsg(msgs::Joint &_msg)
+{
   _msg.set_name(this->GetScopedName());
 
   if (this->sdf->HasElement("pose"))
@@ -381,4 +386,15 @@ void Joint::SetState(const JointState &_state)
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
     this->SetAngle(i, _state.GetAngle(i));
+}
+
+//////////////////////////////////////////////////
+void Joint::SetForce(int /*_index*/, double /*_force*/)
+{
+}
+
+//////////////////////////////////////////////////
+double Joint::GetForce(int /*_index*/)
+{
+  return 0;
 }

@@ -113,7 +113,7 @@ bool Publication::HasTransport(const std::string &_host, unsigned int _port)
   for (iter = this->transports.begin(); iter != this->transports.end(); ++iter)
   {
     if ((*iter)->GetConnection()->GetRemoteAddress() == _host &&
-         (*iter)->GetConnection()->GetRemotePort() == _port)
+        (*iter)->GetConnection()->GetRemotePort() == _port)
     {
       return true;
     }
@@ -163,7 +163,8 @@ void Publication::RemoveSubscription(const NodePtr &_node)
 }
 
 //////////////////////////////////////////////////
-void Publication::RemoveSubscription(const std::string &host, unsigned int port)
+void Publication::RemoveSubscription(const std::string &_host,
+                                     unsigned int _port)
 {
   SubscriptionTransportPtr subptr;
   std::list< CallbackHelperPtr >::iterator iter;
@@ -173,8 +174,8 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
   {
     subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
     if (!subptr || !subptr->GetConnection()->IsOpen() ||
-        (subptr->GetConnection()->GetRemoteAddress() == host &&
-         subptr->GetConnection()->GetRemotePort() == port))
+        (subptr->GetConnection()->GetRemoteAddress() == _host &&
+         subptr->GetConnection()->GetRemotePort() == _port))
     {
       this->callbacks.erase(iter++);
     }

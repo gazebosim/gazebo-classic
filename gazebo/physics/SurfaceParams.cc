@@ -76,7 +76,14 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
   }
 }
 
+/////////////////////////////////////////////////
 void SurfaceParams::FillSurfaceMsg(msgs::Surface &_msg)
+{
+  this->FillMsg(_msg);
+}
+
+/////////////////////////////////////////////////
+void SurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   _msg.mutable_friction()->set_mu(this->mu1);
   _msg.mutable_friction()->set_mu2(this->mu2);

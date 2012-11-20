@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,14 @@ namespace gazebo
       /// \param[in] _event The mouse position.
       public: virtual void HandleMouseEvent(
                   const common::MouseEvent &_event) = 0;
+
+      /// \brief Handle a key release event.
+      /// \param[in] _key The key that was released.
+      public: virtual void HandleKeyReleaseEvent(const std::string &_key) = 0;
+
+      /// \brief Handle a key press event
+      /// \param[in] _key The key that was pressed.
+      public: virtual void HandleKeyPressEvent(const std::string &_key) = 0;
 
       /// \brief Get the type of view controller.
       /// \return The view controller type string.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,15 @@
  * Date: 09 Sept. 2008
  */
 
-#ifndef GAZEBO_PHYSICS_BASE_HH
-#define GAZEBO_PHYSICS_BASE_HH
+#ifndef _GAZEBO_PHYSICS_BASE_HH_
+#define _GAZEBO_PHYSICS_BASE_HH_
 
 #include <boost/enable_shared_from_this.hpp>
-
 #include <string>
 
-#include "sdf/sdf.hh"
-#include "common/CommonTypes.hh"
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
@@ -38,6 +37,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics Classes for physics and dynamics
     /// \{
+
+    /// \brief String names for the different entity types.
     static std::string EntityTypename[] = {
       "common",
       "entity",
@@ -65,7 +66,7 @@ namespace gazebo
       "trimesh"
     };
 
-    /// \class Base Base.hh physics/Base.hh
+    /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {
@@ -127,173 +128,193 @@ namespace gazebo
               };
 
       /// \brief Constructor
-      /// \param parent Parent of this object
-      public: Base(BasePtr parent);
+      /// \param[in] _parent Parent of this object
+      public: explicit Base(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~Base();
 
       /// \brief Load
-      /// \param node Pointer to an SDF parameters
+      /// \param[in] node Pointer to an SDF parameters
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Finialize the object
       public: virtual void Fini();
 
-      /// \brief virtual
+      /// \brief Initialize the object
       public: virtual void Init() {}
 
-      /// \brief empty
+      /// \brief Reset the object
       public: virtual void Reset();
 
-      /// \brief calls recursive Reset on one of the Base::EntityType's
+      /// \brief Calls recursive Reset on one of the Base::EntityType's
+      /// \param[in] _resetType The type of reset operation
       public: virtual void Reset(Base::EntityType _resetType);
 
-      /// \brief empty
+      /// \brief Update the object
       public: virtual void Update() {}
 
-      /// \brief Update the parameters using new sdf values
+      /// \brief Update the parameters using new sdf values.
+      /// \param[in] _sdf Update the object's parameters based on SDF
+      /// values.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Set the name of the entity
-      /// \param name Link name
-      public: virtual void SetName(const std::string &name);
+      /// \brief Set the name of the entity.
+      /// \param[in] _name New name.
+      public: virtual void SetName(const std::string &_name);
 
-      /// \brief Return the name of the entity
-      /// \return Name of the entity
+      /// \brief Return the name of the entity.
+      /// \return Name of the entity.
       public: std::string GetName() const;
 
-      /// \brief Return the ID of this entity. This id is unique
-      /// \return Integer ID
+      /// \brief Return the ID of this entity. This id is unique.
+      /// \return Integer ID.
       public: unsigned int GetId() const;
 
       /// \brief Set whether the object should be "saved", when the user
-      ///        selects to save the world to xml
-      /// \param v Set to True if the object should be saved.
-      public: void SetSaveable(bool v);
+      /// selects to save the world to xml
+      /// \param[in] _v Set to True if the object should be saved.
+      public: void SetSaveable(bool _v);
 
       /// \brief Get whether the object should be "saved", when the user
-      ///        selects to save the world to xml
-      /// \return True if the object is saveable
+      /// selects to save the world to xml.
+      /// \return True if the object is saveable.
       public: bool GetSaveable() const;
 
-      /// \brief Return the ID of the parent
-      /// \return Integer ID
+      /// \brief Return the ID of the parent.
+      /// \return Integer ID.
       public: int GetParentId() const;
 
-      /// \brief Set the parent
-      /// \param parent Parent object
-      public: void SetParent(BasePtr parent);
+      /// \brief Set the parent.
+      /// \param[in] _parent Parent object.
+      public: void SetParent(BasePtr _parent);
 
-      /// \brief Get the parent
-      /// \return Pointer to the parent entity
+      /// \brief Get the parent.
+      /// \return Pointer to the parent entity.
       public: BasePtr GetParent() const;
 
-      /// \brief Add a child to this entity
-      /// \param child Child entity
-      public: void AddChild(BasePtr child);
+      /// \brief Add a child to this entity.
+      /// \param[in] _child Child entity.
+      public: void AddChild(BasePtr _child);
 
-      /// \brief Remove a child from this entity
-      /// \param child Child to remove
-      public: virtual void RemoveChild(unsigned int id);
+      /// \brief Remove a child from this entity.
+      /// \param[in] _id ID of the child to remove.
+      public: virtual void RemoveChild(unsigned int _id);
 
-      /// \brief Remove all children
+      /// \brief Remove all children.
       public: void RemoveChildren();
 
-      /// \brief Get the number of children
-      /// \return The number of children
+      /// \brief Get the number of children.
+      /// \return The number of children.
       public: unsigned int GetChildCount() const;
 
-      /// \brief Get by id
+      /// \brief Get a child or self by id.
+      /// \param[in] _id ID of the object to retreive.
+      /// \return A pointer to the object, NULL if not found
       public: BasePtr GetById(unsigned int _id) const;
 
-      /// \brief Get by name
-      /// \param name Get a child (or self) object by name
+      /// \brief Get by name.
+      /// \param[in] _name Get a child (or self) object by name
       /// \return A pointer to the object, NULL if not found
-      public: BasePtr GetByName(const std::string &name);
+      public: BasePtr GetByName(const std::string &_name);
 
-      /// \brief Get a child by index
-      public: BasePtr GetChild(unsigned int i) const;
+      /// \brief Get a child by index.
+      /// \param[in] _i Index of the child to retreive.
+      /// \return A pointer to the object, NULL if the index is invalid.
+      public: BasePtr GetChild(unsigned int _i) const;
 
-      /// \brief Get a child by name
-      public: BasePtr GetChild(const std::string &name);
+      /// \brief Get a child by name.
+      /// \param[in] _name Name of the child.
+      /// \return A pointer to the object, NULL if not found
+      public: BasePtr GetChild(const std::string &_name);
 
-      /// \brief Remove a child by name
+      /// \brief Remove a child by name.
+      /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
 
-      /// \brief Add a type specifier
+      /// \brief Add a type specifier.
+      /// \param[in] _type New type to append to this objects type
+      /// definition.
       public: void AddType(EntityType _type);
 
-      /// \brief Get the type
+      /// \brief Returns true if this object's type definition has the
+      /// given type.
+      /// \param[in] _t Type to check.
+      /// \return True if this object's type definition has the.
       public: bool HasType(const EntityType &_t) const;
 
-      /// \brief Get a type by index
+      /// \brief Get the full type definition.
+      /// \return The full type definition.
       public: unsigned int GetType() const;
 
       /// \brief Return the name of this entity with the model scope
-      ///        world::model1::...::modelN::entityName
+      /// world::model1::...::modelN::entityName
+      /// \return The scoped name.
       public: std::string GetScopedName() const;
 
-      /// \brief Return the name of this entity with the
-      ///        model+body+collision scope
-      ///        model1::...::modelN::bodyN::entityName
-      public: std::string GetCompleteScopedName() const GAZEBO_DEPRECATED;
-
-      /// \brief print this object to screen via gzmsg
-      public: void Print(std::string prefix);
-
-      /// \brief True == show parameters in the gui
-      public: bool GetShowInGui() const;
-
-      /// \brief True == show parameters in the gui
-      public: void SetShowInGui(bool v);
+      /// \brief Print this object to screen via gzmsg.
+      /// \param[in] _prefix Usually a set of spaces.
+      public: void Print(const std::string &_prefix);
 
       /// \brief Set whether this entity has been selected by the user through
-      //         the gui
-      public: virtual bool SetSelected(bool s);
+      /// the gui.
+      /// \param[in] _show True to set this entity as selected.
+      public: virtual bool SetSelected(bool _show);
 
-      /// \brief True if the entity is selected by the user
+      /// \brief True if the entity is selected by the user.
+      /// \return True if the entity is selected.
       public: bool IsSelected() const;
 
-      /// \brief Returns true if the entities are the same. Checks only the name
-      public: bool operator ==(const Base &ent) const;
+      /// \brief Returns true if the entities are the same.
+      /// Checks only the name.
+      /// \param[in] _ent Base object to compare with.
+      /// \return True if the entities are the same.
+      public: bool operator ==(const Base &_ent) const;
 
       /// \brief Set the world this object belongs to. This will also
-      ///        set the world for all children
+      /// set the world for all children.
+      /// \param[in] _newWorld The new World this object is part of.
       public: void SetWorld(const WorldPtr &_newWorld);
 
-      /// \brief Get the world this object is in
+      /// \brief Get the World this object is in.
+      /// \return The World this object is part of.
       public: const WorldPtr &GetWorld() const;
 
-      /// \brief Get the SDF values for the model
+      /// \brief Get the SDF values for the object.
+      /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief The SDF values for this object.
       protected: sdf::ElementPtr sdf;
 
-      /// \brief Parent of this entity
+      /// \brief Parent of this entity.
       protected: BasePtr parent;
 
-      /// \brief Children of this entity
+      /// \brief Children of this entity.
       protected: Base_V children;
+
+      /// \brief End of the children vector.
       protected: Base_V::iterator childrenEnd;
 
+      /// \brief Pointer to the world.
       protected: WorldPtr world;
 
       /// \brief Set to true if the object should be saved.
       private: bool saveable;
 
-      /// \brief This entities ID
+      /// \brief This entities ID.
       private: unsigned int id;
 
-      /// \brief Used to automaticaly chose a unique ID on creation
+      /// \brief Used to automaticaly chose a unique ID on creation.
       private: static unsigned int idCounter;
 
+      /// \brief The type of this object.
       private: unsigned int type;
 
+      /// \brief True if selected.
       private: bool selected;
     };
     /// \}
   }
 }
 #endif
-

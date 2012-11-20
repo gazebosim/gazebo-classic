@@ -56,14 +56,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RaySensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
-      public: virtual void Load(const std::string &_worldName,
-                                sdf::ElementPtr _sdf);
-
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
 
       /// \brief Initialize the ray
@@ -169,12 +162,10 @@ namespace gazebo
       public: physics::MultiRayShapePtr GetLaserShape() const
               {return this->laserShape;}
 
-      private: physics::LinkPtr link;
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;
       private: physics::EntityPtr parentEntity;
 
-      private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
       private: boost::mutex *mutex;
       private: msgs::LaserScan laserMsg;

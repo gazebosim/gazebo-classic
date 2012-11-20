@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,12 +57,31 @@ namespace gazebo
   class SensorPlugin;
   class GUIPlugin;
   class SystemPlugin;
+  class VisualPlugin;
 
+  /// \def WorldPluginPtr
+  /// \brief boost::shared_ptr to WorldPlugin
   typedef boost::shared_ptr<WorldPlugin> WorldPluginPtr;
+
+  /// \def ModelPluginPtr
+  /// \brief boost::shared_ptr to ModelPlugin
   typedef boost::shared_ptr<ModelPlugin> ModelPluginPtr;
+
+  /// \def SensorPluginPtr
+  /// \brief boost::shared_ptr to SensorPlugin
   typedef boost::shared_ptr<SensorPlugin> SensorPluginPtr;
+
+  /// \def GUIPluginPtr
+  /// \brief boost::shared_ptr to GUIPlugin
   typedef boost::shared_ptr<GUIPlugin> GUIPluginPtr;
+
+  /// \def SystemPluginPtr
+  /// \brief boost::shared_ptr to SystemPlugin
   typedef boost::shared_ptr<SystemPlugin> SystemPluginPtr;
+
+  /// \def VisualPluginPtr
+  /// \brief boost::shared_ptr to VisualPlugin
+  typedef boost::shared_ptr<VisualPlugin> VisualPluginPtr;
 
   namespace common
   {
@@ -75,21 +94,42 @@ namespace gazebo
     class NumericAnimation;
     class Animation;
     class Color;
+    class SkeletonAnimation;
 
     template <typename T>
     class ParamT;
 
+    /// \def Param_V
+    /// \brief std::vector of Param*
     typedef std::vector<common::Param*> Param_V;
+
+    /// \def StrStr_M
+    /// \brief std::map of a std::string to a std::string
     typedef std::map<std::string, std::string> StrStr_M;
+
+    /// \def AnimationPtr
+    /// \brief boost::shared_ptr to an Animation class
     typedef boost::shared_ptr<Animation> AnimationPtr;
+
+    /// \def PoseAnimationPtr
+    /// \brief boost::shared_ptr to a PoseAnimation class
     typedef boost::shared_ptr<PoseAnimation> PoseAnimationPtr;
+
+    /// \def NumericAnimationPtr
+    /// \brief boost::shared_ptr to a NumericAnimation class
     typedef boost::shared_ptr<NumericAnimation> NumericAnimationPtr;
   }
 
   namespace event
   {
     class Connection;
+
+    /// \def ConnectionPtr
+    /// \brief boost::shared_ptr to a Connection class
     typedef boost::shared_ptr<Connection> ConnectionPtr;
+
+    /// \def Connection_V
+    /// \brief std::vector of ConnectionPtr
     typedef std::vector<ConnectionPtr> Connection_V;
   }
 }

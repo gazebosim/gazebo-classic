@@ -235,6 +235,7 @@ void UserCamera::HandleKeyPressEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyPressEvent(_key);
+  this->viewController->HandleKeyPressEvent(_key);
 }
 
 /////////////////////////////////////////////////
@@ -242,6 +243,7 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 {
   if (this->gui)
     this->gui->HandleKeyReleaseEvent(_key);
+  this->viewController->HandleKeyReleaseEvent(_key);
 }
 
 /////////////////////////////////////////////////
@@ -408,7 +410,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
   {
     this->scene->GetManager()->destroyAnimation("cameratrack");
-    this->scene->GetManager()->destroyAnimationState("cameratrack");
   }
 
   math::Box box = _visual->GetBoundingBox();
@@ -544,13 +545,29 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
         !entity->getUserAny().isEmpty() &&
         entity->getUserAny().getType() == typeid(std::string))
     {
-      _mod = Ogre::any_cast<std::string>(entity->getUserAny());
+      try
+      {
+        _mod = Ogre::any_cast<std::string>(entity->getUserAny());
+      }
+      catch(Ogre::Exception &e)
+      {
+        gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+        gzthrow("Unable to get visual " + _mod);
+      }
     }
 
     if (!entity->getUserAny().isEmpty())
     {
-      result = this->scene->GetVisual(
-          Ogre::any_cast<std::string>(entity->getUserAny()));
+      try
+      {
+        result = this->scene->GetVisual(
+            Ogre::any_cast<std::string>(entity->getUserAny()));
+      }
+      catch(Ogre::Exception &e)
+      {
+        gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+        gzthrow("Unable to get visual " + _mod);
+      }
     }
   }
 

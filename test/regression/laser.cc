@@ -30,7 +30,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 {
   Load("worlds/empty.world");
   std::ostringstream laserModel;
-    laserModel << "<gazebo version='1.2'>"
+    laserModel << "<sdf version='" << SDF_VERSION << "'>"
       "<model name='box'>"
         "<static>true</static>"
         "<link name='link'>"
@@ -58,7 +58,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
         "</sensor>"
       "</link>"
     "</model>"
-  "</gazebo>";
+  "</sdf>";
 
   SpawnSDF(laserModel.str());
   while (!HasEntity("box"))
@@ -66,7 +66,8 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 
   sensors::RaySensorPtr laser =
     boost::shared_static_cast<sensors::RaySensor>(
-        sensors::SensorManager::Instance()->GetSensor("laser"));
+        sensors::SensorManager::Instance()->GetSensor(
+          "default::box::link::laser"));
   EXPECT_TRUE(laser);
   laser->Update(true);
   while (laser->GetRange(0) == 0)

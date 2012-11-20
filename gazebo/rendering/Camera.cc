@@ -96,6 +96,9 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
   }
 
   this->lastRenderWallTime = common::Time::GetWallTime();
+
+  // Set default render rate to 30Hz
+  this->SetRenderRate(30.0);
 }
 
 //////////////////////////////////////////////////
@@ -255,9 +258,7 @@ void Camera::Update()
       try
       {
         this->scene->GetManager()->destroyAnimation(
-            this->animState->getAnimationName());
-        this->scene->GetManager()->destroyAnimationState(
-            this->animState->getAnimationName());
+            std::string(this->animState->getAnimationName()));
       } catch(Ogre::Exception &_e)
       {
       }
@@ -287,8 +288,12 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  this->newData = true;
-  this->RenderImpl();
+  if (common::Time::GetWallTime() - this->lastRenderWallTime >=
+      this->renderPeriod)
+  {
+    this->newData = true;
+    this->RenderImpl();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1413,4 +1418,16 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->prevAnimTime = common::Time::GetWallTime();
 
   return true;
+}
+
+//////////////////////////////////////////////////
+void Camera::SetRenderRate(double _hz)
+{
+  this->renderPeriod = 1.0 / _hz;
+}
+
+//////////////////////////////////////////////////
+double Camera::GetRenderRate() const
+{
+  return 1.0 / this->renderPeriod.Double();
 }

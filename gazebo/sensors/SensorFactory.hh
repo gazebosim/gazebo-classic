@@ -20,14 +20,14 @@
  * Date: 18 May 2003
  */
 
-#ifndef SENSORFACTORY_HH
-#define SENSORFACTORY_HH
+#ifndef _SENSORFACTORY_HH_
+#define _SENSORFACTORY_HH_
 
 #include <string>
 #include <map>
 #include <vector>
 
-#include "sensors/SensorTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo
 {
@@ -35,7 +35,7 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-  /// \def Sensor 
+  /// \def Sensor
   /// \brief Prototype for sensor factory functions
   typedef Sensor* (*SensorFactoryFn) ();
 
@@ -56,9 +56,8 @@ namespace gazebo
     public: static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).
-    /// \param[in] _classname Name of class of sensor to register
-    /// \param _factoryfn Function handle for registration
-    /// \TODO Nate check
+    /// \param[in] _classname Name of class of sensor to register.
+    /// \param[in] _factoryfn Function handle for registration.
     public: static void RegisterSensor(const std::string &_classname,
                                        SensorFactoryFn _factoryfn);
 
@@ -69,7 +68,8 @@ namespace gazebo
     public: static SensorPtr NewSensor(const std::string &_classname);
 
     /// \brief Get all the sensor types
-    /// \param _types Vector of strings of the sensor types, populated by function
+    /// \param _types Vector of strings of the sensor types,
+    /// populated by function
     public: static void GetSensorTypes(std::vector<std::string> &_types);
 
     /// \brief A list of registered sensor classes

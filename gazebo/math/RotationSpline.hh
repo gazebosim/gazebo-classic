@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef ROTATIONALSPLINE_HH
-#define ROTATIONALSPLINE_HH
+#ifndef _ROTATIONSPLINE_HH_
+#define _ROTATIONSPLINE_HH_
 
 #include <vector>
 #include "math/Quaternion.hh"
@@ -38,10 +38,10 @@ namespace gazebo
     /// \addtogroup gazebo_math
     /// \{
 
+    /// \class RotationSpline RotationSpline.hh math/gzmath.hh
     /// \brief Spline for rotations
     class  RotationSpline
     {
-
         /// \brief Constructor. Sets the autoCalc to true
         public: RotationSpline();
 
@@ -104,9 +104,9 @@ namespace gazebo
         ///          by calling this method with a parameter of 'false'. Just
         ///          remember to manually call the recalcTangents method when
         ///          you are done.
-        /// \param[in] _autoCalc If true, tangents are calculated for you whenever
-        ///        a point changes. If false, you must call reclacTangents to
-        ///        recalculate them when it best suits.
+        /// \param[in] _autoCalc If true, tangents are calculated for you
+        /// whenever a point changes. If false, you must call reclacTangents to
+        /// recalculate them when it best suits.
         public: void SetAutoCalculate(bool _autoCalc);
 
       /// \brief Recalculates the tangents associated with this spline.

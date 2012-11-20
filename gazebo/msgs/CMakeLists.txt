@@ -21,6 +21,7 @@ set (msgs
   imagegeom.proto
   image.proto
   image_stamped.proto
+  imu.proto
   inertial.proto
   int.proto
   joint.proto
@@ -36,6 +37,7 @@ set (msgs
   physics.proto
   planegeom.proto
   pid.proto
+  plugin.proto
   pose.proto
   pose_stamped.proto
   pose_trajectory.proto
@@ -75,9 +77,7 @@ set (msgs
   joint_cmd.proto
 )
 
-include_directories(
-  ${CMAKE_CURRENT_BINARY_DIR}
-)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 gz_add_executable(gazebomsgs_out
   generator/GazeboGenerator.cc

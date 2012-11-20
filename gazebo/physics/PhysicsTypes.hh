@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#ifndef _PHYSICSTYPES_HH_
+#define _PHYSICSTYPES_HH_
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -49,46 +51,138 @@ namespace gazebo
     class MeshShape;
     class HeightmapShape;
 
+    /// \def BasePtr
+    /// \brief Boost shared pointer to a Base object
     typedef boost::shared_ptr<Base> BasePtr;
+
+    /// \def ContactPtr
+    /// \brief Boost shared pointer to a Contact object
     typedef boost::shared_ptr<Contact> ContactPtr;
+
+    /// \def EntityPtr
+    /// \brief Boost shared pointer to an Entity object
     typedef boost::shared_ptr<Entity> EntityPtr;
+
+    /// \def WorldPtr
+    /// \brief Boost shared pointer to a World object
     typedef boost::shared_ptr<World> WorldPtr;
+
+    /// \def ModelPtr
+    /// \brief Boost shared pointer to a Model object
     typedef boost::shared_ptr<Model> ModelPtr;
+
+    /// \def Actor
+    /// \brief Boost shared pointer to an Actor object
     typedef boost::shared_ptr<Actor> ActorPtr;
+
+    /// \def LinkPtr
+    /// \brief Boost shared pointer to a Link object
     typedef boost::shared_ptr<Link> LinkPtr;
+
+    /// \def CollisionPtr
+    /// \brief Boost shared pointer to a Collision object
     typedef boost::shared_ptr<Collision> CollisionPtr;
+
+    /// \def JointPtr
+    /// \brief Boost shared pointer to a Joint object
     typedef boost::shared_ptr<Joint> JointPtr;
+
+    /// \def  PhysicsEnginePtr
+    /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
+
+    /// \def ShapePtr
+    /// \brief Boost shared pointer to a Shape object
     typedef boost::shared_ptr<Shape> ShapePtr;
+
+    /// \def RayShapePtr
+    /// \brief Boost shared pointer to a RayShape object
     typedef boost::shared_ptr<RayShape> RayShapePtr;
+
+    /// \def HeightmapShapePtr
+    /// \brief Boost shared pointer to a HeightmapShape object
     typedef boost::shared_ptr<HeightmapShape> HeightmapShapePtr;
+
+    /// \def MultiRayShapePtr
+    /// \brief Boost shared pointer to a MultiRayShape object
     typedef boost::shared_ptr<MultiRayShape> MultiRayShapePtr;
+
+    /// \def InertialPtr
+    /// \brief Boost shared pointer to a Inertial object
     typedef boost::shared_ptr<Inertial> InertialPtr;
+
+    /// \def RoadPtr
+    /// \brief Boost shared pointer to a Road object
     typedef boost::shared_ptr<Road> RoadPtr;
+
+    /// \def SurfaceParamsPtr
+    /// \brief Boost shared pointer to a SurfaceParams object
     typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;
 
+    /// \def BoxShapePtr
+    /// \brief Boost shared pointer to a BoxShape object
     typedef boost::shared_ptr<BoxShape> BoxShapePtr;
+
+    /// \def CylinderShapePtr
+    /// \brief Boost shared pointer to a CylinderShape object
     typedef boost::shared_ptr<CylinderShape> CylinderShapePtr;
+
+    /// \def SphereShapePtr
+    /// \brief Boost shared pointer to a SphereShape object
     typedef boost::shared_ptr<SphereShape> SphereShapePtr;
+
+    /// \def MeshShapePtr
+    /// \brief Boost shared pointer to a MeshShape object
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
 
+    /// \def Base_V
+    /// \brief Vector of BasePtr
     typedef std::vector<BasePtr> Base_V;
+
+    /// \def Model_V
+    /// \brief Vector of ModelPtr
     typedef std::vector<ModelPtr> Model_V;
+
+    /// \def Actor_V
+    /// \brief Vector of ActorPtr
     typedef std::vector<ActorPtr> Actor_V;
+
+    /// \def Joint_V
+    /// \brief Vector of JointPtr
     typedef std::vector<JointPtr> Joint_V;
+
+    /// \def Link_V
+    /// \brief Vector of LinkPtr
     typedef std::vector<LinkPtr>  Link_V;
+
+    /// \def Collision_V
+    /// \brief Vector of CollisionPtr
     typedef std::vector<CollisionPtr>  Collision_V;
 
     #ifndef GZ_COLLIDE_BITS
 
+    /// \def GZ_ALL_COLLIDE
+    /// \brief Default collision bitmask. Collision objects will collide
+    /// with everything.
     #define GZ_ALL_COLLIDE 0x0FFFFFFF
+
+    /// \def GZ_NONE_COLLIDE
+    /// \brief Collision object will collide with nothing.
     #define GZ_NONE_COLLIDE 0x00000000
+
+    /// \def GZ_FIXED_COLLIDE
+    /// \brief Collision object will collide only with fixed objects.
     #define GZ_FIXED_COLLIDE 0x00000001
+
+    /// \def GZ_SENSOR_COLLIDE
+    /// \brief Collision object will collide only with sensors
     #define GZ_SENSOR_COLLIDE 0x00000003
+
+    /// \def GZ_GHOST_COLLIDE
+    /// \brief Collides with everything else but other ghost.
     #define GZ_GHOST_COLLIDE 0x10000000
 
     #endif
   }
 }
-
-
+#endif

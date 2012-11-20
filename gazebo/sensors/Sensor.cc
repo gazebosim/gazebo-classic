@@ -54,9 +54,11 @@ Sensor::Sensor()
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
+  this->node->Fini();
+  this->node.reset();
+
   this->sdf->Reset();
   this->sdf.reset();
-  this->node.reset();
   this->connections.clear();
 }
 
@@ -127,6 +129,7 @@ void Sensor::Update(bool _force)
   {
     if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
     {
+      this->lastUpdateTime = this->world->GetSimTime();
       this->UpdateImpl(_force);
     }
   }
@@ -142,6 +145,13 @@ void Sensor::Fini()
 std::string Sensor::GetName() const
 {
   return this->sdf->Get<std::string>("name");
+}
+
+//////////////////////////////////////////////////
+std::string Sensor::GetScopedName() const
+{
+  return this->world->GetName() + "::" + this->parentName + "::" +
+         this->GetName();
 }
 
 //////////////////////////////////////////////////
@@ -198,6 +208,12 @@ void Sensor::SetUpdateRate(double _hz)
 common::Time Sensor::GetLastUpdateTime()
 {
   return this->lastUpdateTime;
+}
+
+//////////////////////////////////////////////////
+common::Time Sensor::GetLastMeasurementTime()
+{
+  return this->lastMeasurementTime;
 }
 
 //////////////////////////////////////////////////

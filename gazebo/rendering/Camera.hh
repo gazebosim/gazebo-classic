@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,17 +85,21 @@ namespace gazebo
 
       /// \brief Load the camera with a set of parmeters
       /// \param[in] _sdf The SDF camera info
-      public: void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
        /// \brief Load the camera with default parmeters
-      public: void Load();
+      public: virtual void Load();
 
       /// \brief Initialize the camera
-      public: void Init();
+      public: virtual void Init();
 
       /// \brief Set the render Hz rate
       /// \param[in] _hz The Hz rate
       public: void SetRenderRate(double _hz);
+
+      /// \brief Get the render Hz rate
+      /// \return The Hz rate
+      public: double GetRenderRate() const;
 
       /// \brief Render the camera
       ///
@@ -118,7 +122,7 @@ namespace gazebo
       /// \brief Finalize the camera.
       ///
       /// This function is called before the camera is destructed
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
@@ -586,6 +590,9 @@ namespace gazebo
       private: Ogre::CompositorInstance *ssaoInstance;
 
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
+
+      /// \brief Render period.
+      private: common::Time renderPeriod;
     };
     /// \}
   }

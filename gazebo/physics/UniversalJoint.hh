@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@
 #define _UNIVERSALJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/math/MathTypes.hh"
-#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -33,20 +31,23 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief A universal joint
+    /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
+    /// \brief A universal joint.
     template<class T>
     class UniversalJoint : public T
     {
-      /// \brief Constructor
-      public: UniversalJoint(BasePtr _parent) : T(_parent)
+      /// \brief Constructor.
+      /// \param[in] _parent Parent link of the univeral joint.
+      public: explicit UniversalJoint(BasePtr _parent) : T(_parent)
               {this->AddType(Base::UNIVERSAL_JOINT);}
 
-      /// \brief Destuctor
+      /// \brief Destuctor.
       public: virtual ~UniversalJoint()
               {}
 
-      /// \brief Load a UniversalJoint
-      protected: virtual void Load(sdf::ElementPtr _sdf)
+      /// \brief Load a UniversalJoint.
+      /// \param[in] _sdf SDF values to load from.
+      public: virtual void Load(sdf::ElementPtr _sdf)
                  {
                    T::Load(_sdf);
                    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
@@ -67,6 +68,3 @@ namespace gazebo
   }
 }
 #endif
-
-
-

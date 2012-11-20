@@ -77,7 +77,7 @@ math::Vector2d PlaneShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::FillShapeMsg(msgs::Geometry &_msg)
+void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
   msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal());

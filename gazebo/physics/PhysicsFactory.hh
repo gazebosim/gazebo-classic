@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
  * Date: 21 May 2009
  */
 
-#ifndef PHYSICSFACTORY_HH
-#define PHYSICSFACTORY_HH
+#ifndef _PHYSICSFACTORY_HH_
+#define _PHYSICSFACTORY_HH_
 
 #include <string>
 #include <map>
@@ -35,37 +35,43 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    // Prototype for physics factory functions
+    /// \def PhysicsFactoryFn
+    /// \brief Prototype for physics factory functions.
     typedef PhysicsEnginePtr (*PhysicsFactoryFn) (WorldPtr world);
 
-    /// \brief The physics factory
+    /// \class PhysicsFactory PhysicsFactory.hh physics/physics.hh
+    /// \brief The physics factory instantiates different physics engines.
     class PhysicsFactory
     {
-      /// \brief Register everything
+      /// \brief Register everything.
       public: static void RegisterAll();
 
       /// \brief Register a physics class.
-      public: static void RegisterPhysicsEngine(std::string classname,
-                  PhysicsFactoryFn factoryfn);
+      /// \param[in] _className Name of the physics class.
+      /// \param[in] _factoryfn Function pointer used to create a physics
+      /// engine.
+      public: static void RegisterPhysicsEngine(std::string _className,
+                  PhysicsFactoryFn _factoryfn);
 
       /// \brief Create a new instance of a physics engine.
+      /// \param[in] _className Name of the physics class.
+      /// \param[in] _world World to pass to the created physics engine.
       public: static PhysicsEnginePtr NewPhysicsEngine(
-                  const std::string &classname, WorldPtr world);
+                  const std::string &_className, WorldPtr _world);
 
-      /// \brief A list of registered physics classes
+      /// \brief A list of registered physics classes.
       private: static std::map<std::string, PhysicsFactoryFn> engines;
     };
-
 
     /// \brief Static physics registration macro
     ///
     /// Use this macro to register physics engine with the server.
-    /// @param name Physics type name, as it appears in the world file.
-    /// @param classname C++ class name for the physics engine.
-#define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
-    PhysicsEnginePtr New##classname(WorldPtr world) \
+    /// \param[in] name Physics type name, as it appears in the world file.
+    /// \param[in] classname C++ class name for the physics engine.
+    #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
+    PhysicsEnginePtr New##classname(WorldPtr _world) \
     { \
-      return PhysicsEnginePtr(new gazebo::physics::classname(world)); \
+      return PhysicsEnginePtr(new gazebo::physics::classname(_world)); \
     } \
     void Register##classname() \
     {\

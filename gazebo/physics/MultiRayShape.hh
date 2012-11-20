@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,128 +14,159 @@
  * limitations under the License.
  *
 */
-#ifndef MULTIRAYGEOM_HH
-#define MULTIRAYGEOM_HH
+#ifndef _MULTIRAYSHAPE_HH_
+#define _MULTIRAYSHAPE_HH_
 
 #include <vector>
 #include <string>
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "math/Vector3.hh"
-#include "math/Angle.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Angle.hh"
 
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
-#include "physics/RayShape.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/RayShape.hh"
 
 namespace gazebo
 {
-  namespace msgs
-  {
-    class Visual;
-  }
-
   namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class MultiRayShape MultiRayShape.hh physics/physics.hh
     /// \brief Laser collision contains a set of ray-collisions,
-    ///        structured to simulate a laser range scanner
+    /// structured to simulate a laser range scanner.
     class MultiRayShape : public Shape
     {
-      /// \brief Constructor
-      public: MultiRayShape(CollisionPtr parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent collision shape.
+      public: explicit MultiRayShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~MultiRayShape();
 
-      /// \brief Init the shape
+      /// \brief Init the shape.
       public: virtual void Init();
 
-      public: void SetDisplayType(const std::string &type);
-
       /// \brief Get detected range for a ray.
+      /// \param[in] _index Index of the ray.
       /// \returns Returns DBL_MAX for no detection.
-      public: double GetRange(int index);
+      public: double GetRange(int _index);
 
       /// \brief Get detected retro (intensity) value for a ray.
-      public: double GetRetro(int index);
+      /// \param[in] _index Index of the ray.
+      /// \return Retro value for the ray.
+      public: double GetRetro(int _index);
 
       /// \brief Get detected fiducial value for a ray.
-      public: int GetFiducial(int index);
+      /// \param[in] _index Index of the ray.
+      /// \return Fiducial value for the ray.
+      public: int GetFiducial(int _index);
 
-      /// \brief Get the minimum range
+      /// \brief Get the minimum range.
+      /// \return Minimum range of all the rays.
       public: double GetMinRange() const;
 
-      /// \brief Get the maximum range
+      /// \brief Get the maximum range.
+      /// \return Maximum range of all the rays.
       public: double GetMaxRange() const;
 
-      /// \brief Get the range resolution
+      /// \brief Get the range resolution.
+      /// \return Range resolution of all the rays.
       public: double GetResRange() const;
 
-
-      /// \brief Get the horizontal sample count
+      /// \brief Get the horizontal sample count.
+      /// \return Horizontal sample count.
       public: int GetSampleCount() const;
 
-      /// \brief Get the range resolution
+      /// \brief Get the horizontal resolution.
+      /// \return Horizontal resolution.
       public: double GetScanResolution() const;
 
-      /// \brief Get the minimum angle
+      /// \brief Get the minimum angle.
+      /// \return Minimum angle of ray scan.
       public: math::Angle GetMinAngle() const;
 
-      /// \brief Get the maximum angle
+      /// \brief Get the maximum angle.
+      /// \return Maximum angle of ray scan.
       public: math::Angle GetMaxAngle() const;
 
-
-
-
-      /// \brief Get the vertical sample count
+      /// \brief Get the vertical sample count.
+      /// \return Verical sample count.
       public: int GetVerticalSampleCount() const;
 
-      /// \brief Get the vertical range resolution
+      /// \brief Get the vertical range resolution.
+      /// \return Vertical range resolution.
       public: double GetVerticalScanResolution() const;
 
-      /// \brief Get the vertical min angle
+      /// \brief Get the vertical min angle.
+      /// \return Vertical min angle.
       public: math::Angle GetVerticalMinAngle() const;
 
-      /// \brief Get the vertical max angle
+      /// \brief Get the vertical max angle.
+      /// \return Verticam max angle.
       public: math::Angle GetVerticalMaxAngle() const;
 
-      /// \brief Update the collision
+      /// \brief Update the ray collisions.
       public: void Update();
 
-      public: void FillShapeMsg(msgs::Geometry &) {}
-      public: virtual void ProcessMsg(const msgs::Geometry &) {}
-       /// \brief Physics engine specific method for updating the rays
+      /// \TODO This function is not implemented.
+      /// \brief Fill a message with this shape's values.
+      /// \param[out] _msg Message that contains the shape's values.
+      public: void FillMsg(msgs::Geometry &_msg);
+
+      /// \TODO This function is not implemented.
+      /// \brief Update the ray based on a message.
+      /// \param[in] _msg Message to update from.
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// \brief Connect a to the new laser scan signal.
+      /// \param[in] _subscriber Callback function.
+      /// \return The connection, which must be kept in scope.
+      public: template<typename T>
+              event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
+              {return newLaserScans.Connect(_subscriber);}
+
+      /// \brief Disconnect from the new laser scans signal.
+      /// \param[in] _conn Connection to remove.
+      public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
+              {newLaserScans.Disconnect(_conn);}
+
+      /// \brief Physics engine specific method for updating the rays.
       protected: virtual void UpdateRays() = 0;
 
-      /// \brief Add a ray to the collision
-      protected: virtual void AddRay(const math::Vector3 &start,
-                                     const math::Vector3 &end);
+      /// \brief Add a ray to the collision.
+      /// \param[in] _start Start of the ray.
+      /// \param[in] _end End of the ray.
+      protected: virtual void AddRay(const math::Vector3 &_start,
+                                     const math::Vector3 &_end);
 
-      /// Ray data
+      /// \brief Ray data
       protected: std::vector<RayShapePtr> rays;
 
+      /// \brief Pose offset of all the rays.
       protected: math::Pose offset;
+
+      /// \brief Ray SDF element pointer.
       protected: sdf::ElementPtr rayElem;
+
+      /// \brief Scan SDF element pointer.
       protected: sdf::ElementPtr scanElem;
+
+      /// \brief Horizontal SDF element pointer.
       protected: sdf::ElementPtr horzElem;
+
+      /// \brief Vertical SDF element pointer.
       protected: sdf::ElementPtr vertElem;
+
+      /// \brief Range SDF element pointer.
       protected: sdf::ElementPtr rangeElem;
 
-
-      /// \brief Connect a to the add entity signal
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewLaserScans(T subscriber)
-              { return newLaserScans.Connect(subscriber); }
-      public: void DisconnectNewLaserScans(event::ConnectionPtr &c)
-              { newLaserScans.Disconnect(c); }
+      /// \brief New laser scans event.
       protected: event::EventT<void()> newLaserScans;
     };
     /// \}
   }
 }
 #endif
-

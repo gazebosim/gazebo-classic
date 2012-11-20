@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class SystemPaths SystemPaths.hh common/common.hh
     /// \brief Functions to handle getting system paths, keeps track of:
     ///        \li SystemPaths#gazeboPaths - media paths containing
     ///            worlds, models, sdf descriptions, material scripts,
@@ -82,21 +83,16 @@ namespace gazebo
       /// \return Right now, it just returns "/worlds"
       public: std::string GetWorldPathExtension();
 
-      /// \brief deprecated
-      /// \param[in] filename the path to the file to search
-      /// \param[in] _searchLocalPath True to search in the current working
-      /// directory.
-      public: std::string FindFileWithGazeboPaths(const std::string &_filename,
-                  bool _searchLocalPath = true) GAZEBO_DEPRECATED;
-
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
+      /// \return Returns full path name to file
       public: std::string FindFileURI(const std::string &_uri);
 
       /// \brief Find a file in the gazebo paths
       /// \param[in] _filename Name of the file to find.
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
+      /// \return Returns full path name to file
       public: std::string FindFile(const std::string &_filename,
                                    bool _searchLocalPath = true);
 
@@ -119,7 +115,8 @@ namespace gazebo
       /// \brief clear out SystemPaths#pluginPaths
       public: void ClearPluginPaths();
 
-      /// \brief add _suffix to the list of path search sufixes
+      /// \brief add _suffix to the list of path search suffixes
+      /// \param[in] _suffix The suffix to add
       public: void AddSearchPathSuffix(const std::string &_suffix);
 
       /// \brief re-read SystemPaths#gazeboPaths from environment variable

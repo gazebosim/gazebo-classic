@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,8 +164,8 @@ namespace gazebo
       /// \param[in] _autoRender True to allow Gazebo to automatically
       /// render the camera. This should almost always be true.
       /// \return Pointer to the new laser.
-     public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
-                                         bool _autoRender = true);
+      // public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
+      //                                   bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of lasers.
@@ -220,17 +220,19 @@ namespace gazebo
 
       /// \brief Select a visual by name.
       /// \param[in] _name Name of the visual to select.
-      public: void SelectVisual(const std::string &_name);
+      /// \param[in] _mode Selection mode (normal, or move).
+      public: void SelectVisual(const std::string &_name,
+                                const std::string &_mode);
 
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking.
-      /// \param[in] camera The ogre camera, used to do mouse picking
-      /// \param[in] mousePos The position of the mouse in screen coordinates
+      /// \param[in] _camera The ogre camera, used to do mouse picking
+      /// \param[in] _mousePos The position of the mouse in screen coordinates
       /// \param[out] _mod Used for object manipulation
       /// \return The selected entity, or NULL
       public: VisualPtr GetVisualAt(CameraPtr _camera,
                                     const math::Vector2i &_mousePos,
-                                    std::string &mod);
+                                    std::string &_mod);
 
       /// \brief Move the visual to be ontop of the nearest visual below it.
       /// \param[in] _visualName Name of the visual to move.
@@ -373,16 +375,24 @@ namespace gazebo
                                              const math::Vector2i &_mousePos,
                                              bool _ignorSelectionObj);
 
-      // \brief Get the mesh information for the given mesh.
+      /// \brief Get the mesh information for the given mesh.
+      /// \param[in] _mesh Mesh to get info about.
+      /// \param[out] _count Number of vertices in the mesh.
+      /// \param[out] _vertices Array of the vertices.
+      /// \param[out] _indexCount Number if indices.
+      /// \param[out] _indices Array of the indices.
+      /// \param[in] _position Position of the mesh.
+      /// \param[in] _orient Orientation of the mesh.
+      /// \param[in] _scale Scale of the mesh
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
-      private: void GetMeshInformation(const Ogre::Mesh *mesh,
-                                       size_t &vertex_count,
-                                       Ogre::Vector3* &vertices,
-                                       size_t &index_count,
-                                       uint64_t* &indices,
-                                       const Ogre::Vector3 &position,
-                                       const Ogre::Quaternion &orient,
-                                       const Ogre::Vector3 &scale);
+      private: void GetMeshInformation(const Ogre::Mesh *_mesh,
+                                       size_t &_vertexCount,
+                                       Ogre::Vector3* &_vertices,
+                                       size_t &_indexCount,
+                                       uint64_t* &_indices,
+                                       const Ogre::Vector3 &_position,
+                                       const Ogre::Quaternion &_orient,
+                                       const Ogre::Vector3 &_scale);
 
       /// \brief Print scene graph.
       /// \param[in] _prefix String to prefix each line of output with.
@@ -656,6 +666,13 @@ namespace gazebo
 
       /// \brief Pointer to a visual selected by a user via the GUI.
       private: VisualPtr selectedVis;
+
+      /// \brief Selection mode (normal or move). Normal means the the
+      /// object is just selection, and not being moved by the user. Move
+      /// means the object is being actively moved by the user and the Scene
+      /// should then ignore pose updates from the physics engine until
+      /// after the move is complete.
+      private: std::string selectionMode;
 
       /// \brief Keep around our request message.
       private: msgs::Request *requestMsg;

@@ -9,7 +9,7 @@ include_directories (
 )
 
 link_directories(  
-  ${OGRE_LIBRARY_PATH}
+  ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS} 
   ${ODE_LIBRARY_DIRS}
 )
@@ -22,7 +22,6 @@ link_directories(
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
-  common.cc
   factory.cc
   file_handling.cc
   heightmap.cc
@@ -37,8 +36,6 @@ set (gtest_sources
   transport.cc)
 
 set (plugins)
-
-configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build plugins
 foreach (src ${plugins})

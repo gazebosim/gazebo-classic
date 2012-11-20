@@ -191,7 +191,8 @@ double BulletHingeJoint::GetForce(int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
+void BulletHingeJoint::SetHighStop(int /*_index*/,
+                                   const math::Angle &/*_angle*/)
 {
   if (this->btHinge)
   {
@@ -208,7 +209,8 @@ void BulletHingeJoint::SetHighStop(int /*_index*/, math::Angle /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetLowStop(int /*_index*/, math::Angle /*_angle*/)
+void BulletHingeJoint::SetLowStop(int /*_index*/,
+                                  const math::Angle &/*_angle*/)
 {
   if (this->btHinge)
   {

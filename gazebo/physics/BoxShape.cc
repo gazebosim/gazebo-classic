@@ -54,6 +54,12 @@ math::Vector3 BoxShape::GetSize() const
 //////////////////////////////////////////////////
 void BoxShape::FillShapeMsg(msgs::Geometry &_msg)
 {
+  this->FillMsg(_msg);
+}
+
+//////////////////////////////////////////////////
+void BoxShape::FillMsg(msgs::Geometry &_msg)
+{
   _msg.set_type(msgs::Geometry::BOX);
   msgs::Set(_msg.mutable_box()->mutable_size(), this->GetSize());
 }

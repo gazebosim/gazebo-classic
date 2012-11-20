@@ -12,7 +12,7 @@ include_directories(
 )
 
 link_directories(  
-  ${OGRE_LIBRARY_PATH}
+  ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS} 
 )
 

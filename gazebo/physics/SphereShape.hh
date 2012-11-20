@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
  * Date: 14 Oct 2009
  */
 
-#ifndef SPHERESHAPE_HH
-#define SPHERESHAPE_HH
+#ifndef _SPHERESHAPE_HH_
+#define _SPHERESHAPE_HH_
 
-#include "physics/Shape.hh"
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
@@ -32,37 +32,44 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Sphere collision
+    /// \class SphereShape SphereShape.hh physics/physics.hh
+    /// \brief Sphere collision shape.
     class SphereShape : public Shape
     {
-      /// \brief Constructor
-      public: SphereShape(CollisionPtr parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent collision object.
+      public: explicit SphereShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~SphereShape();
 
-      /// \brief Initialize the sphere
+      /// \brief Initialize the sphere.
       public: virtual void Init();
 
-      /// \brief Set the size
-      public: virtual void SetRadius(const double &radius);
+      /// \brief Set the size.
+      /// \param[in] _radius Radius of the sphere.
+      public: virtual void SetRadius(double _radius);
 
+      /// \brief Get the sphere's radius.
+      /// \return Radius of the sphere.
       public: double GetRadius() const;
 
-      public: virtual void FillShapeMsg(msgs::Geometry &_msg);
+      /// \brief Fill in the values for a geomertry message.
+      /// \param[out] _msg The geometry message to fill.
+      public: virtual void FillMsg(msgs::Geometry &_msg);
 
+      /// \brief Process a geometry message.
+      /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      /// \brief Get the mass of a shape
-      public: virtual double GetMass(double _density) const;
+      /// \brief Deprecated.
+      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
 
-      /// \brief Get inertial for a shape
-      public: virtual void GetInertial(double _mass,
-                                       InertialPtr _inertial) const;
+      /// \brief Deprecated.
+      public: virtual void GetInertial(double _mass, InertialPtr _inertial)
+              const GAZEBO_DEPRECATED;
     };
     /// \}
   }
 }
 #endif
-
-

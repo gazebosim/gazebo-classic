@@ -303,20 +303,6 @@ std::string Base::GetScopedName() const
   return scopedName;
 }
 
-//////////////////////////////////////////////////
-std::string Base::GetCompleteScopedName() const
-{
-  BasePtr p = this->parent;
-  std::string scopedName = this->GetName();
-
-  while (p)
-  {
-    scopedName.insert(0, p->GetName()+"::");
-    p = p->GetParent();
-  }
-
-  return scopedName;
-}
 
 //////////////////////////////////////////////////
 bool Base::HasType(const Base::EntityType &_t) const
@@ -331,14 +317,13 @@ unsigned int Base::GetType() const
 }
 
 //////////////////////////////////////////////////
-void Base::Print(std::string _prefix)
+void Base::Print(const std::string &_prefix)
 {
   Base_V::iterator iter;
   gzmsg << _prefix << this->GetName() << "\n";
 
-  _prefix += "  ";
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
-    (*iter)->Print(_prefix);
+    (*iter)->Print(_prefix + "  ");
 }
 
 //////////////////////////////////////////////////

@@ -19,101 +19,115 @@
  * Date: 12 Oct 2009
  */
 
-#ifndef ODEJOINT_HH
-#define ODEJOINT_HH
+#ifndef _ODEJOINT_HH_
+#define _ODEJOINT_HH_
 
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/Joint.hh"
+#include <boost/any.hpp>
+#include <string>
+
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_ode ODE Physics
-    /// \{
-
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
-      /// \brief Constructor
+      /// \brief Constructor.
+      /// \param[in] _parent Parent of the Joint.
       public: ODEJoint(BasePtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ODEJoint();
 
-      /// \brief Load ODEJoint
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Reset the joint
+      // Documentation inherited.
       public: virtual void Reset();
 
-      /// \brief Get the link to which the joint is attached according
-      ///        the _index
+      // Documentation inherited.
       public: virtual LinkPtr GetJointLink(int _index) const;
 
-      /// \brief Determines of the two bodies are connected by a joint
-      public: bool virtual AreConnected(LinkPtr _one, LinkPtr _two) const;
+      // Documentation inherited.
+      public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
 
-      /// \brief The default function does nothing. This should be
-      ///        overriden in the child classes where appropriate
+      /// \brief Get an ODE joint parameter.
+      ///
+      /// The default function does nothing. This should be
+      /// overriden in the child classes where appropriate.
+      /// \param[in] _parameter ID of the parameter to get.
+      /// \return Value of the parameter.
       public: virtual double GetParam(int _parameter) const;
 
-      /// \brief Attach the two bodies with this joint
-      public: virtual void Attach(LinkPtr parent, LinkPtr child);
-
-      /// \brief Detach this joint from all bodies
-      public: virtual void Detach();
-
-      /// \brief By default this does nothing. It should be overridden in child
-      ///        classes where appropriate
+      /// \brief Set an ODE joint paramter.
+      ///
+      /// By default this does nothing. It should be overridden in child
+      /// classes where appropriate
+      /// \param[in] _parameter ID of the parameter to set.
+      /// \param[in] _value Value to set.
       public: virtual void SetParam(int _parameter, double _value);
 
-      /// \brief Set the ERP of this joint
-      public: void SetERP(double newERP);
+      // Documentation inherited.
+      public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
-      /// \brief Get the ERP of this joint
+      // Documentation inherited.
+      public: virtual void Detach();
+
+      /// \brief Set the ERP of this joint.
+      /// \param[in] _erp Error Reduction Parameter value.
+      public: void SetERP(double _erp);
+
+      /// \brief Get the ERP of this joint.
+      /// \return The Error Reduction Parameter of this joint
       public: double GetERP();
 
-      /// \brief Set the CFM of this joint
-      public: void SetCFM(double newCFM);
+      /// \brief Set the CFM of this joint.
+      /// \param[in] _cfm The Constraint Force Mixing value
+      public: void SetCFM(double _cfm);
 
-      /// \brief Get the ERP of this joint
+      /// \brief Get the CFM of this joint
+      /// \return The Constraint Force Mixing value
       public: double GetCFM();
 
       /// \brief Get the feedback data structure for this joint, if set
+      /// \return Pointer to the joint feedback.
       public: dJointFeedback *GetFeedback();
 
-      /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, math::Angle angle);
+      // Documentation inherited.
+      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
 
-      /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, math::Angle angle);
+      // Documentation inherited.
+      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
 
-      /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(int index);
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(int _index);
 
-      /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(int index);
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(int _index);
 
-      /// \brief Get the force the joint applies to the first link
-      /// \param index The index of the link(0 or 1)
-      public: virtual math::Vector3 GetLinkForce(unsigned int index) const;
+      // Documentation inherited.
+      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
 
-      /// \brief Get the torque the joint applies to the first link
-      /// \param index The index of the link(0 or 1)
-      public: virtual math::Vector3 GetLinkTorque(unsigned int index) const;
+      // Documentation inherited.
+      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
-      /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, int index, double value);
+      // Documentation inherited.
+      public: virtual void SetAttribute(Attribute _attr, int _index,
+                                        double _value);
 
-      /// This is our id
+      // Documentation inherited.
+      public: virtual void SetAttribute(const std::string &_key, int _index,
+                                        const boost::any &_value);
+
+      /// \brief This is our ODE ID
       protected: dJointID jointId;
 
-      /// Feedback data for this joint
+      /// \brief Feedback data for this joint
       private: dJointFeedback *feedback;
     };
-    /// \}
   }
 }
 #endif

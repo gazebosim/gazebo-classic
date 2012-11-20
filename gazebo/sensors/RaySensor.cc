@@ -48,21 +48,18 @@ RaySensor::RaySensor()
 {
   this->mutex = new boost::mutex();
   this->active = false;
-  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
   delete this->mutex;
-  this->laserCollision.reset();
-  this->laserShape.reset();
-}
 
-//////////////////////////////////////////////////
-void RaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
-{
-  Sensor::Load(_worldName, _sdf);
+  this->laserCollision->Fini();
+  this->laserCollision.reset();
+
+  this->laserShape->Fini();
+  this->laserShape.reset();
 }
 
 //////////////////////////////////////////////////
@@ -79,8 +76,6 @@ std::string RaySensor::GetTopic() const
 void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-
-  this->node->Init(_worldName);
   this->scanPub = this->node->Advertise<msgs::LaserScan>(this->GetTopic());
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
@@ -90,10 +85,8 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserCollision->SetRelativePose(this->pose);
 
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
-      this->laserCollision->GetShape());
-
+                     this->laserCollision->GetShape());
   this->laserShape->Load(this->sdf);
-
   this->laserShape->Init();
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -233,15 +226,14 @@ int RaySensor::GetFiducial(int index)
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
-  this->lastUpdateTime = this->world->GetSimTime();
-
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->laserShape->Update();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
-  // moving this behind laserShap update
+  // moving this behind laserShape update
   this->mutex->lock();
 
   // Store the latest laser scans into laserMsg

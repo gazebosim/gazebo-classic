@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,12 @@ namespace gazebo
       /// \brief Add a point to the point list
       /// \param[in] pt math::Vector3 point
       public: void AddPoint(const math::Vector3 &_pt);
+
+      /// \brief Add a point to the point list.
+      /// \param[in] _x X position.
+      /// \param[in] _y Y position.
+      /// \param[in] _z Z position.
+      public: void AddPoint(double _x, double _y, double _z);
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set

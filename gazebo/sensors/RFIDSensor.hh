@@ -23,13 +23,13 @@
 #include <vector>
 #include <string>
 
-#include "transport/TransportTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
-#include "sensors/Sensor.hh"
-#include "sensors/RFIDTagManager.hh"
+#include "gazebo/math/Pose.hh"
+
+#include "gazebo/sensors/Sensor.hh"
 
 namespace gazebo
 {
@@ -37,6 +37,8 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    class RFIDTag;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -48,6 +50,7 @@ namespace gazebo
       public: RFIDSensor();
 
       /// \brief  Destructor
+      /// \brief Destructor
       public: virtual ~RFIDSensor();
 
       /// \brief Load the sensor with SDF parameters
@@ -63,33 +66,42 @@ namespace gazebo
       /// \brief  Initialize the sensor
       public: virtual void Init();
 
+      /// \brief Add RFID tag.
+      /// \param[in] _tag RFID tag to add.
+      public: void AddTag(RFIDTag *_tag);
+
       protected: virtual void UpdateImpl(bool _force);
 
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
-      /// \brief
-      /// \TODO Nate fill in
+      /// \brief Iterates through all the RFID tags, and finds the one which
+      /// are in range of the sensor.
       private: void EvaluateTags();
 
-      /// \brief
-      /// \TODO Nate fill in
+      /// \brief Check the range for one RFID tag.
+      /// \param[in] _pose Pose of a tag.
       private: bool CheckTagRange(const math::Pose &_pose);
 
-      /// \brief Checks if ray intersects RFID sensor
-      /// \return True if intersects, false if not
-      /// \TODO Nate check
-      private: bool CheckRayIntersection(const math::Pose &_pose);
+      /// \brief Checks if ray intersects RFID sensor.
+      /// \param[in] _pose Pose to compare against.
+      /// \return True if intersects, false if not.
+      // private: bool CheckRayIntersection(const math::Pose &_pose);
 
+      /// \brief Parent entity
       private: physics::EntityPtr entity;
 
-      private: physics::CollisionPtr laserCollision;
-      private: physics::RayShapePtr laserShape;
+      /// \brief Unused
+      // private: physics::CollisionPtr laserCollision;
 
-      private: transport::NodePtr node;
+      /// \brief Unused
+      // private: physics::RayShapePtr laserShape;
+
+      /// \brief Publisher for RFID pose messages.
       private: transport::PublisherPtr scanPub;
 
-      private: RFIDTagManager *rtm;
+      /// \brief All the RFID tags.
+      private: std::vector<RFIDTag*> tags;
     };
     /// \}
   }

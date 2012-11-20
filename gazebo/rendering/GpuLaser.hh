@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +25,18 @@
 #include <string>
 #include <vector>
 
-#include "rendering/Camera.hh"
-#include "OGRE/OgreRenderObjectListener.h"
-#include "sensors/SensorTypes.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Time.hh"
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector2i.hh"
 
-#include "sdf/sdf.hh"
+#include "gazebo/sdf/sdf.hh"
 
 namespace Ogre
 {
@@ -64,8 +64,6 @@ namespace gazebo
 
     /// \class GpuLaser GpuLaser.hh rendering/rendering.hh
     /// \brief GPU based laser distance sensor
-    ///
-    /// This is the base class for all cameras.
     class GpuLaser : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
@@ -78,29 +76,28 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GpuLaser();
 
-      /// \brief Load the camera with a set of parmeters
-      /// \param[in] _sdf The SDF camera info
-      public: void Load(sdf::ElementPtr &_sdf);
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
-       /// \brief Load the camera with default parmeters
-      public: void Load();
+      // Documentation inherited
+      public: virtual void Load();
 
-      /// \brief Initialize the camera
-      public: void Init();
+      // Documentation inherited
+      public: virtual void Init();
 
-      /// \brief Finalize the camera
-      public: void Fini();
+      // Documentation inherited
+      public: virtual void Fini();
 
-      /// \brief Create the texture which is used to render laser data
-      /// \param[in] _textureName Name of the new texture
+      /// \brief Create the texture which is used to render laser data.
+      /// \param[in] _textureName Name of the new texture.
       public: void CreateLaserTexture(const std::string &_textureName);
 
-      /// \brief Render the camera
+      // Documentation inherited
       public: virtual void PostRender();
 
-      /// \brief All things needed to get back z buffer for laser data
-      /// \return Array of laser data
-      public: virtual const float *GetLaserData();
+      /// \brief All things needed to get back z buffer for laser data.
+      /// \return Array of laser data.
+      public: const float *GetLaserData();
 
       /// \brief Connect to a laser frame signal
       /// \param[in] _subscriber Callback that is called when a new image is
@@ -130,27 +127,48 @@ namespace gazebo
               const Ogre::Pass *_p, const Ogre::AutoParamDataSource *_s,
               const Ogre::LightList *_ll, bool _supp);
 
-      /// \brief Implementation of the render function
+      // Documentation inherited.
       private: virtual void RenderImpl();
 
-      private: void UpdateRenderTarget(Ogre::RenderTarget *target,
-                                       Ogre::Material *material,
-                                       Ogre::Camera *cam,
-                                       bool updateTex = false);
+      /// \brief Update a render target.
+      /// \param[in, out] _target Render target to update (render).
+      /// \param[in, out] _material Material used during render.
+      /// \param[in] _cam Camerat to render from.
+      /// \param[in] _updateTex True to update the textures in the material
+      private: void UpdateRenderTarget(Ogre::RenderTarget *_target,
+                                       Ogre::Material *_material,
+                                       Ogre::Camera *_cam,
+                                       bool _updateTex = false);
 
+      /// \brief Create an ortho camera.
       private: void CreateOrthoCam();
 
+      /// \brief Create a mesh.
       private: void CreateMesh();
 
+      /// \brief Create a canvas.
       private: void CreateCanvas();
 
-      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float left, float right,
-               float bottom, float top, float near, float far);
+      /// \brief Builds scaled Orthogonal Matrix from parameters.
+      /// \param[in] _left Left clip.
+      /// \param[in] _right Right clip.
+      /// \param[in] _bottom Bottom clip.
+      /// \param[in] _top Top clip.
+      /// \param[in] _near Near clip.
+      /// \param[in] _far Far clip.
+      /// \return The Scaled orthogonal Ogre::Matrix4
+      private: Ogre::Matrix4 BuildScaledOrthoMatrix(float _left, float _right,
+               float _bottom, float _top, float _near, float _far);
 
-      private: virtual void Set1stPassTarget(Ogre::RenderTarget *target,
-                  unsigned int index);
+      /// \brief Sets first pass target.
+      /// \param[in] _target Render target for the first pass.
+      /// \param[in] _index Index of the texture.
+      private: virtual void Set1stPassTarget(Ogre::RenderTarget *_target,
+                                             unsigned int _index);
 
-      private: virtual void Set2ndPassTarget(Ogre::RenderTarget *target);
+      /// \brief Sets second pass target.
+      /// \param[in] _target Render target for the second pass.
+      private: virtual void Set2ndPassTarget(Ogre::RenderTarget *_target);
 
       private: event::EventT<void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newLaserFrame;

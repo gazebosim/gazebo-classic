@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  * Date: 8 May 2003
  */
 
-#ifndef BOXSHAPE_HH
-#define BOXSHAPE_HH
+#ifndef _BOXSHAPE_HH_
+#define _BOXSHAPE_HH_
 
-#include "physics/Shape.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {
@@ -31,33 +31,45 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Box geometry primitive
+    /// \class BoxShape BoxShape.hh physics/physcs.hh
+    /// \brief Box geometry primitive.
     class BoxShape : public Shape
     {
-      /// \brief Constructor
-      public: BoxShape(CollisionPtr parent);
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit BoxShape(CollisionPtr _parent);
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~BoxShape();
 
-      /// \brief Initialize the box
+      /// \brief Initialize the box.
       public: virtual void Init();
 
-      /// \brief Set the size of the box
-      public: virtual void SetSize(const math::Vector3 &size);
+      /// \brief Set the size of the box.
+      /// \param[in] _size Size of each side of the box.
+      public: virtual void SetSize(const math::Vector3 &_size);
 
-      /// \brief Get the size of the box
+      /// \brief Get the size of the box.
+      /// \return The size of each side of the box.
       public: math::Vector3 GetSize() const;
 
-      public: void FillShapeMsg(msgs::Geometry &_msg);
+      /// \brief Deprecated.
+      public: void FillShapeMsg(msgs::Geometry &_msg) GAZEBO_DEPRECATED;
 
+      /// \brief Fill in the values for a geomertry message.
+      /// \param[out] _msg The geometry message to fill.
+      public: void FillMsg(msgs::Geometry &_msg);
+
+      /// \brief Process a geometry message.
+      /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      public: virtual double GetMass(double _density) const;
+      /// \brief Deprecated
+      public: virtual double GetMass(double _density) const GAZEBO_DEPRECATED;
 
-      /// \brief Get inertial for a shape
-      public: virtual void GetInertial(double _mass,
-                                       InertialPtr _inertial) const;
+      /// \brief Deprecated
+      public: virtual void GetInertial(double _mass, InertialPtr _inertial)
+              const GAZEBO_DEPRECATED;
     };
     /// \}
   }

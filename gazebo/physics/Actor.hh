@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef ACTOR_HH
-#define ACTOR_HH
+#ifndef _ACTOR_HH_
+#define _ACTOR_HH_
 
 #include <string>
 #include <map>
@@ -33,6 +33,7 @@ namespace gazebo
     class Mesh;
     class Color;
   }
+
   namespace physics
   {
     struct TrajectoryInfo
@@ -48,20 +49,20 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class Actor Actor.hh physics/Actor.hh
+    /// \class Actor Actor.hh physics/physics.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
-    ///              scriptable animation.
+    /// scriptable animation.
     class Actor : public Model
     {
       /// \brief Constructor
-      /// \param parent Parent object
-      public: Actor(BasePtr parent);
+      /// \param[in] _parent Parent object
+      public: explicit Actor(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~Actor();
 
       /// \brief Load the actor
-      /// \param _sdf SDF parameters
+      /// \param[in] _sdf SDF parameters
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the actor
@@ -82,89 +83,159 @@ namespace gazebo
       /// \brief Finalize the actor
       public: virtual void Fini();
 
-      /// \brief update the parameters using new sdf values
+      /// \brief update the parameters using new sdf values.
+      /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Get the SDF values for the actor
+      /// \brief Get the SDF values for the actor.
+      /// \return Pointer to the SDF values.
       public: virtual const sdf::ElementPtr GetSDF();
 
-      private: void AddSphereInertia(sdf::ElementPtr linkSdf, math::Pose pose,
-                        double mass, double radius);
+      /// \brief Add inertia for a sphere.
+      /// \param[in] _linkSdf The link to add the inertia to.
+      /// \param[in] _pose Pose of the inertia.
+      /// \param[in] _mass Mass of the inertia.
+      /// \param[in] _radiau Radius of the sphere.
+      private: void AddSphereInertia(sdf::ElementPtr _linkSdf,
+                                     const math::Pose &_pose,
+                                     double _mass, double _radius);
 
-      private: void AddSphereCollision(sdf::ElementPtr linkSdf,
-                        std::string name, math::Pose pose, double radius);
+      /// \brief Add a spherical collision object.
+      /// \param[in] _linkSdf Link to add the collision to.
+      /// \param[in] _name Name of the collision object.
+      /// \param[in] _pose Pose of the collision object.
+      /// \param[in] _radius Radius of the collision object.
+      private: void AddSphereCollision(sdf::ElementPtr _linkSdf,
+                                       const std::string &_name,
+                                       const math::Pose &_pose,
+                                       double _radius);
 
-      private: void AddSphereVisual(sdf::ElementPtr linkSdf, std::string name,
-                        math::Pose pose, double radius, std::string material,
-                        common::Color ambient);
+      /// \brief Add a spherical visual object.
+      /// \param[in] _linkSdf Link to add the visual to.
+      /// \param[in] _name Name of the visual object.
+      /// \param[in] _pose Pose of the visual object.
+      /// \param[in] _radius Radius of the visual object.
+      /// \param[in] _material Name of the visual material.
+      /// \param[in] _ambient Ambient color.
+      private: void AddSphereVisual(sdf::ElementPtr _linkSdf,
+                                    const std::string &_name,
+                                    const math::Pose &_pose,
+                                    double _radius,
+                                    const std::string &_material,
+                                    const common::Color &_ambient);
 
-      private: void AddBoxVisual(sdf::ElementPtr linkSdf, std::string name,
-                      math::Pose pose, math::Vector3 size, std::string material,
-                      common::Color ambient);
+      /// \brief Add a box visual object.
+      /// \param[in] _linkSdf Link to add the visual to.
+      /// \param[in] _name Name of the visual object.
+      /// \param[in] _pose Pose of the visual object.
+      /// \param[in] _size Dimensions of the visual object.
+      /// \param[in] _material Name of the visual material.
+      /// \param[in] _ambient Ambient color.
+      private: void AddBoxVisual(sdf::ElementPtr _linkSdf,
+                                 const std::string &_name,
+                                 const math::Pose &_pose,
+                                 const math::Vector3 &_size,
+                                 const std::string &_material,
+                                 const common::Color &_ambient);
 
-      private: void AddActorVisual(sdf::ElementPtr linkSdf, std::string name,
-                      math::Pose pose);
+      /// \brief Add an actor visual to a link.
+      /// \param[in] _linkSdf Link to add the visual to.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _pose Pose of the visual.
+      private: void AddActorVisual(sdf::ElementPtr _linkSdf,
+                                   const std::string &_name,
+                                   const math::Pose &_pose);
 
+      /// \brief Load an animation from SDF.
+      /// \param[in] _sdf SDF element containing the animation.
       private: void LoadAnimation(sdf::ElementPtr _sdf);
 
+      /// \brief Load an animation script from SDF.
+      /// \param[in] _sdf SDF element containing the animation script.
       private: void LoadScript(sdf::ElementPtr _sdf);
 
+      /// \brief Set the actor's pose.
+      /// \param[in] _frame Each frame name and transform.
+      /// \param[in] _skelMap Map of bone relationships.
+      /// \param[in] _time Time over which to animate the set pose.
       private: void SetPose(std::map<std::string, math::Matrix4> _frame,
                      std::map<std::string, std::string> _skelMap, double _time);
 
+      /// \brief Pointer to the actor's mesh.
       protected: const common::Mesh *mesh;
 
+      /// \brief The actor's skeleton.
       protected: common::Skeleton *skeleton;
 
+      /// \brief Filename for the skin.
       protected: std::string skinFile;
 
+      /// \brief Scaling factor to apply to the skin.
       protected: double skinScale;
 
+      /// \brief Amount of time to delay start by.
       protected: double startDelay;
 
+      /// \brief Time length of a scipt.
       protected: double scriptLength;
 
+      /// \brief Time the scipt was last updated.
       protected: double lastScriptTime;
 
+      /// \brief True if the animation should loop.
       protected: bool loop;
 
+      /// \brief True if the actor is being updated.
       protected: bool active;
 
+      /// \brief True if the actor should start running automatically.
       protected: bool autoStart;
 
+      /// \brief Base link.
       protected: LinkPtr mainLink;
 
+      /// \brief Time of the previous frame.
       protected: common::Time prevFrameTime;
 
+      /// \brief Time when the animation was started.
       protected: common::Time playStartTime;
 
+      /// \brief All the trajectories.
       protected: std::map<unsigned int, common::PoseAnimation*> trajectories;
 
+      /// \brief Trajectory information
       protected: std::vector<TrajectoryInfo> trajInfo;
 
+      /// \brief Skeleton animations
       protected: std::map<std::string, common::SkeletonAnimation*>
                                                             skelAnimation;
 
+      /// \brief Skeleton to naode map
       protected: std::map<std::string, std::map<std::string, std::string> >
                                                             skelNodesMap;
 
+      /// \brief True to interpolate along x direction.
       protected: std::map<std::string, bool> interpolateX;
 
+      /// \brief Last position of the actor
       protected: math::Vector3 lastPos;
 
+      /// \brief Length of the actor's path.
       protected: double pathLength;
 
+      /// \brief THe last trajectory
       protected: unsigned int lastTraj;
 
+      /// \brief Name of the visual
       protected: std::string visualName;
 
+      /// \brief Where to send bone info.
       protected: transport::PublisherPtr bonePosePub;
 
+      /// \brief THe old action.
       protected: std::string oldAction;
     };
     /// \}
   }
 }
 #endif
-
-

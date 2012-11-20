@@ -25,11 +25,11 @@
 
 #include <boost/bind.hpp>
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODEScrewJoint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEScrewJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -96,16 +96,16 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetDamping(int /*index*/, const double _damping)
+void ODEScrewJoint::SetDamping(int /*index*/, double _damping)
 {
   this->damping_coefficient = _damping;
   dJointSetDamping(this->jointId, this->damping_coefficient);
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetThreadPitch(int /*index*/, const double _thread_pitch)
+void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 {
-  dJointSetScrewThreadPitch(this->jointId, _thread_pitch);
+  dJointSetScrewThreadPitch(this->jointId, _threadPitch);
 }
 
 //////////////////////////////////////////////////
