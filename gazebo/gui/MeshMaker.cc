@@ -162,7 +162,7 @@ void MeshMaker::CreateTheEntity()
 
   std::ostringstream newModelStr;
 
-  newModelStr << "<gazebo version ='1.0'>\
+  newModelStr << "<sdf version ='1.3'>\
     <model name='custom_user_mesh" << counter << "_model'>\
     <pose>" << this->visualMsg->pose().position().x() << " "
               << this->visualMsg->pose().position().y() << " "
@@ -186,7 +186,7 @@ void MeshMaker::CreateTheEntity()
       </visual>\
     </link>\
   </model>\
-  </gazebo>";
+  </sdf>";
 
   msg.set_sdf(newModelStr.str());
 

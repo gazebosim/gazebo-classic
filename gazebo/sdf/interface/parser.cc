@@ -425,8 +425,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
     /* parse new sdf xml */
     if (!readXml(elemXml, _sdf))
     {
-      gzwarn << "Unable to parse sdf element["
-             << _sdf->GetName() << "]\n";
+      gzwarn << "Unable to parse sdf element[" << _sdf->GetName() << "]\n";
       return false;
     }
   }

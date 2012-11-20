@@ -177,7 +177,7 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 std::string BoxMaker::GetSDFString()
 {
   std::ostringstream newModelStr;
-  newModelStr << "<gazebo version ='1.2'>"
+  newModelStr << "<sdf version ='1.3'>"
     << "<model name='unit_box_" << counter << "'>"
     << "<pose>0 0 0.5 0 0 0</pose>"
     << "<link name ='link'>"
@@ -204,7 +204,7 @@ std::string BoxMaker::GetSDFString()
     <<   "</visual>"
     << "</link>"
     << "</model>"
-    << "</gazebo>";
+    << "</sdf>";
 
   return newModelStr.str();
 }
