@@ -53,7 +53,7 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the IMU.
+      // Documentation inherited
       protected: virtual void Fini();
 
       /// \brief Returns the angular velocity.
