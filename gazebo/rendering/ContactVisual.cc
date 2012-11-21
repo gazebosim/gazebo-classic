@@ -18,15 +18,16 @@
  * Author: Nate Koenig
  */
 
-#include "rendering/ogre_gazebo.h"
-#include "common/MeshManager.hh"
-#include "transport/Node.hh"
-#include "transport/Subscriber.hh"
-#include "msgs/msgs.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/DynamicLines.hh"
-#include "rendering/ContactVisual.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/ContactVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -36,13 +37,15 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
                              const std::string &_topicName)
 : Visual(_name, _vis)
 {
+  this->receivedMsg = false;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
   this->contactsSub = this->node->Subscribe(_topicName,
       &ContactVisual::OnContact, this);
 
-  common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.05, 10, 10);
+  common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.02, 10, 10);
 
   // Add the mesh into OGRE
   if (!this->sceneNode->getCreator()->hasEntity("contact_sphere") &&
@@ -53,7 +56,7 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
     this->InsertMesh(mesh);
   }
 
-  for (unsigned int i = 0; i < 10; i++)
+  for (unsigned int i = 0; i < 100; i++)
   {
     std::string objName = this->GetName() +
         "_contactpoint_" + boost::lexical_cast<std::string>(i);
@@ -80,6 +83,7 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
     this->points.push_back(cp);
   }
 
+
   this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&ContactVisual::Update, this)));
@@ -93,15 +97,16 @@ ContactVisual::~ContactVisual()
 /////////////////////////////////////////////////
 void ContactVisual::Update()
 {
-  int c = 0;
+  boost::mutex::scoped_lock lock(this->mutex);
 
-  if (!this->contactsMsg)
+  if (!this->contactsMsg || !this->receivedMsg)
     return;
 
+  int c = 0;
   for (int i = 0; i < this->contactsMsg->contact_size(); i++)
   {
-    for (int j = 0;
-        c < 10 && j < this->contactsMsg->contact(i).position_size(); j++)
+    for (int j = 0; c < 100 &&
+        j < this->contactsMsg->contact(i).position_size(); j++)
     {
       math::Vector3 pos = msgs::Convert(
           this->contactsMsg->contact(i).position(j));
@@ -123,12 +128,16 @@ void ContactVisual::Update()
     }
   }
 
-  for ( ; c < 10; c++)
+  for ( ; c < 100; c++)
     this->points[c]->sceneNode->setVisible(false);
+
+  this->receivedMsg = false;
 }
 
 /////////////////////////////////////////////////
 void ContactVisual::OnContact(ConstContactsPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   this->contactsMsg = _msg;
+  this->receivedMsg = true;
 }

@@ -51,7 +51,6 @@ namespace gazebo
       private: QAction *moveToAction;
       private: QAction *followAction;
       private: QAction *showCollisionAction;
-      private: QAction *transparentAction;
       private: QAction *skeletonAction;
       private: QAction *showJointsAction;
       private: QAction *showCOMAction;

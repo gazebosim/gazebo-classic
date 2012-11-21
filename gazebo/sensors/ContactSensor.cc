@@ -19,22 +19,19 @@
  * Date: 09 Sept. 2008
 */
 
-#include <float.h>
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "common/Exception.hh"
-#include "physics/Physics.hh"
-#include "physics/World.hh"
-#include "physics/Collision.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/ContactSensor.hh"
+#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Collision.hh"
 
-#include "transport/Node.hh"
-
-#include "math/Vector3.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/ContactSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -43,16 +40,14 @@ GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
 //////////////////////////////////////////////////
 ContactSensor::ContactSensor()
-    : Sensor()
+: Sensor()
 {
-  this->mutex = new boost::mutex();
 }
 
 //////////////////////////////////////////////////
 ContactSensor::~ContactSensor()
 {
   this->collisions.clear();
-  delete this->mutex;
 }
 
 //////////////////////////////////////////////////
@@ -60,11 +55,25 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
+  // Create a publisher for the contact information.
   if (this->sdf->HasElement("contact") &&
-      this->sdf->GetElement("contact")->HasElement("topic"))
+      this->sdf->GetElement("contact")->HasElement("topic") &&
+      this->sdf->GetElement("contact")->GetValueString("topic")
+      != "__default_topic__")
   {
+    // This will create a topic based on the name specified in SDF.
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
       this->sdf->GetElement("contact")->GetValueString("topic"));
+  }
+  else
+  {
+    // This will create a topic based on the name of the parent and the
+    // name of the sensor.
+    std::string topicName = "~/";
+    topicName += this->parentName + "/" + this->GetName() + "/imu";
+    boost::replace_all(topicName, "::", "/");
+
+    this->contactsPub = this->node->Advertise<msgs::Contacts>(topicName);
   }
 }
 
@@ -110,31 +119,27 @@ void ContactSensor::Load(const std::string &_worldName)
 void ContactSensor::Init()
 {
   Sensor::Init();
-
-  std::vector<physics::CollisionPtr>::iterator iter;
-  for (iter = this->collisions.begin(); iter != this->collisions.end(); ++iter)
-  {
-    (*iter)->SetContactsEnabled(true);
-  }
 }
 
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
-  this->mutex->lock();
+  boost::mutex::scoped_lock lock(this->mutex);
+
   if (this->contactsPub && this->contactsPub->HasConnections() &&
       this->contacts.size() > 0)
   {
-    msgs::Contacts msg;
+    this->contactsMsg.clear_contact();
 
     Contact_M::iterator iter;
     std::map<std::string, physics::Contact>::iterator iter2;
+
+    // Iterate over all the contacts.
     for (iter = this->contacts.begin(); iter != this->contacts.end(); ++iter)
     {
-      // Only transmit one contact
       for (iter2 = iter->second.begin(); iter2 != iter->second.end(); ++iter2)
       {
-        msgs::Contact *contactMsg = msg.add_contact();
+        msgs::Contact *contactMsg = this->contactsMsg.add_contact();
         contactMsg->set_collision1(
             iter2->second.collision1->GetScopedName());
         contactMsg->set_collision2(
@@ -152,17 +157,16 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 
     this->contacts.clear();
     this->lastMeasurementTime = this->world->GetSimTime();
-    msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
-    this->contactsPub->Publish(msg);
+    msgs::Set(this->contactsMsg.mutable_time(), this->lastMeasurementTime);
+    this->contactsPub->Publish(this->contactsMsg);
   }
-
-  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
   Sensor::Fini();
+  this->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -247,9 +251,6 @@ std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
 void ContactSensor::OnContact(const std::string &_collisionName,
                               const physics::Contact &_contact)
 {
-  this->mutex->lock();
+  boost::mutex::scoped_lock lock(this->mutex);
   this->contacts[_collisionName][_contact.collision2->GetName()] = _contact;
-  this->mutex->unlock();
 }
-
-

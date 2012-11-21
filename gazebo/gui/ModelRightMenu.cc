@@ -60,11 +60,11 @@ ModelRightMenu::ModelRightMenu()
   // connect(this->showCollisionAction, SIGNAL(triggered()), this,
   //         SLOT(OnShowCollision()));
 
-  // this->transparentAction = new QAction(tr("Transparent"), this);
-  // this->transparentAction->setStatusTip(tr("Make model transparent"));
-  // this->transparentAction->setCheckable(true);
-  // connect(this->transparentAction, SIGNAL(triggered()), this,
-  //         SLOT(OnTransparent()));
+  g_transparentAct = new QAction(tr("Transparent"), this);
+  g_transparentAct->setStatusTip(tr("Make model transparent"));
+  g_transparentAct->setCheckable(true);
+  connect(g_transparentAct, SIGNAL(triggered()), this,
+          SLOT(OnTransparent()));
 
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
@@ -100,13 +100,14 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   QMenu menu;
   // menu.addAction(this->snapBelowAction);
   menu.addAction(this->moveToAction);
+  menu.addAction(g_transparentAct);
+  menu.addAction(g_deleteAct);
+
   // menu.addAction(this->followAction);
   // menu.addAction(this->showCollisionAction);
   // menu.addAction(this->showJointsAction);
   // menu.addAction(this->showCOMAction);
-  // menu.addAction(this->transparentAction);
   // menu.addAction(this->skeletonAction);
-  menu.addAction(g_deleteAct);
 
   // if (this->transparentActionState[this->modelName])
   //   this->transparentAction->setChecked(true);
@@ -185,10 +186,9 @@ void ModelRightMenu::OnShowCOM()
 /////////////////////////////////////////////////
 void ModelRightMenu::OnTransparent()
 {
-  this->transparentActionState[this->modelName] =
-    this->transparentAction->isChecked();
+  this->transparentActionState[this->modelName] = g_transparentAct->isChecked();
 
-  if (this->transparentAction->isChecked())
+  if (g_transparentAct->isChecked())
   {
     this->requestMsg = msgs::CreateRequest("set_transparency", this->modelName);
     this->requestMsg->set_dbl_data(0.5);

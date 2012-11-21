@@ -275,12 +275,10 @@ void Scene::Init()
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
-  // TODO: Add GUI option to view all contacts
-  /*ContactVisualPtr contactVis(new ContactVisual(
+  ContactVisualPtr contactVis(new ContactVisual(
         "_GUIONLY_world_contact_vis",
         this->worldVisual, "~/physics/contacts"));
   this->visuals[contactVis->GetName()] = contactVis;
-  */
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);

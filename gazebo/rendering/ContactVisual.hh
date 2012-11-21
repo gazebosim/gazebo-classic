@@ -95,6 +95,11 @@ namespace gazebo
 
       /// \brief All the contact points.
       private: std::vector<ContactVisual::ContactPoint*> points;
+
+      /// \brief Mutex to protect the contact message.
+      private: boost::mutex mutex;
+
+      private: bool receivedMsg;
     };
     /// \}
   }

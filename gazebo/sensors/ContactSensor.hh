@@ -36,21 +36,18 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
-    class Contact;
-
-    /// \class ContactSensor ContactSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
+
+    /// \class ContactSensor ContactSensor.hh sensors/sensors.hh
     /// \brief Contact sensor. This sensor detects and reports contacts between
     ///  objects
     class ContactSensor: public Sensor
     {
-      /// \brief Constructor
-      /// \param body The underlying collision test uses an ODE collision, so
-      ///             ray sensors must be attached to a body.
+      /// \brief Constructor.
       public: ContactSensor();
 
-      /// \brief Destructor
+      /// \brief Destructor.
       public: virtual ~ContactSensor();
 
       /// \brief Load the sensor with SDF parameters
@@ -59,32 +56,32 @@ namespace gazebo
       public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
+      /// \brief Load the sensor with default parameters.
+      /// \param[in] _worldName Name of world to load from.
       public: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the sensor
+      /// \brief Initialize the sensor.
       public: virtual void Init();
 
-      /// \brief Update the sensor information
-      /// \param[in] _force True if update is forced, false if not
+      /// \brief Update the sensor information.
+      /// \param[in] _force True if update is forced, false if not.
       protected: virtual void UpdateImpl(bool _force);
 
-      /// \brief Finalize the sensor
+      /// \brief Finalize the sensor.
       protected: virtual void Fini();
 
-      /// \brief Get the number of collisions that the sensor is observing
-      /// \return Number of collisions
+      /// \brief Get the number of collisions that the sensor is observing.
+      /// \return Number of collisions.
       public: unsigned int GetCollisionCount() const;
 
-      /// \brief Get a collision name at index _index
-      /// \param[in] _index Index of collision in collection of collisions
-      /// \return name of collision
+      /// \brief Get a collision name at index _index.
+      /// \param[in] _index Index of collision in collection of collisions.
+      /// \return name of collision.
       public: std::string GetCollisionName(unsigned int _index) const;
 
-      /// \brief Return the number of contacts for an observed collision
-      /// \param[in] _collisionName The name of the observed collision
-      /// \return The collision contact count
+      /// \brief Return the number of contacts for an observed collision.
+      /// \param[in] _collisionName The name of the observed collision.
+      /// \return The collision contact count.
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
@@ -107,6 +104,7 @@ namespace gazebo
       private: void OnContact(const std::string &_collisionName,
                               const physics::Contact &_contact);
 
+      /// \brief Collisions this sensor monitors for contacts
       private: std::vector<physics::CollisionPtr> collisions;
 
       private: typedef std::map<std::string,
@@ -114,20 +112,15 @@ namespace gazebo
 
       private: Contact_M contacts;
 
+      /// \brief Output contact information.
       private: transport::PublisherPtr contactsPub;
 
-      private: boost::mutex *mutex;
+      /// \brief Mutex to protect reads and writes.
+      private: boost::mutex mutex;
 
-      /// \brief returns a pointer to the mutex for locking while reading
-      ///        internally kept map of map of collision names and contacts
-      /// \return The mutex for the sensor
-      public: boost::mutex* GetUpdateMutex() const
-              {return this->mutex;}
+      private: msgs::Contacts contactsMsg;
     };
     /// \}
   }
 }
-
 #endif
-
-
