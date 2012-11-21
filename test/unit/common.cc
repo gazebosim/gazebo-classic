@@ -146,7 +146,8 @@ TEST_F(CommonTest, Paths)
 
   gazeboResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
   ogreResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
-  pluginPathBackup += getenv("GAZEBO_PLUGIN_PATH");
+  if (getenv("GAZEBO_PLUGIN_PATH"))
+    pluginPathBackup += getenv("GAZEBO_PLUGIN_PATH");
 
   putenv(const_cast<char*>("GAZEBO_LOG_PATH="));
   common::SystemPaths *paths = common::SystemPaths::Instance();
