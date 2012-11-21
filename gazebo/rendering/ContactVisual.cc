@@ -98,7 +98,7 @@ void ContactVisual::Update()
   if (!this->contactsMsg)
     return;
 
-  for (int i = 0; i < this->contactsMsg->contact_size(); i++)
+  for (int i = this->contactsMsg->contact_size()-1; i >= 0; i--)
   {
     for (int j = 0;
         c < 10 && j < this->contactsMsg->contact(i).position_size(); j++)
