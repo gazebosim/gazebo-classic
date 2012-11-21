@@ -302,8 +302,6 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::Step()
 {
-  this->worldUpdateMutex->lock();
-
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
@@ -332,12 +330,13 @@ void World::Step()
   // exponentially avg out
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
                       this->sleepOffset * 0.99;
-
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
+    this->worldUpdateMutex->lock();
+
     this->prevStepWallTime = common::Time::GetWallTime();
 
     if (!this->IsPaused() || this->stepInc > 0)
@@ -351,6 +350,8 @@ void World::Step()
     }
     else
       this->pauseTime += this->physicsEngine->GetStepTime();
+
+    this->worldUpdateMutex->unlock();
   }
 
   if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
@@ -362,8 +363,6 @@ void World::Step()
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
   }
-
-  this->worldUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
