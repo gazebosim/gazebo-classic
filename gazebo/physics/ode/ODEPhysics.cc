@@ -323,7 +323,7 @@ void ODEPhysics::UpdateCollision()
 
   // This line prevents ProcessContactFeedback from being called
   // Commenting it out reduces Real Time Factor to 0.07
-  this->contactFeedbackIndex = 0;
+  //this->contactFeedbackIndex = 0;
 
   for (i = 0; i < this->collidersCount; ++i)
   {
