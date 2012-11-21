@@ -18,6 +18,7 @@
 
 #include "math/Spline.hh"
 #include "math/RotationSpline.hh"
+#include "common/Console.hh"
 #include "common/KeyFrame.hh"
 #include "common/Animation.hh"
 
@@ -103,9 +104,20 @@ unsigned int Animation::GetKeyFrameCount() const
 }
 
 /////////////////////////////////////////////////
-KeyFrame* Animation::GetKeyFrame(unsigned int _index) const
+KeyFrame *Animation::GetKeyFrame(unsigned int _index) const
 {
-  return this->keyFrames[_index];
+  KeyFrame *result = NULL;
+
+  if (_index < this->keyFrames.size())
+    result = this->keyFrames[_index];
+  else
+  {
+    gzerr << "Key frame index[" << _index
+          << "] is larger than key frame array size["
+          << this->keyFrames.size() << "]\n";
+  }
+
+  return result;
 }
 
 /////////////////////////////////////////////////

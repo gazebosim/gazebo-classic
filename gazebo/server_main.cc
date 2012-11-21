@@ -14,11 +14,14 @@
  * limitations under the License.
  *
 */
-#include "Server.hh"
+#include "gazebo/common/LogRecord.hh"
+#include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+  gazebo::common::LogRecord::Instance()->Init("server");
+
   gazebo::Server *server = new gazebo::Server();
   if (!server->ParseArgs(argc, argv))
     return -1;

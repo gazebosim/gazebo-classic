@@ -1,8 +1,6 @@
 package gazebo.msgs;
 
-/// \addtogroup gazebo_msgs
-/// \{
-///
+/// \ingroup gazebo_msgs
 /// \interface WorldControl
 /// \brief A message that allows for control of world functions
 

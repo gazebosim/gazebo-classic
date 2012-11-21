@@ -139,7 +139,7 @@ TEST_F(HeightmapTest, NotSquareImage)
       TEST_REGRESSION_PATH);
 
   this->server = new Server();
-  EXPECT_THROW(this->server->Load("worlds/not_square_heightmap.world"),
+  EXPECT_THROW(this->server->LoadFile("worlds/not_square_heightmap.world"),
                common::Exception);
 
   this->server->Fini();

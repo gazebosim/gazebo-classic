@@ -121,7 +121,6 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
-  // \TODO where to put: this->lastMeasurementTime = this->world->GetSimTime();
   this->mutex->lock();
   if (this->contactsPub && this->contactsPub->HasConnections() &&
       this->contacts.size() > 0)
@@ -151,6 +150,9 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
       }
     }
 
+    this->contacts.clear();
+    this->lastMeasurementTime = this->world->GetSimTime();
+    msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
     this->contactsPub->Publish(msg);
   }
 

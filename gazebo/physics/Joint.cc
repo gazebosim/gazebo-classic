@@ -374,12 +374,6 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-JointState Joint::GetState()
-{
-  return JointState(boost::shared_static_cast<Joint>(shared_from_this()));
-}
-
-//////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
   this->SetMaxForce(0, 0);

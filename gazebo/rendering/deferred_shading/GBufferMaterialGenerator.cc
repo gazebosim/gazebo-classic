@@ -125,7 +125,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::GenerateVertexShader(
 
   for (uint32_t i = 0; i < numTexCoords; ++i)
   {
-    ss << "  gl_TexCoord[" << 0 << "] = gl_MultiTexCoord" << 0 << ";\n";
+    ss << "  gl_TexCoord[" << i << "] = gl_MultiTexCoord" << i << ";\n";
   }
   ss << "}\n";
 

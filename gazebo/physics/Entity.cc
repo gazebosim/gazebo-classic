@@ -125,7 +125,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 }
 
-
 //////////////////////////////////////////////////
 void Entity::SetName(const std::string &_name)
 {

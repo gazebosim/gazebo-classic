@@ -34,6 +34,7 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \class RFIDTagVisual RFIDTagVisual.hh rendering/rendering.hh
     /// \brief Visualization for RFID tags sensor
     class RFIDTagVisual : public Visual
     {
@@ -49,6 +50,7 @@ namespace gazebo
       public: virtual ~RFIDTagVisual();
 
       /// \brief Callback triggered when new RFID data is received.
+      /// \param[in] _msg Message containing RFID pose data
       private: void OnScan(ConstPosePtr &_msg);
 
       /// \brief Node that handles communication.
