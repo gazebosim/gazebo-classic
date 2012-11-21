@@ -262,6 +262,7 @@ void Camera::Update()
       } catch(Ogre::Exception &_e)
       {
       }
+
       this->animState = NULL;
       if (this->onAnimationComplete)
         this->onAnimationComplete();
@@ -1272,11 +1273,13 @@ bool Camera::IsVisible(VisualPtr _visual)
   return false;
 }
 
+/////////////////////////////////////////////////
 bool Camera::IsVisible(const std::string &_visualName)
 {
   return this->IsVisible(this->scene->GetVisual(_visualName));
 }
 
+/////////////////////////////////////////////////
 bool Camera::GetInitialized() const
 {
   return this->initialized;

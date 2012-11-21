@@ -527,6 +527,23 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
     if ((*iter)->propertyName().toStdString() == "name")
       msg.set_name(this->variantManager->value(
             (*iter)).toString().toStdString());
+    else if ((*iter)->propertyName().toStdString() == "pose")
+    {
+      math::Pose pose;
+      pose.Set(this->variantManager->value(
+                 this->GetChildItem((*iter), "x")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "y")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "z")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "roll")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "pitch")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "yaw")).toDouble());
+      msgs::Set(msg.mutable_pose(), pose);
+    }
     else if ((*iter)->propertyName().toStdString() == "range")
       msg.set_range(this->variantManager->value((*iter)).toDouble());
     else if ((*iter)->propertyName().toStdString() == "diffuse")
@@ -2305,6 +2322,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = NULL;
+  QtProperty *topItem = NULL;
 
   this->lightType = _msg.type();
 
@@ -2312,6 +2330,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
   if (_msg.has_name())
     item->setValue(_msg.name().c_str());
   this->propTreeBrowser->addProperty(item);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("pose"));
+  this->propTreeBrowser->addProperty(topItem);
+  if (_msg.has_pose())
+    this->FillPoseProperty(_msg.pose(), topItem);
+  else
+    this->FillPoseProperty(msgs::Convert(math::Pose()), topItem);
 
   // Create and set the diffuse color property
   item = this->variantManager->addProperty(QVariant::Color, tr("diffuse"));

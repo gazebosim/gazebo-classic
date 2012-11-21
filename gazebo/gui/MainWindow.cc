@@ -821,8 +821,6 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
   iter = this->entities.find(name);
   if (iter != this->entities.end())
     result = iter->second;
-  else
-    gzerr << "Unable to find model[" << _name << "]\n";
 
   return result;
 }
