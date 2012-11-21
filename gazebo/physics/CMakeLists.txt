@@ -12,6 +12,7 @@ set (sources
   Collision.cc
   CollisionState.cc
   Contact.cc
+  ContactManager.cc
   CylinderShape.cc
   Entity.cc
   Gripper.cc

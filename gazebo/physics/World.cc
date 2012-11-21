@@ -45,6 +45,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Link.hh"
@@ -447,11 +448,16 @@ void World::Update()
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
   {
+    // Reset the contact count
+    ContactManager::Instance()->ResetCount();
+
     // This must be called before PhysicsEngine::UpdatePhysics.
     this->physicsEngine->UpdateCollision();
 
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
+
+    std::cout << "Contact Count[" << ContactManager::Instance()->GetContactCount() << "]\n";
 
     /// need this because ODE does not call dxReallocateWorldProcessContext()
     /// until dWorld.*Step

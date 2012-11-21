@@ -43,7 +43,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class ContactFeedback
+    /* REMOVED: class ContactFeedback
     {
       /// \brief Contact information.
       public: Contact contact;
@@ -53,7 +53,7 @@ namespace gazebo
 
       /// \brief Number of elements in feedbacks array.
       public: int feedbackCount;
-    };
+    };*/
 
     /// \brief ODE physics engine.
     class ODEPhysics : public PhysicsEngine
@@ -198,8 +198,8 @@ namespace gazebo
       /// \brief process contact feedbacks into physics::ContactFeedback
       /// \param[in,out] _feedback Contact feedback information.
       /// \param[out] _msg Message to add contact information to.
-      public: void ProcessContactFeedback(ContactFeedback *_feedback,
-                                          msgs::Contact *_msg);
+      //REMOVED: public: void ProcessContactFeedback(ContactFeedback *_feedback,
+                                          //msgs::Contact *_msg);
 
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
@@ -241,10 +241,10 @@ namespace gazebo
       private: std::string stepType;
 
       /// \brief Buffer of contact feedback information.
-      private: std::vector<ContactFeedback*> contactFeedbacks;
+      //REMOVED: private: std::vector<ContactFeedback*> contactFeedbacks;
 
       /// \brief Current index into the contactFeedbacks buffer
-      private: unsigned int contactFeedbackIndex;
+      //REMOVED: private: unsigned int contactFeedbackIndex;
 
       /// \brief All the collsiion spaces.
       private: std::map<std::string, dSpaceID> spaces;

@@ -21,44 +21,45 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-#include "gazebo_config.h"
-#include "common/Diagnostics.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "math/Vector3.hh"
-#include "common/Time.hh"
-#include "common/Timer.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Diagnostics.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Timer.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/PhysicsFactory.hh"
-#include "physics/World.hh"
-#include "physics/Entity.hh"
-#include "physics/Model.hh"
-#include "physics/SurfaceParams.hh"
-#include "physics/Collision.hh"
-#include "physics/MapShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Entity.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MapShape.hh"
+#include "gazebo/physics/ContactManager.hh"
 
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODELink.hh"
-#include "physics/ode/ODEScrewJoint.hh"
-#include "physics/ode/ODEHingeJoint.hh"
-#include "physics/ode/ODEHinge2Joint.hh"
-#include "physics/ode/ODESliderJoint.hh"
-#include "physics/ode/ODEBallJoint.hh"
-#include "physics/ode/ODEUniversalJoint.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODEScrewJoint.hh"
+#include "gazebo/physics/ode/ODEHingeJoint.hh"
+#include "gazebo/physics/ode/ODEHinge2Joint.hh"
+#include "gazebo/physics/ode/ODESliderJoint.hh"
+#include "gazebo/physics/ode/ODEBallJoint.hh"
+#include "gazebo/physics/ode/ODEUniversalJoint.hh"
 
-#include "physics/ode/ODERayShape.hh"
-#include "physics/ode/ODEBoxShape.hh"
-#include "physics/ode/ODESphereShape.hh"
-#include "physics/ode/ODECylinderShape.hh"
-#include "physics/ode/ODEPlaneShape.hh"
-#include "physics/ode/ODETrimeshShape.hh"
-#include "physics/ode/ODEMultiRayShape.hh"
-#include "physics/ode/ODEHeightmapShape.hh"
+#include "gazebo/physics/ode/ODERayShape.hh"
+#include "gazebo/physics/ode/ODEBoxShape.hh"
+#include "gazebo/physics/ode/ODESphereShape.hh"
+#include "gazebo/physics/ode/ODECylinderShape.hh"
+#include "gazebo/physics/ode/ODEPlaneShape.hh"
+#include "gazebo/physics/ode/ODETrimeshShape.hh"
+#include "gazebo/physics/ode/ODEMultiRayShape.hh"
+#include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
-#include "physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -126,7 +127,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->contactGroup = dJointGroupCreate(0);
 
-  this->contactFeedbackIndex = 0;
+  //REMOVED: this->contactFeedbackIndex = 0;
   this->colliders.resize(100);
 }
 
@@ -135,9 +136,10 @@ ODEPhysics::~ODEPhysics()
 {
   dCloseODE();
 
-  for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
+  /* REMOVED for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
     delete this->contactFeedbacks[i];
   this->contactFeedbacks.clear();
+  */
 
   dJointGroupDestroy(this->contactGroup);
 
@@ -324,7 +326,7 @@ void ODEPhysics::UpdateCollision()
   // Reset the contact feedback index.
   // Note: Contact feedback will only be generated for collisions which
   // have a sensor attached.
-  this->contactFeedbackIndex = 0;
+  // REMOVED: this->contactFeedbackIndex = 0;
 
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
@@ -353,7 +355,7 @@ void ODEPhysics::UpdatePhysics()
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
 
-    if (this->contactFeedbackIndex > 0)
+    /* REMOVED if (this->contactFeedbackIndex > 0)
     {
       msgs::Contacts msg;
 
@@ -367,7 +369,7 @@ void ODEPhysics::UpdatePhysics()
       // don't publish empty messages
       if (msg.contact_size() > 0)
         this->contactPub->Publish(msg);
-    }
+    }*/
 
     dJointGroupEmpty(this->contactGroup);
     this->physicsUpdateMutex->unlock();
@@ -788,10 +790,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     numc = maxCollide;
   }
 
-  ContactFeedback *contactFeedback = NULL;
+  // REMOVED: ContactFeedback *contactFeedback = NULL;
+
 
   // Check to see if either collision object should be recording contacts.
-  if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
+  /*REMOVED if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
   {
     // Get or create a contact feedback object.
     if (this->contactFeedbackIndex < this->contactFeedbacks.size())
@@ -809,7 +812,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     contactFeedback->feedbackCount = 0;
     contactFeedback->contact.count = 0;
     contactFeedback->contact.time = this->world->GetSimTime();
-  }
+  }*/
 
   // Set the contact surface parameter flags.
   contact.surface.mode = dContactBounce |
@@ -872,6 +875,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
+  Contact *contactFeedback = ContactManager::Instance()->NewContact();
+  contactFeedback->collision1 = _collision1;
+  contactFeedback->collision2 = _collision2;
+  contactFeedback->time = this->world->GetSimTime();
+
   // For each contact
   for (int j = 0; j < numc; j++)
   {
@@ -893,26 +901,29 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       dJointCreateContact(this->worldId, this->contactGroup, &contact);
 
     // Store the contact info
-    if (contactFeedback)
-    {
-      // Store the contact depth
-      contactFeedback->contact.depths[j] = contact.geom.depth;
+    //if (contactFeedback)
+    //{
 
-      // Store the contact position
-      contactFeedback->contact.positions[j].Set(contact.geom.pos[0],
-          contact.geom.pos[1], contact.geom.pos[2]);
+    // Store the contact depth
+    contactFeedback->depths[j] = contact.geom.depth;
+
+    // Store the contact position
+    contactFeedback->positions[j].Set(contact.geom.pos[0],
+                                      contact.geom.pos[1],
+                                      contact.geom.pos[2]);
 
       // Store the contact normal
-      contactFeedback->contact.normals[j].Set(contact.geom.normal[0],
-          contact.geom.normal[1], contact.geom.normal[2]);
+    contactFeedback->normals[j].Set(contact.geom.normal[0],
+                                    contact.geom.normal[1],
+                                    contact.geom.normal[2]);
 
       // Increase the counters
-      contactFeedback->contact.count++;
-      contactFeedback->feedbackCount++;
+      contactFeedback->count++;
+      // REMOVED: contactFeedback->feedbackCount++;
 
       // Set the joint feedback.
-      dJointSetFeedback(contactJoint, &(contactFeedback->feedbacks[j]));
-    }
+      // REMOVED: dJointSetFeedback(contactJoint, &(contactFeedback->feedbacks[j]));
+    //}
 
     // Attach the contact joint.
     dJointAttach(contactJoint, b1, b2);
@@ -920,7 +931,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
+/*void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
                                         msgs::Contact *_msg)
 {
   if (_feedback->contact.collision1 == NULL)
@@ -962,9 +973,9 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
   }
 
   // Add the contact to each collision
-  _feedback->contact.collision1->AddContact(_feedback->contact);
-  _feedback->contact.collision2->AddContact(_feedback->contact);
-}
+  // _feedback->contact.collision1->AddContact(_feedback->contact);
+  // _feedback->contact.collision2->AddContact(_feedback->contact);
+}*/
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
