@@ -428,7 +428,7 @@ void MainWindow::OnFullScreen(bool _value)
 void MainWindow::ViewReset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0));
+  cam->SetWorldPose(math::Pose(5, -5, 2, 0, GZ_DTOR(11.31), GZ_DTOR(135)));
 }
 
 /////////////////////////////////////////////////
@@ -602,7 +602,7 @@ void MainWindow::CreateActions()
       SLOT(CreateDirectionalLight()));
 
   g_viewResetAct = new QAction(tr("Reset View"), this);
-  g_viewResetAct->setStatusTip(tr("Move camera to origin"));
+  g_viewResetAct->setStatusTip(tr("Move camera to pose"));
   connect(g_viewResetAct, SIGNAL(triggered()), this,
       SLOT(ViewReset()));
 
@@ -709,9 +709,9 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
 
-    if (_msg->camera().has_origin())
+    if (_msg->camera().has_pose())
     {
-      const msgs::Pose &msg_pose = _msg->camera().origin();
+      const msgs::Pose &msg_pose = _msg->camera().pose();
 
       math::Vector3 cam_pose_pos = math::Vector3(
         msg_pose.position().x(),
