@@ -150,24 +150,24 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (name == "scene")
+    if (name == "Scene")
     {
       this->propTreeBrowser->clear();
       this->requestMsg = msgs::CreateRequest("scene_info",
                          this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
-    else if (name == "models")
+    else if (name == "Models")
     {
       this->modelsItem->setSelected(false);
       this->modelsItem->setExpanded(!this->modelsItem->isExpanded());
     }
-    else if (name == "lights")
+    else if (name == "Lights")
     {
       this->lightsItem->setSelected(false);
       this->lightsItem->setExpanded(!this->lightsItem->isExpanded());
     }
-    else if (name == "physics")
+    else if (name == "Physics")
     {
       this->propTreeBrowser->clear();
       this->requestMsg = msgs::CreateRequest("physics_info",
@@ -212,7 +212,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 
       light->FillMsg(this->lightMsg);
       this->propTreeBrowser->clear();
-      this->fillTypes.push_back("light");
+      this->fillTypes.push_back("Light");
 
       this->modelTreeWidget->setCurrentItem(lItem);
     }
@@ -232,17 +232,17 @@ void ModelListWidget::Update()
     this->fillingPropertyTree = true;
     this->propTreeBrowser->clear();
 
-    if (this->fillTypes[0] == "model")
+    if (this->fillTypes[0] == "Model")
       this->FillPropertyTree(this->modelMsg, NULL);
-    else if (this->fillTypes[0] == "link")
+    else if (this->fillTypes[0] == "Link")
       this->FillPropertyTree(this->linkMsg, NULL);
-    else if (this->fillTypes[0] == "joint")
+    else if (this->fillTypes[0] == "Joint")
       this->FillPropertyTree(this->jointMsg, NULL);
-    else if (this->fillTypes[0] == "scene")
+    else if (this->fillTypes[0] == "Scene")
       this->FillPropertyTree(this->sceneMsg, NULL);
-    else if (this->fillTypes[0] == "physics")
+    else if (this->fillTypes[0] == "Physics")
       this->FillPropertyTree(this->physicsMsg, NULL);
-    else if (this->fillTypes[0] == "light")
+    else if (this->fillTypes[0] == "Light")
       this->FillPropertyTree(this->lightMsg, NULL);
 
     this->fillingPropertyTree = false;
@@ -354,42 +354,42 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->propMutex->lock();
     this->modelMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("model");
+    this->fillTypes.push_back("Model");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->linkMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->linkMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("link");
+    this->fillTypes.push_back("Link");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->jointMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->jointMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("joint");
+    this->fillTypes.push_back("Joint");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->sceneMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->sceneMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("scene");
+    this->fillTypes.push_back("Scene");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->physicsMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->physicsMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("physics");
+    this->fillTypes.push_back("Physics");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == this->lightMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->lightMsg.ParseFromString(_msg->serialized_data());
-    this->fillTypes.push_back("light");
+    this->fillTypes.push_back("Light");
     this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == "error")
@@ -2069,20 +2069,20 @@ void ModelListWidget::ResetTree()
 
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("physics"))));
-    this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("physics")));
+        QStringList(QString("%1").arg(tr("Physics"))));
+    this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("Physics")));
     this->modelTreeWidget->addTopLevelItem(this->physicsItem);
 
     this->modelsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("models"))));
-    this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("models")));
+        QStringList(QString("%1").arg(tr("Models"))));
+    this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("Models")));
     this->modelTreeWidget->addTopLevelItem(this->modelsItem);
 
     this->lightsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("%1").arg(tr("lights"))));
-    this->lightsItem->setData(0, Qt::UserRole, QVariant(tr("lights")));
+        QStringList(QString("%1").arg(tr("Lights"))));
+    this->lightsItem->setData(0, Qt::UserRole, QVariant(tr("Lights")));
     this->modelTreeWidget->addTopLevelItem(this->lightsItem);
   }
 
@@ -2142,8 +2142,8 @@ void ModelListWidget::ResetScene()
 {
   this->sceneItem = new QTreeWidgetItem(
       static_cast<QTreeWidgetItem*>(0),
-      QStringList(QString("%1").arg(tr("scene"))));
-  this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("scene")));
+      QStringList(QString("%1").arg(tr("Scene"))));
+  this->sceneItem->setData(0, Qt::UserRole, QVariant(tr("Scene")));
   this->modelTreeWidget->addTopLevelItem(this->sceneItem);
 }
 
