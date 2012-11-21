@@ -50,6 +50,10 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf)
               {T::Load(_sdf);}
 
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 1;}
+
       /// \brief Set the anchor.
       /// \param[in] _index Index of the axis. Not used.
       /// \param[in] _anchor Anchor for the axis.

@@ -114,10 +114,6 @@ namespace gazebo
       /// \brief Reset the joint.
       public: virtual void Reset();
 
-      /// \brief Get the joint state.
-      /// \return The current joint state.
-      public: JointState GetState();
-
       /// \brief Set the joint state.
       /// \param[in] _state Joint state
       public: void SetState(const JointState &_state);
@@ -267,6 +263,10 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
       public: math::Angle GetAngle(int _index) const;
+
+      /// \brief Get the angle count.
+      /// \return The number of DOF for the joint.
+      public: virtual unsigned int GetAngleCount() const = 0;
 
       /// \brief If the Joint is static, Gazebo stores the state of
       /// this Joint as a scalar inside the Joint class, so
