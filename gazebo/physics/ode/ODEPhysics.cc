@@ -353,7 +353,8 @@ void ODEPhysics::UpdatePhysics()
     msgs::Contacts msg;
 
     // put contact forces into contact feedbacks
-    for (unsigned int i = 0; i < this->contactFeedbackIndex; ++i)
+    for (int i = this->contactFeedbackIndex-1; i >= 0 &&
+          i >= this->contactFeedbackIndex-21; i--)
       this->ProcessContactFeedback(this->contactFeedbacks[i],
                                    msg.add_contact());
     msgs::Set(msg.mutable_time(), this->world->GetSimTime());

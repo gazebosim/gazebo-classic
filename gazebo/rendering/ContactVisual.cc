@@ -53,7 +53,7 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
     this->InsertMesh(mesh);
   }
 
-  for (unsigned int i = 0; i < 10; i++)
+  for (unsigned int i = 0; i < 20; i++)
   {
     std::string objName = this->GetName() +
         "_contactpoint_" + boost::lexical_cast<std::string>(i);
@@ -101,7 +101,7 @@ void ContactVisual::Update()
   for (int i = this->contactsMsg->contact_size()-1; i >= 0; i--)
   {
     for (int j = 0;
-        c < 10 && j < this->contactsMsg->contact(i).position_size(); j++)
+        c < 20 && j < this->contactsMsg->contact(i).position_size(); j++)
     {
       math::Vector3 pos = msgs::Convert(
           this->contactsMsg->contact(i).position(j));
