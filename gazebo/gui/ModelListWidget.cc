@@ -407,18 +407,21 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
 /////////////////////////////////////////////////
 void ModelListWidget::RemoveEntity(const std::string &_name)
 {
-  if (gui::has_entity_name(_name))
+  QTreeWidgetItem *items[2];
+  items[0] = this->modelsItem;
+  items[1] = this->lightsItem;
+
+  for (int i = 0; i < 2; ++i)
   {
-    QTreeWidgetItem *listItem = this->GetListItem(_name, this->modelsItem);
+    QTreeWidgetItem *listItem = this->GetListItem(_name, items[i]);
     if (listItem)
     {
-      int i = this->modelsItem->indexOfChild(listItem);
-      this->modelsItem->takeChild(i);
-
+      items[i]->takeChild(items[i]->indexOfChild(listItem));
       this->propTreeBrowser->clear();
       this->selectedEntityName.clear();
       this->sdfElement.reset();
       this->fillTypes.clear();
+      return;
     }
   }
 }
@@ -461,7 +464,17 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
 
+  // Check to see if the selected item is a model
   int i = this->modelsItem->indexOfChild(item);
+  if (i >= 0)
+  {
+    g_modelRightMenu->Run(item->text(0).toStdString(),
+                          this->modelTreeWidget->mapToGlobal(_pt));
+    return;
+  }
+
+  // Check to see if the selected item is a light
+  i = this->lightsItem->indexOfChild(item);
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
@@ -514,6 +527,23 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
     if ((*iter)->propertyName().toStdString() == "name")
       msg.set_name(this->variantManager->value(
             (*iter)).toString().toStdString());
+    else if ((*iter)->propertyName().toStdString() == "pose")
+    {
+      math::Pose pose;
+      pose.Set(this->variantManager->value(
+                 this->GetChildItem((*iter), "x")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "y")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "z")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "roll")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "pitch")).toDouble(),
+               this->variantManager->value(
+                 this->GetChildItem((*iter), "yaw")).toDouble());
+      msgs::Set(msg.mutable_pose(), pose);
+    }
     else if ((*iter)->propertyName().toStdString() == "range")
       msg.set_range(this->variantManager->value((*iter)).toDouble());
     else if ((*iter)->propertyName().toStdString() == "diffuse")
@@ -2292,6 +2322,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = NULL;
+  QtProperty *topItem = NULL;
 
   this->lightType = _msg.type();
 
@@ -2299,6 +2330,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
   if (_msg.has_name())
     item->setValue(_msg.name().c_str());
   this->propTreeBrowser->addProperty(item);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("pose"));
+  this->propTreeBrowser->addProperty(topItem);
+  if (_msg.has_pose())
+    this->FillPoseProperty(_msg.pose(), topItem);
+  else
+    this->FillPoseProperty(msgs::Convert(math::Pose()), topItem);
 
   // Create and set the diffuse color property
   item = this->variantManager->addProperty(QVariant::Color, tr("diffuse"));

@@ -20,14 +20,17 @@
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
+#include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/archive/iterators/istream_iterator.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
 
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/LogRecord.hh"
 #include "gazebo/common/LogPlay.hh"
 
 using namespace gazebo;

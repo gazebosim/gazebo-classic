@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef NODE_HH
-#define NODE_HH
+#ifndef _NODE_HH_
+#define _NODE_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
@@ -75,6 +75,7 @@ namespace gazebo
       /// \brief Process all publishers, which has each publisher send it's
       /// most recent message over the wire. This is for internal use only
       public: void ProcessPublishers();
+
       /// \brief Process incoming messages.
       public: void ProcessIncoming();
 

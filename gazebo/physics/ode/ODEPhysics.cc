@@ -321,6 +321,8 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
 
+  // This line prevents ProcessContactFeedback from being called
+  // Commenting it out reduces Real Time Factor to 0.07
   this->contactFeedbackIndex = 0;
 
   for (i = 0; i < this->collidersCount; ++i)
@@ -354,8 +356,11 @@ void ODEPhysics::UpdatePhysics()
     for (unsigned int i = 0; i < this->contactFeedbackIndex; ++i)
       this->ProcessContactFeedback(this->contactFeedbacks[i],
                                    msg.add_contact());
+    msgs::Set(msg.mutable_time(), this->world->GetSimTime());
 
-    this->contactPub->Publish(msg);
+    // don't publish empty messages
+    if (msg.contact_size() > 0)
+      this->contactPub->Publish(msg);
 
     dJointGroupEmpty(this->contactGroup);
     this->physicsUpdateMutex->unlock();

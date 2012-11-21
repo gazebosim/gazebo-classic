@@ -271,7 +271,7 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
     gzerr << "ConnectionManager::OnMasterRead empty data\n";
 }
 
-
+/////////////////////////////////////////////////
 void ConnectionManager::ProcessMessage(const std::string &_data)
 {
   msgs::Packet packet;

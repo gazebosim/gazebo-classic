@@ -83,8 +83,9 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       return this->lastTechnique;
     }
     // else
-    //   gzerr << "Object is not a SubEntity: "
-    //         << _rend->getMaterial()->getName() << std::endl;
+    //    gzerr << "Object is not a SubEntity["
+    //          << _rend->getMaterial()->getName() << "] Type[" <<
+    //          typeid(*_rend).name() << "]\n";
   }
   // else
   //  gzerr << "Rendering scheme without a Renderable: " << _schemeName

@@ -611,10 +611,26 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     // Make sure we set the _mod only if we have found a selection object
     if (closestEntity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
         closestEntity->getUserAny().getType() == typeid(std::string))
-      _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+    {
+      try
+      {
+        _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+      }
+    }
 
-    visual = this->GetVisual(Ogre::any_cast<std::string>(
-          closestEntity->getUserAny()));
+    try
+    {
+      visual = this->GetVisual(Ogre::any_cast<std::string>(
+            closestEntity->getUserAny()));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
   }
 
   return visual;
@@ -703,10 +719,17 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
       Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
       if (pentity)
       {
-        VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
-                                      pentity->getUserAny()));
-        if (v)
-          _visuals.push_back(v);
+        try
+        {
+          VisualPtr v = this->GetVisual(Ogre::any_cast<std::string>(
+                                        pentity->getUserAny()));
+          if (v)
+            _visuals.push_back(v);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          gzerr << "boost any_cast error:" << e.what() << "\n";
+        }
       }
     }
   }
@@ -722,8 +745,15 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
                                                       _mousePos, true);
   if (closestEntity)
   {
-    visual = this->GetVisual(Ogre::any_cast<std::string>(
-          closestEntity->getUserAny()));
+    try
+    {
+      visual = this->GetVisual(Ogre::any_cast<std::string>(
+            closestEntity->getUserAny()));
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+    }
   }
 
   return visual;
@@ -1370,9 +1400,11 @@ void Scene::PreRender()
       {
         math::Pose pose = msgs::Convert(*(*pIter));
         iter->second->SetPose(pose);
+        PoseMsgs_L::iterator prev = pIter++;
+        this->poseMsgs.erase(prev);
       }
-      PoseMsgs_L::iterator prev = pIter++;
-      this->poseMsgs.erase(prev);
+      else
+        ++pIter;
     }
     else
       ++pIter;
@@ -1639,11 +1671,20 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "entity_delete")
   {
-    Visual_M::iterator iter;
-    iter = this->visuals.find(_msg->data());
-    if (iter != this->visuals.end())
+    Light_M::iterator lightIter = this->lights.find(_msg->data());
+
+    // Check to see if the deleted entity is a light.
+    if (lightIter != this->lights.end())
     {
-      this->RemoveVisual(iter->second);
+      this->lights.erase(lightIter);
+    }
+    // Otherwise delete a visual
+    else
+    {
+      Visual_M::iterator iter;
+      iter = this->visuals.find(_msg->data());
+      if (iter != this->visuals.end())
+        this->RemoveVisual(iter->second);
     }
   }
   else if (_msg->request() == "show_collision")
@@ -1836,7 +1877,6 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
   iter = this->lights.find(_msg->name());
-
 
   if (iter == this->lights.end())
   {

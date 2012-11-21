@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,22 @@
 #ifndef _RENDERING_MATERIAL_HH_
 #define _RENDERING_MATERIAL_HH_
 
-#include "common/Material.hh"
+#include "gazebo/common/Material.hh"
 
 /// \cond
 namespace gazebo
 {
   namespace rendering
   {
+    /// \class Material Material.hh rendering/rendering.hh
+    /// \brief An internal class used by Visuals to add materials to Ogre.
     class Material
     {
+      /// \brief Create all the default materials
       public: static void CreateMaterials();
+
+      /// \brief Update the Ogre materials from a Gazebo material.
+      /// \param[in] _mat The Gazebo material to add to the Ogre system.
       public: static void Update(const gazebo::common::Material *_mat);
     };
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ namespace gazebo
     class DiagnosticTimer;
     typedef boost::shared_ptr< DiagnosticTimer > DiagnosticTimerPtr;
 
+    /// \class DiagnosticManager Diagnostics.hh common/common.hh
     /// \brief A diagnostic manager class
     class DiagnosticManager : public SingletonT<DiagnosticManager>
     {
@@ -100,6 +101,7 @@ namespace gazebo
       private: friend class SingletonT<DiagnosticManager>;
     };
 
+    /// \class DiagnosticTimer Diagnostics.hh common/common.hh
     /// \brief A timer designed for diagnostics
     class DiagnosticTimer : public Timer
     {

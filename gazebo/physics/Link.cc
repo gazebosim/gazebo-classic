@@ -494,6 +494,22 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+Collision_V Link::GetCollisions() const
+{
+  Collision_V result;
+  Base_V::const_iterator biter;
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+  {
+    if ((*biter)->HasType(Base::COLLISION))
+    {
+      result.push_back(boost::shared_static_cast<Collision>(*biter));
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
@@ -530,7 +546,7 @@ math::Vector3 Link::GetRelativeLinearVel() const
 math::Vector3 Link::GetRelativeAngularVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(
-      this->GetWorldAngularVel());
+         this->GetWorldAngularVel());
 }
 
 //////////////////////////////////////////////////
@@ -839,16 +855,11 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-LinkState Link::GetState()
+void Link::SetState(const LinkState & /*_state*/)
 {
-  return LinkState(boost::shared_static_cast<Link>(shared_from_this()));
-}
+  // this->SetRelativePose(_state.GetPose());
 
-//////////////////////////////////////////////////
-void Link::SetState(const LinkState &_state)
-{
-  this->SetRelativePose(_state.GetPose());
-
+  /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
   {
     CollisionState collisionState = _state.GetCollisionState(i);
@@ -857,7 +868,7 @@ void Link::SetState(const LinkState &_state)
       collision->SetState(collisionState);
     else
       gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

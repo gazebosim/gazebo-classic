@@ -186,6 +186,7 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   gazebo::stop();
   this->renderWidget->hide();
   this->tabWidget->hide();
+  this->toolsWidget->hide();
 
   this->connections.clear();
 
@@ -410,6 +411,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showFullScreen();
     this->renderWidget->showFullScreen();
     this->tabWidget->hide();
+    this->toolsWidget->hide();
     this->menuBar->hide();
   }
   else
@@ -417,6 +419,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showNormal();
     this->renderWidget->showNormal();
     this->tabWidget->show();
+    this->toolsWidget->show();
     this->menuBar->show();
   }
 }
@@ -502,7 +505,7 @@ void MainWindow::CreateActions()
   connect(g_newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
-  g_resetModelsAct->setShortcut(tr("Ctrl+Shift-R"));
+  g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
   g_resetModelsAct->setStatusTip(tr("Reset model poses"));
   connect(g_resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelOnly()));
@@ -818,8 +821,6 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
   iter = this->entities.find(name);
   if (iter != this->entities.end())
     result = iter->second;
-  else
-    gzerr << "Unable to find model[" << _name << "]\n";
 
   return result;
 }

@@ -413,12 +413,11 @@ msgs::Visual Collision::CreateCollisionVisual()
 /////////////////////////////////////////////////
 CollisionState Collision::GetState()
 {
-  return CollisionState(
-      boost::shared_static_cast<Collision>(shared_from_this()));
+  return this->state;
 }
 
 /////////////////////////////////////////////////
 void Collision::SetState(const CollisionState &_state)
 {
-  this->SetWorldPose(_state.GetPose());
+  this->SetRelativePose(_state.GetPose());
 }
