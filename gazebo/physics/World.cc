@@ -571,6 +571,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     msgs::Model msg;
     model->FillMsg(msg);
     this->modelPub->Publish(msg);
+
+    this->EnableAllModels();
   }
   else
   {
