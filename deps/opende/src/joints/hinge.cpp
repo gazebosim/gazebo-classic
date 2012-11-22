@@ -131,8 +131,8 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
             info->m = 6;
     }
     // joint damping
-    if ( use_damping )
-      info->m = 6;
+    // if ( use_damping )
+    //   info->m = 6;
 }
 
 

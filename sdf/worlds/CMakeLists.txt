@@ -4,6 +4,7 @@ set (files
   actor_circle.world
   two_actors.world
   camera.world
+  damp_test.world
   depth_camera.world
   empty.world
   joints.world
