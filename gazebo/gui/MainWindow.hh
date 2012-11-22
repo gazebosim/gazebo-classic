@@ -77,6 +77,7 @@ namespace gazebo
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
       private slots: void ViewGrid();
+      private slots: void ViewContacts();
       private slots: void ViewReset();
       private slots: void ViewFullScreen();
       private slots: void ViewFPS();

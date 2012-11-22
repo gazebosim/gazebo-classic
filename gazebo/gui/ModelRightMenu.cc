@@ -46,6 +46,12 @@ ModelRightMenu::ModelRightMenu()
   this->moveToAction->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAction, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
 
+  this->transparentAct = new QAction(tr("Transparent"), this);
+  this->transparentAct->setStatusTip(tr("Make model transparent"));
+  this->transparentAct->setCheckable(true);
+  connect(this->transparentAct, SIGNAL(triggered()), this,
+          SLOT(OnTransparent()));
+
   // Create the delete action
   g_deleteAct = new DeleteAction(tr("Delete"), this);
   g_deleteAct->setStatusTip(tr("Delete a model"));
@@ -59,12 +65,6 @@ ModelRightMenu::ModelRightMenu()
   // this->showCollisionAction->setCheckable(true);
   // connect(this->showCollisionAction, SIGNAL(triggered()), this,
   //         SLOT(OnShowCollision()));
-
-  g_transparentAct = new QAction(tr("Transparent"), this);
-  g_transparentAct->setStatusTip(tr("Make model transparent"));
-  g_transparentAct->setCheckable(true);
-  connect(g_transparentAct, SIGNAL(triggered()), this,
-          SLOT(OnTransparent()));
 
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
@@ -100,7 +100,8 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   QMenu menu;
   // menu.addAction(this->snapBelowAction);
   menu.addAction(this->moveToAction);
-  menu.addAction(g_transparentAct);
+  menu.addAction(this->transparentAct);
+  menu.addSeparator();
   menu.addAction(g_deleteAct);
 
   // menu.addAction(this->followAction);
@@ -109,10 +110,10 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   // menu.addAction(this->showCOMAction);
   // menu.addAction(this->skeletonAction);
 
-  // if (this->transparentActionState[this->modelName])
-  //   this->transparentAction->setChecked(true);
-  // else
-  //   this->transparentAction->setChecked(false);
+  if (this->transparentActionState[this->modelName])
+    this->transparentAct->setChecked(true);
+  else
+    this->transparentAct->setChecked(false);
 
   // if (this->skeletonActionState[this->modelName])
   //   this->skeletonAction->setChecked(true);
@@ -186,9 +187,9 @@ void ModelRightMenu::OnShowCOM()
 /////////////////////////////////////////////////
 void ModelRightMenu::OnTransparent()
 {
-  this->transparentActionState[this->modelName] = g_transparentAct->isChecked();
+  this->transparentActionState[this->modelName] = this->transparentAct->isChecked();
 
-  if (g_transparentAct->isChecked())
+  if (this->transparentAct->isChecked())
   {
     this->requestMsg = msgs::CreateRequest("set_transparency", this->modelName);
     this->requestMsg->set_dbl_data(0.5);

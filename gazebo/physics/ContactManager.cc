@@ -14,6 +14,15 @@
  * limitations under the License.
  *
 */
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+
+#include "gazebo/common/Time.hh"
+
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/ContactManager.hh"
 
 using namespace gazebo;
@@ -29,12 +38,37 @@ ContactManager::ContactManager()
 ContactManager::~ContactManager()
 {
   this->Clear();
+  this->node.reset();
+  this->contactPub.reset();
 }
 
 /////////////////////////////////////////////////
-Contact *ContactManager::NewContact()
+void ContactManager::Init(WorldPtr _world)
+{
+  this->world = _world;
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->world->GetName());
+
+  this->contactPub =
+    this->node->Advertise<msgs::Contacts>("~/physics/contacts");
+}
+
+/////////////////////////////////////////////////
+Contact *ContactManager::NewContact(Collision *_collision1,
+                                    Collision *_collision2,
+                                    const common::Time &_time)
 {
   Contact *result = NULL;
+
+  if (!_collision1 || !_collision2)
+    return result;
+
+  // If no one is listening, then don't create any contact information.
+  // This is a signal to the Physics engine that it can skip the extra
+  // processing necessary to get back contact information.
+  if (!this->contactPub->HasConnections())
+    return result;
 
   // Get or create a contact feedback object.
   if (this->contactIndex < this->contacts.size())
@@ -45,6 +79,11 @@ Contact *ContactManager::NewContact()
     this->contacts.push_back(result);
     this->contactIndex = this->contacts.size();
   }
+
+  result->count = 0;
+  result->collision1 = _collision1;
+  result->collision2 = _collision2;
+  result->time = _time;
 
   return result;
 }
@@ -86,4 +125,39 @@ void ContactManager::Clear()
 
   // Reset the contact count to zero.
   this->contactIndex = 0;
+}
+
+/////////////////////////////////////////////////
+void ContactManager::PublishContacts()
+{
+//  if (this->contacts.size() == 0)
+//    return;
+
+  if (!this->contactPub)
+  {
+    gzerr << "ContactManager has not been initialized. "
+          << "Unable to publish contacts.\n";
+    return;
+  }
+
+  msgs::Contacts msg;
+
+  for (unsigned int i = 0; i < this->contactIndex; ++i)
+  {
+    msgs::Contact *contactMsg = msg.add_contact();
+
+    contactMsg->set_collision1(this->contacts[i]->collision1->GetScopedName());
+    contactMsg->set_collision2(this->contacts[i]->collision2->GetScopedName());
+    msgs::Set(contactMsg->mutable_time(), this->contacts[i]->time);
+
+    for (int j = 0; j < this->contacts[i]->count; ++j)
+    {
+      msgs::Set(contactMsg->add_position(), this->contacts[i]->positions[j]);
+      msgs::Set(contactMsg->add_normal(), this->contacts[i]->normals[j]);
+      contactMsg->add_depth(this->contacts[i]->depths[j]);
+    }
+  }
+
+  msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+  this->contactPub->Publish(msg);
 }

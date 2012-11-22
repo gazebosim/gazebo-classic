@@ -104,6 +104,8 @@ namespace gazebo
       private: void OnContact(const std::string &_collisionName,
                               const physics::Contact &_contact);
 
+      private: void OnContacts(ConstContactsPtr &_msg);
+
       /// \brief Collisions this sensor monitors for contacts
       private: std::vector<physics::CollisionPtr> collisions;
 
@@ -119,6 +121,8 @@ namespace gazebo
       private: boost::mutex mutex;
 
       private: msgs::Contacts contactsMsg;
+
+      private: static transport::SubscriberPtr contactSub;
     };
     /// \}
   }

@@ -18,19 +18,21 @@
  * Author: Nate Koenig
  */
 
-#include "msgs/msgs.hh"
-#include "common/Exception.hh"
-#include "common/Console.hh"
-#include "common/Events.hh"
-
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
-
-#include "physics/Link.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-
 #include "sdf/sdf.hh"
+
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/Node.hh"
+
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+
 
 using namespace gazebo;
 using namespace physics;
@@ -49,8 +51,6 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 
   this->responsePub =
     this->node->Advertise<msgs::Response>("~/response");
-  this->contactPub =
-    this->node->Advertise<msgs::Contacts>("~/physics/contacts");
 
   this->requestSub = this->node->Subscribe("~/request",
                                            &PhysicsEngine::OnRequest, this);
@@ -58,6 +58,10 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->physicsUpdateMutex = new boost::recursive_mutex();
 
   this->updateRateDouble = 0.0;
+
+  // Create and initialized the contact manager.
+  this->contactManager = new ContactManager();
+  this->contactManager->Init(this->world);
 }
 
 //////////////////////////////////////////////////
@@ -85,6 +89,8 @@ PhysicsEngine::~PhysicsEngine()
   this->responsePub.reset();
   this->requestSub.reset();
   this->node.reset();
+
+  delete this->contactManager;
 }
 
 //////////////////////////////////////////////////
@@ -184,4 +190,10 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 {
+}
+
+//////////////////////////////////////////////////
+ContactManager *PhysicsEngine::GetContactManager() const
+{
+  return this->contactManager;
 }

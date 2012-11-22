@@ -36,6 +36,8 @@
 using namespace gazebo;
 using namespace sensors;
 
+transport::SubscriberPtr ContactSensor::contactSub = NULL;
+
 GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
 //////////////////////////////////////////////////
@@ -82,7 +84,13 @@ void ContactSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::CollisionPtr collision;
+  if (this->contactSub == NULL)
+  {
+    this->contactSub = this->node->Subscribe("~/physics/contacts",
+        &ContactSensor::OnContacts, this);
+  }
+
+  /*physics::CollisionPtr collision;
   std::string collisionName;
   std::string collisionScopedName;
 
@@ -112,7 +120,7 @@ void ContactSensor::Load(const std::string &_worldName)
             boost::bind(&ContactSensor::OnContact, this, _1, _2)));
     }
     collisionElem = collisionElem->GetNextElement("collision");
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
@@ -124,7 +132,7 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+/*  boost::mutex::scoped_lock lock(this->mutex);
 
   if (this->contactsPub && this->contactsPub->HasConnections() &&
       this->contacts.size() > 0)
@@ -157,9 +165,9 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 
     this->contacts.clear();
     this->lastMeasurementTime = this->world->GetSimTime();
-    msgs::Set(this->contactsMsg.mutable_time(), this->lastMeasurementTime);
     this->contactsPub->Publish(this->contactsMsg);
   }
+  */
 }
 
 //////////////////////////////////////////////////
@@ -253,4 +261,10 @@ void ContactSensor::OnContact(const std::string &_collisionName,
 {
   boost::mutex::scoped_lock lock(this->mutex);
   this->contacts[_collisionName][_contact.collision2->GetName()] = _contact;
+}
+
+//////////////////////////////////////////////////
+void ContactSensor::OnContacts(ConstContactsPtr &_msg)
+{
+  std::cout << "Got contact message\n";
 }

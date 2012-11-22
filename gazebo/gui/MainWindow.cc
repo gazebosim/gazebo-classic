@@ -24,6 +24,7 @@
 #include "transport/Transport.hh"
 
 #include "rendering/UserCamera.hh"
+#include "rendering/RenderEvents.hh"
 
 #include "gui/Actions.hh"
 #include "gui/Gui.hh"
@@ -441,6 +442,12 @@ void MainWindow::ViewGrid()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewContacts()
+{
+  gazebo::rendering::Events::viewContacts(g_viewContactsAct->isChecked());
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
@@ -613,6 +620,13 @@ void MainWindow::CreateActions()
   connect(g_viewGridAct, SIGNAL(triggered()), this,
           SLOT(ViewGrid()));
 
+  g_viewContactsAct = new QAction(tr("Contacts"), this);
+  g_viewContactsAct->setStatusTip(tr("View Contacts"));
+  g_viewContactsAct->setCheckable(true);
+  g_viewContactsAct->setChecked(false);
+  connect(g_viewContactsAct, SIGNAL(triggered()), this,
+          SLOT(ViewContacts()));
+
   g_viewFullScreenAct = new QAction(tr("Full Screen"), this);
   g_viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
   connect(g_viewFullScreenAct, SIGNAL(triggered()), this,
@@ -660,6 +674,7 @@ void MainWindow::CreateMenus()
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(g_viewGridAct);
+  this->viewMenu->addAction(g_viewContactsAct);
   this->viewMenu->addSeparator();
   this->viewMenu->addAction(g_viewResetAct);
   this->viewMenu->addAction(g_viewFullScreenAct);

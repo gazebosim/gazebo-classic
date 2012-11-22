@@ -359,6 +359,10 @@ namespace gazebo
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
 
+      /// \brief Enable or disable contact visualization.
+      /// \param[in] _view True to enable contact visualization.
+      public: void ViewContacts(bool _view);
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 

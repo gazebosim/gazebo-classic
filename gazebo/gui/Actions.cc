@@ -45,11 +45,10 @@ QAction *gazebo::gui::g_spotLghtCreateAct = 0;
 QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 
 QAction *gazebo::gui::g_viewGridAct = 0;
+QAction *gazebo::gui::g_viewContactsAct = 0;
 QAction *gazebo::gui::g_viewResetAct = 0;
 QAction *gazebo::gui::g_viewFullScreenAct = 0;
 QAction *gazebo::gui::g_viewFPSAct = 0;
 QAction *gazebo::gui::g_viewOrbitAct = 0;
-
-QAction *gazebo::gui::g_transparentAct = 0;
 
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;

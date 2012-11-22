@@ -127,7 +127,6 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->contactGroup = dJointGroupCreate(0);
 
-  //REMOVED: this->contactFeedbackIndex = 0;
   this->colliders.resize(100);
 }
 
@@ -135,11 +134,6 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 ODEPhysics::~ODEPhysics()
 {
   dCloseODE();
-
-  /* REMOVED for (unsigned int i = 0; i < this->contactFeedbacks.size(); i++)
-    delete this->contactFeedbacks[i];
-  this->contactFeedbacks.clear();
-  */
 
   dJointGroupDestroy(this->contactGroup);
 
@@ -320,13 +314,11 @@ void ODEPhysics::UpdateCollision()
   this->collidersCount = 0;
   this->trimeshCollidersCount = 0;
 
+  // Reset the contact count
+  this->contactManager->ResetCount();
+
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide(this->spaceId, this, CollisionCallback);
-
-  // Reset the contact feedback index.
-  // Note: Contact feedback will only be generated for collisions which
-  // have a sensor attached.
-  // REMOVED: this->contactFeedbackIndex = 0;
 
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
@@ -343,6 +335,9 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
+  /*std::cout << "Contact Count["
+              << this->contactManager->GetContactCount() << "]\n";
+              */
 }
 
 //////////////////////////////////////////////////
@@ -355,25 +350,11 @@ void ODEPhysics::UpdatePhysics()
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
 
-    /* REMOVED if (this->contactFeedbackIndex > 0)
-    {
-      msgs::Contacts msg;
-
-      // put contact forces into contact feedbacks
-      for (unsigned int i = 0; i < this->contactFeedbackIndex; ++i)
-        this->ProcessContactFeedback(this->contactFeedbacks[i],
-            msg.add_contact());
-
-      msgs::Set(msg.mutable_time(), this->world->GetSimTime());
-
-      // don't publish empty messages
-      if (msg.contact_size() > 0)
-        this->contactPub->Publish(msg);
-    }*/
-
     dJointGroupEmpty(this->contactGroup);
     this->physicsUpdateMutex->unlock();
   }
+
+  this->contactManager->PublishContacts();
 }
 
 //////////////////////////////////////////////////
@@ -790,30 +771,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     numc = maxCollide;
   }
 
-  // REMOVED: ContactFeedback *contactFeedback = NULL;
-
-
-  // Check to see if either collision object should be recording contacts.
-  /*REMOVED if (_collision1->GetContactsEnabled() || _collision2->GetContactsEnabled())
-  {
-    // Get or create a contact feedback object.
-    if (this->contactFeedbackIndex < this->contactFeedbacks.size())
-      contactFeedback = this->contactFeedbacks[this->contactFeedbackIndex++];
-    else
-    {
-      contactFeedback = new ContactFeedback();
-      this->contactFeedbacks.push_back(contactFeedback);
-      this->contactFeedbackIndex = this->contactFeedbacks.size();
-    }
-
-    // Store the relevant information about the contact.
-    contactFeedback->contact.collision1 = _collision1;
-    contactFeedback->contact.collision2 = _collision2;
-    contactFeedback->feedbackCount = 0;
-    contactFeedback->contact.count = 0;
-    contactFeedback->contact.time = this->world->GetSimTime();
-  }*/
-
   // Set the contact surface parameter flags.
   contact.surface.mode = dContactBounce |
                          dContactMu2 |
@@ -875,24 +832,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
-  Contact *contactFeedback = ContactManager::Instance()->NewContact();
-  contactFeedback->collision1 = _collision1;
-  contactFeedback->collision2 = _collision2;
-  contactFeedback->time = this->world->GetSimTime();
-
-  // For each contact
+  // Create a joint for each contact
   for (int j = 0; j < numc; j++)
   {
-    // A depth of < 0 may never occur.
-    // I have never seen this before, so I'm commenting this out for
-    // performance reasons.
-    // if (_contactCollisions[this->indices[j]].depth < 0)
-    // {
-    //   gzerr << "Contact has negative depth ["
-    //         << _contactCollisions[this->indices[j]].depth << "]\n";
-    //   continue;
-    // }
-
     contact.geom = _contactCollisions[this->indices[j]];
 
     // Create the contact joint. This introduces the contact constraint to
@@ -900,33 +842,42 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     dJointID contactJoint =
       dJointCreateContact(this->worldId, this->contactGroup, &contact);
 
-    // Store the contact info
-    //if (contactFeedback)
-    //{
+    // Attach the contact joint.
+    dJointAttach(contactJoint, b1, b2);
+  }
 
-    // Store the contact depth
-    contactFeedback->depths[j] = contact.geom.depth;
+  // Add a new contact to the manager. This will return NULL if no one is
+  // listening for contact information.
+  Contact *contactFeedback = this->contactManager->NewContact(_collision1,
+      _collision2, this->world->GetSimTime());
 
-    // Store the contact position
-    contactFeedback->positions[j].Set(contact.geom.pos[0],
-                                      contact.geom.pos[1],
-                                      contact.geom.pos[2]);
+  // Store contact information if someone is listening to the contact
+  // manager
+  if (contactFeedback)
+  {
+    for (int j = 0; j < numc; j++)
+    {
+      // Store the contact depth
+      contactFeedback->depths[j] = _contactCollisions[this->indices[j]].depth;
+
+      // Store the contact position
+      contactFeedback->positions[j].Set(
+          _contactCollisions[this->indices[j]].pos[0],
+          _contactCollisions[this->indices[j]].pos[1],
+          _contactCollisions[this->indices[j]].pos[2]);
 
       // Store the contact normal
-    contactFeedback->normals[j].Set(contact.geom.normal[0],
-                                    contact.geom.normal[1],
-                                    contact.geom.normal[2]);
+      contactFeedback->normals[j].Set(
+          _contactCollisions[this->indices[j]].normal[0],
+          _contactCollisions[this->indices[j]].normal[1],
+          _contactCollisions[this->indices[j]].normal[2]);
 
       // Increase the counters
       contactFeedback->count++;
-      // REMOVED: contactFeedback->feedbackCount++;
 
       // Set the joint feedback.
       // REMOVED: dJointSetFeedback(contactJoint, &(contactFeedback->feedbacks[j]));
-    //}
-
-    // Attach the contact joint.
-    dJointAttach(contactJoint, b1, b2);
+    }
   }
 }
 

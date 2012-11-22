@@ -42,7 +42,8 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->contactsSub = this->node->Subscribe(_topicName,
+  this->topicName = _topicName;
+  this->contactsSub = this->node->Subscribe(this->topicName,
       &ContactVisual::OnContact, this);
 
   common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.02, 10, 10);
@@ -55,34 +56,6 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
       common::MeshManager::Instance()->GetMesh("contact_sphere");
     this->InsertMesh(mesh);
   }
-
-  for (unsigned int i = 0; i < 100; i++)
-  {
-    std::string objName = this->GetName() +
-        "_contactpoint_" + boost::lexical_cast<std::string>(i);
-    Ogre::Entity *obj = this->scene->GetManager()->createEntity(
-        objName, "contact_sphere");
-    obj->setMaterialName("Gazebo/BlueLaser");
-
-    ContactVisual::ContactPoint *cp = new ContactVisual::ContactPoint();
-    cp->sceneNode = this->sceneNode->createChildSceneNode(objName + "_node");
-    cp->sceneNode->attachObject(obj);
-
-    cp->normal = new DynamicLines(RENDERING_LINE_LIST);
-    cp->depth = new DynamicLines(RENDERING_LINE_LIST);
-
-    cp->normal->AddPoint(math::Vector3(0, 0, 0));
-    cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
-
-    cp->depth->AddPoint(math::Vector3(0, 0, 0));
-    cp->depth->AddPoint(math::Vector3(0, 0, -1));
-    cp->sceneNode->attachObject(cp->depth);
-    cp->sceneNode->attachObject(cp->normal);
-    cp->sceneNode->setVisible(false);
-
-    this->points.push_back(cp);
-  }
-
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -102,17 +75,20 @@ void ContactVisual::Update()
   if (!this->contactsMsg || !this->receivedMsg)
     return;
 
-  int c = 0;
+  unsigned int c = 0;
   for (int i = 0; i < this->contactsMsg->contact_size(); i++)
   {
-    for (int j = 0; c < 100 &&
-        j < this->contactsMsg->contact(i).position_size(); j++)
+    for (int j = 0; j < this->contactsMsg->contact(i).position_size(); j++)
     {
       math::Vector3 pos = msgs::Convert(
           this->contactsMsg->contact(i).position(j));
       math::Vector3 normal = msgs::Convert(
           this->contactsMsg->contact(i).normal(j));
       double depth = this->contactsMsg->contact(i).depth(j);
+
+      // Create a new contact visualization point if necessary
+      if (c >= this->points.size())
+        this->CreateNewPoint();
 
       this->points[c]->sceneNode->setVisible(true);
       this->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
@@ -128,7 +104,7 @@ void ContactVisual::Update()
     }
   }
 
-  for ( ; c < 100; c++)
+  for ( ; c < this->points.size(); c++)
     this->points[c]->sceneNode->setVisible(false);
 
   this->receivedMsg = false;
@@ -138,6 +114,62 @@ void ContactVisual::Update()
 void ContactVisual::OnContact(ConstContactsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  this->contactsMsg = _msg;
-  this->receivedMsg = true;
+  if (this->enabled)
+  {
+    this->contactsMsg = _msg;
+    this->receivedMsg = true;
+  }
+}
+
+/////////////////////////////////////////////////
+void ContactVisual::SetEnabled(bool _enabled)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->enabled = _enabled;
+
+  if (!enabled)
+  {
+    this->contactsSub.reset();
+
+    this->contactsMsg.reset();
+    this->receivedMsg = false;
+
+    for (unsigned int c = 0 ; c < this->points.size(); c++)
+      this->points[c]->sceneNode->setVisible(false);
+  }
+  else if (!this->contactsSub)
+  {
+    this->contactsSub = this->node->Subscribe(this->topicName,
+        &ContactVisual::OnContact, this);
+  }
+}
+
+/////////////////////////////////////////////////
+void ContactVisual::CreateNewPoint()
+{
+  std::string objName = this->GetName() +
+    "_contactpoint_" + boost::lexical_cast<std::string>(this->points.size());
+
+  /// \todo We can improve this by using instanced geometry.
+  Ogre::Entity *obj = this->scene->GetManager()->createEntity(
+                      objName, "contact_sphere");
+  obj->setMaterialName("Gazebo/BlueLaser");
+
+  ContactVisual::ContactPoint *cp = new ContactVisual::ContactPoint();
+  cp->sceneNode = this->sceneNode->createChildSceneNode(objName + "_node");
+  cp->sceneNode->attachObject(obj);
+
+  cp->normal = new DynamicLines(RENDERING_LINE_LIST);
+  cp->depth = new DynamicLines(RENDERING_LINE_LIST);
+
+  cp->normal->AddPoint(math::Vector3(0, 0, 0));
+  cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
+
+  cp->depth->AddPoint(math::Vector3(0, 0, 0));
+  cp->depth->AddPoint(math::Vector3(0, 0, -1));
+  cp->sceneNode->attachObject(cp->depth);
+  cp->sceneNode->attachObject(cp->normal);
+  cp->sceneNode->setVisible(false);
+
+  this->points.push_back(cp);
 }
