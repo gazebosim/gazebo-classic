@@ -355,8 +355,6 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
-  this->worldUpdateMutex->lock();
-
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
@@ -385,6 +383,8 @@ void World::Step()
   if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
          >= common::Time(this->physicsEngine->GetUpdatePeriod()))
   {
+    this->worldUpdateMutex->lock();
+
     this->prevStepWallTime = common::Time::GetWallTime();
 
     if (!this->IsPaused() || this->stepInc > 0)
@@ -398,11 +398,11 @@ void World::Step()
     }
     else
       this->pauseTime += this->physicsEngine->GetStepTime();
+
+    this->worldUpdateMutex->unlock();
   }
 
   this->ProcessMessages();
-
-  this->worldUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -576,6 +576,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     msgs::Model msg;
     model->FillMsg(msg);
     this->modelPub->Publish(msg);
+
+    this->EnableAllModels();
   }
   else
   {
