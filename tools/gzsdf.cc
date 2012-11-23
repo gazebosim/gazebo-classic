@@ -119,8 +119,7 @@ int main(int argc, char** argv)
     TiXmlDocument xmlDoc;
     if (xmlDoc.LoadFile(params[1]))
     {
-      TiXmlElement *gazeboNode = xmlDoc.FirstChildElement("gazebo");
-      sdf::Converter::Convert(gazeboNode, SDF::version, true);
+      sdf::Converter::Convert(&xmlDoc, SDF::version, true);
       xmlDoc.SaveFile(params[1]);
     }
     else

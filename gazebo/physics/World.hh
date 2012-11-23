@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <list>
+#include <deque>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
@@ -132,7 +133,7 @@ namespace gazebo
 
       /// \brief Get a list of all the models.
       /// \return A list of all the Models in the world.
-      public: std::list<ModelPtr> GetModels() const;
+      public: Model_V GetModels() const;
 
       /// \brief Reset with options.
       ///
@@ -159,8 +160,8 @@ namespace gazebo
       public: void PrintEntityTree();
 
       /// \brief Get the world simulation time, note if you want the PC
-      /// wall clock call World::GetRealTime.
-      /// \return The current simulation time.
+      /// wall clock call common::Time::GetWallTime.
+      /// \return The current simulation time
       public: common::Time GetSimTime() const;
 
       /// \brief Set the sim time.
@@ -233,10 +234,6 @@ namespace gazebo
       /// \return A pointer to nearest Entity, NULL if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
-      /// \brief Get the current world state.
-      /// \return A object that contains the entire state of the World.
-      public: WorldState GetState();
-
       /// \brief Set the current world state.
       /// \param _state The state to set the World to.
       public: void SetState(const WorldState &_state);
@@ -307,6 +304,9 @@ namespace gazebo
       public: void EnablePhysicsEngine(bool _enable)
               {this->enablePhysicsEngine = _enable;}
 
+      /// \brief Update the state SDF value from the current state.
+      public: void UpdateStateSDF();
+
       /// \brief Get a model by id.
       ///
       /// Each Entity has a unique ID, this function finds a Model with
@@ -348,6 +348,9 @@ namespace gazebo
 
       /// \brief Step the world once.
       private: void Step();
+
+      /// \brief Step the world once by reading from a log file.
+      private: void LogStep();
 
       /// \brief Update the world.
       private: void Update();
@@ -416,12 +419,14 @@ namespace gazebo
       /// \brief Process all recieved model messages.
       private: void ProcessModelMsgs();
 
-      /// \brief Update the state SDF values from the current state.
-      private: void UpdateStateSDF();
+      /// \brief Log callback. This is where we write out state info.
+      private: bool OnLog(std::ostringstream &_stream);
 
-      /// \brief Update the state SDF from a given state.
-      /// \param[in] _state State to update from.
-      private: void UpdateSDFFromState(const WorldState &_state);
+      /// \brief Process all incoming messages.
+      private: void ProcessMessages();
+
+      /// \brief Publish the world stats message.
+      private: void PublishWorldStats();
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -597,6 +602,14 @@ namespace gazebo
 
       /// \brief Period over which messages should be processed.
       private: common::Time processMsgsPeriod;
+
+      /// \brief Buffer of states.
+      private: std::deque<WorldState> states;
+      private: WorldState prevStates[2];
+      private: int stateToggle;
+
+      private: sdf::ElementPtr logPlayStateSDF;
+      private: WorldState logPlayState;
     };
     /// \}
   }

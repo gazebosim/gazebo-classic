@@ -89,7 +89,7 @@ bool ModelMaker::InitFromSDFString(const std::string &_data)
   }
 
   this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("gazebo.sdf", this->modelSDF);
+  sdf::initFile("root.sdf", this->modelSDF);
   sdf::readString(_data, this->modelSDF);
 
   if (!sdf::readString(_data, this->modelSDF))
@@ -116,7 +116,7 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   }
 
   this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("gazebo.sdf", this->modelSDF);
+  sdf::initFile("root.sdf", this->modelSDF);
 
   if (!sdf::readFile(_filename, this->modelSDF))
   {

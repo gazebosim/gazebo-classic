@@ -63,12 +63,6 @@ RaySensor::~RaySensor()
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
-{
-  Sensor::Load(_worldName, _sdf);
-}
-
-//////////////////////////////////////////////////
 std::string RaySensor::GetTopic() const
 {
   std::string topicName = "~/";
@@ -239,7 +233,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   this->laserShape->Update();
   this->lastMeasurementTime = this->world->GetSimTime();
 
-  // moving this behind laserShap update
+  // moving this behind laserShape update
   this->mutex->lock();
 
   // Store the latest laser scans into laserMsg

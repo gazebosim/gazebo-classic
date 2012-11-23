@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef PUBLISHER_HH
-#define PUBLISHER_HH
+#ifndef _PUBLISHER_HH_
+#define _PUBLISHER_HH_
 
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
@@ -65,7 +65,7 @@ namespace gazebo
 
       /// \brief Publish a protobuf message on the topic
       /// \param[in] _message Message to be published
-      /// \param[_block] Whether to block until the message is actually
+      /// \param[in] _block Whether to block until the message is actually
       /// written out
       public: void Publish(const google::protobuf::Message &_message,
                  bool _block = false)

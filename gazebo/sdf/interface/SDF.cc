@@ -728,7 +728,8 @@ ElementPtr Element::AddElement(const std::string &_name)
       for (iter2 = elem->elementDescriptions.begin();
            iter2 != elem->elementDescriptions.end(); ++iter2)
       {
-        elem->AddElement((*iter2)->name);
+        if ((*iter2)->GetRequired() == "1")
+          elem->AddElement((*iter2)->name);
       }
 
       return this->elements.back();
@@ -1000,6 +1001,27 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
       result = this->GetElementImpl(_key)->GetValueColor();
     else if (this->HasElementDescription(_key))
       result = this->GetElementDescription(_key)->GetValueColor();
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+gazebo::common::Time Element::GetValueTime(const std::string &_key)
+{
+  gazebo::common::Time result;
+  if (_key.empty())
+    this->value->Get(result);
+  else
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else if (this->HasElement(_key))
+      result = this->GetElementImpl(_key)->GetValueTime();
+    else if (this->HasElementDescription(_key))
+      result = this->GetElementDescription(_key)->GetValueTime();
     else
       gzerr << "Unable to find value for key[" << _key << "]\n";
   }
@@ -1330,10 +1352,10 @@ void SDF::PrintDoc()
   std::cout << "<ul><li><b>Left Panel:</b> List of all the SDF elements.</li>";
   std::cout << "<li><b>Right Panel:</b> Descriptions of all the SDF "
             << "elements.</li>";
-  std::cout << "<li><b>Selection:</b> Click an element in the Left Panel "
+  std::cout << "<li><b>Selection:</b> Clicking an element in the Left Panel "
             << "moves the corresponding description to the top of the Right "
             << "Panel.</li>";
-  std::cout << "<li><b>Search:</b> Use your web-browser's built in 'find' "
+  std::cout << "<li><b>Search:</b> Use your web-browser's built in 'Find' "
             << "function to locate a specific element."
             << "</li></ul>";
   std::cout << "</blockquote>";
@@ -1399,13 +1421,13 @@ std::string SDF::ToString() const
 {
   std::ostringstream stream;
 
-  if (this->root->GetName() != "gazebo")
-    stream << "<gazebo version='" << SDF::version << "'>\n";
+  if (this->root->GetName() != "sdf")
+    stream << "<sdf version='" << SDF::version << "'>\n";
 
   stream << this->root->ToString("");
 
-  if (this->root->GetName() != "gazebo")
-    stream << "</gazebo>";
+  if (this->root->GetName() != "sdf")
+    stream << "</sdf>";
 
   return stream.str();
 }
@@ -1413,7 +1435,7 @@ std::string SDF::ToString() const
 /////////////////////////////////////////////////
 void SDF::SetFromString(const std::string &_sdfData)
 {
-  sdf::initFile("gazebo.sdf", this->root);
+  sdf::initFile("root.sdf", this->root);
   if (!sdf::readString(_sdfData, this->root))
   {
     gzerr << "Unable to parse sdf string[" << _sdfData << "]\n";

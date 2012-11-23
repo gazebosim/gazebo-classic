@@ -28,7 +28,6 @@ namespace gazebo
 {
   namespace math
   {
-
     /// \def GeneratorType
     /// \brief boost::mt19937
     typedef boost::mt19937 GeneratorType;

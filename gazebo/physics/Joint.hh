@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include <boost/any.hpp>
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
@@ -111,10 +113,6 @@ namespace gazebo
 
       /// \brief Reset the joint.
       public: virtual void Reset();
-
-      /// \brief Get the joint state.
-      /// \return The current joint state.
-      public: JointState GetState();
 
       /// \brief Set the joint state.
       /// \param[in] _state Joint state
@@ -266,6 +264,10 @@ namespace gazebo
       /// \return Angle of the axis.
       public: math::Angle GetAngle(int _index) const;
 
+      /// \brief Get the angle count.
+      /// \return The number of DOF for the joint.
+      public: virtual unsigned int GetAngleCount() const = 0;
+
       /// \brief If the Joint is static, Gazebo stores the state of
       /// this Joint as a scalar inside the Joint class, so
       /// this call will NOT move the joint dynamically for a static Model.
@@ -305,7 +307,15 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
       public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value) = 0;
+                                        double _value) GAZEBO_DEPRECATED = 0;
+
+      /// \brief Set a non-generic parameter for the joint.
+      /// replaces SetAttribute(Attribute, int, double)
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual void SetAttribute(const std::string &_key, int _index,
+                                        const boost::any &_value) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
