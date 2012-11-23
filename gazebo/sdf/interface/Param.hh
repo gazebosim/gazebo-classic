@@ -169,12 +169,21 @@ namespace sdf
 
     /// \brief Destructor
     public: virtual ~ParamT() {}
+
+    /// \brief Update param value
     public: virtual void Update()
             {
               if (this->updateFunc)
               {
-                const T v = boost::any_cast<T>(this->updateFunc());
-                Param::Set(v);
+                try
+                {
+                  const T v = boost::any_cast<T>(this->updateFunc());
+                  Param::Set(v);
+                }
+                catch(boost::bad_any_cast &e)
+                {
+                  gzerr << "boost any_cast error:" << e.what() << "\n";
+                }
               }
             }
 

@@ -393,8 +393,7 @@ void Master::RemoveConnection(unsigned int _index)
     PubList::iterator pubIter = this->publishers.begin();
     while (pubIter != this->publishers.end())
     {
-      if ((*pubIter).second->id ==
-          connIter->second->id)
+      if ((*pubIter).second->GetId() == connIter->second->GetId())
       {
         this->RemovePublisher((*pubIter).first);
         done = false;
@@ -415,7 +414,7 @@ void Master::RemoveConnection(unsigned int _index)
     SubList::iterator subIter = this->subscribers.begin();
     while (subIter != this->subscribers.end())
     {
-      if ((*subIter).second->id == connIter->second->id)
+      if ((*subIter).second->GetId() == connIter->second->GetId())
       {
         this->RemoveSubscriber((*subIter).first);
         done = false;

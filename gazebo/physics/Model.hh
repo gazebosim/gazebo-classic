@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,20 +144,27 @@ namespace gazebo
       /// \return Get the number of joints.
       public: unsigned int GetJointCount() const;
 
-      /// \brief Construct and return a vector of Link's in this model.
-      /// Note this constructs the vector of Link's on the fly, could be costly.
-      /// \return A vector of Link's in this model.
-      public: Link_V GetAllLinks() const;
+      /// Deprecated
+      public: Link_V GetAllLinks() const GAZEBO_DEPRECATED;
 
-      /// \brief Get a joint by index.
-      /// \param[in] _index Index of the joint.
-      /// \return A pointer to the joint, NULL if the index is invalid.
-      public: JointPtr GetJoint(unsigned int _index) const;
+      /// \brief Construct and return a vector of Link's in this model
+      /// Note this constructs the vector of Link's on the fly, could be costly
+      /// \return a vector of Link's in this model
+      public: Link_V GetLinks() const;
 
-      /// \brief Get a joint.
-      /// \param[in] _name The name of the joint, specified in the world file.
-      /// \return Pointer to the joint, NULL if the name is invalid.
-      public: JointPtr GetJoint(const std::string &_name);
+      /// \brief Get a joint by index
+      /// \param index Index of the joint
+      /// \return A pointer to the joint
+      public: JointPtr GetJoint(unsigned int index) const GAZEBO_DEPRECATED;
+
+      /// \brief Get the joints.
+      /// \return Vector of joints.
+      public: const Joint_V &GetJoints() const;
+
+      /// \brief Get a joint
+      /// \param name The name of the joint, specified in the world file
+      /// \return Pointer to the joint
+      public: JointPtr GetJoint(const std::string &name);
 
       /// \brief Get a link by id.
       /// \return Pointer to the link, NULL if the id is invalid.
@@ -168,10 +175,8 @@ namespace gazebo
       /// \return Pointer to the link, NULL if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
 
-      /// \brief Get a child link by index.
-      /// \param[in] _index Index of the link.
-      /// \return Point to the link, NULL if the index is invalid.
-      public: LinkPtr GetLink(unsigned int _index) const;
+      /// \brief This function is dangerous. Do not use.
+      public: LinkPtr GetLink(unsigned int _index) const GAZEBO_DEPRECATED;
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
@@ -243,9 +248,6 @@ namespace gazebo
       /// \sa Model::AttachStaticModel.
       public: void DetachStaticModel(const std::string &_model);
 
-      /// \brief Get the current model state.
-      /// \return The current model state.
-      public: ModelState GetState();
 
       /// \brief Set the current model state.
       /// \param[in] _state State to set the model to.
@@ -283,6 +285,15 @@ namespace gazebo
       /// Load all plugins specified in the SDF for the model.
       public: void LoadPlugins();
 
+      /// \brief Get the number of plugins this model has.
+      /// \return Number of plugins associated with this model.
+      public: unsigned int GetPluginCount() const;
+
+      /// \brief Get the number of sensors attached to this model.
+      /// This will count all the sensors attached to all the links.
+      /// \return Number of sensors.
+      public: unsigned int GetSensorCount() const;
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -298,6 +309,11 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadGripper(sdf::ElementPtr _sdf);
 
+      /// used by Model::AttachStaticModel
+      protected: std::vector<ModelPtr> attachedModels;
+
+      /// used by Model::AttachStaticModel
+      protected: std::vector<math::Pose> attachedModelsOffset;
       /// \brief The canonical link of the model.
       private: LinkPtr canonicalLink;
 
@@ -329,11 +345,7 @@ namespace gazebo
       /// \brief Controller for the joints.
       private: JointController *jointController;
 
-      /// \brief Used by Model::AttachStaticModel.
-      protected: std::vector<ModelPtr> attachedModels;
-
-      /// \brief used by Model::AttachStaticModel.
-      protected: std::vector<math::Pose> attachedModelsOffset;
+      private: bool pluginsLoaded;
     };
     /// \}
   }

@@ -23,6 +23,7 @@
 #define _BULLETJOINT_HH_
 
 #include <boost/any.hpp>
+#include <string>
 
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/Joint.hh"

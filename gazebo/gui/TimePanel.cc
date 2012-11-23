@@ -17,6 +17,8 @@
 #include <sstream>
 
 #include "transport/Node.hh"
+
+#include "gui/Actions.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/TimePanel.hh"
 
@@ -124,6 +126,17 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 
   this->simTime = msgs::Convert(_msg->sim_time());
   this->realTime = msgs::Convert(_msg->real_time());
+
+  if (_msg->paused() && !g_pauseAct->isChecked())
+  {
+    g_pauseAct->setChecked(true);
+    g_playAct->setChecked(false);
+  }
+  else if (!_msg->paused() && !g_playAct->isChecked())
+  {
+    g_pauseAct->setChecked(false);
+    g_playAct->setChecked(true);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -55,30 +55,6 @@ Console *Console::Instance()
 //////////////////////////////////////////////////
 void Console::Load()
 {
-  char logFilename[50];
-
-  // TODO: Reimplement logging
-  /*if (**(this->logDataP))
-    {
-    time_t t;
-    struct tm *localTime;
-    char baseFilename[50];
-
-    time(&t);
-    localTime = localtime(&t);
-
-    strftime(baseFilename, sizeof(baseFilename),
-    "gazebo-%Y_%m_%d_%H_%M", localTime);
-
-    snprintf(logFilename, sizeof(logFilename), "%s.log", baseFilename);
-    }
-    else
-    {
-    */
-  snprintf(logFilename, strlen("/dev/null"), "/dev/null");
-  // }
-
-  this->logStream.open(logFilename, std::ios::out);
 }
 
 //////////////////////////////////////////////////
@@ -109,10 +85,4 @@ std::ostream &Console::ColorErr(const std::string &lbl,
     file.substr(index , file.size() - index)<< ":" << line << "]\033[0m ";
 
   return *this->errStream;
-}
-
-//////////////////////////////////////////////////
-std::ofstream &Console::Log()
-{
-  return this->logStream;
 }

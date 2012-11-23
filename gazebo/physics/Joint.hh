@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,10 +113,6 @@ namespace gazebo
 
       /// \brief Reset the joint.
       public: virtual void Reset();
-
-      /// \brief Get the joint state.
-      /// \return The current joint state.
-      public: JointState GetState();
 
       /// \brief Set the joint state.
       /// \param[in] _state Joint state
@@ -268,6 +264,10 @@ namespace gazebo
       /// \return Angle of the axis.
       public: math::Angle GetAngle(int _index) const;
 
+      /// \brief Get the angle count.
+      /// \return The number of DOF for the joint.
+      public: virtual unsigned int GetAngleCount() const = 0;
+
       /// \brief If the Joint is static, Gazebo stores the state of
       /// this Joint as a scalar inside the Joint class, so
       /// this call will NOT move the joint dynamically for a static Model.
@@ -317,11 +317,6 @@ namespace gazebo
       public: virtual void SetAttribute(const std::string &_key, int _index,
                                         const boost::any &_value) = 0;
 
-      /// \brief Set a parameter for the joint
-      public: virtual void SetThreadPitch(int /*_index*/,
-                                          const double /*_pitch*/)
-                {gzerr << "not implemented\n";}
-
       /// \brief Get the child link
       /// \return Pointer to the child link.
       public: LinkPtr GetChild() const;
@@ -331,6 +326,7 @@ namespace gazebo
       public: LinkPtr GetParent() const;
 
       /// \brief DEPRECATED
+      /// \param[out] _msg Message to fill with joint's properties
       /// \sa Joint::FillMsg
       public: void FillJointMsg(msgs::Joint &_msg) GAZEBO_DEPRECATED;
 

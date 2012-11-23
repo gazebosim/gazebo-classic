@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
+    /// \class PID PID.hh common/common.hh
     /// \brief Generic PID controller class.
     /// Generic proportiolnal-integral-derivative controller class that
     /// keeps track of PID-error states and control inputs given
