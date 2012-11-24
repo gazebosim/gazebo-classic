@@ -770,10 +770,6 @@ static void ComputeRows(
           if (b2>=0) b_damp[index] += JiM_ptr[j+6] * f_damp_ptr2[j];
         }
 
-        printf("\n-----------------\ndebug0: row[%d] ------------\nb_damp [%f]\n", i, b_damp[index]);
-        printf("debug0: JiM[%f %f %f %f %f %f]\n", JiM_ptr[0], JiM_ptr[1], JiM_ptr[2], JiM_ptr[3], JiM_ptr[4], JiM_ptr[5]);
-        printf("debug0: f_damp[%f %f %f %f %f %f]\n", f_damp_ptr1[0], f_damp_ptr1[1], f_damp_ptr1[2], f_damp_ptr1[3], f_damp_ptr1[4], f_damp_ptr1[5]);
-   
         // and scale JiM by Ad
         b_damp[index] *= Ad[index];
         // FIXME: find some kind of limiters that works as artificial dampers
@@ -878,21 +874,11 @@ static void ComputeRows(
           //      scaled by Ad_i, so we need to do the same to J*v(n+1)/h
           //      but given that J is already scaled by Ad_i, we don't have
           //      to do it explicitly here
-
-          printf("debug1: delta[%f] rhs[%f] old[%f] Adcfm[%f]\n", delta, rhs[index], old_lambda, Adcfm[index]);
-
-          printf("debug1: Adcfm[");
-          for (int kk = startRow ; kk < startRow+nRows ; ++kk)
-            printf("%f ", Adcfm[order[kk].index]);
-          printf("]\n");
-
           delta =
 #ifdef PENETRATION_JVERROR_CORRECTION
                  Jvnew_final +
 #endif
                 rhs[index] - old_lambda*Adcfm[index];
-
-          printf("debug2: delta[%f]\n", delta);
 
 #ifdef USE_JOINT_DAMPING
           /***************************************************************************/
@@ -904,8 +890,6 @@ static void ComputeRows(
           delta -= dot6(caccel_ptr1, J_ptr);
           if (caccel_ptr2)
             delta -= dot6(caccel_ptr2, J_ptr + 6);
-
-          printf("debug3: delta[%f]\n", delta);
 
           // set the limits for this constraint.
           // this is the place where the QuickStep method differs from the
@@ -1066,9 +1050,6 @@ static void ComputeRows(
     Jvnew_final = Jvnew_final > 1.0 ? 1.0 : ( Jvnew_final < -1.0 ? -1.0 : Jvnew_final );
 #endif
 
-
-    printf("debug: ============ end of loop on m ==========\n");
-
 #ifdef USE_JOINT_DAMPING
     /****************************************************************/
     /* compute v_damp per caccel update                             */
@@ -1087,7 +1068,6 @@ static void ComputeRows(
       dxBody *const *const bodyend = body + nb;
       const dReal *caccel_ptr = caccel;
 
-      printf("debug: assembling v_damp\n");
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccel_ptr+=6, invIrow += 12, f_damp_ptr+=6, v_damp_ptr+=6, bodycurr++) {
         // f_damp should be updated in SOR LCP
 
@@ -1108,9 +1088,6 @@ static void ComputeRows(
         }
         // v_damp = invI * f_damp
         dMultiplyAdd0_331 (v_damp_ptr+3, invIrow, tmp3);
-
-        printf("debug: caccel[%d][%f %f %f | %f %f %f]\n", bodycurr, caccel_ptr[0], caccel_ptr[1], caccel_ptr[2], caccel_ptr[3], caccel_ptr[4], caccel_ptr[5]);
-        printf("debug: v_damp[%d][%f %f %f | %f %f %f]\n", bodycurr, v_damp_ptr[0], v_damp_ptr[1], v_damp_ptr[2], v_damp_ptr[3], v_damp_ptr[4], v_damp_ptr[5]);
       }
     }
 
@@ -1125,7 +1102,6 @@ static void ComputeRows(
     /*                                                              */
     /****************************************************************/
     {
-      printf("debug: assembling f_damp\n");
       // dSetZero (f_damp,6*nb); // reset f_damp, following update skips around, so cannot set to 0 inline
       dRealPtr J_damp_ptr = J_damp;
       // compute f_damp and velocity updates
@@ -1141,14 +1117,11 @@ static void ComputeRows(
         if (b2 >= 0) for (int k=0;k<6;k++) v_joint_damp[j] += J_damp_ptr[k+6] * v_damp[b2*6+k];
         // multiply by damping coefficients (B is diagnoal)
         v_joint_damp[j] *= alpha * coeff_damp[j];
-        printf("debug8: alpha[%f] coeff[%d][%f]\n", alpha, j, coeff_damp[j]);
 
         // so now v_joint_damp = B * J_damp * v_damp
         // update f_damp = J_damp' * v_joint_damp
         for (int k=0; k<6; k++) f_damp[b1*6+k] = -J_damp_ptr[k]*v_joint_damp[j];
         if (b2 >= 0) for (int k=0; k<6; k++) f_damp[b2*6+k] = -J_damp_ptr[6+k]*v_joint_damp[j];
-
-        printf("debug: f_damp[%d][%f %f %f | %f %f %f]\n", j, f_damp[0], f_damp[1], f_damp[2], f_damp[3], f_damp[4], f_damp[5]);
       }
 
     }
@@ -1314,19 +1287,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
         for (int k=6; k<12; k++) sum += iMJ_ptr[k] * J_ptr[k];
       }
       Ad[i] = sor_w / (sum + cfm[i]);
-      printf("debug6: %d %f %f %f %f\n", i, Ad[i], sor_w, sum, cfm[i]);
-
-      for (int j=0; j<6; j++) printf("%f ", iMJ_ptr[j]);
-      printf("\n");
-      for (int j=0; j<6; j++) printf("%f ", J_ptr[j]);
-      printf("\n");
-      if (jb[i*2+1] >= 0) {
-        for (int j=6; j<12; j++) printf("%f ", iMJ_ptr[j]);
-        printf("\n");
-        for (int j=6; j<12; j++) printf("%f ", J_ptr[j]);
-        printf("\n");
-      }
-
     }
   }
 
@@ -1398,7 +1358,6 @@ static void SOR_LCP (dxWorldProcessContext *context,
       rhs[i] *= Ad_i;
       rhs_erp[i] *= Ad_i;
       // scale Ad by CFM. N.B. this should be done last since it is used above
-      printf("debug5: %d Ad_i[%f] cfm[%f]\n", i, Ad_i, cfm[i]);
       Adcfm[i] = Ad_i * cfm[i];
     }
   }
@@ -1902,7 +1861,6 @@ void dxQuickStepper (dxWorldProcessContext *context,
           /*******************************************************/
           /*  allocate space for damped joint Jacobians          */
           /*******************************************************/
-          printf("debug7: damping %d\n",jicurr->joint->use_damping);
           if (jicurr->joint->use_damping)
           {
             // damping coefficient is in jicurr->info.damping_coefficient);
