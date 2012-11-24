@@ -89,7 +89,7 @@ typedef dReal *dRealMutablePtr;
 // during the solution. depending on the situation, this can help a lot
 // or hardly at all, but it doesn't seem to hurt.
 
-#define RANDOMLY_REORDER_CONSTRAINTS 1
+// #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
 
@@ -1111,10 +1111,18 @@ static void ComputeRows(
         int b1 = jb_damp[j*2];
         int b2 = jb_damp[j*2+1];
         v_joint_damp[j] = 0;
-        // ramp-up
-        dReal alpha = (dReal)iteration / (dReal)num_iterations;
+
+        // ramp-up coefficient for the last quarter of the iteration
+        dReal alpha = 0.0;
+        if (iteration >= 3*(num_iterations-1)/4)
+          alpha = ((dReal)iteration - 3.0*(num_iterations-1)/4.0) /
+                        ((dReal)(num_iterations-1)/4.0);
+
         for (int k=0;k<6;k++) v_joint_damp[j] += J_damp_ptr[k] * v_damp[b1*6+k];
         if (b2 >= 0) for (int k=0;k<6;k++) v_joint_damp[j] += J_damp_ptr[k+6] * v_damp[b2*6+k];
+
+        // printf("%d [%d] a=%f v= %f\t",iteration, j, alpha, v_joint_damp[j]);
+
         // multiply by damping coefficients (B is diagnoal)
         v_joint_damp[j] *= alpha * coeff_damp[j];
 
@@ -1122,6 +1130,10 @@ static void ComputeRows(
         // update f_damp = J_damp' * v_joint_damp
         for (int k=0; k<6; k++) f_damp[b1*6+k] = -J_damp_ptr[k]*v_joint_damp[j];
         if (b2 >= 0) for (int k=0; k<6; k++) f_damp[b2*6+k] = -J_damp_ptr[6+k]*v_joint_damp[j];
+
+        // for (int k=0;k<6;k++)
+        //   printf("%f\t", f_damp[b1*6+k]);
+        // printf("\n");
       }
 
     }
