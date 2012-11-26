@@ -130,10 +130,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
   this->timer->start(44);
-
-  this->connections.push_back(
-      gui::Events::ConnectFullScreen(
-        boost::bind(&RenderWidget::OnFullScreen, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -143,14 +139,6 @@ RenderWidget::~RenderWidget()
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnFullScreen(bool &_value)
-{
-  if (_value)
-    this->setStyleSheet(tr("QWidget{margin: 0px; padding: 0px; border: 0px;}"));
-  else
-    this->setStyleSheet(tr("QWidget{margin-right: 10px;}"));
-}
-
 void RenderWidget::update()
 {
   if (this->clear)
