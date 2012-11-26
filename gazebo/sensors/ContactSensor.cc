@@ -36,7 +36,7 @@
 using namespace gazebo;
 using namespace sensors;
 
-transport::SubscriberPtr ContactSensor::contactSub = NULL;
+transport::SubscriberPtr ContactSensor::contactSub;
 
 GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
