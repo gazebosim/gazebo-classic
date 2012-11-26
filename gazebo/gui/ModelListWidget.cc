@@ -74,8 +74,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->modelTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->modelTreeWidget->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
-  this->modelTreeWidget->setItemDelegate(
-      new ModelListSheetDelegate(this->modelTreeWidget, this->modelTreeWidget));
 
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
