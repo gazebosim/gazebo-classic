@@ -446,7 +446,8 @@ class ServerFixture : public testing::Test
 
 
   protected: void SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _wait = true)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -478,7 +479,7 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
+               while (_wait && !this->HasEntity(_name))
                  common::Time::MSleep(10);
              }
 

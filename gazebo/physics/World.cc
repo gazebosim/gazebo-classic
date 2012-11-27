@@ -80,6 +80,9 @@ World::World(const std::string &_name)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
+  this->factorySDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", this->factorySDF);
+
   this->logPlayStateSDF.reset(new sdf::Element);
   sdf::initFile("state.sdf", this->logPlayStateSDF);
 
@@ -1234,8 +1237,7 @@ void World::ProcessFactoryMsgs()
   for (iter = this->factoryMsgs.begin();
        iter != this->factoryMsgs.end(); ++iter)
   {
-    sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("root.sdf", factorySDF);
+    this->factorySDF->root->ClearElements();
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
