@@ -21,7 +21,6 @@
 
 #include <sstream>
 
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -35,8 +34,6 @@
 
 using namespace gazebo;
 using namespace sensors;
-
-transport::SubscriberPtr ContactSensor::contactSub;
 
 GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
@@ -84,7 +81,7 @@ void ContactSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (this->contactSub == NULL)
+  if (!this->contactSub)
   {
     this->contactSub = this->node->Subscribe("~/physics/contacts",
         &ContactSensor::OnContacts, this);
@@ -132,12 +129,25 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
-/*  boost::mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->mutex);
 
-  if (this->contactsPub && this->contactsPub->HasConnections() &&
-      this->contacts.size() > 0)
+  if (this->contactsPub && this->contactsPub->HasConnections())
   {
     this->contactsMsg.clear_contact();
+
+    // Iterate over all the contact messages
+    for (ContactMsgs_L::iterator iter = this->incomingContacts.begin();
+         iter != this->incomingContacts.end(); ++iter)
+    {
+      for
+    }
+  }
+
+  this->incomingContacts.clear();
+
+/*
+
+  {
 
     Contact_M::iterator iter;
     std::map<std::string, physics::Contact>::iterator iter2;
@@ -266,5 +276,10 @@ void ContactSensor::OnContact(const std::string &_collisionName,
 //////////////////////////////////////////////////
 void ContactSensor::OnContacts(ConstContactsPtr &_msg)
 {
-  std::cout << "Got contact message\n";
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->incomingContacts.push_back(_msg);
+
+  // Prevent the incomingContacts list to grow indefinitely.
+  if (this->incomingContacts.size() > 100)
+    this->incomingContacts.pop_front();
 }

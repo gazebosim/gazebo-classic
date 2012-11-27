@@ -26,6 +26,8 @@
 #include <map>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/physics/Contact.hh"
@@ -120,9 +122,12 @@ namespace gazebo
       /// \brief Mutex to protect reads and writes.
       private: boost::mutex mutex;
 
-      private: msgs::Contacts contactsMsg;
+      private: msgs::Contacts contactsOutMsg;
 
-      private: static transport::SubscriberPtr contactSub;
+      typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;
+      private: ContactMsgs_L incomingContacts;
+
+      private: transport::SubscriberPtr contactSub;
     };
     /// \}
   }
