@@ -59,7 +59,11 @@ Light::~Light()
   if (this->light)
     this->scene->GetManager()->destroyLight(this->GetName());
 
+  this->visual->DeleteDynamicLine(this->line);
+  delete this->line;
   this->scene->RemoveVisual(this->visual);
+  this->visual.reset();
+
   this->sdf->Reset();
   this->sdf.reset();
 }
@@ -137,7 +141,7 @@ void Light::UpdateSDFFromMsg(ConstLightPtr &_msg)
     this->sdf->GetAttribute("type")->Set("point");
   else if (_msg->has_type() && _msg->type() == msgs::Light::SPOT)
     this->sdf->GetAttribute("type")->Set("spot");
-  else
+  else if (_msg->has_type() && _msg->type() == msgs::Light::DIRECTIONAL)
     this->sdf->GetAttribute("type")->Set("directional");
 
   if (_msg->has_diffuse())
@@ -254,7 +258,35 @@ void Light::CreateVisual()
   if (this->line)
     this->line->Clear();
   else
+  {
     this->line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
+
+    // Create a scene node to hold the light selection object.
+    Ogre::SceneNode *visSceneNode;
+    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
+        this->GetName() + "_SELECTION_NODE_");
+
+    // Make sure the unit_sphere has been inserted.
+    this->visual->InsertMesh("unit_sphere");
+
+    // Create the selection object.
+    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>
+      (visSceneNode->getCreator()->createEntity(this->GetName() +
+                                                "_selection_sphere",
+                                                "unit_sphere"));
+
+    // Attach the selection object to the light visual
+    visSceneNode->attachObject(obj);
+
+    // Make sure the selection object is rendered only in the selection
+    // buffer.
+    obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
+    obj->setUserAny(Ogre::Any(this->GetName()));
+    obj->setCastShadows(false);
+
+    // Scale the selection object to roughly match the light visual size.
+    visSceneNode->setScale(0.25, 0.25, 0.25);
+  }
 
   std::string lightType = this->sdf->GetValueString("type");
 
@@ -361,9 +393,10 @@ void Light::CreateVisual()
   }
 
   this->line->setMaterial("Gazebo/LightOn");
-  this->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  // turn off light source box visuals by default
+  this->line->setVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE |
+                                 GZ_VISIBILITY_GUI);
+
   this->visual->SetVisible(true);
 }
 

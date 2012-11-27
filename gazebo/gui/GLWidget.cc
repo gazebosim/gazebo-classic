@@ -107,6 +107,8 @@ GLWidget::GLWidget(QWidget *_parent)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->selectionSub = this->node->Subscribe("~/selection",
       &GLWidget::OnSelectionMsg, this);
@@ -126,6 +128,7 @@ GLWidget::~GLWidget()
   this->connections.clear();
   this->node.reset();
   this->modelPub.reset();
+  this->lightPub.reset();
   this->selectionSub.reset();
 
   this->userCamera.reset();
@@ -661,7 +664,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  this->userCamera->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0.0));
+  this->userCamera->SetWorldPose(math::Pose(5, -5, 2, 0,
+                                            GZ_DTOR(11.31), GZ_DTOR(135)));
 
   if (this->windowId >= 0)
   {
@@ -994,12 +998,24 @@ void GLWidget::PublishVisualPose(rendering::VisualPtr _vis)
 {
   if (_vis)
   {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
-    msg.set_name(_vis->GetName());
+    // Check to see if the visual is a model.
+    if (gui::get_entity_id(_vis->GetName()))
+    {
+      msgs::Model msg;
+      msg.set_id(gui::get_entity_id(_vis->GetName()));
+      msg.set_name(_vis->GetName());
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
-    this->modelPub->Publish(msg);
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      this->modelPub->Publish(msg);
+    }
+    // Otherwise, check to see if the visual is a light
+    else if (this->scene->GetLight(_vis->GetName()))
+    {
+      msgs::Light msg;
+      msg.set_name(_vis->GetName());
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      this->lightPub->Publish(msg);
+    }
   }
 }
 

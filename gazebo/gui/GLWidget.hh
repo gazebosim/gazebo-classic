@@ -154,6 +154,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
+      private: transport::PublisherPtr lightPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;

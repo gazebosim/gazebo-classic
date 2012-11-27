@@ -80,6 +80,9 @@ World::World(const std::string &_name)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->sdf);
 
+  this->factorySDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", this->factorySDF);
+
   this->logPlayStateSDF.reset(new sdf::Element);
   sdf::initFile("state.sdf", this->logPlayStateSDF);
 
@@ -355,37 +358,39 @@ void World::LogStep()
 //////////////////////////////////////////////////
 void World::Step()
 {
-  this->worldUpdateMutex->lock();
-
   // Send statistics about the world simulation
   if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
     this->PublishWorldStats();
   }
 
-  if (this->IsPaused() && !this->stepInc > 0)
-    this->pauseTime += this->physicsEngine->GetStepTime();
-  else
-  {
-    // sleep here to get the correct update rate
-    common::Time sleepTime = this->prevStepWallTime +
-      common::Time(this->physicsEngine->GetUpdatePeriod()) -
-      common::Time::GetWallTime() - this->sleepOffset;
+  // sleep here to get the correct update rate
+  common::Time tmpTime = common::Time::GetWallTime();
+  common::Time sleepTime = this->prevStepWallTime +
+    common::Time(this->physicsEngine->GetUpdatePeriod()) -
+    tmpTime - this->sleepOffset;
 
-    common::Time actualSleep = common::Time::GetWallTime();
+  if (sleepTime > 0)
     common::Time::NSleep(sleepTime);
-    common::Time tmpTime = common::Time::GetWallTime();
-    actualSleep = tmpTime - actualSleep;
+  else
+    sleepTime = 0;
 
-    // throttling update rate
-    if (tmpTime - this->prevStepWallTime
-           >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+  common::Time actualSleep = common::Time::GetWallTime() - tmpTime;
+
+  // exponentially avg out
+  this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
+                      this->sleepOffset * 0.99;
+  // throttling update rate, with sleepOffset as tolerance
+  // the tolerance is needed as the sleep time is not exact
+  if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
+         >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+  {
+    this->worldUpdateMutex->lock();
+
+    this->prevStepWallTime = common::Time::GetWallTime();
+
+    if (!this->IsPaused() || this->stepInc > 0)
     {
-      this->sleepOffset = tmpTime - this->prevStepWallTime
-        - common::Time(this->physicsEngine->GetUpdatePeriod())
-        + actualSleep - sleepTime;
-
-      this->prevStepWallTime = tmpTime;
       // query timestep to allow dynamic time step size updates
       this->simTime += this->physicsEngine->GetStepTime();
       this->Update();
@@ -393,11 +398,13 @@ void World::Step()
       if (this->IsPaused() && this->stepInc > 0)
         this->stepInc--;
     }
+    else
+      this->pauseTime += this->physicsEngine->GetStepTime();
+
+    this->worldUpdateMutex->unlock();
   }
 
   this->ProcessMessages();
-
-  this->worldUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -571,6 +578,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     msgs::Model msg;
     model->FillMsg(msg);
     this->modelPub->Publish(msg);
+
+    this->EnableAllModels();
   }
   else
   {
@@ -1228,8 +1237,7 @@ void World::ProcessFactoryMsgs()
   for (iter = this->factoryMsgs.begin();
        iter != this->factoryMsgs.end(); ++iter)
   {
-    sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("root.sdf", factorySDF);
+    this->factorySDF->root->ClearElements();
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
@@ -1436,7 +1444,6 @@ void World::SetState(const WorldState &_state)
       gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
   }
 }
-
 
 //////////////////////////////////////////////////
 void World::InsertModelFile(const std::string &_sdfFilename)
