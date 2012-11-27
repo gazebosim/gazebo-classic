@@ -387,6 +387,7 @@ void ODEPhysics::UpdatePhysics()
     this->physicsUpdateMutex->unlock();
   }
 
+  // Output the contact information
   this->contactManager->PublishContacts();
 }
 
@@ -887,7 +888,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     jointFeedback->count = 0;
     jointFeedback->contact = contactFeedback;
   }
-
 
   // Create a joint for each contact
   for (int j = 0; j < numc; j++)
