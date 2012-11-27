@@ -100,34 +100,28 @@ namespace gazebo
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
-      /// \brief Function callback that occurs during contact event
-      /// \param[in] _collisionName Name of collision
-      /// \param[in] _contact Contact undergoing event
-      private: void OnContact(const std::string &_collisionName,
-                              const physics::Contact &_contact);
-
       private: void OnContacts(ConstContactsPtr &_msg);
 
       /// \brief Collisions this sensor monitors for contacts
-      private: std::vector<physics::CollisionPtr> collisions;
+      private: std::vector<std::string> collisions;
 
-      private: typedef std::map<std::string,
-               std::map<std::string, physics::Contact> > Contact_M;
+      // private: typedef std::map<std::string,
+      //         std::map<std::string, physics::Contact> > Contact_M;
 
-      private: Contact_M contacts;
+      // private: Contact_M contacts;
 
       /// \brief Output contact information.
       private: transport::PublisherPtr contactsPub;
 
+      private: transport::SubscriberPtr contactSub;
+
       /// \brief Mutex to protect reads and writes.
       private: boost::mutex mutex;
 
-      private: msgs::Contacts contactsOutMsg;
+      private: msgs::Contacts contactsMsg;
 
       typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;
       private: ContactMsgs_L incomingContacts;
-
-      private: transport::SubscriberPtr contactSub;
     };
     /// \}
   }

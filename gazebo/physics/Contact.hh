@@ -26,7 +26,7 @@
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/physics/JointFeedback.hh"
+#include "gazebo/physics/JointWrench.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
 // MAX_COLLIDE_RETURNS limits contact detection, needs to be large
@@ -76,7 +76,7 @@ namespace gazebo
       public: Collision *collision2;
 
       /// \brief Array of forces for the contact.
-      public: JointFeedback forces[MAX_CONTACT_JOINTS];
+      public: JointWrench wrench[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force positions.
       public: math::Vector3 positions[MAX_CONTACT_JOINTS];
