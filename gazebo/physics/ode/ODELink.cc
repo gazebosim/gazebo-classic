@@ -71,8 +71,9 @@ void ODELink::Init()
     this->linkId = dBodyCreate(this->odePhysics->GetWorldId());
     dBodySetData(this->linkId, this);
 
-    // Only use auto disable if no joints are present
-    if (this->GetModel()->GetJointCount() == 0)
+    // Only use auto disable if no joints and no sensors are present
+    if (this->GetModel()->GetJointCount() == 0 &&
+        this->GetSensorCount() == 0)
     {
       dBodySetAutoDisableDefaults(this->linkId);
       dBodySetAutoDisableFlag(this->linkId, 1);

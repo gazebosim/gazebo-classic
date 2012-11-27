@@ -26,6 +26,7 @@
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Collision.hh"
 
@@ -69,7 +70,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     // This will create a topic based on the name of the parent and the
     // name of the sensor.
     std::string topicName = "~/";
-    topicName += this->parentName + "/" + this->GetName() + "/imu";
+    topicName += this->parentName + "/" + this->GetName();
     boost::replace_all(topicName, "::", "/");
 
     this->contactsPub = this->node->Advertise<msgs::Contacts>(topicName);
@@ -121,6 +122,10 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
   std::vector<std::string>::iterator collIter;
   std::string collision1, collision2;
 
+  // Don't do anything if there is no new data to process.
+  if (this->incomingContacts.size() == 0)
+    return;
+
   // Clear the outgoing contact message.
   this->contactsMsg.clear_contact();
 
@@ -129,9 +134,9 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
       iter != this->incomingContacts.end(); ++iter)
   {
     // Iterate over all the contacts in the message
-    for (unsigned int i = 0; i < (*iter)->contact_size(); ++i)
+    for (int i = 0; i < (*iter)->contact_size(); ++i)
     {
-      collision1 = (*iter)->contact[i].collision1();
+      collision1 = (*iter)->contact(i).collision1();
 
       // Try to find the first collision's name
       collIter = std::find(this->collisions.begin(),
@@ -141,23 +146,23 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
       if (collIter == this->collisions.end())
       {
         collision2 = collision1;
-        collision1 = (*iter)->contact[i].collision2();
+        collision1 = (*iter)->contact(i).collision2();
         collIter = std::find(this->collisions.begin(),
             this->collisions.end(), collision1);
       }
       else
-        collision2 = (*iter)->contact[i].collision2();
+        collision2 = (*iter)->contact(i).collision2();
 
       // If this sensor is monitoring one of the collision's in the
       // contact, then add the contact to our outgoing message.
       if (collIter != this->collisions.end())
       {
-        unsigned int count = (*iter)->contact[i].position_size();
+        int count = (*iter)->contact(i).position_size();
 
         // Check to see if the contact arrays all have the same size.
-        if (count != (*iter)->contact[i].normal_size() ||
-            count != (*iter)->contact[i].wrench_size() ||
-            count != (*iter)->contact[i].depth_size())
+        if (count != (*iter)->contact(i).normal_size() ||
+            //count != (*iter)->contact(i).wrench_size() ||
+            count != (*iter)->contact(i).depth_size())
         {
           gzerr << "Contact message has invalid array sizes\n";
           continue;
@@ -165,7 +170,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 
         // Copy the contact message.
         msgs::Contact *contactMsg = this->contactsMsg.add_contact();
-        contactMsg->CopyFrom((*iter)->contact[i]);
+        contactMsg->CopyFrom((*iter)->contact(i));
       }
     }
   }
@@ -173,13 +178,14 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
   // Clear the incoming contact list.
   this->incomingContacts.clear();
 
+  this->lastMeasurementTime = this->world->GetSimTime();
+
   // Generate a outgoing message only if someone is listening.
   if (this->contactsPub && this->contactsPub->HasConnections())
   {
+    msgs::Set(this->contactsMsg.mutable_time(), this->lastMeasurementTime);
     this->contactsPub->Publish(this->contactsMsg);
   }
-
-  this->lastMeasurementTime = this->world->GetSimTime();
 }
 
 //////////////////////////////////////////////////
@@ -200,7 +206,7 @@ std::string ContactSensor::GetCollisionName(unsigned int _index) const
   std::string result;
 
   if (_index < this->collisions.size())
-    result = this->collisions[_index]->GetScopedName();
+    result = this->collisions[_index];
 
   return result;
 }
@@ -211,12 +217,12 @@ unsigned int ContactSensor::GetCollisionContactCount(
 {
   unsigned int result = 0;
 
-  for (unsigned int i = 0; i < this->contactsMsg.contact_size(); ++i)
+  for (int i = 0; i < this->contactsMsg.contact_size(); ++i)
   {
-    if (this->contactsMsg.contact[i].collision1() == _collisionName ||
-        this->contactsMsg.contact[i].collision2() == _collisionName)
+    if (this->contactsMsg.contact(i).collision1() == _collisionName ||
+        this->contactsMsg.contact(i).collision2() == _collisionName)
     {
-      result += this->contactsMsg.contact[i].position_size();
+      result += this->contactsMsg.contact(i).position_size();
     }
   }
 
@@ -225,32 +231,8 @@ unsigned int ContactSensor::GetCollisionContactCount(
 
 //////////////////////////////////////////////////
 physics::Contact ContactSensor::GetCollisionContact(
-    const std::string &_collisionName, unsigned int _index) const
+    const std::string & /*_collisionName*/, unsigned int /*_index*/) const
 {
-  Contact_M::const_iterator iter = this->contacts.find(_collisionName);
-
-  if (iter != this->contacts.end())
-  {
-    if (_index < iter->second.size())
-    {
-      std::map<std::string, physics::Contact>::const_iterator iter2;
-      iter2 = iter->second.begin();
-      std::advance(iter2, _index);
-      return iter2->second;
-    }
-    else
-    {
-      gzerr << "Invalid index[" << _index
-            << "] retreiving contact for collision[" << _collisionName
-            << "] in contact sensor[" << this->GetName() << "]\n";
-    }
-  }
-  else
-  {
-    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision["
-          << _collisionName << "]\n";
-  }
-
   return physics::Contact();
 }
 
@@ -262,30 +244,19 @@ std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
 
   std::string collision2;
 
-  for (unsigned int i = 0; i < this->contactsMsg.contact_size(); ++i)
+  for (int i = 0; i < this->contactsMsg.contact_size(); ++i)
   {
     collision2.clear();
 
-    if (this->contactsMsg.contact[i].collision1() == _collisionName)
-      collision2 = this->contactsMsg.contact[i].collision2();
-    else if (this->contactsMsg.contact[i].collision2() == _collisionName)
-      collision2 =  this->contactsMsg.contact[i].collision1();
+    if (this->contactsMsg.contact(i).collision1() == _collisionName)
+      collision2 = this->contactsMsg.contact(i).collision2();
+    else if (this->contactsMsg.contact(i).collision2() == _collisionName)
+      collision2 =  this->contactsMsg.contact(i).collision1();
 
     if (collision2.empty())
       continue;
 
-    msgs::Set(result[collision2].position[j],
-              this->contactsMsg.contact[i].position[j]);
-
-    msgs::Set(result[collision2].normal[j],
-              this->contactsMsg.contact[i].normal[j]);
-
-    result[collision2].normal[j].depth[j] =
-      this->contactsMsg.contact[i].depth[j];
-
-    msgs::Set(result[collision2].wrench[j].body1Force,
-              this->contactsMsg.contact[i].wrench[j].body_1_force());
-
+    result[collision2] = this->contactsMsg.contact(i);
   }
 
   return result;

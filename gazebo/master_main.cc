@@ -16,9 +16,11 @@
 */
 #include <signal.h>
 #include <boost/lexical_cast.hpp>
-#include "transport/Transport.hh"
-#include "Master.hh"
-#include "gazebo_config.h"
+
+#include "gazebo/common/Exception.hh"
+#include "gazebo/transport/Transport.hh"
+#include "gazebo/Master.hh"
+#include "gazebo/gazebo_config.h"
 
 gazebo::Master *master = NULL;
 
@@ -37,26 +39,33 @@ void SignalHandler(int /*dummy*/)
 
 int main(int /*argc*/, char ** /*argv*/)
 {
-  PrintVersion();
-
-  if (signal(SIGINT, SignalHandler) == SIG_ERR)
+  try
   {
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
-    return -1;
+    PrintVersion();
+
+    if (signal(SIGINT, SignalHandler) == SIG_ERR)
+    {
+      std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+      return -1;
+    }
+
+    std::string host = "";
+    unsigned int port = 0;
+
+    if (!gazebo::transport::get_master_uri(host, port))
+
+      master = new gazebo::Master();
+    master->Init(port);
+    master->Run();
+    master->Fini();
+
+    delete master;
+    master = NULL;
   }
-
-  std::string host = "";
-  unsigned int port = 0;
-
-  if (!gazebo::transport::get_master_uri(host, port))
-
-  master = new gazebo::Master();
-  master->Init(port);
-  master->Run();
-  master->Fini();
-
-  delete master;
-  master = NULL;
+  catch(gazebo::common::Exception &_e)
+  {
+    _e.Print();
+  }
 
   return 1;
 }

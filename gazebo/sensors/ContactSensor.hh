@@ -87,12 +87,10 @@ namespace gazebo
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
-      /// \brief Get a contact for a collision by index
-      /// \param[in] _collisionName Name of collision contact
-      /// \param[in] _index Index of collision to get
-      /// \return Contact object
+      /// Deprecated. Use ContactSensor::GetContacts
       public: physics::Contact GetCollisionContact(
-                  const std::string &_collisionName, unsigned int _index) const;
+                  const std::string &_collisionName, unsigned int _index) const
+              GAZEBO_DEPRECATED;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
@@ -100,24 +98,22 @@ namespace gazebo
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
+      /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);
 
       /// \brief Collisions this sensor monitors for contacts
       private: std::vector<std::string> collisions;
 
-      // private: typedef std::map<std::string,
-      //         std::map<std::string, physics::Contact> > Contact_M;
-
-      // private: Contact_M contacts;
-
       /// \brief Output contact information.
       private: transport::PublisherPtr contactsPub;
 
+      /// \brief Subscription to contact messages from the physics engine
       private: transport::SubscriberPtr contactSub;
 
       /// \brief Mutex to protect reads and writes.
       private: boost::mutex mutex;
 
+      /// \brief Contacts message used to output sensor data.
       private: msgs::Contacts contactsMsg;
 
       typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;

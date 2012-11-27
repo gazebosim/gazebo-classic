@@ -28,8 +28,6 @@ using namespace physics;
 //////////////////////////////////////////////////
 Contact::Contact()
 {
-  this->collision1 = NULL;
-  this->collision2 = NULL;
   this->count = 0;
 }
 
@@ -51,21 +49,58 @@ Contact Contact::Clone() const
 }
 
 //////////////////////////////////////////////////
-Contact &Contact::operator =(const Contact &contact)
+Contact &Contact::operator =(const Contact &_contact)
 {
-  this->collision1 = contact.collision1;
-  this->collision2 = contact.collision2;
+  this->collision1 = _contact.collision1;
+  this->collision2 = _contact.collision2;
 
-  this->count = contact.count;
+  this->count = _contact.count;
   for (int i = 0; i < MAX_CONTACT_JOINTS; i++)
   {
-    this->forces[i] = contact.forces[i];
-    this->positions[i] = contact.positions[i];
-    this->normals[i] = contact.normals[i];
-    this->depths[i] = contact.depths[i];
+    this->wrench[i] = _contact.wrench[i];
+    this->positions[i] = _contact.positions[i];
+    this->normals[i] = _contact.normals[i];
+    this->depths[i] = _contact.depths[i];
   }
 
-  this->time = contact.time;
+  this->time = _contact.time;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Contact &Contact::operator =(const msgs::Contact &_contact)
+{
+  this->count = 0;
+
+  this->collision1 = _contact.collision1();
+  this->collision2 = _contact.collision2();
+
+  for (int j = 0; j < _contact.position_size(); ++j)
+  {
+    this->positions[j] = msgs::Convert(_contact.position(j));
+
+    this->normals[j] = msgs::Convert(_contact.normal(j));
+
+    this->depths[j] = _contact.depth(j);
+/*
+    this->wrench[j].body1Force =
+      msgs::Convert(_contact.wrench(j).body_1_force());
+
+    this->wrench[j].body2Force =
+      msgs::Convert(_contact.wrench(j).body_1_force());
+
+    this->wrench[j].body1Torque =
+      msgs::Convert(_contact.wrench(j).body_1_torque());
+
+    this->wrench[j].body2Torque =
+      msgs::Convert(_contact.wrench(j).body_2_torque());
+      */
+
+    this->count++;
+  }
+
+  this->time = msgs::Convert(_contact.time());
 
   return *this;
 }
@@ -76,4 +111,27 @@ void Contact::Reset()
   this->count = 0;
 }
 
+//////////////////////////////////////////////////
+std::string Contact::DebugString() const
+{
+  std::ostringstream stream;
 
+  stream << "Collision 1[" << this->collision1 << "]\n"
+         << "Collision 2[" << this->collision2 << "]\n"
+         << "Time[" << this->time << "]\n"
+         << "Contact Count[" << this->count << "]\n";
+
+  for (int i = 0; i < this->count; ++i)
+  {
+    stream << "--- Contact[" << i << "]\n";
+    stream << "  Depth[" << this->depths[i] << "]\n"
+           << "  Position[" << this->positions[i] << "]\n"
+           << "  Normal[" << this->normals[i] << "]\n";
+           // << "  Force1[" << this->wrench[i].body1Force << "]\n"
+           // << "  Force2[" << this->wrench[i].body2Force << "]\n"
+           // << "  Torque1[" << this->wrench[i].body1Torque << "]\n"
+           // << "  Torque2[" << this->wrench[i].body2Torque << "]\n";
+  }
+
+  return stream.str();
+}

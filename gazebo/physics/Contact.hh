@@ -24,6 +24,8 @@
 
 #include <vector>
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/JointWrench.hh"
@@ -66,14 +68,23 @@ namespace gazebo
       /// \return Reference to this contact
       public: Contact &operator =(const Contact &_contact);
 
+      /// \brief Operator =.
+      /// \param[in] _contact msgs::Contact to copy.
+      /// \return Reference to this contact
+      public: Contact &operator =(const msgs::Contact &_contact);
+
+      /// \brief Produce a debug string.
+      /// \return A string that contains the values of the contact.
+      public: std::string DebugString() const;
+
       /// \brief Reset to default values.
       public: void Reset();
 
-      /// \brief Pointer to the first collision in the contact.
-      public: Collision *collision1;
+      /// \brief Name of the first collision object
+      public: std::string collision1;
 
-      /// \brief Pointer to the second collision in the contact.
-      public: Collision *collision2;
+      /// \brief Name of the second collision object
+      public: std::string collision2;
 
       /// \brief Array of forces for the contact.
       public: JointWrench wrench[MAX_CONTACT_JOINTS];

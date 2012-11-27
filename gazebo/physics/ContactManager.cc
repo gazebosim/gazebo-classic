@@ -81,8 +81,8 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   }
 
   result->count = 0;
-  result->collision1 = _collision1;
-  result->collision2 = _collision2;
+  result->collision1 = _collision1->GetScopedName();
+  result->collision2 = _collision2->GetScopedName();
   result->time = _time;
 
   return result;
@@ -144,10 +144,13 @@ void ContactManager::PublishContacts()
 
   for (unsigned int i = 0; i < this->contactIndex; ++i)
   {
+    if (this->contacts[i]->count == 0)
+      continue;
+
     msgs::Contact *contactMsg = msg.add_contact();
 
-    contactMsg->set_collision1(this->contacts[i]->collision1->GetScopedName());
-    contactMsg->set_collision2(this->contacts[i]->collision2->GetScopedName());
+    contactMsg->set_collision1(this->contacts[i]->collision1);
+    contactMsg->set_collision2(this->contacts[i]->collision2);
     msgs::Set(contactMsg->mutable_time(), this->contacts[i]->time);
 
     for (int j = 0; j < this->contacts[i]->count; ++j)

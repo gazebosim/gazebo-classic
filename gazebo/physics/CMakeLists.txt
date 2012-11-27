@@ -59,7 +59,7 @@ set (headers
   Gripper.hh
   Joint.hh
   JointController.hh
-  JointFeedback.hh
+  JointWrench.hh
   JointState.hh
   Link.hh
   LinkState.hh
