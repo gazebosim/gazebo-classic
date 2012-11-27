@@ -102,7 +102,7 @@ void LogPlay::Open(const std::string &_logFile)
 void LogPlay::ReadHeader()
 {
   std::string logVersion, gazeboVersion;
-  uint32_t randSeed;
+  uint32_t randSeed = math::Rand::GetSeed();
   TiXmlElement *headerXml, *childXml;
 
   // Get the header element
