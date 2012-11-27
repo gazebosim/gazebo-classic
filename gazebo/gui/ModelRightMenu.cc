@@ -187,7 +187,8 @@ void ModelRightMenu::OnShowCOM()
 /////////////////////////////////////////////////
 void ModelRightMenu::OnTransparent()
 {
-  this->transparentActionState[this->modelName] = this->transparentAct->isChecked();
+  this->transparentActionState[this->modelName] =
+    this->transparentAct->isChecked();
 
   if (this->transparentAct->isChecked())
   {

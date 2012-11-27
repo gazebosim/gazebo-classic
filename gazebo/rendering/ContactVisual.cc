@@ -86,6 +86,14 @@ void ContactVisual::Update()
           this->contactsMsg->contact(i).normal(j));
       double depth = this->contactsMsg->contact(i).depth(j);
 
+      math::Vector3 force = msgs::Convert(
+          this->contactsMsg->contact(i).wrench(j).body_1_force());
+
+      // Scaling factor for the normal line.
+      double normalScale = force.GetSquaredLength() * 0.01;
+      normalScale = std::max(0.1, normalScale);
+      normalScale = std::min(0.5, normalScale);
+
       // Create a new contact visualization point if necessary
       if (c >= this->points.size())
         this->CreateNewPoint();
@@ -93,7 +101,7 @@ void ContactVisual::Update()
       this->points[c]->sceneNode->setVisible(true);
       this->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
 
-      this->points[c]->normal->SetPoint(1, normal*0.1);
+      this->points[c]->normal->SetPoint(1, normal*normalScale);
       this->points[c]->depth->SetPoint(1, normal*-depth*10);
 
       this->points[c]->normal->setMaterial("Gazebo/LightOn");

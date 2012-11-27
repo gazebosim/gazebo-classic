@@ -83,7 +83,7 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
     this->normals[j] = msgs::Convert(_contact.normal(j));
 
     this->depths[j] = _contact.depth(j);
-/*
+
     this->wrench[j].body1Force =
       msgs::Convert(_contact.wrench(j).body_1_force());
 
@@ -95,7 +95,6 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
 
     this->wrench[j].body2Torque =
       msgs::Convert(_contact.wrench(j).body_2_torque());
-      */
 
     this->count++;
   }
@@ -126,12 +125,36 @@ std::string Contact::DebugString() const
     stream << "--- Contact[" << i << "]\n";
     stream << "  Depth[" << this->depths[i] << "]\n"
            << "  Position[" << this->positions[i] << "]\n"
-           << "  Normal[" << this->normals[i] << "]\n";
-           // << "  Force1[" << this->wrench[i].body1Force << "]\n"
-           // << "  Force2[" << this->wrench[i].body2Force << "]\n"
-           // << "  Torque1[" << this->wrench[i].body1Torque << "]\n"
-           // << "  Torque2[" << this->wrench[i].body2Torque << "]\n";
+           << "  Normal[" << this->normals[i] << "]\n"
+           << "  Force1[" << this->wrench[i].body1Force << "]\n"
+           << "  Force2[" << this->wrench[i].body2Force << "]\n"
+           << "  Torque1[" << this->wrench[i].body1Torque << "]\n"
+           << "  Torque2[" << this->wrench[i].body2Torque << "]\n";
   }
 
   return stream.str();
+}
+
+//////////////////////////////////////////////////
+void Contact::FillMsg(msgs::Contact &_msg) const
+{
+  _msg.set_collision1(this->collision1);
+  _msg.set_collision2(this->collision2);
+  msgs::Set(_msg.mutable_time(), this->time);
+
+  for (int j = 0; j < this->count; ++j)
+  {
+    _msg.add_depth(this->depths[j]);
+
+    msgs::Set(_msg.add_position(), this->positions[j]);
+    msgs::Set(_msg.add_normal(), this->normals[j]);
+
+    msgs::JointWrench *jntWrench = _msg.add_wrench();
+    jntWrench->set_body_1_name(this->collision1);
+    jntWrench->set_body_2_name(this->collision2);
+    msgs::Set(jntWrench->mutable_body_1_force(), this->wrench[j].body1Force);
+    msgs::Set(jntWrench->mutable_body_2_force(), this->wrench[j].body2Force);
+    msgs::Set(jntWrench->mutable_body_1_torque(), this->wrench[j].body1Torque);
+    msgs::Set(jntWrench->mutable_body_2_torque(), this->wrench[j].body2Torque);
+  }
 }

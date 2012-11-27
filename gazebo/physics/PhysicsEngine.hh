@@ -283,7 +283,6 @@ namespace gazebo
       /// \brief Store the value of the updateRate parameter in double form.
       /// To improve efficiency.
       private: double updateRateDouble;
-
     };
     /// \}
   }

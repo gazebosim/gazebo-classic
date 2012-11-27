@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <map>
+#include <list>
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
@@ -97,6 +98,9 @@ namespace gazebo
       /// \return Container of contacts
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
+
+      // Documentation inherited.
+      public: virtual bool IsActive();
 
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);

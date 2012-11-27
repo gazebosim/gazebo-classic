@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
     delete server;
   }
-  catch (gazebo::common::Exception &_e)
+  catch(gazebo::common::Exception &_e)
   {
     _e.Print();
   }

@@ -47,7 +47,6 @@ RaySensor::RaySensor()
     : Sensor()
 {
   this->mutex = new boost::mutex();
-  this->active = false;
 }
 
 //////////////////////////////////////////////////

@@ -23,6 +23,7 @@
 #define _CONTACT_HH_
 
 #include <vector>
+#include <string>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -41,7 +42,6 @@ namespace gazebo
 {
   namespace physics
   {
-    class Collision;
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -72,6 +72,10 @@ namespace gazebo
       /// \param[in] _contact msgs::Contact to copy.
       /// \return Reference to this contact
       public: Contact &operator =(const msgs::Contact &_contact);
+
+      /// \brief Populate a msgs::Contact with data from this.
+      /// \param[out] _msg Contact message the will hold the data.
+      public: void FillMsg(msgs::Contact &_msg) const;
 
       /// \brief Produce a debug string.
       /// \return A string that contains the values of the contact.

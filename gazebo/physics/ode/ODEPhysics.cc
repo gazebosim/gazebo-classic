@@ -137,6 +137,14 @@ ODEPhysics::~ODEPhysics()
 
   dJointGroupDestroy(this->contactGroup);
 
+  // Delete all the joint feedbacks.
+  for (std::vector<ODEJointFeedback*>::iterator iter =
+      this->jointFeedbacks.begin(); iter != this->jointFeedbacks.end(); ++iter)
+  {
+    delete *iter;
+  }
+  this->jointFeedbacks.clear();
+
   if (this->spaceId)
   {
     dSpaceSetCleanup(this->spaceId, 0);
@@ -313,6 +321,7 @@ void ODEPhysics::UpdateCollision()
   unsigned int i = 0;
   this->collidersCount = 0;
   this->trimeshCollidersCount = 0;
+  this->jointFeedbackIndex = 0;
 
   // Reset the contact count
   this->contactManager->ResetCount();
@@ -327,7 +336,7 @@ void ODEPhysics::UpdateCollision()
         this->colliders[i].second, this->contactCollisions);
   }
 
-  // Generater trimesh collision.
+  // Generate trimesh collision.
   // This must happen in this thread sequentially
   for (i = 0; i < this->trimeshCollidersCount; ++i)
   {
@@ -335,9 +344,6 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
-  /*std::cout << "Contact Count["
-              << this->contactManager->GetContactCount() << "]\n";
-              */
 }
 
 //////////////////////////////////////////////////
@@ -349,6 +355,33 @@ void ODEPhysics::UpdatePhysics()
 
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
+
+    // Set the joint contact feedback for each contact.
+    for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
+    {
+      for (int j = 0; j < this->jointFeedbacks[i]->count; ++j)
+      {
+        this->jointFeedbacks[i]->contact->wrench[j].body1Force.Set(
+            this->jointFeedbacks[i]->feedbacks[j].f1[0],
+            this->jointFeedbacks[i]->feedbacks[j].f1[1],
+            this->jointFeedbacks[i]->feedbacks[j].f1[2]);
+
+        this->jointFeedbacks[i]->contact->wrench[j].body2Force.Set(
+            this->jointFeedbacks[i]->feedbacks[j].f2[0],
+            this->jointFeedbacks[i]->feedbacks[j].f2[1],
+            this->jointFeedbacks[i]->feedbacks[j].f2[2]);
+
+        this->jointFeedbacks[i]->contact->wrench[j].body1Torque.Set(
+            this->jointFeedbacks[i]->feedbacks[j].t1[0],
+            this->jointFeedbacks[i]->feedbacks[j].t1[1],
+            this->jointFeedbacks[i]->feedbacks[j].t1[2]);
+
+        this->jointFeedbacks[i]->contact->wrench[j].body2Torque.Set(
+            this->jointFeedbacks[i]->feedbacks[j].t2[0],
+            this->jointFeedbacks[i]->feedbacks[j].t2[1],
+            this->jointFeedbacks[i]->feedbacks[j].t2[2]);
+      }
+    }
 
     dJointGroupEmpty(this->contactGroup);
     this->physicsUpdateMutex->unlock();
@@ -832,6 +865,30 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
+  // Add a new contact to the manager. This will return NULL if no one is
+  // listening for contact information.
+  Contact *contactFeedback = this->contactManager->NewContact(_collision1,
+      _collision2, this->world->GetSimTime());
+
+  ODEJointFeedback *jointFeedback = NULL;
+
+  // Create a joint feedback mechanism
+  if (contactFeedback)
+  {
+    if (this->jointFeedbackIndex < this->jointFeedbacks.size())
+      jointFeedback = this->jointFeedbacks[this->jointFeedbackIndex];
+    else
+    {
+      jointFeedback = new ODEJointFeedback();
+      this->jointFeedbacks.push_back(jointFeedback);
+    }
+
+    this->jointFeedbackIndex++;
+    jointFeedback->count = 0;
+    jointFeedback->contact = contactFeedback;
+  }
+
+
   // Create a joint for each contact
   for (int j = 0; j < numc; j++)
   {
@@ -842,20 +899,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     dJointID contactJoint =
       dJointCreateContact(this->worldId, this->contactGroup, &contact);
 
-    // Attach the contact joint.
-    dJointAttach(contactJoint, b1, b2);
-  }
-
-  // Add a new contact to the manager. This will return NULL if no one is
-  // listening for contact information.
-  Contact *contactFeedback = this->contactManager->NewContact(_collision1,
-      _collision2, this->world->GetSimTime());
-
-  // Store contact information if someone is listening to the contact
-  // manager
-  if (contactFeedback)
-  {
-    for (int j = 0; j < numc; j++)
+    // Store contact information.
+    if (contactFeedback && jointFeedback)
     {
       // Store the contact depth
       contactFeedback->depths[j] = _contactCollisions[this->indices[j]].depth;
@@ -872,61 +917,18 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
           _contactCollisions[this->indices[j]].normal[1],
           _contactCollisions[this->indices[j]].normal[2]);
 
+      // Set the joint feedback.
+      dJointSetFeedback(contactJoint, &(jointFeedback->feedbacks[j]));
+
       // Increase the counters
       contactFeedback->count++;
-
-      // Set the joint feedback.
-      // REMOVED: dJointSetFeedback(contactJoint, &(contactFeedback->feedbacks[j]));
+      jointFeedback->count++;
     }
+
+    // Attach the contact joint.
+    dJointAttach(contactJoint, b1, b2);
   }
 }
-
-//////////////////////////////////////////////////
-/*void ODEPhysics::ProcessContactFeedback(ContactFeedback *_feedback,
-                                        msgs::Contact *_msg)
-{
-  if (_feedback->contact.collision1 == NULL)
-    gzerr << "collision update Collision1 is null\n";
-
-  if (_feedback->contact.collision2 == NULL)
-    gzerr << "Collision update Collision2 is null\n";
-
-  _msg->set_collision1(_feedback->contact.collision1->GetScopedName());
-  _msg->set_collision2(_feedback->contact.collision2->GetScopedName());
-
-  // Copy all the joint forces to the contact
-  for (int i = 0; i < _feedback->feedbackCount; i++)
-  {
-    msgs::Set(_msg->add_position(), _feedback->contact.positions[i]);
-    msgs::Set(_msg->add_normal(), _feedback->contact.normals[i]);
-    _msg->add_depth(_feedback->contact.depths[i]);
-    msgs::Set(_msg->mutable_time(), _feedback->contact.time);
-
-    _feedback->contact.forces[i].body1Force.Set(
-        _feedback->feedbacks[i].f1[0],
-        _feedback->feedbacks[i].f1[1],
-        _feedback->feedbacks[i].f1[2]);
-
-    _feedback->contact.forces[i].body2Force.Set(
-        _feedback->feedbacks[i].f2[0],
-        _feedback->feedbacks[i].f2[1],
-        _feedback->feedbacks[i].f2[2]);
-
-    _feedback->contact.forces[i].body1Torque.Set(
-        _feedback->feedbacks[i].t1[0],
-        _feedback->feedbacks[i].t1[1],
-        _feedback->feedbacks[i].t1[2]);
-
-    _feedback->contact.forces[i].body2Torque.Set(
-        _feedback->feedbacks[i].t2[0],
-        _feedback->feedbacks[i].t2[1],
-        _feedback->feedbacks[i].t2[2]);
-  }
-
-  // Add the contact to each collision
-  // _feedback->contact.collision1->AddContact(_feedback->contact);
-  // _feedback->contact.collision2->AddContact(_feedback->contact);
-}*/
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,

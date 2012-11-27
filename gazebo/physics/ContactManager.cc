@@ -148,17 +148,7 @@ void ContactManager::PublishContacts()
       continue;
 
     msgs::Contact *contactMsg = msg.add_contact();
-
-    contactMsg->set_collision1(this->contacts[i]->collision1);
-    contactMsg->set_collision2(this->contacts[i]->collision2);
-    msgs::Set(contactMsg->mutable_time(), this->contacts[i]->time);
-
-    for (int j = 0; j < this->contacts[i]->count; ++j)
-    {
-      msgs::Set(contactMsg->add_position(), this->contacts[i]->positions[j]);
-      msgs::Set(contactMsg->add_normal(), this->contacts[i]->normals[j]);
-      contactMsg->add_depth(this->contacts[i]->depths[j]);
-    }
+    this->contacts[i]->FillMsg(*contactMsg);
   }
 
   msgs::Set(msg.mutable_time(), this->world->GetSimTime());

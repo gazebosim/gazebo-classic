@@ -161,7 +161,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 
         // Check to see if the contact arrays all have the same size.
         if (count != (*iter)->contact(i).normal_size() ||
-            //count != (*iter)->contact(i).wrench_size() ||
+            count != (*iter)->contact(i).wrench_size() ||
             count != (*iter)->contact(i).depth_size())
         {
           gzerr << "Contact message has invalid array sizes\n";
@@ -267,10 +267,21 @@ void ContactSensor::OnContacts(ConstContactsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
-  // Store the contacts message for processing in UpdateImpl
-  this->incomingContacts.push_back(_msg);
+  // Only store information if the sensor is active
+  if (this->IsActive())
+  {
+    // Store the contacts message for processing in UpdateImpl
+    this->incomingContacts.push_back(_msg);
 
-  // Prevent the incomingContacts list to grow indefinitely.
-  if (this->incomingContacts.size() > 100)
-    this->incomingContacts.pop_front();
+    // Prevent the incomingContacts list to grow indefinitely.
+    if (this->incomingContacts.size() > 100)
+      this->incomingContacts.pop_front();
+  }
+}
+
+//////////////////////////////////////////////////
+bool ContactSensor::IsActive()
+{
+  return this->active ||
+         (this->contactsPub && this->contactsPub->HasConnections());
 }
