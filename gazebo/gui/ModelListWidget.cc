@@ -157,12 +157,12 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     }
     else if (name == "Models")
     {
-      this->modelsItem->setSelected(false);
+      this->propTreeBrowser->clear();
       this->modelsItem->setExpanded(!this->modelsItem->isExpanded());
     }
     else if (name == "Lights")
     {
-      this->lightsItem->setSelected(false);
+      this->propTreeBrowser->clear();
       this->lightsItem->setExpanded(!this->lightsItem->isExpanded());
     }
     else if (name == "Physics")
@@ -174,6 +174,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     }
     else
     {
+      this->propTreeBrowser->clear();
       event::Events::setSelectedEntity(name, "normal");
     }
   }
@@ -201,6 +202,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
           this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
       this->modelTreeWidget->setCurrentItem(mItem);
+      mItem->setExpanded(!mItem->isExpanded());
     }
     else if (lItem)
     {
