@@ -6,15 +6,15 @@
       <uri>model://sun</uri>
     </include>
 
-    <!--
+    <include>
+      <uri>model://pioneer2dx</uri>
+      <pose>-65 65 0 0 0 0</pose>
+    </include>
+
     <include>
       <uri>model://ground_plane</uri>
     </include>
 
-    <include>
-      <uri>model://pioneer2dx</uri>
-    </include>
--->
 
     <model name="heightmap">
       <static>true</static>
@@ -23,7 +23,7 @@
           <geometry>
             <heightmap>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
-              <size>129 129 10</size>
+              <size>129 129 50</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>
@@ -56,7 +56,7 @@
                 <fade_dist>5</fade_dist>
               </blend>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
-              <size>129 129 10</size>
+              <size>129 129 50</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>
