@@ -613,7 +613,7 @@ namespace gazebo
       /// \brief True if initialized.
       protected: bool initialized;
 
-      /// \brief Animation stat, used to animate the camera.
+      /// \brief Animation state, used to animate the camera.
       protected: Ogre::AnimationState *animState;
 
       /// \brief Previous time the camera animation was updated.
