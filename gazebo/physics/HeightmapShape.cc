@@ -67,6 +67,12 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+int HeightmapShape::GetSubSampling() const
+{
+  return this->subSampling;
+}
+
+//////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
   this->subSampling = 4;
@@ -116,7 +122,7 @@ void HeightmapShape::FillHeightMap()
   unsigned int count;
   this->img.GetData(&data, count);
 
-  // Iterate over all the verices
+  // Iterate over all the vertices
   for (y = 0; y < this->vertSize; y++)
   {
     // yf ranges between 0 and 4
@@ -197,7 +203,7 @@ void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 //////////////////////////////////////////////////
 math::Vector2i HeightmapShape::GetVertexCount() const
 {
-  return math::Vector2i(this->img.GetWidth(), this->img.GetHeight());
+  return math::Vector2i(this->vertSize, this->vertSize);
 }
 
 /////////////////////////////////////////////////

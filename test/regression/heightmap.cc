@@ -15,6 +15,9 @@
  *
 */
 #include <string.h>
+
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 #include "heights_cmp.h"
@@ -31,6 +34,35 @@ TEST_F(HeightmapTest, Heights)
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model);
 
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzthrow("Unable to use rendering engine.");
+    return;
+  }
+
+  // Make sure we can get a valid pointer to the scene.
+  rendering::ScenePtr scene = rendering::get_scene("default");
+  if (!scene)
+  {
+    gzthrow("Unable to get scene.");
+    return;
+  }
+
+  // Wait for the heightmap to get loaded by the scene.
+  {
+    int i = 0;
+    while (i < 10 && scene->GetHeightmap() == NULL)
+    {
+      common::Time::MSleep(100);
+      i++;
+    }
+
+    if (i >= 10)
+      gzthrow("Unable to get heightmap");
+  }
+
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
 
@@ -45,19 +77,40 @@ TEST_F(HeightmapTest, Heights)
 
   float diffMax, diffSum, diffAvg;
   std::vector<float> test;
+  std::vector<float> renderTest;
 
   int x, y;
+
+  double pMax = 0;
+  double rMax = 0;
   for (y = 0; y < shape->GetVertexCount().y; ++y)
   {
     for (x = 0; x < shape->GetVertexCount().x; ++x)
     {
       test.push_back(shape->GetHeight(x, y));
+
+      renderTest.push_back(
+          scene->GetHeightmap()->GetHeight(
+            ((float)x/shape->GetSubSampling()) - shape->GetSize().x*0.5,
+            shape->GetSize().y*0.5 - ((float)y/shape->GetSubSampling())));
+
+      std::cout << "XY[" << x << " " << y << "] P["
+                << test.back() << "] R[" << renderTest.back() << "]\n";
+
+      if (test.back() > pMax)
+        pMax = test.back();
+      if (renderTest.back() > rMax)
+        rMax = renderTest.back();
+      EXPECT_TRUE(math::equal(test.back(), renderTest.back(), 0.4f));
     }
   }
+
+  std::cout << "PMax[" << pMax << "] RMax[" << rMax << "]\n";
 
   FloatCompare(heights, &test[0], test.size(), diffMax, diffSum, diffAvg);
   printf("Max[%f] Sim[%f] Avg[%f]\n", diffMax, diffSum, diffAvg);
 
+  //std::cout << "Height[" << scene->GetHeightmap()->GetHeight(pt.x, pt.y) << "]\n";
   // This will print the heights
   /*printf("static float __heights[] = {");
   unsigned int i=0;
@@ -79,7 +132,7 @@ TEST_F(HeightmapTest, Heights)
   printf(" %f};\nstatic float *heights = __heights;\n", shape->GetHeight(x,y));
   */
 }
-
+/*
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, WhiteAlpha)
 {
@@ -144,7 +197,7 @@ TEST_F(HeightmapTest, NotSquareImage)
 
   this->server->Fini();
   delete this->server;
-}
+}*/
 
 /////////////////////////////////////////////////
 /*TEST_F(HeightmapTest, InvalidSizeImage)

@@ -315,7 +315,13 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 }
 
 /////////////////////////////////////////////////
-double Heightmap::GetHeight(double x, double y)
+double Heightmap::GetHeight(double _x, double _y, double _z)
 {
-  return this->terrainGroup->getHeightAtWorldPosition(x, y, 600);
+  Ogre::TerrainGroup::RayResult result = this->terrainGroup->rayIntersects(
+      Ogre::Ray(Ogre::Vector3(_x, _y, _z), Ogre::Vector3(0, 0, -1)));
+
+  if (result.hit)
+    return result.position.z;
+  else
+    return 0;
 }

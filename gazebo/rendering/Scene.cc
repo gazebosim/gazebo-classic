@@ -130,7 +130,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
-  this->heightmap = NULL;
+  this->terrain = NULL;
   this->selectedVis.reset();
 }
 
@@ -690,10 +690,58 @@ VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
 }
 
 //////////////////////////////////////////////////
+double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
+{
+  double height = 0;
+  Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
+
+  if (!this->raySceneQuery)
+    this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
+  this->raySceneQuery->setRay(ray);
+  this->raySceneQuery->setSortByDistance(true, 0);
+
+  // Perform the scene query
+  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult::iterator iter;
+
+  for (iter = result.begin(); iter != result.end(); ++iter)
+  {
+    // is the result a MovableObject
+    if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
+    {
+      if (!iter->movable->isVisible() ||
+          iter->movable->getName().find("__COLLISION_VISUAL__") !=
+          std::string::npos)
+        continue;
+      if (iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
+        continue;
+
+      height = _pt.z - iter->distance;
+      break;
+    }
+  }
+
+  // The default ray scene query does not work with terrain, so we have to
+  // check ourselves.
+  if (this->terrain)
+  {
+    double terrainHeight = this->terrain->GetHeight(_pt.x, _pt.y, _pt.z);
+    std::cout << "Terrain Heihgt[" << terrainHeight << "]\n";
+    if (terrainHeight <= _pt.z)
+      height = std::max(height, terrainHeight);
+  }
+
+  return height;
+}
+
+//////////////////////////////////////////////////
 void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
                                  std::vector<VisualPtr> &_visuals)
 {
   Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
+
+  if (!this->raySceneQuery)
+    this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
 
   this->raySceneQuery->setRay(ray);
   this->raySceneQuery->setSortByDistance(true, 0);
@@ -1774,12 +1822,12 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       // Ignore collision visuals for the heightmap
       if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
-          this->heightmap == NULL)
+          this->terrain == NULL)
       {
         try
         {
-          this->heightmap = new Heightmap(shared_from_this());
-          this->heightmap->LoadFromMsg(_msg);
+          this->terrain = new Heightmap(shared_from_this());
+          this->terrain->LoadFromMsg(_msg);
         } catch(...)
         {
           return false;
@@ -2178,7 +2226,7 @@ std::string Scene::StripSceneName(const std::string &_name) const
 //////////////////////////////////////////////////
 Heightmap *Scene::GetHeightmap() const
 {
-  return this->heightmap;
+  return this->terrain;
 }
 
 /////////////////////////////////////////////////
