@@ -10,7 +10,7 @@
           <geometry>
             <heightmap>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
-              <size>1032 1032 100</size>
+              <size>129 129 10</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>
@@ -43,7 +43,7 @@
                 <fade_dist>5</fade_dist>
               </blend>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
-              <size>1032 1032 100</size>
+              <size>129 129 10</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>

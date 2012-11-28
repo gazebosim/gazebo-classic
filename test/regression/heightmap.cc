@@ -59,6 +59,7 @@ TEST_F(HeightmapTest, Heights)
       i++;
     }
 
+    common::Time::MSleep(100);
     if (i >= 10)
       gzthrow("Unable to get heightmap");
   }
@@ -81,19 +82,28 @@ TEST_F(HeightmapTest, Heights)
 
   float x, y;
 
-  for (y = 0; y < shape->GetSize().y; y += 0.1)
+  //for (y = 0; y < shape->GetSize().y; y += 0.5)
+  for (y = 0; y < 129; y += 0.1)
   {
-    for (x = 0; x < shape->GetSize().x; x += 0.1)
+    //for (x = 0; x < shape->GetSize().x; x += 0.5)
+    for (x = 0; x < 129; x += 0.1)
     {
-      test.push_back(shape->GetHeight(std::max(rint(x), 128.0),
-                                      std::max(rint(y), 128.0)));
+      int xi = rint(x);
+      if (xi >= 129)
+        xi = 128;
+      int yi = rint(y);
+      if (yi >= 128)
+        yi = 128;
 
-      renderTest.push_back( scene->GetHeightmap()->GetHeight(
-            x - shape->GetSize().x*0.5,
-            floor(shape->GetSize().y*0.5) - y));
+      double xd = x - (shape->GetSize().x-1) * 0.5;
+      double yd = ((shape->GetSize().y-1)*0.5) - y;
+
+      test.push_back(shape->GetHeight(xi, yi));
+
+      renderTest.push_back(scene->GetHeightmap()->GetHeight(xd, yd));
 
       if (fabs(test.back() - renderTest.back()) >= 0.12)
-        std::cout << "XY[" << x << " " << y << "] P["
+        std::cout << "XY[" << xd << " " << yd << "][" << xi << " " << yi << "] P["
           << test.back() << "] R[" << renderTest.back() << "]\n";
 
       EXPECT_TRUE(math::equal(test.back(), renderTest.back(), 0.12f));
