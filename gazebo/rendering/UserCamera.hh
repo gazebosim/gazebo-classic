@@ -182,6 +182,9 @@ namespace gazebo
                      bool _inheritOrientation, double _minDist = 0,
                      double _maxDist = 0);
 
+      // Documentation inherited.
+      protected: virtual void AnimationComplete();
+
       /// \brief Set the camera to track a scene node.
       ///
       /// Tracking just causes the camera to rotate to follow the visual.
