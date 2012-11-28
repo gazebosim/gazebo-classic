@@ -134,13 +134,13 @@ namespace gazebo
     /// PSSM shadow technique. A TerrainMaterialGenerator which can cope with
     /// normal mapped, specular mapped terrain.
     /// \note Requires the Cg plugin to render correctly
-    class TerrainMaterialGenerator : public Ogre::TerrainMaterialGeneratorA
+    class GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor
-      public: TerrainMaterialGenerator();
+      public: GzTerrainMatGen();
 
               /// \brief Destructor
-      public: virtual ~TerrainMaterialGenerator();
+      public: virtual ~GzTerrainMatGen();
 
               /// \brief  Shader model 2 profile target.
       public: class SM2Profile :

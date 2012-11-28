@@ -328,16 +328,16 @@ void Heightmap::SetupShadows(bool _enableShadows)
 
   // RTSS PSSM shadows compatible terrain material
   Ogre::TerrainMaterialGenerator *matGen =
-    new Ogre::TerrainMaterialGenerator();
+    new GzTerrainMatGen();
 
   Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
   ptr.bind(matGen);
 
   this->terrainGlobals->setDefaultMaterialGenerator(ptr);
-  matProfile = static_cast<TerrainMaterialGenerator::SM2Profile*>(
+  matProfile = static_cast<GzTerrainMatGen::SM2Profile*>(
       matGen->getActiveProfile());
   if (!matProfile)
-    gzerr << "Invlid mat profile\n";
+    gzerr << "Invalid mat profile\n";
 
   if (_enableShadows)
   {
@@ -356,13 +356,13 @@ void Heightmap::SetupShadows(bool _enableShadows)
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
-// TerrainMaterialGenerator
+// GzTerrainMatGen
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////
-TerrainMaterialGenerator::TerrainMaterialGenerator()
+GzTerrainMatGen::GzTerrainMatGen()
 : TerrainMaterialGeneratorA()
 {
   /// \TODO - This will have to be changed if TerrainMaterialGeneratorA
@@ -381,12 +381,12 @@ TerrainMaterialGenerator::TerrainMaterialGenerator()
 }
 
 /////////////////////////////////////////////////
-TerrainMaterialGenerator::~TerrainMaterialGenerator()
+GzTerrainMatGen::~GzTerrainMatGen()
 {
 }
 
 /////////////////////////////////////////////////
-TerrainMaterialGenerator::SM2Profile::SM2Profile(
+GzTerrainMatGen::SM2Profile::SM2Profile(
     Ogre::TerrainMaterialGenerator *_parent, const Ogre::String &_name,
     const Ogre::String &_desc)
 : TerrainMaterialGeneratorA::SM2Profile::SM2Profile(_parent, _name, _desc)
@@ -394,14 +394,14 @@ TerrainMaterialGenerator::SM2Profile::SM2Profile(
 }
 
 /////////////////////////////////////////////////
-TerrainMaterialGenerator::SM2Profile::~SM2Profile()
+GzTerrainMatGen::SM2Profile::~SM2Profile()
 {
   // Because the base SM2Profile has no virtual destructor:
   OGRE_DELETE this->mShaderGen;
 }
 
 /////////////////////////////////////////////////
-void TerrainMaterialGenerator::SM2Profile::addTechnique(
+void GzTerrainMatGen::SM2Profile::addTechnique(
     const Ogre::MaterialPtr &_mat, const Ogre::Terrain *_terrain,
     TechniqueType _tt)
 {
@@ -419,7 +419,7 @@ void TerrainMaterialGenerator::SM2Profile::addTechnique(
     if (hmgr.isLanguageSupported("cg"))
     {
       this->mShaderGen =
-        OGRE_NEW TerrainMaterialGenerator::SM2Profile::ShaderHelperCg();
+        OGRE_NEW GzTerrainMatGen::SM2Profile::ShaderHelperCg();
     }
     else if (hmgr.isLanguageSupported("hlsl") &&
              ((check2x && gmgr.isSyntaxSupported("ps_4_0")) ||
@@ -460,7 +460,7 @@ void TerrainMaterialGenerator::SM2Profile::addTechnique(
 
   // Doesn't delegate to the proper method otherwise
   Ogre::HighLevelGpuProgramPtr vprog =
-    ((TerrainMaterialGenerator::SM2Profile::ShaderHelperCg*)this->mShaderGen)->
+    ((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)->
     generateVertexProgram(this, _terrain, _tt);
 
   Ogre::HighLevelGpuProgramPtr fprog =
@@ -550,7 +550,7 @@ void TerrainMaterialGenerator::SM2Profile::addTechnique(
 // generate() and generateForCompositeMap() are identical to
 // TerrainMaterialGeneratorA implementation, the only reason for repeating
 // them is that, unfortunately, addTechnique() is not declared virtual.
-Ogre::MaterialPtr TerrainMaterialGenerator::SM2Profile::generate(
+Ogre::MaterialPtr GzTerrainMatGen::SM2Profile::generate(
     const Ogre::Terrain *_terrain)
 {
   // re-use old material if exists
@@ -610,7 +610,7 @@ Ogre::MaterialPtr TerrainMaterialGenerator::SM2Profile::generate(
   return mat;
 }
 
-Ogre::MaterialPtr TerrainMaterialGenerator::SM2Profile::generateForCompositeMap(
+Ogre::MaterialPtr GzTerrainMatGen::SM2Profile::generateForCompositeMap(
     const Ogre::Terrain *_terrain)
 {
   // re-use old material if exists
@@ -644,7 +644,7 @@ Ogre::MaterialPtr TerrainMaterialGenerator::SM2Profile::generateForCompositeMap(
 }
 
 /////////////////////////////////////////////////
-void TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::defaultVpParams(
+void GzTerrainMatGen::SM2Profile::ShaderHelperCg::defaultVpParams(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain,
     TechniqueType _tt, const Ogre::HighLevelGpuProgramPtr &_prog)
 {
@@ -698,7 +698,7 @@ void TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::defaultVpParams(
 
 /////////////////////////////////////////////////
 void
-TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::generateVpDynamicShadows(
+GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpDynamicShadows(
     const SM2Profile *_prof, const Ogre::Terrain * /*_terrain*/,
     TechniqueType /*_tt*/, Ogre::StringUtil::StrStreamType &_outStream)
 {
@@ -733,7 +733,7 @@ TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::generateVpDynamicShadows(
 }
 
 /////////////////////////////////////////////////
-unsigned int TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::
+unsigned int GzTerrainMatGen::SM2Profile::ShaderHelperCg::
 generateVpDynamicShadowsParams(unsigned int _texCoord, const SM2Profile *_prof,
     const Ogre::Terrain * /*_terrain*/, TechniqueType /*_tt*/,
     Ogre::StringUtil::StrStreamType &_outStream)
@@ -769,7 +769,7 @@ generateVpDynamicShadowsParams(unsigned int _texCoord, const SM2Profile *_prof,
 // TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpHeader()
 // but is needed because generateVpDynamicShadowsParams() is not declared
 // virtual.
-void TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::generateVpHeader(
+void GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpHeader(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain,
     TechniqueType _tt, Ogre::StringUtil::StrStreamType &_outStream)
 {
@@ -947,7 +947,7 @@ void TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::generateVpHeader(
 // This method is identical to
 // TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpFooter()
 // but is needed because generateVpDynamicShadows() is not declared virtual.
-void TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::generateVpFooter(
+void GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpFooter(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain,
     TechniqueType _tt, Ogre::StringUtil::StrStreamType &_outStream)
 {
@@ -977,7 +977,7 @@ void TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::generateVpFooter(
 }
 
 /////////////////////////////////////////////////
-void TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::
+void GzTerrainMatGen::SM2Profile::ShaderHelperCg::
 generateVertexProgramSource(const SM2Profile *_prof,
     const Ogre::Terrain* _terrain, TechniqueType _tt,
     Ogre::StringUtil::StrStreamType &_outStream)
@@ -999,7 +999,7 @@ generateVertexProgramSource(const SM2Profile *_prof,
 
 /////////////////////////////////////////////////
 Ogre::HighLevelGpuProgramPtr
-TerrainMaterialGenerator::SM2Profile::ShaderHelperCg::generateVertexProgram(
+GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVertexProgram(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain,
     TechniqueType _tt)
 {
