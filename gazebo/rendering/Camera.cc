@@ -66,10 +66,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
   this->saveCount = 0;
   this->bayerFrameBuffer = NULL;
 
-  this->myCount = cameraCounter++;
-
   std::ostringstream stream;
-  stream << _namePrefix << "(" << this->myCount << ")";
+  stream << _namePrefix << "(" << this->cameraCounter++ << ")";
   this->name = stream.str();
 
   this->renderTarget = NULL;
@@ -265,6 +263,9 @@ void Camera::Update()
       }
 
       this->animState = NULL;
+
+      this->AnimationComplete();
+
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
@@ -1295,6 +1296,7 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
     return false;
   }
 
+
   Ogre::TransformKeyFrame *key;
   math::Vector3 rpy = _pose.rot.GetAsEuler();
   math::Vector3 start = this->GetWorldPose().pos;
@@ -1434,4 +1436,9 @@ void Camera::SetRenderRate(double _hz)
 double Camera::GetRenderRate() const
 {
   return 1.0 / this->renderPeriod.Double();
+}
+
+//////////////////////////////////////////////////
+void Camera::AnimationComplete()
+{
 }

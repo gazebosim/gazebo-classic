@@ -41,6 +41,9 @@ namespace gazebo
     ///        related information, its elements are labeled by x, y, z.
     class Vector3
     {
+      /// \brief math::Vector3(0, 0, 0)
+      public: static const Vector3 Zero;
+
       /// \brief Constructor
       public: Vector3();
 
