@@ -49,7 +49,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      public: UserCamera(const std::string &_name, Scene *_scene);
+      public: UserCamera(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~UserCamera();

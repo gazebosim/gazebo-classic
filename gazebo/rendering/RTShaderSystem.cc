@@ -108,7 +108,7 @@ void RTShaderSystem::Fini()
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 &&\
     OGRE_VERSION_MINOR >= MINOR_VERSION
 //////////////////////////////////////////////////
-void RTShaderSystem::AddScene(Scene *_scene)
+void RTShaderSystem::AddScene(ScenePtr _scene)
 {
   if (!this->initialized)
     return;
@@ -120,18 +120,18 @@ void RTShaderSystem::AddScene(Scene *_scene)
   this->scenes.push_back(_scene);
 }
 #else
-void RTShaderSystem::AddScene(Scene * /*_scene*/)
+void RTShaderSystem::AddScene(ScenePtr /*_scene*/)
 {
 }
 #endif
 
 //////////////////////////////////////////////////
-void RTShaderSystem::RemoveScene(Scene *_scene)
+void RTShaderSystem::RemoveScene(ScenePtr _scene)
 {
   if (!this->initialized)
     return;
 
-  std::vector<Scene*>::iterator iter;
+  std::vector<ScenePtr>::iterator iter;
   for (iter = this->scenes.begin(); iter != scenes.end(); ++iter)
     if ((*iter) == _scene)
       break;
@@ -179,7 +179,7 @@ void RTShaderSystem::Clear()
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, Scene *_scene)
+void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
   _viewport->setMaterialScheme(_scene->GetName() +
@@ -187,7 +187,7 @@ void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, Scene *_scene)
 #endif
 }
 
-void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, Scene *_scene)
+void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
   _viewport->setMaterialScheme(_scene->GetName());
@@ -412,7 +412,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
 }
 
 /////////////////////////////////////////////////
-void RTShaderSystem::RemoveShadows(Scene *_scene)
+void RTShaderSystem::RemoveShadows(ScenePtr _scene)
 {
   if (!this->initialized || !this->shadowsApplied)
     return;
@@ -435,7 +435,7 @@ void RTShaderSystem::RemoveShadows(Scene *_scene)
 }
 
 /////////////////////////////////////////////////
-void RTShaderSystem::ApplyShadows(Scene *_scene)
+void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 {
   if (!this->initialized || this->shadowsApplied)
     return;

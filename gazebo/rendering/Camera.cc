@@ -47,7 +47,8 @@ using namespace rendering;
 unsigned int Camera::cameraCounter = 0;
 
 //////////////////////////////////////////////////
-Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
+Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
+               bool _autoRender)
 {
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
@@ -214,7 +215,7 @@ unsigned int Camera::GetWindowId() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetScene(Scene *_scene)
+void Camera::SetScene(ScenePtr _scene)
 {
   this->scene = _scene;
 }
@@ -1045,7 +1046,7 @@ void Camera::CreateRenderTexture(const std::string &textureName)
 }
 
 //////////////////////////////////////////////////
-Scene *Camera::GetScene() const
+ScenePtr Camera::GetScene() const
 {
   return this->scene;
 }
