@@ -116,9 +116,6 @@ void DiffDrivePlugin::OnUpdate()
   common::Time stepTime = currTime - this->prevUpdateTime;
   */
 
-  this->wheelSpeed[LEFT] = 0.2;
-  this->wheelSpeed[RIGHT] = 0.2;
-
   double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
   double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
