@@ -343,7 +343,7 @@ void URDF2Gazebo::parseGazeboExtension(TiXmlDocument &urdf_xml)
           gazebo->kd = boost::lexical_cast<double>(
             getKeyValueAsString(child_elem).c_str());
       }
-      else if (child_elem->ValueStr() == "self_collide")
+      else if (child_elem->ValueStr() == "selfCollide")
       {
         std::string value_str = getKeyValueAsString(child_elem);
 

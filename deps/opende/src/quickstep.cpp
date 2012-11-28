@@ -140,6 +140,7 @@ struct dxSORLCPParameters {
     dRealPtr coeff_damp ;
     int* jb_damp ;
     dRealMutablePtr v_joint_damp ;
+    dRealMutablePtr a_joint_damp ;
     int m_damp;
 #endif
 };
@@ -562,6 +563,7 @@ static void ComputeRows(
   dRealPtr coeff_damp   = params.coeff_damp;
   int*            jb_damp      = params.jb_damp;
   dRealMutablePtr v_joint_damp = params.v_joint_damp;
+  dRealMutablePtr a_joint_damp = params.a_joint_damp;
   int m_damp                   = params.m_damp;
 #endif
 
@@ -1110,29 +1112,71 @@ static void ComputeRows(
       for (int j=0; j<m_damp;J_damp_ptr+=12, j++) {
         int b1 = jb_damp[j*2];
         int b2 = jb_damp[j*2+1];
-        v_joint_damp[j] = 0;
 
         // ramp-up coefficient for the last quarter of the iteration
+        // turn damping off if only 1 inner iteration is requested
         dReal alpha = 0.0;
-        if (iteration >= 3*(num_iterations-1)/4)
+        if (num_iterations > 1 && iteration >= 3*(num_iterations-1)/4)
           alpha = ((dReal)iteration - 3.0*(num_iterations-1)/4.0) /
                         ((dReal)(num_iterations-1)/4.0);
 
+        v_joint_damp[j] = 0;
         for (int k=0;k<6;k++) v_joint_damp[j] += J_damp_ptr[k] * v_damp[b1*6+k];
         if (b2 >= 0) for (int k=0;k<6;k++) v_joint_damp[j] += J_damp_ptr[k+6] * v_damp[b2*6+k];
 
         // printf("%d [%d] a=%f v= %f\t",iteration, j, alpha, v_joint_damp[j]);
 
         // multiply by damping coefficients (B is diagnoal)
-        v_joint_damp[j] *= alpha * coeff_damp[j];
+        dReal tmpv = v_joint_damp[j] * alpha * coeff_damp[j];
 
         // so now v_joint_damp = B * J_damp * v_damp
         // update f_damp = J_damp' * v_joint_damp
-        for (int k=0; k<6; k++) f_damp[b1*6+k] = -J_damp_ptr[k]*v_joint_damp[j];
-        if (b2 >= 0) for (int k=0; k<6; k++) f_damp[b2*6+k] = -J_damp_ptr[6+k]*v_joint_damp[j];
+        for (int k=0; k<6; k++) f_damp[b1*6+k] = -J_damp_ptr[k]*tmpv;
+        if (b2 >= 0) for (int k=0; k<6; k++) f_damp[b2*6+k] = -J_damp_ptr[6+k]*tmpv;
 
         // for (int k=0;k<6;k++)
         //   printf("%f\t", f_damp[b1*6+k]);
+
+#define TRUNCATE_JOINT_DAMPING
+#ifdef TRUNCATE_JOINT_DAMPING
+        // if a_joint_damp (damping acceleration at the joint:  J * f_damp * invM ) * dt > v_joint_damp,
+        // then damping force will likely destabilize the system.
+        // try reducing f_damp so a_joint_damp * dt <= v_joint_damp.
+
+        // compute a_joint_damp
+        // can consolidate this computation later
+        dReal tmpa[3];
+        a_joint_damp[j] = 0;
+        dReal invM1 = body[b1]->invMass;
+        const dReal *invI1 = invI + 12 * b1;
+        for (int k=0;k<3;k++) a_joint_damp[j] += J_damp_ptr[k] * f_damp[b1*6+k] * invM1;
+        dMultiplyAdd0_331 (tmpa, invI1, f_damp+b1*6+3);
+        for (int k=3;k<6;k++) a_joint_damp[j] += J_damp_ptr[k] * tmpa[k-3];
+        if (b2 >= 0)
+        {
+          dReal invM2 = body[b2]->invMass;
+          const dReal *invI2 = invI + 12 * b2;
+          for (int k=0;k<3;k++) a_joint_damp[j] += J_damp_ptr[k] * f_damp[b2*6+k] * invM2;
+          dMultiplyAdd0_331 (tmpa, invI2, f_damp+b2*6+3);
+          for (int k=3;k<6;k++) a_joint_damp[j] += J_damp_ptr[k] * tmpa[k-3];
+        }
+
+        // if damping force is too large, scale f_damp down by ratio and a safety factor
+        if (fabs(v_joint_damp[j]) > 1.0e-6)
+        {
+          dReal ratio_damp = a_joint_damp[j]*stepsize / v_joint_damp[j];
+          // printf("ratio [%f]\tdv [%f]/\tv0 [%f]\t", ratio_damp, a_joint_damp[j]*stepsize , v_joint_damp[j]);
+          if (ratio_damp < -1.0)
+          {
+            for (int k=0; k<6; k++) f_damp[b1*6+k] /= 2.0*fabs(ratio_damp);
+            if (b2 >= 0) for (int k=0; k<6; k++) f_damp[b2*6+k] /= 2.0*fabs(ratio_damp);
+
+            // printf("\nf_damp_new\t");
+            // for (int k=0;k<6;k++)
+            //   printf("%f\t", f_damp[b1*6+k]);
+          }
+        }
+#endif
         // printf("\n");
       }
 
@@ -1251,7 +1295,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #endif
 #ifdef USE_JOINT_DAMPING
   const int m_damp, dRealMutablePtr J_damp, dRealPtr coeff_damp, int *jb_damp,dRealMutablePtr v_damp,
-  dRealMutablePtr f_damp,dRealMutablePtr v_joint_damp, dRealPtr JiM, // damping related
+  dRealMutablePtr f_damp,dRealMutablePtr v_joint_damp,dRealMutablePtr a_joint_damp, dRealPtr JiM,
 #endif
   const dReal stepsize)
 {
@@ -1491,6 +1535,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
     params[thread_id].coeff_damp = coeff_damp   ;
     params[thread_id].jb_damp    = jb_damp ;
     params[thread_id].v_joint_damp = v_joint_damp ;
+    params[thread_id].a_joint_damp = a_joint_damp ;
     params[thread_id].m_damp = m_damp ;
 #endif
 
@@ -1699,6 +1744,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *v_damp;
   dReal *J_damp = NULL;
   dReal *v_joint_damp = NULL;
+  dReal *a_joint_damp = NULL;
   dReal* f_damp = NULL;
   dReal *JiM = NULL;
   int *jb_damp = NULL;
@@ -1800,12 +1846,19 @@ void dxQuickStepper (dxWorldProcessContext *context,
       J_damp = context->AllocateArray<dReal> (jelements);
       dSetZero (J_damp,jelements);
 
-      // v_joint = J_damp * v
-      // v_joint is the velocity of the joint in joint space
+      // v_joint_damp = J_damp * v
+      // v_joint_damp is the velocity of the joint in joint space
       // (relative angular rates of attached bodies)
       const unsigned v_joint_damp_elements = mlocal;
       v_joint_damp = context->AllocateArray<dReal> (v_joint_damp_elements);
       dSetZero (v_joint_damp,v_joint_damp_elements);
+
+      // a_joint_damp = dt * J_damp * invM * f
+      // a_joint_damp is the damping force of the joint in joint space
+      // (relative angular rates of attached bodies)
+      const unsigned a_joint_damp_elements = mlocal;
+      a_joint_damp = context->AllocateArray<dReal> (a_joint_damp_elements);
+      dSetZero (a_joint_damp,a_joint_damp_elements);
 
       // jb is the body index for each jacobian
       const unsigned jbelements = mlocal*2;
@@ -2099,7 +2152,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                world->row_threadpool,
 #endif
 #ifdef USE_JOINT_DAMPING
-               m_damp,J_damp,coeff_damp,jb_damp,v_damp,f_damp,v_joint_damp,JiM,
+               m_damp,J_damp,coeff_damp,jb_damp,v_damp,f_damp,v_joint_damp,a_joint_damp,JiM,
 #endif
                stepsize);
 
@@ -2517,6 +2570,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
 #ifdef USE_JOINT_DAMPING
       sub1_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m_damp); // for J_damp
       sub1_res1 += dEFFICIENT_SIZE(sizeof(dReal) * m_damp ); // for v_joint_damp
+      sub1_res1 += dEFFICIENT_SIZE(sizeof(dReal) * m_damp ); // for a_joint_damp
       sub1_res1 += dEFFICIENT_SIZE(sizeof(int) * 2 * m_damp); // for jb_damp
       sub1_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for f_damp
       sub1_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for v_damp
