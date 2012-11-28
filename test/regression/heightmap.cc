@@ -144,7 +144,7 @@ TEST_F(HeightmapTest, Heights)
   printf(" %f};\nstatic float *heights = __heights;\n", shape->GetHeight(x,y));
   */
 }
-/*
+
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, WhiteAlpha)
 {
@@ -209,7 +209,7 @@ TEST_F(HeightmapTest, NotSquareImage)
 
   this->server->Fini();
   delete this->server;
-}*/
+}
 
 /////////////////////////////////////////////////
 /*TEST_F(HeightmapTest, InvalidSizeImage)
