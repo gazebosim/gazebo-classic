@@ -46,7 +46,7 @@ using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-UserCamera::UserCamera(const std::string &_name, Scene *_scene)
+UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
   std::stringstream stream;

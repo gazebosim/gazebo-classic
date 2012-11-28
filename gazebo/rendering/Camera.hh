@@ -77,7 +77,7 @@ namespace gazebo
       /// \param[in] _namePrefix Unique prefix name for the camera.
       /// \param[in] _scene Scene that will contain the camera
       /// \param[in] _autoRender Almost everyone should leave this as true.
-      public: Camera(const std::string &_namePrefix, Scene *_scene,
+      public: Camera(const std::string &_namePrefix, ScenePtr _scene,
                      bool _autoRender = true);
 
       /// \brief Destructor
@@ -139,7 +139,7 @@ namespace gazebo
 
       /// \brief Set the scene this camera is viewing
       /// \param[in] _scene Pointer to the scene
-      public: void SetScene(Scene *_scene);
+      public: void SetScene(ScenePtr _scene);
 
       /// \brief Get the global pose of the camera
       /// \return Pose of the camera in the world coordinate frame
@@ -363,7 +363,7 @@ namespace gazebo
 
       /// \brief Get the scene this camera is in
       /// \return Pointer to scene containing this camera
-      public: Scene *GetScene() const;
+      public: ScenePtr GetScene() const;
 
       /// \brief Get point on a plane
       /// \param[in] _x X cooridnate in camera's viewport, in pixels
@@ -597,7 +597,7 @@ namespace gazebo
       protected: common::Time lastRenderWallTime;
 
       /// \brief Pointer to the scene.
-      protected: Scene *scene;
+      protected: ScenePtr scene;
 
       /// \brief Event triggered when a new frame is generated.
       protected: event::EventT<void(const unsigned char *,
