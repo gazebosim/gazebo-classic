@@ -270,8 +270,8 @@ namespace gazebo
 
       /// \brief Get the Z-value of the first object below the given point.
       /// \param[in] _pt Position to search below for a visual.
-      /// \return The Z-value of the nearest visual below the point. The
-      /// passed in point's z-value is returned if no visual is found.
+      /// \return The Z-value of the nearest visual below the point. Zero
+      /// is returned if no visual is found.
       public: double GetHeightBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Get the world pos of a the first contact at a pixel location.

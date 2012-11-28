@@ -86,6 +86,7 @@ TEST_F(HeightmapTest, Heights)
   {
     for (x = 0; x < shape->GetSize().x; x += 0.2)
     {
+      // Compute the proper physics test point.
       int xi = rint(x);
       if (xi >= shape->GetSize().x)
         xi = shape->GetSize().x - 1.0;
@@ -93,11 +94,16 @@ TEST_F(HeightmapTest, Heights)
       if (yi >= shape->GetSize().y)
         yi = shape->GetSize().y - 1.0;
 
+      // Compute the proper render test point.
       double xd = xi - floor(shape->GetSize().x) * 0.5;
       double yd = floor((shape->GetSize().y)*0.5) - yi;
 
+      // The shape->GetHeight function requires a point relative to the
+      // bottom left of the heightmap image
       physicsTest.push_back(shape->GetHeight(xi, yi));
 
+      // The render test requires a point relative to the center of the
+      // heightmap.
       renderTest.push_back(scene->GetHeightmap()->GetHeight(xd, yd));
 
       // Debug output
