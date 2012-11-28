@@ -19,9 +19,10 @@
 
 #include <string>
 
-#include "rendering/ViewController.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ViewController.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2i.hh"
 
 namespace gazebo
 {

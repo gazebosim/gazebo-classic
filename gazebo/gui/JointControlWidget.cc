@@ -256,8 +256,11 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
 
     msgs::Response response = transport::request("default", *this->requestMsg);
 
-    if (response.type() != "error")
+    if (response.response() != "error" &&
+        response.type() == modelMsg.GetTypeName())
+    {
       modelMsg.ParseFromString(response.serialized_data());
+    }
   }
 
   this->modelLabel->setText(QString::fromStdString(

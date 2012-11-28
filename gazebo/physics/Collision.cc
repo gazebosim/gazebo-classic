@@ -192,7 +192,7 @@ void Collision::SetContactsEnabled(bool _enable)
 //////////////////////////////////////////////////
 bool Collision::GetContactsEnabled() const
 {
-  return this->contactsEnabled;
+  return this->contact.ConnectionCount() > 0 || this->contactsEnabled;
 }
 
 //////////////////////////////////////////////////

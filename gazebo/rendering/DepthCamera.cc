@@ -42,7 +42,7 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene,
+DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
                          bool _autoRender)
 : Camera(_namePrefix, _scene, _autoRender)
 {

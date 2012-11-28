@@ -82,11 +82,11 @@ namespace gazebo
 
       /// \brief Add a scene manager
       /// \param[in] _scene The scene to process
-      public: void AddScene(Scene *_scene);
+      public: void AddScene(ScenePtr _scene);
 
       /// \brief Remove a scene
       /// \param[in] The scene to remove
-      public: void RemoveScene(Scene *_scene);
+      public: void RemoveScene(ScenePtr _scene);
 
       /// \brief Update the shaders. This should not be called frequently.
       public: void UpdateShaders();
@@ -103,13 +103,13 @@ namespace gazebo
       /// \param[in] _viewport The viewport to add.
       /// \param[in] _scene The scene that the viewport uses.
       public: static void AttachViewport(Ogre::Viewport *_viewport,
-                                         Scene *_scene);
+                                         ScenePtr _scene);
 
       /// \brief Set a viewport to not use shaders.
       /// \param[in] _viewport The viewport to remove.
       /// \param[in] _scene The scene that the viewport uses.
       public: static void DetachViewport(Ogre::Viewport *_viewport,
-                                         Scene *_scene);
+                                         ScenePtr _scene);
 
       /// \brief Set the lighting model to per pixel or per vertex.
       /// \param[in] _set True means to use per-pixel shaders.
@@ -121,11 +121,11 @@ namespace gazebo
 
       /// \brief Apply shadows to a scene.
       /// \param[in] _scene The scene to receive shadows.
-      public: void ApplyShadows(Scene *_scene);
+      public: void ApplyShadows(ScenePtr _scene);
 
       /// \brief Remove shadows from a scene.
       /// \param[in] _scene The scene to remove shadows from.
-      public: void RemoveShadows(Scene *_scene);
+      public: void RemoveShadows(ScenePtr _scene);
 
       /// \brief Get the Ogre PSSM Shadows camera setup.
       /// \return The Ogre PSSM Shadows camera setup.
@@ -156,7 +156,7 @@ namespace gazebo
       private: bool shadowsApplied;
 
       /// \brief All the scenes.
-      private: std::vector<Scene *> scenes;
+      private: std::vector<ScenePtr> scenes;
 
       /// \brief Mutex used to protext the entities list.
       private: boost::mutex *entityMutex;

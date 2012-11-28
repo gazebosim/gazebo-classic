@@ -77,10 +77,6 @@ namespace gazebo
       /// \brief Finalize the camera
       protected: virtual void Fini();
 
-      /// \brief Set whether the sensor is active or not
-      /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(bool _value);
-
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
       public: rendering::CameraPtr GetCamera() const
