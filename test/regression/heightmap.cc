@@ -81,31 +81,23 @@ TEST_F(HeightmapTest, Heights)
 
   int x, y;
 
-  double pMax = 0;
-  double rMax = 0;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < 129; ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < 129; ++x)
     {
-      test.push_back(shape->GetHeight(x, y));
+      test.push_back(shape->GetHeight(x * 4, y * 4));
 
-      renderTest.push_back(
-          scene->GetHeightmap()->GetHeight(
-            ((float)x/shape->GetSubSampling()) - shape->GetSize().x*0.5,
-            shape->GetSize().y*0.5 - ((float)y/shape->GetSubSampling())));
+      renderTest.push_back( scene->GetHeightmap()->GetHeight(
+            x - shape->GetSize().x*0.5,
+            floor(shape->GetSize().y*0.5) - y));
 
-      std::cout << "XY[" << x << " " << y << "] P["
-                << test.back() << "] R[" << renderTest.back() << "]\n";
+      if (fabs(test.back() - renderTest.back()) >= 0.2)
+        std::cout << "XY[" << x << " " << y << "] P["
+          << test.back() << "] R[" << renderTest.back() << "]\n";
 
-      if (test.back() > pMax)
-        pMax = test.back();
-      if (renderTest.back() > rMax)
-        rMax = renderTest.back();
-      EXPECT_TRUE(math::equal(test.back(), renderTest.back(), 0.4f));
+      EXPECT_TRUE(math::equal(test.back(), renderTest.back(), 0.2f));
     }
   }
-
-  std::cout << "PMax[" << pMax << "] RMax[" << rMax << "]\n";
 
   FloatCompare(heights, &test[0], test.size(), diffMax, diffSum, diffAvg);
   printf("Max[%f] Sim[%f] Avg[%f]\n", diffMax, diffSum, diffAvg);
