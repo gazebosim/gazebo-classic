@@ -76,38 +76,41 @@ TEST_F(HeightmapTest, Heights)
   EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
   EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
 
-  float diffMax, diffSum, diffAvg;
-  std::vector<float> test;
+  // float diffMax, diffSum, diffAvg;
+  std::vector<float> physicsTest;
   std::vector<float> renderTest;
 
   float x, y;
 
-  //for (y = 0; y < shape->GetSize().y; y += 0.5)
-  for (y = 0; y < 128; y += 0.1)
+  for (y = 0; y < shape->GetSize().y; y += 0.2)
   {
-    //for (x = 0; x < shape->GetSize().x; x += 0.5)
-    for (x = 0; x < 128; x += 0.1)
+    for (x = 0; x < shape->GetSize().x; x += 0.2)
     {
       int xi = rint(x);
-      if (xi >= 129)
-        xi = 128;
+      if (xi >= shape->GetSize().x)
+        xi = shape->GetSize().x - 1.0;
       int yi = rint(y);
-      if (yi >= 128)
-        yi = 128;
+      if (yi >= shape->GetSize().y)
+        yi = shape->GetSize().y - 1.0;
 
-      double xd = x - (shape->GetSize().x-1) * 0.5;
-      double yd = floor((shape->GetSize().y)*0.5) - y;
+      double xd = xi - floor(shape->GetSize().x) * 0.5;
+      double yd = floor((shape->GetSize().y)*0.5) - yi;
 
-
-      test.push_back(shape->GetHeight(xi, yi));
+      physicsTest.push_back(shape->GetHeight(xi, yi));
 
       renderTest.push_back(scene->GetHeightmap()->GetHeight(xd, yd));
 
-      if (fabs(test.back() - renderTest.back()) >= 0.12)
-        std::cout << "XY[" << xd << " " << yd << "][" << xi << " " << yi << "] P["
-          << test.back() << "] R[" << renderTest.back() << "]\n";
+      // Debug output
+      if (fabs(physicsTest.back() - renderTest.back()) >= 0.13)
+      {
+        std::cout << "XY[" << xd << " " << yd << "][" << xi
+          << " " << yi << "] P[" << physicsTest.back() << "] R["
+          << renderTest.back() << "]\n";
+      }
 
-      EXPECT_TRUE(math::equal(test.back(), renderTest.back(), 0.12f));
+      // Test to see if the physics height is equal to the render engine
+      // height.
+      EXPECT_TRUE(math::equal(physicsTest.back(), renderTest.back(), 0.13f));
     }
   }
 
