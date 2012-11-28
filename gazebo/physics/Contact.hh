@@ -91,6 +91,8 @@ namespace gazebo
       public: std::string collision2;
 
       /// \brief Array of forces for the contact.
+      /// All forces and torques are relative to the center of mass of the
+      /// respective links that the collision elments are attached to.
       public: JointWrench wrench[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force positions.
