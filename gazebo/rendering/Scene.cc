@@ -96,6 +96,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
+  this->connections.push_back(
+      Events::ConnectViewContacts(boost::bind(&Scene::ViewContacts, this, _1)));
+
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
@@ -275,12 +278,6 @@ void Scene::Init()
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
-  // TODO: Add GUI option to view all contacts
-  /*ContactVisualPtr contactVis(new ContactVisual(
-        "_GUIONLY_world_contact_vis",
-        this->worldVisual, "~/physics/contacts"));
-  this->visuals[contactVis->GetName()] = contactVis;
-  */
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
@@ -2213,4 +2210,24 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
     this->visuals[_newName] = result;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+void Scene::ViewContacts(bool _view)
+{
+  ContactVisualPtr vis = boost::shared_dynamic_cast<ContactVisual>(
+      this->visuals["__GUIONLY_CONTACT_VISUAL__"]);
+
+  if (!vis && _view)
+  {
+    vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
+              this->worldVisual, "~/physics/contacts"));
+    vis->SetEnabled(_view);
+    this->visuals[vis->GetName()] = vis;
+  }
+
+  if (vis)
+    vis->SetEnabled(_view);
+  else
+    gzerr << "Unable to get contact visualization. This should never happen.\n";
 }

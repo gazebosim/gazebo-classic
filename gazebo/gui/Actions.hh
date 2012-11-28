@@ -51,6 +51,7 @@ namespace gazebo
     extern QAction *g_dirLghtCreateAct;
 
     extern QAction *g_viewGridAct;
+    extern QAction *g_viewContactsAct;
     extern QAction *g_viewResetAct;
     extern QAction *g_viewFullScreenAct;
     extern QAction *g_viewFPSAct;

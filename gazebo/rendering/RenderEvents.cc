@@ -22,6 +22,4 @@ using namespace rendering;
 
 event::EventT<void (const std::string &)> Events::createScene;
 event::EventT<void (const std::string &)> Events::removeScene;
-
-
-
+event::EventT<void (bool)> Events::viewContacts;

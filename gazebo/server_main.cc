@@ -14,21 +14,30 @@
  * limitations under the License.
  *
 */
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/LogRecord.hh"
 #include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gazebo::common::LogRecord::Instance()->Init("server");
+  try
+  {
+    gazebo::common::LogRecord::Instance()->Init("server");
 
-  gazebo::Server *server = new gazebo::Server();
-  if (!server->ParseArgs(argc, argv))
-    return -1;
+    gazebo::Server *server = new gazebo::Server();
+    if (!server->ParseArgs(argc, argv))
+      return -1;
 
-  server->Run();
-  server->Fini();
+    server->Run();
+    server->Fini();
 
-  delete server;
+    delete server;
+  }
+  catch(gazebo::common::Exception &_e)
+  {
+    _e.Print();
+  }
+
   return 0;
 }

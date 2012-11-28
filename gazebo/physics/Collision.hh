@@ -169,16 +169,12 @@ namespace gazebo
       /// \param[in] The collision state.
       public: void SetState(const CollisionState &_state);
 
-      /// \brief Setup callback for contact event
-      /// \param[in] _subscriber The callback.
-      /// \return Pointer to the new connection, which must be kept in
-      /// scope.
+      /// Deprecated.
       public: template<typename T>
               event::ConnectionPtr ConnectContact(T _subscriber)
               {return contact.Connect(_subscriber);}
 
-      /// \brief Disconnect callback for contact event.
-      /// \param[in] _conn The connection to disconnect.
+      /// Deprecated.
       public: void DisconnectContact(event::ConnectionPtr &_conn)
               {contact.Disconnect(_conn);}
 
