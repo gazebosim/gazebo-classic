@@ -75,7 +75,13 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(250);
 
   this->editorPalette = new EditorPalette(this);
-  this->editorPalette->hide();
+  this->paletteTabWidget = new QTabWidget();
+  this->paletteTabWidget->setObjectName("paletteTab");
+  this->paletteTabWidget->addTab(this->editorPalette, "Palette");
+  this->paletteTabWidget->setSizePolicy(QSizePolicy::Expanding,
+                                        QSizePolicy::Expanding);
+  this->paletteTabWidget->setMinimumWidth(250);
+  this->paletteTabWidget->hide();
 
   this->toolsWidget = new ToolsWidget();
 
@@ -85,7 +91,7 @@ MainWindow::MainWindow()
 
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->tabWidget);
-//  splitter->addWidget(this->editorPalette);
+  splitter->addWidget(this->paletteTabWidget);
   splitter->addWidget(this->renderWidget);
   splitter->addWidget(this->toolsWidget);
 
@@ -99,7 +105,7 @@ MainWindow::MainWindow()
   splitter->setStretchFactor(1, 1);
   splitter->setStretchFactor(2, 2);
   splitter->setStretchFactor(3, 1);
-  splitter->setCollapsible(1, false);
+  splitter->setCollapsible(2, false);
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -345,11 +351,15 @@ void MainWindow::OnEditBuilding()
   {
     this->Pause();
     this->renderWidget->ShowEditor(1);
+    this->tabWidget->hide();
+    this->paletteTabWidget->show();
   }
   else
   {
-    this->Play();
     this->renderWidget->ShowEditor(0);
+    this->tabWidget->show();
+    this->paletteTabWidget->hide();
+    this->Play();
   }
 /*  msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);

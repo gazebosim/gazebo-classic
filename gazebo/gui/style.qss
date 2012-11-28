@@ -360,7 +360,8 @@ QTabBar::tab:!selected
   margin-top: 2px;
 }
 
-QTabWidget#mainTab::pane
+QTabWidget#mainTab::pane,
+QTabWidget#paletteTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -378,8 +379,6 @@ QTabWidget#mainTab::pane
   margin: 0px;
   color: #f0f0f0;
 }
-
-
 
 QTabWidget::tab
 {
@@ -401,6 +400,7 @@ QWidget#toolsWidget
 
 QWidget#modelList > QFrame,
 QWidget#insertModel > QFrame,
+QWidget#editorPalette > QFrame,
 QWidget#jointControl > QFrame,
 QWidget#toolsWidget > QFrame
 {

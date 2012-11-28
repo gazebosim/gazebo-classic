@@ -82,6 +82,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->editorWidget = new EditorWidget(this);
+  this->editorWidget->hide();
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
@@ -116,9 +117,13 @@ RenderWidget::RenderWidget(QWidget *_parent)
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   bottomFrame->setLayout(bottomPanelLayout);
 
+  QSplitter *splitter = new QSplitter(this);
+  splitter->addWidget(this->editorWidget);
+  splitter->addWidget(this->glWidget);
+  splitter->setOrientation(Qt::Vertical);
+
   frameLayout->addWidget(toolFrame);
-  frameLayout->addWidget(this->editorWidget);
-  frameLayout->addWidget(this->glWidget);
+  frameLayout->addWidget(splitter);
   frameLayout->addWidget(bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
@@ -224,7 +229,14 @@ void RenderWidget::update()
 
 void RenderWidget::ShowEditor(int mode)
 {
-  this->editorWidget->SetMode(mode);
+  if (mode > 0)
+  {
+    this->editorWidget->show();
+    this->editorWidget->SetMode(mode);
+  }
+  else
+    this->editorWidget->hide();
+
 }
 
 void RenderWidget::RemoveScene(const std::string &_name)

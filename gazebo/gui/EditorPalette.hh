@@ -32,7 +32,6 @@ namespace gazebo
 
       public: EditorPalette(QWidget *_parent = 0);
       public: virtual ~EditorPalette();
-      protected: void paintEvent(QPaintEvent *event);
     };
   }
 }

@@ -24,14 +24,29 @@ using namespace gui;
 EditorPalette::EditorPalette(QWidget *_parent)
   : QWidget(_parent)
 {
-  this->setObjectName("EditorPalette");
+  this->setObjectName("editorPalette");
+
+  QHBoxLayout *hboxLayout = new QHBoxLayout;
+
+  QLabel *modelLabel = new QLabel(tr("Model: "));
+  hboxLayout->addWidget(modelLabel);
+
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+
+/*  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->addWidget(label, 0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+  mainLayout->addWidget(frame);*/
+
+  mainLayout->addLayout(hboxLayout);
+
+  this->setLayout(mainLayout);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 EditorPalette::~EditorPalette()
 {
 
-}
-
-void EditorPalette::paintEvent(QPaintEvent * /* event */)
-{
 }

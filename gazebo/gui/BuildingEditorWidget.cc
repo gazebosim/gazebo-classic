@@ -23,7 +23,7 @@ using namespace gui;
 BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   : QWidget(_parent)
 {
-  this->setObjectName("BuildingEditorWidget");
+  this->setObjectName("buildingEditorWidget");
   setBackgroundRole(QPalette::Base);
   setAutoFillBackground(true);
 

@@ -24,7 +24,7 @@ using namespace gui;
 EditorWidget::EditorWidget(QWidget *_parent)
   : QWidget(_parent)
 {
-  this->setObjectName("EditorWidget");
+  this->setObjectName("editorWidget");
 
   this->editorFrame = new QFrame;
   this->editorFrame->setFrameShape(QFrame::NoFrame);
@@ -33,7 +33,7 @@ EditorWidget::EditorWidget(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->editorFrame);
-  mainLayout->setContentsMargins(1, 1, 1, 5);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
   this->buildingEditorWidget = new BuildingEditorWidget(this);
@@ -49,9 +49,6 @@ EditorWidget::EditorWidget(QWidget *_parent)
 
   this->editorFrame->setMouseTracking(true);
   this->setMouseTracking(true);
-
-  this->editorFrame->hide();
-
 }
 
 EditorWidget::~EditorWidget()
@@ -61,13 +58,15 @@ EditorWidget::~EditorWidget()
 
 void EditorWidget::SetMode(int mode)
 {
+  /// TODO: 2 modes, building and model,
+  ///       create enums for these
   switch (mode)
   {
     case 0:
-      this->editorFrame->hide();
+      this->buildingEditorWidget->hide();
       break;
     case 1:
-      this->editorFrame->show();
+      this->buildingEditorWidget->show();
       break;
     default:
       break;

@@ -134,6 +134,7 @@ namespace gazebo
 //      priavte: QWidget
       private: EditorPalette *editorPalette;
       private: QTabWidget *tabWidget;
+      private: QTabWidget *paletteTabWidget;
       private: QMenuBar *menuBar;
     };
 
