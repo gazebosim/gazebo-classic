@@ -474,25 +474,25 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   pssmCasterPass->setFog(true); */
 
   // shadow camera setup
-  Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
-  sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
+  this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
+  sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(this->pssmSetup));
 
   double shadowFarDistance = 100;
   double cameraNearClip = 0.3;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
-  pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  pssmSetup->setSplitPadding(cameraNearClip);
-  pssmSetup->setOptimalAdjustFactor(0, 4);
-  pssmSetup->setOptimalAdjustFactor(1, 1);
-  pssmSetup->setOptimalAdjustFactor(2, 0.5);
+  this->pssmSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
+  this->pssmSetup->setSplitPadding(cameraNearClip);
+  this->pssmSetup->setOptimalAdjustFactor(0, 4);
+  this->pssmSetup->setOptimalAdjustFactor(1, 1);
+  this->pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
   this->shadowRenderState = this->shaderGenerator->createSubRenderState(
       Ogre::RTShader::IntegratedPSSM3::Type);
   Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState =
     static_cast<Ogre::RTShader::IntegratedPSSM3*>(this->shadowRenderState);
   const Ogre::PSSMShadowCameraSetup::SplitPointList& srcSplitPoints =
-    pssmSetup->getSplitPoints();
+    this->pssmSetup->getSplitPoints();
   Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
 
   for (unsigned int i = 0; i < srcSplitPoints.size(); ++i)
@@ -509,4 +509,10 @@ void RTShaderSystem::ApplyShadows(Scene *_scene)
   this->UpdateShaders();
 
   this->shadowsApplied = true;
+}
+
+/////////////////////////////////////////////////
+Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
+{
+  return this->pssmSetup;
 }
