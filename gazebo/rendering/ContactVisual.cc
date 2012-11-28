@@ -75,6 +75,14 @@ void ContactVisual::Update()
   if (!this->contactsMsg || !this->receivedMsg)
     return;
 
+  // The following values are used to calculate normal scaling factor based
+  // on force value.
+  double magScale = 100;
+  double vMax = 0.5;
+  double vMin = 0.1;
+  double vRange = vMax - vMin; // 0.4
+  double offset = vRange - vMin; // 0.3
+
   unsigned int c = 0;
   for (int i = 0; i < this->contactsMsg->contact_size(); i++)
   {
@@ -90,9 +98,9 @@ void ContactVisual::Update()
           this->contactsMsg->contact(i).wrench(j).body_1_force());
 
       // Scaling factor for the normal line.
-      double normalScale = force.GetSquaredLength() * 0.01;
-      normalScale = std::max(0.1, normalScale);
-      normalScale = std::min(0.5, normalScale);
+      // Eq in the family of Y = 1/(1+exp(-(x^2)))
+      double normalScale = (2.0 * vRange) / (1 + exp
+          (-force.GetSquaredLength() / magScale)) - offset;
 
       // Create a new contact visualization point if necessary
       if (c >= this->points.size())
