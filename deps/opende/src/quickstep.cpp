@@ -767,19 +767,11 @@ static void ComputeRows(
         dRealPtr JiM_ptr = JiM + index*12;
 
         // compute b_damp = JiM * f_damp, b_damp is preset to zero already
-        for (int j=0;j<6;j++) {
-          b_damp[index] += JiM_ptr[j] * f_damp_ptr1[j];
-          if (b2>=0) b_damp[index] += JiM_ptr[j+6] * f_damp_ptr2[j];
-        }
+        for (int j=0;j<6;j++) b_damp[index] += JiM_ptr[j] * f_damp_ptr1[j];
+        if (b2>=0) for (int j=0;j<6;j++) b_damp[index] += JiM_ptr[j+6] * f_damp_ptr2[j];
 
         // and scale JiM by Ad
         b_damp[index] *= Ad[index];
-        // FIXME: find some kind of limiters that works as artificial dampers
-        // b_damp must make b smaller
-        // so b_damp must have opposite sign as b
-        // and abs(b_damp) < abs(b)
-        //if (b_damp[index]*b[index]>0) b_damp[index]=0;
-        //if (dFabs(b_damp[index])>dFabs(b[index])) b_damp[index]=-b[index];
       }
 #endif
 
