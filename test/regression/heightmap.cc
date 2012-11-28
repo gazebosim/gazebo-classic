@@ -79,30 +79,30 @@ TEST_F(HeightmapTest, Heights)
   std::vector<float> test;
   std::vector<float> renderTest;
 
-  int x, y;
+  float x, y;
 
-  for (y = 0; y < 129; ++y)
+  for (y = 0; y < shape->GetSize().y; y += 0.1)
   {
-    for (x = 0; x < 129; ++x)
+    for (x = 0; x < shape->GetSize().x; x += 0.1)
     {
-      test.push_back(shape->GetHeight(x * 4, y * 4));
+      test.push_back(shape->GetHeight(std::max(rint(x), 128.0),
+                                      std::max(rint(y), 128.0)));
 
       renderTest.push_back( scene->GetHeightmap()->GetHeight(
             x - shape->GetSize().x*0.5,
             floor(shape->GetSize().y*0.5) - y));
 
-      if (fabs(test.back() - renderTest.back()) >= 0.2)
+      if (fabs(test.back() - renderTest.back()) >= 0.12)
         std::cout << "XY[" << x << " " << y << "] P["
           << test.back() << "] R[" << renderTest.back() << "]\n";
 
-      EXPECT_TRUE(math::equal(test.back(), renderTest.back(), 0.2f));
+      EXPECT_TRUE(math::equal(test.back(), renderTest.back(), 0.12f));
     }
   }
 
   FloatCompare(heights, &test[0], test.size(), diffMax, diffSum, diffAvg);
-  printf("Max[%f] Sim[%f] Avg[%f]\n", diffMax, diffSum, diffAvg);
+  printf("Max[%f] Sum[%f] Avg[%f]\n", diffMax, diffSum, diffAvg);
 
-  //std::cout << "Height[" << scene->GetHeightmap()->GetHeight(pt.x, pt.y) << "]\n";
   // This will print the heights
   /*printf("static float __heights[] = {");
   unsigned int i=0;

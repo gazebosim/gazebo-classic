@@ -75,7 +75,7 @@ int HeightmapShape::GetSubSampling() const
 //////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
-  this->subSampling = 4;
+  this->subSampling = 1;
 
   math::Vector3 terrainSize = this->GetSize();
 
@@ -89,8 +89,7 @@ void HeightmapShape::Init()
   else
     this->scale.z = fabs(terrainSize.z) / this->img.GetMaxColor().r;
 
-  // Step 1: Construct the heightmap lookup table, using the ogre ray scene
-  // query functionality
+  // Step 1: Construct the heightmap lookup table
   this->FillHeightMap();
 }
 
@@ -209,7 +208,8 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y)
 {
-  return this->heights[_y * this->vertSize + _x];
+  return this->heights[(_y * this->subSampling) * this->vertSize +
+                       (_x * this->subSampling)];
 }
 
 /////////////////////////////////////////////////
