@@ -23,6 +23,7 @@
 #include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/GLWidget.hh"
+#include "gui/EditorWidget.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
@@ -80,6 +81,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
+  this->editorWidget = new EditorWidget(this);
+
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
   TimePanel *timePanel = new TimePanel(this);
@@ -114,6 +117,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   bottomFrame->setLayout(bottomPanelLayout);
 
   frameLayout->addWidget(toolFrame);
+  frameLayout->addWidget(this->editorWidget);
   frameLayout->addWidget(this->glWidget);
   frameLayout->addWidget(bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
@@ -218,6 +222,11 @@ void RenderWidget::update()
   this->glWidget->update();
 }
 
+void RenderWidget::ShowEditor(int mode)
+{
+  this->editorWidget->SetMode(mode);
+}
+
 void RenderWidget::RemoveScene(const std::string &_name)
 {
   this->clear = true;
@@ -229,5 +238,3 @@ void RenderWidget::CreateScene(const std::string &_name)
   this->create = true;
   this->createName = _name;
 }
-
-

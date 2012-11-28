@@ -31,8 +31,8 @@
 #include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/RenderWidget.hh"
+#include "gui/EditorPalette.hh"
 #include "gui/ToolsWidget.hh"
-#include "gui/GLWidget.hh"
 #include "gui/MainWindow.hh"
 #include "gui/GuiEvents.hh"
 
@@ -74,6 +74,9 @@ MainWindow::MainWindow()
                                  QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(250);
 
+  this->editorPalette = new EditorPalette(this);
+  this->editorPalette->hide();
+
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
@@ -82,17 +85,20 @@ MainWindow::MainWindow()
 
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->tabWidget);
+//  splitter->addWidget(this->editorPalette);
   splitter->addWidget(this->renderWidget);
   splitter->addWidget(this->toolsWidget);
 
   QList<int> sizes;
   sizes.push_back(300);
+  sizes.push_back(300);
   sizes.push_back(700);
   sizes.push_back(300);
   splitter->setSizes(sizes);
   splitter->setStretchFactor(0, 1);
-  splitter->setStretchFactor(1, 2);
-  splitter->setStretchFactor(2, 1);
+  splitter->setStretchFactor(1, 1);
+  splitter->setStretchFactor(2, 2);
+  splitter->setStretchFactor(3, 1);
   splitter->setCollapsible(1, false);
 
   centerLayout->addWidget(splitter);
@@ -332,6 +338,25 @@ void MainWindow::OnResetWorld()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnEditBuilding()
+{
+  bool isChecked = g_editBuildingAct->isChecked();
+  if (isChecked)
+  {
+    this->Pause();
+    this->renderWidget->ShowEditor(1);
+  }
+  else
+  {
+    this->Play();
+    this->renderWidget->ShowEditor(0);
+  }
+/*  msgs::WorldControl msg;
+  msg.mutable_reset()->set_all(true);
+  this->worldControlPub->Publish(msg);*/
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Arrow()
 {
   gui::Events::manipMode("select");
@@ -515,6 +540,13 @@ void MainWindow::CreateActions()
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
+  g_editBuildingAct = new QAction(tr("Edit &Building"), this);
+  g_editBuildingAct->setShortcut(tr("Ctrl+B"));
+  g_editBuildingAct->setStatusTip(tr("Enter Building Editor Mode"));
+  g_editBuildingAct->setCheckable(true);
+  g_editBuildingAct->setChecked(false);
+  connect(g_editBuildingAct, SIGNAL(triggered()), this, SLOT(OnEditBuilding()));
+
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setCheckable(true);
@@ -657,6 +689,7 @@ void MainWindow::CreateMenus()
   this->editMenu = this->menuBar->addMenu(tr("&Edit"));
   this->editMenu->addAction(g_resetModelsAct);
   this->editMenu->addAction(g_resetWorldAct);
+  this->editMenu->addAction(g_editBuildingAct);
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(g_viewGridAct);
@@ -976,4 +1009,3 @@ QSize TreeViewDelegate::sizeHint(const QStyleOptionViewItem &_opt,
   QSize sz = QItemDelegate::sizeHint(_opt, _index) + QSize(2, 2);
   return sz;
 }
-

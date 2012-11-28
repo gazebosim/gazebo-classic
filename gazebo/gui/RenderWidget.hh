@@ -31,6 +31,7 @@ class QHBoxLayout;
 namespace gazebo
 {
   class GLWidget;
+  class EditorWidget;
 
   namespace gui
   {
@@ -43,12 +44,15 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
+      public: void ShowEditor(int mode);
+
       private slots: virtual void update();
 
       private: void OnFullScreen(bool &_value);
 
       private: QHBoxLayout *bottomBarLayout;
       private: GLWidget *glWidget;
+      private: EditorWidget *editorWidget;
       private: QFrame *mainFrame;
       private: QLabel *xyzLabel;
       private: QLineEdit *xPosEdit;
@@ -77,5 +81,3 @@ namespace gazebo
   }
 }
 #endif
-
-

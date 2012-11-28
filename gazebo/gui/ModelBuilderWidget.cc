@@ -24,7 +24,6 @@
 #include "transport/Publisher.hh"
 
 #include "gui/GLWidget.hh"
-
 #include "gui/ModelBuilderWidget.hh"
 
 using namespace gazebo;
@@ -175,5 +174,3 @@ void ModelBuilderWidget::OnCylinderCreate(const math::Vector3 &/*pos*/,
                                      const math::Vector3 &/*scale*/)
 {
 }
-
-

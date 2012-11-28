@@ -32,8 +32,8 @@ namespace gazebo
   {
     class RenderWidget;
     class ToolsWidget;
-
     class ModelListWidget;
+    class EditorPalette;
 
     class MainWindow : public QMainWindow
     {
@@ -83,6 +83,7 @@ namespace gazebo
       private slots: void ViewOrbit();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
+      private slots: void OnEditBuilding();
 
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
@@ -130,6 +131,8 @@ namespace gazebo
       private: msgs::Request *requestMsg;
 
       // private: QTreeWidget *treeWidget;
+//      priavte: QWidget
+      private: EditorPalette *editorPalette;
       private: QTabWidget *tabWidget;
       private: QMenuBar *menuBar;
     };

@@ -37,6 +37,7 @@ namespace gazebo
     extern QAction *g_newModelAct;
     extern QAction *g_resetModelsAct;
     extern QAction *g_resetWorldAct;
+    extern QAction *g_editBuildingAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
