@@ -46,7 +46,7 @@ using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-UserCamera::UserCamera(const std::string &_name, Scene *_scene)
+UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
   std::stringstream stream;
@@ -179,6 +179,12 @@ void UserCamera::Update()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::AnimationComplete()
+{
+  this->viewController->Init();
+}
+
+//////////////////////////////////////////////////
 void UserCamera::PostRender()
 {
   Camera::PostRender();
@@ -224,7 +230,9 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 
     // DEBUG: this->selectionBuffer->ShowOverlay(true);
 
-    this->viewController->HandleMouseEvent(_evt);
+    // Don't update the camera if it's being animated.
+    if (!this->animState)
+      this->viewController->HandleMouseEvent(_evt);
   }
 }
 
@@ -416,7 +424,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   math::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
-  math::Vector3 end = box.GetCenter();
+  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
   end.Correct();
   math::Vector3 dir = end - start;
   dir.Correct();

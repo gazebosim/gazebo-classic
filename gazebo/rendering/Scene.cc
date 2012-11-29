@@ -96,6 +96,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
+  this->connections.push_back(
+      Events::ConnectViewContacts(boost::bind(&Scene::ViewContacts, this, _1)));
+
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
@@ -191,7 +194,7 @@ Scene::~Scene()
   this->lights.clear();
 
   // Remove a scene
-  RTShaderSystem::Instance()->RemoveScene(this);
+  RTShaderSystem::Instance()->RemoveScene(shared_from_this());
 
   for (uint32_t i = 0; i < this->grids.size(); i++)
     delete this->grids[i];
@@ -242,8 +245,8 @@ void Scene::Init()
   this->worldVisual.reset(new Visual("__world_node__", shared_from_this()));
 
   // RTShader system self-enables if the render path type is FORWARD,
-  RTShaderSystem::Instance()->AddScene(this);
-  RTShaderSystem::Instance()->ApplyShadows(this);
+  RTShaderSystem::Instance()->AddScene(shared_from_this());
+  RTShaderSystem::Instance()->ApplyShadows(shared_from_this());
 
   if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
     this->InitDeferredShading();
@@ -275,12 +278,6 @@ void Scene::Init()
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
-  // TODO: Add GUI option to view all contacts
-  /*ContactVisualPtr contactVis(new ContactVisual(
-        "_GUIONLY_world_contact_vis",
-        this->worldVisual, "~/physics/contacts"));
-  this->visuals[contactVis->GetName()] = contactVis;
-  */
 
   Road2d *road = new Road2d();
   road->Load(this->worldVisual);
@@ -443,7 +440,8 @@ uint32_t Scene::GetGridCount() const
 //////////////////////////////////////////////////
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
-  CameraPtr camera(new Camera(this->name + "::" + _name, this, _autoRender));
+  CameraPtr camera(new Camera(this->name + "::" + _name,
+        shared_from_this(), _autoRender));
   this->cameras.push_back(camera);
 
   return camera;
@@ -454,7 +452,7 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
                                         bool _autoRender)
 {
   DepthCameraPtr camera(new DepthCamera(this->name + "::" + _name,
-        this, _autoRender));
+        shared_from_this(), _autoRender));
   this->cameras.push_back(camera);
 
   return camera;
@@ -505,7 +503,8 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 //////////////////////////////////////////////////
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
-  UserCameraPtr camera(new UserCamera(this->GetName() + "::" + name_, this));
+  UserCameraPtr camera(new UserCamera(this->GetName() + "::" + name_,
+                       shared_from_this()));
   camera->Load();
   camera->Init();
   this->userCameras.push_back(camera);
@@ -1880,7 +1879,7 @@ void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 
   if (iter == this->lights.end())
   {
-    LightPtr light(new Light(this));
+    LightPtr light(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
     this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
@@ -2076,9 +2075,9 @@ void Scene::SetShadowsEnabled(bool _value)
   {
     // RT Shader shadows
     if (_value)
-      RTShaderSystem::Instance()->ApplyShadows(this);
+      RTShaderSystem::Instance()->ApplyShadows(shared_from_this());
     else
-      RTShaderSystem::Instance()->RemoveShadows(this);
+      RTShaderSystem::Instance()->RemoveShadows(shared_from_this());
   }
   else
   {
@@ -2213,4 +2212,24 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
     this->visuals[_newName] = result;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+void Scene::ViewContacts(bool _view)
+{
+  ContactVisualPtr vis = boost::shared_dynamic_cast<ContactVisual>(
+      this->visuals["__GUIONLY_CONTACT_VISUAL__"]);
+
+  if (!vis && _view)
+  {
+    vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
+              this->worldVisual, "~/physics/contacts"));
+    vis->SetEnabled(_view);
+    this->visuals[vis->GetName()] = vis;
+  }
+
+  if (vis)
+    vis->SetEnabled(_view);
+  else
+    gzerr << "Unable to get contact visualization. This should never happen.\n";
 }

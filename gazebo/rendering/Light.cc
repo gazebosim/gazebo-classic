@@ -42,7 +42,7 @@ using namespace rendering;
 unsigned int Light::lightCounter = 0;
 
 //////////////////////////////////////////////////
-Light::Light(Scene *_scene)
+Light::Light(ScenePtr _scene)
 {
   this->line = NULL;
   this->scene = _scene;
@@ -66,6 +66,8 @@ Light::~Light()
 
   this->sdf->Reset();
   this->sdf.reset();
+
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////

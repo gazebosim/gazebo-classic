@@ -149,12 +149,6 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::SetActive(bool value)
-{
-  Sensor::SetActive(value);
-}
-
-//////////////////////////////////////////////////
 void CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (this->camera)

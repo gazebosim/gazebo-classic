@@ -403,9 +403,15 @@ namespace gazebo
       msgs::Visual result;
 
       result.set_name(_sdf->GetValueString("name"));
-      result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
-      result.set_transparency(_sdf->GetValueDouble("transparency"));
-      result.set_laser_retro(_sdf->GetValueDouble("laser_retro"));
+
+      if (_sdf->HasElement("cast_shadows"))
+        result.set_cast_shadows(_sdf->GetValueBool("cast_shadows"));
+
+      if (_sdf->HasElement("transparency"))
+        result.set_transparency(_sdf->GetValueDouble("transparency"));
+
+      if (_sdf->HasElement("laser_retro"))
+        result.set_laser_retro(_sdf->GetValueDouble("laser_retro"));
 
       // Load the geometry
       if (_sdf->HasElement("geometry"))

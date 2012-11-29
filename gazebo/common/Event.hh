@@ -110,6 +110,10 @@ namespace gazebo
       /// \param[in] _id The id of the connection to disconnect
       public: virtual void Disconnect(int _id);
 
+      /// \brief Get the number of connections.
+      /// \return Number of connection to this Event.
+      public: unsigned int ConnectionCount() const;
+
       /// \brief Access the signal
       public: void operator()()
               {this->Signal();}
@@ -464,6 +468,12 @@ namespace gazebo
       this->Disconnect(_c->GetId());
       _c->event = NULL;
       _c->id = -1;
+    }
+
+    template<typename T>
+    unsigned int EventT<T>::ConnectionCount() const
+    {
+      return this->connections.size();
     }
 
     /// \brief Removes a connection
