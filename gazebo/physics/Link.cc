@@ -157,6 +157,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
+  // Set pose for this object before the children
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
   this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
 
