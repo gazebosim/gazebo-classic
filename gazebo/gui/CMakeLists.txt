@@ -36,6 +36,7 @@ set (sources
   BuildingCreatorWidget.cc
   BuildingCreatorPalette.cc
   FinishModelDialog.cc
+  WindowDoorInspectorDialog.cc
 )
 
 set (qt_headers
@@ -54,6 +55,7 @@ set (qt_headers
   BuildingCreatorWidget.hh
   BuildingCreatorPalette.hh
   FinishModelDialog.hh
+  WindowDoorInspectorDialog.hh
 )
 
 set (headers

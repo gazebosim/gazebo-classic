@@ -17,11 +17,12 @@
 
 #include "gui/BuildingCreatorPalette.hh"
 #include "gui/FinishModelDialog.hh"
+#include "gui/WindowDoorInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-
+/////////////////////////////////////////////////
 BuildingCreatorPalette::BuildingCreatorPalette(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -146,7 +147,8 @@ void BuildingCreatorPalette::OnSave()
 /////////////////////////////////////////////////
 void BuildingCreatorPalette::OnFinish()
 {
-  FinishModelDialog dialog(this);
+//  FinishModelDialog dialog(this);
+  WindowDoorInspectorDialog dialog(0, this);
   dialog.exec();
 
 }

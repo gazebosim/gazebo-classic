@@ -27,11 +27,14 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: FinishModelDialog(QWidget *parent = 0);
+      public: FinishModelDialog(QWidget *_parent = 0);
+
       public: ~FinishModelDialog();
 
       private slots: void OnBrowse();
+
       private slots: void OnCancel();
+
       private slots: void OnFinish();
 
       private: QLineEdit* modelLocationLineEdit;

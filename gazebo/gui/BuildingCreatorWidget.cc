@@ -20,6 +20,7 @@
 using namespace gazebo;
 using namespace gui;
 
+/////////////////////////////////////////////////
 BuildingCreatorWidget::BuildingCreatorWidget(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -29,11 +30,13 @@ BuildingCreatorWidget::BuildingCreatorWidget(QWidget *_parent)
 
 }
 
+/////////////////////////////////////////////////
 BuildingCreatorWidget::~BuildingCreatorWidget()
 {
 
 }
 
+/////////////////////////////////////////////////
 void BuildingCreatorWidget::paintEvent(QPaintEvent * /* event */)
 {
 }

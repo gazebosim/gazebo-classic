@@ -31,6 +31,7 @@ namespace gazebo
       Q_OBJECT
 
       public: BuildingCreatorWidget(QWidget *_parent = 0);
+
       public: ~BuildingCreatorWidget();
 
       protected: void paintEvent(QPaintEvent *event);
