@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
+    /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
     class Image
     {
@@ -66,7 +67,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _filename the path to the image
-      public: Image(const std::string &_filename="");
+      public: explicit Image(const std::string &_filename="");
 
       /// \brief Destructor
       public: virtual ~Image();

@@ -22,6 +22,9 @@
 #ifndef _BULLETJOINT_HH_
 #define _BULLETJOINT_HH_
 
+#include <boost/any.hpp>
+#include <string>
+
 #include "physics/bullet/BulletPhysics.hh"
 #include "physics/Joint.hh"
 
@@ -88,6 +91,12 @@ namespace gazebo
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, int /*_index*/,
                                         double /*_value*/)
+              {gzerr << "Not implement in Bullet\n";}
+
+      // Documentation inherited.
+      public: virtual void SetAttribute(const std::string &/*_key*/,
+                                        int /*_index*/,
+                                        const boost::any &/*_value*/)
               {gzerr << "Not implement in Bullet\n";}
 
       protected: btTypedConstraint *constraint;

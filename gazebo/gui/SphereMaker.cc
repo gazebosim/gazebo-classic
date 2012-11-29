@@ -158,7 +158,7 @@ std::string SphereMaker::GetSDFString()
 {
   std::ostringstream newModelStr;
 
-  newModelStr << "<gazebo version='1.2'>"
+  newModelStr << "<sdf version='1.3'>"
     << "<model name='unit_sphere_" << counter << "'>"
     << "  <pose>0 0 0.5 0 0 0</pose>"
     << "  <link name='link'>"
@@ -181,7 +181,7 @@ std::string SphereMaker::GetSDFString()
     << "    </visual>"
     << "  </link>"
     << "  </model>"
-    << "</gazebo>";
+    << "</sdf>";
 
   return newModelStr.str();
 }

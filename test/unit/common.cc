@@ -144,9 +144,14 @@ TEST_F(CommonTest, Paths)
   std::string ogreResourcePathBackup = "OGRE_RESOURCE_PATH=";
   std::string pluginPathBackup = "GAZEBO_PLUGIN_PATH=";
 
-  gazeboResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
-  ogreResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
-  pluginPathBackup += getenv("GAZEBO_PLUGIN_PATH");
+  if (getenv("GAZEBO_RESOURCE_PATH"))
+    gazeboResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
+
+  if (getenv("GAZEBO_RESOURCE_PATH"))
+    ogreResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
+
+  if (getenv("GAZEBO_PLUGIN_PATH"))
+    pluginPathBackup += getenv("GAZEBO_PLUGIN_PATH");
 
   putenv(const_cast<char*>("GAZEBO_LOG_PATH="));
   common::SystemPaths *paths = common::SystemPaths::Instance();
@@ -154,8 +159,6 @@ TEST_F(CommonTest, Paths)
   paths->ClearGazeboPaths();
   paths->ClearOgrePaths();
   paths->ClearPluginPaths();
-
-  EXPECT_FALSE(paths->GetLogPath().empty());
 
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
   const std::list<std::string> pathList1 = paths->GetGazeboPaths();
@@ -575,7 +578,6 @@ TEST_F(CommonTest, Material)
 
 TEST_F(CommonTest, Console)
 {
-  gzlog << "Log test\n";
   common::Console::Instance()->Load();
   common::Console::Instance()->SetQuiet(true);
 }

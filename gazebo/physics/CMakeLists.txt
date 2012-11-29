@@ -12,6 +12,7 @@ set (sources
   Collision.cc
   CollisionState.cc
   Contact.cc
+  ContactManager.cc
   CylinderShape.cc
   Entity.cc
   Gripper.cc
@@ -58,7 +59,7 @@ set (headers
   Gripper.hh
   Joint.hh
   JointController.hh
-  JointFeedback.hh
+  JointWrench.hh
   JointState.hh
   Link.hh
   LinkState.hh

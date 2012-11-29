@@ -142,10 +142,13 @@ class ServerFixture : public testing::Test
   protected: void RunServer(const std::string &_worldFilename, bool _paused)
              {
                ASSERT_NO_THROW(this->server = new Server());
-
-               ASSERT_NO_THROW(this->server->Load(_worldFilename));
+               ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);
+
+               rendering::create_scene(
+                   gazebo::physics::get_world()->GetName(), false);
+
                this->server->Run();
                ASSERT_NO_THROW(this->server->Fini());
                delete this->server;
@@ -364,7 +367,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.2'>"
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _modelName << "'>"
                  << "<static>true</static>"
                  << "<pose>" << _pos.x << " "
@@ -410,7 +413,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.2'>"
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
@@ -447,12 +450,13 @@ class ServerFixture : public testing::Test
 
 
   protected: void SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _wait = true)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.2'>"
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
                                      << _pos.y << " "
@@ -479,7 +483,7 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
+               while (_wait && !this->HasEntity(_name))
                  common::Time::MSleep(10);
              }
 
@@ -490,7 +494,7 @@ class ServerFixture : public testing::Test
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version ='1.2'>"
+               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
                  << "<model name ='" << _name << "'>"
                  << "<pose>" << _pos.x << " "
                                      << _pos.y << " "

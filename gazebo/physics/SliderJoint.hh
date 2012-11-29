@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,12 @@ namespace gazebo
 
       /// \brief Load a SliderJoint.
       /// \param[in] _sdf SDF values to load from
-      protected: virtual void Load(sdf::ElementPtr _sdf)
-                 {T::Load(_sdf);}
+      public: virtual void Load(sdf::ElementPtr _sdf)
+              {T::Load(_sdf);}
+
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 1;}
 
       /// \brief Set the anchor.
       /// \param[in] _index Index of the axis. Not used.

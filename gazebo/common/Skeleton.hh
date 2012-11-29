@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef SKELETON_HH
-#define SKELETON_HH
+#ifndef _SKELETON_HH_
+#define _SKELETON_HH_
 
 #include <vector>
 #include <string>
@@ -44,6 +44,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common Animation
     /// \{
 
+    /// \class Skeleton Skeleton.hh common/common.hh
     /// \brief A skeleton
     class Skeleton
     {
@@ -118,7 +119,7 @@ namespace gazebo
                                      double _weight);
 
       /// \brief Returns the number of bone weights for a vertex
-      /// \param[in] the index of the vertex
+      /// \param[in] _vertex the index of the vertex
       /// \return the count
       public: unsigned int GetNumVertNodeWeights(unsigned int _vertex);
 
@@ -134,17 +135,17 @@ namespace gazebo
       public: unsigned int GetNumAnimations();
 
       /// \brief Find animation
-      /// \param _i the animation index
+      /// \param[in] _i the animation index
       /// \return the animation, or NULL if _i is out of bounds
       public: SkeletonAnimation* GetAnimation(const unsigned int _i);
 
       /// \brief Add an animation. The skeleton does not take ownership of the
       /// animation
-      /// \param _anim the animation
+      /// \param[in] _anim the animation to add
       public: void AddAnimation(SkeletonAnimation *_anim);
 
       /// \brief Initializes the hande numbers for each node in the map
-      /// using breath first traversal
+      /// using breadth first traversal
       protected: void BuildNodeMap();
 
       /// \brief the root node
@@ -163,6 +164,7 @@ namespace gazebo
       protected: std::vector<SkeletonAnimation*> anims;
     };
 
+    /// \class SkeletonNode Skeleton.hh common/common.hh
     /// \brief A skeleton node
     class SkeletonNode
     {
@@ -170,12 +172,14 @@ namespace gazebo
       public: enum SkeletonNodeType {NODE, JOINT};
 
       /// \brief Constructor
+      /// \param[in] _parent The parent node
       public: SkeletonNode(SkeletonNode* _parent);
 
       /// \brief Constructor
       /// \param[in] _parent the parent node
-      /// \param[in] __name name of node
-      /// \param
+      /// \param[in] _name name of node
+      /// \param[in] _id Id of node
+      /// \param[in] _type The type of this node
       public: SkeletonNode(SkeletonNode* _parent, std::string _name,
                 std::string _id, SkeletonNodeType _type = JOINT);
 
@@ -345,6 +349,7 @@ namespace gazebo
       protected: std::vector<NodeTransform> rawTransforms;
     };
 
+    /// \clas NodeTransform Skeleton.hh common/common.hh
     /// \brief A transformation node
     class NodeTransform
     {

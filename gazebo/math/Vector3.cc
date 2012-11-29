@@ -25,6 +25,7 @@
 using namespace gazebo;
 using namespace math;
 
+const Vector3 Vector3::Zero = math::Vector3(0, 0, 0);
 
 //////////////////////////////////////////////////
 Vector3::Vector3()

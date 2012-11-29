@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MODELRIGHTMENU_HH
-#define MODELRIGHTMENU_HH
+#ifndef _MODELRIGHTMENU_HH_
+#define _MODELRIGHTMENU_HH_
 
 #include <map>
 #include <string>
@@ -47,11 +47,12 @@ namespace gazebo
 
       private: std::string modelName;
 
-      private: QAction *snapBelowAction;
       private: QAction *moveToAction;
+      private: QAction *transparentAct;
+
+      private: QAction *snapBelowAction;
       private: QAction *followAction;
       private: QAction *showCollisionAction;
-      private: QAction *transparentAction;
       private: QAction *skeletonAction;
       private: QAction *showJointsAction;
       private: QAction *showCOMAction;

@@ -10,8 +10,8 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set (GAZEBO_VERSION_NAME "helium")
 set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 2)
-set (GAZEBO_PATCH_VERSION 5)
+set (GAZEBO_MINOR_VERSION 3)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -280,6 +280,16 @@ else (build_errors)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
+
+  ########################################
+  # If present, load platform-specific build hooks.  This system is used,
+  # for example, by the Ubuntu overlay (in the gazebo-release repo), to
+  # arrange for installation of Ubuntu-specific application-launching
+  # configuration.
+  if (EXISTS ${PROJECT_SOURCE_DIR}/cmake/packager-hooks/CMakeLists.txt)
+    message(STATUS "Loading packager build hooks from cmake/packager-hooks")
+    add_subdirectory(cmake/packager-hooks)
+  endif()
 
   message(STATUS "Configuration successful. Type make to compile gazebo")
 endif(build_errors)

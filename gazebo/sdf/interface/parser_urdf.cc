@@ -73,7 +73,7 @@ bool initSDF(sdf::SDFPtr _sdf)
   bool result = false;
 
   std::string filename;
-  filename = find_file("gazebo.sdf");
+  filename = find_file("root.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -1704,8 +1704,8 @@ TiXmlDocument URDF2Gazebo::initModelString(std::string urdf_str)
     insertGazeboExtensionRobot(robot);
 
     // add robot to gazebo_xml_out
-    TiXmlElement *gazebo_sdf = new TiXmlElement("gazebo");
-    gazebo_sdf->SetAttribute("version", "1.2");
+    TiXmlElement *gazebo_sdf = new TiXmlElement("sdf");
+    gazebo_sdf->SetAttribute("version", "1.3");
     gazebo_sdf->LinkEndChild(robot);
     gazebo_xml_out.LinkEndChild(gazebo_sdf);
 

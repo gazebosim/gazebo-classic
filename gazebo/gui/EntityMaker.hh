@@ -28,10 +28,19 @@ namespace gazebo
     class MouseEvent;
   }
 
+  /// \ingroup gazebo_gui
+  /// \brief gui namespace
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class EntityMaker EntityMaker.hh gui/gui.hh
+    /// \brief to make an entity base class
     class EntityMaker
     {
+      /// \def CreateCallback
+      /// \brief boost::function with vector3 pos and vector3 scale
       public: typedef boost::function<void(const math::Vector3 &pos,
                   const math::Vector3 &scale)> CreateCallback;
 
@@ -44,19 +53,34 @@ namespace gazebo
       /// \brief Set whether to snap to grid
       public: static void SetSnapToGrid(bool _snap);
 
+      /// \brief
+      /// \param[in] _camera Pointer to the user camera
       public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
-
+      /// \brief
       public: virtual void Stop() = 0;
+
+      /// \brief Checks if entity is active
       public: virtual bool IsActive() const = 0;
 
+      /// \brief Callback for pushing entity with mouse
+      /// \param[in] _event MouseEvent object
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+      /// \brief Callback for releasing mouse button
+      /// \param[in] _event MouseEvent object
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+      /// \brief Callback for dragging with mouse
+      /// \param[in] _event MouseEvent object
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      /// \brief Callback when moving mouse
+      /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
-      // \brief Get a point snapped to a grid
+      /// \brief Get a point snapped to a grid
+      /// \param[in] _p input point to be snapped
+      /// \return math::Vector3 with the point on the grid
       protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
 
+      /// \brief Creates the entity
       protected: virtual void CreateTheEntity() = 0;
 
       protected: rendering::UserCameraPtr camera;

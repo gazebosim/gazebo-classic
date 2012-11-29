@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ namespace gazebo
     /// \addtogroup gazebo_event Events
     /// \{
 
+    /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
     class Event
     {
@@ -87,6 +88,7 @@ namespace gazebo
       public: template<typename T> friend class EventT;
     };
 
+    /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing
     template< typename T>
     class EventT : public Event
@@ -107,6 +109,10 @@ namespace gazebo
       /// \brief Disconnect a callback to this event
       /// \param[in] _id The id of the connection to disconnect
       public: virtual void Disconnect(int _id);
+
+      /// \brief Get the number of connections.
+      /// \return Number of connection to this Event.
+      public: unsigned int ConnectionCount() const;
 
       /// \brief Access the signal
       public: void operator()()
@@ -464,8 +470,14 @@ namespace gazebo
       _c->id = -1;
     }
 
+    template<typename T>
+    unsigned int EventT<T>::ConnectionCount() const
+    {
+      return this->connections.size();
+    }
+
     /// \brief Removes a connection
-    /// \param[_id] the connection index
+    /// \param[in] _id the connection index
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {

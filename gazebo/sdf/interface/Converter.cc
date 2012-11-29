@@ -16,6 +16,7 @@
 */
 #include <vector>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "gazebo/common/Common.hh"
 #include "gazebo/common/Console.hh"
@@ -24,15 +25,27 @@
 using namespace sdf;
 
 /////////////////////////////////////////////////
-bool Converter::Convert(TiXmlElement *_elem, const std::string &_toVersion,
+bool Converter::Convert(TiXmlDocument *_doc, const std::string &_toVersion,
                         bool _quiet)
 {
-  if (!_elem->Attribute("version"))
+  TiXmlElement *elem = _doc->FirstChildElement("gazebo");
+
+  // Replace <gazebo> with <sdf>
+  if (elem && boost::lexical_cast<double>(_toVersion) >= 1.3)
+  {
+    elem->SetValue("sdf");
+    std::cout << "Set SDF value\n";
+  }
+  else if (!elem)
+    elem = _doc->FirstChildElement("sdf");
+
+  if (!elem->Attribute("version"))
   {
     gzerr << "  Unable to determine original SDF version\n";
     return false;
   }
-  std::string origVersion = _elem->Attribute("version");
+
+  std::string origVersion = elem->Attribute("version");
 
   if (origVersion == _toVersion)
     return true;
@@ -47,7 +60,7 @@ bool Converter::Convert(TiXmlElement *_elem, const std::string &_toVersion,
               << gzclr_end;
   }
 
-  _elem->SetAttribute("version", _toVersion);
+  elem->SetAttribute("version", _toVersion);
 
   boost::replace_all(origVersion, ".", "_");
 
@@ -61,7 +74,7 @@ bool Converter::Convert(TiXmlElement *_elem, const std::string &_toVersion,
     return false;
   }
 
-  ConvertImpl(_elem, xmlDoc.FirstChildElement("convert"));
+  ConvertImpl(elem, xmlDoc.FirstChildElement("convert"));
 
   return true;
 }

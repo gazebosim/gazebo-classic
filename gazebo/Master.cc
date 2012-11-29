@@ -66,7 +66,8 @@ void Master::Init(uint16_t _port)
   }
   catch(std::exception &_e)
   {
-    gzthrow("Unable to start server[" << _e.what() << "]\n");
+    gzthrow("Unable to start server[" << _e.what() << "]. "
+            "There is probably another Gazebo process running.");
   }
 }
 
@@ -393,8 +394,7 @@ void Master::RemoveConnection(unsigned int _index)
     PubList::iterator pubIter = this->publishers.begin();
     while (pubIter != this->publishers.end())
     {
-      if ((*pubIter).second->id ==
-          connIter->second->id)
+      if ((*pubIter).second->GetId() == connIter->second->GetId())
       {
         this->RemovePublisher((*pubIter).first);
         done = false;
@@ -415,7 +415,7 @@ void Master::RemoveConnection(unsigned int _index)
     SubList::iterator subIter = this->subscribers.begin();
     while (subIter != this->subscribers.end())
     {
-      if ((*subIter).second->id == connIter->second->id)
+      if ((*subIter).second->GetId() == connIter->second->GetId())
       {
         this->RemoveSubscriber((*subIter).first);
         done = false;

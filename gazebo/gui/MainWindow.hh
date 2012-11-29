@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ namespace gazebo
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
       private slots: void ViewGrid();
+      private slots: void ViewContacts();
       private slots: void ViewReset();
       private slots: void ViewFullScreen();
       private slots: void ViewFPS();

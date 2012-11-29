@@ -19,23 +19,21 @@
  * Date: 15 July 2003
  */
 
-#include <sstream>
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "common/Events.hh"
-#include "common/Exception.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "transport/transport.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/physics/World.hh"
 
-#include "physics/World.hh"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Rendering.hh"
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/Camera.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Rendering.hh"
-
-#include "sensors/SensorFactory.hh"
-#include "sensors/CameraSensor.hh"
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -151,19 +149,13 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::SetActive(bool value)
-{
-  Sensor::SetActive(value);
-}
-
-//////////////////////////////////////////////////
 void CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (this->camera)
   {
     this->camera->Render();
     this->camera->PostRender();
-    this->lastUpdateTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->world->GetSimTime();
 
     if (this->imagePub->HasConnections())
     {

@@ -31,15 +31,14 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_sensors
-  /// \brief Sensors namespace
   namespace sensors
   {
-    /// \class CameraSensor CameraSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors Sensors
-    /// \brief A set of sensor classes, functions, and definitions
     /// \{
+
+    /// \class CameraSensor CameraSensor.hh sensors/sensors.hh
     /// \brief Basic camera sensor
+    ///
     /// This sensor is used for simulating standard monocular cameras
     class CameraSensor : public Sensor
     {
@@ -78,35 +77,26 @@ namespace gazebo
       /// \brief Finalize the camera
       protected: virtual void Fini();
 
-      /// \brief Set whether the sensor is active or not
-      /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(bool _value);
-
-      /// \brief Returns a pointer to the rendering::Camera
-      /// \return The Pointer to the camera sensor
-      /// \TODO: nate check
+      /// \brief Returns a pointer to the rendering::Camera.
+      /// \return The Pointer to the camera sensor.
       public: rendering::CameraPtr GetCamera() const
               {return this->camera;}
 
-      /// \brief Gets the width of the image in pixels
-      /// \return The width in pixels of the image
-      /// \TODO: nate check
+      /// \brief Gets the width of the image in pixels.
+      /// \return The image width in pixels.
       public: unsigned int GetImageWidth() const;
 
-      /// \brief Gets the height of the image in pixels
-      /// \return The height in pixels of the image
-      /// \TODO: nate check
+      /// \brief Gets the height of the image in pixels.
+      /// \return The image height in pixels.
       public: unsigned int GetImageHeight() const;
 
-      /// \brief Gets the raw image data from the sensor
-      /// \return The pointer to the data array
-      /// \TODO: nate check
+      /// \brief Gets the raw image data from the sensor.
+      /// \return The pointer to the image data array.
       public: const unsigned char *GetImageData();
 
-      /// \brief Saves the image to the disk
-      /// \param[in] &_filename The name of the file to be saved
-      /// \return True if successful, false if unsuccessful
-      /// \TODO: nate check
+      /// \brief Saves the image to the disk.
+      /// \param[in] _filename The name of the file to be saved.
+      /// \return True if successful, false if unsuccessful.
       public: bool SaveFrame(const std::string &_filename);
 
       private: rendering::CameraPtr camera;

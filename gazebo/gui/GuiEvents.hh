@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GUI_EVENTS_HH
-#define GUI_EVENTS_HH
+#ifndef _GUI_EVENTS_HH_
+#define _GUI_EVENTS_HH_
 
 #include <string>
 #include "common/Event.hh"

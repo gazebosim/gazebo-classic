@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,19 +43,23 @@ namespace gazebo
 
       /// \brief Destuctor.
       public: virtual ~UniversalJoint()
-              {}
+              { }
+
+      /// \interal
+      public: virtual unsigned int GetAngleCount() const
+              {return 2;}
 
       /// \brief Load a UniversalJoint.
       /// \param[in] _sdf SDF values to load from.
-      protected: virtual void Load(sdf::ElementPtr _sdf)
-                 {
-                   T::Load(_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf)
+              {
+                T::Load(_sdf);
 
-                   this->SetAxis(0,
-                       this->sdf->GetElement("axis")->GetValueVector3("xyz"));
-                   this->SetAxis(1,
-                       this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
-                 }
+                this->SetAxis(0,
+                    this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+                this->SetAxis(1,
+                    this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+              }
     };
     /// \}
   }

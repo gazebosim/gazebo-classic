@@ -22,7 +22,6 @@ link_directories(
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
-  common.cc
   factory.cc
   file_handling.cc
   heightmap.cc
@@ -37,8 +36,6 @@ set (gtest_sources
   transport.cc)
 
 set (plugins)
-
-configure_file (test_config.h.in ${PROJECT_BINARY_DIR}/test_config.h)
 
 # Build plugins
 foreach (src ${plugins})
@@ -66,4 +63,7 @@ target_link_libraries(${BINARY_NAME}
     )
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME} --gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
+  # Check that the test produced a result and create a failure if it didn't.
+  # Guards against crashed and timed out tests.
+  add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 endforeach()

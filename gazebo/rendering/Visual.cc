@@ -26,6 +26,7 @@
 #include "common/Events.hh"
 #include "common/Common.hh"
 
+#include "rendering/WireBox.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
@@ -47,6 +48,7 @@ using namespace rendering;
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
@@ -81,6 +83,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
   this->sdf.reset(new sdf::Element);
@@ -116,6 +119,8 @@ Visual::~Visual()
 
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender(this->preRenderConnection);
+
+  delete this->boundingBox;
 
   // delete instance from lines vector
   /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
@@ -749,7 +754,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 
       if (dynamic_cast<Ogre::Entity*>(obj))
         ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
-      else
+      else if (dynamic_cast<Ogre::SimpleRenderable*>(obj))
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
 
@@ -1074,75 +1079,23 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetHighlighted(bool /*_highlighted*/)
+void Visual::SetHighlighted(bool _highlighted)
 {
-  /*
-  if (this->GetAttachedObjectCount() > 0)
-    this->sceneNode->showBoundingBox(_highlighted);
-    */
-
-/* TODO: This code will cause objects that use the same mesh to be
- * highlighted. Using the same mesh is good for performance. We need to come
- * up with a better way to highlight objects, possibly by attaching
- * a special visual to selected objects.
-  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  if (_highlighted)
   {
-    Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
-
-    entity = dynamic_cast<Ogre::Entity*>(obj);
-
-    if (!entity)
-      continue;
-
-    // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    // Create the bounding box if it's not already created.
+    if (!this->boundingBox)
     {
-      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
-      Ogre::MaterialPtr material = subEntity->getMaterial();
-
-      unsigned int techniqueCount;
-      Ogre::Technique *technique;
-      Ogre::Pass *pass;
-      Ogre::ColourValue dc;
-
-      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-          techniqueCount++)
-      {
-        technique = material->getTechnique(techniqueCount);
-        if (_highlighted)
-        {
-          pass = technique->createPass();
-          pass->setName("highlight");
-          pass->setDiffuse(
-              Conversions::Convert(common::Color(0.8, 0.8, 0.8, 0.8)));
-          pass->setSelfIllumination(
-              Conversions::Convert(common::Color(0.8, 0.8, 0.8)));
-          pass->setDepthBias(0.2, 0.1);
-
-          pass->setDepthWriteEnabled(false);
-          pass->setDepthCheckEnabled(true);
-          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-        }
-        else
-        {
-          for (unsigned int k = 0; k < technique->getNumPasses(); ++k)
-          {
-            if (technique->getPass(k)->getName() == "highlight")
-            {
-              technique->removePass(k);
-            }
-          }
-        }
-      }
+      this->boundingBox = new WireBox(shared_from_this(),
+                                      this->GetBoundingBox());
     }
-  }
-  */
 
-  /*for (unsigned int i = 0; i < this->children.size(); ++i)
+    this->boundingBox->SetVisible(true);
+  }
+  else if (this->boundingBox)
   {
-    this->children[i]->SetHighlighted(_highlighted);
-  }*/
+    this->boundingBox->SetVisible(false);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1500,18 +1453,33 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
           continue;
       }
 
-      Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
-      math::Vector3 min = Conversions::Convert(bb.getMinimum());
-      math::Vector3 max = Conversions::Convert(bb.getMaximum());
+      Ogre::AxisAlignedBox bb = obj->getBoundingBox();
+
+      math::Vector3 min;
+      math::Vector3 max;
+      math::Quaternion rotDiff;
+      math::Vector3 posDiff;
+
+      rotDiff = Conversions::Convert(node->_getDerivedOrientation()) -
+                this->GetWorldPose().rot;
+
+      posDiff = Conversions::Convert(node->_getDerivedPosition()) -
+                this->GetWorldPose().pos;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = Conversions::Convert(node->getPosition());
-        max = Conversions::Convert(node->getPosition());
-        min -= math::Vector3(0.5, 0.5, 0.5);
-        max += math::Vector3(0.5, 0.5, 0.5);
+        min = math::Vector3(-0.5, -0.5, -0.5);
+        max = math::Vector3(0.5, 0.5, 0.5);
       }
+      else
+      {
+        min = rotDiff *
+          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
+        max = rotDiff *
+          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
+      }
+
 
       box.Merge(math::Box(min, max));
     }

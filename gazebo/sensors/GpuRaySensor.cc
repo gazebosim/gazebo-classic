@@ -42,14 +42,12 @@ GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 GpuRaySensor::GpuRaySensor()
     : Sensor()
 {
-  this->mutex = new boost::mutex();
   this->active = false;
 }
 
 //////////////////////////////////////////////////
 GpuRaySensor::~GpuRaySensor()
 {
-  delete this->mutex;
 }
 
 //////////////////////////////////////////////////
@@ -62,131 +60,132 @@ void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
 void GpuRaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->poseSub = this->node->Subscribe("~/pose",
-                                        &GpuRaySensor::OnPose, this);
 
-  this->rayElem = this->sdf->GetElement("ray");
-  this->scanElem = this->rayElem->GetElement("scan");
+  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
+  this->scanElem = rayElem->GetElement("scan");
   this->horzElem = this->scanElem->GetElement("horizontal");
-  this->rangeElem = this->rayElem->GetElement("range");
+  this->rangeElem = rayElem->GetElement("range");
 
   if (this->scanElem->HasElement("vertical"))
     this->vertElem = this->scanElem->GetElement("vertical");
 
-  width_1st = this->GetRayCount();
-  height_1st = this->GetVerticalRayCount();
+  this->horzRayCount = this->GetRayCount();
+  this->vertRayCount = this->GetVerticalRayCount();
 
-  if (width_1st == 0 || height_1st == 0)
+  if (this->horzRayCount == 0 || this->vertRayCount == 0)
   {
     gzthrow("GpuRaySensor: Image has 0 size!");
   }
 
-  width_2nd = this->GetRangeCount();
-  height_2nd = this->GetVerticalRangeCount();
+  this->horzRangeCount = this->GetRangeCount();
+  this->vertRangeCount = this->GetVerticalRangeCount();
 
-  if (height_1st == 1)
+  if (this->vertRayCount == 1)
   {
-    height_2nd = 1;
+    this->vertRangeCount = 1;
     this->isHorizontal = true;
   }
   else
     this->isHorizontal = false;
 
-  ratio_2nd = width_2nd / height_2nd;
+  this->rangeCountRatio = this->horzRangeCount / this->vertRangeCount;
 
-  near = this->GetRangeMin();
-  far = this->GetRangeMax();
+  this->near = this->GetRangeMin();
+  this->far = this->GetRangeMax();
 
-  hfov = (this->GetAngleMax() - this->GetAngleMin()).Radian();
-  vfov = (this->GetVerticalAngleMax()
+  this->hfov = (this->GetAngleMax() - this->GetAngleMin()).Radian();
+  this->vfov = (this->GetVerticalAngleMax()
           - this->GetVerticalAngleMin()).Radian();
 
-  hang = (this->GetAngleMax() + this->GetAngleMin()).Radian() / 2.0;
-  vang = (this->GetVerticalAngleMax()
+  this->horzHalfAngle =
+    (this->GetAngleMax() + this->GetAngleMin()).Radian() / 2.0;
+
+  this->vertHalfAngle = (this->GetVerticalAngleMax()
           + this->GetVerticalAngleMin()).Radian() / 2.0;
 
-  if (hfov > 2 * M_PI)
-    hfov = 2*M_PI;
+  if (this->hfov > 2 * M_PI)
+    this->hfov = 2*M_PI;
 
   this->cameraCount = 1;
 
-  if (hfov > 2.8)
+  if (this->hfov > 2.8)
   {
-    if (hfov > 5.6)
+    if (this->hfov > 5.6)
       this->cameraCount = 3;
     else
       this->cameraCount = 2;
   }
 
-  hfov /= this->cameraCount;
-  width_1st /= this->cameraCount;
+  this->hfov /= this->cameraCount;
+  this->horzRayCount /= this->cameraCount;
 
-  if (vfov > M_PI / 2)
+  if (this->vfov > M_PI / 2)
   {
     gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
-    vfov = M_PI / 2;
-    this->SetVerticalAngleMin(vang - (vfov / 2));
-    this->SetVerticalAngleMax(vang + (vfov / 2));
+    this->vfov = M_PI / 2;
+    this->SetVerticalAngleMin(this->vertHalfAngle - (this->vfov / 2));
+    this->SetVerticalAngleMax(this->vertHalfAngle + (this->vfov / 2));
   }
 
-  if ((width_1st * height_1st) < (width_2nd * height_2nd))
+  if ((this->horzRayCount * this->vertRayCount) <
+      (this->horzRangeCount * this->vertRangeCount))
   {
-    width_1st = std::max(width_1st, width_2nd);
-    height_1st = std::max(height_1st, height_2nd);
+    this->horzRayCount = std::max(this->horzRayCount, this->horzRangeCount);
+    this->vertRayCount = std::max(this->vertRayCount, this->vertRangeCount);
   }
 
   if (this->isHorizontal)
   {
-    if (height_1st > 1)
+    if (this->vertRayCount > 1)
     {
-      chfov = 2 * atan(tan(hfov/2) / cos(vfov/2));
-      cvfov = vfov;
-      ratio_1st = tan(chfov/2.0) / tan(vfov/2.0);
+      this->chfov = 2 * atan(tan(this->hfov/2) / cos(this->vfov/2));
+      this->cvfov = this->vfov;
+      this->rayCountRatio = tan(this->chfov/2.0) / tan(this->vfov/2.0);
 
-      if ((width_1st / ratio_1st) > height_1st)
-        height_1st = width_1st / ratio_1st;
+      if ((this->horzRayCount / this->rayCountRatio) > this->vertRayCount)
+        this->vertRayCount = this->horzRayCount / this->rayCountRatio;
       else
-        width_1st = height_1st * ratio_1st;
+        this->horzRayCount = this->vertRayCount * this->rayCountRatio;
     }
     else
     {
-      chfov = hfov;
-      cvfov = vfov;
+      this->chfov = this->hfov;
+      this->cvfov = this->vfov;
     }
   }
   else
   {
-    if (width_1st > 1)
+    if (this->horzRayCount > 1)
     {
-      chfov = hfov;
-      cvfov = 2 * atan(tan(vfov/2) / cos(hfov/2));
-      ratio_1st = tan(hfov/2.0) / tan(cvfov/2.0);
+      this->chfov = this->hfov;
+      this->cvfov = 2 * atan(tan(this->vfov/2) / cos(this->hfov/2));
+      this->rayCountRatio = tan(this->hfov/2.0) / tan(this->cvfov/2.0);
 
-      if ((width_1st / ratio_1st) > height_1st)
-        height_1st = width_1st / ratio_1st;
+      if ((this->horzRayCount / this->rayCountRatio) > this->vertRayCount)
+        this->vertRayCount = this->horzRayCount / this->rayCountRatio;
       else
-        width_1st = height_1st * ratio_1st;
+        this->horzRayCount = this->vertRayCount * this->rayCountRatio;
     }
     else
     {
-      chfov = hfov;
-      cvfov = vfov;
+      this->chfov = this->hfov;
+      this->cvfov = this->vfov;
     }
   }
 
   this->cameraElem.reset(new sdf::Element);
   sdf::initFile("camera.sdf", this->cameraElem);
 
-  this->cameraElem->GetElement("horizontal_fov")->Set(chfov);
+  this->cameraElem->GetElement("horizontal_fov")->Set(this->chfov);
 
   sdf::ElementPtr ptr = this->cameraElem->GetElement("image");
-  ptr->GetElement("width")->Set(width_1st);
-  ptr->GetElement("height")->Set(height_1st);
+  ptr->GetElement("width")->Set(this->horzRayCount);
+  ptr->GetElement("height")->Set(this->vertRayCount);
   ptr->GetElement("format")->Set("R8G8B8");
 
   ptr = this->cameraElem->GetElement("clip");
-  ptr->GetElement("near")->Set(near);
-  ptr->GetElement("far")->Set(far);
+  ptr->GetElement("near")->Set(this->near);
+  ptr->GetElement("far")->Set(this->far);
 }
 
 //////////////////////////////////////////////////
@@ -214,7 +213,7 @@ void GpuRaySensor::Init()
     this->laserCam->Load(this->cameraElem);
 
     this->laserCam->Init();
-    this->laserCam->SetRangeCount(width_2nd, height_2nd);
+    this->laserCam->SetRangeCount(this->horzRangeCount, this->vertRangeCount);
     this->laserCam->SetClipDist(this->GetRangeMin(), this->GetRangeMax());
     this->laserCam->SetParentSensor(this);
     this->laserCam->CreateLaserTexture(this->GetName() + "_RttTex_Laser");
@@ -246,69 +245,105 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
+void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
 {
-  this->laserCam->DisconnectNewLaserFrame(_c);
+  this->laserCam->DisconnectNewLaserFrame(_conn);
 }
 
 //////////////////////////////////////////////////
-unsigned int GpuRaySensor::GetCameraCount()
+unsigned int GpuRaySensor::GetCameraCount() const
 {
   return this->cameraCount;
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::IsHorizontal()
+bool GpuRaySensor::IsHorizontal() const
 {
   return this->isHorizontal;
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetHAngle()
+double GpuRaySensor::GetHAngle() const
 {
-  return this->hang;
+  return this->horzHalfAngle;
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetVAngle()
+double GpuRaySensor::GetVAngle() const
 {
-  return this->vang;
+  return this->vertHalfAngle;
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetHFOV()
+double GpuRaySensor::GetHFOV() const
 {
   return this->hfov;
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetCHFOV()
+double GpuRaySensor::GetHorzFOV() const
+{
+  return this->hfov;
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::GetCHFOV() const
+{
+  return this->GetCosHorzFOV();
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::GetCosHorzFOV() const
 {
   return this->chfov;
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetVFOV()
+double GpuRaySensor::GetVFOV() const
+{
+  return this->GetVertFOV();
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::GetVertFOV() const
 {
   return this->vfov;
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetCVFOV()
+double GpuRaySensor::GetCVFOV() const
+{
+  return this->GetCosVertFOV();
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::GetCosVertFOV() const
 {
   return this->cvfov;
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::Get1stRatio()
+double GpuRaySensor::Get1stRatio() const
 {
-  return this->ratio_1st;
+  return this->GetRayCountRatio();
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::Get2ndRatio()
+double GpuRaySensor::GetRayCountRatio() const
 {
-  return this->ratio_2nd;
+  return this->rayCountRatio;
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::Get2ndRatio() const
+{
+  return this->GetRangeCountRatio();
+}
+
+//////////////////////////////////////////////////
+double GpuRaySensor::GetRangeCountRatio() const
+{
+  return this->rangeCountRatio;
 }
 
 //////////////////////////////////////////////////
@@ -431,9 +466,9 @@ void GpuRaySensor::SetVerticalAngleMax(double _angle)
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::GetRanges(std::vector<double> &/*_ranges*/)
+void GpuRaySensor::GetRanges(std::vector<double> &/*_ranges*/) const
 {
-  /*boost::mutex::scoped_lock(*this->mutex);
+  /*boost::mutex::scoped_lock(this->mutex);
   _ranges.resize(this->laserMsg.ranges_size());
   memcpy(&_ranges[0], this->laserMsg.ranges().data(),
          sizeof(_ranges[0]) * this->laserMsg.ranges_size());*/
@@ -448,18 +483,18 @@ double GpuRaySensor::GetRange(int _index)
     return 0.0;
   }
 
-  boost::mutex::scoped_lock(*this->mutex);
+  boost::mutex::scoped_lock lock(this->mutex);
   return this->laserMsg.ranges(_index);
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRetro(int /*_index*/)
+double GpuRaySensor::GetRetro(int /*_index*/) const
 {
   return 0.0;
 }
 
 //////////////////////////////////////////////////
-int GpuRaySensor::GetFiducial(int /*_index*/)
+int GpuRaySensor::GetFiducial(int /*_index*/) const
 {
   return 0;
 }
@@ -471,11 +506,6 @@ void GpuRaySensor::UpdateImpl(bool /*_force*/)
   {
     this->laserCam->Render();
     this->laserCam->PostRender();
-    this->lastUpdateTime = this->world->GetSimTime();
+    this->lastMeasurementTime = this->world->GetSimTime();
   }
-}
-
-//////////////////////////////////////////////////
-void GpuRaySensor::OnPose(ConstPosePtr &/*_msg*/)
-{
 }

@@ -47,7 +47,8 @@ using namespace rendering;
 unsigned int Camera::cameraCounter = 0;
 
 //////////////////////////////////////////////////
-Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
+Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
+               bool _autoRender)
 {
   this->initialized = false;
   this->sdf.reset(new sdf::Element);
@@ -65,10 +66,8 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
   this->saveCount = 0;
   this->bayerFrameBuffer = NULL;
 
-  this->myCount = cameraCounter++;
-
   std::ostringstream stream;
-  stream << _namePrefix << "(" << this->myCount << ")";
+  stream << _namePrefix << "(" << this->cameraCounter++ << ")";
   this->name = stream.str();
 
   this->renderTarget = NULL;
@@ -96,6 +95,9 @@ Camera::Camera(const std::string &_namePrefix, Scene *_scene, bool _autoRender)
   }
 
   this->lastRenderWallTime = common::Time::GetWallTime();
+
+  // Set default render rate to 30Hz
+  this->SetRenderRate(30.0);
 }
 
 //////////////////////////////////////////////////
@@ -211,7 +213,7 @@ unsigned int Camera::GetWindowId() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetScene(Scene *_scene)
+void Camera::SetScene(ScenePtr _scene)
 {
   this->scene = _scene;
 }
@@ -259,7 +261,11 @@ void Camera::Update()
       } catch(Ogre::Exception &_e)
       {
       }
+
       this->animState = NULL;
+
+      this->AnimationComplete();
+
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
@@ -285,8 +291,12 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  this->newData = true;
-  this->RenderImpl();
+  if (common::Time::GetWallTime() - this->lastRenderWallTime >=
+      this->renderPeriod)
+  {
+    this->newData = true;
+    this->RenderImpl();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1037,7 +1047,7 @@ void Camera::CreateRenderTexture(const std::string &textureName)
 }
 
 //////////////////////////////////////////////////
-Scene *Camera::GetScene() const
+ScenePtr Camera::GetScene() const
 {
   return this->scene;
 }
@@ -1265,11 +1275,13 @@ bool Camera::IsVisible(VisualPtr _visual)
   return false;
 }
 
+/////////////////////////////////////////////////
 bool Camera::IsVisible(const std::string &_visualName)
 {
   return this->IsVisible(this->scene->GetVisual(_visualName));
 }
 
+/////////////////////////////////////////////////
 bool Camera::GetInitialized() const
 {
   return this->initialized;
@@ -1283,6 +1295,7 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
     this->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
     return false;
   }
+
 
   Ogre::TransformKeyFrame *key;
   math::Vector3 rpy = _pose.rot.GetAsEuler();
@@ -1411,4 +1424,21 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->prevAnimTime = common::Time::GetWallTime();
 
   return true;
+}
+
+//////////////////////////////////////////////////
+void Camera::SetRenderRate(double _hz)
+{
+  this->renderPeriod = 1.0 / _hz;
+}
+
+//////////////////////////////////////////////////
+double Camera::GetRenderRate() const
+{
+  return 1.0 / this->renderPeriod.Double();
+}
+
+//////////////////////////////////////////////////
+void Camera::AnimationComplete()
+{
 }

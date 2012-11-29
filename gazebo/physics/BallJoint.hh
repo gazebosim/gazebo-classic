@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,8 @@ namespace gazebo
 
       /// \brief Template to ::Load the BallJoint.
       /// \param[in] _sdf SDF to load the joint from.
-      protected: void Load(sdf::ElementPtr _sdf)
-                 {T::Load(_sdf);}
+      public: void Load(sdf::ElementPtr _sdf)
+              {T::Load(_sdf);}
 
       /// \internal
       /// \brief Set the axis of rotation. This is not used for ball joints.
@@ -78,6 +78,10 @@ namespace gazebo
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int /*_index*/)
               {return math::Angle();}
+
+      /// \internal
+      public: virtual unsigned int GetAngleCount() const
+              {return 0;}
     };
     /// \}
   }

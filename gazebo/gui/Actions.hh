@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ namespace gazebo
     extern QAction *g_dirLghtCreateAct;
 
     extern QAction *g_viewGridAct;
+    extern QAction *g_viewContactsAct;
     extern QAction *g_viewResetAct;
     extern QAction *g_viewFullScreenAct;
     extern QAction *g_viewFPSAct;
@@ -60,6 +61,7 @@ namespace gazebo
     extern QAction *g_translateAct;
     extern QAction *g_rotateAct;
 
+    /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
     class DeleteAction : public QAction
     {
