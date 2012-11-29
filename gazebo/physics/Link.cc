@@ -157,6 +157,9 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
+  this->SetRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
+
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
@@ -231,10 +234,6 @@ void Link::Init()
   }*/
 
   this->enabled = true;
-
-  // DO THIS LAST!
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
-  this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
 }
 
 //////////////////////////////////////////////////
