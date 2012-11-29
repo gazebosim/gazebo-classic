@@ -31,9 +31,10 @@ namespace gazebo
       public: ~FinishModelDialog();
 
       private slots: void OnBrowse();
+      private slots: void OnCancel();
+      private slots: void OnFinish();
 
-//      private: void showFiles(const QStringList &files);
-//      private: QDir currentDir;
+      private: QLineEdit* modelLocationLineEdit;
    };
  }
 }

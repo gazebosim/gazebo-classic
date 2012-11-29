@@ -20,7 +20,7 @@
 using namespace gazebo;
 using namespace gui;
 
-
+/////////////////////////////////////////////////
 FinishModelDialog::FinishModelDialog(QWidget *_parent)
   : QDialog(_parent)
 {
@@ -38,8 +38,8 @@ FinishModelDialog::FinishModelDialog(QWidget *_parent)
   modelNameLineEdit->setPlaceholderText(tr("MyNamedModel.sdf"));
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("Location"));
-  QLineEdit* modelLocationLineEdit = new QLineEdit;
-  modelLocationLineEdit->setPlaceholderText(tr(""));
+  modelLocationLineEdit = new QLineEdit;
+  this->modelLocationLineEdit->setPlaceholderText(tr(""));
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
@@ -49,16 +49,27 @@ FinishModelDialog::FinishModelDialog(QWidget *_parent)
          "[This will open up a new tab in your browser]\n"));
   QCheckBox *contributeCheckBox = new QCheckBox(contributeText);
 
-  QVBoxLayout *mainLayout = new QVBoxLayout;
+  QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+  connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+  QPushButton *finishButton = new QPushButton(tr("&Finish"));
+  connect(finishButton, SIGNAL(clicked()), this, SLOT(OnFinish()));
+  buttonsLayout->addWidget(cancelButton);
+  buttonsLayout->addWidget(finishButton);
+  buttonsLayout->setAlignment(Qt::AlignRight);
+
   QGridLayout *gridLayout = new QGridLayout;
   gridLayout->addWidget(modelLabel, 0, 0);
   gridLayout->addWidget(modelNameLineEdit, 0, 1);
   gridLayout->addWidget(modelLocation, 1, 0);
-  gridLayout->addWidget(modelLocationLineEdit, 1, 1);
+  gridLayout->addWidget(this->modelLocationLineEdit, 1, 1);
+  gridLayout->addWidget(browseButton, 1, 2);
 
+  QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(messageLabel);
   mainLayout->addLayout(gridLayout);
   mainLayout->addWidget(contributeCheckBox);
+  mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
 }
@@ -71,5 +82,20 @@ FinishModelDialog::~FinishModelDialog()
 /////////////////////////////////////////////////
 void FinishModelDialog::OnBrowse()
 {
-  ///TODO
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+    "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+  this->modelLocationLineEdit->setText(dir);
+}
+
+/////////////////////////////////////////////////
+void FinishModelDialog::OnCancel()
+{
+  this->close();
+}
+
+/////////////////////////////////////////////////
+void FinishModelDialog::OnFinish()
+{
+  /// TODO:
+  this->accept();
 }
