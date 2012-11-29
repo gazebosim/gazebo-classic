@@ -242,6 +242,11 @@ namespace gazebo
         protected: class ShaderHelperCg :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
         {
+          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
+                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                      TechniqueType _tt);
+
+
           public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
                       const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                       TechniqueType _tt);

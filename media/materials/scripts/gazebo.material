@@ -39,7 +39,7 @@ fragment_program Gazebo/DepthMapFS glsl
   }
 }
 
-material Gazebo/Grey
+/*material Gazebo/Grey
 {
   technique
   {
@@ -49,7 +49,7 @@ material Gazebo/Grey
       fragment_program_ref Gazebo/TestMeF { }
     }
   }
-}
+}*/
 
 material Gazebo/DepthMap
 {
@@ -156,7 +156,7 @@ material Gazebo/LaserScan2nd
   }
 }
 
-/*material Gazebo/Grey
+material Gazebo/Grey
 {
   technique
   {
@@ -167,7 +167,7 @@ material Gazebo/LaserScan2nd
       specular 0.01 0.01 0.01 1.000000 1.500000
     }
   }
-}*/
+}
 
 material Gazebo/White
 {
