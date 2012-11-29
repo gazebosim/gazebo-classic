@@ -461,11 +461,12 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
 
   // Doesn't delegate to the proper method otherwise
   Ogre::HighLevelGpuProgramPtr vprog =
-    ((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)->
+    ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)->
     generateVertexProgram(this, _terrain, _tt);
 
   Ogre::HighLevelGpuProgramPtr fprog =
-    this->mShaderGen->generateFragmentProgram(this, _terrain, _tt);
+    ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)->
+    generateFragmentProgram(this, _terrain, _tt);
 
   pass->setVertexProgram(vprog->getName());
   pass->setFragmentProgram(fprog->getName());
@@ -683,6 +684,8 @@ Ogre::HighLevelGpuProgramPtr
 GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgram(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain, TechniqueType _tt)
 {
+  std::cout << "\n\n GENERATE FRAGMENT PROGRAM \n\n";
+
   Ogre::HighLevelGpuProgramPtr ret = this->createFragmentProgram(_prof,
       _terrain, _tt);
 
@@ -781,7 +784,6 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
 
   for (unsigned int i = 0; i < numUVMultipliers; ++i)
     _outStream << "uniform vec4 uvMul_" << i << ";\n";
-  ;
 
   _outStream <<
     "out vec4 oPos;\n"
@@ -1168,7 +1170,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
     for (Ogre::uint i = 0; i < numLayers; ++i)
     {
       _outStream << "uniform sampler2D difftex" << i << ";\n";
-      _outStream << ", uniform sampler2D normtex" << i << ";\n";
+      _outStream << "uniform sampler2D normtex" << i << ";\n";
     }
   }
 
@@ -1232,17 +1234,18 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
       // we do this in the pixel shader because we don't have per-vertex normals
       // because of the LOD, we use a normal map
       // tangent is always +x or -z in object space depending on alignment
-      switch(terrain->getAlignment())
+      switch(_terrain->getAlignment())
       {
-        case Terrain::ALIGN_X_Y:
-        case Terrain::ALIGN_X_Z:
+        case Ogre::Terrain::ALIGN_X_Y:
+        case Ogre::Terrain::ALIGN_X_Z:
           _outStream << "  vec3 tangent = vec3(1, 0, 0);\n";
           break;
-        case Terrain::ALIGN_Y_Z:
+        case Ogre::Terrain::ALIGN_Y_Z:
           _outStream << "  vec3 tangent = vec3(0, 0, -1);\n";
           break;
         default:
           gzerr << "Inavlid terrain alignment\n";
+          break;
       };
 
       _outStream << "  vec3 binormal = normalize(cross(tangent, normal));\n";
@@ -1258,8 +1261,8 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
       if (_prof->isLayerParallaxMappingEnabled())
         _outStream << "  float displacement;\n";
       // move
-      _outStream << "  TSlightDir = normalize(mul(TBN, lightDir));\n";
-      _outStream << "  TSeyeDir = normalize(mul(TBN, eyeDir));\n";
+      _outStream << "  TSlightDir = normalize(TBN * lightDir);\n";
+      _outStream << "  TSeyeDir = normalize(TBN * eyeDir);\n";
     }
     else
     {
@@ -1267,8 +1270,14 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
       _outStream << "  lightDir = normalize(lightDir);\n";
       _outStream << "  eyeDir = normalize(eyeDir);\n";
       _outStream << "  vec3 halfAngle = normalize(lightDir + eyeDir);\n";
-      _outStream << "  vec4 litRes = lit(dot(lightDir, normal), "
-        "dot(halfAngle, normal), scaleBiasSpecular.z);\n";
+
+      // _outStream << "  vec4 litRes = lit(dot(lightDir, normal), "
+      //  "dot(halfAngle, normal), scaleBiasSpecular.z);\n";
+      _outStream << "float NdotL = dot(lightDir, normal);\n";
+      _outStream << "float NdotH = dot(halfAngle, normal);\n";
+      _outStream << "float m = scaleBiasSpecular.z;\n";
+      _outStream << "float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m);\n";
+      _outStream << "vec4 litRes =vec4(1.0, max(0.0, NdotL), specular, 1.0);\n";
     }
   }
 }
@@ -1277,13 +1286,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
 void
 GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(
     Ogre::uint *_texCoord, Ogre::uint *_sampler, const SM2Profile *_prof,
-    const Terrain *_terrain, TechniqueType _tt,
+    const Ogre::Terrain * /*_terrain*/, TechniqueType _tt,
     Ogre::StringUtil::StrStreamType &_outStream)
 {
   if (_tt == HIGH_LOD)
-    this->mShadowSamplerStartHi = *sampler;
-  else if (tt == LOW_LOD)
-    this->mShadowSamplerStartLo = *sampler;
+    this->mShadowSamplerStartHi = *_sampler;
+  else if (_tt == LOW_LOD)
+    this->mShadowSamplerStartLo = *_sampler;
 
   // in semantics & params
   Ogre::uint numTextures = 1;
@@ -1299,8 +1308,8 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(
       "vec4 lightSpacePos" << i << ";\n" <<
       "uniform sampler2D shadowMap" << i << ";\n";
 
-    *sampler = *sampler + 1;
-    *texCoord = *texCoord + 1;
+    *_sampler = *_sampler + 1;
+    *_texCoord = *_texCoord + 1;
 
     if (_prof->getReceiveDynamicShadowsDepth())
     {
@@ -1312,13 +1321,14 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(
 
 /////////////////////////////////////////////////
 void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
-    const SM2Profile *_prof, const Ogre:;Terrain *_terrain, TechniqueType tt,
-    Ogre::uint _layer, Ogre::StringUtil::StrStreamType &_outStream)
+    const SM2Profile *_prof, const Ogre::Terrain * /*_terrain*/,
+    TechniqueType _tt, Ogre::uint _layer,
+    Ogre::StringUtil::StrStreamType &_outStream)
 {
-  Ogre::uint uvIdx = layer / 2;
-  Ogre::String uvChannels = (layer % 2) ? ".zw" : ".xy";
-  Ogre::uint blendIdx = (layer-1) / 4;
-  Ogre::String blendChannel = this->getChannel(layer-1);
+  Ogre::uint uvIdx = _layer / 2;
+  Ogre::String uvChannels = (_layer % 2) ? ".zw" : ".xy";
+  Ogre::uint blendIdx = (_layer-1) / 4;
+  Ogre::String blendChannel = this->getChannel(_layer-1);
   Ogre::String blendWeightStr = Ogre::String("blendTexVal") +
     Ogre::StringConverter::toString(blendIdx) + "." + blendChannel;
 
@@ -1328,7 +1338,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
   //   _outStream << "  if (" << blendWeightStr << " > 0.0003)\n  { \n";
 
   // generate UV
-  _outStream << "  vec2 uv" << layer << " = layerUV" << uvIdx
+  _outStream << "  vec2 uv" << _layer << " = layerUV" << uvIdx
              << uvChannels << ";\n";
 
   // calculate lighting here if normal mapping
@@ -1337,32 +1347,40 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
     if (_prof->isLayerParallaxMappingEnabled() && _tt != RENDER_COMPOSITE_MAP)
     {
       // modify UV - note we have to sample an extra time
-      _outStream << "  displacement = tex2D(normtex" << layer
-                 << ", uv" << layer << ").a\n"
+      _outStream << "  displacement = tex2D(normtex" << _layer
+                 << ", uv" << _layer << ").a\n"
         "    * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
-      _outStream << "  uv" << layer << " += TSeyeDir.xy * displacement;\n";
+      _outStream << "  uv" << _layer << " += TSeyeDir.xy * displacement;\n";
     }
 
     // access TS normal map
-    _outStream << "  TSnormal = expand(tex2D(normtex" << layer << ", uv"
-               << layer << ")).rgb;\n";
+    _outStream << "  TSnormal = expand(tex2D(normtex" << _layer << ", uv"
+               << _layer << ")).rgb;\n";
     _outStream << "  TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
-    _outStream << "  litResLayer = lit(dot(TSlightDir, TSnormal), "
-                  "dot(TShalfAngle, TSnormal), scaleBiasSpecular.z);\n";
 
-    if (!layer)
+    //_outStream << "  litResLayer = lit(dot(TSlightDir, TSnormal), "
+    //              "dot(TShalfAngle, TSnormal), scaleBiasSpecular.z);\n";
+    _outStream << "float NdotL = dot(TSlightDir, TSnormal);\n";
+    _outStream << "float NdotH = dot(TShalfAngle, TSnormal);\n";
+    _outStream << "float m = scaleBiasSpecular.z\n";
+    _outStream << "float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m);\n";
+    _outStream << "litResLayer = vec4(1.0, max(0.0, NdotL), specular, 1.0);\n";
+
+    if (!_layer)
       _outStream << "  litRes = litResLayer;\n";
     else
-      _outStream << "  litRes = lerp(litRes, litResLayer, "
-                 << blendWeightStr << ");\n";
+      _outStream << "litRes = litRes + blendWeightStr * "
+                    "(litResLayer-litRes);\n";
+      //_outStream << "  litRes = lerp(litRes, litResLayer, "
+      //           << blendWeightStr << ");\n";
   }
 
   // sample diffuse texture
-  _outStream << "  vec4 diffuseSpecTex" << layer
-    << " = tex2D(difftex" << layer << ", uv" << layer << ");\n";
+  _outStream << "  vec4 diffuseSpecTex" << _layer
+    << " = tex2D(difftex" << _layer << ", uv" << _layer << ");\n";
 
   // apply to common
-  if (!layer)
+  if (!_layer)
   {
     _outStream << "  diffuse = diffuseSpecTex0.rgb;\n";
     if (_prof->isLayerSpecularMappingEnabled())
@@ -1370,11 +1388,19 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
   }
   else
   {
-    _outStream << "  diffuse = lerp(diffuse, diffuseSpecTex" << layer
-      << ".rgb, " << blendWeightStr << ");\n";
+    _outStream << "  diffuse = diffuse + blendWeightStr * (diffuseSpecTex"
+               << _layer << ".rgb - diffuse);\n";
+    // _outStream << "  diffuse = lerp(diffuse, diffuseSpecTex" << _layer
+    //  << ".rgb, " << blendWeightStr << ");\n";
+
     if (_prof->isLayerSpecularMappingEnabled())
-      _outStream << "  specular = lerp(specular, diffuseSpecTex" << layer
-        << ".a, " << blendWeightStr << ");\n";
+    {
+      _outStream << "  specular = specular + blendWeightStr * (diffuseSpecTex"
+                 << _layer << ".a - diffuse);\n";
+
+      // _outStream << "  specular = lerp(specular, diffuseSpecTex" << _layer
+      //  << ".a, " << blendWeightStr << ");\n";
+    }
   }
 
   // End early-out
@@ -1386,11 +1412,11 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
 /////////////////////////////////////////////////
 void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-    TechniqueType tt, Ogre::StringUtil::StrStreamType &_outStream)
+    TechniqueType _tt, Ogre::StringUtil::StrStreamType &_outStream)
 {
   if (_tt == LOW_LOD)
   {
-    if (_prof->isShadowingEnabled(tt, terrain))
+    if (_prof->isShadowingEnabled(_tt, _terrain))
     {
       this->generateFpDynamicShadows(_prof, _terrain, _tt, _outStream);
       _outStream << "  outputCol.rgb = diffuse * rtshadow;\n";
@@ -1450,7 +1476,9 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
              _tt != RENDER_COMPOSITE_MAP;
   if (fog)
   {
-    _outStream << "  outputCol.rgb = lerp(outputCol.rgb, fogColour, fogVal);\n";
+    _outStream << "  outputCol.rgb = outputCol.rgb + fogVal * "
+                  "(fogColour - outputCol.rgb);\n";
+    //_outStream << "  outputCol.rgb = lerp(outputCol.rgb, fogColour, fogVal);\n";
   }
 
   // Final return
@@ -1460,8 +1488,8 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
 /////////////////////////////////////////////////
 void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::
 generateFpDynamicShadowsHelpers(
-    const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-    TechniqueType tt, Ogre::StringUtil::StrStreamType &_outStream)
+    const SM2Profile *_prof, const Ogre::Terrain * /*_terrain*/,
+    TechniqueType /*_tt*/, Ogre::StringUtil::StrStreamType &_outStream)
 {
   // TODO make filtering configurable
   _outStream <<
@@ -1582,6 +1610,85 @@ generateFpDynamicShadowsHelpers(
                   "} \n\n\n";
   }
 }
+
+/////////////////////////////////////////////////
+void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadows(
+    const SM2Profile *_prof, const Ogre::Terrain * /*_terrain*/,
+    TechniqueType /*_tt*/, Ogre::StringUtil::StrStreamType &_outStream)
+{
+  if (_prof->getReceiveDynamicShadowsPSSM())
+  {
+    Ogre::uint numTextures =
+      _prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+
+    _outStream << "  float camDepth = uvMisc.z;\n";
+
+    if (_prof->getReceiveDynamicShadowsDepth())
+    {
+      _outStream << "  float rtshadow = calcPSSMDepthShadow(";
+    }
+    else
+    {
+      _outStream << "  float rtshadow = calcPSSMSimpleShadow(";
+    }
+
+    for (Ogre::uint i = 0; i < numTextures; ++i)
+      _outStream << "shadowMap" << i << ", ";
+
+    _outStream << "\n    ";
+
+    for (Ogre::uint i = 0; i < numTextures; ++i)
+      _outStream << "lightSpacePos" << i << ", ";
+
+    if (_prof->getReceiveDynamicShadowsDepth())
+    {
+      _outStream << "\n    ";
+
+      for (Ogre::uint i = 0; i < numTextures; ++i)
+        _outStream << "inverseShadowmapSize" << i << ", ";
+    }
+    _outStream << "\n" <<
+      "    pssmSplitPoints, camDepth);\n";
+  }
+  else
+  {
+    if (_prof->getReceiveDynamicShadowsDepth())
+    {
+      _outStream <<
+        "  float rtshadow = calcDepthShadow(shadowMap0, lightSpacePos0, "
+        "inverseShadowmapSize0);";
+    }
+    else
+    {
+      _outStream <<
+        "  float rtshadow = calcSimpleShadow(shadowMap0, lightSpacePos0);";
+    }
+  }
+
+  _outStream << "  shadow = min(shadow, rtshadow);\n";
+}
+
+/////////////////////////////////////////////////
+void
+GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgramSource(
+    const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+    TechniqueType _tt, Ogre::StringUtil::StrStreamType &_outStream)
+{
+  this->generateFpHeader(_prof, _terrain, _tt, _outStream);
+
+  if (_tt != LOW_LOD)
+  {
+    Ogre::uint maxLayers = _prof->getMaxLayers(_terrain);
+    Ogre::uint numLayers = std::min(maxLayers,
+        static_cast<Ogre::uint>(_terrain->getLayerCount()));
+
+    for (Ogre::uint i = 0; i < numLayers; ++i)
+      this->generateFpLayer(_prof, _terrain, _tt, i, _outStream);
+  }
+
+  this->generateFpFooter(_prof, _terrain, _tt, _outStream);
+}
+
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////

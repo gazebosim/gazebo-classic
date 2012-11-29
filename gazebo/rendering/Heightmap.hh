@@ -154,6 +154,7 @@ namespace gazebo
         public: virtual ~SM2Profile();
 
         public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
+
         public: Ogre::MaterialPtr generateForCompositeMap(
                     const Ogre::Terrain *_terrain);
 
@@ -224,6 +225,16 @@ namespace gazebo
                          const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain,
                          TechniqueType tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: void generateFpDynamicShadows(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFragmentProgramSource(
+                         const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
 
