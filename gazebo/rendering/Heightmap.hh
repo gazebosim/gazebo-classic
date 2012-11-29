@@ -160,6 +160,42 @@ namespace gazebo
         protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
                        const Ogre::Terrain *_terrain, TechniqueType _tt);
 
+        /// Utility class to help with generating shaders for GLSL.
+        protected: class ShaderHelperGLSL :
+            public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
+        {
+          public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
+                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                      TechniqueType _tt);
+
+          protected: virtual void generateVpHeader(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVpFooter(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVertexProgramSource(
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void defaultVpParams(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         const Ogre::HighLevelGpuProgramPtr &_prog);
+
+          protected: virtual unsigned int generateVpDynamicShadowsParams(
+                         unsigned int _texCoordStart, const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateVpDynamicShadows(
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+        };
+
         /// Utility class to help with generating shaders for Cg / HLSL.
         protected: class ShaderHelperCg :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
@@ -193,6 +229,22 @@ namespace gazebo
           protected: virtual void generateVpDynamicShadows(
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+
+          protected: virtual void generateFpHeader(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpLayer(const SM2Profile *_prof,
+                         const Ogre:;Terrain *_terrain, TechniqueType tt,
+                         Ogre::uint _layer,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpFooter(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
       };

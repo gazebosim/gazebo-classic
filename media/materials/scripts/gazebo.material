@@ -1,5 +1,15 @@
 import * from "grid.material"
 
+vertex_program Gazebo/TestMe glsl
+{
+  source test.vert
+
+  default_params
+  {
+  }
+}
+
+
 vertex_program Gazebo/DepthMapVS glsl
 {
   source depth_map.vert
@@ -18,6 +28,18 @@ fragment_program Gazebo/DepthMapFS glsl
   {
     param_named_auto pNear near_clip_distance
     param_named_auto pFar far_clip_distance
+  }
+}
+
+material Gazebo/Grey
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/TestMe { }
+      fragment_program_ref Gazebo/DepthMapFS { }
+    }
   }
 }
 
@@ -126,7 +148,7 @@ material Gazebo/LaserScan2nd
   }
 }
 
-material Gazebo/Grey
+/*material Gazebo/Grey
 {
   technique
   {
@@ -137,7 +159,7 @@ material Gazebo/Grey
       specular 0.01 0.01 0.01 1.000000 1.500000
     }
   }
-}
+}*/
 
 material Gazebo/White
 {

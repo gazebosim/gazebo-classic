@@ -443,7 +443,8 @@ void URDF2Gazebo::insertGazeboExtensionCollision(TiXmlElement *elem,
           addKeyValue(contact_ode, "max_vel", values2str(1, &(*ge)->maxVel));
         // contact interpenetration margin tolerance
         if ((*ge)->is_minDepth)
-          addKeyValue(contact_ode, "min_depth", values2str(1, &(*ge)->minDepth));
+          addKeyValue(contact_ode, "min_depth",
+                      values2str(1, &(*ge)->minDepth));
         if ((*ge)->is_laser_retro)
           addKeyValue(elem, "laser_retro", values2str(1, &(*ge)->laser_retro));
 
