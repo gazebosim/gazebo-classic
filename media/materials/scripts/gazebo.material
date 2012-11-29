@@ -9,6 +9,14 @@ vertex_program Gazebo/TestMe glsl
   }
 }
 
+fragment_program Gazebo/TestMeF glsl
+{
+  source test.frag
+
+  default_params
+  {
+  }
+}
 
 vertex_program Gazebo/DepthMapVS glsl
 {
@@ -38,7 +46,7 @@ material Gazebo/Grey
     pass
     {
       vertex_program_ref Gazebo/TestMe { }
-      fragment_program_ref Gazebo/DepthMapFS { }
+      fragment_program_ref Gazebo/TestMeF { }
     }
   }
 }

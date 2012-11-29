@@ -1080,6 +1080,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
     "  return v * 2 - 1;\n"
     "}\n\n";
 
+  _outStream <<
+    "vec4 lit(float NdotL, float NdotH, float m)\n"
+    "{\n"
+    "  float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m) : 0.0;\n"
+    "  return vec4(1.0, max(0.0, NdotL), specular, 1.0);\n"
+    "}\n\n";
+
   if (_prof->isShadowingEnabled(_tt, _terrain))
     this->generateFpDynamicShadowsHelpers(_prof, _terrain, _tt, _outStream);
 
@@ -1199,7 +1206,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   if (_tt != LOW_LOD)
   {
     // global normal
-    _outStream << "  vec3 normal = expand(tex2D(globalNormal, uv)).rgb;\n";
+    _outStream << "  vec3 normal = expand(texture(globalNormal, uv)).rgb;\n";
   }
 
   _outStream <<
@@ -1215,7 +1222,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   {
     // we just do a single calculation from composite map
     _outStream <<
-      "  vec4 composite = tex2D(compositeMap, uv);\n"
+      "  vec4 composite = texture(compositeMap, uv);\n"
       "  diffuse = composite.rgb;\n";
     // TODO - specular; we'll need normals for this!
   }
@@ -1225,7 +1232,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
     for (Ogre::uint i = 0; i < numBlendTextures; ++i)
     {
       _outStream << "  vec4 blendTexVal" << i
-                 << " = tex2D(blendTex" << i << ", uv);\n";
+                 << " = texture(blendTex" << i << ", uv);\n";
     }
 
     if (_prof->isLayerNormalMappingEnabled())
@@ -1271,13 +1278,8 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
       _outStream << "  eyeDir = normalize(eyeDir);\n";
       _outStream << "  vec3 halfAngle = normalize(lightDir + eyeDir);\n";
 
-      // _outStream << "  vec4 litRes = lit(dot(lightDir, normal), "
-      //  "dot(halfAngle, normal), scaleBiasSpecular.z);\n";
-      _outStream << "float NdotL = dot(lightDir, normal);\n";
-      _outStream << "float NdotH = dot(halfAngle, normal);\n";
-      _outStream << "float m = scaleBiasSpecular.z;\n";
-      _outStream << "float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m);\n";
-      _outStream << "vec4 litRes =vec4(1.0, max(0.0, NdotL), specular, 1.0);\n";
+       _outStream << "  vec4 litRes = lit(dot(lightDir, normal), "
+         "dot(halfAngle, normal), scaleBiasSpecular.z);\n";
     }
   }
 }
@@ -1347,29 +1349,24 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
     if (_prof->isLayerParallaxMappingEnabled() && _tt != RENDER_COMPOSITE_MAP)
     {
       // modify UV - note we have to sample an extra time
-      _outStream << "  displacement = tex2D(normtex" << _layer
+      _outStream << "  displacement = texture(normtex" << _layer
                  << ", uv" << _layer << ").a\n"
         "    * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
       _outStream << "  uv" << _layer << " += TSeyeDir.xy * displacement;\n";
     }
 
     // access TS normal map
-    _outStream << "  TSnormal = expand(tex2D(normtex" << _layer << ", uv"
+    _outStream << "  TSnormal = expand(texture(normtex" << _layer << ", uv"
                << _layer << ")).rgb;\n";
     _outStream << "  TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
 
-    //_outStream << "  litResLayer = lit(dot(TSlightDir, TSnormal), "
-    //              "dot(TShalfAngle, TSnormal), scaleBiasSpecular.z);\n";
-    _outStream << "float NdotL = dot(TSlightDir, TSnormal);\n";
-    _outStream << "float NdotH = dot(TShalfAngle, TSnormal);\n";
-    _outStream << "float m = scaleBiasSpecular.z\n";
-    _outStream << "float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m);\n";
-    _outStream << "litResLayer = vec4(1.0, max(0.0, NdotL), specular, 1.0);\n";
+    _outStream << "  litResLayer = lit(dot(TSlightDir, TSnormal), "
+      "dot(TShalfAngle, TSnormal), scaleBiasSpecular.z);\n";
 
     if (!_layer)
       _outStream << "  litRes = litResLayer;\n";
     else
-      _outStream << "litRes = litRes + blendWeightStr * "
+      _outStream << "litRes = litRes + " << blendWeightStr << " * "
                     "(litResLayer-litRes);\n";
       //_outStream << "  litRes = lerp(litRes, litResLayer, "
       //           << blendWeightStr << ");\n";
@@ -1377,7 +1374,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
 
   // sample diffuse texture
   _outStream << "  vec4 diffuseSpecTex" << _layer
-    << " = tex2D(difftex" << _layer << ", uv" << _layer << ");\n";
+    << " = texture(difftex" << _layer << ", uv" << _layer << ");\n";
 
   // apply to common
   if (!_layer)
@@ -1388,14 +1385,16 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
   }
   else
   {
-    _outStream << "  diffuse = diffuse + blendWeightStr * (diffuseSpecTex"
+    _outStream << "  diffuse = diffuse + " << blendWeightStr
+               << " * (diffuseSpecTex"
                << _layer << ".rgb - diffuse);\n";
     // _outStream << "  diffuse = lerp(diffuse, diffuseSpecTex" << _layer
     //  << ".rgb, " << blendWeightStr << ");\n";
 
     if (_prof->isLayerSpecularMappingEnabled())
     {
-      _outStream << "  specular = specular + blendWeightStr * (diffuseSpecTex"
+      _outStream << "  specular = specular + " << blendWeightStr
+                 << " * (diffuseSpecTex"
                  << _layer << ".a - diffuse);\n";
 
       // _outStream << "  specular = lerp(specular, diffuseSpecTex" << _layer
@@ -1432,13 +1431,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
         _prof->isGlobalColourMapEnabled())
     {
       // sample colour map and apply to diffuse
-      _outStream << "  diffuse *= tex2D(globalColourMap, uv).rgb;\n";
+      _outStream << "  diffuse *= texture(globalColourMap, uv).rgb;\n";
     }
 
     if (_prof->isLightmapEnabled())
     {
       // sample lightmap
-      _outStream << "  shadow = tex2D(lightMap, uv).r;\n";
+      _outStream << "  shadow = texture(lightMap, uv).r;\n";
     }
 
     if (_prof->isShadowingEnabled(_tt, _terrain))
@@ -1482,7 +1481,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
   }
 
   // Final return
-  _outStream << "  return outputCol;\n" << "}\n";
+  _outStream << "  gl_FragColor = outputCol;\n" << "}\n";
 }
 
 /////////////////////////////////////////////////
@@ -1522,7 +1521,9 @@ generateFpDynamicShadowsHelpers(
       "      // manually project and assign derivatives \n"
       "      // to avoid gradient issues inside loops \n"
       "      newUV = newUV / newUV.w; \n"
-      "      float depth = tex2D(shadowMap, newUV.xy, 1, 1).x; \n"
+      // The following line used to be:
+      //"      float depth = tex2d(shadowMap, newUV.xy, 1.0, 1.0).x; \n"
+      "      float depth = texture(shadowMap, newUV.xy, 1.0).x; \n"
       "      if (depth >= 1 || depth >= uv.z)\n"
       "        shadow += 1.0;\n"
       "    } \n"
@@ -1535,7 +1536,7 @@ generateFpDynamicShadowsHelpers(
     _outStream <<
       "float calcSimpleShadow(sampler2D shadowMap, vec4 shadowMapPos) \n"
       "{ \n"
-      "  return tex2Dproj(shadowMap, shadowMapPos).x; \n"
+      "  return textureProj(shadowMap, shadowMapPos).x; \n"
       "} \n";
   }
 

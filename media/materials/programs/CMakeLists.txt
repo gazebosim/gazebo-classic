@@ -27,6 +27,7 @@ set (files
   plain_color_vs.glsl
   plain_color_fs.glsl
   test.vert
+  test.frag
 ) 
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/programs/)
