@@ -361,7 +361,7 @@ QTabBar::tab:!selected
 }
 
 QTabWidget#mainTab::pane,
-QTabWidget#paletteTab::pane
+QTabWidget#buildingCreatorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;

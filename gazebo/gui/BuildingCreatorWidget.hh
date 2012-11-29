@@ -14,24 +14,26 @@
  * limitations under the License.
  *
 */
-#ifndef _EDITOR_PALETTE_HH_
-#define _EDITOR_PALETTE_HH_
+#ifndef _BUILDING_CREATOR_WIDGET_HH_
+#define _BUILDING_CREATOR_WIDGET_HH_
 
+#include <string>
 #include "gui/qt.h"
 
 #include "common/MouseEvent.hh"
 #include "common/Event.hh"
-
 namespace gazebo
 {
   namespace gui
   {
-    class EditorPalette : public QWidget
+    class BuildingCreatorWidget : public QWidget
     {
       Q_OBJECT
 
-      public: EditorPalette(QWidget *_parent = 0);
-      public: virtual ~EditorPalette();
+      public: BuildingCreatorWidget(QWidget *_parent = 0);
+      public: ~BuildingCreatorWidget();
+
+      protected: void paintEvent(QPaintEvent *event);
     };
   }
 }

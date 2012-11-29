@@ -16,7 +16,7 @@
 */
 
 #include "gui/EditorWidget.hh"
-#include "gui/BuildingEditorWidget.hh"
+#include "gui/BuildingCreatorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -36,14 +36,14 @@ EditorWidget::EditorWidget(QWidget *_parent)
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
-  this->buildingEditorWidget = new BuildingEditorWidget(this);
+  this->buildingCreatorWidget = new BuildingCreatorWidget(this);
 
   QHBoxLayout *editorLayout = new QHBoxLayout;
   editorLayout->setContentsMargins(0, 0, 0, 0);
 
   this->editorFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
-  editorLayout->addWidget(this->buildingEditorWidget);
+  editorLayout->addWidget(this->buildingCreatorWidget);
   editorLayout->setContentsMargins(0, 0, 0, 0);
   this->editorFrame->setLayout(editorLayout);
 
@@ -63,10 +63,10 @@ void EditorWidget::SetMode(int mode)
   switch (mode)
   {
     case 0:
-      this->buildingEditorWidget->hide();
+      this->buildingCreatorWidget->hide();
       break;
     case 1:
-      this->buildingEditorWidget->show();
+      this->buildingCreatorWidget->show();
       break;
     default:
       break;

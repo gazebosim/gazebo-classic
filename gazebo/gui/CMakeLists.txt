@@ -33,8 +33,9 @@ set (sources
   JointControlWidget.cc
   ToolsWidget.cc
   EditorWidget.cc
-  BuildingEditorWidget.cc
-  EditorPalette.cc
+  BuildingCreatorWidget.cc
+  BuildingCreatorPalette.cc
+  FinishModelDialog.cc
 )
 
 set (qt_headers
@@ -50,8 +51,9 @@ set (qt_headers
   JointControlWidget.hh
   ToolsWidget.hh
   EditorWidget.hh
-  BuildingEditorWidget.hh
-  EditorPalette.hh
+  BuildingCreatorWidget.hh
+  BuildingCreatorPalette.hh
+  FinishModelDialog.hh
 )
 
 set (headers

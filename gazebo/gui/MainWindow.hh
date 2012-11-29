@@ -33,7 +33,7 @@ namespace gazebo
     class RenderWidget;
     class ToolsWidget;
     class ModelListWidget;
-    class EditorPalette;
+    class BuildingCreatorPalette;
 
     class MainWindow : public QMainWindow
     {
@@ -132,9 +132,9 @@ namespace gazebo
 
       // private: QTreeWidget *treeWidget;
 //      priavte: QWidget
-      private: EditorPalette *editorPalette;
+      private: BuildingCreatorPalette *buildingCreatorPalette;
       private: QTabWidget *tabWidget;
-      private: QTabWidget *paletteTabWidget;
+      private: QTabWidget *buildingCreatorTabWidget;
       private: QMenuBar *menuBar;
     };
 

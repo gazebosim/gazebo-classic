@@ -15,25 +15,25 @@
  *
 */
 
-#include "gui/BuildingEditorWidget.hh"
+#include "gui/BuildingCreatorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
+BuildingCreatorWidget::BuildingCreatorWidget(QWidget *_parent)
   : QWidget(_parent)
 {
-  this->setObjectName("buildingEditorWidget");
+  this->setObjectName("buildingCreatorWidget");
   setBackgroundRole(QPalette::Base);
   setAutoFillBackground(true);
 
 }
 
-BuildingEditorWidget::~BuildingEditorWidget()
+BuildingCreatorWidget::~BuildingCreatorWidget()
 {
 
 }
 
-void BuildingEditorWidget::paintEvent(QPaintEvent * /* event */)
+void BuildingCreatorWidget::paintEvent(QPaintEvent * /* event */)
 {
 }

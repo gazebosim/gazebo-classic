@@ -14,42 +14,33 @@
  * limitations under the License.
  *
 */
-#ifndef _EDITOR_WIDGET_HH_
-#define _EDITOR_WIDGET_HH_
-
-#include <string>
-#include <vector>
-#include <list>
+#ifndef _BUILDING_CREATOR_PALETTE_HH_
+#define _BUILDING_CREATOR_PALETTE_HH_
 
 #include "gui/qt.h"
-
-#include "transport/TransportTypes.hh"
-
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
-
-#include "math/Pose.hh"
-
-#include "msgs/msgs.hh"
-
 
 namespace gazebo
 {
   namespace gui
   {
-    class BuildingCreatorWidget;
-
-    class EditorWidget : public QWidget
+    class BuildingCreatorPalette : public QWidget
     {
       Q_OBJECT
 
-      public: EditorWidget(QWidget *_parent = 0);
-      public: virtual ~EditorWidget();
+      public: BuildingCreatorPalette(QWidget *_parent = 0);
+      public: ~BuildingCreatorPalette();
 
-      public: void SetMode(int mode);
+      private: std::string modelName;
 
-      private: QFrame *editorFrame;
-      private: QWidget *buildingCreatorWidget;
+      /// \brief On discard callback.
+      private slots: void OnDiscard();
+
+      /// \brief On save callback.
+      private slots: void OnSave();
+
+      /// \brief On finish callback.
+      private slots: void OnFinish();
+
 
     };
   }

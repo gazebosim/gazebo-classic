@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2012 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,28 +14,28 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_EDITOR_WIDGET_HH_
-#define _BUILDING_EDITOR_WIDGET_HH_
+#ifndef _FINISH_MODEL_DIALOG_HH_
+#define _FINISH_MODEL_DIALOG_HH_
 
-#include <string>
 #include "gui/qt.h"
 
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
 namespace gazebo
 {
   namespace gui
   {
-    class BuildingEditorWidget : public QWidget
+    class FinishModelDialog : public QDialog
     {
       Q_OBJECT
 
-      public: BuildingEditorWidget(QWidget *_parent = 0);
-      public: virtual ~BuildingEditorWidget();
+      public: FinishModelDialog(QWidget *parent = 0);
+      public: ~FinishModelDialog();
 
-      protected: void paintEvent(QPaintEvent *event);
-    };
-  }
+      private slots: void OnBrowse();
+
+//      private: void showFiles(const QStringList &files);
+//      private: QDir currentDir;
+   };
+ }
 }
 
 #endif
