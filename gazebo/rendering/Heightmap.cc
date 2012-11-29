@@ -142,7 +142,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(5);
+  this->terrainGlobals->setMaxPixelError(2);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -169,6 +169,7 @@ void Heightmap::ConfigureTerrainDefaults()
   {
     this->terrainGlobals->setLightMapDirection(
         Conversions::Convert(directionalLight->GetDirection()));
+
     this->terrainGlobals->setCompositeMapDiffuse(
         Conversions::Convert(directionalLight->GetDiffuseColor()));
   }
@@ -315,7 +316,13 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 }
 
 /////////////////////////////////////////////////
-double Heightmap::GetHeight(double x, double y)
+double Heightmap::GetHeight(double _x, double _y, double _z)
 {
-  return this->terrainGroup->getHeightAtWorldPosition(x, y, 600);
+  Ogre::TerrainGroup::RayResult result = this->terrainGroup->rayIntersects(
+      Ogre::Ray(Ogre::Vector3(_x, _y, _z), Ogre::Vector3(0, 0, -1)));
+
+  if (result.hit)
+    return result.position.z;
+  else
+    return 0;
 }

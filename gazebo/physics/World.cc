@@ -454,8 +454,10 @@ void World::Update()
   // Update the physics engine
   if (this->enablePhysicsEngine && this->physicsEngine)
   {
+    // This must be called before PhysicsEngine::UpdatePhysics.
     this->physicsEngine->UpdateCollision();
 
+    // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
 
     /// need this because ODE does not call dxReallocateWorldProcessContext()

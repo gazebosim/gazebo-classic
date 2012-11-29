@@ -30,6 +30,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
@@ -240,6 +241,9 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 
     // Tell the background thread to grab the models from online.
     this->updateCacheCondition.notify_one();
+
+    // Let the other thread start downloading.
+    common::Time::MSleep(100);
 
     // Wait for the thread to finish.
     boost::mutex::scoped_lock lock(this->updateMutex);

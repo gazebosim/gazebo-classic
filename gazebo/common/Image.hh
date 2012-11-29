@@ -67,7 +67,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _filename the path to the image
-      public: Image(const std::string &_filename="");
+      public: explicit Image(const std::string &_filename="");
 
       /// \brief Destructor
       public: virtual ~Image();

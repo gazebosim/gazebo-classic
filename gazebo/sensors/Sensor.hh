@@ -111,7 +111,7 @@ namespace gazebo
 
       /// \brief Returns true if sensor generation is active.
       /// \return True if active, false if not.
-      public: bool IsActive();
+      public: virtual bool IsActive();
 
       /// \brief Get sensor type.
       /// \return Type of sensor.
