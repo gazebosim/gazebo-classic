@@ -1,0 +1,115 @@
+/*
+ * Copyright 2011 Nate Koenig
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+/* Desc: SimbodyCollision class
+ * Author: Nate Koenig
+ * Date: 13 Feb 2006
+ */
+
+#include "physics/simbody/simbody_inc.h"
+#include "physics/simbody/SimbodyCollision.hh"
+
+using namespace gazebo;
+using namespace physics;
+
+//////////////////////////////////////////////////
+SimbodyCollision::SimbodyCollision(LinkPtr _parent)
+    : Collision(_parent)
+{
+  this->SetName("Simbody_Collision");
+  this->collisionShape = NULL;
+}
+
+//////////////////////////////////////////////////
+SimbodyCollision::~SimbodyCollision()
+{
+  /*
+  delete this->collisionShape;
+  this->collisionShape = NULL;
+  */
+}
+
+//////////////////////////////////////////////////
+void SimbodyCollision::Load(sdf::ElementPtr _sdf)
+{
+  Collision::Load(_sdf);
+}
+
+//////////////////////////////////////////////////
+void SimbodyCollision::OnPoseChange()
+{
+  /*
+  math::Pose pose = this->GetRelativePose();
+  SimbodyLink *bbody = static_cast<SimbodyLink*>(this->body);
+
+  bbody->SetCollisionRelativePose(this, pose);
+  */
+}
+
+//////////////////////////////////////////////////
+void SimbodyCollision::SetCategoryBits(unsigned int /*_bits*/)
+{
+}
+
+//////////////////////////////////////////////////
+void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
+{
+}
+
+//////////////////////////////////////////////////
+/*Mass SimbodyCollision::GetLinkMassMatrix()
+{
+  Mass result;
+  return result;
+}*/
+
+//////////////////////////////////////////////////
+math::Box SimbodyCollision::GetBoundingBox() const
+{
+  math::Box result;
+  if (this->collisionShape)
+  {
+    btVector3 btMin, btMax;
+    this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
+
+    result.min.Set(btMin.x(), btMin.y(), btMin.z());
+    result.max.Set(btMax.x(), btMax.y(), btMax.z());
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
+void SimbodyCollision::SetCollisionShape(btCollisionShape *_shape)
+{
+  this->collisionShape = _shape;
+
+  // btmath::Vector3 vec;
+  // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
+
+  // this->mass.SetCoG(this->GetRelativePose().pos);
+}
+
+//////////////////////////////////////////////////
+btCollisionShape *SimbodyCollision::GetCollisionShape() const
+{
+  return this->collisionShape;
+}
+
+//////////////////////////////////////////////////
+void SimbodyCollision::SetCompoundShapeIndex(int /*_index*/)
+{
+  // this->compoundShapeIndex = 0;
+}
