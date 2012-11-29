@@ -168,6 +168,10 @@ namespace gazebo
                       const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                       TechniqueType _tt);
 
+          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
+                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                      TechniqueType _tt);
+
           protected: virtual void generateVpHeader(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
@@ -193,6 +197,33 @@ namespace gazebo
           protected: virtual void generateVpDynamicShadows(
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpHeader(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpLayer(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType tt,
+                         Ogre::uint _layer,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpFooter(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpDynamicShadowsParams(
+                         Ogre::uint *_texCoord, Ogre::uint *_sampler,
+                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+                         TechniqueType _tt,
+                         Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void generateFpDynamicShadowsHelpers(
+                         const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain,
+                         TechniqueType tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
 
@@ -229,22 +260,6 @@ namespace gazebo
           protected: virtual void generateVpDynamicShadows(
                          const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
-
-
-          protected: virtual void generateFpHeader(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
-                         Ogre::StringUtil::StrStreamType &_outStream);
-
-          protected: virtual void generateFpLayer(const SM2Profile *_prof,
-                         const Ogre:;Terrain *_terrain, TechniqueType tt,
-                         Ogre::uint _layer,
-                         Ogre::StringUtil::StrStreamType &_outStream);
-
-          protected: virtual void generateFpFooter(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
       };
