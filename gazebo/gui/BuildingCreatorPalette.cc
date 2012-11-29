@@ -18,6 +18,7 @@
 #include "gui/BuildingCreatorPalette.hh"
 #include "gui/FinishModelDialog.hh"
 #include "gui/WindowDoorInspectorDialog.hh"
+#include "gui/WallInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -149,6 +150,7 @@ void BuildingCreatorPalette::OnFinish()
 {
 //  FinishModelDialog dialog(this);
   WindowDoorInspectorDialog dialog(0, this);
+//  WallInspectorDialog dialog(this);
   dialog.exec();
 
 }

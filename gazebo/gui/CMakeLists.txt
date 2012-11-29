@@ -37,6 +37,7 @@ set (sources
   BuildingCreatorPalette.cc
   FinishModelDialog.cc
   WindowDoorInspectorDialog.cc
+  WallInspectorDialog.cc
 )
 
 set (qt_headers
@@ -56,6 +57,7 @@ set (qt_headers
   BuildingCreatorPalette.hh
   FinishModelDialog.hh
   WindowDoorInspectorDialog.hh
+  WallInspectorDialog.hh
 )
 
 set (headers
