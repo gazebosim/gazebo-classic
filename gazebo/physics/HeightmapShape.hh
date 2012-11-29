@@ -97,6 +97,10 @@ namespace gazebo
       /// \return The minimum height.
       public: float GetMinHeight() const;
 
+      /// \brief Get the amount of subsampling.
+      /// \return Amount of subsampling.
+      public: int GetSubSampling() const;
+
       /// \brief Create a lookup table of the terrain's height.
       private: void FillHeightMap();
 
