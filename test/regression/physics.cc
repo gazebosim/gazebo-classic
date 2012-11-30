@@ -93,6 +93,15 @@ TEST_F(PhysicsTest, DropStuff)
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
+  int i = 0;
+  while (!this->HasEntity("cylinder") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get cylinder");
 
   {
     // todo: get parameters from drop_test.world
@@ -195,6 +204,16 @@ TEST_F(PhysicsTest, CollisionTest)
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
+  int i = 0;
+  while (!this->HasEntity("sphere") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get sphere");
+
   {
     // todo: get parameters from drop_test.world
     double test_duration = 1.1;
@@ -269,6 +288,16 @@ TEST_F(PhysicsTest, SimplePendulumTest)
   Load("worlds/simple_pendulums.world", true);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
+
+  int i = 0;
+  while (!this->HasEntity("model_1") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get model_1");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
   EXPECT_TRUE(physicsEngine);

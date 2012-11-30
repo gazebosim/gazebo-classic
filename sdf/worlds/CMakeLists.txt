@@ -11,10 +11,7 @@ set (files
   lights.world
   model_nesting.world
   pioneer2dx.world
-  drop_test.world
   trimesh_test.world
-  collision_test.world
-  simple_pendulums.world
   cart_test.world
   double_pendulums.world
   plugin.world
