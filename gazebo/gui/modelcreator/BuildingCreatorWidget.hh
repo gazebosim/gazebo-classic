@@ -35,6 +35,11 @@ namespace gazebo
       public: ~BuildingCreatorWidget();
 
       protected: void paintEvent(QPaintEvent *event);
+
+      private: QGraphicsScene *scene;
+
+      private: QGraphicsView *view;
+
     };
   }
 }

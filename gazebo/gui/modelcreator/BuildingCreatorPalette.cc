@@ -15,10 +15,10 @@
  *
 */
 
-#include "gui/BuildingCreatorPalette.hh"
-#include "gui/FinishModelDialog.hh"
-#include "gui/WindowDoorInspectorDialog.hh"
-#include "gui/WallInspectorDialog.hh"
+#include "gui/modelcreator/BuildingCreatorPalette.hh"
+#include "gui/modelcreator/FinishModelDialog.hh"
+#include "gui/modelcreator/WindowDoorInspectorDialog.hh"
+#include "gui/modelcreator/WallInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;

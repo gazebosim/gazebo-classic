@@ -31,10 +31,11 @@ class QHBoxLayout;
 namespace gazebo
 {
   class GLWidget;
-  class EditorWidget;
 
   namespace gui
   {
+    class EditorWidget;
+
     class RenderWidget : public QWidget
     {
       Q_OBJECT

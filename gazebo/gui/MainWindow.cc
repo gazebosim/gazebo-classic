@@ -31,10 +31,10 @@
 #include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/RenderWidget.hh"
-#include "gui/BuildingCreatorPalette.hh"
 #include "gui/ToolsWidget.hh"
 #include "gui/MainWindow.hh"
 #include "gui/GuiEvents.hh"
+#include "gui/modelcreator/BuildingCreatorPalette.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -66,13 +66,14 @@ MainWindow::MainWindow()
   this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
 
+  int minimumTabWidth = 250;
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
-  this->tabWidget->setMinimumWidth(250);
+  this->tabWidget->setMinimumWidth(minimumTabWidth);
 
   this->buildingCreatorPalette = new BuildingCreatorPalette(this);
   this->buildingCreatorTabWidget = new QTabWidget();
@@ -81,7 +82,7 @@ MainWindow::MainWindow()
       this->buildingCreatorPalette, "Building Creator");
   this->buildingCreatorTabWidget->setSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Expanding);
-  this->buildingCreatorTabWidget->setMinimumWidth(250);
+  this->buildingCreatorTabWidget->setMinimumWidth(minimumTabWidth);
   this->buildingCreatorTabWidget->hide();
 
   this->toolsWidget = new ToolsWidget();

@@ -23,10 +23,10 @@
 #include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/GLWidget.hh"
-#include "gui/EditorWidget.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
+#include "gui/modelcreator/EditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -82,6 +82,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->editorWidget = new EditorWidget(this);
+  this->editorWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   this->editorWidget->hide();
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
@@ -120,6 +121,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->editorWidget);
   splitter->addWidget(this->glWidget);
+  splitter->setStretchFactor(0, 0);
+  splitter->setStretchFactor(1, 1);
   splitter->setOrientation(Qt::Vertical);
 
   frameLayout->addWidget(toolFrame);

@@ -15,8 +15,8 @@
  *
 */
 
-#include "gui/EditorWidget.hh"
-#include "gui/BuildingCreatorWidget.hh"
+#include "gui/modelcreator/EditorWidget.hh"
+#include "gui/modelcreator/BuildingCreatorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -26,29 +26,36 @@ EditorWidget::EditorWidget(QWidget *_parent)
 {
   this->setObjectName("editorWidget");
 
-  this->editorFrame = new QFrame;
+/*  this->editorFrame = new QFrame;
   this->editorFrame->setFrameShape(QFrame::NoFrame);
   this->editorFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
+                                   QSizePolicy::Expanding);*/
 
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(this->editorFrame);
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(mainLayout);
 
+  qDebug () << "editor wh " << this->pos().x() << this->width() << " " << this->height();
+  qDebug () << "editor parent wh " << _parent->pos().x() << _parent->width() << " " << _parent->height();
   this->buildingCreatorWidget = new BuildingCreatorWidget(this);
 
   QHBoxLayout *editorLayout = new QHBoxLayout;
   editorLayout->setContentsMargins(0, 0, 0, 0);
 
-  this->editorFrame->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Expanding);
+/*  this->editorFrame->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);*/
   editorLayout->addWidget(this->buildingCreatorWidget);
   editorLayout->setContentsMargins(0, 0, 0, 0);
-  this->editorFrame->setLayout(editorLayout);
+
+/*  this->editorFrame->setLayout(editorLayout);
 
   this->editorFrame->setMouseTracking(true);
-  this->setMouseTracking(true);
+  this->setMouseTracking(true);*/
+
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+//  mainLayout->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+//  mainLayout->addWidget(this->editorFrame);
+  buildingCreatorWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  mainLayout->addWidget(this->buildingCreatorWidget);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(mainLayout);
 }
 
 EditorWidget::~EditorWidget()

@@ -5,9 +5,12 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
 )
 
+#include_directories(modelcreator)
+
 add_definitions( ${QT_DEFINITIONS} )
 
 add_subdirectory(qtpropertybrowser)
+add_subdirectory(modelcreator)
 
 set (sources
   main.cc
@@ -32,12 +35,6 @@ set (sources
   ModelRightMenu.cc
   JointControlWidget.cc
   ToolsWidget.cc
-  EditorWidget.cc
-  BuildingCreatorWidget.cc
-  BuildingCreatorPalette.cc
-  FinishModelDialog.cc
-  WindowDoorInspectorDialog.cc
-  WallInspectorDialog.cc
 )
 
 set (qt_headers
@@ -52,12 +49,6 @@ set (qt_headers
   ModelRightMenu.hh
   JointControlWidget.hh
   ToolsWidget.hh
-  EditorWidget.hh
-  BuildingCreatorWidget.hh
-  BuildingCreatorPalette.hh
-  FinishModelDialog.hh
-  WindowDoorInspectorDialog.hh
-  WallInspectorDialog.hh
 )
 
 set (headers
@@ -87,6 +78,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
+                                 gazebo_modelcreator
                                  gzqtpropertybrowser
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
@@ -99,6 +91,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
+                                gazebo_modelcreator
                                 gzqtpropertybrowser
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}
