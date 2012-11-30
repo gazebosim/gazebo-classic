@@ -2256,6 +2256,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   QtProperty *solverItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
+
+  item = this->variantManager->addProperty(QVariant::Bool, tr("enabled"));
+  if (_msg.has_enable_physics())
+    item->setValue(_msg.enable_physics());
+  solverItem->addSubProperty(item);
+
   item = this->variantManager->addProperty(QVariant::Double, tr("step size"));
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
