@@ -1439,7 +1439,7 @@ void Scene::PreRender()
   while (pIter != this->poseMsgs.end())
   {
     Visual_M::iterator iter = this->visuals.find((*pIter)->name());
-    if (iter != this->visuals.end())
+    if (iter != this->visuals.end() && iter->second)
     {
       // If an object is selected, don't let the physics engine move it.
       if (!this->selectedVis || this->selectionMode != "move" ||

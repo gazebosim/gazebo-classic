@@ -34,6 +34,7 @@
 
 #include <urdf_parser/urdf_parser.h>
 #include <sdf/interface/parser_urdf.hh>
+#include <sdf/sdf.hh>
 
 #include <fstream>
 #include <sstream>

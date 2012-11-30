@@ -575,8 +575,23 @@ bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
               gzerr << "No <model> element in manifest[" << manifest << "]\n";
             else
             {
-              filename = modelPath + "/" +
-                         modelXML->FirstChildElement("sdf")->GetText();
+              TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
+              TiXmlElement *sdfSearch = sdfXML;
+
+              // Find the SDF element that matches our current SDF version.
+              while (sdfSearch)
+              {
+                if (sdfSearch->Attribute("version") &&
+                    std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+                {
+                  sdfXML = sdfSearch;
+                  break;
+                }
+
+                sdfSearch = sdfSearch->NextSiblingElement("sdf");
+              }
+
+              filename = modelPath + "/" + sdfXML->GetText();
             }
           }
         }
