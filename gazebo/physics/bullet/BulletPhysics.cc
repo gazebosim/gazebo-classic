@@ -179,6 +179,92 @@ void BulletPhysics::InitForThread()
 {
 }
 
+/////////////////////////////////////////////////
+void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
+{
+  msgs::Response response;
+  response.set_id(_msg->id());
+  response.set_request(_msg->request());
+  response.set_response("success");
+  std::string *serializedData = response.mutable_serialized_data();
+
+  if (_msg->request() == "physics_info")
+  {
+    msgs::Physics physicsMsg;
+    physicsMsg.set_type(msgs::Physics::BULLET);
+    physicsMsg.set_update_rate(this->GetUpdateRate());
+    // This function was copied from ODEPhysics with portions commented out.
+    // TODO: determine which of these should be implemented.
+    //physicsMsg.set_solver_type(this->stepType);
+    physicsMsg.set_dt(this->stepTimeDouble);
+    //physicsMsg.set_iters(this->GetSORPGSIters());
+    //physicsMsg.set_sor(this->GetSORPGSW());
+    physicsMsg.set_cfm(this->GetWorldCFM());
+    //physicsMsg.set_erp(this->GetWorldERP());
+    //physicsMsg.set_contact_max_correcting_vel(
+    //    this->GetContactMaxCorrectingVel());
+    //physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
+    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+
+    response.set_type(physicsMsg.GetTypeName());
+    physicsMsg.SerializeToString(serializedData);
+    this->responsePub->Publish(response);
+  }
+}
+
+/////////////////////////////////////////////////
+void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
+{
+  if (_msg->has_dt())
+  {
+    this->SetStepTime(_msg->dt());
+  }
+
+  if (_msg->has_update_rate())
+    this->SetUpdateRate(_msg->update_rate());
+  // Like OnRequest, this function was copied from ODEPhysics.
+  // TODO: change this when changing OnRequest.
+  //if (_msg->has_solver_type())
+  //{
+  //  sdf::ElementPtr solverElem =
+  //    this->sdf->GetElement("ode")->GetElement("solver");
+  //  if (_msg->solver_type() == "quick")
+  //  {
+  //    solverElem->GetAttribute("type")->Set("quick");
+  //    this->physicsStepFunc = &dWorldQuickStep;
+  //  }
+  //  else if (_msg->solver_type() == "world")
+  //  {
+  //    solverElem->GetAttribute("type")->Set("world");
+  //    this->physicsStepFunc = &dWorldStep;
+  //  }
+  //}
+
+  //if (_msg->has_iters())
+  //  this->SetSORPGSIters(_msg->iters());
+
+  //if (_msg->has_sor())
+  //  this->SetSORPGSW(_msg->sor());
+
+  if (_msg->has_cfm())
+    this->SetWorldCFM(_msg->cfm());
+
+  //if (_msg->has_erp())
+  //  this->SetWorldERP(_msg->erp());
+
+  //if (_msg->has_contact_max_correcting_vel())
+  //  this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
+
+  //if (_msg->has_contact_surface_layer())
+  //  this->SetContactSurfaceLayer(_msg->contact_surface_layer());
+
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  /// Make sure all models get at least one update cycle.
+  this->world->EnableAllModels();
+}
+
 //////////////////////////////////////////////////
 void BulletPhysics::UpdateCollision()
 {
@@ -202,6 +288,16 @@ void BulletPhysics::UpdatePhysics()
 //////////////////////////////////////////////////
 void BulletPhysics::Fini()
 {
+  PhysicsEngine::Fini();
+}
+
+//////////////////////////////////////////////////
+void BulletPhysics::Reset()
+{
+  // See DemoApplication::clientResetScene() in 
+  // bullet/Demos/OpenGL/DemoApplication.cpp
+  //this->physicsUpdateMutex->lock();
+  //this->physicsUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -339,6 +435,24 @@ btTransform BulletPhysics::ConvertPose(const math::Pose &_pose)
   trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
                                  _pose.rot.z, _pose.rot.w));
   return trans;
+}
+
+//////////////////////////////////////////////////
+double BulletPhysics::GetWorldCFM()
+{
+  sdf::ElementPtr elem = this->sdf->GetElement("bullet");
+  elem = elem->GetElement("constraints");
+  return elem->GetValueDouble("cfm");
+}
+
+//////////////////////////////////////////////////
+void BulletPhysics::SetWorldCFM(double _cfm)
+{
+  sdf::ElementPtr elem = this->sdf->GetElement("bullet");
+  elem = elem->GetElement("constraints");
+  elem->GetElement("cfm")->Set(_cfm);
+
+  info.m_globalCfm = _cfm;
 }
 
 //////////////////////////////////////////////////
