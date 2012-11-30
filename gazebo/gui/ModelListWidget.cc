@@ -595,6 +595,8 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
             this->GetChildItem((*iter), "step size")).toDouble());
       msg.set_iters(this->variantManager->value(
             this->GetChildItem((*iter), "iterations")).toInt());
+      msg.set_enable_physics(this->variantManager->value(
+            this->GetChildItem((*iter), "enable")).toBool());
       msg.set_sor(this->variantManager->value(
             this->GetChildItem((*iter), "SOR")).toDouble());
     }
@@ -2257,7 +2259,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
 
-  item = this->variantManager->addProperty(QVariant::Bool, tr("enabled"));
+  item = this->variantManager->addProperty(QVariant::Bool, tr("enable"));
   if (_msg.has_enable_physics())
     item->setValue(_msg.enable_physics());
   solverItem->addSubProperty(item);
