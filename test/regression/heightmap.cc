@@ -38,7 +38,7 @@ TEST_F(HeightmapTest, Heights)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzthrow("Unable to use rendering engine.");
+    gzerr << "No rendering engine, unable to run heights test\n";
     return;
   }
 
