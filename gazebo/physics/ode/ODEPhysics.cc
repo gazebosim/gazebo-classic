@@ -321,6 +321,11 @@ void ODEPhysics::InitForThread()
 //////////////////////////////////////////////////
 void ODEPhysics::UpdateCollision()
 {
+  {
+    boost::recursive_mutex::scoped_lock lock (*this->physicsUpdateMutex);
+    dJointGroupEmpty(this->contactGroup);
+  }
+
   unsigned int i = 0;
   this->collidersCount = 0;
   this->trimeshCollidersCount = 0;
@@ -357,7 +362,7 @@ void ODEPhysics::UpdatePhysics()
 {
   // need to lock, otherwise might conflict with world resetting
   {
-    this->physicsUpdateMutex->lock();
+    boost::recursive_mutex::scoped_lock lock (*this->physicsUpdateMutex);
 
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
@@ -388,9 +393,6 @@ void ODEPhysics::UpdatePhysics()
             this->jointFeedbacks[i]->feedbacks[j].t2[2]);
       }
     }
-
-    dJointGroupEmpty(this->contactGroup);
-    this->physicsUpdateMutex->unlock();
   }
 }
 
@@ -403,10 +405,9 @@ void ODEPhysics::Fini()
 //////////////////////////////////////////////////
 void ODEPhysics::Reset()
 {
-  this->physicsUpdateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock (*this->physicsUpdateMutex);
   // Very important to clear out the contact group
   dJointGroupEmpty(this->contactGroup);
-  this->physicsUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
