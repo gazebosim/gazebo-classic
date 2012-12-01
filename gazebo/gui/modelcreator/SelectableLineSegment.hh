@@ -25,33 +25,37 @@ class CornerGrabber;
 class SelectableLineSegment : public QGraphicsPolygonItem
 {
 
-  public: SelectableLineSegment(QPointF _position);
+  public: SelectableLineSegment(QPointF _start, QPointF _end);
 
-  private: void SetCornerPositions();
+  public: ~SelectableLineSegment();
+
+  public: void SetCornerPosition(QPoint _pos, int cornerIndex);
+
+  private: void UpdateCornerPositions();
 
   private: void CreateCustomPath(QPointF _mouseLocation, CornerGrabber*);
 
   private: void EnclosePath(qreal _lineStartX,qreal _lineStartY,
     qreal _lineEndX, qreal _lineEndY);
 
-  private: virtual void paint (QPainter *painter,
+  protected:  void paint (QPainter *painter,
     const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-  private: virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent *_event);
+  protected: void hoverEnterEvent ( QGraphicsSceneHoverEvent *_event);
 
-  private: virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent *_event);
+  protected: void hoverLeaveEvent ( QGraphicsSceneHoverEvent *_event);
 
-  private: virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent *_event);
+  protected: void mouseMoveEvent ( QGraphicsSceneMouseEvent *_event);
 
-  private: virtual void mousePressEvent (QGraphicsSceneMouseEvent *_event);
+  protected: void mousePressEvent (QGraphicsSceneMouseEvent *_event);
 
-  private: virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
+  protected: void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
 
-  private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *event);
+  protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *event);
 
-  private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+  protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
-  private: virtual bool sceneEventFilter(QGraphicsItem * watched,
+  protected: bool sceneEventFilter(QGraphicsItem * watched,
     QEvent *_event) ;
 
   /// \brief the hover event handler will toggle this between red and black
@@ -72,7 +76,7 @@ class SelectableLineSegment : public QGraphicsPolygonItem
 
   private: int yCornerGrabBuffer;
 
-  private: qreal graphicsItemBoundingBoxWidth;
+//  private: qreal graphicsItemBoundingBoxWidth;
 
   private: QPointF lineEnd0;
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_CREATOR_WIDGET_HH_
-#define _BUILDING_CREATOR_WIDGET_HH_
+#ifndef _CREATOR_SCENE_HH_
+#define _CREATOR_SCENE_HH_
 
 #include <string>
 #include "gui/qt.h"
@@ -29,27 +29,33 @@ namespace gazebo
 {
   namespace gui
   {
-    class BuildingCreatorWidget : public QWidget
+    class CreatorView : public QGraphicsView
     {
       Q_OBJECT
 
-      public: BuildingCreatorWidget(QWidget *_parent = 0);
+      public: CreatorView(QWidget *_parent = 0);
 
-      public: ~BuildingCreatorWidget();
+      public: ~CreatorView();
 
       public: enum modelTypes {None, Wall, Window, Door, Stairs};
 
-      protected: void paintEvent(QPaintEvent *event);
-
-      /*protected: void mousePressEvent(QMouseEvent *_event);
+/*      protected: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
       protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
 
       protected: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
-      protected: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+      protected: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);*/
 
-      private: void DrawLines(QPointF _pos);
+      protected: void mousePressEvent(QMouseEvent *_event);
+
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+      protected: void mouseMoveEvent(QMouseEvent *_event);
+
+      protected: void mouseDoubleClickEvent(QMouseEvent *_event);
+
+      private: void DrawLines(QPoint _pos);
 
       private: int drawMode;
 
@@ -57,15 +63,7 @@ namespace gazebo
 
       private: std::vector<SelectableLineSegment*> lineList;
 
-      private: qreal lastLinePosX;
-
-      private: qreal lastLinePosY;*/
-
-//      private: QGraphicsScene *scene;
-
-//      private: CreatorScene *view;
-
-
+      private: QPoint lastLinePos;
     };
   }
 }

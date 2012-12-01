@@ -121,7 +121,11 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->editorWidget);
   splitter->addWidget(this->glWidget);
-  splitter->setStretchFactor(0, 0);
+  QList<int> sizes;
+  sizes.push_back(300);
+  sizes.push_back(300);
+  splitter->setSizes(sizes);
+  splitter->setStretchFactor(0, 1);
   splitter->setStretchFactor(1, 1);
   splitter->setOrientation(Qt::Vertical);
 

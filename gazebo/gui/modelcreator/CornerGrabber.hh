@@ -44,19 +44,19 @@ class CornerGrabber : public QGraphicsItem
   private: virtual void paint (QPainter *_painter,
     const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-  private: virtual void hoverEnterEvent (QGraphicsSceneHoverEvent *_event);
+  protected: void hoverEnterEvent (QGraphicsSceneHoverEvent *_event);
 
-  private: virtual void hoverLeaveEvent (QGraphicsSceneHoverEvent *_event);
+  protected: void hoverLeaveEvent (QGraphicsSceneHoverEvent *_event);
 
-  private: virtual void mouseMoveEvent (QGraphicsSceneMouseEvent *_event);
+  protected: void mouseMoveEvent (QGraphicsSceneMouseEvent *_event);
 
-  private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+  protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-  private: virtual void mousePressEvent (QGraphicsSceneMouseEvent *_event);
+  protected: void mousePressEvent (QGraphicsSceneMouseEvent *_event);
 
-  private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+  protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
-  private: virtual void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
+  protected: void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
 
   private: qreal mouseDownX;
 

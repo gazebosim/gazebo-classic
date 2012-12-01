@@ -28,7 +28,7 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent) :
   height(6),
   mouseButtonState(kMouseReleased)
 {
-  setParentItem(_parent);
+  this->setParentItem(_parent);
 
   this->outterBorderPen.setWidth(2);
   this->outterBorderPen.setColor(this->outterBorderColor);
@@ -51,6 +51,7 @@ int CornerGrabber::GetMouseState()
 /////////////////////////////////////////////////
 QPointF CornerGrabber::GetCenterPoint()
 {
+//  qDebug () << "center pt " <<pos();
   return QPointF(pos().x() + this->width/2, pos().y() + this->height/2);
 }
 

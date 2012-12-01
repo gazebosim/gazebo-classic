@@ -20,27 +20,31 @@
 #include "CornerGrabber.hh"
 
 /////////////////////////////////////////////////
-SelectableLineSegment::SelectableLineSegment(QPointF _position):
+SelectableLineSegment::SelectableLineSegment(QPointF _start, QPointF _end):
   QGraphicsPolygonItem(),
   outterBorderColor(Qt::black),
   pen(),
   location(0,0),
   dragStart(0,0),
   gridSpace(10),
-  lineLength(200),
-  xCornerGrabBuffer(20),
-  yCornerGrabBuffer(20),
+  xCornerGrabBuffer(10),
+  yCornerGrabBuffer(10),
   cornerGrabbed(false),
   selectRegion()
 {
-  this->graphicsItemBoundingBoxWidth = this->lineLength
-    + (2 * this->xCornerGrabBuffer);
+//  this->graphicsItemBoundingBoxWidth = this->lineLength
+//    + (2 * this->xCornerGrabBuffer);
 
+  qreal width = _end.x() - _start.x();
+  qreal height = _end.y() - _start.y();
   lineEnd0 = QPointF(this->xCornerGrabBuffer, this->yCornerGrabBuffer);
-  lineEnd1 = QPointF(this->xCornerGrabBuffer + this->lineLength,
-                     this->yCornerGrabBuffer);
+//  lineEnd1 = QPointF(this->xCornerGrabBuffer + this->lineLength,
+//                     this->yCornerGrabBuffer);
+  lineEnd1 = QPointF(this->xCornerGrabBuffer + width,
+                     this->yCornerGrabBuffer + height);
 
-  this->setPos(_position);
+  this->setPos(_start);
+  this->lineLength = sqrt(width*width + height*height);
 
   this->pen.setWidth(2);
   this->pen.setColor(this->outterBorderColor);
@@ -65,9 +69,22 @@ SelectableLineSegment::SelectableLineSegment(QPointF _position):
   QPointF p8 (this->lineEnd1.x() - this->xCornerGrabBuffer,
               this->lineEnd1.y() + this->yCornerGrabBuffer);
 
+  this->corners[0] = new CornerGrabber(this);
+  this->corners[1] = new CornerGrabber(this);
+  this->UpdateCornerPositions();
+
   this->selectRegion << p1 << p2  << p5 << p6 << p7 << p8 << p3 << p4 << p1;
 
   this->setPolygon(this->selectRegion);
+}
+
+SelectableLineSegment::~SelectableLineSegment()
+{
+  this->corners[0]->setParentItem(NULL);
+  this->corners[1]->setParentItem(NULL);
+
+  delete this->corners[0];
+  delete this->corners[1];
 }
 
 /**
@@ -81,7 +98,7 @@ bool SelectableLineSegment::sceneEventFilter(QGraphicsItem *_watched,
   QEvent *_event)
 {
   CornerGrabber * corner = dynamic_cast<CornerGrabber *>(_watched);
-  if ( corner == NULL) return false; // not expected to get here
+  if (corner == NULL) return false; // not expected to get here
 
   QGraphicsSceneMouseEvent * event =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -118,7 +135,7 @@ bool SelectableLineSegment::sceneEventFilter(QGraphicsItem *_watched,
     }
   }
 
-  if ( corner->GetMouseState() == CornerGrabber::kMouseMoving )
+  if (corner->GetMouseState() == CornerGrabber::kMouseMoving )
   {
     this->CreateCustomPath(event->pos(), corner);
     this->update();
@@ -126,6 +143,23 @@ bool SelectableLineSegment::sceneEventFilter(QGraphicsItem *_watched,
 
   // true => do not send event to watched - we are finished with this event
   return true;
+}
+
+void SelectableLineSegment::SetCornerPosition(QPoint _pos, int cornerIndex)
+{
+/*  CornerGrabber *corner = this->corners[cornerIndex];
+  if (corner)
+  {
+    QPoint c;
+    c.setX(corner->GetCenterPoint().x());
+    c.setY(corner->GetCenterPoint().y());
+    QPoint newPoint = c + _pos;
+    qDebug() << newPoint << c <<  corner->GetCenterPoint() << _pos;
+    corner->SetMouseDownX(newPoint.x());
+    corner->SetMouseDownY(newPoint.y());
+    corner->SetMouseState(CornerGrabber::kMouseMoving );
+    this->CreateCustomPath(mapFromScene(newPoint), corner);
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -169,7 +203,7 @@ void SelectableLineSegment::CreateCustomPath(QPointF _mouseLocation,
 
   this->EnclosePath(lineStartX, lineStartY, lineEndX, lineEndY);
 
-  this->SetCornerPositions();
+  this->UpdateCornerPositions();
 }
 
 /////////////////////////////////////////////////
@@ -297,11 +331,8 @@ void SelectableLineSegment::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
   this->outterBorderColor = Qt::black;
 
-  this->corners[0]->setParentItem(NULL);
-  this->corners[1]->setParentItem(NULL);
-
-  delete this->corners[0];
-  delete this->corners[1];
+  this->corners[0]->removeSceneEventFilter(this);
+  this->corners[1]->removeSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -309,17 +340,13 @@ void SelectableLineSegment::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
   this->outterBorderColor = Qt::red;
 
-  this->corners[0] = new CornerGrabber(this);
-  this->corners[1] = new CornerGrabber(this);
-
   this->corners[0]->installSceneEventFilter(this);
   this->corners[1]->installSceneEventFilter(this);
-
-  this->SetCornerPositions();
 }
 
+
 /////////////////////////////////////////////////
-void SelectableLineSegment::SetCornerPositions()
+void SelectableLineSegment::UpdateCornerPositions()
 {
   int cornerWidth = (this->corners[0]->boundingRect().width())/2;
   int cornerHeight = ( this->corners[0]->boundingRect().height())/2;
@@ -329,10 +356,10 @@ void SelectableLineSegment::SetCornerPositions()
   this->corners[1]->setPos(this->lineEnd1.x()- cornerWidth,
                       this->lineEnd1.y() - cornerHeight);
 
-  qDebug() << "corner[0].pos : " + QString::number(this->corners[0]->pos().x())
+/*  qDebug() << "corner[0].pos : " + QString::number(this->corners[0]->pos().x())
     + ", " + QString::number(this->corners[0]->pos().y())
     << "; corner[1].pos : " + QString::number(this->corners[1]->pos().x())
-    + ", " + QString::number(this->corners[1]->pos().y());
+    + ", " + QString::number(this->corners[1]->pos().y());*/
 }
 
 #if 0
@@ -351,6 +378,7 @@ void SelectableLineSegment::paint (QPainter *_painter,
 
   this->pen.setColor(Qt::red);
   _painter->drawLine(this->lineEnd0, this->lineEnd1);
+//  qDebug() << "line end0,1 " << mapToScene(lineEnd0) << mapToScene(lineEnd1);
 }
 
 /////////////////////////////////////////////////
