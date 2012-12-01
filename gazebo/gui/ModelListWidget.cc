@@ -589,14 +589,14 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       this->FillVector3Msg((*iter), msg.mutable_gravity());
     else if ((*iter)->propertyName().toStdString() == "update rate")
       msg.set_update_rate(this->variantManager->value((*iter)).toDouble());
+    else if ((*iter)->propertyName().toStdString() == "enable physics")
+      msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
       msg.set_dt(this->variantManager->value(
             this->GetChildItem((*iter), "step size")).toDouble());
       msg.set_iters(this->variantManager->value(
             this->GetChildItem((*iter), "iterations")).toInt());
-      msg.set_enable_physics(this->variantManager->value(
-            this->GetChildItem((*iter), "enable")).toBool());
       msg.set_sor(this->variantManager->value(
             this->GetChildItem((*iter), "SOR")).toDouble());
     }
@@ -2233,6 +2233,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 {
   QtVariantProperty *item = NULL;
 
+  item = this->variantManager->addProperty(QVariant::Bool,
+    tr("enable physics"));
+  if (_msg.has_enable_physics())
+    item->setValue(_msg.enable_physics());
+  this->propTreeBrowser->addProperty(item);
+
   item = this->variantManager->addProperty(QVariant::Double, tr("update rate"));
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
@@ -2258,11 +2264,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   QtProperty *solverItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
-
-  item = this->variantManager->addProperty(QVariant::Bool, tr("enable"));
-  if (_msg.has_enable_physics())
-    item->setValue(_msg.enable_physics());
-  solverItem->addSubProperty(item);
 
   item = this->variantManager->addProperty(QVariant::Double, tr("step size"));
   static_cast<QtVariantPropertyManager*>

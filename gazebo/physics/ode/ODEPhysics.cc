@@ -236,6 +236,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->stepType);
     physicsMsg.set_dt(this->stepTimeDouble);
     physicsMsg.set_iters(this->GetSORPGSIters());
+    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(this->GetSORPGSW());
     physicsMsg.set_cfm(this->GetWorldCFM());
     physicsMsg.set_erp(this->GetWorldERP());
