@@ -755,17 +755,17 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
 
   if (compression)
   {
-    _outStream << "in vec4 inPos; // POSITION\n"
-               << "in vec4 inHeight; // TEXCOORD0\n";
+    _outStream << "in vec4 vertex; // POSITION\n"
+               << "in vec2 uv0; // TEXCOORD0\n";
   }
   else
   {
-    _outStream << "in vec4 pos;\n"
-               << "in vec2 uv;\n";
+    _outStream << "in vec4 vertex;\n"
+               << "in vec2 uv0;\n";
   }
 
   if (_tt != RENDER_COMPOSITE_MAP)
-    _outStream << "in vec4 inDelta; // TEXCOORD1\n";
+    _outStream << "in vec2 uv1; // TEXCOORD1\n";
 
   _outStream <<
     "uniform mat4 worldMatrix;\n"
@@ -793,12 +793,10 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
     _outStream << "uniform vec4 uvMul_" << i << ";\n";
 
   _outStream <<
-    "out vec4 oPosObj;\n";
+    "out vec4 position;\n";
 
   unsigned int texCoordSet = 1;
-  _outStream << "out vec4 oUVMisc;\n";
-  // _outStream << "out vec4 oUVMisc : TEXCOORD" << texCoordSet++
-  //          << " // xy = uv, z = camDepth\n";
+  _outStream << "out vec4 uvMisc;\n";
 
   // layer UV's premultiplied, packed as xy/zw
   unsigned int numUVSets = numLayers / 2;
@@ -810,8 +808,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
   {
     for (unsigned int i = 0; i < numUVSets; ++i)
     {
-      _outStream << "out vec4 oUV" << i << ";\n";
-                //<< " : TEXCOORD" << texCoordSet++ << "\n";
+      _outStream << "out vec4 layerUV" << i << ";\n";
     }
   }
 
@@ -832,7 +829,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
 
   if (_prof->isShadowingEnabled(_tt, _terrain))
   {
-    texCoordSet = generateVpDynamicShadowsParams(texCoordSet, _prof,
+    texCoordSet = this->generateVpDynamicShadowsParams(texCoordSet, _prof,
         _terrain, _tt, _outStream);
   }
 
@@ -851,14 +848,19 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
   if (compression)
   {
     _outStream
-      << "  oPosObj = posIndexToObjectSpace * "
-         "vec4(inPos.x, inPos.y, inHeight.x, 1.0);\n"
+      << "  position = posIndexToObjectSpace * "
+         "vec4(vertex.x, vertex.y, uv0.x, 1.0);\n"
 
-      << "   vec2 uv = vec2(inPos.x * baseUVScale, 1.0 - "
-      << "(inPos.y * baseUVScale));\n";
+      << "   vec2 uv = vec2(vertex.x * baseUVScale, 1.0 - "
+      << "(vertex.y * baseUVScale));\n";
+  }
+  else
+  {
+    _outStream << "  position = vertex;\n"
+               << "  vec2 uv = uv0;\n";
   }
 
-  _outStream << "   vec4 worldPos = worldMatrix * oPosObj;\n";
+  _outStream << "   vec4 worldPos = worldMatrix * position;\n";
 
   if (_tt != RENDER_COMPOSITE_MAP)
   {
@@ -872,7 +874,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
     // the vertex will never be indexed), we will achieve our aim.
     // sign(vertexLOD - targetLOD) == -1 is to morph
     _outStream <<
-      "   float toMorph = -min(0.0, sign(inDelta.y - lodMorph.y));\n";
+      "   float toMorph = -min(0.0, sign(uv1.y - lodMorph.y));\n";
 
     // this will either be 1 (morph) or 0 (don't morph)
     if (_prof->getParent()->getDebugLevel())
@@ -890,13 +892,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
     switch (_terrain->getAlignment())
     {
       case Ogre::Terrain::ALIGN_X_Y:
-        _outStream << "   worldPos.z += inDelta.x * toMorph * lodMorph.x;\n";
+        _outStream << "   worldPos.z += uv1.x * toMorph * lodMorph.x;\n";
         break;
       case Ogre::Terrain::ALIGN_X_Z:
-        _outStream << "   worldPos.y += inDelta.x * toMorph * lodMorph.x;\n";
+        _outStream << "   worldPos.y += uv1.x * toMorph * lodMorph.x;\n";
         break;
       case Ogre::Terrain::ALIGN_Y_Z:
-        _outStream << "   worldPos.x += inDelta.x * toMorph * lodMorph.x;\n";
+        _outStream << "   worldPos.x += uv1.x * toMorph * lodMorph.x;\n";
         break;
       default:
         gzerr << "Invalid alignment\n";
@@ -911,10 +913,10 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
       unsigned int layer  =  i * 2;
       unsigned int uvMulIdx = layer / 4;
 
-      _outStream << "   oUV" << i << ".xy = " << " uv.xy * uvMul_"
-                 << uvMulIdx << "." << getChannel(layer) << ";\n";
-      _outStream << "   oUV" << i << ".zw = " << " uv.xy * uvMul_"
-                 << uvMulIdx << "." << getChannel(layer+1) << ";\n";
+      _outStream << "   layerUV" << i << ".xy = " << " uv.xy * uvMul_"
+                 << uvMulIdx << "." << this->GetChannel(layer) << ";\n";
+      _outStream << "   layerUV" << i << ".zw = " << " uv.xy * uvMul_"
+                 << uvMulIdx << "." << this->GetChannel(layer+1) << ";\n";
     }
   }
 }
@@ -928,7 +930,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpFooter(
     TechniqueType _tt, Ogre::StringUtil::StrStreamType &_outStream)
 {
   _outStream << "   vec4 pos = viewProjMatrix * worldPos;\n"
-             << "   oUVMisc.xy = uv.xy;\n";
+             << "   uvMisc.xy = uv.xy;\n";
 
   bool fog = _terrain->getSceneManager()->getFogMode() != Ogre::FOG_NONE &&
              _tt != RENDER_COMPOSITE_MAP;
@@ -970,7 +972,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadows(
   // Calculate the position of vertex in light space
   for (unsigned int i = 0; i < numTextures; ++i)
   {
-    _outStream << "   oLightSpacePos" << i << " = texViewProjMatrix"
+    _outStream << "   lightSpacePos" << i << " = texViewProjMatrix"
                << i << " * worldPos; \n";
 
     // Don't linearize depth range: RTSS PSSM implementation uses
@@ -978,7 +980,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadows(
     // if (prof->getReceiveDynamicShadowsDepth())
     // {
     //   // make linear
-    //   outStream << "oLightSpacePos" << i << ".z = (oLightSpacePos" << i
+    //   outStream << "lightSpacePos" << i << ".z = (lightSpacePos" << i
     //             << ".z - depthRange" << i << ".x) * depthRange" << i
     //             << ".w;\n";
     // }
@@ -986,7 +988,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadows(
 
   if (_prof->getReceiveDynamicShadowsPSSM())
   {
-    _outStream << "   // pass cam depth\n   oUVMisc.z = pos.z;\n";
+    _outStream << "   // pass cam depth\n   uvMisc.z = pos.z;\n";
   }
 }
 
@@ -1060,7 +1062,7 @@ generateVpDynamicShadowsParams(unsigned int _texCoord, const SM2Profile *_prof,
 
   for (unsigned int i = 0; i < numTextures; ++i)
   {
-    _outStream << "out vec4 oLightSpacePos" << i << ";\n"
+    _outStream << "out vec4 lightSpacePos" << i << ";\n"
                << "uniform mat4 texViewProjMatrix" << i << ";\n";
 
     // Don't add depth range params
@@ -1137,7 +1139,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   {
     _outStream <<
       "uniform vec3 fogColour;\n"
-      "float fogVal;\n";
+      "in float fogVal;\n";
   }
 
   Ogre::uint currentSamplerIdx = 0;
@@ -1212,7 +1214,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   if (_tt != LOW_LOD)
   {
     // global normal
-    _outStream << "  vec3 normal = expand(texture(globalNormal, uv)).rgb;\n";
+    _outStream << "  vec3 normal = expand(texture(globalNormal, uv)).xyz;\n";
   }
 
   _outStream <<
@@ -1336,7 +1338,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
   Ogre::uint uvIdx = _layer / 2;
   Ogre::String uvChannels = (_layer % 2) ? ".zw" : ".xy";
   Ogre::uint blendIdx = (_layer-1) / 4;
-  Ogre::String blendChannel = this->getChannel(_layer-1);
+  Ogre::String blendChannel = this->GetChannel(_layer-1);
   Ogre::String blendWeightStr = Ogre::String("blendTexVal") +
     Ogre::StringConverter::toString(blendIdx) + "." + blendChannel;
 
@@ -1389,8 +1391,8 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpLayer(
   }
   else
   {
-     _outStream << "  diffuse = mix(diffuse, diffuseSpecTex" << _layer
-                << ".xyz, " << blendWeightStr << ");\n";
+     // TEST: _outStream << "  diffuse = mix(diffuse, diffuseSpecTex" << _layer
+     //           << ".xyz, " << blendWeightStr << ");\n";
 
     if (_prof->isLayerSpecularMappingEnabled())
     {
@@ -1446,6 +1448,9 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
     _outStream << "  outputCol.xyz += ambient * diffuse + litRes.y * "
                   "lightDiffuseColour * diffuse * shadow;\n";
 
+    _outStream << "  outputCol.xyz = litRes.y * lightDiffuseColour * diffuse;\n ";
+
+    /*
     // specular default
     if (!_prof->isLayerSpecularMappingEnabled())
       _outStream << "  specular = 1.0;\n";
@@ -1466,14 +1471,18 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
         _outStream << "  outputCol.xy += lodInfo.xy;\n";
       }
     }
+    */
   }
 
+  /*
   bool fog = _terrain->getSceneManager()->getFogMode() != Ogre::FOG_NONE &&
              _tt != RENDER_COMPOSITE_MAP;
   if (fog)
   {
     _outStream << "  outputCol.xyz = mix(outputCol.xyz, fogColour, fogVal);\n";
   }
+  */
+
 
   // Final return
   _outStream << "\n}\n";
@@ -1578,12 +1587,12 @@ generateFpDynamicShadowsHelpers(
       if (!i)
       {
         _outStream << "  if (camDepth <= pssmSplitPoints."
-                   << ShaderHelper::getChannel(i) << ") \n";
+                   << this->GetChannel(i) << ") \n";
       }
       else if (i < numTextures - 1)
       {
         _outStream << "  else if (camDepth <= pssmSplitPoints."
-                   << ShaderHelper::getChannel(i) << ") \n";
+                   << this->GetChannel(i) << ") \n";
       }
       else
         _outStream << "  else \n";
@@ -1686,6 +1695,24 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgramSource(
   this->generateFpFooter(_prof, _terrain, _tt, _outStream);
 }
 
+/////////////////////////////////////////////////
+Ogre::String GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::GetChannel(
+Ogre::uint _idx)
+{
+  Ogre::uint rem = _idx % 4;
+  switch(rem)
+  {
+    case 0:
+    default:
+      return "x";
+    case 1:
+      return "y";
+    case 2:
+      return "z";
+    case 3:
+      return "w";
+  };
+}
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////

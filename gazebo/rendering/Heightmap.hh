@@ -237,6 +237,7 @@ namespace gazebo
                          const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
+          private: Ogre::String GetChannel(Ogre::uint _idx);
         };
 
         /// Utility class to help with generating shaders for Cg / HLSL.
