@@ -30,6 +30,16 @@ TEST_F(Pioneer2dx, StraightLine)
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
 
+  int i = 0;
+  while (!this->HasEntity("pioneer2dx") && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+
+  if (i > 20)
+    gzthrow("Unable to get pioneer2dx");
+
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
       gazebo::math::Vector3(0.2, 0, 0));
