@@ -232,8 +232,9 @@ bool Sensor::GetVisualize() const
 std::string Sensor::GetTopic() const
 {
   std::string result;
-  if (this->sdf->HasElement("topic"))
-    result = this->sdf->GetElement("topic")->GetValueString();
+  if (this->sdf->HasElement("topic") &&
+      this->sdf->GetValueString("topic") != "__default__")
+    result = this->sdf->GetValueString("topic");
   return result;
 }
 
