@@ -2472,6 +2472,7 @@ static size_t EstimateSOR_LCPMemoryRequirements(int m,int /*nb*/
 #ifdef USE_JOINT_DAMPING
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for b_damp
 #endif
+  res += dEFFICIENT_SIZE(sizeof(dxSORLCPParameters) * m); // for params (given num_chunks must be <= m)
   return res;
 }
 
