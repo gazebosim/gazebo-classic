@@ -1,5 +1,6 @@
-/* Copyright (C) 2012
- *     Jonas Mellin & Zakiruz Zaman
+/*
+ * Copyright 2012 Open Source Robotics Foundation
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *
+*/
 /* Desc: Gazebo RFID Sensor
  * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
