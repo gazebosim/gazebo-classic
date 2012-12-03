@@ -66,7 +66,8 @@ void Master::Init(uint16_t _port)
   }
   catch(std::exception &_e)
   {
-    gzthrow("Unable to start server[" << _e.what() << "]\n");
+    gzthrow("Unable to start server[" << _e.what() << "]. "
+            "There is probably another Gazebo process running.");
   }
 }
 

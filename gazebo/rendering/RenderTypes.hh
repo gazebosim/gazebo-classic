@@ -21,7 +21,11 @@
 
 /// \def GZ_VISIBILITY_ALL
 /// \brief Render everything visibility mask.
-#define GZ_VISIBILITY_ALL             0xFFFFFFFF
+#define GZ_VISIBILITY_ALL             0x0FFFFFFF
+
+/// \def GZ_VISIBILITY_SELECTION
+/// \brief Renders only objects that can be selected.
+#define GZ_VISIBILITY_SELECTION       0x10000000
 
 /// \def GZ_VISIBILITY_GUI
 /// \brief Render GUI visuals mask.

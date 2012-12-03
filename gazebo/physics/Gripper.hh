@@ -79,6 +79,9 @@ namespace gazebo
       /// \brief The physics engine.
       private: physics::PhysicsEnginePtr physics;
 
+      /// \brief Pointer to the world.
+      private: physics::WorldPtr world;
+
       /// \brief A fixed joint to connect the gripper to a grasped object.
       private: physics::JointPtr fixedJoint;
 
@@ -125,10 +128,10 @@ namespace gazebo
       private: unsigned int min_contact_count;
 
       /// \brief Steps touching before engaging fixed joint
-      private: int attach_steps;
+      private: int attachSteps;
 
       /// \brief Steps not touching before deisengaging fixed joint
-      private: int detach_steps;
+      private: int detachSteps;
     };
     /// \}
   }

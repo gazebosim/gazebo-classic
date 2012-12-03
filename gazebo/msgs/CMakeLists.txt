@@ -14,6 +14,9 @@ set (msgs
   fog.proto
   friction.proto
   geometry.proto
+  gui_overlay_config.proto
+  gui_camera.proto
+  gui.proto
   gz_string.proto
   gz_string_v.proto
   header.proto
@@ -25,6 +28,9 @@ set (msgs
   inertial.proto
   int.proto
   joint.proto
+  joint_animation.proto
+  joint_cmd.proto
+  joint_wrench.proto
   laserscan.proto
   light.proto
   link.proto
@@ -39,6 +45,7 @@ set (msgs
   pid.proto
   plugin.proto
   pose.proto
+  pose_animation.proto
   pose_stamped.proto
   pose_trajectory.proto
   projector.proto
@@ -58,8 +65,10 @@ set (msgs
   spheregeom.proto
   subscribe.proto
   surface.proto
+  test.proto
   time.proto
   topic_info.proto
+  track_visual.proto
   vector2d.proto
   vector3d.proto
   visual.proto
@@ -67,14 +76,6 @@ set (msgs
   world_reset.proto 
   world_stats.proto 
   world_modify.proto 
-  gui_overlay_config.proto
-  gui_camera.proto
-  gui.proto
-  track_visual.proto
-  test.proto
-  pose_animation.proto
-  joint_animation.proto
-  joint_cmd.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

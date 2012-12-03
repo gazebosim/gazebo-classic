@@ -24,6 +24,7 @@
 #include "transport/Transport.hh"
 
 #include "rendering/UserCamera.hh"
+#include "rendering/RenderEvents.hh"
 
 #include "gui/Actions.hh"
 #include "gui/Gui.hh"
@@ -428,7 +429,7 @@ void MainWindow::OnFullScreen(bool _value)
 void MainWindow::ViewReset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->SetWorldPose(math::Pose(-5, 0, 1, 0, GZ_DTOR(11.31), 0));
+  cam->SetWorldPose(math::Pose(5, -5, 2, 0, GZ_DTOR(11.31), GZ_DTOR(135)));
 }
 
 /////////////////////////////////////////////////
@@ -438,6 +439,12 @@ void MainWindow::ViewGrid()
   msg.set_name("default");
   msg.set_grid(g_viewGridAct->isChecked());
   this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ViewContacts()
+{
+  gazebo::rendering::Events::viewContacts(g_viewContactsAct->isChecked());
 }
 
 /////////////////////////////////////////////////
@@ -602,7 +609,7 @@ void MainWindow::CreateActions()
       SLOT(CreateDirectionalLight()));
 
   g_viewResetAct = new QAction(tr("Reset View"), this);
-  g_viewResetAct->setStatusTip(tr("Move camera to origin"));
+  g_viewResetAct->setStatusTip(tr("Move camera to pose"));
   connect(g_viewResetAct, SIGNAL(triggered()), this,
       SLOT(ViewReset()));
 
@@ -612,6 +619,13 @@ void MainWindow::CreateActions()
   g_viewGridAct->setChecked(true);
   connect(g_viewGridAct, SIGNAL(triggered()), this,
           SLOT(ViewGrid()));
+
+  g_viewContactsAct = new QAction(tr("Contacts"), this);
+  g_viewContactsAct->setStatusTip(tr("View Contacts"));
+  g_viewContactsAct->setCheckable(true);
+  g_viewContactsAct->setChecked(false);
+  connect(g_viewContactsAct, SIGNAL(triggered()), this,
+          SLOT(ViewContacts()));
 
   g_viewFullScreenAct = new QAction(tr("Full Screen"), this);
   g_viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
@@ -660,6 +674,7 @@ void MainWindow::CreateMenus()
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(g_viewGridAct);
+  this->viewMenu->addAction(g_viewContactsAct);
   this->viewMenu->addSeparator();
   this->viewMenu->addAction(g_viewResetAct);
   this->viewMenu->addAction(g_viewFullScreenAct);
@@ -709,9 +724,9 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
 
-    if (_msg->camera().has_origin())
+    if (_msg->camera().has_pose())
     {
-      const msgs::Pose &msg_pose = _msg->camera().origin();
+      const msgs::Pose &msg_pose = _msg->camera().pose();
 
       math::Vector3 cam_pose_pos = math::Vector3(
         msg_pose.position().x(),
@@ -821,8 +836,6 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
   iter = this->entities.find(name);
   if (iter != this->entities.end())
     result = iter->second;
-  else
-    gzerr << "Unable to find model[" << _name << "]\n";
 
   return result;
 }

@@ -19,7 +19,6 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
-#include "rendering/RenderEngine.hh"
 #include "sensors/Sensor.hh"
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"

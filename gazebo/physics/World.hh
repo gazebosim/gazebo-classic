@@ -610,6 +610,10 @@ namespace gazebo
 
       private: sdf::ElementPtr logPlayStateSDF;
       private: WorldState logPlayState;
+
+      /// \brief Store a factory SDF object to improve speed at which
+      /// objects are inserted via the factory.
+      private: sdf::SDFPtr factorySDF;
     };
     /// \}
   }

@@ -145,7 +145,13 @@ class ServerFixture : public testing::Test
                ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
                ASSERT_NO_THROW(this->server->Init());
                this->SetPause(_paused);
+
+               rendering::create_scene(
+                   gazebo::physics::get_world()->GetName(), false);
+
                this->server->Run();
+               rendering::remove_scene(gazebo::physics::get_world()->GetName());
+
                ASSERT_NO_THROW(this->server->Fini());
                delete this->server;
                this->server = NULL;
@@ -446,7 +452,8 @@ class ServerFixture : public testing::Test
 
 
   protected: void SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _wait = true)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -478,7 +485,7 @@ class ServerFixture : public testing::Test
                this->factoryPub->Publish(msg);
 
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
+               while (_wait && !this->HasEntity(_name))
                  common::Time::MSleep(10);
              }
 

@@ -15,6 +15,9 @@
  *
 */
 #include <string.h>
+
+#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/Scene.hh"
 #include "ServerFixture.hh"
 #include "images_cmp.h"
 #include "heights_cmp.h"
@@ -31,6 +34,36 @@ TEST_F(HeightmapTest, Heights)
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model);
 
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run heights test\n";
+    return;
+  }
+
+  // Make sure we can get a valid pointer to the scene.
+  rendering::ScenePtr scene = rendering::get_scene("default");
+  if (!scene)
+  {
+    gzthrow("Unable to get scene.");
+    return;
+  }
+
+  // Wait for the heightmap to get loaded by the scene.
+  {
+    int i = 0;
+    while (i < 10 && scene->GetHeightmap() == NULL)
+    {
+      common::Time::MSleep(100);
+      i++;
+    }
+
+    common::Time::MSleep(100);
+    if (i >= 10)
+      gzthrow("Unable to get heightmap");
+  }
+
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
 
@@ -43,20 +76,52 @@ TEST_F(HeightmapTest, Heights)
   EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
   EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
 
-  float diffMax, diffSum, diffAvg;
-  std::vector<float> test;
+  // float diffMax, diffSum, diffAvg;
+  std::vector<float> physicsTest;
+  std::vector<float> renderTest;
 
-  int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  float x, y;
+
+  for (y = 0; y < shape->GetSize().y; y += 0.2)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->GetSize().x; x += 0.2)
     {
-      test.push_back(shape->GetHeight(x, y));
+      // Compute the proper physics test point.
+      int xi = rint(x);
+      if (xi >= shape->GetSize().x)
+        xi = shape->GetSize().x - 1.0;
+      int yi = rint(y);
+      if (yi >= shape->GetSize().y)
+        yi = shape->GetSize().y - 1.0;
+
+      // Compute the proper render test point.
+      double xd = xi - floor(shape->GetSize().x) * 0.5;
+      double yd = floor((shape->GetSize().y)*0.5) - yi;
+
+      // The shape->GetHeight function requires a point relative to the
+      // bottom left of the heightmap image
+      physicsTest.push_back(shape->GetHeight(xi, yi));
+
+      // The render test requires a point relative to the center of the
+      // heightmap.
+      renderTest.push_back(scene->GetHeightmap()->GetHeight(xd, yd));
+
+      // Debug output
+      if (fabs(physicsTest.back() - renderTest.back()) >= 0.13)
+      {
+        std::cout << "XY[" << xd << " " << yd << "][" << xi
+          << " " << yi << "] P[" << physicsTest.back() << "] R["
+          << renderTest.back() << "]\n";
+      }
+
+      // Test to see if the physics height is equal to the render engine
+      // height.
+      EXPECT_TRUE(math::equal(physicsTest.back(), renderTest.back(), 0.13f));
     }
   }
 
-  FloatCompare(heights, &test[0], test.size(), diffMax, diffSum, diffAvg);
-  printf("Max[%f] Sim[%f] Avg[%f]\n", diffMax, diffSum, diffAvg);
+  // FloatCompare(heights, &test[0], test.size(), diffMax, diffSum, diffAvg);
+  // printf("Max[%f] Sum[%f] Avg[%f]\n", diffMax, diffSum, diffAvg);
 
   // This will print the heights
   /*printf("static float __heights[] = {");
