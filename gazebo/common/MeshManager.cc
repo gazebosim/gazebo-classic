@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -291,7 +291,6 @@ void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
 }
 
 //////////////////////////////////////////////////
-// Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::CreatePlane(const std::string &name,
     const math::Vector3 &normal, double d, const math::Vector2d &size,
     const math::Vector2d &segments, const math::Vector2d &uvTile)
@@ -896,7 +895,6 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
 }
 
 //////////////////////////////////////////////////
-// Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
     bool doubleSided)
 {
