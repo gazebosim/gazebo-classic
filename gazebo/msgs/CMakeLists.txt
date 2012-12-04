@@ -12,6 +12,7 @@ set (msgs
   cylindergeom.proto
   factory.proto
   fog.proto
+  force_torque.proto
   friction.proto
   geometry.proto
   gui_overlay_config.proto

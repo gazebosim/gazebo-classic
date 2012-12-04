@@ -28,6 +28,7 @@
 #include "physics/ode/ODELink.hh"
 #include "physics/ode/ODEJoint.hh"
 #include "physics/ScrewJoint.hh"
+#include "physics/JointWrench.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -56,6 +57,11 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->sdf->GetElement("physics")->HasElement("ode"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
+
+    if (elem->HasElement("provide_feedback"))
+    {
+      this->provideFeedback = elem->GetValueBool("provide_feedback");
+    }
 
     if (elem->HasElement("limit"))
     {
@@ -93,13 +99,11 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
           elem->GetElement("velocity")->GetValueDouble());
   }
 
-  // TODO: reimplement
-  /*if (**this->provideFeedbackP)
+  if (this->provideFeedback)
   {
     this->feedback = new dJointFeedback;
     dJointSetFeedback(this->jointId, this->feedback);
   }
-  */
 }
 
 //////////////////////////////////////////////////
@@ -528,4 +532,44 @@ void ODEJoint::Reset()
 {
   dJointReset(this->jointId);
   Joint::Reset();
+}
+
+//////////////////////////////////////////////////
+JointWrench ODEJoint::GetForceTorque(int _index)
+{
+  JointWrench wrench;
+  /// \todo: should check to see if this type of joint has _index
+  if (_index < 2)
+  {
+
+    dJointFeedback* fb = this->GetFeedback();
+    wrench.body1Force = math::Vector3(fb->f1[0], fb->f1[1], fb->f1[2]);
+    wrench.body2Force = math::Vector3(fb->f2[0], fb->f2[1], fb->f2[2]);
+    wrench.body1Torque = math::Vector3(fb->t1[0], fb->t1[1], fb->t1[2]);
+    wrench.body2Torque = math::Vector3(fb->t2[0], fb->t2[1], fb->t2[2]);
+
+    math::Vector3 force = this->GetGlobalAxis(_index) * this->forceApplied[_index];
+
+    // if hinge, this->forceApplied[_index] * axis + torque;
+    if (this->HasType(Base::HINGE_JOINT))
+    {
+      wrench.body1Torque += force;
+      wrench.body2Torque -= force;
+    }
+    // if slider, this->forceApplied[_index] * axis + forces;
+    else if (this->HasType(Base::SLIDER_JOINT))
+    {
+      wrench.body1Force += force;
+      wrench.body2Force -= force;
+    }
+    else
+    {
+      /// \todo: do the other joints
+    }
+  }
+  else
+  {
+    gzerr << "trying to get force with index [" << _index << "]\n";
+  }
+  return wrench;
 }

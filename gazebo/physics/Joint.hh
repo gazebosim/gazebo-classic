@@ -33,6 +33,7 @@
 
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
+#include "physics/JointWrench.hh"
 
 namespace gazebo
 {
@@ -366,6 +367,15 @@ namespace gazebo
 
       /// \brief Angle used when the joint is paret of a static model.
       private: math::Angle staticAngle;
+
+      /// \brief Save force applied by user
+      /// This plus the joint feedback (joint contstraint forces) is the
+      /// equivalent of simulated force torque sensor reading
+      /// Allocate a 2 vector in case hinge2 joint is used.
+      protected: double forceApplied[2];
+
+      /// \brief get force torque values at a joint
+      public: virtual JointWrench GetForceTorque(int _index) = 0;
     };
     /// \}
   }

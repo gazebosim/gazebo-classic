@@ -34,6 +34,7 @@ namespace gazebo
     class CameraSensor;
     class DepthCameraSensor;
     class ContactSensor;
+    class ForceTorqueSensor;
     class GpuRaySensor;
     class RFIDSensor;
     class RFIDTag;
@@ -57,6 +58,10 @@ namespace gazebo
     /// \def ContactSensorPtr
     /// \brief Shared pointer to ContactSensor
     typedef boost::shared_ptr<ContactSensor> ContactSensorPtr;
+
+    /// \def ForceTorqueSensorPtr
+    /// \brief Shared pointer to ForceTorqueSensor
+    typedef boost::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
 
     /// \def GpuRaySensorPtr
     /// \brief Shared pointer to GpuRaySensor
@@ -89,6 +94,10 @@ namespace gazebo
     /// \def ContactSensor_V
     /// \brief Vector of ContactSensor shared pointers
     typedef std::vector<ContactSensorPtr> ContactSensor_V;
+
+    /// \def ForceTorqueSensor_V
+    /// \brief Vector of ForceTorqueSensor shared pointers
+    typedef std::vector<ForceTorqueSensorPtr> ForceTorqueSensor_V;
 
     /// \def GpuRaySensor_V
     /// \brief Vector of GpuRaySensor shared pointers

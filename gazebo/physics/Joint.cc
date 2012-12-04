@@ -40,6 +40,8 @@ Joint::Joint(BasePtr _parent)
   : Base(_parent)
 {
   this->AddType(Base::JOINT);
+  this->forceApplied[0] = 0;
+  this->forceApplied[1] = 0;
 }
 
 //////////////////////////////////////////////////
@@ -383,12 +385,24 @@ void Joint::SetState(const JointState &_state)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetForce(int /*_index*/, double /*_force*/)
+void Joint::SetForce(int _index, double _force)
 {
+  /// \todo: should check to see if this type of joint has _index
+  if (_index < 2)
+    this->forceApplied[_index] = _force;
+  else
+    gzerr << "trying to apply force on index [" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
-double Joint::GetForce(int /*_index*/)
+double Joint::GetForce(int _index)
 {
-  return 0;
+  /// \todo: should check to see if this type of joint has _index
+  if (_index < 2)
+    return this->forceApplied[_index];
+  else
+  {
+    gzerr << "trying to get force with index [" << _index << "]\n";
+    return 0;
+  }
 }
