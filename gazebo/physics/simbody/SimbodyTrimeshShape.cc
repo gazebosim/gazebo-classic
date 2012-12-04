@@ -54,46 +54,4 @@ void SimbodyTrimeshShape::Init()
 
   SimbodyCollisionPtr bParent =
     boost::shared_static_cast<SimbodyCollision>(this->collisionParent);
-
-  float *vertices = NULL;
-  int *indices = NULL;
-
-  btTriangleMesh *mTriMesh = new btTriangleMesh();
-
-  unsigned int numVertices = this->mesh->GetVertexCount();
-  unsigned int numIndices = this->mesh->GetIndexCount();
-
-  // Get all the vertex and index data
-  this->mesh->FillArrays(&vertices, &indices);
-
-  // Scale the vertex data
-  for (unsigned int j = 0;  j < numVertices; j++)
-  {
-    vertices[j*3+0] = vertices[j*3+0] * this->sdf->GetValueVector3("scale").x;
-    vertices[j*3+1] = vertices[j*3+1] * this->sdf->GetValueVector3("scale").y;
-    vertices[j*3+2] = vertices[j*3+2] * this->sdf->GetValueVector3("scale").z;
-  }
-
-  // Create the Simbody trimesh
-  for (unsigned int j = 0; j < numIndices; j += 3)
-  {
-    btVector3 bv0(vertices[indices[j]*3+0],
-                  vertices[indices[j]*3+1],
-                  vertices[indices[j]*3+2]);
-
-    btVector3 bv1(vertices[indices[j+1]*3+0],
-                  vertices[indices[j+1]*3+1],
-                  vertices[indices[j+1]*3+2]);
-
-    btVector3 bv2(vertices[indices[j+2]*3+0],
-                  vertices[indices[j+2]*3+1],
-                  vertices[indices[j+2]*3+2]);
-
-    mTriMesh->addTriangle(bv0, bv1, bv2);
-  }
-
-  bParent->SetCollisionShape(new btConvexTriangleMeshShape(mTriMesh, true));
-
-  delete [] vertices;
-  delete [] indices;
 }

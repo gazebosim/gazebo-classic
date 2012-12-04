@@ -26,8 +26,6 @@
 #include "physics/simbody/SimbodyJoint.hh"
 #include "physics/simbody/SimbodyPhysics.hh"
 
-class btUniversalConstraint;
-
 namespace gazebo
 {
   namespace physics
@@ -40,7 +38,7 @@ namespace gazebo
     class SimbodyUniversalJoint : public UniversalJoint<SimbodyJoint>
     {
       /// \brief Constructor
-      public: SimbodyUniversalJoint(btDynamicsWorld *world, BasePtr _parent);
+      public: SimbodyUniversalJoint(MultibodySystem *world, BasePtr _parent);
 
       /// \brief Destuctor
       public: virtual ~SimbodyUniversalJoint();
@@ -98,8 +96,6 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
-
-      private: btUniversalConstraint *btUniversal;
     };
 
     /// \}

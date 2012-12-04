@@ -33,14 +33,12 @@ using namespace physics;
 SimbodyJoint::SimbodyJoint(BasePtr _parent)
   : Joint(_parent)
 {
-  this->constraint = NULL;
   this->world = NULL;
 }
 
 //////////////////////////////////////////////////
 SimbodyJoint::~SimbodyJoint()
 {
-  delete this->constraint;
   this->world = NULL;
 }
 
@@ -61,9 +59,6 @@ LinkPtr SimbodyJoint::GetJointLink(int _index) const
 {
   LinkPtr result;
 
-  if (this->constraint == NULL)
-    gzthrow("Attach bodies to the joint first");
-
   if (_index == 0 || _index == 1)
   {
     SimbodyLinkPtr simbodyLink1 =
@@ -71,13 +66,6 @@ LinkPtr SimbodyJoint::GetJointLink(int _index) const
 
     SimbodyLinkPtr simbodyLink2 =
       boost::shared_static_cast<SimbodyLink>(this->parentLink);
-
-    btRigidBody rigidLink = this->constraint->getRigidBodyA();
-
-    if (simbodyLink1 && rigidLink.getUserPointer() == simbodyLink1.get())
-      result = this->childLink;
-    else if (simbodyLink2)
-      result = this->parentLink;
   }
 
   return result;
@@ -86,10 +74,10 @@ LinkPtr SimbodyJoint::GetJointLink(int _index) const
 //////////////////////////////////////////////////
 bool SimbodyJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  return this->constraint && ((this->childLink.get() == _one.get() &&
-                               this->parentLink.get() == _two.get()) ||
-                              (this->childLink.get() == _two.get() &&
-                               this->parentLink.get() == _one.get()));
+  return ((this->childLink.get() == _one.get() &&
+           this->parentLink.get() == _two.get()) ||
+          (this->childLink.get() == _two.get() &&
+           this->parentLink.get() == _one.get()));
 }
 
 //////////////////////////////////////////////////
@@ -97,6 +85,4 @@ void SimbodyJoint::Detach()
 {
   this->childLink.reset();
   this->parentLink.reset();
-
-  delete this->constraint;
 }

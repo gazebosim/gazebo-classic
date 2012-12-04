@@ -36,8 +36,6 @@
 #include "physics/PhysicsTypes.hh"
 #include "physics/Collision.hh"
 
-class btCollisionShape;
-
 namespace gazebo
 {
   namespace physics
@@ -73,15 +71,11 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const;
 
       /// \brief Set the collision shape
-      public: void SetCollisionShape(btCollisionShape *shape);
+      public: void SetCollisionShape(ContactGeometry *shape);
 
       /// \brief Get the simbody collision shape
-      public: btCollisionShape *GetCollisionShape() const;
+      public: ContactGeometry *GetCollisionShape() const;
 
-      /// \brief Set the index of the compound shape
-      public: void SetCompoundShapeIndex(int index);
-
-      protected: btCollisionShape *collisionShape;
     };
     /// \}
   }

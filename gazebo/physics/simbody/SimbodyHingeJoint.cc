@@ -29,7 +29,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyHingeJoint::SimbodyHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
+SimbodyHingeJoint::SimbodyHingeJoint(MultibodySystem *_world, BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -77,39 +77,23 @@ void SimbodyHingeJoint::Attach(LinkPtr _one, LinkPtr _two)
   axisB = this->childLink->GetWorldPose().rot.RotateVectorReverse(axis);
   axisB = axisB.Round();
 
-  this->btHinge = new btHingeConstraint(
-      *simbodyParentLink->GetSimbodyLink(),
-      *simbodyChildLink->GetSimbodyLink(),
-      btVector3(pivotA.x, pivotA.y, pivotA.z),
-      btVector3(pivotB.x, pivotB.y, pivotB.z),
-      btVector3(axisA.x, axisA.y, axisA.z),
-      btVector3(axisB.x, axisB.y, axisB.z));
-
-  this->constraint = this->btHinge;
-
-  double angle = this->btHinge->getHingeAngle();
-  this->btHinge->setLimit(angle - .4, angle + .4);
   // Add the joint to the world
-  this->world->addConstraint(this->btHinge, true);
 
   // Allows access to impulse
-  this->btHinge->enableFeedback(true);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHingeJoint::GetAnchor(int /*_index*/) const
 {
-  btTransform trans = this->btHinge->getAFrame();
-  trans.getOrigin() +=
-    this->btHinge->getRigidBodyA().getCenterOfMassTransform().getOrigin();
-  return math::Vector3(trans.getOrigin().getX(),
-      trans.getOrigin().getY(), trans.getOrigin().getZ());
+  gzerr << "Not implemented...\n";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetAnchor(int /*_index*/,
                                  const math::Vector3 &/*_anchor*/)
 {
+  gzerr << "Not implemented...\n";
   // The anchor (pivot in Simbody lingo), can only be set on creation
 }
 
@@ -118,9 +102,7 @@ void SimbodyHingeJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
-  ((btHingeConstraint*)this->btHinge)->setAxis(vec);
-  */
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -132,17 +114,14 @@ void SimbodyHingeJoint::SetDamping(int /*index*/, double /*_damping*/)
 //////////////////////////////////////////////////
 math::Angle SimbodyHingeJoint::GetAngle(int /*_index*/) const
 {
-  if (this->btHinge)
-    return this->btHinge->getHingeAngle();
-  else
-    gzthrow("Joint has not been created");
+  gzerr << "Not implemented...\n";
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetVelocity(int /*_index*/, double /*_angle*/)
 {
-  // this->btHinge->enableAngularMotor(true, -_angle,
-  // this->GetMaxForce(_index));
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -155,85 +134,48 @@ double SimbodyHingeJoint::GetVelocity(int /*_index*/) const
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetMaxForce(int /*_index*/, double _t)
 {
-  this->btHinge->setMaxMotorImpulse(_t);
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyHingeJoint::GetMaxForce(int /*_index*/)
 {
-  return this->btHinge->getMaxMotorImpulse();
+  gzerr << "Not implemented...\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetForce(int /*_index*/, double _torque)
 {
-  // math::Vector3 axis = this->GetLocalAxis(_index);
-  // this->btHinge->enableAngularMotor(true);
-
-  // z-axis of constraint frame
-  btVector3 hingeAxisLocal =
-    this->btHinge->getAFrame().getBasis().getColumn(2);
-
-  btVector3 hingeAxisWorld =
-    this->btHinge->getRigidBodyA().getWorldTransform().getBasis() *
-    hingeAxisLocal;
-
-  btVector3 hingeTorque = _torque * hingeAxisWorld;
-
-  this->btHinge->getRigidBodyA().applyTorque(hingeTorque);
-  this->btHinge->getRigidBodyB().applyTorque(-hingeTorque);
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyHingeJoint::GetForce(int /*_index*/)
 {
-  return this->btHinge->getAppliedImpulse();
+  gzerr << "Not implemented...\n";
+  return 0;
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetHighStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  if (this->btHinge)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->btHinge->setLimit(this->btHinge->getLowerLimit(),
-    //                         _angle.Radian());
-  }
-  else
-  {
-    gzthrow("Joint must be created first");
-  }
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetLowStop(int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
-  if (this->btHinge)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->btHinge->setLimit(-_angle.Radian(),
-    //                         this->btHinge->getUpperLimit());
-  }
-  else
-    gzthrow("Joint must be created first");
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyHingeJoint::GetHighStop(int /*_index*/)
 {
   math::Angle result;
-
-  if (this->btHinge)
-    result = this->btHinge->getUpperLimit();
-  else
-    gzthrow("Joint must be created first");
-
+  gzerr << "Not implemented...\n";
   return result;
 }
 
@@ -241,11 +183,7 @@ math::Angle SimbodyHingeJoint::GetHighStop(int /*_index*/)
 math::Angle SimbodyHingeJoint::GetLowStop(int /*_index*/)
 {
   math::Angle result;
-  if (this->btHinge)
-    result = this->btHinge->getLowerLimit();
-  else
-    gzthrow("Joint must be created first");
-
+  gzerr << "Not implemented...\n";
   return result;
 }
 

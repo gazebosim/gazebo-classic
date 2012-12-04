@@ -14,18 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap collision
+/* Desc: Box shape
  * Author: Nate Koenig
- * Date: 8 May 2003
+ * Date: 14 Oct 2009
  */
 
-#ifndef _SIMBODYHEIGHTMAPGEOM_HH_
-#define _SIMBODYHEIGHTMAPGEOM_HH_
-#include <string>
+#ifndef _SIMBODY_BOXSHAPE_HH_
+#define _SIMBODY_BOXSHAPE_HH_
 
-#include "physics/HeightmapShape.hh"
 #include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/Collision.hh"
+#include "physics/BoxShape.hh"
 
 namespace gazebo
 {
@@ -35,17 +33,25 @@ namespace gazebo
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
 
-    /// \brief Height map collision
-    class SimbodyHeightmapShape : public HeightmapShape
+    /// \brief Simbody box collision
+    class SimbodyBoxShape : public BoxShape
     {
       /// \brief Constructor
-      public: SimbodyHeightmapShape(CollisionPtr _parent);
+      public: SimbodyBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
 
       /// \brief Destructor
-      public: virtual ~SimbodyHeightmapShape();
+      public: virtual ~SimbodyBoxShape() {}
 
-      /// \brief Load the heightmap
-      public: virtual void Init();
+      /// \brief Set the size of the box
+      public: void SetSize(const math::Vector3 &_size)
+              {
+                BoxShape::SetSize(_size);
+                SimbodyCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<SimbodyCollision>(
+                    this->collisionParent);
+
+                /// Simbody requires the half-extents of the box
+              }
     };
     /// \}
   }

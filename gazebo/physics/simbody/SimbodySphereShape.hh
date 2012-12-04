@@ -14,18 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap collision
+/* Desc: Sphere collisionetry
  * Author: Nate Koenig
- * Date: 8 May 2003
+ * Date: 21 May 2009
  */
 
-#ifndef _SIMBODYHEIGHTMAPGEOM_HH_
-#define _SIMBODYHEIGHTMAPGEOM_HH_
-#include <string>
+#ifndef _SIMBODY_SPHERESHAPE_HH_
+#define _SIMBODY_SPHERESHAPE_HH_
 
-#include "physics/HeightmapShape.hh"
 #include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/Collision.hh"
+#include "physics/SphereShape.hh"
 
 namespace gazebo
 {
@@ -35,17 +33,25 @@ namespace gazebo
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
 
-    /// \brief Height map collision
-    class SimbodyHeightmapShape : public HeightmapShape
+    /// \brief Simbody sphere collision
+    class SimbodySphereShape : public SphereShape
     {
       /// \brief Constructor
-      public: SimbodyHeightmapShape(CollisionPtr _parent);
+      public: SimbodySphereShape(CollisionPtr _parent) : SphereShape(_parent) {}
 
       /// \brief Destructor
-      public: virtual ~SimbodyHeightmapShape();
+      public: virtual ~SimbodySphereShape() {}
 
-      /// \brief Load the heightmap
-      public: virtual void Init();
+      /// \brief Set the radius
+      public: void SetRadius(const double &_radius)
+              {
+                SphereShape::SetRadius(_radius);
+                SimbodyCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<SimbodyCollision>(
+                    this->collisionParent);
+
+                // set collision shape
+              }
     };
     /// \}
   }

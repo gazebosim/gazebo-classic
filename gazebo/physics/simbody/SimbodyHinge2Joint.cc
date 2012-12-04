@@ -31,7 +31,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyHinge2Joint::SimbodyHinge2Joint(btDynamicsWorld *_world, BasePtr _parent)
+SimbodyHinge2Joint::SimbodyHinge2Joint(MultibodySystem *_world, BasePtr _parent)
     : Hinge2Joint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -67,41 +67,34 @@ void SimbodyHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
   math::Vector3 axis2 = axis2Elem->GetValueVector3("xyz");
 
-  btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
-  btVector3 baxis1(axis1.x, axis1.y, axis1.z);
-  btVector3 baxis2(axis2.x, axis2.y, axis2.z);
-
-  this->btHinge2 = new btHinge2Constraint(
-      *simbodyParentLink->GetSimbodyLink(),
-      *simbodyChildLink->GetSimbodyLink(),
-      banchor, baxis1, baxis2);
-
-  this->constraint = this->btHinge2;
+  Vec3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
+  Vec3 baxis1(axis1.x, axis1.y, axis1.z);
+  Vec3 baxis2(axis2.x, axis2.y, axis2.z);
 
   // Add the joint to the world
-  this->world->addConstraint(this->constraint, true);
 
   // Allows access to impulse
-  this->constraint->enableFeedback(true);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHinge2Joint::GetAnchor(int /*index*/) const
 {
+  gzerr << "Not implemented";
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyHinge2Joint::GetAxis(int /*index*/) const
 {
-  btVector3 vec = this->btHinge2->getAxis1();
-  return math::Vector3(vec.getX(), vec.getY(), vec.getZ());
+  gzerr << "Not implemented";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyHinge2Joint::GetAngle(int /*_index*/) const
 {
-  return this->btHinge2->getAngle1();
+  gzerr << "Not implemented";
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
@@ -129,9 +122,6 @@ void SimbodyHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
-  ((btHingeConstraint*)this->btHinge)->setAxis(vec);
-  */
 }
 
 //////////////////////////////////////////////////
@@ -162,37 +152,27 @@ double SimbodyHinge2Joint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void SimbodyHinge2Joint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btHinge2->setUpperLimit(_angle.Radian());
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
 void SimbodyHinge2Joint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btHinge2->setLowerLimit(_angle.Radian());
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyHinge2Joint::GetHighStop(int _index)
 {
-  btRotationalLimitMotor *motor =
-    this->btHinge2->getRotationalLimitMotor(_index);
-  if (motor)
-    return motor->m_hiLimit;
-
-  gzthrow("Unable to get high stop for axis _index[" << _index << "]");
-  return 0;
+  gzerr << "Not implemented";
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyHinge2Joint::GetLowStop(int _index)
 {
-  btRotationalLimitMotor *motor =
-    this->btHinge2->getRotationalLimitMotor(_index);
-  if (motor)
-    return motor->m_loLimit;
-
-  gzthrow("Unable to get high stop for axis _index[" << _index << "]");
-  return 0;
+  gzerr << "Not implemented";
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////

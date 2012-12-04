@@ -14,18 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap collision
+/* Desc: Cylinder shape
  * Author: Nate Koenig
- * Date: 8 May 2003
+ * Date: 14 Oct 2009
  */
 
-#ifndef _SIMBODYHEIGHTMAPGEOM_HH_
-#define _SIMBODYHEIGHTMAPGEOM_HH_
-#include <string>
+#ifndef _SIMBODY_CYLINDERSHAPE_HH_
+#define _SIMBODY_CYLINDERSHAPE_HH_
 
-#include "physics/HeightmapShape.hh"
 #include "physics/simbody/SimbodyPhysics.hh"
-#include "physics/Collision.hh"
+#include "physics/CylinderShape.hh"
 
 namespace gazebo
 {
@@ -35,17 +33,26 @@ namespace gazebo
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
 
-    /// \brief Height map collision
-    class SimbodyHeightmapShape : public HeightmapShape
+    /// \brief Cylinder collision
+    class SimbodyCylinderShape : public CylinderShape
     {
       /// \brief Constructor
-      public: SimbodyHeightmapShape(CollisionPtr _parent);
+      public: SimbodyCylinderShape(CollisionPtr _parent)
+              : CylinderShape(_parent) {}
 
       /// \brief Destructor
-      public: virtual ~SimbodyHeightmapShape();
+      public: virtual ~SimbodyCylinderShape() {}
 
-      /// \brief Load the heightmap
-      public: virtual void Init();
+      /// \brief Set the size of the cylinder
+      public: void SetSize(const double &_radius, const double &_length)
+              {
+                CylinderShape::SetSize(_radius, _length);
+                SimbodyCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<SimbodyCollision>(
+                    this->collisionParent);
+
+                // set collision shape
+              }
     };
     /// \}
   }

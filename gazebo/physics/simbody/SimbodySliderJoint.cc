@@ -31,7 +31,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodySliderJoint::SimbodySliderJoint(btDynamicsWorld *_world, BasePtr _parent)
+SimbodySliderJoint::SimbodySliderJoint(MultibodySystem *_world, BasePtr _parent)
     : SliderJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -61,53 +61,15 @@ void SimbodySliderJoint::Attach(LinkPtr _one, LinkPtr _two)
   if (!simbodyChildLink || !simbodyParentLink)
     gzthrow("Requires simbody bodies");
 
-  btVector3 anchor, axis1, axis2;
-  btTransform frame1, frame2;
-  frame1 = btTransform::getIdentity();
-  frame2 = btTransform::getIdentity();
-
-  math::Vector3 pivotA, pivotB;
-
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
-
-  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
-  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
-
-  std::cout << "AnchorPos[" << this->anchorPos << "]\n";
-  std::cout << "Slider PivotA[" << pivotA << "] PivotB[" << pivotB << "]\n";
-
-  frame1.setOrigin(btVector3(pivotA.x, pivotA.y, pivotA.z));
-  frame2.setOrigin(btVector3(pivotB.x, pivotB.y, pivotB.z));
-
-  frame1.getBasis().setEulerZYX(0, M_PI*0.5, 0);
-  frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
-
-  this->btSlider = new btSliderConstraint(
-      *simbodyChildLink->GetSimbodyLink(),
-      *simbodyParentLink->GetSimbodyLink(),
-      frame2, frame1, true);
-
-  // this->btSlider->setLowerAngLimit(0.0);
-  // this->btSlider->setUpperAngLimit(0.0);
-
-  double pos = this->btSlider->getLinearPos();
-  this->btSlider->setLowerLinLimit(pos);
-  this->btSlider->setUpperLinLimit(pos+0.9);
-
-  this->constraint = this->btSlider;
-
   // Add the joint to the world
-  this->world->addConstraint(this->btSlider, true);
 
   // Allows access to impulse
-  this->constraint->enableFeedback(true);
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodySliderJoint::GetAngle(int /*_index*/) const
 {
-  return static_cast<btSliderConstraint*>(this->constraint)->getLinearPos();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
@@ -120,7 +82,6 @@ double SimbodySliderJoint::GetVelocity(int /*_index*/) const
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetVelocity(int /*_index*/, double _angle)
 {
-  this->btSlider->setTargetLinMotorVelocity(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -132,59 +93,46 @@ void SimbodySliderJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetDamping(int /*index*/, const double _damping)
 {
-  this->btSlider->setDampingDirLin(_damping);
 }
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetForce(int /*_index*/, double _force)
 {
-  /*btVector3 hingeAxisLocal = this->btSlider->getAFrame().getBasis().getColumn(2); // z-axis of constraint frame
-  btVector3 hingeAxisWorld = this->btSlider->getRigidBodyA().getWorldTransform().getBasis() * hingeAxisLocal;
-
-  btVector3 hingeTorque = _torque * hingeAxisWorld;
-  */
-
-  btVector3 force(0, 0, _force);
-  this->constraint->getRigidBodyA().applyCentralForce(force);
-  this->constraint->getRigidBodyB().applyCentralForce(-force);
 }
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetHighStop(int /*_index*/,
                                     const math::Angle &/*_angle*/)
 {
-  // this->btSlider->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetLowStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  // this->btSlider->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodySliderJoint::GetHighStop(int /*_index*/)
 {
-  return this->btSlider->getUpperLinLimit();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodySliderJoint::GetLowStop(int /*_index*/)
 {
-  return this->btSlider->getLowerLinLimit();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetMaxForce(int /*_index*/, double _force)
 {
-  this->btSlider->setMaxLinMotorForce(_force);
 }
 
 //////////////////////////////////////////////////
 double SimbodySliderJoint::GetMaxForce(int /*_index*/)
 {
-  return this->btSlider->getMaxLinMotorForce();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////

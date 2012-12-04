@@ -26,8 +26,6 @@
 #include "physics/simbody/SimbodyJoint.hh"
 #include "physics/simbody/SimbodyPhysics.hh"
 
-class btPoint2PointConstraint;
-
 namespace gazebo
 {
   namespace physics
@@ -40,7 +38,7 @@ namespace gazebo
     class SimbodyBallJoint : public BallJoint<SimbodyJoint>
     {
       /// \brief Simbody Ball Joint Constructor
-      public: SimbodyBallJoint(btDynamicsWorld *_world, BasePtr _parent);
+      public: SimbodyBallJoint(MultibodySystem *_world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyBallJoint();
@@ -87,8 +85,6 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
-
-      private: btPoint2PointConstraint *btBall;
     };
 
     /// \}

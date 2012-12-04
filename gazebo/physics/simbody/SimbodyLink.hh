@@ -26,14 +26,10 @@
 #include "physics/simbody/SimbodyTypes.hh"
 #include "physics/Link.hh"
 
-class btRigidBody;
-
 namespace gazebo
 {
   namespace physics
   {
-    class SimbodyMotionState;
-
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \brief simbody physics engine wrapper
@@ -106,9 +102,6 @@ namespace gazebo
       /// \brief Set whether this body will collide with others in the model
       public: void SetSelfCollide(bool collide);
 
-      /// \brief Get the simbody rigid body
-      public: btRigidBody *GetSimbodyLink() const;
-
       /// \brief Set the linear damping factor
       public: virtual void SetLinearDamping(double damping);
 
@@ -147,9 +140,6 @@ namespace gazebo
       /// \copydoc Link::SetAutoDisable(bool)
       public: virtual void SetAutoDisable(bool _disable);
 
-      private: btCompoundShape *compoundShape;
-      private: SimbodyMotionState *motionState;
-      private: btRigidBody *rigidLink;
       private: SimbodyPhysicsPtr simbodyPhysics;
       protected: math::Pose pose;
     };

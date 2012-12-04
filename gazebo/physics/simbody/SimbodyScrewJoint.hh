@@ -29,8 +29,6 @@
 #include "physics/simbody/SimbodyJoint.hh"
 #include "physics/ScrewJoint.hh"
 
-class btSliderConstraint;
-
 namespace gazebo
 {
   namespace physics
@@ -43,7 +41,7 @@ namespace gazebo
     class SimbodyScrewJoint : public ScrewJoint<SimbodyJoint>
     {
       /// \brief Constructor
-      public: SimbodyScrewJoint(btDynamicsWorld *world, BasePtr _parent);
+      public: SimbodyScrewJoint(MultibodySystem *world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyScrewJoint();
@@ -98,8 +96,6 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
-
-      private: btSliderConstraint *btScrew;
     };
     /// \}
   }

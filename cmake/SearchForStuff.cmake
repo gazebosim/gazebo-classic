@@ -106,10 +106,10 @@ if (PKG_CONFIG_FOUND)
   
   #################################################
   # Find Simbody
-  message ("\n\nCMKAE_MODULE_PATH: ${CMAKE_MODULE_PATH}\n\n\n")
+  message ("\n\nCMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\n\n\n")
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
   find_package(Simbody REQUIRED)
-  if (Simbody_FOUND)
+  if (SIMBODY_FOUND)
     set (HAVE_Simbody TRUE)
   else()
     set (HAVE_Simbody FALSE)

@@ -59,7 +59,6 @@ namespace gazebo
                              const math::Vector3 &_posEnd);
 
       private: SimbodyPhysicsPtr physicsEngine;
-      private: btCollisionWorld::ClosestRayResultCallback rayCallback;
     };
     /// \}
   }

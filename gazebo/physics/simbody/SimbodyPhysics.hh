@@ -101,14 +101,8 @@ namespace gazebo
       public: virtual void ConvertMass(void *_engineMass,
                                        InertialPtr _inertial);
 
-      /// \brief Convert a simbody transform to a gazebo pose
-      public: static math::Pose ConvertPose(const btTransform &_bt);
-
-      /// \brief Convert a gazebo pose to a simbody transform
-      public: static btTransform ConvertPose(const math::Pose &_pose);
-
       /// \brief Register a joint with the dynamics world
-      public: btDynamicsWorld *GetDynamicsWorld() const
+      public: MultibodySystem *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
 
       /// \brief Set the gavity vector
@@ -116,11 +110,7 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
-      private: btBroadphaseInterface *broadPhase;
-      private: btDefaultCollisionConfiguration *collisionConfig;
-      private: btCollisionDispatcher *dispatcher;
-      private: btSequentialImpulseConstraintSolver *solver;
-      private: btDiscreteDynamicsWorld *dynamicsWorld;
+      private: MultibodySystem *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
 

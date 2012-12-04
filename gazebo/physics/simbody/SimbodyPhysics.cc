@@ -63,17 +63,13 @@ extern ContactAddedCallback gContactAddedCallback;
 extern ContactProcessedCallback gContactProcessedCallback;
 
 //////////////////////////////////////////////////
-bool ContactCallback(btManifoldPoint &/*_cp*/,
-    const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/,
-    int /*_index0*/, const btCollisionObjectWrapper * /*_obj1*/,
-    int /*_partId1*/, int /*_index1*/)
+bool ContactCallback()
 {
   return true;
 }
 
 //////////////////////////////////////////////////
-bool ContactProcessed(btManifoldPoint &/*_cp*/, void * /*_body0*/,
-                      void * /*_body1*/)
+bool ContactProcessed()
 {
   return true;
 }
@@ -82,40 +78,16 @@ bool ContactProcessed(btManifoldPoint &/*_cp*/, void * /*_body0*/,
 SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
-  this->collisionConfig = new btDefaultCollisionConfiguration();
-
-  this->dispatcher = new btCollisionDispatcher(this->collisionConfig);
-
-  this->broadPhase = new btDbvtBroadphase();
-
   // Create the dynamics solver
-  this->solver = new btSequentialImpulseConstraintSolver;
 
   // Instantiate the world
-  this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
-      this->broadPhase, this->solver, this->collisionConfig);
 
   // TODO: Enable this to do custom contact setting
-  gContactAddedCallback = ContactCallback;
-  gContactProcessedCallback = ContactProcessed;
 }
 
 //////////////////////////////////////////////////
 SimbodyPhysics::~SimbodyPhysics()
 {
-  delete this->broadPhase;
-  delete this->collisionConfig;
-  delete this->dispatcher;
-  delete this->solver;
-
-  // TODO: Fix this line
-  // delete this->dynamicsWorld;
-
-  this->broadPhase = NULL;
-  this->collisionConfig = NULL;
-  this->dispatcher = NULL;
-  this->solver = NULL;
-  this->dynamicsWorld = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -128,20 +100,7 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
   this->stepTimeDouble = simbodyElem->GetElement("dt")->GetValueDouble();
 
   math::Vector3 g = this->sdf->GetValueVector3("gravity");
-  this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
 
-  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
-
-  // Split impulse feature. This can leads to improper stacking of objects
-  info.m_splitImpulse = 1;
-  info.m_splitImpulsePenetrationThreshold = -0.02;
-
-  if (simbodyElem->HasElement("constraints"))
-  {
-    info.m_globalCfm =
-      simbodyElem->GetElement("constraints")->GetValueDouble("cfm");
-    info.m_erp = simbodyElem->GetElement("constraints")->GetValueDouble("erp");
-  }
 }
 
 //////////////////////////////////////////////////
@@ -163,15 +122,11 @@ void SimbodyPhysics::UpdateCollision()
 void SimbodyPhysics::UpdatePhysics()
 {
   // need to lock, otherwise might conflict with world resetting
-  this->physicsUpdateMutex->lock();
+  boost::mutex::scoped_lock lock(this->physicsUpdateMutex);
 
   common::Time currTime =  this->world->GetRealTime();
 
-  this->dynamicsWorld->stepSimulation(
-      (currTime - this->lastUpdateTime).Float(), 7, this->stepTimeDouble);
   this->lastUpdateTime = currTime;
-
-  this->physicsUpdateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -182,8 +137,8 @@ void SimbodyPhysics::Fini()
 //////////////////////////////////////////////////
 void SimbodyPhysics::SetStepTime(double _value)
 {
-  this->sdf->GetElement("ode")->GetElement(
-      "solver")->GetAttribute("dt")->Set(_value);
+  this->sdf->GetElement("simbody")->GetElement(
+      "solver")->GetAttribute("min_step_size")->Set(_value);
 
   this->stepTimeDouble = _value;
 }
@@ -259,20 +214,20 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 {
   JointPtr joint;
 
-  if (_type == "revolute")
-    joint.reset(new SimbodyHingeJoint(this->dynamicsWorld, _parent));
-  else if (_type == "universal")
-    joint.reset(new SimbodyUniversalJoint(this->dynamicsWorld, _parent));
-  else if (_type == "ball")
-    joint.reset(new SimbodyBallJoint(this->dynamicsWorld, _parent));
-  else if (_type == "prismatic")
-    joint.reset(new SimbodySliderJoint(this->dynamicsWorld, _parent));
-  else if (_type == "revolute2")
-    joint.reset(new SimbodyHinge2Joint(this->dynamicsWorld, _parent));
-  else if (_type == "screw")
-    joint.reset(new SimbodyScrewJoint(this->dynamicsWorld, _parent));
-  else
-    gzthrow("Unable to create joint of type[" << _type << "]");
+  // if (_type == "revolute")
+  //   joint.reset(new SimbodyHingeJoint(this->dynamicsWorld, _parent));
+  // else if (_type == "universal")
+  //   joint.reset(new SimbodyUniversalJoint(this->dynamicsWorld, _parent));
+  // else if (_type == "ball")
+  //   joint.reset(new SimbodyBallJoint(this->dynamicsWorld, _parent));
+  // else if (_type == "prismatic")
+  //   joint.reset(new SimbodySliderJoint(this->dynamicsWorld, _parent));
+  // else if (_type == "revolute2")
+  //   joint.reset(new SimbodyHinge2Joint(this->dynamicsWorld, _parent));
+  // else if (_type == "screw")
+  //   joint.reset(new SimbodyScrewJoint(this->dynamicsWorld, _parent));
+  // else
+  //   gzthrow("Unable to create joint of type[" << _type << "]");
 
   return joint;
 }
@@ -290,38 +245,9 @@ void SimbodyPhysics::ConvertMass(void * /*_engineMass*/,
 }
 
 //////////////////////////////////////////////////
-math::Pose SimbodyPhysics::ConvertPose(const btTransform &_bt)
-{
-  math::Pose pose;
-  pose.pos.x = _bt.getOrigin().getX();
-  pose.pos.y = _bt.getOrigin().getY();
-  pose.pos.z = _bt.getOrigin().getZ();
-
-  pose.rot.w = _bt.getRotation().getW();
-  pose.rot.x = _bt.getRotation().getX();
-  pose.rot.y = _bt.getRotation().getY();
-  pose.rot.z = _bt.getRotation().getZ();
-
-  return pose;
-}
-
-//////////////////////////////////////////////////
-btTransform SimbodyPhysics::ConvertPose(const math::Pose &_pose)
-{
-  btTransform trans;
-
-  trans.setOrigin(btVector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
-  trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                 _pose.rot.z, _pose.rot.w));
-  return trans;
-}
-
-//////////////////////////////////////////////////
 void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->GetAttribute("xyz")->Set(_gravity);
-  this->dynamicsWorld->setGravity(btVector3(_gravity.x,
-        _gravity.y, _gravity.z));
 }
 
 //////////////////////////////////////////////////

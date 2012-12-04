@@ -30,7 +30,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyBallJoint::SimbodyBallJoint(btDynamicsWorld *_world, BasePtr _parent)
+SimbodyBallJoint::SimbodyBallJoint(MultibodySystem *_world, BasePtr _parent)
     : BallJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -79,19 +79,9 @@ void SimbodyBallJoint::Attach(LinkPtr _one, LinkPtr _two)
   pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
   pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
 
-  this->btBall = new btPoint2PointConstraint(
-      *simbodyParentLink->GetSimbodyLink(),
-      *simbodyChildLink->GetSimbodyLink(),
-      btVector3(pivotA.x, pivotA.y, pivotA.z),
-      btVector3(pivotB.x, pivotB.y, pivotB.z));
-
-  this->constraint = this->btBall;
-
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
 
   // Allows access to impulse
-  this->constraint->enableFeedback(true);
 }
 
 /////////////////////////////////////////////////
@@ -144,33 +134,13 @@ math::Angle SimbodyBallJoint::GetAngleImpl(int /*_index*/) const
 void SimbodyBallJoint::SetHighStop(int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
-  if (this->btBall)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->btBall->setLimit(this->btBall->getLowerLimit(),
-    //                         _angle.Radian());
-  }
-  else
-  {
-    gzthrow("Joint must be created first");
-  }
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyBallJoint::SetLowStop(int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
-  if (this->btBall)
-  {
-    // this function has additional parameters that we may one day
-    // implement. Be warned that this function will reset them to default
-    // settings
-    // this->btBall->setLimit(-_angle.Radian(),
-    //                         this->btBall->getUpperLimit());
-  }
-  else
-    gzthrow("Joint must be created first");
+  gzerr << "Not implemented\n";
 }
 

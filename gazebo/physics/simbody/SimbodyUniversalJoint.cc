@@ -29,7 +29,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyUniversalJoint::SimbodyUniversalJoint(btDynamicsWorld *_world,
+SimbodyUniversalJoint::SimbodyUniversalJoint(MultibodySystem *_world,
   BasePtr _parent) : UniversalJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -57,20 +57,9 @@ void SimbodyUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
   math::Vector3 axis1 = axisElem->GetValueVector3("xyz");
   math::Vector3 axis2 = axisElem->GetValueVector3("xyz");
 
-  this->btUniversal = new btUniversalConstraint(
-      *simbodyParentLink->GetSimbodyLink(),
-      *simbodyChildLink->GetSimbodyLink(),
-      btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
-      btVector3(axis1.x, axis1.y, axis1.z),
-      btVector3(axis2.x, axis2.y, axis2.z));
-
-  this->constraint = this->btUniversal;
-
   // Add the joint to the world
-  this->world->addConstraint(this->btUniversal, true);
 
   // Allows access to impulse
-  this->btUniversal->enableFeedback(true);
 }
 
 //////////////////////////////////////////////////
@@ -89,8 +78,7 @@ void SimbodyUniversalJoint::SetAnchor(int /*_index*/,
 //////////////////////////////////////////////////
 math::Vector3 SimbodyUniversalJoint::GetAxis(int _index) const
 {
-  btVector3 axis = this->btUniversal->getAxis(_index);
-  return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -109,10 +97,7 @@ void SimbodyUniversalJoint::SetAxis(int /*_index*/,
 //////////////////////////////////////////////////
 math::Angle SimbodyUniversalJoint::GetAngle(int _index) const
 {
-  if (_index == 0)
-    return this->btUniversal->getAngle1();
-  else
-    return this->btUniversal->getAngle2();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
@@ -150,48 +135,19 @@ double SimbodyUniversalJoint::GetMaxForce(int /*_index*/)
 //////////////////////////////////////////////////
 void SimbodyUniversalJoint::SetHighStop(int _index, const math::Angle &_angle)
 {
-  if (this->btUniversal)
-  {
-    if (_index == 0)
-      this->btUniversal->setUpperLimit(
-        _angle.Radian(), this->GetHighStop(1).Radian());
-    else
-      this->btUniversal->setUpperLimit(
-        this->GetHighStop(0).Radian(), _angle.Radian());
-  }
-  else
-    gzthrow("Joint must be created first");
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyUniversalJoint::SetLowStop(int _index, const math::Angle &_angle)
 {
-  if (this->btUniversal)
-  {
-    if (_index == 0)
-      this->btUniversal->setLowerLimit(
-        _angle.Radian(), this->GetLowStop(1).Radian());
-    else
-      this->btUniversal->setUpperLimit(
-        this->GetLowStop(0).Radian(), _angle.Radian());
-  }
-  else
-    gzthrow("Joint must be created first");
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
 {
   math::Angle result;
-
-  if (this->btUniversal)
-  {
-    btRotationalLimitMotor *motor;
-    motor = this->btUniversal->getRotationalLimitMotor(_index);
-    result = motor->m_hiLimit;
-  }
-  else
-    gzthrow("Joint must be created first");
 
   return result;
 }
@@ -200,15 +156,6 @@ math::Angle SimbodyUniversalJoint::GetHighStop(int _index)
 math::Angle SimbodyUniversalJoint::GetLowStop(int _index)
 {
   math::Angle result;
-
-  if (this->btUniversal)
-  {
-    btRotationalLimitMotor *motor;
-    motor = this->btUniversal->getRotationalLimitMotor(_index);
-    result = motor->m_loLimit;
-  }
-  else
-    gzthrow("Joint must be created first");
 
   return result;
 }

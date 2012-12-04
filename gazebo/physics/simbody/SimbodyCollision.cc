@@ -80,36 +80,17 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 math::Box SimbodyCollision::GetBoundingBox() const
 {
   math::Box result;
-  if (this->collisionShape)
-  {
-    btVector3 btMin, btMax;
-    this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
-
-    result.min.Set(btMin.x(), btMin.y(), btMin.z());
-    result.max.Set(btMax.x(), btMax.y(), btMax.z());
-  }
   return result;
 }
 
 //////////////////////////////////////////////////
-void SimbodyCollision::SetCollisionShape(btCollisionShape *_shape)
+void SimbodyCollision::SetCollisionShape(ContactGeometry *_shape)
 {
   this->collisionShape = _shape;
-
-  // btmath::Vector3 vec;
-  // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
-
-  // this->mass.SetCoG(this->GetRelativePose().pos);
 }
 
 //////////////////////////////////////////////////
-btCollisionShape *SimbodyCollision::GetCollisionShape() const
+ContactGeometry *SimbodyCollision::GetCollisionShape() const
 {
   return this->collisionShape;
-}
-
-//////////////////////////////////////////////////
-void SimbodyCollision::SetCompoundShapeIndex(int /*_index*/)
-{
-  // this->compoundShapeIndex = 0;
 }

@@ -1,8 +1,13 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${Simbody_INCLUDE_DIRS})
+message("includes: ${Simbody_INCLUDE_DIR}\n\n")
+message("library dirs: ${Simbody_LIB_DIR}\n\n")
+message("libraries: ${Simbody_LIBRARIES}\n\n")
+message("cflags: ${Simbody_CFLAGS}\n\n")
 
-link_directories(${Simbody_LIBRARY_DIRS})
+include_directories(${Simbody_INCLUDE_DIR})
+
+link_directories(${Simbody_LIB_DIR})
 
 add_definitions(${Simbody_CFLAGS})
 
@@ -10,7 +15,6 @@ set (sources
   SimbodyPhysics.cc
   SimbodyLink.cc
   SimbodyCollision.cc
-  SimbodyMotionState.cc
   SimbodyTrimeshShape.cc
   SimbodyJoint.cc
   SimbodyHingeJoint.cc

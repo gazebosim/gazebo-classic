@@ -28,8 +28,6 @@
 #include "physics/simbody/SimbodyJoint.hh"
 #include "physics/simbody/SimbodyPhysics.hh"
 
-class btHingeConstraint;
-
 namespace gazebo
 {
   namespace physics
@@ -42,7 +40,7 @@ namespace gazebo
     class SimbodyHingeJoint : public HingeJoint<SimbodyJoint>
     {
       ///  Constructor
-      public: SimbodyHingeJoint(btDynamicsWorld *world, BasePtr _parent);
+      public: SimbodyHingeJoint(MultibodySystem *world, BasePtr _parent);
 
       /// Destructor
       public: virtual ~SimbodyHingeJoint();
@@ -103,8 +101,6 @@ namespace gazebo
 
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngleImpl(int _index) const;
-
-      private: btHingeConstraint *btHinge;
     };
     /// \}
   }

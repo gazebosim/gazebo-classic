@@ -35,7 +35,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyScrewJoint::SimbodyScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
+SimbodyScrewJoint::SimbodyScrewJoint(MultibodySystem *_world, BasePtr _parent)
     : ScrewJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -66,42 +66,15 @@ void SimbodyScrewJoint::Attach(LinkPtr _one, LinkPtr _two)
   if (!simbodyChildLink || !simbodyParentLink)
     gzthrow("Requires simbody bodies");
 
-  btTransform frame1, frame2;
-  frame1 = btTransform::getIdentity();
-  frame2 = btTransform::getIdentity();
-
-  math::Vector3 pivotA, pivotB;
-
-  pivotA = this->anchorPos - this->parentLink->GetWorldPose().pos;
-  pivotB = this->anchorPos - this->childLink->GetWorldPose().pos;
-
-  pivotA = this->parentLink->GetWorldPose().rot.RotateVectorReverse(pivotA);
-  pivotB = this->childLink->GetWorldPose().rot.RotateVectorReverse(pivotB);
-
-  frame1.setOrigin(btVector3(pivotA.x, pivotA.y, pivotA.z));
-  frame2.setOrigin(btVector3(pivotB.x, pivotB.y, pivotB.z));
-
-  frame1.getBasis().setEulerZYX(0, M_PI*0.5, 0);
-  frame2.getBasis().setEulerZYX(0, M_PI*0.5, 0);
-
-  this->btScrew = new btSliderConstraint(
-      *simbodyChildLink->GetSimbodyLink(),
-      *simbodyParentLink->GetSimbodyLink(),
-      frame2, frame1, true);
-
-  this->constraint = this->btScrew;
-
   // Add the joint to the world
-  this->world->addConstraint(this->constraint);
 
   // Allows access to impulse
-  this->constraint->enableFeedback(true);
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyScrewJoint::GetAngle(int /*_index*/) const
 {
-  return this->btScrew->getLinearPos();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
@@ -144,25 +117,23 @@ void SimbodyScrewJoint::SetForce(int /*_index*/, double /*_force*/)
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetHighStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btScrew->setUpperLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetLowStop(int /*_index*/, const math::Angle &_angle)
 {
-  this->btScrew->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyScrewJoint::GetHighStop(int /*_index*/)
 {
-  return this->btScrew->getUpperLinLimit();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyScrewJoint::GetLowStop(int /*_index*/)
 {
-  return this->btScrew->getLowerLinLimit();
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
