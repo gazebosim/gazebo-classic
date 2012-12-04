@@ -362,8 +362,8 @@ namespace gazebo
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
 
-      /// \brief joint damping_coefficient
-      protected: double damping_coefficient;
+      /// \brief joint dampingUoefficient
+      protected: double dampingUoefficient;
 
       /// \brief Angle used when the joint is paret of a static model.
       private: math::Angle staticAngle;

@@ -96,9 +96,9 @@ void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEHingeJoint::SetDamping(int /*index*/, double _damping)
 {
-  this->damping_coefficient = _damping;
+  this->dampingUoefficient = _damping;
   // use below when ode version is fixed
-  // dJointSetDamping(this->jointId, this->damping_coefficient);
+  // dJointSetDamping(this->jointId, this->dampingUoefficient);
   this->applyDamping = physics::Joint::ConnectJointUpdate(
     boost::bind(&ODEHingeJoint::ApplyDamping, this));
 }
@@ -106,8 +106,8 @@ void ODEHingeJoint::SetDamping(int /*index*/, double _damping)
 //////////////////////////////////////////////////
 void ODEHingeJoint::ApplyDamping()
 {
-  double damping_force = -this->damping_coefficient * this->GetVelocity(0);
-  this->SetForce(0, damping_force);
+  double dampingUorce = -this->dampingUoefficient * this->GetVelocity(0);
+  this->SetForce(0, dampingUorce);
 }
 
 //////////////////////////////////////////////////
