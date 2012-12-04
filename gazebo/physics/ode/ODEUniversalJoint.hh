@@ -49,6 +49,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetDamping(int _index, double _damping);
 
+      /// \brief callback to apply damping force to joint.
+      public: void ApplyDamping();
+
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;
 

@@ -39,6 +39,7 @@ ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEUniversalJoint::~ODEUniversalJoint()
 {
+  physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -87,8 +88,20 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetDamping(int /*_index*/, double _damping)
 {
-  dJointSetDamping(this->jointId, _damping);
+  this->damping_coefficient = _damping;
+  // use below when ode version is fixed
+  // dJointSetDamping(this->jointId, _damping);
+  this->applyDamping = physics::Joint::ConnectJointUpdate(
+    boost::bind(&ODEUniversalJoint::ApplyDamping, this));
 }
+
+//////////////////////////////////////////////////
+void ODEUniversalJoint::ApplyDamping()
+{
+  double damping_force = -this->damping_coefficient * this->GetVelocity(0);
+  this->SetForce(0, damping_force);
+}
+
 
 //////////////////////////////////////////////////
 math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
