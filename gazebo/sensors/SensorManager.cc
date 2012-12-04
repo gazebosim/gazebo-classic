@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
-#include "rendering/RenderEngine.hh"
 #include "sensors/Sensor.hh"
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"

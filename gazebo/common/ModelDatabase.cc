@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#include "gazebo/sdf/sdf.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
@@ -240,6 +242,9 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 
     // Tell the background thread to grab the models from online.
     this->updateCacheCondition.notify_one();
+
+    // Let the other thread start downloading.
+    common::Time::MSleep(100);
 
     // Wait for the thread to finish.
     boost::mutex::scoped_lock lock(this->updateMutex);
@@ -455,6 +460,21 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
     if (modelXML)
     {
       TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
+      TiXmlElement *sdfSearch = sdfXML;
+
+      // Find the SDF element that matches our current SDF version.
+      while (sdfSearch)
+      {
+        if (sdfSearch->Attribute("version") &&
+            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+        {
+          sdfXML = sdfSearch;
+          break;
+        }
+
+        sdfSearch = sdfSearch->NextSiblingElement("sdf");
+      }
+
       if (sdfXML)
       {
         result = path + "/" + sdfXML->GetText();

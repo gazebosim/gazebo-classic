@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ Time Time::MSleep(unsigned int _ms)
 {
   Time result;
 
-  if (Time(clock_resolution) <= Time(0, _ms*1000000))
+  if (Time(0, _ms*1000000) >= clock_resolution)
   {
     struct timespec interval;
     struct timespec remainder;
@@ -157,7 +157,7 @@ Time Time::NSleep(unsigned int _ns)
 {
   Time result;
 
-  if (Time(clock_resolution) <= Time(0, _ns))
+  if (Time(0, _ns) >= clock_resolution)
   {
     struct timespec nsleep;
     struct timespec remainder;
@@ -183,7 +183,7 @@ Time Time::NSleep(Time _time)
 {
   Time result;
 
-  if (Time(clock_resolution) <= _time)
+  if (_time >= clock_resolution)
   {
     struct timespec nsleep;
     struct timespec remainder;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,10 +76,6 @@ namespace gazebo
 
       /// \brief Finalize the camera
       protected: virtual void Fini();
-
-      /// \brief Set whether the sensor is active or not
-      /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(bool _value);
 
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,12 +146,6 @@ void CameraSensor::Fini()
     this->camera->Fini();
   this->camera.reset();
   this->scene.reset();
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::SetActive(bool value)
-{
-  Sensor::SetActive(value);
 }
 
 //////////////////////////////////////////////////
