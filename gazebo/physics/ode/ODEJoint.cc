@@ -102,8 +102,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
       if (dynamicsElem->HasElement("damping"))
       {
-        sdf::ElementPtr dampingElem = dynamicsElem->GetElement("damping");
-        this->SetDamping(0, dampingElem->GetValueDouble());
+        this->SetDamping(0, dynamicsElem->GetValueDouble("damping"));
       }
       if (dynamicsElem->HasElement("friction"))
       {
