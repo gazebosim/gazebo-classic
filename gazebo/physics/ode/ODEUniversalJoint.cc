@@ -88,7 +88,7 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetDamping(int /*_index*/, double _damping)
 {
-  this->dampingUoefficient = _damping;
+  this->dampingCoefficient = _damping;
   // use below when ode version is fixed
   // dJointSetDamping(this->jointId, _damping);
   this->applyDamping = physics::Joint::ConnectJointUpdate(
@@ -98,8 +98,8 @@ void ODEUniversalJoint::SetDamping(int /*_index*/, double _damping)
 //////////////////////////////////////////////////
 void ODEUniversalJoint::ApplyDamping()
 {
-  double dampingUorce = -this->dampingUoefficient * this->GetVelocity(0);
-  this->SetForce(0, dampingUorce);
+  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
+  this->SetForce(0, dampingForce);
 }
 
 
