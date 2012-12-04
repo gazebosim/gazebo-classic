@@ -42,15 +42,27 @@ ModelRightMenu::ModelRightMenu()
   // this->followAction->setStatusTip(tr("Follow the selection"));
   // connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
 
-  this->moveToAction = new QAction(tr("Move To"), this);
-  this->moveToAction->setStatusTip(tr("Move camera to the selection"));
-  connect(this->moveToAction, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
+  this->moveToAct= new QAction(tr("Move To"), this);
+  this->moveToAct->setStatusTip(tr("Move camera to the selection"));
+  connect(this->moveToAct, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
 
   this->transparentAct = new QAction(tr("Transparent"), this);
   this->transparentAct->setStatusTip(tr("Make model transparent"));
   this->transparentAct->setCheckable(true);
   connect(this->transparentAct, SIGNAL(triggered()), this,
           SLOT(OnTransparent()));
+
+  this->showCollisionAct = new QAction(tr("Collisions"), this);
+  this->showCollisionAct->setStatusTip(tr("Show collisions objects"));
+  this->showCollisionAct->setCheckable(true);
+  connect(this->showCollisionAct, SIGNAL(triggered()), this,
+          SLOT(OnShowCollision()));
+
+  this->showJointsAct = new QAction(tr("Joints"), this);
+  this->showJointsAct->setStatusTip(tr("Show joints"));
+  this->showJointsAct->setCheckable(true);
+  connect(this->showJointsAct, SIGNAL(triggered()), this,
+          SLOT(OnShowJoints()));
 
   // Create the delete action
   g_deleteAct = new DeleteAction(tr("Delete"), this);
@@ -60,11 +72,6 @@ ModelRightMenu::ModelRightMenu()
   connect(g_deleteAct, SIGNAL(triggered()), this,
           SLOT(OnDelete()));
 
-  // this->showCollisionAction = new QAction(tr("Show Collision"), this);
-  // this->showCollisionAction->setStatusTip(tr("Show Collision Entity"));
-  // this->showCollisionAction->setCheckable(true);
-  // connect(this->showCollisionAction, SIGNAL(triggered()), this,
-  //         SLOT(OnShowCollision()));
 
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
@@ -72,12 +79,6 @@ ModelRightMenu::ModelRightMenu()
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
 
-
-  // this->showJointsAction = new QAction(tr("Joints"), this);
-  // this->showJointsAction->setStatusTip(tr("Show joints"));
-  // this->showJointsAction->setCheckable(true);
-  // connect(this->showJointsAction, SIGNAL(triggered()), this,
-  //         SLOT(OnShowJoints()));
 
   // this->showCOMAction = new QAction(tr("Center of Mass"), this);
   // this->showCOMAction->setStatusTip(tr("Show Center of Mass"));
@@ -99,14 +100,17 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
 
   QMenu menu;
   // menu.addAction(this->snapBelowAction);
-  menu.addAction(this->moveToAction);
-  menu.addAction(this->transparentAct);
+  menu.addAction(this->moveToAct);
+
+  QMenu *viewMenu = menu.addMenu(tr("View"));
+  viewMenu->addAction(this->transparentAct);
+  viewMenu->addAction(this->showCollisionAct);
+  viewMenu->addAction(this->showJointsAct);
+
   menu.addSeparator();
   menu.addAction(g_deleteAct);
 
   // menu.addAction(this->followAction);
-  // menu.addAction(this->showCollisionAction);
-  // menu.addAction(this->showJointsAction);
   // menu.addAction(this->showCOMAction);
   // menu.addAction(this->skeletonAction);
 
@@ -115,15 +119,20 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   else
     this->transparentAct->setChecked(false);
 
+  if (this->showCollisionsActionState[this->modelName])
+    this->showCollisionAct->setChecked(true);
+  else
+    this->showCollisionAct->setChecked(false);
+
+  if (this->showJointsActionState[this->modelName])
+    this->showJointsAct->setChecked(true);
+  else
+    this->showJointsAct->setChecked(false);
+
   // if (this->skeletonActionState[this->modelName])
   //   this->skeletonAction->setChecked(true);
   // else
   //   this->skeletonAction->setChecked(false);
-
-  // if (this->showCollisionsActionState[this->modelName])
-  //   this->showCollisionAction->setChecked(true);
-  // else
-  //   this->showCollisionAction->setChecked(false);
 
   menu.exec(_pt);
 }
@@ -146,9 +155,9 @@ void ModelRightMenu::OnMoveTo()
 void ModelRightMenu::OnShowCollision()
 {
   this->showCollisionsActionState[this->modelName] =
-    this->showCollisionAction->isChecked();
+    this->showCollisionAct->isChecked();
 
-  if (this->showCollisionAction->isChecked())
+  if (this->showCollisionAct->isChecked())
     this->requestMsg = msgs::CreateRequest("show_collision", this->modelName);
   else
     this->requestMsg = msgs::CreateRequest("hide_collision", this->modelName);
@@ -160,9 +169,9 @@ void ModelRightMenu::OnShowCollision()
 void ModelRightMenu::OnShowJoints()
 {
   this->showJointsActionState[this->modelName] =
-    this->showJointsAction->isChecked();
+    this->showJointsAct->isChecked();
 
-  if (this->showJointsAction->isChecked())
+  if (this->showJointsAct->isChecked())
     this->requestMsg = msgs::CreateRequest("show_joints", this->modelName);
   else
     this->requestMsg = msgs::CreateRequest("hide_joints", this->modelName);

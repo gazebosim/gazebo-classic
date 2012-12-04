@@ -189,3 +189,21 @@ void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
 {
   TopicManager::Instance()->GetTopicNamespaces(_namespaces);
 }
+
+/////////////////////////////////////////////////
+void transport::request(const std::string &_worldName,
+                        const std::string &_request,
+                        const std::string &_data)
+{
+  boost::unique_lock<boost::mutex> lock(requestMutex);
+  g_response = NULL;
+  g_request = &_request;
+
+  NodePtr node = NodePtr(new Node());
+  node->Init(_worldName);
+
+  PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
+  msgs::Request *request = msgs::CreateRequest(_request, _data);
+  requestPub->Publish(*request);
+  delete *request;
+}

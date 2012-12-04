@@ -426,42 +426,57 @@ void MainWindow::OnFullScreen(bool _value)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewReset()
+void MainWindow::Reset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->SetWorldPose(math::Pose(5, -5, 2, 0, GZ_DTOR(11.31), GZ_DTOR(135)));
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewGrid()
+void MainWindow::ShowCollisions()
+{
+  if (g_showCollisionsAct->isChecked())
+    transport::request("default", "show_collision", "all");
+  else
+    transport::request("default", "hide_collision", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowGrid()
 {
   msgs::Scene msg;
   msg.set_name("default");
-  msg.set_grid(g_viewGridAct->isChecked());
+  msg.set_grid(g_showGridAct->isChecked());
   this->scenePub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewContacts()
+void MainWindow::ShowContacts()
 {
-  gazebo::rendering::Events::viewContacts(g_viewContactsAct->isChecked());
+  msgs::Request *msg;
+  if (g_showContactsAct->isChecked())
+    msg = msgs::CreateRequest("show_contact", "all");
+  else
+    msg = msgs::CreateRequest("hide_contact", "all");
+  this->requestPub->Publish(*msg);
+  delete msg;
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewFullScreen()
+void MainWindow::FullScreen()
 {
   g_fullscreen = !g_fullscreen;
   gui::Events::fullScreen(g_fullscreen);
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewFPS()
+void MainWindow::FPS()
 {
   gui::Events::fps();
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ViewOrbit()
+void MainWindow::Orbit()
 {
   gui::Events::orbit();
 }
@@ -608,37 +623,44 @@ void MainWindow::CreateActions()
   connect(g_dirLghtCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateDirectionalLight()));
 
-  g_viewResetAct = new QAction(tr("Reset View"), this);
-  g_viewResetAct->setStatusTip(tr("Move camera to pose"));
-  connect(g_viewResetAct, SIGNAL(triggered()), this,
-      SLOT(ViewReset()));
+  g_resetAct = new QAction(tr("Reset Camera"), this);
+  g_resetAct->setStatusTip(tr("Move camera to pose"));
+  connect(g_resetAct, SIGNAL(triggered()), this,
+      SLOT(Reset()));
 
-  g_viewGridAct = new QAction(tr("Grid"), this);
-  g_viewGridAct->setStatusTip(tr("View Grid"));
-  g_viewGridAct->setCheckable(true);
-  g_viewGridAct->setChecked(true);
-  connect(g_viewGridAct, SIGNAL(triggered()), this,
-          SLOT(ViewGrid()));
+  g_showCollisionsAct = new QAction(tr("Collisions"), this);
+  g_showCollisionsAct->setStatusTip(tr("Show Collisions"));
+  g_showCollisionsAct->setCheckable(true);
+  g_showCollisionsAct->setChecked(false);
+  connect(g_showCollisionsAct, SIGNAL(triggered()), this,
+          SLOT(ShowCollisions()));
 
-  g_viewContactsAct = new QAction(tr("Contacts"), this);
-  g_viewContactsAct->setStatusTip(tr("View Contacts"));
-  g_viewContactsAct->setCheckable(true);
-  g_viewContactsAct->setChecked(false);
-  connect(g_viewContactsAct, SIGNAL(triggered()), this,
-          SLOT(ViewContacts()));
+  g_showGridAct = new QAction(tr("Grid"), this);
+  g_showGridAct->setStatusTip(tr("Show Grid"));
+  g_showGridAct->setCheckable(true);
+  g_showGridAct->setChecked(true);
+  connect(g_showGridAct, SIGNAL(triggered()), this,
+          SLOT(ShowGrid()));
 
-  g_viewFullScreenAct = new QAction(tr("Full Screen"), this);
-  g_viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
-  connect(g_viewFullScreenAct, SIGNAL(triggered()), this,
-      SLOT(ViewFullScreen()));
+  g_showContactsAct = new QAction(tr("Contacts"), this);
+  g_showContactsAct->setStatusTip(tr("Show Contacts"));
+  g_showContactsAct->setCheckable(true);
+  g_showContactsAct->setChecked(false);
+  connect(g_showContactsAct, SIGNAL(triggered()), this,
+          SLOT(ShowContacts()));
 
-  // g_viewFPSAct = new QAction(tr("FPS View Control"), this);
-  // g_viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
-  // connect(g_viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
+  g_fullScreenAct = new QAction(tr("Full Screen"), this);
+  g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
+  connect(g_fullScreenAct, SIGNAL(triggered()), this,
+      SLOT(FullScreen()));
 
-  g_viewOrbitAct = new QAction(tr("Orbit View Control"), this);
-  g_viewOrbitAct->setStatusTip(tr("Orbit View Style"));
-  connect(g_viewOrbitAct, SIGNAL(triggered()), this, SLOT(ViewOrbit()));
+  // g_fpsAct = new QAction(tr("FPS View Control"), this);
+  // g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
+  // connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
+
+  g_orbitAct = new QAction(tr("Orbit View Control"), this);
+  g_orbitAct->setStatusTip(tr("Orbit View Style"));
+  connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 }
 
 /////////////////////////////////////////////////
@@ -673,14 +695,15 @@ void MainWindow::CreateMenus()
   this->editMenu->addAction(g_resetWorldAct);
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
-  this->viewMenu->addAction(g_viewGridAct);
-  this->viewMenu->addAction(g_viewContactsAct);
+  this->viewMenu->addAction(g_showGridAct);
+  this->viewMenu->addAction(g_showContactsAct);
+  this->viewMenu->addAction(g_showCollisionsAct);
   this->viewMenu->addSeparator();
-  this->viewMenu->addAction(g_viewResetAct);
-  this->viewMenu->addAction(g_viewFullScreenAct);
+  this->viewMenu->addAction(g_resetAct);
+  this->viewMenu->addAction(g_fullScreenAct);
   this->viewMenu->addSeparator();
-  // this->viewMenu->addAction(g_viewFPSAct);
-  this->viewMenu->addAction(g_viewOrbitAct);
+  // this->viewMenu->addAction(g_fpsAct);
+  this->viewMenu->addAction(g_orbitAct);
 
   this->menuBar->addSeparator();
 
@@ -717,7 +740,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 {
   if (_msg->has_fullscreen() && _msg->fullscreen())
   {
-    ViewFullScreen();
+    this->FullScreen();
   }
 
   if (_msg->has_camera())

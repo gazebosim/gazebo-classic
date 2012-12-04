@@ -85,6 +85,11 @@ namespace gazebo
     /// \return The response to the request.  Can be empty.
     msgs::Response request(const std::string &_worldName,
                            const msgs::Request &_request);
+
+    void request(const std::string &_worldName,
+                 const std::string &_request,
+                 const std::string &_data = "");
+
     /// \}
   }
 }

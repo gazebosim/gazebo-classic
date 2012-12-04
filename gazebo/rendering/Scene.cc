@@ -15,14 +15,15 @@
  *
 */
 #include <boost/lexical_cast.hpp>
+
 #include "gazebo/rendering/skyx/include/SkyX.h"
+#include "gazebo/rendering/ogre_gazebo.h"
 
-#include "rendering/ogre_gazebo.h"
-#include "msgs/msgs.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/sdf/sdf.hh"
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
@@ -95,9 +96,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
-
-  this->connections.push_back(
-      Events::ConnectViewContacts(boost::bind(&Scene::ViewContacts, this, _1)));
 
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this);
@@ -1734,19 +1732,37 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         this->RemoveVisual(iter->second);
     }
   }
+  else if (_msg->request() == "show_contact")
+  {
+    this->ShowContacts(true);
+  }
+  else if (_msg->request() == "hide_contact")
+  {
+    this->ShowContacts(false);
+  }
   else if (_msg->request() == "show_collision")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCollision(true);
+    if (_msg->data() == "all")
+      this->ShowCollisions(true);
     else
-      gzerr << "Unable to find visual[" << _msg->data() << "]\n";
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCollision(true);
+      else
+        gzerr << "Unable to find visual[" << _msg->data() << "]\n";
+    }
   }
   else if (_msg->request() == "hide_collision")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCollision(false);
+    if (_msg->data() == "all")
+      this->ShowCollisions(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCollision(false);
+    }
   }
   else if (_msg->request() == "show_joints")
   {
@@ -2263,7 +2279,17 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
 }
 
 /////////////////////////////////////////////////
-void Scene::ViewContacts(bool _view)
+void Scene::ShowCollisions(bool _show)
+{
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->ShowCollision(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowContacts(bool _view)
 {
   ContactVisualPtr vis = boost::shared_dynamic_cast<ContactVisual>(
       this->visuals["__GUIONLY_CONTACT_VISUAL__"]);

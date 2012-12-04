@@ -47,14 +47,14 @@ namespace gazebo
 
       private: std::string modelName;
 
-      private: QAction *moveToAction;
+      private: QAction *moveToAct;
       private: QAction *transparentAct;
+      private: QAction *showCollisionAct;
+      private: QAction *showJointsAct;
 
       private: QAction *snapBelowAction;
       private: QAction *followAction;
-      private: QAction *showCollisionAction;
       private: QAction *skeletonAction;
-      private: QAction *showJointsAction;
       private: QAction *showCOMAction;
 
       private: transport::NodePtr node;
