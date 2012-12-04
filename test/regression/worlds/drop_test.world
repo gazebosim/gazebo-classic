@@ -26,6 +26,7 @@
     <include><uri>model://ground_plane</uri></include>
     <model name="box">
       <pose>0 0 10.5 0 0 0</pose>
+      <allow_auto_disable>false</allow_auto_disable>
       <link name="link">
         <inertial>
           <inertia>
@@ -77,6 +78,7 @@
     </model>
     <model name="sphere">
       <pose>0 1.5 10.5 0 0 0</pose>
+      <allow_auto_disable>false</allow_auto_disable>
       <link name="link">
         <inertial>
           <inertia>
@@ -128,6 +130,7 @@
     </model>
     <model name="cylinder">
       <pose>0 -1.5 10.5 0 0 0</pose>
+      <allow_auto_disable>false</allow_auto_disable>
       <link name="link">
         <inertial>
           <inertia>

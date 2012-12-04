@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig & Andrew Howard
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,6 +150,8 @@ class ServerFixture : public testing::Test
                    gazebo::physics::get_world()->GetName(), false);
 
                this->server->Run();
+               rendering::remove_scene(gazebo::physics::get_world()->GetName());
+
                ASSERT_NO_THROW(this->server->Fini());
                delete this->server;
                this->server = NULL;
