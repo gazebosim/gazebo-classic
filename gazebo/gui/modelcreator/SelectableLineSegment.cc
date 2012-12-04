@@ -106,7 +106,7 @@ void SelectableLineSegment::DisconnectLine(SelectableLineSegment *line)
 
 /////////////////////////////////////////////////
 bool SelectableLineSegment::sceneEventFilter(QGraphicsItem *_watched,
-  QEvent *_event)
+    QEvent *_event)
 {
   CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
   if (corner == NULL) return false;
@@ -147,82 +147,51 @@ bool SelectableLineSegment::sceneEventFilter(QGraphicsItem *_watched,
 
   if (corner->GetMouseState() == CornerGrabber::kMouseMoving )
   {
-    this->CreateCustomPath(event->pos(), corner);
+    QPointF scenePosition = corner->mapToScene(event->pos());
+    this->CreateCustomPath(scenePosition, corner);
 
     CornerGrabber* weldedCorner = corner->GetWeldedCorner();
     if (weldedCorner)
     {
-      QPointF scenePosition = corner->mapToScene(event->pos());
       if (this->adjacentLineSegments[0]
         && this->adjacentLineSegments[0]->HasCorner(weldedCorner))
       {
-        QPointF p = this->adjacentLineSegments[0]->mapToScene(
-          this->adjacentLineSegments[0]->GetCorner(1)->GetCenterPoint());
-        adjacentLineSegments[0]->TranslateCorner(scenePosition-p,1);
+        this->adjacentLineSegments[0]->SetCornerPosition(scenePosition, 1);
+        this->adjacentLineSegments[0]->update();
       }
       else if (this->adjacentLineSegments[1]
         && this->adjacentLineSegments[1]->HasCorner(weldedCorner))
       {
-        QPointF p = this->adjacentLineSegments[1]->mapToScene(
-          this->adjacentLineSegments[0]->GetCorner(1)->GetCenterPoint());
-        this->adjacentLineSegments[0]->TranslateCorner(scenePosition-p,1);
+        this->adjacentLineSegments[1]->SetCornerPosition(scenePosition, 0);
+        this->adjacentLineSegments[1]->update();
       }
     }
     this->update();
   }
-
   return true;
 }
 
-void SelectableLineSegment::TranslateCorner(QPointF _translation,
-  int _cornerIndex)
+/////////////////////////////////////////////////
+void SelectableLineSegment::SetCornerPosition(QPointF _position,
+    int _cornerIndex)
 {
-
-  CornerGrabber *corner = this->corners[_cornerIndex];
-  if (corner)
+  if (this->corners[_cornerIndex])
   {
-    QPointF newPoint = mapFromScene(lastPointPos[_cornerIndex] + _translation);
-    corner->SetMouseDownX(newPoint.x());
-    corner->SetMouseDownY(newPoint.y());
-    corner->SetMouseState(CornerGrabber::kMouseMoving );
+    CreateCustomPath(_position, this->corners[_cornerIndex]);
+    return;
+  }
+}
 
-    qreal lineEndX = 0;
-    qreal lineEndY = 0;
-    qreal lineStartX = 0;
-    qreal lineStartY = 0;
-
-    if (corner == this->corners[0])
-    {
-      lineStartY =  this->mapToScene(this->corners[0]->GetCenterPoint()).y()
-        + _translation.y();
-      lineStartX =  this->mapToScene(this->corners[0]->GetCenterPoint()).x()
-        + _translation.x();
-      lineEndY = this->mapToScene(this->corners[1]->GetCenterPoint()).y();
-      lineEndX = this->mapToScene(this->corners[1]->GetCenterPoint()).x();
-    }
-    else
-    {
-      lineStartY = this->mapToScene(this->corners[0]->GetCenterPoint()).y();
-      lineStartX = this->mapToScene(this->corners[0]->GetCenterPoint()).x();
-
-      lineEndY =  this->mapToScene(this->corners[1]->GetCenterPoint()).y()
-        + _translation.y();
-      lineEndX =  this->mapToScene(this->corners[1]->GetCenterPoint()).x()
-        + _translation.x();
-    }
-
-    this->lineEnd0.setX(mapFromScene(lineStartX, lineStartY).x());
-    this->lineEnd0.setY(mapFromScene(lineStartX, lineStartY).y());
-
-    this->lineEnd1.setX(mapFromScene(lineEndX,lineEndY).x());
-    this->lineEnd1.setY(mapFromScene(lineEndX,lineEndY).y());
-
-    lastPointPos[0] = lineEnd0;
-    lastPointPos[1] = lineEnd1;
-
-    this->EnclosePath(lineStartX, lineStartY, lineEndX, lineEndY);
-
-    this->UpdateCornerPositions();
+/////////////////////////////////////////////////
+void SelectableLineSegment::TranslateCorner(QPointF _translation,
+    int _cornerIndex)
+{
+  if (this->corners[_cornerIndex])
+  {
+    QPointF newPos = this->mapToScene(
+        this->corners[_cornerIndex]->GetCenterPoint()) + _translation;
+    CreateCustomPath(newPos, this->corners[_cornerIndex]);
+    return;
   }
 }
 
@@ -262,16 +231,10 @@ void SelectableLineSegment::CreateCustomPath(QPointF _mouseLocation,
   qreal lineStartX = 0;
   qreal lineStartY = 0;
 
-  qreal mouseX =0, mouseY = 0;
-
-  QPointF scenePosition = _corner->mapToScene(_mouseLocation);
-  mouseY = scenePosition.y();
-  mouseX = scenePosition.x();
-
   if (_corner == this->corners[0])
   {
-    lineStartY =  mouseY;
-    lineStartX =  mouseX;
+    lineStartY = _mouseLocation.y();
+    lineStartX = _mouseLocation.x();
     lineEndY = this->mapToScene(this->corners[1]->GetCenterPoint()).y();
     lineEndX = this->mapToScene(this->corners[1]->GetCenterPoint()).x();
   }
@@ -279,9 +242,8 @@ void SelectableLineSegment::CreateCustomPath(QPointF _mouseLocation,
   {
     lineStartY = this->mapToScene(this->corners[0]->GetCenterPoint()).y();
     lineStartX = this->mapToScene(this->corners[0]->GetCenterPoint()).x();
-
-    lineEndY =  mouseY;
-    lineEndX =  mouseX;
+    lineEndY =  _mouseLocation.y();
+    lineEndX =  _mouseLocation.x();
   }
 
   this->lineEnd0.setX(mapFromScene(lineStartX, lineStartY).x());
@@ -290,9 +252,6 @@ void SelectableLineSegment::CreateCustomPath(QPointF _mouseLocation,
   this->lineEnd1.setX(mapFromScene(lineEndX,lineEndY).x());
   this->lineEnd1.setY(mapFromScene(lineEndX,lineEndY).y());
 
-  lastPointPos[0] = lineEnd0;
-  lastPointPos[1] = lineEnd1;
-
   this->EnclosePath(lineStartX, lineStartY, lineEndX, lineEndY);
 
   this->UpdateCornerPositions();
@@ -300,7 +259,7 @@ void SelectableLineSegment::CreateCustomPath(QPointF _mouseLocation,
 
 /////////////////////////////////////////////////
 void SelectableLineSegment::EnclosePath(qreal _lineStartX, qreal _lineStartY,
-                                        qreal _lineEndX, qreal _lineEndY)
+    qreal _lineEndX, qreal _lineEndY)
 {
   /* to draw the select region around the line,
   define a large box(rect p1,p2,p3,p4) around each end of the line.
@@ -319,22 +278,22 @@ void SelectableLineSegment::EnclosePath(qreal _lineStartX, qreal _lineStartY,
   QList<QPointF> pointsEnd;
 
   pointsStart.append(QPointF(_lineStartX - this->xCornerGrabBuffer,
-                     _lineStartY - this->yCornerGrabBuffer));
+      _lineStartY - this->yCornerGrabBuffer));
   pointsStart.append(QPointF(_lineStartX + this->xCornerGrabBuffer,
-                     _lineStartY - this->yCornerGrabBuffer));
+      _lineStartY - this->yCornerGrabBuffer));
   pointsStart.append(QPointF(_lineStartX + this->xCornerGrabBuffer,
-                     _lineStartY + this->yCornerGrabBuffer));
+      _lineStartY + this->yCornerGrabBuffer));
   pointsStart.append(QPointF(_lineStartX - this->xCornerGrabBuffer,
-                     _lineStartY + this->yCornerGrabBuffer));
+      _lineStartY + this->yCornerGrabBuffer));
 
   pointsEnd.append(QPointF(_lineEndX - this->xCornerGrabBuffer,
-                   _lineEndY - this->yCornerGrabBuffer));
+      _lineEndY - this->yCornerGrabBuffer));
   pointsEnd.append(QPointF(_lineEndX + this->xCornerGrabBuffer,
-                   _lineEndY - this->yCornerGrabBuffer));
+      _lineEndY - this->yCornerGrabBuffer));
   pointsEnd.append(QPointF(_lineEndX + this->xCornerGrabBuffer,
-                   _lineEndY + this->yCornerGrabBuffer));
+      _lineEndY + this->yCornerGrabBuffer));
   pointsEnd.append(QPointF(_lineEndX - this->xCornerGrabBuffer,
-                   _lineEndY + this->yCornerGrabBuffer));
+      _lineEndY + this->yCornerGrabBuffer));
 
   qreal minDistance = 0 ;
   qreal secondMinDistance = 0;

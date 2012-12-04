@@ -24,10 +24,11 @@ class CornerGrabber;
 
 class SelectableLineSegment : public QGraphicsPolygonItem
 {
-
   public: SelectableLineSegment(QPointF _start, QPointF _end);
 
   public: ~SelectableLineSegment();
+
+  public: void SetCornerPosition(QPointF _position, int _cornerIndex);
 
   public: void TranslateCorner(QPointF _translation, int _cornerIndex);
 
@@ -46,10 +47,10 @@ class SelectableLineSegment : public QGraphicsPolygonItem
   private: void CreateCustomPath(QPointF _mouseLocation, CornerGrabber*);
 
   private: void EnclosePath(qreal _lineStartX,qreal _lineStartY,
-    qreal _lineEndX, qreal _lineEndY);
+      qreal _lineEndX, qreal _lineEndY);
 
   protected:  void paint (QPainter *painter,
-    const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+      const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
   protected: void hoverEnterEvent ( QGraphicsSceneHoverEvent *_event);
 
@@ -98,8 +99,6 @@ class SelectableLineSegment : public QGraphicsPolygonItem
   private: CornerGrabber*  corners[2];
 
   private: QPolygonF selectRegion;
-
-  private: QPointF lastPointPos[2];
 
   private: SelectableLineSegment *adjacentLineSegments[2];
 

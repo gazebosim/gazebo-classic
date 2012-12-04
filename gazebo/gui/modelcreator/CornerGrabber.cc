@@ -69,6 +69,18 @@ void CornerGrabber::SetMouseDownY(qreal _y)
 }
 
 /////////////////////////////////////////////////
+qreal CornerGrabber::GetMouseDownX()
+{
+  return this->mouseDownX;
+}
+
+/////////////////////////////////////////////////
+qreal CornerGrabber::GetMouseDownY()
+{
+  return this->mouseDownY;
+}
+
+/////////////////////////////////////////////////
 void CornerGrabber::WeldCorner(CornerGrabber *_corner)
 {
   if (!weldedCorner)

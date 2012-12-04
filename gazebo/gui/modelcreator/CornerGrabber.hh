@@ -36,6 +36,10 @@ class CornerGrabber : public QGraphicsItem
 
   public: void SetMouseDownY(qreal _y);
 
+  public: qreal GetMouseDownX();
+
+  public: qreal GetMouseDownY();
+
   public: void WeldCorner(CornerGrabber *_corner);
 
   public: CornerGrabber *GetWeldedCorner();

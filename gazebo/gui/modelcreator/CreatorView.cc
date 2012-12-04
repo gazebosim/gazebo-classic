@@ -41,14 +41,27 @@ CreatorView::~CreatorView()
 /////////////////////////////////////////////////
 void CreatorView::mousePressEvent(QMouseEvent *_event)
 {
-  this->drawMode = Wall;
-
   QGraphicsView::mousePressEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void CreatorView::mouseReleaseEvent(QMouseEvent *_event)
 {
+  /// TODO for testing, delete me later
+  if (_event->button() == Qt::RightButton)
+  {
+    if (this->drawMode == Wall)
+    {
+      qDebug() << "set draw mode to none";
+      this->drawMode = None;
+    }
+    else {
+      qDebug() << "set draw mode to wall";
+      this->drawMode = Wall;
+    }
+    return;
+  }
+
   switch (drawMode)
   {
     case None:
