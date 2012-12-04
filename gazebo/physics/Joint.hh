@@ -27,6 +27,7 @@
 #include <boost/any.hpp>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -366,6 +367,9 @@ namespace gazebo
 
       /// \brief Angle used when the joint is paret of a static model.
       private: math::Angle staticAngle;
+
+      /// \brief apply damping for adding viscous damping forces on updates
+      protected: gazebo::event::ConnectionPtr applyDamping;
     };
     /// \}
   }
