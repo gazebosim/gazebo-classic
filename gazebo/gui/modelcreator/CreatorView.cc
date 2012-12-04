@@ -24,13 +24,12 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 CreatorView::CreatorView(QWidget *_parent)
-  : QGraphicsView(_parent)
+  : QGraphicsView(_parent), currentLine(0)
 {
-  this->setObjectName("creatorScene");
+  this->setObjectName("creatorView");
 
   this->drawMode = None;
   this->drawInProgress = false;
-
 }
 
 /////////////////////////////////////////////////
@@ -43,7 +42,8 @@ CreatorView::~CreatorView()
 void CreatorView::mousePressEvent(QMouseEvent *_event)
 {
   this->drawMode = Wall;
-  qDebug() << " mouse press event " << mapToScene(_event->pos());
+
+  QGraphicsView::mousePressEvent(_event);
 }
 
 /////////////////////////////////////////////////
@@ -54,26 +54,22 @@ void CreatorView::mouseReleaseEvent(QMouseEvent *_event)
     case None:
       break;
     case Wall:
-      if (!drawInProgress)
-      {
-        drawInProgress = true;
-        lastLinePos = _event->pos();
-      }
       this->DrawLines(_event->pos());
       break;
     default:
       break;
   }
+
+  if (drawMode != None && !drawInProgress)
+    drawInProgress = true;
+
+  QGraphicsView::mouseReleaseEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void CreatorView::mouseMoveEvent(QMouseEvent *_event)
 {
-
-  QPointF point = mapToScene(lastLinePos) - mapToScene(_event->pos());
-  QPoint p(static_cast<int>(point.x()), static_cast<int>(point.y()));
-
-  qDebug() << " mouse move event " << mapToScene(_event->pos()) << mapToScene(lastLinePos) << p;
+  QPointF delta = _event->pos() - lastMousePos;
   switch (drawMode)
   {
     case None:
@@ -81,34 +77,46 @@ void CreatorView::mouseMoveEvent(QMouseEvent *_event)
     case Wall:
       if (drawInProgress)
       {
-        SelectableLineSegment* line = lineList.back();
-        if (line)
-        {
-          line->SetCornerPosition(p, 1);
-        }
+        if (currentLine)
+          currentLine->TranslateCorner(delta, 1);
       }
       break;
     default:
       break;
   }
+  lastMousePos = _event->pos();
+  QGraphicsView::mouseMoveEvent(_event);
 }
 
-
 /////////////////////////////////////////////////
-void CreatorView::mouseDoubleClickEvent(QMouseEvent *_event)
+void CreatorView::mouseDoubleClickEvent(QMouseEvent */*_event*/)
 {
   drawMode =  None;
   drawInProgress = false;
+
+  if (currentLine)
+  {
+    lineList.pop_back();
+    scene()->removeItem(currentLine);
+    delete currentLine;
+    currentLine = NULL;
+  }
 }
 
 /////////////////////////////////////////////////
 void CreatorView::DrawLines(QPoint _pos)
 {
-  QPointF pointStart = mapToScene(lastLinePos);
-  QPointF pointEnd = mapToScene(_pos);
-  SelectableLineSegment* line = new SelectableLineSegment(
+  QPointF pointStart = mapToScene(_pos);
+  QPointF pointEnd = pointStart;
+  SelectableLineSegment* newLine = new SelectableLineSegment(
     pointStart, pointEnd);
-  lastLinePos = _pos;
-  lineList.push_back(line);
-  scene()->addItem(line);
+
+  if (currentLine)
+    currentLine->ConnectLine(newLine);
+  currentLine = newLine;
+
+  lastLineCornerPos = _pos;
+  lastMousePos = _pos;
+  lineList.push_back(newLine);
+  scene()->addItem(newLine);
 }

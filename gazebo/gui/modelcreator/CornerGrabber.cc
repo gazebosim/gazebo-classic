@@ -26,7 +26,8 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent) :
   outterBorderPen(),
   width(6),
   height(6),
-  mouseButtonState(kMouseReleased)
+  mouseButtonState(kMouseReleased),
+  weldedCorner(0)
 {
   this->setParentItem(_parent);
 
@@ -55,14 +56,43 @@ QPointF CornerGrabber::GetCenterPoint()
   return QPointF(pos().x() + this->width/2, pos().y() + this->height/2);
 }
 
+/////////////////////////////////////////////////
 void CornerGrabber::SetMouseDownX(qreal _x)
 {
   this->mouseDownX = _x;
 }
 
+/////////////////////////////////////////////////
 void CornerGrabber::SetMouseDownY(qreal _y)
 {
   this->mouseDownY = _y;
+}
+
+/////////////////////////////////////////////////
+void CornerGrabber::WeldCorner(CornerGrabber *_corner)
+{
+  if (!weldedCorner)
+  {
+    weldedCorner = _corner;
+    weldedCorner->WeldCorner(this);
+  }
+}
+
+/////////////////////////////////////////////////
+CornerGrabber *CornerGrabber::GetWeldedCorner()
+{
+  return weldedCorner;
+}
+
+/////////////////////////////////////////////////
+void CornerGrabber::UnweldCorner()
+{
+  CornerGrabber *tmpCorner = this->weldedCorner;
+  this->weldedCorner = NULL;
+  if (tmpCorner)
+  {
+    tmpCorner->UnweldCorner();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -116,12 +146,12 @@ QRectF CornerGrabber::boundingRect() const
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *,
+void CornerGrabber::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
   this->outterBorderPen.setCapStyle(Qt::SquareCap);
   this->outterBorderPen.setStyle(Qt::SolidLine);
-  painter->setPen(this->outterBorderPen);
+  _painter->setPen(this->outterBorderPen);
 
   QPointF topLeft (0, 0);
   QPointF bottomRight (this->width, this->height);
@@ -130,5 +160,5 @@ void CornerGrabber::paint (QPainter *painter, const QStyleOptionGraphicsItem *,
 
   QBrush brush (Qt::SolidPattern);
   brush.setColor (this->outterBorderColor);
-  painter->fillRect(rect,brush);
+  _painter->fillRect(rect,brush);
 }

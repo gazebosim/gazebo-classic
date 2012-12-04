@@ -29,7 +29,17 @@ class SelectableLineSegment : public QGraphicsPolygonItem
 
   public: ~SelectableLineSegment();
 
-  public: void SetCornerPosition(QPoint _pos, int cornerIndex);
+  public: void TranslateCorner(QPointF _translation, int _cornerIndex);
+
+  public: void ConnectLine(SelectableLineSegment *_line);
+
+  public: void DisconnectLine(SelectableLineSegment *_line);
+
+  public: SelectableLineSegment *GetAdjacentLine(int _index);
+
+  public: CornerGrabber *GetCorner(int _index);
+
+  public: bool HasCorner(CornerGrabber *_corner);
 
   private: void UpdateCornerPositions();
 
@@ -88,6 +98,10 @@ class SelectableLineSegment : public QGraphicsPolygonItem
   private: CornerGrabber*  corners[2];
 
   private: QPolygonF selectRegion;
+
+  private: QPointF lastPointPos[2];
+
+  private: SelectableLineSegment *adjacentLineSegments[2];
 
 };
 

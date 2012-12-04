@@ -36,6 +36,12 @@ class CornerGrabber : public QGraphicsItem
 
   public: void SetMouseDownY(qreal _y);
 
+  public: void WeldCorner(CornerGrabber *_corner);
+
+  public: CornerGrabber *GetWeldedCorner();
+
+  public: void UnweldCorner();
+
   /// \brief Mouse states
   public: enum mouseStates {kMouseReleased=0, kMouseDown, kMouseMoving};
 
@@ -73,6 +79,8 @@ class CornerGrabber : public QGraphicsItem
   private: qreal height;
 
   private: int mouseButtonState;
+
+  private: CornerGrabber* weldedCorner;
 };
 
 #endif // CORNERGRABBER_H

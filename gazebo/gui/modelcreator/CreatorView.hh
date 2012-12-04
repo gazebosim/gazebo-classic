@@ -39,14 +39,6 @@ namespace gazebo
 
       public: enum modelTypes {None, Wall, Window, Door, Stairs};
 
-/*      protected: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
-
-      protected: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
-
-      protected: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
-
-      protected: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);*/
-
       protected: void mousePressEvent(QMouseEvent *_event);
 
       protected: void mouseReleaseEvent(QMouseEvent *_event);
@@ -63,7 +55,11 @@ namespace gazebo
 
       private: std::vector<SelectableLineSegment*> lineList;
 
-      private: QPoint lastLinePos;
+      private: SelectableLineSegment *currentLine;
+
+      private: QPoint lastLineCornerPos;
+
+      private: QPoint lastMousePos;
     };
   }
 }
