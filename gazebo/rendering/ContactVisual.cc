@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,8 +80,8 @@ void ContactVisual::Update()
   double magScale = 100;
   double vMax = 0.5;
   double vMin = 0.1;
-  double vRange = vMax - vMin; // 0.4
-  double offset = vRange - vMin; // 0.3
+  double vRange = vMax - vMin;
+  double offset = vRange - vMin;
 
   unsigned int c = 0;
   for (int i = 0; i < this->contactsMsg->contact_size(); i++)

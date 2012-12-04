@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1439,7 +1439,7 @@ void Scene::PreRender()
   while (pIter != this->poseMsgs.end())
   {
     Visual_M::iterator iter = this->visuals.find((*pIter)->name());
-    if (iter != this->visuals.end())
+    if (iter != this->visuals.end() && iter->second)
     {
       // If an object is selected, don't let the physics engine move it.
       if (!this->selectedVis || this->selectionMode != "move" ||
