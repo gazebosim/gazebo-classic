@@ -198,11 +198,6 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
     }
   }
 
-  std::vector<std::string> filenames;
-  filenames.push_back("left.png");
-  filenames.push_back("right.png");
-  this->SaveFrame(filenames);
-
   if (publish)
     this->imagePub->Publish(msg);
 }
