@@ -35,9 +35,12 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   nameLayout->addWidget(wallLabel);
   nameLayout->addWidget(wallNameLabel);
 
-
   QLabel *lengthLabel = new QLabel(tr("Length: "));
-  QSpinBox *lengthSpinBox = new QSpinBox;
+  this->lengthSpinBox = new QDoubleSpinBox;
+  this->lengthSpinBox->setRange(-1000, 1000);
+  this->lengthSpinBox->setSingleStep(0.001);
+  this->lengthSpinBox->setDecimals(3);
+  this->lengthSpinBox->setValue(0.000);
 
   QHBoxLayout *lengthLayout = new QHBoxLayout;
   lengthLayout->addWidget(lengthLabel);
@@ -54,13 +57,33 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QLabel *startXLabel = new QLabel(tr("x: "));
   QLabel *startYLabel = new QLabel(tr("y: "));
-  QSpinBox *startXSpinBox = new QSpinBox;
-  QSpinBox *startYSpinBox = new QSpinBox;
+
+  this->startXSpinBox = new QDoubleSpinBox;
+  this->startXSpinBox->setRange(-1000, 1000);
+  this->startXSpinBox->setSingleStep(0.001);
+  this->startXSpinBox->setDecimals(3);
+  this->startXSpinBox->setValue(0.000);
+
+  this->startYSpinBox = new QDoubleSpinBox;
+  this->startYSpinBox->setRange(-1000, 1000);
+  this->startYSpinBox->setSingleStep(0.001);
+  this->startYSpinBox->setDecimals(3);
+  this->startYSpinBox->setValue(0.000);
 
   QLabel *endXLabel = new QLabel(tr("x: "));
   QLabel *endYLabel = new QLabel(tr("y: "));
-  QSpinBox *endXSpinBox = new QSpinBox;
-  QSpinBox *endYSpinBox = new QSpinBox;
+
+  this->endXSpinBox = new QDoubleSpinBox;
+  this->endXSpinBox->setRange(-1000, 1000);
+  this->endXSpinBox->setSingleStep(0.001);
+  this->endXSpinBox->setDecimals(3);
+  this->endXSpinBox->setValue(0.000);
+
+  this->endYSpinBox = new QDoubleSpinBox;
+  this->endYSpinBox->setRange(-1000, 1000);
+  this->endYSpinBox->setSingleStep(0.001);
+  this->endYSpinBox->setDecimals(3);
+  this->endYSpinBox->setValue(0.000);
 
   QGridLayout *startXYLayout = new QGridLayout;
   startXYLayout->addWidget(startXLabel, 0, 0);
@@ -84,7 +107,6 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   xyLayout->addLayout(startXYLayout);
   xyLayout->addLayout(endXYLayout);
 
-
   QVBoxLayout * lengthGroupLayout = new QVBoxLayout;
   lengthGroupLayout->addLayout(lengthLayout);
   lengthGroupLayout->addWidget(lengthCaptionLabel);
@@ -95,9 +117,19 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   lengthGroupBox->setLayout(lengthGroupLayout);
 
   QLabel *heightLabel = new QLabel(tr("Height: "));
-  QSpinBox *heightSpinBox = new QSpinBox;
+  this->heightSpinBox = new QDoubleSpinBox;
+  this->heightSpinBox->setRange(-1000, 1000);
+  this->heightSpinBox->setSingleStep(0.001);
+  this->heightSpinBox->setDecimals(3);
+  this->heightSpinBox->setValue(0.000);
+
   QLabel *thicknessLabel = new QLabel(tr("Thickness "));
-  QSpinBox *thicknessSpinBox = new QSpinBox;
+  this->thicknessSpinBox = new QDoubleSpinBox;
+  this->thicknessSpinBox->setRange(-1000, 1000);
+  this->thicknessSpinBox->setSingleStep(0.001);
+  this->thicknessSpinBox->setDecimals(3);
+  this->thicknessSpinBox->setValue(0.000);
+
   QGridLayout *heightThicknessLayout = new QGridLayout;
   heightThicknessLayout->addWidget(heightLabel, 0, 0);
   heightThicknessLayout->addWidget(heightSpinBox, 0, 1);
@@ -105,7 +137,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   heightThicknessLayout->addWidget(thicknessSpinBox, 1, 1);
 
   QLabel *materialLabel = new QLabel(tr("Material: "));
-  QComboBox *materialComboBox = new QComboBox;
+  this->materialComboBox = new QComboBox;
   materialComboBox->addItem(QString("Concrete"));
 
   QHBoxLayout *materialLayout = new QHBoxLayout;
@@ -120,7 +152,6 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(OKButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
-
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
@@ -137,6 +168,31 @@ WallInspectorDialog::~WallInspectorDialog()
 {
 }
 
+/////////////////////////////////////////////////
+double WallInspectorDialog::GetLength()
+{
+  return this->lengthSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+math::Vector2d WallInspectorDialog::GetStartPosition()
+{
+  return math::Vector2d(this->startXSpinBox->value(),
+      this->startYSpinBox->value());
+}
+
+/////////////////////////////////////////////////
+math::Vector2d WallInspectorDialog::GetEndPosition()
+{
+  return math::Vector2d(this->endXSpinBox->value(),
+      this->endYSpinBox->value());
+}
+
+/////////////////////////////////////////////////
+std::string WallInspectorDialog::GetMaterial()
+{
+  return this->materialComboBox->currentText().toStdString();
+}
 
 /////////////////////////////////////////////////
 void WallInspectorDialog::OnCancel()

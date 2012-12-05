@@ -18,6 +18,7 @@
 #ifndef _WALL_INSPECTOR_DIALOG_HH_
 #define _WALL_INSPECTOR_DIALOG_HH_
 
+#include "math/Vector2d.hh"
 #include "gui/qt.h"
 
 namespace gazebo
@@ -32,11 +33,35 @@ namespace gazebo
 
       public: ~WallInspectorDialog();
 
+      public: double GetLength();
+
+      public: math::Vector2d GetStartPosition();
+
+      public: math::Vector2d GetEndPosition();
+
+      public: std::string GetMaterial();
+
       private slots: void OnCancel();
 
       private slots: void OnOK();
 
+      private: QDoubleSpinBox *startXSpinBox;
+
+      private: QDoubleSpinBox *startYSpinBox;
+
+      private: QDoubleSpinBox *endXSpinBox;
+
+      private: QDoubleSpinBox *endYSpinBox;
+
+      private: QDoubleSpinBox *heightSpinBox;
+
+      private: QDoubleSpinBox *thicknessSpinBox;
+
       private: QLabel* wallNameLabel;
+
+      private: QDoubleSpinBox *lengthSpinBox;
+
+      private: QComboBox *materialComboBox;
    };
  }
 }

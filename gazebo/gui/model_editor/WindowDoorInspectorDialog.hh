@@ -18,6 +18,7 @@
 #ifndef _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 #define _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
 
+#include "math/Vector2d.hh"
 #include "gui/qt.h"
 
 namespace gazebo
@@ -31,9 +32,19 @@ namespace gazebo
       public: enum type {WINDOW, DOOR};
 
       public: WindowDoorInspectorDialog(int _type = WINDOW,
-                                        QWidget *_parent = 0);
+          QWidget *_parent = 0);
 
       public: ~WindowDoorInspectorDialog();
+
+      public: double GetWidth();
+
+      public: double GetHeight();
+
+      public: double GetLength();
+
+      public: math::Vector2d GetPosition();
+
+      public: std::string GetType();
 
       private slots: void OnCancel();
 
@@ -44,6 +55,18 @@ namespace gazebo
       private: int modelType;
 
       private: std::string modelTypeStr;
+
+      private: QDoubleSpinBox *widthSpinBox;
+
+      private: QDoubleSpinBox *lengthSpinBox;
+
+      private: QDoubleSpinBox *heightSpinBox;
+
+      private: QDoubleSpinBox *positionXSpinBox;
+
+      private: QDoubleSpinBox *positionYSpinBox;
+
+      private: QComboBox *typeComboBox;
    };
  }
 }

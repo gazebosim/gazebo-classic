@@ -112,11 +112,11 @@ BuildingEditorPalette::~BuildingEditorPalette()
 void BuildingEditorPalette::OnDiscard()
 {
   int ret = QMessageBox::warning(this, tr("Discard"),
-                              tr("Are you sure you want to discard\n"
-                              "your model? All of your work will\n"
-                              "be lost."),
-                              QMessageBox::Discard | QMessageBox::Cancel,
-                              QMessageBox::Discard);
+      tr("Are you sure you want to discard\n"
+      "your model? All of your work will\n"
+      "be lost."),
+      QMessageBox::Discard | QMessageBox::Cancel,
+      QMessageBox::Discard);
 
   switch (ret)
   {
@@ -149,8 +149,8 @@ void BuildingEditorPalette::OnSave()
 void BuildingEditorPalette::OnFinish()
 {
 //  FinishModelDialog dialog(this);
-  WindowDoorInspectorDialog dialog(0, this);
-//  WallInspectorDialog dialog(this);
+//  WindowDoorInspectorDialog dialog(0, this);
+  WallInspectorDialog dialog(this);
   dialog.exec();
 
 }

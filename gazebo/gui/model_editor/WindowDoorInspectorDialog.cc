@@ -15,6 +15,7 @@
  *
 */
 
+#include "math/Vector2d.hh"
 #include "WindowDoorInspectorDialog.hh"
 
 using namespace gazebo;
@@ -25,7 +26,6 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("windowDoorInspectorDialog");
-
 
   this->modelType = _type;
 
@@ -49,9 +49,23 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   QLabel *lengthLabel = new QLabel(tr("Length: "));
   QLabel *heightLabel = new QLabel(tr("Height: "));
 
-  QSpinBox *widthSpinBox = new QSpinBox;
-  QSpinBox *lengthSpinBox = new QSpinBox;
-  QSpinBox *heightSpinBox = new QSpinBox;
+  this->widthSpinBox = new QDoubleSpinBox;
+  this->widthSpinBox->setRange(-1000, 1000);
+  this->widthSpinBox->setSingleStep(0.001);
+  this->widthSpinBox->setDecimals(3);
+  this->widthSpinBox->setValue(0.000);
+
+  this->lengthSpinBox = new QDoubleSpinBox;
+  this->lengthSpinBox->setRange(-1000, 1000);
+  this->lengthSpinBox->setSingleStep(0.001);
+  this->lengthSpinBox->setDecimals(3);
+  this->lengthSpinBox->setValue(0.000);
+
+  this->heightSpinBox = new QDoubleSpinBox;
+  this->heightSpinBox->setRange(-1000, 1000);
+  this->heightSpinBox->setSingleStep(0.001);
+  this->heightSpinBox->setDecimals(3);
+  this->heightSpinBox->setValue(0.000);
 
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
@@ -67,8 +81,17 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   QLabel *positionXLabel = new QLabel(tr("x: "));
   QLabel *positionYLabel = new QLabel(tr("y: "));
 
-  QSpinBox *positionXSpinBox = new QSpinBox;
-  QSpinBox *positionYSpinBox = new QSpinBox;
+  this->positionXSpinBox = new QDoubleSpinBox;
+  this->positionXSpinBox->setRange(-1000, 1000);
+  this->positionXSpinBox->setSingleStep(0.001);
+  this->positionXSpinBox->setDecimals(3);
+  this->positionXSpinBox->setValue(0.000);
+
+  this->positionYSpinBox = new QDoubleSpinBox;
+  this->positionYSpinBox->setRange(-1000, 1000);
+  this->positionYSpinBox->setSingleStep(0.001);
+  this->positionYSpinBox->setDecimals(3);
+  this->positionYSpinBox->setValue(0.000);
 
   QHBoxLayout *positionLayout = new QHBoxLayout;
   positionLayout->addWidget(positionXLabel);
@@ -80,8 +103,8 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   positionGroupBox->setLayout(positionLayout);
 
   QLabel *typeLabel = new QLabel(tr("Type: "));
-  QComboBox *typeComboBox = new QComboBox;
-  typeComboBox->addItem(QString("Single"));
+  this->typeComboBox = new QComboBox;
+  this->typeComboBox->addItem(QString("Single"));
 
   QHBoxLayout *typeLayout = new QHBoxLayout;
   typeLayout->addWidget(typeLabel);
@@ -96,15 +119,12 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _type,
   buttonsLayout->addWidget(OKButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
-
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
   mainLayout->addWidget(sizeGroupBox);
   mainLayout->addWidget(positionGroupBox);
   mainLayout->addLayout(typeLayout);
   mainLayout->addLayout(buttonsLayout);
-
-
 
   this->setLayout(mainLayout);
 }
@@ -114,6 +134,36 @@ WindowDoorInspectorDialog::~WindowDoorInspectorDialog()
 {
 }
 
+/////////////////////////////////////////////////
+double WindowDoorInspectorDialog::GetWidth()
+{
+  return this->widthSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double WindowDoorInspectorDialog::GetLength()
+{
+  return this->lengthSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double WindowDoorInspectorDialog::GetHeight()
+{
+  return this->heightSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+math::Vector2d WindowDoorInspectorDialog::GetPosition()
+{
+  return math::Vector2d(this->positionXSpinBox->value(),
+      this->positionYSpinBox->value());
+}
+
+/////////////////////////////////////////////////
+std::string WindowDoorInspectorDialog::GetType()
+{
+  return this->typeComboBox->currentText().toStdString();
+}
 
 /////////////////////////////////////////////////
 void WindowDoorInspectorDialog::OnCancel()
