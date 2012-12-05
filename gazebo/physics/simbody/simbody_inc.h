@@ -20,10 +20,10 @@
 
 // This disables warning messages for ODE
 #pragma GCC system_header
-#include <SimTKcommon.h>
-#include <SimTKsimbody.h>
-#include <SimTKmath.h>
-#include <Simbody.h>
-using namespace SimTK;
+// #include <SimTKcommon.h>
+// #include <SimTKsimbody.h>
+// #include <SimTKmath.h>
+// #include <Simbody.h>
+// using namespace SimTK;
 
 #endif

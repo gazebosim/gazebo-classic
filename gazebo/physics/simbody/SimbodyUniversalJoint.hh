@@ -38,7 +38,8 @@ namespace gazebo
     class SimbodyUniversalJoint : public UniversalJoint<SimbodyJoint>
     {
       /// \brief Constructor
-      public: SimbodyUniversalJoint(MultibodySystem *world, BasePtr _parent);
+      public: SimbodyUniversalJoint(SimTK::MultibodySystem *world,
+                                    BasePtr _parent);
 
       /// \brief Destuctor
       public: virtual ~SimbodyUniversalJoint();

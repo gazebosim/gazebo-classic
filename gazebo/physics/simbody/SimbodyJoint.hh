@@ -99,7 +99,7 @@ namespace gazebo
                                         const boost::any &/*_value*/)
               {gzerr << "Not implement in Simbody\n";}
 
-      protected: MultibodySystem *world;
+      protected: SimTK::MultibodySystem *world;
     };
     /// \}
   }

@@ -37,7 +37,7 @@ namespace gazebo
     class SimbodyScrewJoint : public ScrewJoint<SimbodyJoint>
     {
       /// \brief Constructor
-      public: SimbodyScrewJoint(MultibodySystem *world, BasePtr _parent);
+      public: SimbodyScrewJoint(SimTK::MultibodySystem *world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyScrewJoint();

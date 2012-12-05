@@ -39,7 +39,8 @@ namespace gazebo
     class SimbodySliderJoint : public SliderJoint<SimbodyJoint>
     {
       /// \brief Constructor
-      public: SimbodySliderJoint(MultibodySystem *world, BasePtr _parent);
+      public: SimbodySliderJoint(SimTK::MultibodySystem *world,
+                                 BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodySliderJoint();

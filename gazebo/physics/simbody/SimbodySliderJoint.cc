@@ -31,7 +31,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodySliderJoint::SimbodySliderJoint(MultibodySystem *_world, BasePtr _parent)
+SimbodySliderJoint::SimbodySliderJoint(SimTK::MultibodySystem *_world,
+                                       BasePtr _parent)
     : SliderJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -132,7 +133,7 @@ void SimbodySliderJoint::SetMaxForce(int /*_index*/, double _force)
 //////////////////////////////////////////////////
 double SimbodySliderJoint::GetMaxForce(int /*_index*/)
 {
-  return math::Angle();
+  return math::Angle().Radian();
 }
 
 //////////////////////////////////////////////////

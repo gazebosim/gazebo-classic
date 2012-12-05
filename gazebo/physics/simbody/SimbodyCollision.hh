@@ -33,6 +33,9 @@
 #include "physics/Collision.hh"
 */
 
+#include <SimTKmath.h>
+// using namespace SimTK;
+
 #include "physics/PhysicsTypes.hh"
 #include "physics/Collision.hh"
 
@@ -71,11 +74,12 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const;
 
       /// \brief Set the collision shape
-      public: void SetCollisionShape(ContactGeometry *shape);
+      public: void SetCollisionShape(SimTK::ContactGeometry *shape);
 
       /// \brief Get the simbody collision shape
-      public: ContactGeometry *GetCollisionShape() const;
+      public: SimTK::ContactGeometry *GetCollisionShape() const;
 
+      private: SimTK::ContactGeometry *collisionShape;
     };
     /// \}
   }

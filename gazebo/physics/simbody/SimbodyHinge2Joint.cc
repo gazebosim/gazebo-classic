@@ -31,7 +31,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyHinge2Joint::SimbodyHinge2Joint(MultibodySystem *_world, BasePtr _parent)
+SimbodyHinge2Joint::SimbodyHinge2Joint(SimTK::MultibodySystem *_world,
+                                       BasePtr _parent)
     : Hinge2Joint<SimbodyJoint>(_parent)
 {
   this->world = _world;
@@ -67,9 +68,9 @@ void SimbodyHinge2Joint::Attach(LinkPtr _one, LinkPtr _two)
   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis");
   math::Vector3 axis2 = axis2Elem->GetValueVector3("xyz");
 
-  Vec3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
-  Vec3 baxis1(axis1.x, axis1.y, axis1.z);
-  Vec3 baxis2(axis2.x, axis2.y, axis2.z);
+  SimTK::Vec3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
+  SimTK::Vec3 baxis1(axis1.x, axis1.y, axis1.z);
+  SimTK::Vec3 baxis2(axis2.x, axis2.y, axis2.z);
 
   // Add the joint to the world
 

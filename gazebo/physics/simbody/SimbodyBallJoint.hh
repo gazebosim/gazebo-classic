@@ -38,7 +38,7 @@ namespace gazebo
     class SimbodyBallJoint : public BallJoint<SimbodyJoint>
     {
       /// \brief Simbody Ball Joint Constructor
-      public: SimbodyBallJoint(MultibodySystem *_world, BasePtr _parent);
+      public: SimbodyBallJoint(SimTK::MultibodySystem *_world, BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyBallJoint();

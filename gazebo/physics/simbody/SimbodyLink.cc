@@ -36,7 +36,6 @@ using namespace physics;
 SimbodyLink::SimbodyLink(EntityPtr _parent)
     : Link(_parent)
 {
-  this->rigidLink = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -72,7 +71,7 @@ void SimbodyLink::Init()
     {
       SimbodyCollisionPtr collision;
       collision = boost::shared_static_cast<SimbodyCollision>(*iter);
-      ContactGeometry *shape = collision->GetCollisionShape();
+      SimTK::ContactGeometry *shape = collision->GetCollisionShape();
 
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;
@@ -85,7 +84,7 @@ void SimbodyLink::Init()
 
   // Create the new rigid body
 
-  MultibodySystem *wd = this->simbodyPhysics->GetDynamicsWorld();
+  SimTK::MultibodySystem *wd = this->simbodyPhysics->GetDynamicsWorld();
 }
 
 //////////////////////////////////////////////////

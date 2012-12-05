@@ -59,9 +59,6 @@ using namespace physics;
 
 GZ_REGISTER_PHYSICS_ENGINE("simbody", SimbodyPhysics)
 
-extern ContactAddedCallback gContactAddedCallback;
-extern ContactProcessedCallback gContactProcessedCallback;
-
 //////////////////////////////////////////////////
 bool ContactCallback()
 {
@@ -122,7 +119,7 @@ void SimbodyPhysics::UpdateCollision()
 void SimbodyPhysics::UpdatePhysics()
 {
   // need to lock, otherwise might conflict with world resetting
-  boost::mutex::scoped_lock lock(this->physicsUpdateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
   common::Time currTime =  this->world->GetRealTime();
 
@@ -210,7 +207,8 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-JointPtr SimbodyPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
+JointPtr SimbodyPhysics::CreateJoint(const std::string &/*_type*/,
+                                     ModelPtr /*_parent*/)
 {
   JointPtr joint;
 

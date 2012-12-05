@@ -40,7 +40,7 @@ namespace gazebo
     class SimbodyHingeJoint : public HingeJoint<SimbodyJoint>
     {
       ///  Constructor
-      public: SimbodyHingeJoint(MultibodySystem *world, BasePtr _parent);
+      public: SimbodyHingeJoint(SimTK::MultibodySystem *world, BasePtr _parent);
 
       /// Destructor
       public: virtual ~SimbodyHingeJoint();

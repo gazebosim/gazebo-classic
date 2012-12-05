@@ -29,7 +29,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyHingeJoint::SimbodyHingeJoint(MultibodySystem *_world, BasePtr _parent)
+SimbodyHingeJoint::SimbodyHingeJoint(SimTK::MultibodySystem *_world,
+                                     BasePtr _parent)
     : HingeJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;

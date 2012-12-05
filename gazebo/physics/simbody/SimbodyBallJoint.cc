@@ -30,7 +30,8 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyBallJoint::SimbodyBallJoint(MultibodySystem *_world, BasePtr _parent)
+SimbodyBallJoint::SimbodyBallJoint(SimTK::MultibodySystem *_world,
+                                   BasePtr _parent)
     : BallJoint<SimbodyJoint>(_parent)
 {
   this->world = _world;

@@ -31,6 +31,11 @@
 #include "physics/Collision.hh"
 #include "physics/Shape.hh"
 
+// #include <SimTKcommon.h>
+#include <SimTKsimbody.h>
+// #include <Simbody.h>
+// using namespace SimTK;
+
 namespace gazebo
 {
   namespace physics
@@ -102,7 +107,7 @@ namespace gazebo
                                        InertialPtr _inertial);
 
       /// \brief Register a joint with the dynamics world
-      public: MultibodySystem *GetDynamicsWorld() const
+      public: SimTK::MultibodySystem *GetDynamicsWorld() const
               {return this->dynamicsWorld;}
 
       /// \brief Set the gavity vector
@@ -110,7 +115,7 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
-      private: MultibodySystem *dynamicsWorld;
+      private: SimTK::MultibodySystem *dynamicsWorld;
 
       private: common::Time lastUpdateTime;
 

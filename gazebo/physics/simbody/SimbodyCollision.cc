@@ -36,10 +36,8 @@ SimbodyCollision::SimbodyCollision(LinkPtr _parent)
 //////////////////////////////////////////////////
 SimbodyCollision::~SimbodyCollision()
 {
-  /*
   delete this->collisionShape;
   this->collisionShape = NULL;
-  */
 }
 
 //////////////////////////////////////////////////
@@ -84,13 +82,13 @@ math::Box SimbodyCollision::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyCollision::SetCollisionShape(ContactGeometry *_shape)
+void SimbodyCollision::SetCollisionShape(SimTK::ContactGeometry *_shape)
 {
   this->collisionShape = _shape;
 }
 
 //////////////////////////////////////////////////
-ContactGeometry *SimbodyCollision::GetCollisionShape() const
+SimTK::ContactGeometry *SimbodyCollision::GetCollisionShape() const
 {
   return this->collisionShape;
 }
