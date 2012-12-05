@@ -39,6 +39,8 @@
 #include "physics/bullet/BulletHinge2Joint.hh"
 #include "physics/bullet/BulletScrewJoint.hh"
 
+#include "transport/Publisher.hh"
+
 #include "physics/PhysicsTypes.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/World.hh"
@@ -452,6 +454,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
   elem = elem->GetElement("constraints");
   elem->GetElement("cfm")->Set(_cfm);
 
+  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
   info.m_globalCfm = _cfm;
 }
 

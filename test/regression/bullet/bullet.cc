@@ -17,7 +17,6 @@
 
 #include "ServerFixture.hh"
 #include "physics/physics.hh"
-#include "SimplePendulumIntegrator.hh"
 
 using namespace gazebo;
 class BulletTest : public ServerFixture
@@ -34,7 +33,7 @@ TEST_F(BulletTest, EmptyWorldTest)
 
   // simulate a couple seconds
   world->StepWorld(2000);
-  double t = world->GetSimeTime().Double();
+  double t = world->GetSimTime().Double();
   EXPECT_TRUE(t > 0);
 
   Unload();
