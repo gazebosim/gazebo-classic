@@ -103,7 +103,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void EditorView::mouseDoubleClickEvent(QMouseEvent */*_event*/)
+void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
   drawMode =  None;
   drawInProgress = false;
@@ -115,6 +115,7 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent */*_event*/)
     delete currentLine;
     currentLine = NULL;
   }
+  QGraphicsView::mouseDoubleClickEvent(_event);
 }
 
 /////////////////////////////////////////////////

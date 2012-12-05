@@ -56,6 +56,7 @@ void DoorItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
 /////////////////////////////////////////////////
 void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
+  qDebug() << " double click door";
   WindowDoorInspectorDialog dialog(0);
   if (dialog.exec() == QDialog::Accepted)
   {

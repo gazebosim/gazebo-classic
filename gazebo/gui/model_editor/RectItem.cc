@@ -79,7 +79,7 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 
   QGraphicsSceneMouseEvent *event =
       dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
-  if ( event == NULL)
+  if (event == NULL)
     return false;
 
   switch (event->type() )
@@ -101,9 +101,6 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
       corner->SetMouseState(CornerGrabber::kMouseMoving );
       break;
     }
-    case QEvent::GraphicsSceneMouseDoubleClick:
-      return false;
-      break;
     default:
       return false;
       break;
@@ -208,6 +205,7 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
+  qDebug() << " press ";
   _event->setAccepted(true);
   this->dragStart = _event->pos();
 }
@@ -223,7 +221,7 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
-  _event->setAccepted(false);
+  _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
