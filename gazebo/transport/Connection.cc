@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,14 @@
  *
 */
 #include <boost/lexical_cast.hpp>
+
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "common/Console.hh"
 #include "msgs/msgs.hh"
@@ -49,6 +57,7 @@ Connection::Connection()
 
   this->localURI = std::string("http://") + this->GetLocalHostname() + ":" +
                    boost::lexical_cast<std::string>(this->GetLocalPort());
+
   this->localAddress = this->GetLocalEndpoint().address().to_string();
 }
 
@@ -568,16 +577,74 @@ void Connection::ReadLoop(const ReadCallback &cb)
 //////////////////////////////////////////////////
 boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
 {
-  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
-  boost::asio::ip::tcp::resolver::query query(boost::asio::ip::host_name(), "");
-  boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
-  boost::asio::ip::tcp::resolver::iterator end;
   boost::asio::ip::tcp::endpoint ep;
 
-  while (iter != end)
-    ep = *iter++;
+  // Check to see if the GZ_IP environment variable has been set. If so, use
+  // that value instead of trying to determin the value ourselves.
+  char *ip = getenv("GZ_IP");
+  if (ip)
+  {
+    if (!this->ValidateIP(ip))
+    {
+      gzerr << "GZ_IP environment variable with value[" << ip
+            << "] is invalid. We will still try to use it, be warned.\n";
+    }
+
+    ep.address(boost::asio::ip::address_v4::from_string(ip));
+    return ep;
+  }
+
+
+  // the following is *nix implementation to get the external IP of the
+  // current machine.
+
+  struct ifaddrs *ifaddr, *ifa;
+
+  // Get interface addresses
+  if (getifaddrs(&ifaddr) == -1)
+  {
+    perror("getifaddres");
+    gzthrow("Unable to get local interface addresses");
+    return ep;
+  }
+
+  char host[NI_MAXHOST];
+
+  // Iterate over all the interface addresses
+  for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+  {
+    if (ifa->ifa_addr == NULL)
+      continue;
+
+    int family = ifa->ifa_addr->sa_family;
+    if (family == AF_INET || family == AF_INET6)
+    {
+      int s = getnameinfo(ifa->ifa_addr,
+          (family == AF_INET) ? sizeof(struct sockaddr_in) :
+          sizeof(struct sockaddr_in6),
+          host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
+      if (s != 0)
+        gzthrow(std::string("getnameinfo() failed[") + gai_strerror(s) + "]\n");
+
+      // Validate the IP address to make sure it's a valid dotted quad.
+      // Also make sure that the IP address is not for the local host.
+      if (this->ValidateIP(host) && std::string(host).find("127.0") != 0)
+      {
+        ep.address(boost::asio::ip::address_v4::from_string(host));
+      }
+    }
+  }
 
   return ep;
+}
+
+/////////////////////////////////////////////////
+bool Connection::ValidateIP(const std::string &_ip)
+{
+  struct sockaddr_in sa;
+  int result = inet_pton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+  return result != 0;
 }
 
 //////////////////////////////////////////////////
@@ -604,6 +671,7 @@ std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep)
     name = (*iter).host_name();
     ++iter;
   }
+
 
   return name;
 }

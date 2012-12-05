@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,6 +276,10 @@ namespace gazebo
       /// \brief Get the ID of the connection.
       /// \return The connection's unique ID.
       public: unsigned int GetId() const;
+
+      /// \brief Return true if the _ip is a valid.
+      /// \return True if the _ip is a valid.
+      public: static bool ValidateIP(const std::string &_ip);
 
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
