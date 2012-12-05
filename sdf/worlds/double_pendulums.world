@@ -52,7 +52,6 @@
                         <izz>1.000000</izz>
                     </inertia>
                     <mass>10.000000</mass>
-                    <density>1.000000</density>
                 </inertial>
                 <visual name="visual_cylinder">
                     <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
@@ -105,7 +104,6 @@
                     </surface>
                     <laser_retro>100.000000</laser_retro>
                 </collision>
-                <damping />
                 <gravity>1</gravity>
                 <self_collide>1</self_collide>
                 <kinematic>0</kinematic>
@@ -123,7 +121,6 @@
                         <izz>1.000000</izz>
                     </inertia>
                     <mass>10.000000</mass>
-                    <density>1.000000</density>
                 </inertial>
                 <visual name="visual_box">
                     <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
@@ -174,7 +171,6 @@
                     </surface>
                     <laser_retro>100.000000</laser_retro>
                 </collision>
-                <damping />
                 <gravity>1</gravity>
                 <self_collide>0</self_collide>
                 <kinematic>0</kinematic>
@@ -254,7 +250,6 @@
                         <izz>1.000000</izz>
                     </inertia>
                     <mass>10.000000</mass>
-                    <density>1.000000</density>
                 </inertial>
                 <visual name="visual_cylinder">
                     <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
@@ -307,7 +302,6 @@
                     </surface>
                     <laser_retro>100.000000</laser_retro>
                 </collision>
-                <damping />
                 <gravity>1</gravity>
                 <self_collide>1</self_collide>
                 <kinematic>0</kinematic>
@@ -325,7 +319,6 @@
                         <izz>1.000000</izz>
                     </inertia>
                     <mass>10.000000</mass>
-                    <density>1.000000</density>
                 </inertial>
                 <visual name="visual_box">
                     <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
@@ -376,7 +369,6 @@
                     </surface>
                     <laser_retro>100.000000</laser_retro>
                 </collision>
-                <damping />
                 <gravity>1</gravity>
                 <self_collide>0</self_collide>
                 <kinematic>0</kinematic>
@@ -456,7 +448,6 @@
                         <izz>1.000000</izz>
                     </inertia>
                     <mass>10.000000</mass>
-                    <density>1.000000</density>
                 </inertial>
                 <visual name="visual_cylinder">
                     <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
@@ -509,7 +500,6 @@
                     </surface>
                     <laser_retro>100.000000</laser_retro>
                 </collision>
-                <damping />
                 <gravity>1</gravity>
                 <self_collide>1</self_collide>
                 <kinematic>0</kinematic>
@@ -527,7 +517,6 @@
                         <izz>1.000000</izz>
                     </inertia>
                     <mass>10.000000</mass>
-                    <density>1.000000</density>
                 </inertial>
                 <visual name="visual_box">
                     <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
@@ -578,7 +567,6 @@
                     </surface>
                     <laser_retro>100.000000</laser_retro>
                 </collision>
-                <damping />
                 <gravity>1</gravity>
                 <self_collide>0</self_collide>
                 <kinematic>0</kinematic>
