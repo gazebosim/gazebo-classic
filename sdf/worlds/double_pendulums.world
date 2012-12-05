@@ -199,8 +199,14 @@
                         <max_force>1000.000000</max_force>
                         <velocity>0.000000</velocity>
                         <fudge_factor>0.000000</fudge_factor>
-                        <limit cfm="0.000000" erp="0.100000" />
-                        <suspension cfm="0.000000" erp="0.200000" />
+                        <limit>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </limit>
+                        <suspension>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </suspension>
                     </ode>
                 </physics>
             </joint>
@@ -228,8 +234,14 @@
                         <max_force>1000.000000</max_force>
                         <velocity>0.000000</velocity>
                         <fudge_factor>0.000000</fudge_factor>
-                        <limit cfm="0.000000" erp="0.100000" />
-                        <suspension cfm="0.000000" erp="0.200000" />
+                        <limit>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </limit>
+                        <suspension>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </suspension>
                     </ode>
                 </physics>
             </joint>
@@ -397,8 +409,14 @@
                         <max_force>1000.000000</max_force>
                         <velocity>0.000000</velocity>
                         <fudge_factor>0.000000</fudge_factor>
-                        <limit cfm="0.000000" erp="0.100000" />
-                        <suspension cfm="0.000000" erp="0.200000" />
+                        <limit>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </limit>
+                        <suspension>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </suspension>
                     </ode>
                 </physics>
             </joint>
@@ -426,8 +444,14 @@
                         <max_force>1000.000000</max_force>
                         <velocity>0.000000</velocity>
                         <fudge_factor>0.000000</fudge_factor>
-                        <limit cfm="0.000000" erp="0.100000" />
-                        <suspension cfm="0.000000" erp="0.200000" />
+                        <limit>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </limit>
+                        <suspension>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </suspension>
                     </ode>
                 </physics>
             </joint>
@@ -595,8 +619,14 @@
                         <max_force>1000.000000</max_force>
                         <velocity>0.000000</velocity>
                         <fudge_factor>0.000000</fudge_factor>
-                        <limit cfm="0.000000" erp="0.100000" />
-                        <suspension cfm="0.000000" erp="0.200000" />
+                        <limit>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </limit>
+                        <suspension>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </suspension>
                     </ode>
                 </physics>
             </joint>
@@ -624,8 +654,14 @@
                         <max_force>1000.000000</max_force>
                         <velocity>0.000000</velocity>
                         <fudge_factor>0.000000</fudge_factor>
-                        <limit cfm="0.000000" erp="0.100000" />
-                        <suspension cfm="0.000000" erp="0.200000" />
+                        <limit>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </limit>
+                        <suspension>
+                           <cfm>0</cfm>
+                           <erp>0.2</erp>
+                        </suspension>
                     </ode>
                 </physics>
             </joint>
