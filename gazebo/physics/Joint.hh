@@ -154,6 +154,9 @@ namespace gazebo
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
 
+      /// \brief Callback to apply damping force to joint.
+      public: virtual void ApplyDamping();
+
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
       /// \return Connection pointer, which must be kept in scope.

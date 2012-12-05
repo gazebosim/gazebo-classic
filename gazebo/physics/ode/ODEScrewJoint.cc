@@ -98,20 +98,13 @@ void ODEScrewJoint::SetDamping(int /*index*/, double _damping)
   this->dampingCoefficient = _damping;
   // dJointSetDamping(this->jointId, this->dampingCoefficient);
   this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&ODEScrewJoint::ApplyDamping, this));
+    boost::bind(&Joint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 {
   dJointSetScrewThreadPitch(this->jointId, _threadPitch);
-}
-
-//////////////////////////////////////////////////
-void ODEScrewJoint::ApplyDamping()
-{
-  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
-  this->SetForce(0, dampingForce);
 }
 
 //////////////////////////////////////////////////

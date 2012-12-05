@@ -96,14 +96,7 @@ void ODESliderJoint::SetDamping(int /*index*/, double _damping)
   // use below when ode version is fixed
   // dJointSetDamping(this->jointId, this->dampingCoefficient);
   this->applyDamping = physics::Joint::ConnectJointUpdate(
-    boost::bind(&ODESliderJoint::ApplyDamping, this));
-}
-
-//////////////////////////////////////////////////
-void ODESliderJoint::ApplyDamping()
-{
-  double dampingForce = -this->dampingCoefficient * this->GetVelocity(0);
-  this->SetForce(0, dampingForce);
+    boost::bind(&Joint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////
