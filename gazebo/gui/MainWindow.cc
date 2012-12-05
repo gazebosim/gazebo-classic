@@ -35,7 +35,7 @@
 #include "gui/ToolsWidget.hh"
 #include "gui/MainWindow.hh"
 #include "gui/GuiEvents.hh"
-#include "gui/modelcreator/BuildingCreatorPalette.hh"
+#include "gui/model_editor/BuildingEditorPalette.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -76,15 +76,15 @@ MainWindow::MainWindow()
                                  QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(minimumTabWidth);
 
-  this->buildingCreatorPalette = new BuildingCreatorPalette(this);
-  this->buildingCreatorTabWidget = new QTabWidget();
-  this->buildingCreatorTabWidget->setObjectName("buildingCreatorTab");
-  this->buildingCreatorTabWidget->addTab(
-      this->buildingCreatorPalette, "Building Creator");
-  this->buildingCreatorTabWidget->setSizePolicy(QSizePolicy::Expanding,
+  this->buildingEditorPalette = new BuildingEditorPalette(this);
+  this->buildingEditorTabWidget = new QTabWidget();
+  this->buildingEditorTabWidget->setObjectName("buildingEditorTab");
+  this->buildingEditorTabWidget->addTab(
+      this->buildingEditorPalette, "Building Editor");
+  this->buildingEditorTabWidget->setSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Expanding);
-  this->buildingCreatorTabWidget->setMinimumWidth(minimumTabWidth);
-  this->buildingCreatorTabWidget->hide();
+  this->buildingEditorTabWidget->setMinimumWidth(minimumTabWidth);
+  this->buildingEditorTabWidget->hide();
 
   this->toolsWidget = new ToolsWidget();
 
@@ -94,7 +94,7 @@ MainWindow::MainWindow()
 
   QSplitter *splitter = new QSplitter(this);
   splitter->addWidget(this->tabWidget);
-  splitter->addWidget(this->buildingCreatorTabWidget);
+  splitter->addWidget(this->buildingEditorTabWidget);
   splitter->addWidget(this->renderWidget);
   splitter->addWidget(this->toolsWidget);
 
@@ -355,13 +355,13 @@ void MainWindow::OnEditBuilding()
     this->Pause();
     this->renderWidget->ShowEditor(1);
     this->tabWidget->hide();
-    this->buildingCreatorTabWidget->show();
+    this->buildingEditorTabWidget->show();
   }
   else
   {
     this->renderWidget->ShowEditor(0);
     this->tabWidget->show();
-    this->buildingCreatorTabWidget->hide();
+    this->buildingEditorTabWidget->hide();
     this->Play();
   }
 /*  msgs::WorldControl msg;

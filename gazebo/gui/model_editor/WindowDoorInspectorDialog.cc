@@ -15,7 +15,7 @@
  *
 */
 
-#include "gui/modelcreator/WindowDoorInspectorDialog.hh"
+#include "WindowDoorInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;

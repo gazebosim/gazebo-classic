@@ -26,7 +26,7 @@
 #include "gui/GuiEvents.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
-#include "gui/modelcreator/EditorWidget.hh"
+#include "gui/model_editor/EditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

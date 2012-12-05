@@ -5,12 +5,10 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
 )
 
-#include_directories(modelcreator)
-
 add_definitions( ${QT_DEFINITIONS} )
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(modelcreator)
+add_subdirectory(model_editor)
 
 set (sources
   main.cc
@@ -78,7 +76,7 @@ target_link_libraries(gazebo_gui gazebo_common
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs
-                                 gazebo_modelcreator
+                                 gazebo_model_editor
                                  gzqtpropertybrowser
                                  ${QT_LIBRARIES}
                                  ${ogre_libraries}
@@ -91,7 +89,7 @@ target_link_libraries(gzclient  gazebo_common
                                 gazebo_rendering
                                 gazebo_sensors
                                 gazebo_msgs
-                                gazebo_modelcreator
+                                gazebo_model_editor
                                 gzqtpropertybrowser
                                 ${QT_LIBRARIES}
                                 ${ogre_libraries}

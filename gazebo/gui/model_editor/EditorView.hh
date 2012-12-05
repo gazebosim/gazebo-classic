@@ -15,14 +15,10 @@
  *
 */
 
-#ifndef _CREATOR_SCENE_HH_
-#define _CREATOR_SCENE_HH_
+#ifndef _EDITOR_VIEW_HH_
+#define _EDITOR_VIEW_HH_
 
-#include <string>
 #include "gui/qt.h"
-
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
 
 class SelectableLineSegment;
 
@@ -30,13 +26,13 @@ namespace gazebo
 {
   namespace gui
   {
-    class CreatorView : public QGraphicsView
+    class EditorView : public QGraphicsView
     {
       Q_OBJECT
 
-      public: CreatorView(QWidget *_parent = 0);
+      public: EditorView(QWidget *_parent = 0);
 
-      public: ~CreatorView();
+      public: ~EditorView();
 
       public: enum modelTypes {None, Wall, Window, Door, Stairs};
 

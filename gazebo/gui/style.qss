@@ -61,7 +61,7 @@ QToolButton
   padding: 2px;
   margin: 2px;
   width: 20px;
-          
+
   border-radius: 8px;
   border: 0px solid #808080;
 }
@@ -361,7 +361,7 @@ QTabBar::tab:!selected
 }
 
 QTabWidget#mainTab::pane,
-QTabWidget#buildingCreatorTab::pane
+QTabWidget#buildingEditorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -422,7 +422,7 @@ QWidget#renderWidget > QWidget
   margin-right: 0px;
 }
 
-QWidget#toolFrame 
+QWidget#toolFrame
 {
   border-bottom: 1px solid #101010;
   background-color: #808080;
@@ -430,7 +430,7 @@ QWidget#toolFrame
   border-top-right-radius: 10px;
 }
 
-QWidget#renderBottomFrame 
+QWidget#renderBottomFrame
 {
   border-top: 1px solid #101010;
   border-bottom-left-radius: 10px;
@@ -440,7 +440,7 @@ QWidget#renderBottomFrame
   border-bottom-right-radius: 10px;
 }
 
-QWidget#timePanel 
+QWidget#timePanel
 {
   background-color: #808080;
   border-bottom-right-radius: 10px;

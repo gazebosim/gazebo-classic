@@ -15,7 +15,7 @@
  *
 */
 
-#include "CreatorView.hh"
+#include "EditorView.hh"
 #include "SelectableLineSegment.hh"
 #include "RectItem.hh"
 #include "GridLines.hh"
@@ -24,29 +24,29 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-CreatorView::CreatorView(QWidget *_parent)
+EditorView::EditorView(QWidget *_parent)
   : QGraphicsView(_parent), currentLine(0)
 {
-  this->setObjectName("creatorView");
+  this->setObjectName("editorView");
 
   this->drawMode = None;
   this->drawInProgress = false;
 }
 
 /////////////////////////////////////////////////
-CreatorView::~CreatorView()
+EditorView::~EditorView()
 {
 
 }
 
 /////////////////////////////////////////////////
-void CreatorView::mousePressEvent(QMouseEvent *_event)
+void EditorView::mousePressEvent(QMouseEvent *_event)
 {
   QGraphicsView::mousePressEvent(_event);
 }
 
 /////////////////////////////////////////////////
-void CreatorView::mouseReleaseEvent(QMouseEvent *_event)
+void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
   /// TODO for testing, delete me later
   if (_event->button() == Qt::RightButton)
@@ -81,7 +81,7 @@ void CreatorView::mouseReleaseEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void CreatorView::mouseMoveEvent(QMouseEvent *_event)
+void EditorView::mouseMoveEvent(QMouseEvent *_event)
 {
   QPointF delta = _event->pos() - lastMousePos;
   switch (drawMode)
@@ -103,7 +103,7 @@ void CreatorView::mouseMoveEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void CreatorView::mouseDoubleClickEvent(QMouseEvent */*_event*/)
+void EditorView::mouseDoubleClickEvent(QMouseEvent */*_event*/)
 {
   drawMode =  None;
   drawInProgress = false;
@@ -118,7 +118,7 @@ void CreatorView::mouseDoubleClickEvent(QMouseEvent */*_event*/)
 }
 
 /////////////////////////////////////////////////
-void CreatorView::DrawLines(QPoint _pos)
+void EditorView::DrawLines(QPoint _pos)
 {
   QPointF pointStart = mapToScene(_pos);
   QPointF pointEnd = pointStart;

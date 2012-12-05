@@ -15,10 +15,10 @@
  *
 */
 
-#include "BuildingCreatorWidget.hh"
+#include "BuildingEditorWidget.hh"
 #include "SelectableLineSegment.hh"
 #include "GridLines.hh"
-#include "CreatorView.hh"
+#include "EditorView.hh"
 #include "RectItem.hh"
 #include "WindowItem.hh"
 #include "DoorItem.hh"
@@ -27,17 +27,16 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-BuildingCreatorWidget::BuildingCreatorWidget(QWidget *_parent)
+BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   : QWidget(_parent)
 {
-  this->setObjectName("buildingCreatorWidget");
+  this->setObjectName("buildingEditorWidget");
 
-  CreatorView *view = new CreatorView();
+  EditorView *view = new EditorView();
   QGraphicsScene *scene = new QGraphicsScene();
 
   QColor c (250,250,250);
   QBrush brush (c, Qt::SolidPattern);
-  //this->scene->setBackgroundBrush(brush);
   scene->setBackgroundBrush(brush);
 
   int boundingWidth = 600;
@@ -69,82 +68,6 @@ BuildingCreatorWidget::BuildingCreatorWidget(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-BuildingCreatorWidget::~BuildingCreatorWidget()
-{
-
-}
-
-/////////////////////////////////////////////////
-void BuildingCreatorWidget::paintEvent(QPaintEvent * /* event */)
+BuildingEditorWidget::~BuildingEditorWidget()
 {
 }
-/*
-/////////////////////////////////////////////////
-void BuildingCreatorWidget::mousePressEvent(QMouseEvent *_event)
-{
-  this->drawMode = Wall;
-  qDebug() << " mouse press event " << _event->pos();
-}
-
-/////////////////////////////////////////////////
-void BuildingCreatorWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
-{
-  switch (drawMode)
-  {
-    case None:
-      break;
-    case Wall:
-      if (!drawInProgress)
-      {
-        drawInProgress = true;
-        lastLinePosX = _event->pos().x();
-        lastLinePosY = _event->pos().y();
-      }
-      this->DrawLines(_event->pos());
-      break;
-    default:
-      break;
-  }
-}
-
-/////////////////////////////////////////////////
-void BuildingCreatorWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
-{
-  switch (drawMode)
-  {
-    case None:
-      break;
-    case Wall:
-      if (drawInProgress)
-      {
-        SelectableLineSegment* line = lineList.back();
-        if (line)
-        {
-          line->SetCornerPosition(_event->pos(), 1);
-        }
-      }
-      this->DrawLines(_event->pos());
-      break;
-    default:
-      break;
-  }
-}
-
-
-/////////////////////////////////////////////////
-void BuildingCreatorWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
-{
-  drawMode =  None;
-  drawInProgress = false;
-}
-
-/////////////////////////////////////////////////
-void BuildingCreatorWidget::DrawLines(QPointF _pos)
-{
-  SelectableLineSegment* line = new SelectableLineSegment(
-    QPointF(lastLinePosX, lastLinePosY), _pos);
-  lastLinePosX = _pos.x();
-  lastLinePosY = _pos.y();
-  lineList.push_back(line);
-  this->scene->addItem(line);
-}*/

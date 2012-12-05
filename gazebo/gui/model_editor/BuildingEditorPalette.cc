@@ -15,7 +15,7 @@
  *
 */
 
-#include "BuildingCreatorPalette.hh"
+#include "BuildingEditorPalette.hh"
 #include "FinishModelDialog.hh"
 #include "WindowDoorInspectorDialog.hh"
 #include "WallInspectorDialog.hh"
@@ -24,10 +24,10 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-BuildingCreatorPalette::BuildingCreatorPalette(QWidget *_parent)
+BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   : QWidget(_parent)
 {
-  this->setObjectName("buildingCreatorPalette");
+  this->setObjectName("buildingEditorPalette");
 
   this->modelName = "building";
 
@@ -104,12 +104,12 @@ BuildingCreatorPalette::BuildingCreatorPalette(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-BuildingCreatorPalette::~BuildingCreatorPalette()
+BuildingEditorPalette::~BuildingEditorPalette()
 {
 }
 
 /////////////////////////////////////////////////
-void BuildingCreatorPalette::OnDiscard()
+void BuildingEditorPalette::OnDiscard()
 {
   int ret = QMessageBox::warning(this, tr("Discard"),
                               tr("Are you sure you want to discard\n"
@@ -133,7 +133,7 @@ void BuildingCreatorPalette::OnDiscard()
 }
 
 /////////////////////////////////////////////////
-void BuildingCreatorPalette::OnSave()
+void BuildingEditorPalette::OnSave()
 {
   bool ok;
   QString text = QInputDialog::getText(this, tr("Save"),
@@ -146,7 +146,7 @@ void BuildingCreatorPalette::OnSave()
 }
 
 /////////////////////////////////////////////////
-void BuildingCreatorPalette::OnFinish()
+void BuildingEditorPalette::OnFinish()
 {
 //  FinishModelDialog dialog(this);
   WindowDoorInspectorDialog dialog(0, this);

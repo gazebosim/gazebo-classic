@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _BUILDING_CREATOR_PALETTE_HH_
-#define _BUILDING_CREATOR_PALETTE_HH_
+#ifndef _BUILDING_EDITOR_PALETTE_HH_
+#define _BUILDING_EDITOR_PALETTE_HH_
 
 #include "gui/qt.h"
 
@@ -24,12 +24,12 @@ namespace gazebo
 {
   namespace gui
   {
-    class BuildingCreatorPalette : public QWidget
+    class BuildingEditorPalette : public QWidget
     {
       Q_OBJECT
 
-      public: BuildingCreatorPalette(QWidget *_parent = 0);
-      public: ~BuildingCreatorPalette();
+      public: BuildingEditorPalette(QWidget *_parent = 0);
+      public: ~BuildingEditorPalette();
 
       private: std::string modelName;
 

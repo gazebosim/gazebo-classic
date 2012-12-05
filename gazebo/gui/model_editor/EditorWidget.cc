@@ -16,53 +16,37 @@
 */
 
 #include "EditorWidget.hh"
-#include "BuildingCreatorWidget.hh"
+#include "BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
 
+/////////////////////////////////////////////////
 EditorWidget::EditorWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("editorWidget");
 
-/*  this->editorFrame = new QFrame;
-  this->editorFrame->setFrameShape(QFrame::NoFrame);
-  this->editorFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);*/
-
-
-  qDebug () << "editor wh " << this->pos().x() << this->width() << " " << this->height();
-  qDebug () << "editor parent wh " << _parent->pos().x() << _parent->width() << " " << _parent->height();
-  this->buildingCreatorWidget = new BuildingCreatorWidget(this);
+  this->buildingEditorWidget = new BuildingEditorWidget(this);
 
   QHBoxLayout *editorLayout = new QHBoxLayout;
   editorLayout->setContentsMargins(0, 0, 0, 0);
-
-/*  this->editorFrame->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Expanding);*/
-  editorLayout->addWidget(this->buildingCreatorWidget);
+  editorLayout->addWidget(this->buildingEditorWidget);
   editorLayout->setContentsMargins(0, 0, 0, 0);
-
-/*  this->editorFrame->setLayout(editorLayout);
-
-  this->editorFrame->setMouseTracking(true);
-  this->setMouseTracking(true);*/
-
   QVBoxLayout *mainLayout = new QVBoxLayout;
-//  mainLayout->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-//  mainLayout->addWidget(this->editorFrame);
-  buildingCreatorWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  mainLayout->addWidget(this->buildingCreatorWidget);
+  this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  mainLayout->addWidget(this->buildingEditorWidget);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 }
 
+/////////////////////////////////////////////////
 EditorWidget::~EditorWidget()
 {
-
 }
 
+/////////////////////////////////////////////////
 void EditorWidget::SetMode(int mode)
 {
   /// TODO: 2 modes, building and model,
@@ -70,18 +54,13 @@ void EditorWidget::SetMode(int mode)
   switch (mode)
   {
     case 0:
-      this->buildingCreatorWidget->hide();
+      this->buildingEditorWidget->hide();
       break;
     case 1:
-      this->buildingCreatorWidget->show();
+      this->buildingEditorWidget->show();
       break;
     default:
       break;
   }
 
 }
-/*
-QSize EditorWidget::sizeHint() const
-{
-  return QSize(100, 100);
-}*/

@@ -15,43 +15,24 @@
  *
 */
 
-#ifndef _EDITOR_WIDGET_HH_
-#define _EDITOR_WIDGET_HH_
-
-#include <string>
-#include <vector>
-#include <list>
+#ifndef _BUILDING_EDITOR_WIDGET_HH_
+#define _BUILDING_EDITOR_WIDGET_HH_
 
 #include "gui/qt.h"
-
-#include "transport/TransportTypes.hh"
-
-#include "common/MouseEvent.hh"
-#include "common/Event.hh"
-
-#include "math/Pose.hh"
-
-#include "msgs/msgs.hh"
-
 
 namespace gazebo
 {
   namespace gui
   {
-    class BuildingCreatorWidget;
-
-    class EditorWidget : public QWidget
+    class BuildingEditorWidget : public QWidget
     {
       Q_OBJECT
 
-      public: EditorWidget(QWidget *_parent = 0);
-      public: virtual ~EditorWidget();
+      public: BuildingEditorWidget(QWidget *_parent = 0);
 
-      public: void SetMode(int mode);
+      public: ~BuildingEditorWidget();
 
-      private: QFrame *editorFrame;
-      private: QWidget *buildingCreatorWidget;
-
+      public: enum modelTypes {None, Wall, Window, Door, Stairs};
     };
   }
 }
