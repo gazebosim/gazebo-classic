@@ -32,8 +32,8 @@ boost::condition_variable g_responseCondition;
 boost::mutex requestMutex;
 bool g_stopped = true;
 
-const msgs::Request *g_request = NULL;
-msgs::Response *g_response = NULL;
+std::list<msgs::Request *> g_requests;
+std::list<msgs::Response> g_responses;
 
 /////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &master_host,
@@ -146,23 +146,38 @@ void transport::pause_incoming(bool _pause)
 /////////////////////////////////////////////////
 void on_response(ConstResponsePtr &_msg)
 {
-  if (!g_request || _msg->id() != g_request->id())
+  if (g_requests.size() <= 0)
     return;
 
-  if (!g_response)
-    g_response = new msgs::Response;
+  std::list<msgs::Request *>::iterator iter;
+  for (iter = g_requests.begin(); iter != g_requests.end(); ++iter)
+  {
+    if (_msg->id() == (*iter)->id())
+      break;
+  }
 
-  g_response->CopyFrom(*_msg);
-  g_responseCondition.notify_one();
+  // Stop if the response is not for any of the request messages.
+  if (iter == g_requests.end())
+    return;
+
+  //msgs::Response *response = new msgs::Response;
+  //response->CopyFrom(*_msg);
+  g_responses.push_back(*_msg);
+
+
+  g_responseCondition.notify_all();
 }
 
 /////////////////////////////////////////////////
 msgs::Response transport::request(const std::string &_worldName,
-                                  const msgs::Request &_request)
+                                  const std::string &_request,
+                                  const std::string &_data)
 {
-  boost::unique_lock<boost::mutex> lock(requestMutex);
-  g_response = NULL;
-  g_request = &_request;
+  boost::mutex::scoped_lock lock(requestMutex);
+
+  msgs::Request *request = msgs::CreateRequest(_request, _data);
+
+  g_requests.push_back(request);
 
   NodePtr node = NodePtr(new Node());
   node->Init(_worldName);
@@ -170,18 +185,30 @@ msgs::Response transport::request(const std::string &_worldName,
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
 
-  requestPub->Publish(_request);
+  std::cout << "Request[" << request->DebugString() << "]\n";
 
-  g_responseCondition.wait(lock);
+  requestPub->Publish(*request);
 
-  requestPub.reset();
-  responseSub.reset();
-  node.reset();
+  std::list<msgs::Response>::iterator iter;
+  while (true)
+  {
+    // Wait for a response
+    g_responseCondition.wait(lock);
 
-  if (g_response != NULL)
-    return *g_response;
-  else
-    return msgs::Response();
+    for (iter = g_responses.begin(); iter != g_responses.end(); ++iter)
+    {
+      if ((*iter).id() == request->id())
+      {
+        delete request;
+
+        g_responses.erase(iter);
+        return *iter;
+      }
+    }
+  }
+
+  delete request;
+  return msgs::Response();
 }
 
 /////////////////////////////////////////////////
@@ -191,19 +218,18 @@ void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
 }
 
 /////////////////////////////////////////////////
-void transport::request(const std::string &_worldName,
-                        const std::string &_request,
-                        const std::string &_data)
+void transport::requestNoReply(const std::string &_worldName,
+                               const std::string &_request,
+                               const std::string &_data)
 {
-  boost::unique_lock<boost::mutex> lock(requestMutex);
-  g_response = NULL;
-  g_request = &_request;
-
   NodePtr node = NodePtr(new Node());
   node->Init(_worldName);
 
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
   msgs::Request *request = msgs::CreateRequest(_request, _data);
   requestPub->Publish(*request);
-  delete *request;
+  delete request;
+
+  requestPub.reset();
+  node.reset();
 }

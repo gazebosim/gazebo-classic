@@ -436,9 +436,9 @@ void MainWindow::Reset()
 void MainWindow::ShowCollisions()
 {
   if (g_showCollisionsAct->isChecked())
-    transport::request("default", "show_collision", "all");
+    transport::requestNoReply("default", "show_collision", "all");
   else
-    transport::request("default", "hide_collision", "all");
+    transport::requestNoReply("default", "hide_collision", "all");
 }
 
 /////////////////////////////////////////////////

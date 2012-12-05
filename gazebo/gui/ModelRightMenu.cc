@@ -64,6 +64,12 @@ ModelRightMenu::ModelRightMenu()
   connect(this->showJointsAct, SIGNAL(triggered()), this,
           SLOT(OnShowJoints()));
 
+  this->showCOMAct = new QAction(tr("Center of Mass"), this);
+  this->showCOMAct->setStatusTip(tr("Show Center of Mass"));
+  this->showCOMAct->setCheckable(true);
+  connect(this->showCOMAct, SIGNAL(triggered()), this,
+          SLOT(OnShowCOM()));
+
   // Create the delete action
   g_deleteAct = new DeleteAction(tr("Delete"), this);
   g_deleteAct->setStatusTip(tr("Delete a model"));
@@ -80,11 +86,6 @@ ModelRightMenu::ModelRightMenu()
   //         SLOT(OnSkeleton()));
 
 
-  // this->showCOMAction = new QAction(tr("Center of Mass"), this);
-  // this->showCOMAction->setStatusTip(tr("Show Center of Mass"));
-  // this->showCOMAction->setCheckable(true);
-  // connect(this->showCOMAction, SIGNAL(triggered()), this,
-  //         SLOT(OnShowCOM()));
 }
 
 /////////////////////////////////////////////////
@@ -106,6 +107,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   viewMenu->addAction(this->transparentAct);
   viewMenu->addAction(this->showCollisionAct);
   viewMenu->addAction(this->showJointsAct);
+  viewMenu->addAction(this->showCOMAct);
 
   menu.addSeparator();
   menu.addAction(g_deleteAct);
@@ -183,9 +185,9 @@ void ModelRightMenu::OnShowJoints()
 void ModelRightMenu::OnShowCOM()
 {
   this->showCOMActionState[this->modelName] =
-    this->showCOMAction->isChecked();
+    this->showCOMAct->isChecked();
 
-  if (this->showCOMAction->isChecked())
+  if (this->showCOMAct->isChecked())
     this->requestMsg = msgs::CreateRequest("show_com", this->modelName);
   else
     this->requestMsg = msgs::CreateRequest("hide_com", this->modelName);

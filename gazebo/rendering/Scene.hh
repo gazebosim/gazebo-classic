@@ -365,6 +365,10 @@ namespace gazebo
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
 
+      /// \brief Enable or disable center of mass visualization.
+      /// \param[in] _show True to enable center of mass visualization.
+      public: void ShowCOMs(bool _show);
+
       /// \brief Enable or disable collision visualization.
       /// \param[in] _show True to enable collision visualization.
       public: void ShowCollisions(bool _show);

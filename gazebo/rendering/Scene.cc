@@ -1780,17 +1780,27 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "show_com")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCOM(true);
+    if (_msg->data() == "all")
+      this->ShowCOMs(true);
     else
-      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCOM(true);
+      else
+        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    }
   }
   else if (_msg->request() == "hide_com")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowCOM(false);
+    if (_msg->data() == "all")
+      this->ShowCOMs(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowCOM(false);
+    }
   }
   else if (_msg->request() == "set_transparency")
   {
@@ -2276,6 +2286,16 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
     this->visuals[_newName] = result;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowCOMs(bool _show)
+{
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->ShowCOM(_show);
+  }
 }
 
 /////////////////////////////////////////////////

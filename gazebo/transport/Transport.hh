@@ -81,15 +81,22 @@ namespace gazebo
     /// until a response is received.
     /// \param[in] _worldName The name of the world to which the request
     /// should be sent
-    /// \param[in] _request The request itself
+    /// \param[in] _request The type request.
+    /// \param[in] _data Optional data string.
     /// \return The response to the request.  Can be empty.
     msgs::Response request(const std::string &_worldName,
-                           const msgs::Request &_request);
+                           const std::string &_request,
+                           const std::string &_data = "");
 
-    void request(const std::string &_worldName,
-                 const std::string &_request,
-                 const std::string &_data = "");
-
+    /// \brief Send a request and don't wait for a response. This is
+    /// non-blocking.
+    /// \param[in] _worldName The name of the world to which the request
+    /// should be sent.
+    /// \param[in] _request The type request.
+    /// \param[in] _data Optional data string.
+    void requestNoReply(const std::string &_worldName,
+                         const std::string &_request,
+                         const std::string &_data = "");
     /// \}
   }
 }

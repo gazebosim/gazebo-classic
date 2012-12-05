@@ -251,10 +251,8 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     this->jointPub = this->node->Advertise<msgs::JointCmd>(
         std::string("~/") + _modelName + "/joint_cmd");
 
-    this->requestMsg = msgs::CreateRequest("entity_info");
-    this->requestMsg->set_data(_modelName);
-
-    msgs::Response response = transport::request("default", *this->requestMsg);
+    msgs::Response response = transport::request("default",
+        "entity_info", _modelName);
 
     if (response.response() != "error" &&
         response.type() == modelMsg.GetTypeName())

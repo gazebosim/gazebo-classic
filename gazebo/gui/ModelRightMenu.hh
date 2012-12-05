@@ -51,11 +51,11 @@ namespace gazebo
       private: QAction *transparentAct;
       private: QAction *showCollisionAct;
       private: QAction *showJointsAct;
+      private: QAction *showCOMAct;
 
       private: QAction *snapBelowAction;
       private: QAction *followAction;
       private: QAction *skeletonAction;
-      private: QAction *showCOMAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub;
