@@ -226,14 +226,35 @@ void transport::requestNoReply(const std::string &_worldName,
                                const std::string &_request,
                                const std::string &_data)
 {
+  // Create a node for communication.
   NodePtr node = NodePtr(new Node());
+
+  // Initialize the node, use the world name for the topic namespace.
   node->Init(_worldName);
 
-  PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
+  // Process the request.
+  requestNoReply(node, _request, _data);
+
+  // Cleanup the node.
+  node.reset();
+}
+
+/////////////////////////////////////////////////
+void transport::requestNoReply(NodePtr _node, const std::string &_request,
+                               const std::string &_data)
+{
+  // Create a publisher on the request topic.
+  PublisherPtr requestPub = _node->Advertise<msgs::Request>("~/request");
+
+  // Create a new request message
   msgs::Request *request = msgs::CreateRequest(_request, _data);
+
+  // Publish the request message
   requestPub->Publish(*request);
+
+  // Cleanup the request
   delete request;
 
+  // Clean up the publisher.
   requestPub.reset();
-  node.reset();
 }

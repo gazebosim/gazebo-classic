@@ -95,8 +95,16 @@ namespace gazebo
     /// \param[in] _request The type request.
     /// \param[in] _data Optional data string.
     void requestNoReply(const std::string &_worldName,
-                         const std::string &_request,
-                         const std::string &_data = "");
+                        const std::string &_request,
+                        const std::string &_data = "");
+
+    /// \brief Send a request and don't wait for a response. This is
+    /// non-blocking.
+    /// \param[in] _node Pointer to a node that provides communication.
+    /// \param[in] _request The type request.
+    /// \param[in] _data Optional data string.
+    void requestNoReply(NodePtr _node, const std::string &_request,
+                        const std::string &_data = "");
     /// \}
   }
 }

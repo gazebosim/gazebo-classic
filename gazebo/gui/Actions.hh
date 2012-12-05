@@ -54,6 +54,9 @@ namespace gazebo
     extern QAction *g_showGridAct;
     extern QAction *g_showContactsAct;
     extern QAction *g_showJointsAct;
+    extern QAction *g_showCOMAct;
+    extern QAction *g_transparentAct;
+
     extern QAction *g_resetAct;
     extern QAction *g_fullScreenAct;
     extern QAction *g_fpsAct;

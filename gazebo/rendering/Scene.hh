@@ -365,6 +365,10 @@ namespace gazebo
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
 
+      /// \brief Enable or disable transparency for all visuals.
+      /// \param[in] _show True to enable transparency for all visuals.
+      public: void SetTransparent(bool _show);
+
       /// \brief Enable or disable center of mass visualization.
       /// \param[in] _show True to enable center of mass visualization.
       public: void ShowCOMs(bool _show);
@@ -717,6 +721,7 @@ namespace gazebo
       private: bool showCOMs;
       private: bool showCollisions;
       private: bool showJoints;
+      private: bool transparent;
     };
     /// \}
   }

@@ -464,6 +464,28 @@ void MainWindow::ShowJoints()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::SetTransparent()
+{
+  if (g_transparentAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_transparent", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "set_opaque", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowCOM()
+{
+  if (g_showCOMAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_com", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_com", "all");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowContacts()
 {
   if (g_showContactsAct->isChecked())
@@ -654,6 +676,20 @@ void MainWindow::CreateActions()
   connect(g_showGridAct, SIGNAL(triggered()), this,
           SLOT(ShowGrid()));
 
+  g_transparentAct = new QAction(tr("Transparent"), this);
+  g_transparentAct->setStatusTip(tr("Transparent"));
+  g_transparentAct->setCheckable(true);
+  g_transparentAct->setChecked(false);
+  connect(g_transparentAct, SIGNAL(triggered()), this,
+          SLOT(SetTransparent()));
+
+  g_showCOMAct = new QAction(tr("Center of Mass"), this);
+  g_showCOMAct->setStatusTip(tr("Show COM"));
+  g_showCOMAct->setCheckable(true);
+  g_showCOMAct->setChecked(false);
+  connect(g_showCOMAct, SIGNAL(triggered()), this,
+          SLOT(ShowCOM()));
+
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
   g_showContactsAct->setCheckable(true);
@@ -716,10 +752,15 @@ void MainWindow::CreateMenus()
 
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(g_showGridAct);
-  this->viewMenu->addAction(g_showContactsAct);
-  this->viewMenu->addAction(g_showJointsAct);
-  this->viewMenu->addAction(g_showCollisionsAct);
   this->viewMenu->addSeparator();
+
+  this->viewMenu->addAction(g_transparentAct);
+  this->viewMenu->addAction(g_showCollisionsAct);
+  this->viewMenu->addAction(g_showJointsAct);
+  this->viewMenu->addAction(g_showCOMAct);
+  this->viewMenu->addAction(g_showContactsAct);
+  this->viewMenu->addSeparator();
+
   this->viewMenu->addAction(g_resetAct);
   this->viewMenu->addAction(g_fullScreenAct);
   this->viewMenu->addSeparator();

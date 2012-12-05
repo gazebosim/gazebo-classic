@@ -29,18 +29,15 @@ using namespace gui;
 
 ModelRightMenu::ModelRightMenu()
 {
+  this->showAllCollisions = false;
+  this->showAllJoints = false;
+  this->showAllCOM = false;
+  this->allTransparent = false;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
-
-  // this->snapBelowAction = new QAction(tr("Snap"), this);
-  // this->snapBelowAction->setStatusTip(tr("Snap to object below"));
-  // connect(this->snapBelowAction, SIGNAL(triggered()), this,
-  //         SLOT(OnSnapBelow()));
-
-  // this->followAction = new QAction(tr("Follow"), this);
-  // this->followAction->setStatusTip(tr("Follow the selection"));
-  // connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
+  this->requestSub = this->node->Subscribe("~/request",
+      &ModelRightMenu::OnRequest, this);
 
   this->moveToAct= new QAction(tr("Move To"), this);
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
@@ -70,6 +67,11 @@ ModelRightMenu::ModelRightMenu()
   connect(this->showCOMAct, SIGNAL(triggered()), this,
           SLOT(OnShowCOM()));
 
+  this->snapBelowAct = new QAction(tr("Snap"), this);
+  this->snapBelowAct->setStatusTip(tr("Snap to object below"));
+  connect(this->snapBelowAct, SIGNAL(triggered()), this,
+           SLOT(OnSnapBelow()));
+
   // Create the delete action
   g_deleteAct = new DeleteAction(tr("Delete"), this);
   g_deleteAct->setStatusTip(tr("Delete a model"));
@@ -78,14 +80,16 @@ ModelRightMenu::ModelRightMenu()
   connect(g_deleteAct, SIGNAL(triggered()), this,
           SLOT(OnDelete()));
 
+  // this->followAction = new QAction(tr("Follow"), this);
+  // this->followAction->setStatusTip(tr("Follow the selection"));
+  // connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
+
 
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
   // this->skeletonAction->setCheckable(true);
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
-
-
 }
 
 /////////////////////////////////////////////////
@@ -100,8 +104,8 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   this->modelName = _modelName.substr(0, _modelName.find("::"));
 
   QMenu menu;
-  // menu.addAction(this->snapBelowAction);
   menu.addAction(this->moveToAct);
+  menu.addAction(this->snapBelowAct);
 
   QMenu *viewMenu = menu.addMenu(tr("View"));
   viewMenu->addAction(this->transparentAct);
@@ -113,25 +117,25 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   menu.addAction(g_deleteAct);
 
   // menu.addAction(this->followAction);
-  // menu.addAction(this->showCOMAction);
   // menu.addAction(this->skeletonAction);
 
-  if (this->transparentActionState[this->modelName])
+  if (this->transparentActionState[this->modelName] || this->allTransparent)
     this->transparentAct->setChecked(true);
   else
     this->transparentAct->setChecked(false);
 
-  if (this->showCollisionsActionState[this->modelName])
+  if (this->showCollisionsActionState[this->modelName] ||
+      this->showAllCollisions)
     this->showCollisionAct->setChecked(true);
   else
     this->showCollisionAct->setChecked(false);
 
-  if (this->showCOMActionState[this->modelName])
+  if (this->showCOMActionState[this->modelName] || this->showAllCOM)
     this->showCOMAct->setChecked(true);
   else
     this->showCOMAct->setChecked(false);
 
-  if (this->showJointsActionState[this->modelName])
+  if (this->showJointsActionState[this->modelName] || this->showAllJoints)
     this->showJointsAct->setChecked(true);
   else
     this->showJointsAct->setChecked(false);
@@ -143,13 +147,6 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   //   this->skeletonAction->setChecked(false);
 
   menu.exec(_pt);
-}
-
-/////////////////////////////////////////////////
-void ModelRightMenu::OnSnapBelow()
-{
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -166,11 +163,9 @@ void ModelRightMenu::OnShowCollision()
     this->showCollisionAct->isChecked();
 
   if (this->showCollisionAct->isChecked())
-    this->requestMsg = msgs::CreateRequest("show_collision", this->modelName);
+    transport::requestNoReply(this->node, "show_collision", this->modelName);
   else
-    this->requestMsg = msgs::CreateRequest("hide_collision", this->modelName);
-
-  this->requestPub->Publish(*this->requestMsg);
+    transport::requestNoReply(this->node, "hide_collision", this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -180,11 +175,9 @@ void ModelRightMenu::OnShowJoints()
     this->showJointsAct->isChecked();
 
   if (this->showJointsAct->isChecked())
-    this->requestMsg = msgs::CreateRequest("show_joints", this->modelName);
+    transport::requestNoReply(this->node, "show_joints", this->modelName);
   else
-    this->requestMsg = msgs::CreateRequest("hide_joints", this->modelName);
-
-  this->requestPub->Publish(*this->requestMsg);
+    transport::requestNoReply(this->node, "hide_joints", this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -194,11 +187,9 @@ void ModelRightMenu::OnShowCOM()
     this->showCOMAct->isChecked();
 
   if (this->showCOMAct->isChecked())
-    this->requestMsg = msgs::CreateRequest("show_com", this->modelName);
+    transport::requestNoReply(this->node, "show_com", this->modelName);
   else
-    this->requestMsg = msgs::CreateRequest("hide_com", this->modelName);
-
-  this->requestPub->Publish(*this->requestMsg);
+    transport::requestNoReply(this->node, "hide_com", this->modelName);
 }
 
 /////////////////////////////////////////////////
@@ -208,45 +199,44 @@ void ModelRightMenu::OnTransparent()
     this->transparentAct->isChecked();
 
   if (this->transparentAct->isChecked())
-  {
-    this->requestMsg = msgs::CreateRequest("set_transparency", this->modelName);
-    this->requestMsg->set_dbl_data(0.5);
-  }
+    transport::requestNoReply(this->node, "set_transparent", this->modelName);
   else
-  {
-    this->requestMsg = msgs::CreateRequest("set_transparency", this->modelName);
-    this->requestMsg->set_dbl_data(0.0);
-  }
-
-  this->requestPub->Publish(*this->requestMsg);
+    transport::requestNoReply(this->node, "set_opaque", this->modelName);
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::OnSkeleton()
-{
-  this->skeletonActionState[this->modelName] =
-    this->skeletonAction->isChecked();
-
-  if (this->skeletonAction->isChecked())
-  {
-    this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
-    this->requestMsg->set_dbl_data(1.0);
-  }
-  else
-  {
-    this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
-    this->requestMsg->set_dbl_data(0.0);
-  }
-
-  this->requestPub->Publish(*this->requestMsg);
-}
-
-/////////////////////////////////////////////////
-void ModelRightMenu::OnFollow()
+void ModelRightMenu::OnSnapBelow()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->TrackVisual(this->modelName);
+  cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
 }
+
+/////////////////////////////////////////////////
+// void ModelRightMenu::OnSkeleton()
+// {
+//   this->skeletonActionState[this->modelName] =
+//     this->skeletonAction->isChecked();
+//
+//   if (this->skeletonAction->isChecked())
+//   {
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg->set_dbl_data(1.0);
+//   }
+//   else
+//   {
+//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg->set_dbl_data(0.0);
+//   }
+//
+//   this->requestPub->Publish(*this->requestMsg);
+// }
+
+/////////////////////////////////////////////////
+// void ModelRightMenu::OnFollow()
+// {
+//   rendering::UserCameraPtr cam = gui::get_active_camera();
+//   cam->TrackVisual(this->modelName);
+// }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::OnDelete(const std::string &_name)
@@ -257,7 +247,69 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   if (!name.empty())
   {
-    this->requestMsg = msgs::CreateRequest("entity_delete", name);
-    this->requestPub->Publish(*this->requestMsg);
+    transport::requestNoReply(this->node, "entity_delete", name);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnRequest(ConstRequestPtr &_msg)
+{
+  if (_msg->request() == "show_collision" ||
+      _msg->request() == "hide_collision" )
+  {
+    bool value = _msg->request() == "show_collision" ? true : false;
+    if (_msg->data() == "all")
+    {
+      this->SetMap(this->showCollisionsActionState, value);
+      this->showAllCollisions = value;
+    }
+    else
+      this->showCollisionsActionState[_msg->data()] = value;
+  }
+  else if (_msg->request() == "show_joints" ||
+           _msg->request() == "hide_joints" )
+  {
+    bool value = _msg->request() == "show_joints" ? true : false;
+    if (_msg->data() == "all")
+    {
+      this->SetMap(this->showJointsActionState, value);
+      this->showAllJoints = value;
+    }
+    else
+      this->showJointsActionState[_msg->data()] = value;
+  }
+  else if (_msg->request() == "show_com" ||
+           _msg->request() == "hide_com" )
+  {
+    bool value = _msg->request() == "show_com" ? true : false;
+    if (_msg->data() == "all")
+    {
+      this->SetMap(this->showCOMActionState, value);
+      this->showAllCOM = value;
+    }
+    else
+      this->showCOMActionState[_msg->data()] = value;
+  }
+  else if (_msg->request() == "set_transparent" ||
+           _msg->request() == "set_opaque" )
+  {
+    bool value = _msg->request() == "set_transparent" ? true : false;
+    if (_msg->data() == "all")
+    {
+      this->SetMap(this->transparentActionState, value);
+      this->allTransparent = value;
+    }
+    else
+      this->transparentActionState[_msg->data()] = value;
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::SetMap(std::map<std::string, bool> &_map, bool _value)
+{
+  for (std::map<std::string, bool>::iterator iter = _map.begin();
+       iter != _map.end(); ++iter)
+  {
+    iter->second = _value;
   }
 }

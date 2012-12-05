@@ -83,6 +83,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->showCOMs = false;
   this->showCollisions = false;
   this->showJoints = false;
+  this->transparent = false;
 
   this->requestMsg = NULL;
   this->enableVisualizations = _enableVisualizations;
@@ -1816,11 +1817,27 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         vis->ShowCOM(false);
     }
   }
-  else if (_msg->request() == "set_transparency")
+  else if (_msg->request() == "set_transparent")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->SetTransparency(_msg->dbl_data());
+    if (_msg->data() == "all")
+      this->SetTransparent(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetTransparency(0.5);
+    }
+  }
+  else if (_msg->request() == "set_opaque")
+  {
+    if (_msg->data() == "all")
+      this->SetTransparent(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->SetTransparency(0.0);
+    }
   }
   else if (_msg->request() == "show_skeleton")
   {
@@ -1910,6 +1927,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       visual->ShowCOM(this->showCOMs);
       visual->ShowCollision(this->showCollisions);
       visual->ShowJoints(this->showJoints);
+      visual->SetTransparency(this->transparent ? 0.5 : 0.0);
     }
   }
 
@@ -2304,6 +2322,17 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
     this->visuals[_newName] = result;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetTransparent(bool _show)
+{
+  this->transparent = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->SetTransparency(_show ? 0.5 : 0.0);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -48,6 +48,9 @@ QAction *gazebo::gui::g_showCollisionsAct = 0;
 QAction *gazebo::gui::g_showGridAct = 0;
 QAction *gazebo::gui::g_showContactsAct = 0;
 QAction *gazebo::gui::g_showJointsAct = 0;
+QAction *gazebo::gui::g_showCOMAct = 0;
+QAction *gazebo::gui::g_transparentAct = 0;
+
 QAction *gazebo::gui::g_resetAct = 0;
 QAction *gazebo::gui::g_fullScreenAct = 0;
 QAction *gazebo::gui::g_fpsAct = 0;
