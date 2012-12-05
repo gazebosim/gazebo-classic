@@ -72,11 +72,11 @@ void GridLines::mousePressEvent(QGraphicsSceneDragDropEvent *)
 }
 
 /////////////////////////////////////////////////
-void GridLines::mousePressEvent ( QGraphicsSceneMouseEvent *_event)
+void GridLines::mousePressEvent ( QGraphicsSceneMouseEvent */*_event*/)
 {
 }
 
 /////////////////////////////////////////////////
-void GridLines::mouseMoveEvent ( QGraphicsSceneMouseEvent *_event)
+void GridLines::mouseMoveEvent ( QGraphicsSceneMouseEvent */*_event*/)
 {
 }

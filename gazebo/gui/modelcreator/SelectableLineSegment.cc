@@ -16,7 +16,6 @@
 */
 
 #include "SelectableLineSegment.hh"
-#include <math.h>
 #include "CornerGrabber.hh"
 
 /////////////////////////////////////////////////
@@ -409,14 +408,14 @@ void SelectableLineSegment::UpdateCornerPositions()
 void SelectableLineSegment::paint (QPainter *_painter,
   const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
-  QPen pen;
-  pen.setWidth(2);
-  pen.setColor(this->outterBorderColor);
+  QPen outterBorderPen;
+  outterBorderPen.setWidth(2);
+  outterBorderPen.setColor(this->outterBorderColor);
 
-  pen.setStyle(Qt::SolidLine);
-  _painter->setPen(pen);
+  outterBorderPen.setStyle(Qt::SolidLine);
+  _painter->setPen(outterBorderPen);
 
-  pen.setColor(Qt::red);
+  outterBorderPen.setColor(Qt::red);
   _painter->drawLine(this->lineEnd0, this->lineEnd1);
 }
 

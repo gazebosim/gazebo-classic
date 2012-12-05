@@ -16,34 +16,26 @@
 */
 
 #include "RectItem.hh"
-#include <QDebug>
-#include "math.h"
 #include "CornerGrabber.hh"
 
 /////////////////////////////////////////////////
 RectItem::RectItem():
-    text(),
     outterBorderColor(Qt::black),
-    outterBorderPen(),
     location(0,0),
     dragStart(0,0),
     gridSpace(10),
-    width(100),
-    height(10),
     cornerDragStart(0,0),
     xCornerGrabBuffer(10),
     yCornerGrabBuffer(10)
 {
+  this->width = 100;
+  this->height = 100;
+
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
 
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
-
-//  this->text.setPos(35,35);
-//  this->text.setPlainText("text goes here");
-//  this->text.setParentItem(this);
-
 
   this->corners[0] = new CornerGrabber(this,0);
   this->corners[1] = new CornerGrabber(this,1);
@@ -69,27 +61,11 @@ RectItem::~RectItem()
   delete this->corners[3];
 }
 
-/**
- *  To allow the user to grab the corners to re-size, we need to get a hover
- *  indication. But if the mouse pointer points to the left, then when the mouse
- *  tip is to the left but just outsize the box, we will not get the hover.
- *  So the solution is to tell the graphics scene the box is larger than
- *  what the painter actually paints in. This way when the user gets the mouse
- *  within a few pixels of what appears to be the edge of the box, we get
- *  the hover indication.
-
- *  So the cornerGrabBuffer is a few pixel wide buffer zone around the outside
- *  edge of the box.
- *
- */
 /////////////////////////////////////////////////
 void RectItem::AdjustSize(int _x, int _y)
 {
   this->width += _x;
   this->height += _y;
-
-//  this->drawingWidth = this->width - this->xCornerGrabBuffer;
-//  this->drawingHeight = this->height - this->yCornerGrabBuffer;
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
 }
@@ -268,7 +244,6 @@ void RectItem::hoverEnterEvent (QGraphicsSceneHoverEvent *)
 /////////////////////////////////////////////////
 void RectItem::UpdateCornerPositions()
 {
-
   int cornerWidth = (this->corners[0]->boundingRect().width())/2;
   int cornerHeight = (this->corners[0]->boundingRect().height())/2;
 
@@ -288,26 +263,24 @@ QRectF RectItem::boundingRect() const
   return QRectF(0,0,this->width,this->height);
 }
 
-// example of a drop shadow effect on a box, using QLinearGradient and two boxes
 /////////////////////////////////////////////////
-void RectItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *, QWidget *)
+void RectItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
+    QWidget *)
 {
   QPointF topLeft(this->drawingOriginX, this->drawingOriginY);
   QPointF topRight(this->drawingWidth, this->drawingOriginY);
   QPointF bottomLeft(this->drawingOriginX, this->drawingHeight);
   QPointF bottomRight(this->drawingWidth, this->drawingHeight);
 
-  QPointF middleLeft(this->drawingOriginX, this->drawingHeight/2.0);
-  QPointF middleRight(this->drawingWidth, this->drawingHeight/2.0);
-
   QPen pen;
   pen.setStyle(Qt::SolidLine);
   pen.setColor(outterBorderColor);
   _painter->setPen(pen);
 
-  _painter->drawLine(topLeft, bottomLeft);
+  _painter->drawLine(topLeft, topRight);
   _painter->drawLine(topRight, bottomRight);
-  _painter->drawLine(middleLeft, middleRight);
+  _painter->drawLine(bottomRight, bottomLeft);
+  _painter->drawLine(bottomLeft, topLeft);
 }
 
 /////////////////////////////////////////////////

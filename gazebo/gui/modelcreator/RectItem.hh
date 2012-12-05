@@ -10,13 +10,11 @@ class RectItem : public QGraphicsItem
 {
     public: RectItem();
 
-    public: ~RectItem();
-
-    public: QGraphicsTextItem text;
+    public: virtual ~RectItem();
 
     public: void SetGridSpace(int _space);
 
-    private: void UpdateCornerPositions();
+    protected: void UpdateCornerPositions();
 
     private: void AdjustSize(int _x, int _y);
 
@@ -42,9 +40,19 @@ class RectItem : public QGraphicsItem
     private: virtual bool sceneEventFilter(QGraphicsItem *_watched,
         QEvent *_event);
 
-    private: QColor outterBorderColor;
+    protected: qreal width;
 
-    private: QPen outterBorderPen;
+    protected: qreal height;
+
+    protected: qreal drawingWidth;
+
+    protected: qreal drawingHeight;
+
+    protected: qreal drawingOriginX;
+
+    protected: qreal drawingOriginY;
+
+    protected: QColor outterBorderColor;
 
     private: QPointF location;
 
@@ -52,26 +60,14 @@ class RectItem : public QGraphicsItem
 
     private: int gridSpace;
 
-    private: qreal width;
-
-    private: qreal height;
-
     private: QPointF cornerDragStart;
 
     private: int xCornerGrabBuffer;
 
     private: int yCornerGrabBuffer;
 
-    private: qreal drawingWidth;
-
-    private: qreal drawingHeight;
-
-    private: qreal drawingOriginX;
-
-    private: qreal drawingOriginY;
-
     /// \brief Corners of the rectangle, going clockwise with 0 being top left
     CornerGrabber*  corners[4];
 };
 
-#endif // STATEBOX_H
+#endif

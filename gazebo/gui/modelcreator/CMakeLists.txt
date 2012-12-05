@@ -13,7 +13,9 @@ set (sources
   CornerGrabber.cc
   CreatorView.cc
   RectItem.cc
- )
+  WindowItem.cc
+  DoorItem.cc
+)
 
 set (qt_headers
   EditorWidget.hh
@@ -27,7 +29,9 @@ set (qt_headers
   CornerGrabber.hh
   CreatorView.hh
   RectItem.hh
-  )
+  WindowItem.hh
+  DoorItem.hh
+)
 
 #set (resources qtpropertybrowser.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})

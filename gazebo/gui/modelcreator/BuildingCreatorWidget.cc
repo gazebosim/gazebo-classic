@@ -20,6 +20,8 @@
 #include "GridLines.hh"
 #include "CreatorView.hh"
 #include "RectItem.hh"
+#include "WindowItem.hh"
+#include "DoorItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -53,9 +55,13 @@ BuildingCreatorWidget::BuildingCreatorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-  RectItem *item = new RectItem();
-  item->setPos(200,200);
-  scene->addItem(item);
+  WindowItem *windowItem = new WindowItem();
+  windowItem->setPos(0,0);
+  scene->addItem(windowItem);
+
+  DoorItem *doorItem = new DoorItem();
+  doorItem->setPos(150,150);
+  scene->addItem(doorItem);
 
 //  qDebug() << " width height "<< _parent->width() << " " << _parent->height() << scene->width() << scene->height() << view->width() << view->height();
   canvasLayout->setContentsMargins(0, 0, 0, 0);
