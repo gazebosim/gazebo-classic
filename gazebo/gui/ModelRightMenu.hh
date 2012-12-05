@@ -18,6 +18,7 @@
 #define _MODELRIGHTMENU_HH_
 
 #include <map>
+#include <vector>
 #include <string>
 
 #include "gazebo/gui/qt.h"

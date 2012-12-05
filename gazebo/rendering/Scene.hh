@@ -718,9 +718,16 @@ namespace gazebo
       /// \brief Controls the sky.
       private: SkyX::BasicController *skyxController;
 
+      /// \brief True when all COMs should be visualized.
       private: bool showCOMs;
+
+      /// \brief True when all collisions should be visualized.
       private: bool showCollisions;
+
+      /// \brief True when all joints should be visualized.
       private: bool showJoints;
+
+      /// \brief True when all objects should be transparent.
       private: bool transparent;
     };
     /// \}

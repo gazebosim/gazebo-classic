@@ -168,6 +168,12 @@ void on_response(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
+{
+  TopicManager::Instance()->GetTopicNamespaces(_namespaces);
+}
+
+/////////////////////////////////////////////////
 boost::shared_ptr<msgs::Response> transport::request(
     const std::string &_worldName, const std::string &_request,
     const std::string &_data)
@@ -213,12 +219,6 @@ boost::shared_ptr<msgs::Response> transport::request(
 
   delete request;
   return response;
-}
-
-/////////////////////////////////////////////////
-void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
-{
-  TopicManager::Instance()->GetTopicNamespaces(_namespaces);
 }
 
 /////////////////////////////////////////////////
