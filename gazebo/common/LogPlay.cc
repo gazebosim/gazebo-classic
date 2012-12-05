@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ void LogPlay::Open(const std::string &_logFile)
 void LogPlay::ReadHeader()
 {
   std::string logVersion, gazeboVersion;
-  uint32_t randSeed;
+  uint32_t randSeed = math::Rand::GetSeed();
   TiXmlElement *headerXml, *childXml;
 
   // Get the header element

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,6 +268,12 @@ namespace gazebo
                                         std::vector<VisualPtr> &_visuals);
 
 
+      /// \brief Get the Z-value of the first object below the given point.
+      /// \param[in] _pt Position to search below for a visual.
+      /// \return The Z-value of the nearest visual below the point. Zero
+      /// is returned if no visual is found.
+      public: double GetHeightBelowPoint(const math::Vector3 &_pt);
+
       /// \brief Get the world pos of a the first contact at a pixel location.
       /// \param[in] _camera Pointer to the camera.
       /// \param[in] _mousePos 2D position of the mouse in pixels.
@@ -358,6 +364,10 @@ namespace gazebo
       /// \return Pointer to the currently selected visual, or NULL if
       /// nothing is selected.
       public: VisualPtr GetSelectedVisual() const;
+
+      /// \brief Enable or disable contact visualization.
+      /// \param[in] _view True to enable contact visualization.
+      public: void ViewContacts(bool _view);
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -681,7 +691,7 @@ namespace gazebo
       private: bool enableVisualizations;
 
       /// \brief The heightmap, if any.
-      private: Heightmap *heightmap;
+      private: Heightmap *terrain;
 
       /// \brief All the projectors.
       private: std::map<std::string, Projector *> projectors;

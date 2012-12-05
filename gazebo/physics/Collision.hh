@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,16 +169,12 @@ namespace gazebo
       /// \param[in] The collision state.
       public: void SetState(const CollisionState &_state);
 
-      /// \brief Setup callback for contact event
-      /// \param[in] _subscriber The callback.
-      /// \return Pointer to the new connection, which must be kept in
-      /// scope.
+      /// Deprecated.
       public: template<typename T>
               event::ConnectionPtr ConnectContact(T _subscriber)
               {return contact.Connect(_subscriber);}
 
-      /// \brief Disconnect callback for contact event.
-      /// \param[in] _conn The connection to disconnect.
+      /// Deprecated.
       public: void DisconnectContact(event::ConnectionPtr &_conn)
               {contact.Disconnect(_conn);}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,9 @@ namespace gazebo
     ///        related information, its elements are labeled by x, y, z.
     class Vector3
     {
+      /// \brief math::Vector3(0, 0, 0)
+      public: static const Vector3 Zero;
+
       /// \brief Constructor
       public: Vector3();
 

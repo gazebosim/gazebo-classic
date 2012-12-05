@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,8 +71,10 @@ void ODELink::Init()
     this->linkId = dBodyCreate(this->odePhysics->GetWorldId());
     dBodySetData(this->linkId, this);
 
-    // Only use auto disable if no joints are present
-    if (this->GetModel()->GetJointCount() == 0)
+    // Only use auto disable if no joints and no sensors are present
+    if (this->GetModel()->GetAutoDisable() &&
+        this->GetModel()->GetJointCount() == 0 &&
+        this->GetSensorCount() == 0)
     {
       dBodySetAutoDisableDefaults(this->linkId);
       dBodySetAutoDisableFlag(this->linkId, 1);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -279,6 +279,10 @@ namespace gazebo
       /// model has joints.
       /// \param[in] _disable If true, the model is allowed to auto disable.
       public: void SetAutoDisable(bool _disable);
+
+      /// \brief Return the value of the SDF <allow_auto_disable> element.
+      /// \return True if auto disable is allowed for this model.
+      public: bool GetAutoDisable() const;
 
       /// \brief Load all plugins
       ///
