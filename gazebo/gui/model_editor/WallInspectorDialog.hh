@@ -39,7 +39,23 @@ namespace gazebo
 
       public: math::Vector2d GetEndPosition();
 
+      public: double GetHeight();
+
+      public: double GetThickness();
+
       public: std::string GetMaterial();
+
+      public: void SetLength(double _length);
+
+      public: void SetStartPosition(math::Vector2d _pos);
+
+      public: void SetEndPosition(math::Vector2d _pos);
+
+      public: void SetHeight(double _height);
+
+      public: void SetThickness(double _thickness);
+
+      public: void SetMaterial(std::string _material);
 
       private slots: void OnCancel();
 

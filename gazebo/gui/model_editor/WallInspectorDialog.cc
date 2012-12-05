@@ -189,9 +189,61 @@ math::Vector2d WallInspectorDialog::GetEndPosition()
 }
 
 /////////////////////////////////////////////////
+double WallInspectorDialog::GetHeight()
+{
+  return this->heightSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+double WallInspectorDialog::GetThickness()
+{
+  return this->thicknessSpinBox->value();
+}
+
+/////////////////////////////////////////////////
 std::string WallInspectorDialog::GetMaterial()
 {
   return this->materialComboBox->currentText().toStdString();
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetLength(double _length)
+{
+  this->lengthSpinBox->setValue(_length);
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetStartPosition(math::Vector2d _pos)
+{
+  this->startXSpinBox->setValue(_pos.x);
+  this->startYSpinBox->setValue(_pos.y);
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetEndPosition(math::Vector2d _pos)
+{
+  this->endXSpinBox->setValue(_pos.x);
+  this->endYSpinBox->setValue(_pos.y);
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetHeight(double _height)
+{
+  this->heightSpinBox->setValue(_height);
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetThickness(double _thickness)
+{
+  this->thicknessSpinBox->setValue(_thickness);
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetMaterial(std::string _material)
+{
+  int index = this->materialComboBox->findText(
+      QString::fromStdString(_material));
+  this->materialComboBox->setCurrentIndex(index);
 }
 
 /////////////////////////////////////////////////

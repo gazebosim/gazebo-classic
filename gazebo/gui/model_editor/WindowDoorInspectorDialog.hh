@@ -46,6 +46,16 @@ namespace gazebo
 
       public: std::string GetType();
 
+      public: void SetWidth(double _width);
+
+      public: void SetHeight(double _height);
+
+      public: void SetLength(double _length);
+
+      public: void SetPosition(math::Vector2d _pos);
+
+      public: void SetType(std::string _type);
+
       private slots: void OnCancel();
 
       private slots: void OnOK();

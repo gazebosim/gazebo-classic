@@ -166,6 +166,39 @@ std::string WindowDoorInspectorDialog::GetType()
 }
 
 /////////////////////////////////////////////////
+void WindowDoorInspectorDialog::SetWidth(double _width)
+{
+  this->lengthSpinBox->setValue(_width);
+}
+
+/////////////////////////////////////////////////
+void WindowDoorInspectorDialog::SetHeight(double _height)
+{
+  this->heightSpinBox->setValue(_height);
+}
+
+/////////////////////////////////////////////////
+void WindowDoorInspectorDialog::SetLength(double _length)
+{
+  this->lengthSpinBox->setValue(_length);
+}
+
+/////////////////////////////////////////////////
+void WindowDoorInspectorDialog::SetPosition(math::Vector2d _pos)
+{
+  this->positionXSpinBox->setValue(_pos.x);
+  this->positionYSpinBox->setValue(_pos.y);
+}
+
+/////////////////////////////////////////////////
+void WindowDoorInspectorDialog::SetType(std::string _type)
+{
+  int index = this->typeComboBox->findText(
+    QString::fromStdString(_type));
+  this->typeComboBox->setCurrentIndex(index);
+}
+
+/////////////////////////////////////////////////
 void WindowDoorInspectorDialog::OnCancel()
 {
   this->close();
