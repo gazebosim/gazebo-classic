@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,12 @@ namespace gazebo
 
       private: std::string modelName;
 
-      private: QAction *snapBelowAction;
       private: QAction *moveToAction;
+      private: QAction *transparentAct;
+
+      private: QAction *snapBelowAction;
       private: QAction *followAction;
       private: QAction *showCollisionAction;
-      private: QAction *transparentAction;
       private: QAction *skeletonAction;
       private: QAction *showJointsAction;
       private: QAction *showCOMAction;

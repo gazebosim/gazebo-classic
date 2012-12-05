@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ namespace gazebo
       /// \param[in] _namePrefix Unique prefix name for the camera.
       /// \param[in] _scene Scene that will contain the camera
       /// \param[in] _autoRender Almost everyone should leave this as true.
-      public: Camera(const std::string &_namePrefix, Scene *_scene,
+      public: Camera(const std::string &_namePrefix, ScenePtr _scene,
                      bool _autoRender = true);
 
       /// \brief Destructor
@@ -139,7 +139,7 @@ namespace gazebo
 
       /// \brief Set the scene this camera is viewing
       /// \param[in] _scene Pointer to the scene
-      public: void SetScene(Scene *_scene);
+      public: void SetScene(ScenePtr _scene);
 
       /// \brief Get the global pose of the camera
       /// \return Pose of the camera in the world coordinate frame
@@ -363,7 +363,7 @@ namespace gazebo
 
       /// \brief Get the scene this camera is in
       /// \return Pointer to scene containing this camera
-      public: Scene *GetScene() const;
+      public: ScenePtr GetScene() const;
 
       /// \brief Get point on a plane
       /// \param[in] _x X cooridnate in camera's viewport, in pixels
@@ -449,13 +449,16 @@ namespace gazebo
       /// \return Ture if the camera is initialized
       public: bool GetInitialized() const;
 
-      /// \brief Move the camera to a position. This is an animated motion
+      /// \brief Move the camera to a position (this is an animated motion).
+      /// \sa Camera::MoveToPositions
       /// \param[in] _pose End position of the camera
       /// \param[in] _time Duration of the camera's movement
       public: virtual bool MoveToPosition(const math::Pose &_pose,
                                           double _time);
 
-      /// \brief Move the camera to a series of positions
+      /// \brief Move the camera to a series of poses (this is an
+      /// animated motion).
+      /// \sa Camera::MoveToPosition
       /// \param[in] _pts Vector of poses to move to
       /// \param[in] _time Duration of the entire move
       /// \param[in] _onComplete Callback that is called when the move is
@@ -503,6 +506,14 @@ namespace gazebo
                      bool _inheritOrientation,
                      double _minDist = 0, double _maxDist = 0);
 
+      /// \brief Get the next frame filename based on SDF parameters
+      /// \return The frame's filename
+      protected: std::string GetFrameFilename();
+
+      /// \brief Internal function used to indicate that an animation has
+      /// completed.
+      protected: virtual void AnimationComplete();
+
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
       /// \param[in] _dst Destination buffer for the image data
@@ -521,74 +532,121 @@ namespace gazebo
       /// \return Integer representation of the Ogre image format
       private: static int GetOgrePixelFormat(const std::string &_format);
 
-      /// \brief Get the next frame filename based on SDF parameters
-      /// \return The frame's filename
-      protected: std::string GetFrameFilename();
 
-      /// \brief Create the ogre camera
+      /// \brief Create the ogre camera.
       private: void CreateCamera();
 
+      /// \brief Name of the camera.
       protected: std::string name;
 
+      /// \brief Camera's SDF values.
       protected: sdf::ElementPtr sdf;
 
+      /// \brief ID of the window that the camera is attached to.
       protected: unsigned int windowId;
 
-      protected: unsigned int textureWidth, textureHeight;
+      /// \brief Width of the render texture.
+      protected: unsigned int textureWidth;
 
+      /// \brief Height of the render texture.
+      protected: unsigned int textureHeight;
+
+      /// \brief The OGRE camera
       protected: Ogre::Camera *camera;
+
+      /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
+
+      /// \brief Scene node that controls camera position.
       protected: Ogre::SceneNode *sceneNode;
+
+      /// \brief Scene nod that controls camera pitch.
       protected: Ogre::SceneNode *pitchNode;
 
-      // Info for saving images
+      // \brief Buffer for a single image frame.
       protected: unsigned char *saveFrameBuffer;
+
+      /// \brief Buffer for a bayer image frame.
       protected: unsigned char *bayerFrameBuffer;
+
+      /// \brief Number of saved frames.
       protected: unsigned int saveCount;
 
+      /// \brief Format for saving images.
       protected: int imageFormat;
-      protected: int imageWidth, imageHeight;
 
+      /// \brief Save image width.
+      protected: int imageWidth;
+
+      /// \brief Save image height.
+      protected: int imageHeight;
+
+      /// \brief Target that renders frames.
       protected: Ogre::RenderTarget *renderTarget;
 
+      /// \brief Texture that receives results from rendering.
       protected: Ogre::Texture *renderTexture;
 
-      private: static unsigned int cameraCounter;
-      private: unsigned int myCount;
-
+      /// \brief True to capture frames into an image buffer.
       protected: bool captureData;
 
+      /// \brief True if new data is available.
       protected: bool newData;
 
+      /// \brief Time the last frame was rendered.
       protected: common::Time lastRenderWallTime;
 
-      protected: Scene *scene;
+      /// \brief Pointer to the scene.
+      protected: ScenePtr scene;
 
+      /// \brief Event triggered when a new frame is generated.
       protected: event::EventT<void(const unsigned char *,
                      unsigned int, unsigned int, unsigned int,
                      const std::string &)> newImageFrame;
 
+      /// \brief The camera's event connections.
       protected: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief List of requests.
       protected: std::list<msgs::Request> requests;
-      private: friend class Scene;
 
-      private: sdf::ElementPtr imageElem;
-
+      /// \brief True if initialized.
       protected: bool initialized;
-      private: VisualPtr trackedVisual;
 
+      /// \brief Animation state, used to animate the camera.
       protected: Ogre::AnimationState *animState;
+
+      /// \brief Previous time the camera animation was updated.
       protected: common::Time prevAnimTime;
+
+      /// \brief User callback for when an animation completes.
       protected: boost::function<void()> onAnimationComplete;
 
+      /// \brief Pointer to image SDF element.
+      private: sdf::ElementPtr imageElem;
+
+      /// \brief Visual that the camera is tracking.
+      private: VisualPtr trackedVisual;
+
+      /// \brief Counter used to create unique camera names.
+      private: static unsigned int cameraCounter;
+
+      /// \brief Deferred shading geometry buffer.
       private: Ogre::CompositorInstance *dsGBufferInstance;
+
+      /// \brief Deferred shading merge compositor.
       private: Ogre::CompositorInstance *dsMergeInstance;
 
+      /// \brief Deferred lighting geometry buffer.
       private: Ogre::CompositorInstance *dlGBufferInstance;
+
+      /// \brief Deferred lighting merge compositor.
       private: Ogre::CompositorInstance *dlMergeInstance;
 
+      /// \brief Screen space ambient occlusion compositor.
       private: Ogre::CompositorInstance *ssaoInstance;
 
+      /// \brief Queue of move positions.
       private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 
       /// \brief Render period.

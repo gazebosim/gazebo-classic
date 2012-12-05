@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      public: UserCamera(const std::string &_name, Scene *_scene);
+      public: UserCamera(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~UserCamera();
@@ -181,6 +181,9 @@ namespace gazebo
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
                      bool _inheritOrientation, double _minDist = 0,
                      double _maxDist = 0);
+
+      // Documentation inherited.
+      protected: virtual void AnimationComplete();
 
       /// \brief Set the camera to track a scene node.
       ///

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _filename the path to the image
-      public: Image(const std::string &_filename="");
+      public: explicit Image(const std::string &_filename="");
 
       /// \brief Destructor
       public: virtual ~Image();

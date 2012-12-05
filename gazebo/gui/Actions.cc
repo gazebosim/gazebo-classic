@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ QAction *gazebo::gui::g_spotLghtCreateAct = 0;
 QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 
 QAction *gazebo::gui::g_viewGridAct = 0;
+QAction *gazebo::gui::g_viewContactsAct = 0;
 QAction *gazebo::gui::g_viewResetAct = 0;
 QAction *gazebo::gui::g_viewFullScreenAct = 0;
 QAction *gazebo::gui::g_viewFPSAct = 0;

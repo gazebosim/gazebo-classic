@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -754,7 +754,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 
       if (dynamic_cast<Ogre::Entity*>(obj))
         ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
-      else
+      else if (dynamic_cast<Ogre::SimpleRenderable*>(obj))
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
 
@@ -1466,19 +1466,20 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       posDiff = Conversions::Convert(node->_getDerivedPosition()) -
                 this->GetWorldPose().pos;
 
-      min = rotDiff * Conversions::Convert(bb.getMinimum() * node->getScale())
-            + posDiff;
-      max = rotDiff * Conversions::Convert(bb.getMaximum() * node->getScale())
-            + posDiff;
-
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = Conversions::Convert(node->getPosition());
-        max = Conversions::Convert(node->getPosition());
-        min -= math::Vector3(0.5, 0.5, 0.5);
-        max += math::Vector3(0.5, 0.5, 0.5);
+        min = math::Vector3(-0.5, -0.5, -0.5);
+        max = math::Vector3(0.5, 0.5, 0.5);
       }
+      else
+      {
+        min = rotDiff *
+          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
+        max = rotDiff *
+          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
+      }
+
 
       box.Merge(math::Box(min, max));
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -256,8 +256,11 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
 
     msgs::Response response = transport::request("default", *this->requestMsg);
 
-    if (response.type() != "error")
+    if (response.response() != "error" &&
+        response.type() == modelMsg.GetTypeName())
+    {
       modelMsg.ParseFromString(response.serialized_data());
+    }
   }
 
   this->modelLabel->setText(QString::fromStdString(

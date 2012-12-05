@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ ModelMaker::~ModelMaker()
 /////////////////////////////////////////////////
 bool ModelMaker::InitFromModel(const std::string &_modelName)
 {
-  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (this->modelVisual)
   {
     scene->RemoveVisual(this->modelVisual);
@@ -79,7 +79,7 @@ bool ModelMaker::InitFromModel(const std::string &_modelName)
 /////////////////////////////////////////////////
 bool ModelMaker::InitFromSDFString(const std::string &_data)
 {
-  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   if (this->modelVisual)
   {
@@ -106,7 +106,7 @@ bool ModelMaker::InitFromSDFString(const std::string &_data)
 bool ModelMaker::InitFromFile(const std::string &_filename)
 {
   this->clone = false;
-  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   if (this->modelVisual)
   {
@@ -130,7 +130,7 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
 /////////////////////////////////////////////////
 bool ModelMaker::Init()
 {
-  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   // Load the world file
   std::string modelName;
@@ -241,7 +241,7 @@ void ModelMaker::Start(const rendering::UserCameraPtr _camera)
 void ModelMaker::Stop()
 {
   // Remove the temporary visual from the scene
-  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   scene->RemoveVisual(this->modelVisual);
   this->modelVisual.reset();
   this->visuals.clear();
@@ -328,7 +328,7 @@ void ModelMaker::CreateTheEntity()
   msgs::Factory msg;
   if (!this->clone)
   {
-    rendering::Scene *scene = gui::get_active_camera()->GetScene();
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
     sdf::ElementPtr modelElem;
     bool isModel = false;
     bool isLight = false;
