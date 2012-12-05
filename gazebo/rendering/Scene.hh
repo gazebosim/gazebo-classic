@@ -369,6 +369,10 @@ namespace gazebo
       /// \param[in] _show True to enable center of mass visualization.
       public: void ShowCOMs(bool _show);
 
+      /// \brief Enable or disable joint visualization.
+      /// \param[in] _show True to enable joint visualization.
+      public: void ShowJoints(bool _show);
+
       /// \brief Enable or disable collision visualization.
       /// \param[in] _show True to enable collision visualization.
       public: void ShowCollisions(bool _show);
@@ -709,6 +713,10 @@ namespace gazebo
 
       /// \brief Controls the sky.
       private: SkyX::BasicController *skyxController;
+
+      private: bool showCOMs;
+      private: bool showCollisions;
+      private: bool showJoints;
     };
     /// \}
   }

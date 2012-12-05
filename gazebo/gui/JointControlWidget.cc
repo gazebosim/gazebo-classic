@@ -251,13 +251,13 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     this->jointPub = this->node->Advertise<msgs::JointCmd>(
         std::string("~/") + _modelName + "/joint_cmd");
 
-    msgs::Response response = transport::request("default",
+    boost::shared_ptr<msgs::Response> response = transport::request("default",
         "entity_info", _modelName);
 
-    if (response.response() != "error" &&
-        response.type() == modelMsg.GetTypeName())
+    if (response->response() != "error" &&
+        response->type() == modelMsg.GetTypeName())
     {
-      modelMsg.ParseFromString(response.serialized_data());
+      modelMsg.ParseFromString(response->serialized_data());
     }
   }
 

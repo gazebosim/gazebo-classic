@@ -436,9 +436,11 @@ void MainWindow::Reset()
 void MainWindow::ShowCollisions()
 {
   if (g_showCollisionsAct->isChecked())
-    transport::requestNoReply("default", "show_collision", "all");
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_collision", "all");
   else
-    transport::requestNoReply("default", "hide_collision", "all");
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_collision", "all");
 }
 
 /////////////////////////////////////////////////
@@ -451,15 +453,25 @@ void MainWindow::ShowGrid()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowJoints()
+{
+  if (g_showJointsAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_joints", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_joints", "all");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowContacts()
 {
-  msgs::Request *msg;
   if (g_showContactsAct->isChecked())
-    msg = msgs::CreateRequest("show_contact", "all");
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_contact", "all");
   else
-    msg = msgs::CreateRequest("hide_contact", "all");
-  this->requestPub->Publish(*msg);
-  delete msg;
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_contact", "all");
 }
 
 /////////////////////////////////////////////////
@@ -649,6 +661,14 @@ void MainWindow::CreateActions()
   connect(g_showContactsAct, SIGNAL(triggered()), this,
           SLOT(ShowContacts()));
 
+  g_showJointsAct = new QAction(tr("Joints"), this);
+  g_showJointsAct->setStatusTip(tr("Show Joints"));
+  g_showJointsAct->setCheckable(true);
+  g_showJointsAct->setChecked(false);
+  connect(g_showJointsAct, SIGNAL(triggered()), this,
+          SLOT(ShowJoints()));
+
+
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
   g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
   connect(g_fullScreenAct, SIGNAL(triggered()), this,
@@ -697,6 +717,7 @@ void MainWindow::CreateMenus()
   this->viewMenu = this->menuBar->addMenu(tr("&View"));
   this->viewMenu->addAction(g_showGridAct);
   this->viewMenu->addAction(g_showContactsAct);
+  this->viewMenu->addAction(g_showJointsAct);
   this->viewMenu->addAction(g_showCollisionsAct);
   this->viewMenu->addSeparator();
   this->viewMenu->addAction(g_resetAct);

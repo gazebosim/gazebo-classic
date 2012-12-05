@@ -78,6 +78,7 @@ namespace gazebo
       private slots: void InsertModel();
       private slots: void ShowGrid();
       private slots: void ShowCollisions();
+      private slots: void ShowJoints();
       private slots: void ShowContacts();
       private slots: void Reset();
       private slots: void FullScreen();

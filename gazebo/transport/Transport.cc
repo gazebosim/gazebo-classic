@@ -33,7 +33,7 @@ boost::mutex requestMutex;
 bool g_stopped = true;
 
 std::list<msgs::Request *> g_requests;
-std::list<msgs::Response> g_responses;
+std::list<boost::shared_ptr<msgs::Response> > g_responses;
 
 /////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &master_host,
@@ -160,18 +160,17 @@ void on_response(ConstResponsePtr &_msg)
   if (iter == g_requests.end())
     return;
 
-  //msgs::Response *response = new msgs::Response;
-  //response->CopyFrom(*_msg);
-  g_responses.push_back(*_msg);
-
+  boost::shared_ptr<msgs::Response> response(new msgs::Response);
+  response->CopyFrom(*_msg);
+  g_responses.push_back(response);
 
   g_responseCondition.notify_all();
 }
 
 /////////////////////////////////////////////////
-msgs::Response transport::request(const std::string &_worldName,
-                                  const std::string &_request,
-                                  const std::string &_data)
+boost::shared_ptr<msgs::Response> transport::request(
+    const std::string &_worldName, const std::string &_request,
+    const std::string &_data)
 {
   boost::mutex::scoped_lock lock(requestMutex);
 
@@ -185,30 +184,35 @@ msgs::Response transport::request(const std::string &_worldName,
   PublisherPtr requestPub = node->Advertise<msgs::Request>("~/request");
   SubscriberPtr responseSub = node->Subscribe("~/response", &on_response);
 
-  std::cout << "Request[" << request->DebugString() << "]\n";
-
   requestPub->Publish(*request);
 
-  std::list<msgs::Response>::iterator iter;
-  while (true)
+  boost::shared_ptr<msgs::Response> response;
+  std::list<boost::shared_ptr<msgs::Response> >::iterator iter;
+
+  bool valid = false;
+  while (!valid)
   {
     // Wait for a response
     g_responseCondition.wait(lock);
 
     for (iter = g_responses.begin(); iter != g_responses.end(); ++iter)
     {
-      if ((*iter).id() == request->id())
+      if ((*iter)->id() == request->id())
       {
-        delete request;
-
+        response = *iter;
         g_responses.erase(iter);
-        return *iter;
+        valid = true;
+        break;
       }
     }
   }
 
+  requestPub.reset();
+  responseSub.reset();
+  node.reset();
+
   delete request;
-  return msgs::Response();
+  return response;
 }
 
 /////////////////////////////////////////////////

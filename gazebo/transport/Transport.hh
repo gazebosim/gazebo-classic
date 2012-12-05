@@ -84,9 +84,9 @@ namespace gazebo
     /// \param[in] _request The type request.
     /// \param[in] _data Optional data string.
     /// \return The response to the request.  Can be empty.
-    msgs::Response request(const std::string &_worldName,
-                           const std::string &_request,
-                           const std::string &_data = "");
+    boost::shared_ptr<msgs::Response> request(const std::string &_worldName,
+                                              const std::string &_request,
+                                              const std::string &_data = "");
 
     /// \brief Send a request and don't wait for a response. This is
     /// non-blocking.

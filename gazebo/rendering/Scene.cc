@@ -80,6 +80,10 @@ struct VisualMessageLess {
 //////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->showCOMs = false;
+  this->showCollisions = false;
+  this->showJoints = false;
+
   this->requestMsg = NULL;
   this->enableVisualizations = _enableVisualizations;
   this->node = transport::NodePtr(new transport::Node());
@@ -1654,7 +1658,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   JointVisualPtr jointVis(new JointVisual(
           _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
-  jointVis->SetVisible(false);
+  jointVis->SetVisible(this->showJoints);
 
   this->visuals[jointVis->GetName()] = jointVis;
   return true;
@@ -1766,17 +1770,27 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "show_joints")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowJoints(true);
+    if (_msg->data() == "all")
+      this->ShowJoints(true);
     else
-      gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowJoints(true);
+      else
+        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+    }
   }
   else if (_msg->request() == "hide_joints")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    if (vis)
-      vis->ShowJoints(false);
+    if (_msg->data() == "all")
+      this->ShowJoints(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowJoints(false);
+    }
   }
   else if (_msg->request() == "show_com")
   {
@@ -1892,6 +1906,10 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       {
         visual->SetVisible(false);
       }
+
+      visual->ShowCOM(this->showCOMs);
+      visual->ShowCollision(this->showCollisions);
+      visual->ShowJoints(this->showJoints);
     }
   }
 
@@ -2291,6 +2309,7 @@ VisualPtr Scene::CloneVisual(const std::string &_visualName,
 /////////////////////////////////////////////////
 void Scene::ShowCOMs(bool _show)
 {
+  this->showCOMs = _show;
   for (Visual_M::iterator iter = this->visuals.begin();
        iter != this->visuals.end(); ++iter)
   {
@@ -2301,6 +2320,7 @@ void Scene::ShowCOMs(bool _show)
 /////////////////////////////////////////////////
 void Scene::ShowCollisions(bool _show)
 {
+  this->showCollisions = _show;
   for (Visual_M::iterator iter = this->visuals.begin();
        iter != this->visuals.end(); ++iter)
   {
@@ -2309,21 +2329,32 @@ void Scene::ShowCollisions(bool _show)
 }
 
 /////////////////////////////////////////////////
-void Scene::ShowContacts(bool _view)
+void Scene::ShowJoints(bool _show)
+{
+  this->showJoints = _show;
+  for (Visual_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    iter->second->ShowJoints(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowContacts(bool _show)
 {
   ContactVisualPtr vis = boost::shared_dynamic_cast<ContactVisual>(
       this->visuals["__GUIONLY_CONTACT_VISUAL__"]);
 
-  if (!vis && _view)
+  if (!vis && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->worldVisual, "~/physics/contacts"));
-    vis->SetEnabled(_view);
+    vis->SetEnabled(_show);
     this->visuals[vis->GetName()] = vis;
   }
 
   if (vis)
-    vis->SetEnabled(_view);
+    vis->SetEnabled(_show);
   else
     gzerr << "Unable to get contact visualization. This should never happen.\n";
 }

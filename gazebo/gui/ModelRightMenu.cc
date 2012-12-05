@@ -126,10 +126,16 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   else
     this->showCollisionAct->setChecked(false);
 
+  if (this->showCOMActionState[this->modelName])
+    this->showCOMAct->setChecked(true);
+  else
+    this->showCOMAct->setChecked(false);
+
   if (this->showJointsActionState[this->modelName])
     this->showJointsAct->setChecked(true);
   else
     this->showJointsAct->setChecked(false);
+
 
   // if (this->skeletonActionState[this->modelName])
   //   this->skeletonAction->setChecked(true);

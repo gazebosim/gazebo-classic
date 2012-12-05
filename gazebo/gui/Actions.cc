@@ -47,6 +47,7 @@ QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 QAction *gazebo::gui::g_showCollisionsAct = 0;
 QAction *gazebo::gui::g_showGridAct = 0;
 QAction *gazebo::gui::g_showContactsAct = 0;
+QAction *gazebo::gui::g_showJointsAct = 0;
 QAction *gazebo::gui::g_resetAct = 0;
 QAction *gazebo::gui::g_fullScreenAct = 0;
 QAction *gazebo::gui::g_fpsAct = 0;
