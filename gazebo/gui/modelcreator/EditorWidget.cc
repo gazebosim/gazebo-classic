@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#include "gui/modelcreator/EditorWidget.hh"
-#include "gui/modelcreator/BuildingCreatorWidget.hh"
+#include "EditorWidget.hh"
+#include "BuildingCreatorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
