@@ -12,6 +12,7 @@ set (sources
   GridLines.cc
   CornerGrabber.cc
   CreatorView.cc
+  RectItem.cc
  )
 
 set (qt_headers
@@ -25,6 +26,7 @@ set (qt_headers
   GridLines.hh
   CornerGrabber.hh
   CreatorView.hh
+  RectItem.hh
   )
 
 #set (resources qtpropertybrowser.qrc)

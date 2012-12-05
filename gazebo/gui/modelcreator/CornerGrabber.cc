@@ -18,12 +18,12 @@
 #include "CornerGrabber.hh"
 
 /////////////////////////////////////////////////
-CornerGrabber::CornerGrabber(QGraphicsItem *_parent) :
+CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   QGraphicsItem(_parent),
+  index(_index),
   mouseDownX(0),
   mouseDownY(0),
   outterBorderColor(Qt::black),
-  outterBorderPen(),
   width(6),
   height(6),
   mouseButtonState(kMouseReleased),
@@ -31,10 +31,13 @@ CornerGrabber::CornerGrabber(QGraphicsItem *_parent) :
 {
   this->setParentItem(_parent);
 
-  this->outterBorderPen.setWidth(2);
-  this->outterBorderPen.setColor(this->outterBorderColor);
-
   this->setAcceptHoverEvents(true);
+}
+
+/////////////////////////////////////////////////
+int CornerGrabber::GetIndex()
+{
+  return this->index;
 }
 
 /////////////////////////////////////////////////
@@ -161,9 +164,13 @@ QRectF CornerGrabber::boundingRect() const
 void CornerGrabber::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
   QWidget *)
 {
-  this->outterBorderPen.setCapStyle(Qt::SquareCap);
-  this->outterBorderPen.setStyle(Qt::SolidLine);
-  _painter->setPen(this->outterBorderPen);
+  QPen outterBorderPen;
+  outterBorderPen.setWidth(2);
+  outterBorderPen.setColor(this->outterBorderColor);
+
+  outterBorderPen.setCapStyle(Qt::SquareCap);
+  outterBorderPen.setStyle(Qt::SolidLine);
+  _painter->setPen(outterBorderPen);
 
   QPointF topLeft (0, 0);
   QPointF bottomRight (this->width, this->height);

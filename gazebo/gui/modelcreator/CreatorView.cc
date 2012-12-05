@@ -17,6 +17,7 @@
 
 #include "CreatorView.hh"
 #include "SelectableLineSegment.hh"
+#include "RectItem.hh"
 #include "GridLines.hh"
 
 using namespace gazebo;

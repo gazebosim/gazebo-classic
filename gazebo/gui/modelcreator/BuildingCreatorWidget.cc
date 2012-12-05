@@ -19,6 +19,7 @@
 #include "SelectableLineSegment.hh"
 #include "GridLines.hh"
 #include "CreatorView.hh"
+#include "RectItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -44,29 +45,21 @@ BuildingCreatorWidget::BuildingCreatorWidget(QWidget *_parent)
   QHBoxLayout *canvasLayout = new QHBoxLayout(this);
   canvasLayout->addWidget(view);
 
-//  GridLines *gridLines = new GridLines (boundingWidth, boundingHeight);
-//  this->scene->addItem(gridLines);
-
-//  SelectableLineSegment* sampleLine = new SelectableLineSegment(
-//    QPointF(0,0));
-//  sampleLine->setPos(0,0);
-//  this->scene->addItem(sampleLine);
+  GridLines *gridLines = new GridLines (boundingWidth, boundingHeight);
+  scene->addItem(gridLines);
 
   view->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   view->setScene(scene);
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-  qDebug() << " width height "<< _parent->width() << " " << _parent->height() << scene->width() << scene->height() << view->width() << view->height();
+  RectItem *item = new RectItem();
+  item->setPos(200,200);
+  scene->addItem(item);
+
+//  qDebug() << " width height "<< _parent->width() << " " << _parent->height() << scene->width() << scene->height() << view->width() << view->height();
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(canvasLayout);
-
-/*  this->lastLinePosX = 0;
-  this->lastLinePosY = 0;
-
-  this->drawMode = None;
-  this->drawInProgress = false;*/
-
 }
 
 /////////////////////////////////////////////////

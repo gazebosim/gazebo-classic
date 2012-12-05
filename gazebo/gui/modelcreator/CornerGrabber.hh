@@ -22,7 +22,9 @@
 
 class CornerGrabber : public QGraphicsItem
 {
-  public: explicit CornerGrabber(QGraphicsItem *_parent = 0);
+  public: explicit CornerGrabber(QGraphicsItem *_parent = 0, int index = 0);
+
+  public: int GetIndex();
 
   /// \brief Set the current mouse state
   public: void SetMouseState(int _state);
@@ -67,6 +69,8 @@ class CornerGrabber : public QGraphicsItem
   protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
   protected: void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
+
+  private: int index;
 
   private: qreal mouseDownX;
 

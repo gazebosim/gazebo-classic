@@ -72,9 +72,6 @@ class SelectableLineSegment : public QGraphicsPolygonItem
   /// \brief the hover event handler will toggle this between red and black
   private: QColor outterBorderColor;
 
-  /// \brief the pen is used to paint the red/black border
-  private: QPen pen;
-
   private: QPointF location;
 
   private: QPointF dragStart;
