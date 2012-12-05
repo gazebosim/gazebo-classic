@@ -30,6 +30,8 @@ class DoorItem : public RectItem
 
     private: virtual void paint (QPainter *_painter,
         const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+
+    private: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 };
 
 #endif

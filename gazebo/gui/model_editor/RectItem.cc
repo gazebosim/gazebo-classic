@@ -101,6 +101,9 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
       corner->SetMouseState(CornerGrabber::kMouseMoving );
       break;
     }
+    case QEvent::GraphicsSceneMouseDoubleClick:
+      return false;
+      break;
     default:
       return false;
       break;
@@ -192,7 +195,7 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void RectItem::mouseReleaseEvent ( QGraphicsSceneMouseEvent *_event)
+void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(true);
   this->location.setX( ( static_cast<int>(this->location.x())
@@ -203,14 +206,14 @@ void RectItem::mouseReleaseEvent ( QGraphicsSceneMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void RectItem::mousePressEvent ( QGraphicsSceneMouseEvent *_event)
+void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(true);
   this->dragStart = _event->pos();
 }
 
 /////////////////////////////////////////////////
-void RectItem::mouseMoveEvent ( QGraphicsSceneMouseEvent *_event)
+void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
   QPointF newPos = _event->pos() ;
   this->location += (newPos - this->dragStart);
@@ -218,7 +221,13 @@ void RectItem::mouseMoveEvent ( QGraphicsSceneMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void RectItem::hoverLeaveEvent (QGraphicsSceneHoverEvent *)
+void RectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
+{
+  _event->setAccepted(false);
+}
+
+/////////////////////////////////////////////////
+void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
   this->outterBorderColor = Qt::black;
 
@@ -229,7 +238,7 @@ void RectItem::hoverLeaveEvent (QGraphicsSceneHoverEvent *)
 }
 
 /////////////////////////////////////////////////
-void RectItem::hoverEnterEvent (QGraphicsSceneHoverEvent *)
+void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
   this->outterBorderColor = Qt::red;
 

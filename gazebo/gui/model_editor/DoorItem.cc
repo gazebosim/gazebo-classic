@@ -17,6 +17,10 @@
 
 #include "RectItem.hh"
 #include "DoorItem.hh"
+#include "WindowDoorInspectorDialog.hh"
+
+using namespace gazebo;
+using namespace gui;
 
 /////////////////////////////////////////////////
 DoorItem::DoorItem(): RectItem()
@@ -47,4 +51,14 @@ void DoorItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
       this->drawingOriginY - this->drawingHeight,
       this->drawingWidth*2, this->drawingHeight*2);
   _painter->drawArc(arcRect, 0, -90 * 16);
+}
+
+/////////////////////////////////////////////////
+void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
+{
+  WindowDoorInspectorDialog dialog(0);
+  if (dialog.exec() == QDialog::Accepted)
+  {
+  }
+  _event->setAccepted(true);
 }

@@ -17,8 +17,8 @@
 
 #include "BuildingEditorPalette.hh"
 #include "FinishModelDialog.hh"
-#include "WindowDoorInspectorDialog.hh"
-#include "WallInspectorDialog.hh"
+//#include "WindowDoorInspectorDialog.hh"
+//#include "WallInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -148,9 +148,9 @@ void BuildingEditorPalette::OnSave()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnFinish()
 {
-//  FinishModelDialog dialog(this);
+  FinishModelDialog dialog(this);
 //  WindowDoorInspectorDialog dialog(0, this);
-  WallInspectorDialog dialog(this);
-  dialog.exec();
+//  WallInspectorDialog dialog(this);
+//  dialog.exec();
 
 }

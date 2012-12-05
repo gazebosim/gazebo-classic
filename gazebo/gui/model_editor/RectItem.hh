@@ -53,6 +53,8 @@ class RectItem : public QGraphicsItem
 
     private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
+    protected: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+
     private: virtual bool sceneEventFilter(QGraphicsItem *_watched,
         QEvent *_event);
 
