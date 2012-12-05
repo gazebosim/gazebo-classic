@@ -15,62 +15,35 @@
  *
 */
 
-#include "transport/transport.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Scene.hh"
-#include "rendering/Visual.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
 
-#include "gui/Actions.hh"
-#include "gui/Gui.hh"
-#include "gui/ModelRightMenu.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
 
 using namespace gazebo;
 using namespace gui;
 
+/////////////////////////////////////////////////
 ModelRightMenu::ModelRightMenu()
 {
-  this->showAllCollisions = false;
-  this->showAllJoints = false;
-  this->showAllCOM = false;
-  this->allTransparent = false;
-
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->requestSub = this->node->Subscribe("~/request",
       &ModelRightMenu::OnRequest, this);
 
-  this->moveToAct= new QAction(tr("Move To"), this);
+  this->moveToAct = new QAction(tr("Move To"), this);
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAct, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
 
-  this->transparentAct = new QAction(tr("Transparent"), this);
-  this->transparentAct->setStatusTip(tr("Make model transparent"));
-  this->transparentAct->setCheckable(true);
-  connect(this->transparentAct, SIGNAL(triggered()), this,
-          SLOT(OnTransparent()));
-
-  this->showCollisionAct = new QAction(tr("Collisions"), this);
-  this->showCollisionAct->setStatusTip(tr("Show collisions objects"));
-  this->showCollisionAct->setCheckable(true);
-  connect(this->showCollisionAct, SIGNAL(triggered()), this,
-          SLOT(OnShowCollision()));
-
-  this->showJointsAct = new QAction(tr("Joints"), this);
-  this->showJointsAct->setStatusTip(tr("Show joints"));
-  this->showJointsAct->setCheckable(true);
-  connect(this->showJointsAct, SIGNAL(triggered()), this,
-          SLOT(OnShowJoints()));
-
-  this->showCOMAct = new QAction(tr("Center of Mass"), this);
-  this->showCOMAct->setStatusTip(tr("Show Center of Mass"));
-  this->showCOMAct->setCheckable(true);
-  connect(this->showCOMAct, SIGNAL(triggered()), this,
-          SLOT(OnShowCOM()));
-
-  this->snapBelowAct = new QAction(tr("Snap"), this);
-  this->snapBelowAct->setStatusTip(tr("Snap to object below"));
-  connect(this->snapBelowAct, SIGNAL(triggered()), this,
-           SLOT(OnSnapBelow()));
+  // \todo Reimplement
+  // this->snapBelowAct = new QAction(tr("Snap"), this);
+  // this->snapBelowAct->setStatusTip(tr("Snap to object below"));
+  // connect(this->snapBelowAct, SIGNAL(triggered()), this,
+  //          SLOT(OnSnapBelow()));
 
   // Create the delete action
   g_deleteAct = new DeleteAction(tr("Delete"), this);
@@ -80,10 +53,38 @@ ModelRightMenu::ModelRightMenu()
   connect(g_deleteAct, SIGNAL(triggered()), this,
           SLOT(OnDelete()));
 
+  ViewState *state = new ViewState(this, "set_transparent", "set_opaque");
+  state->action = new QAction(tr("Transparent"), this);
+  state->action->setStatusTip(tr("Make model transparent"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  state = new ViewState(this, "show_collision", "hide_collision");
+  state->action = new QAction(tr("Collisions"), this);
+  state->action->setStatusTip(tr("Show collision objects"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  state = new ViewState(this, "show_joints", "hide_joints");
+  state->action = new QAction(tr("Joints"), this);
+  state->action->setStatusTip(tr("Show joints"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  state = new ViewState(this, "show_com", "hide_com");
+  state->action = new QAction(tr("Center of mass"), this);
+  state->action->setStatusTip(tr("Show center of mass"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  // \todo Reimplement
   // this->followAction = new QAction(tr("Follow"), this);
   // this->followAction->setStatusTip(tr("Follow the selection"));
   // connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
-
 
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
@@ -105,46 +106,30 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
 
   QMenu menu;
   menu.addAction(this->moveToAct);
-  menu.addAction(this->snapBelowAct);
+  // menu.addAction(this->snapBelowAct);
 
+  // Create the view menu
   QMenu *viewMenu = menu.addMenu(tr("View"));
-  viewMenu->addAction(this->transparentAct);
-  viewMenu->addAction(this->showCollisionAct);
-  viewMenu->addAction(this->showJointsAct);
-  viewMenu->addAction(this->showCOMAct);
+  for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
+       iter != this->viewStates.end(); ++iter)
+  {
+    viewMenu->addAction((*iter)->action);
+
+    std::map<std::string, bool>::iterator modelIter =
+      (*iter)->modelStates.find(this->modelName);
+
+    if (modelIter == (*iter)->modelStates.end())
+      (*iter)->action->setChecked((*iter)->globalEnable);
+    else
+      (*iter)->action->setChecked(modelIter->second);
+  }
 
   menu.addSeparator();
   menu.addAction(g_deleteAct);
 
+  // \todo Reimplement these features.
   // menu.addAction(this->followAction);
   // menu.addAction(this->skeletonAction);
-
-  if (this->transparentActionState[this->modelName] || this->allTransparent)
-    this->transparentAct->setChecked(true);
-  else
-    this->transparentAct->setChecked(false);
-
-  if (this->showCollisionsActionState[this->modelName] ||
-      this->showAllCollisions)
-    this->showCollisionAct->setChecked(true);
-  else
-    this->showCollisionAct->setChecked(false);
-
-  if (this->showCOMActionState[this->modelName] || this->showAllCOM)
-    this->showCOMAct->setChecked(true);
-  else
-    this->showCOMAct->setChecked(false);
-
-  if (this->showJointsActionState[this->modelName] || this->showAllJoints)
-    this->showJointsAct->setChecked(true);
-  else
-    this->showJointsAct->setChecked(false);
-
-
-  // if (this->skeletonActionState[this->modelName])
-  //   this->skeletonAction->setChecked(true);
-  // else
-  //   this->skeletonAction->setChecked(false);
 
   menu.exec(_pt);
 }
@@ -157,60 +142,103 @@ void ModelRightMenu::OnMoveTo()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::OnShowCollision()
-{
-  this->showCollisionsActionState[this->modelName] =
-    this->showCollisionAct->isChecked();
+// void ModelRightMenu::OnSnapBelow()
+// {
+//   rendering::UserCameraPtr cam = gui::get_active_camera();
+//   if (!cam)
+//     gzerr << "Invalid user camera\n";
+//
+//   if (!cam->GetScene())
+//     gzerr << "Invalid user camera scene\n";
+//
+//   // cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
+// }
 
-  if (this->showCollisionAct->isChecked())
-    transport::requestNoReply(this->node, "show_collision", this->modelName);
-  else
-    transport::requestNoReply(this->node, "hide_collision", this->modelName);
+/////////////////////////////////////////////////
+void ModelRightMenu::OnDelete(const std::string &_name)
+{
+  std::string name = _name;
+  if (name.empty())
+    name = this->modelName;
+
+  // Delete the entity
+  if (!name.empty())
+    transport::requestNoReply(this->node, "entity_delete", name);
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::OnShowJoints()
+void ModelRightMenu::OnRequest(ConstRequestPtr &_msg)
 {
-  this->showJointsActionState[this->modelName] =
-    this->showJointsAct->isChecked();
+  // Process the request by looking at all the view states.
+  for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
+       iter != this->viewStates.end(); ++iter)
+  {
+    // Only proceed if the request matches one of the check or uncheck
+    // requests of the view state
+    if (_msg->request() == (*iter)->checkRequest ||
+        _msg->request() == (*iter)->uncheckRequest)
+    {
+      // Determine the value(state) of the view states
+      bool value = _msg->request() == (*iter)->checkRequest ? true : false;
 
-  if (this->showJointsAct->isChecked())
-    transport::requestNoReply(this->node, "show_joints", this->modelName);
-  else
-    transport::requestNoReply(this->node, "hide_joints", this->modelName);
+      // If the request is for all objects...
+      if (_msg->data() == "all")
+      {
+        // Set all model states within the view state to the value.
+        for (std::map<std::string, bool>::iterator modelIter =
+            (*iter)->modelStates.begin();
+            modelIter != (*iter)->modelStates.end(); ++modelIter)
+        {
+          modelIter->second = value;
+        }
+
+        // Use a globalEnable to handle the case when new models are added
+        (*iter)->globalEnable = value;
+      }
+      // Otherwise the request is for a single model...
+      else
+      {
+        // Set the state of the given model
+        (*iter)->modelStates[_msg->data()] = value;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::OnShowCOM()
+ViewState::ViewState(ModelRightMenu *_parent,
+                     const std::string &_checkRequest,
+                     const std::string &_uncheckRequest)
+  : QObject(_parent)
 {
-  this->showCOMActionState[this->modelName] =
-    this->showCOMAct->isChecked();
-
-  if (this->showCOMAct->isChecked())
-    transport::requestNoReply(this->node, "show_com", this->modelName);
-  else
-    transport::requestNoReply(this->node, "hide_com", this->modelName);
+  this->globalEnable = false;
+  this->action = NULL;
+  this->parent = _parent;
+  this->checkRequest = _checkRequest;
+  this->uncheckRequest = _uncheckRequest;
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::OnTransparent()
+void ViewState::Callback()
 {
-  this->transparentActionState[this->modelName] =
-    this->transparentAct->isChecked();
+  // Store the check state for the model
+  this->modelStates[this->parent->modelName] = this->action->isChecked();
 
-  if (this->transparentAct->isChecked())
-    transport::requestNoReply(this->node, "set_transparent", this->modelName);
+  // Send a message with the new check state. The Scene listens to these
+  // messages and updates the visualizations accordingly.
+  if (this->action->isChecked())
+  {
+    transport::requestNoReply(this->parent->node, this->checkRequest,
+                              this->parent->modelName);
+  }
   else
-    transport::requestNoReply(this->node, "set_opaque", this->modelName);
+  {
+    transport::requestNoReply(this->parent->node, this->uncheckRequest,
+                              this->parent->modelName);
+  }
 }
 
-/////////////////////////////////////////////////
-void ModelRightMenu::OnSnapBelow()
-{
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
-}
-
+/// \todo Reimplement these functions.
 /////////////////////////////////////////////////
 // void ModelRightMenu::OnSkeleton()
 // {
@@ -237,79 +265,3 @@ void ModelRightMenu::OnSnapBelow()
 //   rendering::UserCameraPtr cam = gui::get_active_camera();
 //   cam->TrackVisual(this->modelName);
 // }
-
-/////////////////////////////////////////////////
-void ModelRightMenu::OnDelete(const std::string &_name)
-{
-  std::string name = _name;
-  if (name.empty())
-    name = this->modelName;
-
-  if (!name.empty())
-  {
-    transport::requestNoReply(this->node, "entity_delete", name);
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelRightMenu::OnRequest(ConstRequestPtr &_msg)
-{
-  if (_msg->request() == "show_collision" ||
-      _msg->request() == "hide_collision" )
-  {
-    bool value = _msg->request() == "show_collision" ? true : false;
-    if (_msg->data() == "all")
-    {
-      this->SetMap(this->showCollisionsActionState, value);
-      this->showAllCollisions = value;
-    }
-    else
-      this->showCollisionsActionState[_msg->data()] = value;
-  }
-  else if (_msg->request() == "show_joints" ||
-           _msg->request() == "hide_joints" )
-  {
-    bool value = _msg->request() == "show_joints" ? true : false;
-    if (_msg->data() == "all")
-    {
-      this->SetMap(this->showJointsActionState, value);
-      this->showAllJoints = value;
-    }
-    else
-      this->showJointsActionState[_msg->data()] = value;
-  }
-  else if (_msg->request() == "show_com" ||
-           _msg->request() == "hide_com" )
-  {
-    bool value = _msg->request() == "show_com" ? true : false;
-    if (_msg->data() == "all")
-    {
-      this->SetMap(this->showCOMActionState, value);
-      this->showAllCOM = value;
-    }
-    else
-      this->showCOMActionState[_msg->data()] = value;
-  }
-  else if (_msg->request() == "set_transparent" ||
-           _msg->request() == "set_opaque" )
-  {
-    bool value = _msg->request() == "set_transparent" ? true : false;
-    if (_msg->data() == "all")
-    {
-      this->SetMap(this->transparentActionState, value);
-      this->allTransparent = value;
-    }
-    else
-      this->transparentActionState[_msg->data()] = value;
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelRightMenu::SetMap(std::map<std::string, bool> &_map, bool _value)
-{
-  for (std::map<std::string, bool>::iterator iter = _map.begin();
-       iter != _map.end(); ++iter)
-  {
-    iter->second = _value;
-  }
-}

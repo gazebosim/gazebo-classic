@@ -1809,7 +1809,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   else if (_msg->request() == "hide_com")
   {
     if (_msg->data() == "all")
-      this->ShowCOMs(true);
+      this->ShowCOMs(false);
     else
     {
       VisualPtr vis = this->GetVisual(_msg->data());

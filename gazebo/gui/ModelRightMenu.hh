@@ -19,14 +19,16 @@
 
 #include <map>
 #include <string>
-#include "gui/qt.h"
-#include "msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
+
+#include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class ViewState;
 
     /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
     /// \brief Displays a menu when the right mouse button has been pressed.
@@ -49,23 +51,12 @@ namespace gazebo
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
 
-      /// \brief QT callback when show collisions has been selected.
-      private slots: void OnShowCollision();
-
-      /// \brief QT callback when show joints has been selected.
-      private slots: void OnShowJoints();
-
-      /// \brief QT callback when show COM has been selected.
-      private slots: void OnShowCOM();
-
-      /// \brief QT callback when transparent has been selected.
-      private slots: void OnTransparent();
-
       /// \brief QT callback when delete has been selected.
+      /// \param[in] _name Name of the model to delete.
       private slots: void OnDelete(const std::string &_name="");
 
       /// \brief QT callback when snap below has been selected.
-      private slots: void OnSnapBelow();
+      // private slots: void OnSnapBelow();
 
       // private slots: void OnFollow();
       // private slots: void OnSkeleton();
@@ -73,11 +64,6 @@ namespace gazebo
       /// \brief Request callback.
       /// \param[in] _msg Request message to process.
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      /// \brief Helper function to set all values in a map to _value.
-      /// \param[in] _map The map to set.
-      /// \param[in] _value The value to set the map to.
-      private: void SetMap(std::map<std::string, bool> &_map, bool _value);
 
       /// \brief Node for communication.
       private: transport::NodePtr node;
@@ -91,51 +77,54 @@ namespace gazebo
       /// \brief Action for moving the camera to an object.
       private: QAction *moveToAct;
 
-      /// \brief Action for setting an object transparent.
-      private: QAction *transparentAct;
-
-      /// \brief Action for showing the collisions of an object.
-      private: QAction *showCollisionAct;
-
-      /// \brief Action for showing the joints of an object.
-      private: QAction *showJointsAct;
-
-      /// \brief Action for showing the COM of an object.
-      private: QAction *showCOMAct;
-
       /// \brief Action for snapping an object to another object below the
       /// first.
-      private: QAction *snapBelowAct;
-
+      // private: QAction *snapBelowAct;
       // private: QAction *followAct;
       // private: QAction *skeletonAct;
 
-      /// \brief True when all collision objects should be shown.
-      private: bool showAllCollisions;
+      /// \brief The various view states
+      private: std::vector<ViewState*> viewStates;
 
-      /// \brief Map of model names to collision visualization state
-      private: std::map<std::string, bool> showCollisionsActionState;
+      // The view state class is a friend for convenience
+      private: friend class ViewState;
+    };
 
-      /// \brief True when all joints should be shown.
-      private: bool showAllJoints;
+    /// \class ViewState ViewState.hh gui/gui.hh
+    /// \brief A class for managing view visualization states.
+    /// Used by ModelRightMenu.
+    class ViewState : public QObject
+    {
+      Q_OBJECT
 
-      /// \brief Map of model names to joint visualization state
-      private: std::map<std::string, bool> showJointsActionState;
+      /// \brief Constructor
+      /// \param[in] _parent Pointer to the MOdelRightMenu
+      /// \param[in] _checkRequest Name of the request to send when checked.
+      /// \param[in] _uncheckRequest Name of the request to send when unchecked.
+      public: ViewState(ModelRightMenu *_parent,
+                  const std::string &_checkRequest,
+                  const std::string &_uncheckRequest);
 
-      /// \brief True when all COM should be shown.
-      private: bool showAllCOM;
+      /// \brief State of all the models for this view.
+      public: std::map<std::string, bool> modelStates;
 
-      /// \brief Map of model names to COM visualization state
-      private: std::map<std::string, bool> showCOMActionState;
+      /// \brief Action for this view.
+      public: QAction *action;
 
-      /// \brief True when all visuals are transparent.
-      private: bool allTransparent;
+      /// \brief True if the view visualization is enabled globally.
+      public: bool globalEnable;
 
-      /// \brief Map of model names to transparent visualization state
-      private: std::map<std::string, bool> transparentActionState;
+      /// \brief Pointer to the ModelRightMenu.
+      public: ModelRightMenu *parent;
 
-      /// \brief Map of model names to skeleton visualization state
-      // private: std::map<std::string, bool> skeletonActionState;
+      /// \brief Name of the request to send when checked.
+      public: std::string checkRequest;
+
+      /// \brief Name of the request to send when unchecked.
+      public: std::string uncheckRequest;
+
+      /// \brief QT callback for the QAction.
+      public slots: void Callback();
     };
   }
 }
