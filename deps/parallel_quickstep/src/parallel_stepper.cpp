@@ -852,6 +852,12 @@ void dxParallelQuickStepper( dxWorldProcessContext *context,
     dxBody *const *const bodyend = body + nb;
     for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++) {
       dxBody *b = *bodycurr;
+      b->facc_last[0] = b->facc[0];
+      b->facc_last[1] = b->facc[1];
+      b->facc_last[2] = b->facc[2];
+      b->tacc_last[0] = b->tacc[0];
+      b->tacc_last[1] = b->tacc[1];
+      b->tacc_last[2] = b->tacc[2];
       dSetZero (b->facc,3);
       dSetZero (b->tacc,3);
     }

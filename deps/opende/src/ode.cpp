@@ -279,6 +279,8 @@ dxBody *dBodyCreate (dxWorld *w)
   dSetZero (b->avel,4);
   dSetZero (b->facc,4);
   dSetZero (b->tacc,4);
+  dSetZero (b->facc_last,4);
+  dSetZero (b->tacc_last,4);
   dSetZero (b->finite_rot_axis,4);
   addObjectToList (b,(dObject **) &w->firstbody);
   w->nb++;
@@ -684,10 +686,24 @@ const dReal * dBodyGetForce (dBodyID b)
 }
 
 
+const dReal * dBodyGetForceLast (dBodyID b)
+{
+  dAASSERT (b);
+  return b->facc_last;
+}
+
+
 const dReal * dBodyGetTorque (dBodyID b)
 {
   dAASSERT (b);
   return b->tacc;
+}
+
+
+const dReal * dBodyGetTorqueLast (dBodyID b)
+{
+  dAASSERT (b);
+  return b->tacc_last;
 }
 
 

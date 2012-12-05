@@ -465,7 +465,7 @@ math::Vector3 ODELink::GetWorldForce() const
   {
     const dReal *dforce;
 
-    dforce = dBodyGetForce(this->linkId);
+    dforce = dBodyGetForceLast(this->linkId);
 
     force.x = dforce[0];
     force.y = dforce[1];
@@ -484,7 +484,7 @@ math::Vector3 ODELink::GetWorldTorque() const
   {
     const dReal *dtorque;
 
-    dtorque = dBodyGetTorque(this->linkId);
+    dtorque = dBodyGetTorqueLast(this->linkId);
 
     torque.x = dtorque[0];
     torque.y = dtorque[1];

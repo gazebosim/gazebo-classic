@@ -2067,6 +2067,12 @@ void dxRobustStepIsland(dxWorldProcessContext* context, dxWorld *world,
   // zero all force accumulators
   for (int i=0; i<nb; i++) 
   {
+    body[i]->facc_last[0] = body[i]->facc[0];
+    body[i]->facc_last[1] = body[i]->facc[1];
+    body[i]->facc_last[2] = body[i]->facc[2];
+    body[i]->tacc_last[0] = body[i]->tacc[0];
+    body[i]->tacc_last[1] = body[i]->tacc[1];
+    body[i]->tacc_last[2] = body[i]->tacc[2];
     body[i]->facc[0] = 0;
     body[i]->facc[1] = 0;
     body[i]->facc[2] = 0;

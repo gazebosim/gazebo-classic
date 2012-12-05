@@ -564,6 +564,8 @@ void dWorldExportDIF (dWorldID w, FILE *file, const char *prefix)
 		}
 		c.printNonzero ("facc",b->facc);
 		c.printNonzero ("tacc",b->tacc);
+		c.printNonzero ("facc_last",b->facc_last);
+		c.printNonzero ("tacc_last",b->tacc_last);
 		if (b->flags & dxBodyFlagFiniteRotationAxis) {
 			c.print ("finite_rotation_axis",b->finite_rot_axis);
 		}
