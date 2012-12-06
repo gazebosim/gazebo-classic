@@ -192,9 +192,9 @@ void MultiCameraSensor::UpdateImpl(bool /*_force*/)
       image->set_height((*iter)->GetImageHeight());
       image->set_pixel_format(common::Image::ConvertPixelFormat(
             (*iter)->GetImageFormat()));
-      image->set_step((*iter)->GetImageWidth() * 3);
+      image->set_step((*iter)->GetImageWidth() * (*iter)->GetImageDepth());
       image->set_data((*iter)->GetImageData(0),
-                      image->width() * 3 * image->height());
+          image->width() * (*iter)->GetImageDepth() * image->height());
     }
   }
 
