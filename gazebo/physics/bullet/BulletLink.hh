@@ -147,6 +147,12 @@ namespace gazebo
       /// \copydoc Link::SetAutoDisable(bool)
       public: virtual void SetAutoDisable(bool _disable);
 
+      /// \brief Stores shape information for collisions. btCompoundShape is the
+      ///        most general shape option, as it allows for a combination of
+      ///        several shapes. This makes it simpler to implement. It may be
+      ///        more efficient to use the base class btCollisionShape and try
+      ///        to choose the best shape type for each link, but that should be
+      ///        tested before changing things.
       private: btCompoundShape *compoundShape;
       private: BulletMotionState *motionState;
       private: btRigidBody *rigidLink;
