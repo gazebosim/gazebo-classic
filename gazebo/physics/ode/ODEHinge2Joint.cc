@@ -39,6 +39,7 @@ ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEHinge2Joint::~ODEHinge2Joint()
 {
+  physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -83,7 +84,11 @@ void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetDamping(int /*_index*/, double _damping)
 {
-  dJointSetDamping(this->jointId, _damping);
+  this->dampingCoefficient = _damping;
+  // use below when ode version is fixed
+  // dJointSetDamping(this->jointId, _damping);
+  this->applyDamping = physics::Joint::ConnectJointUpdate(
+    boost::bind(&Joint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////
