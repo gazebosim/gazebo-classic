@@ -36,6 +36,22 @@ using namespace transport;
 unsigned int Connection::idCounter = 0;
 IOManager *Connection::iomanager = NULL;
 
+// Version 1.52 of boost has an address::is_unspecfied function, but
+// Version 1.46.1 (installed on ubuntu) does not. So this helper function
+// is stolen from adress::is_unspecified function in boost v1.52.
+bool addressIsUnspecified(const boost::asio::ip::address_v4 &_addr)
+{
+  return _addr.to_ulong() == 0;
+}
+
+// Version 1.52 of boost has an address::is_loopback function, but
+// Version 1.46.1 (installed on ubuntu) does not. So this helper function
+// is stolen from adress::is_loopback function in boost v1.52.
+bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
+{
+ return (_addr.to_ulong() & 0xFF000000) == 0x7F000000;
+}
+
 //////////////////////////////////////////////////
 Connection::Connection()
 {
@@ -577,66 +593,121 @@ void Connection::ReadLoop(const ReadCallback &cb)
 //////////////////////////////////////////////////
 boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
 {
-  boost::asio::ip::tcp::endpoint ep;
+  boost::asio::ip::address_v4 address;
 
-  // Check to see if the GZ_IP environment variable has been set. If so, use
-  // that value instead of trying to determin the value ourselves.
-  char *ip = getenv("GZ_IP");
-  if (ip)
+  // Get the GAZEBO_HOSTNAME environment variable. This will be NULL if it's not
+  // set.
+  char *hostname = getenv("GAZEBO_HOSTNAME");
+
+  // Get the GAZEBO_IP environment variable. This will be NULL if it's not
+  // set.
+  char *ip = getenv("GAZEBO_IP");
+
+  // First try GAZEBO_HOSTNAME if it is set.
+  if (hostname)
+  {
+    boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
+    boost::asio::ip::tcp::resolver::query query(hostname, "");
+    boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
+    boost::asio::ip::tcp::resolver::iterator end;
+
+    // Loop throught the results, and stop at the first valid address.
+    while (iter != end)
+    {
+      boost::asio::ip::tcp::endpoint testEndPoint = *iter++;
+
+      // Check the end point for validity.
+      if (!addressIsUnspecified(testEndPoint.address().to_v4()))
+      {
+        address = testEndPoint.address().to_v4();
+        break;
+      }
+    }
+
+    // Complain if GAZEBO_HOSTNAME was set, but we were not able to get
+    // a valid address.
+    if (addressIsUnspecified(address))
+      gzerr << "GAZEBO_HOSTNAME[" << hostname << "] is invalid. "
+            << "We will fallback onto GAZEBO_IP.";
+  }
+
+  // Try GAZEBO_IP if GAZEBO_HOSTNAME is not set or we were not able to
+  // find a valid address.
+  if (ip && addressIsUnspecified(address))
   {
     if (!this->ValidateIP(ip))
     {
-      gzerr << "GZ_IP environment variable with value[" << ip
+      gzerr << "GAZEBO_IP environment variable with value[" << ip
             << "] is invalid. We will still try to use it, be warned.\n";
     }
 
-    ep.address(boost::asio::ip::address_v4::from_string(ip));
-    return ep;
+    address = boost::asio::ip::address_v4::from_string(ip);
   }
 
-
-  // the following is *nix implementation to get the external IP of the
-  // current machine.
-
-  struct ifaddrs *ifaddr, *ifa;
-
-  // Get interface addresses
-  if (getifaddrs(&ifaddr) == -1)
+  // Try to automatically find a valid address if GAZEBO_IP and
+  // GAZEBO_HOSTNAME have failed.
+  if (addressIsUnspecified(address))
   {
-    perror("getifaddres");
-    gzthrow("Unable to get local interface addresses");
-    return ep;
-  }
+    // the following is *nix implementation to get the external IP of the
+    // current machine.
 
-  char host[NI_MAXHOST];
+    struct ifaddrs *ifaddr, *ifa;
 
-  // Iterate over all the interface addresses
-  for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-  {
-    if (ifa->ifa_addr == NULL)
-      continue;
-
-    int family = ifa->ifa_addr->sa_family;
-    if (family == AF_INET || family == AF_INET6)
+    // Get interface addresses
+    if (getifaddrs(&ifaddr) == -1)
     {
-      int s = getnameinfo(ifa->ifa_addr,
-          (family == AF_INET) ? sizeof(struct sockaddr_in) :
-          sizeof(struct sockaddr_in6),
-          host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+      perror("getifaddres");
+      gzthrow("Unable to get local interface addresses");
+    }
 
-      if (s != 0)
-        gzthrow(std::string("getnameinfo() failed[") + gai_strerror(s) + "]\n");
+    char host[NI_MAXHOST];
 
-      // Validate the IP address to make sure it's a valid dotted quad.
-      // Also make sure that the IP address is not for the local host.
-      if (this->ValidateIP(host) && std::string(host).find("127.0") != 0)
+    // Iterate over all the interface addresses
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+      if (ifa->ifa_addr == NULL)
+        continue;
+
+      int family = ifa->ifa_addr->sa_family;
+      if (family == AF_INET || family == AF_INET6)
       {
-        ep.address(boost::asio::ip::address_v4::from_string(host));
+        int s = getnameinfo(ifa->ifa_addr,
+            (family == AF_INET) ? sizeof(struct sockaddr_in) :
+            sizeof(struct sockaddr_in6),
+            host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
+        if (s != 0)
+          gzthrow(std::string("getnameinfo() failed[") +
+                  gai_strerror(s) + "]\n");
+
+        // Validate the IP address to make sure it's a valid dotted quad.
+        if (!this->ValidateIP(host))
+          continue;
+
+        address = boost::asio::ip::address_v4::from_string(host);
+
+        // Also make sure that the IP address is not a loopback interface.
+        if (!addressIsLoopback(address))
+          break;
       }
+    }
+
+    // Use a loopback interface as a fallback.
+    if (addressIsUnspecified(address))
+    {
+      gzwarn << "Unable to find a non-loopback interface. You will "
+             << "not be able to connect to remote server.\n";
+
+      address = address.loopback();
     }
   }
 
-  return ep;
+  // Complain if we were unable to find a valid address
+  if (addressIsUnspecified(address))
+    gzthrow("Unable to get IP address for the local machine."
+            "Please check your network configuration.");
+
+  return boost::asio::ip::tcp::endpoint(address, 0);
 }
 
 /////////////////////////////////////////////////
