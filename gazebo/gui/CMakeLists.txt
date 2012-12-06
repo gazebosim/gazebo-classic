@@ -5,7 +5,7 @@ link_directories(
   ${Boost_LIBRARY_DIRS} 
 )
 
-add_definitions( ${QT_DEFINITIONS} )
+add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
@@ -32,6 +32,7 @@ set (sources
   ModelRightMenu.cc
   JointControlWidget.cc
   ToolsWidget.cc
+  sensor_widgets/CameraSensorWidget.cc
 )
 
 set (qt_headers
@@ -46,6 +47,7 @@ set (qt_headers
   ModelRightMenu.hh
   JointControlWidget.hh
   ToolsWidget.hh
+  sensor_widgets/CameraSensorWidget.hh
 )
 
 set (headers
