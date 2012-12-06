@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -278,6 +278,7 @@ namespace gazebo
       public: unsigned int GetId() const;
 
       /// \brief Return true if the _ip is a valid.
+      /// \param[in] _ip Dotted quad to validate.
       /// \return True if the _ip is a valid.
       public: static bool ValidateIP(const std::string &_ip);
 

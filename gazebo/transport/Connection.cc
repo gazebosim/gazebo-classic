@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2011 Nate Koenig
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -671,7 +671,6 @@ std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep)
     name = (*iter).host_name();
     ++iter;
   }
-
 
   return name;
 }
