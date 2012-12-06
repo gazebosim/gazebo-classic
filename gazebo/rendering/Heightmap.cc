@@ -1835,11 +1835,13 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::updateVpParams(
         Ogre::StringConverter::toString(i), uvMul);
   }
 
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
   if (_terrain->_getUseVertexCompression() && _tt != RENDER_COMPOSITE_MAP)
   {
     Ogre::Real baseUVScale = 1.0f / (_terrain->getSize() - 1);
     _params->setNamedConstant("baseUVScale", baseUVScale);
   }
+#endif
 }
 
 /////////////////////////////////////////////////
