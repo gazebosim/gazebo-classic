@@ -166,10 +166,6 @@ void Link::Init()
 
   this->SetKinematic(this->sdf->GetValueBool("kinematic"));
 
-  // If no collisions are attached, then don't let gravity affect the body.
-  if (this->children.size()== 0 || !this->sdf->GetValueBool("gravity"))
-    this->SetGravityMode(false);
-
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
 
