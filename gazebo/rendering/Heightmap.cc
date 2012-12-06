@@ -420,7 +420,6 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
 
   if (!this->mShaderGen)
   {
-
     // By default we use the GLSL shaders.
     if (hmgr.isLanguageSupported("glsl"))
     {
@@ -468,10 +467,10 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
   // Doesn't delegate to the proper method otherwise
   Ogre::HighLevelGpuProgramPtr vprog =
     ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)
-    // Use this line if running Ogre's CG shaders
-    //((TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg*)this->mShaderGen)
-    // Use this line if running our CG shaders
-    //((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+  // Use this line if running Ogre's CG shaders
+  // ((TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+  // Use this line if running our CG shaders
+  // ((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)
     ->generateVertexProgram(this, _terrain, _tt);
 
   // DEBUG: std::cout << "VertShader[" << vprog->getName() << "]:\n"
@@ -479,10 +478,10 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
 
   Ogre::HighLevelGpuProgramPtr fprog =
     ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)
-    // Use this line if running Ogre's CG shaders
-    //((TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg*)this->mShaderGen)
-    // Use this line if running our CG shaders
-    //((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+  // Use this line if running Ogre's CG shaders
+  // ((TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+  // Use this line if running our CG shaders
+  // ((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)
     ->generateFragmentProgram(this, _terrain, _tt);
 
   // DEBUG: std::cout << "FragShader[" << fprog->getName() << "]:\n"
@@ -1811,7 +1810,12 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgramSource(
 
 /////////////////////////////////////////////////
 void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::updateVpParams(
-    const SM2Profile *_prof, const Ogre::Terrain *_terrain, TechniqueType _tt,
+    const SM2Profile *_prof, const Ogre::Terrain *_terrain,
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
+    TechniqueType _tt,
+#else
+    TechniqueType /*_tt*/,
+#endif
     const Ogre::GpuProgramParametersSharedPtr &_params)
 {
   _params->setIgnoreMissingParams(true);
