@@ -34,7 +34,7 @@ TEST_F(BulletTest, EmptyWorldTest)
   // simulate a couple seconds
   world->StepWorld(2000);
   double t = world->GetSimTime().Double();
-  EXPECT_TRUE(t > 0);
+  EXPECT_GT(t, 0);
 
   Unload();
 }
