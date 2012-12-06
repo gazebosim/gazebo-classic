@@ -420,29 +420,18 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
 
   if (!this->mShaderGen)
   {
-    // bool check2x = this->mLayerNormalMappingEnabled ||
-    //               this->mLayerParallaxMappingEnabled;
-
     if (hmgr.isLanguageSupported("glsl"))
     {
       this->mShaderGen = OGRE_NEW
         GzTerrainMatGen::SM2Profile::ShaderHelperGLSL();
     }
+
+    // Uncomment this 'else' to enable cg shaders. I'm keeping the CG
+    // shader for reference
     /*else if (hmgr.isLanguageSupported("cg"))
     {
       this->mShaderGen =
         OGRE_NEW GzTerrainMatGen::SM2Profile::ShaderHelperCg();
-    }
-    else if (hmgr.isLanguageSupported("hlsl") &&
-             ((check2x && gmgr.isSyntaxSupported("ps_4_0")) ||
-              (check2x && gmgr.isSyntaxSupported("ps_2_x")) ||
-              (!check2x && gmgr.isSyntaxSupported("ps_2_0"))))
-    {
-      this->mShaderGen = OGRE_NEW ShaderHelperHLSL();
-    }
-    else if (hmgr.isLanguageSupported("glsles"))
-    {
-      this->mShaderGen = OGRE_NEW ShaderHelperGLSLES();
     }*/
     else
     {
@@ -469,8 +458,6 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
   // Only supporting one pass
   Ogre::Pass *pass = tech->createPass();
 
-  printf("\n****************Vertex and Fragment Pair********************\n");
-
   // Doesn't delegate to the proper method otherwise
   Ogre::HighLevelGpuProgramPtr vprog =
     ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)->
@@ -479,7 +466,6 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
   Ogre::HighLevelGpuProgramPtr fprog =
     ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)->
     generateFragmentProgram(this, _terrain, _tt);
-  printf("\n************************************************************\n");
 
   pass->setVertexProgram(vprog->getName());
   pass->setFragmentProgram(fprog->getName());
@@ -681,13 +667,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVertexProgram(
   ret->load();
   this->defaultVpParams(_prof, _terrain, _tt, ret);
 
-  std::cout << "\nVertShader:\n" << ret->getSource() << "\n\n";
-
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().stream(LML_TRIVIAL)
-    << "*** Terrain Vertex Program: "
-    << ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
-#endif
+  // DEBUG: std::cout << "\nVertShader:\n" << ret->getSource() << "\n\n";
 
   return ret;
 }
@@ -697,7 +677,6 @@ Ogre::HighLevelGpuProgramPtr
 GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgram(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain, TechniqueType _tt)
 {
-
   Ogre::HighLevelGpuProgramPtr ret = this->createFragmentProgram(_prof,
       _terrain, _tt);
 
@@ -711,14 +690,66 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgram(
 
   this->defaultFpParams(_prof, _terrain, _tt, ret);
 
-  std::cout << "\nFragShader[" << ret->getName() << "]:\n"
-            << ret->getSource() << "\n\n";
+  Ogre::GpuProgramParametersSharedPtr params = ret->getDefaultParameters();
+  params->setIgnoreMissingParams(false);
 
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().stream(LML_TRIVIAL) <<
-    "*** Terrain Fragment Program: "
-    << ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
-#endif
+  Ogre::uint maxLayers = _prof->getMaxLayers(_terrain);
+  Ogre::uint numBlendTextures = std::min(
+      _terrain->getBlendTextureCount(maxLayers),
+      _terrain->getBlendTextureCount());
+
+  Ogre::uint numLayers = std::min(maxLayers,
+      static_cast<Ogre::uint>(_terrain->getLayerCount()));
+
+  int samplerCounter = 0;
+
+  if (_tt == LOW_LOD)
+    params->setNamedConstant("compositeMap", samplerCounter++);
+  else
+  {
+    params->setNamedConstant("globalNormal", samplerCounter++);
+
+    if (_terrain->getGlobalColourMapEnabled() &&
+        _prof->isGlobalColourMapEnabled())
+    {
+      params->setNamedConstant("globalColourMap", samplerCounter++);
+    }
+
+    if (_prof->isLightmapEnabled())
+      params->setNamedConstant("lightMap", samplerCounter++);
+
+    for (Ogre::uint i = 0; i < numBlendTextures; ++i)
+    {
+      params->setNamedConstant("blendTex" +
+          boost::lexical_cast<std::string>(i), samplerCounter++);
+    }
+
+    for (Ogre::uint i = 0; i < numLayers; ++i)
+    {
+      params->setNamedConstant("difftex" +
+          boost::lexical_cast<std::string>(i), samplerCounter++);
+      params->setNamedConstant("normtex" +
+          boost::lexical_cast<std::string>(i), samplerCounter++);
+    }
+  }
+
+  if (_prof->isShadowingEnabled(_tt, _terrain))
+  {
+    Ogre::uint numTextures = 1;
+    if (_prof->getReceiveDynamicShadowsPSSM())
+    {
+      numTextures = _prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+    }
+
+    for (Ogre::uint i = 0; i < numTextures; ++i)
+    {
+      params->setNamedConstant("shadowMap" +
+          boost::lexical_cast<std::string>(i), samplerCounter++);
+    }
+  }
+
+  // DEBUG: std::cout << "\nFragShader[" << ret->getName() << "]:\n"
+  //          << ret->getSource() << "\n\n";
 
   return ret;
 }
@@ -957,13 +988,11 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpFooter(
     if (_terrain->getSceneManager()->getFogMode() == Ogre::FOG_LINEAR)
     {
       _outStream <<
-        // "  fogVal = saturate((oPos.z - fogParams.y) * fogParams.w);\n";
         "  fogVal = clamp((oPos.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
     }
     else
     {
       _outStream <<
-        //"  fogVal = 1 - saturate(1 / (exp(oPos.z * fogParams.x)));\n";
         "  fogVal = 1 - clamp(1 / (exp(oPos.z * fogParams.x)), 0.0, 1.0);\n";
     }
   }
@@ -1112,8 +1141,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   _outStream <<
     "vec4 lit(float NdotL, float NdotH, float m)\n"
     "{\n"
-    //"  float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m) : 0.0;\n"
-    "  float specular = step(0.0, NdotL) * max(0.0, NdotH * m);\n"
+    "  float specular = (NdotL > 0) ? pow(max(0.0, NdotH), m) : 0.0;\n"
     "  return vec4(1.0, max(0.0, NdotL), specular, 1.0);\n"
     "}\n";
 
@@ -1271,7 +1299,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
       // we do this in the pixel shader because we don't have per-vertex normals
       // because of the LOD, we use a normal map
       // tangent is always +x or -z in object space depending on alignment
-      switch(_terrain->getAlignment())
+      switch (_terrain->getAlignment())
       {
         case Ogre::Terrain::ALIGN_X_Y:
         case Ogre::Terrain::ALIGN_X_Z:
@@ -1473,8 +1501,6 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
       this->generateFpDynamicShadows(_prof, _terrain, _tt, _outStream);
     }
 
-    _outStream << " shadow = 0.1;\n";
-
     // diffuse lighting
     _outStream << "  outputCol.xyz += ambient * diffuse + litRes.y * "
                   "lightDiffuseColour * diffuse * shadow;\n";
@@ -1551,7 +1577,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(
       "      // to avoid gradient issues inside loops\n"
       "      newUV = newUV / newUV.w;\n"
       // The following line used to be:
-      //"      float depth = tex2d(shadowMap, newUV.xy, 1.0, 1.0).x;\n"
+      // "      float depth = tex2d(shadowMap, newUV.xy, 1.0, 1.0).x;\n"
       "      float depth = textureGrad(shadowMap, newUV.xy, "
       "vec2(1.0, 1.0), vec2(1.0, 1.0)).x;\n"
       "      if (depth >= 1.0 || depth >= uv.z)\n"
@@ -1725,7 +1751,7 @@ Ogre::String GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::GetChannel(
 Ogre::uint _idx)
 {
   Ogre::uint rem = _idx % 4;
-  switch(rem)
+  switch (rem)
   {
     case 0:
     default:
@@ -1761,13 +1787,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVertexProgram(
   ret->load();
   this->defaultVpParams(_prof, _terrain, _tt, ret);
 
-  std::cout << "\n\n" << ret->getSource() << "\n\n";
-
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().stream(LML_TRIVIAL)
-    << "*** Terrain Vertex Program: "
-    << ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
-#endif
+  // DEBUG: std::cout << "\n\n" << ret->getSource() << "\n\n";
 
   return ret;
 }
@@ -2134,8 +2154,6 @@ Ogre::HighLevelGpuProgramPtr
 GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
     const SM2Profile *_prof, const Ogre::Terrain *_terrain, TechniqueType _tt)
 {
-  std::cout << "\n\n CG GENERATE FRAGMENT PROGRAM\n\n";
-
   Ogre::HighLevelGpuProgramPtr ret = this->createFragmentProgram(_prof,
       _terrain, _tt);
 
@@ -2149,13 +2167,7 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   this->defaultFpParams(_prof, _terrain, _tt, ret);
 
-  std::cout << "\nFragShader:\n" << ret->getSource() << "\n\n";
-
-#if OGRE_DEBUG_MODE
-  Ogre::LogManager::getSingleton().stream(LML_TRIVIAL) <<
-    "*** Terrain Fragment Program: "
-    << ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
-#endif
+  // DEBUG: std::cout << "\nFragShader:\n" << ret->getSource() << "\n\n";
 
   return ret;
 }

@@ -131,19 +131,17 @@ namespace gazebo
     };
     /// \}
 
-    /// \brief Custom terrain material generator compatible with the RTSS
-    /// PSSM shadow technique. A TerrainMaterialGenerator which can cope with
-    /// normal mapped, specular mapped terrain.
-    /// \note Requires the Cg plugin to render correctly
+    /// \internal
+    /// \brief Custom terrain material generator for GLSL terrains.
     class GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor
       public: GzTerrainMatGen();
 
-              /// \brief Destructor
+      /// \brief Destructor
       public: virtual ~GzTerrainMatGen();
 
-              /// \brief  Shader model 2 profile target.
+      /// \brief Shader model 2 profile target.
       public: class SM2Profile :
               public Ogre::TerrainMaterialGeneratorA::SM2Profile
       {
@@ -151,7 +149,7 @@ namespace gazebo
         public: SM2Profile(Ogre::TerrainMaterialGenerator *_parent,
                     const Ogre::String &_name, const Ogre::String &_desc);
 
-                /// \brief Destructor
+        /// \brief Destructor
         public: virtual ~SM2Profile();
 
         public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
@@ -162,7 +160,7 @@ namespace gazebo
         protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
                        const Ogre::Terrain *_terrain, TechniqueType _tt);
 
-        /// Utility class to help with generating shaders for GLSL.
+        /// \brief Utility class to help with generating shaders for GLSL.
         protected: class ShaderHelperGLSL :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
         {
@@ -240,6 +238,7 @@ namespace gazebo
           private: Ogre::String GetChannel(Ogre::uint _idx);
         };
 
+        /// Keeping the CG shader for reference.
         /// Utility class to help with generating shaders for Cg / HLSL.
         protected: class ShaderHelperCg :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
@@ -247,7 +246,6 @@ namespace gazebo
           public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
                       const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                       TechniqueType _tt);
-
 
           public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
                       const SM2Profile *_prof, const Ogre::Terrain *_terrain,
