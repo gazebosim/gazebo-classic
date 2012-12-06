@@ -97,8 +97,10 @@ namespace gazebo
       /// \brief Create a physics based ray sensor
       // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
 
+      // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
+      // Documentation inherited
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
       /// \brief Convert a bullet mass to a gazebo Mass
