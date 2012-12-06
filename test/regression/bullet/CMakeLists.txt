@@ -1,7 +1,7 @@
 include_directories (
   ${PROJECT_SOURCE_DIR}/gazebo 
   ${PROJECT_BINARY_DIR}/gazebo
-  ${ODE_INCLUDE_DIRS}
+  ${BULLET_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
@@ -11,33 +11,13 @@ include_directories (
 link_directories(  
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS} 
-  ${ODE_LIBRARY_DIRS}
+  ${BULLET_LIBRARY_DIRS}
 )
-
-# Disable the player test for now, until we figure out a better way to test them
-#if (INCLUDE_PLAYER)
-#  add_subdirectory(player)
-#endif()
-
-if(HAVE_BULLET)
-  add_subdirectory(bullet)
-endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/test/gtest/include)
 
 set (gtest_sources
-  factory.cc
-  file_handling.cc
-  heightmap.cc
-  laser.cc
-  math.cc
-  msgs.cc
-  physics.cc
-  pioneer2dx.cc
-  pr2.cc
-  projector.cc
-  speed.cc
-  transport.cc)
+  bullet.cc)
 
 set (plugins)
 
