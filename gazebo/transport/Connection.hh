@@ -277,6 +277,11 @@ namespace gazebo
       /// \return The connection's unique ID.
       public: unsigned int GetId() const;
 
+      /// \brief Return true if the _ip is a valid.
+      /// \param[in] _ip Dotted quad to validate.
+      /// \return True if the _ip is a valid.
+      public: static bool ValidateIP(const std::string &_ip);
+
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.
