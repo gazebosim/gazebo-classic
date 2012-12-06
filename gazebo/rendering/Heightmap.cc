@@ -420,23 +420,30 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
 
   if (!this->mShaderGen)
   {
+
+    // By default we use the GLSL shaders.
     if (hmgr.isLanguageSupported("glsl"))
     {
       this->mShaderGen = OGRE_NEW
         GzTerrainMatGen::SM2Profile::ShaderHelperGLSL();
     }
-
-    // Uncomment this 'else' to enable cg shaders. I'm keeping the CG
-    // shader for reference
-    /*else if (hmgr.isLanguageSupported("cg"))
-    {
-      this->mShaderGen =
-        OGRE_NEW GzTerrainMatGen::SM2Profile::ShaderHelperCg();
-    }*/
     else
     {
       gzthrow("No supported shader languages");
     }
+
+    // Uncomment this to use cg shaders. I'm keeping the CG
+    // shader for reference. There is some more code to switch, located
+    // below, to enable CG shaders.
+    // if (hmgr.isLanguageSupported("cg"))
+    // {
+    //   this->mShaderGen = OGRE_NEW
+    //     // This will use Ogre's CG shader
+    //     // Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg();
+    //     //
+    //     // This will use our CG shader, which has terrain shadows
+    //     GzTerrainMatGen::SM2Profile::ShaderHelperCg();
+    // }
 
     // check SM3 features
     this->mSM3Available =
@@ -460,12 +467,26 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
 
   // Doesn't delegate to the proper method otherwise
   Ogre::HighLevelGpuProgramPtr vprog =
-    ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)->
-    generateVertexProgram(this, _terrain, _tt);
+    ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)
+    // Use this line if running Ogre's CG shaders
+    //((TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+    // Use this line if running our CG shaders
+    //((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+    ->generateVertexProgram(this, _terrain, _tt);
+
+  // DEBUG: std::cout << "VertShader[" << vprog->getName() << "]:\n"
+  //          << vprog->getSource() << "\n\n";
 
   Ogre::HighLevelGpuProgramPtr fprog =
-    ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)->
-    generateFragmentProgram(this, _terrain, _tt);
+    ((GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*)this->mShaderGen)
+    // Use this line if running Ogre's CG shaders
+    //((TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+    // Use this line if running our CG shaders
+    //((GzTerrainMatGen::SM2Profile::ShaderHelperCg*)this->mShaderGen)
+    ->generateFragmentProgram(this, _terrain, _tt);
+
+  // DEBUG: std::cout << "FragShader[" << fprog->getName() << "]:\n"
+  //          << fprog->getSource() << "\n\n";
 
   pass->setVertexProgram(vprog->getName());
   pass->setFragmentProgram(fprog->getName());
@@ -606,7 +627,7 @@ Ogre::MaterialPtr GzTerrainMatGen::SM2Profile::generate(
     lowLodTechnique->setLodIndex(1);
   }
 
-  this->updateParams(mat, _terrain);
+  this->UpdateParams(mat, _terrain);
 
   return mat;
 }
@@ -640,9 +661,25 @@ Ogre::MaterialPtr GzTerrainMatGen::SM2Profile::generateForCompositeMap(
 
   this->addTechnique(mat, _terrain, RENDER_COMPOSITE_MAP);
 
-  this->updateParamsForCompositeMap(mat, _terrain);
+  this->UpdateParamsForCompositeMap(mat, _terrain);
 
   return mat;
+}
+
+/////////////////////////////////////////////////
+void GzTerrainMatGen::SM2Profile::UpdateParams(const Ogre::MaterialPtr &_mat,
+                  const Ogre::Terrain *_terrain)
+{
+  static_cast<GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*>(
+      this->mShaderGen)->updateParams(this, _mat, _terrain, false);
+}
+
+/////////////////////////////////////////////////
+void GzTerrainMatGen::SM2Profile::UpdateParamsForCompositeMap(
+    const Ogre::MaterialPtr &_mat, const Ogre::Terrain *_terrain)
+{
+  static_cast<GzTerrainMatGen::SM2Profile::ShaderHelperGLSL*>(
+      this->mShaderGen)->updateParams(this, _mat, _terrain, true);
 }
 
 /////////////////////////////////////////////////
@@ -666,8 +703,6 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVertexProgram(
   ret->setSource(sourceStr.str());
   ret->load();
   this->defaultVpParams(_prof, _terrain, _tt, ret);
-
-  // DEBUG: std::cout << "\nVertShader:\n" << ret->getSource() << "\n\n";
 
   return ret;
 }
@@ -748,12 +783,42 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgram(
     }
   }
 
-  // DEBUG: std::cout << "\nFragShader[" << ret->getName() << "]:\n"
-  //          << ret->getSource() << "\n\n";
-
   return ret;
 }
 
+/////////////////////////////////////////////////
+void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::updateParams(
+    const SM2Profile *_prof, const Ogre::MaterialPtr &_mat,
+    const Ogre::Terrain *_terrain, bool _compositeMap)
+{
+  Ogre::Pass *p = _mat->getTechnique(0)->getPass(0);
+
+  if (_compositeMap)
+  {
+    this->updateVpParams(_prof, _terrain, RENDER_COMPOSITE_MAP,
+        p->getVertexProgramParameters());
+    this->updateFpParams(_prof, _terrain, RENDER_COMPOSITE_MAP,
+        p->getFragmentProgramParameters());
+  }
+  else
+  {
+    // high lod
+    this->updateVpParams(_prof, _terrain, HIGH_LOD,
+        p->getVertexProgramParameters());
+    this->updateFpParams(_prof, _terrain, HIGH_LOD,
+        p->getFragmentProgramParameters());
+
+    if (_prof->isCompositeMapEnabled())
+    {
+      // low lod
+      p = _mat->getTechnique(1)->getPass(0);
+      this->updateVpParams(_prof, _terrain, LOW_LOD,
+          p->getVertexProgramParameters());
+      this->updateFpParams(_prof, _terrain, LOW_LOD,
+          p->getFragmentProgramParameters());
+    }
+  }
+}
 
 /////////////////////////////////////////////////
 void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::
@@ -837,7 +902,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
     ++numUVMultipliers;
 
   for (unsigned int i = 0; i < numUVMultipliers; ++i)
-    _outStream << "uniform vec4 uvMul_" << i << ";\n";
+    _outStream << "uniform vec4 uvMul" << i << ";\n";
 
   _outStream <<
     "out vec4 position;\n";
@@ -962,9 +1027,9 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
       unsigned int layer  =  i * 2;
       unsigned int uvMulIdx = layer / 4;
 
-      _outStream << "  layerUV" << i << ".xy = " << " uv.xy * uvMul_"
+      _outStream << "  layerUV" << i << ".xy = " << " uv.xy * uvMul"
                  << uvMulIdx << "." << this->GetChannel(layer) << ";\n";
-      _outStream << "  layerUV" << i << ".zw = " << " uv.xy * uvMul_"
+      _outStream << "  layerUV" << i << ".zw = " << " uv.xy * uvMul"
                  << uvMulIdx << "." << this->GetChannel(layer+1) << ";\n";
     }
   }
@@ -1092,8 +1157,6 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::defaultVpParams(
   }
 #endif
 }
-
-
 
 /////////////////////////////////////////////////
 unsigned int GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::
@@ -1747,6 +1810,39 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFragmentProgramSource(
 }
 
 /////////////////////////////////////////////////
+void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::updateVpParams(
+    const SM2Profile *_prof, const Ogre::Terrain *_terrain, TechniqueType _tt,
+    const Ogre::GpuProgramParametersSharedPtr &_params)
+{
+  _params->setIgnoreMissingParams(true);
+  Ogre::uint maxLayers = _prof->getMaxLayers(_terrain);
+  Ogre::uint numLayers = std::min(maxLayers,
+      static_cast<Ogre::uint>(_terrain->getLayerCount()));
+
+  Ogre::uint numUVMul = numLayers / 4;
+
+  if (numLayers % 4)
+    ++numUVMul;
+
+  for (Ogre::uint i = 0; i < numUVMul; ++i)
+  {
+    Ogre::Vector4 uvMul(
+        _terrain->getLayerUVMultiplier(i * 4),
+        _terrain->getLayerUVMultiplier(i * 4 + 1),
+        _terrain->getLayerUVMultiplier(i * 4 + 2),
+        _terrain->getLayerUVMultiplier(i * 4 + 3));
+    _params->setNamedConstant("uvMul" +
+        Ogre::StringConverter::toString(i), uvMul);
+  }
+
+  if (_terrain->_getUseVertexCompression() && _tt != RENDER_COMPOSITE_MAP)
+  {
+    Ogre::Real baseUVScale = 1.0f / (_terrain->getSize() - 1);
+    _params->setNamedConstant("baseUVScale", baseUVScale);
+  }
+}
+
+/////////////////////////////////////////////////
 Ogre::String GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::GetChannel(
 Ogre::uint _idx)
 {
@@ -1786,8 +1882,6 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVertexProgram(
   ret->setSource(sourceStr.str());
   ret->load();
   this->defaultVpParams(_prof, _terrain, _tt, ret);
-
-  // DEBUG: std::cout << "\n\n" << ret->getSource() << "\n\n";
 
   return ret;
 }
@@ -1956,8 +2050,8 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpHeader(
   }
 
   // uv multipliers
-  unsigned int maxLayers = _prof->getMaxLayers(_terrain);
-  unsigned int numLayers = std::min(maxLayers,
+  Ogre::uint maxLayers = _prof->getMaxLayers(_terrain);
+  Ogre::uint numLayers = std::min(maxLayers,
       static_cast<unsigned int>(_terrain->getLayerCount()));
 
   unsigned int numUVMultipliers = (numLayers / 4);
@@ -1966,7 +2060,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpHeader(
     ++numUVMultipliers;
 
   for (unsigned int i = 0; i < numUVMultipliers; ++i)
-    _outStream << "uniform float4 uvMul_" << i << ",\n";
+    _outStream << "uniform float4 uvMul" << i << ",\n";
 
   _outStream <<
     "out float4 oPos : POSITION,\n"
@@ -2088,9 +2182,9 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpHeader(
       unsigned int layer  =  i * 2;
       unsigned int uvMulIdx = layer / 4;
 
-      _outStream << "  oUV" << i << ".xy = " << " uv.xy * uvMul_"
+      _outStream << "  oUV" << i << ".xy = " << " uv.xy * uvMul"
                  << uvMulIdx << "." << getChannel(layer) << ";\n";
-      _outStream << "  oUV" << i << ".zw = " << " uv.xy * uvMul_"
+      _outStream << "  oUV" << i << ".zw = " << " uv.xy * uvMul"
                  << uvMulIdx << "." << getChannel(layer+1) << ";\n";
     }
   }
@@ -2128,6 +2222,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpFooter(
 
   _outStream << "}\n";
 }
+
 /////////////////////////////////////////////////
 void GzTerrainMatGen::SM2Profile::ShaderHelperCg::
 generateVertexProgramSource(const SM2Profile *_prof,
@@ -2166,8 +2261,6 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
   ret->load();
 
   this->defaultFpParams(_prof, _terrain, _tt, ret);
-
-  // DEBUG: std::cout << "\nFragShader:\n" << ret->getSource() << "\n\n";
 
   return ret;
 }

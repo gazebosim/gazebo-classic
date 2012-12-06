@@ -1,23 +1,5 @@
 import * from "grid.material"
 
-/*vertex_program Gazebo/TestMe glsl
-{
-  source test.vert
-
-  default_params
-  {
-  }
-}*/
-
-/*fragment_program Gazebo/TestMeF glsl
-{
-  source test.frag
-
-  default_params
-  {
-  }
-}*/
-
 vertex_program Gazebo/DepthMapVS glsl
 {
   source depth_map.vert
@@ -38,18 +20,6 @@ fragment_program Gazebo/DepthMapFS glsl
     param_named_auto pFar far_clip_distance
   }
 }
-
-/*material Gazebo/Grey
-{
-  technique
-  {
-    pass
-    {
-      vertex_program_ref Gazebo/TestMe { }
-      fragment_program_ref Gazebo/TestMeF { }
-    }
-  }
-}*/
 
 material Gazebo/DepthMap
 {

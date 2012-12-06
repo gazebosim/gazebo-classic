@@ -157,6 +157,12 @@ namespace gazebo
         public: Ogre::MaterialPtr generateForCompositeMap(
                     const Ogre::Terrain *_terrain);
 
+        public: void UpdateParams(const Ogre::MaterialPtr &_mat,
+                                  const Ogre::Terrain *_terrain);
+
+        public: void UpdateParamsForCompositeMap(const Ogre::MaterialPtr &_mat,
+                                                 const Ogre::Terrain *_terrain);
+
         protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
                        const Ogre::Terrain *_terrain, TechniqueType _tt);
 
@@ -171,6 +177,10 @@ namespace gazebo
           public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
                       const SM2Profile *_prof, const Ogre::Terrain *_terrain,
                       TechniqueType _tt);
+
+          public: virtual void updateParams(const SM2Profile *_prof,
+                      const Ogre::MaterialPtr &_mat,
+                      const Ogre::Terrain *_terrain, bool _compositeMap);
 
           protected: virtual void generateVpHeader(const SM2Profile *_prof,
                          const Ogre::Terrain *_terrain, TechniqueType _tt,
@@ -235,6 +245,11 @@ namespace gazebo
                          const Ogre::Terrain *_terrain,
                          TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
+
+          protected: virtual void updateVpParams(const SM2Profile *_prof,
+                         const Ogre::Terrain *_terrain, TechniqueType _tt,
+                         const Ogre::GpuProgramParametersSharedPtr &_params);
+
           private: Ogre::String GetChannel(Ogre::uint _idx);
         };
 
