@@ -604,14 +604,14 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
   char *ip = getenv("GAZEBO_IP");
 
   // First try GAZEBO_HOSTNAME if it is set.
-  if (hostname)
+  if (hostname && !std::string(hostname).empty())
   {
     boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
     boost::asio::ip::tcp::resolver::query query(hostname, "");
     boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
     boost::asio::ip::tcp::resolver::iterator end;
 
-    // Loop throught the results, and stop at the first valid address.
+    // Loop through the results, and stop at the first valid address.
     while (iter != end)
     {
       boost::asio::ip::tcp::endpoint testEndPoint = *iter++;
@@ -633,7 +633,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
 
   // Try GAZEBO_IP if GAZEBO_HOSTNAME is not set or we were not able to
   // find a valid address.
-  if (ip && addressIsUnspecified(address))
+  if (ip && !std::string(ip).empty() && addressIsUnspecified(address))
   {
     if (!this->ValidateIP(ip))
     {
