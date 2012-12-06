@@ -39,7 +39,7 @@ IOManager *Connection::iomanager = NULL;
 // Version 1.52 of boost has an address::is_unspecfied function, but
 // Version 1.46.1 (installed on ubuntu) does not. So this helper function
 // is stolen from adress::is_unspecified function in boost v1.52.
-bool addressIsUnspecified(const boost::asio::ip::address_v4 &_addr)
+static bool addressIsUnspecified(const boost::asio::ip::address_v4 &_addr)
 {
   return _addr.to_ulong() == 0;
 }
@@ -47,7 +47,7 @@ bool addressIsUnspecified(const boost::asio::ip::address_v4 &_addr)
 // Version 1.52 of boost has an address::is_loopback function, but
 // Version 1.46.1 (installed on ubuntu) does not. So this helper function
 // is stolen from adress::is_loopback function in boost v1.52.
-bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
+static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 {
  return (_addr.to_ulong() & 0xFF000000) == 0x7F000000;
 }
