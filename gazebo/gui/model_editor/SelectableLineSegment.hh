@@ -20,85 +20,90 @@
 
 #include <gui/qt.h>
 
-class CornerGrabber;
-
-class SelectableLineSegment : public QGraphicsPolygonItem
+namespace gazebo
 {
-  public: SelectableLineSegment(QPointF _start, QPointF _end);
+  namespace gui
+  {
+    class CornerGrabber;
 
-  public: ~SelectableLineSegment();
+    class SelectableLineSegment : public QGraphicsPolygonItem
+    {
+      public: SelectableLineSegment(QPointF _start, QPointF _end);
 
-  public: void SetCornerPosition(QPointF _position, int _cornerIndex);
+      public: ~SelectableLineSegment();
 
-  public: void TranslateCorner(QPointF _translation, int _cornerIndex);
+      public: void SetCornerPosition(QPointF _position, int _cornerIndex);
 
-  public: void ConnectLine(SelectableLineSegment *_line);
+      public: void TranslateCorner(QPointF _translation, int _cornerIndex);
 
-  public: void DisconnectLine(SelectableLineSegment *_line);
+      public: void ConnectLine(SelectableLineSegment *_line);
 
-  public: SelectableLineSegment *GetAdjacentLine(int _index);
+      public: void DisconnectLine(SelectableLineSegment *_line);
 
-  public: CornerGrabber *GetCorner(int _index);
+      public: SelectableLineSegment *GetAdjacentLine(int _index);
 
-  public: bool HasCorner(CornerGrabber *_corner);
+      public: CornerGrabber *GetCorner(int _index);
 
-  private: void UpdateCornerPositions();
+      public: bool HasCorner(CornerGrabber *_corner);
 
-  private: void CreateCustomPath(QPointF _mouseLocation, CornerGrabber*);
+      private: void UpdateCornerPositions();
 
-  private: void EnclosePath(qreal _lineStartX,qreal _lineStartY,
-      qreal _lineEndX, qreal _lineEndY);
+      private: void CreateCustomPath(QPointF _mouseLocation, CornerGrabber*);
 
-  protected:  void paint (QPainter *painter,
-      const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+      private: void EnclosePath(qreal _lineStartX,qreal _lineStartY,
+          qreal _lineEndX, qreal _lineEndY);
 
-  protected: void hoverEnterEvent ( QGraphicsSceneHoverEvent *_event);
+      protected:  void paint (QPainter *painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-  protected: void hoverLeaveEvent ( QGraphicsSceneHoverEvent *_event);
+      protected: void hoverEnterEvent ( QGraphicsSceneHoverEvent *_event);
 
-  protected: void mouseMoveEvent ( QGraphicsSceneMouseEvent *_event);
+      protected: void hoverLeaveEvent ( QGraphicsSceneHoverEvent *_event);
 
-  protected: void mousePressEvent (QGraphicsSceneMouseEvent *_event);
+      protected: void mouseMoveEvent ( QGraphicsSceneMouseEvent *_event);
 
-  protected: void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
+      protected: void mousePressEvent (QGraphicsSceneMouseEvent *_event);
 
-  protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *event);
+      protected: void mouseReleaseEvent (QGraphicsSceneMouseEvent *_event);
 
-  protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+      protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *event);
 
-  protected: bool sceneEventFilter(QGraphicsItem * watched,
-    QEvent *_event) ;
+      protected: void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
-  /// \brief the hover event handler will toggle this between red and black
-  private: QColor outterBorderColor;
+      protected: bool sceneEventFilter(QGraphicsItem * watched,
+        QEvent *_event) ;
 
-  private: QPointF location;
+      /// \brief the hover event handler will toggle this between red and black
+      private: QColor outterBorderColor;
 
-  private: QPointF dragStart;
+      private: QPointF location;
 
-  private: int gridSpace;
+      private: QPointF dragStart;
 
-  private: qreal lineLength;
+      private: int gridSpace;
 
-  private: int xCornerGrabBuffer;
+      private: qreal lineLength;
 
-  private: int yCornerGrabBuffer;
+      private: int xCornerGrabBuffer;
 
-//  private: qreal graphicsItemBoundingBoxWidth;
+      private: int yCornerGrabBuffer;
 
-  private: QPointF lineEnd0;
+    //  private: qreal graphicsItemBoundingBoxWidth;
 
-  private: QPointF lineEnd1;
+      private: QPointF lineEnd0;
 
-  private: bool cornerGrabbed;
+      private: QPointF lineEnd1;
 
-  // 0,1  - starting at x=0,y=0
-  private: CornerGrabber*  corners[2];
+      private: bool cornerGrabbed;
 
-  private: QPolygonF selectRegion;
+      // 0,1  - starting at x=0,y=0
+      private: CornerGrabber*  corners[2];
 
-  private: SelectableLineSegment *adjacentLineSegments[2];
+      private: QPolygonF selectRegion;
 
-};
+      private: SelectableLineSegment *adjacentLineSegments[2];
 
+    };
+  }
+}
 #endif

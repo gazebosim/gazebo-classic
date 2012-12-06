@@ -17,6 +17,9 @@
 
 #include "CornerGrabber.hh"
 
+using namespace gazebo;
+using namespace gui;
+
 /////////////////////////////////////////////////
 CornerGrabber::CornerGrabber(QGraphicsItem *_parent, int _index) :
   QGraphicsItem(_parent),

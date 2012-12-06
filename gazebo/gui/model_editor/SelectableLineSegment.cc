@@ -18,6 +18,9 @@
 #include "SelectableLineSegment.hh"
 #include "CornerGrabber.hh"
 
+using namespace gazebo;
+using namespace gui;
+
 /////////////////////////////////////////////////
 SelectableLineSegment::SelectableLineSegment(QPointF _start, QPointF _end):
   QGraphicsPolygonItem(),

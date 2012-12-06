@@ -20,12 +20,12 @@
 
 #include "gui/qt.h"
 
-class SelectableLineSegment;
-
 namespace gazebo
 {
   namespace gui
   {
+    class PolylineItem;
+
     class EditorView : public QGraphicsView
     {
       Q_OBJECT
@@ -44,15 +44,13 @@ namespace gazebo
 
       protected: void mouseDoubleClickEvent(QMouseEvent *_event);
 
-      private: void DrawLines(QPoint _pos);
+      private: void DrawLine(QPoint _pos);
 
       private: int drawMode;
 
       private: bool drawInProgress;
 
-      private: std::vector<SelectableLineSegment*> lineList;
-
-      private: SelectableLineSegment *currentLine;
+      private: std::vector<PolylineItem*> lineList;
 
       private: QPoint lastLineCornerPos;
 

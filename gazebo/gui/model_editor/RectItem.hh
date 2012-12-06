@@ -20,72 +20,78 @@
 
 #include "gui/qt.h"
 
-class CornerGrabber;
-
-class RectItem : public QGraphicsItem
+namespace gazebo
 {
-    public: RectItem();
+  namespace gui
+  {
+    class CornerGrabber;
 
-    public: virtual ~RectItem();
+    class RectItem : public QGraphicsItem
+    {
+        public: RectItem();
 
-    public: void SetGridSpace(int _space);
+        public: virtual ~RectItem();
 
-    protected: void UpdateCornerPositions();
+        public: void SetGridSpace(int _space);
 
-    private: void AdjustSize(int _x, int _y);
+        protected: void UpdateCornerPositions();
 
-    private: virtual QRectF boundingRect() const;
+        private: void AdjustSize(int _x, int _y);
 
-    private: virtual void paint (QPainter *_painter,
-        const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+        private: virtual QRectF boundingRect() const;
 
-    private: virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
+        private: virtual void paint (QPainter *_painter,
+            const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-    private: virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
+        private: virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
-    private: virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
+        private: virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
 
-    private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
+        private: virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
 
-    private: virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
+        private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
-    private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+        private: virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
 
-    private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+        private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-    private: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+        private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
 
-    private: virtual bool sceneEventFilter(QGraphicsItem *_watched,
-        QEvent *_event);
+        private: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
-    protected: qreal width;
+        private: virtual bool sceneEventFilter(QGraphicsItem *_watched,
+            QEvent *_event);
 
-    protected: qreal height;
+        protected: qreal width;
 
-    protected: qreal drawingWidth;
+        protected: qreal height;
 
-    protected: qreal drawingHeight;
+        protected: qreal drawingWidth;
 
-    protected: qreal drawingOriginX;
+        protected: qreal drawingHeight;
 
-    protected: qreal drawingOriginY;
+        protected: qreal drawingOriginX;
 
-    protected: QColor outterBorderColor;
+        protected: qreal drawingOriginY;
 
-    private: QPointF location;
+        protected: QColor outterBorderColor;
 
-    private: QPointF dragStart;
+        private: QPointF location;
 
-    private: int gridSpace;
+        private: QPointF dragStart;
 
-    private: QPointF cornerDragStart;
+        private: int gridSpace;
 
-    private: int xCornerGrabBuffer;
+        private: QPointF cornerDragStart;
 
-    private: int yCornerGrabBuffer;
+        private: int xCornerGrabBuffer;
 
-    /// \brief Corners of the rectangle, going clockwise with 0 being top left
-    CornerGrabber*  corners[4];
-};
+        private: int yCornerGrabBuffer;
+
+        /// \brief Corners of the rectangle, going clockwise with 0 being top left
+        CornerGrabber*  corners[4];
+    };
+  }
+}
 
 #endif

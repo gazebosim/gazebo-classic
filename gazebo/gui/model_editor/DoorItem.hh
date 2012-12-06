@@ -20,18 +20,24 @@
 
 #include "gui/qt.h"
 
-class RectItem;
-
-class DoorItem : public RectItem
+namespace gazebo
 {
-    public: DoorItem();
+  namespace gui
+  {
+    class RectItem;
 
-    public: ~DoorItem();
+    class DoorItem : public RectItem
+    {
+        public: DoorItem();
 
-    private: virtual void paint (QPainter *_painter,
-        const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+        public: ~DoorItem();
 
-    private: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
-};
+        private: virtual void paint (QPainter *_painter,
+            const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+
+        private: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+    };
+  }
+}
 
 #endif

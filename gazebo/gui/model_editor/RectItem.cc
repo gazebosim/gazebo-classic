@@ -18,6 +18,9 @@
 #include "RectItem.hh"
 #include "CornerGrabber.hh"
 
+using namespace gazebo;
+using namespace gui;
+
 /////////////////////////////////////////////////
 RectItem::RectItem():
     outterBorderColor(Qt::black),

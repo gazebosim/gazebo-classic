@@ -22,7 +22,7 @@
 #include "RectItem.hh"
 #include "WindowItem.hh"
 #include "DoorItem.hh"
-//#include "PolylineItem.hh"
+#include "PolylineItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -55,15 +55,15 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-  //PolylineItem *lineItem = new PolylineItem(QPointF(-100, -100), QPointF(-100, 100));
-  //scene->addItem(lineItem);
+  PolylineItem *lineItem = new PolylineItem(QPointF(0, 0), QPointF(-100, 100));
+  scene->addItem(lineItem);
 
   WindowItem *windowItem = new WindowItem();
-  windowItem->setPos(0,0);
+  windowItem->setPos(-100,100);
   scene->addItem(windowItem);
 
   DoorItem *doorItem = new DoorItem();
-  doorItem->setPos(150,150);
+  doorItem->setPos(0,0);
   scene->addItem(doorItem);
 
 //  qDebug() << " width height "<< _parent->width() << " " << _parent->height() << scene->width() << scene->height() << view->width() << view->height();

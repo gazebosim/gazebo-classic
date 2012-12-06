@@ -15,7 +15,7 @@ set (sources
   RectItem.cc
   WindowItem.cc
   DoorItem.cc
-  #PolylineItem.cc
+  PolylineItem.cc
 )
 
 set (qt_headers
@@ -32,7 +32,7 @@ set (qt_headers
   RectItem.hh
   WindowItem.hh
   DoorItem.hh
-  #PolylineItem.hh
+  PolylineItem.hh
 )
 
 #set (resources qtpropertybrowser.qrc)

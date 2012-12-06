@@ -15,32 +15,69 @@
  *
 */
 
-#ifndef _POLYLINE_ITEM_H
-#define _POLYLINE_ITEM_H
+#ifndef _POLYLINE_ITEM_HH_
+#define _POLYLINE_ITEM_HH_
 
 #include <gui/qt.h>
-
-class CornerGrabber;
 
 namespace gazebo
 {
   namespace gui
   {
+    class CornerGrabber;
 
-  class PolylineItem : public QGraphicsPolygonItem
-  {
-    public: PolylineItem(QPointF _start, QPointF _end);
+    class PolylineItem : public QGraphicsPathItem
+    {
+      public: PolylineItem(QPointF _start, QPointF _end);
 
-    public: ~PolylineItem();
+      public: ~PolylineItem();
 
-    public: void AddPoint(QPointF F);
+      public: void AddPoint(QPointF _point);
 
-    private: std::vector<CornerGrabber*> corners;
+      public: void RemovePoint(unsigned int _index);
 
-    private: int cornerWidth;
+      public: unsigned int GetCount();
 
-    private: int cornerHeight;
-  };
+      public: void SetVertexPosition(unsigned int _index, QPointF _pos);
+
+      public: void TranslateVertex(unsigned int _index, QPointF _trans);
+
+      private: void UpdatePath();
+
+      private: void UpdatePathAtIndex(unsigned int _index, QPointF _pos);
+
+      private: void UpdatePathAt(unsigned int _index, QPointF _pos);
+
+      private: void AppendToPath(QPointF _point);
+
+      private: bool sceneEventFilter(QGraphicsItem * watched,
+        QEvent *_event) ;
+
+      private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
+
+      private: void hoverLeaveEvent(QGraphicsSceneHoverEvent *_event);
+
+      private: void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
+
+      private: void mouseMoveEvent(QGraphicsSceneMouseEvent *_event);
+
+      private: void mousePressEvent(QGraphicsSceneMouseEvent *_event);
+
+      private: QPointF origin;
+
+      private: QPointF location;
+
+      private: QPointF dragStart;
+
+      private: int gridSpace;
+
+      private: std::vector<CornerGrabber*> corners;
+
+      private: int cornerWidth;
+
+      private: int cornerHeight;
+    };
+  }
 }
 
 #endif

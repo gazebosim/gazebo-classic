@@ -15,23 +15,28 @@
  *
 */
 
-#ifndef _WINDOW_ITEM_H_
-#define _WINDOW_ITEM_H_
+#ifndef _WINDOW_ITEM_HH_
+#define _WINDOW_ITEM_HH_
 
 #include "gui/qt.h"
 
-class RectItem;
-
-class WindowItem : public RectItem
+namespace gazebo
 {
-    public: WindowItem();
+  namespace gui
+  {
+    class RectItem;
 
-    public: ~WindowItem();
+    class WindowItem : public RectItem
+    {
+        public: WindowItem();
 
-    private: virtual void paint (QPainter *_painter,
-        const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+        public: ~WindowItem();
 
-    private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
-};
+        private: virtual void paint (QPainter *_painter,
+            const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
+        private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+    };
+  }
+}
 #endif

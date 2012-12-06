@@ -16,16 +16,16 @@
 */
 
 #include "EditorView.hh"
-#include "SelectableLineSegment.hh"
 #include "RectItem.hh"
 #include "GridLines.hh"
+#include "PolylineItem.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 EditorView::EditorView(QWidget *_parent)
-  : QGraphicsView(_parent), currentLine(0)
+  : QGraphicsView(_parent)
 {
   this->setObjectName("editorView");
 
@@ -68,7 +68,14 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     case None:
       break;
     case Wall:
-      this->DrawLines(_event->pos());
+      if (!drawInProgress)
+      {
+        this->DrawLine(_event->pos());
+      }
+      else
+      {
+        lineList.back()->AddPoint(this->mapToScene(_event->pos()));
+      }
       break;
     default:
       break;
@@ -83,7 +90,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseMoveEvent(QMouseEvent *_event)
 {
-  QPointF delta = _event->pos() - lastMousePos;
+  QPointF trans = _event->pos() - lastMousePos;
   switch (drawMode)
   {
     case None:
@@ -91,8 +98,11 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
     case Wall:
       if (drawInProgress)
       {
-        if (currentLine)
-          currentLine->TranslateCorner(delta, 1);
+        if (!lineList.empty())
+        {
+          lineList.back()->TranslateVertex(lineList.back()->GetCount() - 1,
+              trans);
+        }
       }
       break;
     default:
@@ -108,30 +118,21 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
   drawMode =  None;
   drawInProgress = false;
 
-  if (currentLine)
-  {
-    lineList.pop_back();
-    scene()->removeItem(currentLine);
-    delete currentLine;
-    currentLine = NULL;
-  }
   QGraphicsView::mouseDoubleClickEvent(_event);
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawLines(QPoint _pos)
+void EditorView::DrawLine(QPoint _pos)
 {
   QPointF pointStart = mapToScene(_pos);
   QPointF pointEnd = pointStart;
-  SelectableLineSegment* newLine = new SelectableLineSegment(
-    pointStart, pointEnd);
 
-  if (currentLine)
-    currentLine->ConnectLine(newLine);
-  currentLine = newLine;
+  qDebug() << " point start " << pointStart;
+
+  PolylineItem* line = new PolylineItem(pointStart, pointEnd);
+  scene()->addItem(line);
+  lineList.push_back(line);
 
   lastLineCornerPos = _pos;
   lastMousePos = _pos;
-  lineList.push_back(newLine);
-  scene()->addItem(newLine);
 }

@@ -18,15 +18,25 @@
 #include "PolylineItem.hh"
 #include "CornerGrabber.hh"
 
-/////////////////////////////////////////////////
-PolylineItem::PolylineItem(QPointF _start, QPointF _end):
-{
+using namespace gazebo;
+using namespace gui;
 
-  this->origin = _start; 
+/////////////////////////////////////////////////
+PolylineItem::PolylineItem(QPointF _start, QPointF _end) :
+    QGraphicsPathItem(), gridSpace(10)
+{
+  this->origin = _start;
   this->setPos(_start);
-  
+
+  this->location = _start;
+
+  QPainterPath p;
+  this->setPath(p);
+
   this->AddPoint(_start);
   this->AddPoint(_end);
+
+  this->setAcceptHoverEvents(true);
 }
 
 /////////////////////////////////////////////////
@@ -34,22 +44,59 @@ PolylineItem::~PolylineItem()
 {
 }
 
-PolylineItem::AddPoint(QPointF _point)
+/////////////////////////////////////////////////
+void PolylineItem::AddPoint(QPointF _point)
 {
   CornerGrabber *corner = new CornerGrabber(this,
-      static_cast<int>corners.size());
-  this->corners->push_back(corner);
-
+      static_cast<int>(corners.size()));
+  this->corners.push_back(corner);
 
   this->cornerWidth = corner->boundingRect().width();
-  this->cornerHeight = (corner->boundingRect().height();
+  this->cornerHeight = corner->boundingRect().height();
+
+//  this->SetVertexPosition(corners.size()-1, _point);
 
   QPointF lineEnd = _point - this->origin;
-  corner->setPos(lineEnd.x() - cornerWidth/2,
-      lineEnd.y() - cornerHeight/2);
+
+  corner->setPos(lineEnd.x() - this->cornerWidth/2.0,
+      lineEnd.y() - this->cornerHeight/2.0);
+
+  this->AppendToPath(_point);
 }
 
-/*
+/////////////////////////////////////////////////
+unsigned int PolylineItem::GetCount()
+{
+  return this->corners.size();
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::SetVertexPosition(unsigned int _index, QPointF _pos)
+{
+  if (_index >= this->corners.size())
+    return;
+
+  QPointF lineEnd = _pos - this->origin;
+
+  this->corners[_index]->setPos(lineEnd.x() - this->cornerWidth/2.0,
+      lineEnd.y() - this->cornerHeight/2.0);
+
+  this->UpdatePathAt(_index, _pos);
+}
+
+/////////////////////////////////////////////////
+void PolylineItem::TranslateVertex(unsigned int _index, QPointF _trans)
+{
+  if (_index >= this->corners.size())
+    return;
+  QPointF newPos = this->corners[_index]->pos() + _trans;
+
+
+  this->corners[_index]->setPos(newPos);
+  QPointF offset(this->cornerWidth/2.0, this->cornerHeight/2.0);
+  this->UpdatePathAt(_index, newPos + offset + this->origin);
+}
+
 /////////////////////////////////////////////////
 bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
     QEvent *_event)
@@ -65,18 +112,17 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
   {
     case QEvent::GraphicsSceneMousePress:
     {
+      qDebug() << "corner press";
       corner->SetMouseState(CornerGrabber::kMouseDown);
       QPointF scenePosition =  corner->mapToScene(event->pos());
 
       corner->SetMouseDownX(scenePosition.x());
       corner->SetMouseDownY(scenePosition.y());
-      this->cornerGrabbed = true;
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
       corner->SetMouseState(CornerGrabber::kMouseReleased);
-      this->cornerGrabbed = false;
       break;
     }
     case QEvent::GraphicsSceneMouseMove:
@@ -93,230 +139,87 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
   if (corner->GetMouseState() == CornerGrabber::kMouseMoving )
   {
     QPointF scenePosition = corner->mapToScene(event->pos());
-    this->CreateCustomPath(scenePosition, corner);
 
-    CornerGrabber* weldedCorner = corner->GetWeldedCorner();
-    if (weldedCorner)
-    {
-      if (this->adjacentLineSegments[0]
-        && this->adjacentLineSegments[0]->HasCorner(weldedCorner))
-      {
-        this->adjacentLineSegments[0]->SetCornerPosition(scenePosition, 1);
-        this->adjacentLineSegments[0]->update();
-      }
-      else if (this->adjacentLineSegments[1]
-        && this->adjacentLineSegments[1]->HasCorner(weldedCorner))
-      {
-        this->adjacentLineSegments[1]->SetCornerPosition(scenePosition, 0);
-        this->adjacentLineSegments[1]->update();
-      }
-    }
+    this->SetVertexPosition(corner->GetIndex(), scenePosition);
+
     this->update();
   }
   return true;
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::SetCornerPosition(QPointF _position,
-    int _cornerIndex)
+void PolylineItem::UpdatePath()
 {
-  if (this->corners[_cornerIndex])
+  QPainterPath newPath;
+
+  QPointF point = this->corners[0]->pos() +
+      QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0);
+  newPath.moveTo(point);
+  for (unsigned int i = 1; i < corners.size(); ++i)
   {
-    CreateCustomPath(_position, this->corners[_cornerIndex]);
-    return;
+    point = this->corners[i]->pos() +
+        QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0);
+    newPath.lineTo(point);
   }
+  this->setPath(newPath);
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::TranslateCorner(QPointF _translation,
-    int _cornerIndex)
+void PolylineItem::UpdatePathAt(unsigned int _index, QPointF _pos)
 {
-  if (this->corners[_cornerIndex])
-  {
-    QPointF newPos = this->mapToScene(
-        this->corners[_cornerIndex]->GetCenterPoint()) + _translation;
-    CreateCustomPath(newPos, this->corners[_cornerIndex]);
-    return;
-  }
+  QPainterPath p = this->path();
+  QPointF newPos = _pos - this->origin;
+  p.setElementPositionAt(_index, newPos.x(), newPos.y());
+  this->setPath(p);
 }
 
 /////////////////////////////////////////////////
-void PolylineItem::ConnectLine(PolylineItem *_line)
+void PolylineItem::AppendToPath(QPointF _point)
 {
-  this->adjacentLineSegments[1] = _line;
-  _line->adjacentLineSegments[0] = this;
-  this->corners[1]->WeldCorner(_line->GetCorner(0));
+  QPainterPath p = this->path();
+  if (p.elementCount() == 0)
+    p.moveTo(_point - this->origin);
+  else p.lineTo(_point - this->origin);
+  this->setPath(p);
 }
 
 /////////////////////////////////////////////////
-PolylineItem *PolylineItem::GetAdjacentLine(int _index)
-{
-  return this->adjacentLineSegments[_index];
-}
-
-/////////////////////////////////////////////////
-CornerGrabber *PolylineItem::GetCorner(int _index)
-{
-  return this->corners[_index];
-}
-
-/////////////////////////////////////////////////
-bool PolylineItem::HasCorner(CornerGrabber *_corner)
-{
-  if (!_corner)
-    return false;
-  return (this->corners[0] == _corner || this->corners[1] == _corner);
-}
-
-/////////////////////////////////////////////////
-void PolylineItem::CreateCustomPath(QPointF _mouseLocation,
-  CornerGrabber* _corner)
-{
-  qreal lineEndX = 0;
-  qreal lineEndY = 0;
-  qreal lineStartX = 0;
-  qreal lineStartY = 0;
-
-  if (_corner == this->corners[0])
-  {
-    lineStartY = _mouseLocation.y();
-    lineStartX = _mouseLocation.x();
-    lineEndY = this->mapToScene(this->corners[1]->GetCenterPoint()).y();
-    lineEndX = this->mapToScene(this->corners[1]->GetCenterPoint()).x();
-  }
-  else
-  {
-    lineStartY = this->mapToScene(this->corners[0]->GetCenterPoint()).y();
-    lineStartX = this->mapToScene(this->corners[0]->GetCenterPoint()).x();
-    lineEndY =  _mouseLocation.y();
-    lineEndX =  _mouseLocation.x();
-  }
-
-  this->lineEnd0.setX(mapFromScene(lineStartX, lineStartY).x());
-  this->lineEnd0.setY(mapFromScene(lineStartX, lineStartY).y());
-
-  this->lineEnd1.setX(mapFromScene(lineEndX,lineEndY).x());
-  this->lineEnd1.setY(mapFromScene(lineEndX,lineEndY).y());
-
-  this->EnclosePath(lineStartX, lineStartY, lineEndX, lineEndY);
-
-  this->UpdateCornerPositions();
-}
-
-/////////////////////////////////////////////////
-void PolylineItem::EnclosePath(qreal _lineStartX, qreal _lineStartY,
-    qreal _lineEndX, qreal _lineEndY)
-{
-  
-
-  QList<QPointF> pointsStart;
-  QList<QPointF> pointsEnd;
-
-  pointsStart.append(QPointF(_lineStartX - this->xCornerGrabBuffer,
-      _lineStartY - this->yCornerGrabBuffer));
-  pointsStart.append(QPointF(_lineStartX + this->xCornerGrabBuffer,
-      _lineStartY - this->yCornerGrabBuffer));
-  pointsStart.append(QPointF(_lineStartX + this->xCornerGrabBuffer,
-      _lineStartY + this->yCornerGrabBuffer));
-  pointsStart.append(QPointF(_lineStartX - this->xCornerGrabBuffer,
-      _lineStartY + this->yCornerGrabBuffer));
-
-  pointsEnd.append(QPointF(_lineEndX - this->xCornerGrabBuffer,
-      _lineEndY - this->yCornerGrabBuffer));
-  pointsEnd.append(QPointF(_lineEndX + this->xCornerGrabBuffer,
-      _lineEndY - this->yCornerGrabBuffer));
-  pointsEnd.append(QPointF(_lineEndX + this->xCornerGrabBuffer,
-      _lineEndY + this->yCornerGrabBuffer));
-  pointsEnd.append(QPointF(_lineEndX - this->xCornerGrabBuffer,
-      _lineEndY + this->yCornerGrabBuffer));
-
-  qreal minDistance = 0 ;
-  qreal secondMinDistance = 0;
-  QPointF p1 ;
-  QPointF p2 ;
-  QPointF p3 ;
-  QPointF p4 ;
-  int i1=0;
-  int i2=0;
-
-  for (int i =0 ; i < 4; i++)
-  {
-    for (int j = 0; j < 4 ; j++)
-    {
-      qreal d1 = pow(pointsStart[i].x() - pointsEnd[j].x(), 2.0)
-                 + pow( pointsStart[i].y() - pointsEnd[j].y(), 2.0);
-      if ( d1 > minDistance)
-      {
-        minDistance = d1;
-        p1 = pointsStart[i];
-        p2 = pointsEnd[j];
-        i1 = i;
-        i2 = j;
-      }
-    }
-  }
-
-  for (int i =0 ; i < 4; i++)
-  {
-    if ( i == i1) continue;
-
-    for (int j = 0; j < 4 ; j++)
-    {
-      if ( j == i2 ) continue;
-      qreal d1 = pow(pointsStart[i].x() - pointsEnd[j].x(), 2.0)
-                 + pow( pointsStart[i].y() - pointsEnd[j].y(), 2.0);
-      if ( d1 > secondMinDistance)
-      {
-        secondMinDistance = d1;
-        p3 = pointsStart[i];
-        p4 = pointsEnd[j];
-      }
-    }
-  }
-
-  this->selectRegion.clear();
-
-  this->selectRegion << mapFromScene(p1) << mapFromScene(p3)
-    << mapFromScene(p4) << mapFromScene(p2) << mapFromScene(p1);
-
-  this->setPolygon(this->selectRegion);
-
-  this->update();
-}
-
-/////////////////////////////////////////////////
-// for supporting moving the box across the scene
 void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
+  this->origin.setX((static_cast<int>(this->origin.x())
+                      / this->gridSpace) * this->gridSpace);
+  this->origin.setY((static_cast<int>(this->origin.y())
+                      / this->gridSpace) * this->gridSpace);
+  this->setPos(this->origin);
   _event->setAccepted(true);
-  this->location.setX((static_cast<int>(this->location.x())
-                      / this->gridSpace) * this->gridSpace);
-  this->location.setY((static_cast<int>(this->location.y())
-                      / this->gridSpace) * this->gridSpace);
-  this->setPos(this->location);
 }
 
 /////////////////////////////////////////////////
 void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-  _event->setAccepted(true);
+
+  qDebug() << "mouse press";
   this->dragStart = _event->pos();
+  _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
 void PolylineItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
   QPointF newPos = _event->pos() ;
-  this->location += (newPos - this->dragStart);
-  this->setPos(this->location);
+  this->origin += (newPos - this->dragStart);
+  this->setPos(this->origin);
 }
 
 /////////////////////////////////////////////////
 void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  this->outterBorderColor = Qt::black;
+  QColor lineColor = Qt::black;
+  QPen linePen = this->pen();
+  linePen.setColor(lineColor);
+  this->setPen(linePen);
 
-  for (int i = 0; i < corners.size(); ++i)
+  for (unsigned int i = 0; i < corners.size(); ++i)
   {
     this->corners[i]->removeSceneEventFilter(this);
   }
@@ -325,41 +228,13 @@ void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 /////////////////////////////////////////////////
 void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  this->outterBorderColor = Qt::red;
+  QColor lineColor = Qt::red;
+  QPen linePen = this->pen();
+  linePen.setColor(lineColor);
+  this->setPen(linePen);
 
-  for (int i = 0; i < corners.size(); ++i)
+  for (unsigned int i = 0; i < corners.size(); ++i)
   {
     this->corners[i]->installSceneEventFilter(this);
   }
-}*/
-
-/////////////////////////////////////////////////
-void PolylineItem::paint (QPainter *_painter,
-  const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
-{
-  QPen outterBorderPen;
-  outterBorderPen.setWidth(2);
-  outterBorderPen.setColor(this->outterBorderColor);
-
-  outterBorderPen.setStyle(Qt::SolidLine);
-  _painter->setPen(outterBorderPen);
-
-  outterBorderPen.setColor(Qt::red);
-  for (int i = 0; i < corners.size()-1; ++i)
-  {
-    _painter->drawLine(this->corners[i] + this->cornerWidth/2,
-        this->corners[i+1] + this->cornerHeight/2);
-  }
-}
-
-/////////////////////////////////////////////////
-void PolylineItem::mouseMoveEvent(QGraphicsSceneDragDropEvent *_event)
-{
-  _event->setAccepted(false);
-}
-
-/////////////////////////////////////////////////
-void PolylineItem::mousePressEvent(QGraphicsSceneDragDropEvent *_event)
-{
-  _event->setAccepted(false);
 }
