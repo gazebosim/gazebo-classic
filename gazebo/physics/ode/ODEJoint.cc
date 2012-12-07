@@ -99,6 +99,26 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
           elem->GetElement("velocity")->GetValueDouble());
   }
 
+  if (this->sdf->HasElement("axis"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->SetDamping(0, dynamicsElem->GetValueDouble("damping"));
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzwarn << "joint friction not implemented\n";
+      }
+    }
+  }
+
+
   if (this->provideFeedback)
   {
     this->feedback = new dJointFeedback;

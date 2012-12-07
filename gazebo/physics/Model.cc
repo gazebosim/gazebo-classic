@@ -190,6 +190,10 @@ void Model::Update()
 {
   this->updateMutex->lock();
 
+  for (Joint_V::iterator jiter = this->joints.begin();
+       jiter != this->joints.end(); ++jiter)
+    (*jiter)->Update();
+
   if (this->jointController)
     this->jointController->Update();
 

@@ -40,6 +40,7 @@ ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEScrewJoint::~ODEScrewJoint()
 {
+  physics::Joint::DisconnectJointUpdate(this->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -94,8 +95,10 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetDamping(int /*index*/, double _damping)
 {
-  this->damping_coefficient = _damping;
-  dJointSetDamping(this->jointId, this->damping_coefficient);
+  this->dampingCoefficient = _damping;
+  // dJointSetDamping(this->jointId, this->dampingCoefficient);
+  this->applyDamping = physics::Joint::ConnectJointUpdate(
+    boost::bind(&Joint::ApplyDamping, this));
 }
 
 //////////////////////////////////////////////////

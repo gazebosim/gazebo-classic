@@ -27,6 +27,7 @@
 #include <boost/any.hpp>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -153,6 +154,9 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set.
       /// \param[in] _damping Damping value for the axis.
       public: virtual void SetDamping(int _index, double _damping) = 0;
+
+      /// \brief Callback to apply damping force to joint.
+      public: virtual void ApplyDamping();
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
@@ -365,11 +369,14 @@ namespace gazebo
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
 
-      /// \brief joint damping_coefficient
-      protected: double damping_coefficient;
+      /// \brief joint dampingCoefficient
+      protected: double dampingCoefficient;
 
       /// \brief Angle used when the joint is paret of a static model.
       private: math::Angle staticAngle;
+
+      /// \brief apply damping for adding viscous damping forces on updates
+      protected: gazebo::event::ConnectionPtr applyDamping;
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the
