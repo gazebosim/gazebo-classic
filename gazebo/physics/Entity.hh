@@ -86,6 +86,10 @@ namespace gazebo
       /// \return True if static.
       public: bool IsStatic() const;
 
+      /// \brief Get the initial pose.
+      /// \return The initial pose.
+      public: math::Pose GetInitialRelativePose() const;
+
       /// \brief Set the initial pose.
       /// \param[in] _pose The initial pose.
       public: void SetInitialRelativePose(const math::Pose &_pose);
@@ -288,7 +292,7 @@ namespace gazebo
       private: bool isCanonicalLink;
 
       /// \brief The initial pose of the entity.
-      public: math::Pose initialRelativePose;
+      private: math::Pose initialRelativePose;
 
       /// \brief World pose of the entity.
       private: math::Pose worldPose;

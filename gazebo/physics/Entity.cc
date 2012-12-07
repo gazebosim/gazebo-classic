@@ -155,6 +155,12 @@ bool Entity::IsStatic() const
 }
 
 //////////////////////////////////////////////////
+math::Pose Entity::GetInitialRelativePose() const
+{
+  return this->initialRelativePose;
+}
+
+//////////////////////////////////////////////////
 void Entity::SetInitialRelativePose(const math::Pose &_p)
 {
   this->initialRelativePose = _p;

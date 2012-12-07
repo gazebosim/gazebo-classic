@@ -237,7 +237,8 @@ void Link::Init()
   {
     if ((*iter)->HasType(Base::COLLISION))
       boost::shared_static_cast<Collision>(*iter)->SetRelativePose(
-        boost::shared_static_cast<Collision>(*iter)->initialRelativePose);
+        boost::shared_static_cast<Collision>(*iter)->GetInitialRelativePose(
+          ));
   }
 }
 
