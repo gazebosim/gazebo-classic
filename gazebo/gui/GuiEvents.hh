@@ -107,6 +107,20 @@ namespace gazebo
                   event::ConnectionPtr _subscriber)
               { modelUpdate.Disconnect(_subscriber); }
 
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot the the create editor item signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static event::ConnectionPtr ConnectCreateEditorItem(T _subscriber)
+              { return createEditorItem.Connect(_subscriber); }
+      /// \brief Disconnect a boost::slot to the create editor item signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectCreateEditorItem(
+                  event::ConnectionPtr _subscriber)
+              { createEditorItem.Disconnect(_subscriber); }
+
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
 
@@ -126,8 +140,10 @@ namespace gazebo
               mousePress;
       public: static event::EventT<void (const common::MouseEvent &)>
               mouseRelease;
+
+      /// \brief An editor item has been created
+      public: static event::EventT<void (std::string)> createEditorItem;
     };
   }
 }
 #endif
-

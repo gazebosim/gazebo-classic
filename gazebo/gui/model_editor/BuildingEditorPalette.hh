@@ -29,9 +29,27 @@ namespace gazebo
       Q_OBJECT
 
       public: BuildingEditorPalette(QWidget *_parent = 0);
+
       public: ~BuildingEditorPalette();
 
+//      public: void SetEditorWidget(BuildingEditorWidget* _widget);
+
       private: std::string modelName;
+
+      /// \brief On draw wall callback.
+      private slots: void OnDrawWall();
+
+      /// \brief On import image callback.
+      private slots: void OnImportImage();
+
+      /// \brief On add window callback.
+      private slots: void OnAddWindow();
+
+      /// \brief On add door callback.
+      private slots: void OnAddDoor();
+
+      /// \brief On add stairs callback.
+      private slots: void OnAddStairs();
 
       /// \brief On discard callback.
       private slots: void OnDiscard();

@@ -66,9 +66,9 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   doorItem->setPos(0,0);
   scene->addItem(doorItem);
 
-//  qDebug() << " width height "<< _parent->width() << " " << _parent->height() << scene->width() << scene->height() << view->width() << view->height();
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(canvasLayout);
+
 }
 
 /////////////////////////////////////////////////

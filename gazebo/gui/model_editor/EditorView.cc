@@ -16,9 +16,12 @@
 */
 
 #include "EditorView.hh"
-#include "RectItem.hh"
 #include "GridLines.hh"
+#include "RectItem.hh"
+#include "WindowItem.hh"
+#include "DoorItem.hh"
 #include "PolylineItem.hh"
+#include "gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -31,12 +34,16 @@ EditorView::EditorView(QWidget *_parent)
 
   this->drawMode = None;
   this->drawInProgress = false;
+  this->mouseMode = Select;
+
+  this->connections.push_back(
+  gui::Events::ConnectCreateEditorItem(
+    boost::bind(&EditorView::OnCreateEditorItem, this, _1)));
 }
 
 /////////////////////////////////////////////////
 EditorView::~EditorView()
 {
-
 }
 
 /////////////////////////////////////////////////
@@ -49,7 +56,7 @@ void EditorView::mousePressEvent(QMouseEvent *_event)
 void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
   /// TODO for testing, delete me later
-  if (_event->button() == Qt::RightButton)
+/*  if (_event->button() == Qt::RightButton)
   {
     if (this->drawMode == Wall)
     {
@@ -61,30 +68,25 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       this->drawMode = Wall;
     }
     return;
-  }
+  }*/
 
   switch (drawMode)
   {
     case None:
       break;
     case Wall:
-      if (!drawInProgress)
-      {
-        this->DrawLine(_event->pos());
-      }
-      else
-      {
-        lineList.back()->AddPoint(this->mapToScene(_event->pos()));
-      }
+      DrawLine(_event->pos());
+      break;
+    case Window:
+      break;
+    case Door:
       break;
     default:
       break;
   }
 
-  if (drawMode != None && !drawInProgress)
-    drawInProgress = true;
-
-  QGraphicsView::mouseReleaseEvent(_event);
+  if (!drawInProgress)
+    QGraphicsView::mouseReleaseEvent(_event);
 }
 
 /////////////////////////////////////////////////
@@ -96,18 +98,22 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
     case None:
       break;
     case Wall:
-      if (drawInProgress)
+      if (drawInProgress && !lineList.empty())
       {
-        if (!lineList.empty())
-        {
-          lineList.back()->TranslateVertex(lineList.back()->GetCount() - 1,
-              trans);
-        }
+        lineList.back()->TranslateVertex(lineList.back()->GetCount() - 1,
+            trans);
       }
+      break;
+    case Window:
+      DrawWindow(_event->pos());
+      break;
+    case Door:
+      DrawDoor(_event->pos());
       break;
     default:
       break;
   }
+
   lastMousePos = _event->pos();
   QGraphicsView::mouseMoveEvent(_event);
 }
@@ -115,7 +121,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
-  drawMode =  None;
+  drawMode = None;
   drawInProgress = false;
 
   QGraphicsView::mouseDoubleClickEvent(_event);
@@ -124,15 +130,72 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::DrawLine(QPoint _pos)
 {
-  QPointF pointStart = mapToScene(_pos);
-  QPointF pointEnd = pointStart;
+  if (!drawInProgress)
+  {
+    QPointF pointStart = mapToScene(_pos);
+    QPointF pointEnd = pointStart;
 
-  qDebug() << " point start " << pointStart;
+    PolylineItem* line = new PolylineItem(pointStart, pointEnd);
+    scene()->addItem(line);
+    lineList.push_back(line);
+    drawInProgress = true;
 
-  PolylineItem* line = new PolylineItem(pointStart, pointEnd);
-  scene()->addItem(line);
-  lineList.push_back(line);
+    lastLineCornerPos = _pos;
+    lastMousePos = _pos;
+  }
+  else
+  {
+    lineList.back()->AddPoint(this->mapToScene(_pos));
+  }
+}
 
-  lastLineCornerPos = _pos;
-  lastMousePos = _pos;
+/////////////////////////////////////////////////
+void EditorView::DrawWindow(QPoint _pos)
+{
+  if (!drawInProgress)
+  {
+    WindowItem *windowItem = new WindowItem();
+    scene()->addItem(windowItem);
+    windowList.push_back(windowItem);
+    drawInProgress = true;
+  }
+  if (!windowList.empty())
+  {
+    QPointF scenePos = mapToScene(_pos);
+    windowList.back()->setPos(scenePos.x(), scenePos.y());
+//qDebug() << " setting window to scenePos";
+  }
+}
+
+/////////////////////////////////////////////////
+void EditorView::DrawDoor(QPoint _pos)
+{
+  if (!drawInProgress)
+  {
+    DoorItem *doorItem = new DoorItem();
+    scene()->addItem(doorItem);
+    doorList.push_back(doorItem);
+    drawInProgress = true;
+  }
+  if (!doorList.empty())
+  {
+    QPointF scenePos = mapToScene(_pos);
+    doorList.back()->setPos(scenePos.x(), scenePos.y());
+  }
+}
+
+
+/////////////////////////////////////////////////
+void EditorView::OnCreateEditorItem(const std::string &_type)
+{
+  if (_type == "Wall")
+    drawMode = Wall;
+  else if (_type == "Window")
+    drawMode = Window;
+  else if (_type == "Door")
+    drawMode = Door;
+  else if (_type == "Stairs")
+    drawMode = Stairs;
+
+  qDebug() << " on create editor item" << _type.c_str();
 }

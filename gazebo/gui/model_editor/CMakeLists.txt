@@ -35,10 +35,10 @@ set (qt_headers
   PolylineItem.hh
 )
 
-#set (resources qtpropertybrowser.qrc)
+set (resources ../resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
-#QT4_ADD_RESOURCES(resources_RCC ${resources})
+QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-add_library(gazebo_model_editor STATIC ${sources} ${headers_MOC} )
+add_library(gazebo_model_editor STATIC ${sources} ${headers_MOC} ${resources_RCC})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

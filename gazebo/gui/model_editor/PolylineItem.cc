@@ -112,7 +112,6 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      qDebug() << "corner press";
       corner->SetMouseState(CornerGrabber::kMouseDown);
       QPointF scenePosition =  corner->mapToScene(event->pos());
 
@@ -197,8 +196,6 @@ void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-
-  qDebug() << "mouse press";
   this->dragStart = _event->pos();
   _event->setAccepted(true);
 }
@@ -238,26 +235,3 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
     this->corners[i]->installSceneEventFilter(this);
   }
 }
-/*
-/////////////////////////////////////////////////
-void PolylineItem::paint (QPainter *_painter,
-  const QStyleOptionGraphicsItem *, QWidget *)
-{
-  QPen outterBorderPen;
-  outterBorderPen.setWidth(2);
-  outterBorderPen.setColor(this->outterBorderColor);
-
-  outterBorderPen.setStyle(Qt::SolidLine);
-  _painter->setPen(outterBorderPen);
-
-  outterBorderPen.setColor(Qt::red);
-  for (unsigned int i = 0; i < corners.size()-1; ++i)
-  {
-    QPointF pointA = this->corners[i]->pos() +
-        QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0);
-    QPointF pointB = this->corners[i+1]->pos() +
-        QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0);
-    //qDebug() << this->corners[i]->pos() << this->corners[i+1]->pos() << pointA << pointB << QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0) << this->cornerHeight;
-    _painter->drawLine(pointA, pointB);
-  }
-}*/

@@ -26,6 +26,7 @@ RectItem::RectItem():
     outterBorderColor(Qt::black),
     location(0,0),
     dragStart(0,0),
+    rotateStart(0,0),
     gridSpace(10),
     cornerDragStart(0,0),
     xCornerGrabBuffer(10),
@@ -198,9 +199,9 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(true);
-  this->location.setX( ( static_cast<int>(this->location.x())
+  this->location.setX( (static_cast<int>(this->location.x())
       / this->gridSpace) * this->gridSpace);
-  this->location.setY( ( static_cast<int>(this->location.y())
+  this->location.setY( (static_cast<int>(this->location.y())
       / this->gridSpace) * this->gridSpace);
   this->setPos(this->location);
 }
@@ -208,9 +209,10 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
-  qDebug() << " press ";
   _event->setAccepted(true);
   this->dragStart = _event->pos();
+
+  this->rotateStart = this->mapToScene(_event->pos());
 }
 
 /////////////////////////////////////////////////
@@ -219,6 +221,18 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   QPointF newPos = _event->pos() ;
   this->location += (newPos - this->dragStart);
   this->setPos(this->location);
+
+/*
+  // dragging
+  QPoint center(drawingOriginX + (drawingOriginX + drawingWidth)/2,
+      drawingOriginY + (drawingOriginY + drawingHeight)/2);
+
+  QPointF newPoint = this->mapToScene(newPos) - this->pos();
+  QLineF prevLine(center.x(), center.y(),
+      this->rotateStart.x(), this->rotateStart.y());
+  QLineF line(center.x(), center.y(), newPoint.x(), newPoint.y());
+  this->setTransformOriginPoint(center);
+  this->setRotation(-prevLine.angleTo(line));*/
 }
 
 /////////////////////////////////////////////////

@@ -19,11 +19,14 @@
 #define _EDITOR_VIEW_HH_
 
 #include "gui/qt.h"
+#include "common/Event.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class WindowItem;
+    class DoorItem;
     class PolylineItem;
 
     class EditorView : public QGraphicsView
@@ -34,7 +37,9 @@ namespace gazebo
 
       public: ~EditorView();
 
-      public: enum modelTypes {None, Wall, Window, Door, Stairs};
+      public: enum modelTypes{None, Wall, Window, Door, Stairs};
+
+      public: enum mouseActions{Select, Translate, Rotate};
 
       protected: void mousePressEvent(QMouseEvent *_event);
 
@@ -46,15 +51,29 @@ namespace gazebo
 
       private: void DrawLine(QPoint _pos);
 
+      private: void DrawWindow(QPoint _pos);
+
+      private: void DrawDoor(QPoint _pos);
+
+      private: void OnCreateEditorItem(const std::string &_type);
+
       private: int drawMode;
+
+      private: int mouseMode;
 
       private: bool drawInProgress;
 
       private: std::vector<PolylineItem*> lineList;
 
+      private: std::vector<WindowItem*> windowList;
+
+      private: std::vector<DoorItem*> doorList;
+
       private: QPoint lastLineCornerPos;
 
       private: QPoint lastMousePos;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

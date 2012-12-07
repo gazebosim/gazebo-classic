@@ -80,6 +80,8 @@ namespace gazebo
 
         private: QPointF dragStart;
 
+        private: QPointF rotateStart;
+
         private: int gridSpace;
 
         private: QPointF cornerDragStart;

@@ -364,9 +364,6 @@ void MainWindow::OnEditBuilding()
     this->buildingEditorTabWidget->hide();
     this->Play();
   }
-/*  msgs::WorldControl msg;
-  msg.mutable_reset()->set_all(true);
-  this->worldControlPub->Publish(msg);*/
 }
 
 /////////////////////////////////////////////////

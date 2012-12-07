@@ -47,6 +47,12 @@ EditorWidget::~EditorWidget()
 }
 
 /////////////////////////////////////////////////
+QWidget *EditorWidget::GetBuildingEditor()
+{
+  return this->buildingEditorWidget;
+}
+
+/////////////////////////////////////////////////
 void EditorWidget::SetMode(int mode)
 {
   /// TODO: 2 modes, building and model,

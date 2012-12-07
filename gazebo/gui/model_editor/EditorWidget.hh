@@ -34,6 +34,8 @@ namespace gazebo
 
       public: void SetMode(int mode);
 
+      public: QWidget *GetBuildingEditor();
+
       private: QWidget *buildingEditorWidget;
 
     };
