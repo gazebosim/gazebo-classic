@@ -232,13 +232,13 @@ void Link::Init()
   this->SetRelativePose(this->sdf->GetValuePose("pose"));
   this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
 
-  // Reset collision elements to properly set pose
+  // Set relative pose of collision children again, now that the parent link has
+  // its pose set.
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
       boost::shared_static_cast<Collision>(*iter)->SetRelativePose(
-        boost::shared_static_cast<Collision>(*iter)->GetInitialRelativePose(
-          ));
+        boost::shared_static_cast<Collision>(*iter)->GetInitialRelativePose());
   }
 }
 
