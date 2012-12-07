@@ -264,8 +264,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
     for (std::list<std::string>::iterator iter = this->modelPaths.begin();
          iter != this->modelPaths.end(); ++iter)
     {
-      path = boost::filesystem::path(*iter);
-      path /= suffix;
+      path = boost::filesystem::path(*iter) / suffix;
       if (boost::filesystem::exists(path))
         break;
     }
