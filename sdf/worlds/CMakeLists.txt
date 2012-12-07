@@ -6,6 +6,7 @@ set (files
   camera.world
   depth_camera.world
   empty.world
+  force_torque_demo.world
   joints.world
   heightmap.world
   lights.world
