@@ -18,7 +18,6 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>

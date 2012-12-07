@@ -18,7 +18,6 @@
  * Author: Nate Koenig, Jordi Polo
  * Date: 3 May 2008
  */
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <assert.h>
 #include <dirent.h>
@@ -266,7 +265,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
          iter != this->modelPaths.end(); ++iter)
     {
       path = boost::filesystem::path(*iter);
-      path = boost::filesystem::operator/(path, suffix);
+      path /= suffix;
       if (boost::filesystem::exists(path))
         break;
     }
