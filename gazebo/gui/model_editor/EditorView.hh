@@ -27,7 +27,7 @@ namespace gazebo
   {
     class WindowItem;
     class DoorItem;
-    class PolylineItem;
+    class WallItem;
 
     class EditorView : public QGraphicsView
     {
@@ -63,7 +63,7 @@ namespace gazebo
 
       private: bool drawInProgress;
 
-      private: std::vector<PolylineItem*> lineList;
+      private: std::vector<WallItem*> wallList;
 
       private: std::vector<WindowItem*> windowList;
 
@@ -74,6 +74,8 @@ namespace gazebo
       private: QPoint lastMousePos;
 
       private: std::vector<event::ConnectionPtr> connections;
+
+      private: QGraphicsItem* currentMouseItem;
     };
   }
 }

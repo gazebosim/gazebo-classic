@@ -199,10 +199,13 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(true);
-  this->location.setX( (static_cast<int>(this->location.x())
+
+  /// TODO: uncomment to enable snap to grid
+/*  this->location.setX( (static_cast<int>(this->location.x())
       / this->gridSpace) * this->gridSpace);
   this->location.setY( (static_cast<int>(this->location.y())
-      / this->gridSpace) * this->gridSpace);
+      / this->gridSpace) * this->gridSpace);*/
+
   this->setPos(this->location);
 }
 
@@ -210,6 +213,7 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   _event->setAccepted(true);
+  this->location = this->pos();
   this->dragStart = _event->pos();
 
   this->rotateStart = this->mapToScene(_event->pos());

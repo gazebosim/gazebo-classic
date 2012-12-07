@@ -29,7 +29,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 EditorView::EditorView(QWidget *_parent)
-  : QGraphicsView(_parent)
+  : QGraphicsView(_parent), currentMouseItem(0)
 {
   this->setObjectName("editorView");
 
@@ -76,11 +76,26 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     case None:
       break;
     case Wall:
-      DrawLine(_event->pos());
+      this->DrawLine(_event->pos());
       break;
     case Window:
+      if (drawInProgress)
+      {
+        this->windowList.push_back(static_cast<WindowItem*>(
+            this->currentMouseItem));
+        this->drawMode = None;
+        this->drawInProgress = false;
+      }
+
       break;
     case Door:
+      if (drawInProgress)
+      {
+        this->doorList.push_back(static_cast<DoorItem*>(
+            this->currentMouseItem));
+        this->drawMode = None;
+        this->drawInProgress = false;
+      }
       break;
     default:
       break;
@@ -99,17 +114,20 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
     case None:
       break;
     case Wall:
-      if (drawInProgress && !lineList.empty())
+    {
+      WallItem *wallItem = static_cast<WallItem*>(this->currentMouseItem);
+      if (this->drawInProgress && wallItem)
       {
-        lineList.back()->TranslateVertex(lineList.back()->GetCount() - 1,
-            trans);
+        if (wallItem)
+          wallItem->TranslateVertex(wallItem->GetCount()-1,trans);
       }
       break;
+    }
     case Window:
-      DrawWindow(_event->pos());
+      this->DrawWindow(_event->pos());
       break;
     case Door:
-      DrawDoor(_event->pos());
+      this->DrawDoor(_event->pos());
       break;
     default:
       break;
@@ -122,9 +140,14 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
-  drawMode = None;
-  drawInProgress = false;
-
+  if (this->drawMode == Wall)
+  {
+    WallItem* wallItem = static_cast<WallItem*>(this->currentMouseItem);
+    wallItem->PopEndPoint();
+    wallList.push_back(wallItem);
+    this->drawMode = None;
+    this->drawInProgress = false;
+  }
   QGraphicsView::mouseDoubleClickEvent(_event);
 }
 
@@ -136,52 +159,61 @@ void EditorView::DrawLine(QPoint _pos)
     QPointF pointStart = mapToScene(_pos);
     QPointF pointEnd = pointStart;
 
-    WallItem* line = new WallItem(pointStart, pointEnd);
-    scene()->addItem(line);
-    lineList.push_back(line);
-    drawInProgress = true;
+    WallItem* lineItem = new WallItem(pointStart, pointEnd);
+    this->scene()->addItem(lineItem);
+//    lineList.push_back(lineItem);
+    this->currentMouseItem = lineItem;
+    this->drawInProgress = true;
 
     lastLineCornerPos = _pos;
     lastMousePos = _pos;
   }
   else
   {
-    lineList.back()->AddPoint(this->mapToScene(_pos));
+    WallItem* wallItem = static_cast<WallItem*>(this->currentMouseItem);
+    if (wallItem)
+      wallItem->AddPoint(this->mapToScene(_pos));
   }
 }
 
 /////////////////////////////////////////////////
 void EditorView::DrawWindow(QPoint _pos)
 {
+  WindowItem *windowItem = NULL;
   if (!drawInProgress)
   {
-    WindowItem *windowItem = new WindowItem();
-    scene()->addItem(windowItem);
-    windowList.push_back(windowItem);
-    drawInProgress = true;
+    windowItem = new WindowItem();
+    this->scene()->addItem(windowItem);
+//    windowList.push_back(windowItem);
+    this->currentMouseItem = windowItem;
+    this->drawInProgress = true;
   }
-  if (!windowList.empty())
+  windowItem = static_cast<WindowItem*>(this->currentMouseItem);
+  if (windowItem)
   {
-    QPointF scenePos = mapToScene(_pos);
-    windowList.back()->setPos(scenePos.x(), scenePos.y());
-//qDebug() << " setting window to scenePos";
+    QPointF scenePos = this->mapToScene(_pos);
+    windowItem->setPos(scenePos.x(), scenePos.y());
+    //    windowList.back()->setPos(scenePos.x(), scenePos.y());
   }
 }
 
 /////////////////////////////////////////////////
 void EditorView::DrawDoor(QPoint _pos)
 {
+  DoorItem *doorItem = NULL;
   if (!drawInProgress)
   {
-    DoorItem *doorItem = new DoorItem();
-    scene()->addItem(doorItem);
-    doorList.push_back(doorItem);
-    drawInProgress = true;
+    doorItem = new DoorItem();
+    this->scene()->addItem(doorItem);
+//    doorList.push_back(doorItem);
+    this->currentMouseItem = doorItem;
+    this->drawInProgress = true;
   }
-  if (!doorList.empty())
+  doorItem = static_cast<DoorItem*>(currentMouseItem);
+  if (doorItem)
   {
     QPointF scenePos = mapToScene(_pos);
-    doorList.back()->setPos(scenePos.x(), scenePos.y());
+    doorItem->setPos(scenePos.x(), scenePos.y());
   }
 }
 
@@ -190,13 +222,20 @@ void EditorView::DrawDoor(QPoint _pos)
 void EditorView::OnCreateEditorItem(const std::string &_type)
 {
   if (_type == "Wall")
-    drawMode = Wall;
+    this->drawMode = Wall;
   else if (_type == "Window")
-    drawMode = Window;
+    this->drawMode = Window;
   else if (_type == "Door")
-    drawMode = Door;
+    this->drawMode = Door;
   else if (_type == "Stairs")
-    drawMode = Stairs;
+    this->drawMode = Stairs;
+
+  if (this->drawInProgress && this->currentMouseItem)
+  {
+    this->scene()->removeItem(this->currentMouseItem);
+    this->currentMouseItem = NULL;
+    this->drawInProgress = false;
+  }
 
   qDebug() << " on create editor item" << _type.c_str();
 }

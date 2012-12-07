@@ -65,6 +65,16 @@ void PolylineItem::AddPoint(QPointF _point)
 }
 
 /////////////////////////////////////////////////
+void PolylineItem::PopEndPoint()
+{
+  CornerGrabber *corner = this->corners.back();
+  this->scene()->removeItem(corner);
+  this->corners.pop_back();
+  delete corner;
+  this->UpdatePath();
+}
+
+/////////////////////////////////////////////////
 unsigned int PolylineItem::GetCount()
 {
   return this->corners.size();
@@ -185,10 +195,11 @@ void PolylineItem::AppendToPath(QPointF _point)
 /////////////////////////////////////////////////
 void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
-  this->origin.setX((static_cast<int>(this->origin.x())
+  /// TODO: uncomment to enable snap to grid
+  /*this->origin.setX((static_cast<int>(this->origin.x())
                       / this->gridSpace) * this->gridSpace);
   this->origin.setY((static_cast<int>(this->origin.y())
-                      / this->gridSpace) * this->gridSpace);
+                      / this->gridSpace) * this->gridSpace);*/
   this->setPos(this->origin);
   _event->setAccepted(true);
 }
@@ -196,6 +207,7 @@ void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void PolylineItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
+  this->origin = this->pos();
   this->dragStart = _event->pos();
   _event->setAccepted(true);
 }
