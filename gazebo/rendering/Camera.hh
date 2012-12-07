@@ -449,12 +449,22 @@ namespace gazebo
       /// \return Ture if the camera is initialized
       public: bool GetInitialized() const;
 
+      /// \brief Return true if the camera is moving due to an animation.
+      public: bool IsAnimating() const;
+
       /// \brief Move the camera to a position (this is an animated motion).
       /// \sa Camera::MoveToPositions
       /// \param[in] _pose End position of the camera
       /// \param[in] _time Duration of the camera's movement
       public: virtual bool MoveToPosition(const math::Pose &_pose,
                                           double _time);
+
+      /// \brief Rotate the camera to an orientation
+      /// (this is an animated motion).
+      /// \param[in] _quat End orientation of the camera
+      /// \param[in] _time Duration of the camera's movement
+      public: virtual bool RotateToOrientation(const math::Quaternion &_quat,
+                                               double _time);
 
       /// \brief Move the camera to a series of poses (this is an
       /// animated motion).

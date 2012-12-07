@@ -414,6 +414,8 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
   if (this->animState)
     return;
+
+  std::cout << "SetWorldPosition[" << _pos << "]\n";
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
@@ -1285,6 +1287,19 @@ bool Camera::IsVisible(const std::string &_visualName)
 bool Camera::GetInitialized() const
 {
   return this->initialized;
+}
+
+/////////////////////////////////////////////////
+bool Camera::RotateToOrientation(const math::Quaternion & /*_quat*/,
+                                 double /*_time*/)
+{
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Camera::IsAnimating() const
+{
+  return this->animState != NULL;
 }
 
 /////////////////////////////////////////////////

@@ -121,7 +121,8 @@ namespace gazebo
 
       private: VisualPtr refVisual;
       private: math::Vector2i posCache;
-      private: math::Vector3 worldFocal;
+
+      private: float dy, dp;
 
       private: std::string key;
     };

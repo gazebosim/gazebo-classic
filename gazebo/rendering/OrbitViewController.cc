@@ -65,6 +65,8 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
   this->yaw = rpy.z;
   this->pitch = rpy.y;
 
+  this->dy = this->dp = 0.0;
+
   this->focalPoint = _focalPoint;
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
   if (this->distance <= 1.0)
@@ -174,9 +176,16 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     if (_event.pressPos == _event.pos)
     {
       this->focalPoint = this->camera->GetScene()->GetFirstContact(this->camera,
-          math::Vector2i(width*0.5, height *0.5));
+          _event.pressPos);
+
       this->distance = this->camera->GetWorldPose().pos.Distance(
           this->focalPoint);
+
+      math::Vector3 delta = this->focalPoint - this->camera->GetWorldPose().pos;
+      double y = atan2(delta.y, delta.x);
+      double p = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+      math::Pose pose(this->camera->GetWorldPosition(), math::Vector3(0, p, y));
+      this->camera->MoveToPosition(pose, 0.2);
     }
 
     /// Lock rotation to an axis if the "y" or "z" key is pressed.
@@ -185,24 +194,37 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       // Limit rotation about the "y" axis.
       if (this->key == "y")
       {
-        this->pitch += drag.y * _event.moveScale * 0.2;
-        this->NormalizePitch(this->pitch);
+        this->dp += drag.y * _event.moveScale * 0.1;
+        this->NormalizePitch(this->dp);
+        // this->pitch += drag.y * _event.moveScale * 0.4;
+        // this->NormalizePitch(this->pitch);
       }
       // Limit rotation about the "z" axis.
       else
       {
-        this->yaw += drag.x * _event.moveScale * -0.2;
-        this->NormalizeYaw(this->yaw);
+        this->dy += drag.x * _event.moveScale * -0.1;
+        this->NormalizeYaw(this->dy);
+
+        // this->yaw += drag.x * _event.moveScale * -0.4;
+        // this->NormalizeYaw(this->yaw);
       }
     }
     // Otherwise rotate about "y" and "z".
     else
     {
-      this->yaw += drag.x * _event.moveScale * -0.2;
-      this->pitch += drag.y * _event.moveScale * 0.2;
-      this->NormalizeYaw(this->yaw);
-      this->NormalizePitch(this->pitch);
+      this->dy = drag.x * _event.moveScale * -0.4;
+      this->dp = drag.y * _event.moveScale * 0.4;
+      this->NormalizeYaw(this->dy);
+      this->NormalizePitch(this->dp);
+
+      // this->yaw += drag.x * _event.moveScale * -0.4;
+      // this->pitch += drag.y * _event.moveScale * 0.4;
+      // this->NormalizeYaw(this->yaw);
+      // this->NormalizePitch(this->pitch);
     }
+
+    this->refVisual->SetPosition(this->focalPoint);
+    this->UpdatePose();
   }
   else if (_event.buttons & common::MouseEvent::LEFT)
   {
@@ -252,14 +274,15 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   }
   else if (_event.type == common::MouseEvent::SCROLL)
   {
-    int factor = 40;
+    int factor = 80;
 
     if (!_event.alt)
     {
+      math::Vector3 worldFocal;
       if (this->posCache.x != _event.pos.x ||
           this->posCache.y != _event.pos.y )
       {
-        this->worldFocal =
+        worldFocal =
           this->camera->GetScene()->GetFirstContact(this->camera,
                                                     _event.pos);
         this->distance = this->camera->GetWorldPose().pos.Distance(
@@ -269,12 +292,12 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
       // This is not perfect, but it does a decent enough job.
       if (_event.scroll.y < 0)
-        this->focalPoint += (this->worldFocal - this->focalPoint) * 0.04;
+        this->focalPoint += (worldFocal - this->focalPoint) * 0.04;
       else
-        this->focalPoint += (this->focalPoint - this->worldFocal) * 0.04;
+        this->focalPoint += (this->focalPoint - worldFocal) * 0.04;
     }
     else
-      factor = 80;
+      factor = 120;
 
     // This assumes that _event.scroll.y is -1 or +1
     this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
@@ -283,8 +306,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   else
     this->refVisual->SetVisible(false);
 
-  this->refVisual->SetPosition(this->focalPoint);
-  this->UpdatePose();
+  // this->refVisual->SetPosition(this->focalPoint);
+  // this->UpdatePose();
 }
 
 //////////////////////////////////////////////////
@@ -371,16 +394,27 @@ void OrbitViewController::UpdatePose()
 {
   math::Vector3 pos;
 
-  pos.x = this->distance * -cos(this->yaw) * cos(this->pitch);
-  pos.y = this->distance * -sin(this->yaw) * cos(this->pitch);
-  pos.z = this->distance * sin(this->pitch);
+  math::Vector3 delta = this->camera->GetWorldPosition() - this->focalPoint;
+  double y = atan2(delta.y, delta.x);
+  double p = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+
+  pos.x = this->distance * cos(y + this->dy) * cos(p + this->dp);
+  pos.y = this->distance * sin(y + this->dy) * cos(p + this->dp);
+  pos.z = this->distance * sin(p + this->dp);
 
   pos += this->focalPoint;
 
-  this->camera->SetWorldPosition(pos);
+  if (!this->camera->IsAnimating())
+  {
+    this->camera->SetWorldPosition(pos);
+    delta = this->focalPoint - pos;
 
-  math::Quaternion rot;
-  math::Vector3 rpy(0, this->pitch, this->yaw);
-  rot.SetFromEuler(rpy);
-  this->camera->SetWorldRotation(rot);
+    y = atan2(delta.y, delta.x);
+    p = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+
+    math::Quaternion rot;
+    math::Vector3 rpy(0, p, y);
+    rot.SetFromEuler(rpy);
+    this->camera->SetWorldRotation(rot);
+  }
 }
