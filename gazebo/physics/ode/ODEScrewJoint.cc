@@ -108,13 +108,6 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::ApplyDamping()
-{
-  double damping_force = this->damping_coefficient * this->GetVelocity(0);
-  this->SetForce(0, damping_force);
-}
-
-//////////////////////////////////////////////////
 void ODEScrewJoint::SetForce(int _index, double _force)
 {
   ODEJoint::SetForce(_index, _force);
