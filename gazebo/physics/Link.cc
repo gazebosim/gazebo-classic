@@ -236,7 +236,8 @@ void Link::Init()
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Reset();
+      boost::shared_static_cast<Collision>(*iter)->SetRelativePose(
+        boost::shared_static_cast<Collision>(*iter)->initialRelativePose);
   }
 }
 

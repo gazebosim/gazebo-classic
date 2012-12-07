@@ -288,7 +288,7 @@ namespace gazebo
       private: bool isCanonicalLink;
 
       /// \brief The initial pose of the entity.
-      private: math::Pose initialRelativePose;
+      public: math::Pose initialRelativePose;
 
       /// \brief World pose of the entity.
       private: math::Pose worldPose;
