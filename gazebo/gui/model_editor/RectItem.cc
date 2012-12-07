@@ -282,9 +282,51 @@ void RectItem::UpdateCornerPositions()
 }
 
 /////////////////////////////////////////////////
+void RectItem::SetWidth(int _width)
+{
+  this->width = _width;
+  this->drawingWidth = this->width;
+  this->UpdateCornerPositions();
+  this->update();
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetHeight(int _height)
+{
+  this->height = _height;
+  this->drawingHeight = this->height;
+  this->UpdateCornerPositions();
+  this->update();
+}
+
+
+/////////////////////////////////////////////////
+void RectItem::SetSize(QSize _size)
+{
+  this->width = _size.width();
+  this->drawingWidth = this->width;
+  this->height = _size.height();
+  this->drawingHeight = this->height;
+  this->UpdateCornerPositions();
+  this->update();
+}
+
+/////////////////////////////////////////////////
+int RectItem::GetWidth()
+{
+  return this->drawingWidth;
+}
+
+/////////////////////////////////////////////////
+int RectItem::GetHeight()
+{
+  return this->drawingHeight;
+}
+
+/////////////////////////////////////////////////
 QRectF RectItem::boundingRect() const
 {
-  return QRectF(0,0,this->width,this->height);
+  return QRectF(0, 0, this->width, this->height);
 }
 
 /////////////////////////////////////////////////

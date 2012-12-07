@@ -21,6 +21,7 @@
 #include "WindowItem.hh"
 #include "DoorItem.hh"
 #include "PolylineItem.hh"
+#include "WallItem.hh"
 #include "gui/GuiEvents.hh"
 
 using namespace gazebo;
@@ -135,7 +136,7 @@ void EditorView::DrawLine(QPoint _pos)
     QPointF pointStart = mapToScene(_pos);
     QPointF pointEnd = pointStart;
 
-    PolylineItem* line = new PolylineItem(pointStart, pointEnd);
+    WallItem* line = new WallItem(pointStart, pointEnd);
     scene()->addItem(line);
     lineList.push_back(line);
     drawInProgress = true;

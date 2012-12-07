@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _RECT_ITEM_H_
-#define _RECT_ITEM_H_
+#ifndef _RECT_ITEM_HH_
+#define _RECT_ITEM_HH_
 
 #include "gui/qt.h"
 
@@ -33,6 +33,16 @@ namespace gazebo
         public: virtual ~RectItem();
 
         public: void SetGridSpace(int _space);
+
+        public: void SetWidth(int _width);
+
+        public: void SetHeight(int _height);
+
+        public: void SetSize(QSize _size);
+
+        public: int GetWidth();
+
+        public: int GetHeight();
 
         protected: void UpdateCornerPositions();
 
@@ -51,28 +61,32 @@ namespace gazebo
 
         private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
-        private: virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *_event);
+        private: virtual void mouseReleaseEvent(
+            QGraphicsSceneMouseEvent *_event);
 
-        private: virtual void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
+        private: virtual void mouseMoveEvent(
+            QGraphicsSceneDragDropEvent *_event);
 
-        private: virtual void mousePressEvent(QGraphicsSceneDragDropEvent *_event);
+        private: virtual void mousePressEvent(
+            QGraphicsSceneDragDropEvent *_event);
 
-        private: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+        private: virtual void mouseDoubleClickEvent(
+            QGraphicsSceneMouseEvent *_event);
 
         private: virtual bool sceneEventFilter(QGraphicsItem *_watched,
             QEvent *_event);
 
-        protected: qreal width;
+        protected: int width;
 
-        protected: qreal height;
+        protected: int height;
 
-        protected: qreal drawingWidth;
+        protected: int drawingWidth;
 
-        protected: qreal drawingHeight;
+        protected: int drawingHeight;
 
-        protected: qreal drawingOriginX;
+        protected: int drawingOriginX;
 
-        protected: qreal drawingOriginY;
+        protected: int drawingOriginY;
 
         protected: QColor outterBorderColor;
 
@@ -90,7 +104,7 @@ namespace gazebo
 
         private: int yCornerGrabBuffer;
 
-        /// \brief Corners of the rectangle, going clockwise with 0 being top left
+        /// \brief Four corners, going clockwise with 0 being top left
         CornerGrabber*  corners[4];
     };
   }

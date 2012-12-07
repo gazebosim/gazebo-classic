@@ -62,8 +62,11 @@ void WindowItem::paint (QPainter *_painter, const QStyleOptionGraphicsItem *,
 void WindowItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 {
   WindowDoorInspectorDialog dialog(0);
+  dialog.SetWidth(this->GetWidth());
+  dialog.SetHeight(this->GetHeight());
   if (dialog.exec() == QDialog::Accepted)
   {
+    this->SetSize(QSize(dialog.GetWidth(), dialog.GetHeight()));
   }
   _event->setAccepted(true);
 }

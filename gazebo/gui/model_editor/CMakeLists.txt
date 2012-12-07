@@ -8,7 +8,6 @@ set (sources
   FinishModelDialog.cc
   WindowDoorInspectorDialog.cc
   WallInspectorDialog.cc
-  SelectableLineSegment.cc
   GridLines.cc
   CornerGrabber.cc
   EditorView.cc
@@ -16,6 +15,7 @@ set (sources
   WindowItem.cc
   DoorItem.cc
   PolylineItem.cc
+  WallItem.cc
 )
 
 set (qt_headers
@@ -25,7 +25,6 @@ set (qt_headers
   FinishModelDialog.hh
   WindowDoorInspectorDialog.hh
   WallInspectorDialog.hh
-  SelectableLineSegment.hh
   GridLines.hh
   CornerGrabber.hh
   EditorView.hh
@@ -33,6 +32,7 @@ set (qt_headers
   WindowItem.hh
   DoorItem.hh
   PolylineItem.hh
+  WallItem.hh
 )
 
 set (resources ../resources.qrc)

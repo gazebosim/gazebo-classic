@@ -23,6 +23,7 @@
 #include "WindowItem.hh"
 #include "DoorItem.hh"
 #include "PolylineItem.hh"
+#include "WallItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -55,7 +56,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->centerOn(QPointF(0, 0));
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-  PolylineItem *lineItem = new PolylineItem(QPointF(0, 0), QPointF(-100, 100));
+  WallItem *lineItem = new WallItem(QPointF(0, 0), QPointF(-100, 100));
   scene->addItem(lineItem);
 
   WindowItem *windowItem = new WindowItem();

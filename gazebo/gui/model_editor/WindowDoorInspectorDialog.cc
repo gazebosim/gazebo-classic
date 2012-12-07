@@ -168,7 +168,7 @@ std::string WindowDoorInspectorDialog::GetType()
 /////////////////////////////////////////////////
 void WindowDoorInspectorDialog::SetWidth(double _width)
 {
-  this->lengthSpinBox->setValue(_width);
+  this->widthSpinBox->setValue(_width);
 }
 
 /////////////////////////////////////////////////

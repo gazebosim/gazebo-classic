@@ -34,7 +34,7 @@ namespace gazebo
 
       public: void AddPoint(QPointF _point);
 
-      public: void RemovePoint(unsigned int _index);
+//      public: void RemovePoint(unsigned int _index);
 
       public: unsigned int GetCount();
 

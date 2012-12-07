@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DOOR_ITEM_H_
-#define _DOOR_ITEM_H_
+#ifndef _DOOR_ITEM_HH_
+#define _DOOR_ITEM_HH_
 
 #include "gui/qt.h"
 
@@ -35,7 +35,7 @@ namespace gazebo
         private: virtual void paint (QPainter *_painter,
             const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-        private: virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+        private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
     };
   }
 }
