@@ -36,23 +36,45 @@ namespace gazebo
     /// \brief Bullet box collision
     class BulletBoxShape : public BoxShape
     {
-      /// \brief Constructor
+      /// \brief Constructor, empty because the box is created by SetSize.
       public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
 
-      /// \brief Destructor
-      public: virtual ~BulletBoxShape() {}
-
-      /// \brief Set the size of the box
-      public: void SetSize(const math::Vector3 &_size)
-              {
-                BoxShape::SetSize(_size);
+      /// \brief Destructor.
+      public: virtual ~BulletBoxShape() {
                 BulletCollisionPtr bParent;
                 bParent = boost::shared_dynamic_cast<BulletCollision>(
                     this->collisionParent);
+                if (bParent && bParent->GetCollisionShape()) {
+                  delete bParent->GetCollisionShape();
+                  bParent->SetCollisionShape(NULL);
+                }
+              }
 
-                /// Bullet requires the half-extents of the box
-                bParent->SetCollisionShape(new btBoxShape(
-                    btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));
+      /// \brief Set the size of the box. This is also where the box is created
+      ///        when SetSize is run for the first time.
+      public: void SetSize(const math::Vector3 &_size)
+              {
+                BulletCollisionPtr bParent;
+                bParent = boost::shared_dynamic_cast<BulletCollision>(
+                    this->collisionParent);
+                btCollisionShape *bShape = bParent->GetCollisionShape();
+
+                if (!bShape) {
+                  // Create the box if it doesn't yet exist.
+                  // Bullet requires the half-extents of the box
+                  bParent->SetCollisionShape(new btBoxShape(
+                      btVector3(_size.x*0.5, _size.y*0.5, _size.z*0.5)));
+                } else {
+                  // Re-scale the existing btBoxShape
+                  math::Vector3 scaling = _size / this->GetSize();
+                  btVector3 old_scaling = bShape->getLocalScaling();
+                  bShape->setLocalScaling(btVector3(
+                    btScalar(scaling.x) * old_scaling.getX(),
+                    btScalar(scaling.y) * old_scaling.getY(),
+                    btScalar(scaling.z) * old_scaling.getZ()));
+                }
+                // Do this last so the old size is available above, if necessary
+                BoxShape::SetSize(_size);
               }
     };
     /// \}

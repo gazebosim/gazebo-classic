@@ -30,6 +30,8 @@ using namespace physics;
 BulletMotionState::BulletMotionState(Link *_link)
   : btMotionState()
 {
+  // We probably need something like the following:
+  // btDefaultMotionState* ms =new btDefaultMotionState();
   this->link = _link;
 }
 
