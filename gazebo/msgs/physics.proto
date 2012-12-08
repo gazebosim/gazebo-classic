@@ -13,6 +13,7 @@ message Physics
   enum Type
   {
     ODE = 1;
+    BULLET = 2;
   }
   required Type type = 2[default=ODE];
 

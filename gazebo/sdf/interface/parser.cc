@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#define BOOST_FILESYSTEM_VERSION 2
 #include <stdlib.h>
 #include <stdio.h>
 
