@@ -18,7 +18,6 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
-#define BOOST_FILESYSTEM_VERSION 2
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -436,13 +435,13 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
         for (std::vector<boost::filesystem::path>::iterator dIter =
             paths.begin(); dIter != paths.end(); ++dIter)
         {
-          if (dIter->filename().find(".material") != std::string::npos)
+          if (dIter->filename().extension() == ".material")
           {
-            std::string fullPath = path + "/" + dIter->filename();
+            boost::filesystem::path fullPath = path / dIter->filename();
 
             Ogre::DataStreamPtr stream =
               Ogre::ResourceGroupManager::getSingleton().openResource(
-                  fullPath, "General");
+                  fullPath.string(), "General");
 
             // There is a material file under there somewhere, read the thing in
             try
@@ -450,7 +449,8 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
               Ogre::MaterialManager::getSingleton().parseScript(
                   stream, "General");
               Ogre::MaterialPtr matPtr =
-                Ogre::MaterialManager::getSingleton().getByName(fullPath);
+                Ogre::MaterialManager::getSingleton().getByName(
+                    fullPath.string());
 
               if (!matPtr.isNull())
               {
