@@ -353,9 +353,6 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
-
-  // Output the contact information
-  this->contactManager->PublishContacts();
 }
 
 //////////////////////////////////////////////////

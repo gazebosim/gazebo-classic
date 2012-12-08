@@ -55,6 +55,7 @@
 #include "gazebo/physics/World.hh"
 
 #include "physics/Collision.hh"
+#include "physics/ContactManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -482,6 +483,9 @@ void World::Update()
 
     this->dirtyPoses.clear();
   }
+
+  // Output the contact information
+  this->physicsEngine->GetContactManager()->PublishContacts();
 
   int currState = (this->stateToggle + 1) % 2;
   this->prevStates[currState] = WorldState(shared_from_this());
