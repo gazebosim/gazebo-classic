@@ -54,6 +54,17 @@ namespace gazebo
       /// from ModelDatabase::GetModels.
       private slots: void Update();
 
+      /// \brief QT callback when a path is changed.
+      /// \param[in] _path The path that was changed.
+      private slots: void OnDirectoryChanged(const QString &_path);
+
+      /// \brief Update the list of models on the local system.
+      private: void UpdateAllLocalPaths();
+
+      /// \brief Update a specific path.
+      /// \param[in] _path The path to update.
+      private: void UpdateLocalPath(const std::string &_path);
+
       /// \brief Widget that display all the models that can be inserted.
       private: QTreeWidget *fileTreeWidget;
 
@@ -65,6 +76,9 @@ namespace gazebo
 
       /// \brief Buffer to hold the results from ModelDatabase::GetModels.
       private: std::map<std::string, std::string> modelBuffer;
+
+      /// \brief A file/directory watcher.
+      private: QFileSystemWatcher *watcher;
     };
   }
 }
