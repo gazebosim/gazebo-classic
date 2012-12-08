@@ -49,7 +49,7 @@ namespace gazebo
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
-    private: physics::JointPtr joint;
+    private: physics::Joint_V joints;
 
     private: boost::mutex update_mutex;
 

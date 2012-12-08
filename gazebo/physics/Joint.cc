@@ -50,7 +50,7 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Vector3 &_pos)
 {
   if (_parent)
   {
@@ -67,7 +67,13 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 
   this->parentLink = _parent;
   this->childLink = _child;
-  this->LoadImpl(_pose);
+  this->anchorPos = _pos;
+}
+
+//////////////////////////////////////////////////
+void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+{
+  this->Load(_parent, _child, _pose.pos);
 }
 
 //////////////////////////////////////////////////
@@ -77,10 +83,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
   std::string parentName = _sdf->GetValueString("parent");
   std::string childName = _sdf->GetValueString("child");
-
-  math::Pose pose;
-  if (_sdf->HasElement("pose"))
-    pose = _sdf->GetValuePose("pose");
 
   if (this->model)
   {
@@ -102,7 +104,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName  + "]");
 
-  this->LoadImpl(pose);
+  /// \todo: FIXME either element pose need to be converted to xyz because
+  /// that's all we use here, or we need to use the rotational part
+  /// of pose.  But rotational part of the pose is redundanct with
+  /// specification of <axis> for joints, it just adds complexity,
+  /// so we should make <pose> a <position>.
+  if (_sdf->HasElement("pose"))
+    this->anchorPos = _sdf->GetValuePose("pose").pos;
+
+  // this->LoadImpl( _sdf->GetValuePose("pose"));
 }
 
 /////////////////////////////////////////////////
@@ -114,6 +124,9 @@ void Joint::LoadImpl(const math::Pose &_pose)
     this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
   this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
 
+  /// \todo: FIXME either convert _pose to Vector3 because
+  /// that's all we use here, or we need to use the rotational part
+  /// of _pose.
   // setting anchor relative to gazebo link frame pose
   if (this->childLink)
     this->anchorPos = (_pose + this->childLink->GetWorldPose()).pos;
@@ -127,7 +140,7 @@ void Joint::Init()
   this->Attach(this->parentLink, this->childLink);
 
   // Set the anchor vector
-  this->SetAnchor(0, this->anchorPos);
+  this->SetAnchor(0, this->anchorPos + this->childLink->GetWorldPose().pos);
 
   if (this->sdf->HasElement("axis"))
   {

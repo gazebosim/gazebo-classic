@@ -555,41 +555,66 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-JointWrench ODEJoint::GetForceTorque(int _index)
+JointWrench ODEJoint::GetForceTorque(int /*_index*/)
 {
   JointWrench wrench;
-  /// \todo: should check to see if this type of joint has _index
-  if (_index < 2)
+  // Note that:
+  // f2, t2 are the force torque measured on parent body's cg
+  // f1, t1 are the force torque measured on child body's cg
+  dJointFeedback* fb = this->GetFeedback();
+  wrench.body1Force = math::Vector3(fb->f1[0], fb->f1[1], fb->f1[2]);
+  wrench.body1Torque = math::Vector3(fb->t1[0], fb->t1[1], fb->t1[2]);
+  wrench.body2Force = math::Vector3(fb->f2[0], fb->f2[1], fb->f2[2]);
+  wrench.body2Torque = math::Vector3(fb->t2[0], fb->t2[1], fb->t2[2]);
+
   {
+    // convert torque from about child CG to joint anchor location
+    // cg position specified in child link frame
+    math::Vector3 cgPos = this->childLink->GetInertial()->GetPose().pos;
+    // moment arm rotated into world frame (given feedback is in world frame)
+    math::Vector3 childMomentArm =
+      this->childLink->GetWorldPose().rot.RotateVector(
+      this->anchorPos - cgPos);
 
-    dJointFeedback* fb = this->GetFeedback();
-    wrench.body1Force = math::Vector3(fb->f1[0], fb->f1[1], fb->f1[2]);
-    wrench.body2Force = math::Vector3(fb->f2[0], fb->f2[1], fb->f2[2]);
-    wrench.body1Torque = math::Vector3(fb->t1[0], fb->t1[1], fb->t1[2]);
-    wrench.body2Torque = math::Vector3(fb->t2[0], fb->t2[1], fb->t2[2]);
+    // gzerr << "anchor [" << anchorPos
+    //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
+    //       << "] childMomentArm[" << childMomentArm
+    //       << "] f1[" << wrench.body1Force
+    //       << "] t1[" << wrench.body1Torque
+    //       << "] fxp[" << wrench.body1Force.Cross(childMomentArm)
+    //       << "]\n";
 
-    math::Vector3 force = this->GetGlobalAxis(_index) * this->forceApplied[_index];
+    wrench.body1Torque += wrench.body1Force.Cross(childMomentArm);
+  }
 
-    // if hinge, this->forceApplied[_index] * axis + torque;
-    if (this->HasType(Base::HINGE_JOINT))
-    {
-      wrench.body1Torque += force;
-      wrench.body2Torque -= force;
-    }
-    // if slider, this->forceApplied[_index] * axis + forces;
-    else if (this->HasType(Base::SLIDER_JOINT))
-    {
-      wrench.body1Force += force;
-      wrench.body2Force -= force;
-    }
-    else
-    {
-      /// \todo: do the other joints
-    }
+
+  // convert torque from about parent CG to joint anchor location
+  if (this->parentLink)
+  {
+    // parent cg specified in child link frame
+    math::Vector3 cgPos = ((this->parentLink->GetInertial()->GetPose() +
+                          this->parentLink->GetWorldPose()) -
+                          this->childLink->GetWorldPose()).pos;
+
+    // rotate moement arms into world frame
+    math::Vector3 parentMomentArm =
+      this->childLink->GetWorldPose().rot.RotateVector(
+      this->anchorPos - cgPos);
+
+    wrench.body2Torque -= wrench.body2Force.Cross(parentMomentArm);
+
+    // A good check is that
+    // the computed body2Torque shoud in fact be opposite of body1Torque
   }
   else
   {
-    gzerr << "trying to get force with index [" << _index << "]\n";
+    // convert torque from about child CG to joint anchor location
+    // or simply use equal opposite force as body1 wrench
+    wrench.body2Force = -wrench.body1Force;
+    wrench.body2Torque = -wrench.body1Torque;
   }
+
+
+
   return wrench;
 }

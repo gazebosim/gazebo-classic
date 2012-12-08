@@ -42,7 +42,7 @@ void ForceTorquePlugin::Load(physics::ModelPtr _parent,
   //  the world name.
   this->world = _parent->GetWorld();
   this->model = _parent;
-  this->joint = this->model->GetJoint("model_with_fixed_joint::joint_1");
+  this->joints = this->model->GetJoints();
 
   // this->world->PhysicsEngine()->SetGravity(math::Vector3(0,0,0));
 
@@ -58,12 +58,25 @@ void ForceTorquePlugin::UpdateStates()
 {
   common::Time cur_time = this->world->GetSimTime();
 
-  // need to convert to joint frame
-  gzdbg << "  b1f [" << this->joint->GetForceTorque(0).body1Force
-        << "] b1t [" << this->joint->GetForceTorque(0).body1Torque
-        << "] b2f [" << this->joint->GetForceTorque(0).body2Force
-        << "] b2t [" << this->joint->GetForceTorque(0).body2Torque
-        << "]\n";
+  // convert to joint frame?
+
+  gzdbg << "-----------------------------------------------------\n";
+  for (unsigned int i = 0; i < this->joints.size(); ++i)
+  {
+    
+    if (i < 2)
+      this->joints[i]->SetForce(0, 1.0);
+
+
+    physics::JointWrench jw = this->joints[i]->GetForceTorque(0);
+    gzdbg << "model [" << this->model->GetName()
+          << "] joint [" << this->joints[i]->GetName()
+          << "] b1f [" << jw.body1Force
+          << "] b1t [" << jw.body1Torque
+          << "] b2f [" << jw.body2Force
+          << "] b2t [" << jw.body2Torque
+          << "]\n";
+  }
 }
 
 GZ_REGISTER_MODEL_PLUGIN(ForceTorquePlugin)

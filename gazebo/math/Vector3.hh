@@ -174,6 +174,13 @@ namespace gazebo
       /// \param[in] _v vector to add
       public: const Vector3 &operator+=(const Vector3 &_v);
 
+      /// \brief Negation operator
+      /// \return negative of this vector
+      public: inline Vector3 operator-() const
+              {
+                return Vector3(-this->x, -this->y, -this->z);
+              }
+
       /// \brief Subtraction operators
       /// \param[in] _pt a vector to substract
       /// \return a vector
