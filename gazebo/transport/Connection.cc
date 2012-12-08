@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <boost/lexical_cast.hpp>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -23,6 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include <boost/lexical_cast.hpp>
 
 #include "common/Console.hh"
 #include "msgs/msgs.hh"
