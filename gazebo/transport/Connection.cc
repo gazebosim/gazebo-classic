@@ -50,7 +50,7 @@ static bool addressIsUnspecified(const boost::asio::ip::address_v4 &_addr)
 // is stolen from adress::is_loopback function in boost v1.52.
 static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 {
- return (_addr.to_ulong() & 0xFF000000) == 0x7F000000;
+  return (_addr.to_ulong() & 0xFF000000) == 0x7F000000;
 }
 
 //////////////////////////////////////////////////
