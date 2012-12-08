@@ -17,6 +17,7 @@
 
 #include "PolylineItem.hh"
 #include "CornerGrabber.hh"
+#include "LineSegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -47,6 +48,18 @@ PolylineItem::~PolylineItem()
 /////////////////////////////////////////////////
 void PolylineItem::AddPoint(QPointF _point)
 {
+  QPointF lineEnd = _point - this->origin;
+  if (!corners.empty())
+  {
+
+    QPointF lineStart = this->mapToScene(corners.back()->pos())
+        + QPointF(this->cornerWidth/2.0, this->cornerHeight/2.0)
+        - this->origin;
+    LineSegmentItem *segment = new LineSegmentItem(this, this->segments.size());
+    segment->SetLine(lineStart, lineEnd);
+    this->segments.push_back(segment);
+  }
+
   CornerGrabber *corner = new CornerGrabber(this,
       static_cast<int>(corners.size()));
   this->corners.push_back(corner);
@@ -55,8 +68,6 @@ void PolylineItem::AddPoint(QPointF _point)
   this->cornerHeight = corner->boundingRect().height();
 
 //  this->SetVertexPosition(corners.size()-1, _point);
-
-  QPointF lineEnd = _point - this->origin;
 
   corner->setPos(lineEnd.x() - this->cornerWidth/2.0,
       lineEnd.y() - this->cornerHeight/2.0);
@@ -68,9 +79,20 @@ void PolylineItem::AddPoint(QPointF _point)
 void PolylineItem::PopEndPoint()
 {
   CornerGrabber *corner = this->corners.back();
-  this->scene()->removeItem(corner);
-  this->corners.pop_back();
-  delete corner;
+  if (corner)
+  {
+    this->scene()->removeItem(corner);
+    this->corners.pop_back();
+    delete corner;
+  }
+
+  LineSegmentItem *segment =  this->segments.back();
+  if (segment)
+  {
+    this->scene()->removeItem(segment);
+    this->segments.pop_back();
+    delete segment;
+  }
   this->UpdatePath();
 }
 
@@ -91,6 +113,11 @@ void PolylineItem::SetVertexPosition(unsigned int _index, QPointF _pos)
   this->corners[_index]->setPos(lineEnd.x() - this->cornerWidth/2.0,
       lineEnd.y() - this->cornerHeight/2.0);
 
+  if (_index != 0)
+    this->segments[_index-1]->SetEndPoint(lineEnd);
+  if (_index < this->segments.size())
+    this->segments[_index]->SetStartPoint(lineEnd);
+
   this->UpdatePathAt(_index, _pos);
 }
 
@@ -99,44 +126,62 @@ void PolylineItem::TranslateVertex(unsigned int _index, QPointF _trans)
 {
   if (_index >= this->corners.size())
     return;
-  QPointF newPos = this->corners[_index]->pos() + _trans;
 
+  QPointF newCornerPos = this->corners[_index]->pos() + _trans;
 
-  this->corners[_index]->setPos(newPos);
+  this->corners[_index]->setPos(newCornerPos);
+
   QPointF offset(this->cornerWidth/2.0, this->cornerHeight/2.0);
-  this->UpdatePathAt(_index, newPos + offset + this->origin);
+  if (_index != 0)
+    this->segments[_index-1]->SetEndPoint(newCornerPos + offset);
+  if (_index < this->segments.size())
+    this->segments[_index]->SetStartPoint(newCornerPos + offset);
+
+  this->UpdatePathAt(_index, newCornerPos + offset + this->origin);
 }
 
 /////////////////////////////////////////////////
 bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
     QEvent *_event)
 {
-  CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
-  if (corner == NULL) return false;
   QGraphicsSceneMouseEvent * event =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
   if (event == NULL)
     return false;
 
+  LineSegmentItem *segment = dynamic_cast<LineSegmentItem *>(_watched);
+  if (segment != NULL)
+    return this->segmentEventFilter(segment, event);
+
+  CornerGrabber *corner = dynamic_cast<CornerGrabber *>(_watched);
+  if (corner != NULL)
+    return this->cornerEventFilter(corner, event);
+
+  return false;
+}
+
+bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
+    QGraphicsSceneMouseEvent *_event)
+{
+  QPointF scenePosition =  _segment->mapToScene(_event->pos());
   switch (_event->type())
   {
     case QEvent::GraphicsSceneMousePress:
     {
-      corner->SetMouseState(CornerGrabber::kMouseDown);
-      QPointF scenePosition =  corner->mapToScene(event->pos());
-
-      corner->SetMouseDownX(scenePosition.x());
-      corner->SetMouseDownY(scenePosition.y());
+      _segment->SetMouseState(QEvent::GraphicsSceneMousePress);
+      _segment->SetMouseDownX(scenePosition.x());
+      _segment->SetMouseDownY(scenePosition.y());
+      this->segmentMouseMove = scenePosition;
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
-      corner->SetMouseState(CornerGrabber::kMouseReleased);
+      _segment->SetMouseState(QEvent::GraphicsSceneMouseRelease);
       break;
     }
     case QEvent::GraphicsSceneMouseMove:
     {
-      corner->SetMouseState(CornerGrabber::kMouseMoving );
+      _segment->SetMouseState(QEvent::GraphicsSceneMouseMove);
       break;
     }
     default:
@@ -145,11 +190,55 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
     }
   }
 
-  if (corner->GetMouseState() == CornerGrabber::kMouseMoving )
+  if (_segment->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    QPointF scenePosition = corner->mapToScene(event->pos());
+    QPointF trans = scenePosition - segmentMouseMove;
 
-    this->SetVertexPosition(corner->GetIndex(), scenePosition);
+    this->TranslateVertex(_segment->GetIndex(), trans);
+    this->TranslateVertex(_segment->GetIndex() + 1, trans);
+
+    this->segmentMouseMove = scenePosition;
+
+    this->update();
+  }
+  return true;
+}
+
+bool PolylineItem::cornerEventFilter(CornerGrabber* _corner,
+    QGraphicsSceneMouseEvent *_event)
+{
+  switch (_event->type())
+  {
+    case QEvent::GraphicsSceneMousePress:
+    {
+      _corner->SetMouseState(QEvent::GraphicsSceneMousePress);
+      QPointF scenePosition =  _corner->mapToScene(_event->pos());
+
+      _corner->SetMouseDownX(scenePosition.x());
+      _corner->SetMouseDownY(scenePosition.y());
+      break;
+    }
+    case QEvent::GraphicsSceneMouseRelease:
+    {
+      _corner->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      break;
+    }
+    case QEvent::GraphicsSceneMouseMove:
+    {
+      _corner->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  if (_corner->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  {
+    QPointF scenePosition = _corner->mapToScene(_event->pos());
+
+    this->SetVertexPosition(_corner->GetIndex(), scenePosition);
 
     this->update();
   }
@@ -232,6 +321,11 @@ void PolylineItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
   {
     this->corners[i]->removeSceneEventFilter(this);
   }
+
+  for (unsigned int i = 0; i < segments.size(); ++i)
+  {
+    this->segments[i]->removeSceneEventFilter(this);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -245,5 +339,10 @@ void PolylineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
   for (unsigned int i = 0; i < corners.size(); ++i)
   {
     this->corners[i]->installSceneEventFilter(this);
+  }
+
+  for (unsigned int i = 0; i < segments.size(); ++i)
+  {
+    this->segments[i]->installSceneEventFilter(this);
   }
 }

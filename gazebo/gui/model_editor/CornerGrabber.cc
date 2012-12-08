@@ -63,13 +63,13 @@ QPointF CornerGrabber::GetCenterPoint()
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownX(qreal _x)
+void CornerGrabber::SetMouseDownX(double _x)
 {
   this->mouseDownX = _x;
 }
 
 /////////////////////////////////////////////////
-void CornerGrabber::SetMouseDownY(qreal _y)
+void CornerGrabber::SetMouseDownY(double _y)
 {
   this->mouseDownY = _y;
 }

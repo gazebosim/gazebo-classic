@@ -16,6 +16,7 @@ set (sources
   DoorItem.cc
   PolylineItem.cc
   WallItem.cc
+  LineSegmentItem.cc
 )
 
 set (qt_headers
@@ -33,6 +34,7 @@ set (qt_headers
   DoorItem.hh
   PolylineItem.hh
   WallItem.hh
+  LineSegmentItem.hh
 )
 
 set (resources ../resources.qrc)

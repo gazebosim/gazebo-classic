@@ -16,7 +16,6 @@
 */
 
 #include "BuildingEditorWidget.hh"
-#include "SelectableLineSegment.hh"
 #include "GridLines.hh"
 #include "EditorView.hh"
 #include "RectItem.hh"

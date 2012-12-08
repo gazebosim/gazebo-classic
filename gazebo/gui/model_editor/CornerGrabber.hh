@@ -38,13 +38,13 @@ namespace gazebo
 
       public: QPointF GetCenterPoint();
 
-      public: void SetMouseDownX(qreal _x);
+      public: void SetMouseDownX(double _x);
 
-      public: void SetMouseDownY(qreal _y);
+      public: void SetMouseDownY(double _y);
 
-      public: qreal GetMouseDownX();
+      public: double GetMouseDownX();
 
-      public: qreal GetMouseDownY();
+      public: double GetMouseDownY();
 
       public: void WeldCorner(CornerGrabber *_corner);
 
@@ -76,16 +76,16 @@ namespace gazebo
 
       private: int index;
 
-      private: qreal mouseDownX;
+      private: double mouseDownX;
 
-      private: qreal mouseDownY;
+      private: double mouseDownY;
 
       /// \brief the hover event handlers will toggle this between red and black
       private: QColor outterBorderColor;
 
-      private: qreal width;
+      private: double width;
 
-      private: qreal height;
+      private: double height;
 
       private: int mouseButtonState;
 

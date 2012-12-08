@@ -17,6 +17,7 @@
 
 #include "PolylineItem.hh"
 #include "WallItem.hh"
+#include "LineSegmentItem.hh"
 #include "WallInspectorDialog.hh"
 
 using namespace gazebo;
@@ -31,16 +32,57 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 WallItem::~WallItem()
 {
 }
-
+/*
 /////////////////////////////////////////////////
-void WallItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
+bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
+    QGraphicsSceneMouseEvent *_event)
 {
-  WallInspectorDialog dialog;
-//  dialog.SetWidth(this->GetWidth());
-//  dialog.SetHeight(this->GetHeight());
-  if (dialog.exec() == QDialog::Accepted)
+  QPointF scenePosition =  _segment->mapToScene(_event->pos());
+  switch (_event->type())
   {
-//    this->SetSize(QSize(dialog.GetWidth(), dialog.GetHeight()));
+    case QEvent::GraphicsSceneMousePress:
+    {
+      _segment->SetMouseState(QEvent::GraphicsSceneMousePress);
+      _segment->SetMouseDownX(scenePosition.x());
+      _segment->SetMouseDownY(scenePosition.y());
+      this->segmentMouseMove = scenePosition;
+      break;
+    }
+    case QEvent::GraphicsSceneMouseRelease:
+    {
+      _segment->SetMouseState(QEvent::GraphicsSceneMouseRelease);
+      break;
+    }
+    case QEvent::GraphicsSceneMouseMove:
+    {
+      _segment->SetMouseState(QEvent::GraphicsSceneMouseMove);
+      break;
+    }
+    case QEvent::GraphicsSceneMouseDoubleClick:
+    {
+      WallInspectorDialog dialog;
+      if (dialog.exec() == QDialog::Accepted)
+      {
+      }
+      _segment->SetMouseState(QEvent::GraphicsSceneMouseDoubleClick);
+      break;
+    }
+    default:
+    {
+      break;
+    }
   }
-  _event->setAccepted(true);
-}
+
+  if (_segment->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  {
+    QPointF trans = scenePosition - segmentMouseMove;
+
+    this->TranslateVertex(_segment->GetIndex(), trans);
+    this->TranslateVertex(_segment->GetIndex() + 1, trans);
+
+    this->segmentMouseMove = scenePosition;
+
+    this->update();
+  }
+  return true;
+}*/

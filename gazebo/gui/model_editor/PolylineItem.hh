@@ -25,6 +25,7 @@ namespace gazebo
   namespace gui
   {
     class CornerGrabber;
+    class LineSegmentItem;
 
     class PolylineItem : public QGraphicsPathItem
     {
@@ -52,8 +53,14 @@ namespace gazebo
 
       private: void AppendToPath(QPointF _point);
 
-      private: bool sceneEventFilter(QGraphicsItem * watched,
-        QEvent *_event) ;
+      protected: bool sceneEventFilter(QGraphicsItem * watched,
+        QEvent *_event);
+
+      protected: virtual bool cornerEventFilter(CornerGrabber *_corner,
+          QGraphicsSceneMouseEvent *_event);
+
+      protected: virtual bool segmentEventFilter(LineSegmentItem *_item,
+          QGraphicsSceneMouseEvent *_event);
 
       private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
 
@@ -75,9 +82,13 @@ namespace gazebo
 
       private: std::vector<CornerGrabber*> corners;
 
+      private: std::vector<LineSegmentItem*> segments;
+
       private: int cornerWidth;
 
       private: int cornerHeight;
+
+      protected: QPointF segmentMouseMove;
     };
   }
 }

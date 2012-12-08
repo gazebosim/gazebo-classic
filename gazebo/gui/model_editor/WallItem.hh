@@ -25,6 +25,7 @@ namespace gazebo
   namespace gui
   {
     class PolylineItem;
+    class LineSegmentItem;
 
     class WallItem : public PolylineItem
     {
@@ -32,7 +33,8 @@ namespace gazebo
 
         public: ~WallItem();
 
-        private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+        //private: bool segmentEventFilter(LineSegmentItem *_segment,
+        //    QGraphicsSceneMouseEvent *_event);
     };
   }
 }
