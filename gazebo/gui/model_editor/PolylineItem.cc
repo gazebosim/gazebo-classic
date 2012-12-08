@@ -163,6 +163,7 @@ bool PolylineItem::sceneEventFilter(QGraphicsItem *_watched,
 bool PolylineItem::segmentEventFilter(LineSegmentItem *_segment,
     QGraphicsSceneMouseEvent *_event)
 {
+
   QPointF scenePosition =  _segment->mapToScene(_event->pos());
   switch (_event->type())
   {

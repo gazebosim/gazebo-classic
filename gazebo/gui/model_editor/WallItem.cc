@@ -29,10 +29,11 @@ WallItem::WallItem(QPointF _start, QPointF _end)
 {
 }
 
+/////////////////////////////////////////////////
 WallItem::~WallItem()
 {
 }
-/*
+
 /////////////////////////////////////////////////
 bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     QGraphicsSceneMouseEvent *_event)
@@ -85,4 +86,4 @@ bool WallItem::segmentEventFilter(LineSegmentItem *_segment,
     this->update();
   }
   return true;
-}*/
+}

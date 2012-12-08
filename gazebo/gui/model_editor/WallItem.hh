@@ -33,8 +33,8 @@ namespace gazebo
 
         public: ~WallItem();
 
-        //private: bool segmentEventFilter(LineSegmentItem *_segment,
-        //    QGraphicsSceneMouseEvent *_event);
+        private: bool segmentEventFilter(LineSegmentItem *_segment,
+            QGraphicsSceneMouseEvent *_event);
     };
   }
 }

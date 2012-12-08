@@ -53,13 +53,13 @@ namespace gazebo
 
       private: void AppendToPath(QPointF _point);
 
-      protected: bool sceneEventFilter(QGraphicsItem * watched,
+      private: bool sceneEventFilter(QGraphicsItem * watched,
         QEvent *_event);
 
-      protected: virtual bool cornerEventFilter(CornerGrabber *_corner,
+      private: virtual bool cornerEventFilter(CornerGrabber *_corner,
           QGraphicsSceneMouseEvent *_event);
 
-      protected: virtual bool segmentEventFilter(LineSegmentItem *_item,
+      private: virtual bool segmentEventFilter(LineSegmentItem *_item,
           QGraphicsSceneMouseEvent *_event);
 
       private: void hoverEnterEvent(QGraphicsSceneHoverEvent *_event);
