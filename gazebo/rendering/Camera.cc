@@ -415,7 +415,6 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
   if (this->animState)
     return;
 
-  std::cout << "SetWorldPosition[" << _pos << "]\n";
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
@@ -750,7 +749,7 @@ void Camera::SetSceneNode(Ogre::SceneNode *node)
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetSceneNode() const
 {
-  return this->pitchNode;
+  return this->sceneNode;
 }
 
 //////////////////////////////////////////////////

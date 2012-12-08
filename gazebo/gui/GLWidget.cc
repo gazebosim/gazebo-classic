@@ -661,16 +661,16 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  math::Vector3 pos(5, -5, 2);
+  math::Vector3 camPos(-10, 0, 2);
   math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = pos - lookAt;
+  math::Vector3 delta = lookAt - camPos;
 
-  double yaw = atan2(delta.x, delta.y);
-  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->userCamera->SetWorldPose(math::Pose(pos, math::Vector3(0, pitch, yaw)));
+  double yaw = atan2(delta.y, delta.x);
 
-  //this->userCamera->SetWorldPose(math::Pose(5, -5, 2, 0,
-  //                                          GZ_DTOR(11.31), GZ_DTOR(135)));
+  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  std::cout << "Yaw[" << GZ_RTOD(yaw) << "] Pitch[" << GZ_RTOD(pitch) << "]\n";
+  this->userCamera->SetWorldPose(math::Pose(camPos,
+        math::Vector3(0, pitch, yaw)));
 
   if (this->windowId >= 0)
   {
