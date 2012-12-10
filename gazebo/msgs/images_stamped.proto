@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ImagesStamped
+/// \brief Message for a multiple image with a time
+
+
+import "time.proto";
+import "image.proto";
+
+message ImagesStamped
+{
+  // Time when all the images were captured
+  required Time time          = 1;
+  repeated Image image        = 2;
+}
