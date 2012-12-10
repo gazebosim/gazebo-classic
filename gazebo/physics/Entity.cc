@@ -312,9 +312,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
       EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
-      {
         entity->worldPose = (entity->initialRelativePose + _pose);
-      }
       else
       {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
@@ -404,11 +402,10 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
 {
-  this->GetWorld()->GetSetWorldPoseMutex()->lock();
+  boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
 
+  math::Pose oldPose = this->worldPose;
   (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
-
-  this->GetWorld()->GetSetWorldPoseMutex()->unlock();
 
   if (_publish)
     this->PublishPose();
