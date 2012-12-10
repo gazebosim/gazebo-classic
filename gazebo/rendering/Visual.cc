@@ -1215,10 +1215,6 @@ void Visual::SetRotation(const math::Quaternion &_rot)
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
-  if (this->GetName() == "box::link::collision")
-    printf("Here\n");
-
-  std::cout << "Visual[" << this->GetName() << "] SetPose[" << _pose << "]\n";
   this->SetPosition(_pose.pos);
   this->SetRotation(_pose.rot);
 }
@@ -1247,8 +1243,6 @@ math::Pose Visual::GetPose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose _pose)
 {
-  std::cout << "Visual[" << this->GetName() << "] SetWPose[" << _pose << "]\n";
-
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
 }
@@ -1256,7 +1250,6 @@ void Visual::SetWorldPose(const math::Pose _pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
-  std::cout << "Visual[" << this->GetName() << "] SetWPos[" << _pos << "]\n";
   this->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 

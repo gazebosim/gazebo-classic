@@ -728,7 +728,6 @@ double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
   if (this->terrain)
   {
     double terrainHeight = this->terrain->GetHeight(_pt.x, _pt.y, _pt.z);
-    std::cout << "Terrain Heihgt[" << terrainHeight << "]\n";
     if (terrainHeight <= _pt.z)
       height = std::max(height, terrainHeight);
   }

@@ -831,8 +831,6 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     return;
   }
 
-  std::cout << "Model::ProcessMsg[" << _msg.DebugString() << "]\n";
-
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
     this->SetWorldPose(msgs::Convert(_msg.pose()));
