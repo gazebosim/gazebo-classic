@@ -24,6 +24,7 @@ set (msgs
   imagegeom.proto
   image.proto
   image_stamped.proto
+  images_stamped.proto
   imu.proto
   inertial.proto
   int.proto
