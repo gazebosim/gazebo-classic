@@ -43,6 +43,8 @@
 #include "physics/Model.hh"
 #include "physics/Contact.hh"
 
+#include "sensors/SensorManager.hh"
+
 #include "transport/Node.hh"
 
 using namespace gazebo;
@@ -678,14 +680,38 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
-  // Load the plugins
-  if (this->sdf->HasElement("plugin"))
+  // Check to see if we need to load any model plugins
+  if (this->GetPluginCount() > 0)
   {
-    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-    while (pluginElem)
+    int iterations = 0;
+
+    // Wait for the sensors to be initialized before loading
+    // plugins, if there are any sensors
+    while (this->GetSensorCount() > 0 &&
+        !sensors::SensorManager::Instance()->SensorsInitialized() &&
+        iterations < 50)
     {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
+      common::Time::MSleep(100);
+      iterations++;
+    }
+
+    // Load the plugins if the sensors have been loaded, or if there
+    // are no sensors attached to the model.
+    if (iterations < 50)
+    {
+      // Load the plugins
+      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        this->LoadPlugin(pluginElem);
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+    }
+    else
+    {
+      gzerr << "Sensors failed to initialize when loading model["
+        << this->GetName() << "] via the factory mechanism."
+        << "Plugins for the model will not be loaded.\n";
     }
   }
 }
