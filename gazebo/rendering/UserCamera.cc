@@ -58,6 +58,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->viewController = NULL;
 
   this->selectionBuffer = NULL;
+  // Set default UserCamera render rate to 30Hz
+  this->SetRenderRate(30.0);
 }
 
 //////////////////////////////////////////////////

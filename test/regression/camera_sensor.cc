@@ -40,27 +40,70 @@ void OnNewCameraFrame(const unsigned char *_image,
   image_count+= 1;
 }
 
-TEST_F(CameraSensor, EmptyWorld)
+TEST_F(CameraSensor, CheckThrottle)
 {
   // spawn sensors of various sizes to test speed
   {
-    Load("worlds/empty.world");
+    Load("worlds/empty_test.world");
     std::string modelName = "camera_model";
     std::string cameraName = "camera_sensor";
     unsigned int width  = 320;
     unsigned int height = 240;  // 106 fps
-    width  = 640;
-    height = 480;  // 80.25 fps
-    width  = 1280;
-    height = 960;  // 41.19 fps
+    double updateRate = 10;
     math::Pose setPose, testPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
     SpawnCamera(modelName, cameraName, setPose.pos,
-        setPose.rot.GetAsEuler(), width, height, 100000);
-
+        setPose.rot.GetAsEuler(), width, height, updateRate);
     sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
     sensors::CameraSensorPtr camSensor =
       boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    image_count = 0;
+    img = new unsigned char[width * height*3];
+    event::ConnectionPtr c =
+      camSensor->GetCamera()->ConnectNewImageFrame(
+          boost::bind(&::OnNewCameraFrame,
+                      _1, _2, _3, _4, _5));
+    common::Timer timer;
+    timer.Start();
+
+    // time how long it takes to get 50 images @ 10Hz
+    int total_images = 50;
+
+    while (image_count < total_images)
+      common::Time::MSleep(10);
+    common::Time dt = timer.GetElapsed();
+    double rate = static_cast<double>(total_images)/dt.Double();
+    gzdbg << "timer [" << dt.Double()
+          << "] seconds rate [" << rate
+          << "] fps\n";
+    EXPECT_GT(rate, 9.0);
+    EXPECT_LT(rate, 11.0);
+    camSensor->GetCamera()->DisconnectNewImageFrame(c);
+    delete img;
+    Unload();
+  }
+}
+
+TEST_F(CameraSensor, UnlimitedTest)
+{
+  // spawn sensors of various sizes to test speed
+  {
+    Load("worlds/empty_test.world");
+    std::string modelName = "camera_model";
+    std::string cameraName = "camera_sensor";
+
+    // test resolution, my machine gets about 106 fps
+    unsigned int width  = 320;
+    unsigned int height = 240;
+    double updateRate = 0;
+    math::Pose setPose, testPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+    SpawnCamera(modelName, cameraName, setPose.pos,
+        setPose.rot.GetAsEuler(), width, height, updateRate);
+    sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+    sensors::CameraSensorPtr camSensor =
+      boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    image_count = 0;
     img = new unsigned char[width * height*3];
     event::ConnectionPtr c =
       camSensor->GetCamera()->ConnectNewImageFrame(
@@ -69,14 +112,107 @@ TEST_F(CameraSensor, EmptyWorld)
     common::Timer timer;
     timer.Start();
     // time how long it takes to get N images
-    int total_images = 2500;
+    int total_images = 500;
     while (image_count < total_images)
       common::Time::MSleep(10);
     common::Time dt = timer.GetElapsed();
-    gzerr << "timer [" << dt.Double()
-          << "] seconds rate [" << static_cast<double>(total_images)/dt.Double()
+    double rate = static_cast<double>(total_images)/dt.Double();
+    gzdbg << "timer [" << dt.Double()
+          << "] seconds rate [" << rate
           << "] fps\n";
     camSensor->GetCamera()->DisconnectNewImageFrame(c);
+    EXPECT_GT(rate, 50.0);
+
+    delete img;
+    Unload();
+  }
+}
+
+TEST_F(CameraSensor, MultiSenseHigh)
+{
+  // spawn sensors of various sizes to test speed
+  {
+    Load("worlds/empty_test.world");
+    std::string modelName = "camera_model";
+    std::string cameraName = "camera_sensor";
+
+    // nominal resolution of multisense
+    unsigned int width  = 2048;
+    unsigned int height = 1088;
+    double updateRate = 25;
+    math::Pose setPose, testPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+    SpawnCamera(modelName, cameraName, setPose.pos,
+        setPose.rot.GetAsEuler(), width, height, updateRate);
+    sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+    sensors::CameraSensorPtr camSensor =
+      boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    image_count = 0;
+    img = new unsigned char[width * height*3];
+    event::ConnectionPtr c =
+      camSensor->GetCamera()->ConnectNewImageFrame(
+          boost::bind(&::OnNewCameraFrame,
+                      _1, _2, _3, _4, _5));
+    common::Timer timer;
+    timer.Start();
+    // time how long it takes to get N images
+    int total_images = 500;
+    while (image_count < total_images)
+      common::Time::MSleep(10);
+    common::Time dt = timer.GetElapsed();
+    double rate = static_cast<double>(total_images)/dt.Double();
+    gzdbg << "timer [" << dt.Double()
+          << "] seconds rate [" << rate
+          << "] fps\n";
+    camSensor->GetCamera()->DisconnectNewImageFrame(c);
+    EXPECT_GT(rate, 24.0);
+    EXPECT_LT(rate, 25.0);
+
+    delete img;
+    Unload();
+  }
+}
+
+TEST_F(CameraSensor, MultiSenseLow)
+{
+  // spawn sensors of various sizes to test speed
+  {
+    Load("worlds/empty_test.world");
+    std::string modelName = "camera_model";
+    std::string cameraName = "camera_sensor";
+
+    // lower resolution of multisense
+    unsigned int width  = 1024;
+    unsigned int height = 544;
+    double updateRate = 25;
+    math::Pose setPose, testPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+    SpawnCamera(modelName, cameraName, setPose.pos,
+        setPose.rot.GetAsEuler(), width, height, updateRate);
+    sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+    sensors::CameraSensorPtr camSensor =
+      boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+    image_count = 0;
+    img = new unsigned char[width * height*3];
+    event::ConnectionPtr c =
+      camSensor->GetCamera()->ConnectNewImageFrame(
+          boost::bind(&::OnNewCameraFrame,
+                      _1, _2, _3, _4, _5));
+    common::Timer timer;
+    timer.Start();
+    // time how long it takes to get N images
+    int total_images = 500;
+    while (image_count < total_images)
+      common::Time::MSleep(10);
+    common::Time dt = timer.GetElapsed();
+    double rate = static_cast<double>(total_images)/dt.Double();
+    gzdbg << "timer [" << dt.Double()
+          << "] seconds rate [" << rate
+          << "] fps\n";
+    camSensor->GetCamera()->DisconnectNewImageFrame(c);
+    EXPECT_GT(rate, 24.0);
+    EXPECT_LT(rate, 25.0);
+
     delete img;
     Unload();
   }
