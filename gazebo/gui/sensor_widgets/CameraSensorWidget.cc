@@ -47,7 +47,6 @@ CameraSensorWidget::CameraSensorWidget(QWidget *_parent)
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  // this->pub = this->node->Advertise<msgs::Sky>("~/sky");
 }
 
 /////////////////////////////////////////////////

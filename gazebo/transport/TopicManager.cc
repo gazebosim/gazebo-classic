@@ -354,6 +354,21 @@ void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 }
 
 //////////////////////////////////////////////////
+std::map<std::string, std::list<std::string> >
+TopicManager::GetAdvertisedTopics() const
+{
+  std::map<std::string, std::list<std::string> > result;
+
+  for(PublicationPtr_M::const_iterator iter = this->advertisedTopics.begin();
+      iter != this->advertisedTopics.end(); ++iter)
+  {
+    result[iter->second->GetMsgType()].push_back(iter->first);
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 void TopicManager::ClearBuffers()
 {
   PublicationPtr_M::iterator iter;

@@ -52,6 +52,8 @@ namespace gazebo
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
+      private slots: void Select();
+
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
@@ -105,6 +107,8 @@ namespace gazebo
       private: QMenu *viewMenu;
       private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
+
+      private: QAction *testAction;
 
       private: RenderWidget *renderWidget;
       private: ToolsWidget *toolsWidget;

@@ -222,6 +222,12 @@ namespace gazebo
       /// \param[out] _namespaces The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
+      /// \brief Get a list of all the topics
+      /// \return A map where keys are message types, and values are a list
+      /// of topic names.
+      public: std::map<std::string, std::list<std::string> >
+              GetAdvertisedTopics() const;
+
       /// \brief Clear all buffers
       public: void ClearBuffers();
 

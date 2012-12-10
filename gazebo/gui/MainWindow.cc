@@ -15,6 +15,8 @@
  *
  */
 
+#include "gui/TopicSelector.hh"
+
 #include "gazebo.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -29,7 +31,6 @@
 #include "gui/Actions.hh"
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
-#include "gui/SkyWidget.hh"
 #include "gui/ModelListWidget.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/ToolsWidget.hh"
@@ -203,6 +204,13 @@ void MainWindow::New()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Select()
+{
+  TopicSelector *selector = new TopicSelector(this);
+  selector->show();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Open()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
@@ -238,9 +246,23 @@ void MainWindow::Import()
 /////////////////////////////////////////////////
 void MainWindow::Save()
 {
-  msgs::ServerControl msg;
-  msg.set_save_world_name(get_world());
-  this->serverControlPub->Publish(msg);
+  /*boost::shared_ptr<msgs::Response> response;
+  response = transport::request(this->node, "world_sdf");
+
+  msgs::GzString strMsg;
+  if (response.response() != "error" &&
+      response.type() == strMsg.GetTypeName())
+  {
+    strMsg.ParseFromString(response.serialized_data());
+
+    std::ofstream out(this->filename.c_str(), "w");
+    out << this->filename;
+    out.close();
+  }
+  else
+  {
+    gzerr << "Unable to get SDF from server.\n";
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -475,6 +497,12 @@ void MainWindow::CreateActions()
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
   */
 
+  this->testAction = new QAction(tr("Select topic"), this);
+  this->testAction->setShortcut(tr("Ctrl+T"));
+  this->testAction->setStatusTip(tr("Select a topic"));
+  connect(this->testAction, SIGNAL(triggered()), this, SLOT(Select()));
+
+
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
@@ -486,12 +514,10 @@ void MainWindow::CreateActions()
   connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
   */
 
-  /*
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
   connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
-  */
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
@@ -660,10 +686,11 @@ void MainWindow::CreateMenus()
   this->setMenuWidget(frame);
 
   this->fileMenu = this->menuBar->addMenu(tr("&File"));
-  // this->fileMenu->addAction(g_openAct);
+  this->fileMenu->addAction(this->testAction);
+  this->fileMenu->addAction(g_openAct);
   // this->fileMenu->addAction(g_importAct);
   // this->fileMenu->addAction(g_newAct);
-  // this->fileMenu->addAction(g_saveAct);
+  this->fileMenu->addAction(g_saveAct);
   this->fileMenu->addAction(g_saveAsAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(g_quitAct);

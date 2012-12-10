@@ -32,6 +32,7 @@ set (sources
   ModelRightMenu.cc
   JointControlWidget.cc
   ToolsWidget.cc
+  TopicSelector.cc
   sensor_widgets/CameraSensorWidget.cc
 )
 
@@ -47,6 +48,7 @@ set (qt_headers
   ModelRightMenu.hh
   JointControlWidget.hh
   ToolsWidget.hh
+  TopicSelector.hh
   sensor_widgets/CameraSensorWidget.hh
 )
 
