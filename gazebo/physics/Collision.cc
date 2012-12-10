@@ -301,6 +301,9 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->shape->FillMsg(*_msg.mutable_geometry());
   this->surface->FillMsg(*_msg.mutable_surface());
 
+  if (this->GetName() == "collision")
+    std::cout << "FillMsg[" << this->GetRelativePose() << "]\n";
+
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
   _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());

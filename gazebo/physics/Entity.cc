@@ -299,22 +299,37 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 
   // force an update of all children
   // update all children pose, moving them with the model.
+  // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-       iter != this->childrenEnd; ++iter)
+      iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
       EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
-      {
         entity->worldPose = (entity->initialRelativePose + _pose);
-      }
       else
       {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
         if (_publish)
           entity->PublishPose();
+      }
+
+      // The inner loop updates all the collisions.
+      for (Base_V::iterator iter2 = entity->children.begin();
+          iter2 != entity->childrenEnd; ++iter2)
+      {
+        if (!(*iter2)->HasType(ENTITY))
+          continue;
+
+        EntityPtr entity2 = boost::shared_static_cast<Entity>(*iter2);
+
+        std::cout << "::SetWorldPoseModel. Entity[" << entity2->GetName() << "]\n";
+
+        entity2->worldPose = ((entity2->worldPose - oldModelWorldPose) + _pose);
+        if (_publish)
+          entity2->PublishPose();
       }
 
       if (_notify)
