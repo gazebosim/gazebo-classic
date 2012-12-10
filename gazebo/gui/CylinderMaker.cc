@@ -186,7 +186,7 @@ std::string CylinderMaker::GetSDFString()
   std::ostringstream newModelStr;
 
   newModelStr
-    << "<sdf version ='1.2'>"
+    << "<sdf version ='1.3'>"
     << "  <model name ='unit_cylinder_" << counter << "'>"
     << "    <pose>0 0 0.5 0 0 0</pose>"
     << "    <link name='link'>"
