@@ -130,6 +130,7 @@
             <upper>0</upper>
             <effort>0</effort>
             <velocity>0</velocity>
+          </limit>
           <xyz>0 0 1</xyz>
         </axis>
       </joint>
