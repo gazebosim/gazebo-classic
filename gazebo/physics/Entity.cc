@@ -226,7 +226,11 @@ void Entity::PublishPose()
 //////////////////////////////////////////////////
 math::Pose Entity::GetRelativePose() const
 {
-  if (this->IsCanonicalLink())
+  // We return the initialRelativePose for COLLISION objects because they
+  // cannot move relative to their parent link.
+  // \todo Look into storing relative poses for all objects instead of world
+  // poses. It may simplify pose updating.
+  if (this->IsCanonicalLink() || this->HasType(COLLISION))
   {
     return this->initialRelativePose;
   }
@@ -314,22 +318,6 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
         if (_publish)
           entity->PublishPose();
-      }
-
-      // The inner loop updates all the collisions.
-      for (Base_V::iterator iter2 = entity->children.begin();
-          iter2 != entity->childrenEnd; ++iter2)
-      {
-        if (!(*iter2)->HasType(ENTITY))
-          continue;
-
-        EntityPtr entity2 = boost::shared_static_cast<Entity>(*iter2);
-
-        std::cout << "::SetWorldPoseModel. Entity[" << entity2->GetName() << "]\n";
-
-        entity2->worldPose = ((entity2->worldPose - oldModelWorldPose) + _pose);
-        if (_publish)
-          entity2->PublishPose();
       }
 
       if (_notify)
